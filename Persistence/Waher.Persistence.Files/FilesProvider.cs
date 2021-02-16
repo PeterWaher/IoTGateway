@@ -7,6 +7,7 @@ using System.Xml;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Runtime.Cache;
+using Waher.Runtime.Profiling;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Statistics;
@@ -162,7 +163,7 @@ namespace Waher.Persistence.Files
 			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted)
 		{
 			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  Encrypted, true, null);
+				  Encrypted, true, null, null);
 		}
 #endif
 		/// <summary>
@@ -186,7 +187,7 @@ namespace Waher.Persistence.Files
 			Encoding Encoding, int TimeoutMilliseconds, CustomKeyHandler CustomKeyMethod)
 		{
 			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  !(CustomKeyMethod is null), true, CustomKeyMethod);
+				  !(CustomKeyMethod is null), true, CustomKeyMethod, null);
 		}
 
 		/// <summary>
@@ -209,7 +210,7 @@ namespace Waher.Persistence.Files
 			Encoding Encoding, int TimeoutMilliseconds)
 		{
 			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				false, false, null);
+				false, false, null, null);
 		}
 
 #if NETSTANDARD1_5
@@ -235,7 +236,7 @@ namespace Waher.Persistence.Files
 			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Compiled)
 		{
 			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  Encrypted, Compiled, null);
+				  Encrypted, Compiled, null, null);
 		}
 
 		/// <summary>
@@ -260,20 +261,155 @@ namespace Waher.Persistence.Files
 			Encoding Encoding, int TimeoutMilliseconds, CustomKeyHandler CustomKeyMethod, bool Compiled)
 		{
 			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  !(CustomKeyMethod is null), Compiled, CustomKeyMethod);
+				  !(CustomKeyMethod is null), Compiled, CustomKeyMethod, null);
+		}
+
+		/// <summary>
+		/// Persists objects into binary files.
+		/// </summary>
+		/// <param name="Folder">Folder to store data files.</param>
+		/// <param name="DefaultCollectionName">Default collection name.</param>
+		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
+		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
+		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
+		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
+		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
+		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
+		/// of a doubly linked list of blocks of this size.</param>
+		/// <param name="Encoding">Encoding to use for text properties.</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+		/// <param name="Thread">Profiling thread. If provided, will be used to indicate events during setup of provider.</param>
+		public static Task<FilesProvider> CreateAsync(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
+			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, ProfilerThread Thread)
+		{
+			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
+				  Encrypted, true, null, Thread);
+		}
+#endif
+		/// <summary>
+		/// Persists objects into binary files.
+		/// </summary>
+		/// <param name="Folder">Folder to store data files.</param>
+		/// <param name="DefaultCollectionName">Default collection name.</param>
+		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
+		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
+		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
+		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
+		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
+		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
+		/// of a doubly linked list of blocks of this size.</param>
+		/// <param name="Encoding">Encoding to use for text properties.</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+		/// <param name="CustomKeyMethod">Custom method to get keys for encrypted files. (Implies encrypted files)</param>
+		/// <param name="Thread">Profiling thread. If provided, will be used to indicate events during setup of provider.</param>
+		public static Task<FilesProvider> CreateAsync(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
+			Encoding Encoding, int TimeoutMilliseconds, CustomKeyHandler CustomKeyMethod, ProfilerThread Thread)
+		{
+			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
+				  !(CustomKeyMethod is null), true, CustomKeyMethod, Thread);
+		}
+
+		/// <summary>
+		/// Persists objects into binary files.
+		/// </summary>
+		/// <param name="Folder">Folder to store data files.</param>
+		/// <param name="DefaultCollectionName">Default collection name.</param>
+		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
+		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
+		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
+		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
+		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
+		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
+		/// of a doubly linked list of blocks of this size.</param>
+		/// <param name="Encoding">Encoding to use for text properties.</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+		/// <param name="Thread">Profiling thread. If provided, will be used to indicate events during setup of provider.</param>
+		public static Task<FilesProvider> CreateAsync(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
+			Encoding Encoding, int TimeoutMilliseconds, ProfilerThread Thread)
+		{
+			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
+				false, false, null, Thread);
+		}
+
+#if NETSTANDARD1_5
+		/// <summary>
+		/// Persists objects into binary files.
+		/// </summary>
+		/// <param name="Folder">Folder to store data files.</param>
+		/// <param name="DefaultCollectionName">Default collection name.</param>
+		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
+		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
+		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
+		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
+		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
+		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
+		/// of a doubly linked list of blocks of this size.</param>
+		/// <param name="Encoding">Encoding to use for text properties.</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+		/// <param name="Compiled">If object serializers should be compiled or not.</param>
+		/// <param name="Thread">Profiling thread. If provided, will be used to indicate events during setup of provider.</param>
+		public static Task<FilesProvider> CreateAsync(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
+			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Compiled, ProfilerThread Thread)
+		{
+			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
+				  Encrypted, Compiled, null, Thread);
+		}
+
+		/// <summary>
+		/// Persists objects into binary files.
+		/// </summary>
+		/// <param name="Folder">Folder to store data files.</param>
+		/// <param name="DefaultCollectionName">Default collection name.</param>
+		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
+		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
+		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
+		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
+		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
+		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
+		/// of a doubly linked list of blocks of this size.</param>
+		/// <param name="Encoding">Encoding to use for text properties.</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+		/// <param name="CustomKeyMethod">Custom method to get keys for encrypted files. (Implies encrypted files)</param>
+		/// <param name="Compiled">If object serializers should be compiled or not.</param>
+		/// <param name="Thread">Profiling thread. If provided, will be used to indicate events during setup of provider.</param>
+		public static Task<FilesProvider> CreateAsync(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
+			Encoding Encoding, int TimeoutMilliseconds, CustomKeyHandler CustomKeyMethod, bool Compiled, ProfilerThread Thread)
+		{
+			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
+				  !(CustomKeyMethod is null), Compiled, CustomKeyMethod, Thread);
 		}
 #endif
 		private async static Task<FilesProvider> CreateAsync(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
-			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Compiled, CustomKeyHandler CustomKeyMethod)
+			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Compiled, CustomKeyHandler CustomKeyMethod, ProfilerThread Thread)
 		{
+			Thread?.Start();
+			Thread?.NewState("Create");
+
 			FilesProvider Result = new FilesProvider(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize,
 				Encoding, TimeoutMilliseconds, Encrypted, Compiled, CustomKeyMethod);
 
+			Thread?.NewState("Master");
 			Result.master = await StringDictionary.Create(Result.folder + "Files.master", string.Empty, string.Empty, Result, false);
 
+			Thread?.NewState("Default");
 			await Result.GetFile(Result.defaultCollectionName);
+
+			Thread?.NewState("Config");
 			await Result.LoadConfiguration();
 
+			Thread?.Stop();
 			return Result;
 		}
 

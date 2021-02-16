@@ -1,58 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
+using System.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Order;
+using Waher.Script.Objects;
+using Waher.Script.Persistence.Functions;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
 	/// <summary>
-	/// Data Source defined by a vector.
+	/// Data Source defined by XML.
 	/// </summary>
-	public class VectorSource : IDataSource
+	public class XmlSource : IDataSource
 	{
-		private readonly Dictionary<Type, bool> types = new Dictionary<Type, bool>();
-		private readonly Dictionary<string, bool> isLabel = new Dictionary<string, bool>();
-		private readonly IVector vector;
+		private readonly XmlDocument xmlDocument;
+		private readonly XmlNode xmlNode;
 		private readonly ScriptNode node;
 		private readonly string name;
 		private readonly string alias;
 
 		/// <summary>
-		/// Data Source defined by a vector.
+		/// Data Source defined by XML.
 		/// </summary>
 		/// <param name="Name">Name of source.</param>
 		/// <param name="Alias">Alias for source.</param>
-		/// <param name="Vector">Vector</param>
+		/// <param name="Xml">XML</param>
 		/// <param name="Node">Node defining the vector.</param>
-		public VectorSource(string Name, string Alias, IVector Vector, ScriptNode Node)
+		public XmlSource(string Name, string Alias, XmlDocument Xml, ScriptNode Node)
 		{
-			this.vector = Vector;
+			this.xmlDocument = Xml;
+			this.xmlNode = null;
 			this.node = Node;
 			this.name = Name;
 			this.alias = Alias;
-
-			Type LastType = null;
-			Type T;
-
-			foreach (IElement E in Vector.ChildElements)
-			{
-				T = E.AssociatedObjectValue?.GetType();
-				if (T is null || T == LastType)
-					continue;
-
-				LastType = T;
-				this.types[T] = true;
-			}
 		}
 
 		/// <summary>
-		/// Vector
+		/// Data Source defined by XML.
 		/// </summary>
-		public IVector Vector => this.vector;
+		/// <param name="Name">Name of source.</param>
+		/// <param name="Alias">Alias for source.</param>
+		/// <param name="Xml">XML</param>
+		/// <param name="Node">Node defining the vector.</param>
+		public XmlSource(string Name, string Alias, XmlNode Xml, ScriptNode Node)
+		{
+			this.xmlDocument = null;
+			this.xmlNode = Xml;
+			this.node = Node;
+			this.name = Name;
+			this.alias = Alias;
+		}
 
 		/// <summary>
 		/// Finds objects matching filter conditions in <paramref name="Where"/>.
@@ -67,63 +66,24 @@ namespace Waher.Script.Persistence.SQL.Sources
 		public Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
-			return Find(this.vector, Offset, Top, Where, Variables, Order, Node);
-		}
+			XPath WhereXPath = Where as XPath;
+			if (WhereXPath is null && !(Where is null))
+				throw new ScriptRuntimeException("WHERE clause must use an XPATH expression when selecting nodes from XML.", Where);
 
-		internal static async Task<IResultSetEnumerator> Find(IVector Vector, int Offset, int Top, ScriptNode Where, Variables Variables,
-			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
-		{ 
-			IResultSetEnumerator e = new SynchEnumerator(Vector.VectorElements.GetEnumerator());
-			int i, c;
+			IElement Obj;
 
-			if (!(Where is null))
-				e = new ConditionalEnumerator(e, Variables, Where);
-
-			if ((c = Order?.Length ?? 0) > 0)
+			if (WhereXPath is null)
+				Obj = new ObjectValue(this.xmlDocument ?? this.xmlNode);
+			else
 			{
-				List<IElement> Items = new List<IElement>();
-
-				while (await e.MoveNextAsync())
-				{
-					if (e.Current is Element E)
-						Items.Add(E);
-					else
-						Items.Add(Expression.Encapsulate(e.Current));
-				}
-
-				Items.Add(e.Current as IElement);
-
-				IComparer<IElement> Order2;
-
-				if (c == 1)
-					Order2 = ToPropertyOrder(Node, Order[0]);
-				else
-				{
-					IComparer<IElement>[] Orders = new IComparer<IElement>[c];
-
-					for (i = 0; i < c; i++)
-						Orders[i] = ToPropertyOrder(Node, Order[i]);
-
-					Order2 = new CompoundOrder(Orders);
-				}
-
-				Items.Sort(Order2);
-
-				e = new SynchEnumerator(Items.GetEnumerator());
+				ObjectProperties P = new ObjectProperties(this.xmlDocument ?? this.xmlNode, Variables);
+				Obj = WhereXPath.Evaluate(P);
 			}
 
-			if (Offset > 0)
-				e = new OffsetEnumerator(e, Offset);
+			if (!(Obj is IVector Vector))
+				Vector = Operators.Vectors.VectorDefinition.Encapsulate(new IElement[] { Obj }, false, Node);
 
-			if (Top != int.MaxValue)
-				e = new MaxCountEnumerator(e, Top);
-
-			return e;
-		}
-
-		private static PropertyOrder ToPropertyOrder(ScriptNode Node, KeyValuePair<VariableReference, bool> Order)
-		{
-			return new PropertyOrder(Node, Order.Key.VariableName, Order.Value ? 1 : -1);
+			return VectorSource.Find(Vector, Offset, Top, null, Variables, Order, Node);
 		}
 
 		/// <summary>
@@ -207,27 +167,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <returns>If the label is a label in the source.</returns>
 		public Task<bool> IsLabel(string Label)
 		{
-			lock (this.isLabel)
-			{
-				if (!this.isLabel.TryGetValue(Label, out bool Result))
-				{
-					Result = false;
-
-					foreach (Type T in this.types.Keys)
-					{
-						if (!(T.GetRuntimeProperty(Label) is null &&
-							T.GetRuntimeField(Label) is null))
-						{
-							Result = true;
-							break;
-						}
-					}
-
-					this.isLabel[Label] = Result;
-				}
-
-				return Task.FromResult<bool>(Result);
-			}
+			return Task.FromResult<bool>(false);
 		}
 
 		/// <summary>

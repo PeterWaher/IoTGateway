@@ -197,6 +197,7 @@
 	<Assembly fileName='System.Xml.XmlSerializer.dll'/>
 	<Assembly fileName='System.Xml.XPath.dll'/>
 	<Assembly fileName='System.Xml.XPath.XDocument.dll'/>
+	<Assembly fileName='System.Xml.XPath.XmlDocument.dll'/>
 	<Assembly fileName='clrcompression.dll' />
 	<Assembly fileName='clrcompression.dll'/>
 	<Assembly fileName='clretwrc.dll'/>

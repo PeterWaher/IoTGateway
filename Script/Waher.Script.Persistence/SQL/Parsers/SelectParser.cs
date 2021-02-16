@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Functions.Vectors;
 using Waher.Script.Operators.Membership;
+using Waher.Script.Persistence.Functions;
 using Waher.Script.Persistence.SQL.SourceDefinitions;
 
 namespace Waher.Script.Persistence.SQL.Parsers
@@ -88,11 +90,22 @@ namespace Waher.Script.Persistence.SQL.Parsers
 					Columns = new List<ScriptNode>();
 					ColumnNames = new List<ScriptNode>();
 
+					ScriptNode Node;
+					ScriptNode Name;
+
 					while (true)
 					{
-						ScriptNode Node = Parser.ParseNoWhiteSpace();
-						ScriptNode Name = null;
+						if (s == "/")
+							Node = ParseXPath(Parser, true);
+						else
+						{
+							Node = Parser.ParseNoWhiteSpace();
 
+							if (Node is XPath XPath)
+								XPath.ExtractValue = true;
+						}
+
+						Name = null;
 						Parser.SkipWhiteSpace();
 
 						s = Parser.PeekNextToken().ToUpper();
@@ -116,6 +129,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 							break;
 
 						Parser.NextToken();
+						s = Parser.PeekNextToken();
 					}
 				}
 
@@ -132,7 +146,13 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				if (s == "WHERE")
 				{
 					Parser.NextToken();
-					Where = Parser.ParseOrs();
+
+					s = Parser.PeekNextToken();
+					if (s == "/")
+						Where = ParseXPath(Parser, false);
+					else
+						Where = Parser.ParseOrs();
+				
 					s = Parser.PeekNextToken().ToUpper();
 				}
 
@@ -267,6 +287,20 @@ namespace Waher.Script.Persistence.SQL.Parsers
 			{
 				return false;
 			}
+		}
+
+		private static XPath ParseXPath(ScriptParser Parser, bool ExtractValue)
+		{
+			Parser.SkipWhiteSpace();
+
+			StringBuilder sb = new StringBuilder();
+			int Start = Parser.Position;
+			char ch;
+
+			while ((ch = Parser.NextChar()) > 32 && ch != 160 && ch != ',' && ch != ';')
+				sb.Append(ch);
+
+			return new XPath(sb.ToString(), ExtractValue, Start, Parser.Position - Start, Parser.Expression);
 		}
 
 		internal static bool TryParseSources(ScriptParser Parser, out SourceDefinition Source)

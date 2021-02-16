@@ -279,8 +279,7 @@
 							<File Id='System.Xml.XmlSerializer.dll' Name='System.Xml.XmlSerializer.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Xml.XmlSerializer.dll' Vital='yes'/>
 							<File Id='System.Xml.XPath.dll' Name='System.Xml.XPath.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Xml.XPath.dll' Vital='yes' KeyPath='yes'/>
 							<File Id='System.Xml.XPath.XDocument.dll' Name='System.Xml.XPath.XDocument.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Xml.XPath.XDocument.dll' Vital='yes'/>
-							<RemoveFile Id='RemoveSystem.Xml.XPath.dll' Name='System.Xml.XPath.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Xml.XPath.XDocument.dll' Name='System.Xml.XPath.XDocument.dll'  On='uninstall' />
+							<File Id='System.Xml.XPath.XmlDocument.dll' Name='System.Xml.XPath.XmlDocument.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Xml.XPath.XmlDocument.dll' Vital='yes'/>
 							<RemoveFile Id='RemoveSystem.AppContext.dll' Name='System.AppContext.dll'  On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Buffers.dll' Name='System.Buffers.dll'  On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Collections.Concurrent.dll' Name='System.Collections.Concurrent.dll'  On='uninstall' />
@@ -435,6 +434,9 @@
 							<RemoveFile Id='RemoveSystem.Xml.XDocument.dll' Name='System.Xml.XDocument.dll'  On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Xml.XmlDocument.dll' Name='System.Xml.XmlDocument.dll'  On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Xml.XmlSerializer.dll' Name='System.Xml.XmlSerializer.dll'  On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Xml.XPath.dll' Name='System.Xml.XPath.dll'  On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Xml.XPath.XDocument.dll' Name='System.Xml.XPath.XDocument.dll'  On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Xml.XPath.XmlDocument.dll' Name='System.Xml.XPath.XmlDocument.dll'  On='uninstall' />
 						</Component>
 						<Component Id='MicrosoftLibraries' Guid='A9BAC7EA-59F6-4362-B44C-63B82A034C88'>
 							<File Id='clrcompression.dll' Name='clrcompression.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\clrcompression.dll' Vital='yes' KeyPath='yes' />

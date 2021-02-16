@@ -1552,7 +1552,8 @@ The following functions are available in the `Waher.Script.Persistence` library.
 | `FindObjects(Type, Offset, MaxCount, Filter, SortOrder)` | Finds objects of a given `Type`. `Offset` and `MaxCount` provide a means to paginate the result set. `Filter` can be null, if none is used, or a string containing an expression to limit the result set. `SortOrder` sorts the result. It also determines the index to use. | `FindObjects(Namespace.CustomType, 0, 10, "StringProperty='StringValue'", ["Property1","Property2"])` |
 | `Pivot(Result)` | Pivots a result matrix so columns become rows, and vice versa. It is similar to the matrix transpose operator, except it takes column headers into account also. | `pivot(select Type, count(*) Nr from PersistedEvent group by Type)` |
 | `SaveNewObject(Obj)` | Saves a new object to the underlying persistence layer. | `SaveNewObject(Obj)` |
-| `UpdateObject(Obj)` | Updaes an object in the underlying persistence layer. | `UpdateObject(Obj)` |
+| `UpdateObject(Obj)` | Updates an object in the underlying persistence layer. | `UpdateObject(Obj)` |
+| `XPath(Expression)` | Specifies an XPath-expression. | `XPath("Element/@Attr")` |
 
 #### Statistics-related functions (Waher.Script.Statistics)
 
@@ -1981,6 +1982,27 @@ Example:
 ```
 v:=[{a:1,b:2},{a:2,b:1}];
 select a, b from v
+```
+
+##### SELECT FROM XML
+
+The `SELECT` statement can also extract information from XML sources by using XPATH. Column extressions and `WHERE` clauses must be
+made in XPATH, in order to operate on XML sources. XML Sources can be entire XML Documents, or XML Nodes inside an XML Document.
+If the XPATH does not contain whitespace, and begins with a `/`, it can be written as-is in the script. Otherwise, you can use the
+`XPath(expression)` function to convert a string value to an XPATH expression than can be used to select nodes from a XML source.
+XPATH exrepssions used in column definition, extract values from the corresponding XML nodes selected, while XPATH expressions used in
+`WHERE` clauses, refer to the nodes selected.
+
+Example:
+
+```
+Xml:=<Books>
+<Book price="10" title="Book 1"/>
+<Book price="20" title="Book 2"/>
+<Book price="30" title="Book 3"/>
+</Books>;
+
+select XPath("@title") Title, XPath("@price") Price from Xml where /Books/Book[@price>15];
 ```
 
 #### INSERT VALUES

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.Xml;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -74,8 +74,15 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 				return new CollectionSource(S.Value, Alias);
 			else if (E is IVector V)
 				return new VectorSource(Name, Alias, V, Source);
-			else
-				throw new ScriptRuntimeException("Data source type not supported: " + E.AssociatedObjectValue?.GetType()?.FullName, Source);
+			else if (E is ObjectValue Value)
+			{
+				if (Value.AssociatedObjectValue is XmlDocument Doc)
+					return new XmlSource(Name, Alias, Doc, Source);
+				else if (Value.AssociatedObjectValue is XmlNode N)
+					return new XmlSource(Name, Alias, N, Source);
+			}
+
+			throw new ScriptRuntimeException("Data source type not supported: " + E.AssociatedObjectValue?.GetType()?.FullName, Source);
 		}
 
 		private static IDataSource GetDataSource(VariableReference Source, string Alias, Variables Variables)

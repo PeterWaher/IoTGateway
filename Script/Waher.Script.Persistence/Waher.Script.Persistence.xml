@@ -170,6 +170,68 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.Functions.XPath">
+            <summary>
+            Node repesenting an XPath expression
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.XPath.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Node repesenting an XPath expression
+            </summary>
+            <param name="XPath">XPath expression.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.XPath.#ctor(System.String,System.Boolean,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Node repesenting an XPath expression
+            </summary>
+            <param name="XPath">XPath expression.</param>
+            <param name="ExtractValue">If the goal of the XPATH is to extract a value.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.XPath.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.XPath.XPathExpression">
+            <summary>
+            XPATH expression
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.XPath.ExtractValue">
+            <summary>
+            If the value should be extracted.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.XPath.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.XPath.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.XPath.ToElement(System.Xml.XmlNode,System.Boolean)">
+            <summary>
+            Encapsulates an XML Node for use in script.
+            </summary>
+            <param name="Node">XML Node</param>
+            <param name="ExtractValue">If the goal of the XPATH is to extract a value.</param>
+            <returns>Script element.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.Output.CaseInsensitiveStringOutput">
             <summary>
             Converts values of type <see cref="T:Waher.Persistence.CaseInsensitiveString"/> to expression strings.
@@ -2196,6 +2258,112 @@
             <returns>If an index was found and dropped.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.DropCollection">
+            <summary>
+            Drops the collection from the source.
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Persistence.SQL.Sources.XmlSource">
+            <summary>
+            Data Source defined by XML.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.#ctor(System.String,System.String,System.Xml.XmlDocument,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Data Source defined by XML.
+            </summary>
+            <param name="Name">Name of source.</param>
+            <param name="Alias">Alias for source.</param>
+            <param name="Xml">XML</param>
+            <param name="Node">Node defining the vector.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.#ctor(System.String,System.String,System.Xml.XmlNode,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Data Source defined by XML.
+            </summary>
+            <param name="Name">Name of source.</param>
+            <param name="Alias">Alias for source.</param>
+            <param name="Xml">XML</param>
+            <param name="Node">Node defining the vector.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+            <summary>
+            Finds objects matching filter conditions in <paramref name="Where"/>.
+            </summary>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
+            <param name="Variables">Current set of variables.</param>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
+            <returns>Enumerator.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.Update(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Updates a set of objects.
+            </summary>
+            <param name="Objects">Objects to update</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.FindDelete(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+            <summary>
+            Finds and Deletes a set of objects.
+            </summary>
+            <param name="Offset">Offset at which to return elements.</param>
+            <param name="Top">Maximum number of elements to return.</param>
+            <param name="Where">Filter conditions.</param>
+            <param name="Variables">Current set of variables.</param>
+            <param name="Order">Order at which to order the result set.</param>
+            <param name="Node">Script node performing the evaluation.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.Insert(System.Object)">
+            <summary>
+            Inserts an object.
+            </summary>
+            <param name="Object">Object to insert.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.XmlSource.CollectionName">
+            <summary>
+            Name of corresponding collection.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.XmlSource.TypeName">
+            <summary>
+            Name of corresponding type.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.XmlSource.Name">
+            <summary>
+            Collection name or alias.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.IsSource(System.String)">
+            <summary>
+            Checks if the name refers to the source.
+            </summary>
+            <param name="Name">Name to check.</param>
+            <returns>If the name refers to the source.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.IsLabel(System.String)">
+            <summary>
+            Checks if the label is a label in the source.
+            </summary>
+            <param name="Label">Label</param>
+            <returns>If the label is a label in the source.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.CreateIndex(System.String,System.String[])">
+            <summary>
+            Creates an index in the source.
+            </summary>
+            <param name="Name">Name of index.</param>
+            <param name="Fields">Field names. Prefix with hyphen (-) to define descending order.</param>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.DropIndex(System.String)">
+            <summary>
+            Drops an index from the source.
+            </summary>
+            <param name="Name">Name of index.</param>
+            <returns>If an index was found and dropped.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.DropCollection">
             <summary>
             Drops the collection from the source.
             </summary>

@@ -1,276 +1,278 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Name="IoT Client" Version="1.0" Manufacturer="Waher Data AB" Language="1033" Codepage="1252"
-					 Id="72B6AD2D-D8A1-4D29-BCD9-971CEEFC0B64" UpgradeCode="123A8D51-1558-45DA-ADF3-6C5FB853438C">
-    <Package Id='*' Keywords='Installer' InstallScope='perMachine'
-						 Description="IoT Client Installer" Comments='The Waher IoT Gateway is a registered trademark of Waher Data AB.'
-						 Manufacturer='Waher Data AB' InstallerVersion='301' Languages='1033' Compressed='yes'
-						 SummaryCodepage='1252' InstallPrivileges='elevated' />
-    <Media Id='1' Cabinet='IoTClient.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
-    <Property Id="INSTALLDIR">
-      <RegistrySearch Id='IoTClientRegistry' Type='raw' Root='HKLM' Key='Software\[Manufacturer]\[ProductName]' Name='InstallDir' />
-    </Property>
-    <Property Id="DiskPrompt" Value="IoT Client 1.0 Installation [1]"/>
-    <Property Id="InfoIcon">info_icon</Property>
-    <Property Id="WarningIcon">warning_icon</Property>
-    <Property Id="ErrorIcon">error_icon</Property>
-    <Property Id="QuestionIcon">question_icon</Property>
-    <Directory Id='TARGETDIR' Name='SourceDir'>
-      <Merge Id="VCRedist" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Redist\MSVC\14.28.29325\MergeModules\Microsoft_VC142_CRT_x86.msm" DiskId="1" Language="0"/>
-      <Directory Id='ProgramFilesFolder' Name='ProgramFiles'>
-        <Directory Id='WaherDataAB' Name='Waher Data AB'>
-          <Directory Id='INSTALLDIR' Name='IoT Client 1.0'>
-            <Component Id='SystemLibraries' Guid='660E4CC3-334A-4124-BEF2-FB82A4796534'>
-              <File Id='System.Xml.XPath.XDocument.dll' Name='System.Xml.XPath.XDocument.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XPath.XDocument.dll' Vital='yes' KeyPath='yes'/>
-              <File Id='System.AppContext.dll' Name='System.AppContext.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.AppContext.dll' Vital='yes'/>
-              <File Id='System.Collections.Concurrent.dll' Name='System.Collections.Concurrent.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Collections.Concurrent.dll' Vital='yes'/>
-              <File Id='System.Collections.dll' Name='System.Collections.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Collections.dll' Vital='yes'/>
-              <File Id='System.Collections.NonGeneric.dll' Name='System.Collections.NonGeneric.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Collections.NonGeneric.dll' Vital='yes'/>
-              <File Id='System.Collections.Specialized.dll' Name='System.Collections.Specialized.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Collections.Specialized.dll' Vital='yes'/>
-              <File Id='System.ComponentModel.dll' Name='System.ComponentModel.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.ComponentModel.dll' Vital='yes'/>
-              <File Id='System.ComponentModel.EventBasedAsync.dll' Name='System.ComponentModel.EventBasedAsync.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.ComponentModel.EventBasedAsync.dll' Vital='yes'/>
-              <File Id='System.ComponentModel.Primitives.dll' Name='System.ComponentModel.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.ComponentModel.Primitives.dll' Vital='yes'/>
-              <File Id='System.ComponentModel.TypeConverter.dll' Name='System.ComponentModel.TypeConverter.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.ComponentModel.TypeConverter.dll' Vital='yes'/>
-              <File Id='System.Console.dll' Name='System.Console.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Console.dll' Vital='yes'/>
-              <File Id='System.Data.Common.dll' Name='System.Data.Common.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Data.Common.dll' Vital='yes'/>
-              <File Id='System.Diagnostics.Contracts.dll' Name='System.Diagnostics.Contracts.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.Contracts.dll' Vital='yes'/>
-              <File Id='System.Diagnostics.Debug.dll' Name='System.Diagnostics.Debug.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.Debug.dll' Vital='yes'/>
-              <File Id='System.Diagnostics.FileVersionInfo.dll' Name='System.Diagnostics.FileVersionInfo.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.FileVersionInfo.dll' Vital='yes'/>
-              <File Id='System.Diagnostics.Process.dll' Name='System.Diagnostics.Process.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.Process.dll' Vital='yes'/>
-              <File Id='System.Diagnostics.StackTrace.dll' Name='System.Diagnostics.StackTrace.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.StackTrace.dll' Vital='yes'/>
-              <File Id='System.Diagnostics.TextWriterTraceListener.dll' Name='System.Diagnostics.TextWriterTraceListener.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.TextWriterTraceListener.dll' Vital='yes'/>
-              <File Id='System.Diagnostics.Tools.dll' Name='System.Diagnostics.Tools.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.Tools.dll' Vital='yes'/>
-              <File Id='System.Diagnostics.TraceSource.dll' Name='System.Diagnostics.TraceSource.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.TraceSource.dll' Vital='yes'/>
-              <File Id='System.Diagnostics.Tracing.dll' Name='System.Diagnostics.Tracing.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.Tracing.dll' Vital='yes'/>
-              <File Id='System.Drawing.Primitives.dll' Name='System.Drawing.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Drawing.Primitives.dll' Vital='yes'/>
-              <File Id='System.Dynamic.Runtime.dll' Name='System.Dynamic.Runtime.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Dynamic.Runtime.dll' Vital='yes'/>
-              <File Id='System.Globalization.Calendars.dll' Name='System.Globalization.Calendars.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Globalization.Calendars.dll' Vital='yes'/>
-              <File Id='System.Globalization.dll' Name='System.Globalization.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Globalization.dll' Vital='yes'/>
-              <File Id='System.Globalization.Extensions.dll' Name='System.Globalization.Extensions.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Globalization.Extensions.dll' Vital='yes'/>
-              <File Id='System.IO.Compression.dll' Name='System.IO.Compression.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.Compression.dll' Vital='yes'/>
-              <File Id='System.IO.Compression.ZipFile.dll' Name='System.IO.Compression.ZipFile.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.Compression.ZipFile.dll' Vital='yes'/>
-              <File Id='System.IO.dll' Name='System.IO.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.dll' Vital='yes'/>
-              <File Id='System.IO.FileSystem.dll' Name='System.IO.FileSystem.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.FileSystem.dll' Vital='yes'/>
-              <File Id='System.IO.FileSystem.DriveInfo.dll' Name='System.IO.FileSystem.DriveInfo.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.FileSystem.DriveInfo.dll' Vital='yes'/>
-              <File Id='System.IO.FileSystem.Primitives.dll' Name='System.IO.FileSystem.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.FileSystem.Primitives.dll' Vital='yes'/>
-              <File Id='System.IO.FileSystem.Watcher.dll' Name='System.IO.FileSystem.Watcher.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.FileSystem.Watcher.dll' Vital='yes'/>
-              <File Id='System.IO.IsolatedStorage.dll' Name='System.IO.IsolatedStorage.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.IsolatedStorage.dll' Vital='yes'/>
-              <File Id='System.IO.MemoryMappedFiles.dll' Name='System.IO.MemoryMappedFiles.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.MemoryMappedFiles.dll' Vital='yes'/>
-              <File Id='System.IO.Pipes.dll' Name='System.IO.Pipes.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.Pipes.dll' Vital='yes'/>
-              <File Id='System.IO.UnmanagedMemoryStream.dll' Name='System.IO.UnmanagedMemoryStream.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.UnmanagedMemoryStream.dll' Vital='yes'/>
-              <File Id='System.Linq.dll' Name='System.Linq.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Linq.dll' Vital='yes'/>
-              <File Id='System.Linq.Expressions.dll' Name='System.Linq.Expressions.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Linq.Expressions.dll' Vital='yes'/>
-              <File Id='System.Linq.Parallel.dll' Name='System.Linq.Parallel.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Linq.Parallel.dll' Vital='yes'/>
-              <File Id='System.Linq.Queryable.dll' Name='System.Linq.Queryable.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Linq.Queryable.dll' Vital='yes'/>
-              <File Id='System.Net.Http.dll' Name='System.Net.Http.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.Http.dll' Vital='yes'/>
-              <File Id='System.Net.NameResolution.dll' Name='System.Net.NameResolution.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.NameResolution.dll' Vital='yes'/>
-              <File Id='System.Net.NetworkInformation.dll' Name='System.Net.NetworkInformation.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.NetworkInformation.dll' Vital='yes'/>
-              <File Id='System.Net.Ping.dll' Name='System.Net.Ping.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.Ping.dll' Vital='yes'/>
-              <File Id='System.Net.Primitives.dll' Name='System.Net.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.Primitives.dll' Vital='yes'/>
-              <File Id='System.Net.Requests.dll' Name='System.Net.Requests.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.Requests.dll' Vital='yes'/>
-              <File Id='System.Net.Security.dll' Name='System.Net.Security.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.Security.dll' Vital='yes'/>
-              <File Id='System.Net.Sockets.dll' Name='System.Net.Sockets.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.Sockets.dll' Vital='yes'/>
-              <File Id='System.Net.WebHeaderCollection.dll' Name='System.Net.WebHeaderCollection.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.WebHeaderCollection.dll' Vital='yes'/>
-              <File Id='System.Net.WebSockets.Client.dll' Name='System.Net.WebSockets.Client.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.WebSockets.Client.dll' Vital='yes'/>
-              <File Id='System.Net.WebSockets.dll' Name='System.Net.WebSockets.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.WebSockets.dll' Vital='yes'/>
-              <File Id='System.ObjectModel.dll' Name='System.ObjectModel.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.ObjectModel.dll' Vital='yes'/>
-              <File Id='System.Reflection.dll' Name='System.Reflection.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Reflection.dll' Vital='yes'/>
-              <File Id='System.Reflection.Extensions.dll' Name='System.Reflection.Extensions.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Reflection.Extensions.dll' Vital='yes'/>
-              <File Id='System.Reflection.Primitives.dll' Name='System.Reflection.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Reflection.Primitives.dll' Vital='yes'/>
-              <File Id='System.Resources.Reader.dll' Name='System.Resources.Reader.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Resources.Reader.dll' Vital='yes'/>
-              <File Id='System.Resources.ResourceManager.dll' Name='System.Resources.ResourceManager.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Resources.ResourceManager.dll' Vital='yes'/>
-              <File Id='System.Resources.Writer.dll' Name='System.Resources.Writer.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Resources.Writer.dll' Vital='yes'/>
-              <File Id='System.Runtime.CompilerServices.VisualC.dll' Name='System.Runtime.CompilerServices.VisualC.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.CompilerServices.VisualC.dll' Vital='yes'/>
-              <File Id='System.Runtime.dll' Name='System.Runtime.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.dll' Vital='yes'/>
-              <File Id='System.Runtime.Extensions.dll' Name='System.Runtime.Extensions.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.Extensions.dll' Vital='yes'/>
-              <File Id='System.Runtime.Handles.dll' Name='System.Runtime.Handles.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.Handles.dll' Vital='yes'/>
-              <File Id='System.Runtime.InteropServices.dll' Name='System.Runtime.InteropServices.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.InteropServices.dll' Vital='yes'/>
-              <File Id='System.Runtime.InteropServices.RuntimeInformation.dll' Name='System.Runtime.InteropServices.RuntimeInformation.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.InteropServices.RuntimeInformation.dll' Vital='yes'/>
-              <File Id='System.Runtime.Numerics.dll' Name='System.Runtime.Numerics.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.Numerics.dll' Vital='yes'/>
-              <File Id='System.Runtime.Serialization.Formatters.dll' Name='System.Runtime.Serialization.Formatters.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.Serialization.Formatters.dll' Vital='yes'/>
-              <File Id='System.Runtime.Serialization.Json.dll' Name='System.Runtime.Serialization.Json.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.Serialization.Json.dll' Vital='yes'/>
-              <File Id='System.Runtime.Serialization.Primitives.dll' Name='System.Runtime.Serialization.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.Serialization.Primitives.dll' Vital='yes'/>
-              <File Id='System.Runtime.Serialization.Xml.dll' Name='System.Runtime.Serialization.Xml.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.Serialization.Xml.dll' Vital='yes'/>
-              <File Id='System.Security.Claims.dll' Name='System.Security.Claims.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Security.Claims.dll' Vital='yes'/>
-              <File Id='System.Security.Cryptography.Algorithms.dll' Name='System.Security.Cryptography.Algorithms.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Security.Cryptography.Algorithms.dll' Vital='yes'/>
-              <File Id='System.Security.Cryptography.Csp.dll' Name='System.Security.Cryptography.Csp.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Security.Cryptography.Csp.dll' Vital='yes'/>
-              <File Id='System.Security.Cryptography.Encoding.dll' Name='System.Security.Cryptography.Encoding.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Security.Cryptography.Encoding.dll' Vital='yes'/>
-              <File Id='System.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Security.Cryptography.Primitives.dll' Vital='yes'/>
-              <File Id='System.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Security.Cryptography.X509Certificates.dll' Vital='yes'/>
-              <File Id='System.Security.Principal.dll' Name='System.Security.Principal.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Security.Principal.dll' Vital='yes'/>
-              <File Id='System.Security.SecureString.dll' Name='System.Security.SecureString.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Security.SecureString.dll' Vital='yes'/>
-              <File Id='System.Text.Encoding.dll' Name='System.Text.Encoding.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Text.Encoding.dll' Vital='yes'/>
-              <File Id='System.Text.Encoding.Extensions.dll' Name='System.Text.Encoding.Extensions.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Text.Encoding.Extensions.dll' Vital='yes'/>
-              <File Id='System.Text.RegularExpressions.dll' Name='System.Text.RegularExpressions.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Text.RegularExpressions.dll' Vital='yes'/>
-              <File Id='System.Threading.dll' Name='System.Threading.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Threading.dll' Vital='yes'/>
-              <File Id='System.Threading.Overlapped.dll' Name='System.Threading.Overlapped.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Threading.Overlapped.dll' Vital='yes'/>
-              <File Id='System.Threading.Tasks.dll' Name='System.Threading.Tasks.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Threading.Tasks.dll' Vital='yes'/>
-              <File Id='System.Threading.Tasks.Parallel.dll' Name='System.Threading.Tasks.Parallel.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Threading.Tasks.Parallel.dll' Vital='yes'/>
-              <File Id='System.Threading.Thread.dll' Name='System.Threading.Thread.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Threading.Thread.dll' Vital='yes'/>
-              <File Id='System.Threading.ThreadPool.dll' Name='System.Threading.ThreadPool.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Threading.ThreadPool.dll' Vital='yes'/>
-              <File Id='System.Threading.Timer.dll' Name='System.Threading.Timer.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Threading.Timer.dll' Vital='yes'/>
-              <File Id='System.ValueTuple.dll' Name='System.ValueTuple.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.ValueTuple.dll' Vital='yes'/>
-              <File Id='System.Xml.ReaderWriter.dll' Name='System.Xml.ReaderWriter.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.ReaderWriter.dll' Vital='yes'/>
-              <File Id='System.Xml.XDocument.dll' Name='System.Xml.XDocument.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XDocument.dll' Vital='yes'/>
-              <File Id='System.Xml.XmlDocument.dll' Name='System.Xml.XmlDocument.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XmlDocument.dll' Vital='yes'/>
-              <File Id='System.Xml.XmlSerializer.dll' Name='System.Xml.XmlSerializer.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XmlSerializer.dll' Vital='yes'/>
-              <File Id='System.Xml.XPath.dll' Name='System.Xml.XPath.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XPath.dll' Vital='yes'/>
-              <RemoveFile Id='RemoveSystem.Xml.XPath.XDocument.dll' Name='System.Xml.XPath.XDocument.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.AppContext.dll' Name='System.AppContext.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Collections.Concurrent.dll' Name='System.Collections.Concurrent.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Collections.dll' Name='System.Collections.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Collections.NonGeneric.dll' Name='System.Collections.NonGeneric.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Collections.Specialized.dll' Name='System.Collections.Specialized.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.ComponentModel.dll' Name='System.ComponentModel.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.ComponentModel.EventBasedAsync.dll' Name='System.ComponentModel.EventBasedAsync.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.ComponentModel.Primitives.dll' Name='System.ComponentModel.Primitives.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.ComponentModel.TypeConverter.dll' Name='System.ComponentModel.TypeConverter.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Console.dll' Name='System.Console.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Data.Common.dll' Name='System.Data.Common.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Diagnostics.Contracts.dll' Name='System.Diagnostics.Contracts.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Diagnostics.Debug.dll' Name='System.Diagnostics.Debug.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Diagnostics.FileVersionInfo.dll' Name='System.Diagnostics.FileVersionInfo.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Diagnostics.Process.dll' Name='System.Diagnostics.Process.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Diagnostics.StackTrace.dll' Name='System.Diagnostics.StackTrace.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Diagnostics.TextWriterTraceListener.dll' Name='System.Diagnostics.TextWriterTraceListener.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Diagnostics.Tools.dll' Name='System.Diagnostics.Tools.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Diagnostics.TraceSource.dll' Name='System.Diagnostics.TraceSource.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Diagnostics.Tracing.dll' Name='System.Diagnostics.Tracing.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Drawing.Primitives.dll' Name='System.Drawing.Primitives.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Dynamic.Runtime.dll' Name='System.Dynamic.Runtime.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Globalization.Calendars.dll' Name='System.Globalization.Calendars.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Globalization.dll' Name='System.Globalization.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Globalization.Extensions.dll' Name='System.Globalization.Extensions.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.IO.Compression.dll' Name='System.IO.Compression.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.IO.Compression.ZipFile.dll' Name='System.IO.Compression.ZipFile.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.IO.dll' Name='System.IO.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.IO.FileSystem.dll' Name='System.IO.FileSystem.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.IO.FileSystem.DriveInfo.dll' Name='System.IO.FileSystem.DriveInfo.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.IO.FileSystem.Primitives.dll' Name='System.IO.FileSystem.Primitives.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.IO.FileSystem.Watcher.dll' Name='System.IO.FileSystem.Watcher.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.IO.IsolatedStorage.dll' Name='System.IO.IsolatedStorage.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.IO.MemoryMappedFiles.dll' Name='System.IO.MemoryMappedFiles.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.IO.Pipes.dll' Name='System.IO.Pipes.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.IO.UnmanagedMemoryStream.dll' Name='System.IO.UnmanagedMemoryStream.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Linq.dll' Name='System.Linq.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Linq.Expressions.dll' Name='System.Linq.Expressions.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Linq.Parallel.dll' Name='System.Linq.Parallel.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Linq.Queryable.dll' Name='System.Linq.Queryable.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Net.Http.dll' Name='System.Net.Http.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Net.NameResolution.dll' Name='System.Net.NameResolution.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Net.NetworkInformation.dll' Name='System.Net.NetworkInformation.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Net.Ping.dll' Name='System.Net.Ping.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Net.Primitives.dll' Name='System.Net.Primitives.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Net.Requests.dll' Name='System.Net.Requests.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Net.Security.dll' Name='System.Net.Security.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Net.Sockets.dll' Name='System.Net.Sockets.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Net.WebHeaderCollection.dll' Name='System.Net.WebHeaderCollection.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Net.WebSockets.Client.dll' Name='System.Net.WebSockets.Client.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Net.WebSockets.dll' Name='System.Net.WebSockets.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.ObjectModel.dll' Name='System.ObjectModel.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Reflection.dll' Name='System.Reflection.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Reflection.Extensions.dll' Name='System.Reflection.Extensions.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Reflection.Primitives.dll' Name='System.Reflection.Primitives.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Resources.Reader.dll' Name='System.Resources.Reader.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Resources.ResourceManager.dll' Name='System.Resources.ResourceManager.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Resources.Writer.dll' Name='System.Resources.Writer.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Runtime.CompilerServices.VisualC.dll' Name='System.Runtime.CompilerServices.VisualC.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Runtime.dll' Name='System.Runtime.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Runtime.Extensions.dll' Name='System.Runtime.Extensions.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Runtime.Handles.dll' Name='System.Runtime.Handles.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Runtime.InteropServices.dll' Name='System.Runtime.InteropServices.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Runtime.InteropServices.RuntimeInformation.dll' Name='System.Runtime.InteropServices.RuntimeInformation.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Runtime.Numerics.dll' Name='System.Runtime.Numerics.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Runtime.Serialization.Formatters.dll' Name='System.Runtime.Serialization.Formatters.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Runtime.Serialization.Json.dll' Name='System.Runtime.Serialization.Json.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Runtime.Serialization.Primitives.dll' Name='System.Runtime.Serialization.Primitives.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Runtime.Serialization.Xml.dll' Name='System.Runtime.Serialization.Xml.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Security.Claims.dll' Name='System.Security.Claims.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Security.Cryptography.Algorithms.dll' Name='System.Security.Cryptography.Algorithms.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Security.Cryptography.Csp.dll' Name='System.Security.Cryptography.Csp.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Security.Cryptography.Encoding.dll' Name='System.Security.Cryptography.Encoding.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Security.Principal.dll' Name='System.Security.Principal.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Security.SecureString.dll' Name='System.Security.SecureString.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Text.Encoding.dll' Name='System.Text.Encoding.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Text.Encoding.Extensions.dll' Name='System.Text.Encoding.Extensions.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Text.RegularExpressions.dll' Name='System.Text.RegularExpressions.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Threading.dll' Name='System.Threading.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Threading.Overlapped.dll' Name='System.Threading.Overlapped.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Threading.Tasks.dll' Name='System.Threading.Tasks.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Threading.Tasks.Parallel.dll' Name='System.Threading.Tasks.Parallel.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Threading.Thread.dll' Name='System.Threading.Thread.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Threading.ThreadPool.dll' Name='System.Threading.ThreadPool.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Threading.Timer.dll' Name='System.Threading.Timer.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.ValueTuple.dll' Name='System.ValueTuple.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Xml.ReaderWriter.dll' Name='System.Xml.ReaderWriter.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Xml.XDocument.dll' Name='System.Xml.XDocument.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Xml.XmlDocument.dll' Name='System.Xml.XmlDocument.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Xml.XmlSerializer.dll' Name='System.Xml.XmlSerializer.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveSystem.Xml.XPath.dll' Name='System.Xml.XPath.dll' On='uninstall'/>
-            </Component>
-            <Component Id='MicrosoftLibraries' Guid='B2FC6B57-783C-45B5-A84E-BD5F1F173506'>
-              <File Id='Microsoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Microsoft.Win32.Primitives.dll' Vital='yes' KeyPath='yes' />
-              <File Id='netstandard.dll' Name='netstandard.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\netstandard.dll' Vital='yes' />
-              <RemoveFile Id='RemoveMicrosoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' On='uninstall'/>
-              <RemoveFile Id='Removenetstandard.dll' Name='netstandard.dll' On='uninstall'/>
-            </Component>
-            <Component Id='ExternalLibraries' Guid='65C7C4CA-DE10-4838-8301-B23824CDFA23'>
-              <File Id='SkiaSharp.dll' Name='SkiaSharp.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\SkiaSharp.dll' Vital='yes' KeyPath='yes'/>
-              <File Id='libSkiaSharp.dll' Name='libSkiaSharp.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\x86\libSkiaSharp.dll' Vital='yes'/>
-              <RemoveFile Id='RemoveSkiaSharp.dll' Name='SkiaSharp.dll' On='uninstall'/>
-              <RemoveFile Id='RemovelibSkiaSharp.dll' Name='libSkiaSharp.dll' On='uninstall'/>
-            </Component>
-            <Component Id='MainExecutable' Guid='CF8BB89B-C017-4945-AF9E-B18FDB4E2EE9'>
-              <RegistryKey Root='HKLM' Key='Software\[Manufacturer]\[ProductName]'>
-                <RegistryValue Type='string' Name='InstallDir' Value='[INSTALLDIR]' Action='write'/>
-              </RegistryKey>
-              <File Id='Waher.Client.WPF.application' Name='Waher.Client.WPF.application' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Client.WPF.application' Vital='yes'/>
-              <File Id='Waher.Client.WPF.exe' Name='Waher.Client.WPF.exe' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Client.WPF.exe' Vital='yes' KeyPath='yes'>
-                <Shortcut Id="StartMenuIoTClientConsole" Directory="ProgramMenuDir" Name="IoT Client 1.0"
-                          WorkingDirectory='INSTALLDIR' Icon="Configure.ico" IconIndex="0" Advertise="yes" />
-              </File>
-              <File Id='Waher.Client.WPF.exe.config' Name='Waher.Client.WPF.exe.config' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Client.WPF.exe.config' Vital='yes'/>
-              <File Id='Waher.Client.WPF.exe.manifest' Name='Waher.Client.WPF.exe.manifest' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Client.WPF.exe.manifest' Vital='yes'/>
-              <File Id='Waher.Content.dll' Name='Waher.Content.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.dll' Vital='yes'/>
-              <File Id='Waher.Content.Emoji.dll' Name='Waher.Content.Emoji.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Emoji.dll' Vital='yes'/>
-              <File Id='Waher.Content.Emoji.Emoji1.dll' Name='Waher.Content.Emoji.Emoji1.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Emoji.Emoji1.dll' Vital='yes'/>
-              <File Id='Waher.Content.Html.dll' Name='Waher.Content.Html.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Html.dll' Vital='yes'/>
-              <File Id='Waher.Content.Images.dll' Name='Waher.Content.Images.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Images.dll' Vital='yes'/>
-              <File Id='Waher.Content.Markdown.dll' Name='Waher.Content.Markdown.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.dll' Vital='yes'/>
-              <File Id='Waher.Content.Markdown.Consolidation.dll' Name='Waher.Content.Markdown.Consolidation.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.Consolidation.dll' Vital='yes'/>
-              <File Id='Waher.Content.Markdown.GraphViz.dll' Name='Waher.Content.Markdown.GraphViz.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.GraphViz.dll' Vital='yes'/>
-              <File Id='Waher.Content.Markdown.Layout2D.dll' Name='Waher.Content.Markdown.Layout2D.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.Layout2D.dll' Vital='yes'/>
-              <File Id='Waher.Content.Markdown.PlantUml.dll' Name='Waher.Content.Markdown.PlantUml.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.PlantUml.dll' Vital='yes'/>
-              <File Id='Waher.Content.SystemFiles.dll' Name='Waher.Content.SystemFiles.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.SystemFiles.dll' Vital='yes'/>
-              <File Id='Waher.Content.Xml.dll' Name='Waher.Content.Xml.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xml.dll' Vital='yes'/>
-              <File Id='Waher.Content.Xsl.dll' Name='Waher.Content.Xsl.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xsl.dll' Vital='yes'/>
-              <File Id='Waher.Events.dll' Name='Waher.Events.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Events.dll' Vital='yes'/>
-              <File Id='Waher.Layout.Layout2D.dll' Name='Waher.Layout.Layout2D.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Layout.Layout2D.dll' Vital='yes'/>
-              <File Id='Waher.Networking.dll' Name='Waher.Networking.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.dll' Vital='yes'/>
+	<Product Name="IoT Client" Version="1.0" Manufacturer="Waher Data AB" Language="1033" Codepage="1252"
+					   Id="72B6AD2D-D8A1-4D29-BCD9-971CEEFC0B64" UpgradeCode="123A8D51-1558-45DA-ADF3-6C5FB853438C">
+		<Package Id='*' Keywords='Installer' InstallScope='perMachine'
+							 Description="IoT Client Installer" Comments='The Waher IoT Gateway is a registered trademark of Waher Data AB.'
+							 Manufacturer='Waher Data AB' InstallerVersion='301' Languages='1033' Compressed='yes'
+							 SummaryCodepage='1252' InstallPrivileges='elevated' />
+		<Media Id='1' Cabinet='IoTClient.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
+		<Property Id="INSTALLDIR">
+			<RegistrySearch Id='IoTClientRegistry' Type='raw' Root='HKLM' Key='Software\[Manufacturer]\[ProductName]' Name='InstallDir' />
+		</Property>
+		<Property Id="DiskPrompt" Value="IoT Client 1.0 Installation [1]"/>
+		<Property Id="InfoIcon">info_icon</Property>
+		<Property Id="WarningIcon">warning_icon</Property>
+		<Property Id="ErrorIcon">error_icon</Property>
+		<Property Id="QuestionIcon">question_icon</Property>
+		<Directory Id='TARGETDIR' Name='SourceDir'>
+			<Merge Id="VCRedist" SourceFile="C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Redist\MSVC\14.28.29325\MergeModules\Microsoft_VC142_CRT_x86.msm" DiskId="1" Language="0"/>
+			<Directory Id='ProgramFilesFolder' Name='ProgramFiles'>
+				<Directory Id='WaherDataAB' Name='Waher Data AB'>
+					<Directory Id='INSTALLDIR' Name='IoT Client 1.0'>
+						<Component Id='SystemLibraries' Guid='660E4CC3-334A-4124-BEF2-FB82A4796534'>
+							<File Id='System.AppContext.dll' Name='System.AppContext.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.AppContext.dll' Vital='yes' KeyPath='yes'/>
+							<File Id='System.Collections.Concurrent.dll' Name='System.Collections.Concurrent.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Collections.Concurrent.dll' Vital='yes'/>
+							<File Id='System.Collections.dll' Name='System.Collections.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Collections.dll' Vital='yes'/>
+							<File Id='System.Collections.NonGeneric.dll' Name='System.Collections.NonGeneric.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Collections.NonGeneric.dll' Vital='yes'/>
+							<File Id='System.Collections.Specialized.dll' Name='System.Collections.Specialized.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Collections.Specialized.dll' Vital='yes'/>
+							<File Id='System.ComponentModel.dll' Name='System.ComponentModel.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.ComponentModel.dll' Vital='yes'/>
+							<File Id='System.ComponentModel.EventBasedAsync.dll' Name='System.ComponentModel.EventBasedAsync.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.ComponentModel.EventBasedAsync.dll' Vital='yes'/>
+							<File Id='System.ComponentModel.Primitives.dll' Name='System.ComponentModel.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.ComponentModel.Primitives.dll' Vital='yes'/>
+							<File Id='System.ComponentModel.TypeConverter.dll' Name='System.ComponentModel.TypeConverter.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.ComponentModel.TypeConverter.dll' Vital='yes'/>
+							<File Id='System.Console.dll' Name='System.Console.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Console.dll' Vital='yes'/>
+							<File Id='System.Data.Common.dll' Name='System.Data.Common.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Data.Common.dll' Vital='yes'/>
+							<File Id='System.Diagnostics.Contracts.dll' Name='System.Diagnostics.Contracts.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.Contracts.dll' Vital='yes'/>
+							<File Id='System.Diagnostics.Debug.dll' Name='System.Diagnostics.Debug.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.Debug.dll' Vital='yes'/>
+							<File Id='System.Diagnostics.FileVersionInfo.dll' Name='System.Diagnostics.FileVersionInfo.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.FileVersionInfo.dll' Vital='yes'/>
+							<File Id='System.Diagnostics.Process.dll' Name='System.Diagnostics.Process.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.Process.dll' Vital='yes'/>
+							<File Id='System.Diagnostics.StackTrace.dll' Name='System.Diagnostics.StackTrace.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.StackTrace.dll' Vital='yes'/>
+							<File Id='System.Diagnostics.TextWriterTraceListener.dll' Name='System.Diagnostics.TextWriterTraceListener.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.TextWriterTraceListener.dll' Vital='yes'/>
+							<File Id='System.Diagnostics.Tools.dll' Name='System.Diagnostics.Tools.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.Tools.dll' Vital='yes'/>
+							<File Id='System.Diagnostics.TraceSource.dll' Name='System.Diagnostics.TraceSource.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.TraceSource.dll' Vital='yes'/>
+							<File Id='System.Diagnostics.Tracing.dll' Name='System.Diagnostics.Tracing.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Diagnostics.Tracing.dll' Vital='yes'/>
+							<File Id='System.Drawing.Primitives.dll' Name='System.Drawing.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Drawing.Primitives.dll' Vital='yes'/>
+							<File Id='System.Dynamic.Runtime.dll' Name='System.Dynamic.Runtime.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Dynamic.Runtime.dll' Vital='yes'/>
+							<File Id='System.Globalization.Calendars.dll' Name='System.Globalization.Calendars.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Globalization.Calendars.dll' Vital='yes'/>
+							<File Id='System.Globalization.dll' Name='System.Globalization.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Globalization.dll' Vital='yes'/>
+							<File Id='System.Globalization.Extensions.dll' Name='System.Globalization.Extensions.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Globalization.Extensions.dll' Vital='yes'/>
+							<File Id='System.IO.Compression.dll' Name='System.IO.Compression.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.Compression.dll' Vital='yes'/>
+							<File Id='System.IO.Compression.ZipFile.dll' Name='System.IO.Compression.ZipFile.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.Compression.ZipFile.dll' Vital='yes'/>
+							<File Id='System.IO.dll' Name='System.IO.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.dll' Vital='yes'/>
+							<File Id='System.IO.FileSystem.dll' Name='System.IO.FileSystem.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.FileSystem.dll' Vital='yes'/>
+							<File Id='System.IO.FileSystem.DriveInfo.dll' Name='System.IO.FileSystem.DriveInfo.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.FileSystem.DriveInfo.dll' Vital='yes'/>
+							<File Id='System.IO.FileSystem.Primitives.dll' Name='System.IO.FileSystem.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.FileSystem.Primitives.dll' Vital='yes'/>
+							<File Id='System.IO.FileSystem.Watcher.dll' Name='System.IO.FileSystem.Watcher.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.FileSystem.Watcher.dll' Vital='yes'/>
+							<File Id='System.IO.IsolatedStorage.dll' Name='System.IO.IsolatedStorage.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.IsolatedStorage.dll' Vital='yes'/>
+							<File Id='System.IO.MemoryMappedFiles.dll' Name='System.IO.MemoryMappedFiles.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.MemoryMappedFiles.dll' Vital='yes'/>
+							<File Id='System.IO.Pipes.dll' Name='System.IO.Pipes.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.Pipes.dll' Vital='yes'/>
+							<File Id='System.IO.UnmanagedMemoryStream.dll' Name='System.IO.UnmanagedMemoryStream.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.IO.UnmanagedMemoryStream.dll' Vital='yes'/>
+							<File Id='System.Linq.dll' Name='System.Linq.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Linq.dll' Vital='yes'/>
+							<File Id='System.Linq.Expressions.dll' Name='System.Linq.Expressions.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Linq.Expressions.dll' Vital='yes'/>
+							<File Id='System.Linq.Parallel.dll' Name='System.Linq.Parallel.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Linq.Parallel.dll' Vital='yes'/>
+							<File Id='System.Linq.Queryable.dll' Name='System.Linq.Queryable.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Linq.Queryable.dll' Vital='yes'/>
+							<File Id='System.Net.Http.dll' Name='System.Net.Http.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.Http.dll' Vital='yes'/>
+							<File Id='System.Net.NameResolution.dll' Name='System.Net.NameResolution.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.NameResolution.dll' Vital='yes'/>
+							<File Id='System.Net.NetworkInformation.dll' Name='System.Net.NetworkInformation.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.NetworkInformation.dll' Vital='yes'/>
+							<File Id='System.Net.Ping.dll' Name='System.Net.Ping.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.Ping.dll' Vital='yes'/>
+							<File Id='System.Net.Primitives.dll' Name='System.Net.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.Primitives.dll' Vital='yes'/>
+							<File Id='System.Net.Requests.dll' Name='System.Net.Requests.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.Requests.dll' Vital='yes'/>
+							<File Id='System.Net.Security.dll' Name='System.Net.Security.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.Security.dll' Vital='yes'/>
+							<File Id='System.Net.Sockets.dll' Name='System.Net.Sockets.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.Sockets.dll' Vital='yes'/>
+							<File Id='System.Net.WebHeaderCollection.dll' Name='System.Net.WebHeaderCollection.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.WebHeaderCollection.dll' Vital='yes'/>
+							<File Id='System.Net.WebSockets.Client.dll' Name='System.Net.WebSockets.Client.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.WebSockets.Client.dll' Vital='yes'/>
+							<File Id='System.Net.WebSockets.dll' Name='System.Net.WebSockets.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Net.WebSockets.dll' Vital='yes'/>
+							<File Id='System.ObjectModel.dll' Name='System.ObjectModel.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.ObjectModel.dll' Vital='yes'/>
+							<File Id='System.Reflection.dll' Name='System.Reflection.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Reflection.dll' Vital='yes'/>
+							<File Id='System.Reflection.Extensions.dll' Name='System.Reflection.Extensions.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Reflection.Extensions.dll' Vital='yes'/>
+							<File Id='System.Reflection.Primitives.dll' Name='System.Reflection.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Reflection.Primitives.dll' Vital='yes'/>
+							<File Id='System.Resources.Reader.dll' Name='System.Resources.Reader.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Resources.Reader.dll' Vital='yes'/>
+							<File Id='System.Resources.ResourceManager.dll' Name='System.Resources.ResourceManager.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Resources.ResourceManager.dll' Vital='yes'/>
+							<File Id='System.Resources.Writer.dll' Name='System.Resources.Writer.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Resources.Writer.dll' Vital='yes'/>
+							<File Id='System.Runtime.CompilerServices.VisualC.dll' Name='System.Runtime.CompilerServices.VisualC.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.CompilerServices.VisualC.dll' Vital='yes'/>
+							<File Id='System.Runtime.dll' Name='System.Runtime.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.dll' Vital='yes'/>
+							<File Id='System.Runtime.Extensions.dll' Name='System.Runtime.Extensions.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.Extensions.dll' Vital='yes'/>
+							<File Id='System.Runtime.Handles.dll' Name='System.Runtime.Handles.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.Handles.dll' Vital='yes'/>
+							<File Id='System.Runtime.InteropServices.dll' Name='System.Runtime.InteropServices.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.InteropServices.dll' Vital='yes'/>
+							<File Id='System.Runtime.InteropServices.RuntimeInformation.dll' Name='System.Runtime.InteropServices.RuntimeInformation.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.InteropServices.RuntimeInformation.dll' Vital='yes'/>
+							<File Id='System.Runtime.Numerics.dll' Name='System.Runtime.Numerics.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.Numerics.dll' Vital='yes'/>
+							<File Id='System.Runtime.Serialization.Formatters.dll' Name='System.Runtime.Serialization.Formatters.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.Serialization.Formatters.dll' Vital='yes'/>
+							<File Id='System.Runtime.Serialization.Json.dll' Name='System.Runtime.Serialization.Json.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.Serialization.Json.dll' Vital='yes'/>
+							<File Id='System.Runtime.Serialization.Primitives.dll' Name='System.Runtime.Serialization.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.Serialization.Primitives.dll' Vital='yes'/>
+							<File Id='System.Runtime.Serialization.Xml.dll' Name='System.Runtime.Serialization.Xml.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Runtime.Serialization.Xml.dll' Vital='yes'/>
+							<File Id='System.Security.Claims.dll' Name='System.Security.Claims.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Security.Claims.dll' Vital='yes'/>
+							<File Id='System.Security.Cryptography.Algorithms.dll' Name='System.Security.Cryptography.Algorithms.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Security.Cryptography.Algorithms.dll' Vital='yes'/>
+							<File Id='System.Security.Cryptography.Csp.dll' Name='System.Security.Cryptography.Csp.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Security.Cryptography.Csp.dll' Vital='yes'/>
+							<File Id='System.Security.Cryptography.Encoding.dll' Name='System.Security.Cryptography.Encoding.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Security.Cryptography.Encoding.dll' Vital='yes'/>
+							<File Id='System.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Security.Cryptography.Primitives.dll' Vital='yes'/>
+							<File Id='System.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Security.Cryptography.X509Certificates.dll' Vital='yes'/>
+							<File Id='System.Security.Principal.dll' Name='System.Security.Principal.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Security.Principal.dll' Vital='yes'/>
+							<File Id='System.Security.SecureString.dll' Name='System.Security.SecureString.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Security.SecureString.dll' Vital='yes'/>
+							<File Id='System.Text.Encoding.dll' Name='System.Text.Encoding.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Text.Encoding.dll' Vital='yes'/>
+							<File Id='System.Text.Encoding.Extensions.dll' Name='System.Text.Encoding.Extensions.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Text.Encoding.Extensions.dll' Vital='yes'/>
+							<File Id='System.Text.RegularExpressions.dll' Name='System.Text.RegularExpressions.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Text.RegularExpressions.dll' Vital='yes'/>
+							<File Id='System.Threading.dll' Name='System.Threading.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Threading.dll' Vital='yes'/>
+							<File Id='System.Threading.Overlapped.dll' Name='System.Threading.Overlapped.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Threading.Overlapped.dll' Vital='yes'/>
+							<File Id='System.Threading.Tasks.dll' Name='System.Threading.Tasks.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Threading.Tasks.dll' Vital='yes'/>
+							<File Id='System.Threading.Tasks.Parallel.dll' Name='System.Threading.Tasks.Parallel.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Threading.Tasks.Parallel.dll' Vital='yes'/>
+							<File Id='System.Threading.Thread.dll' Name='System.Threading.Thread.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Threading.Thread.dll' Vital='yes'/>
+							<File Id='System.Threading.ThreadPool.dll' Name='System.Threading.ThreadPool.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Threading.ThreadPool.dll' Vital='yes'/>
+							<File Id='System.Threading.Timer.dll' Name='System.Threading.Timer.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Threading.Timer.dll' Vital='yes'/>
+							<File Id='System.ValueTuple.dll' Name='System.ValueTuple.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.ValueTuple.dll' Vital='yes'/>
+							<File Id='System.Xml.ReaderWriter.dll' Name='System.Xml.ReaderWriter.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.ReaderWriter.dll' Vital='yes'/>
+							<File Id='System.Xml.XDocument.dll' Name='System.Xml.XDocument.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XDocument.dll' Vital='yes'/>
+							<File Id='System.Xml.XmlDocument.dll' Name='System.Xml.XmlDocument.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XmlDocument.dll' Vital='yes'/>
+							<File Id='System.Xml.XmlSerializer.dll' Name='System.Xml.XmlSerializer.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XmlSerializer.dll' Vital='yes'/>
+							<File Id='System.Xml.XPath.dll' Name='System.Xml.XPath.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XPath.dll' Vital='yes'/>
+							<File Id='System.Xml.XPath.XDocument.dll' Name='System.Xml.XPath.XDocument.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XPath.XDocument.dll' Vital='yes'/>
+							<File Id='System.Xml.XPath.XmlDocument.dll' Name='System.Xml.XPath.XmlDocument.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\System.Xml.XPath.XmlDocument.dll' Vital='yes'/>
+							<RemoveFile Id='RemoveSystem.AppContext.dll' Name='System.AppContext.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Collections.Concurrent.dll' Name='System.Collections.Concurrent.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Collections.dll' Name='System.Collections.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Collections.NonGeneric.dll' Name='System.Collections.NonGeneric.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Collections.Specialized.dll' Name='System.Collections.Specialized.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.ComponentModel.dll' Name='System.ComponentModel.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.ComponentModel.EventBasedAsync.dll' Name='System.ComponentModel.EventBasedAsync.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.ComponentModel.Primitives.dll' Name='System.ComponentModel.Primitives.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.ComponentModel.TypeConverter.dll' Name='System.ComponentModel.TypeConverter.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Console.dll' Name='System.Console.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Data.Common.dll' Name='System.Data.Common.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Diagnostics.Contracts.dll' Name='System.Diagnostics.Contracts.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Diagnostics.Debug.dll' Name='System.Diagnostics.Debug.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Diagnostics.FileVersionInfo.dll' Name='System.Diagnostics.FileVersionInfo.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Diagnostics.Process.dll' Name='System.Diagnostics.Process.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Diagnostics.StackTrace.dll' Name='System.Diagnostics.StackTrace.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Diagnostics.TextWriterTraceListener.dll' Name='System.Diagnostics.TextWriterTraceListener.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Diagnostics.Tools.dll' Name='System.Diagnostics.Tools.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Diagnostics.TraceSource.dll' Name='System.Diagnostics.TraceSource.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Diagnostics.Tracing.dll' Name='System.Diagnostics.Tracing.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Drawing.Primitives.dll' Name='System.Drawing.Primitives.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Dynamic.Runtime.dll' Name='System.Dynamic.Runtime.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Globalization.Calendars.dll' Name='System.Globalization.Calendars.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Globalization.dll' Name='System.Globalization.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Globalization.Extensions.dll' Name='System.Globalization.Extensions.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.IO.Compression.dll' Name='System.IO.Compression.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.IO.Compression.ZipFile.dll' Name='System.IO.Compression.ZipFile.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.IO.dll' Name='System.IO.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.IO.FileSystem.dll' Name='System.IO.FileSystem.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.IO.FileSystem.DriveInfo.dll' Name='System.IO.FileSystem.DriveInfo.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.IO.FileSystem.Primitives.dll' Name='System.IO.FileSystem.Primitives.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.IO.FileSystem.Watcher.dll' Name='System.IO.FileSystem.Watcher.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.IO.IsolatedStorage.dll' Name='System.IO.IsolatedStorage.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.IO.MemoryMappedFiles.dll' Name='System.IO.MemoryMappedFiles.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.IO.Pipes.dll' Name='System.IO.Pipes.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.IO.UnmanagedMemoryStream.dll' Name='System.IO.UnmanagedMemoryStream.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Linq.dll' Name='System.Linq.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Linq.Expressions.dll' Name='System.Linq.Expressions.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Linq.Parallel.dll' Name='System.Linq.Parallel.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Linq.Queryable.dll' Name='System.Linq.Queryable.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Net.Http.dll' Name='System.Net.Http.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Net.NameResolution.dll' Name='System.Net.NameResolution.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Net.NetworkInformation.dll' Name='System.Net.NetworkInformation.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Net.Ping.dll' Name='System.Net.Ping.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Net.Primitives.dll' Name='System.Net.Primitives.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Net.Requests.dll' Name='System.Net.Requests.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Net.Security.dll' Name='System.Net.Security.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Net.Sockets.dll' Name='System.Net.Sockets.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Net.WebHeaderCollection.dll' Name='System.Net.WebHeaderCollection.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Net.WebSockets.Client.dll' Name='System.Net.WebSockets.Client.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Net.WebSockets.dll' Name='System.Net.WebSockets.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.ObjectModel.dll' Name='System.ObjectModel.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Reflection.dll' Name='System.Reflection.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Reflection.Extensions.dll' Name='System.Reflection.Extensions.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Reflection.Primitives.dll' Name='System.Reflection.Primitives.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Resources.Reader.dll' Name='System.Resources.Reader.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Resources.ResourceManager.dll' Name='System.Resources.ResourceManager.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Resources.Writer.dll' Name='System.Resources.Writer.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Runtime.CompilerServices.VisualC.dll' Name='System.Runtime.CompilerServices.VisualC.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Runtime.dll' Name='System.Runtime.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Runtime.Extensions.dll' Name='System.Runtime.Extensions.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Runtime.Handles.dll' Name='System.Runtime.Handles.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Runtime.InteropServices.dll' Name='System.Runtime.InteropServices.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Runtime.InteropServices.RuntimeInformation.dll' Name='System.Runtime.InteropServices.RuntimeInformation.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Runtime.Numerics.dll' Name='System.Runtime.Numerics.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Runtime.Serialization.Formatters.dll' Name='System.Runtime.Serialization.Formatters.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Runtime.Serialization.Json.dll' Name='System.Runtime.Serialization.Json.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Runtime.Serialization.Primitives.dll' Name='System.Runtime.Serialization.Primitives.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Runtime.Serialization.Xml.dll' Name='System.Runtime.Serialization.Xml.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Security.Claims.dll' Name='System.Security.Claims.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Security.Cryptography.Algorithms.dll' Name='System.Security.Cryptography.Algorithms.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Security.Cryptography.Csp.dll' Name='System.Security.Cryptography.Csp.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Security.Cryptography.Encoding.dll' Name='System.Security.Cryptography.Encoding.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Security.Principal.dll' Name='System.Security.Principal.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Security.SecureString.dll' Name='System.Security.SecureString.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Text.Encoding.dll' Name='System.Text.Encoding.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Text.Encoding.Extensions.dll' Name='System.Text.Encoding.Extensions.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Text.RegularExpressions.dll' Name='System.Text.RegularExpressions.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Threading.dll' Name='System.Threading.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Threading.Overlapped.dll' Name='System.Threading.Overlapped.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Threading.Tasks.dll' Name='System.Threading.Tasks.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Threading.Tasks.Parallel.dll' Name='System.Threading.Tasks.Parallel.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Threading.Thread.dll' Name='System.Threading.Thread.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Threading.ThreadPool.dll' Name='System.Threading.ThreadPool.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Threading.Timer.dll' Name='System.Threading.Timer.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.ValueTuple.dll' Name='System.ValueTuple.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Xml.ReaderWriter.dll' Name='System.Xml.ReaderWriter.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Xml.XDocument.dll' Name='System.Xml.XDocument.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Xml.XmlDocument.dll' Name='System.Xml.XmlDocument.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Xml.XmlSerializer.dll' Name='System.Xml.XmlSerializer.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Xml.XPath.dll' Name='System.Xml.XPath.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Xml.XPath.XDocument.dll' Name='System.Xml.XPath.XDocument.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSystem.Xml.XPath.XmlDocument.dll' Name='System.Xml.XPath.XmlDocument.dll' On='uninstall'/>
+						</Component>
+						<Component Id='MicrosoftLibraries' Guid='B2FC6B57-783C-45B5-A84E-BD5F1F173506'>
+							<File Id='Microsoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Microsoft.Win32.Primitives.dll' Vital='yes' KeyPath='yes' />
+							<File Id='netstandard.dll' Name='netstandard.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\netstandard.dll' Vital='yes' />
+							<RemoveFile Id='RemoveMicrosoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' On='uninstall'/>
+							<RemoveFile Id='Removenetstandard.dll' Name='netstandard.dll' On='uninstall'/>
+						</Component>
+						<Component Id='ExternalLibraries' Guid='65C7C4CA-DE10-4838-8301-B23824CDFA23'>
+							<File Id='SkiaSharp.dll' Name='SkiaSharp.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\SkiaSharp.dll' Vital='yes' KeyPath='yes'/>
+							<File Id='libSkiaSharp.dll' Name='libSkiaSharp.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\x86\libSkiaSharp.dll' Vital='yes'/>
+							<RemoveFile Id='RemoveSkiaSharp.dll' Name='SkiaSharp.dll' On='uninstall'/>
+							<RemoveFile Id='RemovelibSkiaSharp.dll' Name='libSkiaSharp.dll' On='uninstall'/>
+						</Component>
+						<Component Id='MainExecutable' Guid='CF8BB89B-C017-4945-AF9E-B18FDB4E2EE9'>
+							<RegistryKey Root='HKLM' Key='Software\[Manufacturer]\[ProductName]'>
+								<RegistryValue Type='string' Name='InstallDir' Value='[INSTALLDIR]' Action='write'/>
+							</RegistryKey>
+							<File Id='Waher.Client.WPF.application' Name='Waher.Client.WPF.application' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Client.WPF.application' Vital='yes'/>
+							<File Id='Waher.Client.WPF.exe' Name='Waher.Client.WPF.exe' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Client.WPF.exe' Vital='yes' KeyPath='yes'>
+								<Shortcut Id="StartMenuIoTClientConsole" Directory="ProgramMenuDir" Name="IoT Client 1.0"
+										  WorkingDirectory='INSTALLDIR' Icon="Configure.ico" IconIndex="0" Advertise="yes" />
+							</File>
+							<File Id='Waher.Client.WPF.exe.config' Name='Waher.Client.WPF.exe.config' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Client.WPF.exe.config' Vital='yes'/>
+							<File Id='Waher.Client.WPF.exe.manifest' Name='Waher.Client.WPF.exe.manifest' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Client.WPF.exe.manifest' Vital='yes'/>
+							<File Id='Waher.Content.dll' Name='Waher.Content.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.dll' Vital='yes'/>
+							<File Id='Waher.Content.Emoji.dll' Name='Waher.Content.Emoji.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Emoji.dll' Vital='yes'/>
+							<File Id='Waher.Content.Emoji.Emoji1.dll' Name='Waher.Content.Emoji.Emoji1.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Emoji.Emoji1.dll' Vital='yes'/>
+							<File Id='Waher.Content.Html.dll' Name='Waher.Content.Html.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Html.dll' Vital='yes'/>
+							<File Id='Waher.Content.Images.dll' Name='Waher.Content.Images.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Images.dll' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.dll' Name='Waher.Content.Markdown.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.dll' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Consolidation.dll' Name='Waher.Content.Markdown.Consolidation.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.Consolidation.dll' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.GraphViz.dll' Name='Waher.Content.Markdown.GraphViz.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.GraphViz.dll' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Layout2D.dll' Name='Waher.Content.Markdown.Layout2D.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.Layout2D.dll' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.PlantUml.dll' Name='Waher.Content.Markdown.PlantUml.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.PlantUml.dll' Vital='yes'/>
+							<File Id='Waher.Content.SystemFiles.dll' Name='Waher.Content.SystemFiles.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.SystemFiles.dll' Vital='yes'/>
+							<File Id='Waher.Content.Xml.dll' Name='Waher.Content.Xml.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xml.dll' Vital='yes'/>
+							<File Id='Waher.Content.Xsl.dll' Name='Waher.Content.Xsl.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xsl.dll' Vital='yes'/>
+							<File Id='Waher.Events.dll' Name='Waher.Events.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Events.dll' Vital='yes'/>
+							<File Id='Waher.Layout.Layout2D.dll' Name='Waher.Layout.Layout2D.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Layout.Layout2D.dll' Vital='yes'/>
+							<File Id='Waher.Networking.dll' Name='Waher.Networking.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.dll' Name='Waher.Networking.XMPP.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.BOSH.dll' Name='Waher.Networking.XMPP.BOSH.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.BOSH.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Concentrator.dll' Name='Waher.Networking.XMPP.Concentrator.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Concentrator.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Contracts.dll' Name='Waher.Networking.XMPP.Contracts.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Contracts.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Control.dll' Name='Waher.Networking.XMPP.Control.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Control.dll' Vital='yes'/>
-              <File Id='Waher.Networking.XMPP.MUC.dll' Name='Waher.Networking.XMPP.MUC.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.MUC.dll' Vital='yes'/>
-              <File Id='Waher.Networking.XMPP.P2P.dll' Name='Waher.Networking.XMPP.P2P.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.P2P.dll' Vital='yes'/>
-              <File Id='Waher.Networking.XMPP.PEP.dll' Name='Waher.Networking.XMPP.PEP.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.PEP.dll' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.MUC.dll' Name='Waher.Networking.XMPP.MUC.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.MUC.dll' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.P2P.dll' Name='Waher.Networking.XMPP.P2P.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.P2P.dll' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.PEP.dll' Name='Waher.Networking.XMPP.PEP.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.PEP.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Provisioning.dll' Name='Waher.Networking.XMPP.Provisioning.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Provisioning.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.PubSub.dll' Name='Waher.Networking.XMPP.PubSub.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.PubSub.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Sensor.dll' Name='Waher.Networking.XMPP.Sensor.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Sensor.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Synchronization.dll' Name='Waher.Networking.XMPP.Synchronization.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Synchronization.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.WebSocket.dll' Name='Waher.Networking.XMPP.WebSocket.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.WebSocket.dll' Vital='yes'/>
 							<File Id='Waher.Persistence.dll' Name='Waher.Persistence.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.dll' Vital='yes'/>
-              <File Id='Waher.Persistence.FilesLW.dll' Name='Waher.Persistence.FilesLW.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.FilesLW.dll' Vital='yes'/>
-              <File Id='Waher.Persistence.Serialization.dll' Name='Waher.Persistence.Serialization.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.Serialization.dll' Vital='yes'/>
-              <File Id='Waher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Cache.dll' Vital='yes'/>
-              <File Id='Waher.Runtime.Inventory.dll' Name='Waher.Runtime.Inventory.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Inventory.dll' Vital='yes'/>
-              <File Id='Waher.Runtime.Language.dll' Name='Waher.Runtime.Language.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Language.dll' Vital='yes'/>
-              <File Id='Waher.Runtime.Settings.dll' Name='Waher.Runtime.Settings.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Settings.dll' Vital='yes'/>
-              <File Id='Waher.Runtime.Temporary.dll' Name='Waher.Runtime.Temporary.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Temporary.dll' Vital='yes'/>
-              <File Id='Waher.Runtime.Threading.dll' Name='Waher.Runtime.Threading.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Threading.dll' Vital='yes'/>
+							<File Id='Waher.Persistence.FilesLW.dll' Name='Waher.Persistence.FilesLW.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.FilesLW.dll' Vital='yes'/>
+							<File Id='Waher.Persistence.Serialization.dll' Name='Waher.Persistence.Serialization.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.Serialization.dll' Vital='yes'/>
+							<File Id='Waher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Cache.dll' Vital='yes'/>
+							<File Id='Waher.Runtime.Inventory.dll' Name='Waher.Runtime.Inventory.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Inventory.dll' Vital='yes'/>
+							<File Id='Waher.Runtime.Language.dll' Name='Waher.Runtime.Language.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Language.dll' Vital='yes'/>
+							<File Id='Waher.Runtime.Settings.dll' Name='Waher.Runtime.Settings.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Settings.dll' Vital='yes'/>
+							<File Id='Waher.Runtime.Temporary.dll' Name='Waher.Runtime.Temporary.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Temporary.dll' Vital='yes'/>
+							<File Id='Waher.Runtime.Threading.dll' Name='Waher.Runtime.Threading.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Threading.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Timing.dll' Name='Waher.Runtime.Timing.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Timing.dll' Vital='yes'/>
 							<File Id='Waher.Script.dll' Name='Waher.Script.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.dll' Vital='yes'/>
 							<File Id='Waher.Script.Content.dll' Name='Waher.Script.Content.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Content.dll' Vital='yes'/>
@@ -278,54 +280,54 @@
 							<File Id='Waher.Script.Graphs.dll' Name='Waher.Script.Graphs.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Graphs.dll' Vital='yes'/>
 							<File Id='Waher.Script.Graphs3D.dll' Name='Waher.Script.Graphs3D.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Graphs3D.dll' Vital='yes'/>
 							<File Id='Waher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Persistence.dll' Vital='yes'/>
-              <File Id='Waher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Statistics.dll' Vital='yes'/>
-              <File Id='Waher.Script.Xml.dll' Name='Waher.Script.Xml.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Xml.dll' Vital='yes'/>
-              <File Id='Waher.Security.dll' Name='Waher.Security.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.dll' Vital='yes'/>
+							<File Id='Waher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Statistics.dll' Vital='yes'/>
+							<File Id='Waher.Script.Xml.dll' Name='Waher.Script.Xml.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Xml.dll' Vital='yes'/>
+							<File Id='Waher.Security.dll' Name='Waher.Security.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.dll' Vital='yes'/>
 							<File Id='Waher.Security.EllipticCurves.dll' Name='Waher.Security.EllipticCurves.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.EllipticCurves.dll' Vital='yes'/>
 							<File Id='Waher.Security.SHA3.dll' Name='Waher.Security.SHA3.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.SHA3.dll' Vital='yes'/>
 							<File Id='Waher.Things.dll' Name='Waher.Things.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Things.dll' Vital='yes'/>
-              <RemoveFile Id='RemoveWaher.Client.WPF.application' Name='Waher.Client.WPF.application' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Client.WPF.exe' Name='Waher.Client.WPF.exe' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Client.WPF.exe.config' Name='Waher.Client.WPF.exe.config' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Client.WPF.exe.manifest' Name='Waher.Client.WPF.exe.manifest' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.dll' Name='Waher.Content.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Emoji.dll' Name='Waher.Content.Emoji.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Emoji.Emoji1.dll' Name='Waher.Content.Emoji.Emoji1.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Html.dll' Name='Waher.Content.Html.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Images.dll' Name='Waher.Content.Images.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Markdown.dll' Name='Waher.Content.Markdown.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Markdown.Consolidation.dll' Name='Waher.Content.Markdown.Consolidation.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Markdown.GraphViz.dll' Name='Waher.Content.Markdown.GraphViz.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Markdown.Layout2D.dll' Name='Waher.Content.Markdown.Layout2D.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Markdown.PlantUml.dll' Name='Waher.Content.Markdown.PlantUml.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.SystemFiles.dll' Name='Waher.Content.SystemFiles.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Xml.dll' Name='Waher.Content.Xml.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Xsl.dll' Name='Waher.Content.Xsl.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Events.dll' Name='Waher.Events.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Layout.Layout2D.dll' Name='Waher.Layout.Layout2D.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Networking.dll' Name='Waher.Networking.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Client.WPF.application' Name='Waher.Client.WPF.application' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Client.WPF.exe' Name='Waher.Client.WPF.exe' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Client.WPF.exe.config' Name='Waher.Client.WPF.exe.config' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Client.WPF.exe.manifest' Name='Waher.Client.WPF.exe.manifest' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.dll' Name='Waher.Content.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Emoji.dll' Name='Waher.Content.Emoji.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Emoji.Emoji1.dll' Name='Waher.Content.Emoji.Emoji1.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Html.dll' Name='Waher.Content.Html.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Images.dll' Name='Waher.Content.Images.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.dll' Name='Waher.Content.Markdown.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Consolidation.dll' Name='Waher.Content.Markdown.Consolidation.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.GraphViz.dll' Name='Waher.Content.Markdown.GraphViz.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Layout2D.dll' Name='Waher.Content.Markdown.Layout2D.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.PlantUml.dll' Name='Waher.Content.Markdown.PlantUml.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.SystemFiles.dll' Name='Waher.Content.SystemFiles.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Xml.dll' Name='Waher.Content.Xml.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Xsl.dll' Name='Waher.Content.Xsl.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Events.dll' Name='Waher.Events.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Layout.Layout2D.dll' Name='Waher.Layout.Layout2D.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.dll' Name='Waher.Networking.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.dll' Name='Waher.Networking.XMPP.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.BOSH.dll' Name='Waher.Networking.XMPP.BOSH.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.dll' Name='Waher.Networking.XMPP.Concentrator.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Contracts.dll' Name='Waher.Networking.XMPP.Contracts.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Control.dll' Name='Waher.Networking.XMPP.Control.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Networking.XMPP.MUC.dll' Name='Waher.Networking.XMPP.MUC.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Networking.XMPP.P2P.dll' Name='Waher.Networking.XMPP.P2P.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Networking.XMPP.PEP.dll' Name='Waher.Networking.XMPP.PEP.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.MUC.dll' Name='Waher.Networking.XMPP.MUC.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.P2P.dll' Name='Waher.Networking.XMPP.P2P.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.PEP.dll' Name='Waher.Networking.XMPP.PEP.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Provisioning.dll' Name='Waher.Networking.XMPP.Provisioning.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.PubSub.dll' Name='Waher.Networking.XMPP.PubSub.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Sensor.dll' Name='Waher.Networking.XMPP.Sensor.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Synchronization.dll' Name='Waher.Networking.XMPP.Synchronization.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.WebSocket.dll' Name='Waher.Networking.XMPP.WebSocket.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.dll' Name='Waher.Persistence.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Persistence.FilesLW.dll' Name='Waher.Persistence.FilesLW.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Persistence.Serialization.dll' Name='Waher.Persistence.Serialization.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Runtime.Inventory.dll' Name='Waher.Runtime.Inventory.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Runtime.Language.dll' Name='Waher.Runtime.Language.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Runtime.Settings.dll' Name='Waher.Runtime.Settings.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Runtime.Temporary.dll' Name='Waher.Runtime.Temporary.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Runtime.Threading.dll' Name='Waher.Runtime.Threading.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Persistence.FilesLW.dll' Name='Waher.Persistence.FilesLW.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Persistence.Serialization.dll' Name='Waher.Persistence.Serialization.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Inventory.dll' Name='Waher.Runtime.Inventory.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Language.dll' Name='Waher.Runtime.Language.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Settings.dll' Name='Waher.Runtime.Settings.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Temporary.dll' Name='Waher.Runtime.Temporary.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Threading.dll' Name='Waher.Runtime.Threading.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Timing.dll' Name='Waher.Runtime.Timing.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.dll' Name='Waher.Script.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Content.dll' Name='Waher.Script.Content.dll' On='uninstall'/>
@@ -333,30 +335,30 @@
 							<RemoveFile Id='RemoveWaher.Script.Graphs.dll' Name='Waher.Script.Graphs.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Graphs3D.dll' Name='Waher.Script.Graphs3D.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Script.Xml.dll' Name='Waher.Script.Xml.dll' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Security.dll' Name='Waher.Security.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Xml.dll' Name='Waher.Script.Xml.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.dll' Name='Waher.Security.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.EllipticCurves.dll' Name='Waher.Security.EllipticCurves.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.SHA3.dll' Name='Waher.Security.SHA3.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.dll' Name='Waher.Things.dll' On='uninstall'/>
-            </Component>
-            <Component Id='MainDebugFiles' Guid='2A936317-68FE-40F9-AC44-4242C32FAAF7'>
-              <File Id='Waher.Client.WPF.pdb' Name='Waher.Client.WPF.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Client.WPF.pdb' Vital='yes' KeyPath='yes'/>
-              <File Id='Waher.Content.pdb' Name='Waher.Content.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.pdb' Vital='yes'/>
-              <File Id='Waher.Content.Emoji.pdb' Name='Waher.Content.Emoji.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Emoji.pdb' Vital='yes'/>
-              <File Id='Waher.Content.Emoji.Emoji1.pdb' Name='Waher.Content.Emoji.Emoji1.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Emoji.Emoji1.pdb' Vital='yes'/>
-              <File Id='Waher.Content.Html.pdb' Name='Waher.Content.Html.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Html.pdb' Vital='yes'/>
-              <File Id='Waher.Content.Images.pdb' Name='Waher.Content.Images.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Images.pdb' Vital='yes'/>
-              <File Id='Waher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.pdb' Vital='yes'/>
-              <File Id='Waher.Content.Markdown.GraphViz.pdb' Name='Waher.Content.Markdown.GraphViz.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.GraphViz.pdb' Vital='yes'/>
-              <File Id='Waher.Content.Markdown.Layout2D.pdb' Name='Waher.Content.Markdown.Layout2D.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.Layout2D.pdb' Vital='yes'/>
-              <File Id='Waher.Content.Markdown.PlantUml.pdb' Name='Waher.Content.Markdown.PlantUml.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.PlantUml.pdb' Vital='yes'/>
-              <File Id='Waher.Content.SystemFiles.pdb' Name='Waher.Content.SystemFiles.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.SystemFiles.pdb' Vital='yes'/>
-              <File Id='Waher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xml.pdb' Vital='yes'/>
-              <File Id='Waher.Content.Xsl.pdb' Name='Waher.Content.Xsl.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xsl.pdb' Vital='yes'/>
-              <File Id='Waher.Events.pdb' Name='Waher.Events.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Events.pdb' Vital='yes'/>
-              <File Id='Waher.Layout.Layout2D.pdb' Name='Waher.Layout.Layout2D.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Layout.Layout2D.pdb' Vital='yes'/>
-              <File Id='Waher.Networking.pdb' Name='Waher.Networking.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.pdb' Vital='yes'/>
+						</Component>
+						<Component Id='MainDebugFiles' Guid='2A936317-68FE-40F9-AC44-4242C32FAAF7'>
+							<File Id='Waher.Client.WPF.pdb' Name='Waher.Client.WPF.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Client.WPF.pdb' Vital='yes' KeyPath='yes'/>
+							<File Id='Waher.Content.pdb' Name='Waher.Content.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Emoji.pdb' Name='Waher.Content.Emoji.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Emoji.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Emoji.Emoji1.pdb' Name='Waher.Content.Emoji.Emoji1.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Emoji.Emoji1.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Html.pdb' Name='Waher.Content.Html.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Html.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Images.pdb' Name='Waher.Content.Images.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Images.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.GraphViz.pdb' Name='Waher.Content.Markdown.GraphViz.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.GraphViz.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Layout2D.pdb' Name='Waher.Content.Markdown.Layout2D.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.Layout2D.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.PlantUml.pdb' Name='Waher.Content.Markdown.PlantUml.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.PlantUml.pdb' Vital='yes'/>
+							<File Id='Waher.Content.SystemFiles.pdb' Name='Waher.Content.SystemFiles.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.SystemFiles.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xml.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Xsl.pdb' Name='Waher.Content.Xsl.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xsl.pdb' Vital='yes'/>
+							<File Id='Waher.Events.pdb' Name='Waher.Events.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Events.pdb' Vital='yes'/>
+							<File Id='Waher.Layout.Layout2D.pdb' Name='Waher.Layout.Layout2D.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Layout.Layout2D.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.pdb' Name='Waher.Networking.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.pdb' Name='Waher.Networking.XMPP.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.xml' Name='Waher.Networking.XMPP.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.xml' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.BOSH.pdb' Name='Waher.Networking.XMPP.BOSH.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.BOSH.pdb' Vital='yes'/>
@@ -365,11 +367,11 @@
 							<File Id='Waher.Networking.XMPP.Concentrator.xml' Name='Waher.Networking.XMPP.Concentrator.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Concentrator.xml' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Contracts.pdb' Name='Waher.Networking.XMPP.Contracts.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Contracts.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Control.pdb' Name='Waher.Networking.XMPP.Control.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Control.pdb' Vital='yes'/>
-              <File Id='Waher.Networking.XMPP.MUC.pdb' Name='Waher.Networking.XMPP.MUC.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.MUC.pdb' Vital='yes'/>
-              <File Id='Waher.Networking.XMPP.MUC.xml' Name='Waher.Networking.XMPP.MUC.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.MUC.xml' Vital='yes'/>
-              <File Id='Waher.Networking.XMPP.P2P.pdb' Name='Waher.Networking.XMPP.P2P.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.P2P.pdb' Vital='yes'/>
-              <File Id='Waher.Networking.XMPP.P2P.xml' Name='Waher.Networking.XMPP.P2P.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.P2P.xml' Vital='yes'/>
-              <File Id='Waher.Networking.XMPP.PEP.pdb' Name='Waher.Networking.XMPP.PEP.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.PEP.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.MUC.pdb' Name='Waher.Networking.XMPP.MUC.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.MUC.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.MUC.xml' Name='Waher.Networking.XMPP.MUC.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.MUC.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.P2P.pdb' Name='Waher.Networking.XMPP.P2P.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.P2P.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.P2P.xml' Name='Waher.Networking.XMPP.P2P.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.P2P.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.PEP.pdb' Name='Waher.Networking.XMPP.PEP.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.PEP.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.PEP.xml' Name='Waher.Networking.XMPP.PEP.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.PEP.xml' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Provisioning.pdb' Name='Waher.Networking.XMPP.Provisioning.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Provisioning.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Provisioning.xml' Name='Waher.Networking.XMPP.Provisioning.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Provisioning.xml' Vital='yes'/>
@@ -382,12 +384,12 @@
 							<File Id='Waher.Networking.XMPP.WebSocket.pdb' Name='Waher.Networking.XMPP.WebSocket.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.WebSocket.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.WebSocket.xml' Name='Waher.Networking.XMPP.WebSocket.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.WebSocket.xml' Vital='yes'/>
 							<File Id='Waher.Persistence.pdb' Name='Waher.Persistence.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.pdb' Vital='yes'/>
-              <File Id='Waher.Persistence.FilesLW.pdb' Name='Waher.Persistence.FilesLW.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.FilesLW.pdb' Vital='yes'/>
-              <File Id='Waher.Persistence.Serialization.pdb' Name='Waher.Persistence.Serialization.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.Serialization.pdb' Vital='yes'/>
-              <File Id='Waher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Cache.pdb' Vital='yes'/>
-              <File Id='Waher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Inventory.pdb' Vital='yes'/>
-              <File Id='Waher.Runtime.Language.pdb' Name='Waher.Runtime.Language.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Language.pdb' Vital='yes'/>
-              <File Id='Waher.Runtime.Settings.pdb' Name='Waher.Runtime.Settings.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Settings.pdb' Vital='yes'/>
+							<File Id='Waher.Persistence.FilesLW.pdb' Name='Waher.Persistence.FilesLW.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.FilesLW.pdb' Vital='yes'/>
+							<File Id='Waher.Persistence.Serialization.pdb' Name='Waher.Persistence.Serialization.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.Serialization.pdb' Vital='yes'/>
+							<File Id='Waher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Cache.pdb' Vital='yes'/>
+							<File Id='Waher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Inventory.pdb' Vital='yes'/>
+							<File Id='Waher.Runtime.Language.pdb' Name='Waher.Runtime.Language.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Language.pdb' Vital='yes'/>
+							<File Id='Waher.Runtime.Settings.pdb' Name='Waher.Runtime.Settings.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Settings.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Threading.pdb' Name='Waher.Runtime.Threading.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Threading.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Timing.pdb' Name='Waher.Runtime.Timing.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Timing.pdb' Vital='yes'/>
 							<File Id='Waher.Script.pdb' Name='Waher.Script.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.pdb' Vital='yes'/>
@@ -396,39 +398,39 @@
 							<File Id='Waher.Script.Graphs.pdb' Name='Waher.Script.Graphs.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Graphs.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Graphs3D.pdb' Name='Waher.Script.Graphs3D.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Graphs3D.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Persistence.pdb' Vital='yes'/>
-              <File Id='Waher.Script.Statistics.pdb' Name='Waher.Script.Statistics.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Statistics.pdb' Vital='yes'/>
-              <File Id='Waher.Script.Xml.pdb' Name='Waher.Script.Xml.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Xml.pdb' Vital='yes'/>
-              <File Id='Waher.Security.pdb' Name='Waher.Security.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.pdb' Vital='yes'/>
+							<File Id='Waher.Script.Statistics.pdb' Name='Waher.Script.Statistics.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Statistics.pdb' Vital='yes'/>
+							<File Id='Waher.Script.Xml.pdb' Name='Waher.Script.Xml.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Xml.pdb' Vital='yes'/>
+							<File Id='Waher.Security.pdb' Name='Waher.Security.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.pdb' Vital='yes'/>
 							<File Id='Waher.Security.EllipticCurves.pdb' Name='Waher.Security.EllipticCurves.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.EllipticCurves.pdb' Vital='yes'/>
 							<File Id='Waher.Security.SHA3.pdb' Name='Waher.Security.SHA3.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.SHA3.pdb' Vital='yes'/>
 							<File Id='Waher.Things.pdb' Name='Waher.Things.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Things.pdb' Vital='yes'/>
-              <RemoveFile Id='RemoveWaher.Client.WPF.pdb' Name='Waher.Client.WPF.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.pdb' Name='Waher.Content.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Emoji.pdb' Name='Waher.Content.Emoji.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Emoji.Emoji1.pdb' Name='Waher.Content.Emoji.Emoji1.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Html.pdb' Name='Waher.Content.Html.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Images.pdb' Name='Waher.Content.Images.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Markdown.GraphViz.pdb' Name='Waher.Content.Markdown.GraphViz.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Markdown.Layout2D.pdb' Name='Waher.Content.Markdown.Layout2D.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Markdown.PlantUml.pdb' Name='Waher.Content.Markdown.PlantUml.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.SystemFiles.pdb' Name='Waher.Content.SystemFiles.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Content.Xsl.pdb' Name='Waher.Content.Xsl.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Events.pdb' Name='Waher.Events.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Layout.Layout2D.pdb' Name='Waher.Layout.Layout2D.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Networking.pdb' Name='Waher.Networking.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Client.WPF.pdb' Name='Waher.Client.WPF.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.pdb' Name='Waher.Content.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Emoji.pdb' Name='Waher.Content.Emoji.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Emoji.Emoji1.pdb' Name='Waher.Content.Emoji.Emoji1.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Html.pdb' Name='Waher.Content.Html.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Images.pdb' Name='Waher.Content.Images.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.GraphViz.pdb' Name='Waher.Content.Markdown.GraphViz.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Layout2D.pdb' Name='Waher.Content.Markdown.Layout2D.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.PlantUml.pdb' Name='Waher.Content.Markdown.PlantUml.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.SystemFiles.pdb' Name='Waher.Content.SystemFiles.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Xsl.pdb' Name='Waher.Content.Xsl.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Events.pdb' Name='Waher.Events.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Layout.Layout2D.pdb' Name='Waher.Layout.Layout2D.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.pdb' Name='Waher.Networking.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.pdb' Name='Waher.Networking.XMPP.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.xml' Name='Waher.Networking.XMPP.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.BOSH.pdb' Name='Waher.Networking.XMPP.BOSH.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.BOSH.xml' Name='Waher.Networking.XMPP.BOSH.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.pdb' Name='Waher.Networking.XMPP.Concentrator.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.xml' Name='Waher.Networking.XMPP.Concentrator.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.xml' Name='Waher.Networking.XMPP.Concentrator.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Contracts.pdb' Name='Waher.Networking.XMPP.Contracts.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Control.pdb' Name='Waher.Networking.XMPP.Control.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Networking.XMPP.MUC.pdb' Name='Waher.Networking.XMPP.MUC.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Networking.XMPP.MUC.xml' Name='Waher.Networking.XMPP.MUC.xml' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Networking.XMPP.P2P.pdb' Name='Waher.Networking.XMPP.P2P.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.MUC.pdb' Name='Waher.Networking.XMPP.MUC.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.MUC.xml' Name='Waher.Networking.XMPP.MUC.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.P2P.pdb' Name='Waher.Networking.XMPP.P2P.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.P2P.xml' Name='Waher.Networking.XMPP.P2P.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.PEP.pdb' Name='Waher.Networking.XMPP.PEP.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.PEP.xml' Name='Waher.Networking.XMPP.PEP.xml' On='uninstall'/>
@@ -437,18 +439,18 @@
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.PubSub.pdb' Name='Waher.Networking.XMPP.PubSub.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.PubSub.xml' Name='Waher.Networking.XMPP.PubSub.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Sensor.pdb' Name='Waher.Networking.XMPP.Sensor.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Networking.XMPP.Sensor.xml' Name='Waher.Networking.XMPP.Sensor.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Sensor.xml' Name='Waher.Networking.XMPP.Sensor.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Synchronization.pdb' Name='Waher.Networking.XMPP.Synchronization.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Synchronization.xml' Name='Waher.Networking.XMPP.Synchronization.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.WebSocket.pdb' Name='Waher.Networking.XMPP.WebSocket.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.WebSocket.xml' Name='Waher.Networking.XMPP.WebSocket.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.pdb' Name='Waher.Persistence.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Persistence.FilesLW.pdb' Name='Waher.Persistence.FilesLW.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Persistence.Serialization.pdb' Name='Waher.Persistence.Serialization.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Runtime.Language.pdb' Name='Waher.Runtime.Language.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Runtime.Settings.pdb' Name='Waher.Runtime.Settings.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Persistence.FilesLW.pdb' Name='Waher.Persistence.FilesLW.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Persistence.Serialization.pdb' Name='Waher.Persistence.Serialization.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Language.pdb' Name='Waher.Runtime.Language.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Settings.pdb' Name='Waher.Runtime.Settings.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Threading.pdb' Name='Waher.Runtime.Threading.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Timing.pdb' Name='Waher.Runtime.Timing.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.pdb' Name='Waher.Script.pdb' On='uninstall'/>
@@ -457,13 +459,13 @@
 							<RemoveFile Id='RemoveWaher.Script.Graphs.pdb' Name='Waher.Script.Graphs.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Graphs3D.pdb' Name='Waher.Script.Graphs3D.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Script.Statistics.pdb' Name='Waher.Script.Statistics.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Script.Xml.pdb' Name='Waher.Script.Xml.pdb' On='uninstall'/>
-              <RemoveFile Id='RemoveWaher.Security.pdb' Name='Waher.Security.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Statistics.pdb' Name='Waher.Script.Statistics.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Xml.pdb' Name='Waher.Script.Xml.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.pdb' Name='Waher.Security.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.EllipticCurves.pdb' Name='Waher.Security.EllipticCurves.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.SHA3.pdb' Name='Waher.Security.SHA3.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.pdb' Name='Waher.Things.pdb' On='uninstall'/>
-            </Component>
+						</Component>
 						<Directory Id='Graphics' Name='Graphics'>
 							<Component Id='Emoji1Zip' Guid='9A7A7EA5-3961-45DC-8B2B-A9829636F790'>
 								<RemoveFolder Id='RemoveEmoji1Folder' On='uninstall' />
@@ -471,53 +473,53 @@
 								<RemoveFile Id='RemoveEmoji1Zip' Name='Emoji1.zip' On='uninstall'/>
 							</Component>
 						</Directory>
-          </Directory>
-        </Directory>
-      </Directory>
-      <Directory Id="ProgramMenuFolder" Name="Programs">
-        <Directory Id="ProgramMenuDir" Name="IoT Client 1.0">
-          <Component Id="ProgramMenuDir" Guid="19878820-A9D8-4F18-B148-35806CC6CC3F">
-            <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
-            <RegistryKey Root='HKCU' Key='Software\[Manufacturer]\[ProductName]'>
-              <RegistryValue Type='string' Value='' KeyPath='yes' Action='write' />
-            </RegistryKey>
-          </Component>
-        </Directory>
-      </Directory>
-      <Directory Id="DesktopFolder" Name="Desktop" />
-    </Directory>
-    <Feature Id='Complete' Title='IoT Client' Description='The IoT Client'
-						 Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'>
-      <Feature Id='IoTClient' Title='IoT Client' Description='Contains the required software to run the IoT Client.' Level='1'>
-        <ComponentRef Id='SystemLibraries'/>
-        <ComponentRef Id='MicrosoftLibraries'/>
-        <ComponentRef Id='MainExecutable' />
-        <ComponentRef Id='ExternalLibraries' />
-        <ComponentRef Id='ProgramMenuDir' />
-      </Feature>
-      <Feature Id="VCRedist" Title="Visual C++ 14.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-        <MergeRef Id="VCRedist"/>
-      </Feature>
-      <Feature Id='Emoji1' Title='Emoji1' Description='Contains emojies from Emoji1.' Level='1'>
+					</Directory>
+				</Directory>
+			</Directory>
+			<Directory Id="ProgramMenuFolder" Name="Programs">
+				<Directory Id="ProgramMenuDir" Name="IoT Client 1.0">
+					<Component Id="ProgramMenuDir" Guid="19878820-A9D8-4F18-B148-35806CC6CC3F">
+						<RemoveFolder Id='ProgramMenuDir' On='uninstall' />
+						<RegistryKey Root='HKCU' Key='Software\[Manufacturer]\[ProductName]'>
+							<RegistryValue Type='string' Value='' KeyPath='yes' Action='write' />
+						</RegistryKey>
+					</Component>
+				</Directory>
+			</Directory>
+			<Directory Id="DesktopFolder" Name="Desktop" />
+		</Directory>
+		<Feature Id='Complete' Title='IoT Client' Description='The IoT Client'
+							 Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'>
+			<Feature Id='IoTClient' Title='IoT Client' Description='Contains the required software to run the IoT Client.' Level='1'>
+				<ComponentRef Id='SystemLibraries'/>
+				<ComponentRef Id='MicrosoftLibraries'/>
+				<ComponentRef Id='MainExecutable' />
+				<ComponentRef Id='ExternalLibraries' />
+				<ComponentRef Id='ProgramMenuDir' />
+			</Feature>
+			<Feature Id="VCRedist" Title="Visual C++ 14.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+				<MergeRef Id="VCRedist"/>
+			</Feature>
+			<Feature Id='Emoji1' Title='Emoji1' Description='Contains emojies from Emoji1.' Level='1'>
 				<ComponentRef Id='Emoji1Zip' />
 			</Feature>
-      <Feature Id='DebugFiles' Title='Debug Files' Description='Provides debug files. This will help debugging, since it provides more information in case something goes wrong.' Level='1000'>
-        <ComponentRef Id='MainDebugFiles'/>
-      </Feature>
-    </Feature>
-    <WixVariable Id="WixUIBannerBmp" Value="..\..\banner.bmp" />
-    <WixVariable Id="WixUIDialogBmp" Value="..\..\dialog.bmp" />
-    <UI Id="MyWixUI_Mondo">
-      <UIRef Id="WixUI_Mondo" />
-      <UIRef Id="WixUI_ErrorProgressText" />
-      <DialogRef Id="WelcomeDlg" />
-      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="SetupTypeDlg" Order="1">1</Publish>
-      <Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="1">1</Publish>
-    </UI>
-    <Icon Id="Configure.ico" SourceFile="..\..\Configure.ico" />
-    <InstallExecuteSequence>
-      <LaunchConditions After='AppSearch' />
-      <RemoveExistingProducts After='InstallFinalize' />
-    </InstallExecuteSequence>
-  </Product>
+			<Feature Id='DebugFiles' Title='Debug Files' Description='Provides debug files. This will help debugging, since it provides more information in case something goes wrong.' Level='1000'>
+				<ComponentRef Id='MainDebugFiles'/>
+			</Feature>
+		</Feature>
+		<WixVariable Id="WixUIBannerBmp" Value="..\..\banner.bmp" />
+		<WixVariable Id="WixUIDialogBmp" Value="..\..\dialog.bmp" />
+		<UI Id="MyWixUI_Mondo">
+			<UIRef Id="WixUI_Mondo" />
+			<UIRef Id="WixUI_ErrorProgressText" />
+			<DialogRef Id="WelcomeDlg" />
+			<Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="SetupTypeDlg" Order="1">1</Publish>
+			<Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="1">1</Publish>
+		</UI>
+		<Icon Id="Configure.ico" SourceFile="..\..\Configure.ico" />
+		<InstallExecuteSequence>
+			<LaunchConditions After='AppSearch' />
+			<RemoveExistingProducts After='InstallFinalize' />
+		</InstallExecuteSequence>
+	</Product>
 </Wix>

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text;
+using System.Reflection;
 using System.Xml;
 using Waher.Runtime.Inventory;
 using Waher.Script.Output;
@@ -16,7 +16,10 @@ namespace Waher.Script.Xml
 		/// </summary>
 		/// <param name="Object">Object</param>
 		/// <returns>How well objects of this type are supported.</returns>
-		public Grade Supports(Type Object) => Object == typeof(XmlDocument) ? Grade.Ok : Grade.NotAtAll;
+		public Grade Supports(Type Object)
+		{
+			return typeof(XmlNode).GetTypeInfo().IsAssignableFrom(Object.GetTypeInfo()) ? Grade.Ok : Grade.NotAtAll;
+		}
 
 		/// <summary>
 		/// Gets a string representing a value.
@@ -25,8 +28,8 @@ namespace Waher.Script.Xml
 		/// <returns>Expression string.</returns>
 		public string GetString(object Value)
 		{
-			XmlDocument Doc = (XmlDocument)Value;
-			return Doc.OuterXml;
+			XmlNode Node = (XmlNode)Value;
+			return Node.OuterXml;
 		}
 	}
 }

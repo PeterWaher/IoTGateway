@@ -2425,7 +2425,7 @@ namespace Waher.Script
 							}
 							else
 							{
-								ScriptNode IfNull = this.AssertOperandNotNull(this.ParseObject());
+								ScriptNode IfNull = this.AssertOperandNotNull(this.ParseStatement());
 								Node = new NullCheck(Node, IfNull, Start, this.pos - Start, this);
 							}
 							break;

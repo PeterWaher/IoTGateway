@@ -30,6 +30,20 @@ namespace Waher.Persistence.Serialization
 			: base(Context, typeof(GenericObject))
 		{
 			this.returnTypedObjects = ReturnTypedObjects;
+
+			this.ArchiveObjects = true;
+			this.ArchiveTimeDynamic = true;
+		}
+
+		/// <summary>
+		/// Number of days to archive objects of this type. If equal to <see cref="int.MaxValue"/>, no limit is defined.
+		/// </summary>
+		public override int GetArchivingTimeDays(object Object)
+		{
+			if (Object is GenericObject GenObj)
+				return GenObj.ArchivingTime;
+			else
+				return base.GetArchivingTimeDays(Object);
 		}
 
 		/// <summary>

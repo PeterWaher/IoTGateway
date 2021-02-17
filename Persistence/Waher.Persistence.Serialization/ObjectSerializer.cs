@@ -185,6 +185,7 @@ namespace Waher.Persistence.Serialization
 		private MethodInfo obsoleteMethod = null;
 		private int archiveDays = 0;
 		private bool archive = false;
+		private bool archiveDynamic = false;
 		private bool isNullable;
 		private bool normalized;
 
@@ -343,6 +344,8 @@ namespace Waher.Persistence.Serialization
 						throw new SerializationException("Invalid property type for the archiving time: " + this.archiveProperty.Name, this.type);
 					else
 						this.archiveField = null;
+
+					this.archiveDynamic = !(this.archiveProperty is null && this.archiveField is null);
 				}
 				else
 					this.archiveDays = ArchivingTimeAttribute.Days;
@@ -2519,7 +2522,7 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Number of days to archive objects of this type. If equal to <see cref="int.MaxValue"/>, no limit is defined.
 		/// </summary>
-		public int GetArchivingTimeDays(object Object)
+		public virtual int GetArchivingTimeDays(object Object)
 		{
 			if (!this.archive)
 				return 0;
@@ -2539,6 +2542,7 @@ namespace Waher.Persistence.Serialization
 		public bool ArchiveObjects
 		{
 			get { return this.archive; }
+			internal set { this.archive = value; }
 		}
 
 		/// <summary>
@@ -2546,7 +2550,8 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		public bool ArchiveTimeDynamic
 		{
-			get { return !(this.archiveProperty is null && this.archiveField is null); }
+			get { return this.archiveDynamic; }
+			internal set { this.archiveDynamic = value; }
 		}
 
 		/// <summary>

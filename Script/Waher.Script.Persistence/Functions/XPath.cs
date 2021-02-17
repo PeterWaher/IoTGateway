@@ -93,7 +93,29 @@ namespace Waher.Script.Persistence.Functions
 			if (Obj is null)
 				return ObjectValue.Null;
 			else if (Obj is XmlNode N)
-				Result = N.SelectNodes(Argument);
+			{
+				XmlNamespaceManager NamespaceManager;
+
+				if (Obj is XmlDocument Doc)
+				{
+					NamespaceManager = new XmlNamespaceManager(Doc.NameTable);
+					if (!string.IsNullOrEmpty(Doc.DocumentElement.NamespaceURI) && string.IsNullOrEmpty(Doc.DocumentElement.Prefix))
+						NamespaceManager.AddNamespace("default", Doc.DocumentElement.NamespaceURI);
+				}
+				else if (!(N.OwnerDocument is null))
+				{
+					NamespaceManager = new XmlNamespaceManager(N.OwnerDocument.NameTable);
+					if (!string.IsNullOrEmpty(N.NamespaceURI) && string.IsNullOrEmpty(N.Prefix) && !NamespaceManager.HasNamespace(N.NamespaceURI))
+						NamespaceManager.AddNamespace("default", N.NamespaceURI);
+				}
+				else
+					NamespaceManager = null;
+
+				if (NamespaceManager is null)
+					Result = N.SelectNodes(Argument);
+				else
+					Result = N.SelectNodes(Argument, NamespaceManager);
+			}
 			else
 				throw new ScriptRuntimeException("XPath expression only operate on XML.", this);
 

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects.Matrices;
 

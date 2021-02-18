@@ -73,4 +73,25 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		PublicSearchable
 	}
+
+	/// <summary>
+	/// Options on what keys to use when signing data.
+	/// </summary>
+	public enum SignWith
+	{
+		/// <summary>
+		/// Use current endpoint keys.
+		/// </summary>
+		CurrentKeys,
+
+		/// <summary>
+		/// Use keys from latest approved Legal Identity
+		/// </summary>
+		LatestApprovedId,
+
+		/// <summary>
+		/// Use keys from latest approved Legal Identity, if any, or current endpoint keys if not.
+		/// </summary>
+		LatestApprovedIdOrCurrentKeys
+	}
 }

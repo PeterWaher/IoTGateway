@@ -1601,5 +1601,23 @@ namespace Waher.Networking.XMPP.P2P
 			return null;
 		}
 
+		/// <summary>
+		/// Gets the local key with a given public key.
+		/// </summary>
+		/// <param name="PublicKey">Public key</param>
+		/// <returns>Key, if found, or null if not.</returns>
+		public IE2eEndpoint GetLocalKey(byte[] PublicKey)
+		{
+			string s = Convert.ToBase64String(PublicKey);
+
+			foreach (IE2eEndpoint Endpoint in this.keys)
+			{
+				if (Endpoint.PublicKeyBase64 == s)
+					return Endpoint;
+			}
+
+			return null;
+		}
+
 	}
 }

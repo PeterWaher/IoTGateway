@@ -17,9 +17,12 @@ using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Networking.XMPP.Contracts.Search;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
+using Waher.Persistence;
+using Waher.Persistence.Filters;
 using Waher.Runtime.Cache;
-using Waher.Runtime.Temporary;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Settings;
+using Waher.Runtime.Temporary;
 using Waher.Security;
 using Waher.Security.CallStack;
 using Waher.Security.EllipticCurves;
@@ -45,10 +48,13 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public const string NamespaceSmartContracts = "urn:ieee:iot:leg:sc:1.0";
 
+		private static readonly string KeySettings = typeof(ContractsClient).FullName + ".";
+
 		private readonly Dictionary<string, KeyEventArgs> publicKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Dictionary<string, KeyEventArgs> matchingKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Cache<string, KeyValuePair<byte[], bool>> contentPerPid = new Cache<string, KeyValuePair<byte[], bool>>(int.MaxValue, TimeSpan.FromDays(1), TimeSpan.FromDays(1));
 		private EndpointSecurity localEndpoint;
+		private DateTime keysTimestamp = DateTime.MinValue;
 		private object[] approvedSources = null;
 		private readonly string componentAddress;
 		private RandomNumberGenerator rnd = RandomNumberGenerator.Create();
@@ -134,6 +140,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			this.localEndpoint?.Dispose();
 			this.localEndpoint = null;
+			this.keysTimestamp = DateTime.MinValue;
 
 			this.rnd?.Dispose();
 			this.rnd = null;
@@ -155,44 +162,80 @@ namespace Waher.Networking.XMPP.Contracts
 
 		#region Keys
 
-		private async Task<EndpointSecurity> LoadKeys()
+		/// <summary>
+		/// Timestamps of current keys used for signatures.
+		/// </summary>
+		public DateTime KeysTimestamp => this.keysTimestamp;
+
+		private async Task LoadKeys()
 		{
 			List<IE2eEndpoint> Keys = new List<IE2eEndpoint>();
-			string Name = typeof(ContractsClient).FullName;
 
-			foreach (EllipticCurveEndpoint Curve in EndpointSecurity.CreateEndpoints(256, 192, int.MaxValue, typeof(EllipticCurveEndpoint)))
+			Dictionary<string, object> Settings = await RuntimeSettings.GetWhereKeyLikeAsync(KeySettings + "*", "*");
+			IE2eEndpoint[] AvailableEndpoints = EndpointSecurity.CreateEndpoints(256, 192, int.MaxValue, typeof(EllipticCurveEndpoint));
+			DateTime? Timestamp = null;
+			bool DisposeEndpoints = true;
+			byte[] Key;
+
+			foreach (KeyValuePair<string, object> Setting in Settings)
 			{
-				string d = await RuntimeSettings.GetAsync(Name + "." + Curve.LocalName, string.Empty);
-				byte[] Key;
+				string LocalName = Setting.Key.Substring(KeySettings.Length);
 
-				try
+				if (Setting.Value is string d)
 				{
 					if (string.IsNullOrEmpty(d))
-						Key = null;
-					else
-						Key = Convert.FromBase64String(d);
-				}
-				catch (Exception)
-				{
-					Key = null;
-				}
+						continue;
 
-				if (Key is null)
+					try
+					{
+						Key = Convert.FromBase64String(d);
+					}
+					catch (Exception)
+					{
+						continue;
+					}
+
+					foreach (IE2eEndpoint Curve in AvailableEndpoints)
+					{
+						if (Curve.LocalName == LocalName)
+						{
+							Keys.Add(Curve.CreatePrivate(Key));
+							break;
+						}
+					}
+				}
+				else if (Setting.Value is DateTime TP && LocalName == "Timestamp")
+					Timestamp = TP;
+			}
+
+			if (Keys.Count == 0)
+			{
+				DisposeEndpoints = false;
+
+				foreach (EllipticCurveEndpoint Curve in AvailableEndpoints)
 				{
 					Key = this.GetKey(Curve.Curve);
-					await RuntimeSettings.SetAsync(Name + "." + Curve.LocalName, Convert.ToBase64String(Key));
+					await RuntimeSettings.SetAsync(KeySettings + Curve.LocalName, Convert.ToBase64String(Key));
 					Keys.Add(Curve);
 				}
-				else
-				{
-					Keys.Add(Curve.CreatePrivate(Key));
-					Curve.Dispose();
-				}
+
+				Timestamp = DateTime.Now;
+				await RuntimeSettings.SetAsync(KeySettings + ".Timestamp", Timestamp.Value);
+			}
+			else if (!Timestamp.HasValue)
+			{
+				Timestamp = DateTime.Now;
+				await RuntimeSettings.SetAsync(KeySettings + ".Timestamp", Timestamp.Value);
 			}
 
 			this.localEndpoint = new EndpointSecurity(null, 128, Keys.ToArray());
+			this.keysTimestamp = Timestamp.Value;
 
-			return this.localEndpoint;
+			if (DisposeEndpoints)
+			{
+				foreach (IE2eEndpoint Curve in AvailableEndpoints)
+					Curve.Dispose();
+			}
 		}
 
 		private byte[] GetKey(EllipticCurve Curve)
@@ -205,6 +248,15 @@ namespace Waher.Networking.XMPP.Contracts
 			Doc.LoadXml(s);
 			s = Doc.DocumentElement.GetAttribute("d");
 			return Convert.FromBase64String(s);
+		}
+
+		/// <summary>
+		/// Generates new keys for the contracts clients.
+		/// </summary>
+		public async Task GenerateNewKeys()
+		{
+			await RuntimeSettings.DeleteWhereKeyLikeAsync(KeySettings + "*", "*");
+			await this.LoadKeys();
 		}
 
 		#endregion
@@ -577,6 +629,7 @@ namespace Waher.Networking.XMPP.Contracts
 							E.NamespaceURI == NamespaceLegalIdentities)
 						{
 							Identity2 = LegalIdentity.Parse(E);
+							await this.UpdateSettings(Identity2, e.Key.PublicKey);
 						}
 						else
 							e2.Ok = false;
@@ -724,7 +777,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 					try
 					{
-						KeyValuePair<string, TemporaryFile> P = await this.GetAttachmentAsync(Attachment.Url, 30000);
+						KeyValuePair<string, TemporaryFile> P = await this.GetAttachmentAsync(Attachment.Url, SignWith.LatestApprovedIdOrCurrentKeys, 30000);
 
 						using (TemporaryFile File = P.Value)
 						{
@@ -830,7 +883,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Validates a signature of binary data.
 		/// </summary>
 		/// <param name="Identity">Legal identity used to create the signature.</param>
-		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Data">Binary data to sign.</param>
 		/// <param name="Signature">Digital signature of data</param>
 		/// <returns>
 		/// true = Signature is valid.
@@ -858,7 +911,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Validates a signature of binary data.
 		/// </summary>
 		/// <param name="Identity">Legal identity used to create the signature.</param>
-		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Data">Binary data to sign.</param>
 		/// <param name="Signature">Digital signature of data</param>
 		/// <returns>
 		/// true = Signature is valid.
@@ -948,38 +1001,37 @@ namespace Waher.Networking.XMPP.Contracts
 
 		private async Task IdentityMessageHandler(object Sender, MessageEventArgs e)
 		{
-			LegalIdentityEventHandler h = this.IdentityUpdated;
+			LegalIdentity Identity = LegalIdentity.Parse(e.Content);
 
-			if (h is null)
-				this.client.Information("Incoming identity message discarded: No event handler registered.");
-			else
+			if (!this.IsFromTrustProvider(Identity.Id, e.From))
 			{
-				LegalIdentity Identity = LegalIdentity.Parse(e.Content);
+				this.client.Warning("Incoming identity message discarded: " + Identity.Id + " not from " + e.From + ".");
+				return;
+			}
 
-				if (!this.IsFromTrustProvider(Identity.Id, e.From))
+			if (string.Compare(e.FromBareJID, Identity.Provider, true) != 0)
+			{
+				this.client.Warning("Incoming identity message discarded: Sender " + e.FromBareJID + " not equal to Trust Provider " + Identity.Provider + ".");
+				return;
+			}
+
+			await this.Validate(Identity, false, async (sender2, e2) =>
+			{
+				if (e2.Status != IdentityStatus.Valid)
 				{
-					this.client.Warning("Incoming identity message discarded: " + Identity.Id + " not from " + e.From + ".");
+					this.client.Warning("Invalid legal identity received and discarded. Validation status: " + e2.Status.ToString());
+
+					Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
+						new KeyValuePair<string, object>("Status", e2.Status));
+
 					return;
 				}
 
-				if (string.Compare(e.FromBareJID, Identity.Provider, true) != 0)
+				await this.UpdateSettings(Identity);
+
+				LegalIdentityEventHandler h = this.IdentityUpdated;
+				if (!(h is null))
 				{
-					this.client.Warning("Incoming identity message discarded: Sender " + e.FromBareJID + " not equal to Trust Provider " + Identity.Provider + ".");
-					return;
-				}
-
-				await this.Validate(Identity, false, async (sender2, e2) =>
-				{
-					if (e2.Status != IdentityStatus.Valid)
-					{
-						this.client.Warning("Invalid legal identity received and discarded. Validation status: " + e2.Status.ToString());
-
-						Log.Warning("Invalid legal identity received and discarded.", this.client.BareJID, e.From,
-							new KeyValuePair<string, object>("Status", e2.Status));
-
-						return;
-					}
-
 					try
 					{
 						await h(this, new LegalIdentityEventArgs(new IqResultEventArgs(e.Message, e.Id, e.To, e.From, e.Ok, null), Identity));
@@ -988,7 +1040,124 @@ namespace Waher.Networking.XMPP.Contracts
 					{
 						this.client.Exception(ex);
 					}
-				}, null);
+				}
+			}, null);
+		}
+
+		private Task UpdateSettings(LegalIdentity Identity)
+		{
+			return this.UpdateSettings(Identity, null);
+		}
+
+		/// <summary>
+		/// Checks if the private key of a legal identity is available. Private keys are required to be able to
+		/// sign data, petitions and contracts.
+		/// </summary>
+		/// <param name="Identity">Legal Identity.</param>
+		/// <returns>If the private key of the legal identity is available (and belongs to the Bare JID of the client).</returns>
+		public Task<bool> HasPrivateKey(LegalIdentity Identity)
+		{
+			return this.HasPrivateKey(Identity.Id);
+		}
+
+		/// <summary>
+		/// Checks if the private key of a legal identity is available. Private keys are required to be able to
+		/// sign data, petitions and contracts.
+		/// </summary>
+		/// <param name="IdentityId">Identity string of Legal Identity.</param>
+		/// <returns>If the private key of the legal identity is available (and belongs to the Bare JID of the client).</returns>
+		public async Task<bool> HasPrivateKey(string IdentityId)
+		{
+			LegalIdentityState State = await Database.FindFirstIgnoreRest<LegalIdentityState>(new FilterAnd(
+				new FilterFieldEqualTo("BareJid", this.client.BareJID),
+				new FilterFieldEqualTo("LegalId", IdentityId)));
+
+			if (State is null)
+				return false;
+
+			IE2eEndpoint Endpoint = this.localEndpoint.GetLocalKey(State.PublicKey);
+
+			return !(Endpoint is null);
+		}
+
+		private async Task<IE2eEndpoint> GetLatestApprovedKey(bool ExceptionIfNone)
+		{
+			bool HaveStates = false;
+
+			foreach (LegalIdentityState State in await Database.Find<LegalIdentityState>(new FilterAnd(
+				new FilterFieldEqualTo("BareJid", this.client.BareJID),
+				new FilterFieldEqualTo("State", IdentityState.Approved)), "-Timestamp"))
+			{
+				HaveStates = true;
+
+				IE2eEndpoint Endpoint = this.localEndpoint.GetLocalKey(State.PublicKey);
+				if (Endpoint is null)
+					continue;
+
+				return Endpoint;
+			}
+
+			if (ExceptionIfNone)
+			{
+				IEnumerable<LegalIdentityState> States = await Database.Find<LegalIdentityState>();
+
+				if (HaveStates)
+					throw new Exception("Private keys are not available on this device. Were they created on another device?");
+				else
+					throw new Exception("No approved legal identity available.");
+			}
+
+			return null;
+		}
+
+		private async Task UpdateSettings(LegalIdentity Identity, byte[] PublicKey)
+		{
+			if (!string.IsNullOrEmpty(Identity.Id))
+			{
+				LegalIdentityState StateObj = Types.Instantiate<LegalIdentityState>(false, Identity.Id);
+
+				if (string.IsNullOrEmpty(StateObj.ObjectId))
+				{
+					LegalIdentityState StateObj2 = await Database.FindFirstDeleteRest<LegalIdentityState>(new FilterAnd(
+						new FilterFieldEqualTo("BareJid", this.client.BareJID),
+						new FilterFieldEqualTo("LegalId", Identity.Id)));
+
+					if (StateObj2 is null)
+						StateObj.BareJid = this.client.BareJID;
+					else
+					{
+						Types.UnregisterSingleton(StateObj, Identity.Id);
+						Types.RegisterSingleton(StateObj2, Identity.Id);
+						StateObj = StateObj2;
+					}
+				}
+
+				DateTime Timestamp = Identity.Updated > Identity.Created ? Identity.Updated : Identity.Created;
+
+				if (Timestamp > StateObj.Timestamp)
+				{
+					StateObj.State = Identity.State;
+					StateObj.Timestamp = Identity.Updated > Identity.Created ? Identity.Updated : Identity.Created;
+
+					if (PublicKey is null)
+					{
+						switch (Identity.State)
+						{
+							case IdentityState.Compromised:
+							case IdentityState.Obsoleted:
+							case IdentityState.Rejected:
+								StateObj.PublicKey = null;
+								break;
+						}
+					}
+					else
+						StateObj.PublicKey = PublicKey;
+
+					if (string.IsNullOrEmpty(StateObj.ObjectId))
+						await Database.Insert(StateObj);
+					else
+						await Database.Update(StateObj);
+				}
 			}
 		}
 
@@ -1208,7 +1377,10 @@ namespace Waher.Networking.XMPP.Contracts
 					XmlElement E;
 
 					if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+					{
 						Identity = LegalIdentity.Parse(E);
+						await this.UpdateSettings(Identity);
+					}
 					else
 						e.Ok = false;
 
@@ -1284,7 +1456,10 @@ namespace Waher.Networking.XMPP.Contracts
 					XmlElement E;
 
 					if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+					{
 						Identity = LegalIdentity.Parse(E);
+						await this.UpdateSettings(Identity);
+					}
 					else
 						e.Ok = false;
 
@@ -1334,59 +1509,90 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Signs binary data with the corresponding private key.
 		/// </summary>
-		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Data">Binary data to sign.</param>
+		/// <param name="SignWith">What keys that can be used to sign the data.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public void Sign(byte[] Data, SignatureEventHandler Callback, object State)
+		public Task Sign(byte[] Data, SignWith SignWith, SignatureEventHandler Callback, object State)
 		{
-			this.Sign(this.componentAddress, Data, Callback, State);
+			return this.Sign(this.componentAddress, Data, SignWith, Callback, State);
 		}
 
 		/// <summary>
 		/// Signs binary data with the corresponding private key.
 		/// </summary>
 		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
-		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Data">Binary data to sign.</param>
+		/// <param name="SignWith">What keys that can be used to sign the data.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public Task Sign(string Address, byte[] Data, SignatureEventHandler Callback, object State)
+		public async Task Sign(string Address, byte[] Data, SignWith SignWith, SignatureEventHandler Callback, object State)
 		{
 			this.AssertAllowed();
 
-			return this.GetMatchingLocalKey(Address, async (sender, e) =>
-			{
-				byte[] Signature = null;
+			byte[] Signature = null;
+			IE2eEndpoint Key;
 
-				if (e.Ok)
-					Signature = e.Key.Sign(Data);
+			switch (SignWith)
+			{
+				case SignWith.CurrentKeys:
+					Key = null;
+					break;
+
+				case SignWith.LatestApprovedId:
+					Key = await this.GetLatestApprovedKey(true);
+					break;
+
+				case SignWith.LatestApprovedIdOrCurrentKeys:
+				default:
+					Key = await this.GetLatestApprovedKey(false);
+					break;
+			}
+
+			if (Key is null)
+			{
+				await this.GetMatchingLocalKey(Address, async (sender, e) =>
+				{
+					if (e.Ok)
+						Signature = e.Key.Sign(Data);
+
+					if (!(Callback is null))
+						await Callback(this, new SignatureEventArgs(e, Signature));
+
+				}, State);
+			}
+			else
+			{
+				Signature = Key.Sign(Data);
 
 				if (!(Callback is null))
-					await Callback(this, new SignatureEventArgs(e, Signature));
-
-			}, State);
+					await Callback(this, new SignatureEventArgs(Key, Signature, State));
+			}
 		}
 
 		/// <summary>
 		/// Signs binary data with the corresponding private key.
 		/// </summary>
-		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Data">Binary data to sign.</param>
+		/// <param name="SignWith">What keys that can be used to sign the data.</param>
 		/// <returns>Digital signature.</returns>
-		public Task<byte[]> SignAsync(byte[] Data)
+		public Task<byte[]> SignAsync(byte[] Data, SignWith SignWith)
 		{
-			return this.SignAsync(this.componentAddress, Data);
+			return this.SignAsync(this.componentAddress, Data, SignWith);
 		}
 
 		/// <summary>
 		/// Signs binary data with the corresponding private key.
 		/// </summary>
 		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
-		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Data">Binary data to sign.</param>
+		/// <param name="SignWith">What keys that can be used to sign the data.</param>
 		/// <returns>Digital signature.</returns>
-		public async Task<byte[]> SignAsync(string Address, byte[] Data)
+		public async Task<byte[]> SignAsync(string Address, byte[] Data, SignWith SignWith)
 		{
 			TaskCompletionSource<byte[]> Result = new TaskCompletionSource<byte[]>();
 
-			await this.Sign(Address, Data, (sender, e) =>
+			await this.Sign(Address, Data, SignWith, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Signature);
@@ -1403,59 +1609,74 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Signs binary data with the corresponding private key.
 		/// </summary>
-		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Data">Binary data to sign.</param>
+		/// <param name="SignWith">What keys that can be used to sign the data.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public void Sign(Stream Data, SignatureEventHandler Callback, object State)
+		public Task Sign(Stream Data, SignWith SignWith, SignatureEventHandler Callback, object State)
 		{
-			this.Sign(this.componentAddress, Data, Callback, State);
+			return this.Sign(this.componentAddress, Data, SignWith, Callback, State);
 		}
 
 		/// <summary>
 		/// Signs binary data with the corresponding private key.
 		/// </summary>
 		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
-		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Data">Binary data to sign.</param>
+		/// <param name="SignWith">What keys that can be used to sign the data.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
-		public Task Sign(string Address, Stream Data, SignatureEventHandler Callback, object State)
+		public async Task Sign(string Address, Stream Data, SignWith SignWith, SignatureEventHandler Callback, object State)
 		{
 			this.AssertAllowed();
 
-			return this.GetMatchingLocalKey(Address, async (sender, e) =>
-			{
-				byte[] Signature = null;
+			IE2eEndpoint Key = SignWith == SignWith.CurrentKeys ? null : await this.GetLatestApprovedKey(true);
+			byte[] Signature = null;
 
-				if (e.Ok)
-					Signature = e.Key.Sign(Data);
+			if (Key is null)
+			{
+				await this.GetMatchingLocalKey(Address, async (sender, e) =>
+				{
+					if (e.Ok)
+						Signature = e.Key.Sign(Data);
+
+					if (!(Callback is null))
+						await Callback(this, new SignatureEventArgs(e, Signature));
+
+				}, State);
+			}
+			else
+			{
+				Signature = Key.Sign(Data);
 
 				if (!(Callback is null))
-					await Callback(this, new SignatureEventArgs(e, Signature));
-
-			}, State);
+					await Callback(this, new SignatureEventArgs(Key, Signature, State));
+			}
 		}
 
 		/// <summary>
 		/// Signs binary data with the corresponding private key.
 		/// </summary>
-		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Data">Binary data to sign.</param>
+		/// <param name="SignWith">What keys that can be used to sign the data.</param>
 		/// <returns>Digital signature.</returns>
-		public Task<byte[]> SignAsync(Stream Data)
+		public Task<byte[]> SignAsync(Stream Data, SignWith SignWith)
 		{
-			return this.SignAsync(this.componentAddress, Data);
+			return this.SignAsync(this.componentAddress, Data, SignWith);
 		}
 
 		/// <summary>
 		/// Signs binary data with the corresponding private key.
 		/// </summary>
 		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
-		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Data">Binary data to sign.</param>
+		/// <param name="SignWith">What keys that can be used to sign the data.</param>
 		/// <returns>Digital signature.</returns>
-		public Task<byte[]> SignAsync(string Address, Stream Data)
+		public async Task<byte[]> SignAsync(string Address, Stream Data, SignWith SignWith)
 		{
 			TaskCompletionSource<byte[]> Result = new TaskCompletionSource<byte[]>();
 
-			this.Sign(Address, Data, (sender, e) =>
+			await this.Sign(Address, Data, SignWith, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Signature);
@@ -1466,7 +1687,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -1477,7 +1698,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Validates a signature of binary data.
 		/// </summary>
 		/// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
-		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Data">Binary data to sign.</param>
 		/// <param name="Signature">Digital signature of data</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
@@ -1491,7 +1712,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
 		/// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
-		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Data">Binary data to sign.</param>
 		/// <param name="Signature">Digital signature of data</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
@@ -1534,7 +1755,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Validates a signature of binary data.
 		/// </summary>
 		/// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
-		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Data">Binary data to sign.</param>
 		/// <param name="Signature">Digital signature of data</param>
 		/// <returns>Legal identity object.</returns>
 		public Task<LegalIdentity> ValidateSignatureAsync(string LegalId, byte[] Data, byte[] Signature)
@@ -1547,7 +1768,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Address">Address of entity on which the legal identity are registered.</param>
 		/// <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
-		/// <param name="Data">Binary data to sign-</param>
+		/// <param name="Data">Binary data to sign.</param>
 		/// <param name="Signature">Digital signature of data</param>
 		/// <returns>Legal identity object.</returns>
 		public Task<LegalIdentity> ValidateSignatureAsync(string Address, string LegalId, byte[] Data, byte[] Signature)
@@ -2029,9 +2250,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void SignContract(Contract Contract, string Role, bool Transferable, SmartContractEventHandler Callback, object State)
+		public Task SignContract(Contract Contract, string Role, bool Transferable, SmartContractEventHandler Callback, object State)
 		{
-			this.SignContract(this.GetTrustProvider(Contract.ContractId), Contract, Role, Transferable, Callback, State);
+			return this.SignContract(this.GetTrustProvider(Contract.ContractId), Contract, Role, Transferable, Callback, State);
 		}
 
 		/// <summary>
@@ -2045,14 +2266,14 @@ namespace Waher.Networking.XMPP.Contracts
 		/// and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void SignContract(string Address, Contract Contract, string Role, bool Transferable,
+		public async Task SignContract(string Address, Contract Contract, string Role, bool Transferable,
 			SmartContractEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 			Contract.Serialize(Xml, false, false, false, false, false, false, false);
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
 
-			this.Sign(Address, Data, async (sender, e) =>
+			await this.Sign(Address, Data, SignWith.LatestApprovedId, async (sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -2102,11 +2323,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Transferable signatures are copied to contracts based on the current contract as a template,
 		/// and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
 		/// <returns>Contract</returns>
-		public Task<Contract> SignContractAsync(string Address, Contract Contract, string Role, bool Transferable)
+		public async Task<Contract> SignContractAsync(string Address, Contract Contract, string Role, bool Transferable)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
-			this.SignContract(Address, Contract, Role, Transferable, (sender, e) =>
+			await this.SignContract(Address, Contract, Role, Transferable, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.SetResult(e.Contract);
@@ -2117,7 +2338,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			}, null);
 
-			return Result.Task;
+			return await Result.Task;
 		}
 
 		#endregion
@@ -2742,7 +2963,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 					try
 					{
-						KeyValuePair<string, TemporaryFile> P = await this.GetAttachmentAsync(Attachment.Url, 30000);
+						KeyValuePair<string, TemporaryFile> P = await this.GetAttachmentAsync(Attachment.Url, SignWith.LatestApprovedId, 30000);
 						bool? IsValid;
 
 						using (TemporaryFile File = P.Value)
@@ -3632,7 +3853,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			string NonceStr = Convert.ToBase64String(Nonce);
 			byte[] Data = Encoding.UTF8.GetBytes(PetitionId + ":" + LegalId + ":" + Purpose + ":" + NonceStr + ":" + this.client.BareJID);
-			byte[] Signature = await this.SignAsync(Data);
+			byte[] Signature = await this.SignAsync(Data, SignWith.LatestApprovedId);
 
 			Xml.Append("<petitionIdentity xmlns='");
 			Xml.Append(NamespaceLegalIdentities);
@@ -3841,7 +4062,7 @@ namespace Waher.Networking.XMPP.Contracts
 			string NonceStr = Convert.ToBase64String(Nonce);
 			string ContentStr = Convert.ToBase64String(Content);
 			byte[] Data = Encoding.UTF8.GetBytes(PetitionId + ":" + LegalId + ":" + Purpose + ":" + NonceStr + ":" + this.client.BareJID + ":" + ContentStr);
-			byte[] Signature = await this.SignAsync(Data);
+			byte[] Signature = await this.SignAsync(Data, PeerReview ? SignWith.LatestApprovedIdOrCurrentKeys : SignWith.LatestApprovedId);
 
 			Xml.Append("<petitionSignature xmlns='");
 			Xml.Append(NamespaceLegalIdentities);
@@ -4182,7 +4403,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("</reviewer></peerReview>");
 
 			byte[] Data = Encoding.UTF8.GetBytes(Xml.ToString());
-			byte[] Signature = await this.SignAsync(Data);
+			byte[] Signature = await this.SignAsync(Data, SignWith.CurrentKeys);
 			string FileName = ReviewerLegalIdentity.Id + ".xml";
 			string ContentType = "text/xml; charset=utf-8";
 
@@ -4233,7 +4454,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			string NonceStr = Convert.ToBase64String(Nonce);
 			byte[] Data = Encoding.UTF8.GetBytes(PetitionId + ":" + ContractId + ":" + Purpose + ":" + NonceStr + ":" + this.client.BareJID);
-			byte[] Signature = await this.SignAsync(Data);
+			byte[] Signature = await this.SignAsync(Data, SignWith.LatestApprovedId);
 
 			Xml.Append("<petitionContract xmlns='");
 			Xml.Append(NamespaceSmartContracts);
@@ -4527,19 +4748,21 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Gets an attachment from a Trust Provider
 		/// </summary>
 		/// <param name="Url">URL to attachment.</param>
+		/// <param name="SignWith">What keys that can be used to sign the data.</param>
 		/// <returns>Content-Type, and attachment.</returns>
-		public Task<KeyValuePair<string, TemporaryFile>> GetAttachmentAsync(string Url)
+		public Task<KeyValuePair<string, TemporaryFile>> GetAttachmentAsync(string Url, SignWith SignWith)
 		{
-			return this.GetAttachmentAsync(Url, 30000);
+			return this.GetAttachmentAsync(Url, SignWith, 30000);
 		}
 
 		/// <summary>
 		/// Gets an attachment from a Trust Provider
 		/// </summary>
 		/// <param name="Url">URL to attachment.</param>
+		/// <param name="SignWith">What keys that can be used to sign the data.</param>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		/// <returns>Content-Type, and attachment.</returns>
-		public async Task<KeyValuePair<string, TemporaryFile>> GetAttachmentAsync(string Url, int Timeout)
+		public async Task<KeyValuePair<string, TemporaryFile>> GetAttachmentAsync(string Url, SignWith SignWith, int Timeout)
 		{
 			using (HttpClient HttpClient = new HttpClient()
 			{
@@ -4588,7 +4811,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 								if (!string.IsNullOrEmpty(Realm) && !string.IsNullOrEmpty(NonceStr))
 								{
-									byte[] Signature = await this.SignAsync(Nonce);
+									byte[] Signature = await this.SignAsync(Nonce, SignWith);
 									StringBuilder sb = new StringBuilder();
 
 									sb.Append("jid=\"");

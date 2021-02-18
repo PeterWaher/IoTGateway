@@ -435,6 +435,16 @@
             Component address.
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractsClient.KeysTimestamp">
+            <summary>
+            Timestamps of current keys used for signatures.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GenerateNewKeys">
+            <summary>
+            Generates new keys for the contracts clients.
+            </summary>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SetAllowedSources(System.Object[])">
             <summary>
             If access to sensitive methods is only accessible from a set of approved sources.
@@ -580,7 +590,7 @@
             Validates a signature of binary data.
             </summary>
             <param name="Identity">Legal identity used to create the signature.</param>
-            <param name="Data">Binary data to sign-</param>
+            <param name="Data">Binary data to sign.</param>
             <param name="Signature">Digital signature of data</param>
             <returns>
             true = Signature is valid.
@@ -593,7 +603,7 @@
             Validates a signature of binary data.
             </summary>
             <param name="Identity">Legal identity used to create the signature.</param>
-            <param name="Data">Binary data to sign-</param>
+            <param name="Data">Binary data to sign.</param>
             <param name="Signature">Digital signature of data</param>
             <returns>
             true = Signature is valid.
@@ -615,6 +625,22 @@
             <param name="Identity">Legal identity to validate</param>
             <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
             <returns>Status of validation.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.HasPrivateKey(Waher.Networking.XMPP.Contracts.LegalIdentity)">
+            <summary>
+            Checks if the private key of a legal identity is available. Private keys are required to be able to
+            sign data, petitions and contracts.
+            </summary>
+            <param name="Identity">Legal Identity.</param>
+            <returns>If the private key of the legal identity is available (and belongs to the Bare JID of the client).</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.HasPrivateKey(System.String)">
+            <summary>
+            Checks if the private key of a legal identity is available. Private keys are required to be able to
+            sign data, petitions and contracts.
+            </summary>
+            <param name="IdentityId">Identity string of Legal Identity.</param>
+            <returns>If the private key of the legal identity is available (and belongs to the Bare JID of the client).</returns>
         </member>
         <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.IdentityUpdated">
             <summary>
@@ -753,68 +779,76 @@
             <param name="LegalIdentityId">ID of the legal identity to compromise.</param>
             <returns>Legal identity object corresponding to <paramref name="LegalIdentityId"/>.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Sign(System.Byte[],Waher.Networking.XMPP.Contracts.SignatureEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Sign(System.Byte[],Waher.Networking.XMPP.Contracts.SignWith,Waher.Networking.XMPP.Contracts.SignatureEventHandler,System.Object)">
             <summary>
             Signs binary data with the corresponding private key.
             </summary>
-            <param name="Data">Binary data to sign-</param>
+            <param name="Data">Binary data to sign.</param>
+            <param name="SignWith">What keys that can be used to sign the data.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Sign(System.String,System.Byte[],Waher.Networking.XMPP.Contracts.SignatureEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Sign(System.String,System.Byte[],Waher.Networking.XMPP.Contracts.SignWith,Waher.Networking.XMPP.Contracts.SignatureEventHandler,System.Object)">
             <summary>
             Signs binary data with the corresponding private key.
             </summary>
             <param name="Address">Address of entity on which the legal identity are registered.</param>
-            <param name="Data">Binary data to sign-</param>
+            <param name="Data">Binary data to sign.</param>
+            <param name="SignWith">What keys that can be used to sign the data.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignAsync(System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignAsync(System.Byte[],Waher.Networking.XMPP.Contracts.SignWith)">
             <summary>
             Signs binary data with the corresponding private key.
             </summary>
-            <param name="Data">Binary data to sign-</param>
+            <param name="Data">Binary data to sign.</param>
+            <param name="SignWith">What keys that can be used to sign the data.</param>
             <returns>Digital signature.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignAsync(System.String,System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignAsync(System.String,System.Byte[],Waher.Networking.XMPP.Contracts.SignWith)">
             <summary>
             Signs binary data with the corresponding private key.
             </summary>
             <param name="Address">Address of entity on which the legal identity are registered.</param>
-            <param name="Data">Binary data to sign-</param>
+            <param name="Data">Binary data to sign.</param>
+            <param name="SignWith">What keys that can be used to sign the data.</param>
             <returns>Digital signature.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Sign(System.IO.Stream,Waher.Networking.XMPP.Contracts.SignatureEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Sign(System.IO.Stream,Waher.Networking.XMPP.Contracts.SignWith,Waher.Networking.XMPP.Contracts.SignatureEventHandler,System.Object)">
             <summary>
             Signs binary data with the corresponding private key.
             </summary>
-            <param name="Data">Binary data to sign-</param>
+            <param name="Data">Binary data to sign.</param>
+            <param name="SignWith">What keys that can be used to sign the data.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Sign(System.String,System.IO.Stream,Waher.Networking.XMPP.Contracts.SignatureEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Sign(System.String,System.IO.Stream,Waher.Networking.XMPP.Contracts.SignWith,Waher.Networking.XMPP.Contracts.SignatureEventHandler,System.Object)">
             <summary>
             Signs binary data with the corresponding private key.
             </summary>
             <param name="Address">Address of entity on which the legal identity are registered.</param>
-            <param name="Data">Binary data to sign-</param>
+            <param name="Data">Binary data to sign.</param>
+            <param name="SignWith">What keys that can be used to sign the data.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignAsync(System.IO.Stream)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignAsync(System.IO.Stream,Waher.Networking.XMPP.Contracts.SignWith)">
             <summary>
             Signs binary data with the corresponding private key.
             </summary>
-            <param name="Data">Binary data to sign-</param>
+            <param name="Data">Binary data to sign.</param>
+            <param name="SignWith">What keys that can be used to sign the data.</param>
             <returns>Digital signature.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignAsync(System.String,System.IO.Stream)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignAsync(System.String,System.IO.Stream,Waher.Networking.XMPP.Contracts.SignWith)">
             <summary>
             Signs binary data with the corresponding private key.
             </summary>
             <param name="Address">Address of entity on which the legal identity are registered.</param>
-            <param name="Data">Binary data to sign-</param>
+            <param name="Data">Binary data to sign.</param>
+            <param name="SignWith">What keys that can be used to sign the data.</param>
             <returns>Digital signature.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ValidateSignature(System.String,System.Byte[],System.Byte[],Waher.Networking.XMPP.Contracts.LegalIdentityEventHandler,System.Object)">
@@ -822,7 +856,7 @@
             Validates a signature of binary data.
             </summary>
             <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
-            <param name="Data">Binary data to sign-</param>
+            <param name="Data">Binary data to sign.</param>
             <param name="Signature">Digital signature of data</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
@@ -833,7 +867,7 @@
             </summary>
             <param name="Address">Address of entity on which the legal identity are registered.</param>
             <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
-            <param name="Data">Binary data to sign-</param>
+            <param name="Data">Binary data to sign.</param>
             <param name="Signature">Digital signature of data</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to <paramref name="Callback"/>.</param>
@@ -843,7 +877,7 @@
             Validates a signature of binary data.
             </summary>
             <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
-            <param name="Data">Binary data to sign-</param>
+            <param name="Data">Binary data to sign.</param>
             <param name="Signature">Digital signature of data</param>
             <returns>Legal identity object.</returns>
         </member>
@@ -853,7 +887,7 @@
             </summary>
             <param name="Address">Address of entity on which the legal identity are registered.</param>
             <param name="LegalId">Legal identity used to create the signature. If empty, current approved legal identities will be used to validate the signature.</param>
-            <param name="Data">Binary data to sign-</param>
+            <param name="Data">Binary data to sign.</param>
             <param name="Signature">Digital signature of data</param>
             <returns>Legal identity object.</returns>
         </member>
@@ -1851,18 +1885,20 @@
             The URL might previously have been provided by the HTTP Upload Service.</param>
             <param name="Signature">Signature of the content of the attachment, made by an approved legal identity of the sender.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetAttachmentAsync(System.String)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetAttachmentAsync(System.String,Waher.Networking.XMPP.Contracts.SignWith)">
             <summary>
             Gets an attachment from a Trust Provider
             </summary>
             <param name="Url">URL to attachment.</param>
+            <param name="SignWith">What keys that can be used to sign the data.</param>
             <returns>Content-Type, and attachment.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetAttachmentAsync(System.String,System.Int32)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetAttachmentAsync(System.String,Waher.Networking.XMPP.Contracts.SignWith,System.Int32)">
             <summary>
             Gets an attachment from a Trust Provider
             </summary>
             <param name="Url">URL to attachment.</param>
+            <param name="SignWith">What keys that can be used to sign the data.</param>
             <param name="Timeout">Timeout, in milliseconds.</param>
             <returns>Content-Type, and attachment.</returns>
         </member>
@@ -1960,6 +1996,26 @@
         <member name="F:Waher.Networking.XMPP.Contracts.ContractVisibility.PublicSearchable">
             <summary>
             Contract is accessible by everyone requesting it. It is also searchable.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.SignWith">
+            <summary>
+            Options on what keys to use when signing data.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.SignWith.CurrentKeys">
+            <summary>
+            Use current endpoint keys.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.SignWith.LatestApprovedId">
+            <summary>
+            Use keys from latest approved Legal Identity
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.SignWith.LatestApprovedIdOrCurrentKeys">
+            <summary>
+            Use keys from latest approved Legal Identity, if any, or current endpoint keys if not.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractPetitionEventHandler">
@@ -2589,12 +2645,25 @@
             Event arguments for key responses
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.KeyEventArgs.#ctor(Waher.Networking.XMPP.Contracts.KeyEventArgs)">
+            <summary>
+            Event arguments for key responses
+            </summary>
+            <param name="e">IQ response event arguments.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.KeyEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.IE2eEndpoint)">
             <summary>
             Event arguments for key responses
             </summary>
             <param name="e">IQ response event arguments.</param>
             <param name="Key">Key.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.KeyEventArgs.#ctor(Waher.Networking.XMPP.IE2eEndpoint,System.Object)">
+            <summary>
+            Event arguments for key responses
+            </summary>
+            <param name="Key">Key.</param>
+            <param name="State">State object.</param>
         </member>
         <member name="P:Waher.Networking.XMPP.Contracts.KeyEventArgs.Key">
             <summary>
@@ -2703,11 +2772,19 @@
             Event arguments for signature responses
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.SignatureEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.Contracts.SignatureEventArgs.#ctor(Waher.Networking.XMPP.IE2eEndpoint,System.Byte[],System.Object)">
             <summary>
             Event arguments for signature responses
             </summary>
-            <param name="e">IQ response event arguments.</param>
+            <param name="Key">Key algorithm used.</param>
+            <param name="Signature">Digital signature</param>
+            <param name="State">State object.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.SignatureEventArgs.#ctor(Waher.Networking.XMPP.Contracts.KeyEventArgs,System.Byte[])">
+            <summary>
+            Event arguments for signature responses
+            </summary>
+            <param name="e">Event arguments of request response.</param>
             <param name="Signature">Digital signature</param>
         </member>
         <member name="P:Waher.Networking.XMPP.Contracts.SignatureEventArgs.Signature">
@@ -3513,6 +3590,52 @@
         <member name="M:Waher.Networking.XMPP.Contracts.LegalIdentity.GetHashCode">
             <summary>
             <see cref="M:System.Object.GetHashCode"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.LegalIdentityState">
+            <summary>
+            Contains information about a legal identity generated by the client.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.LegalIdentityState.#ctor">
+            <summary>
+            Contains information about a legal identity generated by the client.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.LegalIdentityState.#ctor(System.String)">
+            <summary>
+            Contains information about a legal identity generated by the client.
+            </summary>
+            <param name="LegalId">Legal identity.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentityState.ObjectId">
+            <summary>
+            Object ID
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentityState.BareJid">
+            <summary>
+            Bare JID of client applying for the identity.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentityState.LegalId">
+            <summary>
+            Identity string assigned to the legal identity.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentityState.PublicKey">
+            <summary>
+            Public Key used by the cryptographic algororithm used to sign the identity application.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentityState.State">
+            <summary>
+            State of the legal identity.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.LegalIdentityState.Timestamp">
+            <summary>
+            Timestamp when the legal identity was created or last updated.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.LocalizableDescription">

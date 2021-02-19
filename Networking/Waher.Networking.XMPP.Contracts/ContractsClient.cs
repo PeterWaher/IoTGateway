@@ -221,6 +221,8 @@ namespace Waher.Networking.XMPP.Contracts
 
 				Timestamp = DateTime.Now;
 				await RuntimeSettings.SetAsync(KeySettings + ".Timestamp", Timestamp.Value);
+
+				Log.Notice("Private keys for contracts client implicitly created.");
 			}
 			else if (!Timestamp.HasValue)
 			{
@@ -4060,7 +4062,7 @@ namespace Waher.Networking.XMPP.Contracts
 			string NonceStr = Convert.ToBase64String(Nonce);
 			string ContentStr = Convert.ToBase64String(Content);
 			byte[] Data = Encoding.UTF8.GetBytes(PetitionId + ":" + LegalId + ":" + Purpose + ":" + NonceStr + ":" + this.client.BareJID + ":" + ContentStr);
-			byte[] Signature = await this.SignAsync(Data, PeerReview ? SignWith.LatestApprovedIdOrCurrentKeys : SignWith.LatestApprovedId);
+			byte[] Signature = await this.SignAsync(Data, PeerReview ? SignWith.CurrentKeys : SignWith.LatestApprovedId);
 
 			Xml.Append("<petitionSignature xmlns='");
 			Xml.Append(NamespaceLegalIdentities);

@@ -72,25 +72,30 @@ namespace Waher.Runtime.Settings
 			using (Semaphore Semaphore = await Semaphores.BeginWrite("setting:" + Key))
 			{
 				StringSetting Setting = await Database.FindFirstDeleteRest<StringSetting>(new FilterFieldEqualTo("Key", Key));
-				if (Setting is null)
+				return await SetAsyncLocked(Key, Value, Setting);
+			}
+		}
+
+		private static async Task<bool> SetAsyncLocked(string Key, string Value, StringSetting Setting)
+		{
+			if (Setting is null)
+			{
+				Setting = new StringSetting(Key, Value);
+				await Database.Insert(Setting);
+
+				return true;
+			}
+			else
+			{
+				if (Setting.Value != Value)
 				{
-					Setting = new StringSetting(Key, Value);
-					await Database.Insert(Setting);
+					Setting.Value = Value;
+					await Database.Update(Setting);
 
 					return true;
 				}
 				else
-				{
-					if (Setting.Value != Value)
-					{
-						Setting.Value = Value;
-						await Database.Update(Setting);
-
-						return true;
-					}
-					else
-						return false;
-				}
+					return false;
 			}
 		}
 
@@ -143,25 +148,30 @@ namespace Waher.Runtime.Settings
 			using (Semaphore Semaphore = await Semaphores.BeginWrite("setting:" + Key))
 			{
 				Int64Setting Setting = await Database.FindFirstDeleteRest<Int64Setting>(new FilterFieldEqualTo("Key", Key));
-				if (Setting is null)
+				return await SetAsyncLocked(Key, Value, Setting);
+			}
+		}
+
+		private static async Task<bool> SetAsyncLocked(string Key, long Value, Int64Setting Setting)
+		{
+			if (Setting is null)
+			{
+				Setting = new Int64Setting(Key, Value);
+				await Database.Insert(Setting);
+
+				return true;
+			}
+			else
+			{
+				if (Setting.Value != Value)
 				{
-					Setting = new Int64Setting(Key, Value);
-					await Database.Insert(Setting);
+					Setting.Value = Value;
+					await Database.Update(Setting);
 
 					return true;
 				}
 				else
-				{
-					if (Setting.Value != Value)
-					{
-						Setting.Value = Value;
-						await Database.Update(Setting);
-
-						return true;
-					}
-					else
-						return false;
-				}
+					return false;
 			}
 		}
 
@@ -214,25 +224,30 @@ namespace Waher.Runtime.Settings
 			using (Semaphore Semaphore = await Semaphores.BeginWrite("setting:" + Key))
 			{
 				BooleanSetting Setting = await Database.FindFirstDeleteRest<BooleanSetting>(new FilterFieldEqualTo("Key", Key));
-				if (Setting is null)
+				return await SetAsyncLocked(Key, Value, Setting);
+			}
+		}
+
+		private static async Task<bool> SetAsyncLocked(string Key, bool Value, BooleanSetting Setting)
+		{
+			if (Setting is null)
+			{
+				Setting = new BooleanSetting(Key, Value);
+				await Database.Insert(Setting);
+
+				return true;
+			}
+			else
+			{
+				if (Setting.Value != Value)
 				{
-					Setting = new BooleanSetting(Key, Value);
-					await Database.Insert(Setting);
+					Setting.Value = Value;
+					await Database.Update(Setting);
 
 					return true;
 				}
 				else
-				{
-					if (Setting.Value != Value)
-					{
-						Setting.Value = Value;
-						await Database.Update(Setting);
-
-						return true;
-					}
-					else
-						return false;
-				}
+					return false;
 			}
 		}
 
@@ -285,25 +300,30 @@ namespace Waher.Runtime.Settings
 			using (Semaphore Semaphore = await Semaphores.BeginWrite("setting:" + Key))
 			{
 				DateTimeSetting Setting = await Database.FindFirstDeleteRest<DateTimeSetting>(new FilterFieldEqualTo("Key", Key));
-				if (Setting is null)
+				return await SetAsyncLocked(Key, Value, Setting);
+			}
+		}
+
+		private static async Task<bool> SetAsyncLocked(string Key, DateTime Value, DateTimeSetting Setting)
+		{
+			if (Setting is null)
+			{
+				Setting = new DateTimeSetting(Key, Value);
+				await Database.Insert(Setting);
+
+				return true;
+			}
+			else
+			{
+				if (Setting.Value != Value)
 				{
-					Setting = new DateTimeSetting(Key, Value);
-					await Database.Insert(Setting);
+					Setting.Value = Value;
+					await Database.Update(Setting);
 
 					return true;
 				}
 				else
-				{
-					if (Setting.Value != Value)
-					{
-						Setting.Value = Value;
-						await Database.Update(Setting);
-
-						return true;
-					}
-					else
-						return false;
-				}
+					return false;
 			}
 		}
 
@@ -356,25 +376,30 @@ namespace Waher.Runtime.Settings
 			using (Semaphore Semaphore = await Semaphores.BeginWrite("setting:" + Key))
 			{
 				TimeSpanSetting Setting = await Database.FindFirstDeleteRest<TimeSpanSetting>(new FilterFieldEqualTo("Key", Key));
-				if (Setting is null)
+				return await SetAsyncLocked(Key, Value, Setting);
+			}
+		}
+
+		private static async Task<bool> SetAsyncLocked(string Key, TimeSpan Value, TimeSpanSetting Setting)
+		{
+			if (Setting is null)
+			{
+				Setting = new TimeSpanSetting(Key, Value);
+				await Database.Insert(Setting);
+
+				return true;
+			}
+			else
+			{
+				if (Setting.Value != Value)
 				{
-					Setting = new TimeSpanSetting(Key, Value);
-					await Database.Insert(Setting);
+					Setting.Value = Value;
+					await Database.Update(Setting);
 
 					return true;
 				}
 				else
-				{
-					if (Setting.Value != Value)
-					{
-						Setting.Value = Value;
-						await Database.Update(Setting);
-
-						return true;
-					}
-					else
-						return false;
-				}
+					return false;
 			}
 		}
 
@@ -427,25 +452,30 @@ namespace Waher.Runtime.Settings
 			using (Semaphore Semaphore = await Semaphores.BeginWrite("setting:" + Key))
 			{
 				DoubleSetting Setting = await Database.FindFirstDeleteRest<DoubleSetting>(new FilterFieldEqualTo("Key", Key));
-				if (Setting is null)
+				return await SetAsyncLocked(Key, Value, Setting);
+			}
+		}
+
+		private static async Task<bool> SetAsyncLocked(string Key, double Value, DoubleSetting Setting)
+		{
+			if (Setting is null)
+			{
+				Setting = new DoubleSetting(Key, Value);
+				await Database.Insert(Setting);
+
+				return true;
+			}
+			else
+			{
+				if (Setting.Value != Value)
 				{
-					Setting = new DoubleSetting(Key, Value);
-					await Database.Insert(Setting);
+					Setting.Value = Value;
+					await Database.Update(Setting);
 
 					return true;
 				}
 				else
-				{
-					if (Setting.Value != Value)
-					{
-						Setting.Value = Value;
-						await Database.Update(Setting);
-
-						return true;
-					}
-					else
-						return false;
-				}
+					return false;
 			}
 		}
 
@@ -472,8 +502,8 @@ namespace Waher.Runtime.Settings
 		/// <returns>Setting value.</returns>
 		public static async Task<object> GetAsync(string Key, object DefaultValue)
 		{
-			ObjectSetting Setting = await GetAsync<ObjectSetting>(Key);
-			return Setting?.Value ?? DefaultValue;
+			Setting Setting = await GetAsync<Setting>(Key);
+			return Setting?.GetValueObject() ?? DefaultValue;
 		}
 
 		/// <summary>
@@ -495,40 +525,112 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static async Task<bool> SetAsync(string Key, object Value)
 		{
-			if (!(Value is null))
-			{
-				Type T = Value.GetType();
-				TypeInfo TI = T.GetTypeInfo();
-
-				if (!(TI.GetCustomAttribute(typeof(CollectionNameAttribute)) is null))
-					throw new InvalidOperationException("Object setting values cannot be stored separate collections. (CollectionName attribute found.)");
-
-				TypeNameAttribute TypeNameAttribute = TI.GetCustomAttribute<TypeNameAttribute>();
-				if (TypeNameAttribute.TypeNameSerialization != TypeNameSerialization.FullName)
-					throw new InvalidOperationException("Full Type names must be serialized when persisting object setting values. (TypeName attribute.)");
-			}
-
 			using (Semaphore Semaphore = await Semaphores.BeginWrite("setting:" + Key))
 			{
-				ObjectSetting Setting = await Database.FindFirstDeleteRest<ObjectSetting>(new FilterFieldEqualTo("Key", Key));
-				if (Setting is null)
-				{
-					Setting = new ObjectSetting(Key, Value);
-					await Database.Insert(Setting);
+				Setting Setting = await Database.FindFirstDeleteRest<Setting>(new FilterFieldEqualTo("Key", Key));
 
-					return true;
+				if (Value is null)
+				{
+					if (!(Setting is ObjectSetting))
+					{
+						await Database.Delete(Setting);
+						Setting = null;
+					}
 				}
 				else
 				{
-					if (((Setting.Value is null) ^ (Value is null)) || !Setting.Value.Equals(Value))
+					if (Value is string s)
 					{
-						Setting.Value = Value;
-						await Database.Update(Setting);
+						if (!(Setting is StringSetting StringSetting))
+						{
+							await Database.Delete(Setting);
+							StringSetting = null;
+						}
+
+						return await SetAsyncLocked(Key, s, StringSetting);
+					}
+					else if (Value is long l)
+					{
+						if (!(Setting is Int64Setting Int64Setting))
+						{
+							await Database.Delete(Setting);
+							Int64Setting = null;
+						}
+
+						return await SetAsyncLocked(Key, l, Int64Setting);
+					}
+					else if (Value is double d)
+					{
+						if (!(Setting is DoubleSetting DoubleSetting))
+						{
+							await Database.Delete(Setting);
+							DoubleSetting = null;
+						}
+
+						return await SetAsyncLocked(Key, d, DoubleSetting);
+					}
+					else if (Value is bool b)
+					{
+						if (!(Setting is BooleanSetting BooleanSetting))
+						{
+							await Database.Delete(Setting);
+							BooleanSetting = null;
+						}
+
+						return await SetAsyncLocked(Key, b, BooleanSetting);
+					}
+					else if (Value is DateTime TP)
+					{
+						if (!(Setting is DateTimeSetting DateTimeSetting))
+						{
+							await Database.Delete(Setting);
+							DateTimeSetting = null;
+						}
+
+						return await SetAsyncLocked(Key, TP, DateTimeSetting);
+					}
+					else if (Value is TimeSpan TS)
+					{
+						if (!(Setting is TimeSpanSetting TimeSpanSetting))
+						{
+							await Database.Delete(Setting);
+							TimeSpanSetting = null;
+						}
+
+						return await SetAsyncLocked(Key, TS, TimeSpanSetting);
+					}
+					else
+					{
+						Type T = Value.GetType();
+						TypeInfo TI = T.GetTypeInfo();
+
+						if (!(TI.GetCustomAttribute(typeof(CollectionNameAttribute)) is null))
+							throw new InvalidOperationException("Object setting values cannot be stored separate collections. (CollectionName attribute found.)");
+
+						TypeNameAttribute TypeNameAttribute = TI.GetCustomAttribute<TypeNameAttribute>();
+						if (TypeNameAttribute.TypeNameSerialization != TypeNameSerialization.FullName)
+							throw new InvalidOperationException("Full Type names must be serialized when persisting object setting values. (TypeName attribute.). Exceptions for the types: Boolean, Int64, String, DateTime, TimeSpan, Double.");
+					}
+				}
+
+				if (Setting is ObjectSetting ObjectSetting)
+				{
+					if (((ObjectSetting.Value is null) ^ (Value is null)) || !ObjectSetting.Value.Equals(Value))
+					{
+						ObjectSetting.Value = Value;
+						await Database.Update(ObjectSetting);
 
 						return true;
 					}
 					else
 						return false;
+				}
+				else
+				{
+					Setting = new ObjectSetting(Key, Value);
+					await Database.Insert(Setting);
+
+					return true;
 				}
 			}
 		}

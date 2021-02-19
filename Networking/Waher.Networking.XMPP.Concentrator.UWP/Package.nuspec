@@ -26,7 +26,7 @@
       <dependency id="Waher.Persistence" version="1.2.4"/>
       <dependency id="Waher.Runtime.Inventory" version="1.0.20"/>
       <dependency id="Waher.Runtime.Language" version="1.0.4"/>
-      <dependency id="Waher.Runtime.Settings" version="1.0.7"/>
+      <dependency id="Waher.Runtime.Settings" version="1.0.8"/>
       <dependency id="Waher.Runtime.Timing" version="1.0.4"/>
       <dependency id="Waher.Security" version="1.0.8"/>
       <dependency id="Waher.Things" version="1.1.1"/>

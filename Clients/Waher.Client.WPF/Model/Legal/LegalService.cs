@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Waher.Content.Markdown;
+using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Client.WPF.Dialogs.Legal;
@@ -102,60 +103,68 @@ namespace Waher.Client.WPF.Model.Legal
 			Item.Click += this.CompromizedLegalIdentities_Click;
 		}
 
-		private void RegisterLegalIdentity_Click(object sender, RoutedEventArgs e)
+		private async void RegisterLegalIdentity_Click(object sender, RoutedEventArgs e)
 		{
-			LegalIdentityForm Form = new LegalIdentityForm
+			try
 			{
-				Owner = MainWindow.currentInstance
-			};
-			bool? Result = Form.ShowDialog();
-			string s;
-
-			if (Result.HasValue && Result.Value)
-			{
-				List<Property> Properties = new List<Property>();
-
-				if (!string.IsNullOrEmpty(s = Form.FirstName.Text))
-					Properties.Add(new Property("FIRST", s));
-
-				if (!string.IsNullOrEmpty(s = Form.MiddleNames.Text))
-					Properties.Add(new Property("MIDDLE", s));
-
-				if (!string.IsNullOrEmpty(s = Form.LastName.Text))
-					Properties.Add(new Property("LAST", s));
-
-				if (!string.IsNullOrEmpty(s = Form.PersonalNumber.Text))
-					Properties.Add(new Property("PNR", s));
-
-				if (!string.IsNullOrEmpty(s = Form.Address.Text))
-					Properties.Add(new Property("ADDR", s));
-
-				if (!string.IsNullOrEmpty(s = Form.Address2.Text))
-					Properties.Add(new Property("ADDR2", s));
-
-				if (!string.IsNullOrEmpty(s = Form.PostalCode.Text))
-					Properties.Add(new Property("ZIP", s));
-
-				if (!string.IsNullOrEmpty(s = Form.Area.Text))
-					Properties.Add(new Property("AREA", s));
-
-				if (!string.IsNullOrEmpty(s = Form.City.Text))
-					Properties.Add(new Property("CITY", s));
-
-				if (!string.IsNullOrEmpty(s = Form.Region.Text))
-					Properties.Add(new Property("REGION", s));
-
-				if (!string.IsNullOrEmpty(s = Form.Country.Text))
-					Properties.Add(new Property("COUNTRY", s));
-
-				this.contractsClient.Apply(Properties.ToArray(), (sender2, e2) =>
+				LegalIdentityForm Form = new LegalIdentityForm
 				{
-					if (!e2.Ok)
-						MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to register legal identity." : e2.ErrorText);
+					Owner = MainWindow.currentInstance
+				};
+				bool? Result = Form.ShowDialog();
+				string s;
 
-					return Task.CompletedTask;
+				if (Result.HasValue && Result.Value)
+				{
+					List<Property> Properties = new List<Property>();
 
-				}, null);
+					if (!string.IsNullOrEmpty(s = Form.FirstName.Text))
+						Properties.Add(new Property("FIRST", s));
+
+					if (!string.IsNullOrEmpty(s = Form.MiddleNames.Text))
+						Properties.Add(new Property("MIDDLE", s));
+
+					if (!string.IsNullOrEmpty(s = Form.LastName.Text))
+						Properties.Add(new Property("LAST", s));
+
+					if (!string.IsNullOrEmpty(s = Form.PersonalNumber.Text))
+						Properties.Add(new Property("PNR", s));
+
+					if (!string.IsNullOrEmpty(s = Form.Address.Text))
+						Properties.Add(new Property("ADDR", s));
+
+					if (!string.IsNullOrEmpty(s = Form.Address2.Text))
+						Properties.Add(new Property("ADDR2", s));
+
+					if (!string.IsNullOrEmpty(s = Form.PostalCode.Text))
+						Properties.Add(new Property("ZIP", s));
+
+					if (!string.IsNullOrEmpty(s = Form.Area.Text))
+						Properties.Add(new Property("AREA", s));
+
+					if (!string.IsNullOrEmpty(s = Form.City.Text))
+						Properties.Add(new Property("CITY", s));
+
+					if (!string.IsNullOrEmpty(s = Form.Region.Text))
+						Properties.Add(new Property("REGION", s));
+
+					if (!string.IsNullOrEmpty(s = Form.Country.Text))
+						Properties.Add(new Property("COUNTRY", s));
+
+					await this.contractsClient.GenerateNewKeys();
+					await this.contractsClient.Apply(Properties.ToArray(), (sender2, e2) =>
+					{
+						if (!e2.Ok)
+							MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to register legal identity." : e2.ErrorText);
+
+						return Task.CompletedTask;
+
+					}, null);
+				}
+			}
+			catch (Exception ex)
+			{
+				MainWindow.ErrorBox(ex.Message);
 			}
 		}
 

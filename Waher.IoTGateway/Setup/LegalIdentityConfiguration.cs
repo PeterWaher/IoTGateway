@@ -518,7 +518,7 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		protected override string ConfigPrivilege => "Admin.Legal.ID";
 
-		private Task ApplyLegalIdentity(HttpRequest Request, HttpResponse Response)
+		private async Task ApplyLegalIdentity(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
@@ -604,7 +604,8 @@ namespace Waher.IoTGateway.Setup
 
 			Response.StatusCode = 200;
 
-			return Gateway.ContractsClient.Apply(this.GetProperties(), this.ApplyResponse, new object[] { Password, TabID, ProtectWithPassword });
+			await Gateway.ContractsClient.GenerateNewKeys();
+			await Gateway.ContractsClient.Apply(this.GetProperties(), this.ApplyResponse, new object[] { Password, TabID, ProtectWithPassword });
 		}
 
 		private async Task ApplyResponse(object Sender, LegalIdentityEventArgs e)

@@ -1099,9 +1099,6 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (ExceptionIfNone)
 			{
-				// TODO: Remove
-				IEnumerable<LegalIdentityState> States = await Database.Find<LegalIdentityState>();
-
 				if (HaveStates)
 					throw new Exception("Private keys are not available on this device. Were they created on another device?");
 				else

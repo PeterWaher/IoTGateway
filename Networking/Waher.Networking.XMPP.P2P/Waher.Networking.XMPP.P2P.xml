@@ -1771,6 +1771,13 @@
             <param name="KeyType">Type of key to get.</param>
             <returns>Key, if found, or null if not.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.GetLocalKey(System.Byte[])">
+            <summary>
+            Gets the local key with a given public key.
+            </summary>
+            <param name="PublicKey">Public key</param>
+            <returns>Key, if found, or null if not.</returns>
+        </member>
         <member name="T:Waher.Networking.XMPP.P2P.PeerAddressEventHandler">
             <summary>
             Delegate for peer address events.

@@ -3638,6 +3638,11 @@
             Timestamp when the legal identity was created or last updated.
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.LegalIdentityState.ToString">
+            <summary>
+            <see cref="M:System.Object.ToString"/>
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.LocalizableDescription">
             <summary>
             Abstract base class for contractual parameters

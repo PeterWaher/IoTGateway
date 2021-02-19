@@ -1099,6 +1099,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (ExceptionIfNone)
 			{
+				// TODO: Remove
 				IEnumerable<LegalIdentityState> States = await Database.Find<LegalIdentityState>();
 
 				if (HaveStates)

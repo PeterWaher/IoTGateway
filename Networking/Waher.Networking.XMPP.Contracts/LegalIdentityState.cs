@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Inventory;
@@ -92,6 +93,30 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get => this.timestamp;
 			set => this.timestamp = value;
+		}
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(this.bareJid);
+			sb.Append(", ");
+			sb.Append(this.legalId);
+			sb.Append(", ");
+			sb.Append(this.state.ToString());
+			sb.Append(", ");
+			sb.Append(this.timestamp.ToString());
+
+			if (!(this.publicKey is null))
+			{
+				sb.Append(", ");
+				sb.Append(Convert.ToBase64String(this.publicKey));
+			}
+
+			return sb.ToString();
 		}
 	}
 }

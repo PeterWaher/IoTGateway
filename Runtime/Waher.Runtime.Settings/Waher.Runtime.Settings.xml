@@ -201,6 +201,38 @@
             <param name="Value">New value.</param>
             <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
         </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.Get(System.String,System.Object)">
+            <summary>
+            Gets a object-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="DefaultValue">Default value, if not found.</param>
+            <returns>Setting value.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.GetAsync(System.String,System.Object)">
+            <summary>
+            Gets a object-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="DefaultValue">Default value, if not found.</param>
+            <returns>Setting value.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.Set(System.String,System.Object)">
+            <summary>
+            Sets a object-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">New value.</param>
+            <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.SetAsync(System.String,System.Object)">
+            <summary>
+            Sets a object-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">New value.</param>
+            <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+        </member>
         <member name="M:Waher.Runtime.Settings.RuntimeSettings.DeleteAsync(System.String)">
             <summary>
             Deletes a runtime setting
@@ -403,6 +435,34 @@
             </summary>
         </member>
         <member name="M:Waher.Runtime.Settings.SettingObjects.Int64Setting.GetValueObject">
+            <summary>
+            Gets the value of the setting, as an object.
+            </summary>
+            <returns>Value object.</returns>
+        </member>
+        <member name="T:Waher.Runtime.Settings.SettingObjects.ObjectSetting">
+            <summary>
+            Object setting object.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.ObjectSetting.#ctor">
+            <summary>
+            String setting object.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.ObjectSetting.#ctor(System.String,System.Object)">
+            <summary>
+            Object setting object.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">Value.</param>
+        </member>
+        <member name="P:Waher.Runtime.Settings.SettingObjects.ObjectSetting.Value">
+            <summary>
+            Value.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.ObjectSetting.GetValueObject">
             <summary>
             Gets the value of the setting, as an object.
             </summary>

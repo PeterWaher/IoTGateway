@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Persistence;
+using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Settings.SettingObjects;
 using Waher.Runtime.Threading;
@@ -435,6 +437,90 @@ namespace Waher.Runtime.Settings
 				else
 				{
 					if (Setting.Value != Value)
+					{
+						Setting.Value = Value;
+						await Database.Update(Setting);
+
+						return true;
+					}
+					else
+						return false;
+				}
+			}
+		}
+
+		#endregion
+
+		#region Object-valued settings
+
+		/// <summary>
+		/// Gets a object-valued setting.
+		/// </summary>
+		/// <param name="Key">Key name.</param>
+		/// <param name="DefaultValue">Default value, if not found.</param>
+		/// <returns>Setting value.</returns>
+		public static object Get(string Key, object DefaultValue)
+		{
+			return GetAsync(Key, DefaultValue).Result;
+		}
+
+		/// <summary>
+		/// Gets a object-valued setting.
+		/// </summary>
+		/// <param name="Key">Key name.</param>
+		/// <param name="DefaultValue">Default value, if not found.</param>
+		/// <returns>Setting value.</returns>
+		public static async Task<object> GetAsync(string Key, object DefaultValue)
+		{
+			ObjectSetting Setting = await GetAsync<ObjectSetting>(Key);
+			return Setting?.Value ?? DefaultValue;
+		}
+
+		/// <summary>
+		/// Sets a object-valued setting.
+		/// </summary>
+		/// <param name="Key">Key name.</param>
+		/// <param name="Value">New value.</param>
+		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+		public static bool Set(string Key, object Value)
+		{
+			return SetAsync(Key, Value).Result;
+		}
+
+		/// <summary>
+		/// Sets a object-valued setting.
+		/// </summary>
+		/// <param name="Key">Key name.</param>
+		/// <param name="Value">New value.</param>
+		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+		public static async Task<bool> SetAsync(string Key, object Value)
+		{
+			if (!(Value is null))
+			{
+				Type T = Value.GetType();
+				TypeInfo TI = T.GetTypeInfo();
+
+				if (!(TI.GetCustomAttribute(typeof(CollectionNameAttribute)) is null))
+					throw new InvalidOperationException("Object setting values cannot be stored separate collections. (CollectionName attribute found.)");
+
+				TypeNameAttribute TypeNameAttribute = TI.GetCustomAttribute<TypeNameAttribute>();
+				if (TypeNameAttribute.TypeNameSerialization != TypeNameSerialization.FullName)
+					throw new InvalidOperationException("Full Type names must be serialized when persisting object setting values. (TypeName attribute.)");
+			}
+
+			using (Semaphore Semaphore = await Semaphores.BeginWrite("setting:" + Key))
+			{
+				ObjectSetting Setting = await Database.FindFirstDeleteRest<ObjectSetting>(new FilterFieldEqualTo("Key", Key));
+				if (Setting is null)
+				{
+					Setting = new ObjectSetting(Key, Value);
+					await Database.Insert(Setting);
+
+					return true;
+				}
+				else
+				{
+					if (((Setting.Value is null) ^ (Value is null)) || !Setting.Value.Equals(Value))
 					{
 						Setting.Value = Value;
 						await Database.Update(Setting);

@@ -220,14 +220,14 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 
 				Timestamp = DateTime.Now;
-				await RuntimeSettings.SetAsync(KeySettings + ".Timestamp", Timestamp.Value);
+				await RuntimeSettings.SetAsync(KeySettings + "Timestamp", Timestamp.Value);
 
 				Log.Notice("Private keys for contracts client implicitly created.");
 			}
 			else if (!Timestamp.HasValue)
 			{
 				Timestamp = DateTime.Now;
-				await RuntimeSettings.SetAsync(KeySettings + ".Timestamp", Timestamp.Value);
+				await RuntimeSettings.SetAsync(KeySettings + "Timestamp", Timestamp.Value);
 			}
 
 			this.localEndpoint = new EndpointSecurity(null, 128, Keys.ToArray());

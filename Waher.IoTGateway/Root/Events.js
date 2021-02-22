@@ -260,9 +260,7 @@ function POST(Content, Resource)
 				}
 			}
 			else
-			{
 				ShowError(xhttp);
-			}
 		};
 	}
 

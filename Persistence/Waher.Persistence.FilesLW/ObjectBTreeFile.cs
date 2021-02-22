@@ -4154,7 +4154,7 @@ namespace Waher.Persistence.Files
 				XmlOutput.WriteAttributeString("fileName", this.fileName);
 
 				await this.ExportGraphXMLLocked(0, XmlOutput, Properties);
-			
+
 				XmlOutput.WriteEndElement();
 
 				if (!(this.blobFile is null))
@@ -5449,7 +5449,7 @@ namespace Waher.Persistence.Files
 									}
 
 									ApplicableFilter = this.ConvertFilter(Rest);
-									return new Searching.FilteredCursor<T>(Cursor, ApplicableFilter, 
+									return new Searching.FilteredCursor<T>(Cursor, ApplicableFilter,
 										false, true, this.timeoutMilliseconds, this.provider);
 								}
 							}
@@ -5841,7 +5841,7 @@ namespace Waher.Persistence.Files
 				throw this.UnknownFilterType(Filter);
 		}
 
-		private async Task<ICursor<T>> TryGetObjectIdCursor<T>(FilterFieldValue FilterFieldValue, 
+		private async Task<ICursor<T>> TryGetObjectIdCursor<T>(FilterFieldValue FilterFieldValue,
 			ObjectSerializer Serializer, LockType LockType, bool LockParent)
 		{
 			object Value = FilterFieldValue.Value;
@@ -6073,12 +6073,51 @@ namespace Waher.Persistence.Files
 								Result.Append('\n');
 								break;
 
+							case '.':
+							case '$':
+							case '^':
+							case '{':
+							case '[':
+							case '(':
+							case '|':
+							case ')':
+							case '*':
+							case '+':
+							case '?':
 							case '\\':
-								Result.Append('\\');
+								Result.Append(ch);
 								break;
 
 							case 'e':
 								Result.Append('\u001B');
+								break;
+
+							case 'c':
+								i++;
+								if (i < c)
+								{
+									ch = RegularExpression[i++];
+
+									if (ch == '@')
+										Result.Append((char)ch);
+									else if (ch >= 'A' && ch <= 'Z')
+										Result.Append((char)(ch - 64));
+									else
+									{
+										switch (ch)
+										{
+											case '[': Result.Append((char)27); break;
+											case '\\': Result.Append((char)28); break;
+											case ']': Result.Append((char)29); break;
+											case '^': Result.Append((char)30); break;
+											case '_': Result.Append((char)31); break;
+											default: return Result.ToString();
+										}
+									}
+								}
+								else
+									return Result.ToString();
+
 								break;
 
 							case 'x':
@@ -6139,6 +6178,9 @@ namespace Waher.Persistence.Files
 
 								Result.Append((char)k);
 								break;
+
+							default:
+								return Result.ToString();
 						}
 					}
 				}

@@ -193,7 +193,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 							switch (E2.LocalName)
 							{
 								case "put":
-									PutUrl = XML.Attribute(E2, "url");
+									PutUrl = this.CheckEmptyDomain(XML.Attribute(E2, "url"));
 
 									List<KeyValuePair<string, string>> Headers = new List<KeyValuePair<string, string>>();
 
@@ -212,7 +212,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 									break;
 
 								case "get":
-									GetUrl = XML.Attribute(E2, "url");
+									GetUrl = this.CheckEmptyDomain(XML.Attribute(E2, "url"));
 									break;
 							}
 						}
@@ -239,7 +239,16 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 				}
 
 			}, State);
+		}
 
+		private string CheckEmptyDomain(string Url)
+		{
+			int i;
+
+			if ((i = Url.IndexOf(":///")) > 0 || (i = Url.IndexOf("://:")) > 0)
+				Url = Url.Insert(i + 3, this.client.Host);
+
+			return Url;
 		}
 
 		/// <summary>

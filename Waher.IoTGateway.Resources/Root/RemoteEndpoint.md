@@ -1,4 +1,4 @@
-﻿Title: Remote Endpoint {{UserName}}
+﻿Title: Remote Endpoint {{EP}}
 Description: Page containing information about a specific remote endpoint.
 Date: 2020-05-26
 Author: Peter Waher

@@ -1282,8 +1282,17 @@ namespace Waher.Runtime.Inventory
 			if (Result is null)
 				return null;
 
-			if (!(Arguments is null) && Arguments.Length > 0 && !(Type.GetTypeInfo().GetCustomAttribute(typeof(SingletonAttribute)) is null))
+			if (Arguments is null || Arguments.Length == 0)
+				return Result;
+
+			if (!(Type.GetTypeInfo().GetCustomAttribute(typeof(SingletonAttribute)) is null))
 				RegisterSingleton(Result);
+			else
+			{
+				Type Type2 = Result.GetType();
+				if (Type2 != Type && !(Type2.GetTypeInfo().GetCustomAttribute(typeof(SingletonAttribute)) is null))
+					RegisterSingleton(Result);
+			}
 
 			return Result;
 		}

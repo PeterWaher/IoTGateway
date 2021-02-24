@@ -98,6 +98,7 @@ namespace Waher.Runtime.Inventory.Test
 			SingletonClass Obj = Types.Instantiate<SingletonClass>(false);
 			SingletonClass Obj2 = Types.Instantiate<SingletonClass>(false);
 			Assert.IsNotNull(Obj);
+			Assert.IsNotNull(Obj2);
 			Assert.AreEqual(Obj.Rnd, Obj2.Rnd);
 		}
 
@@ -188,6 +189,21 @@ namespace Waher.Runtime.Inventory.Test
 			ParamsExample ParamsExample = Types.Instantiate<ParamsExample>(false,
 				(object)(new SealedClass[] { new SealedClass("A", "B", "C") }));
 			Assert.IsNotNull(ParamsExample);
+		}
+
+		[TestMethod]
+		public void Test_18_SingletonInterfaceDefaultImplementation()
+		{
+			ISingleton Obj = Types.InstantiateDefault<ISingleton>(false, "Hello");
+			ISingleton Obj2 = Types.InstantiateDefault<ISingleton>(false);
+			
+			Assert.IsNotNull(Obj);
+			Assert.AreEqual("Hello", Obj.String);
+
+			Assert.IsNotNull(Obj2);
+			Assert.AreEqual("Hello", Obj2.String);
+
+			Assert.AreEqual(Obj.Value, Obj2.Value);
 		}
 	}
 }

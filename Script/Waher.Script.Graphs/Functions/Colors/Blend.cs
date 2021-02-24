@@ -214,16 +214,12 @@ namespace Waher.Script.Graphs.Functions.Colors
 
 				using (SKData Data = SKData.Create(Pixels, c))
 				{
-					SKImage Result = SKImage.FromPixels(new SKImageInfo(ImageInfo.Width, ImageInfo.Height, SKColorType.Bgra8888), Data, ImageInfo.RowBytes);
-					Pixels = IntPtr.Zero;
-
-					return Result;
+					return SKImage.FromPixels(new SKImageInfo(ImageInfo.Width, ImageInfo.Height, SKColorType.Bgra8888), Data, ImageInfo.RowBytes);
 				}
 			}
 			finally
 			{
-				if (Pixels != IntPtr.Zero)
-					Marshal.FreeCoTaskMem(Pixels);
+				Marshal.FreeCoTaskMem(Pixels);
 			}
 		}
 
@@ -270,19 +266,13 @@ namespace Waher.Script.Graphs.Functions.Colors
 
 				using (SKData Data = SKData.Create(Pixels1, c))
 				{
-					SKImage Result = SKImage.FromPixels(new SKImageInfo(ImageInfo.Width, ImageInfo.Height, SKColorType.Bgra8888), Data, ImageInfo.RowBytes);
-					Pixels1 = IntPtr.Zero;
-
-					return Result;
+					return SKImage.FromPixels(new SKImageInfo(ImageInfo.Width, ImageInfo.Height, SKColorType.Bgra8888), Data, ImageInfo.RowBytes);
 				}
 			}
 			finally
 			{
-				if (Pixels1 != IntPtr.Zero)
-					Marshal.FreeCoTaskMem(Pixels1);
-
-				if (Pixels2 != IntPtr.Zero)
-					Marshal.FreeCoTaskMem(Pixels2);
+				Marshal.FreeCoTaskMem(Pixels1);
+				Marshal.FreeCoTaskMem(Pixels2);
 			}
 		}
 

@@ -55,14 +55,12 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Structures
 			lpCommand = restartCommand;
 			cActions = actions?.Count ?? 0;
 
-			if (null != actions)
+			if (!(actions is null))
 			{
 				lpsaActions = Marshal.AllocHGlobal(Marshal.SizeOf<ScAction>() * cActions);
 
 				if (lpsaActions == IntPtr.Zero)
-				{
 					throw new Exception(string.Format("Unable to allocate memory for service action, error was: 0x{0:X}", Marshal.GetLastWin32Error()));
-				}
 
 				IntPtr nextAction = lpsaActions;
 
@@ -73,9 +71,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Structures
 				}
 			}
 			else
-			{
 				lpsaActions = IntPtr.Zero;
-			}
 		}
 	}
 }

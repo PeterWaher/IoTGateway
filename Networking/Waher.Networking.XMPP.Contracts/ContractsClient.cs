@@ -3852,7 +3852,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.rnd.GetBytes(Nonce);
 
 			string NonceStr = Convert.ToBase64String(Nonce);
-			byte[] Data = Encoding.UTF8.GetBytes(PetitionId + ":" + LegalId + ":" + Purpose + ":" + NonceStr + ":" + this.client.BareJID);
+			byte[] Data = Encoding.UTF8.GetBytes(PetitionId + ":" + LegalId + ":" + Purpose + ":" + NonceStr + ":" + this.client.BareJID.ToLower());
 			byte[] Signature = await this.SignAsync(Data, SignWith.LatestApprovedId);
 
 			Xml.Append("<petitionIdentity xmlns='");
@@ -4061,7 +4061,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			string NonceStr = Convert.ToBase64String(Nonce);
 			string ContentStr = Convert.ToBase64String(Content);
-			byte[] Data = Encoding.UTF8.GetBytes(PetitionId + ":" + LegalId + ":" + Purpose + ":" + NonceStr + ":" + this.client.BareJID + ":" + ContentStr);
+			byte[] Data = Encoding.UTF8.GetBytes(PetitionId + ":" + LegalId + ":" + Purpose + ":" + NonceStr + ":" + this.client.BareJID.ToLower() + ":" + ContentStr);
 			byte[] Signature = await this.SignAsync(Data, PeerReview ? SignWith.CurrentKeys : SignWith.LatestApprovedId);
 
 			Xml.Append("<petitionSignature xmlns='");
@@ -4453,7 +4453,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.rnd.GetBytes(Nonce);
 
 			string NonceStr = Convert.ToBase64String(Nonce);
-			byte[] Data = Encoding.UTF8.GetBytes(PetitionId + ":" + ContractId + ":" + Purpose + ":" + NonceStr + ":" + this.client.BareJID);
+			byte[] Data = Encoding.UTF8.GetBytes(PetitionId + ":" + ContractId + ":" + Purpose + ":" + NonceStr + ":" + this.client.BareJID.ToLower());
 			byte[] Signature = await this.SignAsync(Data, SignWith.LatestApprovedId);
 
 			Xml.Append("<petitionContract xmlns='");

@@ -17,6 +17,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Networking.XMPP.Provisioning.Cache;
+using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Things;
@@ -1713,6 +1714,19 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void ClearDeviceCache(string DeviceJID, IqResultEventHandlerAsync Callback, object State)
 		{
+			this.ClearDeviceCache(this.provisioningServerAddress, DeviceJID, Callback, State);
+		}
+
+		/// <summary>
+		/// Clears the rule cache of a device.
+		/// </summary>
+		/// <param name="ServiceJID">JID of provisioning service.</param>
+		/// <param name="DeviceJID">Bare JID of device whose rule cache is to be cleared.
+		/// If null, all owned devices will get their rule caches cleared.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void ClearDeviceCache(string ServiceJID, string DeviceJID, IqResultEventHandlerAsync Callback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<clearCache xmlns='");
@@ -1726,7 +1740,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(this.provisioningServerAddress, Xml.ToString(), Callback, State);
+			this.client.SendIqSet(ServiceJID, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -1807,6 +1821,22 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void DeleteDeviceRules(string DeviceJID, string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
 		{
+			this.DeleteDeviceRules(this.provisioningServerAddress, DeviceJID, NodeId, SourceId, Partition, Callback, State);
+		}
+
+		/// <summary>
+		/// Deletes the rules of a device.
+		/// </summary>
+		/// <param name="ServiceJID">JID of provisioning service.</param>
+		/// <param name="DeviceJID">Bare JID of device whose rules are to be deleted.
+		/// If null, all owned devices will get their rules deleted.</param>
+		/// <param name="NodeId">Optional Node ID of device.</param>
+		/// <param name="SourceId">Optional Source ID of device.</param>
+		/// <param name="Partition">Optional Partition of device.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void DeleteDeviceRules(string ServiceJID, string DeviceJID, string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<deleteRules xmlns='");
@@ -1822,7 +1852,53 @@ namespace Waher.Networking.XMPP.Provisioning
 			this.AppendNodeInfo(Xml, NodeId, SourceId, Partition);
 			Xml.Append("/>");
 
-			this.client.SendIqSet(this.provisioningServerAddress, Xml.ToString(), Callback, State);
+			this.client.SendIqSet(ServiceJID, Xml.ToString(), Callback, State);
+		}
+
+		#endregion
+
+		#region Finding Provisioning Service
+
+		/// <summary>
+		/// Finds the thing decision support service for a device.
+		/// </summary>
+		/// <param name="DeviceBareJid">Device Bare JID</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void FindDecisionSupportService(string DeviceBareJid, ServiceEventHandler Callback, object State)
+		{
+			this.client.FindComponent(DeviceBareJid, NamespaceProvisioningDevice, Callback, State);
+		}
+
+		/// <summary>
+		/// Finds the decision support service for a device.
+		/// </summary>
+		/// <param name="DeviceBareJid">Device Bare JID</param>
+		/// <returns>Thing Registry, if found.</returns>
+		public Task<string> FindDecisionSupportServiceAsync(string DeviceBareJid)
+		{
+			return this.client.FindComponentAsync(DeviceBareJid, NamespaceProvisioningDevice);
+		}
+
+		/// <summary>
+		/// Finds the provisioning service for an owner.
+		/// </summary>
+		/// <param name="DeviceBareJid">Device Bare JID</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void FindProvisioningService(string DeviceBareJid, ServiceEventHandler Callback, object State)
+		{
+			this.client.FindComponent(DeviceBareJid, NamespaceProvisioningOwner, Callback, State);
+		}
+
+		/// <summary>
+		/// Finds the provisioning service for an owner.
+		/// </summary>
+		/// <param name="DeviceBareJid">Device Bare JID</param>
+		/// <returns>Thing Registry, if found.</returns>
+		public Task<string> FindProvisioningServiceAsync(string DeviceBareJid)
+		{
+			return this.client.FindComponentAsync(DeviceBareJid, NamespaceProvisioningOwner);
 		}
 
 		#endregion

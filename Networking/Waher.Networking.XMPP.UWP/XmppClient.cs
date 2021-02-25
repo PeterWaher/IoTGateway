@@ -281,6 +281,7 @@ namespace Waher.Networking.XMPP
 		private readonly Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
 		private readonly Dictionary<string, object> tags = new Dictionary<string, object>();
 		private readonly List<IXmppExtension> extensions = new List<IXmppExtension>();
+		private readonly Dictionary<string, string> services = new Dictionary<string, string>();
 		private AuthenticationMethod authenticationMethod = null;
 #if !WINDOWS_UWP
 		private readonly X509Certificate clientCertificate = null;
@@ -724,6 +725,11 @@ namespace Waher.Networking.XMPP
 				this.fragment.Clear();
 				this.upgradeToTls = false;
 
+				lock (this.services)
+				{
+					this.services.Clear();
+				}
+
 				if (this.textTransportLayer is null)
 				{
 					this.client = new TextTcpClient(this.encoding);
@@ -1135,7 +1141,7 @@ namespace Waher.Networking.XMPP
 				}
 			}
 			finally
-			{ 
+			{
 				this.OnStateChanged -= StateEventHandler;
 			}
 
@@ -7815,6 +7821,95 @@ namespace Waher.Networking.XMPP
 				}
 
 			}, State);
+		}
+
+		#endregion
+
+		#region Finding components
+
+		/// <summary>
+		/// Finds a component having a specific feature, servicing a JID.
+		/// </summary>
+		/// <param name="Jid">JID</param>
+		/// <param name="Feature">Requested feature.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public async void FindComponent(string Jid, string Feature, ServiceEventHandler Callback, object State)
+		{
+			string Service;
+
+			try
+			{
+				Service = await this.FindComponentAsync(Jid, Feature);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+				Service = null;
+			}
+
+			if (!(Callback is null))
+			{
+				try
+				{
+					await Callback(this, new ServiceEventArgs(Service, State));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Finds a component having a specific feature, servicing a JID.
+		/// </summary>
+		/// <param name="Jid">JID</param>
+		/// <param name="Feature">Requested feature.</param>
+		/// <returns>Component JID, if found, or null if not.</returns>
+		public async Task<string> FindComponentAsync(string Jid, string Feature)
+		{
+			string Key = Jid + " " + Feature;
+
+			lock (this.services)
+			{
+				if (this.services.TryGetValue(Key, out string Service))
+					return Service;
+			}
+
+			string BareJid = GetBareJID(Jid);
+			int i = BareJid.IndexOf('@');
+			string Domain = BareJid.Substring(i + 1);
+
+			ServiceDiscoveryEventArgs e = await this.ServiceDiscoveryAsync(Domain);
+			string Result = null;
+
+			if (e.HasFeature(Feature))
+				Result = Domain;
+			else
+			{
+				ServiceItemsDiscoveryEventArgs e2 = await this.ServiceItemsDiscoveryAsync(Domain);
+
+				foreach (Item Component in e2.Items)
+				{
+					e = await this.ServiceDiscoveryAsync(Component.JID);
+					if (e.HasFeature(Feature))
+					{
+						Result = Component.JID;
+						break;
+					}
+				}
+			}
+
+			if (!string.IsNullOrEmpty(Result))
+			{
+				lock (this.services)
+				{
+					this.services[Key] = Result;
+				}
+			}
+
+			return Result;
 		}
 
 		#endregion

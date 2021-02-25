@@ -218,6 +218,7 @@
     <Compile Include="ServiceDiscovery\Identity.cs" />
     <Compile Include="ServiceDiscovery\Item.cs" />
     <Compile Include="ServiceDiscovery\ServiceDiscoveryEventArgs.cs" />
+    <Compile Include="ServiceDiscovery\ServiceEventArgs.cs" />
     <Compile Include="ServiceDiscovery\ServiceItemsDiscoveryEventArgs.cs" />
     <Compile Include="SoftwareVersion\SoftwareVersionEventArgs.cs" />
     <Compile Include="StanzaErrors\BadRequestException.cs" />

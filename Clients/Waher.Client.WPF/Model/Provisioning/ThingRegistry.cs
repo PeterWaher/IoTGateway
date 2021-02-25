@@ -639,12 +639,23 @@ namespace Waher.Client.WPF.Model.Provisioning
 			MenuItem Item = (MenuItem)sender;
 			XmppContact Contact = (XmppContact)Item.Tag;
 
-			this.provisioningClient.ClearDeviceCache(Contact.BareJID, (sender2, e2) =>
+			this.provisioningClient.FindProvisioningService(Contact.BareJID, (sender2, e2) =>
 			{
-				if (e2.Ok)
-					MainWindow.SuccessBox("The rule cache in " + Contact.BareJID + " has been cleared.");
+				if (string.IsNullOrEmpty(e2.JID))
+					MainWindow.ErrorBox("Unable to find provisioning service for " + Contact.BareJID);
 				else
-					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to clear the rule cache in " + Contact.BareJID + "." : e2.ErrorText);
+				{
+					this.provisioningClient.ClearDeviceCache(e2.JID, Contact.BareJID, (sender3, e3) =>
+					{
+						if (e3.Ok)
+							MainWindow.SuccessBox("The rule cache in " + Contact.BareJID + " has been cleared.");
+						else
+							MainWindow.ErrorBox(string.IsNullOrEmpty(e3.ErrorText) ? "Unable to clear the rule cache in " + Contact.BareJID + "." : e3.ErrorText);
+
+						return Task.CompletedTask;
+
+					}, null);
+				}
 
 				return Task.CompletedTask;
 
@@ -656,12 +667,23 @@ namespace Waher.Client.WPF.Model.Provisioning
 			MenuItem Item = (MenuItem)sender;
 			XmppContact Contact = (XmppContact)Item.Tag;
 
-			this.provisioningClient.DeleteDeviceRules(Contact.BareJID, (sender2, e2) =>
+			this.provisioningClient.FindProvisioningService(Contact.BareJID, (sender2, e2) =>
 			{
-				if (e2.Ok)
-					MainWindow.SuccessBox("The rules in " + Contact.BareJID + " have been deleted.");
+				if (string.IsNullOrEmpty(e2.JID))
+					MainWindow.ErrorBox("Unable to find provisioning service for " + Contact.BareJID);
 				else
-					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to delete the rules in " + Contact.BareJID + "." : e2.ErrorText);
+				{
+					this.provisioningClient.DeleteDeviceRules(e2.JID, Contact.BareJID, string.Empty, string.Empty, string.Empty, (sender3, e3) =>
+					{
+						if (e3.Ok)
+							MainWindow.SuccessBox("The rules in " + Contact.BareJID + " have been deleted.");
+						else
+							MainWindow.ErrorBox(string.IsNullOrEmpty(e3.ErrorText) ? "Unable to delete the rules in " + Contact.BareJID + "." : e3.ErrorText);
+
+						return Task.CompletedTask;
+
+					}, null);
+				}
 
 				return Task.CompletedTask;
 
@@ -673,12 +695,23 @@ namespace Waher.Client.WPF.Model.Provisioning
 			MenuItem Item = (MenuItem)sender;
 			Node Node = (Node)Item.Tag;
 
-			this.provisioningClient.DeleteDeviceRules(Node.Concentrator.BareJID, Node.NodeId, Node.SourceId, Node.Partition, (sender2, e2) =>
+			this.provisioningClient.FindProvisioningService(Node.Concentrator.BareJID, (sender2, e2) =>
 			{
-				if (e2.Ok)
-					MainWindow.SuccessBox("The rules in " + Node.Header + " have been deleted.");
+				if (string.IsNullOrEmpty(e2.JID))
+					MainWindow.ErrorBox("Unable to find provisioning service for " + Node.Concentrator.BareJID);
 				else
-					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to delete the rules in " + Node.Header + "." : e2.ErrorText);
+				{
+					this.provisioningClient.DeleteDeviceRules(e2.JID, Node.Concentrator.BareJID, Node.NodeId, Node.SourceId, Node.Partition, (sender3, e3) =>
+					{
+						if (e3.Ok)
+							MainWindow.SuccessBox("The rules in " + Node.Header + " have been deleted.");
+						else
+							MainWindow.ErrorBox(string.IsNullOrEmpty(e3.ErrorText) ? "Unable to delete the rules in " + Node.Header + "." : e3.ErrorText);
+
+						return Task.CompletedTask;
+
+					}, null);
+				}
 
 				return Task.CompletedTask;
 
@@ -690,15 +723,25 @@ namespace Waher.Client.WPF.Model.Provisioning
 			MenuItem Item = (MenuItem)sender;
 			XmppContact Contact = (XmppContact)Item.Tag;
 
-			this.registryClient.Disown(Contact.BareJID, (sender2, e2) =>
+			this.registryClient.FindThingRegistry(Contact.BareJID, (sender2, e2) =>
 			{
-				if (e2.Ok)
-					MainWindow.SuccessBox(Contact.BareJID + " has been disowned.");
+				if (string.IsNullOrEmpty(e2.JID))
+					MainWindow.ErrorBox("Unable to find thing registry servicing " + Contact.BareJID);
 				else
-					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to disown " + Contact.BareJID + "." : e2.ErrorText);
+				{
+					this.registryClient.Disown(e2.JID, Contact.BareJID, string.Empty, string.Empty, string.Empty, (sender3, e3) =>
+					{
+						if (e3.Ok)
+							MainWindow.SuccessBox(Contact.BareJID + " has been disowned.");
+						else
+							MainWindow.ErrorBox(string.IsNullOrEmpty(e3.ErrorText) ? "Unable to disown " + Contact.BareJID + "." : e3.ErrorText);
+
+						return Task.CompletedTask;
+
+					}, null);
+				}
 
 				return Task.CompletedTask;
-
 			}, null);
 		}
 
@@ -707,15 +750,25 @@ namespace Waher.Client.WPF.Model.Provisioning
 			MenuItem Item = (MenuItem)sender;
 			Node Node = (Node)Item.Tag;
 
-			this.registryClient.Disown(Node.Concentrator.BareJID, Node.NodeId, Node.SourceId, Node.Partition, (sender2, e2) =>
+			this.registryClient.FindThingRegistry(Node.Concentrator.BareJID, (sender2, e2) =>
 			{
-				if (e2.Ok)
-					MainWindow.SuccessBox(Node.Header + " has been disowned.");
+				if (string.IsNullOrEmpty(e2.JID))
+					MainWindow.ErrorBox("Unable to find thing registry servicing " + Node.Concentrator.BareJID);
 				else
-					MainWindow.ErrorBox(string.IsNullOrEmpty(e2.ErrorText) ? "Unable to disown " + Node.Header + "." : e2.ErrorText);
-			
+				{
+					this.registryClient.Disown(e2.JID, Node.Concentrator.BareJID, Node.NodeId, Node.SourceId, Node.Partition, (sender3, e3) =>
+					{
+						if (e3.Ok)
+							MainWindow.SuccessBox(Node.Header + " has been disowned.");
+						else
+							MainWindow.ErrorBox(string.IsNullOrEmpty(e3.ErrorText) ? "Unable to disown " + Node.Header + "." : e3.ErrorText);
+
+						return Task.CompletedTask;
+
+					}, null);
+				}
+
 				return Task.CompletedTask;
-			
 			}, null);
 		}
 

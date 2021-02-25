@@ -8,6 +8,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Things;
 using Waher.Networking.XMPP.Provisioning.SearchOperators;
+using Waher.Networking.XMPP.ServiceDiscovery;
 
 namespace Waher.Networking.XMPP.Provisioning
 {
@@ -810,6 +811,21 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void Disown(string ThingJid, string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
 		{
+			this.Disown(this.thingRegistryAddress, ThingJid, NodeId, SourceId, Partition, Callback, State);
+		}
+
+		/// <summary>
+		/// Disowns a thing, so that it can be claimed by another.
+		/// </summary>
+		/// <param name="RegistryJid">JID of registry service.</param>
+		/// <param name="ThingJid">JID of thing to disown.</param>
+		/// <param name="NodeId">Optional Node ID of thing.</param>
+		/// <param name="SourceId">Optional Source ID of thing.</param>
+		/// <param name="Partition">Optional Partition of thing.</param>
+		/// <param name="Callback">Method to call when response is received.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void Disown(string RegistryJid, string ThingJid, string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
+		{
 			StringBuilder Request = new StringBuilder();
 
 			Request.Append("<disown xmlns='");
@@ -822,7 +838,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("'/>");
 
-			this.client.SendIqSet(this.thingRegistryAddress, Request.ToString(), async (sender, e) =>
+			this.client.SendIqSet(RegistryJid, Request.ToString(), async (sender, e) =>
 			{
 				if (!(Callback is null))
 				{
@@ -1349,6 +1365,9 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		private static bool AddOperator(string Name, string Value, bool Numeric, Operator Operator, char Wildcard, Dictionary<string, SearchOperator> Operators)
 		{
+			Name = Uri.UnescapeDataString(Name);
+			Value = Uri.UnescapeDataString(Value);
+
 			if (Numeric)
 			{
 				if (!CommonTypes.TryParse(Value, out double NumericValue))
@@ -1659,5 +1678,29 @@ namespace Waher.Networking.XMPP.Provisioning
 				return !IsIoTDiscoClaimURI(Operators);
 		}
 
+		#region Finding Thing Registry
+
+		/// <summary>
+		/// Finds the thing registry servicing a device.
+		/// </summary>
+		/// <param name="DeviceBareJid">Device Bare JID</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void FindThingRegistry(string DeviceBareJid, ServiceEventHandler Callback, object State)
+		{
+			this.client.FindComponent(DeviceBareJid, NamespaceDiscovery, Callback, State);
+		}
+
+		/// <summary>
+		/// Finds the thing registry servicing a device.
+		/// </summary>
+		/// <param name="DeviceBareJid">Device Bare JID</param>
+		/// <returns>Thing Registry, if found.</returns>
+		public Task<string> FindThingRegistryAsync(string DeviceBareJid)
+		{
+			return this.client.FindComponentAsync(DeviceBareJid, NamespaceDiscovery);
+		}
+
+		#endregion
 	}
 }

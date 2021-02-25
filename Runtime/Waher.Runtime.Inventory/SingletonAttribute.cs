@@ -32,6 +32,7 @@ namespace Waher.Runtime.Inventory
 			{
 				Objects = new object[instances.Count];
 				instances.Values.CopyTo(Objects, 0);
+				instances.Clear();
 			}
 
 			foreach (object Object in Objects)

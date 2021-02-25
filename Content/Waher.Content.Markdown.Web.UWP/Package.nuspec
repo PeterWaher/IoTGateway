@@ -20,7 +20,7 @@
         <dependency id="Waher.Content.Emoji" version="1.0.4"/>
         <dependency id="Waher.Content.Markdown" version="1.0.47"/>
         <dependency id="Waher.Networking.HTTP.UWP" version="1.1.5"/>
-        <dependency id="Waher.Runtime.Inventory" version="1.0.20"/>
+        <dependency id="Waher.Runtime.Inventory" version="1.0.22"/>
         <dependency id="Waher.Script" version="1.0.50"/>
         <dependency id="Waher.Security" version="1.0.8"/>
       </group>

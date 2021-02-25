@@ -20,7 +20,7 @@
       <dependency id="Waher.IoTGateway" version="1.1.13"/>
       <dependency id="Waher.Networking.XMPP" version="1.1.9"/>
       <dependency id="Waher.Persistence" version="1.2.4"/>
-      <dependency id="Waher.Runtime.Inventory" version="1.0.20"/>
+      <dependency id="Waher.Runtime.Inventory" version="1.0.22"/>
       <dependency id="Waher.Runtime.Language" version="1.0.4"/>
       <dependency id="Waher.Script" version="1.0.50"/>
       <dependency id="Waher.Things" version="1.1.1"/>

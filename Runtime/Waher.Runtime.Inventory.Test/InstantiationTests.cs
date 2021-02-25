@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Runtime.Inventory.Test.Definitions;
 
@@ -11,6 +12,18 @@ namespace Waher.Runtime.Inventory.Test
 		public static void AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(typeof(InstantiationTests).Assembly);
+		}
+
+		[TestInitialize]
+		public Task TestInitialize()
+		{
+			return Types.StartAllModules(10000);
+		}
+
+		[TestCleanup]
+		public Task TestCleanup()
+		{
+			return Types.StopAllModules();
 		}
 
 		[TestMethod]
@@ -204,6 +217,30 @@ namespace Waher.Runtime.Inventory.Test
 			Assert.AreEqual("Hello", Obj2.String);
 
 			Assert.AreEqual(Obj.Value, Obj2.Value);
+		}
+
+		[TestMethod]
+		public void Test_19_ReleaseSingletonWhenStoppingModules()
+		{
+			ISingleton Obj = Types.InstantiateDefault<ISingleton>(false, "Hello");
+			ISingleton Obj2 = Types.InstantiateDefault<ISingleton>(false);
+
+			Assert.IsNotNull(Obj);
+			Assert.AreEqual("Hello", Obj.String);
+
+			Assert.IsNotNull(Obj2);
+			Assert.AreEqual("Hello", Obj2.String);
+
+			Assert.AreEqual(Obj.Value, Obj2.Value);
+
+			Types.StopAllModules();
+
+			ISingleton Obj3 = Types.InstantiateDefault<ISingleton>(false);
+			
+			Assert.IsNotNull(Obj3);
+			Assert.AreEqual(string.Empty, Obj3.String);
+
+			Assert.AreNotEqual(Obj.Value, Obj3.Value);
 		}
 	}
 }

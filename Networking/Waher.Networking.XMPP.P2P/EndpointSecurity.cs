@@ -1608,6 +1608,9 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>Key, if found, or null if not.</returns>
 		public IE2eEndpoint GetLocalKey(byte[] PublicKey)
 		{
+			if (PublicKey is null)
+				return null;
+
 			string s = Convert.ToBase64String(PublicKey);
 
 			foreach (IE2eEndpoint Endpoint in this.keys)

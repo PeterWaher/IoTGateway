@@ -1074,7 +1074,7 @@ namespace Waher.Networking.XMPP.Contracts
 				new FilterFieldEqualTo("BareJid", this.client.BareJID),
 				new FilterFieldEqualTo("LegalId", IdentityId)));
 
-			if (State is null)
+			if (State?.PublicKey is null)
 				return false;
 
 			IE2eEndpoint Endpoint = this.localEndpoint.GetLocalKey(State.PublicKey);
@@ -1134,10 +1134,10 @@ namespace Waher.Networking.XMPP.Contracts
 
 				DateTime Timestamp = Identity.Updated > Identity.Created ? Identity.Updated : Identity.Created;
 
-				if (Timestamp > StateObj.Timestamp)
+				if (Timestamp > StateObj.Timestamp || (StateObj.PublicKey is null && !(PublicKey is null)))
 				{
 					StateObj.State = Identity.State;
-					StateObj.Timestamp = Identity.Updated > Identity.Created ? Identity.Updated : Identity.Created;
+					StateObj.Timestamp = Timestamp;
 
 					if (PublicKey is null)
 					{

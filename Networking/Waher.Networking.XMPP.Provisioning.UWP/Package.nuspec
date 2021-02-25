@@ -1,51 +1,51 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-  <metadata minClientVersion="3.2">
-    <id>Waher.Networking.XMPP.Provisioning.UWP</id>
-    <version>1.1.3</version>
-    <title>Waher.Networking.XMPP.Provisioning.UWP</title>
-    <authors>Peter Waher</authors>
-    <owners>Waher Data AB</owners>
-    <license type="file">Meta\LICENSE.txt</license>
-    <projectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.Provisioning.UWP</projectUrl>
-    <icon>Meta\Icon_64x64.png</icon>
-    <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
-    <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>Implements the XMPP IoT provisioning extesion as defined by the IEEE XMPP IoT Interface working group.</description>
-    <copyright>Copyright © Waher Data AB 2016-2021. All rights reserved.</copyright>
-    <tags>networking communication xmpp iot provisioning ieee uwp</tags>
-    <dependencies>
-      <dependency id="Waher.Content" version="1.0.30"/>
-      <dependency id="Waher.Content.Xml" version="1.0.12"/>
-      <dependency id="Waher.Events" version="1.0.14"/>
-      <dependency id="Waher.Networking.UWP" version="1.0.21"/>
-      <dependency id="Waher.Networking.XMPP.UWP" version="1.1.9"/>
-      <dependency id="Waher.Persistence" version="1.2.4"/>
-      <dependency id="Waher.Things" version="1.1.1"/>
-    </dependencies>
-  </metadata>
-  <files>
-    <file src="..\..\Images\Icon_64x64.png" target="Meta" />
-    <file src="..\..\LICENSE.txt" target="Meta" />
+	<metadata minClientVersion="3.2">
+		<id>Waher.Networking.XMPP.Provisioning.UWP</id>
+		<version>1.1.4</version>
+		<title>Waher.Networking.XMPP.Provisioning.UWP</title>
+		<authors>Peter Waher</authors>
+		<owners>Waher Data AB</owners>
+		<license type="file">Meta\LICENSE.txt</license>
+		<projectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.Provisioning.UWP</projectUrl>
+		<icon>Meta\Icon_64x64.png</icon>
+		<repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+		<description>Implements the XMPP IoT provisioning extesion as defined by the IEEE XMPP IoT Interface working group.</description>
+		<copyright>Copyright © Waher Data AB 2016-2021. All rights reserved.</copyright>
+		<tags>networking communication xmpp iot provisioning ieee uwp</tags>
+		<dependencies>
+			<dependency id="Waher.Content" version="1.0.30"/>
+			<dependency id="Waher.Content.Xml" version="1.0.12"/>
+			<dependency id="Waher.Events" version="1.0.14"/>
+			<dependency id="Waher.Networking.UWP" version="1.0.21"/>
+			<dependency id="Waher.Networking.XMPP.UWP" version="1.1.10"/>
+			<dependency id="Waher.Persistence" version="1.2.4"/>
+			<dependency id="Waher.Things" version="1.1.1"/>
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="..\..\Images\Icon_64x64.png" target="Meta" />
+		<file src="..\..\LICENSE.txt" target="Meta" />
 
-    <!-- Architecture-independent reference library for use at compile-time. -->
-    <file src="bin\Release\Waher.Networking.XMPP.Provisioning.UWP.dll" target="ref\uap10.0" />
-    <file src="bin\Release\Waher.Networking.XMPP.Provisioning.UWP.pdb" target="ref\uap10.0" />
+		<!-- Architecture-independent reference library for use at compile-time. -->
+		<file src="bin\Release\Waher.Networking.XMPP.Provisioning.UWP.dll" target="ref\uap10.0" />
+		<file src="bin\Release\Waher.Networking.XMPP.Provisioning.UWP.pdb" target="ref\uap10.0" />
 
-    <!-- XML documentation file goes together with the reference library. -->
-    <file src="bin\x86\Release\Waher.Networking.XMPP.Provisioning.UWP.XML" target="ref\uap10.0" />
+		<!-- XML documentation file goes together with the reference library. -->
+		<file src="bin\x86\Release\Waher.Networking.XMPP.Provisioning.UWP.XML" target="ref\uap10.0" />
 
-    <!-- Resource files go together with the reference library. -->
-    <file src="bin\Release\Waher.Networking.XMPP.Provisioning.UWP.pri" target="ref\uap10.0" />
+		<!-- Resource files go together with the reference library. -->
+		<file src="bin\Release\Waher.Networking.XMPP.Provisioning.UWP.pri" target="ref\uap10.0" />
 
-    <!-- The architecture-specific files go in architecture-specific directories. -->
-    <file src="bin\x86\Release\Waher.Networking.XMPP.Provisioning.UWP.dll" target="runtimes\win10-x86\lib\uap10.0" />
-    <file src="bin\x86\Release\Waher.Networking.XMPP.Provisioning.UWP.pdb" target="runtimes\win10-x86\lib\uap10.0" />
+		<!-- The architecture-specific files go in architecture-specific directories. -->
+		<file src="bin\x86\Release\Waher.Networking.XMPP.Provisioning.UWP.dll" target="runtimes\win10-x86\lib\uap10.0" />
+		<file src="bin\x86\Release\Waher.Networking.XMPP.Provisioning.UWP.pdb" target="runtimes\win10-x86\lib\uap10.0" />
 
-    <file src="bin\x64\Release\Waher.Networking.XMPP.Provisioning.UWP.dll" target="runtimes\win10-x64\lib\uap10.0" />
-    <file src="bin\x64\Release\Waher.Networking.XMPP.Provisioning.UWP.pdb" target="runtimes\win10-x64\lib\uap10.0" />
+		<file src="bin\x64\Release\Waher.Networking.XMPP.Provisioning.UWP.dll" target="runtimes\win10-x64\lib\uap10.0" />
+		<file src="bin\x64\Release\Waher.Networking.XMPP.Provisioning.UWP.pdb" target="runtimes\win10-x64\lib\uap10.0" />
 
-    <file src="bin\arm\Release\Waher.Networking.XMPP.Provisioning.UWP.dll" target="runtimes\win10-arm\lib\uap10.0" />
-    <file src="bin\arm\Release\Waher.Networking.XMPP.Provisioning.UWP.pdb" target="runtimes\win10-arm\lib\uap10.0" />
-  </files>
+		<file src="bin\arm\Release\Waher.Networking.XMPP.Provisioning.UWP.dll" target="runtimes\win10-arm\lib\uap10.0" />
+		<file src="bin\arm\Release\Waher.Networking.XMPP.Provisioning.UWP.pdb" target="runtimes\win10-arm\lib\uap10.0" />
+	</files>
 </package>

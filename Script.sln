@@ -61,6 +61,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Waher.IoTGateway.Resources\Root\Script.md = Waher.IoTGateway.Resources\Root\Script.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.QR", "Content\Waher.Content.QR\Waher.Content.QR.csproj", "{0C5C3A13-3571-42DD-BD60-0847A15FE284}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.QR.Test", "Content\Waher.Content.QR.Test\Waher.Content.QR.Test.csproj", "{E9093092-B12D-411D-935D-EEF9E2109659}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -155,6 +159,14 @@ Global
 		{A88F6F6A-0C2F-4A0C-A999-9359CA3570A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A88F6F6A-0C2F-4A0C-A999-9359CA3570A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A88F6F6A-0C2F-4A0C-A999-9359CA3570A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C5C3A13-3571-42DD-BD60-0847A15FE284}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C5C3A13-3571-42DD-BD60-0847A15FE284}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C5C3A13-3571-42DD-BD60-0847A15FE284}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C5C3A13-3571-42DD-BD60-0847A15FE284}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9093092-B12D-411D-935D-EEF9E2109659}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9093092-B12D-411D-935D-EEF9E2109659}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9093092-B12D-411D-935D-EEF9E2109659}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9093092-B12D-411D-935D-EEF9E2109659}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -171,6 +183,8 @@ Global
 		{2B2DC5C3-3CBB-41DD-9B69-342C3A8BE861} = {0709170C-60A7-4421-8A74-07B7F294A229}
 		{A67F86B3-A5C7-4F97-824E-BD7C20594A24} = {0709170C-60A7-4421-8A74-07B7F294A229}
 		{A88F6F6A-0C2F-4A0C-A999-9359CA3570A8} = {0709170C-60A7-4421-8A74-07B7F294A229}
+		{0C5C3A13-3571-42DD-BD60-0847A15FE284} = {823D0609-1731-4770-9B1C-305BB49D6133}
+		{E9093092-B12D-411D-935D-EEF9E2109659} = {823D0609-1731-4770-9B1C-305BB49D6133}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09539FCE-8EB5-447C-A9AF-6FA30BE14418}

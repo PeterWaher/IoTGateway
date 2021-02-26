@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <Description>Contains a managed QR Code encoder.</Description>
+  </PropertyGroup>
+
+</Project>

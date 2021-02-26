@@ -13,7 +13,7 @@ namespace Waher.Runtime.Inventory
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
 	public class SingletonAttribute : Attribute
 	{
-		private static readonly Dictionary<SingletonKey, object> instances = new Dictionary<SingletonKey, object>();
+		private static readonly Dictionary<SingletonKey, KeyValuePair<bool, object>> instances = new Dictionary<SingletonKey, KeyValuePair<bool, object>>();
 
 		/// <summary>
 		/// Defines a class or struct as singleton. This means that when instantiated, using <see cref="Types.Instantiate(Type, object[])"/>,
@@ -26,18 +26,18 @@ namespace Waher.Runtime.Inventory
 
 		internal static void Clear()
 		{
-			object[] Objects;
+			KeyValuePair<bool, object>[] Objects;
 
 			lock (instances)
 			{
-				Objects = new object[instances.Count];
+				Objects = new KeyValuePair<bool, object>[instances.Count];
 				instances.Values.CopyTo(Objects, 0);
 				instances.Clear();
 			}
 
-			foreach (object Object in Objects)
+			foreach (KeyValuePair<bool, object> P in Objects)
 			{
-				if (Object is IDisposable Disposable)
+				if (P.Key && P.Value is IDisposable Disposable)
 				{
 					try
 					{
@@ -61,29 +61,28 @@ namespace Waher.Runtime.Inventory
 		public object Instantiate(bool ReturnNullIfFail, Type Type, params object[] Arguments)
 		{
 			SingletonKey Key = new SingletonKey(Type, Arguments);
-			object Object;
 
 			lock (instances)
 			{
-				if (instances.TryGetValue(Key, out Object))
-					return Object;
+				if (instances.TryGetValue(Key, out KeyValuePair<bool, object> P))
+					return P.Value;
 			}
 
-			Object = Types.Create(ReturnNullIfFail, Type, Arguments);
+			object Object = Types.Create(ReturnNullIfFail, Type, Arguments);
 			if (Object is null)
 				return null;
 
 			lock (instances)
 			{
-				if (instances.TryGetValue(Key, out object Object2))
+				if (instances.TryGetValue(Key, out KeyValuePair<bool, object> P))
 				{
 					if (Object is IDisposable Disposable)
 						Disposable.Dispose();
 
-					return Object2;
+					return P.Value;
 				}
 
-				instances[Key] = Object;
+				instances[Key] = new KeyValuePair<bool, object>(true, Object);
 			}
 
 			return Object;
@@ -103,7 +102,7 @@ namespace Waher.Runtime.Inventory
 				if (instances.ContainsKey(Key))
 					throw new InvalidOperationException("Singleton already registered.");
 
-				instances[Key] = Object;
+				instances[Key] = new KeyValuePair<bool, object>(false, Object);
 			}
 		}
 

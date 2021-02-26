@@ -8,6 +8,8 @@ namespace Waher.Runtime.Inventory.Test
 	[TestClass]
 	public class InstantiationTests
 	{
+		private DisposeCounter counter;
+
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext _)
 		{
@@ -15,15 +17,22 @@ namespace Waher.Runtime.Inventory.Test
 		}
 
 		[TestInitialize]
-		public Task TestInitialize()
+		public async Task TestInitialize()
 		{
-			return Types.StartAllModules(10000);
+			this.counter = Types.InstantiateDefault<DisposeCounter>(false, 1, 2);
+			Assert.AreEqual(0, this.counter.Count);
+
+			await Types.StartAllModules(10000);
+		
+			Assert.AreEqual(0, this.counter.Count);
 		}
 
 		[TestCleanup]
-		public Task TestCleanup()
+		public async Task TestCleanup()
 		{
-			return Types.StopAllModules();
+			await Types.StopAllModules();
+
+			Assert.AreEqual(1, this.counter.Count);
 		}
 
 		[TestMethod]
@@ -241,6 +250,21 @@ namespace Waher.Runtime.Inventory.Test
 			Assert.AreEqual(string.Empty, Obj3.String);
 
 			Assert.AreNotEqual(Obj.Value, Obj3.Value);
+		}
+
+		[TestMethod]
+		public void Test_20_DisposeCounter()
+		{
+			DisposeCounter Obj = Types.Instantiate<DisposeCounter>(false, 2, 3);
+
+			Assert.IsNotNull(Obj);
+			Assert.AreEqual(2, Obj.A);
+			Assert.AreEqual(3, Obj.B);
+			Assert.AreEqual(0, Obj.Count);
+
+			Types.StopAllModules();
+
+			Assert.AreEqual(1, Obj.Count);
 		}
 	}
 }

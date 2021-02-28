@@ -25,7 +25,6 @@ namespace Waher.Content.QR.Test
 		[TestMethod]
 		public void Test_01_GF256_Pow2()
 		{
-			GF256 F = new GF256();
 			byte[] Expected = new byte[]
 			{
 				1,2,4,8,16,32,64,128,29,58,116,232,205,135,19,38,76,152,45,90,
@@ -45,13 +44,12 @@ namespace Waher.Content.QR.Test
 				125,250,233,207,131,27,54,108,216,173,71,142,1
 			};
 
-			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(F.PowerOf2Table));
+			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(GF256.PowerOf2Table));
 		}
 
 		[TestMethod]
 		public void Test_02_GF256_Log2()
 		{
-			GF256 F = new GF256();
 			byte[] Expected = new byte[]
 			{
 				0,0,1,25,2,50,26,198,3,223,51,238,27,104,199,75,
@@ -72,7 +70,96 @@ namespace Waher.Content.QR.Test
 				79,174,213,233,230,231,173,232,116,214,244,234,168,80,88,175
 			};
 
-			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(F.Log2Table));
+			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(GF256.Log2Table));
 		}
+
+		[TestMethod]
+		public void Test_03_GF256Px_1()
+		{
+			byte[] Expected = new byte[] { 1, 1 };
+			ReedSolomonEC EC = new ReedSolomonEC(1);
+
+			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(EC.GeneratorPolynomial.Coefficients));
+		}
+
+		[TestMethod]
+		public void Test_04_GF256Px_2()
+		{
+			byte[] Expected = new byte[] { 1, 3, 2 };
+			ReedSolomonEC EC = new ReedSolomonEC(2);
+
+			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(EC.GeneratorPolynomial.Coefficients));
+		}
+
+		[TestMethod]
+		public void Test_05_GF256Px_3()
+		{
+			byte[] Expected = new byte[] { 1, 7, 14, 8 };
+			ReedSolomonEC EC = new ReedSolomonEC(3);
+
+			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(EC.GeneratorPolynomial.Coefficients));
+		}
+
+		[TestMethod]
+		public void Test_05_GF256Px_7()
+		{
+			byte[] Expected = new byte[]
+			{
+				GF256.PowerOf2Table[0],
+				GF256.PowerOf2Table[87],
+				GF256.PowerOf2Table[229],
+				GF256.PowerOf2Table[146],
+				GF256.PowerOf2Table[149],
+				GF256.PowerOf2Table[238],
+				GF256.PowerOf2Table[102],
+				GF256.PowerOf2Table[21]
+			};
+			ReedSolomonEC EC = new ReedSolomonEC(7);
+
+			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(EC.GeneratorPolynomial.Coefficients));
+		}
+
+		[TestMethod]
+		public void Test_05_GF256Px_30()
+		{
+			byte[] Expected = new byte[]
+			{
+				GF256.PowerOf2Table[0],
+				GF256.PowerOf2Table[41],
+				GF256.PowerOf2Table[173],
+				GF256.PowerOf2Table[145],
+				GF256.PowerOf2Table[152],
+				GF256.PowerOf2Table[216],
+				GF256.PowerOf2Table[31],
+				GF256.PowerOf2Table[179],
+				GF256.PowerOf2Table[182],
+				GF256.PowerOf2Table[50],
+				GF256.PowerOf2Table[48],
+				GF256.PowerOf2Table[110],
+				GF256.PowerOf2Table[86],
+				GF256.PowerOf2Table[239],
+				GF256.PowerOf2Table[96],
+				GF256.PowerOf2Table[222],
+				GF256.PowerOf2Table[125],
+				GF256.PowerOf2Table[42],
+				GF256.PowerOf2Table[173],
+				GF256.PowerOf2Table[226],
+				GF256.PowerOf2Table[193],
+				GF256.PowerOf2Table[224],
+				GF256.PowerOf2Table[130],
+				GF256.PowerOf2Table[156],
+				GF256.PowerOf2Table[37],
+				GF256.PowerOf2Table[251],
+				GF256.PowerOf2Table[216],
+				GF256.PowerOf2Table[238],
+				GF256.PowerOf2Table[40],
+				GF256.PowerOf2Table[192],
+				GF256.PowerOf2Table[180]
+			};
+			ReedSolomonEC EC = new ReedSolomonEC(30);
+
+			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(EC.GeneratorPolynomial.Coefficients));
+		}
+
 	}
 }

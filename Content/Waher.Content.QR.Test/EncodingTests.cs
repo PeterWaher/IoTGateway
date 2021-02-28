@@ -101,7 +101,7 @@ namespace Waher.Content.QR.Test
 		}
 
 		[TestMethod]
-		public void Test_05_GF256Px_7()
+		public void Test_06_GF256Px_7()
 		{
 			byte[] Expected = new byte[]
 			{
@@ -120,7 +120,7 @@ namespace Waher.Content.QR.Test
 		}
 
 		[TestMethod]
-		public void Test_05_GF256Px_30()
+		public void Test_07_GF256Px_30()
 		{
 			byte[] Expected = new byte[]
 			{
@@ -159,6 +159,15 @@ namespace Waher.Content.QR.Test
 			ReedSolomonEC EC = new ReedSolomonEC(30);
 
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(EC.GeneratorPolynomial.Coefficients));
+		}
+
+		[TestMethod]
+		public void Test_08_EC_Code()
+		{
+			ReedSolomonEC EC = new ReedSolomonEC(10);
+			byte[] Code = EC.GenerateCorrectionCode(new byte[] { 32, 91, 11, 120, 209, 114, 220, 77, 67, 64, 236, 17, 236, 17, 236, 17 });
+			byte[] Expected = new byte[] { 196, 35, 39, 119, 235, 215, 231, 226, 93, 23 };
+			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(Code));
 		}
 
 	}

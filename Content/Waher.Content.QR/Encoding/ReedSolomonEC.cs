@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Content.QR.Encoding
 {
@@ -11,6 +9,7 @@ namespace Waher.Content.QR.Encoding
 	public class ReedSolomonEC
 	{
 		private readonly GF256Px generatorPolynomial;
+		private readonly int nrCorrectionCodeWords;
 
 		/// <summary>
 		/// Implements Reed-Solomon Error Correction using polynomial division
@@ -27,14 +26,31 @@ namespace Waher.Content.QR.Encoding
 			int i = 0;
 
 			while (++i < NrCorrectionCodeWords)
-				P = P.Mul(new GF256Px(new byte[] { 1, GF256.PowerOf2Table[i] })); // X-α^i
+				P = P.Multiply(new GF256Px(new byte[] { 1, GF256.PowerOf2Table[i] })); // X-α^i
 
 			this.generatorPolynomial = P;
+			this.nrCorrectionCodeWords = NrCorrectionCodeWords;
 		}
 
 		/// <summary>
 		/// Generator polynomial.
 		/// </summary>
 		public GF256Px GeneratorPolynomial => this.generatorPolynomial;
+
+		/// <summary>
+		/// Computes the Error Correction code for a message.
+		/// </summary>
+		/// <param name="Message">Byte encoded message</param>
+		/// <returns>Error Correction code.</returns>
+		public byte[] GenerateCorrectionCode(byte[] Message)
+		{
+			byte[] C = new byte[Message.Length + this.nrCorrectionCodeWords];
+			Message.CopyTo(C, 0);
+
+			GF256Px M = new GF256Px(C);
+			GF256Px Resiue = M.Residue(this.generatorPolynomial);
+
+			return Resiue.Coefficients;
+		}
 	}
 }

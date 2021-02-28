@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Content.QR.Encoding
 {
@@ -38,7 +36,7 @@ namespace Waher.Content.QR.Encoding
 		/// <param name="P">Polynomial</param>
 		/// <returns>New polynomial corresponding to the multiplication of the
 		/// current polynomial and <paramref name="P"/>.</returns>
-		public GF256Px Mul(GF256Px P)
+		public GF256Px Multiply(GF256Px P)
 		{
 			byte[] C = new byte[this.degree + P.degree + 1];
 			int i, j;
@@ -51,5 +49,39 @@ namespace Waher.Content.QR.Encoding
 
 			return new GF256Px(C);
 		}
+
+		/// <summary>
+		/// Calculates the residue of the polynomial devision of this polynomial,
+		/// with a divisor in <paramref name="Divisor"/>.
+		/// </summary>
+		/// <param name="Divisor"></param>
+		/// <returns></returns>
+		public GF256Px Residue(GF256Px Divisor)
+		{
+			if (this.degree < Divisor.degree)
+				return this;
+
+			if (Divisor.coefficients[0] != 1)
+				throw new NotSupportedException("Leading coefficien must be 1.");   // Will always be one if only generator polynomials are used.
+
+			byte[] C = (byte[])this.coefficients.Clone();
+			int i, c, j;
+			byte b;
+
+			c = this.degree - Divisor.degree;
+			for (i = 0; i <= c; i++)
+			{
+				b = C[i];
+				C[i] = 0;
+				for (j = 1; j <= Divisor.degree; j++)
+					C[i + j] ^= GF256.Multiply(b, Divisor.coefficients[j]);
+			}
+
+			byte[] Residue = new byte[Divisor.degree];
+			Array.Copy(C, c + 1, Residue, 0, Divisor.degree);
+
+			return new GF256Px(Residue);
+		}
+
 	}
 }

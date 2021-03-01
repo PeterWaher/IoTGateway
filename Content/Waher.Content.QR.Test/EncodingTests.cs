@@ -170,5 +170,100 @@ namespace Waher.Content.QR.Test
 			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(Code));
 		}
 
+		[TestMethod]
+		public void Test_09_TotalDataBytes_H()
+		{
+			int[] DataBytes = new int[]
+			{
+				9, 16, 26, 36, 46, 60, 66, 86, 100, 122, 140, 158, 180, 197,
+				223, 253, 283, 313, 341, 385, 406, 442, 464, 514, 538, 596,
+				628, 661, 701, 745, 793, 845, 901, 961, 986, 1054, 1096, 1142,
+				1222, 1276
+			};
+
+			int i = 0;
+
+			foreach (VersionInfo Info in Versions.HighVersions)
+				Assert.AreEqual(DataBytes[i++], Info.TotalDataBytes);
+		}
+
+		[TestMethod]
+		public void Test_10_TotalDataBytes_L()
+		{
+			int[] DataBytes = new int[]
+			{
+				19, 34, 55, 80, 108, 136, 156, 194, 232, 274, 324, 370, 428,
+				461, 523, 589, 647, 721, 795, 861, 932, 1006, 1094, 1174,
+				1276, 1370, 1468, 1531, 1631, 1735, 1843, 1955, 2071, 2191,
+				2306, 2434, 2566, 2702, 2812, 2956
+			};
+
+			int i = 0;
+
+			foreach (VersionInfo Info in Versions.LowVersions)
+				Assert.AreEqual(DataBytes[i++], Info.TotalDataBytes);
+		}
+
+		[TestMethod]
+		public void Test_11_TotalDataBytes_M()
+		{
+			int[] DataBytes = new int[]
+			{
+				16, 28, 44, 64, 86, 108, 124, 154, 182, 216, 254, 290, 334,
+				365, 415, 453, 507, 563, 627, 669, 714, 782, 860, 914, 1000,
+				1062, 1128, 1193, 1267, 1373, 1455, 1541, 1631, 1725, 1812,
+				1914, 1992, 2102, 2216, 2334
+			};
+
+			int i = 0;
+
+			foreach (VersionInfo Info in Versions.MediumVersions)
+				Assert.AreEqual(DataBytes[i++], Info.TotalDataBytes);
+		}
+
+		[TestMethod]
+		public void Test_12_TotalDataBytes_Q()
+		{
+			int[] DataBytes = new int[]
+			{
+				13, 22, 34, 48, 62, 76, 88, 110, 132, 154, 180, 206, 244,
+				261, 295, 325, 367, 397, 445, 485, 512, 568, 614, 664, 718,
+				754, 808, 871, 911, 985, 1033, 1115, 1171, 1231, 1286, 1354,
+				1426, 1502, 1582, 1666
+			};
+
+			int i = 0;
+
+			foreach (VersionInfo Info in Versions.QuartileVersions)
+				Assert.AreEqual(DataBytes[i++], Info.TotalDataBytes);
+		}
+
+		[TestMethod]
+		public void Test_13_ApplyErrorCorrection()
+		{
+			byte[] Message = new byte[]
+			{
+				67, 85, 70, 134, 87, 38, 85, 194, 119, 50, 6, 18, 6, 103, 38, 
+				246, 246, 66, 7, 118, 134, 242, 7, 38, 86, 22, 198, 199, 146, 6, 
+				182, 230, 247, 119, 50, 7, 118, 134, 87, 38, 82, 6, 134, 151, 50, 7, 
+				70, 247, 118, 86, 194, 6, 151, 50, 16, 236, 17, 236, 17, 236, 17, 236
+			};
+			byte[] FinalMessage = this.encoder.ApplyErrorCorrection(5, CorrectionLevel.Q, Message);
+			byte[] Expected = new byte[]
+			{
+				67, 246, 182, 70, 85, 246, 230, 247, 70, 66, 247, 118, 134, 7, 119, 
+				86, 87, 118, 50, 194, 38, 134, 7, 6, 85, 242, 118, 151, 194, 7, 134, 
+				50, 119, 38, 87, 16, 50, 86, 38, 236, 6, 22, 82, 17, 18, 198, 6, 236, 
+				6, 199, 134, 17, 103, 146, 151, 236, 38, 6, 50, 17, 7, 236, 213, 87, 
+				148, 235, 199, 204, 116, 159, 11, 96, 177, 5, 45, 60, 212, 173, 115, 
+				202, 76, 24, 247, 182, 133, 147, 241, 124, 75, 59, 223, 157, 242, 33,
+				229, 200, 238, 106, 248, 134, 76, 40, 154, 27, 195, 255, 117, 129, 
+				230, 172, 154, 209, 189, 82, 111, 17, 10, 2, 86, 163, 108, 131, 161, 
+				163, 240, 32, 111, 120, 192, 178, 39, 133, 141, 236
+			};
+
+			Assert.AreEqual(Convert.ToBase64String(Expected), Convert.ToBase64String(FinalMessage));
+		}
+
 	}
 }

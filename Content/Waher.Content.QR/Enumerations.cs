@@ -20,7 +20,7 @@ namespace Waher.Content.QR
 		M,
 
 		/// <summary>
-		/// Quality (25%)
+		/// Quartile (25%)
 		/// </summary>
 		Q,
 

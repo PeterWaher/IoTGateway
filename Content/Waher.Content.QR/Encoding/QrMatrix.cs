@@ -1,9 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Waher.Content.QR.Encoding
 {
+	/// <summary>
+	/// Delegate for mask functions
+	/// </summary>
+	/// <param name="x">Zero-based X-coordinte.</param>
+	/// <param name="y">Zero-based Y-coordinte.</param>
+	/// <returns>If the bit should be swapped.</returns>
+	public delegate bool MaskFunction(int x, int y);
+
 	/// <summary>
 	/// Class used to compute a QR code matrix.
 	/// </summary>
@@ -32,9 +39,10 @@ namespace Waher.Content.QR.Encoding
 		private static readonly char[] halfBlocks = new char[] { ' ', '▀', '▄', '█' };
 		private static readonly char[] quarterBlocks = new char[] { ' ', '▘', '▝', '▀', '▖', '▌', '▞', '▛', '▗', '▚', '▐', '▜', '▄', '▙', '▟', '█' };
 
-		private readonly bool[,] defined;
-		private readonly bool[,] dots;
 		private readonly int size;
+		private readonly bool[,] defined;
+		private bool[,] mask;
+		private bool[,] dots;
 
 		/// <summary>
 		/// Class used to compute a QR code matrix.
@@ -46,8 +54,29 @@ namespace Waher.Content.QR.Encoding
 				throw new ArgumentException("Invalid size.", nameof(Size));
 
 			this.size = Size;
-			this.defined = new bool[Size, Size];
+			this.defined = this.mask = new bool[Size, Size];
 			this.dots = new bool[Size, Size];
+		}
+
+		/// <summary>
+		/// Class used to compute a QR code matrix.
+		/// </summary>
+		public QrMatrix(bool[,] Matrix, bool[,] Mask)
+		{
+			int c = Matrix.GetLength(0);
+			if (Matrix.GetLength(1) != c)
+				throw new ArgumentException("Matrix not square.", nameof(Matrix));
+
+			if (c < 21 || c > 177 || ((c - 21) & 3) != 0)
+				throw new ArgumentException("Invalid matrix dimensions.", nameof(Matrix));
+
+			if (Mask.GetLength(0) != c || Mask.GetLength(1) != c)
+				throw new ArgumentException("Mask must be same dimension as matrix.", nameof(Mask));
+
+			this.size = c;
+			this.dots = Matrix;
+			this.mask = Mask;
+			this.defined = (bool[,])Mask.Clone();
 		}
 
 		/// <summary>
@@ -228,22 +257,29 @@ namespace Waher.Content.QR.Encoding
 		{
 			StringBuilder sb = new StringBuilder();
 
+			string s = new string(' ', 16 + (this.size << 1));
 			int x, y;
+
+			for (y = 0; y < 4; y++)
+				sb.AppendLine(s);
 
 			for (y = 0; y < this.size; y++)
 			{
+				sb.Append("        ");
+
 				for (x = 0; x < this.size; x++)
 				{
-					if (!this.defined[y, x])
-						sb.Append("░░");
-					else if (this.dots[y, x])
+					if (this.dots[y, x])
 						sb.Append("██");
 					else
 						sb.Append("  ");
 				}
 
-				sb.AppendLine();
+				sb.AppendLine("        ");
 			}
+
+			for (y = 0; y < 4; y++)
+				sb.AppendLine(s);
 
 			return sb.ToString();
 		}
@@ -259,25 +295,34 @@ namespace Waher.Content.QR.Encoding
 		{
 			StringBuilder sb = new StringBuilder();
 
+			string s = new string(' ', 8 + this.size);
 			int x, y, y2;
 			int i;
+
+			for (y = 0; y < 4; y++)
+				sb.AppendLine(s);
 
 			for (y = 0; y < this.size; y += 2)
 			{
 				y2 = y + 1;
 
+				sb.Append("    ");
+
 				for (x = 0; x < this.size; x++)
 				{
-					i = this.defined[y, x] && this.dots[y, x] ? 1 : 0;
+					i = this.dots[y, x] ? 1 : 0;
 
-					if (y2 < this.size && this.defined[y2, x] && this.dots[y2, x])
+					if (y2 < this.size && this.dots[y2, x])
 						i |= 2;
 
 					sb.Append(halfBlocks[i]);
 				}
 
-				sb.AppendLine();
+				sb.AppendLine("    ");
 			}
+
+			for (y = 0; y < 4; y++)
+				sb.AppendLine(s);
 
 			return sb.ToString();
 		}
@@ -293,35 +338,454 @@ namespace Waher.Content.QR.Encoding
 		{
 			StringBuilder sb = new StringBuilder();
 
+			string s = new string(' ', 4 + (this.size + 1) >> 1);
 			int x, y, x2, y2;
 			int i;
+
+			sb.AppendLine(s);
+			sb.AppendLine(s);
 
 			for (y = 0; y < this.size; y += 2)
 			{
 				y2 = y + 1;
 
+				sb.Append("  ");
+
 				for (x = 0; x < this.size; x++)
 				{
 					x2 = x + 1;
 
-					i = this.defined[y, x] && this.dots[y, x] ? 1 : 0;
+					i = this.dots[y, x] ? 1 : 0;
 
-					if (x2 < this.size && this.defined[y, x2] && this.dots[y, x2])
+					if (x2 < this.size && this.dots[y, x2])
 						i |= 2;
 
-					if (y2 < this.size && this.defined[y2, x] && this.dots[y2, x])
+					if (y2 < this.size && this.dots[y2, x])
 						i |= 4;
 
-					if (x2 < this.size && y2 < this.size && this.defined[y2, x2] && this.dots[y2, x2])
+					if (x2 < this.size && y2 < this.size && this.dots[y2, x2])
 						i |= 8;
 
 					sb.Append(quarterBlocks[i]);
 				}
 
-				sb.AppendLine();
+				sb.AppendLine("  ");
 			}
+
+			sb.AppendLine(s);
+			sb.AppendLine(s);
 
 			return sb.ToString();
 		}
+
+		/// <summary>
+		/// Calculates a penalty score based on horizontal bands of dots of the same color.
+		/// </summary>
+		/// <returns>Penalty score</returns>
+		public int PenaltyHorizontalBands()
+		{
+			int x, y, c;
+			int Result = 0;
+			bool? Prev;
+			bool b;
+
+			for (y = 0; y < this.size; y++)
+			{
+				Prev = null;
+				c = 0;
+
+				for (x = 0; x < this.size; x++)
+				{
+					if (Prev.HasValue)
+					{
+						if (Prev == (b = this.dots[y, x]))
+						{
+							c++;
+							if (c == 5)
+								Result += 3;
+							else if (c > 5)
+								Result++;
+						}
+						else
+						{
+							c = 1;
+							Prev = b;
+						}
+					}
+					else
+					{
+						Prev = this.dots[y, x];
+						c = 1;
+					}
+				}
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Calculates a penalty score based on horizontal bands of dots of the same color.
+		/// </summary>
+		/// <returns>Penalty score</returns>
+		public int PenaltyVerticalBands()
+		{
+			int x, y, c;
+			int Result = 0;
+			bool? Prev;
+			bool b;
+
+			for (x = 0; x < this.size; x++)
+			{
+				Prev = null;
+				c = 0;
+
+				for (y = 0; y < this.size; y++)
+				{
+					if (Prev.HasValue)
+					{
+						if (Prev == (b = this.dots[y, x]))
+						{
+							c++;
+							if (c == 5)
+								Result += 3;
+							else if (c > 5)
+								Result++;
+						}
+						else
+							c = 1;
+
+						Prev = b;
+					}
+					else
+					{
+						Prev = this.dots[y, x];
+						c = 1;
+					}
+				}
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Calculates a penalty score based on same colored blocks.
+		/// </summary>
+		/// <returns>Penalty score</returns>
+		public int PenaltyBlocks()
+		{
+			int x, y, c = this.size - 1;
+			int Result = 0;
+			bool b;
+
+			for (y = 0; y < c; y++)
+			{
+				for (x = 0; x < c; x++)
+				{
+					if (this.dots[y + 1, x] == (b = this.dots[y, x]) &&
+						this.dots[y, x + 1] == b &&
+						this.dots[y + 1, x + 1] == b)
+					{
+						Result += 3;
+					}
+				}
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Calculates a penalty score based on horizontal finder patterns found.
+		/// </summary>
+		/// <returns>Penalty score</returns>
+		public int PenaltyHorizontalFinderPattern()
+		{
+			int x, y, i;
+			int Result = 0;
+			bool b;
+
+			for (y = 0; y < this.size; y++)
+			{
+				i = 0;
+				for (x = 0; x < this.size; x++)
+				{
+					b = this.dots[y, x];
+					switch (i)
+					{
+						case 0:
+						case 1:
+						case 2:
+						case 3:
+						case 5:
+						case 9:
+							if (!b)
+								i++;
+							else
+								i = 0;
+							break;
+
+						case 4:
+							if (b)
+								i++;
+							break;
+
+						case 6:
+						case 7:
+						case 8:
+							if (b)
+								i++;
+							else
+								i = 0;
+							break;
+
+						case 10:
+							if (b)
+								Result += 40;
+
+							i = 0;
+							break;
+					}
+				}
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Calculates a penalty score based on vertical finder patterns found.
+		/// </summary>
+		/// <returns>Penalty score</returns>
+		public int PenaltyVerticalFinderPattern()
+		{
+			int x, y, i;
+			int Result = 0;
+			bool b;
+
+			for (x = 0; x < this.size; x++)
+			{
+				i = 0;
+				for (y = 0; y < this.size; y++)
+				{
+					b = this.dots[y, x];
+					switch (i)
+					{
+						case 0:
+						case 1:
+						case 2:
+						case 3:
+						case 5:
+						case 9:
+							if (!b)
+								i++;
+							else
+								i = 0;
+							break;
+
+						case 4:
+							if (b)
+								i++;
+							break;
+
+						case 6:
+						case 7:
+						case 8:
+							if (b)
+								i++;
+							else
+								i = 0;
+							break;
+
+						case 10:
+							if (b)
+								Result += 40;
+
+							i = 0;
+							break;
+					}
+				}
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Calculates a penalty score based on the balance between dark and 
+		/// light dots.
+		/// </summary>
+		/// <returns>Penalty score</returns>
+		public int PenaltyBalance()
+		{
+			int x, y;
+			int NrDark = 0;
+			int NrLight = 0;
+
+			for (y = 0; y < this.size; y++)
+			{
+				for (x = 0; x < this.size; x++)
+				{
+					if (this.dots[y, x])
+						NrDark++;
+					else
+						NrLight++;
+				}
+			}
+
+			int PercentDark = (100 * NrDark) / (NrDark + NrLight);
+			int Prev5 = (PercentDark / 5) * 5;
+			int Next5 = Prev5 += 5;
+
+			Prev5 = Math.Abs(Prev5 - 50) / 5;
+			Next5 = Math.Abs(Next5 - 50) / 5;
+
+			return Math.Min(Prev5, Next5) * 10;
+		}
+
+		/// <summary>
+		/// Calculates the total penalty score of the matrix.
+		/// </summary>
+		/// <returns>Penalty score.</returns>
+		public int Penalty()
+		{
+			return this.Penalty(null);
+		}
+
+		/// <summary>
+		/// Calculates the total penalty score of the matrix.
+		/// </summary>
+		/// <param name="Mask">Optional mask function. May be null.</param>
+		/// <returns>Penalty score.</returns>
+		public int Penalty(MaskFunction Mask)
+		{
+			bool[,] Bak = this.dots;
+
+			if (!(Mask is null))
+				this.ApplyMask(Mask);
+
+			int Result =
+				this.PenaltyHorizontalBands() +
+				this.PenaltyVerticalBands() +
+				this.PenaltyBlocks() +
+				this.PenaltyHorizontalFinderPattern() +
+				this.PenaltyVerticalFinderPattern() +
+				this.PenaltyBalance();
+
+			this.dots = Bak;
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Mask function 0
+		/// </summary>
+		/// <param name="x">Zero-based X-coordinte.</param>
+		/// <param name="y">Zero-based Y-coordinte.</param>
+		/// <returns>If the bit should be swapped.</returns>
+		public static bool Mask0(int x, int y) => ((x + y) & 1) == 0;
+
+		/// <summary>
+		/// Mask function 1
+		/// </summary>
+		/// <param name="x">Zero-based X-coordinte.</param>
+		/// <param name="y">Zero-based Y-coordinte.</param>
+		/// <returns>If the bit should be swapped.</returns>
+		public static bool Mask1(int _, int y) => (y & 1) == 0;
+
+		/// <summary>
+		/// Mask function 2
+		/// </summary>
+		/// <param name="x">Zero-based X-coordinte.</param>
+		/// <param name="y">Zero-based Y-coordinte.</param>
+		/// <returns>If the bit should be swapped.</returns>
+		public static bool Mask2(int x, int _) => (x % 3) == 0;
+
+		/// <summary>
+		/// Mask function 3
+		/// </summary>
+		/// <param name="x">Zero-based X-coordinte.</param>
+		/// <param name="y">Zero-based Y-coordinte.</param>
+		/// <returns>If the bit should be swapped.</returns>
+		public static bool Mask3(int x, int y) => ((x + y) % 3) == 0;
+
+		/// <summary>
+		/// Mask function 4
+		/// </summary>
+		/// <param name="x">Zero-based X-coordinte.</param>
+		/// <param name="y">Zero-based Y-coordinte.</param>
+		/// <returns>If the bit should be swapped.</returns>
+		public static bool Mask4(int x, int y) => (((x / 3) + (y / 2)) & 1) == 0;
+
+		/// <summary>
+		/// Mask function 5
+		/// </summary>
+		/// <param name="x">Zero-based X-coordinte.</param>
+		/// <param name="y">Zero-based Y-coordinte.</param>
+		/// <returns>If the bit should be swapped.</returns>
+		public static bool Mask5(int x, int y) => ((x * y) & 1) + ((x * y) % 3) == 0;
+
+		/// <summary>
+		/// Mask function 6
+		/// </summary>
+		/// <param name="x">Zero-based X-coordinte.</param>
+		/// <param name="y">Zero-based Y-coordinte.</param>
+		/// <returns>If the bit should be swapped.</returns>
+		public static bool Mask6(int x, int y) => ((((x * y) & 1) + ((x * y) % 3)) & 1) == 0;
+
+		/// <summary>
+		/// Mask function 7
+		/// </summary>
+		/// <param name="x">Zero-based X-coordinte.</param>
+		/// <param name="y">Zero-based Y-coordinte.</param>
+		/// <returns>If the bit should be swapped.</returns>
+		public static bool Mask7(int x, int y) => ((((x + y) & 1) + ((x * y) % 3)) & 1) == 0;
+
+		/// <summary>
+		/// Saves the currently defined dots as a mask.
+		/// </summary>
+		public void SaveMask()
+		{
+			this.mask = (bool[,])this.defined.Clone();
+		}
+
+		/// <summary>
+		/// Applies a mask on the matrix.
+		/// </summary>
+		/// <param name="Mask">Mask function</param>
+		public void ApplyMask(MaskFunction Mask)
+		{
+			int x, y;
+
+			this.dots = (bool[,])this.dots.Clone();
+
+			for (y = 0; y < this.size; y++)
+			{
+				for (x = 0; x < this.size; x++)
+				{
+					if (!this.mask[y, x] && Mask(x, y))
+						this.dots[y, x] = !this.dots[y, x];
+				}
+			}
+		}
+
+		/// <summary>
+		/// Writes bits to the matrix.
+		/// </summary>
+		/// <param name="Bits">Bits to write to the matrix, from MSB to LSB.</param>
+		/// <param name="X">Start X-coordinate.</param>
+		/// <param name="Y">Start Y-coordinate.</param>
+		/// <param name="Dx">Movement along X-axis after each bit.</param>
+		/// <param name="Dy">Movement along Y-axis after each bit.</param>
+		/// <param name="NrBits">Number of bits to write.</param>
+		public void WriteBits(uint Bits, int X, int Y, int Dx, int Dy, int NrBits)
+		{
+			while (NrBits > 0)
+			{
+				this.dots[Y, X] = (Bits & 0x80000000) != 0;
+				this.defined[Y, X] = true;
+				Bits <<= 1;
+				NrBits--;
+				X += Dx;
+				Y += Dy;
+			}
+		}
+
 	}
 }

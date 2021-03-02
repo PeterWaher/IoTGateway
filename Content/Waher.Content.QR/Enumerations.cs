@@ -12,22 +12,22 @@ namespace Waher.Content.QR
 		/// <summary>
 		/// Low (7%)
 		/// </summary>
-		L,
+		L = 0,
 
 		/// <summary>
 		/// Medium (15%)
 		/// </summary>
-		M,
+		M = 1,
 
 		/// <summary>
 		/// Quartile (25%)
 		/// </summary>
-		Q,
+		Q = 2,
 
 		/// <summary>
 		/// High (30%)
 		/// </summary>
-		H
+		H = 3
 	}
 
 	/// <summary>

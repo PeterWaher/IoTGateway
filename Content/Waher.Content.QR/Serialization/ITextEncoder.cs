@@ -11,7 +11,6 @@ namespace Waher.Content.QR.Serialization
 		/// Encodes a string.
 		/// </summary>
 		/// <param name="Text">Text to encode.</param>
-		/// <returns>If encoding was possible.</returns>
-		bool Encode(string Text);
+		void Encode(string Text);
 	}
 }

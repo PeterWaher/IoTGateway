@@ -24,20 +24,50 @@ namespace Waher.Content.QR.Serialization
 		}
 
 		/// <summary>
-		/// Encodes a string.
+		/// Checks if a text string can be encoded using the alphanumeric encoding.
+		/// </summary>
+		/// <param name="Text">Text string to encode.</param>
+		/// <returns>If the encoder can be used.</returns>
+		public static bool CanEncode(string _)
+		{
+			return true;
+		}
+
+		/// <summary>
+		/// Gets the byte representation of a string.
 		/// </summary>
 		/// <param name="Text">Text to encode.</param>
-		/// <returns>If encoding was possible.</returns>
-		public bool Encode(string Text)
+		/// <returns>Byte representation.</returns>
+		public byte[] GetBytes(string Text)
 		{
 			byte[] Bin = iso_8859_1.GetBytes(Text);
 			if (iso_8859_1.GetString(Bin) != Text)
 				Bin = System.Text.Encoding.UTF8.GetBytes(Text);
 
+			return Bin;
+		}
+
+		/// <summary>
+		/// Encodes a string.
+		/// </summary>
+		/// <param name="Bin">Binary messate to encode.</param>
+		public void Encode(byte[] Bin)
+		{
 			foreach (byte b in Bin)
 				this.output.WriteBits(b, 8);
+		}
 
-			return true;
+		/// <summary>
+		/// Encodes a string.
+		/// </summary>
+		/// <param name="Text">Text to encode.</param>
+		public void Encode(string Text)
+		{
+			byte[] Bin = iso_8859_1.GetBytes(Text);
+			if (iso_8859_1.GetString(Bin) != Text)
+				Bin = System.Text.Encoding.UTF8.GetBytes(Text);
+
+			this.Encode(Bin);
 		}
 	}
 }

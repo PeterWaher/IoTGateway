@@ -7,6 +7,7 @@ namespace Waher.Content.QR.Encoding
 	/// </summary>
 	public class VersionInfo
 	{
+		private readonly CorrectionLevel level;
 		private readonly int version;
 		private readonly int ecBytesPerBlock;
 		private readonly int blocksPerGroup1;
@@ -18,9 +19,11 @@ namespace Waher.Content.QR.Encoding
 		private readonly int totalDataBytes;
 		private readonly int totalBytes;
 
-		internal VersionInfo(int Version, int EcBytesPerBlock, int BlocksPerGroup1,
-			int DataBytesPerBlock1, int BlocksPerGroup2, int DataBytesPerBlock2)
+		internal VersionInfo(CorrectionLevel Level, int Version, int EcBytesPerBlock, 
+			int BlocksPerGroup1, int DataBytesPerBlock1, int BlocksPerGroup2, 
+			int DataBytesPerBlock2)
 		{
+			this.level = Level;
 			this.version = Version;
 			this.ecBytesPerBlock = EcBytesPerBlock;
 			this.blocksPerGroup1 = BlocksPerGroup1;
@@ -32,6 +35,11 @@ namespace Waher.Content.QR.Encoding
 			this.totalDataBytes = this.blocksPerGroup1 * this.dataBytesPerBlock1 + this.blocksPerGroup2 * this.dataBytesPerBlock2;
 			this.totalBytes = this.totalDataBytes + this.totalEcBytes;
 		}
+
+		/// <summary>
+		/// Error correction level.
+		/// </summary>
+		public CorrectionLevel Level => this.level;
 
 		/// <summary>
 		/// Version number

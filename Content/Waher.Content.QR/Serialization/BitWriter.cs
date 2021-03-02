@@ -131,5 +131,10 @@ namespace Waher.Content.QR.Serialization
 			this.Flush();
 			return this.output.ToArray();
 		}
+
+		/// <summary>
+		/// Total number of bits written.
+		/// </summary>
+		public int TotalBits => (this.length << 3) + this.bits;
 	}
 }

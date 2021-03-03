@@ -309,6 +309,7 @@
     <ProjectReference Include="..\Content\Waher.Content.Markdown.PlantUml\Waher.Content.Markdown.PlantUml.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown.Web\Waher.Content.Markdown.Web.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
+    <ProjectReference Include="..\Content\Waher.Content.QR\Waher.Content.QR.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.SystemFiles\Waher.Content.SystemFiles.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj" />

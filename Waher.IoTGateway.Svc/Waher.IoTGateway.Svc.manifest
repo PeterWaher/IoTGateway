@@ -249,6 +249,7 @@
 	<Assembly fileName='Waher.Content.Markdown.Layout2D.dll'/>
 	<Assembly fileName='Waher.Content.Markdown.PlantUml.dll'/>
 	<Assembly fileName='Waher.Content.Markdown.Web.dll'/>
+	<Assembly fileName='Waher.Content.QR.dll'/>
 	<Assembly fileName='Waher.Content.SystemFiles.dll'/>
 	<Assembly fileName='Waher.Content.Xml.dll'/>
 	<Assembly fileName='Waher.Content.Xsl.dll'/>

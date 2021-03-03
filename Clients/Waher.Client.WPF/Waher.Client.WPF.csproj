@@ -471,6 +471,10 @@
       <Project>{e3533ca0-15f4-49e0-a9df-595bd5edf2dd}</Project>
       <Name>Waher.Content.Markdown</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Content\Waher.Content.QR\Waher.Content.QR.csproj">
+      <Project>{822e04e4-79fa-43e1-bdfc-775ee47236e7}</Project>
+      <Name>Waher.Content.QR</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Content\Waher.Content.SystemFiles\Waher.Content.SystemFiles.csproj">
       <Project>{0179c5ca-dadb-4c1f-b219-44b9ab8380b4}</Project>
       <Name>Waher.Content.SystemFiles</Name>

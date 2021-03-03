@@ -42,6 +42,7 @@
     <ProjectReference Include="..\Content\Waher.Content.Images\Waher.Content.Images.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown.Web\Waher.Content.Markdown.Web.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
+    <ProjectReference Include="..\Content\Waher.Content.QR\Waher.Content.QR.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj" />
     <ProjectReference Include="..\Content\Waher.Content\Waher.Content.csproj" />

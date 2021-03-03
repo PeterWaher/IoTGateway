@@ -8,6 +8,27 @@ namespace Waher.Content.QR.Encoding
 	public static class Versions
 	{
 		/// <summary>
+		/// Fins information about a version and correction level.
+		/// </summary>
+		/// <param name="Version">Version number.</param>
+		/// <param name="Level">Correction level.</param>
+		/// <returns>Version information.</returns>
+		public static VersionInfo FindVersionInfo(int Version, CorrectionLevel Level)
+		{
+			if (Version <= 0 || Version > 40)
+				throw new ArgumentOutOfRangeException("Invalid version.");
+
+			switch (Level)
+			{
+				case CorrectionLevel.L: return Versions.LowVersions[Version - 1];
+				case CorrectionLevel.M: return Versions.MediumVersions[Version - 1];
+				case CorrectionLevel.Q: return Versions.QuartileVersions[Version - 1];
+				case CorrectionLevel.H: return Versions.HighVersions[Version - 1];
+				default: throw new ArgumentException("Invalid Error Correction level.", nameof(Level));
+			}
+		}
+
+		/// <summary>
 		/// Version information for Low Error Correction mode.
 		/// </summary>
 		public static readonly VersionInfo[] LowVersions = new VersionInfo[]

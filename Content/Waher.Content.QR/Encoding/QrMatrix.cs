@@ -12,6 +12,14 @@ namespace Waher.Content.QR.Encoding
 	public delegate bool MaskFunction(int x, int y);
 
 	/// <summary>
+	/// Delegate for QR-code color functions
+	/// </summary>
+	/// <param name="x">Zero-based X-coordinte.</param>
+	/// <param name="y">Zero-based Y-coordinte.</param>
+	/// <returns>Color of pixel, in RGBA (LSB first, i.e. 0xAABBGGRR format).</returns>
+	public delegate uint ColorFunction(int x, int y);
+
+	/// <summary>
 	/// Class used to compute a QR code matrix.
 	/// </summary>
 	public class QrMatrix
@@ -78,6 +86,11 @@ namespace Waher.Content.QR.Encoding
 			this.mask = Mask;
 			this.defined = (bool[,])Mask.Clone();
 		}
+
+		/// <summary>
+		/// Size of the matrix (along each side).
+		/// </summary>
+		public int Size => this.size;
 
 		/// <summary>
 		/// Encoded dots.
@@ -813,6 +826,161 @@ namespace Waher.Content.QR.Encoding
 				X += Dx;
 				Y += Dy;
 			}
+		}
+
+		/// <summary>
+		/// Converts the matrix to pixels, each pixel represented by 4 bytes
+		/// in the order Red, Green, Blue, Alpha (RGBA).
+		/// </summary>
+		/// <returns>Pixels</returns>
+		public byte[] ToRGBA()
+		{
+			int Size8 = this.size + 8;
+			byte[] Result = new byte[Size8 * Size8 * 4];
+			int i = 0;
+			int x, y;
+
+			for (y = 0; y < 4; y++)
+			{
+				for (x = 0; x < Size8; x++)
+				{
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+				}
+			}
+
+			for (y = 0; y < this.size; y++)
+			{
+				for (x = 0; x < 4; x++)
+				{
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+				}
+
+				for (x = 0; x < this.size; x++)
+				{
+					if (this.dots[y, x])
+					{
+						Result[i++] = 0x00;
+						Result[i++] = 0x00;
+						Result[i++] = 0x00;
+						Result[i++] = 0xff;
+					}
+					else
+					{
+						Result[i++] = 0xff;
+						Result[i++] = 0xff;
+						Result[i++] = 0xff;
+						Result[i++] = 0xff;
+					}
+				}
+
+				for (x = 0; x < 4; x++)
+				{
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+				}
+			}
+
+			for (y = 0; y < 4; y++)
+			{
+				for (x = 0; x < Size8; x++)
+				{
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+				}
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Converts the matrix to pixels, each pixel represented by 4 bytes
+		/// in the order Red, Green, Blue, Alpha (RGBA).
+		/// </summary>
+		/// <param name="Color">Color function used to color dots representing ones.</param>
+		/// <returns>Pixels</returns>
+		public byte[] ToRGBA(ColorFunction Color)
+		{
+			int Size8 = this.size + 8;
+			byte[] Result = new byte[Size8 * Size8 * 4];
+			int i = 0;
+			int x, y;
+			uint cl;
+
+			for (y = 0; y < 4; y++)
+			{
+				for (x = 0; x < Size8; x++)
+				{
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+				}
+			}
+
+			for (y = 0; y < this.size; y++)
+			{
+				for (x = 0; x < 4; x++)
+				{
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+				}
+
+				for (x = 0; x < this.size; x++)
+				{
+					if (this.dots[y, x])
+					{
+						cl = Color(x, y);
+
+						Result[i++] = (byte)cl;
+						cl >>= 8;
+						Result[i++] = (byte)cl;
+						cl >>= 8;
+						Result[i++] = (byte)cl;
+						cl >>= 8;
+						Result[i++] = (byte)cl;
+					}
+					else
+					{
+						Result[i++] = 0xff;
+						Result[i++] = 0xff;
+						Result[i++] = 0xff;
+						Result[i++] = 0xff;
+					}
+				}
+
+				for (x = 0; x < 4; x++)
+				{
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+				}
+			}
+
+			for (y = 0; y < 4; y++)
+			{
+				for (x = 0; x < Size8; x++)
+				{
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+					Result[i++] = 0xff;
+				}
+			}
+
+			return Result;
 		}
 
 	}

@@ -122,22 +122,7 @@ namespace Waher.Content.QR
 		/// <returns>Encoded message.</returns>
 		public byte[] ApplyErrorCorrection(int Version, CorrectionLevel Level, byte[] Message)
 		{
-			return this.ApplyErrorCorrection(this.FindVersionInfo(Version, Level), Message);
-		}
-
-		private VersionInfo FindVersionInfo(int Version, CorrectionLevel Level)
-		{
-			if (Version <= 0 || Version > 40)
-				throw new ArgumentOutOfRangeException("Invalid version.");
-
-			switch (Level)
-			{
-				case CorrectionLevel.L: return Versions.LowVersions[Version - 1];
-				case CorrectionLevel.M: return Versions.MediumVersions[Version - 1];
-				case CorrectionLevel.Q: return Versions.QuartileVersions[Version - 1];
-				case CorrectionLevel.H: return Versions.HighVersions[Version - 1];
-				default: throw new ArgumentException("Invalid Error Correction level.", nameof(Level));
-			}
+			return this.ApplyErrorCorrection(Versions.FindVersionInfo(Version, Level), Message);
 		}
 
 		/// <summary>
@@ -237,7 +222,7 @@ namespace Waher.Content.QR
 		/// <returns>QR Code matrix.</returns>
 		public QrMatrix GenerateMatrix(int Version, CorrectionLevel Level, byte[] Message)
 		{
-			return this.GenerateMatrix(this.FindVersionInfo(Version, Level), Message, true);
+			return this.GenerateMatrix(Versions.FindVersionInfo(Version, Level), Message, true);
 		}
 
 		/// <summary>
@@ -251,7 +236,7 @@ namespace Waher.Content.QR
 		/// <returns>QR Code matrix.</returns>
 		public QrMatrix GenerateMatrix(int Version, CorrectionLevel Level, byte[] Message, bool ApplyErrorCorrection)
 		{
-			return this.GenerateMatrix(this.FindVersionInfo(Version, Level), Message, ApplyErrorCorrection);
+			return this.GenerateMatrix(Versions.FindVersionInfo(Version, Level), Message, ApplyErrorCorrection);
 		}
 
 		/// <summary>

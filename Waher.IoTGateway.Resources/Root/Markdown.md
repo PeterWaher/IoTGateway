@@ -1852,7 +1852,7 @@ The `async` can be succeeded by a colon (`:`) and some text that will be display
 result loaded to the client. Example:
 
 	```async:The content takes 30 seconds to be generated
-    Thread.Sleep(30000);
+    System.Threading.Thread.Sleep(30000);
 	GraphWidth:=800;
 	GraphHeight:=400;
 	x:=-10..10|0.1;
@@ -1863,7 +1863,7 @@ result loaded to the client. Example:
 This generates (reload if result has already been returned):
 
 ```async:The content takes 30 seconds to be generated
-Thread.Sleep(30000);
+System.Threading.Thread.Sleep(30000);
 GraphWidth:=800;
 GraphHeight:=400;
 x:=-10..10|0.1;

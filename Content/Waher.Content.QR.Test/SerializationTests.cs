@@ -6,6 +6,9 @@ namespace Waher.Content.QR.Test
 	[TestClass]
 	public class SerializationTests
 	{
+		// Thanks to https://www.thonky.com/qr-code-tutorial/introduction
+		// for tutorial and test vectors.
+
 		[TestMethod]
 		public void Test_01_Bits()
 		{

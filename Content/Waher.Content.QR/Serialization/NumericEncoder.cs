@@ -71,5 +71,30 @@ namespace Waher.Content.QR.Serialization
 					break;
 			}
 		}
+
+		/// <summary>
+		/// Gets the number of bytes required to encode an alphanumeric message
+		/// containing a specific number of characters.
+		/// </summary>
+		/// <param name="NrCharacters">Number of alphanumeric characters.</param>
+		/// <returns>Number of bytes required.</returns>
+		public static int GetByteLength(int NrCharacters)
+		{
+			int NrBits = 10 * (NrCharacters / 3);
+
+			switch ((NrCharacters & 3))
+			{
+				case 1:
+					NrBits += 4;
+					break;
+
+				case 2:
+					NrBits += 7;
+					break;
+			}
+
+			return (NrBits + 7) / 8;
+		}
+
 	}
 }

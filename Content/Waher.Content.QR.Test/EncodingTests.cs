@@ -8,6 +8,9 @@ namespace Waher.Content.QR.Test
 	[TestClass]
 	public class EncodingTests
 	{
+		// Thanks to https://www.thonky.com/qr-code-tutorial/introduction
+		// for tutorial and test vectors.
+
 		private QrEncoder encoder;
 
 		[TestInitialize]
@@ -492,9 +495,9 @@ namespace Waher.Content.QR.Test
 		{
 			CorrectionLevel Level = CorrectionLevel.Q;
 			string Message = "HELLO WORLD";
-			KeyValuePair<byte[], VersionInfo> P = this.encoder.Encode(Level, Message);
-			QrMatrix M = this.encoder.GenerateMatrix(P.Value, P.Key, true, false);
-			//QrMatrix M = this.encoder.GenerateMatrix(Level, Message);
+			//KeyValuePair<byte[], VersionInfo> P = this.encoder.Encode(Level, Message);
+			//QrMatrix M = this.encoder.GenerateMatrix(P.Value, P.Key, true, false);
+			QrMatrix M = this.encoder.GenerateMatrix(Level, Message);
 			Console.Out.WriteLine(M.ToHalfBlockText());
 		}
 

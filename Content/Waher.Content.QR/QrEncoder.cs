@@ -351,10 +351,13 @@ namespace Waher.Content.QR
 
 			// Reserve version information area
 
-			for (i = 0; i < 3; i++)
+			if (Version.Version >= 7)
 			{
-				M.HLine(0, 5, Size - 9 - i, false, false);
-				M.VLine(Size - 9 - i, 0, 5, false, false);
+				for (i = 0; i < 3; i++)
+				{
+					M.HLine(0, 5, Size - 9 - i, false, false);
+					M.VLine(Size - 9 - i, 0, 5, false, false);
+				}
 			}
 
 			// Data bits
@@ -512,19 +515,22 @@ namespace Waher.Content.QR
 			ITextEncoder Encoder;
 			EncodingMode Mode;
 			byte[] Bin = null;
-			int Len;
+			int ByteLen;
+			int NrCharacters;
 
 			if (NumericEncoder.CanEncode(Message))
 			{
 				Encoder = new NumericEncoder(Output);
-				Len = Message.Length;
+				NrCharacters = Message.Length;
+				ByteLen = NumericEncoder.GetByteLength(NrCharacters);
 				Output.WriteBits(0b0001, 4);
 				Mode = EncodingMode.Numeric;
 			}
 			else if (AlphanumericEncoder.CanEncode(Message))
 			{
 				Encoder = new AlphanumericEncoder(Output);
-				Len = Message.Length;
+				NrCharacters = Message.Length;
+				ByteLen = AlphanumericEncoder.GetByteLength(NrCharacters);
 				Output.WriteBits(0b0010, 4);
 				Mode = EncodingMode.Alphanumeric;
 			}
@@ -534,7 +540,7 @@ namespace Waher.Content.QR
 				Encoder = ByteEncoder;
 
 				Bin = ByteEncoder.GetBytes(Message);
-				Len = Bin.Length;
+				NrCharacters = ByteLen = Bin.Length;
 
 				Output.WriteBits(0b0100, 4);
 				Mode = EncodingMode.Byte;
@@ -565,7 +571,7 @@ namespace Waher.Content.QR
 
 			foreach (VersionInfo Option in Options)
 			{
-				if (Option.TotalDataBytes >= Len + 2)
+				if (Option.TotalDataBytes >= ByteLen + 2)
 				{
 					Version = Option;
 					break;
@@ -575,7 +581,7 @@ namespace Waher.Content.QR
 			if (Version is null)
 				throw new NotSupportedException("Message too large to fit in any of the recognized QR versions with the error correction level chosen.");
 
-			Output.WriteBits((uint)Len, this.BitLengthCharacterCount(Version.Version, Mode));
+			Output.WriteBits((uint)NrCharacters, this.BitLengthCharacterCount(Version.Version, Mode));
 
 			if (Bin is null)
 				Encoder.Encode(Message);
@@ -585,8 +591,8 @@ namespace Waher.Content.QR
 					Output.WriteBits(b, 8);
 			}
 
-			Len = Output.TotalBits;
-			int i = (Version.TotalDataBytes << 3) - Len;
+			ByteLen = Output.TotalBits;
+			int i = (Version.TotalDataBytes << 3) - ByteLen;
 			if (i > 0)
 			{
 				if (i > 4)
@@ -600,12 +606,12 @@ namespace Waher.Content.QR
 				Output.WriteBits(0, 8 - i); // Byte padding
 
 			i = Output.TotalBits >> 3;
-			Len = Version.TotalDataBytes;
+			ByteLen = Version.TotalDataBytes;
 
-			while (i++ < Len)
+			while (i++ < ByteLen)
 			{
 				Output.WriteBits(236, 8);
-				if (++i < Len)
+				if (++i < ByteLen)
 					Output.WriteBits(17, 8);
 			}
 

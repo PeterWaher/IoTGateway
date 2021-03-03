@@ -67,5 +67,20 @@ namespace Waher.Content.QR.Serialization
 			if (c == 1)
 				this.output.WriteBits((uint)i, 6);
 		}
+
+		/// <summary>
+		/// Gets the number of bytes required to encode an alphanumeric message
+		/// containing a specific number of characters.
+		/// </summary>
+		/// <param name="NrCharacters">Number of alphanumeric characters.</param>
+		/// <returns>Number of bytes required.</returns>
+		public static int GetByteLength(int NrCharacters)
+		{
+			int NrBits = 11 * (NrCharacters / 2);
+			if ((NrCharacters & 1) != 0)
+				NrBits += 6;
+
+			return (NrBits + 7) / 8;
+		}
 	}
 }

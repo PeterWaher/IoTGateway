@@ -166,6 +166,34 @@ namespace Waher.Content.QR.Encoding
 		}
 
 		/// <summary>
+		/// Number of defined dots in the matrix.
+		/// </summary>
+		public int NrDefinedDots
+		{
+			get
+			{
+				int Result = 0;
+				int x, y;
+
+				for (y = 0; y < this.size; y++)
+				{
+					for (x = 0; x < this.size; x++)
+					{
+						if (this.defined[y, x])
+							Result++;
+					}
+				}
+
+				return Result;
+			}
+		}
+
+		/// <summary>
+		/// Number of undefined dots in the matrix.
+		/// </summary>
+		public int NrUndefined => this.size * this.size - this.NrDefinedDots;
+
+		/// <summary>
 		/// Encodes data bits in free positions in the matrix.
 		/// </summary>
 		/// <param name="Data"></param>

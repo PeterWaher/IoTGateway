@@ -56,7 +56,8 @@ namespace Waher.Content.QR.Test.VersionTests
 			File.WriteAllText(Path.Combine(Path.Combine(Folder, Version.ToString() + "-Half.txt")), M.ToHalfBlockText());
 			File.WriteAllText(Path.Combine(Path.Combine(Folder, Version.ToString() + "-Quarter.txt")), M.ToQuarterBlockText());
 
-			byte[] RGBA = M.ToRGBA();
+			int ImgSize = Math.Max(300, M.Size * 3);
+			byte[] RGBA = M.ToRGBA(ImgSize, ImgSize);
 			IntPtr Pixels = Marshal.AllocCoTaskMem(RGBA.Length);
 			try
 			{
@@ -64,7 +65,7 @@ namespace Waher.Content.QR.Test.VersionTests
 
 				using (SKData Data = SKData.Create(Pixels, RGBA.Length))
 				{
-					using (SKImage Result = SKImage.FromPixels(new SKImageInfo(M.Size + 8, M.Size + 8, SKColorType.Bgra8888), Data, (M.Size + 8) << 2))
+					using (SKImage Result = SKImage.FromPixels(new SKImageInfo(ImgSize, ImgSize, SKColorType.Rgba8888), Data, ImgSize << 2))
 					{
 						using (SKData Data2 = Result.Encode(SKEncodedImageFormat.Png, 100))
 						{

@@ -19,7 +19,7 @@ namespace Waher.Content.QR.Test.VersionTests.Numeric
 			StringBuilder sb = new StringBuilder();
 
 			for (i = 0; i < Len; i++)
-				sb.Append((char)('0' + rnd.Next(0, 9)));
+				sb.Append((char)('0' + rnd.Next(0, 10)));
 
 			return sb.ToString();
 		}

@@ -395,14 +395,12 @@ namespace Waher.Content.QR
 			{
 				u = versionInformationBits[Version.Version - 7];
 				u <<= 32 - 18;
-				M.WriteBits(u, 5, Size - 9, -1, 0, 6);
-				M.WriteBits(u, Size - 9, 5, 0, -1, 6);
-				u <<= 6;
-				M.WriteBits(u, 5, Size - 10, -1, 0, 6);
-				M.WriteBits(u, Size - 10, 5, 0, -1, 6);
-				u <<= 6;
-				M.WriteBits(u, 5, Size - 11, -1, 0, 6);
-				M.WriteBits(u, Size - 11, 5, 0, -1, 6);
+				for (i = 0; i < 6; i++)
+				{
+					M.WriteBits(u, 5 - i, Size - 9, 0, -1, 3);
+					M.WriteBits(u, Size - 9, 5 - i, -1, 0, 3);
+					u <<= 3;
+				}
 			}
 
 			return M;

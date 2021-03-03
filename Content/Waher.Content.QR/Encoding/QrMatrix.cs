@@ -832,71 +832,82 @@ namespace Waher.Content.QR.Encoding
 		/// Converts the matrix to pixels, each pixel represented by 4 bytes
 		/// in the order Red, Green, Blue, Alpha (RGBA).
 		/// </summary>
+		/// <param name="Width">Width of resulting bitmap image.</param>
+		/// <param name="Height">Height of resulting bitmap image.</param>
 		/// <returns>Pixels</returns>
-		public byte[] ToRGBA()
+		public byte[] ToRGBA(int Width, int Height)
 		{
-			int Size8 = this.size + 8;
-			byte[] Result = new byte[Size8 * Size8 * 4];
+			byte[] Result = new byte[Width * Height * 4];
+			int SourceSize = this.size + 8;
+			int HalfSourceSize = SourceSize >> 1;
+			int HalfWidth = Width >> 1;
+			int HalfHeight = Height >> 1;
+			int Left = (4 * Width + HalfSourceSize) / SourceSize;
+			int Top = (4 * Height + HalfSourceSize) / SourceSize;
+			int dx = ((SourceSize << 16) + HalfWidth) / Width;
+			int dy = ((SourceSize << 16) + HalfHeight) / Height;
 			int i = 0;
+			int imgX, imgY;
+			int srcX, srcY;
 			int x, y;
 
-			for (y = 0; y < 4; y++)
+			for (imgY = srcY = 0; imgY < Height; imgY++)
 			{
-				for (x = 0; x < Size8; x++)
+				y = srcY >> 16;
+
+				if (imgY < Top || y >= this.size)
+				{
+					for (imgX = 0; imgX < Width; imgX++)
+					{
+						Result[i++] = 0xff;
+						Result[i++] = 0xff;
+						Result[i++] = 0xff;
+						Result[i++] = 0xff;
+					}
+
+					continue;
+				}
+
+				for (imgX = 0; imgX < Left; imgX++)
 				{
 					Result[i++] = 0xff;
 					Result[i++] = 0xff;
 					Result[i++] = 0xff;
 					Result[i++] = 0xff;
 				}
-			}
 
-			for (y = 0; y < this.size; y++)
-			{
-				for (x = 0; x < 4; x++)
+				for (srcX = 0; imgX < Width; imgX++)
 				{
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-				}
+					x = srcX >> 16;
+					if (x >= this.size)
+						break;
 
-				for (x = 0; x < this.size; x++)
-				{
 					if (this.dots[y, x])
 					{
 						Result[i++] = 0x00;
 						Result[i++] = 0x00;
 						Result[i++] = 0x00;
-						Result[i++] = 0xff;
 					}
 					else
 					{
 						Result[i++] = 0xff;
 						Result[i++] = 0xff;
 						Result[i++] = 0xff;
-						Result[i++] = 0xff;
 					}
+
+					Result[i++] = 0xff;
+					srcX += dx;
 				}
 
-				for (x = 0; x < 4; x++)
+				for (; imgX < Width; imgX++)
 				{
 					Result[i++] = 0xff;
 					Result[i++] = 0xff;
 					Result[i++] = 0xff;
 					Result[i++] = 0xff;
 				}
-			}
 
-			for (y = 0; y < 4; y++)
-			{
-				for (x = 0; x < Size8; x++)
-				{
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-				}
+				srcY += dy;
 			}
 
 			return Result;
@@ -906,39 +917,58 @@ namespace Waher.Content.QR.Encoding
 		/// Converts the matrix to pixels, each pixel represented by 4 bytes
 		/// in the order Red, Green, Blue, Alpha (RGBA).
 		/// </summary>
+		/// <param name="Width">Width of resulting bitmap image.</param>
+		/// <param name="Height">Height of resulting bitmap image.</param>
 		/// <param name="Color">Color function used to color dots representing ones.</param>
 		/// <returns>Pixels</returns>
-		public byte[] ToRGBA(ColorFunction Color)
+		public byte[] ToRGBA(int Width, int Height, ColorFunction Color)
 		{
-			int Size8 = this.size + 8;
-			byte[] Result = new byte[Size8 * Size8 * 4];
+			byte[] Result = new byte[Width * Height * 4];
+			int SourceSize = this.size + 8;
+			int HalfSourceSize = SourceSize >> 1;
+			int HalfWidth = Width >> 1;
+			int HalfHeight = Height >> 1;
+			int Left = (4 * Width + HalfSourceSize) / SourceSize;
+			int Top = (4 * Height + HalfSourceSize) / SourceSize;
+			int dx = ((SourceSize << 16) + HalfWidth) / Width;
+			int dy = ((SourceSize << 16) + HalfHeight) / Height;
 			int i = 0;
+			int imgX, imgY;
+			int srcX, srcY;
 			int x, y;
 			uint cl;
 
-			for (y = 0; y < 4; y++)
+			for (imgY = srcY = 0; imgY < Height; imgY++)
 			{
-				for (x = 0; x < Size8; x++)
+				y = srcY >> 16;
+
+				if (imgY < Top || y >= this.size)
+				{
+					for (imgX = 0; imgX < Width; imgX++)
+					{
+						Result[i++] = 0xff;
+						Result[i++] = 0xff;
+						Result[i++] = 0xff;
+						Result[i++] = 0xff;
+					}
+
+					continue;
+				}
+
+				for (imgX = 0; imgX < Left; imgX++)
 				{
 					Result[i++] = 0xff;
 					Result[i++] = 0xff;
 					Result[i++] = 0xff;
 					Result[i++] = 0xff;
 				}
-			}
 
-			for (y = 0; y < this.size; y++)
-			{
-				for (x = 0; x < 4; x++)
+				for (srcX = 0; imgX < Width; imgX++)
 				{
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-				}
+					x = srcX >> 16;
+					if (x >= this.size)
+						break;
 
-				for (x = 0; x < this.size; x++)
-				{
 					if (this.dots[y, x])
 					{
 						cl = Color(x, y);
@@ -958,26 +988,19 @@ namespace Waher.Content.QR.Encoding
 						Result[i++] = 0xff;
 						Result[i++] = 0xff;
 					}
+
+					srcX += dx;
 				}
 
-				for (x = 0; x < 4; x++)
+				for (; imgX < Width; imgX++)
 				{
 					Result[i++] = 0xff;
 					Result[i++] = 0xff;
 					Result[i++] = 0xff;
 					Result[i++] = 0xff;
 				}
-			}
 
-			for (y = 0; y < 4; y++)
-			{
-				for (x = 0; x < Size8; x++)
-				{
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-					Result[i++] = 0xff;
-				}
+				srcY += dy;
 			}
 
 			return Result;

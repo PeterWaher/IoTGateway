@@ -9,7 +9,10 @@ namespace Waher.Content.QR.Serialization
 	/// </summary>
 	public class AlphanumericEncoder : ITextEncoder
 	{
-		private const string alphanumericCharacters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
+		/// <summary>
+		/// 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:
+		/// </summary>
+		public const string AlphanumericCharacters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
 
 		private readonly BitWriter output;
 
@@ -31,7 +34,7 @@ namespace Waher.Content.QR.Serialization
 		{
 			foreach (char ch in Text)
 			{
-				if (alphanumericCharacters.IndexOf(ch) < 0)
+				if (AlphanumericCharacters.IndexOf(ch) < 0)
 					return false;
 			}
 
@@ -50,7 +53,7 @@ namespace Waher.Content.QR.Serialization
 
 			foreach (char ch in Text)
 			{
-				j = alphanumericCharacters.IndexOf(ch);
+				j = AlphanumericCharacters.IndexOf(ch);
 				if (j < 0)
 					continue;
 

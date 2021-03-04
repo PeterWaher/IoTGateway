@@ -94,8 +94,6 @@ namespace Waher.Content.QR
 				case EncodingMode.Byte:
 					if (Version < 10)
 						return 8;
-					else if (Version < 27)
-						return 16;  // TODO: ??? or 12?
 					else if (Version < 41)
 						return 16;
 					break;
@@ -554,7 +552,7 @@ namespace Waher.Content.QR
 
 			foreach (VersionInfo Option in Options)
 			{
-				if (Option.TotalDataBytes >= ByteLen + 2)
+				if (Option.TotalDataBytes >= ByteLen + 3)
 				{
 					Version = Option;
 					break;

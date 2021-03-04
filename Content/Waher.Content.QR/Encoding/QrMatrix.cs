@@ -819,8 +819,8 @@ namespace Waher.Content.QR.Encoding
 		{
 			while (NrBits > 0)
 			{
-				this.dots[Y, X] = (Bits & 0x80000000) != 0;
 				this.defined[Y, X] = true;
+				this.dots[Y, X] = (Bits & 0x80000000) != 0;
 				Bits <<= 1;
 				NrBits--;
 				X += Dx;

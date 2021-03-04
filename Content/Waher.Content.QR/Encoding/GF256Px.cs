@@ -72,6 +72,9 @@ namespace Waher.Content.QR.Encoding
 			for (i = 0; i <= c; i++)
 			{
 				b = C[i];
+				if (b == 0)
+					continue;
+
 				C[i] = 0;
 				for (j = 1; j <= Divisor.degree; j++)
 					C[i + j] ^= GF256.Multiply(b, Divisor.coefficients[j]);

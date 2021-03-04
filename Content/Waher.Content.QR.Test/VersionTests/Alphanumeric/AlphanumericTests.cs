@@ -13,7 +13,7 @@ namespace Waher.Content.QR.Test.VersionTests.Alphanumeric
 		public override string GetMessage(int ForVersion)
 		{
 			VersionInfo Version = Versions.FindVersionInfo(ForVersion, this.Level);
-			int NrBytes = Version.TotalDataBytes - 2;
+			int NrBytes = Version.TotalDataBytes - 3;
 			int NrBits = NrBytes << 3;
 			int Len = (NrBits / 11) * 2 - 1;
 			int i;

@@ -1,0 +1,811 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Content.QR</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Content.QR.Encoding.GF256">
+            <summary>
+            Class representing arithmentic over the Galois Field GF(256) ~
+            ~ Z2[x]/P(x) over some irreducible polinomial in Z2[x] of order 8.
+            This implementation uses P(x)=x^8+x^4+x^3+x^2+1~285, and
+            minimum privitive element generator x~2.
+            
+            Elements x = b0b1b2b3b4b5b6b7 ~ b0+b1x+b2x^2+...+b7x^7 represented
+            as bytes.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.GF256.PowerOf2Table">
+            <summary>
+            Power of 2 table.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.GF256.Log2Table">
+            <summary>
+            Log2 table.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.GF256.Add(System.Byte,System.Byte)">
+            <summary>
+            Adds two numbers
+            </summary>
+            <param name="x">x</param>
+            <param name="y">y</param>
+            <returns>x+y</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.GF256.Subtract(System.Byte,System.Byte)">
+            <summary>
+            Subtracts one number from another
+            </summary>
+            <param name="x">x</param>
+            <param name="y">y</param>
+            <returns>x-y</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.GF256.Multiply(System.Byte,System.Byte)">
+            <summary>
+            Multiplies two numbers
+            </summary>
+            <param name="x">x</param>
+            <param name="y">y</param>
+            <returns>x*y</returns>
+        </member>
+        <member name="T:Waher.Content.QR.Encoding.GF256Px">
+            <summary>
+            Polynomial over GF(256), where coefficients are defined as bytes in a 
+            byte array (Least significant byte first, i.e. Coefficients[i] corresponds to
+            coefficient for x^i.)
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.GF256Px.#ctor(System.Byte[])">
+            <summary>
+            Polynomial over GF(256), where coefficients are defined as bytes in a 
+            byte array (Least significant byte first, i.e. Coefficients[i] corresponds to
+            coefficient for x^i.)
+            </summary>
+            <param name="Coefficients">Polynomial coefficients.</param>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.GF256Px.Coefficients">
+            <summary>
+            Polynomial coefficients.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.GF256Px.Multiply(Waher.Content.QR.Encoding.GF256Px)">
+            <summary>
+            Multiplies the polynomial with the polynomial defined by
+            <paramref name="P"/>.
+            </summary>
+            <param name="P">Polynomial</param>
+            <returns>New polynomial corresponding to the multiplication of the
+            current polynomial and <paramref name="P"/>.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.GF256Px.Residue(Waher.Content.QR.Encoding.GF256Px)">
+            <summary>
+            Calculates the residue of the polynomial devision of this polynomial,
+            with a divisor in <paramref name="Divisor"/>.
+            </summary>
+            <param name="Divisor"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Waher.Content.QR.Encoding.MaskFunction">
+            <summary>
+            Delegate for mask functions
+            </summary>
+            <param name="x">Zero-based X-coordinte.</param>
+            <param name="y">Zero-based Y-coordinte.</param>
+            <returns>If the bit should be swapped.</returns>
+        </member>
+        <member name="T:Waher.Content.QR.Encoding.ColorFunction">
+            <summary>
+            Delegate for QR-code color functions
+            </summary>
+            <param name="x">Zero-based X-coordinte.</param>
+            <param name="y">Zero-based Y-coordinte.</param>
+            <returns>Color of pixel, in RGBA (LSB first, i.e. 0xAABBGGRR format).</returns>
+        </member>
+        <member name="T:Waher.Content.QR.Encoding.QrMatrix">
+            <summary>
+            Class used to compute a QR code matrix.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.#ctor(System.Int32)">
+            <summary>
+            Class used to compute a QR code matrix.
+            </summary>
+            <param name="Size">Size of matrix.</param>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.#ctor(System.Boolean[0:,0:],System.Boolean[0:,0:])">
+            <summary>
+            Class used to compute a QR code matrix.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.QrMatrix.Size">
+            <summary>
+            Size of the matrix (along each side).
+            </summary>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.QrMatrix.Dots">
+            <summary>
+            Encoded dots.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.QrMatrix.Defined">
+            <summary>
+            What parts of the mask has been defined.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.DrawFinderMarker(System.Int32,System.Int32)">
+            <summary>
+            Draws a Finder marker pattern in the matrix.
+            </summary>
+            <param name="X">Left coordinate of the marker.</param>
+            <param name="Y">Right coordinate of the marker.</param>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.DrawAlignmentMarker(System.Int32,System.Int32)">
+            <summary>
+            Draws a Alignment marker pattern in the matrix.
+            </summary>
+            <param name="X">Left coordinate of the marker.</param>
+            <param name="Y">Right coordinate of the marker.</param>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.HLine(System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean)">
+            <summary>
+            Draws a horizontal line in the matrix.
+            </summary>
+            <param name="X1">Left coordinate.</param>
+            <param name="X2">Right coordinate.</param>
+            <param name="Y">Y coordinate.</param>
+            <param name="Dot">If pixels should be lit (true) or cleared (false).</param>
+            <param name="Toggle">If pixels should be set and cleared consecutively.</param>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.VLine(System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean)">
+            <summary>
+            Draws a horizontal line in the matrix.
+            </summary>
+            <param name="X">X coordinate.</param>
+            <param name="Y1">Top coordinate.</param>
+            <param name="Y2">Bottom coordinate.</param>
+            <param name="Dot">If pixels should be lit (true) or cleared (false).</param>
+            <param name="Toggle">If pixels should be set and cleared consecutively.</param>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.QrMatrix.NrDefinedDots">
+            <summary>
+            Number of defined dots in the matrix.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.QrMatrix.NrUndefined">
+            <summary>
+            Number of undefined dots in the matrix.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.EncodeDataBits(System.Byte[])">
+            <summary>
+            Encodes data bits in free positions in the matrix.
+            </summary>
+            <param name="Data"></param>
+            <returns>If all bytes fit into the matrix.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.ToFullBlockText">
+            <summary>
+            Generates a text string representing the QR code using
+            full block characters and spaces.
+            Must be displayed in a font with fixed character sizes,
+            preferrably where each character is twice as high as wide.
+            </summary>
+            <returns>QR Code.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.ToHalfBlockText">
+            <summary>
+            Generates a text string representing the QR code using
+            half block characters and spaces.
+            Must be displayed in a font with fixed character sizes,
+            preferrably where each character is twice as high as wide.
+            </summary>
+            <returns>QR Code.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.ToQuarterBlockText">
+            <summary>
+            Generates a text string representing the QR code using
+            quarter block characters and spaces.
+            Must be displayed in a font with fixed character sizes,
+            preferrably where each character are square.
+            </summary>
+            <returns>QR Code.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.PenaltyHorizontalBands">
+            <summary>
+            Calculates a penalty score based on horizontal bands of dots of the same color.
+            </summary>
+            <returns>Penalty score</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.PenaltyVerticalBands">
+            <summary>
+            Calculates a penalty score based on horizontal bands of dots of the same color.
+            </summary>
+            <returns>Penalty score</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.PenaltyBlocks">
+            <summary>
+            Calculates a penalty score based on same colored blocks.
+            </summary>
+            <returns>Penalty score</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.PenaltyHorizontalFinderPattern">
+            <summary>
+            Calculates a penalty score based on horizontal finder patterns found.
+            </summary>
+            <returns>Penalty score</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.PenaltyVerticalFinderPattern">
+            <summary>
+            Calculates a penalty score based on vertical finder patterns found.
+            </summary>
+            <returns>Penalty score</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.PenaltyBalance">
+            <summary>
+            Calculates a penalty score based on the balance between dark and 
+            light dots.
+            </summary>
+            <returns>Penalty score</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.Penalty">
+            <summary>
+            Calculates the total penalty score of the matrix.
+            </summary>
+            <returns>Penalty score.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.Penalty(Waher.Content.QR.Encoding.MaskFunction)">
+            <summary>
+            Calculates the total penalty score of the matrix.
+            </summary>
+            <param name="Mask">Optional mask function. May be null.</param>
+            <returns>Penalty score.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.Mask0(System.Int32,System.Int32)">
+            <summary>
+            Mask function 0
+            </summary>
+            <param name="x">Zero-based X-coordinte.</param>
+            <param name="y">Zero-based Y-coordinte.</param>
+            <returns>If the bit should be swapped.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.Mask1(System.Int32,System.Int32)">
+            <summary>
+            Mask function 1
+            </summary>
+            <param name="x">Zero-based X-coordinte.</param>
+            <param name="y">Zero-based Y-coordinte.</param>
+            <returns>If the bit should be swapped.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.Mask2(System.Int32,System.Int32)">
+            <summary>
+            Mask function 2
+            </summary>
+            <param name="x">Zero-based X-coordinte.</param>
+            <param name="y">Zero-based Y-coordinte.</param>
+            <returns>If the bit should be swapped.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.Mask3(System.Int32,System.Int32)">
+            <summary>
+            Mask function 3
+            </summary>
+            <param name="x">Zero-based X-coordinte.</param>
+            <param name="y">Zero-based Y-coordinte.</param>
+            <returns>If the bit should be swapped.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.Mask4(System.Int32,System.Int32)">
+            <summary>
+            Mask function 4
+            </summary>
+            <param name="x">Zero-based X-coordinte.</param>
+            <param name="y">Zero-based Y-coordinte.</param>
+            <returns>If the bit should be swapped.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.Mask5(System.Int32,System.Int32)">
+            <summary>
+            Mask function 5
+            </summary>
+            <param name="x">Zero-based X-coordinte.</param>
+            <param name="y">Zero-based Y-coordinte.</param>
+            <returns>If the bit should be swapped.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.Mask6(System.Int32,System.Int32)">
+            <summary>
+            Mask function 6
+            </summary>
+            <param name="x">Zero-based X-coordinte.</param>
+            <param name="y">Zero-based Y-coordinte.</param>
+            <returns>If the bit should be swapped.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.Mask7(System.Int32,System.Int32)">
+            <summary>
+            Mask function 7
+            </summary>
+            <param name="x">Zero-based X-coordinte.</param>
+            <param name="y">Zero-based Y-coordinte.</param>
+            <returns>If the bit should be swapped.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.SaveMask">
+            <summary>
+            Saves the currently defined dots as a mask.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.ApplyMask(Waher.Content.QR.Encoding.MaskFunction)">
+            <summary>
+            Applies a mask on the matrix.
+            </summary>
+            <param name="Mask">Mask function</param>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.WriteBits(System.UInt32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Writes bits to the matrix.
+            </summary>
+            <param name="Bits">Bits to write to the matrix, from MSB to LSB.</param>
+            <param name="X">Start X-coordinate.</param>
+            <param name="Y">Start Y-coordinate.</param>
+            <param name="Dx">Movement along X-axis after each bit.</param>
+            <param name="Dy">Movement along Y-axis after each bit.</param>
+            <param name="NrBits">Number of bits to write.</param>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.ToRGBA(System.Int32,System.Int32)">
+            <summary>
+            Converts the matrix to pixels, each pixel represented by 4 bytes
+            in the order Red, Green, Blue, Alpha (RGBA).
+            </summary>
+            <param name="Width">Width of resulting bitmap image.</param>
+            <param name="Height">Height of resulting bitmap image.</param>
+            <returns>Pixels</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.QrMatrix.ToRGBA(System.Int32,System.Int32,Waher.Content.QR.Encoding.ColorFunction)">
+            <summary>
+            Converts the matrix to pixels, each pixel represented by 4 bytes
+            in the order Red, Green, Blue, Alpha (RGBA).
+            </summary>
+            <param name="Width">Width of resulting bitmap image.</param>
+            <param name="Height">Height of resulting bitmap image.</param>
+            <param name="Color">Color function used to color dots representing ones.</param>
+            <returns>Pixels</returns>
+        </member>
+        <member name="T:Waher.Content.QR.Encoding.ReedSolomonEC">
+            <summary>
+            Implements Reed-Solomon Error Correction using polynomial division
+            over GF(256)[x].
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.ReedSolomonEC.#ctor(System.Int32)">
+            <summary>
+            Implements Reed-Solomon Error Correction using polynomial division
+            over GF(256)[x].
+            </summary>
+            <param name="NrCorrectionCodeWords">Number of correction code words
+            to support.</param>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.ReedSolomonEC.GeneratorPolynomial">
+            <summary>
+            Generator polynomial.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.ReedSolomonEC.GenerateCorrectionCode(System.Byte[])">
+            <summary>
+            Computes the Error Correction code for a message.
+            </summary>
+            <param name="Message">Byte encoded message</param>
+            <returns>Error Correction code.</returns>
+        </member>
+        <member name="T:Waher.Content.QR.Encoding.VersionInfo">
+            <summary>
+            Contains information about one version of encoding.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.VersionInfo.Level">
+            <summary>
+            Error correction level.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.VersionInfo.Version">
+            <summary>
+            Version number
+            </summary>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.VersionInfo.EcBytesPerBlock">
+            <summary>
+            Error Correction bytes per block
+            </summary>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.VersionInfo.BlocksPerGroup1">
+            <summary>
+            Blocks in Group 1
+            </summary>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.VersionInfo.DataBytesPerBlock1">
+            <summary>
+            Data bytes per block in group 1
+            </summary>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.VersionInfo.BlocksPerGroup2">
+            <summary>
+            Blocks in Group 2
+            </summary>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.VersionInfo.DataBytesPerBlock2">
+            <summary>
+            Data bytes per block in group 2
+            </summary>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.VersionInfo.TotalBlocks">
+            <summary>
+            Total number of blocks
+            </summary>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.VersionInfo.TotalEcBytes">
+            <summary>
+            Total number of error correction bytes
+            </summary>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.VersionInfo.TotalDataBytes">
+            <summary>
+            Total number of data bytes
+            </summary>
+        </member>
+        <member name="P:Waher.Content.QR.Encoding.VersionInfo.TotalBytes">
+            <summary>
+            Total number of bytes
+            </summary>
+        </member>
+        <member name="T:Waher.Content.QR.Encoding.Versions">
+            <summary>
+            Internal database of QR versions and properties.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Encoding.Versions.FindVersionInfo(System.Int32,Waher.Content.QR.CorrectionLevel)">
+            <summary>
+            Fins information about a version and correction level.
+            </summary>
+            <param name="Version">Version number.</param>
+            <param name="Level">Correction level.</param>
+            <returns>Version information.</returns>
+        </member>
+        <member name="F:Waher.Content.QR.Encoding.Versions.LowVersions">
+            <summary>
+            Version information for Low Error Correction mode.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.Encoding.Versions.MediumVersions">
+            <summary>
+            Version information for Medium Error Correction mode.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.Encoding.Versions.QuartileVersions">
+            <summary>
+            Version information for Quartile Error Correction mode.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.Encoding.Versions.HighVersions">
+            <summary>
+            Version information for High Error Correction mode.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.QR.CorrectionLevel">
+            <summary>
+            QR Code correction level.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.CorrectionLevel.L">
+            <summary>
+            Low (7%)
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.CorrectionLevel.M">
+            <summary>
+            Medium (15%)
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.CorrectionLevel.Q">
+            <summary>
+            Quartile (25%)
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.CorrectionLevel.H">
+            <summary>
+            High (30%)
+            </summary>
+        </member>
+        <member name="T:Waher.Content.QR.EncodingMode">
+            <summary>
+            QR Code encoding mode
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.EncodingMode.Numeric">
+            <summary>
+            Numeric (0-9)
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.EncodingMode.Alphanumeric">
+            <summary>
+            Alphanumeric (0-9, A-Z, space, $, %, *, +, -, ., /, and :
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.EncodingMode.Byte">
+            <summary>
+            Bytes, by default, from the ISO-8859-1 character set. (Some decoders can read UTF-8)
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.EncodingMode.Kanji">
+            <summary>
+            Shift JIS character set
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.EncodingMode.Eci">
+            <summary>
+            Extended Channel Interpretation, allows specification of character set
+            </summary>
+        </member>
+        <member name="T:Waher.Content.QR.QrEncoder">
+            <summary>
+            QR Code encoder.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.QrEncoder.#ctor">
+            <summary>
+            QR Code encoder.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.QrEncoder.Dispose">
+            <summary>
+            QR Code encoder.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.QrEncoder.ApplyErrorCorrection(System.Int32,Waher.Content.QR.CorrectionLevel,System.Byte[])">
+            <summary>
+            Applies Error Correction to a byte message.
+            </summary>
+            <param name="Version">Version</param>
+            <param name="Level">Error Correction level</param>
+            <param name="Message">Byte message</param>
+            <returns>Encoded message.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.QrEncoder.ApplyErrorCorrection(Waher.Content.QR.Encoding.VersionInfo,System.Byte[])">
+            <summary>
+            Applies Error Correction to a byte message.
+            </summary>
+            <param name="Version">Version information</param>
+            <param name="Message">Byte message</param>
+            <returns>Encoded message.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.QrEncoder.GenerateMatrix(System.Int32,Waher.Content.QR.CorrectionLevel,System.Byte[])">
+            <summary>
+            Generates a QR Code matrix from a data message.
+            </summary>
+            <param name="Version">QR Code version to use.</param>
+            <param name="Level">Error Correction Level</param>
+            <param name="Message">Data message.</param>
+            <returns>QR Code matrix.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.QrEncoder.GenerateMatrix(System.Int32,Waher.Content.QR.CorrectionLevel,System.Byte[],System.Boolean)">
+            <summary>
+            Generates a QR Code matrix from a data message.
+            </summary>
+            <param name="Version">QR Code version to use.</param>
+            <param name="Level">Error Correction Level</param>
+            <param name="Message">Data message.</param>
+            <param name="ApplyErrorCorrection">If Error Correction should be applied to the message (true)
+            or if the message include error correction codes already (false).</param>
+            <returns>QR Code matrix.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.QrEncoder.GenerateMatrix(Waher.Content.QR.Encoding.VersionInfo,System.Byte[])">
+            <summary>
+            Generates a QR Code matrix from a data message.
+            </summary>
+            <param name="Version">QR Code version and error correction information.</param>
+            <param name="Message">Data message.</param>
+            <returns>QR Code matrix.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.QrEncoder.GenerateMatrix(Waher.Content.QR.Encoding.VersionInfo,System.Byte[],System.Boolean)">
+            <summary>
+            Generates a QR Code matrix from a data message.
+            </summary>
+            <param name="Version">QR Code version and error correction information.</param>
+            <param name="Message">Data message.</param>
+            <param name="ApplyErrorCorrection">If Error Correction should be applied to the message (true)
+            or if the message include error correction codes already (false).</param>
+            <returns>QR Code matrix.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.QrEncoder.GenerateMatrix(Waher.Content.QR.Encoding.VersionInfo,System.Byte[],System.Boolean,System.Boolean)">
+            <summary>
+            Generates a QR Code matrix from a data message.
+            </summary>
+            <param name="Version">QR Code version and error correction information.</param>
+            <param name="Message">Data message.</param>
+            <param name="ApplyErrorCorrection">If Error Correction should be applied to the message (true)
+            or if the message include error correction codes already (false).</param>
+            <param name="AssertMessageFit">Asserts message fits within the code.</param>
+            <returns>QR Code matrix.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.QrEncoder.Encode(Waher.Content.QR.CorrectionLevel,System.String)">
+            <summary>
+            Encodes text for purposes of presenting it in the smallest QR Code matrix possible.
+            </summary>
+            <param name="Level">Error Correction Level</param>
+            <param name="Message">Data message.</param>
+            <returns>Encoded message, with recommended QR Code version.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.QrEncoder.GenerateMatrix(Waher.Content.QR.CorrectionLevel,System.String)">
+            <summary>
+            Generates the smallest QR Code matrix for a given data message.
+            </summary>
+            <param name="Level">Error Correction Level</param>
+            <param name="Message">Data message.</param>
+            <returns>QR Code matrix.</returns>
+        </member>
+        <member name="T:Waher.Content.QR.Serialization.AlphanumericEncoder">
+            <summary>
+            Encodes alphanumeric strings
+            </summary>
+        </member>
+        <member name="F:Waher.Content.QR.Serialization.AlphanumericEncoder.AlphanumericCharacters">
+            <summary>
+            0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.AlphanumericEncoder.#ctor(Waher.Content.QR.Serialization.BitWriter)">
+            <summary>
+            Encodes alphanumeric strings
+            </summary>
+            <param name="Output">Binary output.</param>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.AlphanumericEncoder.CanEncode(System.String)">
+            <summary>
+            Checks if a text string can be encoded using the alphanumeric encoding.
+            </summary>
+            <param name="Text">Text string to encode.</param>
+            <returns>If the encoder can be used.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.AlphanumericEncoder.Encode(System.String)">
+            <summary>
+            Encodes a string.
+            </summary>
+            <param name="Text">Text to encode.</param>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.AlphanumericEncoder.GetByteLength(System.Int32)">
+            <summary>
+            Gets the number of bytes required to encode an alphanumeric message
+            containing a specific number of characters.
+            </summary>
+            <param name="NrCharacters">Number of alphanumeric characters.</param>
+            <returns>Number of bytes required.</returns>
+        </member>
+        <member name="T:Waher.Content.QR.Serialization.BitWriter">
+            <summary>
+            Writes a sequence of bits (Most significant bits first).
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.BitWriter.#ctor">
+            <summary>
+            Writes a sequence of bits (Most significant bits first).
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.BitWriter.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.BitWriter.WriteBit(System.Boolean)">
+            <summary>
+            Writes a bit to the output.
+            </summary>
+            <param name="Bit">Bit.</param>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.BitWriter.WriteBits(System.UInt32,System.Int32)">
+            <summary>
+            Writes several bits to the output stream.
+            </summary>
+            <param name="Value">Binary value.</param>
+            <param name="NrBits">Number of bits to output.</param>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.BitWriter.Flush">
+            <summary>
+            Flushes any remaining bits to the output.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.BitWriter.Pad(System.Int32,System.Byte[])">
+            <summary>
+            Pads the output with padding bytes.
+            </summary>
+            <param name="MaxLength">Maximum length of message.</param>
+            <param name="PaddingBytes">Padding bytes.</param>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.BitWriter.ToArray">
+            <summary>
+            Returns a byte-array of serialized bits.
+            </summary>
+            <returns>Byte array.</returns>
+        </member>
+        <member name="P:Waher.Content.QR.Serialization.BitWriter.TotalBits">
+            <summary>
+            Total number of bits written.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.QR.Serialization.ByteEncoder">
+            <summary>
+            Encodes alphanumeric strings from the ISO 8859-1 character set (by default).
+            If that fails, UTF-8 encoding will be used.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.ByteEncoder.#ctor(Waher.Content.QR.Serialization.BitWriter)">
+            <summary>
+            Encodes alphanumeric strings from the ISO 8859-1 character set (by default).
+            If that fails, UTF-8 encoding will be used.
+            </summary>
+            <param name="Output">Binary output.</param>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.ByteEncoder.CanEncode(System.String)">
+            <summary>
+            Checks if a text string can be encoded using the alphanumeric encoding.
+            </summary>
+            <param name="Text">Text string to encode.</param>
+            <returns>If the encoder can be used.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.ByteEncoder.GetBytes(System.String)">
+            <summary>
+            Gets the byte representation of a string.
+            </summary>
+            <param name="Text">Text to encode.</param>
+            <returns>Byte representation.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.ByteEncoder.Encode(System.Byte[])">
+            <summary>
+            Encodes a string.
+            </summary>
+            <param name="Bin">Binary messate to encode.</param>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.ByteEncoder.Encode(System.String)">
+            <summary>
+            Encodes a string.
+            </summary>
+            <param name="Text">Text to encode.</param>
+        </member>
+        <member name="T:Waher.Content.QR.Serialization.ITextEncoder">
+            <summary>
+            Interface for text encoders.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.ITextEncoder.Encode(System.String)">
+            <summary>
+            Encodes a string.
+            </summary>
+            <param name="Text">Text to encode.</param>
+        </member>
+        <member name="T:Waher.Content.QR.Serialization.NumericEncoder">
+            <summary>
+            Encodes numeric strings
+            </summary>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.NumericEncoder.#ctor(Waher.Content.QR.Serialization.BitWriter)">
+            <summary>
+            Encodes numeric strings
+            </summary>
+            <param name="Output">Binary output.</param>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.NumericEncoder.CanEncode(System.String)">
+            <summary>
+            Checks if a text string can be encoded using the alphanumeric encoding.
+            </summary>
+            <param name="Text">Text string to encode.</param>
+            <returns>If the encoder can be used.</returns>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.NumericEncoder.Encode(System.String)">
+            <summary>
+            Encodes a string.
+            </summary>
+            <param name="Text">Text to encode.</param>
+        </member>
+        <member name="M:Waher.Content.QR.Serialization.NumericEncoder.GetByteLength(System.Int32)">
+            <summary>
+            Gets the number of bytes required to encode an alphanumeric message
+            containing a specific number of characters.
+            </summary>
+            <param name="NrCharacters">Number of alphanumeric characters.</param>
+            <returns>Number of bytes required.</returns>
+        </member>
+    </members>
+</doc>

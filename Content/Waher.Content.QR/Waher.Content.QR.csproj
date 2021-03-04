@@ -16,8 +16,13 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>QR Encoding Text Image Color Coding Managed</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0</FileVersion>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1</FileVersion>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>C:\My Projects\IoTGateway\Content\Waher.Content.QR\Waher.Content.QR.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

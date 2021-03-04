@@ -1295,7 +1295,10 @@ namespace Waher.IoTGateway
 			pepClient = new PepClient(xmppClient, XmppConfiguration.Instance.PubSub);
 
 			if (!string.IsNullOrEmpty(XmppConfiguration.Instance.LegalIdentities))
-				contractsClient = await ContractsClient.Create(xmppClient, XmppConfiguration.Instance.LegalIdentities);
+			{
+				contractsClient = new ContractsClient(xmppClient, XmppConfiguration.Instance.LegalIdentities);
+				await contractsClient.LoadKeys(true);
+			}
 			else
 				contractsClient = null;
 

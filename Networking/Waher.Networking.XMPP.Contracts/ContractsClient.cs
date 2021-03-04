@@ -53,7 +53,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private readonly Dictionary<string, KeyEventArgs> publicKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Dictionary<string, KeyEventArgs> matchingKeys = new Dictionary<string, KeyEventArgs>();
 		private readonly Cache<string, KeyValuePair<byte[], bool>> contentPerPid = new Cache<string, KeyValuePair<byte[], bool>>(int.MaxValue, TimeSpan.FromDays(1), TimeSpan.FromDays(1));
-		private EndpointSecurity localEndpoint;
+		private EndpointSecurity localKeys;
 		private DateTime keysTimestamp = DateTime.MinValue;
 		private object[] approvedSources = null;
 		private readonly string componentAddress;
@@ -66,16 +66,37 @@ namespace Waher.Networking.XMPP.Contracts
 		/// 
 		/// The interface is defined in the IEEE XMPP IoT extensions:
 		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// 
+		/// Before the Contracts Client can be used, you either need to load previously stored
+		/// keys using <see cref="LoadKeys(bool)"/>, or generate new keys, calling
+		/// <see cref="GenerateNewKeys"/>.
+		/// </summary>
+		/// <param name="Client">XMPP Client to use.</param>
+		/// <param name="ComponentAddress">Address to the contracts component.</param>
+		public ContractsClient(XmppClient Client, string ComponentAddress)
+			: this(Client, ComponentAddress, (object[])null)
+		{
+		}
+
+		/// <summary>
+		/// Adds support for legal identities, smart contracts and signatures to an XMPP client.
+		/// 
+		/// The interface is defined in the IEEE XMPP IoT extensions:
+		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
+		/// 
+		/// Before the Contracts Client can be used, you either need to load previously stored
+		/// keys using <see cref="LoadKeys(bool)"/>, or generate new keys, calling
+		/// <see cref="GenerateNewKeys"/>.
 		/// </summary>
 		/// <param name="Client">XMPP Client to use.</param>
 		/// <param name="ComponentAddress">Address to the contracts component.</param>
 		/// <param name="ApprovedSources">If access to sensitive methods is only accessible from a set of approved sources.</param>
-		private ContractsClient(XmppClient Client, string ComponentAddress, object[] ApprovedSources)
+		public ContractsClient(XmppClient Client, string ComponentAddress, object[] ApprovedSources)
 			: base(Client)
 		{
 			this.componentAddress = ComponentAddress;
 			this.approvedSources = ApprovedSources;
-			this.localEndpoint = null;
+			this.localKeys = null;
 
 			this.client.RegisterMessageHandler("identity", NamespaceLegalIdentities, this.IdentityMessageHandler, true);
 			this.client.RegisterMessageHandler("petitionIdentityMsg", NamespaceLegalIdentities, this.PetitionIdentityMessageHandler, false);
@@ -88,37 +109,6 @@ namespace Waher.Networking.XMPP.Contracts
 			this.client.RegisterMessageHandler("contractDeleted", NamespaceSmartContracts, this.ContractDeletedMessageHandler, false);
 			this.client.RegisterMessageHandler("petitionContractMsg", NamespaceSmartContracts, this.PetitionContractMessageHandler, false);
 			this.client.RegisterMessageHandler("petitionContractResponseMsg", NamespaceSmartContracts, this.PetitionContractResponseMessageHandler, false);
-		}
-
-		/// <summary>
-		/// Creates a <see cref="ContractsClient"/> object that adds support for 
-		/// legal identities, smart contracts and signatures to an XMPP client.
-		/// 
-		/// The interface is defined in the IEEE XMPP IoT extensions:
-		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
-		/// </summary>
-		/// <param name="Client">XMPP Client to use.</param>
-		/// <param name="ComponentAddress">Address to the contracts component.</param>
-		public static Task<ContractsClient> Create(XmppClient Client, string ComponentAddress)
-		{
-			return Create(Client, ComponentAddress, null);
-		}
-
-		/// <summary>
-		/// Creates a <see cref="ContractsClient"/> object that adds support for 
-		/// legal identities, smart contracts and signatures to an XMPP client.
-		/// 
-		/// The interface is defined in the IEEE XMPP IoT extensions:
-		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
-		/// </summary>
-		/// <param name="Client">XMPP Client to use.</param>
-		/// <param name="ComponentAddress">Address to the contracts component.</param>
-		/// <param name="ApprovedSources">If access to sensitive methods is only accessible from a set of approved sources.</param>
-		public static async Task<ContractsClient> Create(XmppClient Client, string ComponentAddress, object[] ApprovedSources)
-		{
-			ContractsClient Result = new ContractsClient(Client, ComponentAddress, ApprovedSources);
-			await Result.LoadKeys();
-			return Result;
 		}
 
 		/// <summary>
@@ -138,8 +128,8 @@ namespace Waher.Networking.XMPP.Contracts
 			this.client.UnregisterMessageHandler("petitionContractMsg", NamespaceSmartContracts, this.PetitionContractMessageHandler, false);
 			this.client.UnregisterMessageHandler("petitionContractResponseMsg", NamespaceSmartContracts, this.PetitionContractResponseMessageHandler, false);
 
-			this.localEndpoint?.Dispose();
-			this.localEndpoint = null;
+			this.localKeys?.Dispose();
+			this.localKeys = null;
 			this.keysTimestamp = DateTime.MinValue;
 
 			this.rnd?.Dispose();
@@ -167,7 +157,12 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public DateTime KeysTimestamp => this.keysTimestamp;
 
-		private async Task LoadKeys()
+		/// <summary>
+		/// Loads keys from the underlying persistence layer.
+		/// </summary>
+		/// <param name="CreateIfNone">Allows new keys to be created, if no keys were found in the persistence layer.</param>
+		/// <returns>If keys were loaded or generated (i.e. can be used) or not.</returns>
+		public async Task<bool> LoadKeys(bool CreateIfNone)
 		{
 			List<IE2eEndpoint> Keys = new List<IE2eEndpoint>();
 
@@ -210,6 +205,9 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (Keys.Count == 0)
 			{
+				if (!CreateIfNone)
+					return false;
+
 				DisposeEndpoints = false;
 
 				foreach (EllipticCurveEndpoint Curve in AvailableEndpoints)
@@ -222,7 +220,7 @@ namespace Waher.Networking.XMPP.Contracts
 				Timestamp = DateTime.Now;
 				await RuntimeSettings.SetAsync(KeySettings + "Timestamp", Timestamp.Value);
 
-				Log.Notice("Private keys for contracts client implicitly created.");
+				Log.Notice("Private keys for contracts client created.");
 			}
 			else if (!Timestamp.HasValue)
 			{
@@ -230,7 +228,7 @@ namespace Waher.Networking.XMPP.Contracts
 				await RuntimeSettings.SetAsync(KeySettings + "Timestamp", Timestamp.Value);
 			}
 
-			this.localEndpoint = new EndpointSecurity(null, 128, Keys.ToArray());
+			this.localKeys = new EndpointSecurity(null, 128, Keys.ToArray());
 			this.keysTimestamp = Timestamp.Value;
 
 			if (DisposeEndpoints)
@@ -238,6 +236,8 @@ namespace Waher.Networking.XMPP.Contracts
 				foreach (IE2eEndpoint Curve in AvailableEndpoints)
 					Curve.Dispose();
 			}
+
+			return true;
 		}
 
 		private byte[] GetKey(EllipticCurve Curve)
@@ -258,7 +258,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public async Task GenerateNewKeys()
 		{
 			await RuntimeSettings.DeleteWhereKeyLikeAsync(KeySettings + "*", "*");
-			await this.LoadKeys();
+			await this.LoadKeys(true);
 		}
 
 		#endregion
@@ -461,6 +461,17 @@ namespace Waher.Networking.XMPP.Contracts
 			return this.GetMatchingLocalKey(this.componentAddress, Callback, State);
 		}
 
+		private EndpointSecurity LocalEndpoint
+		{
+			get
+			{
+				if (this.localKeys is null)
+					throw new InvalidOperationException("Local keys not loaded to generated.");
+
+				return this.localKeys;
+			}
+		}
+
 		/// <summary>
 		/// Get the local key that matches a given server key.
 		/// </summary>
@@ -502,7 +513,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 					if (e.Ok)
 					{
-						LocalKey = this.localEndpoint.GetLocalKey(e.Key);
+						LocalKey = this.LocalEndpoint.GetLocalKey(e.Key);
 						if (LocalKey is null)
 							e.Ok = false;
 					}
@@ -1077,7 +1088,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (State?.PublicKey is null)
 				return false;
 
-			IE2eEndpoint Endpoint = this.localEndpoint.GetLocalKey(State.PublicKey);
+			IE2eEndpoint Endpoint = this.LocalEndpoint.GetLocalKey(State.PublicKey);
 
 			return !(Endpoint is null);
 		}
@@ -1092,7 +1103,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				HaveStates = true;
 
-				IE2eEndpoint Endpoint = this.localEndpoint.GetLocalKey(State.PublicKey);
+				IE2eEndpoint Endpoint = this.LocalEndpoint.GetLocalKey(State.PublicKey);
 				if (Endpoint is null)
 					continue;
 

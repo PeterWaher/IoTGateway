@@ -386,35 +386,30 @@
             urn:ieee:iot:leg:sc:1.0
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.#ctor(Waher.Networking.XMPP.XmppClient,System.String)">
+            <summary>
+            Adds support for legal identities, smart contracts and signatures to an XMPP client.
+            
+            The interface is defined in the IEEE XMPP IoT extensions:
+            https://gitlab.com/IEEE-SA/XMPPI/IoT
+            
+            Before the Contracts Client can be used, you either need to load previously stored
+            keys using <see cref="M:Waher.Networking.XMPP.Contracts.ContractsClient.LoadKeys(System.Boolean)"/>, or generate new keys, calling
+            <see cref="M:Waher.Networking.XMPP.Contracts.ContractsClient.GenerateNewKeys"/>.
+            </summary>
+            <param name="Client">XMPP Client to use.</param>
+            <param name="ComponentAddress">Address to the contracts component.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.#ctor(Waher.Networking.XMPP.XmppClient,System.String,System.Object[])">
             <summary>
             Adds support for legal identities, smart contracts and signatures to an XMPP client.
             
             The interface is defined in the IEEE XMPP IoT extensions:
             https://gitlab.com/IEEE-SA/XMPPI/IoT
-            </summary>
-            <param name="Client">XMPP Client to use.</param>
-            <param name="ComponentAddress">Address to the contracts component.</param>
-            <param name="ApprovedSources">If access to sensitive methods is only accessible from a set of approved sources.</param>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Create(Waher.Networking.XMPP.XmppClient,System.String)">
-            <summary>
-            Creates a <see cref="T:Waher.Networking.XMPP.Contracts.ContractsClient"/> object that adds support for 
-            legal identities, smart contracts and signatures to an XMPP client.
             
-            The interface is defined in the IEEE XMPP IoT extensions:
-            https://gitlab.com/IEEE-SA/XMPPI/IoT
-            </summary>
-            <param name="Client">XMPP Client to use.</param>
-            <param name="ComponentAddress">Address to the contracts component.</param>
-        </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Create(Waher.Networking.XMPP.XmppClient,System.String,System.Object[])">
-            <summary>
-            Creates a <see cref="T:Waher.Networking.XMPP.Contracts.ContractsClient"/> object that adds support for 
-            legal identities, smart contracts and signatures to an XMPP client.
-            
-            The interface is defined in the IEEE XMPP IoT extensions:
-            https://gitlab.com/IEEE-SA/XMPPI/IoT
+            Before the Contracts Client can be used, you either need to load previously stored
+            keys using <see cref="M:Waher.Networking.XMPP.Contracts.ContractsClient.LoadKeys(System.Boolean)"/>, or generate new keys, calling
+            <see cref="M:Waher.Networking.XMPP.Contracts.ContractsClient.GenerateNewKeys"/>.
             </summary>
             <param name="Client">XMPP Client to use.</param>
             <param name="ComponentAddress">Address to the contracts component.</param>
@@ -439,6 +434,13 @@
             <summary>
             Timestamps of current keys used for signatures.
             </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.LoadKeys(System.Boolean)">
+            <summary>
+            Loads keys from the underlying persistence layer.
+            </summary>
+            <param name="CreateIfNone">Allows new keys to be created, if no keys were found in the persistence layer.</param>
+            <returns>If keys were loaded or generated (i.e. can be used) or not.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GenerateNewKeys">
             <summary>

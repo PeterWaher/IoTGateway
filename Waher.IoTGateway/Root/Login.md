@@ -22,8 +22,6 @@ User Name:
 Password:  
 <input id="Password" name="Password" type="password" style="width:20em" />
 
-*(Credentials are used to log on to the XMPP server the gateway uses.)*
-
 {{if exists(LoginError) then]]
 <div class='error'>
 ((LoginError))

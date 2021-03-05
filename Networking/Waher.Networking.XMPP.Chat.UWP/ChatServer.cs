@@ -1399,15 +1399,13 @@ namespace Waher.Networking.XMPP.Chat
 
 				if (Result is Graph G)
 				{
-					using (SKImage Bmp = G.CreateBitmap(G.GetSettings(Variables, 600, 300)))
-					{
-						ImageResult(From, Bmp, Support, Variables, true, OrgSubject, OrgCommand, Last);
-						return;
-					}
+					PixelInformation Pixels = G.CreatePixels(G.GetSettings(Variables, 600, 300));
+					ImageResult(From, Pixels, Support, Variables, true, OrgSubject, OrgCommand, Last);
+					return;
 				}
 				else if (Result.AssociatedObjectValue is SKImage Img)
 				{
-					ImageResult(From, Img, Support, Variables, true, OrgSubject, OrgCommand, Last);
+					ImageResult(From, PixelInformation.FromImage(Img), Support, Variables, true, OrgSubject, OrgCommand, Last);
 					return;
 				}
 				else if (Result.AssociatedObjectValue is Exception ex)
@@ -1492,13 +1490,10 @@ namespace Waher.Networking.XMPP.Chat
 				return false;
 		}
 
-		private void ImageResult(string To, SKImage Bmp, RemoteXmppSupport Support, Variables Variables, bool AllowHttpUpload,
+		private void ImageResult(string To, PixelInformation Pixels, RemoteXmppSupport Support, Variables Variables, bool AllowHttpUpload,
 			string OrgSubject, string OrgCommand, bool Last)
 		{
-			SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100);
-			byte[] Bin = Data.ToArray();
-			Data.Dispose();
-
+			byte[] Bin = Pixels.EncodeAsPng();
 			this.ImageResult(To, Bin, Support, Variables, AllowHttpUpload, OrgSubject, OrgCommand, Last);
 		}
 

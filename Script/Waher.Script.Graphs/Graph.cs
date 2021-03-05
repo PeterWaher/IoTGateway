@@ -201,9 +201,9 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		/// <param name="Variables">Variables from where default settings can be retrieved if not available in graph.</param>
 		/// <returns>Bitmap</returns>
-		public SKImage CreateBitmap(Variables Variables)
+		public PixelInformation CreatePixels(Variables Variables)
 		{
-			return this.CreateBitmap(Variables, out GraphSettings _, out object[] _);
+			return this.CreatePixels(Variables, out GraphSettings _, out object[] _);
 		}
 
 		/// <summary>
@@ -212,9 +212,9 @@ namespace Waher.Script.Graphs
 		/// <param name="Variables">Variables from where default settings can be retrieved if not available in graph.</param>
 		/// <param name="Settings">Settings used to create the graph.</param>
 		/// <returns>Bitmap</returns>
-		public SKImage CreateBitmap(Variables Variables, out GraphSettings Settings)
+		public PixelInformation CreatePixels(Variables Variables, out GraphSettings Settings)
 		{
-			return this.CreateBitmap(Variables, out Settings, out object[] _);
+			return this.CreatePixels(Variables, out Settings, out object[] _);
 		}
 
 		/// <summary>
@@ -224,9 +224,9 @@ namespace Waher.Script.Graphs
 		/// <param name="States">State objects that contain graph-specific information about its inner states.
 		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
 		/// <returns>Bitmap</returns>
-		public SKImage CreateBitmap(Variables Variables, out object[] States)
+		public PixelInformation CreatePixels(Variables Variables, out object[] States)
 		{
-			return this.CreateBitmap(Variables, out GraphSettings _, out States);
+			return this.CreatePixels(Variables, out GraphSettings _, out States);
 		}
 
 		/// <summary>
@@ -237,10 +237,10 @@ namespace Waher.Script.Graphs
 		/// <param name="States">State objects that contain graph-specific information about its inner states.
 		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
 		/// <returns>Bitmap</returns>
-		public SKImage CreateBitmap(Variables Variables, out GraphSettings Settings, out object[] States)
+		public PixelInformation CreatePixels(Variables Variables, out GraphSettings Settings, out object[] States)
 		{
 			Settings = this.GetSettings(Variables);
-			return this.CreateBitmap(Settings, out States);
+			return this.CreatePixels(Settings, out States);
 		}
 
 		/// <summary>
@@ -248,9 +248,9 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		/// <param name="Settings">Graph settings.</param>
 		/// <returns>Bitmap</returns>
-		public SKImage CreateBitmap(GraphSettings Settings)
+		public PixelInformation CreatePixels(GraphSettings Settings)
 		{
-			return this.CreateBitmap(Settings, out object[] _);
+			return this.CreatePixels(Settings, out object[] _);
 		}
 
 		/// <summary>
@@ -260,7 +260,7 @@ namespace Waher.Script.Graphs
 		/// <param name="States">State objects that contain graph-specific information about its inner states.
 		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
 		/// <returns>Bitmap</returns>
-		public abstract SKImage CreateBitmap(GraphSettings Settings, out object[] States);
+		public abstract PixelInformation CreatePixels(GraphSettings Settings, out object[] States);
 
 		/// <summary>
 		/// Gets script corresponding to a point in a generated bitmap representation of the graph.

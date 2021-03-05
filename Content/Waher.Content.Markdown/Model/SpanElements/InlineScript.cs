@@ -32,7 +32,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="AloneInParagraph">If construct stands alone in a paragraph.</param>
 		/// <param name="StartPosition">Starting position of script.</param>
 		/// <param name="EndPosition">Ending position of script.</param>
-		public InlineScript(MarkdownDocument Document, Expression Expression, Variables Variables, bool AloneInParagraph, 
+		public InlineScript(MarkdownDocument Document, Expression Expression, Variables Variables, bool AloneInParagraph,
 			int StartPosition, int EndPosition)
 			: base(Document)
 		{
@@ -131,27 +131,22 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			if (Result is Graph G)
 			{
-				using (SKImage Bmp = G.CreateBitmap(Variables, out GraphSettings GraphSettings))
-				{
-					SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100);
-					byte[] Bin = Data.ToArray();
+				PixelInformation Pixels = G.CreatePixels(Variables, out GraphSettings GraphSettings);
+				byte[] Bin = Pixels.EncodeAsPng();
 
-					if (AloneInParagraph)
-						Output.Append("<figure>");
+				if (AloneInParagraph)
+					Output.Append("<figure>");
 
-					Output.Append("<img border=\"2\" width=\"");
-					Output.Append(GraphSettings.Width.ToString());
-					Output.Append("\" height=\"");
-					Output.Append(GraphSettings.Height.ToString());
-					Output.Append("\" src=\"data:image/png;base64,");
-					Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
-					Output.Append("\" />");
+				Output.Append("<img border=\"2\" width=\"");
+				Output.Append(GraphSettings.Width.ToString());
+				Output.Append("\" height=\"");
+				Output.Append(GraphSettings.Height.ToString());
+				Output.Append("\" src=\"data:image/png;base64,");
+				Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
+				Output.Append("\" />");
 
-					if (AloneInParagraph)
-						Output.Append("</figure>");
-
-					Data.Dispose();
-				}
+				if (AloneInParagraph)
+					Output.Append("</figure>");
 			}
 			else if (Result is SKImage Img)
 			{
@@ -281,7 +276,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML output.</param>
 		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
 		public static void GeneratePlainText(object Result, StringBuilder Output, bool AloneInParagraph)
-		{ 
+		{
 			Output.Append(Result.ToString());
 
 			if (AloneInParagraph)
@@ -316,22 +311,17 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="XamlSettings">XAML Settings</param>
 		public static void GenerateXAML(object Result, XmlWriter Output, TextAlignment TextAlignment, bool AloneInParagraph,
 			Variables Variables, XamlSettings XamlSettings)
-		{ 
+		{
 			string s;
 
 			if (Result is Graph G)
 			{
-				using (SKImage Bmp = G.CreateBitmap(Variables))
-				{
-					using (SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100))
-					{
-						byte[] Bin = Data.ToArray();
+				PixelInformation Pixels = G.CreatePixels(Variables);
+				byte[] Bin = Pixels.EncodeAsPng();
 
-						s = "data:image/png;base64," + Convert.ToBase64String(Bin, 0, Bin.Length);
+				s = "data:image/png;base64," + Convert.ToBase64String(Bin, 0, Bin.Length);
 
-						ImageContent.OutputWpf(Output, s, Bmp.Width, Bmp.Height, string.Empty);
-					}
-				}
+				ImageContent.OutputWpf(Output, s, Pixels.Width, Pixels.Height, string.Empty);
 			}
 			else if (Result is SKImage Img)
 			{
@@ -425,22 +415,17 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="XamlSettings">XAML Settings</param>
 		public static void GenerateXamarinForms(object Result, XmlWriter Output, TextAlignment TextAlignment, bool AloneInParagraph,
 			Variables Variables, XamlSettings XamlSettings)
-		{ 
+		{
 			string s;
 
 			if (Result is Graph G)
 			{
-				using (SKImage Bmp = G.CreateBitmap(Variables))
-				{
-					using (SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100))
-					{
-						byte[] Bin = Data.ToArray();
+				PixelInformation Pixels = G.CreatePixels(Variables);
+				byte[] Bin = Pixels.EncodeAsPng();
 
-						s = "data:image/png;base64," + Convert.ToBase64String(Bin, 0, Bin.Length);
+				s = "data:image/png;base64," + Convert.ToBase64String(Bin, 0, Bin.Length);
 
-						ImageContent.OutputXamarinForms(Output, s, Bmp.Width, Bmp.Height);
-					}
-				}
+				ImageContent.OutputXamarinForms(Output, s, Pixels.Width, Pixels.Height);
 			}
 			else if (Result is SKImage Img)
 			{

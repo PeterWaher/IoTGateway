@@ -142,13 +142,11 @@ namespace Waher.Client.WPF.Controls
 			{
 				if (Ans is Graph G)
 				{
-					using (SKImage Bmp = G.CreateBitmap(this.variables, out object[] States))
-					{
-						return this.AddImageBlock(ScriptBlock, Bmp, G, States, ResultBlock);
-					}
+					PixelInformation Pixels = G.CreatePixels(this.variables, out object[] States);
+					return this.AddImageBlock(ScriptBlock, Pixels, G, States, ResultBlock);
 				}
 				else if (Ans.AssociatedObjectValue is SKImage Img)
-					return this.AddImageBlock(ScriptBlock, Img, null, null, ResultBlock);
+					return this.AddImageBlock(ScriptBlock, PixelInformation.FromImage(Img), null, null, ResultBlock);
 				else if (Ans.AssociatedObjectValue is Exception ex)
 				{
 					UIElement Last = ResultBlock ?? ScriptBlock;
@@ -276,40 +274,35 @@ namespace Waher.Client.WPF.Controls
 			e.Handled = true;
 		}
 
-		private UIElement AddImageBlock(UIElement ScriptBlock, SKImage Image, Graph Graph, object[] States, UIElement ResultBlock)
+		private UIElement AddImageBlock(UIElement ScriptBlock, PixelInformation Pixels, Graph Graph, object[] States, UIElement ResultBlock)
 		{
 			BitmapImage BitmapImage;
-			byte[] Bin;
+			byte[] Bin = Pixels.EncodeAsPng();
 
-			using (SKData Data = Image.Encode(SKEncodedImageFormat.Png, 100))
+			using (MemoryStream ms = new MemoryStream(Bin))
 			{
-				Bin = Data.ToArray();
-				MemoryStream ms = new MemoryStream(Bin);
-
 				BitmapImage = new BitmapImage();
 				BitmapImage.BeginInit();
 				BitmapImage.CacheOption = BitmapCacheOption.OnLoad;
 				BitmapImage.StreamSource = ms;
 				BitmapImage.EndInit();
-
-				ms.Dispose();
 			}
 
 			if (ResultBlock is Image ImageBlock)
 			{
 				ImageBlock.Source = BitmapImage;
-				ImageBlock.Width = Image.Width;
-				ImageBlock.Height = Image.Height;
-				ImageBlock.Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Image.Width, Image.Height, Graph, States);
+				ImageBlock.Width = Pixels.Width;
+				ImageBlock.Height = Pixels.Height;
+				ImageBlock.Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Pixels.Width, Pixels.Height, Graph, States);
 			}
 			else
 			{
 				ImageBlock = new Image()
 				{
 					Source = BitmapImage,
-					Width = Image.Width,
-					Height = Image.Height,
-					Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Image.Width, Image.Height, Graph, States)
+					Width = Pixels.Width,
+					Height = Pixels.Height,
+					Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Pixels.Width, Pixels.Height, Graph, States)
 				};
 
 				ImageBlock.PreviewMouseDown += ImageBlock_PreviewMouseDown;

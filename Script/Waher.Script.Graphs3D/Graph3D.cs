@@ -546,7 +546,7 @@ namespace Waher.Script.Graphs3D
 		/// <param name="States">State object(s) that contain graph-specific information about its inner states.
 		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
 		/// <returns>Bitmap</returns>
-		public override SKImage CreateBitmap(GraphSettings Settings, out object[] States)
+		public override PixelInformation CreatePixels(GraphSettings Settings, out object[] States)
 		{
 			IVector XLabels = GetLabels(ref this.minX, ref this.maxX, this.x, Settings.ApproxNrLabelsX, out LabelType XLabelType);
 			IVector YLabels = GetLabels(ref this.minY, ref this.maxY, this.y, Settings.ApproxNrLabelsY, out LabelType YLabelType);
@@ -899,7 +899,7 @@ namespace Waher.Script.Graphs3D
 				new Vector4(PlaneX, OffsetY + Height, OffsetZ, 1),
 				AxisPlaneShader, true, 3);
 
-			return Canvas.CreateBitmap(Settings, out States);
+			return Canvas.CreatePixels(Settings, out States);
 		}
 
 		private float CalcTextSize(double[] LabelPositions, float TextSize)

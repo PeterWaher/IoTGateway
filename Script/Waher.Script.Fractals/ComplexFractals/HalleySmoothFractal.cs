@@ -107,12 +107,10 @@ namespace Waher.Script.Fractals.ComplexFractals
 			int c = Arguments.Length;
 			int i = 0;
 			object Obj;
-			Complex z;
 
 			Obj = Arguments[i++].AssociatedObjectValue;
-			if (Obj is Complex)
+			if (Obj is Complex z)
 			{
-				z = (Complex)Obj;
 				rc = z.Real;
 				ic = z.Imaginary;
 			}
@@ -231,12 +229,10 @@ namespace Waher.Script.Fractals.ComplexFractals
 		private string FractalZoomScript(double r, double i, double Size, object State)
 		{
 			object[] Parameters = (object[])State;
-			SKColor[] Palette = (SKColor[])Parameters[0];
+			//SKColor[] Palette = (SKColor[])Parameters[0];
 			int DimX = (int)Parameters[1];
 			int DimY = (int)Parameters[2];
 			Complex R = (Complex)Parameters[3];
-			double[] Coefficients = Parameters[4] as double[];
-			Complex[] CoefficientsZ = Parameters[4] as Complex[];
 			string ColorExpression = (string)Parameters[5];
 
 			StringBuilder sb = new StringBuilder();
@@ -253,9 +249,9 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			if (Parameters[4] is ScriptNode fDef)
 				sb.Append(fDef.SubExpression);
-			else if (!(CoefficientsZ is null))
+			else if (Parameters[4] is Complex[] CoefficientsZ)
 				sb.Append(Expression.ToString(CoefficientsZ));
-			else
+			else if (Parameters[4] is double[] Coefficients)
 				sb.Append(Expression.ToString(Coefficients));
 
 			if (!string.IsNullOrEmpty(ColorExpression))
@@ -401,12 +397,12 @@ namespace Waher.Script.Fractals.ComplexFractals
 				}
 			}
 
-			Node.Expression.Preview(new GraphBitmap(FractalGraph.ToBitmap(ColorIndex, Width, Height, Palette)));
+			Node.Expression.Preview(new GraphBitmap(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
 
 			double[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
 			FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
 
-			return new FractalGraph(FractalGraph.ToBitmap(ColorIndex, Width, Height, Palette),
+			return new FractalGraph(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
@@ -570,12 +566,12 @@ namespace Waher.Script.Fractals.ComplexFractals
 				}
 			}
 
-			Node.Expression.Preview(new GraphBitmap(FractalGraph.ToBitmap(ColorIndex, Width, Height, Palette)));
+			Node.Expression.Preview(new GraphBitmap(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
 
 			double[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
 			FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
 
-			return new FractalGraph(FractalGraph.ToBitmap(ColorIndex, Width, Height, Palette),
+			return new FractalGraph(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
@@ -715,12 +711,12 @@ namespace Waher.Script.Fractals.ComplexFractals
 				}
 			}
 
-			Node.Expression.Preview(new GraphBitmap(FractalGraph.ToBitmap(ColorIndex, Width, Height, Palette)));
+			Node.Expression.Preview(new GraphBitmap(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
 
 			double[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
 			FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
 
-			return new FractalGraph(FractalGraph.ToBitmap(ColorIndex, Width, Height, Palette),
+			return new FractalGraph(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 

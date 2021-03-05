@@ -20,20 +20,17 @@ namespace Waher.Script.Test
 				Assert.Fail("Expected graph.");
 
 			GraphSettings Settings = new GraphSettings();
-			SKImage Bmp = Result.CreateBitmap(Settings);
+			PixelInformation Pixels = Result.CreatePixels(Settings);
 			
-			this.Save(Bmp, FileName);
+			this.Save(Pixels, FileName);
 		}
 
-		private void Save(SKImage Image, string FileName)
+		private void Save(PixelInformation Pixels, string FileName)
 		{
 			if (!Directory.Exists("Graphs"))
 				Directory.CreateDirectory("Graphs");
 
-			using (SKData Data = Image.Encode(SKEncodedImageFormat.Png, 100))
-			{
-				File.WriteAllBytes(Path.Combine("Graphs", FileName), Data.ToArray());
-			}
+			File.WriteAllBytes(Path.Combine("Graphs", FileName), Pixels.EncodeAsPng());
 		}
 
 		[TestMethod]

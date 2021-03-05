@@ -222,8 +222,8 @@ namespace Waher.Layout.Layout2D.Model.Content
 								State.Session["GraphHeight"] = (double)Settings.Height;
 						}
 
-						SKImage Bmp = G.CreateBitmap(Settings);
-						this.cid = this.Document.AddContent(Bmp);
+						PixelInformation Pixels = G.CreatePixels(Settings);
+						this.cid = this.Document.AddContent(Pixels);
 						this.evaluated = new ImageInternal(this.Document, this)
 						{
 							CidAttribute = new StringAttribute("cid", this.cid)

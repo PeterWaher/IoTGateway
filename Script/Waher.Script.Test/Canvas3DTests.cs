@@ -3,6 +3,7 @@ using System.IO;
 using System.Numerics;
 using SkiaSharp;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Script.Graphs;
 using Waher.Script.Graphs3D;
 
 namespace Waher.Script.Test
@@ -15,13 +16,8 @@ namespace Waher.Script.Test
 			if (!Directory.Exists("Canvas3D"))
 				Directory.CreateDirectory("Canvas3D");
 
-			using (SKImage Image = Canvas.GetBitmap())
-			{
-				using (SKData Data = Image.Encode(SKEncodedImageFormat.Png, 100))
-				{
-					File.WriteAllBytes(Path.Combine("Canvas3D", FileName), Data.ToArray());
-				}
-			}
+			PixelInformation Pixels = Canvas.GetPixels();
+			File.WriteAllBytes(Path.Combine("Canvas3D", FileName), Pixels.EncodeAsPng());
 		}
 
 		[TestMethod]

@@ -402,7 +402,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			ColorIndex = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
 
-			return new FractalGraph(FractalGraph.ToBitmap(ColorIndex, Width, Height, Palette),
+			return new FractalGraph(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
@@ -568,7 +568,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			ColorIndex = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
 
-			return new FractalGraph(FractalGraph.ToBitmap(ColorIndex, Width, Height, Palette),
+			return new FractalGraph(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
@@ -710,7 +710,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			ColorIndex = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
 
-			return new FractalGraph(FractalGraph.ToBitmap(ColorIndex, Width, Height, Palette),
+			return new FractalGraph(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
 				r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 

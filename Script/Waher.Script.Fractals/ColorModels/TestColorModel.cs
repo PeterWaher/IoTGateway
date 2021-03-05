@@ -74,7 +74,10 @@ namespace Waher.Script.Fractals.ColorModels
                     }
                 }
 
-				return new GraphBitmap(Surface.Snapshot());
+				using (SKImage Result = Surface.Snapshot())
+				{
+					return new GraphBitmap(PixelInformation.FromImage(Result));
+				}
 			}
 		}
 

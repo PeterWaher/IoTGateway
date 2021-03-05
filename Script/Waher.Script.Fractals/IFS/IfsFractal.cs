@@ -496,11 +496,8 @@ namespace Waher.Script.Fractals.IFS
 				}
 			}
 
-			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
-			{
-				SKImage Bitmap = SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
-				return new FractalGraph(Bitmap, xMin, yMin, xMax, yMax, rDelta, false, Node, FractalZoomScript, State);
-			}
+			PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
+			return new FractalGraph(Pixels, xMin, yMin, xMax, yMax, rDelta, false, Node, FractalZoomScript, State);
 		}
 
 		public static FractalGraph CalcIfs(double xCenter, double yCenter, double rDelta, long N,
@@ -688,11 +685,8 @@ namespace Waher.Script.Fractals.IFS
 				}
 			}
 
-			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
-			{
-				SKImage Bitmap = SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
-				return new FractalGraph(Bitmap, xMin, yMin, xMax, yMax, rDelta, false, Node, FractalZoomScript, State);
-			}
+			PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
+			return new FractalGraph(Pixels, xMin, yMin, xMax, yMax, rDelta, false, Node, FractalZoomScript, State);
 		}
 	}
 }

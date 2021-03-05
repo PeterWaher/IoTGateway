@@ -191,16 +191,16 @@
             <param name="p">Blending factor (0=<paramref name="c1"/>, 1=<paramref name="c2"/>).</param>
             <returns>Blended color.</returns>
         </member>
-        <member name="M:Waher.Script.Graphs.Functions.Colors.Blend.BlendColors(SkiaSharp.SKImage,SkiaSharp.SKColor,System.Double)">
+        <member name="M:Waher.Script.Graphs.Functions.Colors.Blend.BlendColors(Waher.Script.Graphs.PixelInformation,SkiaSharp.SKColor,System.Double)">
             <summary>
             Blends an image with a fixed color using a blending factor.
             </summary>
-            <param name="Image">Image</param>
+            <param name="Pixels">Image pixels</param>
             <param name="Color">Color</param>
-            <param name="p">Blending factor (0=<paramref name="Image"/>, 1=<paramref name="Color"/>).</param>
+            <param name="p">Blending factor (0=<paramref name="Pixels"/>, 1=<paramref name="Color"/>).</param>
             <returns>Blended image.</returns>
         </member>
-        <member name="M:Waher.Script.Graphs.Functions.Colors.Blend.BlendColors(SkiaSharp.SKImage,SkiaSharp.SKImage,System.Double)">
+        <member name="M:Waher.Script.Graphs.Functions.Colors.Blend.BlendColors(Waher.Script.Graphs.PixelInformation,Waher.Script.Graphs.PixelInformation,System.Double)">
             <summary>
             Blends two images of the same size using a blending factor.
             </summary>
@@ -1464,14 +1464,14 @@
             <param name="DefaultHeight">Default height.</param>
             <returns>Graph settings.</returns>
         </member>
-        <member name="M:Waher.Script.Graphs.Graph.CreateBitmap(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Graphs.Graph.CreatePixels(Waher.Script.Variables)">
             <summary>
             Creates a bitmap of the graph.
             </summary>
             <param name="Variables">Variables from where default settings can be retrieved if not available in graph.</param>
             <returns>Bitmap</returns>
         </member>
-        <member name="M:Waher.Script.Graphs.Graph.CreateBitmap(Waher.Script.Variables,Waher.Script.Graphs.GraphSettings@)">
+        <member name="M:Waher.Script.Graphs.Graph.CreatePixels(Waher.Script.Variables,Waher.Script.Graphs.GraphSettings@)">
             <summary>
             Creates a bitmap of the graph.
             </summary>
@@ -1479,7 +1479,7 @@
             <param name="Settings">Settings used to create the graph.</param>
             <returns>Bitmap</returns>
         </member>
-        <member name="M:Waher.Script.Graphs.Graph.CreateBitmap(Waher.Script.Variables,System.Object[]@)">
+        <member name="M:Waher.Script.Graphs.Graph.CreatePixels(Waher.Script.Variables,System.Object[]@)">
             <summary>
             Creates a bitmap of the graph.
             </summary>
@@ -1488,7 +1488,7 @@
             These can be used in calls back to the graph object to make actions on the generated graph.</param>
             <returns>Bitmap</returns>
         </member>
-        <member name="M:Waher.Script.Graphs.Graph.CreateBitmap(Waher.Script.Variables,Waher.Script.Graphs.GraphSettings@,System.Object[]@)">
+        <member name="M:Waher.Script.Graphs.Graph.CreatePixels(Waher.Script.Variables,Waher.Script.Graphs.GraphSettings@,System.Object[]@)">
             <summary>
             Creates a bitmap of the graph.
             </summary>
@@ -1498,14 +1498,14 @@
             These can be used in calls back to the graph object to make actions on the generated graph.</param>
             <returns>Bitmap</returns>
         </member>
-        <member name="M:Waher.Script.Graphs.Graph.CreateBitmap(Waher.Script.Graphs.GraphSettings)">
+        <member name="M:Waher.Script.Graphs.Graph.CreatePixels(Waher.Script.Graphs.GraphSettings)">
             <summary>
             Creates a bitmap of the graph.
             </summary>
             <param name="Settings">Graph settings.</param>
             <returns>Bitmap</returns>
         </member>
-        <member name="M:Waher.Script.Graphs.Graph.CreateBitmap(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
+        <member name="M:Waher.Script.Graphs.Graph.CreatePixels(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
             <summary>
             Creates a bitmap of the graph.
             </summary>
@@ -1912,7 +1912,7 @@
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
         </member>
-        <member name="M:Waher.Script.Graphs.Graph2D.CreateBitmap(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
+        <member name="M:Waher.Script.Graphs.Graph2D.CreatePixels(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
             <summary>
             Creates a bitmap of the graph.
             </summary>
@@ -1964,18 +1964,11 @@
             Handles bitmap-based graphs.
             </summary>
         </member>
-        <member name="M:Waher.Script.Graphs.GraphBitmap.#ctor(System.Int32,System.Int32)">
+        <member name="M:Waher.Script.Graphs.GraphBitmap.#ctor(Waher.Script.Graphs.PixelInformation)">
             <summary>
             Handles bitmap-based graphs.
             </summary>
-            <param name="Width">Width of graph, in pixels.</param>
-            <param name="Height">Height of graph, in pixels.</param>
-        </member>
-        <member name="M:Waher.Script.Graphs.GraphBitmap.#ctor(SkiaSharp.SKImage)">
-            <summary>
-            Handles bitmap-based graphs.
-            </summary>
-            <param name="Bitmap">Graph bitmap.</param>
+            <param name="Pixels">Pixels</param>
         </member>
         <member name="M:Waher.Script.Graphs.GraphBitmap.AddLeft(Waher.Script.Abstraction.Elements.ISemiGroupElement)">
             <summary>
@@ -1991,7 +1984,7 @@
             <param name="Element">Element to add.</param>
             <returns>Result, if understood, null otherwise.</returns>
         </member>
-        <member name="M:Waher.Script.Graphs.GraphBitmap.CreateBitmap(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
+        <member name="M:Waher.Script.Graphs.GraphBitmap.CreatePixels(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
             <summary>
             Creates a bitmap of the graph.
             </summary>
@@ -2196,6 +2189,138 @@
             </summary>
             <param name="Value">Value</param>
             <returns>Expression string.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.PixelInformation">
+            <summary>
+            Contains pixel information
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformation.#ctor(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Contains pixel information
+            </summary>
+            <param name="Binary">Binary representation of pixels</param>
+            <param name="Width">Width</param>
+            <param name="Height">Height</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.PixelInformation.Binary">
+            <summary>
+            Binary representation of pixels
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.PixelInformation.Width">
+            <summary>
+            Width
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.PixelInformation.Height">
+            <summary>
+            Height
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformation.FromImage(SkiaSharp.SKImage)">
+            <summary>
+            Gets the pixel information from an <see cref="T:SkiaSharp.SKImage"/>.
+            </summary>
+            <param name="Image">Image</param>
+            <returns>Pixel information</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformation.FromRaw(SkiaSharp.SKColorType,System.Byte[],System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Gets the pixel information object from raw pixel data.
+            </summary>
+            <param name="ColorType">How pixels are represented</param>
+            <param name="Binary">Binary representation of pixels</param>
+            <param name="Width">Width</param>
+            <param name="Height">Height</param>
+            <param name="BytesPerRow">Number of bytes per row</param>
+            <returns>Pixel information</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformation.CreateBitmap">
+            <summary>
+            Creates an <see cref="T:SkiaSharp.SKImage"/> image. It must be disposed by the caller.
+            </summary>
+            <returns>Image object.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformation.EncodeAsPng">
+            <summary>
+            Encodes the pixels into a binary PNG image.
+            </summary>
+            <returns>PNG encoded image.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformation.GetRaw">
+            <summary>
+            Gets raw pixel data.
+            </summary>
+            <returns>Raw pixel data.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.PixelInformationPng">
+            <summary>
+            Contains pixel information in PNG format
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformationPng.#ctor(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Contains pixel information in PNG format
+            </summary>
+            <param name="Binary">Binary representation of pixels</param>
+            <param name="Width">Width</param>
+            <param name="Height">Height</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformationPng.CreateBitmap">
+            <summary>
+            Creates an <see cref="T:SkiaSharp.SKImage"/> image. It must be disposed by the caller.
+            </summary>
+            <returns>Image object.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformationPng.EncodeAsPng">
+            <summary>
+            Encodes the pixels into a binary PNG image.
+            </summary>
+            <returns>PNG encoded image.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformationPng.GetRaw">
+            <summary>
+            Gets raw pixel data.
+            </summary>
+            <returns>Raw pixel data.</returns>
+        </member>
+        <member name="T:Waher.Script.Graphs.PixelInformationRaw">
+            <summary>
+            Contains pixel information in a raw unencoded format.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformationRaw.#ctor(SkiaSharp.SKColorType,System.Byte[],System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Contains pixel information in a raw unencoded format.
+            </summary>
+            <param name="ColorType">How pixels are represented</param>
+            <param name="Binary">Binary representation of pixels</param>
+            <param name="Width">Width</param>
+            <param name="Height">Height</param>
+            <param name="BytesPerRow">Number of bytes per row</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.PixelInformationRaw.ColorType">
+            <summary>
+            How pixels are represented
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.PixelInformationRaw.BytesPerRow">
+            <summary>
+            Number of bytes per row
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformationRaw.CreateBitmap">
+            <summary>
+            Creates an <see cref="T:SkiaSharp.SKImage"/> image. It must be disposed by the caller.
+            </summary>
+            <returns>Image object.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.PixelInformationRaw.GetRaw">
+            <summary>
+            Gets raw pixel data.
+            </summary>
+            <returns>Raw pixel data.</returns>
         </member>
         <member name="T:Waher.Script.Graphs.SetOfGraphs">
             <summary>

@@ -54,7 +54,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 		private IElement DoSave(object Obj, string FileName, Variables Variables)
 		{
 			if (Obj is Graph G)
-				Obj = G.CreateBitmap(Variables);
+				Obj = G.CreatePixels(Variables);
 
 			byte[] Bin = null;
 

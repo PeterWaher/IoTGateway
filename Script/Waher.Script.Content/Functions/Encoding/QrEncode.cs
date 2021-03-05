@@ -100,11 +100,7 @@ namespace Waher.Script.Content.Functions.Encoding
 
 			byte[] Rgba = encoder.GenerateMatrix(Level, Text).ToRGBA(Width, Height);
 
-			using (SKData Data = SKData.Create(new MemoryStream(Rgba)))
-			{
-				SKImage Bitmap = SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Rgba8888), Data, Width * 4);
-				return new GraphBitmap(Bitmap);
-			}
+			return new GraphBitmap(PixelInformation.FromRaw(SKColorType.Rgba8888, Rgba, Width, Height, Width << 2));
 		}
 
 	}

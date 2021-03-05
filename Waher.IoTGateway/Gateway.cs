@@ -3060,26 +3060,24 @@ namespace Waher.IoTGateway
 		/// <param name="Settings">Graph settings.</param>
 		public static void SendNotification(Graph Graph, GraphSettings Settings)
 		{
-			using (SKImage Image = Graph.CreateBitmap(Settings))
-			{
-				Gateway.SendNotification(Image);
-			}
+			PixelInformation Pixels = Graph.CreatePixels(Settings);
+			Gateway.SendNotification(Pixels);
 		}
 
 		/// <summary>
 		/// Sends an image as a notification message to configured notification recipients.
 		/// </summary>
-		/// <param name="Image">Image to send.</param>
-		public static void SendNotification(SKImage Image)
+		/// <param name="Pixels">Pixels to send.</param>
+		public static void SendNotification(PixelInformation Pixels)
 		{
-			byte[] Data = InternetContent.Encode(Image, null, out string ContentType);
+			byte[] Data = InternetContent.Encode(Pixels, null, out string ContentType);
 			StringBuilder sb = new StringBuilder();
 
 			sb.Append("<figure>");
 			sb.Append("<img border=\"2\" width=\"");
-			sb.Append(Image.Width.ToString());
+			sb.Append(Pixels.Width.ToString());
 			sb.Append("\" height=\"");
-			sb.Append(Image.Height.ToString());
+			sb.Append(Pixels.Height.ToString());
 			sb.Append("\" src=\"data:");
 			sb.Append(ContentType);
 			sb.Append(";base64,");

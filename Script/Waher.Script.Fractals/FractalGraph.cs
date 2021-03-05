@@ -45,7 +45,7 @@ namespace Waher.Script.Fractals
 		/// <summary>
 		/// Defines a clickable fractal graph in the complex plane.
 		/// </summary>
-		/// <param name="Image">Fractal image.</param>
+		/// <param name="Pixels">Fractal image.</param>
 		/// <param name="r0">Real part of upper left hand corner.</param>
 		/// <param name="i0">Imaginary part of upper left hand corner.</param>
 		/// <param name="r1">Real part of lower right hand corner.</param>
@@ -55,9 +55,9 @@ namespace Waher.Script.Fractals
 		/// <param name="Node">Script node generating the graph.</param>
 		/// <param name="FractalZoomScript">Fractal Zoom Script</param>
 		/// <param name="State">State objects.</param>
-		public FractalGraph(SKImage Image, double r0, double i0, double r1, double i1, double Size,
+		public FractalGraph(PixelInformation Pixels, double r0, double i0, double r1, double i1, double Size,
 			bool InvertY, ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
-			: base(Image)
+			: base(Pixels)
 		{
 			this.r0 = r0;
 			this.i0 = i0;
@@ -66,8 +66,8 @@ namespace Waher.Script.Fractals
 			this.state = State;
 			this.size = Size;
 			this.invertY = InvertY;
-			this.width = Image.Width;
-			this.height = Image.Height;
+			this.width = Pixels.Width;
+			this.height = Pixels.Height;
 			this.node = Node;
 			this.fractalZoomScript = FractalZoomScript;
 		}
@@ -193,7 +193,7 @@ namespace Waher.Script.Fractals
 
 						if (DoPreview)
 							Node.Expression.Preview(new GraphBitmap(
-								FractalGraph.ToBitmap(ColorIndex, Width, Height, Palette)));
+								FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
 
 						Node.Expression.Status("Smoothing. Change: " + (100 * Sum / DynamicPixels).ToString("F3") + "%, Limit: " + LimitPercentChange.ToString("F3") + "%, Iterations: " + Iterations.ToString());
 					}
@@ -520,7 +520,7 @@ namespace Waher.Script.Fractals
 			return Boundary;
 		}
 
-		public static SKImage ToBitmap(double[] ColorIndex, int Width, int Height, SKColor[] Palette)
+		public static PixelInformation ToPixels(double[] ColorIndex, int Width, int Height, SKColor[] Palette)
 		{
 			int N = Palette.Length;
 			int Size = Width * Height;
@@ -594,13 +594,10 @@ namespace Waher.Script.Fractals
 				}
 			}
 
-			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
-			{
-				return SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
-			}
+			return PixelInformation.FromRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
 		}
 
-		public static SKImage ToBitmap(int[] ColorIndex, int Width, int Height, SKColor[] Palette)
+		public static PixelInformation ToPixels(int[] ColorIndex, int Width, int Height, SKColor[] Palette)
 		{
 			int N = Palette.Length;
 			byte[] reds = new byte[N];
@@ -643,10 +640,7 @@ namespace Waher.Script.Fractals
 				}
 			}
 
-			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
-			{
-				return SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
-			}
+			return PixelInformation.FromRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
 		}
 
 	}

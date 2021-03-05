@@ -60,7 +60,7 @@ namespace Waher.Script.Graphs.Functions.Colors
 			object x1 = Arguments[0].AssociatedObjectValue;
 			object x2 = Arguments[1].AssociatedObjectValue;
 			double p = Expression.ToDouble(Arguments[2].AssociatedObjectValue);
-			SKImage Img1, Img2;
+			PixelInformation Img1, Img2;
 			SKColor c1, c2;
 
 			if (x1 is SKColor C1)
@@ -70,12 +70,12 @@ namespace Waher.Script.Graphs.Functions.Colors
 			}
 			else if (x1 is Graph G1)
 			{
-				Img1 = G1.CreateBitmap(Variables);
+				Img1 = G1.CreatePixels(Variables);
 				c1 = SKColor.Empty;
 			}
 			else if (x1 is SKImage I1)
 			{
-				Img1 = I1;
+				Img1 = PixelInformation.FromImage(I1);
 				c1 = SKColor.Empty;
 			}
 			else
@@ -91,12 +91,12 @@ namespace Waher.Script.Graphs.Functions.Colors
 			}
 			else if (x2 is Graph G2)
 			{
-				Img2 = G2.CreateBitmap(Variables);
+				Img2 = G2.CreatePixels(Variables);
 				c2 = SKColor.Empty;
 			}
 			else if (x2 is SKImage I2)
 			{
-				Img2 = I2;
+				Img2 = PixelInformation.FromImage(I2);
 				c2 = SKColor.Empty;
 			}
 			else
@@ -155,72 +155,56 @@ namespace Waher.Script.Graphs.Functions.Colors
 		/// <summary>
 		/// Blends an image with a fixed color using a blending factor.
 		/// </summary>
-		/// <param name="Image">Image</param>
+		/// <param name="Pixels">Image pixels</param>
 		/// <param name="Color">Color</param>
-		/// <param name="p">Blending factor (0=<paramref name="Image"/>, 1=<paramref name="Color"/>).</param>
+		/// <param name="p">Blending factor (0=<paramref name="Pixels"/>, 1=<paramref name="Color"/>).</param>
 		/// <returns>Blended image.</returns>
-		public static SKImage BlendColors(SKImage Image, SKColor Color, double p)
+		public static PixelInformation BlendColors(PixelInformation Pixels, SKColor Color, double p)
 		{
-			SKImageInfo ImageInfo = new SKImageInfo(Image.Width, Image.Height, SKColorType.Bgra8888);
-			int i, j, c = ImageInfo.BytesSize;
+			PixelInformationRaw Raw = Pixels.GetRaw();
+			byte[] Bin = (byte[])Raw.Binary.Clone();
+			int i, j, c = Raw.Binary.Length;
 			byte R = Color.Red;
 			byte G = Color.Green;
 			byte B = Color.Blue;
 			byte A = Color.Alpha;
-			IntPtr Pixels = Marshal.AllocCoTaskMem(c);
-			try
+
+			for (i = 0; i < c; i++)
 			{
-				Image.ReadPixels(ImageInfo, Pixels, ImageInfo.RowBytes, 0, 0);
+				j = (int)(Bin[i] * (1 - p) + B * p + 0.5);
+				if (j < 0)
+					Bin[i] = 0;
+				else if (j > 255)
+					Bin[i] = 255;
+				else
+					Bin[i] = (byte)j;
 
-				byte[] Bin = new byte[c];
-				Marshal.Copy(Pixels, Bin, 0, c);
+				j = (int)(Bin[++i] * (1 - p) + G * p + 0.5);
+				if (j < 0)
+					Bin[i] = 0;
+				else if (j > 255)
+					Bin[i] = 255;
+				else
+					Bin[i] = (byte)j;
 
-				for (i = 0; i < c; i++)
-				{
-					j = (int)(Bin[i] * (1 - p) + B * p + 0.5);
-					if (j < 0)
-						Bin[i] = 0;
-					else if (j > 255)
-						Bin[i] = 255;
-					else
-						Bin[i] = (byte)j;
+				j = (int)(Bin[++i] * (1 - p) + R * p + 0.5);
+				if (j < 0)
+					Bin[i] = 0;
+				else if (j > 255)
+					Bin[i] = 255;
+				else
+					Bin[i] = (byte)j;
 
-					j = (int)(Bin[++i] * (1 - p) + G * p + 0.5);
-					if (j < 0)
-						Bin[i] = 0;
-					else if (j > 255)
-						Bin[i] = 255;
-					else
-						Bin[i] = (byte)j;
-
-					j = (int)(Bin[++i] * (1 - p) + R * p + 0.5);
-					if (j < 0)
-						Bin[i] = 0;
-					else if (j > 255)
-						Bin[i] = 255;
-					else
-						Bin[i] = (byte)j;
-
-					j = (int)(Bin[++i] * (1 - p) + A * p + 0.5);
-					if (j < 0)
-						Bin[i] = 0;
-					else if (j > 255)
-						Bin[i] = 255;
-					else
-						Bin[i] = (byte)j;
-				}
-
-				Marshal.Copy(Bin, 0, Pixels, c);
-
-				using (SKData Data = SKData.Create(Pixels, c))
-				{
-					return SKImage.FromPixels(new SKImageInfo(ImageInfo.Width, ImageInfo.Height, SKColorType.Bgra8888), Data, ImageInfo.RowBytes);
-				}
+				j = (int)(Bin[++i] * (1 - p) + A * p + 0.5);
+				if (j < 0)
+					Bin[i] = 0;
+				else if (j > 255)
+					Bin[i] = 255;
+				else
+					Bin[i] = (byte)j;
 			}
-			finally
-			{
-				Marshal.FreeCoTaskMem(Pixels);
-			}
+
+			return new PixelInformationRaw(Raw.ColorType, Bin, Raw.Width, Raw.Height, Raw.BytesPerRow);
 		}
 
 		/// <summary>
@@ -230,50 +214,32 @@ namespace Waher.Script.Graphs.Functions.Colors
 		/// <param name="Image2">Image 2</param>
 		/// <param name="p">Blending factor (0=<paramref name="Image1"/>, 1=<paramref name="Image2"/>).</param>
 		/// <returns>Blended image.</returns>
-		public static SKImage BlendColors(SKImage Image1, SKImage Image2, double p)
+		public static PixelInformation BlendColors(PixelInformation Image1, PixelInformation Image2, double p)
 		{
 			if (Image1.Width != Image2.Width || Image1.Height != Image2.Height)
 				throw new ArgumentException("Images not of the same size.", nameof(Image2));
 
-			SKImageInfo ImageInfo = new SKImageInfo(Image1.Width, Image1.Height, SKColorType.Bgra8888);
-			int i, j, c = ImageInfo.BytesSize;
-			IntPtr Pixels1 = Marshal.AllocCoTaskMem(c);
-			IntPtr Pixels2 = IntPtr.Zero;
-			try
+			PixelInformationRaw Raw1 = Image1.GetRaw();
+			PixelInformationRaw Raw2 = Image2.GetRaw();
+			byte[] Bin1 = (byte[])Raw1.Binary.Clone();
+			byte[] Bin2 = Raw2.Binary;
+			int i, j, c = Bin1.Length;
+
+			if (Bin2.Length != c)
+				throw new ArgumentException("Images not of the same size.", nameof(Image2));
+
+			for (i = 0; i < c; i++)
 			{
-				Pixels2 = Marshal.AllocCoTaskMem(c);
-
-				Image1.ReadPixels(ImageInfo, Pixels1, ImageInfo.RowBytes, 0, 0);
-				Image2.ReadPixels(ImageInfo, Pixels2, ImageInfo.RowBytes, 0, 0);
-
-				byte[] Bin1 = new byte[c];
-				byte[] Bin2 = new byte[c];
-				Marshal.Copy(Pixels1, Bin1, 0, c);
-				Marshal.Copy(Pixels2, Bin2, 0, c);
-
-				for (i = 0; i < c; i++)
-				{
-					j = (int)(Bin1[i] * (1 - p) + Bin2[i] * p + 0.5);
-					if (j < 0)
-						Bin1[i] = 0;
-					else if (j > 255)
-						Bin1[i] = 255;
-					else
-						Bin1[i] = (byte)j;
-				}
-
-				Marshal.Copy(Bin1, 0, Pixels1, c);
-
-				using (SKData Data = SKData.Create(Pixels1, c))
-				{
-					return SKImage.FromPixels(new SKImageInfo(ImageInfo.Width, ImageInfo.Height, SKColorType.Bgra8888), Data, ImageInfo.RowBytes);
-				}
+				j = (int)(Bin1[i] * (1 - p) + Bin2[i] * p + 0.5);
+				if (j < 0)
+					Bin1[i] = 0;
+				else if (j > 255)
+					Bin1[i] = 255;
+				else
+					Bin1[i] = (byte)j;
 			}
-			finally
-			{
-				Marshal.FreeCoTaskMem(Pixels1);
-				Marshal.FreeCoTaskMem(Pixels2);
-			}
+
+			return new PixelInformationRaw(Raw1.ColorType, Bin1, Raw1.Width, Raw1.Height, Raw1.BytesPerRow);
 		}
 
 	}

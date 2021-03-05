@@ -333,28 +333,23 @@ namespace Waher.WebService.Script
 						this.variables["GraphHeight"] = (double)Settings.Height;
 				}
 
-				using (SKImage Bmp = G.CreateBitmap(Settings, out object[] States))
+				PixelInformation Pixels = G.CreatePixels(Settings, out object[] States);
+				string Tag = Guid.NewGuid().ToString();
+				Bin = Pixels.EncodeAsPng();
+
+				s = Convert.ToBase64String(Bin, 0, Bin.Length);
+				s = "<figure><img border=\"2\" width=\"" + Settings.Width.ToString() + "\" height=\"" + Settings.Height.ToString() +
+					"\" src=\"data:image/png;base64," + s + "\" onclick=\"GraphClicked(this,event,'" + Tag + "');\" /></figure>";
+
+				if (!(this.variables["Graphs"] is Dictionary<string, KeyValuePair<Graph, object[]>> Graphs))
 				{
-					string Tag = Guid.NewGuid().ToString();
-					SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100);
-					Bin = Data.ToArray();
+					Graphs = new Dictionary<string, KeyValuePair<Graph, object[]>>();
+					this.variables["Graphs"] = Graphs;
+				}
 
-					s = Convert.ToBase64String(Bin, 0, Bin.Length);
-					s = "<figure><img border=\"2\" width=\"" + Settings.Width.ToString() + "\" height=\"" + Settings.Height.ToString() +
-						"\" src=\"data:image/png;base64," + s + "\" onclick=\"GraphClicked(this,event,'" + Tag + "');\" /></figure>";
-
-					Data.Dispose();
-
-					if (!(this.variables["Graphs"] is Dictionary<string, KeyValuePair<Graph, object[]>> Graphs))
-					{
-						Graphs = new Dictionary<string, KeyValuePair<Graph, object[]>>();
-						this.variables["Graphs"] = Graphs;
-					}
-
-					lock (Graphs)
-					{
-						Graphs[Tag] = new KeyValuePair<Graph, object[]>(G, States);
-					}
+				lock (Graphs)
+				{
+					Graphs[Tag] = new KeyValuePair<Graph, object[]>(G, States);
 				}
 			}
 			else if (Result.AssociatedObjectValue is SKImage Img)
@@ -449,7 +444,7 @@ namespace Waher.WebService.Script
 			Bin = Encoding.UTF8.GetBytes(s);
 
 			this.response.ContentType = "text/html; charset=utf-8";
-			this.response.ContentLength = Bin.Length;	// To avoid chunked transfer.
+			this.response.ContentLength = Bin.Length;   // To avoid chunked transfer.
 			this.response.SetHeader("X-More", More ? "1" : "0");
 			await this.response.Write(Bin);
 			await this.response.SendResponse();

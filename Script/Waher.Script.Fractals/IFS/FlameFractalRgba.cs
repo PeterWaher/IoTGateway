@@ -172,7 +172,6 @@ namespace Waher.Script.Fractals.IFS
 				throw new ScriptRuntimeException("the fifth parameter to FlameFractal must be an array, containing flame definitions.", this);
 
 			List<FlameFunction> FlameFunctions = new List<FlameFunction>();
-            DoubleMatrix M;
             double Weight;
             double Gamma;
             double Vibrancy;
@@ -181,9 +180,8 @@ namespace Waher.Script.Fractals.IFS
 
             foreach (object FlameItem in FlameArray)
             {
-                if (FlameItem is DoubleMatrix)
+                if (FlameItem is DoubleMatrix M)
                 {
-                    M = (DoubleMatrix)FlameItem;
                     CurrentFunction = new FlameFunction(M, this);
                     FlameFunctions.Add(CurrentFunction);
                 }
@@ -198,7 +196,7 @@ namespace Waher.Script.Fractals.IFS
 
                     CurrentFunction.SetColor(Graph.ToColor(FlameItem));
                 }
-                else if (FlameItem is IFlameVariation)
+                else if (FlameItem is IFlameVariation FlameVariation)
                 {
                     if (CurrentFunction is null)
                     {
@@ -207,9 +205,9 @@ namespace Waher.Script.Fractals.IFS
                         FlameFunctions.Add(CurrentFunction);
                     }
 
-                    CurrentFunction.Add((IFlameVariation)FlameItem);
+                    CurrentFunction.Add(FlameVariation);
                 }
-                else if (FlameItem is ILambdaExpression)
+                else if (FlameItem is ILambdaExpression LambdaExpression)
                 {
                     if (CurrentFunction is null)
                     {
@@ -218,7 +216,7 @@ namespace Waher.Script.Fractals.IFS
                         FlameFunctions.Add(CurrentFunction);
                     }
 
-                    CurrentFunction.Add((ILambdaExpression)FlameItem);
+                    CurrentFunction.Add(LambdaExpression);
                 }
                 else if (!(FlameItem is null))
                 {
@@ -315,7 +313,7 @@ namespace Waher.Script.Fractals.IFS
                     Vibrancy, Preview, Parallel });
         }
 
-        private static Random gen = new Random();
+        private readonly static Random gen = new Random();
 
         private string FractalZoomScript(double r, double i, double Size, object State)
         {
@@ -561,7 +559,7 @@ namespace Waher.Script.Fractals.IFS
 						};
 
                         T[i].Start(new object[] { Done[i], i, v, Functions, SumWeights, P[i], 
-                            Node, i == 0 ? Preview : false, Gamma, Vibrancy });
+                            Node, i == 0 && Preview, Gamma, Vibrancy });
                     }
 
                     WaitHandle.WaitAll(Done);
@@ -614,7 +612,7 @@ namespace Waher.Script.Fractals.IFS
         {
             object[] Parameters = (object[])P;
             ManualResetEvent Done = (ManualResetEvent)Parameters[0];
-            int GameNr = (int)Parameters[1];
+            //int GameNr = (int)Parameters[1];
             Variables v = (Variables)Parameters[2];
             FlameFunction[] Functions = (FlameFunction[])Parameters[3];
             double[] SumWeights = (double[])Parameters[4];

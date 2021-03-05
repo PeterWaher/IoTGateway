@@ -315,12 +315,12 @@ namespace Waher.Script.Fractals.ComplexFractals
                 }
             }
 
-            Node.Expression.Preview(new GraphBitmap(FractalGraph.ToBitmap(ColorIndex, Width, Height, Palette)));
+            Node.Expression.Preview(new GraphBitmap(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
 
             double[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
             FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
 
-            return new FractalGraph(FractalGraph.ToBitmap(ColorIndex, Width, Height, Palette),
+            return new FractalGraph(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
                 r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
         }
 

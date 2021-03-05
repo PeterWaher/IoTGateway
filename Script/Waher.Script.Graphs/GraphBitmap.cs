@@ -11,9 +11,7 @@ namespace Waher.Script.Graphs
 	/// </summary>
 	public class GraphBitmap : Graph, IDisposable
 	{
-		private SKImage bitmap;
-		private int width;
-		private int height;
+		private PixelInformation pixels;
 
 		/// <summary>
 		/// Handles bitmap-based graphs.
@@ -26,26 +24,11 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// Handles bitmap-based graphs.
 		/// </summary>
-		/// <param name="Width">Width of graph, in pixels.</param>
-		/// <param name="Height">Height of graph, in pixels.</param>
-		public GraphBitmap(int Width, int Height)
+		/// <param name="Pixels">Pixels</param>
+		public GraphBitmap(PixelInformation Pixels)
 			: base()
 		{
-			this.width = Width;
-			this.height = Height;
-			this.bitmap = null;
-		}
-
-		/// <summary>
-		/// Handles bitmap-based graphs.
-		/// </summary>
-		/// <param name="Bitmap">Graph bitmap.</param>
-		public GraphBitmap(SKImage Bitmap)
-			: base()
-		{
-			this.width = Bitmap.Width;
-			this.height = Bitmap.Height;
-			this.bitmap = Bitmap;
+			this.pixels = Pixels;
 		}
 
 		/// <summary>
@@ -58,28 +41,37 @@ namespace Waher.Script.Graphs
 			if (!(Element is Graph G))
 				return null;
 
-			GraphSettings Settings = new GraphSettings()
+			GraphSettings Settings = new GraphSettings();
+			if (!(this.pixels is null))
 			{
-				Width = this.width,
-				Height = this.height
-			};
+				Settings.Width = this.pixels.Width;
+				Settings.Height = this.pixels.Height;
+			}
 
-			SKImage Bmp = G.CreateBitmap(Settings);
+			PixelInformation Pixels = G.CreatePixels(Settings);
 
-			if (this.bitmap is null)
-				return new GraphBitmap(Bmp);
-
-			using (SKSurface Surface = SKSurface.Create(new SKImageInfo(Math.Max(Bmp.Width, this.width), Math.Max(Bmp.Height, this.height),
-				SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
+			using (SKSurface Surface = SKSurface.Create(new SKImageInfo(Math.Max(Pixels.Width, this.pixels?.Width ?? 0),
+				Math.Max(Pixels.Height, this.pixels?.Height ?? 0), SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
 			{
 				SKCanvas Canvas = Surface.Canvas;
 
-				Canvas.DrawImage(Bmp, 0, 0);
-				Canvas.DrawImage(this.bitmap, 0, 0);
+				using (SKImage Bmp = Pixels.CreateBitmap())
+				{
+					Canvas.DrawImage(Bmp, 0, 0);
+				}
 
-				Bmp.Dispose();
+				if (!(this.pixels is null))
+				{
+					using (SKImage Image = this.pixels.CreateBitmap())
+					{
+						Canvas.DrawImage(Image, 0, 0);
+					}
+				}
 
-				return new GraphBitmap(Surface.Snapshot());
+				using (SKImage Result = Surface.Snapshot())
+				{
+					return new GraphBitmap(PixelInformation.FromImage(Result));
+				}
 			}
 		}
 
@@ -93,28 +85,37 @@ namespace Waher.Script.Graphs
 			if (!(Element is Graph G))
 				return null;
 
-			GraphSettings Settings = new GraphSettings()
+			GraphSettings Settings = new GraphSettings();
+			if (!(this.pixels is null))
 			{
-				Width = this.width,
-				Height = this.height
-			};
+				Settings.Width = this.pixels.Width;
+				Settings.Height = this.pixels.Height;
+			}
 
-			SKImage Bmp = G.CreateBitmap(Settings);
+			PixelInformation Pixels = G.CreatePixels(Settings);
 
-			if (this.bitmap is null)
-				return new GraphBitmap(Bmp);
-
-			using (SKSurface Surface = SKSurface.Create(new SKImageInfo(Math.Max(Bmp.Width, this.width),
-				Math.Max(Bmp.Height, this.height), SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
+			using (SKSurface Surface = SKSurface.Create(new SKImageInfo(Math.Max(Pixels.Width, this.pixels?.Width ?? 0),
+				Math.Max(Pixels.Height, this.pixels?.Height ?? 0), SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
 			{
 				SKCanvas Canvas = Surface.Canvas;
 
-				Canvas.DrawImage(this.bitmap, 0, 0);
-				Canvas.DrawImage(Bmp, 0, 0);
+				if (!(this.pixels is null))
+				{
+					using (SKImage Image = this.pixels.CreateBitmap())
+					{
+						Canvas.DrawImage(Image, 0, 0);
+					}
+				}
 
-				Bmp.Dispose();
+				using (SKImage Bmp = Pixels.CreateBitmap())
+				{
+					Canvas.DrawImage(Bmp, 0, 0);
+				}
 
-				return new GraphBitmap(Surface.Snapshot());
+				using (SKImage Result = Surface.Snapshot())
+				{
+					return new GraphBitmap(PixelInformation.FromImage(Result));
+				}
 			}
 		}
 
@@ -125,27 +126,10 @@ namespace Waher.Script.Graphs
 		/// <param name="States">State object(s) that contain graph-specific information about its inner states.
 		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
 		/// <returns>Bitmap</returns>
-		public override SKImage CreateBitmap(GraphSettings Settings, out object[] States)
+		public override PixelInformation CreatePixels(GraphSettings Settings, out object[] States)
 		{
-			SKImageInfo ImageInfo = new SKImageInfo(this.bitmap.Width, this.bitmap.Height, SKColorType.Bgra8888);
-			int c = ImageInfo.BytesSize;
-
 			States = new object[0];
-
-			IntPtr Pixels = Marshal.AllocCoTaskMem(c);
-			try
-			{
-				this.bitmap.ReadPixels(ImageInfo, Pixels, ImageInfo.RowBytes, 0, 0);
-
-				using (SKData Data = SKData.Create(Pixels, c))
-				{
-					return SKImage.FromPixels(new SKImageInfo(ImageInfo.Width, ImageInfo.Height, SKColorType.Bgra8888), Data, ImageInfo.RowBytes);
-				}
-			}
-			finally
-			{
-				Marshal.FreeCoTaskMem(Pixels);
-			}
+			return this.pixels;
 		}
 
 		/// <summary>
@@ -155,7 +139,7 @@ namespace Waher.Script.Graphs
 		{
 			get
 			{
-				return new Tuple<int, int>(this.width, this.height);
+				return new Tuple<int, int>(this.pixels?.Width ?? 0, this.pixels?.Height ?? 0);
 			}
 		}
 
@@ -176,7 +160,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			return (obj is GraphBitmap B && this.bitmap.Equals(B.bitmap));
+			return (obj is GraphBitmap B && (this.pixels?.Equals(B.pixels) ?? (B.pixels is null)));
 		}
 
 		/// <summary>
@@ -184,7 +168,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public override int GetHashCode()
 		{
-			return this.bitmap.GetHashCode();
+			return this.pixels?.GetHashCode() ?? 0;
 		}
 
 		/// <summary>
@@ -200,17 +184,16 @@ namespace Waher.Script.Graphs
 		/// <param name="Output">XML output.</param>
 		public override void ExportGraph(XmlWriter Output)
 		{
-			Output.WriteStartElement("GraphBitmap");
-			Output.WriteAttributeString("width", this.width.ToString());
-			Output.WriteAttributeString("height", this.height.ToString());
-
-			using (SKData Data = this.bitmap.Encode(SKEncodedImageFormat.Png, 100))
+			if (!(this.pixels is null))
 			{
-				byte[] Bin = Data.ToArray();
-				Output.WriteElementString("Png", Convert.ToBase64String(Bin));
-			}
+				Output.WriteStartElement("GraphBitmap");
+				Output.WriteAttributeString("width", this.pixels.Width.ToString());
+				Output.WriteAttributeString("height", this.pixels.Height.ToString());
 
-			Output.WriteEndElement();
+				Output.WriteElementString("Png", Convert.ToBase64String(this.pixels.EncodeAsPng()));
+
+				Output.WriteEndElement();
+			}
 		}
 
 		/// <summary>
@@ -219,16 +202,15 @@ namespace Waher.Script.Graphs
 		/// <param name="Xml">XML input.</param>
 		public override void ImportGraph(XmlElement Xml)
 		{
-			this.width = int.Parse(Xml.GetAttribute("width"));
-			this.height = int.Parse(Xml.GetAttribute("height"));
+			int Width = int.Parse(Xml.GetAttribute("width"));
+			int Height = int.Parse(Xml.GetAttribute("height"));
 
 			foreach (XmlNode N in Xml.ChildNodes)
 			{
 				if (N is XmlElement E && E.LocalName == "Png")
 				{
 					byte[] Data = Convert.FromBase64String(E.InnerText);
-					SKBitmap Bitmap = SKBitmap.Decode(Data);
-					this.bitmap = SKImage.FromBitmap(Bitmap);
+					this.pixels = new PixelInformationPng(Data, Width, Height);
 					break;
 				}
 			}

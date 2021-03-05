@@ -6,6 +6,7 @@ using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Exceptions;
+using Waher.Script.Graphs;
 using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
 
@@ -424,11 +425,8 @@ namespace Waher.Script.Fractals.ComplexFractals
                 }
             }
 
-			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
-			{
-				SKImage Bitmap = SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
-				return new FractalGraph(Bitmap, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
-			}
+            PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
+			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
         public static FractalGraph CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
@@ -616,11 +614,8 @@ namespace Waher.Script.Fractals.ComplexFractals
                 }
             }
 
-			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
-			{
-				SKImage Bitmap = SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
-				return new FractalGraph(Bitmap, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
-			}
+            PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
+			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
         public static FractalGraph CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
@@ -784,11 +779,8 @@ namespace Waher.Script.Fractals.ComplexFractals
                 }
             }
 
-			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
-			{
-				SKImage Bitmap = SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
-				return new FractalGraph(Bitmap, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
-			}
+            PixelInformation Pixels = new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
+			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
         public override string FunctionName

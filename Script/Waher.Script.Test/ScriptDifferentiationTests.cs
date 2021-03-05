@@ -26,7 +26,7 @@ namespace Waher.Script.Test
 				Assert.Fail("Expected graph.");
 
 			GraphSettings Settings = new GraphSettings();
-			SKImage Bmp = Result.CreateBitmap(Settings);
+			Result.CreatePixels(Settings);
 		}
 
 		[TestMethod]

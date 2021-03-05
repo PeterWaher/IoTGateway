@@ -175,7 +175,7 @@ namespace Waher.Script.Fractals.IFS
             }
         }
 
-        internal SKImage RenderBitmapRgba(double Gamma, double Vibrancy, bool Preview, SKColor? Background)
+        internal PixelInformation RenderBitmapRgba(double Gamma, double Vibrancy, bool Preview, SKColor? Background)
         {
             int[] Frequency;
             double[] Reds;
@@ -585,13 +585,10 @@ namespace Waher.Script.Fractals.IFS
                 }
             }
 
-			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
-			{
-				return SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
-			}
+            return new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
         }
 
-        internal SKImage RenderBitmapHsl(double Gamma, double LightFactor, bool Preview, SKColor? Background)
+        internal PixelInformation RenderBitmapHsl(double Gamma, double LightFactor, bool Preview, SKColor? Background)
         {
             int[] Frequency;
             double[] Hues;
@@ -777,10 +774,7 @@ namespace Waher.Script.Fractals.IFS
                 }
             }
 
-			using (SKData Data = SKData.Create(new MemoryStream(rgb)))
-			{
-				return SKImage.FromPixels(new SKImageInfo(Width, Height, SKColorType.Bgra8888), Data, Width * 4);
-			}
+            return new PixelInformationRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
 		}
 
 	}

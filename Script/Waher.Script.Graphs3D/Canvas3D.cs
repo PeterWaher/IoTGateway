@@ -155,12 +155,12 @@ namespace Waher.Script.Graphs3D
 		/// Creates a bitmap from the pixels in the canvas.
 		/// </summary>
 		/// <returns></returns>
-		public SKImage GetBitmap()
+		public PixelInformation GetPixels()
 		{
 			this.PaintTransparentPolygons();
 
 			if (this.overSampling == 1)
-				return this.GetBitmap(this.pixels);
+				return new PixelInformationRaw(SKColorType.Rgba8888, this.pixels, this.width, this.height, this.width << 2);
 			else
 			{
 				byte[] Pixels = new byte[this.width * this.height * 4];
@@ -194,16 +194,7 @@ namespace Waher.Script.Graphs3D
 					}
 				}
 
-				return this.GetBitmap(Pixels);
-			}
-		}
-
-		private SKImage GetBitmap(byte[] Pixels)
-		{
-			using (SKData Data = SKData.CreateCopy(Pixels))
-			{
-				SKImageInfo ImageInfo = new SKImageInfo(this.width, this.height, SKColorType.Rgba8888, SKAlphaType.Premul);
-				return SKImage.FromPixels(ImageInfo, Data, this.width << 2);
+				return new PixelInformationRaw(SKColorType.Rgba8888, Pixels, this.width, this.height, this.width << 2);
 			}
 		}
 
@@ -218,10 +209,10 @@ namespace Waher.Script.Graphs3D
 		/// <param name="States">State objects that contain graph-specific information about its inner states.
 		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
 		/// <returns>Bitmap</returns>
-		public override SKImage CreateBitmap(GraphSettings Settings, out object[] States)
+		public override PixelInformation CreatePixels(GraphSettings Settings, out object[] States)
 		{
 			States = null;
-			return this.GetBitmap();
+			return this.GetPixels();
 		}
 
 		/// <summary>

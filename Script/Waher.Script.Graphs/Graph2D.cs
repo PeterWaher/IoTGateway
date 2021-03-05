@@ -456,7 +456,7 @@ namespace Waher.Script.Graphs
 		/// <param name="States">State object(s) that contain graph-specific information about its inner states.
 		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
 		/// <returns>Bitmap</returns>
-		public override SKImage CreateBitmap(GraphSettings Settings, out object[] States)
+		public override PixelInformation CreatePixels(GraphSettings Settings, out object[] States)
 		{
 			using (SKSurface Surface = SKSurface.Create(new SKImageInfo(Settings.Width, Settings.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
 			{
@@ -739,18 +739,19 @@ namespace Waher.Script.Graphs
 					PrevPainter = ePainters.Current;
 				}
 
-				SKImage Result = Surface.Snapshot();
+				using (SKImage Result = Surface.Snapshot())
+				{
+					Font?.Dispose();
 
-				Font?.Dispose();
+					AxisBrush.Dispose();
+					GridBrush.Dispose();
+					GridPen.Dispose();
+					AxisPen.Dispose();
 
-				AxisBrush.Dispose();
-				GridBrush.Dispose();
-				GridPen.Dispose();
-				AxisPen.Dispose();
+					States = new object[] { DrawingArea };
 
-				States = new object[] { DrawingArea };
-
-				return Result;
+					return PixelInformation.FromImage(Result);
+				}
 			}
 		}
 

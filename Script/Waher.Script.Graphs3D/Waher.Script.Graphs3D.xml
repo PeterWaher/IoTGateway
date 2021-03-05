@@ -35,13 +35,13 @@
             Clears the canvas.
             </summary>
         </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.GetBitmap">
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.GetPixels">
             <summary>
             Creates a bitmap from the pixels in the canvas.
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.CreateBitmap(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.CreatePixels(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
             <summary>
             Creates a bitmap of the graph.
             </summary>
@@ -1896,7 +1896,7 @@
             <see cref="M:System.Object.GetHashCode"/>
             </summary>
         </member>
-        <member name="M:Waher.Script.Graphs3D.Graph3D.CreateBitmap(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
+        <member name="M:Waher.Script.Graphs3D.Graph3D.CreatePixels(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
             <summary>
             Creates a bitmap of the graph.
             </summary>

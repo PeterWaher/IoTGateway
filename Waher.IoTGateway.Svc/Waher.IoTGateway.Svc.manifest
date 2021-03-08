@@ -340,6 +340,7 @@
 	<Assembly fileName='Waher.Things.Metering.dll'/>
 	<Assembly fileName='Waher.Things.Mqtt.dll'/>
 	<Assembly fileName='Waher.Things.Snmp.dll'/>
+	<Assembly fileName='Waher.WebService.Script.dll'/>
 	<Assembly fileName='Gateway.config'/>
 	<Assembly fileName='Waher.Utility.AnalyzeClock.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.AnalyzeClock.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.AnalyzeClock\bin\Release\PublishOutput\win-x86\'/>

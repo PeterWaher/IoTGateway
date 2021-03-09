@@ -1477,7 +1477,7 @@ namespace Waher.Persistence.Serialization
 				CSharp.AppendLine("\t\t\tif (!(T is null) && T != typeof(" + this.type.FullName + "))");
 				CSharp.AppendLine("\t\t\t{");
 				CSharp.AppendLine("\t\t\t\tIObjectSerializer Serializer = await this.context.GetObjectSerializer(T);");
-				CSharp.AppendLine("\t\t\t\tSerializer.Serialize(Writer, WriteTypeCode, Embedded, UntypedValue);");
+				CSharp.AppendLine("\t\t\t\tawait Serializer.Serialize(Writer, WriteTypeCode, Embedded, UntypedValue);");
 				CSharp.AppendLine("\t\t\t\treturn;");
 				CSharp.AppendLine("\t\t\t}");
 				CSharp.AppendLine();
@@ -2126,7 +2126,7 @@ namespace Waher.Persistence.Serialization
 									else
 									{
 										CSharp.Append(Indent2);
-										CSharp.Append("this.serializer");
+										CSharp.Append("await this.serializer");
 										CSharp.Append(Member.Name);
 										CSharp.Append(".Serialize(Writer, true, true, Value.");
 										CSharp.Append(Member.Name);

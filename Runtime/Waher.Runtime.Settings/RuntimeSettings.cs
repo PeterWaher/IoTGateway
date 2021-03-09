@@ -481,6 +481,82 @@ namespace Waher.Runtime.Settings
 
 		#endregion
 
+		#region Enum-valued settings
+
+		/// <summary>
+		/// Gets a Enum-valued setting.
+		/// </summary>
+		/// <param name="Key">Key name.</param>
+		/// <param name="DefaultValue">Default value, if not found.</param>
+		/// <returns>Setting value.</returns>
+		public static Enum Get(string Key, Enum DefaultValue)
+		{
+			return GetAsync(Key, DefaultValue).Result;
+		}
+
+		/// <summary>
+		/// Gets a Enum-valued setting.
+		/// </summary>
+		/// <param name="Key">Key name.</param>
+		/// <param name="DefaultValue">Default value, if not found.</param>
+		/// <returns>Setting value.</returns>
+		public static async Task<Enum> GetAsync(string Key, Enum DefaultValue)
+		{
+			EnumSetting Setting = await GetAsync<EnumSetting>(Key);
+			return Setting?.Value ?? DefaultValue;
+		}
+
+		/// <summary>
+		/// Sets a Enum-valued setting.
+		/// </summary>
+		/// <param name="Key">Key name.</param>
+		/// <param name="Value">New value.</param>
+		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+		public static bool Set(string Key, Enum Value)
+		{
+			return SetAsync(Key, Value).Result;
+		}
+
+		/// <summary>
+		/// Sets a Enum-valued setting.
+		/// </summary>
+		/// <param name="Key">Key name.</param>
+		/// <param name="Value">New value.</param>
+		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+		public static async Task<bool> SetAsync(string Key, Enum Value)
+		{
+			using (Semaphore Semaphore = await Semaphores.BeginWrite("setting:" + Key))
+			{
+				EnumSetting Setting = await Database.FindFirstDeleteRest<EnumSetting>(new FilterFieldEqualTo("Key", Key));
+				return await SetAsyncLocked(Key, Value, Setting);
+			}
+		}
+
+		private static async Task<bool> SetAsyncLocked(string Key, Enum Value, EnumSetting Setting)
+		{
+			if (Setting is null)
+			{
+				Setting = new EnumSetting(Key, Value);
+				await Database.Insert(Setting);
+
+				return true;
+			}
+			else
+			{
+				if (Setting.Value != Value)
+				{
+					Setting.Value = Value;
+					await Database.Update(Setting);
+
+					return true;
+				}
+				else
+					return false;
+			}
+		}
+
+		#endregion
+
 		#region Object-valued settings
 
 		/// <summary>
@@ -599,6 +675,16 @@ namespace Waher.Runtime.Settings
 
 						return await SetAsyncLocked(Key, TS, TimeSpanSetting);
 					}
+					else if (Value is Enum E)
+					{
+						if (!(Setting is EnumSetting EnumSetting))
+						{
+							await Database.Delete(Setting);
+							EnumSetting = null;
+						}
+
+						return await SetAsyncLocked(Key, E, EnumSetting);
+					}
 					else
 					{
 						Type T = Value.GetType();
@@ -608,7 +694,7 @@ namespace Waher.Runtime.Settings
 							throw new InvalidOperationException("Object setting values cannot be stored separate collections. (CollectionName attribute found.)");
 
 						TypeNameAttribute TypeNameAttribute = TI.GetCustomAttribute<TypeNameAttribute>();
-						if (TypeNameAttribute.TypeNameSerialization != TypeNameSerialization.FullName)
+						if (TypeNameAttribute is null || TypeNameAttribute.TypeNameSerialization != TypeNameSerialization.FullName)
 							throw new InvalidOperationException("Full Type names must be serialized when persisting object setting values. (TypeName attribute.). Exceptions for the types: Boolean, Int64, String, DateTime, TimeSpan, Double.");
 					}
 				}

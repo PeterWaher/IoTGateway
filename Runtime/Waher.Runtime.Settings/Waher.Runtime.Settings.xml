@@ -201,6 +201,38 @@
             <param name="Value">New value.</param>
             <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
         </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.Get(System.String,System.Enum)">
+            <summary>
+            Gets a Enum-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="DefaultValue">Default value, if not found.</param>
+            <returns>Setting value.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.GetAsync(System.String,System.Enum)">
+            <summary>
+            Gets a Enum-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="DefaultValue">Default value, if not found.</param>
+            <returns>Setting value.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.Set(System.String,System.Enum)">
+            <summary>
+            Sets a Enum-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">New value.</param>
+            <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Settings.RuntimeSettings.SetAsync(System.String,System.Enum)">
+            <summary>
+            Sets a Enum-valued setting.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">New value.</param>
+            <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
+        </member>
         <member name="M:Waher.Runtime.Settings.RuntimeSettings.Get(System.String,System.Object)">
             <summary>
             Gets a object-valued setting.
@@ -407,6 +439,44 @@
             </summary>
         </member>
         <member name="M:Waher.Runtime.Settings.SettingObjects.DoubleSetting.GetValueObject">
+            <summary>
+            Gets the value of the setting, as an object.
+            </summary>
+            <returns>Value object.</returns>
+        </member>
+        <member name="T:Waher.Runtime.Settings.SettingObjects.EnumSetting">
+            <summary>
+            Enumeration setting object.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.EnumSetting.#ctor">
+            <summary>
+            Enumeration setting object.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.EnumSetting.#ctor(System.String,System.Enum)">
+            <summary>
+            Enumeration setting object.
+            </summary>
+            <param name="Key">Key name.</param>
+            <param name="Value">Value.</param>
+        </member>
+        <member name="P:Waher.Runtime.Settings.SettingObjects.EnumSetting.Value">
+            <summary>
+            Value.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Settings.SettingObjects.EnumSetting.EnumTypeName">
+            <summary>
+            Enumeration type name
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Settings.SettingObjects.EnumSetting.EnumValue">
+            <summary>
+            Enumeration value
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Settings.SettingObjects.EnumSetting.GetValueObject">
             <summary>
             Gets the value of the setting, as an object.
             </summary>

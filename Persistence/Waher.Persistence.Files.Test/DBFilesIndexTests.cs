@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Statistics;
+using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Operators.Membership;
@@ -49,10 +50,11 @@ namespace Waher.Persistence.FilesLW.Test
 			DBFilesBTreeTests.DeleteFiles();
 
 #if LW
-            this.provider = await FilesProvider.CreateAsync(DBFilesBTreeTests.Folder, DBFilesBTreeTests.CollectionName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000);
+			this.provider = await FilesProvider.CreateAsync(DBFilesBTreeTests.Folder, DBFilesBTreeTests.CollectionName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000);
 #else
 			this.provider = await FilesProvider.CreateAsync(DBFilesBTreeTests.Folder, DBFilesBTreeTests.CollectionName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
 #endif
+				
 			this.file = await this.provider.GetFile(DBFilesBTreeTests.CollectionName);
 
 			this.index1 = await this.provider.GetIndexFile(this.file, RegenerationOptions.DontRegenerate, "Byte", "-DateTime");
@@ -60,6 +62,8 @@ namespace Waher.Persistence.FilesLW.Test
 			this.index3 = await this.provider.GetIndexFile(this.file, RegenerationOptions.DontRegenerate, "CIString");
 
 			this.start = DateTime.Now;
+
+			Database.Register(this.provider, false);
 		}
 
 		[TestCleanup]
@@ -69,6 +73,8 @@ namespace Waher.Persistence.FilesLW.Test
 
 			if (this.provider != null)
 			{
+				Database.Register(new NullDatabaseProvider(), false);
+
 				this.provider.Dispose();
 				this.provider = null;
 				this.file = null;
@@ -1246,7 +1252,6 @@ namespace Waher.Persistence.FilesLW.Test
 			int NrFalseNegatives = 0;
 			int RecNr = 0;
 
-			Database.Register(this.provider);
 			Expression Exp = new Expression("select Byte, DateTime from Simple");
 			Variables v = new Variables();
 			ObjectMatrix Ans = Exp.Evaluate(v) as ObjectMatrix;

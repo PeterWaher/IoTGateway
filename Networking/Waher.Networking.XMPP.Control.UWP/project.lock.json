@@ -2621,10 +2621,10 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Persistence": "1.2.4",
-          "Waher.Runtime.Settings": "1.0.8"
+          "Waher.Runtime.Settings": "1.0.9"
         }
       },
-      "Waher.Runtime.Settings/1.0.8": {
+      "Waher.Runtime.Settings/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5260,10 +5260,10 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Persistence": "1.2.4",
-          "Waher.Runtime.Settings": "1.0.8"
+          "Waher.Runtime.Settings": "1.0.9"
         }
       },
-      "Waher.Runtime.Settings/1.0.8": {
+      "Waher.Runtime.Settings/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7935,10 +7935,10 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Persistence": "1.2.4",
-          "Waher.Runtime.Settings": "1.0.8"
+          "Waher.Runtime.Settings": "1.0.9"
         }
       },
-      "Waher.Runtime.Settings/1.0.8": {
+      "Waher.Runtime.Settings/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10583,10 +10583,10 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Persistence": "1.2.4",
-          "Waher.Runtime.Settings": "1.0.8"
+          "Waher.Runtime.Settings": "1.0.9"
         }
       },
-      "Waher.Runtime.Settings/1.0.8": {
+      "Waher.Runtime.Settings/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13267,10 +13267,10 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Persistence": "1.2.4",
-          "Waher.Runtime.Settings": "1.0.8"
+          "Waher.Runtime.Settings": "1.0.9"
         }
       },
-      "Waher.Runtime.Settings/1.0.8": {
+      "Waher.Runtime.Settings/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15915,10 +15915,10 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Persistence": "1.2.4",
-          "Waher.Runtime.Settings": "1.0.8"
+          "Waher.Runtime.Settings": "1.0.9"
         }
       },
-      "Waher.Runtime.Settings/1.0.8": {
+      "Waher.Runtime.Settings/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18599,10 +18599,10 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Persistence": "1.2.4",
-          "Waher.Runtime.Settings": "1.0.8"
+          "Waher.Runtime.Settings": "1.0.9"
         }
       },
-      "Waher.Runtime.Settings/1.0.8": {
+      "Waher.Runtime.Settings/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -28711,7 +28711,7 @@
       "path": "../../Runtime/Waher.Runtime.Language/Waher.Runtime.Language.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Language/Waher.Runtime.Language.csproj"
     },
-    "Waher.Runtime.Settings/1.0.8": {
+    "Waher.Runtime.Settings/1.0.9": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Settings/Waher.Runtime.Settings.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Settings/Waher.Runtime.Settings.csproj"

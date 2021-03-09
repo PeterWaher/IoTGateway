@@ -337,6 +337,7 @@ The folder also contains the following unit test projects:
 | **Waher.Runtime.Inventory.Test**   | .NET Core 2.2 | The [Waher.Runtime.Inventory.Test](Runtime/Waher.Runtime.Inventory.Test) project contains unit tests for the [Waher.Runtime.Inventory](Runtime/Waher.Runtime.Inventory) project. |
 | **Waher.Runtime.Language.Test**    | .NET Core 2.2 | The [Waher.Runtime.Language.Test](Runtime/Waher.Runtime.Language.Test) project contains unit tests for the [Waher.Runtime.Language](Runtime/Waher.Runtime.Language) project. |
 | **Waher.Runtime.Profiling.Test**   | .NET Core 2.2 | The [Waher.Runtime.Profiling.Test](Runtime/Waher.Runtime.Profiling.Test) project contains unit tests for the [Waher.Runtime.Profiling](Runtime/Waher.Runtime.Profiling) project. |
+| **Waher.Runtime.Settings.Test**    | .NET Core 2.2 | The [Waher.Runtime.Settings.Test](Runtime/Waher.Runtime.Settings.Test) project contains unit tests for the [Waher.Runtime.Settings](Runtime/Waher.Runtime.Settings) project. |
 | **Waher.Runtime.Text.Test**        | .NET Core 2.2 | The [Waher.Runtime.Text.Test](Runtime/Waher.Runtime.Text.Test) project contains unit tests for the [Waher.Runtime.Text](Runtime/Waher.Runtime.Text) project. |
 | **Waher.Runtime.Threading.Test**   | .NET Core 2.2 | The [Waher.Runtime.Threading.Test](Runtime/Waher.Runtime.Threading.Test) project contains unit tests for the [Waher.Runtime.Threading](Runtime/Waher.Runtime.Threading) project. |
 

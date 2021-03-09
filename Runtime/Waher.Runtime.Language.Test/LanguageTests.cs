@@ -21,9 +21,9 @@ namespace Waher.Runtime.Language.Test
 		public static async Task AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(
-				typeof(FilesProvider).Assembly, 
-				typeof(ObjectSerializer).Assembly, 
-				typeof(LanguageTests).Assembly, 
+				typeof(FilesProvider).Assembly,
+				typeof(ObjectSerializer).Assembly,
+				typeof(LanguageTests).Assembly,
 				typeof(Expression).Assembly);
 
 			Log.Register(consoleEventSink = new ConsoleEventSink());
@@ -35,11 +35,8 @@ namespace Waher.Runtime.Language.Test
 		[AssemblyCleanup]
 		public static void AssemblyCleanup()
 		{
-			if (filesProvider != null)
-			{
-				filesProvider.Dispose();
-				filesProvider = null;
-			}
+			filesProvider?.Dispose();
+			filesProvider = null;
 
 			if (consoleEventSink != null)
 			{

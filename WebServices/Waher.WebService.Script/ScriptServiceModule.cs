@@ -23,9 +23,6 @@ namespace Waher.WebService.Script
 		/// <summary>
 		/// Starts the module.
 		/// </summary>
-		/// <returns>If an asynchronous start operation has been started, a wait handle is returned. This
-		/// wait handle can be used to wait for the asynchronous process to finish. If no such asynchronous
-		/// operation has been started, null can be returned.</returns>
 		public Task Start()
 		{
 			if (Types.TryGetModuleParameter("HTTP", out object Obj) && (this.webServer = Obj as HttpServer) != null)

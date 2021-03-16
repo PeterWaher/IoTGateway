@@ -644,6 +644,19 @@
             <param name="IdentityId">Identity string of Legal Identity.</param>
             <returns>If the private key of the legal identity is available (and belongs to the Bare JID of the client).</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetLatestApprovedLegalId">
+            <summary>
+            Gets the latest approved Legal ID.
+            </summary>
+            <returns>Legal ID, if found, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetLatestApprovedLegalId(System.Byte[])">
+            <summary>
+            Gets the (latest) approved Legal ID whose public key matches <paramref name="PublicKey"/>.
+            </summary>
+            <param name="PublicKey">Public key</param>
+            <returns>Legal ID, if found, null otherwise.</returns>
+        </member>
         <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.IdentityUpdated">
             <summary>
             Event raised whenever the legal identity has been updated by the server.
@@ -1931,6 +1944,27 @@
             Removes an attachment from a proposed or approved contract before it is being signed.
             </summary>
             <param name="AttachmentId">ID of Attachment.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Encrypt(System.Byte[],System.Byte[],System.String)">
+            <summary>
+            Encrypts a message for an intended recipient given its public key and
+            key algorithm name.
+            </summary>
+            <param name="Message">Message to encrypt.</param>
+            <param name="RecipientPublicKey">Public key of recipient.</param>
+            <param name="RecipientPublicKeyName">Name of key algorithm of recipient.</param>
+            <returns>Encrypted message, together with the public key used to obtain the shared secret.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Encrypt(System.Byte[],System.Byte[],System.String,System.String)">
+            <summary>
+            Encrypts a message for an intended recipient given its public key and
+            key algorithm name.
+            </summary>
+            <param name="Message">Message to encrypt.</param>
+            <param name="RecipientPublicKey">Public key of recipient.</param>
+            <param name="RecipientPublicKeyName">Name of key algorithm of recipient.</param>
+            <param name="RecipientPublicKeyNamespace">Namespace of key algorithm of recipient.</param>
+            <returns>Encrypted message, together with the public key used to obtain the shared secret.</returns>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>

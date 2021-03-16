@@ -58,6 +58,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private object[] approvedSources = null;
 		private readonly string componentAddress;
 		private RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+		private Aes aes;
 
 		#region Construction
 
@@ -109,6 +110,12 @@ namespace Waher.Networking.XMPP.Contracts
 			this.client.RegisterMessageHandler("contractDeleted", NamespaceSmartContracts, this.ContractDeletedMessageHandler, false);
 			this.client.RegisterMessageHandler("petitionContractMsg", NamespaceSmartContracts, this.PetitionContractMessageHandler, false);
 			this.client.RegisterMessageHandler("petitionContractResponseMsg", NamespaceSmartContracts, this.PetitionContractResponseMessageHandler, false);
+
+			this.aes = Aes.Create();
+			this.aes.BlockSize = 128;
+			this.aes.KeySize = 256;
+			this.aes.Mode = CipherMode.CBC;
+			this.aes.Padding = PaddingMode.None;
 		}
 
 		/// <summary>
@@ -134,6 +141,9 @@ namespace Waher.Networking.XMPP.Contracts
 
 			this.rnd?.Dispose();
 			this.rnd = null;
+
+			this.aes?.Dispose();
+			this.aes = null;
 
 			base.Dispose();
 		}
@@ -1091,6 +1101,41 @@ namespace Waher.Networking.XMPP.Contracts
 			IE2eEndpoint Endpoint = this.LocalEndpoint.GetLocalKey(State.PublicKey);
 
 			return !(Endpoint is null);
+		}
+
+		/// <summary>
+		/// Gets the latest approved Legal ID.
+		/// </summary>
+		/// <returns>Legal ID, if found, null otherwise.</returns>
+		public Task<string> GetLatestApprovedLegalId()
+		{
+			return this.GetLatestApprovedLegalId(null);
+		}
+
+		/// <summary>
+		/// Gets the (latest) approved Legal ID whose public key matches <paramref name="PublicKey"/>.
+		/// </summary>
+		/// <param name="PublicKey">Public key</param>
+		/// <returns>Legal ID, if found, null otherwise.</returns>
+		public async Task<string> GetLatestApprovedLegalId(byte[] PublicKey)
+		{
+			string PublicKeyBase64 = PublicKey is null ? string.Empty : Convert.ToBase64String(PublicKey);
+
+			foreach (LegalIdentityState State in await Database.Find<LegalIdentityState>(new FilterAnd(
+				new FilterFieldEqualTo("BareJid", this.client.BareJID),
+				new FilterFieldEqualTo("State", IdentityState.Approved)), "-Timestamp"))
+			{
+				if (!(PublicKey is null) && Convert.ToBase64String(State.PublicKey) != PublicKeyBase64)
+					continue;
+
+				IE2eEndpoint Endpoint = this.LocalEndpoint.GetLocalKey(State.PublicKey);
+				if (Endpoint is null)
+					continue;
+
+				return State.LegalId;
+			}
+
+			return null;
 		}
 
 		private async Task<IE2eEndpoint> GetLatestApprovedKey(bool ExceptionIfNone)
@@ -4987,5 +5032,94 @@ namespace Waher.Networking.XMPP.Contracts
 
 		#endregion
 
+		#region Encryption
+
+		/// <summary>
+		/// Encrypts a message for an intended recipient given its public key and
+		/// key algorithm name.
+		/// </summary>
+		/// <param name="Message">Message to encrypt.</param>
+		/// <param name="RecipientPublicKey">Public key of recipient.</param>
+		/// <param name="RecipientPublicKeyName">Name of key algorithm of recipient.</param>
+		/// <returns>Encrypted message, together with the public key used to obtain the shared secret.</returns>
+		public (byte[], byte[]) Encrypt(byte[] Message, byte[] RecipientPublicKey, string RecipientPublicKeyName)
+		{
+			return this.Encrypt(Message, RecipientPublicKey, RecipientPublicKeyName, string.Empty);
+		}
+
+		/// <summary>
+		/// Encrypts a message for an intended recipient given its public key and
+		/// key algorithm name.
+		/// </summary>
+		/// <param name="Message">Message to encrypt.</param>
+		/// <param name="RecipientPublicKey">Public key of recipient.</param>
+		/// <param name="RecipientPublicKeyName">Name of key algorithm of recipient.</param>
+		/// <param name="RecipientPublicKeyNamespace">Namespace of key algorithm of recipient.</param>
+		/// <returns>Encrypted message, together with the public key used to obtain the shared secret.</returns>
+		public (byte[], byte[]) Encrypt(byte[] Message, byte[] RecipientPublicKey, string RecipientPublicKeyName, string RecipientPublicKeyNamespace)
+		{
+			IE2eEndpoint LocalEndpoint = this.localKeys.FindLocalEndpoint(RecipientPublicKeyName, RecipientPublicKeyNamespace);
+			if (LocalEndpoint is null)
+				throw new NotSupportedException("Unable to find matching local key.");
+
+			IE2eEndpoint RemoteEndpoint = LocalEndpoint.CreatePublic(RecipientPublicKey);
+			byte[] LocalPublicKey = LocalEndpoint.PublicKey;
+			byte[] Secret = LocalEndpoint.GetSharedSecret(RemoteEndpoint);
+			byte[] Digest = Hashes.ComputeSHA256Hash(Secret);
+			byte[] Key = new byte[16];
+			byte[] IV = new byte[16];
+			byte[] Encrypted;
+			byte[] ToEncrypt;
+			int i, j, c;
+
+			i = Message.Length;
+			c = 0;
+
+			do
+			{
+				i >>= 7;
+				c++;
+			}
+			while (i > 0);
+
+			i = c + Message.Length;
+			c = (i + 15) & ~0xf;
+
+			ToEncrypt = new byte[c];
+			i = Message.Length;
+			j = 0;
+
+			do
+			{
+				ToEncrypt[j] = (byte)(i & 127);
+				i >>= 7;
+				if (i > 0)
+					ToEncrypt[j] |= 0x80;
+
+				j++;
+			}
+			while (i > 0);
+
+			Array.Copy(Message, 0, ToEncrypt, j, Message.Length);
+			j += Message.Length;
+
+			if (j < c)
+				rnd.GetBytes(ToEncrypt, j, c - j);
+
+			Array.Copy(Digest, 0, Key, 0, 16);
+			Array.Copy(Digest, 16, IV, 0, 16);
+
+			lock (this.aes)
+			{
+				using (ICryptoTransform Aes = this.aes.CreateEncryptor(Key, IV))
+				{
+					Encrypted = Aes.TransformFinalBlock(ToEncrypt, 0, c);
+				}
+			}
+
+			return (Encrypted, LocalPublicKey);
+		}
+
+		#endregion
 	}
 }

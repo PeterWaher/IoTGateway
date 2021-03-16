@@ -729,6 +729,40 @@ namespace Waher.Networking.XMPP.P2P
 		}
 
 		/// <summary>
+		/// Returns the local endpoint that matches a given key name.
+		/// </summary>
+		/// <param name="KeyName">Key (algorithm) name.</param>
+		/// <returns>Matching key, or null if none found.</returns>
+		public IE2eEndpoint FindLocalEndpoint(string KeyName)
+		{
+			return this.FindLocalEndpoint(KeyName, string.Empty);
+		}
+
+		/// <summary>
+		/// Returns the local endpoint that matches a given key name and namespace.
+		/// </summary>
+		/// <param name="KeyName">Key (algorithm) name.</param>
+		/// <param name="KeyNamespace">Key (algorithm) namespace.</param>
+		/// <returns>Matching key, or null if none found.</returns>
+		public IE2eEndpoint FindLocalEndpoint(string KeyName, string KeyNamespace)
+		{
+			IE2eEndpoint[] Endpoints = this.keys;
+			int c = Endpoints.Length;
+			int i;
+
+			for (i = 0; i < c; i++)
+			{
+				if (Endpoints[i].LocalName == KeyName &&
+					(Endpoints[i].Namespace == KeyNamespace || string.IsNullOrEmpty(KeyNamespace)))
+				{
+					return Endpoints[i];
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
 		/// Decrypts XML data from an endpoint.
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>

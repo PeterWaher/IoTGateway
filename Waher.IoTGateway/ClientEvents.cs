@@ -386,7 +386,7 @@ namespace Waher.IoTGateway
 
 		private static Cache<string, TabQueue> GetTabTimeoutCache()
 		{
-			Cache<string, TabQueue> Result = new Cache<string, TabQueue>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(20));
+			Cache<string, TabQueue> Result = new Cache<string, TabQueue>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(20), true);
 			Result.Removed += TimeoutCacheItem_Removed;
 			return Result;
 		}
@@ -420,7 +420,7 @@ namespace Waher.IoTGateway
 
 		private static Cache<string, TabQueue> GetTabQueueCache()
 		{
-			Cache<string, TabQueue> Result = new Cache<string, TabQueue>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(30));
+			Cache<string, TabQueue> Result = new Cache<string, TabQueue>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(30), true);
 			Result.Removed += QueueCacheItem_Removed;
 			return Result;
 		}
@@ -488,7 +488,7 @@ namespace Waher.IoTGateway
 
 		private static Cache<string, ContentQueue> GetContentCache()
 		{
-			Cache<string, ContentQueue> Result = new Cache<string, ContentQueue>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(60));
+			Cache<string, ContentQueue> Result = new Cache<string, ContentQueue>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(60), true);
 			Result.Removed += ContentCacheItem_Removed;
 			return Result;
 		}

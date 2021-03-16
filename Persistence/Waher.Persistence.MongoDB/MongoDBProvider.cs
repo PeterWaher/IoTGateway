@@ -1138,7 +1138,7 @@ namespace Waher.Persistence.MongoDB
 			return First;
 		}
 
-		private readonly Cache<string, object> loadCache = new Cache<string, object>(10000, new TimeSpan(0, 0, 10), new TimeSpan(0, 0, 5));  // TODO: Make parameters configurable.
+		private readonly Cache<string, object> loadCache = new Cache<string, object>(10000, new TimeSpan(0, 0, 10), new TimeSpan(0, 0, 5), true);  // TODO: Make parameters configurable.
 
 		/// <summary>
 		/// Updates an object in the database.

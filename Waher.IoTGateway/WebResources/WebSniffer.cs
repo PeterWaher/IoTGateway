@@ -56,7 +56,7 @@ namespace Waher.IoTGateway.WebResources
 			this.feedbackCheck = Sniffable is HttpServer;
 
 			if (this.feedbackCheck)
-				this.outgoing = new Cache<string, bool>(int.MaxValue, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+				this.outgoing = new Cache<string, bool>(int.MaxValue, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1), true);
 			else
 				this.outgoing = null;
 		}

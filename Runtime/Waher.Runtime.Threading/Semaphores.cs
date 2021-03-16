@@ -18,7 +18,7 @@ namespace Waher.Runtime.Threading
 
 		static Semaphores()
 		{
-			semaphores = new Cache<string, MultiReadSingleWriteObject>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromHours(1));
+			semaphores = new Cache<string, MultiReadSingleWriteObject>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromHours(1), true);
 			semaphores.Removed += Semaphores_Removed;
 		}
 

@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 	/// </summary>
 	public abstract class EllipticCurveEndpoint : E2eEndpoint
 	{
-		private static readonly Cache<string, byte[]> sharedSecrets = new Cache<string, byte[]>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromDays(1));
+		private static readonly Cache<string, byte[]> sharedSecrets = new Cache<string, byte[]>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromDays(1), true);
 
 		/// <summary>
 		/// Remote public key.

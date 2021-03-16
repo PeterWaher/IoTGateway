@@ -21,7 +21,7 @@ namespace Waher.Runtime.Transactions
 		/// <param name="TransactionTimeout">Maximum time before a transaction needs to complete or fail.</param>
 		public Transactions(TimeSpan TransactionTimeout)
 		{
-			this.transactions = new Cache<Guid, T>(int.MaxValue, TransactionTimeout, TransactionTimeout);
+			this.transactions = new Cache<Guid, T>(int.MaxValue, TransactionTimeout, TransactionTimeout, true);
 			this.transactions.Removed += Transactions_Removed;
 
 			TransactionModule.Register(this);

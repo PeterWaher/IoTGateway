@@ -111,7 +111,7 @@ namespace Waher.Security.DTLS
 			this.requiredPrivilege = RequiredPrivilege;
 			this.rnd = RandomNumberGenerator.Create();
 			this.timeouts = new Scheduler();
-			this.states = new Cache<object, EndpointState>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromHours(1));
+			this.states = new Cache<object, EndpointState>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromHours(1), true);
 
 			this.states.Removed += States_Removed;
 

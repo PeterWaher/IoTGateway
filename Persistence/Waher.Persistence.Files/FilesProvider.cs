@@ -139,7 +139,7 @@ namespace Waher.Persistence.Files
 			if (!string.IsNullOrEmpty(this.folder) && this.folder[this.folder.Length - 1] != Path.DirectorySeparatorChar)
 				this.folder += Path.DirectorySeparatorChar;
 
-			this.blocks = new Cache<long, byte[]>(BlocksInCache, TimeSpan.MaxValue, TimeSpan.FromHours(1));
+			this.blocks = new Cache<long, byte[]>(BlocksInCache, TimeSpan.MaxValue, TimeSpan.FromHours(1), true);
 		}
 
 #if NETSTANDARD1_5

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using Waher.Events;
 
@@ -21,6 +20,7 @@ namespace Waher.Runtime.Cache
 		private readonly Random rnd = new Random();
 		private readonly object synchObject = new object();
 		private readonly int maxItems;
+		private readonly bool standalone;
 		private TimeSpan maxTimeUsed;
 		private TimeSpan maxTimeUnused;
 		private Timer timer;
@@ -32,10 +32,24 @@ namespace Waher.Runtime.Cache
 		/// <param name="MaxTimeUsed">Maximum time to keep items that are being used.</param>
 		/// <param name="MaxTimeUnused">Maximum time to keep items that are not being used.</param>
 		public Cache(int MaxItems, TimeSpan MaxTimeUsed, TimeSpan MaxTimeUnused)
+			: this(MaxItems, MaxTimeUnused, MaxTimeUnused, false)
+		{
+		}
+
+		/// <summary>
+		/// Implements an in-memory cache.
+		/// </summary>
+		/// <param name="MaxItems">Maximum number of items in cache.</param>
+		/// <param name="MaxTimeUsed">Maximum time to keep items that are being used.</param>
+		/// <param name="MaxTimeUnused">Maximum time to keep items that are not being used.</param>
+		/// <param name="Standalone">If cache is a standalone cache, or if it can be managed collectively
+		/// with other caches.</param>
+		public Cache(int MaxItems, TimeSpan MaxTimeUsed, TimeSpan MaxTimeUnused, bool Standalone)
 		{
 			this.maxItems = MaxItems;
 			this.maxTimeUsed = MaxTimeUsed;
 			this.maxTimeUnused = MaxTimeUnused;
+			this.standalone = Standalone;
 
 			if (this.maxTimeUsed < TimeSpan.MaxValue || this.maxTimeUnused < TimeSpan.MaxValue)
 				this.timer = new Timer(this.TimerCallback, null, 5000, 5000);
@@ -57,6 +71,12 @@ namespace Waher.Runtime.Cache
 
 			this.Clear();
 		}
+
+		/// <summary>
+		/// If cache is a standalone cache, or if it can be managed collectively
+		/// with other caches.
+		/// </summary>
+		public bool Standalone => this.standalone;
 
 		private void TimerCallback(object state)
 		{

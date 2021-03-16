@@ -22,7 +22,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				{
 					if (registrationsPerClient.Count == 0)
 					{
-						chunkedStreams = new Cache<string, ChunkRecord>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromMinutes(1));
+						chunkedStreams = new Cache<string, ChunkRecord>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromMinutes(1), true);
 						chunkedStreams.Removed += CacheItem_Removed;
 					}
 

@@ -96,7 +96,7 @@ namespace Waher.Networking.Cluster
 
 			this.localStatus = null;
 			this.remoteStatus = new Dictionary<IPEndPoint, object>();
-			this.currentStatus = new Cache<string, object>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(30));
+			this.currentStatus = new Cache<string, object>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(30), true);
 			this.currentStatus.Removed += CurrentStatus_Removed;
 
 			if (Types.TryGetModuleParameter("Scheduler", out object Obj) && Obj is Scheduler Scheduler)

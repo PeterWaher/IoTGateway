@@ -191,9 +191,9 @@ namespace Waher.Networking.HTTP
 #if !WINDOWS_UWP
 			this.serverCertificate = ServerCertificate;
 #endif
-			this.sessions = new Cache<string, Variables>(int.MaxValue, TimeSpan.MaxValue, this.sessionTimeout);
+			this.sessions = new Cache<string, Variables>(int.MaxValue, TimeSpan.MaxValue, this.sessionTimeout, true);
 			this.sessions.Removed += Sessions_Removed;
-			this.currentRequests = new Cache<HttpRequest, RequestInfo>(int.MaxValue, TimeSpan.MaxValue, this.requestTimeout);
+			this.currentRequests = new Cache<HttpRequest, RequestInfo>(int.MaxValue, TimeSpan.MaxValue, this.requestTimeout, true);
 			this.currentRequests.Removed += CurrentRequests_Removed;
 			this.lastStat = DateTime.Now;
 			this.adaptToNetworkChanges = AdaptToNetworkChanges;

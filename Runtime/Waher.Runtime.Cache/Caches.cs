@@ -33,15 +33,30 @@ namespace Waher.Runtime.Cache
 		/// <returns>Array of cache objects.</returns>
 		public static ICache[] GetCaches()
 		{
-			ICache[] Result;
+			return GetCaches(true);
+		}
+
+		/// <summary>
+		/// Gets active caches.
+		/// </summary>
+		/// <param name="ExcludeStandalone">If standalone caches are to be excluded.</param>
+		/// <returns>Array of cache objects.</returns>
+		public static ICache[] GetCaches(bool ExcludeStandalone)
+		{
+			List<ICache> Result = new List<ICache>();
 
 			lock (caches)
 			{
-				Result = new ICache[caches.Count];
-				caches.Values.CopyTo(Result, 0);
+				foreach (ICache Cache in caches.Values)
+				{
+					if (ExcludeStandalone && Cache.Standalone)
+						continue;
+
+					Result.Add(Cache);
+				}
 			}
 
-			return Result;
+			return Result.ToArray();
 		}
 
 		/// <summary>
@@ -49,7 +64,16 @@ namespace Waher.Runtime.Cache
 		/// </summary>
 		public static void ClearAll()
 		{
-			foreach (ICache Cache in GetCaches())
+			ClearAll(true);
+		}
+
+		/// <summary>
+		/// Clears all active caches.
+		/// </summary>
+		/// <param name="ExcludeStandalone">If standalone caches are to be excluded.</param>
+		public static void ClearAll(bool ExcludeStandalone)
+		{
+			foreach (ICache Cache in GetCaches(ExcludeStandalone))
 				Cache.Clear();
 		}
 	}

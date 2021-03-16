@@ -62,7 +62,7 @@ namespace Waher.Networking.CoAP
 		private Scheduler scheduler;
 		private readonly LinkedList<ClientBase> coapOutgoing = new LinkedList<ClientBase>();
 		private readonly LinkedList<ClientBase> coapIncoming = new LinkedList<ClientBase>();
-		private readonly Cache<string, ResponseCacheRec> blockedResponses = new Cache<string, ResponseCacheRec>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromMinutes(1));
+		private readonly Cache<string, ResponseCacheRec> blockedResponses = new Cache<string, ResponseCacheRec>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromMinutes(1), true);
 		private readonly IUserSource users;
 		private readonly string requiredPrivilege;
 		private ushort msgId = 0;

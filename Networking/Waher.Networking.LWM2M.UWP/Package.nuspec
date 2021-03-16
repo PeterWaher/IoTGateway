@@ -23,7 +23,7 @@
       <dependency id="Waher.Runtime.Inventory" version="1.0.23"/>
       <dependency id="Waher.Runtime.Timing" version="1.0.4"/>
       <dependency id="Waher.Security" version="1.0.8"/>
-      <dependency id="Waher.Security.DTLS.UWP" version="1.0.8"/>
+      <dependency id="Waher.Security.DTLS.UWP" version="1.0.9"/>
     </dependencies>
   </metadata>
   <files>

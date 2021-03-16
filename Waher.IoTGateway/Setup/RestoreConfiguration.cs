@@ -335,7 +335,7 @@ namespace Waher.IoTGateway.Setup
 					this.reloadConfiguration = true;
 					await DoAnalyze(TabID);
 
-					Caches.ClearAll();
+					Caches.ClearAll(false);
 				}
 
 				StringBuilder Result = new StringBuilder();

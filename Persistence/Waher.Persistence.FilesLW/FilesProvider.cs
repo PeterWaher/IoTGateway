@@ -8,10 +8,11 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Profiling;
-using Waher.Persistence.Serialization;
+using Waher.Persistence.Exceptions;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
+using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence.Files
 {
@@ -163,7 +164,7 @@ namespace Waher.Persistence.Files
 			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted)
 		{
 			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  Encrypted, true, null, null);
+				Encrypted, true, null, null);
 		}
 #endif
 		/// <summary>
@@ -403,11 +404,26 @@ namespace Waher.Persistence.Files
 			Thread?.NewState("Master");
 			Result.master = await StringDictionary.Create(Result.folder + "Files.master", string.Empty, string.Empty, Result, false);
 
-			Thread?.NewState("Default");
-			await Result.GetFile(Result.defaultCollectionName);
+			try
+			{
+				Thread?.NewState("Default");
+				await Result.GetFile(Result.defaultCollectionName);
 
-			Thread?.NewState("Config");
-			await Result.LoadConfiguration();
+				Thread?.NewState("Config");
+				await Result.LoadConfiguration();
+			}
+			catch (InconsistencyException ex)
+			{
+				Thread?.Exception(ex);
+				Thread?.NewState("Clear");
+				await Result.master.ClearAsync();
+
+				Thread?.NewState("Default");
+				await Result.GetFile(Result.defaultCollectionName);
+
+				Thread?.NewState("Config");
+				await Result.LoadConfiguration();
+			}
 
 			Thread?.Stop();
 			return Result;

@@ -118,9 +118,8 @@ namespace Waher.Runtime.Transactions
 		}
 
 		/// <summary>
-		/// Performs actial preparation.
+		/// Performs actual preparation.
 		/// </summary>
-		/// <returns></returns>
 		protected abstract Task DoPrepare();
 
 		private void AssertState(params TransactionState[] States)

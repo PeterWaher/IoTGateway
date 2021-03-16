@@ -4,6 +4,38 @@
         <name>Waher.Runtime.Transactions</name>
     </assembly>
     <members>
+        <member name="T:Waher.Runtime.Transactions.CompositeTransaction">
+            <summary>
+            A transaction built up of a set of sub-transactions.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.CompositeTransaction.#ctor(System.Boolean,Waher.Runtime.Transactions.ITransaction[])">
+            <summary>
+            A transaction built up of a set of sub-transactions.
+            </summary>
+            <param name="Parallel">If sub-transactions can be run in parallel (true), or in sequence (false).</param>
+            <param name="Transactions">Subtransactions</param>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.CompositeTransaction.DoPrepare">
+            <summary>
+            Performs actual preparation.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.CompositeTransaction.DoExecute">
+            <summary>
+            Performs actual execution.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.CompositeTransaction.DoCommit">
+            <summary>
+            Performs actual commit.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.CompositeTransaction.DoRollback">
+            <summary>
+            Performs actual rollback.
+            </summary>
+        </member>
         <member name="T:Waher.Runtime.Transactions.ITransaction">
             <summary>
             Interface for transactions
@@ -125,9 +157,8 @@
         </member>
         <member name="M:Waher.Runtime.Transactions.Transaction.DoPrepare">
             <summary>
-            Performs actial preparation.
+            Performs actual preparation.
             </summary>
-            <returns></returns>
         </member>
         <member name="M:Waher.Runtime.Transactions.Transaction.Execute">
             <summary>

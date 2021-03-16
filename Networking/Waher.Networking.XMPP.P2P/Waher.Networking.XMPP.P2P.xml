@@ -1543,6 +1543,21 @@
             <param name="Xml">Output</param>
             <returns>If E2E information was available and encryption was possible.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.FindLocalEndpoint(System.String)">
+            <summary>
+            Returns the local endpoint that matches a given key name.
+            </summary>
+            <param name="KeyName">Key (algorithm) name.</param>
+            <returns>Matching key, or null if none found.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.FindLocalEndpoint(System.String,System.String)">
+            <summary>
+            Returns the local endpoint that matches a given key name and namespace.
+            </summary>
+            <param name="KeyName">Key (algorithm) name.</param>
+            <param name="KeyNamespace">Key (algorithm) namespace.</param>
+            <returns>Matching key, or null if none found.</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.Decrypt(Waher.Networking.XMPP.XmppClient,System.String,System.String,System.String,System.String,System.Xml.XmlElement,Waher.Networking.XMPP.IE2eSymmetricCipher,System.String@)">
             <summary>
             Decrypts XML data from an endpoint.

@@ -237,7 +237,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			{
 				if (this.cache is null)
 				{
-					this.cache = new Cache<string, IncomingStream>(1000, TimeSpan.MaxValue, TimeSpan.FromMinutes(1));
+					this.cache = new Cache<string, IncomingStream>(1000, TimeSpan.MaxValue, TimeSpan.FromMinutes(1), true);
 					this.cache.Removed += Cache_Removed;
 				}
 			}

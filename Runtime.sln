@@ -37,7 +37,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Threading", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Threading.Test", "Runtime\Waher.Runtime.Threading.Test\Waher.Runtime.Threading.Test.csproj", "{ACD8AAC8-0F9E-4134-AE24-B80150A67415}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Settings.Test", "Runtime\Waher.Runtime.Settings.Test\Waher.Runtime.Settings.Test.csproj", "{AD3F798E-67DE-4EDA-99F6-80037808AA4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Settings.Test", "Runtime\Waher.Runtime.Settings.Test\Waher.Runtime.Settings.Test.csproj", "{AD3F798E-67DE-4EDA-99F6-80037808AA4D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Transactions", "Runtime\Waher.Runtime.Transactions\Waher.Runtime.Transactions.csproj", "{03A116BF-72C5-4139-BB6F-CFB8288FDD7E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -117,6 +119,10 @@ Global
 		{AD3F798E-67DE-4EDA-99F6-80037808AA4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD3F798E-67DE-4EDA-99F6-80037808AA4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD3F798E-67DE-4EDA-99F6-80037808AA4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03A116BF-72C5-4139-BB6F-CFB8288FDD7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03A116BF-72C5-4139-BB6F-CFB8288FDD7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03A116BF-72C5-4139-BB6F-CFB8288FDD7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03A116BF-72C5-4139-BB6F-CFB8288FDD7E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

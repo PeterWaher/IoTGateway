@@ -992,17 +992,24 @@ namespace Waher.IoTGateway
 		{
 			public int Compare(IModule x, IModule y)
 			{
-				bool dm1 = x is Persistence.LifeCycle.DatabaseModule;
-				bool dm2 = y is Persistence.LifeCycle.DatabaseModule;
+				int c1 = this.ModuleCategory(x);
+				int c2 = this.ModuleCategory(y);
+				
+				int i = c1 - c2;
+				if (i != 0)
+					return i;
 
-				if (dm1 && dm2)
-					return 0;
-				else if (dm1)
-					return -1;
-				else if (dm2)
+				return string.Compare(x.GetType().FullName, y.GetType().FullName);
+			}
+
+			private int ModuleCategory(IModule x)
+			{
+				if (x is Persistence.LifeCycle.DatabaseModule)
 					return 1;
+				else if (x is Runtime.Transactions.TransactionModule)
+					return 2;
 				else
-					return string.Compare(x.GetType().FullName, y.GetType().FullName);
+					return 3;
 			}
 		}
 

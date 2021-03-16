@@ -309,6 +309,7 @@
 	<Assembly fileName='Waher.Runtime.Temporary.dll'/>
 	<Assembly fileName='Waher.Runtime.Threading.dll'/>
 	<Assembly fileName='Waher.Runtime.Timing.dll'/>
+	<Assembly fileName='Waher.Runtime.Transactions.dll'/>
 	<Assembly fileName='Waher.Script.dll'/>
 	<Assembly fileName='Waher.Script.Content.dll'/>
 	<Assembly fileName='Waher.Script.Cryptography.dll'/>

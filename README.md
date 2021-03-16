@@ -329,6 +329,7 @@ language localization, runtime settings, timing and scheduling.
 | **Waher.Runtime.Temporary**           | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Temporary/)           | The [Waher.Runtime.Temporary](Runtime/Waher.Runtime.Temporary) project contains classes simplifying working with temporary in-memory and file streams. |
 | **Waher.Runtime.Threading**           | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Threading/)           | The [Waher.Runtime.Threading](Runtime/Waher.Runtime.Threading) project provides classes for usage in multi-threaded asynchronous environments providing multiple-read/single-write capabilities. |
 | **Waher.Runtime.Timing**              | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Timing/)              | The [Waher.Runtime.Timing](Runtime/Waher.Runtime.Timing) project provides tools for timing and scheduling. |
+| **Waher.Runtime.Transactions**        | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Transactions/)        | The [Waher.Runtime.Transactions](Runtime/Waher.Runtime.Transactions) project defines an architecture for processing transactions to help protect the integrity of data in asynchronous or distributed environments. |
 
 The folder also contains the following unit test projects:
 

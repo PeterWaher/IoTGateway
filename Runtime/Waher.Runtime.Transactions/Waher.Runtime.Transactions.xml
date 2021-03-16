@@ -1,0 +1,385 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Runtime.Transactions</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Runtime.Transactions.ITransaction">
+            <summary>
+            Interface for transactions
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Transactions.ITransaction.Id">
+            <summary>
+            ID of transaction
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Transactions.ITransaction.State">
+            <summary>
+            Transaction state.
+            </summary>
+        </member>
+        <member name="E:Waher.Runtime.Transactions.ITransaction.StateChanged">
+            <summary>
+            Event raised when the transaction state has changed.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.ITransaction.Prepare">
+            <summary>
+            Prepares the transaction for execution. This step can be used for validation and authorization of the transaction.
+            It must not change the underlying state.
+            </summary>
+            <returns>If the preparation phase is OK or not.</returns>
+            <exception cref="T:Waher.Runtime.Transactions.TransactionException">If the transaction not in the <see cref="F:Waher.Runtime.Transactions.TransactionState.Created"/> state.</exception>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.ITransaction.Execute">
+            <summary>
+            Executes the transaction.
+            </summary>
+            <returns>If the transaction was executed correctly or not.</returns>
+            <exception cref="T:Waher.Runtime.Transactions.TransactionException">If the transaction not in the <see cref="F:Waher.Runtime.Transactions.TransactionState.Prepared"/> state.</exception>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.ITransaction.Commit">
+            <summary>
+            Commits any changes made during the execution phase.
+            </summary>
+            <returns>If the transaction was successfully committed.</returns>
+            <exception cref="T:Waher.Runtime.Transactions.TransactionException">If the transaction not in the <see cref="F:Waher.Runtime.Transactions.TransactionState.Executed"/> state.</exception>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.ITransaction.Rollback">
+            <summary>
+            Rolls back any changes made during the execution phase.
+            </summary>
+            <returns>If the transaction was successfully rolled back.</returns>
+            <exception cref="T:Waher.Runtime.Transactions.TransactionException">If the transaction not in the <see cref="F:Waher.Runtime.Transactions.TransactionState.RolledBack"/> state.</exception>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.ITransaction.Abort">
+            <summary>
+            Aborts the transaction.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Transactions.ITransactions">
+            <summary>
+            Interface for collections of transactions that can be monitored by <see cref="T:Waher.Runtime.Transactions.TransactionModule"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.ITransactions.GetTransactions">
+            <summary>
+            Gets pending transactions.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Transactions.MethodAsync">
+            <summary>
+            Asynchronous callback method.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Transactions.Transaction">
+            <summary>
+            Abstract base class for transactions.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transaction.#ctor">
+            <summary>
+            Abstract base class for transactions.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Transactions.Transaction.Id">
+            <summary>
+            ID of transaction
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Transactions.Transaction.State">
+            <summary>
+            Transaction state.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transaction.Dispose">
+            <summary>
+            Disposes of the transaction.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transaction.SetStateLocked(Waher.Runtime.Transactions.TransactionState)">
+            <summary>
+            Sets a new state for the transaction object.
+            </summary>
+            <param name="NewState"></param>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transaction.Raise(Waher.Runtime.Transactions.TransactionEventHandler)">
+            <summary>
+            Raises an event.
+            </summary>
+            <param name="EventHandler">Event handler for event.</param>
+        </member>
+        <member name="E:Waher.Runtime.Transactions.Transaction.StateChanged">
+            <summary>
+            Event raised when the transaction state has changed.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transaction.Prepare">
+            <summary>
+            Prepares the transaction for execution. This step can be used for validation and authorization of the transaction.
+            It must not change the underlying state.
+            </summary>
+            <returns>If the preparation phase is OK or not.</returns>
+            <exception cref="T:Waher.Runtime.Transactions.TransactionException">If the transaction not in the <see cref="F:Waher.Runtime.Transactions.TransactionState.Created"/> state.</exception>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transaction.DoPrepare">
+            <summary>
+            Performs actial preparation.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transaction.Execute">
+            <summary>
+            Executes the transaction.
+            </summary>
+            <returns>If the transaction was executed correctly or not.</returns>
+            <exception cref="T:Waher.Runtime.Transactions.TransactionException">If the transaction not in the <see cref="F:Waher.Runtime.Transactions.TransactionState.Prepared"/> state.</exception>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transaction.DoExecute">
+            <summary>
+            Performs actual execution.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transaction.Commit">
+            <summary>
+            Commits any changes made during the execution phase.
+            </summary>
+            <returns>If the transaction was successfully committed.</returns>
+            <exception cref="T:Waher.Runtime.Transactions.TransactionException">If the transaction not in the <see cref="F:Waher.Runtime.Transactions.TransactionState.Executed"/> state.</exception>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transaction.DoCommit">
+            <summary>
+            Performs actual commit.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transaction.Rollback">
+            <summary>
+            Rolls back any changes made during the execution phase.
+            </summary>
+            <returns>If the transaction was successfully rolled back.</returns>
+            <exception cref="T:Waher.Runtime.Transactions.TransactionException">If the transaction not in the <see cref="F:Waher.Runtime.Transactions.TransactionState.Executed"/> 
+            or <see cref="F:Waher.Runtime.Transactions.TransactionState.Error"/> states.</exception>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transaction.DoRollback">
+            <summary>
+            Performs actual rollback.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transaction.WhenIdle(Waher.Runtime.Transactions.MethodAsync)">
+            <summary>
+            Calls <paramref name="Action"/> when the transaction is idle.
+            </summary>
+            <param name="Action">Callback method.</param>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transaction.Abort">
+            <summary>
+            Aborts the transaction.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Transactions.TransactionEventHandler">
+            <summary>
+            Delegate for transaction events.
+            </summary>
+            <param name="Sender">Sender of event.</param>
+            <param name="e">Event arguments.</param>
+        </member>
+        <member name="T:Waher.Runtime.Transactions.TransactionEventArgs">
+            <summary>
+            Event arguments for transaction events.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.TransactionEventArgs.#ctor(Waher.Runtime.Transactions.ITransaction)">
+            <summary>
+            Event arguments for transaction events.
+            </summary>
+            <param name="Transaction">Reference to transaction object.</param>
+        </member>
+        <member name="P:Waher.Runtime.Transactions.TransactionEventArgs.Transaction">
+            <summary>
+            Reference to transaction object.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Transactions.TransactionException">
+            <summary>
+            Exception object for transaction exceptions.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.TransactionException.#ctor(Waher.Runtime.Transactions.ITransaction,System.String)">
+            <summary>
+            Exception object for transaction exceptions.
+            </summary>
+            <param name="Transaction">Reference to transaction object.</param>
+            <param name="Message">Exception message.</param>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.TransactionException.#ctor(Waher.Runtime.Transactions.ITransaction,System.String,System.Exception)">
+            <summary>
+            Exception object for transaction exceptions.
+            </summary>
+            <param name="Transaction">Reference to transaction object.</param>
+            <param name="Message">Exception message.</param>
+            <param name="InnerException">Inner exception.</param>
+        </member>
+        <member name="P:Waher.Runtime.Transactions.TransactionException.Transaction">
+            <summary>
+            Reference to transaction object.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Transactions.TransactionException.Object">
+            <summary>
+            Object identifier related to the object.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Transactions.TransactionModule">
+            <summary>
+            Module making sure no unfinished transactions are left when system ends.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.TransactionModule.#ctor">
+            <summary>
+            Module making sure no unfinished transactions are left when system ends.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.TransactionModule.Register(Waher.Runtime.Transactions.ITransactions)">
+            <summary>
+            Registers a collection of transactions with the module.
+            </summary>
+            <param name="Transactions">Collection of transactions.</param>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.TransactionModule.Unregister(Waher.Runtime.Transactions.ITransactions)">
+            <summary>
+            Unregisters a collection of transactions with the module.
+            </summary>
+            <param name="Transactions">Collection of transactions.</param>
+            <returns>If the collection was found and removed.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.TransactionModule.Start">
+            <summary>
+            Starts the module.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.TransactionModule.Stop">
+            <summary>
+            Stops the module.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Transactions.Transactions`1">
+            <summary>
+            Maintains a collection of active transactions.
+            </summary>
+            <typeparam name="T">Type of transaction managed by the class</typeparam>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transactions`1.#ctor(System.TimeSpan)">
+            <summary>
+            Maintains a collection of active transactions.
+            </summary>
+            <param name="TransactionTimeout">Maximum time before a transaction needs to complete or fail.</param>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transactions`1.Dispose">
+            <summary>
+            Rolls back any pending transactions and disposes of the object.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transactions`1.CreateNew(System.Object[])">
+            <summary>
+            Creates a new transaction
+            </summary>
+            <param name="Arguments">Constructor arguments.</param>
+            <returns>New transaction</returns>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transactions`1.Register(`0)">
+            <summary>
+            Register a transaction created elsewhere with the collection.
+            </summary>
+            <param name="Transaction">Transaction already created.</param>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transactions`1.Prepare(System.Guid)">
+            <summary>
+            Prepares a transaction in the collection.
+            </summary>
+            <param name="TransactionId">Transaction ID</param>
+            <returns>If a transaction with the corresponding ID was found, and successfully prepared.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transactions`1.Execute(System.Guid)">
+            <summary>
+            Executes a transaction in the collection.
+            </summary>
+            <param name="TransactionId">Transaction ID</param>
+            <returns>If a transaction with the corresponding ID was found, and successfully executed.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transactions`1.Commit(System.Guid)">
+            <summary>
+            Cimmits a transaction in the collection.
+            </summary>
+            <param name="TransactionId">Transaction ID</param>
+            <returns>If a transaction with the corresponding ID was found, and successfully committed.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transactions`1.Rollback(System.Guid)">
+            <summary>
+            Prepares a transaction in the collection.
+            </summary>
+            <param name="TransactionId">Transaction ID</param>
+            <returns>If a transaction with the corresponding ID was found, and successfully prepared.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transactions`1.GetTransactions">
+            <summary>
+            Gets pending transactions.
+            </summary>
+        </member>
+        <member name="T:Waher.Runtime.Transactions.TransactionState">
+            <summary>
+            State of a transaction
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Transactions.TransactionState.Created">
+            <summary>
+            Transaction has been created
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Transactions.TransactionState.Preparing">
+            <summary>
+            Transaction is being prepared
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Transactions.TransactionState.Prepared">
+            <summary>
+            Transaction has been prepared
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Transactions.TransactionState.Executing">
+            <summary>
+            Transaction is being executed
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Transactions.TransactionState.Executed">
+            <summary>
+            Transaction has been executed
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Transactions.TransactionState.Committing">
+            <summary>
+            Transaction is being committed
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Transactions.TransactionState.Committed">
+            <summary>
+            Transaction has been committed
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Transactions.TransactionState.RollingBack">
+            <summary>
+            Transaction is being rolled back
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Transactions.TransactionState.RolledBack">
+            <summary>
+            Transaction has been rolled back
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Transactions.TransactionState.Error">
+            <summary>
+            Transaction is in an error state. Only Rollback is permitted from this point.
+            </summary>
+        </member>
+    </members>
+</doc>

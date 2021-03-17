@@ -29,7 +29,7 @@ namespace Waher.Runtime.Transactions
 		/// <summary>
 		/// Performs actual preparation.
 		/// </summary>
-		protected override async Task DoPrepare()
+		protected override async Task<bool> DoPrepare()
 		{
 			if (this.parallel)
 			{
@@ -41,16 +41,17 @@ namespace Waher.Runtime.Transactions
 
 				await Task.WhenAll(Tasks);
 
-				if (!And(Tasks))
-					throw new TransactionException(this, "Unable to prepare sub-transaction.");
+				return And(Tasks);
 			}
 			else
 			{
 				foreach (ITransaction Transaction in this.transactions)
 				{
 					if (!await Transaction.Prepare())
-						throw new TransactionException(this, "Unable to prepare sub-transaction.");
+						return false;
 				}
+
+				return true;
 			}
 		}
 
@@ -68,7 +69,7 @@ namespace Waher.Runtime.Transactions
 		/// <summary>
 		/// Performs actual execution.
 		/// </summary>
-		protected override async Task DoExecute()
+		protected override async Task<bool> DoExecute()
 		{
 			if (this.parallel)
 			{
@@ -80,23 +81,24 @@ namespace Waher.Runtime.Transactions
 
 				await Task.WhenAll(Tasks);
 
-				if (!And(Tasks))
-					throw new TransactionException(this, "Unable to execute sub-transaction.");
+				return And(Tasks);
 			}
 			else
 			{
 				foreach (ITransaction Transaction in this.transactions)
 				{
 					if (!await Transaction.Execute())
-						throw new TransactionException(this, "Unable to execute sub-transaction.");
+						return false;
 				}
+
+				return true;
 			}
 		}
 
 		/// <summary>
 		/// Performs actual commit.
 		/// </summary>
-		protected override async Task DoCommit()
+		protected override async Task<bool> DoCommit()
 		{
 			if (this.parallel)
 			{
@@ -108,23 +110,24 @@ namespace Waher.Runtime.Transactions
 
 				await Task.WhenAll(Tasks);
 
-				if (!And(Tasks))
-					throw new TransactionException(this, "Unable to commit sub-transaction.");
+				return And(Tasks);
 			}
 			else
 			{
 				foreach (ITransaction Transaction in this.transactions)
 				{
 					if (!await Transaction.Commit())
-						throw new TransactionException(this, "Unable to commit sub-transaction.");
+						return false;
 				}
+
+				return true;
 			}
 		}
 
 		/// <summary>
 		/// Performs actual rollback.
 		/// </summary>
-		protected override async Task DoRollback()
+		protected override async Task<bool> DoRollback()
 		{
 			if (this.parallel)
 			{
@@ -141,6 +144,8 @@ namespace Waher.Runtime.Transactions
 				foreach (ITransaction Transaction in this.transactions)
 					await Transaction.Abort();
 			}
+
+			return true;
 		}
 	}
 }

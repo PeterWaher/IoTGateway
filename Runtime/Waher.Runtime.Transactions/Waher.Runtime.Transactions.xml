@@ -159,6 +159,7 @@
             <summary>
             Performs actual preparation.
             </summary>
+            <returns>If the preparation phase is OK or not.</returns>
         </member>
         <member name="M:Waher.Runtime.Transactions.Transaction.Execute">
             <summary>
@@ -171,6 +172,7 @@
             <summary>
             Performs actual execution.
             </summary>
+            <returns>If the transaction was executed correctly or not.</returns>
         </member>
         <member name="M:Waher.Runtime.Transactions.Transaction.Commit">
             <summary>
@@ -183,6 +185,7 @@
             <summary>
             Performs actual commit.
             </summary>
+            <returns>If the transaction was successfully committed.</returns>
         </member>
         <member name="M:Waher.Runtime.Transactions.Transaction.Rollback">
             <summary>
@@ -196,6 +199,7 @@
             <summary>
             Performs actual rollback.
             </summary>
+            <returns>If the transaction was successfully rolled back.</returns>
         </member>
         <member name="M:Waher.Runtime.Transactions.Transaction.WhenIdle(Waher.Runtime.Transactions.MethodAsync)">
             <summary>

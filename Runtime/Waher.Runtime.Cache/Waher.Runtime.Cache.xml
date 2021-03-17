@@ -19,9 +19,25 @@
             <param name="MaxTimeUsed">Maximum time to keep items that are being used.</param>
             <param name="MaxTimeUnused">Maximum time to keep items that are not being used.</param>
         </member>
+        <member name="M:Waher.Runtime.Cache.Cache`2.#ctor(System.Int32,System.TimeSpan,System.TimeSpan,System.Boolean)">
+            <summary>
+            Implements an in-memory cache.
+            </summary>
+            <param name="MaxItems">Maximum number of items in cache.</param>
+            <param name="MaxTimeUsed">Maximum time to keep items that are being used.</param>
+            <param name="MaxTimeUnused">Maximum time to keep items that are not being used.</param>
+            <param name="Standalone">If cache is a standalone cache, or if it can be managed collectively
+            with other caches.</param>
+        </member>
         <member name="M:Waher.Runtime.Cache.Cache`2.Dispose">
             <summary>
             <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Cache.Cache`2.Standalone">
+            <summary>
+            If cache is a standalone cache, or if it can be managed collectively
+            with other caches.
             </summary>
         </member>
         <member name="P:Waher.Runtime.Cache.Cache`2.MaxItems">
@@ -233,14 +249,33 @@
             </summary>
             <returns>Array of cache objects.</returns>
         </member>
+        <member name="M:Waher.Runtime.Cache.Caches.GetCaches(System.Boolean)">
+            <summary>
+            Gets active caches.
+            </summary>
+            <param name="ExcludeStandalone">If standalone caches are to be excluded.</param>
+            <returns>Array of cache objects.</returns>
+        </member>
         <member name="M:Waher.Runtime.Cache.Caches.ClearAll">
             <summary>
             Clears all active caches.
             </summary>
         </member>
+        <member name="M:Waher.Runtime.Cache.Caches.ClearAll(System.Boolean)">
+            <summary>
+            Clears all active caches.
+            </summary>
+            <param name="ExcludeStandalone">If standalone caches are to be excluded.</param>
+        </member>
         <member name="T:Waher.Runtime.Cache.ICache">
             <summary>
             Interface for caches.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Cache.ICache.Standalone">
+            <summary>
+            If cache is a standalone cache, or if it can be managed collectively
+            with other caches.
             </summary>
         </member>
         <member name="M:Waher.Runtime.Cache.ICache.Clear">

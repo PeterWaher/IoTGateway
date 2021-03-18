@@ -115,6 +115,11 @@
             Abstract base class for transactions.
             </summary>
         </member>
+        <member name="M:Waher.Runtime.Transactions.Transaction.#ctor(System.Guid)">
+            <summary>
+            Abstract base class for transactions.
+            </summary>
+        </member>
         <member name="P:Waher.Runtime.Transactions.Transaction.Id">
             <summary>
             ID of transaction

@@ -27,6 +27,14 @@ namespace Waher.Runtime.Transactions
 		}
 
 		/// <summary>
+		/// Abstract base class for transactions.
+		/// </summary>
+		public Transaction(Guid Id)
+		{
+			this.id = Id;
+		}
+
+		/// <summary>
 		/// ID of transaction
 		/// </summary>
 		public Guid Id => this.id;

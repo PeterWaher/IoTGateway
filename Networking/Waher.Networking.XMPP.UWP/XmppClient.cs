@@ -7046,14 +7046,15 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Default number of retries if results or errors are not returned.
 		/// This value is used when sending IQ requests wihtout specifying request-specific retry parameter values.
+		/// 0 = no retries.
 		/// </summary>
 		public int DefaultNrRetries
 		{
 			get { return this.defaultNrRetries; }
 			set
 			{
-				if (value <= 0)
-					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(DefaultNrRetries));
+				if (value < 0)
+					throw new ArgumentOutOfRangeException("Value cannot be negative.", nameof(DefaultNrRetries));
 
 				this.defaultNrRetries = value;
 			}

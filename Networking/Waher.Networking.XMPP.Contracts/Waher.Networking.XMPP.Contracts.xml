@@ -1966,6 +1966,14 @@
             <param name="RecipientPublicKeyNamespace">Namespace of key algorithm of recipient.</param>
             <returns>Encrypted message, together with the public key used to obtain the shared secret.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Decrypt(System.Byte[],System.Byte[])">
+            <summary>
+            Decrypts a message that was aimed at the client using the current keys.
+            </summary>
+            <param name="EncryptedMessage">Encrypted message.</param>
+            <param name="SenderPublicKey">Public key used by the sender.</param>
+            <returns>Decrypted message.</returns>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">
             <summary>
             Recognized contract states

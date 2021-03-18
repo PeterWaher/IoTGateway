@@ -5120,6 +5120,55 @@ namespace Waher.Networking.XMPP.Contracts
 			return (Encrypted, LocalPublicKey);
 		}
 
+		/// <summary>
+		/// Decrypts a message that was aimed at the client using the current keys.
+		/// </summary>
+		/// <param name="EncryptedMessage">Encrypted message.</param>
+		/// <param name="SenderPublicKey">Public key used by the sender.</param>
+		/// <returns>Decrypted message.</returns>
+		public async Task<byte[]> Decrypt(byte[] EncryptedMessage, byte[] SenderPublicKey)
+		{
+			IE2eEndpoint LocalEndpoint = await this.GetMatchingLocalKeyAsync();
+			IE2eEndpoint RemoteEndpoint = LocalEndpoint.CreatePublic(SenderPublicKey);
+			byte[] Secret = LocalEndpoint.GetSharedSecret(RemoteEndpoint);
+			byte[] Digest = Hashes.ComputeSHA256Hash(Secret);
+			byte[] Key = new byte[16];
+			byte[] IV = new byte[16];
+			byte[] Decrypted;
+			int i, c;
+			byte b;
+
+			Array.Copy(Digest, 0, Key, 0, 16);
+			Array.Copy(Digest, 16, IV, 0, 16);
+
+			lock (this.aes)
+			{
+				using (ICryptoTransform Aes = this.aes.CreateDecryptor(Key, IV))
+				{
+					Decrypted = Aes.TransformFinalBlock(EncryptedMessage, 0, EncryptedMessage.Length);
+				}
+			}
+
+			i = 0;
+			c = 0;
+			do
+			{
+				b = Decrypted[i++];
+				c <<= 7;
+				c |= b & 0x7f;
+			}
+			while ((b & 0x80) != 0);
+
+			if (c < 0 || c > Decrypted.Length - i)
+				throw new InvalidOperationException("Unable to decrypt message.");
+
+			byte[] Message = new byte[c];
+
+			Array.Copy(Decrypted, i, Message, 0, c);
+
+			return Message;
+		}
+
 		#endregion
 	}
 }

@@ -328,6 +328,28 @@
             </summary>
             <param name="Transaction">Transaction already created.</param>
         </member>
+        <member name="M:Waher.Runtime.Transactions.Transactions`1.Unregister(System.Guid)">
+            <summary>
+            Unregisters a transaction.
+            </summary>
+            <param name="Id">Transaction ID.</param>
+            <returns>If the transaction was found and removed.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transactions`1.Unregister(`0)">
+            <summary>
+            Unregisters a transaction.
+            </summary>
+            <param name="Transaction">Transaction reference.</param>
+            <returns>If the transaction was found and removed.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Transactions.Transactions`1.TryGetTransaction(System.Guid,`0@)">
+            <summary>
+            Tries to get a transaction, given its ID.
+            </summary>
+            <param name="Id">Transaction ID.</param>
+            <param name="Transaction">Transaction, if found.</param>
+            <returns>If a transaction with the corresponding ID was found.</returns>
+        </member>
         <member name="M:Waher.Runtime.Transactions.Transactions`1.Prepare(System.Guid)">
             <summary>
             Prepares a transaction in the collection.

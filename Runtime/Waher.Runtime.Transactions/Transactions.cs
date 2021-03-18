@@ -29,19 +29,22 @@ namespace Waher.Runtime.Transactions
 
 		private async void Transactions_Removed(object Sender, CacheItemEventArgs<Guid, T> e)
 		{
-			try
+			if (e.Reason != RemovedReason.Manual)
 			{
-				T Transaction = e.Value;
-
-				if (Transaction.State != TransactionState.Committed &&
-					Transaction.State != TransactionState.RolledBack)
+				try
 				{
-					await Transaction.Abort();
+					T Transaction = e.Value;
+
+					if (Transaction.State != TransactionState.Committed &&
+						Transaction.State != TransactionState.RolledBack)
+					{
+						await Transaction.Abort();
+					}
 				}
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
 			}
 		}
 
@@ -76,6 +79,43 @@ namespace Waher.Runtime.Transactions
 		public void Register(T Transaction)
 		{
 			this.transactions.Add(Transaction.Id, Transaction);
+		}
+
+		/// <summary>
+		/// Unregisters a transaction.
+		/// </summary>
+		/// <param name="Id">Transaction ID.</param>
+		/// <returns>If the transaction was found and removed.</returns>
+		public bool Unregister(Guid Id)
+		{
+			return this.transactions.Remove(Id);
+		}
+
+		/// <summary>
+		/// Unregisters a transaction.
+		/// </summary>
+		/// <param name="Transaction">Transaction reference.</param>
+		/// <returns>If the transaction was found and removed.</returns>
+		public bool Unregister(T Transaction)
+		{
+			if (this.transactions.TryGetValue(Transaction.Id, out T Transaction2) &&
+				Transaction2.Equals(Transaction))
+			{
+				return this.transactions.Remove(Transaction.Id);
+			}
+			else
+				return false;
+		}
+
+		/// <summary>
+		/// Tries to get a transaction, given its ID.
+		/// </summary>
+		/// <param name="Id">Transaction ID.</param>
+		/// <param name="Transaction">Transaction, if found.</param>
+		/// <returns>If a transaction with the corresponding ID was found.</returns>
+		public bool TryGetTransaction(Guid Id, out T Transaction)
+		{
+			return this.transactions.TryGetValue(Id, out Transaction);
 		}
 
 		/// <summary>

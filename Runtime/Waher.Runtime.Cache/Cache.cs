@@ -32,7 +32,7 @@ namespace Waher.Runtime.Cache
 		/// <param name="MaxTimeUsed">Maximum time to keep items that are being used.</param>
 		/// <param name="MaxTimeUnused">Maximum time to keep items that are not being used.</param>
 		public Cache(int MaxItems, TimeSpan MaxTimeUsed, TimeSpan MaxTimeUnused)
-			: this(MaxItems, MaxTimeUnused, MaxTimeUnused, false)
+			: this(MaxItems, MaxTimeUsed, MaxTimeUnused, false)
 		{
 		}
 

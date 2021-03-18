@@ -12,6 +12,7 @@ namespace Waher.Runtime.Transactions
 	public class TransactionModule : IModule
 	{
 		private readonly static List<ITransactions> transactions = new List<ITransactions>();
+		private static bool running = false;
 
 		/// <summary>
 		/// Module making sure no unfinished transactions are left when system ends.
@@ -47,10 +48,16 @@ namespace Waher.Runtime.Transactions
 		}
 
 		/// <summary>
+		/// If the transaction module is running.
+		/// </summary>
+		public static bool Running => running;
+
+		/// <summary>
 		/// Starts the module.
 		/// </summary>
 		public Task Start()
 		{
+			running = true;
 			return Task.CompletedTask;
 		}
 
@@ -60,6 +67,8 @@ namespace Waher.Runtime.Transactions
 		public async Task Stop()
 		{
 			ITransactions[] Collections;
+
+			running = false;
 
 			lock (transactions)
 			{

@@ -293,6 +293,11 @@
             <param name="Transactions">Collection of transactions.</param>
             <returns>If the collection was found and removed.</returns>
         </member>
+        <member name="P:Waher.Runtime.Transactions.TransactionModule.Running">
+            <summary>
+            If the transaction module is running.
+            </summary>
+        </member>
         <member name="M:Waher.Runtime.Transactions.TransactionModule.Start">
             <summary>
             Starts the module.

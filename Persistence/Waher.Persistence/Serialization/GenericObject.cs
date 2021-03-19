@@ -325,9 +325,8 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			GenericObject GenObj = obj as GenericObject;
-
-			if (this.collectionName != GenObj.collectionName ||
+			if (!(obj is GenericObject GenObj) ||
+				this.collectionName != GenObj.collectionName ||
 				this.typeName != GenObj.typeName ||
 				this.objectId != GenObj.objectId)
 			{

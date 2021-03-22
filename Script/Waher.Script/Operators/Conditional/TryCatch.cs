@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using Waher.Events;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -38,9 +37,9 @@ namespace Waher.Script.Operators.Conditional
             catch (Exception ex)
             {
                 object Bak = Variables["Exception"];
-                Variables["Exception"] = ex;
-                try
-                {
+				Variables["Exception"] = Log.UnnestException(ex);
+				try
+				{
                     return this.right.Evaluate(Variables);
                 }
                 finally

@@ -402,14 +402,14 @@ namespace Waher.Networking.XMPP.Contracts
 						break;
 
 					case "signAfter":
-						if (DateTime.TryParse(Attr.Value, out DateTime TP))
+						if (XML.TryParse(Attr.Value, out DateTime TP))
 							Result.signAfter = TP;
 						else
 							return null;
 						break;
 
 					case "signBefore":
-						if (DateTime.TryParse(Attr.Value, out TP))
+						if (XML.TryParse(Attr.Value, out TP))
 							Result.signBefore = TP;
 						else
 							return null;

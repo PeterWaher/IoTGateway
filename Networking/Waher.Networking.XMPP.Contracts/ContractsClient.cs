@@ -5039,12 +5039,14 @@ namespace Waher.Networking.XMPP.Contracts
 		/// key algorithm name.
 		/// </summary>
 		/// <param name="Message">Message to encrypt.</param>
+		/// <param name="Nonce">Nonce-value to use during encryption. Size does not matter,
+		/// but must be unique for every message.</param>
 		/// <param name="RecipientPublicKey">Public key of recipient.</param>
 		/// <param name="RecipientPublicKeyName">Name of key algorithm of recipient.</param>
 		/// <returns>Encrypted message, together with the public key used to obtain the shared secret.</returns>
-		public (byte[], byte[]) Encrypt(byte[] Message, byte[] RecipientPublicKey, string RecipientPublicKeyName)
+		public (byte[], byte[]) Encrypt(byte[] Message, byte[] Nonce, byte[] RecipientPublicKey, string RecipientPublicKeyName)
 		{
-			return this.Encrypt(Message, RecipientPublicKey, RecipientPublicKeyName, string.Empty);
+			return this.Encrypt(Message, Nonce, RecipientPublicKey, RecipientPublicKeyName, string.Empty);
 		}
 
 		/// <summary>
@@ -5052,11 +5054,13 @@ namespace Waher.Networking.XMPP.Contracts
 		/// key algorithm name.
 		/// </summary>
 		/// <param name="Message">Message to encrypt.</param>
+		/// <param name="Nonce">Nonce-value to use during encryption. Size does not matter,
+		/// but must be unique for every message.</param>
 		/// <param name="RecipientPublicKey">Public key of recipient.</param>
 		/// <param name="RecipientPublicKeyName">Name of key algorithm of recipient.</param>
 		/// <param name="RecipientPublicKeyNamespace">Namespace of key algorithm of recipient.</param>
 		/// <returns>Encrypted message, together with the public key used to obtain the shared secret.</returns>
-		public (byte[], byte[]) Encrypt(byte[] Message, byte[] RecipientPublicKey, string RecipientPublicKeyName, string RecipientPublicKeyNamespace)
+		public (byte[], byte[]) Encrypt(byte[] Message, byte[] Nonce, byte[] RecipientPublicKey, string RecipientPublicKeyName, string RecipientPublicKeyNamespace)
 		{
 			IE2eEndpoint LocalEndpoint = this.localKeys.FindLocalEndpoint(RecipientPublicKeyName, RecipientPublicKeyNamespace);
 			if (LocalEndpoint is null)
@@ -5066,11 +5070,15 @@ namespace Waher.Networking.XMPP.Contracts
 			byte[] LocalPublicKey = LocalEndpoint.PublicKey;
 			byte[] Secret = LocalEndpoint.GetSharedSecret(RemoteEndpoint);
 			byte[] Digest = Hashes.ComputeSHA256Hash(Secret);
+			byte[] NonceDigest = Hashes.ComputeSHA256Hash(Nonce);
 			byte[] Key = new byte[16];
 			byte[] IV = new byte[16];
 			byte[] Encrypted;
 			byte[] ToEncrypt;
 			int i, j, c;
+
+			for (i = 0; i < 32; i++)
+				Secret[i] ^= NonceDigest[i];
 
 			i = Message.Length;
 			c = 0;
@@ -5125,18 +5133,24 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="EncryptedMessage">Encrypted message.</param>
 		/// <param name="SenderPublicKey">Public key used by the sender.</param>
+		/// <param name="Nonce">Nonce-value to use during decryption. Must be the same
+		/// as the one used during encryption.</param>
 		/// <returns>Decrypted message.</returns>
-		public async Task<byte[]> Decrypt(byte[] EncryptedMessage, byte[] SenderPublicKey)
+		public async Task<byte[]> Decrypt(byte[] EncryptedMessage, byte[] SenderPublicKey, byte[] Nonce)
 		{
 			IE2eEndpoint LocalEndpoint = await this.GetMatchingLocalKeyAsync();
 			IE2eEndpoint RemoteEndpoint = LocalEndpoint.CreatePublic(SenderPublicKey);
 			byte[] Secret = LocalEndpoint.GetSharedSecret(RemoteEndpoint);
 			byte[] Digest = Hashes.ComputeSHA256Hash(Secret);
+			byte[] NonceDigest = Hashes.ComputeSHA256Hash(Nonce);
 			byte[] Key = new byte[16];
 			byte[] IV = new byte[16];
 			byte[] Decrypted;
 			int i, c;
 			byte b;
+
+			for (i = 0; i < 32; i++)
+				Secret[i] ^= NonceDigest[i];
 
 			Array.Copy(Digest, 0, Key, 0, 16);
 			Array.Copy(Digest, 16, IV, 0, 16);

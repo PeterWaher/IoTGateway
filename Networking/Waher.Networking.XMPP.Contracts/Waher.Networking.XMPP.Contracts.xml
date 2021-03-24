@@ -1945,33 +1945,39 @@
             </summary>
             <param name="AttachmentId">ID of Attachment.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Encrypt(System.Byte[],System.Byte[],System.String)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Encrypt(System.Byte[],System.Byte[],System.Byte[],System.String)">
             <summary>
             Encrypts a message for an intended recipient given its public key and
             key algorithm name.
             </summary>
             <param name="Message">Message to encrypt.</param>
+            <param name="Nonce">Nonce-value to use during encryption. Size does not matter,
+            but must be unique for every message.</param>
             <param name="RecipientPublicKey">Public key of recipient.</param>
             <param name="RecipientPublicKeyName">Name of key algorithm of recipient.</param>
             <returns>Encrypted message, together with the public key used to obtain the shared secret.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Encrypt(System.Byte[],System.Byte[],System.String,System.String)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Encrypt(System.Byte[],System.Byte[],System.Byte[],System.String,System.String)">
             <summary>
             Encrypts a message for an intended recipient given its public key and
             key algorithm name.
             </summary>
             <param name="Message">Message to encrypt.</param>
+            <param name="Nonce">Nonce-value to use during encryption. Size does not matter,
+            but must be unique for every message.</param>
             <param name="RecipientPublicKey">Public key of recipient.</param>
             <param name="RecipientPublicKeyName">Name of key algorithm of recipient.</param>
             <param name="RecipientPublicKeyNamespace">Namespace of key algorithm of recipient.</param>
             <returns>Encrypted message, together with the public key used to obtain the shared secret.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Decrypt(System.Byte[],System.Byte[])">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Decrypt(System.Byte[],System.Byte[],System.Byte[])">
             <summary>
             Decrypts a message that was aimed at the client using the current keys.
             </summary>
             <param name="EncryptedMessage">Encrypted message.</param>
             <param name="SenderPublicKey">Public key used by the sender.</param>
+            <param name="Nonce">Nonce-value to use during decryption. Must be the same
+            as the one used during encryption.</param>
             <returns>Decrypted message.</returns>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractState">

@@ -4992,7 +4992,7 @@ namespace Waher.Script
 				if (Converters.TryGetValue(DesiredType, out ITypeConverter Converter))
 				{
 					Result = Converter?.Convert(Value);
-					return !(Converter is null);
+					return !(Result is null);
 				}
 
 				Dictionary<Type, bool> Explored = new Dictionary<Type, bool>() { { T, true } };
@@ -5000,8 +5000,11 @@ namespace Waher.Script
 
 				foreach (ITypeConverter Converter3 in Converters.Values)
 				{
-					Search.AddLast(Converter3);
-					Explored[Converter3.To] = true;
+					if (!(Converter3 is null))
+					{
+						Search.AddLast(Converter3);
+						Explored[Converter3.To] = true;
+					}
 				}
 
 				while (!(Search.First is null))
@@ -5009,7 +5012,7 @@ namespace Waher.Script
 					ITypeConverter C = Search.First.Value;
 					Search.RemoveFirst();
 
-					if (converters.TryGetValue(C.To, out Dictionary<Type, ITypeConverter> Converters2))
+					if (converters.TryGetValue(C.To, out Dictionary<Type, ITypeConverter> Converters2) && !(Converters2 is null))
 					{
 						if (Converters2.TryGetValue(DesiredType, out ITypeConverter Converter2))
 						{

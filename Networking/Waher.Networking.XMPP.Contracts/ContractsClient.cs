@@ -269,6 +269,26 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			await RuntimeSettings.DeleteWhereKeyLikeAsync(KeySettings + "*", "*");
 			await this.LoadKeys(true);
+
+			foreach (LegalIdentityState State in await Database.Find<LegalIdentityState>(
+				new FilterFieldEqualTo("BareJid", this.client.BareJID)))
+			{
+				switch (State.State)
+				{
+					case IdentityState.Created:
+					case IdentityState.Approved:
+						try
+						{
+							LegalIdentity Identity = await this.ObsoleteLegalIdentityAsync(State.LegalId);
+							await this.UpdateSettings(Identity);
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+						break;
+				}
+			}
 		}
 
 		#endregion
@@ -1190,7 +1210,9 @@ namespace Waher.Networking.XMPP.Contracts
 
 				DateTime Timestamp = Identity.Updated > Identity.Created ? Identity.Updated : Identity.Created;
 
-				if (Timestamp > StateObj.Timestamp || (StateObj.PublicKey is null && !(PublicKey is null)))
+				if (Timestamp > StateObj.Timestamp || 
+					(StateObj.PublicKey is null && !(PublicKey is null)) ||
+					Identity.State > StateObj.State)
 				{
 					StateObj.State = Identity.State;
 					StateObj.Timestamp = Timestamp;

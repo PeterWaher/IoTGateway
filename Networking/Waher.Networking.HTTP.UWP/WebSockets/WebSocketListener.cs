@@ -93,7 +93,7 @@ namespace Waher.Networking.HTTP.WebSockets
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public async Task GET(HttpRequest Request, HttpResponse Response)
+		public async virtual Task GET(HttpRequest Request, HttpResponse Response)
 		{
 			if (!Request.Header.TryGetHeaderField("Upgrade", out HttpField Upgrade) ||
 				Upgrade.Value != "websocket")

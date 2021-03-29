@@ -205,7 +205,7 @@ namespace Waher.IoTGateway.Console
 			}
 			finally
 			{
-				Gateway.Stop().Wait();
+				Gateway.Stop().Wait(30000);		// TODO: Fail-safe approach
 				Log.Terminate();
 			}
 		}

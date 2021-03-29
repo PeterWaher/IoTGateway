@@ -3062,6 +3062,11 @@
             Full JID
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.Disposed">
+            <summary>
+            If the object has been disposed.
+            </summary>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.RemovePeerAddresses(System.String)">
             <summary>
             Removes a JID from the recognized set of JIDs.

@@ -28,6 +28,7 @@ namespace Waher.Networking.XMPP.P2P
 		private readonly Dictionary<string, Dictionary<int, AddressInfo>> addressesByLocalIPPort = new Dictionary<string, Dictionary<int, AddressInfo>>();
 		private PeerToPeerNetwork p2pNetwork = null;
 		private string fullJid;
+		private bool disposed = false;
 
 		/// <summary>
 		/// Class managing peer-to-peer serveless XMPP communication.
@@ -94,6 +95,11 @@ namespace Waher.Networking.XMPP.P2P
 			get { return this.fullJid; }
 			set { this.fullJid = value; }
 		}
+
+		/// <summary>
+		/// If the object has been disposed.
+		/// </summary>
+		public bool Disposed => this.disposed;
 
 		private Task P2PNetwork_OnPeerConnected(object Listener, PeerConnection Peer)
 		{
@@ -603,28 +609,33 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		public void Dispose()
 		{
-			this.p2pNetwork?.Dispose();
-			this.p2pNetwork = null;
-
-			if (!(this.peersByFullJid is null))
+			if (!this.disposed)
 			{
-				PeerState[] States;
+				this.p2pNetwork?.Dispose();
+				this.p2pNetwork = null;
 
-				lock (this.peersByFullJid)
+				if (!(this.peersByFullJid is null))
 				{
-					States = new PeerState[this.peersByFullJid.Count];
-					this.peersByFullJid.Values.CopyTo(States, 0);
+					PeerState[] States;
 
-					this.peersByFullJid.Clear();
+					lock (this.peersByFullJid)
+					{
+						States = new PeerState[this.peersByFullJid.Count];
+						this.peersByFullJid.Values.CopyTo(States, 0);
+
+						this.peersByFullJid.Clear();
+					}
+
+					this.peersByFullJid = null;
+
+					foreach (PeerState State in States)
+					{
+						State.ClearCallbacks();
+						State.Close();
+					}
 				}
 
-				this.peersByFullJid = null;
-
-				foreach (PeerState State in States)
-				{
-					State.ClearCallbacks();
-					State.Close();
-				}
+				this.disposed = true;
 			}
 		}
 

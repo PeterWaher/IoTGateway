@@ -148,6 +148,9 @@ namespace Waher.Networking.XMPP.HTTPX
 					throw new InvalidOperationException("A HTTPX Proxy object has not been registered.");
 				}
 
+				if (Proxy.DefaultXmppClient.Disposed || Proxy.ServerlessMessaging.Disposed)
+					throw new InvalidOperationException("Service is being shut down.");
+
 				proxy = Proxy;
 			}
 

@@ -46,7 +46,7 @@ namespace Waher.Networking.PeerToPeer
 
 		private void NetworkChange_NetworkAddressChanged(object sender, EventArgs e)
 		{
-			if (State != PeerToPeerNetworkState.SearchingForGateway)    // Multiple events might get fired one after the other. Just start one search.
+			if (!this.disposed && State != PeerToPeerNetworkState.SearchingForGateway)    // Multiple events might get fired one after the other. Just start one search.
 			{
 				this.State = PeerToPeerNetworkState.Reinitializing;
 
@@ -163,6 +163,9 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		public void SearchGateways()
 		{
+			if (this.disposed || this.ipAddressesFound is null)
+				return;
+
 			try
 			{
 				this.searchTimer?.Dispose();

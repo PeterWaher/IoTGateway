@@ -29,6 +29,7 @@ https://waher.se/Script.md#cryptographyRelatedFunctionsWaherScriptCryptography</
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Security\Waher.Security.EllipticCurves\Waher.Security.EllipticCurves.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security.SHA3\Waher.Security.SHA3.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj" />
     <ProjectReference Include="..\Waher.Script\Waher.Script.csproj" />

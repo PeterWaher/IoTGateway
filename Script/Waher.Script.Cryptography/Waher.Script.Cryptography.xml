@@ -4,6 +4,386 @@
         <name>Waher.Script.Cryptography</name>
     </assembly>
     <members>
+        <member name="T:Waher.Script.Cryptography.Functions.Ecc.Ed25519">
+            <summary>
+            Creates an Edwards25519 Elliptic curve.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.Ed25519.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an Edwards25519 Elliptic curve.
+            </summary>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.Ed25519.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an Edwards25519 Elliptic curve.
+            </summary>
+            <param name="PrivateKey">Private key.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.Ed25519.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an Edwards25519 Elliptic curve.
+            </summary>
+            <param name="PrivateKey">Private key.</param>
+            <param name="HashKey">If the private key should be hashed before.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.Ed25519.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.Ed25519.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.Ed25519.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Cryptography.Functions.Ecc.Ed448">
+            <summary>
+            Creates an Edwards448 Elliptic curve.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.Ed448.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an Edwards448 Elliptic curve.
+            </summary>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.Ed448.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an Edwards448 Elliptic curve.
+            </summary>
+            <param name="PrivateKey">Private key.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.Ed448.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an Edwards448 Elliptic curve.
+            </summary>
+            <param name="PrivateKey">Private key.</param>
+            <param name="HashKey">If the private key should be hashed before.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.Ed448.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.Ed448.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.Ed448.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Cryptography.Functions.Ecc.P192">
+            <summary>
+            Creates an NIST-P192 Elliptic curve.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.P192.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an NIST-P192 Elliptic curve.
+            </summary>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.P192.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an NIST-P192 Elliptic curve.
+            </summary>
+            <param name="PrivateKey">Private key.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.P192.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.P192.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.P192.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Cryptography.Functions.Ecc.P224">
+            <summary>
+            Creates an NIST-P224 Elliptic curve.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.P224.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an NIST-P224 Elliptic curve.
+            </summary>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.P224.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an NIST-P224 Elliptic curve.
+            </summary>
+            <param name="PrivateKey">Private key.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.P224.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.P224.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.P224.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Cryptography.Functions.Ecc.P256">
+            <summary>
+            Creates an NIST-P256 Elliptic curve.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.P256.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an NIST-P256 Elliptic curve.
+            </summary>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.P256.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an NIST-P256 Elliptic curve.
+            </summary>
+            <param name="PrivateKey">Private key.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.P256.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.P256.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.P256.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Cryptography.Functions.Ecc.P384">
+            <summary>
+            Creates an NIST-P384 Elliptic curve.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.P384.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an NIST-P384 Elliptic curve.
+            </summary>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.P384.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an NIST-P384 Elliptic curve.
+            </summary>
+            <param name="PrivateKey">Private key.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.P384.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.P384.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.P384.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Cryptography.Functions.Ecc.P521">
+            <summary>
+            Creates an NIST-P521 Elliptic curve.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.P521.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an NIST-P521 Elliptic curve.
+            </summary>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.P521.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an NIST-P521 Elliptic curve.
+            </summary>
+            <param name="PrivateKey">Private key.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.P521.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.P521.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.P521.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Cryptography.Functions.Ecc.X25519">
+            <summary>
+            Creates an Curve25519 Elliptic curve.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.X25519.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an Curve25519 Elliptic curve.
+            </summary>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.X25519.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an Curve25519 Elliptic curve.
+            </summary>
+            <param name="PrivateKey">Private key.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.X25519.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.X25519.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.X25519.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Cryptography.Functions.Ecc.X448">
+            <summary>
+            Creates an Curve448 Elliptic curve.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.X448.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an Curve448 Elliptic curve.
+            </summary>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.X448.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates an Curve448 Elliptic curve.
+            </summary>
+            <param name="PrivateKey">Private key.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.X448.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Ecc.X448.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Ecc.X448.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Cryptography.Functions.HashFunctions.Md5">
             <summary>
             Md5(Data)

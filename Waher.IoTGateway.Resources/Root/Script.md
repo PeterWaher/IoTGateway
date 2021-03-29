@@ -1632,7 +1632,14 @@ The following functions are available in the `Waher.Script.Cryptography` library
 
 | Function                        | Description | Example |
 |---------------------------------|-------------|---------|
+| `Ed25519([PrivKey[,HashKey]])   | Creates an Edwards25519 curve, with optional private key (`PrivKey`) and option to pre-hash key (`HashKey`). | [Example][Ed25519Example] |
+| `Ed448([PrivKey[,HashKey]])     | Creates an Edwards448 curve, with optional private key (`PrivKey`) and option to pre-hash key (`HashKey`). | [Example][Ed448Example] |
 | `Md5(Data)`                     | Calculates a MD5 Hash Digest of `Data`.  | [Example][Md5Example] |
+| `P192([PrivKey])                | Creates a NIST-P192 curve, with optional private key (`PrivKey`). | [Example][P192Example] |
+| `P224([PrivKey])                | Creates a NIST-P224 curve, with optional private key (`PrivKey`). | [Example][P224Example] |
+| `P256([PrivKey])                | Creates a NIST-P256 curve, with optional private key (`PrivKey`). | [Example][P256Example] |
+| `P384([PrivKey])                | Creates a NIST-P384 curve, with optional private key (`PrivKey`). | [Example][P384Example] |
+| `P521([PrivKey])                | Creates a NIST-P521 curve, with optional private key (`PrivKey`). | [Example][P521Example] |
 | `RandomBytes(NrBytes)`          | Generates an array of `N` random bytes. | [Example][RandomBytesExample] |
 | `Sha1(Data)`                    | Calculates a SHA-1 Hash Digest of `Data`.  | [Example][Sha1Example] |
 | `Sha1HMac(Data,Key)`            | Calculates a SHA-1 HMAC Hash Digest of `Data` using the key `Key`.  | [Example][Sha1HmacExample] |
@@ -1646,8 +1653,17 @@ The following functions are available in the `Waher.Script.Cryptography` library
 | `Sha3_256(Data)`                | Calculates a 256-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3256Example] |
 | `Sha3_384(Data)`                | Calculates a 384-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3384Example] |
 | `Sha3_512(Data)`                | Calculates a 512-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3512Example] |
+| `X25519([PrivKey])              | Creates a Curve25519 curve, with optional private key (`PrivKey`). | [Example][X25519Example] |
+| `X448([PrivKey])                | Creates a Curve448 curve, with optional private key (`PrivKey`). | [Example][X448Example] |
 
+[Ed25519Example]: Prompt.md?Expression=Ed25519()
+[Ed448Example]: Prompt.md?Expression=Ed448()
 [Md5Example]: Prompt.md?Expression=Md5(Utf8Encode(%22Hello%22))
+[P192Example]: Prompt.md?Expression=P192()
+[P224Example]: Prompt.md?Expression=P224()
+[P256Example]: Prompt.md?Expression=P256()
+[P384Example]: Prompt.md?Expression=P384()
+[P521Example]: Prompt.md?Expression=P521()
 [RandomBytesExample]: Prompt.md?Expression=Base64Encode(RandomBytes(128))
 [Sha1Example]: Prompt.md?Expression=Sha1(Utf8Encode(%22Hello%22))
 [Sha1HmacExample]: Prompt.md?Expression=Sha1HMac(Utf8Encode(%22Hello%22),Utf8Encode(%22World%22))
@@ -1661,6 +1677,8 @@ The following functions are available in the `Waher.Script.Cryptography` library
 [Sha3256Example]: Prompt.md?Expression=Sha3_256(Utf8Encode(%22Hello%22))
 [Sha3384Example]: Prompt.md?Expression=Sha3_384(Utf8Encode(%22Hello%22))
 [Sha3512Example]: Prompt.md?Expression=Sha3_512(Utf8Encode(%22Hello%22))
+[X25519Example]: Prompt.md?Expression=X25519()
+[X448Example]: Prompt.md?Expression=X448()
 
 #### XML-related functions (Waher.Script.Xml)
 
@@ -1992,8 +2010,8 @@ select a, b from v
 
 The `SELECT` statement can also extract information from XML sources by using XPATH. Column extressions and `WHERE` clauses must be
 made in XPATH, in order to operate on XML sources. XML Sources can be entire XML Documents, or XML Nodes inside an XML Document.
-If the XPATH does not contain whitespace, and begins with a `/`, it can be written as-is in the script. Otherwise, you can use the
-`XPath(expression)` function to convert a string value to an XPATH expression than can be used to select nodes from a XML source.
+If the XPATH does not contain whitespace, and begins with a `/`, `.` or a `@`, it can be written as-is in the script. Otherwise, you can 
+use the `XPath(expression)` function to convert a string value to an XPATH expression than can be used to select nodes from a XML source.
 XPATH exrepssions used in column definition, extract values from the corresponding XML nodes selected, while XPATH expressions used in
 `WHERE` clauses, refer to the nodes selected.
 
@@ -2006,7 +2024,7 @@ Xml:=<Books>
 <Book price="30" title="Book 3"/>
 </Books>;
 
-select XPath("@title") Title, XPath("@price") Price from Xml where /Books/Book[@price>15];
+select @title Title, @price Price from Xml where /Books/Book[@price>15];
 ```
 
 #### INSERT VALUES

@@ -67,6 +67,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.QR.Test", "Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Networking", "Script\Waher.Script.Networking\Waher.Script.Networking.csproj", "{C3670B3E-AD1D-4A5F-872F-F4CBEFD08590}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Security", "Security", "{EECF8A99-FA34-4A25-B67A-97EC55EE5C7E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.SHA3", "Security\Waher.Security.SHA3\Waher.Security.SHA3.csproj", "{A822C7E5-DADA-4FD3-A264-888DC5774BA8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.EllipticCurves", "Security\Waher.Security.EllipticCurves\Waher.Security.EllipticCurves.csproj", "{D909ADCC-3C62-44EC-A69E-502D9C3C6624}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -173,6 +179,14 @@ Global
 		{C3670B3E-AD1D-4A5F-872F-F4CBEFD08590}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3670B3E-AD1D-4A5F-872F-F4CBEFD08590}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3670B3E-AD1D-4A5F-872F-F4CBEFD08590}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A822C7E5-DADA-4FD3-A264-888DC5774BA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A822C7E5-DADA-4FD3-A264-888DC5774BA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A822C7E5-DADA-4FD3-A264-888DC5774BA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A822C7E5-DADA-4FD3-A264-888DC5774BA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D909ADCC-3C62-44EC-A69E-502D9C3C6624}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D909ADCC-3C62-44EC-A69E-502D9C3C6624}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D909ADCC-3C62-44EC-A69E-502D9C3C6624}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D909ADCC-3C62-44EC-A69E-502D9C3C6624}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -191,6 +205,8 @@ Global
 		{A88F6F6A-0C2F-4A0C-A999-9359CA3570A8} = {0709170C-60A7-4421-8A74-07B7F294A229}
 		{0C5C3A13-3571-42DD-BD60-0847A15FE284} = {823D0609-1731-4770-9B1C-305BB49D6133}
 		{E9093092-B12D-411D-935D-EEF9E2109659} = {823D0609-1731-4770-9B1C-305BB49D6133}
+		{A822C7E5-DADA-4FD3-A264-888DC5774BA8} = {EECF8A99-FA34-4A25-B67A-97EC55EE5C7E}
+		{D909ADCC-3C62-44EC-A69E-502D9C3C6624} = {EECF8A99-FA34-4A25-B67A-97EC55EE5C7E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09539FCE-8EB5-447C-A9AF-6FA30BE14418}

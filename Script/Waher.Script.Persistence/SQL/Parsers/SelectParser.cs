@@ -95,7 +95,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 
 					while (true)
 					{
-						if (s == "/")
+						if (s == "/" || s == "." || s == "@")
 							Node = ParseXPath(Parser, true);
 						else
 						{
@@ -148,7 +148,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 					Parser.NextToken();
 
 					s = Parser.PeekNextToken();
-					if (s == "/")
+					if (s == "/" || s == "." || s == "@")
 						Where = ParseXPath(Parser, false);
 					else
 						Where = Parser.ParseOrs();
@@ -297,8 +297,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 			int Start = Parser.Position;
 			char ch;
 
-			while ((ch = Parser.NextChar()) > 32 && ch != 160 && ch != ',' && ch != ';')
-				sb.Append(ch);
+			while ((ch = Parser.PeekNextChar()) > 32 && ch != 160 && ch != ',' && ch != ';')
+				sb.Append(Parser.NextChar());
 
 			return new XPath(sb.ToString(), ExtractValue, Start, Parser.Position - Start, Parser.Expression);
 		}

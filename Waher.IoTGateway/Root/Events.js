@@ -1,9 +1,42 @@
 ﻿function CheckEvents(TabID)
 {
-	if ("WebSocket" in window)
-		CheckEventsWS(TabID);
-	else
-		CheckEventsXHTTP(TabID);
+	try
+	{
+		if ("WebSocket" in window)
+		{
+			CheckEventsWS(TabID);
+			return;
+		}
+	}
+	catch (e)
+	{
+		// Try fallback mechanism
+	}
+
+	CheckEventsXHTTP(TabID);
+}
+
+function FindNeuronDomain()
+{
+	var Meta = document.getElementsByTagName('meta');
+	var c = Meta.length;
+	var i;
+
+	for (i = 0; i < c; i++)
+	{
+		var Name = Meta[i].getAttribute("name");
+		if (Name && Name.toLowerCase() == "neuron")
+		{
+			var Domain = Meta[i].getAttribute("content");
+
+			if (Domain)
+				return Domain;
+			else
+				break;
+		}
+	}
+
+	return window.location.host;
 }
 
 function CheckEventsWS(TabID)
@@ -16,7 +49,7 @@ function CheckEventsWS(TabID)
 	else
 		Uri = "ws:";
 
-	Uri += "//" + Location.host + "/ClientEventsWS";
+	Uri += "//" + FindNeuronDomain() + "/ClientEventsWS";
 
 	var Socket = new WebSocket(Uri, ["ls"]);
 	var PingTimer = null;
@@ -221,7 +254,7 @@ function Reload(Data)
 function EndsWith(String, Suffix)
 {
 	var c = String.length;
-	var d = Suffix.lenght;
+	var d = Suffix.length;
 
 	if (c < d)
 		return false;
@@ -288,7 +321,7 @@ function LoadContent(Id)
 				else
 					ShowError(xhttp);
 
-				if (ContentQueue.lenght === 0)
+				if (ContentQueue.length === 0)
 					ContentQueue = null;
 				else
 				{

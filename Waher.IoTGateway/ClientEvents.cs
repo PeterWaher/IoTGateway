@@ -43,7 +43,7 @@ namespace Waher.IoTGateway
 	/// 
 	/// ReportAsynchronousResult() allows you to report asynchronously evaluated results back to clients.
 	/// </summary>
-	public class ClientEvents : HttpAsynchronousResource, IHttpGetMethod, IHttpPostMethod
+	public class ClientEvents : HttpAsynchronousResource, IHttpGetMethod, IHttpPostMethod, IHttpOptionsMethod
 	{
 		/// <summary>
 		/// Resource managing asynchronous events to web clients.
@@ -72,6 +72,11 @@ namespace Waher.IoTGateway
 		/// If the POST method is allowed.
 		/// </summary>
 		public bool AllowsPOST => true;
+
+		/// <summary>
+		/// If the OPTIONS method is allowed.
+		/// </summary>
+		public bool AllowsOPTIONS => true;
 
 		/// <summary>
 		/// Executes the POST method on the resource.
@@ -110,6 +115,8 @@ namespace Waher.IoTGateway
 				}
 			}
 
+			SetTransparentCorsHeaders(this, Request, Response);
+
 			Response.ContentType = Queue.ContentType;
 			await Response.Write(Queue.Content, 0, Queue.Content.Length);
 			await Response.SendResponse();
@@ -138,6 +145,8 @@ namespace Waher.IoTGateway
 
 			TabQueue Queue = Register(Request, null, Location, TabID);
 			StringBuilder Json = null;
+
+			SetTransparentCorsHeaders(this, Request, Response);
 
 			Response.ContentType = "application/json";
 
@@ -348,7 +357,7 @@ namespace Waher.IoTGateway
 
 		internal static void Ping(string TabID)
 		{
-			if (eventsByTabID.TryGetValue(TabID, out TabQueue TabQueue))
+			if (eventsByTabID.TryGetValue(TabID, out TabQueue TabQueue) && !string.IsNullOrEmpty(TabQueue.SessionID))
 				Gateway.HttpServer?.GetSession(TabQueue.SessionID, false);
 		}
 
@@ -1247,6 +1256,55 @@ namespace Waher.IoTGateway
 			}
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Executes the OPTIONS method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public async Task OPTIONS(HttpRequest Request, HttpResponse Response)
+		{
+			SetTransparentCorsHeaders(this, Request, Response);
+			Response.StatusCode = 204;  // No content
+
+			await Response.SendResponse();
+		}
+
+		/// <summary>
+		/// Sets CORS headers for a resource, allowing it to be embedded in other sites.
+		/// </summary>
+		/// <param name="Resource">Resource being processed.</param>
+		/// <param name="Request">HTTP Request object.</param>
+		/// <param name="Response">HTTP Response object.</param>
+		public static void SetTransparentCorsHeaders(HttpResource Resource, HttpRequest Request, HttpResponse Response)
+		{
+			if (Request.Header.TryGetHeaderField("Origin", out HttpField Origin))
+				Response.SetHeader("Access-Control-Allow-Origin", Origin.Value);
+			else
+				Response.SetHeader("Access-Control-Allow-Origin", "*");
+
+			if (Request.Header.TryGetHeaderField("Access-Control-Request-Headers", out HttpField AccessControlRequestHeaders))
+				Response.SetHeader("Access-Control-Allow-Headers", AccessControlRequestHeaders.Value);
+
+			if (Request.Header.TryGetHeaderField("Access-Control-Request-Method", out HttpField AccessControlRequestMethod))
+			{
+				StringBuilder Methods = new StringBuilder();
+				bool First = true;
+
+				foreach (string Method in Resource.AllowedMethods)
+				{
+					if (First)
+						First = false;
+					else
+						Methods.Append(", ");
+
+					Methods.Append(Method);
+				}
+
+				Response.SetHeader("Access-Control-Allow-Methods", Methods.ToString());
+			}
 		}
 
 	}

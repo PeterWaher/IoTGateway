@@ -14,7 +14,7 @@ namespace Waher.IoTGateway
 	/// Web-socket binding method for the <see cref="ClientEvents"/> class. It allows clients connect to the gateway using web-sockets to
 	/// get events.
 	/// </summary>
-	public class ClientEventsWebSocket : WebSocketListener
+	public class ClientEventsWebSocket : WebSocketListener, IHttpOptionsMethod
 	{
 		private static readonly string serverId = Hashes.BinaryToString(Gateway.NextBytes(32));
 
@@ -27,6 +27,23 @@ namespace Waher.IoTGateway
 			this.Accept += ClientEventsWebSocket_Accept;
 			this.Connected += ClientEventsWebSocket_Connected;
 		}
+
+		/// <summary>
+		/// Executes the GET method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public override Task GET(HttpRequest Request, HttpResponse Response)
+		{
+			ClientEvents.SetTransparentCorsHeaders(this, Request, Response);
+			return base.GET(Request, Response);
+		}
+
+		/// <summary>
+		/// If the OPTIONS method is allowed.
+		/// </summary>
+		public bool AllowsOPTIONS => true;
 
 		private void ClientEventsWebSocket_Connected(object Sender, WebSocketEventArgs e)
 		{
@@ -110,13 +127,15 @@ namespace Waher.IoTGateway
 
 		private void ClientEventsWebSocket_Accept(object Sender, WebSocketEventArgs e)
 		{
-			HttpFieldCookie Cookie;
-
-			if ((Cookie = e.Socket.HttpRequest.Header.Cookie) is null ||
-				string.IsNullOrEmpty(Cookie["HttpSessionID"]))
-			{
-				throw new ForbiddenException("HTTP Session required.");
-			}
+			// Cross-domain use allowed.
+			//
+			//HttpFieldCookie Cookie;
+			//
+			//if ((Cookie = e.Socket.HttpRequest.Header.Cookie) is null ||
+			//	string.IsNullOrEmpty(Cookie["HttpSessionID"]))
+			//{
+			//	throw new ForbiddenException("HTTP Session required.");
+			//}
 		}
 
 		/// <summary>
@@ -130,6 +149,19 @@ namespace Waher.IoTGateway
 			}
 		}
 
+		/// <summary>
+		/// Executes the OPTIONS method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public async Task OPTIONS(HttpRequest Request, HttpResponse Response)
+		{
+			ClientEvents.SetTransparentCorsHeaders(this, Request, Response);
+			Response.StatusCode = 204;  // No content
+
+			await Response.SendResponse();
+		}
 
 	}
 }

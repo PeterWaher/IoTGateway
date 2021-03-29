@@ -17,6 +17,7 @@ using Waher.Networking.XMPP.Contracts.HumanReadable;
 using Waher.Networking.XMPP.Contracts.Search;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
+using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Cache;
@@ -281,6 +282,10 @@ namespace Waher.Networking.XMPP.Contracts
 						{
 							LegalIdentity Identity = await this.ObsoleteLegalIdentityAsync(State.LegalId);
 							await this.UpdateSettings(Identity);
+						}
+						catch (ItemNotFoundException)
+						{
+							await Database.Delete(State);
 						}
 						catch (Exception ex)
 						{
@@ -1210,7 +1215,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 				DateTime Timestamp = Identity.Updated > Identity.Created ? Identity.Updated : Identity.Created;
 
-				if (Timestamp > StateObj.Timestamp || 
+				if (Timestamp > StateObj.Timestamp ||
 					(StateObj.PublicKey is null && !(PublicKey is null)) ||
 					Identity.State > StateObj.State)
 				{

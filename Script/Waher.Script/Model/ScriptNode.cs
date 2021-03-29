@@ -341,5 +341,22 @@ namespace Waher.Script.Model
 				return base.ToString();
 		}
 
+		/// <summary>
+		/// Tries to convert an element to a boolean value.
+		/// </summary>
+		/// <param name="Value">Element value.</param>
+		/// <returns>Boolean, if successful.</returns>
+		protected static bool? ToBoolean(IElement Value)
+		{
+			if (Value is BooleanValue b)
+				return b.Value;
+			else if (Value is DoubleNumber d)
+				return d.Value != 0;
+			else if (Value is StringValue s)
+				return Functions.Scalar.Boolean.ToBoolean(s.Value);
+			else
+				return null;
+		}
+
 	}
 }

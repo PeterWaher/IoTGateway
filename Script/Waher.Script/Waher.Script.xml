@@ -9623,6 +9623,13 @@
             <see cref="M:System.Object.ToString"/>
             </summary>
         </member>
+        <member name="M:Waher.Script.Model.ScriptNode.ToBoolean(Waher.Script.Abstraction.Elements.IElement)">
+            <summary>
+            Tries to convert an element to a boolean value.
+            </summary>
+            <param name="Value">Element value.</param>
+            <returns>Boolean, if successful.</returns>
+        </member>
         <member name="T:Waher.Script.Model.ScriptParser">
             <summary>
             Script parser, for custom parsers.

@@ -19,9 +19,9 @@ https://waher.se/Script.md#cryptographyRelatedFunctionsWaherScriptCryptography</
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution parsing cryptography</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.1</AssemblyVersion>
-    <FileVersion>1.0.1</FileVersion>
-    <Version>1.0.1</Version>
+    <AssemblyVersion>1.0.2</AssemblyVersion>
+    <FileVersion>1.0.2</FileVersion>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

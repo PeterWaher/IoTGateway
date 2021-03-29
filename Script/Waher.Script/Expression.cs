@@ -28,7 +28,6 @@ using Waher.Script.Operators.Vectors;
 using Waher.Script.Output;
 using Waher.Script.TypeConversion;
 using Waher.Script.Units;
-using System.Linq.Expressions;
 
 namespace Waher.Script
 {

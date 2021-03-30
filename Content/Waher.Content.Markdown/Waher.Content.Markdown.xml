@@ -225,6 +225,14 @@
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.MarkdownCodec.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of an item, given its Content-Type.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="FileExtension">File extension.</param>
+            <returns>If the Content-Type was recognized.</returns>
+        </member>
         <member name="T:Waher.Content.Markdown.MarkdownElementHandler">
             <summary>
             Delegate for markdown element callback methods.

@@ -62,6 +62,14 @@
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
         </member>
+        <member name="M:Waher.Content.Audio.AudioDecoder.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of an item, given its Content-Type.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="FileExtension">File extension.</param>
+            <returns>If the Content-Type was recognized.</returns>
+        </member>
         <member name="T:Waher.Content.Base64Url">
             <summary>
             Static class that does BASE64URL encoding (using URL and filename safe alphabet), 
@@ -140,6 +148,14 @@
             <param name="FileExtension">File extension.</param>
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Binary.BinaryDecoder.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of an item, given its Content-Type.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="FileExtension">File extension.</param>
+            <returns>If the Content-Type was recognized.</returns>
         </member>
         <member name="T:Waher.Content.ColorReference">
             <summary>
@@ -776,16 +792,6 @@
             to partake in object decodings through the static <see cref="T:Waher.Content.InternetContent"/> class. No registration is required.
             </summary>
         </member>
-        <member name="P:Waher.Content.IContentDecoder.ContentTypes">
-            <summary>
-            Supported content types.
-            </summary>
-        </member>
-        <member name="P:Waher.Content.IContentDecoder.FileExtensions">
-            <summary>
-            Supported file extensions.
-            </summary>
-        </member>
         <member name="M:Waher.Content.IContentDecoder.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
             <summary>
             If the decoder decodes an object with a given content type.
@@ -806,28 +812,10 @@
             <returns>Decoded object.</returns>
             <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
         </member>
-        <member name="M:Waher.Content.IContentDecoder.TryGetContentType(System.String,System.String@)">
-            <summary>
-            Tries to get the content type of an item, given its file extension.
-            </summary>
-            <param name="FileExtension">File extension.</param>
-            <param name="ContentType">Content type.</param>
-            <returns>If the extension was recognized.</returns>
-        </member>
         <member name="T:Waher.Content.IContentEncoder">
             <summary>
             Basic interface for Internet Content encoders. A class implementing this interface and having a default constructor, will be able
             to partake in object encodings through the static <see cref="T:Waher.Content.InternetContent"/> class. No registration is required.
-            </summary>
-        </member>
-        <member name="P:Waher.Content.IContentEncoder.ContentTypes">
-            <summary>
-            Supported content types.
-            </summary>
-        </member>
-        <member name="P:Waher.Content.IContentEncoder.FileExtensions">
-            <summary>
-            Supported file extensions.
             </summary>
         </member>
         <member name="M:Waher.Content.IContentEncoder.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
@@ -849,14 +837,6 @@
             <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
             <returns>Encoded object.</returns>
             <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
-        </member>
-        <member name="M:Waher.Content.IContentEncoder.TryGetContentType(System.String,System.String@)">
-            <summary>
-            Tries to get the content type of an item, given its file extension.
-            </summary>
-            <param name="FileExtension">File extension.</param>
-            <param name="ContentType">Content type.</param>
-            <returns>If the extension was recognized.</returns>
         </member>
         <member name="T:Waher.Content.IContentGetter">
             <summary>
@@ -979,6 +959,37 @@
             <summary>
             Filename of resource.
             </summary>
+        </member>
+        <member name="T:Waher.Content.IInternetContent">
+            <summary>
+            Base interface for Internet content encoders or decoders.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.IInternetContent.ContentTypes">
+            <summary>
+            Supported content types.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.IInternetContent.FileExtensions">
+            <summary>
+            Supported file extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.IInternetContent.TryGetContentType(System.String,System.String@)">
+            <summary>
+            Tries to get the content type of an item, given its file extension.
+            </summary>
+            <param name="FileExtension">File extension.</param>
+            <param name="ContentType">Content type.</param>
+            <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.IInternetContent.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of an item, given its Content-Type.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="FileExtension">File extension.</param>
+            <returns>If the Content-Type was recognized.</returns>
         </member>
         <member name="T:Waher.Content.InternetContent">
             <summary>
@@ -1117,6 +1128,23 @@
             <param name="FileExtension">File extension.</param>
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.GetFileExtension(System.String)">
+            <summary>
+            Gets the file extension of an item, given its content type. It uses the <see cref="M:Waher.Content.InternetContent.TryGetFileExtension(System.String,System.String@)"/> to see if any of the
+            content encoders/decoders support content with the corresponding content type. If no such encoder/decoder is found, the generic
+            bin extension is returned.
+            </summary>
+            <param name="ContentType">File Content-Type.</param>
+            <returns>File extension.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of an item, given its content type.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="FileExtension">File extension.</param>
+            <returns>If the Content-Type was recognized.</returns>
         </member>
         <member name="P:Waher.Content.InternetContent.Converters">
             <summary>
@@ -1378,6 +1406,14 @@
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
         </member>
+        <member name="M:Waher.Content.Multipart.AlternativeCodec.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of an item, given its Content-Type.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="FileExtension">File extension.</param>
+            <returns>If the Content-Type was recognized.</returns>
+        </member>
         <member name="M:Waher.Content.Multipart.AlternativeCodec.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
             <summary>
             If the encoder encodes a given object.
@@ -1587,6 +1623,14 @@
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
         </member>
+        <member name="M:Waher.Content.Multipart.FormDataDecoder.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of an item, given its Content-Type.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="FileExtension">File extension.</param>
+            <returns>If the Content-Type was recognized.</returns>
+        </member>
         <member name="M:Waher.Content.Multipart.FormDataDecoder.Encode(System.Collections.Generic.IEnumerable{Waher.Content.Multipart.EmbeddedContent},System.String)">
             <summary>
             Encodes multi-part content
@@ -1651,6 +1695,14 @@
             <param name="FileExtension">File extension.</param>
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Multipart.MixedCodec.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of an item, given its Content-Type.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="FileExtension">File extension.</param>
+            <returns>If the Content-Type was recognized.</returns>
         </member>
         <member name="M:Waher.Content.Multipart.MixedCodec.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
             <summary>
@@ -1756,6 +1808,14 @@
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
         </member>
+        <member name="M:Waher.Content.Multipart.RelatedCodec.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of an item, given its Content-Type.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="FileExtension">File extension.</param>
+            <returns>If the Content-Type was recognized.</returns>
+        </member>
         <member name="M:Waher.Content.Multipart.RelatedCodec.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
             <summary>
             If the encoder encodes a given object.
@@ -1845,6 +1905,14 @@
             <param name="FileExtension">File extension.</param>
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Multipart.WwwFormDecoder.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of an item, given its Content-Type.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="FileExtension">File extension.</param>
+            <returns>If the Content-Type was recognized.</returns>
         </member>
         <member name="T:Waher.Content.Posters.PosterBase">
             <summary>
@@ -2067,6 +2135,14 @@
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
         </member>
+        <member name="M:Waher.Content.Text.CsvCodec.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of an item, given its Content-Type.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="FileExtension">File extension.</param>
+            <returns>If the Content-Type was recognized.</returns>
+        </member>
         <member name="M:Waher.Content.Text.CsvCodec.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
             <summary>
             If the encoder encodes a given object.
@@ -2144,6 +2220,14 @@
             <param name="FileExtension">File extension.</param>
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Text.JsonDecoder.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of an item, given its Content-Type.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="FileExtension">File extension.</param>
+            <returns>If the Content-Type was recognized.</returns>
         </member>
         <member name="M:Waher.Content.Text.JsonDecoder.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
             <summary>
@@ -2223,6 +2307,14 @@
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
         </member>
+        <member name="M:Waher.Content.Text.PlainTextCodec.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of an item, given its Content-Type.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="FileExtension">File extension.</param>
+            <returns>If the Content-Type was recognized.</returns>
+        </member>
         <member name="M:Waher.Content.Text.PlainTextCodec.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
             <summary>
             If the encoder encodes a given object.
@@ -2300,6 +2392,14 @@
             <param name="FileExtension">File extension.</param>
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Video.VideoDecoder.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of an item, given its Content-Type.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="FileExtension">File extension.</param>
+            <returns>If the Content-Type was recognized.</returns>
         </member>
     </members>
 </doc>

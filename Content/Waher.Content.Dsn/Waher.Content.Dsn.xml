@@ -81,6 +81,14 @@
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
         </member>
+        <member name="M:Waher.Content.Dsn.DeliveryStatusDecoder.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of an item, given its Content-Type.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="FileExtension">File extension.</param>
+            <returns>If the Content-Type was recognized.</returns>
+        </member>
         <member name="M:Waher.Content.Dsn.DeliveryStatusDecoder.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
             <summary>
             Decodes an object.
@@ -380,6 +388,14 @@
             <param name="FileExtension">File extension.</param>
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Dsn.ReportCodec.TryGetFileExtension(System.String,System.String@)">
+            <summary>
+            Tries to get the file extension of an item, given its Content-Type.
+            </summary>
+            <param name="ContentType">Content type.</param>
+            <param name="FileExtension">File extension.</param>
+            <returns>If the Content-Type was recognized.</returns>
         </member>
         <member name="M:Waher.Content.Dsn.ReportCodec.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
             <summary>

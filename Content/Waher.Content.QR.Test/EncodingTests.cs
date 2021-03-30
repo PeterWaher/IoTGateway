@@ -506,5 +506,14 @@ namespace Waher.Content.QR.Test
 			Console.Out.WriteLine(M.ToHalfBlockText());
 		}
 
+		[TestMethod]
+		public void Test_32_EDaler_1_QR()
+		{
+			CorrectionLevel Level = CorrectionLevel.H;
+			string Message = "edaler:id=8747cf73-85be-4db1-9117-a77a36f401fb;fi=27c6d6f2-568c-c07c-040e-dd8dd1fcf047@legal.cybercity.online;ti=27f4887a-ce90-ab4b-a033-cff1090fed0e@legal.sb.br.fi.tagroot.io;am=2;cu=SEK;cr=2021-03-29T13:08:31.770Z;ex=2021-04-01;em=w92rYkprOiCyOTZSDO4FEgKas5ct95EyCPBz6SxF/RA=;ep=O+yaNu5XWk37vyAxqVyCAyLo//cCDwLCoSjegX2BSkIcQJEFbjo0CM8exKN5DV/sbzZ8QnLHc1AA;s=VaM03Ulinilj9psaeyGqkHJhrvZ7EfDeq+KiJZe79VyGGTT8h+wu47ll/DaqAyCQMDLwpf60DtaA06EvTz5RgO8l8b576L92h974Q9nNnj9vjx4Dqe7uib8bKHJM4sOU5yP1s8cKRFAyRZeRbr2LgAcA";
+			QrMatrix M = this.encoder.GenerateMatrix(Level, Message);
+			Console.Out.WriteLine(M.ToHalfBlockText());
+		}
+
 	}
 }

@@ -47,6 +47,25 @@ namespace Waher.Script.Order
 				return OrderedSet1.Compare(x, y);
 			else if (y.AssociatedSet is IOrderedSet OrderedSet2)
 				return OrderedSet2.Compare(x, y);
+			else if (x is IVector v1 && y is IVector v2)
+			{
+				IElement e1, e2;
+				int c1 = v1.Dimension;
+				int c2 = v2.Dimension;
+				int c = Math.Min(c1, c2);
+				int i, j;
+
+				for (i = 0; i < c; i++)
+				{
+					e1 = v1.GetElement(i);
+					e2 = v2.GetElement(i);
+					j = Compare(e1, e2, Node);
+					if (j != 0)
+						return j;
+				}
+
+				return c1 - c2;
+			}
 			else
 				throw new ScriptRuntimeException("Elements not ordered", Node);
 		}

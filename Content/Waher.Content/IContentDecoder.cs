@@ -9,24 +9,8 @@ namespace Waher.Content
 	/// Basic interface for Internet Content decoders. A class implementing this interface and having a default constructor, will be able
 	/// to partake in object decodings through the static <see cref="InternetContent"/> class. No registration is required.
 	/// </summary>
-	public interface IContentDecoder
+	public interface IContentDecoder : IInternetContent
 	{
-		/// <summary>
-		/// Supported content types.
-		/// </summary>
-		string[] ContentTypes
-		{
-			get;
-		}
-
-		/// <summary>
-		/// Supported file extensions.
-		/// </summary>
-		string[] FileExtensions
-		{
-			get;
-		}
-
 		/// <summary>
 		/// If the decoder decodes an object with a given content type.
 		/// </summary>
@@ -46,13 +30,5 @@ namespace Waher.Content
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri);
-
-		/// <summary>
-		/// Tries to get the content type of an item, given its file extension.
-		/// </summary>
-		/// <param name="FileExtension">File extension.</param>
-		/// <param name="ContentType">Content type.</param>
-		/// <returns>If the extension was recognized.</returns>
-		bool TryGetContentType(string FileExtension, out string ContentType);
 	}
 }

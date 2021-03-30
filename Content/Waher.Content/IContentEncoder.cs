@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using Waher.Runtime.Inventory;
 
@@ -9,24 +8,8 @@ namespace Waher.Content
 	/// Basic interface for Internet Content encoders. A class implementing this interface and having a default constructor, will be able
 	/// to partake in object encodings through the static <see cref="InternetContent"/> class. No registration is required.
 	/// </summary>
-	public interface IContentEncoder
+	public interface IContentEncoder : IInternetContent
 	{
-		/// <summary>
-		/// Supported content types.
-		/// </summary>
-		string[] ContentTypes
-		{
-			get;
-		}
-
-		/// <summary>
-		/// Supported file extensions.
-		/// </summary>
-		string[] FileExtensions
-		{
-			get;
-		}
-
 		/// <summary>
 		/// If the encoder encodes a given object.
 		/// </summary>
@@ -46,14 +29,5 @@ namespace Waher.Content
 		/// <returns>Encoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes);
-
-		/// <summary>
-		/// Tries to get the content type of an item, given its file extension.
-		/// </summary>
-		/// <param name="FileExtension">File extension.</param>
-		/// <param name="ContentType">Content type.</param>
-		/// <returns>If the extension was recognized.</returns>
-		bool TryGetContentType(string FileExtension, out string ContentType);
-
 	}
 }

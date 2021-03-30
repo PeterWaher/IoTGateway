@@ -116,6 +116,30 @@ namespace Waher.Content.Html
 		}
 
 		/// <summary>
+		/// Tries to get the file extension of an item, given its Content-Type.
+		/// </summary>
+		/// <param name="ContentType">Content type.</param>
+		/// <param name="FileExtension">File extension.</param>
+		/// <returns>If the Content-Type was recognized.</returns>
+		public bool TryGetFileExtension(string ContentType, out string FileExtension)
+		{
+			switch (ContentType.ToLower())
+			{
+				case "text/html":
+					FileExtension = "html";
+					return true;
+
+				case "application/xhtml+xml":
+					FileExtension = "xhtml";
+					return true;
+
+				default:
+					FileExtension = string.Empty;
+					return false;
+			}
+		}
+
+		/// <summary>
 		/// If the encoder encodes a given object.
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>

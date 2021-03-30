@@ -245,5 +245,58 @@ namespace Waher.Content.Images
 					return false;
 			}
 		}
+	
+		/// <summary>
+		/// Tries to get the file extension of an item, given its Content-Type.
+		/// </summary>
+		/// <param name="ContentType">Content type.</param>
+		/// <param name="FileExtension">File extension.</param>
+		/// <returns>If the Content-Type was recognized.</returns>
+		public bool TryGetFileExtension(string ContentType, out string FileExtension)
+		{
+			switch (ContentType.ToLower())
+			{
+				case "image/png":
+					FileExtension = "png";
+					return true;
+
+				case "image/bmp":
+					FileExtension = "bmp";
+					return true;
+
+				case "image/gif":
+					FileExtension = "gif";
+					return true;
+
+				case "image/jpeg":
+					FileExtension = "jpg";
+					return true;
+
+				case "image/tiff":
+					FileExtension = "tif";
+					return true;
+
+				case "image/x-wmf":
+					FileExtension = "wmf";
+					return true;
+
+				case "image/x-emf":
+					FileExtension = "emf";
+					return true;
+
+				case "image/x-icon":
+					FileExtension = "ico";
+					return true;
+
+				case "image/svg+xml":
+					FileExtension = "svg";
+					return true;
+
+				default:
+					FileExtension = string.Empty;
+					return false;
+			}
+		}
+
 	}
 }

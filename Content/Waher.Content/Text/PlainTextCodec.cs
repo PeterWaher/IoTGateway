@@ -142,6 +142,46 @@ namespace Waher.Content.Text
 		}
 
 		/// <summary>
+		/// Tries to get the file extension of an item, given its Content-Type.
+		/// </summary>
+		/// <param name="ContentType">Content type.</param>
+		/// <param name="FileExtension">File extension.</param>
+		/// <returns>If the Content-Type was recognized.</returns>
+		public bool TryGetFileExtension(string ContentType, out string FileExtension)
+		{
+			switch (ContentType.ToLower())
+			{
+				case "text/plain":
+					FileExtension = "txt";
+					return true;
+
+				case "text/css":
+					FileExtension = "css";
+					return true;
+
+				case "text/sgml":
+					FileExtension = "sgml";
+					return true;
+
+				case "text/tab-separated-values":
+					FileExtension = "tsv";
+					return true;
+
+				case "application/javascript":
+					FileExtension = "js";
+					return true;
+
+				case "text/richtext":
+					FileExtension = "rtx";
+					return true;
+
+				default:
+					FileExtension = string.Empty;
+					return false;
+			}
+		}
+
+		/// <summary>
 		/// If the encoder encodes a given object.
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>

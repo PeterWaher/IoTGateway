@@ -203,5 +203,74 @@ namespace Waher.Content.Video
 					return false;
 			}
 		}
+
+		/// <summary>
+		/// Tries to get the file extension of an item, given its Content-Type.
+		/// </summary>
+		/// <param name="ContentType">Content type.</param>
+		/// <param name="FileExtension">File extension.</param>
+		/// <returns>If the Content-Type was recognized.</returns>
+		public bool TryGetFileExtension(string ContentType, out string FileExtension)
+		{
+			switch (ContentType.ToLower())
+			{
+				case "video/mp4":
+					FileExtension = "mp4";
+					return true;
+
+				case "video/mpeg":
+					FileExtension = "mpg";
+					return true;
+
+				case "video/ogg":
+					FileExtension = "ogv";
+					return true;
+
+				case "video/quicktime":
+					FileExtension = "mov";
+					return true;
+
+				case "video/webm":
+					FileExtension = "webm";
+					return true;
+
+				case "video/x-la-asf":
+					FileExtension = "lsf";
+					return true;
+
+				case "video/x-ms-asf":
+					FileExtension = "asf";
+					return true;
+
+				case "video/x-msvideo":
+					FileExtension = "avi";
+					return true;
+
+				case "video/x-sgi-movie":
+					FileExtension = "movie";
+					return true;
+
+				case "video/3gpp":
+					FileExtension = "3gp";
+					return true;
+
+				case "video/3gpp2":
+					FileExtension = "3g2";
+					return true;
+
+				case "video/x-flv":
+					FileExtension = "flv";
+					return true;
+
+				case "video/x-wmv":
+					FileExtension = "wmv";
+					return true;
+
+				default:
+					FileExtension = string.Empty;
+					return false;
+			}
+		}
+
 	}
 }

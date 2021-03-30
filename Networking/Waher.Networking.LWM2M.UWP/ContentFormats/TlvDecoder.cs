@@ -75,6 +75,26 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		}
 
 		/// <summary>
+		/// Tries to get the file extension of an item, given its Content-Type.
+		/// </summary>
+		/// <param name="ContentType">Content type.</param>
+		/// <param name="FileExtension">File extension.</param>
+		/// <returns>If the Content-Type was recognized.</returns>
+		public bool TryGetFileExtension(string ContentType, out string FileExtension)
+		{
+			switch (ContentType.ToLower())
+			{
+				case TlvDecoder.ContentType:
+					FileExtension = "tlv";
+					return true;
+
+				default:
+					FileExtension = string.Empty;
+					return false;
+			}
+		}
+
+		/// <summary>
 		/// Decodes an object.
 		/// </summary>
 		/// <param name="ContentType">Internet Content Type.</param>

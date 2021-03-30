@@ -145,9 +145,6 @@ namespace Waher.Content.Audio
 					return true;
 
 				case "ra":
-					ContentType = "audio/x-pn-realaudio";
-					return true;
-
 				case "ram":
 					ContentType = "audio/x-pn-realaudio";
 					return true;
@@ -161,5 +158,54 @@ namespace Waher.Content.Audio
 					return false;
 			}
 		}
+
+		/// <summary>
+		/// Tries to get the file extension of an item, given its Content-Type.
+		/// </summary>
+		/// <param name="ContentType">Content type.</param>
+		/// <param name="FileExtension">File extension.</param>
+		/// <returns>If the Content-Type was recognized.</returns>
+		public bool TryGetFileExtension(string ContentType, out string FileExtension)
+		{
+			switch (ContentType.ToLower())
+			{
+				case "audio/basic":
+					FileExtension = "snd";
+					return true;
+
+				case "audio/mid":
+					FileExtension = "mid";
+					return true;
+
+				case "audio/mpeg":
+					FileExtension = "mp3";
+					return true;
+
+				case "audio/ogg":
+					FileExtension = "oga";
+					return true;
+
+				case "audio/x-aiff":
+					FileExtension = "aiff";
+					return true;
+
+				case "audio/x-mpegurl":
+					FileExtension = "m3u";
+					return true;
+
+				case "audio/x-pn-realaudio":
+					FileExtension = "ra";
+					return true;
+
+				case "audio/x-wav":
+					FileExtension = "wav";
+					return true;
+
+				default:
+					FileExtension = string.Empty;
+					return false;
+			}
+		}
+
 	}
 }

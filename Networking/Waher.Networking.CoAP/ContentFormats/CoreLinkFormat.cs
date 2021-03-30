@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.CoAP.CoRE;
 using Waher.Runtime.Inventory;
@@ -167,5 +165,26 @@ namespace Waher.Networking.CoAP.ContentFormats
 				return false;
 			}
 		}
+
+		/// <summary>
+		/// Tries to get the file extension of an item, given its Content-Type.
+		/// </summary>
+		/// <param name="ContentType">Content type.</param>
+		/// <param name="FileExtension">File extension.</param>
+		/// <returns>If the Content-Type was recognized.</returns>
+		public bool TryGetFileExtension(string ContentType, out string FileExtension)
+		{
+			switch (ContentType.ToLower())
+			{
+				case LinkFormatContentType:
+					FileExtension = "wlnk";
+					return true;
+
+				default:
+					FileExtension = string.Empty;
+					return false;
+			}
+		}
+
 	}
 }

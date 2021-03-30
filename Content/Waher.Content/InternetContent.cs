@@ -34,6 +34,7 @@ namespace Waher.Content
 		private readonly static Dictionary<string, KeyValuePair<Grade, IContentEncoder>> encodersByType =
 			new Dictionary<string, KeyValuePair<Grade, IContentEncoder>>();
 		private readonly static Dictionary<string, string> contentTypeByFileExtensions = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly static Dictionary<string, string> fileExtensionsByContentType = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, IContentConverter> convertersByStep = new Dictionary<string, IContentConverter>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, List<IContentConverter>> convertersByFrom = new Dictionary<string, List<IContentConverter>>();
 		private readonly static Dictionary<string, IContentGetter[]> gettersByScheme = new Dictionary<string, IContentGetter[]>(StringComparer.CurrentCultureIgnoreCase);
@@ -69,6 +70,11 @@ namespace Waher.Content
 			lock (contentTypeByFileExtensions)
 			{
 				contentTypeByFileExtensions.Clear();
+			}
+
+			lock (fileExtensionsByContentType)
+			{
+				fileExtensionsByContentType.Clear();
 			}
 
 			lock (convertersByStep)
@@ -591,6 +597,66 @@ namespace Waher.Content
 					lock (contentTypeByFileExtensions)
 					{
 						contentTypeByFileExtensions[FileExtension] = ContentType;
+					}
+
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Gets the file extension of an item, given its content type. It uses the <see cref="TryGetFileExtension"/> to see if any of the
+		/// content encoders/decoders support content with the corresponding content type. If no such encoder/decoder is found, the generic
+		/// bin extension is returned.
+		/// </summary>
+		/// <param name="ContentType">File Content-Type.</param>
+		/// <returns>File extension.</returns>
+		public static string GetFileExtension(string ContentType)
+		{
+			if (TryGetFileExtension(ContentType, out string FileExtension))
+				return FileExtension;
+			else
+				return "bin";
+		}
+
+		/// <summary>
+		/// Tries to get the file extension of an item, given its content type.
+		/// </summary>
+		/// <param name="ContentType">Content type.</param>
+		/// <param name="FileExtension">File extension.</param>
+		/// <returns>If the Content-Type was recognized.</returns>
+		public static bool TryGetFileExtension(string ContentType, out string FileExtension)
+		{
+			ContentType = ContentType.ToLower();
+
+			lock (fileExtensionsByContentType)
+			{
+				if (fileExtensionsByContentType.TryGetValue(ContentType, out FileExtension))
+					return true;
+			}
+
+			foreach (IContentDecoder Decoder in Decoders)
+			{
+				if (Decoder.TryGetFileExtension(ContentType, out FileExtension))
+				{
+					lock (fileExtensionsByContentType)
+					{
+						fileExtensionsByContentType[ContentType] = FileExtension;
+					}
+
+					return true;
+				}
+			}
+
+			foreach (IContentEncoder Encoder in Encoders)
+			{
+				if (Encoder.TryGetFileExtension(ContentType, out FileExtension))
+				{
+					lock (fileExtensionsByContentType)
+					{
+						fileExtensionsByContentType[ContentType] = FileExtension;
 					}
 
 					return true;

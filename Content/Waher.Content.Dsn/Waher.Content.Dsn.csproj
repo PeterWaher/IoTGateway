@@ -16,11 +16,11 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Delivery Status Notification DSN Multipart Report</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.1</AssemblyVersion>
-    <FileVersion>1.0.1</FileVersion>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0</FileVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

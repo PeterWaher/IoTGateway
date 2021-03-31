@@ -1614,24 +1614,24 @@
 										<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
 									</CreateFolder>
 									<RemoveFolder Id='RemovePlantUmlLabExamples' On='uninstall' />
-									<File Id='Gantt.uml' Name='Gantt.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Gantt.uml.uml' KeyPath='yes'/>
-									<File Id='JSON.uml' Name='JSON.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\JSON.uml.uml'/>
-									<File Id='MindMap.uml' Name='MindMap.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\MindMap.uml.uml'/>
-									<File Id='Network.uml' Name='Network.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Network.uml.uml'/>
-									<File Id='Object.uml' Name='Object.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Object.uml.uml'/>
-									<File Id='Salt.uml' Name='Salt.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Salt.uml.uml'/>
-									<File Id='Sequence.uml' Name='Sequence.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Sequence.uml.uml'/>
-									<File Id='State.uml' Name='State.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\State.uml.uml'/>
-									<File Id='Timing.uml' Name='Timing.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Timing.uml.uml'/>
-									<File Id='Use_Case.uml' Name='Use Case.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Use Case.uml.uml'/>
-									<File Id='Work.uml' Name='Work.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Work.uml.uml'/>
-									<File Id='YAML.uml' Name='YAML.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\YAML.uml.uml'/>
-									<File Id='Activity.uml' Name='Activity.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Activity.uml.uml'/>
-									<File Id='Archimate.uml' Name='Archimate.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Archimate.uml.uml'/>
-									<File Id='Class.uml' Name='Class.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Class.uml.uml'/>
-									<File Id='Component.uml' Name='Component.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Component.uml.uml'/>
-									<File Id='Deployment.uml' Name='Deployment.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Deployment.uml.uml'/>
-									<File Id='Entity.uml' Name='Entity.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Entity.uml.uml'/>
+									<File Id='Gantt.uml' Name='Gantt.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Gantt.uml' KeyPath='yes'/>
+									<File Id='JSON.uml' Name='JSON.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\JSON.uml'/>
+									<File Id='MindMap.uml' Name='MindMap.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\MindMap.uml'/>
+									<File Id='Network.uml' Name='Network.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Network.uml'/>
+									<File Id='Object.uml' Name='Object.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Object.uml'/>
+									<File Id='Salt.uml' Name='Salt.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Salt.uml'/>
+									<File Id='Sequence.uml' Name='Sequence.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Sequence.uml'/>
+									<File Id='State.uml' Name='State.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\State.uml'/>
+									<File Id='Timing.uml' Name='Timing.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Timing.uml'/>
+									<File Id='Use_Case.uml' Name='Use Case.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Use Case.uml'/>
+									<File Id='Work.uml' Name='Work.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Work.uml'/>
+									<File Id='YAML.uml' Name='YAML.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\YAML.uml'/>
+									<File Id='Activity.uml' Name='Activity.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Activity.uml'/>
+									<File Id='Archimate.uml' Name='Archimate.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Archimate.uml'/>
+									<File Id='Class.uml' Name='Class.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Class.uml'/>
+									<File Id='Component.uml' Name='Component.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Component.uml'/>
+									<File Id='Deployment.uml' Name='Deployment.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Deployment.uml'/>
+									<File Id='Entity.uml' Name='Entity.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Entity.uml'/>
 									<RemoveFile Id='RemoveGantt.uml' Name='Gantt.uml.dot' On='uninstall'/>
 									<RemoveFile Id='RemoveJSON.uml' Name='JSON.uml.dot' On='uninstall'/>
 									<RemoveFile Id='RemoveMindMap.uml' Name='MindMap.uml.dot' On='uninstall'/>
@@ -1988,10 +1988,10 @@
 				<ComponentRef Id='VideoFiles' />
 				<ComponentRef Id='TransformFiles' />
 				<ComponentRef Id='DefaultFiles'/>
-				<ComponentRef Id='GraphVizLab'/>
-				<ComponentRef Id='GraphVizLabExamples'/>
-				<ComponentRef Id='PlantUmlLab'/>
+				<ComponentRef Id='GraphVizLabFiles'/>
+				<ComponentRef Id='GraphVizLabExampleFiles'/>
 				<ComponentRef Id='PlantUmlLabFiles'/>
+				<ComponentRef Id='PlantUmlLabExampleFiles'/>
 			</Feature>
 			<Feature Id='Emoji1' Title='Emoji1' Description='Contains emojies from Emoji1.' Level='1'>
 				<ComponentRef Id='Emoji1Zip' />

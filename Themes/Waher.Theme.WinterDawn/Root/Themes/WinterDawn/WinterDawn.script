@@ -2,7 +2,13 @@ WinterDawn1600x1600:=NovaMandelbrotSmoothFractal(1.1537109375,0.3169921875,0.046
 WinterDawn1600x1600Dimmed:=Blend(WinterDawn1600x1600,"White",0.65);
 WinterDawn800x800:=NovaMandelbrotSmoothFractal(1.1537109375,0.3169921875,0.046875,1,0+1*i,RandomLinearAnalogousHSL(1024,16,1933158831),800,800);
 WinterDawn800x800Dimmed:=Blend(WinterDawn800x800,"White",0.65);
+WinterDawn3200x1800:=NovaMandelbrotSmoothFractal(1.1537109375,0.3169921875,0.046875,1,0+1*i,RandomLinearAnalogousHSL(1024,16,1933158831),3200,1800);
+WinterDawn3200x1800Dimmed:=Blend(WinterDawn3200x1800,"White",0.65);
 
 WinterDawnBanner1400x425:=NovaMandelbrotSmoothFractal(-0.2701171875,-0.176953125,0.1875,1+1*i,1+2*i,RandomLinearAnalogousHSL(1024,16,505958241),1400,425);
 WinterDawnBanner1900x500:=NovaMandelbrotSmoothFractal(-0.2701171875,-0.176953125,0.1875,1+1*i,1+2*i,RandomLinearAnalogousHSL(1024,16,505958241),1900,500);
 WinterDawnBanner2000x600:=NovaMandelbrotSmoothFractal(-0.2701171875,-0.176953125,0.1875,1+1*i,1+2*i,RandomLinearAnalogousHSL(1024,16,505958241),2000,600);
+WinterDawnBanner2400x600:=NovaMandelbrotSmoothFractal(-0.2701171875,-0.176953125,0.1875,1+1*i,1+2*i,RandomLinearAnalogousHSL(1024,16,505958241),2400,600);
+WinterDawnBanner2500x500:=NovaMandelbrotSmoothFractal(-0.2701171875,-0.176953125,0.1875,1+1*i,1+2*i,RandomLinearAnalogousHSL(1024,16,505958241),2500,500);
+WinterDawnBanner2600x600:=NovaMandelbrotSmoothFractal(-0.2701171875,-0.176953125,0.1875,1+1*i,1+2*i,RandomLinearAnalogousHSL(1024,16,505958241),2600,600);
+WinterDawnBanner3000x600:=NovaMandelbrotSmoothFractal(-0.2701171875,-0.176953125,0.1875,1+1*i,1+2*i,RandomLinearAnalogousHSL(1024,16,505958241),3000,600);

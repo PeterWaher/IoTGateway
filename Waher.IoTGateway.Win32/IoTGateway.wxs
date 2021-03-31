@@ -1623,7 +1623,7 @@
 									<File Id='Sequence.uml' Name='Sequence.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Sequence.uml.uml'/>
 									<File Id='State.uml' Name='State.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\State.uml.uml'/>
 									<File Id='Timing.uml' Name='Timing.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Timing.uml.uml'/>
-									<File Id='Use Case.uml' Name='Use Case.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Use Case.uml.uml'/>
+									<File Id='Use_Case.uml' Name='Use Case.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Use Case.uml.uml'/>
 									<File Id='Work.uml' Name='Work.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Work.uml.uml'/>
 									<File Id='YAML.uml' Name='YAML.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\YAML.uml.uml'/>
 									<File Id='Activity.uml' Name='Activity.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Activity.uml.uml'/>
@@ -1641,7 +1641,7 @@
 									<RemoveFile Id='RemoveSequence.uml' Name='Sequence.uml.dot' On='uninstall'/>
 									<RemoveFile Id='RemoveState.uml' Name='State.uml.dot' On='uninstall'/>
 									<RemoveFile Id='RemoveTiming.uml' Name='Timing.uml.dot' On='uninstall'/>
-									<RemoveFile Id='RemoveUse Case.uml' Name='Use Case.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveUse_Case.uml' Name='Use Case.uml.dot' On='uninstall'/>
 									<RemoveFile Id='RemoveWork.uml' Name='Work.uml.dot' On='uninstall'/>
 									<RemoveFile Id='RemoveYAML.uml' Name='YAML.uml.dot' On='uninstall'/>
 									<RemoveFile Id='RemoveActivity.uml' Name='Activity.uml.dot' On='uninstall'/>

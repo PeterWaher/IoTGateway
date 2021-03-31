@@ -6,7 +6,7 @@ Master: /Master.md
 JavaScript: Prompt.js
 Parameter: Expression
 UserVariable: User
-Privilege: Admin.Data.Prompt
+Privilege: Admin.Lab.Script
 Login: /Login.md
 
 Script prompt

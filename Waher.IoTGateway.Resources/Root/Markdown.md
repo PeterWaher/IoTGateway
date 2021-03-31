@@ -1277,6 +1277,8 @@ in its default folder.
 **Note 2**: You can make the graph clickable by embedding [URL attributes](http://www.graphviz.org/doc/info/attrs.html#d:URL) on either nodes, edges
 or the entire graph.
 
+**Note 3**: You can use the [GraphViz Lab](GraphVizLab/GraphVizLab.md) to experiment with GraphViz syntax.
+
 For more information about the GraphViz syntax, see the [GraphViz documentation](http://www.graphviz.org/documentation/).
 
 #### UML with PlantUML
@@ -1347,6 +1349,8 @@ WB is Waiting
 **Note**: If after having installed [PlantUML](http://plantuml.com/download) and [Java](https://www.java.com), the above is not displayed as a graph, 
 make sure to restart the IoT Gateway service (or the machine). PlantUML and Java are detected during initialization of the service. Make sure that 
 PlantUML is installed in the program data folder.
+
+**Note 2**: You can use the [PlantUML Lab](PlantUmlLab/PlantUmlLab.md) to experiment with PlantUML syntax.
 
 For more information about PlantUML syntax, see the [PlantUML Language Reference Guide](http://plantuml.com/PlantUML_Language_Reference_Guide.pdf).
 

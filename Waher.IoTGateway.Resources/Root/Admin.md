@@ -48,8 +48,13 @@ MenuHeader("Data");
 MenuItem("Backup","/Settings/Backup.md","Admin.Data.Backup");
 MenuItem("Database","/Settings/Database.md","Admin.Data.Database");
 MenuItem("Events","/Sniffers/EventLog.md","Admin.Data.Events");
-MenuItem("Prompt","/Prompt.md","Admin.Data.Prompt");
 MenuItem("Restore","/Settings/Restore.md","Admin.Data.Restore");
+MenuFooter();
+
+MenuHeader("Lab");
+MenuItem("GraphViz","/GraphVizLab/GraphVizLab.md",["Admin.Lab.Script","Admin.Lab.GraphViz"]);
+MenuItem("PlantUML","/PlantUmlLab/PlantUmlLab.md",["Admin.Lab.Script","Admin.Lab.PlantUml"]);
+MenuItem("Script","/Prompt.md","Admin.Lab.Script");
 MenuFooter();
 
 MenuHeader("Legal");

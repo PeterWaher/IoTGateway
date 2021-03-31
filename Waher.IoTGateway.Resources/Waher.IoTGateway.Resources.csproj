@@ -171,6 +171,11 @@
     <None Remove="Root\Emojis.md" />
     <None Remove="Root\Entities.md" />
     <None Remove="Root\favicon.ico" />
+    <None Remove="Root\GraphVizLab\Examples\Network.dot" />
+    <None Remove="Root\GraphVizLab\GraphVizLab.css" />
+    <None Remove="Root\GraphVizLab\GraphVizLab.js" />
+    <None Remove="Root\GraphVizLab\GraphVizLab.md" />
+    <None Remove="Root\GraphVizLab\GraphVizLabGraph.md" />
     <None Remove="Root\Images\Banner1 - 1400x425.png" />
     <None Remove="Root\Images\Banner1 - 1900x500.png" />
     <None Remove="Root\Images\Banner1 - 2000x600.png" />
@@ -180,6 +185,28 @@
     <None Remove="Root\Index.md" />
     <None Remove="Root\Markdown.md" />
     <None Remove="Root\Master.md" />
+    <None Remove="Root\PlantUmlLab\Examples\Activity.uml" />
+    <None Remove="Root\PlantUmlLab\Examples\Archimate.uml" />
+    <None Remove="Root\PlantUmlLab\Examples\Class.uml" />
+    <None Remove="Root\PlantUmlLab\Examples\Component.uml" />
+    <None Remove="Root\PlantUmlLab\Examples\Deployment.uml" />
+    <None Remove="Root\PlantUmlLab\Examples\Entity.uml" />
+    <None Remove="Root\PlantUmlLab\Examples\Gantt.uml" />
+    <None Remove="Root\PlantUmlLab\Examples\JSON.uml" />
+    <None Remove="Root\PlantUmlLab\Examples\MindMap.uml" />
+    <None Remove="Root\PlantUmlLab\Examples\Network.uml" />
+    <None Remove="Root\PlantUmlLab\Examples\Object.uml" />
+    <None Remove="Root\PlantUmlLab\Examples\Salt.uml" />
+    <None Remove="Root\PlantUmlLab\Examples\Sequence.uml" />
+    <None Remove="Root\PlantUmlLab\Examples\State.uml" />
+    <None Remove="Root\PlantUmlLab\Examples\Timing.uml" />
+    <None Remove="Root\PlantUmlLab\Examples\Use Case.uml" />
+    <None Remove="Root\PlantUmlLab\Examples\Work.uml" />
+    <None Remove="Root\PlantUmlLab\Examples\YAML.uml" />
+    <None Remove="Root\PlantUmlLab\PlantUmlLab.css" />
+    <None Remove="Root\PlantUmlLab\PlantUmlLab.js" />
+    <None Remove="Root\PlantUmlLab\PlantUmlLab.md" />
+    <None Remove="Root\PlantUmlLab\PlantUmlLabGraph.md" />
     <None Remove="Root\Prompt.js" />
     <None Remove="Root\Prompt.md" />
     <None Remove="Root\RemoteEndpoint.js" />
@@ -631,6 +658,87 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Highlight\styles\zenburn.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\GraphVizLab\Examples\Network.dot">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\GraphVizLab\GraphVizLab.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\GraphVizLab\GraphVizLab.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\GraphVizLab\GraphVizLab.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\GraphVizLab\GraphVizLabGraph.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\Activity.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\Archimate.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\Class.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\Component.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\Deployment.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\Entity.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\Gantt.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\JSON.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\MindMap.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\Network.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\Object.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\Salt.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\Sequence.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\State.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\Timing.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\Use Case.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\Work.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\Examples\YAML.uml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\PlantUmlLab.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\PlantUmlLab.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\PlantUmlLab.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\PlantUmlLab\PlantUmlLabGraph.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\RemoteEndpointClear.ws">

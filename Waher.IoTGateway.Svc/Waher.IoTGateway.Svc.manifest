@@ -569,11 +569,46 @@
 			<Content fileName="SimpleTree.cssx"/>
 			<Content fileName="SimpleTree.js"/>
 		</Folder>
+		<Folder name="GraphVizLab">
+			<Folder name="Examples">
+				<Content fileName="Network.dot"/>
+			</Folder>
+			<Content fileName="GraphVizLab.js"/>
+			<Content fileName="GraphVizLab.md"/>
+			<Content fileName="GraphVizLabGraph.md"/>
+			<Content fileName="GraphVizLab.css"/>
+		</Folder>
 		<Folder name='Images'>
 			<Content fileName='logo-WaherDataAB-200x39.png'/>
 			<Content fileName='logo-WaherDataAB-300x58.png'/>
 			<Content fileName='logo-WaherDataAB-400x77.png'/>
 			<Content fileName='logo-WaherDataAB-500x97.png'/>
+		</Folder>
+		<Folder name="PlantUmlLab">
+			<Folder name="Examples">
+				<Content fileName="Entity.uml"/>
+				<Content fileName="Gantt.uml"/>
+				<Content fileName="JSON.uml"/>
+				<Content fileName="MindMap.uml"/>
+				<Content fileName="Network.uml"/>
+				<Content fileName="Object.uml"/>
+				<Content fileName="Salt.uml"/>
+				<Content fileName="Sequence.uml"/>
+				<Content fileName="State.uml"/>
+				<Content fileName="Timing.uml"/>
+				<Content fileName="Use Case.uml"/>
+				<Content fileName="Work.uml"/>
+				<Content fileName="YAML.uml"/>
+				<Content fileName="Activity.uml"/>
+				<Content fileName="Archimate.uml"/>
+				<Content fileName="Class.uml"/>
+				<Content fileName="Component.uml"/>
+				<Content fileName="Deployment.uml"/>
+			</Folder>
+			<Content fileName="PlantUmlLab.js"/>
+			<Content fileName="PlantUmlLab.md"/>
+			<Content fileName="PlantUmlLabGraph.md"/>
+			<Content fileName="PlantUmlLab.css"/>
 		</Folder>
 		<Folder name='Settings'>
 			<Content fileName='Backup.js'/>

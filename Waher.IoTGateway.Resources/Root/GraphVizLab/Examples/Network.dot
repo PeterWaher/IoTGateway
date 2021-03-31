@@ -1,0 +1,73 @@
+digraph G {
+rankdir=LR
+
+# Syntax: firewall1 [shape=none, label="firewall1", labelloc="b", image="firewall.gif"]
+# node for the firewall
+
+firewall1 [shape=none, label="firewall1", labelloc="b", image="firewall.gif"]
+
+# Syntax: Nets1 [shape=none, label="10.1.1.0/24\ndomainname1", image="cloud.gif"]
+# nodes directly connected netsNetz12700132 [shape=none, label="127.0.0.1/32\n", image="cloud.gif"]
+
+Netz101010029 [shape=none, label="10.10.10.0/29\ninternal", image="cloud.gif"]
+Netz202020028 [shape=none, label="20.20.20.0/28\ndmz1", image="cloud.gif"]
+Netz808080028 [shape=none, label="80.80.80.0/28\ndmz2", image="cloud.gif"]
+
+# Syntax: Nets1 [shape=none, label="10.1.1.0/24\ndomainname2", image="cloud_routed_net.gif"]
+# nodes for static route nets
+
+Netz303030024 [shape=none, label="30.30.30.0/24\n", image="cloud_routed_net.gif"]
+Netz404040024 [shape=none, label="40.40.40.0/24\n", image="cloud_routed_net.gif"]
+Netz505050024 [shape=none, label="50.50.50.0/24\ndmz3", image="cloud_routed_net.gif"]
+Netz606060024 [shape=none, label="60.60.60.0/24\n", image="cloud_routed_net.gif"]
+Netz707070024 [shape=none, label="70.70.70.0/24\n", image="cloud_routed_net.gif"]
+
+# Router1 [shape=none, label="", image="router2.gif"]
+# nodes for all next hops
+
+Router10101010 [shape=none, label="router1.internal.mycompany.com", labelloc="b", image="router.gif"]
+Router10101011 [shape=none, label="serverfarmfw1.dmz3.mycompany.com", labelloc="b", image="firewall.gif"]
+Router20202010 [shape=none, label="router2.dmz1.mycompany.com", labelloc="b", image="router.gif"]
+
+# FirewallIFsNR [shape=Mrecord, label="IF1\n10.1.1.1|IF2\n10.1.2.1"]
+# record based node for firewall interface table where there is no route
+
+firewall1IFsNR [shape=Mrecord, label="ae3c1\n80.80.80.1|loop0c0\n127.0.0.1|"]
+
+# FirewallIFsR [shape=Mrecord, label="IF3\n10.1.3.1|IF4\n10.1.4.1"]
+# record based node for firewall interface table where there is a route
+
+firewall1IFsR [shape=Mrecord, label="ae1c0\n10.10.10.1|ae2c1\n20.20.20.1|"]
+
+# Netz1 -> FirewallIFsNR:IF1 [dir=back]
+# edge for firewalls interface with direct networks only
+
+Netz12700132 -> firewall1IFsNR:loop0c0
+Netz808080028 -> firewall1IFsNR:ae3c1
+
+# edge for firewall interface table to firewall
+# FirewallIFsNR -> Firewall [dir=none, penwidth=50, color="#8b0000"]
+# Firewall -> FirewallIFsR [dir=none, penwidth=50, color="#8b0000"]
+
+firewall1IFsNR -> firewall1 [dir=none, penwidth=50, color="#8b0000"]
+firewall1 -> firewall1IFsR [dir=none, penwidth=50, color="#8b0000"]
+
+# edge for not direct networks to firewall interface table and to router and to nets
+# FirewallIFsR:IF3 -> Netz3
+# Netz3 -> Router1 [headlabel="10.1.3.2"]
+# Router1 -> Netz5
+
+firewall1IFsR:ae1c0 -> Netz101010029
+firewall1IFsR:ae2c1 -> Netz202020028
+
+Netz101010029 -> Router10101010[headlabel="10.10.10.10"]
+Netz202020028 -> Router10101011[headlabel="10.10.10.11"]
+Netz202020028 -> Router20202010[headlabel="20.20.20.10"]
+
+Router10101010 -> Netz303030024
+Router10101010 -> Netz404040024
+Router10101010 -> Netz505050024
+Router20202010 -> Netz606060024
+Router10101011 -> Netz707070024
+
+}

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
 		 xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
-     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+  xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 	<Product Name="IoT Gateway" Version="1.0" Manufacturer="Waher Data AB" Language="1033" Codepage="1252"
-					   Id="544085A3-0819-4968-A4EC-537570AC3649" UpgradeCode="DA42DB5D-4E79-4AF9-AB56-06C31B06143C">
+					 Id="544085A3-0819-4968-A4EC-537570AC3649" UpgradeCode="DA42DB5D-4E79-4AF9-AB56-06C31B06143C">
 		<Package Id='*' Keywords='Installer' InstallScope='perMachine'
 							 Description="IoT Gateway Installer" Comments='The Waher IoT Gateway is a registered trademark of Waher Data AB.'
 							 Manufacturer='Waher Data AB' InstallerVersion='301' Languages='1033' Compressed='yes'
@@ -280,163 +280,163 @@
 							<File Id='System.Xml.XPath.dll' Name='System.Xml.XPath.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Xml.XPath.dll' Vital='yes' KeyPath='yes'/>
 							<File Id='System.Xml.XPath.XDocument.dll' Name='System.Xml.XPath.XDocument.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Xml.XPath.XDocument.dll' Vital='yes'/>
 							<File Id='System.Xml.XPath.XmlDocument.dll' Name='System.Xml.XPath.XmlDocument.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Xml.XPath.XmlDocument.dll' Vital='yes'/>
-							<RemoveFile Id='RemoveSystem.AppContext.dll' Name='System.AppContext.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Buffers.dll' Name='System.Buffers.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Collections.Concurrent.dll' Name='System.Collections.Concurrent.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Collections.dll' Name='System.Collections.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Collections.Immutable.dll' Name='System.Collections.Immutable.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Collections.NonGeneric.dll' Name='System.Collections.NonGeneric.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Collections.Specialized.dll' Name='System.Collections.Specialized.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.ComponentModel.Annotations.dll' Name='System.ComponentModel.Annotations.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.ComponentModel.DataAnnotations.dll' Name='System.ComponentModel.DataAnnotations.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.ComponentModel.dll' Name='System.ComponentModel.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.ComponentModel.EventBasedAsync.dll' Name='System.ComponentModel.EventBasedAsync.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.ComponentModel.Primitives.dll' Name='System.ComponentModel.Primitives.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.ComponentModel.TypeConverter.dll' Name='System.ComponentModel.TypeConverter.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Configuration.dll' Name='System.Configuration.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Configuration.ConfigurationManager.dll' Name='System.Configuration.ConfigurationManager.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Console.dll' Name='System.Console.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Core.dll' Name='System.Core.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Data.Common.dll' Name='System.Data.Common.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Data.dll' Name='System.Data.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Diagnostics.Contracts.dll' Name='System.Diagnostics.Contracts.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Diagnostics.Debug.dll' Name='System.Diagnostics.Debug.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Diagnostics.DiagnosticSource.dll' Name='System.Diagnostics.DiagnosticSource.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Diagnostics.EventLog.dll' Name='System.Diagnostics.EventLog.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Diagnostics.FileVersionInfo.dll' Name='System.Diagnostics.FileVersionInfo.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Diagnostics.PerformanceCounter.dll' Name='System.Diagnostics.PerformanceCounter.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Diagnostics.Process.dll' Name='System.Diagnostics.Process.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Diagnostics.StackTrace.dll' Name='System.Diagnostics.StackTrace.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Diagnostics.TextWriterTraceListener.dll' Name='System.Diagnostics.TextWriterTraceListener.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Diagnostics.Tools.dll' Name='System.Diagnostics.Tools.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Diagnostics.TraceSource.dll' Name='System.Diagnostics.TraceSource.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Diagnostics.Tracing.dll' Name='System.Diagnostics.Tracing.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.dll' Name='System.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Drawing.dll' Name='System.Drawing.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Drawing.Primitives.dll' Name='System.Drawing.Primitives.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Dynamic.Runtime.dll' Name='System.Dynamic.Runtime.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Globalization.Calendars.dll' Name='System.Globalization.Calendars.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Globalization.dll' Name='System.Globalization.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Globalization.Extensions.dll' Name='System.Globalization.Extensions.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.IO.Compression.dll' Name='System.IO.Compression.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.IO.Compression.Brotli.dll' Name='System.IO.Compression.Brotli.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.IO.Compression.FileSystem.dll' Name='System.IO.Compression.FileSystem.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.IO.Compression.ZipFile.dll' Name='System.IO.Compression.ZipFile.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.IO.dll' Name='System.IO.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.IO.FileSystem.AccessControl.dll' Name='System.IO.FileSystem.AccessControl.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.IO.FileSystem.dll' Name='System.IO.FileSystem.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.IO.FileSystem.DriveInfo.dll' Name='System.IO.FileSystem.DriveInfo.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.IO.FileSystem.Primitives.dll' Name='System.IO.FileSystem.Primitives.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.IO.FileSystem.Watcher.dll' Name='System.IO.FileSystem.Watcher.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.IO.IsolatedStorage.dll' Name='System.IO.IsolatedStorage.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.IO.MemoryMappedFiles.dll' Name='System.IO.MemoryMappedFiles.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.IO.Pipes.dll' Name='System.IO.Pipes.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.IO.Pipes.AccessControl.dll' Name='System.IO.Pipes.AccessControl.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.IO.UnmanagedMemoryStream.dll' Name='System.IO.UnmanagedMemoryStream.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Linq.dll' Name='System.Linq.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Linq.Expressions.dll' Name='System.Linq.Expressions.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Linq.Parallel.dll' Name='System.Linq.Parallel.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Linq.Queryable.dll' Name='System.Linq.Queryable.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Memory.dll' Name='System.Memory.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Net.dll' Name='System.Net.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Net.Http.dll' Name='System.Net.Http.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Net.HttpListener.dll' Name='System.Net.HttpListener.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Net.Mail.dll' Name='System.Net.Mail.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Net.NameResolution.dll' Name='System.Net.NameResolution.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Net.NetworkInformation.dll' Name='System.Net.NetworkInformation.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Net.Ping.dll' Name='System.Net.Ping.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Net.Primitives.dll' Name='System.Net.Primitives.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Net.Requests.dll' Name='System.Net.Requests.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Net.Security.dll' Name='System.Net.Security.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Net.ServicePoint.dll' Name='System.Net.ServicePoint.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Net.Sockets.dll' Name='System.Net.Sockets.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Net.WebClient.dll' Name='System.Net.WebClient.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Net.WebHeaderCollection.dll' Name='System.Net.WebHeaderCollection.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Net.WebProxy.dll' Name='System.Net.WebProxy.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Net.WebSockets.Client.dll' Name='System.Net.WebSockets.Client.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Net.WebSockets.dll' Name='System.Net.WebSockets.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Numerics.dll' Name='System.Numerics.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Numerics.Vectors.dll' Name='System.Numerics.Vectors.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.ObjectModel.dll' Name='System.ObjectModel.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Private.CoreLib.dll' Name='System.Private.CoreLib.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Private.DataContractSerialization.dll' Name='System.Private.DataContractSerialization.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Private.Uri.dll' Name='System.Private.Uri.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Private.Xml.dll' Name='System.Private.Xml.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Private.Xml.Linq.dll' Name='System.Private.Xml.Linq.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Reflection.DispatchProxy.dll' Name='System.Reflection.DispatchProxy.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Reflection.dll' Name='System.Reflection.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Reflection.Emit.dll' Name='System.Reflection.Emit.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Reflection.Emit.ILGeneration.dll' Name='System.Reflection.Emit.ILGeneration.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Reflection.Emit.Lightweight.dll' Name='System.Reflection.Emit.Lightweight.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Reflection.Extensions.dll' Name='System.Reflection.Extensions.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Reflection.Metadata.dll' Name='System.Reflection.Metadata.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Reflection.Primitives.dll' Name='System.Reflection.Primitives.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Reflection.TypeExtensions.dll' Name='System.Reflection.TypeExtensions.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Resources.Reader.dll' Name='System.Resources.Reader.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Resources.ResourceManager.dll' Name='System.Resources.ResourceManager.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Resources.Writer.dll' Name='System.Resources.Writer.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Runtime.CompilerServices.Unsafe.dll' Name='System.Runtime.CompilerServices.Unsafe.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Runtime.CompilerServices.VisualC.dll' Name='System.Runtime.CompilerServices.VisualC.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Runtime.dll' Name='System.Runtime.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Runtime.Extensions.dll' Name='System.Runtime.Extensions.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Runtime.Handles.dll' Name='System.Runtime.Handles.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Runtime.InteropServices.dll' Name='System.Runtime.InteropServices.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Runtime.InteropServices.RuntimeInformation.dll' Name='System.Runtime.InteropServices.RuntimeInformation.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Runtime.InteropServices.WindowsRuntime.dll' Name='System.Runtime.InteropServices.WindowsRuntime.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Runtime.Loader.dll' Name='System.Runtime.Loader.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Runtime.Numerics.dll' Name='System.Runtime.Numerics.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Runtime.Serialization.dll' Name='System.Runtime.Serialization.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Runtime.Serialization.Formatters.dll' Name='System.Runtime.Serialization.Formatters.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Runtime.Serialization.Json.dll' Name='System.Runtime.Serialization.Json.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Runtime.Serialization.Primitives.dll' Name='System.Runtime.Serialization.Primitives.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Runtime.Serialization.Xml.dll' Name='System.Runtime.Serialization.Xml.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.AccessControl.dll' Name='System.Security.AccessControl.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.Claims.dll' Name='System.Security.Claims.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.Cryptography.Algorithms.dll' Name='System.Security.Cryptography.Algorithms.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.Cryptography.Cng.dll' Name='System.Security.Cryptography.Cng.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.Cryptography.Csp.dll' Name='System.Security.Cryptography.Csp.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.Cryptography.Encoding.dll' Name='System.Security.Cryptography.Encoding.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.Cryptography.OpenSsl.dll' Name='System.Security.Cryptography.OpenSsl.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.Cryptography.ProtectedData.dll' Name='System.Security.Cryptography.ProtectedData.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.dll' Name='System.Security.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.Permissions.dll' Name='System.Security.Permissions.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.Principal.dll' Name='System.Security.Principal.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.Principal.Windows.dll' Name='System.Security.Principal.Windows.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Security.SecureString.dll' Name='System.Security.SecureString.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.ServiceModel.Web.dll' Name='System.ServiceModel.Web.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.ServiceProcess.dll' Name='System.ServiceProcess.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.ServiceProcess.ServiceController.dll' Name='System.ServiceProcess.ServiceController.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Text.Encoding.CodePages.dll' Name='System.Text.Encoding.CodePages.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Text.Encoding.dll' Name='System.Text.Encoding.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Text.Encoding.Extensions.dll' Name='System.Text.Encoding.Extensions.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Text.RegularExpressions.dll' Name='System.Text.RegularExpressions.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Threading.dll' Name='System.Threading.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Threading.Overlapped.dll' Name='System.Threading.Overlapped.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Threading.Tasks.Dataflow.dll' Name='System.Threading.Tasks.Dataflow.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Threading.Tasks.dll' Name='System.Threading.Tasks.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Threading.Tasks.Extensions.dll' Name='System.Threading.Tasks.Extensions.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Threading.Tasks.Parallel.dll' Name='System.Threading.Tasks.Parallel.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Threading.Thread.dll' Name='System.Threading.Thread.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Threading.ThreadPool.dll' Name='System.Threading.ThreadPool.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Threading.Timer.dll' Name='System.Threading.Timer.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Transactions.dll' Name='System.Transactions.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Transactions.Local.dll' Name='System.Transactions.Local.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.ValueTuple.dll' Name='System.ValueTuple.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Web.dll' Name='System.Web.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Web.HttpUtility.dll' Name='System.Web.HttpUtility.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Windows.dll' Name='System.Windows.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Xml.dll' Name='System.Xml.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Xml.Linq.dll' Name='System.Xml.Linq.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Xml.ReaderWriter.dll' Name='System.Xml.ReaderWriter.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Xml.Serialization.dll' Name='System.Xml.Serialization.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Xml.XDocument.dll' Name='System.Xml.XDocument.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Xml.XmlDocument.dll' Name='System.Xml.XmlDocument.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Xml.XmlSerializer.dll' Name='System.Xml.XmlSerializer.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Xml.XPath.dll' Name='System.Xml.XPath.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Xml.XPath.XDocument.dll' Name='System.Xml.XPath.XDocument.dll'  On='uninstall' />
-							<RemoveFile Id='RemoveSystem.Xml.XPath.XmlDocument.dll' Name='System.Xml.XPath.XmlDocument.dll'  On='uninstall' />
+							<RemoveFile Id='RemoveSystem.AppContext.dll' Name='System.AppContext.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Buffers.dll' Name='System.Buffers.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Collections.Concurrent.dll' Name='System.Collections.Concurrent.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Collections.dll' Name='System.Collections.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Collections.Immutable.dll' Name='System.Collections.Immutable.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Collections.NonGeneric.dll' Name='System.Collections.NonGeneric.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Collections.Specialized.dll' Name='System.Collections.Specialized.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.ComponentModel.Annotations.dll' Name='System.ComponentModel.Annotations.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.ComponentModel.DataAnnotations.dll' Name='System.ComponentModel.DataAnnotations.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.ComponentModel.dll' Name='System.ComponentModel.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.ComponentModel.EventBasedAsync.dll' Name='System.ComponentModel.EventBasedAsync.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.ComponentModel.Primitives.dll' Name='System.ComponentModel.Primitives.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.ComponentModel.TypeConverter.dll' Name='System.ComponentModel.TypeConverter.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Configuration.dll' Name='System.Configuration.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Configuration.ConfigurationManager.dll' Name='System.Configuration.ConfigurationManager.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Console.dll' Name='System.Console.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Core.dll' Name='System.Core.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Data.Common.dll' Name='System.Data.Common.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Data.dll' Name='System.Data.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Diagnostics.Contracts.dll' Name='System.Diagnostics.Contracts.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Diagnostics.Debug.dll' Name='System.Diagnostics.Debug.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Diagnostics.DiagnosticSource.dll' Name='System.Diagnostics.DiagnosticSource.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Diagnostics.EventLog.dll' Name='System.Diagnostics.EventLog.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Diagnostics.FileVersionInfo.dll' Name='System.Diagnostics.FileVersionInfo.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Diagnostics.PerformanceCounter.dll' Name='System.Diagnostics.PerformanceCounter.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Diagnostics.Process.dll' Name='System.Diagnostics.Process.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Diagnostics.StackTrace.dll' Name='System.Diagnostics.StackTrace.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Diagnostics.TextWriterTraceListener.dll' Name='System.Diagnostics.TextWriterTraceListener.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Diagnostics.Tools.dll' Name='System.Diagnostics.Tools.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Diagnostics.TraceSource.dll' Name='System.Diagnostics.TraceSource.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Diagnostics.Tracing.dll' Name='System.Diagnostics.Tracing.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.dll' Name='System.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Drawing.dll' Name='System.Drawing.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Drawing.Primitives.dll' Name='System.Drawing.Primitives.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Dynamic.Runtime.dll' Name='System.Dynamic.Runtime.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Globalization.Calendars.dll' Name='System.Globalization.Calendars.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Globalization.dll' Name='System.Globalization.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Globalization.Extensions.dll' Name='System.Globalization.Extensions.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.IO.Compression.dll' Name='System.IO.Compression.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.IO.Compression.Brotli.dll' Name='System.IO.Compression.Brotli.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.IO.Compression.FileSystem.dll' Name='System.IO.Compression.FileSystem.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.IO.Compression.ZipFile.dll' Name='System.IO.Compression.ZipFile.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.IO.dll' Name='System.IO.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.IO.FileSystem.AccessControl.dll' Name='System.IO.FileSystem.AccessControl.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.IO.FileSystem.dll' Name='System.IO.FileSystem.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.IO.FileSystem.DriveInfo.dll' Name='System.IO.FileSystem.DriveInfo.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.IO.FileSystem.Primitives.dll' Name='System.IO.FileSystem.Primitives.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.IO.FileSystem.Watcher.dll' Name='System.IO.FileSystem.Watcher.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.IO.IsolatedStorage.dll' Name='System.IO.IsolatedStorage.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.IO.MemoryMappedFiles.dll' Name='System.IO.MemoryMappedFiles.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.IO.Pipes.dll' Name='System.IO.Pipes.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.IO.Pipes.AccessControl.dll' Name='System.IO.Pipes.AccessControl.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.IO.UnmanagedMemoryStream.dll' Name='System.IO.UnmanagedMemoryStream.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Linq.dll' Name='System.Linq.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Linq.Expressions.dll' Name='System.Linq.Expressions.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Linq.Parallel.dll' Name='System.Linq.Parallel.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Linq.Queryable.dll' Name='System.Linq.Queryable.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Memory.dll' Name='System.Memory.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Net.dll' Name='System.Net.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Net.Http.dll' Name='System.Net.Http.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Net.HttpListener.dll' Name='System.Net.HttpListener.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Net.Mail.dll' Name='System.Net.Mail.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Net.NameResolution.dll' Name='System.Net.NameResolution.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Net.NetworkInformation.dll' Name='System.Net.NetworkInformation.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Net.Ping.dll' Name='System.Net.Ping.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Net.Primitives.dll' Name='System.Net.Primitives.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Net.Requests.dll' Name='System.Net.Requests.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Net.Security.dll' Name='System.Net.Security.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Net.ServicePoint.dll' Name='System.Net.ServicePoint.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Net.Sockets.dll' Name='System.Net.Sockets.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Net.WebClient.dll' Name='System.Net.WebClient.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Net.WebHeaderCollection.dll' Name='System.Net.WebHeaderCollection.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Net.WebProxy.dll' Name='System.Net.WebProxy.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Net.WebSockets.Client.dll' Name='System.Net.WebSockets.Client.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Net.WebSockets.dll' Name='System.Net.WebSockets.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Numerics.dll' Name='System.Numerics.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Numerics.Vectors.dll' Name='System.Numerics.Vectors.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.ObjectModel.dll' Name='System.ObjectModel.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Private.CoreLib.dll' Name='System.Private.CoreLib.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Private.DataContractSerialization.dll' Name='System.Private.DataContractSerialization.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Private.Uri.dll' Name='System.Private.Uri.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Private.Xml.dll' Name='System.Private.Xml.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Private.Xml.Linq.dll' Name='System.Private.Xml.Linq.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Reflection.DispatchProxy.dll' Name='System.Reflection.DispatchProxy.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Reflection.dll' Name='System.Reflection.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Reflection.Emit.dll' Name='System.Reflection.Emit.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Reflection.Emit.ILGeneration.dll' Name='System.Reflection.Emit.ILGeneration.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Reflection.Emit.Lightweight.dll' Name='System.Reflection.Emit.Lightweight.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Reflection.Extensions.dll' Name='System.Reflection.Extensions.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Reflection.Metadata.dll' Name='System.Reflection.Metadata.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Reflection.Primitives.dll' Name='System.Reflection.Primitives.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Reflection.TypeExtensions.dll' Name='System.Reflection.TypeExtensions.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Resources.Reader.dll' Name='System.Resources.Reader.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Resources.ResourceManager.dll' Name='System.Resources.ResourceManager.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Resources.Writer.dll' Name='System.Resources.Writer.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.CompilerServices.Unsafe.dll' Name='System.Runtime.CompilerServices.Unsafe.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.CompilerServices.VisualC.dll' Name='System.Runtime.CompilerServices.VisualC.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.dll' Name='System.Runtime.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.Extensions.dll' Name='System.Runtime.Extensions.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.Handles.dll' Name='System.Runtime.Handles.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.InteropServices.dll' Name='System.Runtime.InteropServices.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.InteropServices.RuntimeInformation.dll' Name='System.Runtime.InteropServices.RuntimeInformation.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.InteropServices.WindowsRuntime.dll' Name='System.Runtime.InteropServices.WindowsRuntime.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.Loader.dll' Name='System.Runtime.Loader.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.Numerics.dll' Name='System.Runtime.Numerics.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.Serialization.dll' Name='System.Runtime.Serialization.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.Serialization.Formatters.dll' Name='System.Runtime.Serialization.Formatters.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.Serialization.Json.dll' Name='System.Runtime.Serialization.Json.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.Serialization.Primitives.dll' Name='System.Runtime.Serialization.Primitives.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.Serialization.Xml.dll' Name='System.Runtime.Serialization.Xml.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.AccessControl.dll' Name='System.Security.AccessControl.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.Claims.dll' Name='System.Security.Claims.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.Cryptography.Algorithms.dll' Name='System.Security.Cryptography.Algorithms.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.Cryptography.Cng.dll' Name='System.Security.Cryptography.Cng.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.Cryptography.Csp.dll' Name='System.Security.Cryptography.Csp.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.Cryptography.Encoding.dll' Name='System.Security.Cryptography.Encoding.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.Cryptography.OpenSsl.dll' Name='System.Security.Cryptography.OpenSsl.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.Cryptography.ProtectedData.dll' Name='System.Security.Cryptography.ProtectedData.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.dll' Name='System.Security.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.Permissions.dll' Name='System.Security.Permissions.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.Principal.dll' Name='System.Security.Principal.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.Principal.Windows.dll' Name='System.Security.Principal.Windows.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.SecureString.dll' Name='System.Security.SecureString.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.ServiceModel.Web.dll' Name='System.ServiceModel.Web.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.ServiceProcess.dll' Name='System.ServiceProcess.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.ServiceProcess.ServiceController.dll' Name='System.ServiceProcess.ServiceController.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Text.Encoding.CodePages.dll' Name='System.Text.Encoding.CodePages.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Text.Encoding.dll' Name='System.Text.Encoding.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Text.Encoding.Extensions.dll' Name='System.Text.Encoding.Extensions.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Text.RegularExpressions.dll' Name='System.Text.RegularExpressions.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Threading.dll' Name='System.Threading.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Threading.Overlapped.dll' Name='System.Threading.Overlapped.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Threading.Tasks.Dataflow.dll' Name='System.Threading.Tasks.Dataflow.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Threading.Tasks.dll' Name='System.Threading.Tasks.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Threading.Tasks.Extensions.dll' Name='System.Threading.Tasks.Extensions.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Threading.Tasks.Parallel.dll' Name='System.Threading.Tasks.Parallel.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Threading.Thread.dll' Name='System.Threading.Thread.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Threading.ThreadPool.dll' Name='System.Threading.ThreadPool.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Threading.Timer.dll' Name='System.Threading.Timer.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Transactions.dll' Name='System.Transactions.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Transactions.Local.dll' Name='System.Transactions.Local.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.ValueTuple.dll' Name='System.ValueTuple.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Web.dll' Name='System.Web.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Web.HttpUtility.dll' Name='System.Web.HttpUtility.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Windows.dll' Name='System.Windows.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Xml.dll' Name='System.Xml.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Xml.Linq.dll' Name='System.Xml.Linq.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Xml.ReaderWriter.dll' Name='System.Xml.ReaderWriter.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Xml.Serialization.dll' Name='System.Xml.Serialization.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Xml.XDocument.dll' Name='System.Xml.XDocument.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Xml.XmlDocument.dll' Name='System.Xml.XmlDocument.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Xml.XmlSerializer.dll' Name='System.Xml.XmlSerializer.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Xml.XPath.dll' Name='System.Xml.XPath.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Xml.XPath.XDocument.dll' Name='System.Xml.XPath.XDocument.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Xml.XPath.XmlDocument.dll' Name='System.Xml.XPath.XmlDocument.dll' On='uninstall' />
 						</Component>
 						<Component Id='MicrosoftLibraries' Guid='A9BAC7EA-59F6-4362-B44C-63B82A034C88'>
 							<File Id='clrcompression.dll' Name='clrcompression.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\clrcompression.dll' Vital='yes' KeyPath='yes' />
@@ -548,7 +548,7 @@
 							<File Id='Waher.IoTGateway.Resources.dll' Name='Waher.IoTGateway.Resources.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Resources.dll' Vital='yes'/>
 							<File Id='Waher.IoTGateway.Svc.exe' Name='Waher.IoTGateway.Svc.exe' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Svc.exe' Vital='yes' KeyPath='yes'>
 								<Shortcut Id="StartMenuIoTGatewayConsole" Directory="ProgramMenuDir" Name="IoT Gateway 1.0"
-										  WorkingDirectory='INSTALLDIR' Icon="eye.ico" Arguments="-console" IconIndex="0" Advertise="yes" />
+										 WorkingDirectory='INSTALLDIR' Icon="eye.ico" Arguments="-console" IconIndex="0" Advertise="yes" />
 							</File>
 							<File Id='Waher.IoTGateway.Svc.dll' Name='Waher.IoTGateway.Svc.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Svc.dll' Vital='yes' />
 							<File Id='Waher.IoTGateway.Svc.deps.json' Name='Waher.IoTGateway.Svc.deps.json' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.IoTGateway.Svc.deps.json' Vital='yes' />
@@ -1537,6 +1537,46 @@
 								<RemoveFile Id='Removeglass_ping_Go445_1207030150.wav' Name='glass_ping-Go445-1207030150.wav' On='uninstall'/>
 							</Component>
 						</Directory>
+						<Directory Id='Controls' Name='Controls'>
+							<Component Id='ControlFiles' Guid='9c6c1624-b970-4770-9245-798252976610'>
+								<CreateFolder>
+									<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+								</CreateFolder>
+								<RemoveFolder Id='ControlFiles' On='uninstall' />
+								<File Id='SimpleTable.script' Name='SimpleTable.script' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Controls\SimpleTable.script' Vital='yes' KeyPath='yes'/>
+								<File Id='SimpleTree.cssx' Name='SimpleTree.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Controls\SimpleTree.cssx' Vital='yes'/>
+								<File Id='SimpleTree.js' Name='SimpleTree.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Controls\SimpleTree.js' Vital='yes'/>
+								<RemoveFile Id='RemoveSimpleTable.script' Name='SimpleTable.script' On='uninstall'/>
+								<RemoveFile Id='RemoveSimpleTree.cssx' Name='SimpleTree.cssx' On='uninstall'/>
+								<RemoveFile Id='RemoveSimpleTree.js' Name='SimpleTree.js' On='uninstall'/>
+							</Component>
+						</Directory>
+						<Directory Id='GraphVizLab' Name='GraphVizLab'>
+							<Component Id='GraphVizLabFiles' Guid='4AFED4EB-8449-4C59-9762-1A9E99679507'>
+								<CreateFolder>
+									<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+								</CreateFolder>
+								<RemoveFolder Id='RemoveGraphVizLab' On='uninstall' />
+								<File Id='GraphVizLab.css' Name='GraphVizLab.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\GraphVizLab\GraphVizLab.css' KeyPath='yes'/>
+								<File Id='GraphVizLab.js' Name='GraphVizLab.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\GraphVizLab\GraphVizLab.js'/>
+								<File Id='GraphVizLab.md' Name='GraphVizLab.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\GraphVizLab\GraphVizLab.md'/>
+								<File Id='GraphVizLabGraph.md' Name='GraphVizLabGraph.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\GraphVizLab\GraphVizLabGraph.md'/>
+								<RemoveFile Id='RemoveGraphVizLab.css' Name='GraphVizLab.css' On='uninstall'/>
+								<RemoveFile Id='RemoveGraphVizLab.js' Name='GraphVizLab.js' On='uninstall'/>
+								<RemoveFile Id='RemoveGraphVizLab.md' Name='GraphVizLab.md' On='uninstall'/>
+								<RemoveFile Id='RemoveGraphVizLabGraph.md' Name='GraphVizLabGraph.md' On='uninstall'/>
+							</Component>
+							<Directory Id='GraphVizLabExamples' Name='Examples'>
+								<Component Id='GraphVizLabExampleFiles' Guid='DAECB288-AA9F-401B-929D-BBB51743DB98'>
+									<CreateFolder>
+										<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+									</CreateFolder>
+									<RemoveFolder Id='RemoveGraphVizLabExamples' On='uninstall' />
+									<File Id='Network.dot' Name='Network.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\GraphVizLab\Examples\Network.dot' KeyPath='yes'/>
+									<RemoveFile Id='RemoveNetwork.dot' Name='Network.dot' On='uninstall'/>
+								</Component>
+							</Directory>
+						</Directory>
 						<Directory Id='Images' Name='Images'>
 							<Component Id='ImageFiles' Guid='66D950BA-6795-45CA-9943-38F483CA658B'>
 								<RemoveFolder Id='RemoveImages' On='uninstall' />
@@ -1553,19 +1593,65 @@
 								<RemoveFile Id='Removelogo_WaherDataAB_500x97.png' Name='logo-WaherDataAB-500x97.png' On='uninstall'/>
 							</Component>
 						</Directory>
-						<Directory Id='Controls' Name='Controls'>
-							<Component Id='ControlFiles' Guid='9c6c1624-b970-4770-9245-798252976610'>
+						<Directory Id='PlantUmlLab' Name='PlantUmlLab'>
+							<Component Id='PlantUmlLabFiles' Guid='48A2AE1F-B266-480C-BCE7-BABAA26F4832'>
 								<CreateFolder>
 									<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
 								</CreateFolder>
-								<RemoveFolder Id='ControlFiles' On='uninstall' />
-								<File Id='SimpleTable.script' Name='SimpleTable.script' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Controls\SimpleTable.script' Vital='yes' KeyPath='yes'/>
-								<File Id='SimpleTree.cssx' Name='SimpleTree.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Controls\SimpleTree.cssx' Vital='yes'/>
-								<File Id='SimpleTree.js' Name='SimpleTree.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Controls\SimpleTree.js' Vital='yes'/>
-								<RemoveFile Id='RemoveSimpleTable.script' Name='SimpleTable.script' On='uninstall'/>
-								<RemoveFile Id='RemoveSimpleTree.cssx' Name='SimpleTree.cssx' On='uninstall'/>
-								<RemoveFile Id='RemoveSimpleTree.js' Name='SimpleTree.js' On='uninstall'/>
+								<RemoveFolder Id='RemovePlantUmlLab' On='uninstall' />
+								<File Id='PlantUmlLab.css' Name='PlantUmlLab.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\PlantUmlLab.css' KeyPath='yes'/>
+								<File Id='PlantUmlLab.js' Name='PlantUmlLab.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\PlantUmlLab.js'/>
+								<File Id='PlantUmlLab.md' Name='PlantUmlLab.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\PlantUmlLab.md'/>
+								<File Id='PlantUmlLabGraph.md' Name='PlantUmlLabGraph.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\PlantUmlLabGraph.md'/>
+								<RemoveFile Id='RemovePlantUmlLab.css' Name='PlantUmlLab.css' On='uninstall'/>
+								<RemoveFile Id='RemovePlantUmlLab.js' Name='PlantUmlLab.js' On='uninstall'/>
+								<RemoveFile Id='RemovePlantUmlLab.md' Name='PlantUmlLab.md' On='uninstall'/>
+								<RemoveFile Id='RemovePlantUmlLabGraph.md' Name='PlantUmlLabGraph.md' On='uninstall'/>
 							</Component>
+							<Directory Id='PlantUmlLabExamples' Name='Examples'>
+								<Component Id='PlantUmlLabExampleFiles' Guid='E562C2EF-A8B2-42E6-B8F4-D56D138E702F'>
+									<CreateFolder>
+										<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+									</CreateFolder>
+									<RemoveFolder Id='RemovePlantUmlLabExamples' On='uninstall' />
+									<File Id='Gantt.uml' Name='Gantt.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Gantt.uml.uml' KeyPath='yes'/>
+									<File Id='JSON.uml' Name='JSON.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\JSON.uml.uml'/>
+									<File Id='MindMap.uml' Name='MindMap.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\MindMap.uml.uml'/>
+									<File Id='Network.uml' Name='Network.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Network.uml.uml'/>
+									<File Id='Object.uml' Name='Object.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Object.uml.uml'/>
+									<File Id='Salt.uml' Name='Salt.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Salt.uml.uml'/>
+									<File Id='Sequence.uml' Name='Sequence.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Sequence.uml.uml'/>
+									<File Id='State.uml' Name='State.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\State.uml.uml'/>
+									<File Id='Timing.uml' Name='Timing.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Timing.uml.uml'/>
+									<File Id='Use Case.uml' Name='Use Case.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Use Case.uml.uml'/>
+									<File Id='Work.uml' Name='Work.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Work.uml.uml'/>
+									<File Id='YAML.uml' Name='YAML.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\YAML.uml.uml'/>
+									<File Id='Activity.uml' Name='Activity.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Activity.uml.uml'/>
+									<File Id='Archimate.uml' Name='Archimate.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Archimate.uml.uml'/>
+									<File Id='Class.uml' Name='Class.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Class.uml.uml'/>
+									<File Id='Component.uml' Name='Component.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Component.uml.uml'/>
+									<File Id='Deployment.uml' Name='Deployment.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Deployment.uml.uml'/>
+									<File Id='Entity.uml' Name='Entity.uml.dot' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\PlantUmlLab\Examples\Entity.uml.uml'/>
+									<RemoveFile Id='RemoveGantt.uml' Name='Gantt.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveJSON.uml' Name='JSON.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveMindMap.uml' Name='MindMap.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveNetwork.uml' Name='Network.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveObject.uml' Name='Object.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveSalt.uml' Name='Salt.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveSequence.uml' Name='Sequence.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveState.uml' Name='State.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveTiming.uml' Name='Timing.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveUse Case.uml' Name='Use Case.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveWork.uml' Name='Work.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveYAML.uml' Name='YAML.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveActivity.uml' Name='Activity.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveArchimate.uml' Name='Archimate.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveClass.uml' Name='Class.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveComponent.uml' Name='Component.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveDeployment.uml' Name='Deployment.uml.dot' On='uninstall'/>
+									<RemoveFile Id='RemoveEntity.uml' Name='Entity.uml.dot' On='uninstall'/>
+								</Component>
+							</Directory>
 						</Directory>
 						<Directory Id='Settings' Name='Settings'>
 							<Component Id='SettingsFiles' Guid='13A2665D-91CB-45D3-9739-0236C82065FD'>
@@ -1902,6 +1988,10 @@
 				<ComponentRef Id='VideoFiles' />
 				<ComponentRef Id='TransformFiles' />
 				<ComponentRef Id='DefaultFiles'/>
+				<ComponentRef Id='GraphVizLab'/>
+				<ComponentRef Id='GraphVizLabExamples'/>
+				<ComponentRef Id='PlantUmlLab'/>
+				<ComponentRef Id='PlantUmlLabFiles'/>
 			</Feature>
 			<Feature Id='Emoji1' Title='Emoji1' Description='Contains emojies from Emoji1.' Level='1'>
 				<ComponentRef Id='Emoji1Zip' />

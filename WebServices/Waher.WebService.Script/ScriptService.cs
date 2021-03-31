@@ -69,7 +69,7 @@ namespace Waher.WebService.Script
 			if (Request.Session is null ||
 				!Request.Session.TryGetVariable("User", out Variable v) ||
 				!(v.ValueObject is IUser User) ||
-				!User.HasPrivilege("Admin.Data.Prompt"))
+				!User.HasPrivilege("Admin.Lab.Script"))
 			{
 				throw new ForbiddenException("Access denied.");
 			}

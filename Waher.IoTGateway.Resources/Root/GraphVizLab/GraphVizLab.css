@@ -1,0 +1,32 @@
+div#Lab
+{
+    display:flex;
+}
+
+section#DotSection
+{
+    min-width:45%;
+}
+
+div#DotDiv 
+{
+}
+
+textarea
+{
+    min-height:60vh;
+}
+
+section#GraphSection
+{
+    min-width:45%;
+}
+
+div#GraphDiv
+{
+}
+
+.invisible
+{
+    display:none
+}

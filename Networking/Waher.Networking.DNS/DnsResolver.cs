@@ -188,7 +188,7 @@ namespace Waher.Networking.DNS
 					{
 						Destination = await NextDestination(Backup);
 						if (Destination is null)
-							throw new IOException("Unable to resolve DNS query.");
+							throw new IOException("Unable to resolve DNS query: " + Name + ", " + TYPE.ToString() + ", " + CLASS.ToString());
 
 						continue;   // Check an alternative
 					}
@@ -263,7 +263,7 @@ namespace Waher.Networking.DNS
 
 					Destination = await NextDestination(Backup);
 					if (Destination is null)
-						throw new IOException("Unable to resolve DNS query.");
+						throw new IOException("Unable to resolve DNS query: " + Name + ", " + TYPE.ToString() + ", " + CLASS.ToString());
 
 					Timeout = 5000;
 				}

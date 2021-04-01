@@ -570,13 +570,13 @@
 			<Content fileName="SimpleTree.js"/>
 		</Folder>
 		<Folder name="GraphVizLab">
-			<Folder name="Examples">
-				<Content fileName="Network.dot"/>
-			</Folder>
 			<Content fileName="GraphVizLab.js"/>
 			<Content fileName="GraphVizLab.md"/>
 			<Content fileName="GraphVizLabGraph.md"/>
 			<Content fileName="GraphVizLab.css"/>
+			<Folder name="Examples">
+				<Content fileName="Network.dot"/>
+			</Folder>
 		</Folder>
 		<Folder name='Images'>
 			<Content fileName='logo-WaherDataAB-200x39.png'/>
@@ -585,6 +585,10 @@
 			<Content fileName='logo-WaherDataAB-500x97.png'/>
 		</Folder>
 		<Folder name="PlantUmlLab">
+			<Content fileName="PlantUmlLab.js"/>
+			<Content fileName="PlantUmlLab.md"/>
+			<Content fileName="PlantUmlLabGraph.md"/>
+			<Content fileName="PlantUmlLab.css"/>
 			<Folder name="Examples">
 				<Content fileName="Entity.uml"/>
 				<Content fileName="Gantt.uml"/>
@@ -605,10 +609,6 @@
 				<Content fileName="Component.uml"/>
 				<Content fileName="Deployment.uml"/>
 			</Folder>
-			<Content fileName="PlantUmlLab.js"/>
-			<Content fileName="PlantUmlLab.md"/>
-			<Content fileName="PlantUmlLabGraph.md"/>
-			<Content fileName="PlantUmlLab.css"/>
 		</Folder>
 		<Folder name='Settings'>
 			<Content fileName='Backup.js'/>

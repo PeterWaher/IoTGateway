@@ -15,12 +15,12 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>logger logging logs events eventlogging eventlogs mqtt</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.1.2</AssemblyVersion>
-    <FileVersion>1.1.2</FileVersion>
+    <AssemblyVersion>1.1.3</AssemblyVersion>
+    <FileVersion>1.1.3</FileVersion>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Events\Waher.Events.MQTT\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
-    <Version>1.1.2</Version>
+    <Version>1.1.3</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>

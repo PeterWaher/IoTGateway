@@ -272,7 +272,7 @@ namespace Waher.Events.MQTT
 					else if (Value is string || Value is char)
 					{
 						Xml.Append("' type='xs:string' value='");
-						Xml.Append(Value.ToString());
+						Xml.Append(XML.Encode(Value.ToString()));
 						Xml.Append("'/>");
 					}
 					else if (Value is TimeSpan)
@@ -284,13 +284,13 @@ namespace Waher.Events.MQTT
 					else if (Value is Uri)
 					{
 						Xml.Append("' type='xs:anyURI' value='");
-						Xml.Append(Value.ToString());
+						Xml.Append(XML.Encode(Value.ToString()));
 						Xml.Append("'/>");
 					}
 					else
 					{
 						Xml.Append("' value='");
-						Xml.Append(Value.ToString());
+						Xml.Append(XML.Encode(Value.ToString()));
 						Xml.Append("'/>");
 					}
 				}

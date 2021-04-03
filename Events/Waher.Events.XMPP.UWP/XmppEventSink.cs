@@ -275,7 +275,7 @@ namespace Waher.Events.XMPP
 					else if (Value is string || Value is char)
 					{
 						Xml.Append("' type='xs:string' value='");
-						Xml.Append(Value.ToString());
+						Xml.Append(XML.Encode(Value.ToString()));
 						Xml.Append("'/>");
 					}
 					else if (Value is TimeSpan ts)
@@ -287,13 +287,13 @@ namespace Waher.Events.XMPP
 					else if (Value is Uri u)
 					{
 						Xml.Append("' type='xs:anyURI' value='");
-						Xml.Append(u.ToString());
+						Xml.Append(XML.Encode(u.ToString()));
 						Xml.Append("'/>");
 					}
 					else
 					{
 						Xml.Append("' value='");
-						Xml.Append(Value.ToString());
+						Xml.Append(XML.Encode(Value.ToString()));
 						Xml.Append("'/>");
 					}
 				}

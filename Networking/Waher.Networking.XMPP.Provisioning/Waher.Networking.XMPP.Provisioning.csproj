@@ -17,7 +17,7 @@
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.1.5</AssemblyVersion>
     <FileVersion>1.1.5</FileVersion>
-    <Version>1.1.5</Version>
+    <Version>1.1.6</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.XMPP.Provisioning\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

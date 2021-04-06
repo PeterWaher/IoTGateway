@@ -493,6 +493,21 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void Remove(string ThingJid, string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
 		{
+			this.Remove(this.thingRegistryAddress, ThingJid, NodeId, SourceId, Partition, Callback, State);
+		}
+
+		/// <summary>
+		/// Removes a publicly claimed thing from the thing registry, so that it does not appear in search results.
+		/// </summary>
+		/// <param name="RegistryJid">JID of registry service.</param>
+		/// <param name="ThingJid">JID of thing to disown.</param>
+		/// <param name="NodeId">Optional Node ID of thing.</param>
+		/// <param name="SourceId">Optional Source ID of thing.</param>
+		/// <param name="Partition">Optional Partition of thing.</param>
+		/// <param name="Callback">Method to call when response is received.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void Remove(string RegistryJid, string ThingJid, string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
+		{
 			StringBuilder Request = new StringBuilder();
 
 			Request.Append("<remove xmlns='");
@@ -505,7 +520,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("'/>");
 
-			this.client.SendIqSet(this.thingRegistryAddress, Request.ToString(), async (sender, e) =>
+			this.client.SendIqSet(RegistryJid, Request.ToString(), async (sender, e) =>
 			{
 				if (!(Callback is null))
 				{
@@ -739,6 +754,20 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="State">State object passed on to callback method.</param>
 		public void Unregister(string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
 		{
+			this.Unregister(this.thingRegistryAddress, NodeId, SourceId, Partition, Callback, State);
+		}
+
+		/// <summary>
+		/// Unregisters a thing from the thing registry.
+		/// </summary>
+		/// <param name="RegistryJid">JID of registry service.</param>
+		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
+		/// <param name="SourceId">Source ID of thing, if behind a concentrator.</param>
+		/// <param name="Partition">Partition of thing, if behind a concentrator.</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object passed on to callback method.</param>
+		public void Unregister(string RegistryJid, string NodeId, string SourceId, string Partition, IqResultEventHandlerAsync Callback, object State)
+		{
 			StringBuilder Request = new StringBuilder();
 
 			Request.Append("<unregister xmlns='");
@@ -748,7 +777,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("'/>");
 
-			this.client.SendIqSet(this.thingRegistryAddress, Request.ToString(), async (sender, e) =>
+			this.client.SendIqSet(RegistryJid, Request.ToString(), async (sender, e) =>
 			{
 				if (!(Callback is null))
 				{
@@ -907,6 +936,20 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void Search(int Offset, int MaxCount, SearchOperator[] SearchOperators, SearchResultEventHandler Callback, object State)
 		{
+			this.Search(this.thingRegistryAddress, Offset, MaxCount, SearchOperators, Callback, State);
+		}
+
+		/// <summary>
+		/// Searches for publically available things in the thing registry.
+		/// </summary>
+		/// <param name="RegistryJid">JID of registry service.</param>
+		/// <param name="Offset">Search offset.</param>
+		/// <param name="MaxCount">Maximum number of things to return.</param>
+		/// <param name="SearchOperators">Search operators to use in search.</param>
+		/// <param name="Callback">Method to call when result has been received.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void Search(string RegistryJid, int Offset, int MaxCount, SearchOperator[] SearchOperators, SearchResultEventHandler Callback, object State)
+		{
 			StringBuilder Request = new StringBuilder();
 
 			Request.Append("<search xmlns='");
@@ -922,7 +965,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			Request.Append("</search>");
 
-			this.client.SendIqGet(this.thingRegistryAddress, Request.ToString(), (sender, e) =>
+			this.client.SendIqGet(RegistryJid, Request.ToString(), (sender, e) =>
 			{
 				ParseResultSet(Offset, MaxCount, this, e, Callback, State);
 				return Task.CompletedTask;

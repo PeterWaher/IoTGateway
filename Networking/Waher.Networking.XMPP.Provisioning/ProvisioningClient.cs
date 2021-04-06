@@ -2054,6 +2054,19 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void GetDevices(int Offset, int MaxCount, SearchResultEventHandler Callback, object State)
 		{
+			this.GetDevices(this.provisioningServerAddress, Offset, MaxCount, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets devices owned by the caller.
+		/// </summary>
+		/// <param name="ServiceJID">JID of provisioning service.</param>
+		/// <param name="Offset">Device list offset.</param>
+		/// <param name="MaxCount">Maximum number of things to return.</param>
+		/// <param name="Callback">Method to call when result has been received.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetDevices(string ServiceJID, int Offset, int MaxCount, SearchResultEventHandler Callback, object State)
+		{
 			StringBuilder Request = new StringBuilder();
 
 			Request.Append("<getDevices xmlns='");
@@ -2064,7 +2077,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			Request.Append(MaxCount.ToString());
 			Request.Append("'/>");
 
-			this.client.SendIqGet(this.provisioningServerAddress, Request.ToString(), (sender, e) =>
+			this.client.SendIqGet(ServiceJID, Request.ToString(), (sender, e) =>
 			{
 				ThingRegistryClient.ParseResultSet(Offset, MaxCount, this, e, Callback, State);
 				return Task.CompletedTask;

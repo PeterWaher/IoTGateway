@@ -102,7 +102,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		private void Respond(bool IsFriend, RuleRange Range, IqResultEventHandlerAsync Callback, object State)
 		{
-			this.Client.IsFriendResponse(this.JID, this.RemoteJID, this.Key, IsFriend, Range, Callback, State);
+			this.Client.IsFriendResponse(this.From, this.JID, this.RemoteJID, this.Key, IsFriend, Range, Callback, State);
 		}
 
 	}

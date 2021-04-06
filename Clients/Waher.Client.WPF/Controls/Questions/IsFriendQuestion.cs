@@ -16,6 +16,7 @@ namespace Waher.Client.WPF.Controls.Questions
 		private RuleRange range;
 
 		public IsFriendQuestion()
+			: base()
 		{
 		}
 
@@ -133,7 +134,7 @@ namespace Waher.Client.WPF.Controls.Questions
 		{
 			this.response = Response;
 			this.range = Range;
-			this.client.IsFriendResponse(this.JID, this.RemoteJID, this.Key, Response, Range, this.RuleCallback, null);
+			this.client.IsFriendResponse(this.Sender, this.JID, this.RemoteJID, this.Key, Response, Range, this.RuleCallback, null);
 		}
 
 		private async Task RuleCallback(object Sender, IqResultEventArgs e)

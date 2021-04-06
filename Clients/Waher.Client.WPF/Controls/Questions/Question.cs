@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using Waher.Client.WPF.Model;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence;
@@ -26,6 +24,7 @@ namespace Waher.Client.WPF.Controls.Questions
 		private string remoteJid = string.Empty;
 		private string ownerJid = string.Empty;
 		private string provisioningJid = string.Empty;
+		private string sender = string.Empty;
 
 		public Question()
 		{
@@ -82,6 +81,13 @@ namespace Waher.Client.WPF.Controls.Questions
 		{
 			get { return this.provisioningJid; }
 			set { this.provisioningJid = value; }
+		}
+
+		[DefaultValueStringEmpty]
+		public string Sender
+		{
+			get { return this.sender; }
+			set { this.sender = value; }
 		}
 
 		[IgnoreMember]

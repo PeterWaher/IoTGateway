@@ -1109,9 +1109,22 @@ namespace Waher.Client.WPF
 					LinkedList<Question> Questions = new LinkedList<Question>();
 					bool Found = Question is null;
 
-					foreach (Question Question2 in await Database.Find<Question>(new FilterAnd(new FilterFieldEqualTo("OwnerJID", Owner?.BareJID),
+					foreach (Question Question2 in await Database.Find<Question>(new FilterAnd(
+						new FilterFieldEqualTo("OwnerJID", Owner?.BareJID),
 						new FilterFieldEqualTo("ProvisioningJID", ProvisioningClient?.ProvisioningServerAddress)), "Created"))
 					{
+						if (string.IsNullOrEmpty(Question2.Sender))
+						{
+							string ThingDomain = XmppClient.GetDomain(Question2.JID);
+							string Component = await Owner.Client.FindComponentAsync(ThingDomain, ProvisioningClient.NamespaceProvisioningOwner);
+
+							if (!string.IsNullOrEmpty(Component))
+							{
+								Question2.Sender = Component;
+								await Database.Update(Question2);
+							}
+						}
+
 						Questions.AddLast(Question2);
 
 						if (!Found)

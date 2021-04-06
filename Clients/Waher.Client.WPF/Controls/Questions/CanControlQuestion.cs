@@ -364,37 +364,37 @@ namespace Waher.Client.WPF.Controls.Questions
 		private void NoAllButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.All;
-			this.client.CanControlResponseAll(this.JID, this.RemoteJID, this.Key, false, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
+			this.client.CanControlResponseAll(this.Sender, this.JID, this.RemoteJID, this.Key, false, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void YesAllButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.All;
-			this.client.CanControlResponseAll(this.JID, this.RemoteJID, this.Key, true, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
+			this.client.CanControlResponseAll(this.Sender, this.JID, this.RemoteJID, this.Key, true, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void NoDomainButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.Domain;
-			this.client.CanControlResponseDomain(this.JID, this.RemoteJID, this.Key, false, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
+			this.client.CanControlResponseDomain(this.Sender, this.JID, this.RemoteJID, this.Key, false, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void YesDomainButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.Domain;
-			this.client.CanControlResponseDomain(this.JID, this.RemoteJID, this.Key, true, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
+			this.client.CanControlResponseDomain(this.Sender, this.JID, this.RemoteJID, this.Key, true, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void NoButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.Caller;
-			this.client.CanControlResponseCaller(this.JID, this.RemoteJID, this.Key, false, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
+			this.client.CanControlResponseCaller(this.Sender, this.JID, this.RemoteJID, this.Key, false, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void YesButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.range = OperationRange.Caller;
-			this.client.CanControlResponseCaller(this.JID, this.RemoteJID, this.Key, true, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
+			this.client.CanControlResponseCaller(this.Sender, this.JID, this.RemoteJID, this.Key, true, this.GetParameters(), this.GetNodeReference(), this.RuleCallback, null);
 		}
 
 		private void NoTokenButton_Click(object sender, RoutedEventArgs e)
@@ -412,15 +412,15 @@ namespace Waher.Client.WPF.Controls.Questions
 			switch (this.range)
 			{
 				case OperationRange.ServiceToken:
-					this.client.CanControlResponseService(this.JID, this.RemoteJID, this.Key, Result, this.GetParameters(), this.parameter, this.GetNodeReference(), this.RuleCallback, null);
+					this.client.CanControlResponseService(this.Sender, this.JID, this.RemoteJID, this.Key, Result, this.GetParameters(), this.parameter, this.GetNodeReference(), this.RuleCallback, null);
 					break;
 
 				case OperationRange.DeviceToken:
-					this.client.CanControlResponseDevice(this.JID, this.RemoteJID, this.Key, Result, this.GetParameters(), this.parameter, this.GetNodeReference(), this.RuleCallback, null);
+					this.client.CanControlResponseDevice(this.Sender, this.JID, this.RemoteJID, this.Key, Result, this.GetParameters(), this.parameter, this.GetNodeReference(), this.RuleCallback, null);
 					break;
 
 				case OperationRange.UserToken:
-					this.client.CanControlResponseUser(this.JID, this.RemoteJID, this.Key, Result, this.GetParameters(), this.parameter, this.GetNodeReference(), this.RuleCallback, null);
+					this.client.CanControlResponseUser(this.Sender, this.JID, this.RemoteJID, this.Key, Result, this.GetParameters(), this.parameter, this.GetNodeReference(), this.RuleCallback, null);
 					break;
 			}
 		}

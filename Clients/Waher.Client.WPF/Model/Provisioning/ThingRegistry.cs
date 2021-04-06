@@ -98,7 +98,8 @@ namespace Waher.Client.WPF.Model.Provisioning
 					JID = e.JID,
 					RemoteJID = e.RemoteJID,
 					OwnerJID = XmppClient.GetBareJID(e.To),
-					ProvisioningJID = this.provisioningClient.ProvisioningServerAddress
+					ProvisioningJID = this.provisioningClient.ProvisioningServerAddress,
+					Sender = e.From
 				};
 
 				await Database.Insert(Question);
@@ -130,7 +131,8 @@ namespace Waher.Client.WPF.Model.Provisioning
 					Categories = e.FieldTypes,
 					NodeId = e.NodeId,
 					SourceId = e.SourceId,
-					Partition = e.Partition
+					Partition = e.Partition,
+					Sender = e.From
 				};
 
 				await Database.Insert(Question);
@@ -161,7 +163,8 @@ namespace Waher.Client.WPF.Model.Provisioning
 					ParameterNames = e.Parameters,
 					NodeId = e.NodeId,
 					SourceId = e.SourceId,
-					Partition = e.Partition
+					Partition = e.Partition,
+					Sender = e.From
 				};
 
 				await Database.Insert(Question);

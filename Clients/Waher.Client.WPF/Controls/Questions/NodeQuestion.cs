@@ -8,7 +8,6 @@ using System.Windows.Controls;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence.Attributes;
 using Waher.Things;
-using Waher.Things.SensorData;
 
 namespace Waher.Client.WPF.Controls.Questions
 {

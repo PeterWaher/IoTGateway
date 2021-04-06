@@ -1202,10 +1202,28 @@ namespace Waher.Networking.XMPP.Provisioning
 				await this.ClearInternalCache();
 		}
 
-		private Task ClearInternalCache()
+		private async Task ClearInternalCache()
 		{
-			return Database.Clear("CachedProvisioningQueries");
+			await Database.Clear("CachedProvisioningQueries");
+
+			EventHandler h = this.CacheCleared;
+			if (!(h is null))
+			{
+				try
+				{
+					h(this, new EventArgs());
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
 		}
+
+		/// <summary>
+		/// Event raised when rule cache is cleared.
+		/// </summary>
+		public event EventHandler CacheCleared;
 
 		#endregion
 

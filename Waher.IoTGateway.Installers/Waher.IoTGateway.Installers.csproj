@@ -55,6 +55,7 @@
     <Compile Include=".bak\Waher.Content\Getters\WebGetter.cs" />
     <Compile Include=".bak\Waher.Content\IContentGetter.cs" />
     <Compile Include=".bak\Waher.Content\IContentPoster.cs" />
+    <Compile Include=".bak\Waher.Content\IInternetContent.cs" />
     <Compile Include=".bak\Waher.Content\Multipart\AlternativeCodec.cs" />
     <Compile Include=".bak\Waher.Content\Multipart\ContentAlternatives.cs" />
     <Compile Include=".bak\Waher.Content\Multipart\EmbeddedContent.cs" />
@@ -68,7 +69,6 @@
     <Compile Include=".bak\Waher.Content\Posters\PosterBase.cs" />
     <Compile Include=".bak\Waher.Content\Posters\WebPoster.cs" />
     <Compile Include=".bak\Waher.Content\Text\CsvCodec.cs" />
-    <Compile Include=".bak\Waher.Content\Text\CsvDecoder.cs" />
     <Compile Include=".bak\Waher.Content\Text\JsonCodec.cs" />
     <Compile Include=".bak\Waher.Content\Text\PlainTextCodec.cs" />
     <Compile Include=".bak\Waher.Content\Video\VideoDecoder.cs" />

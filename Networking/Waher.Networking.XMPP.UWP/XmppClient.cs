@@ -282,6 +282,7 @@ namespace Waher.Networking.XMPP
 		private readonly Dictionary<string, object> tags = new Dictionary<string, object>();
 		private readonly List<IXmppExtension> extensions = new List<IXmppExtension>();
 		private readonly Dictionary<string, string> services = new Dictionary<string, string>();
+		private readonly IqResponses responses = new IqResponses(TimeSpan.FromMinutes(1));
 		private AuthenticationMethod authenticationMethod = null;
 #if !WINDOWS_UWP
 		private readonly X509Certificate clientCertificate = null;
@@ -836,6 +837,8 @@ namespace Waher.Networking.XMPP
 				this.pendingRequestsBySeqNr.Clear();
 				this.pendingRequestsByTimeout.Clear();
 			}
+
+			this.responses.Clear();
 		}
 
 		internal async Task ConnectionError(Exception ex)
@@ -1211,6 +1214,8 @@ namespace Waher.Networking.XMPP
 			this.secondTimer = null;
 
 			this.DisposeClient(RaiseEvent);
+
+			this.responses.Dispose();
 
 			ITextTransportLayer TTL;
 
@@ -1887,19 +1892,39 @@ namespace Waher.Networking.XMPP
 							switch (Type)
 							{
 								case "get":
-									IqEventArgs ie = new IqEventArgs(this, E, Id, To, From);
-									if (this.ValidateSender(E, From, ie.FromBareJid, ie, null))
-										this.ProcessIq(this.iqGetHandlers, ie);
+									if (this.responses.TryGet(From, Id, out string ResponseXml, out bool Ok))
+									{
+										if (Ok)
+											this.SendIqResult(Id, From, ResponseXml);
+										else
+											this.SendIqError(Id, From, ResponseXml);
+									}
 									else
-										ie.IqError(new ForbiddenException("Access denied.", E));
+									{
+										IqEventArgs ie = new IqEventArgs(this, E, Id, To, From);
+										if (this.ValidateSender(E, From, ie.FromBareJid, ie, null))
+											this.ProcessIq(this.iqGetHandlers, ie);
+										else
+											ie.IqError(new ForbiddenException("Access denied.", E));
+									}
 									break;
 
 								case "set":
-									ie = new IqEventArgs(this, E, Id, To, From);
-									if (this.ValidateSender(E, From, ie.FromBareJid, ie, null))
-										this.ProcessIq(this.iqSetHandlers, new IqEventArgs(this, E, Id, To, From));
+									if (this.responses.TryGet(From, Id, out ResponseXml, out Ok))
+									{
+										if (Ok)
+											this.SendIqResult(Id, From, ResponseXml);
+										else
+											this.SendIqError(Id, From, ResponseXml);
+									}
 									else
-										ie.IqError(new ForbiddenException("Access denied.", E));
+									{
+										IqEventArgs ie = new IqEventArgs(this, E, Id, To, From);
+										if (this.ValidateSender(E, From, ie.FromBareJid, ie, null))
+											this.ProcessIq(this.iqSetHandlers, new IqEventArgs(this, E, Id, To, From));
+										else
+											ie.IqError(new ForbiddenException("Access denied.", E));
+									}
 									break;
 
 								case "result":
@@ -1908,7 +1933,8 @@ namespace Waher.Networking.XMPP
 									IqResultEventHandlerAsync Callback;
 									object State;
 									PendingRequest Rec;
-									bool Ok = (Type == "result");
+									
+									Ok = (Type == "result");
 
 									if (uint.TryParse(Id, out SeqNr))
 									{
@@ -3835,6 +3861,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Xml">XML to embed into the response.</param>
 		public void SendIqResult(string Id, string To, string Xml)
 		{
+			this.responses.Add(To, Id, Xml, true);
 			this.SendIq(Id, To, Xml, "result", null, null, 0, 0, false, 0);
 		}
 
@@ -3846,6 +3873,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Xml">XML to embed into the response.</param>
 		public void SendIqError(string Id, string To, string Xml)
 		{
+			this.responses.Add(To, Id, Xml, false);
 			this.SendIq(Id, To, Xml, "error", null, null, 0, 0, false, 0);
 		}
 
@@ -7335,9 +7363,12 @@ namespace Waher.Networking.XMPP
 					{
 						lock (this.synchObject)
 						{
-							this.pendingRequestsByTimeout.Remove(Request.Timeout);
-
-							if (Retry = Request.CanRetry())
+							if (!this.pendingRequestsByTimeout.Remove(Request.Timeout))	
+							{
+								this.pendingRequestsBySeqNr.Remove(Request.SeqNr);
+								continue;   // Already processed
+							}
+							else if (Retry = Request.CanRetry())
 							{
 								TP = Request.Timeout;
 

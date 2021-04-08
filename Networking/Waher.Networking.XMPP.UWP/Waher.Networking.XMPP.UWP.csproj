@@ -201,6 +201,7 @@
     <Compile Include="InBandBytestreams\StreamClosedEventArgs.cs" />
     <Compile Include="InBandBytestreams\ValidateStreamEventArgs.cs" />
     <Compile Include="IqEventArgs.cs" />
+    <Compile Include="IqResponses.cs" />
     <Compile Include="IqResultEventArgs.cs" />
     <Compile Include="IXmppExtension.cs" />
     <Compile Include="MessageEventArgs.cs" />

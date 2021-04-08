@@ -40,6 +40,7 @@ namespace Waher.Networking.XMPP
 		private readonly Dictionary<string, MessageEventArgs> receivedMessages = new Dictionary<string, MessageEventArgs>();
 		private readonly Dictionary<string, bool> clientFeatures = new Dictionary<string, bool>();
 		private readonly Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
+		private readonly IqResponses responses = new IqResponses(TimeSpan.FromMinutes(1));
 		private Cache<string, uint> pendingPresenceRequests;
 		private readonly object rosterSyncObject = new object();
 		private TextTcpClient client = null;
@@ -157,6 +158,8 @@ namespace Waher.Networking.XMPP
 
 			this.pendingRequestsBySeqNr.Clear();
 			this.pendingRequestsByTimeout.Clear();
+
+			this.responses.Clear();
 		}
 
 		private async Task ConnectionError(Exception ex)
@@ -343,6 +346,8 @@ namespace Waher.Networking.XMPP
 			this.secondTimer = null;
 
 			this.DisposeClient();
+
+			this.responses.Dispose();
 		}
 
 		private void DisposeClient()
@@ -931,11 +936,27 @@ namespace Waher.Networking.XMPP
 							switch (Type)
 							{
 								case "get":
-									this.ProcessIq(this.iqGetHandlers, new IqEventArgs(this, E, Id, To, From));
+									if (this.responses.TryGet(From, Id, out string ResponseXml, out bool Ok))
+									{
+										if (Ok)
+											this.SendIqResult(Id, To, From, ResponseXml);
+										else
+											this.SendIqError(Id, To, From, ResponseXml);
+									}
+									else
+										this.ProcessIq(this.iqGetHandlers, new IqEventArgs(this, E, Id, To, From));
 									break;
 
 								case "set":
-									this.ProcessIq(this.iqSetHandlers, new IqEventArgs(this, E, Id, To, From));
+									if (this.responses.TryGet(From, Id, out ResponseXml, out Ok))
+									{
+										if (Ok)
+											this.SendIqResult(Id, To, From, ResponseXml);
+										else
+											this.SendIqError(Id, To, From, ResponseXml);
+									}
+									else
+										this.ProcessIq(this.iqSetHandlers, new IqEventArgs(this, E, Id, To, From));
 									break;
 
 								case "result":
@@ -944,7 +965,8 @@ namespace Waher.Networking.XMPP
 									IqResultEventHandlerAsync Callback;
 									object State;
 									PendingRequest Rec;
-									bool Ok = (Type == "result");
+									
+									Ok = (Type == "result");
 
 									if (uint.TryParse(Id, out SeqNr))
 									{
@@ -1602,6 +1624,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Xml">XML to embed into the response.</param>
 		public void SendIqResult(string Id, string From, string To, string Xml)
 		{
+			this.responses.Add(To, Id, Xml, true);
 			this.SendIq(Id, From, To, Xml, "result", null, null, 0, 0, false, 0);
 		}
 
@@ -1614,6 +1637,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Xml">XML to embed into the response.</param>
 		public void SendIqError(string Id, string From, string To, string Xml)
 		{
+			this.responses.Add(To, Id, Xml, false);
 			this.SendIq(Id, From, To, Xml, "error", null, null, 0, 0, false, 0);
 		}
 

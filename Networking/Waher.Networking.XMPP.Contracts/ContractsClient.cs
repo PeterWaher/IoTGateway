@@ -198,7 +198,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 				Thread?.NewState("Endpoints");
 
-				IE2eEndpoint[] AvailableEndpoints = EndpointSecurity.CreateEndpoints(256, 192, int.MaxValue, typeof(EllipticCurveEndpoint));
+				IE2eEndpoint[] AvailableEndpoints = EndpointSecurity.CreateEndpoints(256, 192, int.MaxValue, typeof(EllipticCurveEndpoint), Thread);
 				DateTime? Timestamp = null;
 				bool DisposeEndpoints = true;
 				byte[] Key;

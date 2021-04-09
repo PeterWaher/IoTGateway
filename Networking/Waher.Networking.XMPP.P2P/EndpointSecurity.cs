@@ -11,6 +11,7 @@ using Waher.Networking.XMPP.P2P.E2E;
 using Waher.Networking.XMPP.P2P.SymmetricCiphers;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Profiling;
 
 namespace Waher.Networking.XMPP.P2P
 {
@@ -146,52 +147,94 @@ namespace Waher.Networking.XMPP.P2P
 		public static IE2eEndpoint[] CreateEndpoints(int DesiredSecurityStrength,
 			int MinSecurityStrength, int MaxSecurityStrength, Type OnlyIfDerivedFrom)
 		{
-			lock (endpointTypes)
+			return CreateEndpoints(DesiredSecurityStrength, MinSecurityStrength, MaxSecurityStrength, OnlyIfDerivedFrom, null);
+		}
+
+		/// <summary>
+		/// Creates a set of endpoints within a range of security strengths.
+		/// </summary>
+		/// <param name="DesiredSecurityStrength">Desired security strength.</param>
+		/// <param name="MinSecurityStrength">Minimum security strength.</param>
+		/// <param name="MaxSecurityStrength">Maximum security strength.</param>
+		/// <param name="OnlyIfDerivedFrom">Only return endpoints derived from this type.</param>
+		/// <param name="Thread">Optional profiling thread.</param>
+		/// <returns>Array of local endpoint keys.</returns>
+		public static IE2eEndpoint[] CreateEndpoints(int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength, 
+			Type OnlyIfDerivedFrom, ProfilerThread Thread)
+		{
+			Thread = Thread?.CreateSubThread("Endpoints", ProfilerThreadType.Sequential);
+			try
 			{
-				if (!initialized)
+				Thread?.Start();
+				Thread?.NewState("Init");
+
+				List<IE2eEndpoint> Result = new List<IE2eEndpoint>();
+				TypeInfo OnlyIfDerivedFromType = OnlyIfDerivedFrom?.GetTypeInfo();
+				IEnumerable<IE2eEndpoint> Templates;
+				bool CheckHeritance = true;
+
+				lock (endpointTypes)
 				{
-					Dictionary<string, IE2eEndpoint> E2eTypes = new Dictionary<string, IE2eEndpoint>();
-
-					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IE2eEndpoint)))
+					if (initialized)
+						Templates = endpointTypes.Values;
+					else
 					{
-						TypeInfo TI = T.GetTypeInfo();
-						if (TI.IsAbstract)
-							continue;
+						Dictionary<string, IE2eEndpoint> E2eTypes = new Dictionary<string, IE2eEndpoint>();
 
-						try
+						foreach (Type T in Types.GetTypesImplementingInterface(typeof(IE2eEndpoint)))
 						{
-							IE2eEndpoint Endpoint = (IE2eEndpoint)Activator.CreateInstance(T);
-							E2eTypes[Endpoint.Namespace + "#" + Endpoint.LocalName] = Endpoint;
+							TypeInfo TI = T.GetTypeInfo();
+							if (TI.IsAbstract)
+								continue;
+
+							if (!(OnlyIfDerivedFromType?.IsAssignableFrom(TI) ?? true))
+								continue;
+
+							try
+							{
+								IE2eEndpoint Endpoint = (IE2eEndpoint)Activator.CreateInstance(T);
+								E2eTypes[Endpoint.Namespace + "#" + Endpoint.LocalName] = Endpoint;
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+								continue;
+							}
 						}
-						catch (Exception ex)
+
+						if (OnlyIfDerivedFromType is null)
 						{
-							Log.Critical(ex);
-							continue;
+							endpointTypes = E2eTypes;
+							initialized = true;
 						}
+						else
+							CheckHeritance = false;
+
+						Templates = E2eTypes.Values;
 					}
-
-					endpointTypes = E2eTypes;
-					initialized = true;
 				}
+
+				foreach (IE2eEndpoint Endpoint in Templates)
+				{
+					if (CheckHeritance && !(OnlyIfDerivedFromType?.IsAssignableFrom(Endpoint.GetType().GetTypeInfo()) ?? true))
+						continue;
+
+					Thread?.NewState(Endpoint.LocalName);
+
+					IE2eEndpoint Endpoint2 = Endpoint.Create(DesiredSecurityStrength);
+					int i = Endpoint2.SecurityStrength;
+					if (i >= MinSecurityStrength && i <= MaxSecurityStrength)
+						Result.Add(Endpoint2);
+					else
+						Endpoint2.Dispose();
+				}
+
+				return Result.ToArray();
 			}
-
-			List<IE2eEndpoint> Result = new List<IE2eEndpoint>();
-			TypeInfo OnlyIfDerivedFromType = OnlyIfDerivedFrom?.GetTypeInfo();
-
-			foreach (IE2eEndpoint Endpoint in endpointTypes.Values)
+			finally
 			{
-				if (!(OnlyIfDerivedFromType?.IsAssignableFrom(Endpoint.GetType().GetTypeInfo()) ?? true))
-					continue;
-
-				IE2eEndpoint Endpoint2 = Endpoint.Create(DesiredSecurityStrength);
-				int i = Endpoint2.SecurityStrength;
-				if (i >= MinSecurityStrength && i <= MaxSecurityStrength)
-					Result.Add(Endpoint2);
-				else
-					Endpoint2.Dispose();
+				Thread?.Stop();
 			}
-
-			return Result.ToArray();
 		}
 
 		/// <summary>

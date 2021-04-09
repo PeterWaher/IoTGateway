@@ -32,9 +32,9 @@ Poly1305</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp socks5 serverless peer-to-peer p2p e2e End-to-End ECDH ECDSA EdDSA NIST P192 P224 P256 P384 P521 Curve25519 Curve448 Ed25519 Ed448 Edwards25519 Edwards448 Goldilocks AES ChaCha20 Poly1305</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.1.8</AssemblyVersion>
-    <FileVersion>1.1.8</FileVersion>
-    <Version>1.1.8</Version>
+    <AssemblyVersion>1.1.9</AssemblyVersion>
+    <FileVersion>1.1.9</FileVersion>
+    <Version>1.1.9</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Networking\Waher.Networking.XMPP.P2P\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -51,6 +51,7 @@ Poly1305</Description>
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Temporary\Waher.Runtime.Temporary.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security.ChaChaPoly\Waher.Security.ChaChaPoly.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security.EllipticCurves\Waher.Security.EllipticCurves.csproj" />

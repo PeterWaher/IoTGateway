@@ -1397,6 +1397,17 @@
             <param name="OnlyIfDerivedFrom">Only return endpoints derived from this type.</param>
             <returns>Array of local endpoint keys.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.CreateEndpoints(System.Int32,System.Int32,System.Int32,System.Type,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Creates a set of endpoints within a range of security strengths.
+            </summary>
+            <param name="DesiredSecurityStrength">Desired security strength.</param>
+            <param name="MinSecurityStrength">Minimum security strength.</param>
+            <param name="MaxSecurityStrength">Maximum security strength.</param>
+            <param name="OnlyIfDerivedFrom">Only return endpoints derived from this type.</param>
+            <param name="Thread">Optional profiling thread.</param>
+            <returns>Array of local endpoint keys.</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.TryGetEndpoint(System.String,System.String,Waher.Networking.XMPP.IE2eEndpoint@)">
             <summary>
             Tries to get an existing endpoint, given its qualified name.

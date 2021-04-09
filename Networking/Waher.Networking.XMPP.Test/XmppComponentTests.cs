@@ -218,6 +218,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public void Component_Test_01_Connect()
 		{
 		}

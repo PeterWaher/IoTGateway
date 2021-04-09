@@ -81,6 +81,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public void Control_Test_04_Monitor_1000()
 		{
 			this.ConnectClients();
@@ -247,6 +248,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public void Control_Test_09_Monitor_1000_Server()
 		{
 			this.ConnectClients();
@@ -275,6 +277,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public void Control_Test_13_Monitor_1000_Federated_Server()
 		{
 			this.ConnectClients();

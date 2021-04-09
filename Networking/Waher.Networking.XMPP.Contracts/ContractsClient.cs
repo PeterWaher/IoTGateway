@@ -22,6 +22,7 @@ using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Profiling;
 using Waher.Runtime.Settings;
 using Waher.Runtime.Temporary;
 using Waher.Security;
@@ -173,79 +174,113 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="CreateIfNone">Allows new keys to be created, if no keys were found in the persistence layer.</param>
 		/// <returns>If keys were loaded or generated (i.e. can be used) or not.</returns>
-		public async Task<bool> LoadKeys(bool CreateIfNone)
+		public Task<bool> LoadKeys(bool CreateIfNone)
 		{
-			List<IE2eEndpoint> Keys = new List<IE2eEndpoint>();
+			return this.LoadKeys(CreateIfNone, null);
+		}
 
-			Dictionary<string, object> Settings = await RuntimeSettings.GetWhereKeyLikeAsync(KeySettings + "*", "*");
-			IE2eEndpoint[] AvailableEndpoints = EndpointSecurity.CreateEndpoints(256, 192, int.MaxValue, typeof(EllipticCurveEndpoint));
-			DateTime? Timestamp = null;
-			bool DisposeEndpoints = true;
-			byte[] Key;
-
-			foreach (KeyValuePair<string, object> Setting in Settings)
+		/// <summary>
+		/// Loads keys from the underlying persistence layer.
+		/// </summary>
+		/// <param name="CreateIfNone">Allows new keys to be created, if no keys were found in the persistence layer.</param>
+		/// <param name="Thread">Optional thread to use during profiling.</param>
+		/// <returns>If keys were loaded or generated (i.e. can be used) or not.</returns>
+		public async Task<bool> LoadKeys(bool CreateIfNone, ProfilerThread Thread)
+		{
+			Thread = Thread?.CreateSubThread("Load Keys", ProfilerThreadType.Sequential);
+			Thread?.Start();
+			try
 			{
-				string LocalName = Setting.Key.Substring(KeySettings.Length);
+				Thread?.NewState("Search");
 
-				if (Setting.Value is string d)
+				List<IE2eEndpoint> Keys = new List<IE2eEndpoint>();
+				Dictionary<string, object> Settings = await RuntimeSettings.GetWhereKeyLikeAsync(KeySettings + "*", "*");
+
+				Thread?.NewState("Endpoints");
+
+				IE2eEndpoint[] AvailableEndpoints = EndpointSecurity.CreateEndpoints(256, 192, int.MaxValue, typeof(EllipticCurveEndpoint));
+				DateTime? Timestamp = null;
+				bool DisposeEndpoints = true;
+				byte[] Key;
+
+				Thread?.NewState("Select");
+
+				foreach (KeyValuePair<string, object> Setting in Settings)
 				{
-					if (string.IsNullOrEmpty(d))
-						continue;
+					string LocalName = Setting.Key.Substring(KeySettings.Length);
 
-					try
+					if (Setting.Value is string d)
 					{
-						Key = Convert.FromBase64String(d);
-					}
-					catch (Exception)
-					{
-						continue;
-					}
+						if (string.IsNullOrEmpty(d))
+							continue;
 
-					foreach (IE2eEndpoint Curve in AvailableEndpoints)
-					{
-						if (Curve.LocalName == LocalName)
+						try
 						{
-							Keys.Add(Curve.CreatePrivate(Key));
-							break;
+							Key = Convert.FromBase64String(d);
+						}
+						catch (Exception)
+						{
+							continue;
+						}
+
+						foreach (IE2eEndpoint Curve in AvailableEndpoints)
+						{
+							if (Curve.LocalName == LocalName)
+							{
+								Keys.Add(Curve.CreatePrivate(Key));
+								break;
+							}
 						}
 					}
+					else if (Setting.Value is DateTime TP && LocalName == "Timestamp")
+						Timestamp = TP;
 				}
-				else if (Setting.Value is DateTime TP && LocalName == "Timestamp")
-					Timestamp = TP;
-			}
 
-			if (Keys.Count == 0)
-			{
-				if (!CreateIfNone)
-					return false;
-
-				DisposeEndpoints = false;
-
-				foreach (EllipticCurveEndpoint Curve in AvailableEndpoints)
+				if (Keys.Count == 0)
 				{
-					Key = this.GetKey(Curve.Curve);
-					await RuntimeSettings.SetAsync(KeySettings + Curve.LocalName, Convert.ToBase64String(Key));
-					Keys.Add(Curve);
+					if (!CreateIfNone)
+						return false;
+
+					Thread?.NewState("Create");
+
+					DisposeEndpoints = false;
+
+					foreach (EllipticCurveEndpoint Curve in AvailableEndpoints)
+					{
+						Key = this.GetKey(Curve.Curve);
+						await RuntimeSettings.SetAsync(KeySettings + Curve.LocalName, Convert.ToBase64String(Key));
+						Keys.Add(Curve);
+					}
+
+					Timestamp = DateTime.Now;
+					await RuntimeSettings.SetAsync(KeySettings + "Timestamp", Timestamp.Value);
+
+					Log.Notice("Private keys for contracts client created.");
+				}
+				else if (!Timestamp.HasValue)
+				{
+					Thread?.NewState("Time");
+
+					Timestamp = DateTime.Now;
+					await RuntimeSettings.SetAsync(KeySettings + "Timestamp", Timestamp.Value);
 				}
 
-				Timestamp = DateTime.Now;
-				await RuntimeSettings.SetAsync(KeySettings + "Timestamp", Timestamp.Value);
+				Thread?.NewState("Sec");
 
-				Log.Notice("Private keys for contracts client created.");
+				this.localKeys = new EndpointSecurity(null, 128, Keys.ToArray());
+				this.keysTimestamp = Timestamp.Value;
+
+				if (DisposeEndpoints)
+				{
+					Thread?.NewState("Dispose");
+
+					foreach (IE2eEndpoint Curve in AvailableEndpoints)
+						Curve.Dispose();
+				}
 			}
-			else if (!Timestamp.HasValue)
+			finally
 			{
-				Timestamp = DateTime.Now;
-				await RuntimeSettings.SetAsync(KeySettings + "Timestamp", Timestamp.Value);
-			}
-
-			this.localKeys = new EndpointSecurity(null, 128, Keys.ToArray());
-			this.keysTimestamp = Timestamp.Value;
-
-			if (DisposeEndpoints)
-			{
-				foreach (IE2eEndpoint Curve in AvailableEndpoints)
-					Curve.Dispose();
+				Thread?.Stop();
 			}
 
 			return true;

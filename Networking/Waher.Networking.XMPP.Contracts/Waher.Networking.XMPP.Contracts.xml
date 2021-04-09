@@ -442,6 +442,14 @@
             <param name="CreateIfNone">Allows new keys to be created, if no keys were found in the persistence layer.</param>
             <returns>If keys were loaded or generated (i.e. can be used) or not.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.LoadKeys(System.Boolean,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Loads keys from the underlying persistence layer.
+            </summary>
+            <param name="CreateIfNone">Allows new keys to be created, if no keys were found in the persistence layer.</param>
+            <param name="Thread">Optional thread to use during profiling.</param>
+            <returns>If keys were loaded or generated (i.e. can be used) or not.</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GenerateNewKeys">
             <summary>
             Generates new keys for the contracts clients.

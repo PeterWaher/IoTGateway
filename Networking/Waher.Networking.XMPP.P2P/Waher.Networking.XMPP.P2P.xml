@@ -1408,6 +1408,13 @@
             <param name="Thread">Optional profiling thread.</param>
             <returns>Array of local endpoint keys.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.SetCiphers(System.Type[],System.Boolean)">
+            <summary>
+            Sets allowed cipers in endpoint security.
+            </summary>
+            <param name="CipherTypes">Allowed cipher types. null=all types allowed.</param>
+            <param name="Lock">If set of ciphers should be locked.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.TryGetEndpoint(System.String,System.String,Waher.Networking.XMPP.IE2eEndpoint@)">
             <summary>
             Tries to get an existing endpoint, given its qualified name.

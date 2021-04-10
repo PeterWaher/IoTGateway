@@ -32,6 +32,8 @@ namespace Waher.Networking.XMPP.P2P
 
 		private static Dictionary<string, IE2eEndpoint> endpointTypes = new Dictionary<string, IE2eEndpoint>();
 		private static bool initialized = false;
+		private static Type[] e2eTypes = null;
+		private static bool e2eTypesLocked = false;
 
 		private readonly Dictionary<string, IE2eEndpoint[]> contacts;
 		private XmppClient client;
@@ -72,8 +74,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="SecurityStrength">Desired security strength.</param>
 		/// <param name="LocalEndpoints">Local endpoints to use</param>
-		public EndpointSecurity(XmppClient Client, int SecurityStrength,
-			params IE2eEndpoint[] LocalEndpoints)
+		public EndpointSecurity(XmppClient Client, int SecurityStrength, params IE2eEndpoint[] LocalEndpoints)
 			: this(Client, null, SecurityStrength, LocalEndpoints)
 		{
 		}
@@ -85,8 +86,8 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="ServerlessMessaging">Reference to serverless messaging object.</param>
 		/// <param name="SecurityStrength">Desired security strength.</param>
 		/// <param name="LocalEndpoints">Local endpoints to use</param>
-		public EndpointSecurity(XmppClient Client, XmppServerlessMessaging ServerlessMessaging,
-			int SecurityStrength, params IE2eEndpoint[] LocalEndpoints)
+		public EndpointSecurity(XmppClient Client, XmppServerlessMessaging ServerlessMessaging, int SecurityStrength, 
+			params IE2eEndpoint[] LocalEndpoints)
 			: base()
 		{
 			this.securityStrength = SecurityStrength;
@@ -95,12 +96,7 @@ namespace Waher.Networking.XMPP.P2P
 			this.contacts = new Dictionary<string, IE2eEndpoint[]>(StringComparer.CurrentCultureIgnoreCase);
 
 			if (!(LocalEndpoints is null))
-			{
 				this.keys = LocalEndpoints;
-
-				if (!initialized)
-					CreateEndpoints(128, 0, int.MaxValue);
-			}
 			else
 				this.keys = CreateEndpoints(SecurityStrength, 0, int.MaxValue);
 
@@ -129,11 +125,9 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="MinSecurityStrength">Minimum security strength.</param>
 		/// <param name="MaxSecurityStrength">Maximum security strength.</param>
 		/// <returns>Array of local endpoint keys.</returns>
-		public static IE2eEndpoint[] CreateEndpoints(int DesiredSecurityStrength,
-			int MinSecurityStrength, int MaxSecurityStrength)
+		public static IE2eEndpoint[] CreateEndpoints(int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength)
 		{
-			return CreateEndpoints(DesiredSecurityStrength, MinSecurityStrength,
-				MaxSecurityStrength, null);
+			return CreateEndpoints(DesiredSecurityStrength, MinSecurityStrength, MaxSecurityStrength, null);
 		}
 
 		/// <summary>
@@ -144,8 +138,8 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="MaxSecurityStrength">Maximum security strength.</param>
 		/// <param name="OnlyIfDerivedFrom">Only return endpoints derived from this type.</param>
 		/// <returns>Array of local endpoint keys.</returns>
-		public static IE2eEndpoint[] CreateEndpoints(int DesiredSecurityStrength,
-			int MinSecurityStrength, int MaxSecurityStrength, Type OnlyIfDerivedFrom)
+		public static IE2eEndpoint[] CreateEndpoints(int DesiredSecurityStrength, int MinSecurityStrength, int MaxSecurityStrength, 
+			Type OnlyIfDerivedFrom)
 		{
 			return CreateEndpoints(DesiredSecurityStrength, MinSecurityStrength, MaxSecurityStrength, OnlyIfDerivedFrom, null);
 		}
@@ -180,11 +174,25 @@ namespace Waher.Networking.XMPP.P2P
 					else
 					{
 						Dictionary<string, IE2eEndpoint> E2eTypes = new Dictionary<string, IE2eEndpoint>();
+						Dictionary<string, bool> TypeNames = new Dictionary<string, bool>();
+						TypeInfo E2eTypeInfo = typeof(IE2eEndpoint).GetTypeInfo();
 
-						foreach (Type T in Types.GetTypesImplementingInterface(typeof(IE2eEndpoint)))
+						foreach (KeyValuePair<string, IE2eEndpoint> P in endpointTypes)
 						{
+							E2eTypes[P.Key] = P.Value;
+							TypeNames[P.Value.GetType().FullName] = true;
+						}
+
+						foreach (Type T in e2eTypes ?? Types.GetTypesImplementingInterface(typeof(IE2eEndpoint)))
+						{
+							if (TypeNames.ContainsKey(T.FullName))
+								continue;
+
 							TypeInfo TI = T.GetTypeInfo();
 							if (TI.IsAbstract)
+								continue;
+
+							if (!(e2eTypes is null) && !E2eTypeInfo.IsAssignableFrom(TI))
 								continue;
 
 							if (!(OnlyIfDerivedFromType?.IsAssignableFrom(TI) ?? true))
@@ -202,15 +210,13 @@ namespace Waher.Networking.XMPP.P2P
 							}
 						}
 
+						endpointTypes = E2eTypes;
+						Templates = E2eTypes.Values;
+
 						if (OnlyIfDerivedFromType is null)
-						{
-							endpointTypes = E2eTypes;
 							initialized = true;
-						}
 						else
 							CheckHeritance = false;
-
-						Templates = E2eTypes.Values;
 					}
 				}
 
@@ -238,6 +244,20 @@ namespace Waher.Networking.XMPP.P2P
 		}
 
 		/// <summary>
+		/// Sets allowed cipers in endpoint security.
+		/// </summary>
+		/// <param name="CipherTypes">Allowed cipher types. null=all types allowed.</param>
+		/// <param name="Lock">If set of ciphers should be locked.</param>
+		public static void SetCiphers(Type[] CipherTypes, bool Lock)
+		{
+			if (e2eTypesLocked)
+				throw new InvalidOperationException("Ciphers locked.");
+
+			e2eTypes = CipherTypes;
+			e2eTypesLocked = Lock;
+		}
+
+		/// <summary>
 		/// Tries to get an existing endpoint, given its qualified name.
 		/// </summary>
 		/// <param name="LocalName">Local name</param>
@@ -246,10 +266,16 @@ namespace Waher.Networking.XMPP.P2P
 		/// <returns>If an endpoint was found with the given name.</returns>
 		public static bool TryGetEndpoint(string LocalName, string Namespace, out IE2eEndpoint Endpoint)
 		{
-			if (!initialized)
-				CreateEndpoints(128, 0, int.MaxValue);
+			string Key = Namespace + "#" + LocalName;
 
-			return endpointTypes.TryGetValue(Namespace + "#" + LocalName, out Endpoint);
+			if (endpointTypes.TryGetValue(Key, out Endpoint))
+				return true;
+			else if (initialized)
+				return false;
+
+			CreateEndpoints(128, 0, int.MaxValue);
+
+			return endpointTypes.TryGetValue(Key, out Endpoint);
 		}
 
 		/// <summary>
@@ -432,6 +458,13 @@ namespace Waher.Networking.XMPP.P2P
 			string Key = E.NamespaceURI + "#" + E.LocalName;
 
 			if (endpointTypes.TryGetValue(Key, out IE2eEndpoint E2e))
+				return E2e.Parse(E);
+			else if (initialized)
+				return null;
+
+			CreateEndpoints(128, 0, int.MaxValue);
+
+			if (endpointTypes.TryGetValue(Key, out E2e))
 				return E2e.Parse(E);
 			else
 				return null;

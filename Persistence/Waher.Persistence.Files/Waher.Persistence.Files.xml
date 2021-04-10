@@ -611,6 +611,24 @@
             <returns>BTree file corresponding to the given collection. 
             If file did not exist, and <paramref name="CreateIfNotExists"/> is false, null is returned.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.GetFile(System.String,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Gets the BTree file corresponding to a named collection.
+            </summary>
+            <param name="CollectionName">Name of collection.</param>
+            <param name="Thread">Optional profiling thread.</param>
+            <returns>BTree file corresponding to the given collection.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.GetFile(System.String,System.Boolean,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Gets the BTree file corresponding to a named collection.
+            </summary>
+            <param name="CollectionName">Name of collection.</param>
+            <param name="CreateIfNotExists">If the physical file should be created if one does not already exist.</param>
+            <param name="Thread">Optional profiling thread.</param>
+            <returns>BTree file corresponding to the given collection. 
+            If file did not exist, and <paramref name="CreateIfNotExists"/> is false, null is returned.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.TryGetLabelsFile(System.String,Waher.Persistence.Files.LabelFile@)">
             <summary>
             Tries to get the labels file for a given collection.
@@ -652,10 +670,11 @@
             <param name="CollectionName">Collection name.</param>
             <returns>File name root.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.LoadConfiguration">
+        <member name="M:Waher.Persistence.Files.FilesProvider.LoadConfiguration(Waher.Runtime.Profiling.ProfilerThread)">
             <summary>
             Loads the configuration from the master file.
             </summary>
+            <param name="Thread">Optional profiling thread.</param>
             <returns>Task object</returns>
         </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.GetCollections">

@@ -1247,8 +1247,19 @@ namespace Waher.Persistence.Files
 			while (Wait);
 
 			Thread?.NewState("Labels");
+			ProfilerThread ChildThread = Thread?.CreateSubThread("Labels", ProfilerThreadType.Sequential);
+			LabelFile Labels;
 
-			LabelFile Labels = await LabelFile.Create(CollectionName, this.timeoutMilliseconds, this.encrypted, this);
+			try
+			{
+				ChildThread?.Start();
+
+				Labels = await LabelFile.Create(CollectionName, this.timeoutMilliseconds, this.encrypted, this, ChildThread);
+			}
+			finally
+			{
+				ChildThread?.Stop();
+			}
 
 			Thread?.NewState("BTree");
 

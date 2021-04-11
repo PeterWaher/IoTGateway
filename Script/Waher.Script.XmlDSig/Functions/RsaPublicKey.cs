@@ -68,7 +68,37 @@ namespace Waher.Script.XmlDSig.Functions
 			}
 
 			RSA PublicKey = RSACryptoServiceProvider.Create();
-			PublicKey.FromXmlString(Xml);
+
+			try
+			{
+				PublicKey.FromXmlString(Xml);
+			}
+			catch (PlatformNotSupportedException)
+			{
+				RSAParameters P = new RSAParameters();
+				XmlDocument Doc = new XmlDocument();
+				Doc.LoadXml(Xml);
+
+				if (Doc.DocumentElement is null || Doc.DocumentElement.LocalName != "RSAKeyValue")
+					throw new ScriptRuntimeException("Not an RSA Public Key XML document.", Node);
+
+				foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
+				{
+					if (!(N is XmlElement E))
+						continue;
+
+					switch (E.LocalName)
+					{
+						case "Modulus":
+							P.Modulus = Convert.FromBase64String(E.InnerText);
+							break;
+
+						case "Exponent":
+							P.Exponent = Convert.FromBase64String(E.InnerText);
+							break;
+					}
+				}
+			}
 
 			return PublicKey;
 		}

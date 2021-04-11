@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Security.Cryptography;
-using System.Security.Cryptography.Xml;
+using System.Text;
 using System.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -63,7 +63,26 @@ namespace Waher.Script.XmlDSig.Functions
 			};
 
 			RSACryptoServiceProvider RsaKey = new RSACryptoServiceProvider(KeySize, CspParams);
-			string s = RsaKey.ToXmlString(false);
+			string s;
+
+			try
+			{
+				s = RsaKey.ToXmlString(false);
+			}
+			catch (PlatformNotSupportedException)
+			{
+				StringBuilder sb = new StringBuilder();
+				RSAParameters P = RsaKey.ExportParameters(false);
+
+				sb.Append("<RSAKeyValue><Modulus>");
+				sb.Append(Convert.ToBase64String(P.Modulus));
+				sb.Append("</Modulus><Exponent>");
+				sb.Append(Convert.ToBase64String(P.Exponent));
+				sb.Append("</Exponent></RSAKeyValue>");
+
+				s = sb.ToString();
+			}
+
 			XmlDocument Doc = new XmlDocument();
 			Doc.LoadXml(s);
 

@@ -158,9 +158,11 @@
 	<Assembly fileName='System.Security.Cryptography.Csp.dll'/>
 	<Assembly fileName='System.Security.Cryptography.Encoding.dll'/>
 	<Assembly fileName='System.Security.Cryptography.OpenSsl.dll'/>
+	<Assembly fileName='System.Security.Cryptography.Pkcs.dll'/>
 	<Assembly fileName='System.Security.Cryptography.Primitives.dll'/>
 	<Assembly fileName='System.Security.Cryptography.ProtectedData.dll'/>
 	<Assembly fileName='System.Security.Cryptography.X509Certificates.dll'/>
+	<Assembly fileName='System.Security.Cryptography.Xml.dll'/>
 	<Assembly fileName='System.Security.dll'/>
 	<Assembly fileName='System.Security.Permissions.dll'/>
 	<Assembly fileName='System.Security.Principal.dll'/>
@@ -320,6 +322,7 @@
 	<Assembly fileName='Waher.Script.Persistence.dll'/>
 	<Assembly fileName='Waher.Script.Statistics.dll'/>
 	<Assembly fileName='Waher.Script.Xml.dll'/>
+	<Assembly fileName='Waher.Script.XmlDSig.dll'/>
 	<Assembly fileName='Waher.Security.dll'/>
 	<Assembly fileName='Waher.Security.ACME.dll'/>
 	<Assembly fileName='Waher.Security.CallStack.dll'/>

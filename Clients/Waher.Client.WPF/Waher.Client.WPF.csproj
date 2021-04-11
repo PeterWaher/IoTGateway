@@ -599,6 +599,10 @@
       <Project>{9c55559b-0f46-4799-9b0a-b175389d25b0}</Project>
       <Name>Waher.Script.Graphs</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script.Networking\Waher.Script.Networking.csproj">
+      <Project>{7101894b-d43a-46b2-948f-19a888eab92a}</Project>
+      <Name>Waher.Script.Networking</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj">
       <Project>{9dd2d852-e874-43fc-a83d-c78066e26c16}</Project>
       <Name>Waher.Script.Persistence</Name>
@@ -606,6 +610,10 @@
     <ProjectReference Include="..\..\Script\Waher.Script.Statistics\Waher.Script.Statistics.csproj">
       <Project>{8850d7c6-da07-4bcb-b39a-7090eb39f581}</Project>
       <Name>Waher.Script.Statistics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script.XmlDSig\Waher.Script.XmlDSig.csproj">
+      <Project>{ad578b08-0e8d-47e6-a748-b53fd2702582}</Project>
+      <Name>Waher.Script.XmlDSig</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script.Xml\Waher.Script.Xml.csproj">
       <Project>{68152abc-72bc-450f-8e08-da9638f8dee4}</Project>

@@ -240,9 +240,11 @@
 							<File Id='System.Security.Cryptography.Csp.dll' Name='System.Security.Cryptography.Csp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.Csp.dll' Vital='yes'/>
 							<File Id='System.Security.Cryptography.Encoding.dll' Name='System.Security.Cryptography.Encoding.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.Encoding.dll' Vital='yes'/>
 							<File Id='System.Security.Cryptography.OpenSsl.dll' Name='System.Security.Cryptography.OpenSsl.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.OpenSsl.dll' Vital='yes'/>
+							<File Id='System.Security.Cryptography.Pkcs.dll' Name='System.Security.Cryptography.Pkcs.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.Pkcs.dll' Vital='yes'/>
 							<File Id='System.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.Primitives.dll' Vital='yes'/>
 							<File Id='System.Security.Cryptography.ProtectedData.dll' Name='System.Security.Cryptography.ProtectedData.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.ProtectedData.dll' Vital='yes'/>
 							<File Id='System.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.X509Certificates.dll' Vital='yes'/>
+							<File Id='System.Security.Cryptography.Xml.dll' Name='System.Security.Cryptography.Xml.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.Xml.dll' Vital='yes'/>
 							<File Id='System.Security.dll' Name='System.Security.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.dll' Vital='yes'/>
 							<File Id='System.Security.Permissions.dll' Name='System.Security.Permissions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Permissions.dll' Vital='yes'/>
 							<File Id='System.Security.Principal.dll' Name='System.Security.Principal.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Principal.dll' Vital='yes'/>
@@ -397,9 +399,11 @@
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.Csp.dll' Name='System.Security.Cryptography.Csp.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.Encoding.dll' Name='System.Security.Cryptography.Encoding.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.OpenSsl.dll' Name='System.Security.Cryptography.OpenSsl.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.Cryptography.Pkcs.dll' Name='System.Security.Cryptography.Pkcs.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.ProtectedData.dll' Name='System.Security.Cryptography.ProtectedData.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.Primitives.dll' Name='System.Security.Cryptography.Primitives.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.X509Certificates.dll' Name='System.Security.Cryptography.X509Certificates.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Security.Cryptography.Xml.dll' Name='System.Security.Cryptography.Xml.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.dll' Name='System.Security.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Permissions.dll' Name='System.Security.Permissions.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Principal.dll' Name='System.Security.Principal.dll' On='uninstall' />
@@ -608,6 +612,7 @@
 							<File Id='Waher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Persistence.dll' Vital='yes'/>
 							<File Id='Waher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Statistics.dll' Vital='yes'/>
 							<File Id='Waher.Script.Xml.dll' Name='Waher.Script.Xml.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Xml.dll' Vital='yes'/>
+							<File Id='Waher.Script.XmlDSig.dll' Name='Waher.Script.XmlDSig.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.XmlDSig.dll' Vital='yes'/>
 							<File Id='Waher.Security.dll' Name='Waher.Security.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.dll' Vital='yes'/>
 							<File Id='Waher.Security.ACME.dll' Name='Waher.Security.ACME.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.ACME.dll' Vital='yes'/>
 							<File Id='Waher.Security.CallStack.dll' Name='Waher.Security.CallStack.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.CallStack.dll' Vital='yes'/>
@@ -714,6 +719,7 @@
 							<RemoveFile Id='RemoveWaher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Xml.dll' Name='Waher.Script.Xml.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.XmlDSig.dll' Name='Waher.Script.XmlDSig.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.dll' Name='Waher.Security.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.ACME.dll' Name='Waher.Security.ACME.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.CallStack.dll' Name='Waher.Security.CallStack.dll' On='uninstall'/>

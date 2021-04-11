@@ -102,9 +102,11 @@ namespace Waher.Script.XmlDSig.Functions
 
 			XmlDocument Xml = SignXml.ToXml(Arguments[c - 1].AssociatedObjectValue, this);
 
+			Xml.LoadXml(Xml.OuterXml);  // Why is this necessary? Otherwise, the SignedXml.LoadXml(Signature); method call below will fail...
+
 			SignedXml SignedXml = new SignedXml(Xml);
 			XmlElement Signature = null;
-
+			
 			foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
 			{
 				if (N is XmlElement E && E.LocalName == "Signature")
@@ -116,7 +118,7 @@ namespace Waher.Script.XmlDSig.Functions
 			
 			if (Signature is null)
 				throw new Exception("XML not signed.");
-
+			
 			SignedXml.LoadXml(Signature);
 
 			if (!SignedXml.CheckSignature(PublicKey))

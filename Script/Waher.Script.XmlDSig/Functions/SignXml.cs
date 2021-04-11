@@ -10,23 +10,22 @@ using Waher.Script.Objects;
 namespace Waher.Script.XmlDSig.Functions
 {
 	/// <summary>
-	/// SignXml(KeyName,KeySize,XML,Reference)
+	/// SignXml(KeyName,KeySize,XML)
 	/// </summary>
 	public class SignXml : FunctionMultiVariate
 	{
 		/// <summary>
-		/// SignXml(KeyName,KeySize,XML,Reference)
+		/// SignXml(KeyName,KeySize,XML)
 		/// </summary>
 		/// <param name="KeyName">Key Name</param>
 		/// <param name="KeySize">Key size, in bits.</param>
 		/// <param name="Xml">XML to sign.</param>
-		/// <param name="Reference">Reference URI</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public SignXml(ScriptNode KeyName, ScriptNode KeySize, ScriptNode Xml, ScriptNode Reference, int Start, int Length, Expression Expression)
-			: base(new ScriptNode[] { KeyName, KeySize, Xml, Reference },
-				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Normal, ArgumentType.Scalar },
+		public SignXml(ScriptNode KeyName, ScriptNode KeySize, ScriptNode Xml, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { KeyName, KeySize, Xml },
+				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Normal },
 				  Start, Length, Expression)
 		{
 		}
@@ -44,7 +43,7 @@ namespace Waher.Script.XmlDSig.Functions
 		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
-			get { return new string[] { "KeyName", "KeySize", "Xml", "Reference" }; }
+			get { return new string[] { "KeyName", "KeySize", "Xml" }; }
 		}
 
 		/// <summary>
@@ -62,7 +61,6 @@ namespace Waher.Script.XmlDSig.Functions
 				throw new ScriptRuntimeException("Invalid key size.", this);
 
 			XmlDocument Xml = ToXml(Arguments[2].AssociatedObjectValue, this);
-			string Ref = Arguments[3].AssociatedObjectValue.ToString();
 
 			CspParameters CspParams = new CspParameters()
 			{
@@ -78,7 +76,7 @@ namespace Waher.Script.XmlDSig.Functions
 
 			Reference Reference = new Reference()
 			{
-				Uri = Ref
+				Uri = string.Empty
 			};
 
 			XmlDsigEnvelopedSignatureTransform Env = new XmlDsigEnvelopedSignatureTransform();

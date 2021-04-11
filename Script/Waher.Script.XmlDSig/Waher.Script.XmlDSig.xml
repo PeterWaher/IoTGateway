@@ -71,17 +71,16 @@
         </member>
         <member name="T:Waher.Script.XmlDSig.Functions.SignXml">
             <summary>
-            SignXml(KeyName,KeySize,XML,Reference)
+            SignXml(KeyName,KeySize,XML)
             </summary>
         </member>
-        <member name="M:Waher.Script.XmlDSig.Functions.SignXml.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.XmlDSig.Functions.SignXml.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
-            SignXml(KeyName,KeySize,XML,Reference)
+            SignXml(KeyName,KeySize,XML)
             </summary>
             <param name="KeyName">Key Name</param>
             <param name="KeySize">Key size, in bits.</param>
             <param name="Xml">XML to sign.</param>
-            <param name="Reference">Reference URI</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>

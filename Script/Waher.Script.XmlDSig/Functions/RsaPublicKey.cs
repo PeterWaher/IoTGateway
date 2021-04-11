@@ -75,12 +75,14 @@ namespace Waher.Script.XmlDSig.Functions
 			}
 			catch (PlatformNotSupportedException)
 			{
-				RSAParameters P = new RSAParameters();
 				XmlDocument Doc = new XmlDocument();
 				Doc.LoadXml(Xml);
 
 				if (Doc.DocumentElement is null || Doc.DocumentElement.LocalName != "RSAKeyValue")
 					throw new ScriptRuntimeException("Not an RSA Public Key XML document.", Node);
+
+				byte[] Modulus = null;
+				byte[] Exponent = null;
 
 				foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
 				{
@@ -90,14 +92,23 @@ namespace Waher.Script.XmlDSig.Functions
 					switch (E.LocalName)
 					{
 						case "Modulus":
-							P.Modulus = Convert.FromBase64String(E.InnerText);
+							Modulus = Convert.FromBase64String(E.InnerText);
 							break;
 
 						case "Exponent":
-							P.Exponent = Convert.FromBase64String(E.InnerText);
+							Exponent = Convert.FromBase64String(E.InnerText);
 							break;
 					}
 				}
+
+				if (Modulus is null || Exponent is null)
+					throw new ScriptRuntimeException("Not an RSA Public Key XML document.", Node);
+
+				PublicKey.ImportParameters(new RSAParameters()
+				{
+					Modulus = Modulus,
+					Exponent = Exponent
+				});
 			}
 
 			return PublicKey;

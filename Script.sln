@@ -73,6 +73,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.SHA3", "Secu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.EllipticCurves", "Security\Waher.Security.EllipticCurves\Waher.Security.EllipticCurves.csproj", "{D909ADCC-3C62-44EC-A69E-502D9C3C6624}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.XmlDSig", "Script\Waher.Script.XmlDSig\Waher.Script.XmlDSig.csproj", "{2B3539DF-503D-4755-94FB-23714FA0CDDA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -187,6 +189,10 @@ Global
 		{D909ADCC-3C62-44EC-A69E-502D9C3C6624}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D909ADCC-3C62-44EC-A69E-502D9C3C6624}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D909ADCC-3C62-44EC-A69E-502D9C3C6624}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B3539DF-503D-4755-94FB-23714FA0CDDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B3539DF-503D-4755-94FB-23714FA0CDDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B3539DF-503D-4755-94FB-23714FA0CDDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B3539DF-503D-4755-94FB-23714FA0CDDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

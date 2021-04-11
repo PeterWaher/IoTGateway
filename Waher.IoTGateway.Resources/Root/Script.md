@@ -1688,6 +1688,18 @@ The following functions are available in the `Waher.Script.Xml` library.
 |---------------------------------|-------------|---------|
 | `Xml(s)`                        | Converts the string `s` to an XML Document. | `Xml("<a>Hello</a>")` |
 
+#### XMLDSIG-related functions (Waher.Script.XmlDSig)
+
+The following functions are available in the `Waher.Script.XmlDSig` library.
+
+| Function                                 | Description | Example |
+|------------------------------------------|-------------|---------|
+| `RsaPublicKeyXml(KeyName,KeySize)`       | Exports the public key corresponding to an RSA key with name `KeyName` and size `KeySize`, in bits, as an XML document. | `RsaPublicKeyXml("Test",4096)` |
+| `RsaPublicKey(Xml)`                      | Imports an RSA public key from its XML representation in `Xml`.                                                         | `RsaPublicKey(Xml)` |
+| `SignXml(KeyName,KeySize,XML,Reference)` | Signs XML using the XMLDSIG standard, given an RSA key with name `KeyName` and size `KeySize`, in bits.                 | `SignXml("Test",4096,<Test><a>1</a><b>2</b></Test>,"")` |
+| `VerifyXml(KeyName,KeySize,XML)`         | Verifies signed XML using the XMLDSIG standard, given an RSA key with name `KeyName` and size `KeySize`, in bits.       | `VerifyXml("Test",4096,Xml)` |
+| `VerifyXml(PublicKey,XML)`               | Verifies signed XML using the XMLDSIG standard, given an RSA public key, either parsed, or in XML.                      | `VerifyXml(PublicKey,Xml)` |
+
 #### Markdown-related functions (Waher.Content.Markdown)
 
 The following functions are available in the `Waher.Content.Markdown` library.

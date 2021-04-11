@@ -471,7 +471,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.QR.Test", "Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Settings.Test", "Runtime\Waher.Runtime.Settings.Test\Waher.Runtime.Settings.Test.csproj", "{8AD0A84F-7559-4DD8-AE0D-04FBB4F7E5CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Transactions", "Runtime\Waher.Runtime.Transactions\Waher.Runtime.Transactions.csproj", "{ECB9FD87-D261-4A1D-BAE4-181D5B0D4F81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Transactions", "Runtime\Waher.Runtime.Transactions\Waher.Runtime.Transactions.csproj", "{ECB9FD87-D261-4A1D-BAE4-181D5B0D4F81}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.XmlDSig", "Script\Waher.Script.XmlDSig\Waher.Script.XmlDSig.csproj", "{AD578B08-0E8D-47E6-A748-B53FD2702582}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -5307,6 +5309,30 @@ Global
 		{ECB9FD87-D261-4A1D-BAE4-181D5B0D4F81}.Release|x64.Build.0 = Release|Any CPU
 		{ECB9FD87-D261-4A1D-BAE4-181D5B0D4F81}.Release|x86.ActiveCfg = Release|Any CPU
 		{ECB9FD87-D261-4A1D-BAE4-181D5B0D4F81}.Release|x86.Build.0 = Release|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Debug|ARM.Build.0 = Debug|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Debug|x64.Build.0 = Debug|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Debug|x86.Build.0 = Debug|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Release|ARM.ActiveCfg = Release|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Release|ARM.Build.0 = Release|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Release|ARM64.Build.0 = Release|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Release|x64.ActiveCfg = Release|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Release|x64.Build.0 = Release|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Release|x86.ActiveCfg = Release|Any CPU
+		{AD578B08-0E8D-47E6-A748-B53FD2702582}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -5505,6 +5531,7 @@ Global
 		{23587685-0DE0-4B7B-8574-6DCDC2E78028} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
 		{8AD0A84F-7559-4DD8-AE0D-04FBB4F7E5CE} = {A6A2D4A1-12E4-467E-925C-720093EBFE26}
 		{ECB9FD87-D261-4A1D-BAE4-181D5B0D4F81} = {A6A2D4A1-12E4-467E-925C-720093EBFE26}
+		{AD578B08-0E8D-47E6-A748-B53FD2702582} = {A26DA5FE-E41B-458F-AA90-EB0ADC43E39B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

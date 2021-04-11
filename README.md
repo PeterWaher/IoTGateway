@@ -363,6 +363,7 @@ graphs, physical units and unit conversions, etc. For more information about the
 | **Waher.Script.Persistence**  | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Script.Persistence/)  | The [Waher.Script.Persistence](Script/Waher.Script.Persistence) project is a class library that allows access to the object database defined in the [Waher.Persistence](Persistence/Waher.Persistence) library in script. |
 | **Waher.Script.Statisics**    | .NET Std 1.5 | [NuGet](https://www.nuget.org/packages/Waher.Script.Statistics/)   | The [Waher.Script.Statisics](Script/Waher.Script.Statisics) project is a class library that adds statistical functions to the script engine. |
 | **Waher.Script.Xml**          | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Script.Xml/)          | The [Waher.Script.Xml](Script/Waher.Script.Xml) project is a class library that contains script extensions for parsing XML. |
+| **Waher.Script.XmlDSig**      | .NET Std 2.0 | [NuGet](https://www.nuget.org/packages/Waher.Script.XmlDSig/)      | The [Waher.Script.XmlDSig](Script/Waher.Script.XmlDSig) project is a class library that contains script extensions for signing and verifying XML documents using the [XMLDSIG](https://www.w3.org/TR/xmldsig-core/) standard. |
 
 The folder also contains the following unit test projects:
 

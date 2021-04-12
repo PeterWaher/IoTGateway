@@ -1654,7 +1654,7 @@ namespace Waher.Networking.XMPP
 			{
 				StringBuilder Xml = new StringBuilder();
 
-				this.Error(ex2.Message);
+				this.Exception(ex2);
 
 				Xml.Append("<error type='");
 				Xml.Append(ex2.ErrorType);

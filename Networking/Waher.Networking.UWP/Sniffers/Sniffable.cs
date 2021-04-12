@@ -271,21 +271,27 @@ namespace Waher.Networking.Sniffers
 		{
 			Exception = Log.UnnestException(Exception);
 
-			if (Exception is AggregateException ex)
+			do
 			{
-				foreach (Exception ex2 in ex.InnerExceptions)
-					this.Exception(ex2);
-			}
-			else
-			{
-				string Msg = Exception.Message + "\r\n\r\n" + Log.CleanStackTrace(Exception.StackTrace);
-
-				if (this.hasSniffers)
+				if (Exception is AggregateException ex)
 				{
-					foreach (ISniffer Sniffer in this.staticList)
-						Sniffer.Exception(Msg);
+					foreach (Exception ex2 in ex.InnerExceptions)
+						this.Exception(ex2);
 				}
+				else
+				{
+					string Msg = Exception.Message + "\r\n\r\n" + Log.CleanStackTrace(Exception.StackTrace);
+
+					if (this.hasSniffers)
+					{
+						foreach (ISniffer Sniffer in this.staticList)
+							Sniffer.Exception(Msg);
+					}
+				}
+
+				Exception = Exception.InnerException;
 			}
+			while (!(Exception is null));
 		}
 
 	}

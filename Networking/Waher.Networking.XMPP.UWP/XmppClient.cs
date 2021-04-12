@@ -877,7 +877,7 @@ namespace Waher.Networking.XMPP
 			}
 			else
 			{
-				this.Error(Exception.Message);
+				this.Exception(Exception);
 
 				ExceptionEventHandler h = this.OnError;
 				if (!(h is null))
@@ -3898,7 +3898,7 @@ namespace Waher.Networking.XMPP
 			StringBuilder Xml = new StringBuilder();
 			if (ex is StanzaExceptionException ex2)
 			{
-				this.Error(ex2.Message);
+				this.Exception(ex2);
 
 				Xml.Append("<error type='");
 				Xml.Append(ex2.ErrorType);

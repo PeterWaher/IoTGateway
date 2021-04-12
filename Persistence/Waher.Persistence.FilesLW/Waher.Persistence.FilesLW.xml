@@ -280,6 +280,11 @@
             Base folder of where files will be stored.
             </summary>
         </member>
+        <member name="P:Waher.Persistence.Files.FilesProvider.AsyncFileIo">
+            <summary>
+            If asynchronous file I/O is to be performed (true), or synchronous file I/O (false).
+            </summary>
+        </member>
         <member name="P:Waher.Persistence.Files.FilesProvider.AutoRepairReportFolder">
             <summary>
             Folder for Auto-Repair reports. If empty or null, <see cref="P:Waher.Persistence.Files.FilesProvider.Folder"/>\AutoRepair will be used. 
@@ -480,24 +485,6 @@
             <returns>BTree file corresponding to the given collection. 
             If file did not exist, and <paramref name="CreateIfNotExists"/> is false, null is returned.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.GetFile(System.String,Waher.Runtime.Profiling.ProfilerThread)">
-            <summary>
-            Gets the BTree file corresponding to a named collection.
-            </summary>
-            <param name="CollectionName">Name of collection.</param>
-            <param name="Thread">Optional profiling thread.</param>
-            <returns>BTree file corresponding to the given collection.</returns>
-        </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.GetFile(System.String,System.Boolean,Waher.Runtime.Profiling.ProfilerThread)">
-            <summary>
-            Gets the BTree file corresponding to a named collection.
-            </summary>
-            <param name="CollectionName">Name of collection.</param>
-            <param name="CreateIfNotExists">If the physical file should be created if one does not already exist.</param>
-            <param name="Thread">Optional profiling thread.</param>
-            <returns>BTree file corresponding to the given collection. 
-            If file did not exist, and <paramref name="CreateIfNotExists"/> is false, null is returned.</returns>
-        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.TryGetLabelsFile(System.String,Waher.Persistence.Files.LabelFile@)">
             <summary>
             Tries to get the labels file for a given collection.
@@ -539,11 +526,10 @@
             <param name="CollectionName">Collection name.</param>
             <returns>File name root.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.LoadConfiguration(Waher.Runtime.Profiling.ProfilerThread)">
+        <member name="M:Waher.Persistence.Files.FilesProvider.LoadConfiguration">
             <summary>
             Loads the configuration from the master file.
             </summary>
-            <param name="Thread">Optional profiling thread.</param>
             <returns>Task object</returns>
         </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.GetCollections">
@@ -1599,17 +1585,6 @@
             <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
             <param name="Encrypted">If the files should be encrypted or not.</param>
             <param name="Provider">Reference to the files provider.</param>
-            <returns>LabelFile object.</returns>
-        </member>
-        <member name="M:Waher.Persistence.Files.LabelFile.Create(System.String,System.Int32,System.Boolean,Waher.Persistence.Files.FilesProvider,Waher.Runtime.Profiling.ProfilerThread)">
-            <summary>
-            Creates a LabelFile object.
-            </summary>
-            <param name="CollectionName">Name of collection.</param>
-            <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
-            <param name="Encrypted">If the files should be encrypted or not.</param>
-            <param name="Provider">Reference to the files provider.</param>
-            <param name="Thread">Optional profiling thread.</param>
             <returns>LabelFile object.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.LabelFile.GetFieldCode(System.String)">
@@ -3854,14 +3829,6 @@
             Gets the length of the file, in bytes.
             </summary>
             <returns>Length of file.</returns>
-        </member>
-        <member name="M:Waher.Persistence.Files.SerialFile.ReadBlock(System.Int64,System.Int32)">
-            <summary>
-            Reads a binary block.
-            </summary>
-            <param name="Position">Position in file.</param>
-            <param name="NrBytes">Block size, in bytes. (Can be smaller than persisted block.)</param>
-            <returns>Block</returns>
         </member>
         <member name="M:Waher.Persistence.Files.SerialFile.ReadBlock(System.Int64)">
             <summary>

@@ -401,6 +401,11 @@
             Base folder of where files will be stored.
             </summary>
         </member>
+        <member name="P:Waher.Persistence.Files.FilesProvider.AsyncFileIo">
+            <summary>
+            If asynchronous file I/O is to be performed (true), or synchronous file I/O (false).
+            </summary>
+        </member>
         <member name="P:Waher.Persistence.Files.FilesProvider.AutoRepairReportFolder">
             <summary>
             Folder for Auto-Repair reports. If empty or null, <see cref="P:Waher.Persistence.Files.FilesProvider.Folder"/>\AutoRepair will be used. 
@@ -3985,14 +3990,6 @@
             Gets the length of the file, in bytes.
             </summary>
             <returns>Length of file.</returns>
-        </member>
-        <member name="M:Waher.Persistence.Files.SerialFile.ReadBlock(System.Int64,System.Int32)">
-            <summary>
-            Reads a binary block.
-            </summary>
-            <param name="Position">Position in file.</param>
-            <param name="NrBytes">Block size, in bytes. (Can be smaller than persisted block.)</param>
-            <returns>Block</returns>
         </member>
         <member name="M:Waher.Persistence.Files.SerialFile.ReadBlock(System.Int64)">
             <summary>

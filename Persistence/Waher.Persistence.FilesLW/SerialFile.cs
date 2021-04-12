@@ -19,6 +19,7 @@ namespace Waher.Persistence.Files
 		private readonly string fileName;
 		private readonly bool encrypted;
 		private readonly bool fileExists;
+		private readonly bool asyncFileIo;
 		private Aes aes;
 		private byte[] aesKey;
 		private byte[] ivSeed;
@@ -42,6 +43,7 @@ namespace Waher.Persistence.Files
 			this.collectionName = CollectionName;
 			this.encrypted = Encrypted;
 			this.fileExists = File.Exists(this.fileName);
+			this.asyncFileIo = FilesProvider.AsyncFileIo;
 
 			string Folder = Path.GetDirectoryName(this.fileName);
 			if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
@@ -118,56 +120,15 @@ namespace Waher.Persistence.Files
 		/// <returns>Length of file.</returns>
 		public async Task<long> GetLength()
 		{
-			await this.fileAccess.BeginWrite();
+			await this.fileAccess.BeginRead();
 			try
 			{
 				return this.file.Length;    // Can only change in write state
 			}
 			finally
 			{
-				await this.fileAccess.EndWrite();
+				await this.fileAccess.EndRead();
 			}
-		}
-
-		/// <summary>
-		/// Reads a binary block.
-		/// </summary>
-		/// <param name="Position">Position in file.</param>
-		/// <param name="NrBytes">Block size, in bytes. (Can be smaller than persisted block.)</param>
-		/// <returns>Block</returns>
-		public async Task<byte[]> ReadBlock(long Position, int NrBytes)
-		{
-			await this.fileAccess.BeginWrite();
-			try
-			{
-				return await this.ReadBlockLocked(Position, NrBytes);
-			}
-			finally
-			{
-				await this.fileAccess.EndWrite();
-			}
-		}
-
-		private async Task<byte[]> ReadBlockLocked(long Position, int NrBytes)
-		{
-			byte[] Result = new byte[NrBytes];
-			int NrRead;
-
-			this.file.Position = Position;
-			NrRead = await this.file.ReadAsync(Result, 0, NrBytes);
-
-			if (NrRead < NrBytes)
-				throw Database.FlagForRepair(this.collectionName, "Unexpected end of file " + this.fileName + ".");
-
-			if (this.encrypted)
-			{
-				using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(Position)))
-				{
-					Result = Aes.TransformFinalBlock(Result, 0, Result.Length);
-				}
-			}
-
-			return Result;
 		}
 
 		/// <summary>
@@ -177,7 +138,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Binary block (decrypted if file is encrypted), and the position of the following block.</returns>
 		public async Task<KeyValuePair<byte[], long>> ReadBlock(long Position)
 		{
-			await this.fileAccess.BeginWrite();
+			await this.fileAccess.BeginRead();
 			try
 			{
 				byte[] Block = await this.ReadBlockLocked(Position, MinBlockSize);
@@ -217,8 +178,33 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.fileAccess.EndWrite();
+				await this.fileAccess.EndRead();
 			}
+		}
+
+		private async Task<byte[]> ReadBlockLocked(long Position, int NrBytes)
+		{
+			byte[] Result = new byte[NrBytes];
+			int NrRead;
+
+			this.file.Position = Position;
+			if (this.asyncFileIo)
+				NrRead = await this.file.ReadAsync(Result, 0, NrBytes);
+			else
+				NrRead = this.file.Read(Result, 0, NrBytes);
+
+			if (NrRead < NrBytes)
+				throw Database.FlagForRepair(this.collectionName, "Unexpected end of file " + this.fileName + ".");
+
+			if (this.encrypted)
+			{
+				using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(Position)))
+				{
+					Result = Aes.TransformFinalBlock(Result, 0, Result.Length);
+				}
+			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -295,8 +281,16 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			await this.file.WriteAsync(Block, 0, Block.Length);
-			await this.file.FlushAsync();
+			if (this.asyncFileIo)
+			{
+				await this.file.WriteAsync(Block, 0, Block.Length);
+				await this.file.FlushAsync();
+			}
+			else
+			{
+				this.file.Write(Block, 0, Block.Length);
+				this.file.Flush();
+			}
 
 			return Position;
 		}

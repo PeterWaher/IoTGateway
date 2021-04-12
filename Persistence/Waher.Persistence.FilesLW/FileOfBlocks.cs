@@ -16,6 +16,7 @@ namespace Waher.Persistence.Files
 		private readonly string fileName;
 		private readonly bool filePreExisting;
 		private readonly int blockSize;
+		private readonly bool asyncFileIo;
 		private long length;
 		private uint blockLimit;
 
@@ -35,6 +36,7 @@ namespace Waher.Persistence.Files
 			this.filePreExisting = File.Exists(this.fileName);
 			this.blockSize = BlockSize;
 			this.fileAccess = new MultiReadSingleWriteObject();
+			this.asyncFileIo = FilesProvider.AsyncFileIo;
 
 			string Folder = Path.GetDirectoryName(FileName);
 			if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
@@ -120,7 +122,7 @@ namespace Waher.Persistence.Files
 
 			int NrRead;
 
-			await this.fileAccess.BeginWrite();
+			await this.fileAccess.BeginRead();
 			try
 			{
 				long Pos = ((long)BlockIndex) * this.blockSize;
@@ -128,11 +130,14 @@ namespace Waher.Persistence.Files
 				if (Pos != this.file.Seek(Pos, SeekOrigin.Begin))
 					throw Database.FlagForRepair(this.collectionName, "Invalid file position.");
 
-				NrRead = await this.file.ReadAsync(Block, 0, this.blockSize);
+				if (this.asyncFileIo)
+					NrRead = await this.file.ReadAsync(Block, 0, this.blockSize);
+				else
+					NrRead = this.file.Read(Block, 0, this.blockSize);
 			}
 			finally
 			{
-				await this.fileAccess.EndWrite();
+				await this.fileAccess.EndRead();
 			}
 
 			if (this.blockSize != NrRead)
@@ -157,7 +162,10 @@ namespace Waher.Persistence.Files
 				if (Pos != this.file.Seek(Pos, SeekOrigin.Begin))
 					throw Database.FlagForRepair(this.collectionName, "Invalid file position.");
 
-				await this.file.WriteAsync(Block, 0, this.blockSize);
+				if (this.asyncFileIo)
+					await this.file.WriteAsync(Block, 0, this.blockSize);
+				else
+					this.file.Write(Block, 0, this.blockSize);
 
 				if (BlockIndex == this.blockLimit)
 				{

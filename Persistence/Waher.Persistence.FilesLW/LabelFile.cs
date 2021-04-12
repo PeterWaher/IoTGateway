@@ -64,25 +64,8 @@ namespace Waher.Persistence.Files
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		/// <param name="Provider">Reference to the files provider.</param>
 		/// <returns>LabelFile object.</returns>
-		public static Task<LabelFile> Create(string CollectionName, int TimeoutMilliseconds, bool Encrypted, FilesProvider Provider)
+		public static async Task<LabelFile> Create(string CollectionName, int TimeoutMilliseconds, bool Encrypted, FilesProvider Provider)
 		{
-			return Create(CollectionName, TimeoutMilliseconds, Encrypted, Provider, null);
-		}
-
-		/// <summary>
-		/// Creates a LabelFile object.
-		/// </summary>
-		/// <param name="CollectionName">Name of collection.</param>
-		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
-		/// <param name="Encrypted">If the files should be encrypted or not.</param>
-		/// <param name="Provider">Reference to the files provider.</param>
-		/// <param name="Thread">Optional profiling thread.</param>
-		/// <returns>LabelFile object.</returns>
-		public static async Task<LabelFile> Create(string CollectionName, int TimeoutMilliseconds, bool Encrypted, FilesProvider Provider,
-			ProfilerThread Thread)
-		{
-			Thread?.NewState("File");
-
 			string FileName = Provider.GetFileName(CollectionName);
 			string LabelsFileName = FileName + ".labels";
 			bool LabelsExists = File.Exists(LabelsFileName);
@@ -90,14 +73,10 @@ namespace Waher.Persistence.Files
 			uint LastCode = 0;
 			uint Code = 1;
 
-			Thread?.NewState("Keys");
-
 			await GetKeys(Result, Provider);
 
 			if (LabelsExists)
 			{
-				Thread?.NewState("Load");
-
 				long Len = await Result.GetLength();
 				long Pos = 0;
 
@@ -105,8 +84,6 @@ namespace Waher.Persistence.Files
 				{
 					try
 					{
-						Thread?.Event("Label");
-						
 						KeyValuePair<string, long> P = await Result.ReadLabel(Pos);
 
 						Result.codesByLabel[P.Key] = Code;
@@ -116,11 +93,8 @@ namespace Waher.Persistence.Files
 						Code++;
 						Pos = P.Value;
 					}
-					catch (Exception ex)
+					catch (Exception)
 					{
-						ex = Log.UnnestException(ex);
-						Thread?.Exception(ex);
-
 						await Result.Truncate(Pos);
 						Len = Pos;
 					}
@@ -131,8 +105,6 @@ namespace Waher.Persistence.Files
 				string NamesFileName = FileName + ".names";
 				if (File.Exists(NamesFileName))
 				{
-					Thread?.NewState("Names");
-
 					SortedDictionary<uint, string> NewCodes = null;
 
 					using (StringDictionary Names = await StringDictionary.Create(NamesFileName, string.Empty, CollectionName, Provider, false))

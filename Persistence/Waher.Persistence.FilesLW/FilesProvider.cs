@@ -57,6 +57,7 @@ namespace Waher.Persistence.Files
 #if NETSTANDARD1_5
 		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 #endif
+		private static bool asyncFileIo = true;
 
 		private SerializerCollection serializers;
 		private readonly Dictionary<string, ObjectBTreeFile> files = new Dictionary<string, ObjectBTreeFile>();
@@ -407,30 +408,10 @@ namespace Waher.Persistence.Files
 			try
 			{
 				Thread?.NewState("Default");
-				ProfilerThread ChildThread = Thread?.CreateSubThread("Default", ProfilerThreadType.Sequential);
-				try
-				{
-					ChildThread?.Start();
-
-					await Result.GetFile(Result.defaultCollectionName, ChildThread);
-				}
-				finally
-				{
-					ChildThread?.Stop();
-				}
+				await Result.GetFile(Result.defaultCollectionName);
 
 				Thread?.NewState("Config");
-				ChildThread = Thread?.CreateSubThread("Config", ProfilerThreadType.Sequential);
-				try
-				{
-					ChildThread?.Start();
-					
-					await Result.LoadConfiguration(ChildThread);
-				}
-				finally
-				{
-					ChildThread?.Stop();
-				}
+				await Result.LoadConfiguration();
 			}
 			catch (InconsistencyException ex)
 			{
@@ -442,7 +423,7 @@ namespace Waher.Persistence.Files
 				await Result.GetFile(Result.defaultCollectionName);
 
 				Thread?.NewState("Config");
-				await Result.LoadConfiguration(null);
+				await Result.LoadConfiguration();
 			}
 
 			Thread?.Stop();
@@ -469,6 +450,15 @@ namespace Waher.Persistence.Files
 		public string Folder
 		{
 			get { return this.folder; }
+		}
+
+		/// <summary>
+		/// If asynchronous file I/O is to be performed (true), or synchronous file I/O (false).
+		/// </summary>
+		public static bool AsyncFileIo
+		{
+			get => asyncFileIo;
+			set => asyncFileIo = value;
 		}
 
 		/// <summary>
@@ -1172,7 +1162,7 @@ namespace Waher.Persistence.Files
 		/// <returns>BTree file corresponding to the given collection.</returns>
 		public Task<ObjectBTreeFile> GetFile(string CollectionName)
 		{
-			return this.GetFile(CollectionName, true, null);
+			return this.GetFile(CollectionName, true);
 		}
 
 		/// <summary>
@@ -1182,35 +1172,9 @@ namespace Waher.Persistence.Files
 		/// <param name="CreateIfNotExists">If the physical file should be created if one does not already exist.</param>
 		/// <returns>BTree file corresponding to the given collection. 
 		/// If file did not exist, and <paramref name="CreateIfNotExists"/> is false, null is returned.</returns>
-		public Task<ObjectBTreeFile> GetFile(string CollectionName, bool CreateIfNotExists)
-		{
-			return this.GetFile(CollectionName, CreateIfNotExists, null);
-		}
-
-		/// <summary>
-		/// Gets the BTree file corresponding to a named collection.
-		/// </summary>
-		/// <param name="CollectionName">Name of collection.</param>
-		/// <param name="Thread">Optional profiling thread.</param>
-		/// <returns>BTree file corresponding to the given collection.</returns>
-		public Task<ObjectBTreeFile> GetFile(string CollectionName, ProfilerThread Thread)
-		{
-			return this.GetFile(CollectionName, true, Thread);
-		}
-
-		/// <summary>
-		/// Gets the BTree file corresponding to a named collection.
-		/// </summary>
-		/// <param name="CollectionName">Name of collection.</param>
-		/// <param name="CreateIfNotExists">If the physical file should be created if one does not already exist.</param>
-		/// <param name="Thread">Optional profiling thread.</param>
-		/// <returns>BTree file corresponding to the given collection. 
-		/// If file did not exist, and <paramref name="CreateIfNotExists"/> is false, null is returned.</returns>
-		public async Task<ObjectBTreeFile> GetFile(string CollectionName, bool CreateIfNotExists, ProfilerThread Thread)
+		public async Task<ObjectBTreeFile> GetFile(string CollectionName, bool CreateIfNotExists)
 		{
 			ObjectBTreeFile File;
-
-			Thread?.NewState("Check");
 
 			if (string.IsNullOrEmpty(CollectionName))
 				CollectionName = this.defaultCollectionName;
@@ -1246,22 +1210,7 @@ namespace Waher.Persistence.Files
 			}
 			while (Wait);
 
-			Thread?.NewState("Labels");
-			ProfilerThread ChildThread = Thread?.CreateSubThread("Labels", ProfilerThreadType.Sequential);
-			LabelFile Labels;
-
-			try
-			{
-				ChildThread?.Start();
-
-				Labels = await LabelFile.Create(CollectionName, this.timeoutMilliseconds, this.encrypted, this, ChildThread);
-			}
-			finally
-			{
-				ChildThread?.Stop();
-			}
-
-			Thread?.NewState("BTree");
+			LabelFile Labels = await LabelFile.Create(CollectionName, this.timeoutMilliseconds, this.encrypted, this);
 
 			File = await ObjectBTreeFile.Create(s + ".btree", CollectionName, s + ".blob", this.blockSize, this.blobBlockSize,
 				this, this.encoding, this.timeoutMilliseconds, this.encrypted);
@@ -1272,8 +1221,6 @@ namespace Waher.Persistence.Files
 				this.labelFiles[CollectionName] = Labels;
 			}
 
-			Thread?.NewState("Rec");
-
 			StringBuilder sb = new StringBuilder();
 
 			sb.AppendLine("Collection");
@@ -1282,12 +1229,8 @@ namespace Waher.Persistence.Files
 			KeyValuePair<bool, object> P2 = await this.master.TryGetValueAsync(File.FileName);
 			string s2 = sb.ToString();
 
-			Thread?.NewState("Upd");
-
 			if (this.NeedsMasterRegistryUpdate(P2, File.FileName, s2))
 				await this.master.AddAsync(File.FileName, s2, true);
-
-			Thread?.NewState("FC");
 
 			await this.GetFieldCode(null, CollectionName);
 
@@ -1514,14 +1457,11 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Loads the configuration from the master file.
 		/// </summary>
-		/// <param name="Thread">Optional profiling thread.</param>
 		/// <returns>Task object</returns>
-		private async Task LoadConfiguration(ProfilerThread Thread)
+		private async Task LoadConfiguration()
 		{
 			LinkedList<string> ToRemove = null;
 			List<KeyValuePair<string, object>> Items = new List<KeyValuePair<string, object>>();
-
-			Thread?.NewState("Master");
 
 			foreach (KeyValuePair<string, object> P in this.master)
 				Items.Add(P);
@@ -1545,7 +1485,6 @@ namespace Waher.Persistence.Files
 							break;
 
 						string CollectionName = Rows[1];
-						Thread?.NewState(CollectionName);
 
 						ObjectBTreeFile File = await this.GetFile(CollectionName, false);
 
@@ -1561,8 +1500,6 @@ namespace Waher.Persistence.Files
 					case "Index":
 						if (Rows.Length < 3)
 							break;
-
-						Thread?.NewState("I");
 
 						CollectionName = Rows[1];
 						string[] FieldNames = new string[Rows.Length - 2];
@@ -1585,8 +1522,6 @@ namespace Waher.Persistence.Files
 
 			if (!(ToRemove is null))
 			{
-				Thread?.NewState("Remove");
-
 				foreach (string s in ToRemove)
 					await this.master.RemoveAsync(s);
 			}

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
-using System.Threading;
 using System.Threading.Tasks;
+using Waher.Runtime.Threading;
 
 namespace Waher.Persistence.Files
 {
@@ -14,7 +14,7 @@ namespace Waher.Persistence.Files
 	{
 		private const int MinBlockSize = 64;
 
-		private readonly SemaphoreSlim fileAccess = new SemaphoreSlim(1, 1);
+		private readonly MultiReadSingleWriteObject fileAccess = new MultiReadSingleWriteObject();
 		private readonly FileStream file;
 		private readonly string fileName;
 		private readonly bool encrypted;
@@ -118,14 +118,14 @@ namespace Waher.Persistence.Files
 		/// <returns>Length of file.</returns>
 		public async Task<long> GetLength()
 		{
-			await this.fileAccess.WaitAsync();
+			await this.fileAccess.BeginWrite();
 			try
 			{
 				return this.file.Length;    // Can only change in write state
 			}
 			finally
 			{
-				this.fileAccess.Release();
+				await this.fileAccess.EndWrite();
 			}
 		}
 
@@ -137,14 +137,14 @@ namespace Waher.Persistence.Files
 		/// <returns>Block</returns>
 		public async Task<byte[]> ReadBlock(long Position, int NrBytes)
 		{
-			await this.fileAccess.WaitAsync();
+			await this.fileAccess.BeginWrite();
 			try
 			{
 				return await this.ReadBlockLocked(Position, NrBytes);
 			}
 			finally
 			{
-				this.fileAccess.Release();
+				await this.fileAccess.EndWrite();
 			}
 		}
 
@@ -177,7 +177,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Binary block (decrypted if file is encrypted), and the position of the following block.</returns>
 		public async Task<KeyValuePair<byte[], long>> ReadBlock(long Position)
 		{
-			await this.fileAccess.WaitAsync();
+			await this.fileAccess.BeginWrite();
 			try
 			{
 				byte[] Block = await this.ReadBlockLocked(Position, MinBlockSize);
@@ -217,7 +217,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				this.fileAccess.Release();
+				await this.fileAccess.EndWrite();
 			}
 		}
 
@@ -228,14 +228,14 @@ namespace Waher.Persistence.Files
 		/// <returns>Position of data block.</returns>
 		public async Task<long> WriteBlock(byte[] Data)
 		{
-			await this.fileAccess.WaitAsync();
+			await this.fileAccess.BeginWrite();
 			try
 			{
 				return await this.WriteBlockLocked(Data);
 			}
 			finally
 			{
-				this.fileAccess.Release();
+				await this.fileAccess.EndWrite();
 			}
 		}
 
@@ -324,7 +324,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Length">Length at which the file will be truncated.</param>
 		protected async Task Truncate(long Length)
 		{
-			await this.fileAccess.WaitAsync();
+			await this.fileAccess.BeginWrite();
 			try
 			{
 				this.file.SetLength(Length);
@@ -332,7 +332,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				this.fileAccess.Release();
+				await this.fileAccess.EndWrite();
 			}
 		}
 

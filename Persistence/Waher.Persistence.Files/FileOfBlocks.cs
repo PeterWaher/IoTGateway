@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
+using Waher.Runtime.Threading;
 
 namespace Waher.Persistence.Files
 {
@@ -10,12 +10,12 @@ namespace Waher.Persistence.Files
 	/// </summary>
 	public class FileOfBlocks : IDisposable
 	{
+		private readonly MultiReadSingleWriteObject fileAccess;
 		private readonly FileStream file;
 		private readonly string collectionName;
 		private readonly string fileName;
 		private readonly bool filePreExisting;
 		private readonly int blockSize;
-		private readonly SemaphoreSlim fileAccess;
 		private long length;
 		private uint blockLimit;
 
@@ -34,7 +34,7 @@ namespace Waher.Persistence.Files
 			this.fileName = FileName;
 			this.filePreExisting = File.Exists(this.fileName);
 			this.blockSize = BlockSize;
-			this.fileAccess = new SemaphoreSlim(1, 1);
+			this.fileAccess = new MultiReadSingleWriteObject();
 
 			string Folder = Path.GetDirectoryName(FileName);
 			if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
@@ -120,7 +120,7 @@ namespace Waher.Persistence.Files
 
 			int NrRead;
 
-			await this.fileAccess.WaitAsync();
+			await this.fileAccess.BeginWrite();
 			try
 			{
 				long Pos = ((long)BlockIndex) * this.blockSize;
@@ -132,7 +132,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				this.fileAccess.Release();
+				await this.fileAccess.EndWrite();
 			}
 
 			if (this.blockSize != NrRead)
@@ -149,7 +149,7 @@ namespace Waher.Persistence.Files
 			if (Block is null || Block.Length != this.blockSize)
 				throw Database.FlagForRepair(this.collectionName, "Block not of the correct block size.");
 
-			await this.fileAccess.WaitAsync();
+			await this.fileAccess.BeginWrite();
 			try
 			{
 				long Pos = ((long)BlockIndex) * this.blockSize;
@@ -167,7 +167,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				this.fileAccess.Release();
+				await this.fileAccess.EndWrite();
 			}
 		}
 
@@ -177,7 +177,7 @@ namespace Waher.Persistence.Files
 		/// <param name="BlockLimit">Number of blocks in file.</param>
 		public async Task Truncate(uint BlockLimit)
 		{
-			await this.fileAccess.WaitAsync();
+			await this.fileAccess.BeginWrite();
 			try
 			{
 				long Length = ((long)BlockLimit) * this.blockSize;
@@ -189,7 +189,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				this.fileAccess.Release();
+				await this.fileAccess.EndWrite();
 			}
 		}
 
@@ -198,14 +198,14 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public async Task FlushAsync()
 		{
-			await this.fileAccess.WaitAsync();
+			await this.fileAccess.BeginWrite();
 			try
 			{
 				await this.file.FlushAsync();
 			}
 			finally
 			{
-				this.fileAccess.Release();
+				await this.fileAccess.EndWrite();
 			}
 		}
 

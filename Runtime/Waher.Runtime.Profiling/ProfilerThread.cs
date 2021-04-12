@@ -21,7 +21,12 @@ namespace Waher.Runtime.Profiling
 		/// <summary>
 		/// Documents the changes between states.
 		/// </summary>
-		StateMachine
+		StateMachine,
+
+		/// <summary>
+		/// Accumulates times in various sections during execution.
+		/// </summary>
+		Accumulating
 	}
 
 	/// <summary>
@@ -217,6 +222,7 @@ namespace Waher.Runtime.Profiling
 					break;
 
 				case ProfilerThreadType.Sequential:
+				case ProfilerThreadType.Accumulating:
 				default:
 					Output.Append("concise \"");
 					break;
@@ -225,6 +231,18 @@ namespace Waher.Runtime.Profiling
 			Output.Append(this.name);
 			Output.Append("\" as T");
 			Output.AppendLine(this.order.ToString());
+
+			if (this.type == ProfilerThreadType.Accumulating)
+			{
+				Accumulator Accumulator = new Accumulator(this);
+				ProfilerEvent[] Events = this.events.ToArray();
+				this.events.Clear();
+
+				foreach (ProfilerEvent Event in Events)
+					Event.Accumulate(Accumulator);
+
+				Accumulator.Report(this.events);
+			}
 
 			foreach (ProfilerEvent Event in this.events)
 				Event.ExportPlantUmlPreparation();

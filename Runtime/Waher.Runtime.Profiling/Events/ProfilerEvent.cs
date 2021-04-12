@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
 using System.Xml;
 using Waher.Runtime.Profiling.Export;
@@ -101,6 +99,15 @@ namespace Waher.Runtime.Profiling.Events
 		public virtual void ExportPlantUmlPreparation()
 		{
 			// Do nothing by defualt.
+		}
+
+		/// <summary>
+		/// Accumulates the event.
+		/// </summary>
+		/// <param name="Accumulator">Accumulator.</param>
+		public virtual void Accumulate(Accumulator Accumulator)
+		{
+			Accumulator.AddAsIs(this);
 		}
 	}
 }

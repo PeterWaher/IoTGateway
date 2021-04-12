@@ -88,6 +88,9 @@
         <member name="P:Waher.Runtime.Profiling.Events.Idle.PlantUmlState">
             <inheritdoc/>
         </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Idle.Accumulate(Waher.Runtime.Profiling.Export.Accumulator)">
+            <inheritdoc/>
+        </member>
         <member name="T:Waher.Runtime.Profiling.Events.NewState">
             <summary>
             Thread changes state.
@@ -113,6 +116,9 @@
             <inheritdoc/>
         </member>
         <member name="P:Waher.Runtime.Profiling.Events.NewState.PlantUmlState">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.NewState.Accumulate(Waher.Runtime.Profiling.Export.Accumulator)">
             <inheritdoc/>
         </member>
         <member name="T:Waher.Runtime.Profiling.Events.ProfilerEvent">
@@ -174,6 +180,12 @@
             Prepares the event for export to PlantUML
             </summary>
         </member>
+        <member name="M:Waher.Runtime.Profiling.Events.ProfilerEvent.Accumulate(Waher.Runtime.Profiling.Export.Accumulator)">
+            <summary>
+            Accumulates the event.
+            </summary>
+            <param name="Accumulator">Accumulator.</param>
+        </member>
         <member name="T:Waher.Runtime.Profiling.Events.Start">
             <summary>
             Processing starts.
@@ -190,6 +202,9 @@
             <inheritdoc/>
         </member>
         <member name="P:Waher.Runtime.Profiling.Events.Start.PlantUmlState">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Start.Accumulate(Waher.Runtime.Profiling.Export.Accumulator)">
             <inheritdoc/>
         </member>
         <member name="T:Waher.Runtime.Profiling.Events.Stop">
@@ -209,6 +224,47 @@
         </member>
         <member name="P:Waher.Runtime.Profiling.Events.Stop.PlantUmlState">
             <inheritdoc/>
+        </member>
+        <member name="T:Waher.Runtime.Profiling.Export.Accumulator">
+            <summary>
+            Accumulates events
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Export.Accumulator.#ctor(Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Accumulates events
+            </summary>
+            <param name="Thread">Current thread.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Export.Accumulator.AddAsIs(Waher.Runtime.Profiling.Events.ProfilerEvent)">
+            <summary>
+            Adds an event, as-is.
+            </summary>
+            <param name="Event">Event</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Export.Accumulator.Start(Waher.Runtime.Profiling.Events.Start)">
+            <summary>
+            Adds an event, as-is.
+            </summary>
+            <param name="Event">Event</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Export.Accumulator.Idle(Waher.Runtime.Profiling.Events.Idle)">
+            <summary>
+            Reports thread to be idle.
+            </summary>
+            <param name="Event">Event</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Export.Accumulator.Sum(Waher.Runtime.Profiling.Events.NewState)">
+            <summary>
+            Sums time for a given state.
+            </summary>
+            <param name="Event">New state.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Export.Accumulator.Report(System.Collections.Generic.List{Waher.Runtime.Profiling.Events.ProfilerEvent})">
+            <summary>
+            Reports accumulated events to a list of events.
+            </summary>
+            <param name="Result">Resulting list of events.</param>
         </member>
         <member name="T:Waher.Runtime.Profiling.Export.PlantUmlStates">
             <summary>
@@ -470,6 +526,11 @@
         <member name="F:Waher.Runtime.Profiling.ProfilerThreadType.StateMachine">
             <summary>
             Documents the changes between states.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Profiling.ProfilerThreadType.Accumulating">
+            <summary>
+            Accumulates times in various sections during execution.
             </summary>
         </member>
         <member name="T:Waher.Runtime.Profiling.ProfilerThread">

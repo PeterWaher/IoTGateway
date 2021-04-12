@@ -1,4 +1,5 @@
 ﻿using System;
+using Waher.Runtime.Profiling.Export;
 
 namespace Waher.Runtime.Profiling.Events
 {
@@ -30,6 +31,12 @@ namespace Waher.Runtime.Profiling.Events
 				else
 					return "{-}";
 			}
+		}
+
+		/// <inheritdoc/>
+		public override void Accumulate(Accumulator Accumulator)
+		{
+			Accumulator.Start(this);
 		}
 	}
 }

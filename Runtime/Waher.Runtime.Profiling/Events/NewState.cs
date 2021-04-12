@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Xml;
+using Waher.Runtime.Profiling.Export;
 
 namespace Waher.Runtime.Profiling.Events
 {
@@ -40,5 +41,11 @@ namespace Waher.Runtime.Profiling.Events
 
 		/// <inheritdoc/>
 		public override string PlantUmlState => this.state;
+
+		/// <inheritdoc/>
+		public override void Accumulate(Accumulator Accumulator)
+		{
+			Accumulator.Sum(this);
+		}
 	}
 }

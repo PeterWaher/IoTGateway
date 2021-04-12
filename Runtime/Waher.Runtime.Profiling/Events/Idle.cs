@@ -1,4 +1,5 @@
 ﻿using System;
+using Waher.Runtime.Profiling.Export;
 
 namespace Waher.Runtime.Profiling.Events
 {
@@ -22,5 +23,11 @@ namespace Waher.Runtime.Profiling.Events
 
 		/// <inheritdoc/>
 		public override string PlantUmlState => "{hidden}";
+
+		/// <inheritdoc/>
+		public override void Accumulate(Accumulator Accumulator)
+		{
+			Accumulator.Idle(this);
+		}
 	}
 }

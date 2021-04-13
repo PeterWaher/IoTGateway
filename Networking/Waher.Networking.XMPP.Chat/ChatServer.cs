@@ -772,7 +772,7 @@ namespace Waher.Networking.XMPP.Chat
 							}
 						}
 
-						this.ControlParametersMenu(Parameters, SelectedNode, SelectedSource, Menu, Variables, Support, e, Row, Last);
+						await this.ControlParametersMenu(Parameters, SelectedNode, SelectedSource, Menu, Variables, Support, e, Row, Last);
 						break;
 
 					default:
@@ -1100,7 +1100,7 @@ namespace Waher.Networking.XMPP.Chat
 											if (Parameters2.Count == 0)
 												throw new Exception("No control parameter found starting with that name.");
 
-											this.ControlParametersMenu(Parameters2.ToArray(), SelectedNode, SelectedSource, Menu, Variables, Support, e, Row, Last);
+											await this.ControlParametersMenu(Parameters2.ToArray(), SelectedNode, SelectedSource, Menu, Variables, Support, e, Row, Last);
 											break;
 										}
 										else
@@ -1161,7 +1161,7 @@ namespace Waher.Networking.XMPP.Chat
 			}
 		}
 
-		private void ControlParametersMenu(ControlParameter[] Parameters, INode SelectedNode, IDataSource SelectedSource,
+		private async Task ControlParametersMenu(ControlParameter[] Parameters, INode SelectedNode, IDataSource SelectedSource,
 			SortedDictionary<int, KeyValuePair<string, object>> PrevMenu, Variables Variables, RemoteXmppSupport Support,
 			MessageEventArgs e, string OrgCommand, bool Last)
 		{
@@ -1184,7 +1184,7 @@ namespace Waher.Networking.XMPP.Chat
 					ParameterNames[j] = Parameters[j].Name;
 
 				this.provisioningClient.CanControl(e.FromBareJID, null, ParameterNames,
-					new string[0], new string[0], new string[0], (sender2, e2) =>
+					new string[0], new string[0], new string[0], async (sender2, e2) =>
 					{
 						if (e2.Ok && e2.CanControl)
 						{
@@ -1196,7 +1196,7 @@ namespace Waher.Networking.XMPP.Chat
 								{
 									Parameters2.Add(P);
 									Menu[++i] = new KeyValuePair<string, object>(P.Name, P.Name + " (" + 
-										P.GetStringValue((IThingReference)SelectedNode ?? ThingReference.Empty) + ")");
+										(await P.GetStringValue((IThingReference)SelectedNode ?? ThingReference.Empty)) + ")");
 								}
 							}
 
@@ -1206,8 +1206,6 @@ namespace Waher.Networking.XMPP.Chat
 						}
 						else
 							this.Error(e.From, "Access denied.", Support, e.Subject, OrgCommand, Last);
-
-						return Task.CompletedTask;
 					}, null);
 			}
 			else
@@ -1215,7 +1213,7 @@ namespace Waher.Networking.XMPP.Chat
 				foreach (ControlParameter P in Parameters)
 				{
 					Menu[++i] = new KeyValuePair<string, object>(P.Name, P.Name + " (" +
-						P.GetStringValue((IThingReference)SelectedNode ?? ThingReference.Empty) + ")");
+						await P.GetStringValue((IThingReference)SelectedNode ?? ThingReference.Empty) + ")");
 				}
 
 				this.SendMenu(e.From, Menu, Variables, Support, e.Subject, OrgCommand, Last);

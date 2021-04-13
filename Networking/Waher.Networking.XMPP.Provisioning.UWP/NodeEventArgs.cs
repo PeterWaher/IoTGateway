@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Waher.Networking.XMPP;
 using Waher.Things;
-using Waher.Things.SensorData;
 
 namespace Waher.Networking.XMPP.Provisioning
 {

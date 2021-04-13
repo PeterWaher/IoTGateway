@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using Waher.Things;
-using Waher.Things.SensorData;
 
 namespace Waher.Networking.XMPP.Provisioning
 {
@@ -12,7 +8,7 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	public class NodeResultEventArgs : JidEventArgs
 	{
-		private ThingReference node;
+		private readonly ThingReference node;
 
 		internal NodeResultEventArgs(IqResultEventArgs e, object State, string JID, ThingReference Node)
 			: base(e, State, JID)

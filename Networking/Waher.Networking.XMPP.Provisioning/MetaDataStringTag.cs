@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Provisioning
 {
@@ -11,7 +7,7 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	public class MetaDataStringTag : MetaDataTag
 	{
-		private string value;
+		private readonly string value;
 
 		/// <summary>
 		/// Meta-data string tag.

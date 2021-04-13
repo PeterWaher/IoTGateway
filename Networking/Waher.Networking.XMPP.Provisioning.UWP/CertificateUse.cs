@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 #if WINDOWS_UWP
 using Windows.Security.Cryptography.Certificates;
 #else
@@ -12,11 +9,11 @@ namespace Waher.Networking.XMPP.Provisioning
 {
 	internal class CertificateUse
 	{
-		private string token;
+		private readonly string token;
 #if WINDOWS_UWP
-		private Certificate localCertificate;
+		private readonly Certificate localCertificate;
 #else
-		private X509Certificate2 localCertificate;
+		private readonly X509Certificate2 localCertificate;
 #endif
 		private string remoteCertificateJid;
 		private DateTime lastUse = DateTime.Now;

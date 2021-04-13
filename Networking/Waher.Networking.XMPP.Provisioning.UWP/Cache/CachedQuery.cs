@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Persistence;
 using Waher.Persistence.Attributes;
 
 namespace Waher.Networking.XMPP.Provisioning.Cache

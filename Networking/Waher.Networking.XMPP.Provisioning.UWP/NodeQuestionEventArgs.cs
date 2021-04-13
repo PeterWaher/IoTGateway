@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
-using System.Threading.Tasks;
 using Waher.Content.Xml;
-using Waher.Things;
 
 namespace Waher.Networking.XMPP.Provisioning
 {
@@ -12,12 +9,12 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	public abstract class NodeQuestionEventArgs : QuestionEventArgs
 	{
-		private string[] serviceTokens;
-		private string[] deviceTokens;
-		private string[] userTokens;
-		private string nodeId = string.Empty;
-		private string sourceId = string.Empty;
-		private string partition = string.Empty;
+		private readonly string[] serviceTokens;
+		private readonly string[] deviceTokens;
+		private readonly string[] userTokens;
+		private readonly string nodeId = string.Empty;
+		private readonly string sourceId = string.Empty;
+		private readonly string partition = string.Empty;
 
 		/// <summary>
 		/// Abstract base class containing event arguments for node question events.

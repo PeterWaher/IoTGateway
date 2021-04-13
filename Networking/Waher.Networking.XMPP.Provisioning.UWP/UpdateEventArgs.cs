@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Provisioning
 {
@@ -10,7 +7,7 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	public class UpdateEventArgs : IqResultEventArgs
 	{
-		private bool disowned;
+		private readonly bool disowned;
 
 		internal UpdateEventArgs(IqResultEventArgs e, object State, bool Disowned)
 			: base(e)

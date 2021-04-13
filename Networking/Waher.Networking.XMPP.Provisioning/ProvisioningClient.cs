@@ -386,10 +386,10 @@ namespace Waher.Networking.XMPP.Provisioning
 			IqEventArgs e = (IqEventArgs)e2.State;
 
 			if (e2.Ok)
-				e.IqResult(e2.FirstElement.OuterXml);
+				e.IqResult(e2.FirstElement?.OuterXml ?? string.Empty);
 			else
-				e.IqError(e2.ErrorElement.OuterXml);
-		
+				e.IqError(e2.ErrorElement?.OuterXml ?? string.Empty);
+
 			return Task.CompletedTask;
 		}
 
@@ -625,7 +625,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		public void CanRead(string RequestFromBareJid, FieldType FieldTypes, IEnumerable<IThingReference> Nodes, IEnumerable<string> FieldNames,
 			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, CanReadCallback Callback, object State)
 		{
-			if (Split(RequestFromBareJid, Nodes, out IEnumerable<IThingReference> ToCheck, out IEnumerable<IThingReference> Permitted))
+			if (this.Split(RequestFromBareJid, Nodes, out IEnumerable<IThingReference> ToCheck, out IEnumerable<IThingReference> Permitted))
 			{
 				if (!(Callback is null))
 				{
@@ -733,114 +733,122 @@ namespace Waher.Networking.XMPP.Provisioning
 				bool b;
 				bool CanRead;
 
-				if (e.Ok && E.LocalName == "canReadResponse" && E.NamespaceURI == NamespaceProvisioningDevice)
+				try
 				{
-					CanRead = XML.Attribute(E, "result", false);
-
-					foreach (XmlAttribute Attr in E.Attributes)
+					if (e.Ok && !(E is null) && E.LocalName == "canReadResponse" && E.NamespaceURI == NamespaceProvisioningDevice)
 					{
-						switch (Attr.Name)
+						CanRead = XML.Attribute(E, "result", false);
+
+						foreach (XmlAttribute Attr in E.Attributes)
 						{
-							case "jid":
-								Jid = Attr.Value;
-								break;
-
-							case "all":
-								if (CommonTypes.TryParse(Attr.Value, out b) && b)
-									FieldTypes2 |= FieldType.All;
-								break;
-
-							case "h":
-								if (CommonTypes.TryParse(Attr.Value, out b) && b)
-									FieldTypes2 |= FieldType.Historical;
-								break;
-
-							case "m":
-								if (CommonTypes.TryParse(Attr.Value, out b) && b)
-									FieldTypes2 |= FieldType.Momentary;
-								break;
-
-							case "p":
-								if (CommonTypes.TryParse(Attr.Value, out b) && b)
-									FieldTypes2 |= FieldType.Peak;
-								break;
-
-							case "s":
-								if (CommonTypes.TryParse(Attr.Value, out b) && b)
-									FieldTypes2 |= FieldType.Status;
-								break;
-
-							case "c":
-								if (CommonTypes.TryParse(Attr.Value, out b) && b)
-									FieldTypes2 |= FieldType.Computed;
-								break;
-
-							case "i":
-								if (CommonTypes.TryParse(Attr.Value, out b) && b)
-									FieldTypes2 |= FieldType.Identity;
-								break;
-						}
-					}
-
-					if (CanRead)
-					{
-						if (!(Permitted is null))
-							Nodes2 = new List<IThingReference>(Permitted);
-
-						foreach (XmlNode N in E.ChildNodes)
-						{
-							switch (N.LocalName)
+							switch (Attr.Name)
 							{
-								case "nd":
-									if (Nodes2 is null)
-										Nodes2 = new List<IThingReference>();
-
-									E = (XmlElement)N;
-									NodeId = XML.Attribute(E, "id");
-									SourceId = XML.Attribute(E, "src");
-									Partition = XML.Attribute(E, "pt");
-
-									bool Found = false;
-
-									if (!(Nodes is null))
-									{
-										foreach (IThingReference Ref in Nodes)
-										{
-											if (Ref.NodeId == NodeId && Ref.SourceId == SourceId && Ref.Partition == Partition)
-											{
-												Nodes2.Add(Ref);
-												Found = true;
-												break;
-											}
-										}
-									}
-
-									if (!Found)
-										Nodes2.Add(new ThingReference(NodeId, SourceId, Partition));
+								case "jid":
+									Jid = Attr.Value;
 									break;
 
-								case "f":
-									if (Fields2 is null)
-										Fields2 = new List<string>();
+								case "all":
+									if (CommonTypes.TryParse(Attr.Value, out b) && b)
+										FieldTypes2 |= FieldType.All;
+									break;
 
-									Fields2.Add(XML.Attribute((XmlElement)N, "n"));
+								case "h":
+									if (CommonTypes.TryParse(Attr.Value, out b) && b)
+										FieldTypes2 |= FieldType.Historical;
+									break;
+
+								case "m":
+									if (CommonTypes.TryParse(Attr.Value, out b) && b)
+										FieldTypes2 |= FieldType.Momentary;
+									break;
+
+								case "p":
+									if (CommonTypes.TryParse(Attr.Value, out b) && b)
+										FieldTypes2 |= FieldType.Peak;
+									break;
+
+								case "s":
+									if (CommonTypes.TryParse(Attr.Value, out b) && b)
+										FieldTypes2 |= FieldType.Status;
+									break;
+
+								case "c":
+									if (CommonTypes.TryParse(Attr.Value, out b) && b)
+										FieldTypes2 |= FieldType.Computed;
+									break;
+
+								case "i":
+									if (CommonTypes.TryParse(Attr.Value, out b) && b)
+										FieldTypes2 |= FieldType.Identity;
 									break;
 							}
 						}
-					}
-					else if (!(Permitted is null))
-					{
-						CanRead = true;
-						Jid = RequestFromBareJid;
-						FieldTypes2 = FieldTypes;
-						Nodes2 = new List<IThingReference>(Permitted);
 
-						if (!(FieldNames is null))
-							Fields2 = new List<string>(FieldNames);
+						if (CanRead)
+						{
+							if (!(Permitted is null))
+								Nodes2 = new List<IThingReference>(Permitted);
+
+							foreach (XmlNode N in E.ChildNodes)
+							{
+								switch (N.LocalName)
+								{
+									case "nd":
+										if (Nodes2 is null)
+											Nodes2 = new List<IThingReference>();
+
+										E = (XmlElement)N;
+										NodeId = XML.Attribute(E, "id");
+										SourceId = XML.Attribute(E, "src");
+										Partition = XML.Attribute(E, "pt");
+
+										bool Found = false;
+
+										if (!(Nodes is null))
+										{
+											foreach (IThingReference Ref in Nodes)
+											{
+												if (Ref.NodeId == NodeId && Ref.SourceId == SourceId && Ref.Partition == Partition)
+												{
+													Nodes2.Add(Ref);
+													Found = true;
+													break;
+												}
+											}
+										}
+
+										if (!Found)
+											Nodes2.Add(new ThingReference(NodeId, SourceId, Partition));
+										break;
+
+									case "f":
+										if (Fields2 is null)
+											Fields2 = new List<string>();
+
+										Fields2.Add(XML.Attribute((XmlElement)N, "n"));
+										break;
+								}
+							}
+						}
+						else if (!(Permitted is null))
+						{
+							CanRead = true;
+							Jid = RequestFromBareJid;
+							FieldTypes2 = FieldTypes;
+							Nodes2 = new List<IThingReference>(Permitted);
+
+							if (!(FieldNames is null))
+								Fields2 = new List<string>(FieldNames);
+						}
 					}
+					else
+						CanRead = false;
 				}
-				else
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
 					CanRead = false;
+				}
 
 				CanReadResponseEventArgs e2 = new CanReadResponseEventArgs(e, State, Jid, CanRead, FieldTypes2, Nodes2?.ToArray(), Fields2?.ToArray());
 
@@ -919,7 +927,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		public void CanControl(string RequestFromBareJid, IEnumerable<IThingReference> Nodes, IEnumerable<string> ParameterNames,
 			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, CanControlCallback Callback, object State)
 		{
-			if (Split(RequestFromBareJid, Nodes, out IEnumerable<IThingReference> ToCheck, out IEnumerable<IThingReference> Permitted))
+			if (this.Split(RequestFromBareJid, Nodes, out IEnumerable<IThingReference> ToCheck, out IEnumerable<IThingReference> Permitted))
 			{
 				if (!(Callback is null))
 				{
@@ -972,7 +980,6 @@ namespace Waher.Networking.XMPP.Provisioning
 			{
 				Xml.Append("'>");
 
-
 				if (!(ToCheck is null))
 				{
 					foreach (IThingReference Node in ToCheck)
@@ -1003,74 +1010,82 @@ namespace Waher.Networking.XMPP.Provisioning
 				string Partition;
 				bool CanControl;
 
-				if (e.Ok && E.LocalName == "canControlResponse" && E.NamespaceURI == NamespaceProvisioningDevice)
+				try
 				{
-					CanControl = XML.Attribute(E, "result", false);
-
-					foreach (XmlAttribute Attr in E.Attributes)
+					if (e.Ok && !(E is null) && E.LocalName == "canControlResponse" && E.NamespaceURI == NamespaceProvisioningDevice)
 					{
-						if (Attr.Name == "jid")
-							Jid = Attr.Value;
-					}
+						CanControl = XML.Attribute(E, "result", false);
 
-					if (CanControl)
-					{
-						if (!(Permitted is null))
-							Nodes2 = new List<IThingReference>(Permitted);
-
-						foreach (XmlNode N in E.ChildNodes)
+						foreach (XmlAttribute Attr in E.Attributes)
 						{
-							switch (N.LocalName)
+							if (Attr.Name == "jid")
+								Jid = Attr.Value;
+						}
+
+						if (CanControl)
+						{
+							if (!(Permitted is null))
+								Nodes2 = new List<IThingReference>(Permitted);
+
+							foreach (XmlNode N in E.ChildNodes)
 							{
-								case "nd":
-									if (Nodes2 is null)
-										Nodes2 = new List<IThingReference>();
+								switch (N.LocalName)
+								{
+									case "nd":
+										if (Nodes2 is null)
+											Nodes2 = new List<IThingReference>();
 
-									E = (XmlElement)N;
-									NodeId = XML.Attribute(E, "id");
-									SourceId = XML.Attribute(E, "src");
-									Partition = XML.Attribute(E, "pt");
+										E = (XmlElement)N;
+										NodeId = XML.Attribute(E, "id");
+										SourceId = XML.Attribute(E, "src");
+										Partition = XML.Attribute(E, "pt");
 
-									bool Found = false;
+										bool Found = false;
 
-									if (!(Nodes is null))
-									{
-										foreach (IThingReference Ref in Nodes)
+										if (!(Nodes is null))
 										{
-											if (Ref.NodeId == NodeId && Ref.SourceId == SourceId && Ref.Partition == Partition)
+											foreach (IThingReference Ref in Nodes)
 											{
-												Nodes2.Add(Ref);
-												Found = true;
-												break;
+												if (Ref.NodeId == NodeId && Ref.SourceId == SourceId && Ref.Partition == Partition)
+												{
+													Nodes2.Add(Ref);
+													Found = true;
+													break;
+												}
 											}
 										}
-									}
 
-									if (!Found)
-										Nodes2.Add(new ThingReference(NodeId, SourceId, Partition));
-									break;
+										if (!Found)
+											Nodes2.Add(new ThingReference(NodeId, SourceId, Partition));
+										break;
 
-								case "parameter":
-									if (ParameterNames2 is null)
-										ParameterNames2 = new List<string>();
+									case "parameter":
+										if (ParameterNames2 is null)
+											ParameterNames2 = new List<string>();
 
-									ParameterNames2.Add(XML.Attribute((XmlElement)N, "name"));
-									break;
+										ParameterNames2.Add(XML.Attribute((XmlElement)N, "name"));
+										break;
+								}
 							}
 						}
-					}
-					else if (!(Permitted is null))
-					{
-						CanControl = true;
-						Jid = RequestFromBareJid;
-						Nodes2 = new List<IThingReference>(Permitted);
+						else if (!(Permitted is null))
+						{
+							CanControl = true;
+							Jid = RequestFromBareJid;
+							Nodes2 = new List<IThingReference>(Permitted);
 
-						if (!(ParameterNames is null))
-							ParameterNames2 = new List<string>(ParameterNames);
+							if (!(ParameterNames is null))
+								ParameterNames2 = new List<string>(ParameterNames);
+						}
 					}
+					else
+						CanControl = false;
 				}
-				else
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
 					CanControl = false;
+				}
 
 				CanControlResponseEventArgs e2 = new CanControlResponseEventArgs(e, State, Jid, CanControl,
 					Nodes2?.ToArray(), ParameterNames2?.ToArray());
@@ -1091,12 +1106,12 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		#region Cached queries
 
-		private Task CachedIqGet(string Xml, IqResultEventHandlerAsync Callback, object State)
+		private Task<bool> CachedIqGet(string Xml, IqResultEventHandlerAsync Callback, object State)
 		{
 			return this.CachedIq(Xml, "get", Callback, State);
 		}
 
-		private async Task CachedIq(string Xml, string Method, IqResultEventHandlerAsync Callback, object State)
+		private async Task<bool> CachedIq(string Xml, string Method, IqResultEventHandlerAsync Callback, object State)
 		{
 			CachedQuery Query = await Database.FindFirstDeleteRest<CachedQuery>(new FilterAnd(
 				new FilterFieldEqualTo("Xml", Xml), new FilterFieldEqualTo("Method", Method)));
@@ -1126,18 +1141,24 @@ namespace Waher.Networking.XMPP.Provisioning
 						IqResultEventArgs e = new IqResultEventArgs(E, Id, To, From, Ok, State);
 
 						await Callback(this.client, e);
+
+						return true;
 					}
 					catch (Exception ex)
 					{
 						Log.Critical(ex);
 					}
 				}
+
+				return false;
 			}
 			else
 			{
-				this.client.SendIq(null, this.provisioningServerAddress, Xml, "get", this.CachedIqCallback, new object[] { Callback, State, Xml, Method },
+				this.client.SendIq(null, this.provisioningServerAddress, Xml, Method, this.CachedIqCallback, new object[] { Callback, State, Xml, Method },
 					this.client.DefaultRetryTimeout, this.client.DefaultNrRetries,
 					this.client.DefaultDropOff, this.client.DefaultMaxRetryTimeout);
+
+				return true;
 			}
 		}
 
@@ -1283,7 +1304,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Range">The range of the response.</param>
 		/// <param name="Callback">Optional callback method to call, when response to request has been received.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void IsFriendResponse(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool IsFriend, 
+		public void IsFriendResponse(string ProvisioningServiceJID, string JID, string RemoteJID, string Key, bool IsFriend,
 			RuleRange Range, IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();

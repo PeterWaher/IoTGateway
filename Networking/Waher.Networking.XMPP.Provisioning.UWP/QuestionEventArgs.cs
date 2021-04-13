@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using Waher.Content.Xml;
 
 namespace Waher.Networking.XMPP.Provisioning
@@ -11,8 +8,8 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	public abstract class QuestionEventArgs : MessageEventArgs
 	{
-		private ProvisioningClient client;
-		private string jid;
+		private readonly ProvisioningClient client;
+		private readonly string jid;
 		private string remoteJid;
 		private string key;
 

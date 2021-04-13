@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Provisioning
 {
@@ -10,8 +7,8 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	public class RegistrationEventArgs : IqResultEventArgs
 	{
-		private string ownerJid;
-		private bool isPublic;
+		private readonly string ownerJid;
+		private readonly bool isPublic;
 
 		internal RegistrationEventArgs(IqResultEventArgs e, object State, string OwnerJid, bool IsPublic)
 			: base(e)

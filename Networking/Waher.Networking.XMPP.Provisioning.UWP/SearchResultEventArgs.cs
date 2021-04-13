@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Waher.Things;
 
 namespace Waher.Networking.XMPP.Provisioning
 {
@@ -11,10 +7,10 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	public class SearchResultEventArgs : IqResultEventArgs
 	{
-		private SearchResultThing[] things;
-		private int offset;
-		private int maxCount;
-		private bool more;
+		private readonly SearchResultThing[] things;
+		private readonly int offset;
+		private readonly int maxCount;
+		private readonly bool more;
 
 		internal SearchResultEventArgs(IqResultEventArgs e, object State, int Offset, int MaxCount, bool More, SearchResultThing[] Things)
 			: base(e)

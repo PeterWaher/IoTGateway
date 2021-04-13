@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Waher.Networking.XMPP;
 using Waher.Things;
-using Waher.Things.SensorData;
 
 namespace Waher.Networking.XMPP.Provisioning
 {
@@ -13,7 +8,7 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	public class ClaimedEventArgs : NodeJidEventArgs
 	{
-		private bool isPublic;
+		private readonly bool isPublic;
 
 		internal ClaimedEventArgs(IqEventArgs e, ThingReference Node, string Jid, bool Public)
 			: base(e, Node, Jid)

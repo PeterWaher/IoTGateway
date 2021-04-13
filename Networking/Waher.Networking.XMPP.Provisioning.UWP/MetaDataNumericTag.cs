@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Waher.Content;
 
 namespace Waher.Networking.XMPP.Provisioning
@@ -12,7 +8,7 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	public class MetaDataNumericTag : MetaDataTag
 	{
-		private double value;
+		private readonly double value;
 
 		/// <summary>
 		/// Meta-data numeric tag.

@@ -614,7 +614,7 @@ namespace Waher.Networking.XMPP.Chat
 						else
 							ThingRef = ThingReference.Empty;
 
-						IThingReference[] NodeReferences = new IThingReference[] { ThingRef };
+						IThingReference[] NodeReferences = new IThingReference[] { ThingRef ?? ThingReference.Empty };
 						FieldType FieldTypes = Full ? FieldType.All : FieldType.AllExceptHistorical;
 						InternalReadoutFieldsEventHandler FieldsHandler = Full ? (InternalReadoutFieldsEventHandler)this.AllFieldsRead : this.MomentaryFieldsRead;
 						InternalReadoutErrorsEventHandler ErrorsHandler = Full ? (InternalReadoutErrorsEventHandler)this.AllFieldsErrorsRead : this.MomentaryFieldsErrorsRead;
@@ -911,7 +911,7 @@ namespace Waher.Networking.XMPP.Chat
 
 								this.SendChatMessage(e.From, e.Subject, Row, "Readout of " + Field + " on " + Node.NodeId + " started...", Support, false);
 
-								NodeReferences = new IThingReference[] { ThingRef };
+								NodeReferences = new IThingReference[] { ThingRef ?? ThingReference.Empty };
 
 								if (string.IsNullOrEmpty(Field))
 								{
@@ -1122,7 +1122,7 @@ namespace Waher.Networking.XMPP.Chat
 												this.Execute(s, e.From, Support, e.Subject, Row, Last);
 											else if (this.provisioningClient != null)
 											{
-												this.provisioningClient.CanControl(e.FromBareJID, new IThingReference[] { ThingRef },
+												this.provisioningClient.CanControl(e.FromBareJID, new IThingReference[] { ThingRef ?? ThingReference.Empty },
 													new string[] { ParameterName }, new string[0], new string[0], new string[0], async (sender2, e2) =>
 													{
 														if (e2.Ok && e2.CanControl)

@@ -802,13 +802,16 @@ namespace Waher.Networking.XMPP.Provisioning
 
 									bool Found = false;
 
-									foreach (IThingReference Ref in Nodes)
+									if (!(Nodes is null))
 									{
-										if (Ref.NodeId == NodeId && Ref.SourceId == SourceId && Ref.Partition == Partition)
+										foreach (IThingReference Ref in Nodes)
 										{
-											Nodes2.Add(Ref);
-											Found = true;
-											break;
+											if (Ref.NodeId == NodeId && Ref.SourceId == SourceId && Ref.Partition == Partition)
+											{
+												Nodes2.Add(Ref);
+												Found = true;
+												break;
+											}
 										}
 									}
 
@@ -1030,13 +1033,16 @@ namespace Waher.Networking.XMPP.Provisioning
 
 									bool Found = false;
 
-									foreach (IThingReference Ref in Nodes)
+									if (!(Nodes is null))
 									{
-										if (Ref.NodeId == NodeId && Ref.SourceId == SourceId && Ref.Partition == Partition)
+										foreach (IThingReference Ref in Nodes)
 										{
-											Nodes2.Add(Ref);
-											Found = true;
-											break;
+											if (Ref.NodeId == NodeId && Ref.SourceId == SourceId && Ref.Partition == Partition)
+											{
+												Nodes2.Add(Ref);
+												Found = true;
+												break;
+											}
 										}
 									}
 

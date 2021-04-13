@@ -741,15 +741,38 @@ namespace Waher.Networking.XMPP.Chat
 						break;
 
 					case ":=":
-						if (SelectedNode is null)
-							this.Error(e.From, "No node selected.", Support, e.Subject, Row, Last);
-						else if (SelectedNode is IActuator Actuator)
+						ControlParameter[] Parameters;
+
+						if (this.concentratorServer is null)
 						{
-							ControlParameter[] Parameters = await Actuator.GetControlParameters();
-							this.ControlParametersMenu(Parameters, SelectedNode, SelectedSource, Menu, Variables, Support, e, Row, Last);
+							if (this.controlServer is null)
+							{
+								this.Error(e.From, "Device is not an actuator", Support, e.Subject, Row, Last);
+								break;
+							}
+							else
+							{
+								Parameters = await this.controlServer.GetControlParameters(ThingReference.Empty);
+								SelectedNode = null;
+							}
 						}
 						else
-							this.Error(e.From, "Selected node is not an actuator", Support, e.Subject, Row, Last);
+						{
+							if (SelectedNode is null)
+							{
+								this.Error(e.From, "No node selected.", Support, e.Subject, Row, Last);
+								break;
+							}
+							else if (SelectedNode is IActuator Actuator)
+								Parameters = await Actuator.GetControlParameters();
+							else
+							{
+								this.Error(e.From, "Selected node is not an actuator", Support, e.Subject, Row, Last);
+								break;
+							}
+						}
+
+						this.ControlParametersMenu(Parameters, SelectedNode, SelectedSource, Menu, Variables, Support, e, Row, Last);
 						break;
 
 					default:
@@ -1037,8 +1060,6 @@ namespace Waher.Networking.XMPP.Chat
 								{
 									try
 									{
-										ControlParameter[] Parameters;
-
 										if (string.IsNullOrEmpty(ValueStr))
 										{
 											if (this.concentratorServer != null && SelectedSource != null && (Node = await SelectedSource.GetNodeAsync(ThingRef)) != null)
@@ -1084,10 +1105,7 @@ namespace Waher.Networking.XMPP.Chat
 										}
 										else
 										{
-											if (this.concentratorServer != null)
-												Parameters = await this.controlServer.GetControlParameters(ThingRef);
-											else
-												Parameters = await this.controlServer.GetControlParameters(ThingRef);
+											Parameters = await this.controlServer.GetControlParameters(ThingRef);
 
 											ControlParameter P0 = null;
 
@@ -1177,7 +1195,8 @@ namespace Waher.Networking.XMPP.Chat
 								if (e2.ParameterNames is null || Array.IndexOf<string>(e2.ParameterNames, P.Name) >= 0)
 								{
 									Parameters2.Add(P);
-									Menu[++i] = new KeyValuePair<string, object>(P.Name, P.Name + " (" + P.GetStringValue(SelectedNode) + ")");
+									Menu[++i] = new KeyValuePair<string, object>(P.Name, P.Name + " (" + 
+										P.GetStringValue((IThingReference)SelectedNode ?? ThingReference.Empty) + ")");
 								}
 							}
 
@@ -1194,7 +1213,10 @@ namespace Waher.Networking.XMPP.Chat
 			else
 			{
 				foreach (ControlParameter P in Parameters)
-					Menu[++i] = new KeyValuePair<string, object>(P.Name, P.Name + " (" + P.GetStringValue(SelectedNode) + ")");
+				{
+					Menu[++i] = new KeyValuePair<string, object>(P.Name, P.Name + " (" +
+						P.GetStringValue((IThingReference)SelectedNode ?? ThingReference.Empty) + ")");
+				}
 
 				this.SendMenu(e.From, Menu, Variables, Support, e.Subject, OrgCommand, Last);
 			}

@@ -6,13 +6,13 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Xml;
 using Waher.Events;
 using Waher.Networking.DNS.Communication;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Networking.DNS.ResourceRecords;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
+using Waher.Runtime.Profiling;
 
 namespace Waher.Networking.DNS
 {
@@ -138,7 +138,21 @@ namespace Waher.Networking.DNS
 		/// <exception cref="IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
 		public static Task<ResourceRecord[]> Resolve(string Name, QTYPE TYPE, QCLASS CLASS)
 		{
-			return Resolve(Name, TYPE, null, CLASS);
+			return Resolve(Name, TYPE, null, CLASS, null);
+		}
+
+		/// <summary>
+		/// Resolves a DNS name.
+		/// </summary>
+		/// <param name="Name">Domain Name to resolve</param>
+		/// <param name="TYPE">Resource Record Type of interest.</param>
+		/// <param name="CLASS">Resource Record Class of interest.</param>
+		/// <param name="Thread">Optional profiling thread.</param>
+		/// <returns>Answer to the query</returns>
+		/// <exception cref="IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
+		public static Task<ResourceRecord[]> Resolve(string Name, QTYPE TYPE, QCLASS CLASS, ProfilerThread Thread)
+		{
+			return Resolve(Name, TYPE, null, CLASS, Thread);
 		}
 
 		/// <summary>
@@ -150,7 +164,22 @@ namespace Waher.Networking.DNS
 		/// <param name="CLASS">Resource Record Class of interest.</param>
 		/// <returns>Answer to the query</returns>
 		/// <exception cref="IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
-		public static async Task<ResourceRecord[]> Resolve(string Name, QTYPE TYPE, TYPE? ExceptionType, QCLASS CLASS)
+		public static Task<ResourceRecord[]> Resolve(string Name, QTYPE TYPE, TYPE? ExceptionType, QCLASS CLASS)
+		{
+			return Resolve(Name, TYPE, ExceptionType, CLASS, null);
+		}
+
+		/// <summary>
+		/// Resolves a DNS name.
+		/// </summary>
+		/// <param name="Name">Domain Name to resolve</param>
+		/// <param name="TYPE">Resource Record Type of interest.</param>
+		/// <param name="ExceptionType">If no answer of type <paramref name="TYPE"/> is found, records of this type can also be accepted.</param>
+		/// <param name="CLASS">Resource Record Class of interest.</param>
+		/// <param name="Thread">Optional profiling thread.</param>
+		/// <returns>Answer to the query</returns>
+		/// <exception cref="IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
+		public static async Task<ResourceRecord[]> Resolve(string Name, QTYPE TYPE, TYPE? ExceptionType, QCLASS CLASS, ProfilerThread Thread)
 		{
 			LinkedList<KeyValuePair<string, IPEndPoint>> Backup = null;
 			TYPE? ExpectedType;
@@ -161,6 +190,8 @@ namespace Waher.Networking.DNS
 				ExpectedType = T;
 			else
 				ExpectedType = null;
+
+			Thread?.NewState("Client");
 
 			lock (synchObject)
 			{
@@ -181,7 +212,9 @@ namespace Waher.Networking.DNS
 			{
 				while (true)
 				{
-					DnsResponse Response = await Query(Name, TYPE, CLASS, Timeout, Destination, false);
+					Thread?.NewState("Query");
+
+					DnsResponse Response = await Query(Name, TYPE, CLASS, Timeout, Destination, false, Thread);
 					string CName = null;
 
 					if (Response is null)
@@ -287,6 +320,20 @@ namespace Waher.Networking.DNS
 		/// <exception cref="IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
 		public static Task<DnsResponse> Query(string Name, QTYPE TYPE, QCLASS CLASS)
 		{
+			return Query(Name, TYPE, CLASS, null);
+		}
+
+		/// <summary>
+		/// Resolves a DNS name.
+		/// </summary>
+		/// <param name="Name">Domain Name to resolve</param>
+		/// <param name="TYPE">Resource Record Type of interest.</param>
+		/// <param name="CLASS">Resource Record Class of interest.</param>
+		/// <param name="Thread">Optional profiling thread.</param>
+		/// <returns>Answer to the query</returns>
+		/// <exception cref="IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
+		public static Task<DnsResponse> Query(string Name, QTYPE TYPE, QCLASS CLASS, ProfilerThread Thread)
+		{
 			lock (synchObject)
 			{
 				if (nestingDepth == 0 && networkChanged)
@@ -304,7 +351,7 @@ namespace Waher.Networking.DNS
 
 			try
 			{
-				return Query(Name, TYPE, CLASS, 2000, null, true);
+				return Query(Name, TYPE, CLASS, 2000, null, true, Thread);
 			}
 			finally
 			{
@@ -315,7 +362,8 @@ namespace Waher.Networking.DNS
 			}
 		}
 
-		private static async Task<DnsResponse> Query(string Name, QTYPE TYPE, QCLASS CLASS, int Timeout, IPEndPoint Destination, bool ReturnRaw)
+		private static async Task<DnsResponse> Query(string Name, QTYPE TYPE, QCLASS CLASS, int Timeout, IPEndPoint Destination,
+			bool ReturnRaw, ProfilerThread Thread)
 		{
 			DnsResponse Response;
 			DnsMessage Message;
@@ -324,6 +372,10 @@ namespace Waher.Networking.DNS
 			{
 				try
 				{
+					Thread?.NewState("Search");
+
+					IEnumerable<DnsResponse> Records = await Database.Find<DnsResponse>();
+
 					Response = await Database.FindFirstDeleteRest<DnsResponse>(new FilterAnd(
 						new FilterFieldEqualTo("Name", Name),
 						new FilterFieldEqualTo("Type", TYPE),
@@ -335,8 +387,10 @@ namespace Waher.Networking.DNS
 						Response = null;
 					}
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
+					Thread?.Exception(ex);
+
 					// Some inconsistency in database. Clear collection to get fresh set of DNS entries.
 					await Database.Clear("DnsCache");
 					Response = null;
@@ -348,13 +402,29 @@ namespace Waher.Networking.DNS
 			if (Response is null)
 			{
 				bool Save = true;
+				DnsClient Client;
+
+				if (Destination is null)
+				{
+					Client = httpsClient;
+					if (Client is null)
+					{
+						Client = udpClient;
+						Thread?.NewState("UDP");
+					}
+					else
+						Thread?.NewState("HTTPS");
+				}
+				else
+				{
+					Client = udpClient;
+					Thread?.NewState("UDP");
+				}
+
+				Client.Thread = Thread;
 
 				try
 				{
-					DnsClient Client = Destination is null ? (DnsClient)httpsClient : (DnsClient)udpClient;
-					if (Client is null)
-						Client = udpClient;
-
 					Message = await Client.SendRequestAsync(OpCode.Query, true, new Question[]
 					{
 						new Question(Name, TYPE, CLASS)
@@ -370,9 +440,14 @@ namespace Waher.Networking.DNS
 							break;
 					}
 				}
-				catch (TimeoutException)
+				catch (TimeoutException ex)
 				{
+					Thread?.Exception(ex);
 					Message = null;
+				}
+				finally
+				{
+					Client.Thread = null;
 				}
 
 				if (Message is null || Message.RCode != RCode.NoError)
@@ -399,7 +474,17 @@ namespace Waher.Networking.DNS
 				Response.Expires = DateTime.Now.AddSeconds(Ttl);
 
 				if (Save && Database.HasProvider)
-					await Database.Insert(Response);
+				{
+					Thread?.NewState("Store");
+					try
+					{
+						await Database.Insert(Response);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
 			}
 
 			return Response;
@@ -730,13 +815,30 @@ namespace Waher.Networking.DNS
 		/// <param name="Protocol">Protocol name. Example: "tcp", "udp", etc.</param>
 		/// <returns>Service Endpoint for service.</returns>
 		/// <exception cref="IOException">If service endpoint could not be resolved.</exception>
-		public static async Task<SRV> LookupServiceEndpoint(string DomainName, string ServiceName, string Protocol)
+		public static Task<SRV> LookupServiceEndpoint(string DomainName, string ServiceName, string Protocol)
 		{
+			return LookupServiceEndpoint(DomainName, ServiceName, Protocol, null);
+		}
+
+		/// <summary>
+		/// Looks up a service endpoint for a domain. If multiple are available,
+		/// an appropriate one is selected as defined by RFC 2782.
+		/// </summary>
+		/// <param name="DomainName">Domain name.</param>
+		/// <param name="ServiceName">Service name.</param>
+		/// <param name="Protocol">Protocol name. Example: "tcp", "udp", etc.</param>
+		/// <param name="Thread">Optional profiling thread.</param>
+		/// <returns>Service Endpoint for service.</returns>
+		/// <exception cref="IOException">If service endpoint could not be resolved.</exception>
+		public static async Task<SRV> LookupServiceEndpoint(string DomainName, string ServiceName, string Protocol, ProfilerThread Thread)
+		{
+			Thread?.NewState("Resolve");
+
 			string Name = "_" + ServiceName + "._" + Protocol.ToLower() + "." + DomainName;
 			SortedDictionary<ushort, List<SRV>> ServicesByPriority = new SortedDictionary<ushort, List<SRV>>();
 			List<SRV> SamePriority;
 
-			foreach (ResourceRecord RR in await Resolve(Name, QTYPE.SRV, QCLASS.IN))
+			foreach (ResourceRecord RR in await Resolve(Name, QTYPE.SRV, QCLASS.IN, Thread))
 			{
 				if (RR is SRV SRV)
 				{
@@ -749,6 +851,8 @@ namespace Waher.Networking.DNS
 					SamePriority.Add(SRV);
 				}
 			}
+
+			Thread?.NewState("Select");
 
 			while (true)
 			{
@@ -769,9 +873,7 @@ namespace Waher.Networking.DNS
 				int i;
 
 				foreach (SRV SRV in SamePriority)
-				{
 					TotWeight += SRV.Weight;
-				}
 
 				SRV Selected = null;
 

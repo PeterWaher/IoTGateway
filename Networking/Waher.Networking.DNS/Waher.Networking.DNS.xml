@@ -29,6 +29,11 @@
             Called when DNS client is ready to be initialized.
             </summary>
         </member>
+        <member name="P:Waher.Networking.DNS.Communication.DnsClient.Thread">
+            <summary>
+            Optional thread for profiling.
+            </summary>
+        </member>
         <member name="M:Waher.Networking.DNS.Communication.DnsClient.BeginTransmit(System.UInt16,System.Byte[],System.Net.IPEndPoint,Waher.Networking.DNS.Communication.DnsMessageEventHandler,System.Object)">
             <summary>
             Sends a message to a DNS server.
@@ -444,6 +449,17 @@
             <returns>Answer to the query</returns>
             <exception cref="T:System.IO.IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
         </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.Resolve(System.String,Waher.Networking.DNS.Enumerations.QTYPE,Waher.Networking.DNS.Enumerations.QCLASS,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Resolves a DNS name.
+            </summary>
+            <param name="Name">Domain Name to resolve</param>
+            <param name="TYPE">Resource Record Type of interest.</param>
+            <param name="CLASS">Resource Record Class of interest.</param>
+            <param name="Thread">Optional profiling thread.</param>
+            <returns>Answer to the query</returns>
+            <exception cref="T:System.IO.IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
+        </member>
         <member name="M:Waher.Networking.DNS.DnsResolver.Resolve(System.String,Waher.Networking.DNS.Enumerations.QTYPE,System.Nullable{Waher.Networking.DNS.Enumerations.TYPE},Waher.Networking.DNS.Enumerations.QCLASS)">
             <summary>
             Resolves a DNS name.
@@ -455,6 +471,18 @@
             <returns>Answer to the query</returns>
             <exception cref="T:System.IO.IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
         </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.Resolve(System.String,Waher.Networking.DNS.Enumerations.QTYPE,System.Nullable{Waher.Networking.DNS.Enumerations.TYPE},Waher.Networking.DNS.Enumerations.QCLASS,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Resolves a DNS name.
+            </summary>
+            <param name="Name">Domain Name to resolve</param>
+            <param name="TYPE">Resource Record Type of interest.</param>
+            <param name="ExceptionType">If no answer of type <paramref name="TYPE"/> is found, records of this type can also be accepted.</param>
+            <param name="CLASS">Resource Record Class of interest.</param>
+            <param name="Thread">Optional profiling thread.</param>
+            <returns>Answer to the query</returns>
+            <exception cref="T:System.IO.IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
+        </member>
         <member name="M:Waher.Networking.DNS.DnsResolver.Query(System.String,Waher.Networking.DNS.Enumerations.QTYPE,Waher.Networking.DNS.Enumerations.QCLASS)">
             <summary>
             Resolves a DNS name.
@@ -462,6 +490,17 @@
             <param name="Name">Domain Name to resolve</param>
             <param name="TYPE">Resource Record Type of interest.</param>
             <param name="CLASS">Resource Record Class of interest.</param>
+            <returns>Answer to the query</returns>
+            <exception cref="T:System.IO.IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
+        </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.Query(System.String,Waher.Networking.DNS.Enumerations.QTYPE,Waher.Networking.DNS.Enumerations.QCLASS,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Resolves a DNS name.
+            </summary>
+            <param name="Name">Domain Name to resolve</param>
+            <param name="TYPE">Resource Record Type of interest.</param>
+            <param name="CLASS">Resource Record Class of interest.</param>
+            <param name="Thread">Optional profiling thread.</param>
             <returns>Answer to the query</returns>
             <exception cref="T:System.IO.IOException">If the domain name could not be resolved for the TYPE and CLASS provided.</exception>
         </member>
@@ -535,6 +574,18 @@
             <param name="DomainName">Domain name.</param>
             <param name="ServiceName">Service name.</param>
             <param name="Protocol">Protocol name. Example: "tcp", "udp", etc.</param>
+            <returns>Service Endpoint for service.</returns>
+            <exception cref="T:System.IO.IOException">If service endpoint could not be resolved.</exception>
+        </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.LookupServiceEndpoint(System.String,System.String,System.String,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Looks up a service endpoint for a domain. If multiple are available,
+            an appropriate one is selected as defined by RFC 2782.
+            </summary>
+            <param name="DomainName">Domain name.</param>
+            <param name="ServiceName">Service name.</param>
+            <param name="Protocol">Protocol name. Example: "tcp", "udp", etc.</param>
+            <param name="Thread">Optional profiling thread.</param>
             <returns>Service Endpoint for service.</returns>
             <exception cref="T:System.IO.IOException">If service endpoint could not be resolved.</exception>
         </member>

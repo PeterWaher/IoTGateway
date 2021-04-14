@@ -10,6 +10,7 @@ using Waher.Networking.DNS.Enumerations;
 using Waher.Networking.DNS.ResourceRecords;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Profiling;
 using Waher.Runtime.Timing;
 
 namespace Waher.Networking.DNS.Communication
@@ -36,6 +37,7 @@ namespace Waher.Networking.DNS.Communication
 
 		private readonly Dictionary<ushort, Rec> outgoingMessages = new Dictionary<ushort, Rec>();
 		private readonly LinkedList<KeyValuePair<byte[], IPEndPoint>> outputQueue = new LinkedList<KeyValuePair<byte[], IPEndPoint>>();
+		private ProfilerThread thread = null;
 		private Scheduler scheduler;
 		private bool isWriting = false;
 
@@ -61,6 +63,15 @@ namespace Waher.Networking.DNS.Communication
 		protected virtual void Init()
 		{
 			this.scheduler = new Scheduler();
+		}
+
+		/// <summary>
+		/// Optional thread for profiling.
+		/// </summary>
+		public ProfilerThread Thread
+		{
+			get => this.thread;
+			set => this.thread = value;
 		}
 
 		/// <summary>
@@ -110,6 +121,7 @@ namespace Waher.Networking.DNS.Communication
 			{
 				while (!(Message is null))
 				{
+					this.thread?.Event("Tx");
 					this.TransmitBinary(Message);
 
 					await this.SendAsync(Message, Destination);
@@ -135,6 +147,8 @@ namespace Waher.Networking.DNS.Communication
 			}
 			catch (Exception ex)
 			{
+				ex = Log.UnnestException(ex);
+				this.thread?.Exception(ex);
 				this.Exception(ex);
 			}
 		}
@@ -165,6 +179,8 @@ namespace Waher.Networking.DNS.Communication
 		/// <param name="Message">DNS Message</param>
 		protected virtual void ProcessIncomingMessage(DnsMessage Message)
 		{
+			this.thread?.Event("Rx");
+
 			if (Message.Response)
 			{
 				Rec Rec;
@@ -183,6 +199,8 @@ namespace Waher.Networking.DNS.Communication
 				}
 				catch (Exception ex)
 				{
+					ex = Log.UnnestException(ex);
+					this.thread?.Exception(ex);
 					Log.Critical(ex);
 				}
 			}

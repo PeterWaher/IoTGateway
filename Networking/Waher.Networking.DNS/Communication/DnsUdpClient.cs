@@ -66,7 +66,7 @@ namespace Waher.Networking.DNS.Communication
                             {
                                 this.udp = new UdpClient(AddressFamily)
                                 {
-                                    DontFragment = true,
+                                    //DontFragment = true,
                                     MulticastLoopback = false
                                 };
                             }

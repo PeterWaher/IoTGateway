@@ -160,7 +160,7 @@ namespace Waher.Networking.Cluster
 						{
 							Client = new UdpClient(AddressFamily)
 							{
-								DontFragment = true,
+								//DontFragment = true,
 								ExclusiveAddressUse = true,
 								MulticastLoopback = false,
 								EnableBroadcast = true,

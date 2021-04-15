@@ -283,7 +283,7 @@ namespace Waher.Networking.CoAP
 							{
 								Outgoing = new UdpClient(AddressFamily)
 								{
-									DontFragment = true,
+									//DontFragment = true,
 									MulticastLoopback = false
 								};
 							}
@@ -344,7 +344,7 @@ namespace Waher.Networking.CoAP
 							{
 								Incoming = new UdpClient(AddressFamily)
 								{
-									DontFragment = true,
+									//DontFragment = true,
 									ExclusiveAddressUse = false
 								};
 
@@ -388,7 +388,7 @@ namespace Waher.Networking.CoAP
 								{
 									Incoming = new UdpClient(Port, AddressFamily)
 									{
-										DontFragment = true,
+										//DontFragment = true,
 										MulticastLoopback = false
 									};
 

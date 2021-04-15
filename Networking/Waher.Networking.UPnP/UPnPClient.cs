@@ -63,7 +63,7 @@ namespace Waher.Networking.UPnP
 						{
 							Outgoing = new UdpClient(AddressFamily.InterNetwork);
 							MulticastAddress = IPAddress.Parse("239.255.255.250");
-							Outgoing.DontFragment = true;
+							//Outgoing.DontFragment = true;
 							Outgoing.MulticastLoopback = false;
 						}
 						catch (Exception)

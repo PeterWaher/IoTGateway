@@ -189,7 +189,7 @@ namespace Waher.Persistence.Files
 			Encoding Encoding, int TimeoutMilliseconds, CustomKeyHandler CustomKeyMethod)
 		{
 			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  !(CustomKeyMethod is null), true, CustomKeyMethod, null);
+				!(CustomKeyMethod is null), true, CustomKeyMethod, null);
 		}
 
 		/// <summary>
@@ -238,7 +238,7 @@ namespace Waher.Persistence.Files
 			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Compiled)
 		{
 			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  Encrypted, Compiled, null, null);
+				Encrypted, Compiled, null, null);
 		}
 
 		/// <summary>
@@ -263,7 +263,7 @@ namespace Waher.Persistence.Files
 			Encoding Encoding, int TimeoutMilliseconds, CustomKeyHandler CustomKeyMethod, bool Compiled)
 		{
 			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  !(CustomKeyMethod is null), Compiled, CustomKeyMethod, null);
+				!(CustomKeyMethod is null), Compiled, CustomKeyMethod, null);
 		}
 
 		/// <summary>
@@ -288,7 +288,7 @@ namespace Waher.Persistence.Files
 			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, ProfilerThread Thread)
 		{
 			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  Encrypted, true, null, Thread);
+				Encrypted, true, null, Thread);
 		}
 #endif
 		/// <summary>
@@ -313,7 +313,7 @@ namespace Waher.Persistence.Files
 			Encoding Encoding, int TimeoutMilliseconds, CustomKeyHandler CustomKeyMethod, ProfilerThread Thread)
 		{
 			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  !(CustomKeyMethod is null), true, CustomKeyMethod, Thread);
+				!(CustomKeyMethod is null), true, CustomKeyMethod, Thread);
 		}
 
 		/// <summary>
@@ -390,7 +390,7 @@ namespace Waher.Persistence.Files
 			Encoding Encoding, int TimeoutMilliseconds, CustomKeyHandler CustomKeyMethod, bool Compiled, ProfilerThread Thread)
 		{
 			return CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds,
-				  !(CustomKeyMethod is null), Compiled, CustomKeyMethod, Thread);
+				!(CustomKeyMethod is null), Compiled, CustomKeyMethod, Thread);
 		}
 #endif
 		private async static Task<FilesProvider> CreateAsync(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
@@ -585,7 +585,7 @@ namespace Waher.Persistence.Files
 
 			this.serializers?.Dispose();
 			this.serializers = null;
-		
+
 			WriteTimestamp("Stop.txt");
 		}
 

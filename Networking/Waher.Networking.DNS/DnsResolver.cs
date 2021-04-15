@@ -45,7 +45,14 @@ namespace Waher.Networking.DNS
 
 		static DnsResolver()
 		{
-			NetworkChange.NetworkAddressChanged += (sender, e) => networkChanged = true;
+			try
+			{
+				NetworkChange.NetworkAddressChanged += (sender, e) => networkChanged = true;
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 		}
 
 		/// <summary>

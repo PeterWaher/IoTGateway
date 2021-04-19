@@ -36,12 +36,21 @@ namespace Waher.Content.Images
 
 			// Byte order
 			int RefPos = Reader.Position;
+			int i = Reader.NextSHORT();
 
-			if (Reader.NextByte() != 0x4d)
-				return false;
+			switch (i)
+			{
+				case 0x4949:
+					Reader.BigEndian = false;
+					break;
 
-			if (Reader.NextByte() != 0x4d)
-				return false;
+				case 0x4d4d:
+					Reader.BigEndian = true;
+					break;
+
+				default:
+					return false;
+			}
 
 			if (Reader.NextSHORT() != 0x2a)
 				return false;
@@ -110,7 +119,7 @@ namespace Waher.Content.Images
 
 					int RecSize = (int)(Count.Value * ElementSize);
 					int PosBak;
-					int i, j;
+					int j;
 
 					if (RecSize <= 4)
 						PosBak = Reader.Position + 4;

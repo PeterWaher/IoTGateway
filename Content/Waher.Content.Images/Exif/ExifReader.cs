@@ -12,6 +12,7 @@ namespace Waher.Content.Images.Exif
 		private readonly byte[] data;
 		private readonly int len;
 		private int pos;
+		private bool bigEndian = true;
 
 		/// <summary>
 		/// Current position
@@ -26,6 +27,15 @@ namespace Waher.Content.Images.Exif
 
 				this.pos = value;
 			}
+		}
+
+		/// <summary>
+		/// If Big-Endian encoding is used.
+		/// </summary>
+		public bool BigEndian
+		{
+			get => this.bigEndian;
+			set => this.bigEndian = value;
 		}
 
 		/// <summary>
@@ -75,10 +85,20 @@ namespace Waher.Content.Images.Exif
 			if (j < 0)
 				return -1;
 
-			i <<= 8;
-			i |= j;
+			if (this.bigEndian)
+			{
+				i <<= 8;
+				i |= j;
 
-			return i;
+				return i;
+			}
+			else
+			{
+				j <<= 8;
+				j |= i;
+
+				return j;
+			}
 		}
 
 		/// <summary>
@@ -95,10 +115,20 @@ namespace Waher.Content.Images.Exif
 			if (j < 0)
 				return null;
 
-			i <<= 16;
-			i |= (ushort)j;
+			if (this.bigEndian)
+			{
+				i <<= 16;
+				i |= (ushort)j;
 
-			return (uint)i;
+				return (uint)i;
+			}
+			else
+			{
+				j <<= 16;
+				j |= (ushort)i;
+
+				return (uint)j;
+			}
 		}
 
 		/// <summary>

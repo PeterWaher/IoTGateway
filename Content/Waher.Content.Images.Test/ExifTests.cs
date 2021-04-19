@@ -7,7 +7,7 @@ namespace Waher.Content.Images.Test
 	[TestClass]
 	public class ExifTests
 	{
-		private static string[] jpgFiles = new string[]
+		private static readonly string[] jpgFiles = new string[]
 		{
 			@"jpg\WWL_(Polaroid)_ION230.jpg",
 			@"jpg\Canon_40D.jpg",

@@ -76,6 +76,11 @@
             Current position
             </summary>
         </member>
+        <member name="P:Waher.Content.Images.Exif.ExifReader.BigEndian">
+            <summary>
+            If Big-Endian encoding is used.
+            </summary>
+        </member>
         <member name="P:Waher.Content.Images.Exif.ExifReader.Length">
             <summary>
             Length of data block

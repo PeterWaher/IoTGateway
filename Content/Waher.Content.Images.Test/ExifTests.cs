@@ -630,12 +630,6 @@ namespace Waher.Content.Images.Test
 			this.TestImage(jpgFiles, 88);
 		}
 
-		[TestMethod]
-		public void Test_JPEG_89()
-		{
-			this.TestImage(jpgFiles, 89);
-		}
-
 		private void TestImage(string[] Array, int Index)
 		{
 			string FileName = @"..\..\..\..\..\..\exif-samples-master\" + Array[Index - 1];

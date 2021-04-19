@@ -58,13 +58,6 @@ namespace Waher.Content.Images.Test
 			@"jpg\hdr\iphone_hdr_NO.jpg",
 			@"jpg\hdr\iphone_hdr_YES.jpg",
 			@"jpg\hdr\canon_hdr_NO.jpg",
-			@"jpg\invalid\image01088.jpg",
-			@"jpg\invalid\image01137.jpg",
-			@"jpg\invalid\image01551.jpg",
-			@"jpg\invalid\image01713.jpg",
-			@"jpg\invalid\image01980.jpg",
-			@"jpg\invalid\image02206.jpg",
-			@"jpg\invalid\image00971.jpg",
 			@"jpg\mobile\jolla.jpg",
 			@"jpg\orientation\portrait_5.jpg",
 			@"jpg\orientation\portrait_6.jpg",
@@ -99,547 +92,562 @@ namespace Waher.Content.Images.Test
 			@"jpg\xmp\BlueSquare.jpg",
 		};
 
+		private static readonly string[] invalidJpgFiles = new string[]
+		{
+			@"jpg\invalid\image01088.jpg",
+			@"jpg\invalid\image01137.jpg",
+			@"jpg\invalid\image01551.jpg",
+			@"jpg\invalid\image01713.jpg",
+			@"jpg\invalid\image01980.jpg",
+			@"jpg\invalid\image02206.jpg",
+			@"jpg\invalid\image00971.jpg",
+		};
+
 		// Sample images used from this repository, downloaded in parallel to the IoT Gateway repository:
 		// https://github.com/ianare/exif-samples
 
 		[TestMethod]
 		public void Test_JPEG_01()
 		{
-			this.TestImage(jpgFiles, 01);
+			this.TestImage(jpgFiles, 01, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_02()
 		{
-			this.TestImage(jpgFiles, 02);
+			this.TestImage(jpgFiles, 02, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_03()
 		{
-			this.TestImage(jpgFiles, 03);
+			this.TestImage(jpgFiles, 03, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_04()
 		{
-			this.TestImage(jpgFiles, 04);
+			this.TestImage(jpgFiles, 04, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_05()
 		{
-			this.TestImage(jpgFiles, 05);
+			this.TestImage(jpgFiles, 05, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_06()
 		{
-			this.TestImage(jpgFiles, 06);
+			this.TestImage(jpgFiles, 06, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_07()
 		{
-			this.TestImage(jpgFiles, 07);
+			this.TestImage(jpgFiles, 07, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_08()
 		{
-			this.TestImage(jpgFiles, 08);
+			this.TestImage(jpgFiles, 08, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_09()
 		{
-			this.TestImage(jpgFiles, 09);
+			this.TestImage(jpgFiles, 09, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_10()
 		{
-			this.TestImage(jpgFiles, 10);
+			this.TestImage(jpgFiles, 10, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_11()
 		{
-			this.TestImage(jpgFiles, 11);
+			this.TestImage(jpgFiles, 11, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_12()
 		{
-			this.TestImage(jpgFiles, 12);
+			this.TestImage(jpgFiles, 12, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_13()
 		{
-			this.TestImage(jpgFiles, 13);
+			this.TestImage(jpgFiles, 13, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_14()
 		{
-			this.TestImage(jpgFiles, 14);
+			this.TestImage(jpgFiles, 14, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_15()
 		{
-			this.TestImage(jpgFiles, 15);
+			this.TestImage(jpgFiles, 15, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_16()
 		{
-			this.TestImage(jpgFiles, 16);
+			this.TestImage(jpgFiles, 16, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_17()
 		{
-			this.TestImage(jpgFiles, 17);
+			this.TestImage(jpgFiles, 17, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_18()
 		{
-			this.TestImage(jpgFiles, 18);
+			this.TestImage(jpgFiles, 18, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_19()
 		{
-			this.TestImage(jpgFiles, 19);
+			this.TestImage(jpgFiles, 19, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_20()
 		{
-			this.TestImage(jpgFiles, 20);
+			this.TestImage(jpgFiles, 20, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_21()
 		{
-			this.TestImage(jpgFiles, 21);
+			this.TestImage(jpgFiles, 21, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_22()
 		{
-			this.TestImage(jpgFiles, 22);
+			this.TestImage(jpgFiles, 22, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_23()
 		{
-			this.TestImage(jpgFiles, 23);
+			this.TestImage(jpgFiles, 23, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_24()
 		{
-			this.TestImage(jpgFiles, 24);
+			this.TestImage(jpgFiles, 24, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_25()
 		{
-			this.TestImage(jpgFiles, 25);
+			this.TestImage(jpgFiles, 25, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_26()
 		{
-			this.TestImage(jpgFiles, 26);
+			this.TestImage(jpgFiles, 26, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_27()
 		{
-			this.TestImage(jpgFiles, 27);
+			this.TestImage(jpgFiles, 27, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_28()
 		{
-			this.TestImage(jpgFiles, 28);
+			this.TestImage(jpgFiles, 28, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_29()
 		{
-			this.TestImage(jpgFiles, 29);
+			this.TestImage(jpgFiles, 29, false);	// No EXIF
 		}
 
 		[TestMethod]
 		public void Test_JPEG_30()
 		{
-			this.TestImage(jpgFiles, 30);
+			this.TestImage(jpgFiles, 30, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_31()
 		{
-			this.TestImage(jpgFiles, 31);
+			this.TestImage(jpgFiles, 31, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_32()
 		{
-			this.TestImage(jpgFiles, 32);
+			this.TestImage(jpgFiles, 32, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_33()
 		{
-			this.TestImage(jpgFiles, 33);
+			this.TestImage(jpgFiles, 33, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_34()
 		{
-			this.TestImage(jpgFiles, 34);
+			this.TestImage(jpgFiles, 34, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_35()
 		{
-			this.TestImage(jpgFiles, 35);
+			this.TestImage(jpgFiles, 35, false);	// No EXIF
 		}
 
 		[TestMethod]
 		public void Test_JPEG_36()
 		{
-			this.TestImage(jpgFiles, 36);
+			this.TestImage(jpgFiles, 36, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_37()
 		{
-			this.TestImage(jpgFiles, 37);
+			this.TestImage(jpgFiles, 37, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_38()
 		{
-			this.TestImage(jpgFiles, 38);
+			this.TestImage(jpgFiles, 38, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_39()
 		{
-			this.TestImage(jpgFiles, 39);
+			this.TestImage(jpgFiles, 39, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_40()
 		{
-			this.TestImage(jpgFiles, 40);
+			this.TestImage(jpgFiles, 40, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_41()
 		{
-			this.TestImage(jpgFiles, 41);
+			this.TestImage(jpgFiles, 41, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_42()
 		{
-			this.TestImage(jpgFiles, 42);
+			this.TestImage(jpgFiles, 42, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_43()
 		{
-			this.TestImage(jpgFiles, 43);
+			this.TestImage(jpgFiles, 43, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_44()
 		{
-			this.TestImage(jpgFiles, 44);
+			this.TestImage(jpgFiles, 44, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_45()
 		{
-			this.TestImage(jpgFiles, 45);
+			this.TestImage(jpgFiles, 45, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_46()
 		{
-			this.TestImage(jpgFiles, 46);
+			this.TestImage(jpgFiles, 46, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_47()
 		{
-			this.TestImage(jpgFiles, 47);
+			this.TestImage(jpgFiles, 47, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_48()
 		{
-			this.TestImage(jpgFiles, 48);
+			this.TestImage(jpgFiles, 48, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_49()
 		{
-			this.TestImage(jpgFiles, 49);
+			this.TestImage(jpgFiles, 49, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_50()
 		{
-			this.TestImage(jpgFiles, 50);
+			this.TestImage(jpgFiles, 50, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_51()
 		{
-			this.TestImage(jpgFiles, 51);
+			this.TestImage(jpgFiles, 51, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_52()
 		{
-			this.TestImage(jpgFiles, 52);
+			this.TestImage(jpgFiles, 52, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_53()
 		{
-			this.TestImage(jpgFiles, 53);
+			this.TestImage(jpgFiles, 53, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_54()
 		{
-			this.TestImage(jpgFiles, 54);
+			this.TestImage(jpgFiles, 54, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_55()
 		{
-			this.TestImage(jpgFiles, 55);
+			this.TestImage(jpgFiles, 55, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_56()
 		{
-			this.TestImage(jpgFiles, 56);
+			this.TestImage(jpgFiles, 56, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_57()
 		{
-			this.TestImage(jpgFiles, 57);
+			this.TestImage(jpgFiles, 57, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_58()
 		{
-			this.TestImage(jpgFiles, 58);
+			this.TestImage(jpgFiles, 58, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_59()
 		{
-			this.TestImage(jpgFiles, 59);
+			this.TestImage(jpgFiles, 59, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_60()
 		{
-			this.TestImage(jpgFiles, 60);
+			this.TestImage(jpgFiles, 60, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_61()
 		{
-			this.TestImage(jpgFiles, 61);
+			this.TestImage(jpgFiles, 61, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_62()
 		{
-			this.TestImage(jpgFiles, 62);
+			this.TestImage(jpgFiles, 62, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_63()
 		{
-			this.TestImage(jpgFiles, 63);
+			this.TestImage(jpgFiles, 63, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_64()
 		{
-			this.TestImage(jpgFiles, 64);
+			this.TestImage(jpgFiles, 64, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_65()
 		{
-			this.TestImage(jpgFiles, 65);
+			this.TestImage(jpgFiles, 65, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_66()
 		{
-			this.TestImage(jpgFiles, 66);
+			this.TestImage(jpgFiles, 66, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_67()
 		{
-			this.TestImage(jpgFiles, 67);
+			this.TestImage(jpgFiles, 67, false);	// Backwards offset
 		}
 
 		[TestMethod]
 		public void Test_JPEG_68()
 		{
-			this.TestImage(jpgFiles, 68);
+			this.TestImage(jpgFiles, 68, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_69()
 		{
-			this.TestImage(jpgFiles, 69);
+			this.TestImage(jpgFiles, 69, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_70()
 		{
-			this.TestImage(jpgFiles, 70);
+			this.TestImage(jpgFiles, 70, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_71()
 		{
-			this.TestImage(jpgFiles, 71);
+			this.TestImage(jpgFiles, 71, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_72()
 		{
-			this.TestImage(jpgFiles, 72);
+			this.TestImage(jpgFiles, 72, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_73()
 		{
-			this.TestImage(jpgFiles, 73);
+			this.TestImage(jpgFiles, 73, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_74()
 		{
-			this.TestImage(jpgFiles, 74);
+			this.TestImage(jpgFiles, 74, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_75()
 		{
-			this.TestImage(jpgFiles, 75);
+			this.TestImage(jpgFiles, 75, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_76()
 		{
-			this.TestImage(jpgFiles, 76);
+			this.TestImage(jpgFiles, 76, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_77()
 		{
-			this.TestImage(jpgFiles, 77);
+			this.TestImage(jpgFiles, 77, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_78()
 		{
-			this.TestImage(jpgFiles, 78);
+			this.TestImage(jpgFiles, 78, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_79()
 		{
-			this.TestImage(jpgFiles, 79);
+			this.TestImage(jpgFiles, 79, true);
 		}
 
 		[TestMethod]
 		public void Test_JPEG_80()
 		{
-			this.TestImage(jpgFiles, 80);
+			this.TestImage(jpgFiles, 80, false);	// No EXIF
 		}
 
 		[TestMethod]
 		public void Test_JPEG_81()
 		{
-			this.TestImage(jpgFiles, 81);
+			this.TestImage(jpgFiles, 81, true);
 		}
 
 		[TestMethod]
-		public void Test_JPEG_82()
+		public void Test_Invalid_JPEG_01()
 		{
-			this.TestImage(jpgFiles, 82);
+			this.TestImage(invalidJpgFiles, 01, false);
 		}
 
 		[TestMethod]
-		public void Test_JPEG_83()
+		public void Test_Invalid_JPEG_02()
 		{
-			this.TestImage(jpgFiles, 83);
+			this.TestImage(invalidJpgFiles, 02, false);
 		}
 
 		[TestMethod]
-		public void Test_JPEG_84()
+		public void Test_Invalid_JPEG_03()
 		{
-			this.TestImage(jpgFiles, 84);
+			this.TestImage(invalidJpgFiles, 03, false);
 		}
 
 		[TestMethod]
-		public void Test_JPEG_85()
+		public void Test_Invalid_JPEG_04()
 		{
-			this.TestImage(jpgFiles, 85);
+			this.TestImage(invalidJpgFiles, 04, false);
 		}
 
 		[TestMethod]
-		public void Test_JPEG_86()
+		public void Test_Invalid_JPEG_05()
 		{
-			this.TestImage(jpgFiles, 86);
+			this.TestImage(invalidJpgFiles, 05, false);
 		}
 
 		[TestMethod]
-		public void Test_JPEG_87()
+		public void Test_Invalid_JPEG_06()
 		{
-			this.TestImage(jpgFiles, 87);
+			this.TestImage(invalidJpgFiles, 06, false);
 		}
 
 		[TestMethod]
-		public void Test_JPEG_88()
+		public void TestInvalid__JPEG_07()
 		{
-			this.TestImage(jpgFiles, 88);
+			this.TestImage(invalidJpgFiles, 07, false);
 		}
 
-		private void TestImage(string[] Array, int Index)
+		private void TestImage(string[] Array, int Index, bool ExpectedResult)
 		{
 			string FileName = @"..\..\..\..\..\..\exif-samples-master\" + Array[Index - 1];
-			this.TestImage(FileName);
+			this.TestImage(FileName, ExpectedResult);
 		}
 
-		private void TestImage(string FileName)
+		private void TestImage(string FileName, bool ExpectedResult)
 		{
-			Assert.IsTrue(EXIF.TryExtractFromJPeg(FileName, out ExifTag[] Tags));
-			this.Print(Tags);
+			Console.Out.WriteLine(FileName);
+
+			Assert.AreEqual(ExpectedResult, EXIF.TryExtractFromJPeg(FileName, out ExifTag[] Tags));
+			
+			if (!(Tags is null))
+				this.Print(Tags);
 		}
 
 		private void Print(params ExifTag[] Tags)

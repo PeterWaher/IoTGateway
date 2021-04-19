@@ -4,6 +4,2005 @@
         <name>Waher.Content.Images</name>
     </assembly>
     <members>
+        <member name="T:Waher.Content.Images.EXIF">
+            <summary>
+            Extracts EXIF meta-data from images.
+            
+            Specification:
+            https://www.exif.org/Exif2-2.PDF
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Images.EXIF.TryParse(System.Byte[],Waher.Content.Images.Exif.ExifTag[]@)">
+            <summary>
+            Tries to parse EXIF data.
+            </summary>
+            <param name="ExifData">Binary EXIF data.</param>
+            <param name="Tags">Parsed EXIF tags.</param>
+            <returns>If EXIF data was successfully parsed.</returns>
+        </member>
+        <member name="M:Waher.Content.Images.EXIF.TryExtractFromJPeg(System.String,Waher.Content.Images.Exif.ExifTag[]@)">
+            <summary>
+            Tries to extract EXIF meta-data from a JPEG image.
+            </summary>
+            <param name="FileName">Filename of JPEG image.</param>
+            <param name="Tags">Parsed EXIF tags.</param>
+            <returns>If EXIF information was found and extracted.</returns>
+        </member>
+        <member name="M:Waher.Content.Images.EXIF.TryExtractFromJPeg(System.Byte[],Waher.Content.Images.Exif.ExifTag[]@)">
+            <summary>
+            Tries to extract EXIF meta-data from a JPEG image.
+            </summary>
+            <param name="Image">JPEG image.</param>
+            <param name="Tags">Parsed EXIF tags.</param>
+            <returns>If EXIF information was found and extracted.</returns>
+        </member>
+        <member name="M:Waher.Content.Images.EXIF.TryExtractFromJPeg(System.IO.Stream,Waher.Content.Images.Exif.ExifTag[]@)">
+            <summary>
+            Tries to extract EXIF meta-data from a JPEG stream.
+            </summary>
+            <param name="Image">Stream, pointing to the start of the JPEG image.</param>
+            <param name="Tags">Parsed EXIF tags.</param>
+            <returns>If EXIF information was found and extracted.</returns>
+        </member>
+        <member name="T:Waher.Content.Images.Exif.ExifAsciiTag">
+            <summary>
+            Class for ASCII-valued EXIF meta-data tags.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Images.Exif.ExifAsciiTag.#ctor(Waher.Content.Images.Exif.ExifTagName,System.String)">
+            <summary>
+            Class for ASCII-valued EXIF meta-data tags.
+            </summary>
+            <param name="TagId">Tag ID</param>
+            <param name="Value">Tag Value</param>
+        </member>
+        <member name="P:Waher.Content.Images.Exif.ExifAsciiTag.Value">
+            <summary>
+            EXIF Tag Value
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Images.Exif.ExifAsciiTag.TypedValue">
+            <summary>
+            Typed EXIF Tag Value
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Images.Exif.ExifReader">
+            <summary>
+            EXIF reader
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Images.Exif.ExifReader.Position">
+            <summary>
+            Current position
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Images.Exif.ExifReader.Length">
+            <summary>
+            Length of data block
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Images.Exif.ExifReader.EoF">
+            <summary>
+            End of File
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Images.Exif.ExifReader.#ctor(System.Byte[])">
+            <summary>
+            EXIF reader
+            </summary>
+            <param name="Data">Binary representation.</param>
+        </member>
+        <member name="M:Waher.Content.Images.Exif.ExifReader.NextByte">
+            <summary>
+            Gets next byte. If no more bytes are available, -1 is returned.
+            </summary>
+            <returns>Next byte, or -1 if none.</returns>
+        </member>
+        <member name="M:Waher.Content.Images.Exif.ExifReader.NextSHORT">
+            <summary>
+            Gets next SHORT (unsigned short). If no more bytes are available, -1 is returned.
+            </summary>
+            <returns>Next SHORT, or -1 if none.</returns>
+        </member>
+        <member name="M:Waher.Content.Images.Exif.ExifReader.NextLONG">
+            <summary>
+            Gets next LONG (unsigned int). If no more bytes are available, null is returned.
+            </summary>
+            <returns>Next LONG, or null if none.</returns>
+        </member>
+        <member name="M:Waher.Content.Images.Exif.ExifReader.NextASCIIString">
+            <summary>
+            Gets the next ASCII string.
+            </summary>
+            <returns>ASCII string.</returns>
+        </member>
+        <member name="T:Waher.Content.Images.Exif.ExifTag">
+            <summary>
+            Abstract base class for EXIF meta-data tags.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Images.Exif.ExifTag.#ctor(Waher.Content.Images.Exif.ExifTagName)">
+            <summary>
+            Abstract base class for EXIF meta-data tags.
+            </summary>
+            <param name="TagId">Tag ID</param>
+        </member>
+        <member name="P:Waher.Content.Images.Exif.ExifTag.TagID">
+            <summary>
+            EXIF Tag ID
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Images.Exif.ExifTag.Value">
+            <summary>
+            EXIF Tag Value
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Images.Exif.ExifTag.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Content.Images.Exif.ExifTagName">
+            <summary>
+            Defined EXIF Tag names
+            
+            Source:
+            https://www.loc.gov/preservation/digital/formats/content/tiff_tags.shtml
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.NewSubfileType">
+            <summary>
+            A general indication of the kind of data contained in this subfile.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SubfileType">
+            <summary>
+            A general indication of the kind of data contained in this subfile.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ImageWidth">
+            <summary>
+            The number of columns in the image, i.e., the number of pixels per row.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ImageLength">
+            <summary>
+            The number of rows of pixels in the image.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BitsPerSample">
+            <summary>
+            Number of bits per component.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Compression">
+            <summary>
+            Compression scheme used on the image data.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.PhotometricInterpretation">
+            <summary>
+            The color space of the image data.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Threshholding">
+            <summary>
+            For black and white TIFF files that represent shades of gray, the technique used to convert from gray to black and white pixels.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CellWidth">
+            <summary>
+            The width of the dithering or halftoning matrix used to create a dithered or halftoned bilevel file.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CellLength">
+            <summary>
+            The length of the dithering or halftoning matrix used to create a dithered or halftoned bilevel file.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.FillOrder">
+            <summary>
+            The logical order of bits within a byte.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.DocumentName">
+            <summary>
+            The name of the document from which this image was scanned.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ImageDescription">
+            <summary>
+            A string that describes the subject of the image.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Make">
+            <summary>
+            The scanner manufacturer.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Model">
+            <summary>
+            The scanner model name or number.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.StripOffsets">
+            <summary>
+            For each strip, the byte offset of that strip.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Orientation">
+            <summary>
+            The orientation of the image with respect to the rows and columns.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SamplesPerPixel">
+            <summary>
+            The number of components per pixel.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.RowsPerStrip">
+            <summary>
+            The number of rows per strip.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.StripByteCounts">
+            <summary>
+            For each strip, the number of bytes in the strip after compression.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.MinSampleValue">
+            <summary>
+            The minimum component value used.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.MaxSampleValue">
+            <summary>
+            The maximum component value used.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.XResolution">
+            <summary>
+            The number of pixels per ResolutionUnit in the ImageWidth direction.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.YResolution">
+            <summary>
+            The number of pixels per ResolutionUnit in the ImageLength direction.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.PlanarConfiguration">
+            <summary>
+            How the components of each pixel are stored.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.PageName">
+            <summary>
+            The name of the page from which this image was scanned.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.XPosition">
+            <summary>
+            X position of the image.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.YPosition">
+            <summary>
+            Y position of the image.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.FreeOffsets">
+            <summary>
+            For each string of contiguous unused bytes in a TIFF file, the byte offset of the string.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.FreeByteCounts">
+            <summary>
+            For each string of contiguous unused bytes in a TIFF file, the number of bytes in the string.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.GrayResponseUnit">
+            <summary>
+            The precision of the information contained in the GrayResponseCurve.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.GrayResponseCurve">
+            <summary>
+            For grayscale data, the optical density of each possible pixel value.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.T4Options">
+            <summary>
+            Options for Group 3 Fax compression
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.T6Options">
+            <summary>
+            Options for Group 4 Fax compression
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ResolutionUnit">
+            <summary>
+            The unit of measurement for XResolution and YResolution.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.PageNumber">
+            <summary>
+            The page number of the page from which this image was scanned.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.TransferFunction">
+            <summary>
+            Describes a transfer function for the image in tabular style.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Software">
+            <summary>
+            Name and version number of the software package(s) used to create the image.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.DateTime">
+            <summary>
+            Date and time of image creation.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Artist">
+            <summary>
+            Person who created the image.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.HostComputer">
+            <summary>
+            The computer and/or operating system in use at the time of image creation.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Predictor">
+            A mathematical operator that is applied to the image data before an encoding scheme is applied.
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.WhitePoint">
+            <summary>
+            The chromaticity of the white point of the image.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.PrimaryChromaticities">
+            <summary>
+            The chromaticities of the primaries of the image.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ColorMap">
+            <summary>
+            A color map for palette color images.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.HalftoneHints">
+            <summary>
+            Conveys to the halftone function the range of gray levels within a colorimetrically-specified image that should retain tonal detail.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.TileWidth">
+            <summary>
+            The tile width in pixels.This is the number of columns in each tile.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.TileLength">
+            <summary>
+            The tile length (height) in pixels.This is the number of rows in each tile.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.TileOffsets">
+            <summary>
+            For each tile, the byte offset of that tile, as compressed and stored on disk.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.TileByteCounts">
+            <summary>
+            For each tile, the number of (compressed) bytes in that tile.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BadFaxLines">
+            <summary>
+            Used in the TIFF-F standard, denotes the number of 'bad' scan lines encountered by the facsimile device.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CleanFaxData">
+            <summary>
+            Used in the TIFF-F standard, indicates if 'bad' lines encountered during reception are stored in the data, or if 'bad' lines have been replaced by the receiver.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ConsecutiveBadFaxLines">
+            <summary>
+            Used in the TIFF-F standard, denotes the maximum number of consecutive 'bad' scanlines received.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SubIFDs">
+            <summary>
+            Offset to child IFDs.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.InkSet">
+            <summary>
+            The set of inks used in a separated (PhotometricInterpretation= 5) image.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.InkNames">
+            <summary>
+            The name of each ink used in a separated image.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.NumberOfInks">
+            <summary>
+            The number of inks.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.DotRange">
+            <summary>
+            The component values that correspond to a 0% dot and 100% dot.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.TargetPrinter">
+            <summary>
+            A description of the printing environment for which this separation is intended.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ExtraSamples">
+            <summary>
+            Description of extra components.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SampleFormat">
+            <summary>
+            Specifies how to interpret each data sample in a pixel.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SMinSampleValue">
+            <summary>
+            Specifies the minimum sample value.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SMaxSampleValue">
+            <summary>
+            Specifies the maximum sample value.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.TransferRange">
+            <summary>
+            Expands the range of the TransferFunction.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ClipPath">
+            <summary>
+            Mirrors the essentials of PostScript's path creation functionality.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.XClipPathUnits">
+            <summary>
+            The number of units that span the width of the image, in terms of integer ClipPath coordinates.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.YClipPathUnits">
+            <summary>
+            The number of units that span the height of the image, in terms of integer ClipPath coordinates.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Indexed">
+            <summary>
+            Aims to broaden the support for indexed images to include support for any color space.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.JPEGTables">
+            <summary>
+            JPEG quantization and/or Huffman tables.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.OPIProxy">
+            <summary>
+            OPI-related.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.GlobalParametersIFD">
+            <summary>
+            Used in the TIFF-FX standard to point to an IFD containing tags that are globally applicable to the complete TIFF file.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ProfileType">
+            <summary>
+            Used in the TIFF-FX standard, denotes the type of data stored in this file or IFD.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.FaxProfile">
+            <summary>
+            Used in the TIFF-FX standard, denotes the 'profile' that applies to this file.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CodingMethods">
+            <summary>
+            Used in the TIFF-FX standard, indicates which coding methods are used in the file.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.VersionYear">
+            <summary>
+            Used in the TIFF-FX standard, denotes the year of the standard specified by the FaxProfile field.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ModeNumber">
+            <summary>
+            Used in the TIFF-FX standard, denotes the mode of the standard specified by the FaxProfile field.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Decode">
+            <summary>
+            Used in the TIFF-F and TIFF-FX standards, holds information about the ITULAB (PhotometricInterpretation = 10) encoding.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.DefaultImageColor">
+            <summary>
+            Defined in the Mixed Raster Content part of RFC 2301, is the default color needed in areas where no image is available.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.JPEGProc">
+            <summary>
+            Old-style JPEG compression field. TechNote2 invalidates this part of the specification.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.JPEGInterchangeFormat">
+            <summary>
+            Old-style JPEG compression field. TechNote2 invalidates this part of the specification.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.JPEGInterchangeFormatLength">
+            <summary>
+            Old-style JPEG compression field. TechNote2 invalidates this part of the specification.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.JPEGRestartInterval">
+            <summary>
+            Old-style JPEG compression field. TechNote2 invalidates this part of the specification.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.JPEGLosslessPredictors">
+            <summary>
+            Old-style JPEG compression field. TechNote2 invalidates this part of the specification.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.JPEGPointTransforms">
+            <summary>
+            Old-style JPEG compression field. TechNote2 invalidates this part of the specification.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.JPEGQTables">
+            <summary>
+            Old-style JPEG compression field. TechNote2 invalidates this part of the specification.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.JPEGDCTables">
+            <summary>
+            Old-style JPEG compression field. TechNote2 invalidates this part of the specification.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.JPEGACTables">
+            <summary>
+            Old-style JPEG compression field. TechNote2 invalidates this part of the specification.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.YCbCrCoefficients">
+            <summary>
+            The transformation from RGB to YCbCr image data.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.YCbCrSubSampling">
+            <summary>
+            Specifies the subsampling factors used for the chrominance components of a YCbCr image.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.YCbCrPositioning">
+            <summary>
+            Specifies the positioning of subsampled chrominance components relative to luminance samples.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ReferenceBlackWhite">
+            <summary>
+            Specifies a pair of headroom and footroom image data values (codes) for each pixel component.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.StripRowCounts">
+            <summary>
+            Defined in the Mixed Raster Content part of RFC 2301, used to replace RowsPerStrip for IFDs with variable-sized strips.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.XMP">
+            <summary>
+            XML packet containing XMP metadata
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Image_Rating">
+            <summary>
+            Ratings tag used by Windows Exif private IFD
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Image_RatingPercent">
+            <summary>
+            Ratings tag used by Windows, value as percent Exif private IFD
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ImageID">
+            <summary>
+            OPI-related.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Wang_Annotation">
+            <summary>
+            Annotation data, as used in 'Imaging for Windows'.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CFARepeatPatternDim">
+            <summary>
+            For camera raw files from sensors with CFA overlay.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CFAPattern">
+            <summary>
+            For camera raw files from sensors with CFA overlay.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BatteryLevel">
+            <summary>
+            Encodes camera battery level at time of image capture.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Copyright">
+            <summary>
+            Copyright notice.Baseline Also used by HD Photo.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ExposureTime">
+            <summary>
+            Exposure time, given in seconds.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.FNumber">
+            <summary>
+            The F number.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.MD_FileTag">
+            <summary>
+            Specifies the pixel data format encoding in the Molecular Dynamics GEL file format.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.MD_ScalePixel">
+            <summary>
+            Specifies a scale factor in the Molecular Dynamics GEL file format.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.MD_ColorTable">
+            <summary>
+            Used to specify the conversion from 16bit to 8bit in the Molecular Dynamics GEL file format.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.MD_LabName">
+            <summary>
+            Name of the lab that scanned this file, as used in the Molecular Dynamics GEL file format.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.MD_SampleInfo">
+            <summary>
+            Information about the sample, as used in the Molecular Dynamics GEL file format.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.MD_PrepDate">
+            <summary>
+            Date the sample was prepared, as used in the Molecular Dynamics GEL file format.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.MD_PrepTime">
+            <summary>
+            Time the sample was prepared, as used in the Molecular Dynamics GEL file format.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.MD_FileUnits">
+            <summary>
+            Units for data in this file, as used in the Molecular Dynamics GEL file format.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ModelPixelScaleTag">
+            <summary>
+            Used in interchangeable GeoTIFF_1_0 files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.IPTC_NAA">
+            <summary>
+            IPTC-NAA (International Press Telecommunications Council-Newspaper Association of America) metadata.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.INGR_Packet_Data_Tag">
+            <summary>
+            	Intergraph Application specific storage.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.INGR_Flag_Registers">
+            <summary>
+            Intergraph Application specific flags.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.IrasB_Transformation_Matrix">
+            <summary>
+            Originally part of Intergraph's GeoTIFF tags, but likely understood by IrasB only.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ModelTiepointTag">
+            <summary>
+            Originally part of Intergraph's GeoTIFF tags, but now used in interchangeable GeoTIFF_1_0 files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Site">
+            <summary>
+            Site where image created.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ColorSequence">
+            <summary>
+            Sequence of colors if other than CMYK.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.IT8Header">
+            <summary>
+            Certain inherited headers.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.RasterPadding">
+            <summary>
+            Type of raster padding used, if any.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BitsPerRunLength">
+            <summary>
+            Number of bits for short run length encoding.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BitsPerExtendedRunLength">
+            <summary>
+            Number of bits for long run length encoding.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ColorTable">
+            <summary>
+            Color value in a color pallette.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ImageColorIndicator">
+            <summary>
+            Indicates if image (foreground) color or transparency is specified.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BackgroundColorIndicator">
+            <summary>
+            Background color specification.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ImageColorValue">
+            <summary>
+            Specifies image (foreground) color.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BackgroundColorValue">
+            <summary>
+            Specifies background color.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.PixelIntensityRange">
+            <summary>
+            Specifies data values for 0 percent and 100 percent pixel intensity.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.TransparencyIndicator">
+            <summary>
+            Specifies if transparency is used in HC file.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ColorCharacterization">
+            <summary>
+            Specifies ASCII table or other reference per ISO 12641 and ISO 12642.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.HCUsage">
+            <summary>
+            Indicates the type of information in an HC file.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.TrapIndicator">
+            <summary>
+            Indicates whether or not trapping has been applied to the file.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CMYKEquivalent">
+            <summary>
+            Specifies CMYK equivalent for specific separations.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Reserved1">
+            <summary>
+            Reserved for future use
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Reserved2">
+            <summary>
+            Reserved for future use
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Reserved3">
+            <summary>
+            Reserved for future use
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ModelTransformationTag">
+            <summary>
+            Used in interchangeable GeoTIFF_1_0 files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Photoshop">
+            <summary>
+            Collection of Photoshop 'Image Resource Blocks'.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Exif_IFD">
+            <summary>
+            A pointer to the Exif IFD.	Private Also used by HD Photo.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.InterColorProfile">
+            <summary>
+            ICC profile data.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ImageLayer">
+            <summary>
+            Defined in the Mixed Raster Content part of RFC 2301, used to denote the particular function of this Image in the mixed raster scheme.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.GeoKeyDirectoryTag">
+            <summary>
+            Used in interchangeable GeoTIFF_1_0 files.Private Mandatory in GeoTIFF_1_0
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.GeoDoubleParamsTag">
+            <summary>
+            Used in interchangeable GeoTIFF_1_0 files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.GeoAsciiParamsTag">
+            <summary>
+            Used in interchangeable GeoTIFF_1_0 files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ExposureProgram">
+            <summary>
+            The class of the program used by the camera to set exposure when the picture is taken.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SpectralSensitivity">
+            <summary>
+            Indicates the spectral sensitivity of each channel of the camera used.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.GPSInfo">
+            <summary>
+            A pointer to the Exif-related GPS Info IFD.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ISOSpeedRatings">
+            <summary>
+            Indicates the ISO Speed and ISO Latitude of the camera or input device as specified in ISO 12232.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.OECF">
+            <summary>
+            Indicates the Opto-Electric Conversion Function(OECF) specified in ISO 14524.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Interlace">
+            <summary>
+            Indicates the field number of multifield images.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.TimeZoneOffset">
+            <summary>
+            Encodes time zone of camera clock relative to GMT.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SelfTimeMode">
+            <summary>
+            Number of seconds image capture was delayed from button press.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SensitivityType">
+            <summary>
+            The SensitivityType tag indicates PhotographicSensitivity tag, which one of the parameters of ISO 12232. Although it is an optional tag, it should be recorded when a PhotographicSensitivity tag is recorded.Value = 4, 5, 6, or 7 may be used in case that the values of plural parameters are the same.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.StandardOutputSensitivity">
+            <summary>
+            This tag indicates the standard output sensitivity value of a camera or input device defined in ISO 12232. When recording this tag, the PhotographicSensitivity and SensitivityType tags shall also be recorded.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.RecommendedExposureIndex">
+            <summary>
+            This tag indicates the recommended exposure index value of a camera or input device defined in ISO 12232. When recording this tag, the PhotographicSensitivity and SensitivityType tags shall also be recorded.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ISOSpeed">
+            <summary>
+            This tag indicates the ISO speed value of a camera or input device that is defined in ISO 12232. When recording this tag, the PhotographicSensitivity and SensitivityType tags shall also be recorded.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ISOSpeedLatitudeyyy">
+            <summary>
+            This tag indicates the ISO speed latitude yyy value of a camera or input device that is defined in ISO 12232. However, this tag shall not be recorded without ISOSpeed and ISOSpeedLatitudezzz.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ISOSpeedLatitudezzz">
+            <summary>
+            This tag indicates the ISO speed latitude zzz value of a camera or input device that is defined in ISO 12232. However, this tag shall not be recorded without ISOSpeed and ISOSpeedLatitudeyyy.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.HylaFAX_FaxRecvParams">
+            <summary>
+            Used by HylaFAX.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.HylaFAX_FaxSubAddress">
+            <summary>
+            Used by HylaFAX.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.HylaFAX_FaxRecvTime">
+            <summary>
+            Used by HylaFAX.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ExifVersion">
+            <summary>
+            The version of the supported Exif standard.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.DateTimeOriginal">
+            <summary>
+            The date and time when the original image data was generated.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.DateTimeDigitized">
+            <summary>
+            The date and time when the image was stored as digital data.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ComponentsConfiguration">
+            <summary>
+            Specific to compressed data; specifies the channels and complements PhotometricInterpretation
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CompressedBitsPerPixel">
+            <summary>
+            Specific to compressed data; states the compressed bits per pixel.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ShutterSpeedValue">
+            <summary>
+            Shutter speed.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ApertureValue">
+            <summary>
+            The lens aperture.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BrightnessValue">
+            <summary>
+            The value of brightness.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ExposureBiasValue">
+            <summary>
+            The exposure bias.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.MaxApertureValue">
+            <summary>
+            The smallest F number of the lens.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SubjectDistance">
+            <summary>
+            The distance to the subject, given in meters
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.MeteringMode">
+            <summary>
+            The metering mode.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.LightSource">
+            <summary>
+            The kind of light source.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Flash">
+            <summary>
+            Indicates the status of flash when the image was shot.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.FocalLength">
+            <summary>
+            The actual focal length of the lens, in mm.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.FlashEnergy">
+            <summary>
+            Amount of flash energy (BCPS).
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SpatialFrequencyResponse">
+            <summary>
+            SFR of the camera.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Noise">
+            <summary>
+            Noise measurement values.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.FocalPlaneXResolution">
+            <summary>
+            Number of pixels per FocalPlaneResolutionUnit (37392) in ImageWidth direction for main image.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.FocalPlaneYResolution">
+            <summary>
+            Number of pixels per FocalPlaneResolutionUnit (37392) in ImageLength direction for main image.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.FocalPlaneResolutionUnit">
+            <summary>
+            Unit of measurement for FocalPlaneXResolution(37390) and FocalPlaneYResolution(37391).	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ImageNumber">
+            <summary>
+            Number assigned to an image, e.g., in a chained image burst.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SecurityClassification">
+            <summary>
+            Security classification assigned to the image.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ImageHistory">
+            <summary>
+            Record of what has been done to the image.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SubjectLocation">
+            <summary>
+            Indicates the location and area of the main subject in the overall scene.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ExposureIndex">
+            <summary>
+            Encodes the camera exposure index setting when image was captured.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.TIFF_EPStandardID">
+            <summary>
+            For current spec, tag value equals 1 0 0 0.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SensingMethod">
+            <summary>
+            Type of image sensor.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.MakerNote">
+            <summary>
+            Manufacturer specific information.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.UserComment">
+            <summary>
+            Keywords or comments on the image; complements ImageDescription.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SubsecTime">
+            <summary>
+            A tag used to record fractions of seconds for the DateTime tag.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SubsecTimeOriginal">
+            <summary>
+            A tag used to record fractions of seconds for the DateTimeOriginal tag.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SubsecTimeDigitized">
+            <summary>
+            A tag used to record fractions of seconds for the DateTimeDigitized tag.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ImageSourceData">
+            <summary>
+            Used by Adobe Photoshop.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.XPTitle">
+            <summary>
+            Title tag used by Windows, encoded in UCS2 
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.XPComment">
+            <summary>
+            Comment tag used by Windows, encoded in UCS2 
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.XPAuthor">
+            <summary>
+            Author tag used by Windows, encoded in UCS2 
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.XPKeywords">
+            <summary>
+            Keywords tag used by Windows, encoded in UCS2 
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.XPSubject">
+            <summary>
+            Subject tag used by Windows, encoded in UCS2 
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.FlashpixVersion">
+            <summary>
+            The Flashpix format version supported by a FPXR file.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ColorSpace">
+            <summary>
+            The color space information tag is always recorded as the color space specifier.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.PixelXDimension">
+            <summary>
+            Specific to compressed data; the valid width of the meaningful image.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.PixelYDimension">
+            <summary>
+            Specific to compressed data; the valid height of the meaningful image.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.RelatedSoundFile">
+            <summary>
+            Used to record the name of an audio file related to the image data.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Interoperability">
+            <summary>
+            IFD A pointer to the Exif-related Interoperability IFD.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.FlashEnergy2">
+            <summary>
+            Indicates the strobe energy at the time the image is captured, as measured in Beam Candle Power Seconds
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SpatialFrequencyResponse2">
+            <summary>
+            Records the camera or input device spatial frequency table and SFR values in the direction of image width, image height, and diagonal direction, as specified in ISO 12233.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.FocalPlaneXResolution2">
+            <summary>
+            Indicates the number of pixels in the image width (X) direction per FocalPlaneResolutionUnit on the camera focal plane.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.FocalPlaneYResolution2">
+            <summary>
+            Indicates the number of pixels in the image height (Y) direction per FocalPlaneResolutionUnit on the camera focal plane.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.FocalPlaneResolutionUnit2">
+            <summary>
+            Indicates the unit for measuring FocalPlaneXResolution and FocalPlaneYResolution.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SubjectLocation2">
+            <summary>
+            Indicates the location of the main subject in the scene.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ExposureIndex2">
+            <summary>
+            Indicates the exposure index selected on the camera or input device at the time the image is captured.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SensingMethod2">
+            <summary>
+            Indicates the image sensor type on the camera or input device.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.FileSource">
+            <summary>
+            Indicates the image source.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SceneType">
+            <summary>
+            Indicates the type of scene.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CFAPattern2">
+            <summary>
+            Indicates the color filter array (CFA) geometric pattern of the image sensor when a one-chip color area sensor is used.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CustomRendered">
+            <summary>
+            Indicates the use of special processing on image data, such as rendering geared to output.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ExposureMode">
+            <summary>
+            Indicates the exposure mode set when the image was shot.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.WhiteBalance">
+            <summary>
+            Indicates the white balance mode set when the image was shot.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.DigitalZoomRatio">
+            <summary>
+            Indicates the digital zoom ratio when the image was shot.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.FocalLengthIn35mmFilm">
+            <summary>
+            Indicates the equivalent focal length assuming a 35mm film camera, in mm.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SceneCaptureType">
+            <summary>
+            Indicates the type of scene that was shot.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.GainControl">
+            <summary>
+            Indicates the degree of overall image gain adjustment.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Contrast">
+            <summary>
+            Indicates the direction of contrast processing applied by the camera when the image was shot.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Saturation">
+            <summary>
+            Indicates the direction of saturation processing applied by the camera when the image was shot.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Sharpness">
+            <summary>
+            Indicates the direction of sharpness processing applied by the camera when the image was shot.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.DeviceSettingDescription">
+            <summary>
+            This tag indicates information on the picture-taking conditions of a particular camera model.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SubjectDistanceRange">
+            <summary>
+            Indicates the distance to the subject.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ImageUniqueID">
+            <summary>
+            Indicates an identifier assigned uniquely to each image.	 
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CameraOwnerName">
+            <summary>
+            Camera owner name as ASCII string.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BodySerialNumber">
+            <summary>
+            Camera body serial number as ASCII string.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.LensSpecification">
+            <summary>
+            This tag notes minimum focal length, maximum focal length, minimum F number in the minimum focal length, and minimum F number in the maximum focal length, which are specification information for the lens that was used in photography.When the minimum F number is unknown, the notation is 0/0.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.LensMake">
+            <summary>
+            Lens manufacturer name as ASCII string.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.LensModel">
+            <summary>
+            Lens model name and number as ASCII string.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.LensSerialNumber">
+            <summary>
+            Lens serial number as ASCII string.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.GDAL_METADATA">
+            <summary>
+            Used by the GDAL library, holds an XML list of name = value 'metadata' values about the image as a whole, and about specific samples.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.GDAL_NODATA">
+            <summary>
+            Used by the GDAL library, contains an ASCII encoded nodata or background pixel value.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.PixelFormat">
+            <summary>
+            A 128-bit Globally Unique Identifier (GUID) that identifies the image pixel format.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Transformation">
+            <summary>
+            Specifies the transformation to be applied when decoding the image to present the desired representation.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Uncompressed">
+            <summary>
+            Specifies that image data is uncompressed.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ImageType">
+            <summary>
+            Specifies the image type of each individual frame in a multi-frame file.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ImageWidth2">
+            <summary>
+            Specifies the number of columns in the transformed photo, or the number of pixels per scan line.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ImageHeight">
+            <summary>
+            Specifies the number of pixels or scan lines in the transformed photo.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.WidthResolution">
+            <summary>
+            Specifies the horizontal resolution of a transformed image expressed in pixels per inch.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.HeightResolution">
+            <summary>
+            Specifies the vertical resolution of a transformed image expressed in pixels per inch.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ImageOffset">
+            <summary>
+            Specifies the byte offset pointer to the beginning of the photo data, relative to the beginning of the file.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ImageByteCount">
+            <summary>
+            Specifies the size of the photo in bytes.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.AlphaOffset">
+            <summary>
+            Specifies the byte offset pointer the beginning of the planar alpha channel data, relative to the beginning of the file.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.AlphaByteCount">
+            <summary>
+            Specifies the size of the alpha channel data in bytes.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ImageDataDiscard">
+            <summary>
+            Signifies the level of data that has been discarded from the image as a result of a compressed domain transcode to reduce the file size.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.AlphaDataDiscard">
+            <summary>
+            Signifies the level of data that has been discarded from the planar alpha channel as a result of a compressed domain transcode to reduce the file size.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Oce_Scanjob_Description">
+            <summary>
+            Used in the Oce scanning process.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Oce_Application_Selector">
+            <summary>
+            Used in the Oce scanning process.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Oce_Identification_Number">
+            <summary>
+            Used in the Oce scanning process.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Oce_ImageLogic_Characteristics">
+            <summary>
+            Used in the Oce scanning process.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.PrintImageMatching">
+            <summary>
+            Description needed.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.DNGVersion">
+            <summary>
+            Encodes DNG four-tier version number; for version 1.1.0.0, the tag contains the bytes 1, 1, 0, 0. Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.DNGBackwardVersion">
+            <summary>
+            Defines oldest version of spec with which file is compatible.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.UniqueCameraModel">
+            <summary>
+            Unique, non-localized nbame for camera model.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.LocalizedCameraModel">
+            <summary>
+            Similar to 50708, with localized camera name.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CFAPlaneColor">
+            <summary>
+            Mapping between values in the CFAPattern tag and the plane numbers in LinearRaw space.Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CFALayout">
+            <summary>
+            Spatial layout of the CFA.Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.LinearizationTable">
+            <summary>
+            Lookup table that maps stored values to linear values.Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BlackLevelRepeatDim">
+            <summary>
+            Repeat pattern size for BlackLevel tag.Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BlackLevel">
+            <summary>
+            Specifies the zero light encoding level.Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BlackLevelDeltaH">
+            <summary>
+            Specifies the difference between zero light encoding level for each column and the baseline zero light encoding level.Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BlackLevelDeltaV">
+            <summary>
+            Specifies the difference between zero light encoding level for each row and the baseline zero light encoding level.Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.WhiteLevel">
+            <summary>
+            Specifies the fully saturated encoding level for the raw sample values.Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.DefaultScale">
+            <summary>
+            For cameras with non-square pixels, specifies the default scale factors for each direction to convert the image to square pixels.Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.DefaultCropOrigin">
+            <summary>
+            Specifies the origin of the final image area, ignoring the extra pixels at edges used to prevent interpolation artifacts.Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.DefaultCropSize">
+            <summary>
+            Specifies size of final image area in raw image coordinates.Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ColorMatrix1">
+            <summary>
+            Defines a transformation matrix that converts XYZ values to reference camera native color space values, under the first calibration illuminant.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ColorMatrix2">
+            <summary>
+            Defines a transformation matrix that converts XYZ values to reference camera native color space values, under the second calibration illuminant.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CameraCalibration1">
+            <summary>
+            Defines a calibration matrix that transforms reference camera native space values to individual camera native space values under the first calibration illuminant.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CameraCalibration2">
+            <summary>
+            Defines a calibration matrix that transforms reference camera native space values to individual camera native space values under the second calibration illuminant.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ReductionMatrix1">
+            <summary>
+            Defines a dimensionality reduction matrix for use as the first stage in converting color camera native space values to XYZ values, under the first calibration illuminant.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ReductionMatrix2">
+            <summary>
+            Defines a dimensionality reduction matrix for use as the first stage in converting color camera native space values to XYZ values, under the second calibration illuminant.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.AnalogBalance">
+            <summary>
+            Pertaining to white balance, defines the gain, either analog or digital, that has been applied to the stored raw values.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.AsShotNeutral">
+            <summary>
+            Specifies the selected white balance at the time of capture, encoded as the coordinates of a perfectly neutral color in linear reference space values.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.AsShotWhiteXY">
+            <summary>
+            Specifies the selected white balance at the time of capture, encoded as x-y chromaticity coordinates.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BaselineExposure">
+            <summary>
+            Specifies in EV units how much to move the zero point for exposure compensation.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BaselineNoise">
+            <summary>
+            Specifies the relative noise of the camera model at a baseline ISO value of 100, compared to reference camera model.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BaselineSharpness">
+            <summary>
+            Specifies the relative amount of sharpening required for this camera model, compared to reference camera model.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BayerGreenSplit">
+            <summary>
+            For CFA images, specifies, in arbitrary units, how closely the values of the green pixels in the blue/green rows track the values of the green pixels in the red/green rows. Used in Raw IFD of DNG files.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.LinearResponseLimit">
+            <summary>
+            Specifies the fraction of the encoding range above which the response may become significantly non-linear. Used in IFD 0 of DNG files.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CameraSerialNumber">
+            <summary>
+            Serial number of camera. Used in IFD 0 of DNG files.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.LensInfo">
+            <summary>
+            Information about the lens. Used in IFD 0 of DNG files.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ChromaBlurRadius">
+            <summary>
+            Normally for non-CFA images, provides a hint about how much chroma blur ought to be applied. Used in Raw IFD of DNG files.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.AntiAliasStrength">
+            <summary>
+            Provides a hint about the strength of the camera's anti-aliasing filter. Used in Raw IFD of DNG files.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ShadowScale">
+            <summary>
+            Used by Adobe Camera Raw to control sensitivity of its shadows slider. Used in IFD 0 of DNG files.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.DNGPrivateData">
+            <summary>
+            Provides a way for camera manufacturers to store private data in DNG files for use by their own raw convertors.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.MakerNoteSafety">
+            <summary>
+            Lets the DNG reader know whether the Exif MakerNote tag is safe to preserve.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CalibrationIlluminant1">
+            <summary>
+            Illuminant used for first set of calibration tags.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CalibrationIlluminant2">
+            <summary>
+            CalibrationIlluminant2  Illuminant used for second set of calibration tags.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BestQualityScale">
+            <summary>
+            Specifies the amount by which the values of the DefaultScale tag need to be multiplied to achieve best quality image size.Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.RawDataUniqueID">
+            <summary>
+            Contains a 16-byte unique identifier for the raw image file in the DNG file.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Alias_Layer_Metadata">
+            <summary>
+            Alias Sketchbook Pro layer usage description.Private
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.OriginalRawFileName">
+            <summary>
+            Name of original file if the DNG file results from conversion from a non-DNG raw file.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.OriginalRawFileData">
+            <summary>
+            If the DNG file was converted from a non-DNG raw file, then this tag contains the original raw data. Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ActiveArea">
+            <summary>
+            Defines the active (non-masked) pixels of the sensor. Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.MaskedAreas">
+            <summary>
+            List of non-overlapping rectangle coordinates of fully masked pixels, which can optimally be used by DNG readers to measure the black encoding level. Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.AsShotICCProfile">
+            <summary>
+            Contains ICC profile that, in conjunction with the AsShotPreProfileMatrix tag, specifies a default color rendering from camera color space coordinates (linear reference values) into the ICC profile connection space. Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.AsShotPreProfileMatrix">
+            <summary>
+            Specifies a matrix that should be applied to the camera color space coordinates before processing the values through the ICC profile specified in the AsShotICCProfile tag. Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CurrentICCProfile">
+            <summary>
+            The CurrentICCProfile and CurrentPreProfileMatrix tags have the same purpose and usage as
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CurrentPreProfileMatrix">
+            <summary>
+            The CurrentICCProfile and CurrentPreProfileMatrix tags have the same purpose and usage as
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ColorimetricReference">
+            <summary>
+            The DNG color model documents a transform between camera colors and CIE XYZ values. This tag describes the colorimetric reference for the CIE XYZ values. 0 = The XYZ values are scene-referred. 1 = The XYZ values are output-referred, using the ICC profile perceptual dynamic range.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.CameraCalibrationSignature">
+            <summary>
+            A UTF-8 encoded string associated with the CameraCalibration1 and CameraCalibration2 tags.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ProfileCalibrationSignature">
+            <summary>
+            A UTF-8 encoded string associated with the camera profile tags.Used in IFD 0 or CameraProfile IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ExtraCameraProfiles">
+            <summary>
+            A list of file offsets to extra Camera Profile IFDs.The format of a camera profile begins with a 16-bit byte order mark (MM or II) followed by a 16-bit "magic" number equal to 0x4352 (CR), a 32-bit IFD offset, and then a standard TIFF format IFD.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.AsShotProfileName">
+            <summary>
+            A UTF-8 encoded string containing the name of the "as shot" camera profile, if any.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.NoiseReductionApplied">
+            <summary>
+            Indicates how much noise reduction has been applied to the raw data on a scale of 0.0 to 1.0. A 0.0 value indicates that no noise reduction has been applied.A 1.0 value indicates that the "ideal" amount of noise reduction has been applied, i.e.that the DNG reader should not apply additional noise reduction by default. A value of 0/0 indicates that this parameter is unknown.Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ProfileName">
+            <summary>
+            A UTF-8 encoded string containing the name of the camera profile. Used in IFD 0 or Camera Profile IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ProfileHueSatMapDims">
+            <summary>
+            Specifies the number of input samples in each dimension of the hue/saturation/value mapping tables. The data for these tables are stored in ProfileHueSatMapData1 and ProfileHueSatMapData2 tags. Allowed values include the following: HueDivisions >= 1; SaturationDivisions >= 2; ValueDivisions >=1. Used in IFD 0 or Camera Profile IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ProfileHueSatMapData1">
+            <summary>
+            ProfileHueSatMapData1 Contains the data for the first hue/saturation/value mapping table. Each entry of the table contains three 32-bit IEEE floating-point values. The first entry is hue shift in degrees; the second entry is saturation scale factor; and the third entry is a value scale factor. Used in IFD 0 or Camera Profile IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ProfileHueSatMapData2">
+            <summary>
+            ProfileHueSatMapData2 Contains the data for the second hue/saturation/value mapping table. Each entry of the table contains three 32-bit IEEE floating-point values. The first entry is hue shift in degrees; the second entry is saturation scale factor; and the third entry is a value scale factor. Used in IFD 0 or Camera Profile IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ProfileToneCurve">
+            <summary>
+            Contains a default tone curve that can be applied while processing the image as a starting point for user adjustments. The curve is specified as a list of 32-bit IEEE floating-point value pairs in linear gamma. Each sample has an input value in the range of 0.0 to 1.0, and an output value in the range of 0.0 to 1.0. The first sample is required to be (0.0, 0.0), and the last sample is required to be (1.0, 1.0). Interpolated the curve using a cubic spline.Used in IFD 0 or Camera Profile IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ProfileEmbedPolicy">
+            <summary>
+            Contains information about the usage rules for the associated camera profile.The valid values and meanings are: 0 = “allow copying”; 1 = “embed if used”; 2 = “embed never”; and 3 = “no restrictions”. Used in IFD 0 or Camera Profile IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ProfileCopyright">
+            <summary>
+            Contains information about the usage rules for the associated camera profile.The valid values and meanings are: 0 = “allow copying”; 1 = “embed if used”; 2 = “embed never”; and 3 = “no restrictions”. Used in IFD 0 or Camera Profile IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ForwardMatrix1">
+            <summary>
+            Defines a matrix that maps white balanced camera colors to XYZ D50 colors.Used in IFD 0 or Camera Profile IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ForwardMatrix2">
+            <summary>
+            Defines a matrix that maps white balanced camera colors to XYZ D50 colors.Used in IFD 0 or Camera Profile IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.PreviewApplicationName">
+            <summary>
+            A UTF-8 encoded string containing the name of the application that created the preview stored in the IFD.Used in Preview IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.PreviewApplicationVersion">
+            <summary>
+            A UTF-8 encoded string containing the version number of the application that created the preview stored in the IFD.Used in Preview IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.PreviewSettingsName">
+            <summary>
+            A UTF-8 encoded string containing the name of the conversion settings(for example, snapshot name) used for the preview stored in the IFD.Used in Preview IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.PreviewSettingsDigest">
+            <summary>
+            A unique ID of the conversion settings(for example, MD5 digest) used to render the preview stored in the IFD.Used in Preview IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.PreviewColorSpace">
+            <summary>
+            This tag specifies the color space in which the rendered preview in this IFD is stored.The valid values include: 0 = Unknown; 1 = Gray Gamma 2.2; 2 = sRGB; 3 = Adobe RGB; and 4 = ProPhoto RGB. Used in Preview IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.PreviewDateTime">
+            <summary>
+            This tag is an ASCII string containing the name of the date/time at which the preview stored in the IFD was rendered, encoded using ISO 8601 format.Used in Preview IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.RawImageDigest">
+            <summary>
+            MD5 digest of the raw image data.All pixels in the image are processed in row-scan order.Each pixel is zero padded to 16 or 32 bits deep (16-bit for data less than or equal to 16 bits deep, 32-bit otherwise). The data is processed in little-endian byte order.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.OriginalRawFileDigest">
+            <summary>
+            MD5 digest of the data stored in the OriginalRawFileData tag.Used in IFD 0 of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.SubTileBlockSize">
+            <summary>
+            Normally, pixels within a tile are stored in simple row-scan order.This tag specifies that the pixels within a tile should be grouped first into rectangular blocks of the specified size.These blocks are stored in row-scan order. Within each block, the pixels are stored in row-scan order. Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.RowInterleaveFactor">
+            <summary>
+            Specifies that rows of the image are stored in interleaved order.The value of the tag specifies the number of interleaved fields. Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ProfileLookTableDims">
+            <summary>
+            Specifies the number of input samples in each dimension of a default "look" table.The data for this table is stored in the ProfileLookTableData tag.Allowed values include: HueDivisions >= 1; SaturationDivisions >= 2; and ValueDivisions >= 1. Used in IFD 0 or Camera Profile IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ProfileLookTableData">
+            <summary>
+            Default "look" table that can be applied while processing the image as a starting point for user adjustment. This table uses the same format as the tables stored in the ProfileHueSatMapData1 and ProfileHueSatMapData2 tags, and is applied in the same color space. However, it should be applied later in the processing pipe, after any exposure compensation and/or fill light stages, but before any tone curve stage. Each entry of the table contains three 32-bit IEEE floating-point values. The first entry is hue shift in degrees, the second entry is a saturation scale factor, and the third entry is a value scale factor. Used in IFD 0 or Camera Profile IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.OpcodeList1">
+            <summary>
+            Specifies the list of opcodes (image processing operation codes) that should be applied to the raw image, as read directly from the file. Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.OpcodeList2">
+            <summary>
+            Specifies the list of opcodes (image processing operation codes) that should be applied to the raw image, just after it has been mapped to linear reference values. Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.OpcodeList3">
+            <summary>
+            Specifies the list of opcodes (image processing operation codes) that should be applied to the raw image, just after it has been demosaiced. Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.NoiseProfile">
+            <summary>
+            Describes the amount of noise in a raw image; models the amount of signal-dependent photon (shot) noise and signal-independent sensor readout noise, two common sources of noise in raw images. Used in Raw IFD of DNG files.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.OriginalDefaultFinalSize">
+            <summary>
+            If this file is a proxy for a larger original DNG file, this tag specifics the default final size of the larger original file from which this proxy was generated. The default value for this tag is default final size of the current DNG file, which is DefaultCropSize * DefaultScale.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.OriginalBestQualityFinalSize">
+            <summary>
+            If this file is a proxy for a larger original DNG file, this tag specifics the best quality final size of the larger original file from which this proxy was generated. The default value for this tag is the OriginalDefaultFinalSize, if specified. Otherwise the default value for this tag is the best quality size of the current DNG file, which is DefaultCropSize * DefaultScale * BestQualityScale.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.OriginalDefaultCropSize">
+            <summary>
+            If this file is a proxy for a larger original DNG file, this tag specifics the DefaultCropSize of the larger original file from which this proxy was generated. The default value for this tag is the OriginalDefaultFinalSize, if specified. Otherwise, the default value for this tag is the DefaultCropSize of the current DNG file.	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ProfileHueSatMapEncoding">
+            <summary>
+            Provides a way for color profiles to specify how indexing into a 3D HueSatMap is performed during raw conversion. This tag is not applicable to 2.5D HueSatMap tables (i.e., where the Value dimension is 1). The currently defined values are: 0 = Linear encoding (method described in DNG spec); 1 = sRGB encoding (method described in DNG spec).	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.ProfileLookTableEncoding">
+            <summary>
+            Provides a way for color profiles to specify how indexing into a 3D LookTable is performed during raw conversion. This tag is not applicable to a 2.5D LookTable (i.e., where the Value dimension is 1). The currently defined values are: 0 = Linear encoding (method described in DNG spec); 1 = sRGB encoding (method described in DNG spec).	
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.BaselineExposureOffset">
+            <summary>
+            Provides a way for color profiles to increase or decrease exposure during raw conversion. BaselineExposureOffset specifies the amount (in EV units) to add to th e BaselineExposure tag during image rendering. For example, if the BaselineExposure value fo r a given camera model is +0.3, and the BaselineExposureOffset value for a given camera profile used to render an image for that camera model is -0.7, then th e actual default exposure value used during rendering will be + 0.3 - 0.7 = -0.4.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.DefaultBlackRender">
+            <summary>
+            This optional tag in a color profile provides a hint to the raw converter regarding how to handle the black point(e.g., flare subtraction) during rendering.The currently defined values are: 0 = Auto; 1 = None.If set to Auto, the raw converter should perform black subtraction during rendering.The amount and method of black subtraction may be automatically determined and may be image - dependent.If set to None, the raw converter should not perform any black subtraction during rendering.This may be desirable when using color lookup tables(e.g., LookTable) or tone curves in camera profiles to perform a fixed, consistent level of black subtraction.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.NewRawImageDigest">
+            <summary>
+            This tag is a modified MD5 digest of the raw image data.It has been updated from the algorithm used to compute the RawImageDigest tag be more multi-processor friendly, and to support lossy compression algorithms. The details of the algorithm used to compute this tag are documented in the Adobe DNG SDK source code.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.RawToPreviewGain">
+            <summary>
+            The gain(what number the sample values are multiplied by) between the main raw IFD and the preview IFD containing this tag
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.DefaultUserCrop">
+            <summary>
+            Specifies a default user crop rectangle in relative coordinates. The values must satisfy: 0.0 &lt;= top &lt; bottom &lt;= 1.0; 0.0 &lt;= left &lt; right &lt;= 1.0.The default values of(top = 0, left = 0, bottom = 1, right = 1) correspond exactly to the default crop rectangle(as specified by the DefaultCropOrigin and DefaultCropSize tags).
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Images.Exif.ExifTagType">
+            <summary>
+            Data types of meta-data tags
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagType.BYTE">
+            <summary>
+            An 8-bit unsigned integer.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagType.ASCII">
+            <summary>
+            An 8-bit byte containing one 7-bit ASCII code. The final byte is terminated with NULL.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagType.SHORT">
+            <summary>
+            A 16-bit (2-byte) unsigned integer
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagType.LONG">
+            <summary>
+            A 32-bit (4-byte) unsigned integer
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagType.RATIONAL">
+            <summary>
+            Two LONGs. The first LONG is the numerator and the second LONG expresses the denominator.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagType.UNDEFINED">
+            <summary>
+            An 8-bit byte that can take any value depending on the field definition
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagType.SLONG">
+            <summary>
+            A 32-bit (4-byte) signed integer (2's complement notation)
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagType.SRATIONAL">
+            <summary>
+            Two SLONGs. The first SLONG is the numerator and the second SLONG is the denominator.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Images.Exif.ExifTypedTag`1">
+            <summary>
+            Base class for typed EXIF meta-data tags.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Images.Exif.ExifTypedTag`1.#ctor(Waher.Content.Images.Exif.ExifTagName,`0)">
+            <summary>
+            Base class for typed EXIF meta-data tags.
+            </summary>
+            <param name="TagId">Tag ID</param>
+            <param name="Value">Tag Value</param>
+        </member>
+        <member name="P:Waher.Content.Images.Exif.ExifTypedTag`1.Value">
+            <summary>
+            EXIF Tag Value
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Images.Exif.ExifTypedTag`1.TypedValue">
+            <summary>
+            Typed EXIF Tag Value
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Images.Exif.Rational">
+            <summary>
+            Represents an EXIF RATIONAL value.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Images.Exif.Rational.#ctor(System.UInt32,System.UInt32)">
+            <summary>
+            Represents an EXIF RATIONAL value.
+            </summary>
+            <param name="Numerator">Numerator of Tag Value.</param>
+            <param name="Denominator">Denominator of Tag Value.</param>
+        </member>
+        <member name="P:Waher.Content.Images.Exif.Rational.Numerator">
+            <summary>
+            Typed EXIF Tag Value Numerator
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Images.Exif.Rational.Denominator">
+            <summary>
+            Typed EXIF Tag Value Denominator
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Images.Exif.Rational.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Content.Images.Exif.SignedRational">
+            <summary>
+            Represents an EXIF SRATIONAL value.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Images.Exif.SignedRational.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Represents an EXIF RATIONAL value.
+            </summary>
+            <param name="Numerator">Numerator of Tag Value.</param>
+            <param name="Denominator">Denominator of Tag Value.</param>
+        </member>
+        <member name="P:Waher.Content.Images.Exif.SignedRational.Numerator">
+            <summary>
+            Typed EXIF Tag Value Numerator
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Images.Exif.SignedRational.Denominator">
+            <summary>
+            Typed EXIF Tag Value Denominator
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Images.Exif.SignedRational.ToString">
+            <inheritdoc/>
+        </member>
         <member name="T:Waher.Content.Images.ImageCodec">
             <summary>
             Image encoder/decoder.

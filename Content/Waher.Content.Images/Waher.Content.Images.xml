@@ -49,11 +49,12 @@
             Class for ASCII-valued EXIF meta-data tags.
             </summary>
         </member>
-        <member name="M:Waher.Content.Images.Exif.ExifAsciiTag.#ctor(Waher.Content.Images.Exif.ExifTagName,System.String)">
+        <member name="M:Waher.Content.Images.Exif.ExifAsciiTag.#ctor(System.Int32,Waher.Content.Images.Exif.ExifTagName,System.String)">
             <summary>
             Class for ASCII-valued EXIF meta-data tags.
             </summary>
             <param name="TagId">Tag ID</param>
+            <param name="Name">Tag Name</param>
             <param name="Value">Tag Value</param>
         </member>
         <member name="P:Waher.Content.Images.Exif.ExifAsciiTag.Value">
@@ -126,15 +127,21 @@
             Abstract base class for EXIF meta-data tags.
             </summary>
         </member>
-        <member name="M:Waher.Content.Images.Exif.ExifTag.#ctor(Waher.Content.Images.Exif.ExifTagName)">
+        <member name="M:Waher.Content.Images.Exif.ExifTag.#ctor(System.Int32,Waher.Content.Images.Exif.ExifTagName)">
             <summary>
             Abstract base class for EXIF meta-data tags.
             </summary>
             <param name="TagId">Tag ID</param>
+            <param name="Name">Tag Name</param>
         </member>
         <member name="P:Waher.Content.Images.Exif.ExifTag.TagID">
             <summary>
             EXIF Tag ID
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Images.Exif.ExifTag.Name">
+            <summary>
+            EXIF Tag Name
             </summary>
         </member>
         <member name="P:Waher.Content.Images.Exif.ExifTag.Value">
@@ -1891,6 +1898,11 @@
             Specifies a default user crop rectangle in relative coordinates. The values must satisfy: 0.0 &lt;= top &lt; bottom &lt;= 1.0; 0.0 &lt;= left &lt; right &lt;= 1.0.The default values of(top = 0, left = 0, bottom = 1, right = 1) correspond exactly to the default crop rectangle(as specified by the DefaultCropOrigin and DefaultCropSize tags).
             </summary>
         </member>
+        <member name="F:Waher.Content.Images.Exif.ExifTagName.Unknown">
+            <summary>
+            Unknown tag
+            </summary>
+        </member>
         <member name="T:Waher.Content.Images.Exif.ExifTagType">
             <summary>
             Data types of meta-data tags
@@ -1941,11 +1953,12 @@
             Base class for typed EXIF meta-data tags.
             </summary>
         </member>
-        <member name="M:Waher.Content.Images.Exif.ExifTypedTag`1.#ctor(Waher.Content.Images.Exif.ExifTagName,`0)">
+        <member name="M:Waher.Content.Images.Exif.ExifTypedTag`1.#ctor(System.Int32,Waher.Content.Images.Exif.ExifTagName,`0)">
             <summary>
             Base class for typed EXIF meta-data tags.
             </summary>
             <param name="TagId">Tag ID</param>
+            <param name="Name">Tag Name</param>
             <param name="Value">Tag Value</param>
         </member>
         <member name="P:Waher.Content.Images.Exif.ExifTypedTag`1.Value">

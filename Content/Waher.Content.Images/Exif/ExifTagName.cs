@@ -1748,6 +1748,11 @@ namespace Waher.Content.Images.Exif
 		/// <summary>
 		/// Specifies a default user crop rectangle in relative coordinates. The values must satisfy: 0.0 &lt;= top &lt; bottom &lt;= 1.0; 0.0 &lt;= left &lt; right &lt;= 1.0.The default values of(top = 0, left = 0, bottom = 1, right = 1) correspond exactly to the default crop rectangle(as specified by the DefaultCropOrigin and DefaultCropSize tags).
 		/// </summary>
-		DefaultUserCrop = 0xC7B5
+		DefaultUserCrop = 0xC7B5,
+
+		/// <summary>
+		/// Unknown tag
+		/// </summary>
+		Unknown = 0xFFFF
 	}
 }

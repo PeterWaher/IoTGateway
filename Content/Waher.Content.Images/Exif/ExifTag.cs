@@ -8,21 +8,29 @@ namespace Waher.Content.Images.Exif
 	/// </summary>
 	public abstract class ExifTag
 	{
-		private readonly ExifTagName tagId;
+		private readonly ExifTagName name;
+		private readonly int tagId;
 
 		/// <summary>
 		/// Abstract base class for EXIF meta-data tags.
 		/// </summary>
 		/// <param name="TagId">Tag ID</param>
-		public ExifTag(ExifTagName TagId)
+		/// <param name="Name">Tag Name</param>
+		public ExifTag(int TagId, ExifTagName Name)
 		{
 			this.tagId = TagId;
+			this.name = Name;
 		}
 
 		/// <summary>
 		/// EXIF Tag ID
 		/// </summary>
-		public ExifTagName TagID => this.tagId;
+		public int TagID => this.tagId;
+
+		/// <summary>
+		/// EXIF Tag Name
+		/// </summary>
+		public ExifTagName Name => this.name;
 
 		/// <summary>
 		/// EXIF Tag Value
@@ -34,7 +42,11 @@ namespace Waher.Content.Images.Exif
 		{
 			StringBuilder sb = new StringBuilder();
 
-			sb.Append(this.tagId.ToString());
+			if (this.name == ExifTagName.Unknown)
+				sb.Append(this.tagId.ToString());
+			else
+				sb.Append(this.name.ToString());
+			
 			sb.Append("=");
 
 			object Value = this.Value;

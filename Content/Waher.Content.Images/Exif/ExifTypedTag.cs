@@ -13,9 +13,10 @@ namespace Waher.Content.Images.Exif
 		/// Base class for typed EXIF meta-data tags.
 		/// </summary>
 		/// <param name="TagId">Tag ID</param>
+		/// <param name="Name">Tag Name</param>
 		/// <param name="Value">Tag Value</param>
-		public ExifTypedTag(ExifTagName TagId, T Value)
-			: base(TagId)
+		public ExifTypedTag(int TagId, ExifTagName Name, T Value)
+			: base(TagId, Name)
 		{
 			this.value = Value;
 		}

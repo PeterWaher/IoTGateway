@@ -13,9 +13,10 @@ namespace Waher.Content.Images.Exif
 		/// Class for ASCII-valued EXIF meta-data tags.
 		/// </summary>
 		/// <param name="TagId">Tag ID</param>
+		/// <param name="Name">Tag Name</param>
 		/// <param name="Value">Tag Value</param>
-		public ExifAsciiTag(ExifTagName TagId, string Value)
-			: base(TagId)
+		public ExifAsciiTag(int TagId, ExifTagName Name, string Value)
+			: base(TagId, Name)
 		{
 			this.value = Value;
 		}

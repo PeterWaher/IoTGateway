@@ -13,6 +13,18 @@ namespace Waher.Content.Images
 	/// </summary>
 	public static class EXIF
 	{
+		private static readonly Dictionary<int, ExifTagName> names = GetNames();
+
+		private static Dictionary<int, ExifTagName> GetNames()
+		{
+			Dictionary<int, ExifTagName> Names = new Dictionary<int, ExifTagName>();
+
+			foreach (ExifTagName Value in Enum.GetValues(typeof(ExifTagName)))
+				Names[(int)Value] = Value;
+
+			return Names;
+		}
+
 		/// <summary>
 		/// Tries to parse EXIF data.
 		/// </summary>
@@ -78,6 +90,9 @@ namespace Waher.Content.Images
 					if (TagID < 0)
 						return false;
 
+					if (!names.TryGetValue(TagID, out ExifTagName Name))
+						Name = ExifTagName.Unknown;
+
 					int Type = Reader.NextSHORT();
 					if (Type < 0)
 						return false;
@@ -141,8 +156,8 @@ namespace Waher.Content.Images
 								i = Reader.NextByte();
 								if (i < 0)
 									return false;
-
-								List.Add(new ExifTypedTag<byte>((ExifTagName)TagID, (byte)i));
+								
+								List.Add(new ExifTypedTag<byte>(TagID, Name, (byte)i));
 							}
 							else
 							{
@@ -157,13 +172,13 @@ namespace Waher.Content.Images
 									Items[j] = (byte)i;
 								}
 
-								List.Add(new ExifTypedTag<byte[]>((ExifTagName)TagID, Items));
+								List.Add(new ExifTypedTag<byte[]>(TagID, Name, Items));
 							}
 							break;
 
 						case ExifTagType.ASCII:
 							string AsciiValue = Reader.NextASCIIString();
-							List.Add(new ExifAsciiTag((ExifTagName)TagID, AsciiValue));
+							List.Add(new ExifAsciiTag(TagID, Name, AsciiValue));
 							break;
 
 						case ExifTagType.SHORT:
@@ -173,7 +188,7 @@ namespace Waher.Content.Images
 								if (i < 0)
 									return false;
 
-								List.Add(new ExifTypedTag<ushort>((ExifTagName)TagID, (ushort)i));
+								List.Add(new ExifTypedTag<ushort>(TagID, Name, (ushort)i));
 							}
 							else
 							{
@@ -188,7 +203,7 @@ namespace Waher.Content.Images
 									Items[j] = (ushort)i;
 								}
 
-								List.Add(new ExifTypedTag<ushort[]>((ExifTagName)TagID, Items));
+								List.Add(new ExifTypedTag<ushort[]>(TagID, Name, Items));
 							}
 							break;
 
@@ -201,7 +216,7 @@ namespace Waher.Content.Images
 								if (!u.HasValue)
 									return false;
 
-								List.Add(new ExifTypedTag<uint>((ExifTagName)TagID, u.Value));
+								List.Add(new ExifTypedTag<uint>(TagID, Name, u.Value));
 							}
 							else
 							{
@@ -216,7 +231,7 @@ namespace Waher.Content.Images
 									Items[j] = u.Value;
 								}
 
-								List.Add(new ExifTypedTag<uint[]>((ExifTagName)TagID, Items));
+								List.Add(new ExifTypedTag<uint[]>(TagID, Name, Items));
 							}
 							break;
 
@@ -234,7 +249,7 @@ namespace Waher.Content.Images
 									return false;
 
 								uint DenominatorValue = u.Value;
-								List.Add(new ExifTypedTag<Rational>((ExifTagName)TagID, new Rational(NumeratorValue, DenominatorValue)));
+								List.Add(new ExifTypedTag<Rational>(TagID, Name, new Rational(NumeratorValue, DenominatorValue)));
 							}
 							else
 							{
@@ -257,7 +272,7 @@ namespace Waher.Content.Images
 									Items[j] = new Rational(NumeratorValue, DenominatorValue);
 								}
 
-								List.Add(new ExifTypedTag<Rational[]>((ExifTagName)TagID, Items));
+								List.Add(new ExifTypedTag<Rational[]>(TagID, Name, Items));
 							}
 							break;
 
@@ -268,7 +283,7 @@ namespace Waher.Content.Images
 								if (i < 0)
 									return false;
 
-								List.Add(new ExifTypedTag<byte>((ExifTagName)TagID, (byte)i));
+								List.Add(new ExifTypedTag<byte>(TagID, Name, (byte)i));
 							}
 							else
 							{
@@ -283,7 +298,7 @@ namespace Waher.Content.Images
 									Items[j] = (byte)i;
 								}
 
-								List.Add(new ExifTypedTag<byte[]>((ExifTagName)TagID, Items));
+								List.Add(new ExifTypedTag<byte[]>(TagID, Name, Items));
 							}
 							break;
 
@@ -294,7 +309,7 @@ namespace Waher.Content.Images
 								if (!u.HasValue)
 									return false;
 
-								List.Add(new ExifTypedTag<int>((ExifTagName)TagID, (int)u.Value));
+								List.Add(new ExifTypedTag<int>(TagID, Name, (int)u.Value));
 							}
 							else
 							{
@@ -309,7 +324,7 @@ namespace Waher.Content.Images
 									Items[j] = (int)u.Value;
 								}
 
-								List.Add(new ExifTypedTag<int[]>((ExifTagName)TagID, Items));
+								List.Add(new ExifTypedTag<int[]>(TagID, Name, Items));
 							}
 							break;
 
@@ -327,7 +342,7 @@ namespace Waher.Content.Images
 									return false;
 
 								int DenominatorValue = (int)u.Value;
-								List.Add(new ExifTypedTag<SignedRational>((ExifTagName)TagID, new SignedRational(NumeratorValue, DenominatorValue)));
+								List.Add(new ExifTypedTag<SignedRational>(TagID, Name, new SignedRational(NumeratorValue, DenominatorValue)));
 							}
 							else
 							{
@@ -350,7 +365,7 @@ namespace Waher.Content.Images
 									Items[j] = new SignedRational(NumeratorValue, DenominatorValue);
 								}
 
-								List.Add(new ExifTypedTag<SignedRational[]>((ExifTagName)TagID, Items));
+								List.Add(new ExifTypedTag<SignedRational[]>(TagID, Name, Items));
 							}
 							break;
 					}

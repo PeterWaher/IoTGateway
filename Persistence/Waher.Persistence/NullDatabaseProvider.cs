@@ -413,5 +413,12 @@ namespace Waher.Persistence
 		/// <param name="CollectionName">Name of collection.</param>
 		public Task DropCollection(string CollectionName) => Task.CompletedTask;
 
+		/// <summary>
+		/// Creates a generalized representation of an object.
+		/// </summary>
+		/// <param name="Object">Object</param>
+		/// <returns>Generalized representation.</returns>
+		public Task<GenericObject> Generalize(object Object) => Task.FromResult<GenericObject>(null);
+
 	}
 }

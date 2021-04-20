@@ -1719,6 +1719,36 @@ namespace Waher.Persistence.MongoDB
 			return this.database.DropCollectionAsync(CollectionName);
 		}
 
+		/// <summary>
+		/// Creates a generalized representation of an object.
+		/// </summary>
+		/// <param name="Object">Object</param>
+		/// <returns>Generalized representation.</returns>
+		public Task<GenericObject> Generalize(object Object)
+		{
+			if (Object is null)
+				return Task.FromResult<GenericObject>(null);
+
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object);
+			string CollectionName = Serializer.CollectionName(Object);
+
+			BsonDocument Doc = Object.ToBsonDocument(Object.GetType(), Serializer);
+
+			Serializer = this.GetObjectSerializerEx(typeof(GenericObject));
+
+			BsonDocumentReader Reader = new BsonDocumentReader(Doc);
+			BsonDeserializationContext Context = BsonDeserializationContext.CreateRoot(Reader);
+			BsonDeserializationArgs Args = new BsonDeserializationArgs()
+			{
+				NominalType = typeof(GenericObject)
+			};
+
+			if (Serializer.Deserialize(Context, Args) is GenericObject Obj)
+				return Task.FromResult<GenericObject>(Obj);
+			else
+				throw new InvalidOperationException("Unable to generalize object.");
+		}
+
 		// TODO:
 		//	* Created field
 		//	* Updated field

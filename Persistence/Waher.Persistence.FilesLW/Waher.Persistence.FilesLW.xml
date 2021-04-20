@@ -807,6 +807,13 @@
             <param name="Collection">Collection Name</param>
             <returns>Persistent dictionary</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.Generalize(System.Object)">
+            <summary>
+            Creates a generalized representation of an object.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>Generalized representation.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.ExportXml(System.Boolean)">
             <summary>
             Exports the database to XML.

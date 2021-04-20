@@ -3095,6 +3095,13 @@
             <param name="Wildcard">Wildcard</param>
             <returns>Regular expression</returns>
         </member>
+        <member name="M:Waher.Persistence.Database.Generalize(System.Object)">
+            <summary>
+            Creates a generalized representation of an object.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>Generalized representation.</returns>
+        </member>
         <member name="T:Waher.Persistence.Exceptions.CollectionException">
             <summary>
             Exception related to a collection.
@@ -4282,6 +4289,13 @@
             </summary>
             <param name="CollectionName">Name of collection.</param>
         </member>
+        <member name="M:Waher.Persistence.IDatabaseProvider.Generalize(System.Object)">
+            <summary>
+            Creates a generalized representation of an object.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>Generalized representation.</returns>
+        </member>
         <member name="T:Waher.Persistence.EntryType">
             <summary>
             Ledger entry type.
@@ -4904,6 +4918,13 @@
             Drops a collection, if it exist.
             </summary>
             <param name="CollectionName">Name of collection.</param>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Generalize(System.Object)">
+            <summary>
+            Creates a generalized representation of an object.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>Generalized representation.</returns>
         </member>
         <member name="T:Waher.Persistence.NullLedgerProvider">
             <summary>

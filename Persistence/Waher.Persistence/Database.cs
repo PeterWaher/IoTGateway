@@ -1116,5 +1116,15 @@ namespace Waher.Persistence
 
 		private static readonly char[] regexSpecialCharaters = new char[] { '\\', '^', '$', '{', '}', '[', ']', '(', ')', '.', '*', '+', '?', '|', '<', '>', '-', '&' };
 
+		/// <summary>
+		/// Creates a generalized representation of an object.
+		/// </summary>
+		/// <param name="Object">Object</param>
+		/// <returns>Generalized representation.</returns>
+		public static Task<GenericObject> Generalize(object Object)
+		{
+			return Provider.Generalize(Object);
+		}
+
 	}
 }

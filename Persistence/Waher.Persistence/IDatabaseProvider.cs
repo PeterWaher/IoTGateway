@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
@@ -347,5 +346,11 @@ namespace Waher.Persistence
 		/// <param name="CollectionName">Name of collection.</param>
 		Task DropCollection(string CollectionName);
 
+		/// <summary>
+		/// Creates a generalized representation of an object.
+		/// </summary>
+		/// <param name="Object">Object</param>
+		/// <returns>Generalized representation.</returns>
+		Task<GenericObject> Generalize(object Object);
 	}
 }

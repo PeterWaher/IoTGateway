@@ -2318,6 +2318,36 @@ namespace Waher.Persistence.Files
 			return await StringDictionary.Create(FileName + ".dict", FileName + ".dblob", Collection, this, false);
 		}
 
+		/// <summary>
+		/// Creates a generalized representation of an object.
+		/// </summary>
+		/// <param name="Object">Object</param>
+		/// <returns>Generalized representation.</returns>
+		public async Task<GenericObject> Generalize(object Object)
+		{
+			if (Object is null)
+				return null;
+
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(Object);
+			string CollectionName = await Serializer.CollectionName(Object);
+			BinarySerializer Output = new BinarySerializer(CollectionName, Encoding.UTF8);
+
+			await Serializer.Serialize(Output, true, false, Object);
+
+			Output.FlushBits();
+			byte[] Bin = Output.GetSerialization();
+
+			Serializer = await this.GetObjectSerializerEx(typeof(GenericObject));
+
+			BinaryDeserializer Input = new BinaryDeserializer(CollectionName, Encoding.UTF8, Bin, 0);
+			object Result = await Serializer.Deserialize(Input, null, false);
+
+			if (Result is GenericObject GenObj)
+				return GenObj;
+			else
+				throw new InvalidOperationException("Unable to generalize object.");
+		}
+
 		#endregion
 
 		#region Export

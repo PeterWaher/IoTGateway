@@ -74,6 +74,7 @@ namespace Waher.Networking.HTTP
 		private Dictionary<string, Statistic> callsPerUserAgent = new Dictionary<string, Statistic>();
 		private Dictionary<string, Statistic> callsPerFrom = new Dictionary<string, Statistic>();
 		private Dictionary<string, Statistic> callsPerResource = new Dictionary<string, Statistic>();
+		private readonly Dictionary<Guid, HttpClientConnection> connections = new Dictionary<Guid, HttpClientConnection>();
 		private readonly Dictionary<int, bool> failedPorts = new Dictionary<int, bool>();
 		private readonly VanityResources vanityResources = new VanityResources();
 		private ILoginAuditor loginAuditor = null;
@@ -828,6 +829,11 @@ namespace Waher.Networking.HTTP
 				BinaryTcpClient.Bind(true);
 				HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, this.Sniffers);
 				BinaryTcpClient.Continue();
+
+				lock (this.connections)
+				{
+					this.connections[Connection.Id] = Connection;
+				}
 			}
 			catch (SocketException)
 			{
@@ -893,6 +899,11 @@ namespace Waher.Networking.HTTP
 							{
 								HttpClientConnection Connection = new HttpClientConnection(this, BinaryTcpClient, false, this.Sniffers);
 								BinaryTcpClient.Continue();
+
+								lock (this.connections)
+								{
+									this.connections[Connection.Id] = Connection;
+								}
 							}
 						}
 					}
@@ -957,6 +968,11 @@ namespace Waher.Networking.HTTP
 				}
 
 				Client.Continue();
+
+				lock (this.connections)
+				{
+					this.connections[Connection.Id] = Connection;
+				}
 			}
 			catch (SocketException)
 			{
@@ -971,6 +987,71 @@ namespace Waher.Networking.HTTP
 				Client.Dispose();
 				Log.Critical(ex);
 			}
+		}
+
+		internal bool Remove(HttpClientConnection Connection)
+		{
+			lock (this.connections)
+			{
+				return this.connections.Remove(Connection.Id);
+			}
+		}
+
+		internal HttpClientConnection[] GetConnections()
+		{
+			HttpClientConnection[] Connections;
+
+			lock (this.connections)
+			{
+				Connections = new HttpClientConnection[this.connections.Count];
+				this.connections.Values.CopyTo(Connections, 0);
+			}
+
+			return Connections;
+		}
+
+		/// <summary>
+		/// <see cref="ISniffable.Add"/>
+		/// </summary>
+		public override void Add(ISniffer Sniffer)
+		{
+			base.Add(Sniffer);
+
+			foreach (HttpClientConnection Connection in this.GetConnections())
+			{
+				if (!Connection.Disposed)
+					Connection.Add(Sniffer);
+			}
+		}
+
+		/// <summary>
+		/// <see cref="ISniffable.AddRange"/>
+		/// </summary>
+		public override void AddRange(IEnumerable<ISniffer> Sniffers)
+		{
+			base.AddRange(Sniffers);
+
+			foreach (HttpClientConnection Connection in this.GetConnections())
+			{
+				if (!Connection.Disposed)
+					Connection.AddRange(Sniffers);
+			}
+		}
+
+		/// <summary>
+		/// <see cref="ISniffable.Remove"/>
+		/// </summary>
+		public override bool Remove(ISniffer Sniffer)
+		{
+			bool Result = base.Remove(Sniffer);
+
+			foreach (HttpClientConnection Connection in this.GetConnections())
+			{
+				if (!Connection.Disposed)
+					Connection.Remove(Sniffer);
+			}
+
+			return Result;
 		}
 
 #endif
@@ -1105,7 +1186,7 @@ namespace Waher.Networking.HTTP
 		public HttpResource Register(string ResourceName, HttpMethodHandler GET, bool Synchronous, bool HandlesSubPaths,
 			bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			return this.Register(new HttpGetDelegateResource(ResourceName, new SyncHandler(GET).Call, Synchronous, 
+			return this.Register(new HttpGetDelegateResource(ResourceName, new SyncHandler(GET).Call, Synchronous,
 				HandlesSubPaths, UserSessions, AuthenticationSchemes));
 		}
 
@@ -1178,7 +1259,7 @@ namespace Waher.Networking.HTTP
 		public HttpResource Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous, bool HandlesSubPaths,
 			bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			return this.Register(new HttpGetPostDelegateResource(ResourceName, new SyncHandler(GET).Call, new SyncHandler(POST).Call, 
+			return this.Register(new HttpGetPostDelegateResource(ResourceName, new SyncHandler(GET).Call, new SyncHandler(POST).Call,
 				Synchronous, HandlesSubPaths, UserSessions, AuthenticationSchemes));
 		}
 

@@ -32,6 +32,7 @@ namespace Waher.Networking.HTTP
 		internal const int MaxInmemoryMessageSize = 1024 * 1024;    // 1 MB
 		internal const long MaxEntitySize = 1024 * 1024 * 1024;     // 1 GB
 
+		private Guid id = Guid.NewGuid();
 		private MemoryStream headerStream = null;
 		private Stream dataStream = null;
 		private TransferEncoding transferEncoding = null;
@@ -40,11 +41,13 @@ namespace Waher.Networking.HTTP
 		private HttpRequestHeader header = null;
 		private ConnectionMode mode = ConnectionMode.Http;
 		private WebSocket webSocket = null;
+		private Encoding rxEncoding = null;
 		private byte b1 = 0;
 		private byte b2 = 0;
 		private byte b3 = 0;
 		private readonly bool encrypted;
 		private bool disposed = false;
+		private bool rxText = false;
 
 		internal HttpClientConnection(HttpServer Server, BinaryTcpClient Client, bool Encrypted, params ISniffer[] Sniffers)
 			: base(Sniffers)
@@ -101,7 +104,14 @@ namespace Waher.Networking.HTTP
 
 				this.client?.DisposeWhenDone();
 				this.client = null;
+
+				this.server.Remove(this);
 			}
+		}
+
+		internal Guid Id
+		{
+			get { return this.id; }
 		}
 
 		internal HttpServer Server
@@ -169,25 +179,65 @@ namespace Waher.Networking.HTTP
 					continue;
 				}
 
-				this.ReceiveText(Header);
 				this.header = new HttpRequestHeader(Header, this.server.VanityResources, this.encrypted ? "https" : "http");
+
+				if (this.HasSniffers)
+				{
+					this.ReceiveText(Header);
+
+					HttpFieldContentType ContentType = this.header.ContentType;
+					if (ContentType is null)
+						this.rxText = false;
+					else
+					{
+						if (!string.IsNullOrEmpty(ContentType.CharacterSet))
+						{
+							this.rxText = true;
+							this.rxEncoding = ContentType.Encoding;
+						}
+						else
+						{
+							string s = ContentType.Value;
+							int j = s.IndexOf('/');
+							if (j > 0)
+								s = s.Substring(0, j);
+
+							switch (s.ToLower())
+							{
+								case "text":
+								case "application":
+								case "multipart":
+									this.rxText = true;
+									this.rxEncoding = Encoding.UTF8;
+									break;
+
+								default:
+									this.rxText = false;
+									break;
+							}
+						}
+					}
+				}
 
 				if (this.header.HttpVersion < 1)
 				{
 					await this.SendResponse(null, null, new HttpException(505, "HTTP Version Not Supported", "At least HTTP Version 1.0 is required."), true);
 					return false;
 				}
-				else if (this.header.ContentLength != null && (this.header.ContentLength.ContentLength > MaxEntitySize))
+
+				if (this.header.ContentLength != null && (this.header.ContentLength.ContentLength > MaxEntitySize))
 				{
 					await this.SendResponse(null, null, new HttpException(413, "Request Entity Too Large", "Maximum Entity Size: " + MaxEntitySize.ToString()), true);
 					return false;
 				}
-				else if (i + 1 < NrRead)
+
+				if (i + 1 < NrRead)
 					return await this.BinaryDataReceived(Data, i + 1, NrRead - i - 1);
-				else if (!this.header.HasMessageBody)
+
+				if (!this.header.HasMessageBody)
 					return await this.RequestReceived();
-				else
-					return true;
+
+				return true;
 			}
 
 			if (this.headerStream is null)
@@ -223,7 +273,7 @@ namespace Waher.Networking.HTTP
 					if (TransferEncoding.Value == "chunked")
 					{
 						this.dataStream = new TemporaryStream();
-						this.transferEncoding = new ChunkedTransferEncoding(new BinaryOutputStream(this.dataStream), null);
+						this.transferEncoding = new ChunkedTransferEncoding(new BinaryOutputStream(this.dataStream), null, false, null);
 					}
 					else
 					{
@@ -248,7 +298,7 @@ namespace Waher.Networking.HTTP
 						else
 							this.dataStream = new TemporaryStream();
 
-						this.transferEncoding = new ContentLengthEncoding(new BinaryOutputStream(this.dataStream), l, null);
+						this.transferEncoding = new ContentLengthEncoding(new BinaryOutputStream(this.dataStream), l, null, false, null);
 					}
 					else
 					{
@@ -265,12 +315,22 @@ namespace Waher.Networking.HTTP
 			if (this.HasSniffers)
 			{
 				if (Offset == 0 && NrAccepted == Data.Length)
-					this.ReceiveBinary(Data);
+				{
+					if (this.rxText)
+						this.ReceiveText(this.rxEncoding.GetString(Data));
+					else
+						this.ReceiveBinary(Data);
+				}
 				else
 				{
-					byte[] Data2 = new byte[NrAccepted];
-					Array.Copy(Data, Offset, Data2, 0, NrAccepted);
-					this.ReceiveBinary(Data2);
+					if (this.rxText)
+						this.ReceiveText(this.rxEncoding.GetString(Data, Offset, NrAccepted));
+					else
+					{
+						byte[] Data2 = new byte[NrAccepted];
+						Array.Copy(Data, Offset, Data2, 0, NrAccepted);
+						this.ReceiveBinary(Data2);
+					}
 				}
 			}
 

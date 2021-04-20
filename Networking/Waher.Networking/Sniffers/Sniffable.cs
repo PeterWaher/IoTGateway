@@ -36,7 +36,7 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// <see cref="ISniffable.Add"/>
 		/// </summary>
-		public void Add(ISniffer Sniffer)
+		public virtual void Add(ISniffer Sniffer)
 		{
 			lock (this.sniffers)
 			{
@@ -49,7 +49,7 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// <see cref="ISniffable.AddRange"/>
 		/// </summary>
-		public void AddRange(IEnumerable<ISniffer> Sniffers)
+		public virtual void AddRange(IEnumerable<ISniffer> Sniffers)
 		{
 			lock (this.sniffers)
 			{
@@ -62,7 +62,7 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// <see cref="ISniffable.Remove"/>
 		/// </summary>
-		public bool Remove(ISniffer Sniffer)
+		public virtual bool Remove(ISniffer Sniffer)
 		{
 			lock (this.sniffers)
 			{

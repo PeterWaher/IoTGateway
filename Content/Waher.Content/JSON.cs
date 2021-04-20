@@ -674,6 +674,12 @@ namespace Waher.Content
 					Json.Append(Encode(s));
 					Json.Append('"');
 				}
+				else if (Object is byte[] ByteArray)
+				{
+					Json.Append('"');
+					Json.Append(Convert.ToBase64String(ByteArray));
+					Json.Append('"');
+				}
 				else if (Object is IEnumerable<KeyValuePair<string, object>> Obj)
 					Encode(Obj, Indent, Json, null);
 				else if (Object is IEnumerable<KeyValuePair<string, IElement>> Obj2)
@@ -729,7 +735,7 @@ namespace Waher.Content
 							First = false;
 							Encode(M.ColumnNames, Indent, Json);
 						}
-						
+
 						Json.Append(',');
 
 						if (Indent.HasValue)

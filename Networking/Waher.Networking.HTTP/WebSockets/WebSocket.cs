@@ -191,7 +191,7 @@ namespace Waher.Networking.HTTP.WebSockets
 
 		internal async Task<bool> WebSocketDataReceived(byte[] Data, int Offset, int NrRead)
 		{
-			if (this.connection.HasSniffers)
+			if (this.connection?.HasSniffers ?? false)
 			{
 				if (Offset != 0 || Data.Length != NrRead)
 				{
@@ -201,7 +201,7 @@ namespace Waher.Networking.HTTP.WebSockets
 					Offset = 0;
 				}
 
-				this.connection.ReceiveBinary(Data);
+				this.connection?.ReceiveBinary(Data);
 			}
 
 			int End = Offset + NrRead;
@@ -667,8 +667,8 @@ namespace Waher.Networking.HTTP.WebSockets
 			byte[] Frame = this.CreateFrame(Payload, More);
 			await this.BeginWriteRaw(Frame, Callback);
 
-			this.connection.Server.DataTransmitted(Frame.Length);
-			this.connection.TransmitText(Payload);
+			this.connection?.Server?.DataTransmitted(Frame.Length);
+			this.connection?.TransmitText(Payload);
 		}
 
 		/// <summary>
@@ -747,8 +747,8 @@ namespace Waher.Networking.HTTP.WebSockets
 			byte[] Frame = this.CreateFrame(Payload, More);
 			await this.BeginWriteRaw(Frame, Callback);
 
-			this.connection.Server.DataTransmitted(Frame.Length);
-			this.connection.TransmitBinary(Payload);
+			this.connection?.Server?.DataTransmitted(Frame.Length);
+			this.connection?.TransmitBinary(Payload);
 		}
 
 		/// <summary>
@@ -871,8 +871,8 @@ namespace Waher.Networking.HTTP.WebSockets
 			byte[] Frame = this.CreateFrame(null, WebSocketOpcode.Close, false);
 			await this.BeginWriteRaw(Frame, Callback);
 
-			this.connection.Server.DataTransmitted(Frame.Length);
-			this.connection.TransmitBinary(Frame);
+			this.connection?.Server?.DataTransmitted(Frame.Length);
+			this.connection?.TransmitBinary(Frame);
 		}
 
 		/// <summary>
@@ -919,8 +919,8 @@ namespace Waher.Networking.HTTP.WebSockets
 			byte[] Frame = this.Encode(Code, Reason);
 			await this.BeginWriteRaw(Frame, Callback);
 
-			this.connection.Server.DataTransmitted(Frame.Length);
-			this.connection.TransmitBinary(Frame);
+			this.connection?.Server?.DataTransmitted(Frame.Length);
+			this.connection?.TransmitBinary(Frame);
 		}
 
 		/// <summary>
@@ -987,8 +987,8 @@ namespace Waher.Networking.HTTP.WebSockets
 
 			await this.BeginWriteRaw(Frame, null);
 
-			this.connection.Server.DataTransmitted(Frame.Length);
-			this.connection.TransmitBinary(Frame);
+			this.connection?.Server?.DataTransmitted(Frame.Length);
+			this.connection?.TransmitBinary(Frame);
 		}
 
 		/// <summary>

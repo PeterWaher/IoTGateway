@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP.TransferEncodings
@@ -8,6 +9,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 	/// </summary>
 	public class ContentLengthEncoding : TransferEncoding
 	{
+		private readonly Encoding textEncoding;
+		private readonly bool txText;
 		private long bytesLeft;
 
 		/// <summary>
@@ -16,10 +19,15 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="Output">Decoded output.</param>
 		/// <param name="ContentLength">Content Length</param>
 		/// <param name="ClientConnection">Client connection.</param>
-		internal ContentLengthEncoding(IBinaryTransmission Output, long ContentLength, HttpClientConnection ClientConnection)
+		/// <param name="TxText">If text is transmitted (true), or binary data (false).</param>
+		/// <param name="TextEncoding">Text encoding used (if any).</param>
+		internal ContentLengthEncoding(IBinaryTransmission Output, long ContentLength, HttpClientConnection ClientConnection,
+			bool TxText, Encoding TextEncoding)
 			: base(Output, ClientConnection)
 		{
 			this.bytesLeft = ContentLength;
+			this.txText = TxText;
+			this.textEncoding = TextEncoding;
 		}
 
 		/// <summary>
@@ -68,13 +76,26 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			{
 				int c = (int)Math.Min(this.bytesLeft, NrBytes);
 
-				if (Offset == 0 && c == Data.Length)
-					this.clientConnection.TransmitBinary(Data);
-				else
+				if (this.clientConnection.HasSniffers)
 				{
-					byte[] Data2 = new byte[c];
-					Array.Copy(Data, Offset, Data2, 0, c);
-					this.clientConnection.TransmitBinary(Data2);
+					if (Offset == 0 && c == Data.Length)
+					{
+						if (this.txText)
+							this.clientConnection.TransmitText(this.textEncoding.GetString(Data));
+						else
+							this.clientConnection.TransmitBinary(Data);
+					}
+					else
+					{
+						if (this.txText)
+							this.clientConnection.TransmitText(this.textEncoding.GetString(Data, Offset, c));
+						else
+						{
+							byte[] Data2 = new byte[c];
+							Array.Copy(Data, Offset, Data2, 0, c);
+							this.clientConnection.TransmitBinary(Data2);
+						}
+					}
 				}
 
 				this.clientConnection.Server.DataTransmitted(c);

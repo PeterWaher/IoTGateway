@@ -35,6 +35,7 @@ namespace Waher.Networking.HTTP
 		private bool disposed = false;
 		private bool onlyHeader = false;
 		private bool closeAfterResponse = false;
+		private bool txText = false;
 
 		private TransferEncoding transferEncoding = null;
 		private IBinaryTransmission responseStream;
@@ -695,7 +696,30 @@ namespace Waher.Networking.HTTP
 						{
 							Output.Append("; charset=");
 							Output.Append(this.encoding.WebName);
+							this.txText = true;
 						}
+						else if (this.clientConnection.HasSniffers)
+						{
+							string s = this.contentType;
+							int j = s.IndexOf('/');
+							if (j > 0)
+								s = s.Substring(0, j);
+
+							switch (s.ToLower())
+							{
+								case "text":
+								case "application":
+								case "multipart":
+									this.txText = true;
+									break;
+
+								default:
+									this.txText = false;
+									break;
+							}
+						}
+						else
+							this.txText = false;
 					}
 
 					if ((ExpectContent || this.contentLength.HasValue) &&
@@ -712,19 +736,22 @@ namespace Waher.Networking.HTTP
 						Output.Append("\r\nContent-Length: ");
 						Output.Append(this.contentLength.Value.ToString());
 
-						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream, this.contentLength.Value, this.clientConnection);
+						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream, 
+							this.contentLength.Value, this.clientConnection, this.txText, this.encoding);
 					}
 					else if (ExpectContent)
 					{
 						Output.Append("\r\nTransfer-Encoding: chunked");
-						this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? null : this.responseStream, DefaultChunkSize, this.clientConnection);
+						this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? null : this.responseStream, 
+							DefaultChunkSize, this.clientConnection, this.txText, this.encoding);
 					}
 					else
 					{
 						if ((this.statusCode < 100 || this.statusCode > 199) && this.statusCode != 204 && this.statusCode != 304)
 							Output.Append("\r\nContent-Length: 0");
 
-						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream, 0, this.clientConnection);
+						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream, 0, 
+							this.clientConnection, this.txText, this.encoding);
 					}
 
 					if (!(this.customHeaders is null))

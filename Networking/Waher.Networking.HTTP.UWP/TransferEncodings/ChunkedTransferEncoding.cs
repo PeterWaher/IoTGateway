@@ -9,6 +9,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 	/// </summary>
 	public class ChunkedTransferEncoding : TransferEncoding
 	{
+		private readonly Encoding textEncoding;
+		private readonly bool txText;
 		private readonly byte[] chunk;
 		private int state = 0;
 		private int chunkSize = 0;
@@ -19,10 +21,15 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// </summary>
 		/// <param name="Output">Decoded output.</param>
 		/// <param name="ClientConnection">Client connection.</param>
-		internal ChunkedTransferEncoding(IBinaryTransmission Output, HttpClientConnection ClientConnection)
+		/// <param name="TxText">If text is transmitted (true), or binary data (false).</param>
+		/// <param name="TextEncoding">Text encoding used (if any).</param>
+		internal ChunkedTransferEncoding(IBinaryTransmission Output, HttpClientConnection ClientConnection,
+			bool TxText, Encoding TextEncoding)
 			: base(Output, ClientConnection)
 		{
 			this.chunk = null;
+			this.txText = TxText;
+			this.textEncoding = TextEncoding;
 		}
 
 		/// <summary>
@@ -31,12 +38,17 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="Output">Decoded output.</param>
 		/// <param name="ChunkSize">Chunk size.</param>
 		/// <param name="ClientConnection">Client conncetion.</param>
-		internal ChunkedTransferEncoding(IBinaryTransmission Output, int ChunkSize, HttpClientConnection ClientConnection)
+		/// <param name="TxText">If text is transmitted (true), or binary data (false).</param>
+		/// <param name="TextEncoding">Text encoding used (if any).</param>
+		internal ChunkedTransferEncoding(IBinaryTransmission Output, int ChunkSize, HttpClientConnection ClientConnection,
+			bool TxText, Encoding TextEncoding)
 			: base(Output, ClientConnection)
 		{
 			this.chunkSize = ChunkSize;
 			this.chunk = new byte[ChunkSize];
 			this.pos = 0;
+			this.txText = TxText;
+			this.textEncoding = TextEncoding;
 		}
 
 		/// <summary>
@@ -216,7 +228,14 @@ namespace Waher.Networking.HTTP.TransferEncodings
 				if (!(this.clientConnection is null))
 				{
 					this.clientConnection.Server.DataTransmitted(Len + 2);
-					this.clientConnection.TransmitBinary(Chunk);
+
+					if (this.clientConnection.HasSniffers)
+					{
+						if (this.txText)
+							this.clientConnection.TransmitText(this.textEncoding.GetString(this.chunk, 0, this.pos));
+						else
+							this.clientConnection.TransmitBinary(Chunk);
+					}
 				}
 			}
 
@@ -258,7 +277,9 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			if (!(this.clientConnection is null))
 			{
 				this.clientConnection.Server.DataTransmitted(5);
-				this.clientConnection.TransmitBinary(Chunk);
+
+				if (this.clientConnection.HasSniffers && !this.txText)
+					this.clientConnection.TransmitBinary(Chunk);
 			}
 
 			return true;

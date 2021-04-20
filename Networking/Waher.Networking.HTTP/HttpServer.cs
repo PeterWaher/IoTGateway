@@ -988,6 +988,7 @@ namespace Waher.Networking.HTTP
 				Log.Critical(ex);
 			}
 		}
+#endif
 
 		internal bool Remove(HttpClientConnection Connection)
 		{
@@ -1053,8 +1054,6 @@ namespace Waher.Networking.HTTP
 
 			return Result;
 		}
-
-#endif
 
 		#endregion
 

@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
@@ -12,7 +11,6 @@ using Waher.Script.Model;
 using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Comparisons;
 using Waher.Script.Operators.Logical;
-using Waher.Script.Persistence.SQL.Sources;
 
 namespace Waher.Script.Persistence.Functions
 {

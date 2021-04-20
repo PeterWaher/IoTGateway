@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 using Waher.Persistence;
 
 namespace Waher.Script.Persistence.Functions

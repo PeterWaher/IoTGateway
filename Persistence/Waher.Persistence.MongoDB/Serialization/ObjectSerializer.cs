@@ -1,5 +1,4 @@
 ﻿using System;
-using System.CodeDom.Compiler;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,7 +14,6 @@ using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Waher.Persistence.Attributes;
-using Waher.Persistence.Filters;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Threading;
 using System.Linq;

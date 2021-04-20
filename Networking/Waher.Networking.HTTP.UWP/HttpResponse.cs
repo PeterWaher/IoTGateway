@@ -635,7 +635,7 @@ namespace Waher.Networking.HTTP
 					{
 						this.ContentType = string.IsNullOrEmpty(ContentType) ? "application/octet-stream" : ContentType;
 						this.ContentLength = Content.Length;
-						
+
 						await this.Write(Content);
 					}
 
@@ -699,25 +699,7 @@ namespace Waher.Networking.HTTP
 							this.txText = true;
 						}
 						else if (this.clientConnection.HasSniffers)
-						{
-							string s = this.contentType;
-							int j = s.IndexOf('/');
-							if (j > 0)
-								s = s.Substring(0, j);
-
-							switch (s.ToLower())
-							{
-								case "text":
-								case "application":
-								case "multipart":
-									this.txText = true;
-									break;
-
-								default:
-									this.txText = false;
-									break;
-							}
-						}
+							this.txText = HttpClientConnection.IsSniffableTextType(this.contentType);
 						else
 							this.txText = false;
 					}
@@ -736,13 +718,13 @@ namespace Waher.Networking.HTTP
 						Output.Append("\r\nContent-Length: ");
 						Output.Append(this.contentLength.Value.ToString());
 
-						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream, 
+						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream,
 							this.contentLength.Value, this.clientConnection, this.txText, this.encoding);
 					}
 					else if (ExpectContent)
 					{
 						Output.Append("\r\nTransfer-Encoding: chunked");
-						this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? null : this.responseStream, 
+						this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? null : this.responseStream,
 							DefaultChunkSize, this.clientConnection, this.txText, this.encoding);
 					}
 					else
@@ -750,7 +732,7 @@ namespace Waher.Networking.HTTP
 						if ((this.statusCode < 100 || this.statusCode > 199) && this.statusCode != 204 && this.statusCode != 304)
 							Output.Append("\r\nContent-Length: 0");
 
-						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream, 0, 
+						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? null : this.responseStream, 0,
 							this.clientConnection, this.txText, this.encoding);
 					}
 

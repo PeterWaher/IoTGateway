@@ -197,24 +197,13 @@ namespace Waher.Networking.HTTP
 						}
 						else
 						{
-							string s = ContentType.Value;
-							int j = s.IndexOf('/');
-							if (j > 0)
-								s = s.Substring(0, j);
-
-							switch (s.ToLower())
+							if (IsSniffableTextType(ContentType.Value))
 							{
-								case "text":
-								case "application":
-								case "multipart":
-									this.rxText = true;
-									this.rxEncoding = Encoding.UTF8;
-									break;
-
-								default:
-									this.rxText = false;
-									break;
+								this.rxText = true;
+								this.rxEncoding = Encoding.UTF8;
 							}
+							else
+								this.rxText = false;
 						}
 					}
 				}
@@ -260,6 +249,73 @@ namespace Waher.Networking.HTTP
 
 				await this.SendResponse(null, null, new HttpException(431, "Request Header Fields Too Large", "Max Header Size: " + MaxHeaderSize.ToString()), true);
 				return false;
+			}
+		}
+
+		internal static bool IsSniffableTextType(string ContentType)
+		{
+			ContentType = ContentType.ToLower();
+			int j = ContentType.IndexOf('/');
+			if (j < 0)
+				return false;
+
+			string s = ContentType.Substring(0, j);
+
+			// TODO: Customizable.
+
+			switch (s)
+			{
+				case "text":
+					switch (ContentType)
+					{
+						case "text/plain":
+						case "text/csv":
+						case "text/x-json":
+						case "text/tab-separated-values":
+						case "text/xml":
+						default:
+							return true;
+
+						case "text/css":
+						case "text/x-cssx":
+						case "text/html":
+						case "text/markdown":
+						case "text/xsl":
+							return false;
+					}
+
+				case "application":
+					switch (ContentType)
+					{
+						case "application/x-www-form-urlencoded":
+						case "application/json":
+						case "application/xml":
+						case "application/link-format":
+						case "application/vnd.oma.lwm2m+json":
+						case "application/vnd.oma.lwm2m+tlv":
+						case "application/jose+json":
+						case "application/jwt":
+							return true;
+						
+						case "application/javascript":
+						case "application/xhtml+xml":
+						case "application/xslt+xml":
+						default:
+							return false;
+					}
+
+				case "multipart":
+					switch (ContentType)
+					{
+						case "multipart/form-data":
+							return true;
+
+						default:
+							return false;
+					}
+
+				default:
+					return false;
 			}
 		}
 
@@ -509,7 +565,7 @@ namespace Waher.Networking.HTTP
 							bool Encrypted = this.client.IsEncrypted;
 #if !WINDOWS_UWP
 							int Strength = Encrypted ? Math.Min(
-								Math.Min(this.client.CipherStrength, this.client.HashStrength), 
+								Math.Min(this.client.CipherStrength, this.client.HashStrength),
 								this.client.KeyExchangeStrength) : 0;
 #endif
 

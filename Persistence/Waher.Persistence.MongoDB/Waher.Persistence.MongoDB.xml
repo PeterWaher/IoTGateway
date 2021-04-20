@@ -517,6 +517,13 @@
             </summary>
             <param name="CollectionName">Name of collection.</param>
         </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Generalize(System.Object)">
+            <summary>
+            Creates a generalized representation of an object.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>Generalized representation.</returns>
+        </member>
         <member name="T:Waher.Persistence.MongoDB.Serialization.GeneratedObjectSerializerBase">
             <summary>
             Abstract base class for generated object serializers.

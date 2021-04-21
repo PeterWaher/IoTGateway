@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Persistence;
-using Waher.Persistence.Serialization;
 
 namespace Waher.Script.Persistence.Functions
 {
@@ -55,9 +55,14 @@ namespace Waher.Script.Persistence.Functions
 		public override IElement Evaluate(IElement Argument, Variables Variables)
 		{
 			object Obj = Argument.AssociatedObjectValue;
-			GenericObject GenObj = Database.Generalize(Obj).Result;
 
-			return new ObjectValue(GenObj);
+			if (Obj is ICollection<KeyValuePair<string, IElement>> GenObj)
+				return new ObjectValue(GenObj);
+
+			if (!(Obj is ICollection<KeyValuePair<string, object>> GenObj2))
+				GenObj2 = Database.Generalize(Obj).Result;
+
+			return new ObjectValue(GenObj2);
 		}
 
 	}

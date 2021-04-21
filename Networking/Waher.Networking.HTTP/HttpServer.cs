@@ -956,7 +956,7 @@ namespace Waher.Networking.HTTP
 			try
 			{
 				this.Information("Switching to TLS.");
-				await Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls12, false);
+				await Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls12, ClientCertificates.Optional);
 				this.Information("TLS established.");
 
 				HttpClientConnection Connection = new HttpClientConnection(this, Client, true, this.Sniffers);

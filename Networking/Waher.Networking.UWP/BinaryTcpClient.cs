@@ -1200,26 +1200,28 @@ namespace Waher.Networking
 		private RemoteCertificateValidationCallback certValidation = null;
 		private X509Certificate remoteCertificate = null;
 
-		private bool ValidateCertificateRequired(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+		private bool ValidateCertificateRequired(object Sender, X509Certificate Certificate, X509Chain Chain, 
+			SslPolicyErrors SslPolicyErrors)
 		{
-			return this.ValidateCertificate(sender, certificate, chain, sslPolicyErrors, true);
+			return this.ValidateCertificate(Sender, Certificate, Chain, SslPolicyErrors, true);
 		}
 
-		private bool ValidateCertificateOptional(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+		private bool ValidateCertificateOptional(object Sender, X509Certificate Certificate, X509Chain Chain, 
+			SslPolicyErrors SslPolicyErrors)
 		{
-			return this.ValidateCertificate(sender, certificate, chain, sslPolicyErrors, false);
+			return this.ValidateCertificate(Sender, Certificate, Chain, SslPolicyErrors, false);
 		}
 
-		private bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors,
+		private bool ValidateCertificate(object Sender, X509Certificate Certificate, X509Chain Chain, SslPolicyErrors SslPolicyErrors,
 			bool RequireCertificate)
 		{
 			bool Result;
 
-			this.remoteCertificate = certificate;
+			this.remoteCertificate = Certificate;
 
-			if (sslPolicyErrors == SslPolicyErrors.None)
+			if (SslPolicyErrors == SslPolicyErrors.None)
 				this.remoteCertificateValid = Result = true;
-			else if (certificate is null && !RequireCertificate)
+			else if ((SslPolicyErrors == SslPolicyErrors.RemoteCertificateNotAvailable || Certificate is null) && !RequireCertificate)
 			{
 				this.remoteCertificateValid = false;
 				Result = true;
@@ -1231,7 +1233,7 @@ namespace Waher.Networking
 			{
 				try
 				{
-					Result = this.certValidation(sender, certificate, chain, sslPolicyErrors);
+					Result = this.certValidation(Sender, Certificate, Chain, SslPolicyErrors);
 				}
 				catch (Exception ex)
 				{
@@ -1242,7 +1244,7 @@ namespace Waher.Networking
 
 			if (!Result)
 			{
-				byte[] Cert = certificate?.Export(X509ContentType.Cert) ?? new byte[0];
+				byte[] Cert = Certificate?.Export(X509ContentType.Cert) ?? new byte[0];
 				StringBuilder Base64 = new StringBuilder();
 				string s;
 				int c = Cert.Length;
@@ -1263,9 +1265,9 @@ namespace Waher.Networking
 
 				KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[]
 				{
-					new KeyValuePair<string, object>("SslPolicyErrors", sslPolicyErrors.ToString()),
-					new KeyValuePair<string, object>("Subject", certificate?.Subject),
-					new KeyValuePair<string, object>("Issuer", certificate?.Issuer),
+					new KeyValuePair<string, object>("SslPolicyErrors", SslPolicyErrors.ToString()),
+					new KeyValuePair<string, object>("Subject", Certificate?.Subject),
+					new KeyValuePair<string, object>("Issuer", Certificate?.Issuer),
 					new KeyValuePair<string, object>("HostName", this.hostName),
 					new KeyValuePair<string, object>("DomainName", this.domainName),
 					new KeyValuePair<string, object>("Cert", Base64.ToString())
@@ -1274,10 +1276,10 @@ namespace Waher.Networking
 				if (this.trustRemoteEndpoint)
 				{
 					Result = true;
-					Log.Notice("Invalid certificate received. But server is trusted.", certificate?.Subject, certificate?.Issuer, Tags);
+					Log.Notice("Invalid certificate received. But server is trusted.", Certificate?.Subject, Certificate?.Issuer, Tags);
 				}
 				else
-					Log.Warning("Invalid certificate received (and rejected)", certificate?.Subject, certificate?.Issuer, "CertError", Tags);
+					Log.Warning("Invalid certificate received (and rejected)", Certificate?.Subject, Certificate?.Issuer, "CertError", Tags);
 
 				if (this.HasSniffers)
 				{
@@ -1290,11 +1292,11 @@ namespace Waher.Networking
 
 					SniffMsg.AppendLine();
 					SniffMsg.Append("sslPolicyErrors: ");
-					SniffMsg.AppendLine(sslPolicyErrors.ToString());
+					SniffMsg.AppendLine(SslPolicyErrors.ToString());
 					SniffMsg.Append("Subject: ");
-					SniffMsg.AppendLine(certificate?.Subject);
+					SniffMsg.AppendLine(Certificate?.Subject);
 					SniffMsg.Append("Issuer: ");
-					SniffMsg.AppendLine(certificate?.Issuer);
+					SniffMsg.AppendLine(Certificate?.Issuer);
 					SniffMsg.Append("BASE64(Cert): ");
 					SniffMsg.Append(Base64);
 
@@ -1326,7 +1328,7 @@ namespace Waher.Networking
 		/// <param name="ServerCertificate">Server certificate.</param>
 		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate)
 		{
-			return this.UpgradeToTlsAsServer(ServerCertificate, SslProtocols.Tls12, false, null, false);
+			return this.UpgradeToTlsAsServer(ServerCertificate, SslProtocols.Tls12, ClientCertificates.Optional, null, false);
 		}
 
 		/// <summary>
@@ -1336,7 +1338,7 @@ namespace Waher.Networking
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
 		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols)
 		{
-			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, false, null, false);
+			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, ClientCertificates.Optional, null, false);
 		}
 
 		/// <summary>
@@ -1344,10 +1346,10 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="ServerCertificate">Server certificate.</param>
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
-		/// <param name="ClientCertificateRequired">If client certificates are required.</param>
-		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols, bool ClientCertificateRequired)
+		/// <param name="ClientCertificates">If client certificates are requested from client.</param>
+		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols, ClientCertificates ClientCertificates)
 		{
-			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, ClientCertificateRequired, null, false);
+			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, ClientCertificates, null, false);
 		}
 
 		/// <summary>
@@ -1355,12 +1357,12 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="ServerCertificate">Server certificate.</param>
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
-		/// <param name="ClientCertificateRequired">If client certificates are required.</param>
+		/// <param name="ClientCertificates">If client certificates are requested from client.</param>
 		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
-		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols, bool ClientCertificateRequired,
+		public Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols, ClientCertificates ClientCertificates,
 			RemoteCertificateValidationCallback CertificateValidationCheck)
 		{
-			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, ClientCertificateRequired, CertificateValidationCheck, false);
+			return this.UpgradeToTlsAsServer(ServerCertificate, Protocols, ClientCertificates, CertificateValidationCheck, false);
 		}
 
 		/// <summary>
@@ -1368,10 +1370,10 @@ namespace Waher.Networking
 		/// </summary>
 		/// <param name="ServerCertificate">Server certificate.</param>
 		/// <param name="Protocols">Allowed SSL/TLS protocols.</param>
-		/// <param name="ClientCertificateRequired">If client certificates are required.</param>
+		/// <param name="ClientCertificates">If client certificates are requested from client.</param>
 		/// <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
 		/// <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
-		public async Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols, bool ClientCertificateRequired,
+		public async Task UpgradeToTlsAsServer(X509Certificate ServerCertificate, SslProtocols Protocols, ClientCertificates ClientCertificates,
 			RemoteCertificateValidationCallback CertificateValidationCheck, bool TrustRemoteEndpoint)
 		{
 			lock (this.synchObj)
@@ -1392,10 +1394,32 @@ namespace Waher.Networking
 
 			try
 			{
-				SslStream SslStream = new SslStream(this.stream, true, this.ValidateCertificateOptional);
+				RemoteCertificateValidationCallback Callback;
+				bool RequestCertificate;
+
+				switch (ClientCertificates)
+				{
+					case ClientCertificates.NotUsed:
+						RequestCertificate = false;
+						Callback = this.ValidateCertificateOptional;
+						break;
+
+					case ClientCertificates.Optional:
+					default:
+						RequestCertificate = true;
+						Callback = this.ValidateCertificateOptional;
+						break;
+
+					case ClientCertificates.Required:
+						RequestCertificate = true;
+						Callback = this.ValidateCertificateRequired;
+						break;
+				}
+
+				SslStream SslStream = new SslStream(this.stream, true, Callback);
 				this.stream = SslStream;
 
-				await SslStream.AuthenticateAsServerAsync(ServerCertificate, ClientCertificateRequired, Protocols, true);
+				await SslStream.AuthenticateAsServerAsync(ServerCertificate, RequestCertificate, Protocols, true);
 			}
 			finally
 			{

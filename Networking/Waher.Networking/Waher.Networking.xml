@@ -394,30 +394,30 @@
             <param name="ServerCertificate">Server certificate.</param>
             <param name="Protocols">Allowed SSL/TLS protocols.</param>
         </member>
-        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsServer(System.Security.Cryptography.X509Certificates.X509Certificate,System.Security.Authentication.SslProtocols,System.Boolean)">
+        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsServer(System.Security.Cryptography.X509Certificates.X509Certificate,System.Security.Authentication.SslProtocols,Waher.Networking.ClientCertificates)">
             <summary>
             Upgrades a server connection to TLS.
             </summary>
             <param name="ServerCertificate">Server certificate.</param>
             <param name="Protocols">Allowed SSL/TLS protocols.</param>
-            <param name="ClientCertificateRequired">If client certificates are required.</param>
+            <param name="ClientCertificates">If client certificates are requested from client.</param>
         </member>
-        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsServer(System.Security.Cryptography.X509Certificates.X509Certificate,System.Security.Authentication.SslProtocols,System.Boolean,System.Net.Security.RemoteCertificateValidationCallback)">
+        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsServer(System.Security.Cryptography.X509Certificates.X509Certificate,System.Security.Authentication.SslProtocols,Waher.Networking.ClientCertificates,System.Net.Security.RemoteCertificateValidationCallback)">
             <summary>
             Upgrades a server connection to TLS.
             </summary>
             <param name="ServerCertificate">Server certificate.</param>
             <param name="Protocols">Allowed SSL/TLS protocols.</param>
-            <param name="ClientCertificateRequired">If client certificates are required.</param>
+            <param name="ClientCertificates">If client certificates are requested from client.</param>
             <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
         </member>
-        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsServer(System.Security.Cryptography.X509Certificates.X509Certificate,System.Security.Authentication.SslProtocols,System.Boolean,System.Net.Security.RemoteCertificateValidationCallback,System.Boolean)">
+        <member name="M:Waher.Networking.BinaryTcpClient.UpgradeToTlsAsServer(System.Security.Cryptography.X509Certificates.X509Certificate,System.Security.Authentication.SslProtocols,Waher.Networking.ClientCertificates,System.Net.Security.RemoteCertificateValidationCallback,System.Boolean)">
             <summary>
             Upgrades a server connection to TLS.
             </summary>
             <param name="ServerCertificate">Server certificate.</param>
             <param name="Protocols">Allowed SSL/TLS protocols.</param>
-            <param name="ClientCertificateRequired">If client certificates are required.</param>
+            <param name="ClientCertificates">If client certificates are requested from client.</param>
             <param name="CertificateValidationCheck">Method to call to check if a server certificate is valid.</param>
             <param name="TrustRemoteEndpoint">If the remote endpoint should be trusted, even if the certificate does not validate.</param>
         </member>
@@ -444,6 +444,26 @@
         <member name="M:Waher.Networking.BinaryTcpClient.PauseReading">
             <summary>
             Allows the caller to pause reading.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.ClientCertificates">
+            <summary>
+            Client Certificate Options
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.ClientCertificates.NotUsed">
+            <summary>
+            Client certificates are not used, and will not be requested.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.ClientCertificates.Optional">
+            <summary>
+            Client certificates are requested, but not required.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.ClientCertificates.Required">
+            <summary>
+            Client certificates are requested, and required.
             </summary>
         </member>
         <member name="T:Waher.Networking.IBinaryTransmission">

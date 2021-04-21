@@ -1221,15 +1221,18 @@ namespace Waher.Networking
 
 			if (SslPolicyErrors == SslPolicyErrors.None)
 				this.remoteCertificateValid = Result = true;
-			else if ((SslPolicyErrors == SslPolicyErrors.RemoteCertificateNotAvailable || Certificate is null) && !RequireCertificate)
+			else if ((SslPolicyErrors == SslPolicyErrors.RemoteCertificateNotAvailable || Certificate is null))
 			{
 				this.remoteCertificateValid = false;
-				Result = true;
+				Result = !RequireCertificate;
 			}
 			else
-				this.remoteCertificateValid = Result = false;
+			{
+				this.remoteCertificateValid = false;
+				Result = this.trustRemoteEndpoint;
+			}
 
-			if (!(this.certValidation is null))
+			if (!(this.certValidation is null) && !(Certificate is null))
 			{
 				try
 				{
@@ -1244,66 +1247,75 @@ namespace Waher.Networking
 
 			if (!Result)
 			{
-				byte[] Cert = Certificate?.Export(X509ContentType.Cert) ?? new byte[0];
-				StringBuilder Base64 = new StringBuilder();
-				string s;
-				int c = Cert.Length;
-				int i = 0;
-				int j;
-
-				while (i < c)
+				if (RequireCertificate)
 				{
-					j = Math.Min(57, c - i);
-					s = Convert.ToBase64String(Cert, i, j);
-					i += j;
+					byte[] Cert = Certificate?.Export(X509ContentType.Cert) ?? new byte[0];
+					StringBuilder Base64 = new StringBuilder();
+					string s;
+					int c = Cert.Length;
+					int i = 0;
+					int j;
 
-					Base64.Append(s);
+					while (i < c)
+					{
+						j = Math.Min(57, c - i);
+						s = Convert.ToBase64String(Cert, i, j);
+						i += j;
 
-					if (i < c)
-						Base64.AppendLine();
-				}
+						Base64.Append(s);
 
-				KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[]
-				{
-					new KeyValuePair<string, object>("SslPolicyErrors", SslPolicyErrors.ToString()),
-					new KeyValuePair<string, object>("Subject", Certificate?.Subject),
-					new KeyValuePair<string, object>("Issuer", Certificate?.Issuer),
-					new KeyValuePair<string, object>("HostName", this.hostName),
-					new KeyValuePair<string, object>("DomainName", this.domainName),
-					new KeyValuePair<string, object>("Cert", Base64.ToString())
-				};
+						if (i < c)
+							Base64.AppendLine();
+					}
 
-				if (this.trustRemoteEndpoint)
-				{
-					Result = true;
-					Log.Notice("Invalid certificate received. But server is trusted.", Certificate?.Subject, Certificate?.Issuer, Tags);
+					KeyValuePair<string, object>[] Tags = new KeyValuePair<string, object>[]
+					{
+						new KeyValuePair<string, object>("SslPolicyErrors", SslPolicyErrors.ToString()),
+						new KeyValuePair<string, object>("Subject", Certificate?.Subject),
+						new KeyValuePair<string, object>("Issuer", Certificate?.Issuer),
+						new KeyValuePair<string, object>("HostName", this.hostName),
+						new KeyValuePair<string, object>("DomainName", this.domainName),
+						new KeyValuePair<string, object>("Cert", Base64.ToString())
+					};
+
+					if (this.trustRemoteEndpoint)
+					{
+						Result = true;
+						Log.Notice("Invalid certificate received. But server is trusted.", Certificate?.Subject, Certificate?.Issuer, Tags);
+					}
+					else
+						Log.Warning("Invalid certificate received (and rejected)", Certificate?.Subject, Certificate?.Issuer, "CertError", Tags);
+
+					if (this.HasSniffers)
+					{
+						StringBuilder SniffMsg = new StringBuilder();
+
+						if (this.trustRemoteEndpoint)
+							SniffMsg.AppendLine("Invalid certificate received. But server is trusted.");
+						else
+							SniffMsg.AppendLine("Invalid certificate received (and rejected).");
+
+						SniffMsg.AppendLine();
+						SniffMsg.Append("sslPolicyErrors: ");
+						SniffMsg.AppendLine(SslPolicyErrors.ToString());
+						SniffMsg.Append("Subject: ");
+						SniffMsg.AppendLine(Certificate?.Subject);
+						SniffMsg.Append("Issuer: ");
+						SniffMsg.AppendLine(Certificate?.Issuer);
+						SniffMsg.Append("BASE64(Cert): ");
+						SniffMsg.Append(Base64);
+
+						if (this.trustRemoteEndpoint)
+							this.Information(SniffMsg.ToString());
+						else
+							this.Warning(SniffMsg.ToString());
+					}
 				}
 				else
-					Log.Warning("Invalid certificate received (and rejected)", Certificate?.Subject, Certificate?.Issuer, "CertError", Tags);
-
-				if (this.HasSniffers)
 				{
-					StringBuilder SniffMsg = new StringBuilder();
-
-					if (this.trustRemoteEndpoint)
-						SniffMsg.AppendLine("Invalid certificate received. But server is trusted.");
-					else
-						SniffMsg.AppendLine("Invalid certificate received (and rejected).");
-
-					SniffMsg.AppendLine();
-					SniffMsg.Append("sslPolicyErrors: ");
-					SniffMsg.AppendLine(SslPolicyErrors.ToString());
-					SniffMsg.Append("Subject: ");
-					SniffMsg.AppendLine(Certificate?.Subject);
-					SniffMsg.Append("Issuer: ");
-					SniffMsg.AppendLine(Certificate?.Issuer);
-					SniffMsg.Append("BASE64(Cert): ");
-					SniffMsg.Append(Base64);
-
-					if (this.trustRemoteEndpoint)
-						this.Information(SniffMsg.ToString());
-					else
-						this.Warning(SniffMsg.ToString());
+					this.remoteCertificate = null;
+					this.remoteCertificateValid = false;
+					Result = true;
 				}
 			}
 

@@ -79,6 +79,9 @@ namespace Waher.Networking.HTTP
 		private readonly VanityResources vanityResources = new VanityResources();
 		private ILoginAuditor loginAuditor = null;
 		private DateTime lastStat = DateTime.MinValue;
+		private ClientCertificates clientCertificates = ClientCertificates.NotUsed;
+		private bool trustClientCertificates = false;
+		private bool clientCertificateSettingsLocked = false;
 		private string eTagSalt = string.Empty;
 		private string name = typeof(HttpServer).Namespace;
 		private int[] httpPorts;
@@ -809,6 +812,22 @@ namespace Waher.Networking.HTTP
 			this.serverCertificate = ServerCertificate;
 			this.upgradePort = null;
 		}
+
+		/// <summary>
+		/// Configures Mutual-TLS capabilities of the server. Affects all connections, all resources.
+		/// </summary>
+		/// <param name="ClientCertificates">If client certificates are not used, optional or required.</param>
+		/// <param name="TrustClientCertificates">If client certificates should be trusted, even if they do not validate.</param>
+		/// <param name="LockSettings">If client certificate settings should be locked.</param>
+		public void ConfigureMutualTls(ClientCertificates ClientCertificates, bool TrustClientCertificates, bool LockSettings)
+		{
+			if (this.clientCertificateSettingsLocked)
+				throw new InvalidOperationException("Mutual TLS settings locked.");
+
+			this.clientCertificates = ClientCertificates;
+			this.trustClientCertificates = TrustClientCertificates;
+			this.clientCertificateSettingsLocked = LockSettings;
+		}
 #endif
 
 		#endregion
@@ -956,7 +975,10 @@ namespace Waher.Networking.HTTP
 			try
 			{
 				this.Information("Switching to TLS.");
-				await Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls12, ClientCertificates.Optional);
+
+				await Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls12, 
+					this.clientCertificates, null, this.trustClientCertificates);
+				
 				this.Information("TLS established.");
 
 				HttpClientConnection Connection = new HttpClientConnection(this, Client, true, this.Sniffers);

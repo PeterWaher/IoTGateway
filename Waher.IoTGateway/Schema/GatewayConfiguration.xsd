@@ -18,17 +18,35 @@
 					<xs:annotation>
 						<xs:documentation>Default web page.</xs:documentation>
 					</xs:annotation>
-          <xs:complexType>
-            <xs:simpleContent>
-              <xs:extension base="xs:string">
-                <xs:attribute name="host" type="xs:string" use="optional">
-                  <xs:annotation>
-                    <xs:documentation>To which host name the default page relates to.</xs:documentation>
-                  </xs:annotation>
-                </xs:attribute>
-              </xs:extension>
-            </xs:simpleContent>
-          </xs:complexType>
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:string">
+								<xs:attribute name="host" type="xs:string" use="optional">
+									<xs:annotation>
+										<xs:documentation>To which host name the default page relates to.</xs:documentation>
+									</xs:annotation>
+								</xs:attribute>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="MutualTls" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>Specifies configuration for Mutual TLS (or mTLS) for the Web Servier.</xs:documentation>
+						<xs:documentation>Any settings affect all domains.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:attribute name="clientCertificates" type="ClientCertificates" use="required">
+							<xs:annotation>
+								<xs:documentation>If client certificates are requested during TLS handshake.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+						<xs:attribute name="trustCertificates" type="xs:boolean" use="optional" default="true">
+							<xs:annotation>
+								<xs:documentation>If certificates should be trusted, even if they don't validate.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
 				</xs:element>
 				<xs:element name="Database">
 					<xs:annotation>
@@ -99,19 +117,19 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
-        <xs:element name="VanityResources" minOccurs="0" maxOccurs="1">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="VanityResource" minOccurs="0" maxOccurs="unbounded">
-                <xs:complexType>
-                  <xs:attribute name="regex" type="xs:string" use="required"/>
-                  <xs:attribute name="url" type="xs:string" use="required"/>
-                </xs:complexType>
-              </xs:element>
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="ExportExceptions" minOccurs="0" maxOccurs="1">
+				<xs:element name="VanityResources" minOccurs="0" maxOccurs="1">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="VanityResource" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:attribute name="regex" type="xs:string" use="required"/>
+									<xs:attribute name="url" type="xs:string" use="required"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="ExportExceptions" minOccurs="0" maxOccurs="1">
 					<xs:complexType>
 						<xs:attribute name="folder" type="xs:string" use="required"/>
 					</xs:complexType>
@@ -136,6 +154,14 @@
 			<xs:enumeration value="16384"/>
 			<xs:enumeration value="32768"/>
 			<xs:enumeration value="65536"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="ClientCertificates">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="NotUsed"/>
+			<xs:enumeration value="Optional"/>
+			<xs:enumeration value="Required"/>
 		</xs:restriction>
 	</xs:simpleType>
 

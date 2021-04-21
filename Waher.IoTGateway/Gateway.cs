@@ -37,6 +37,7 @@ using Waher.IoTGateway.Setup;
 using Waher.IoTGateway.Setup.Legal;
 using Waher.IoTGateway.WebResources;
 using Waher.IoTGateway.WebResources.ExportFormats;
+using Waher.Networking;
 using Waher.Networking.CoAP;
 using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
@@ -320,6 +321,8 @@ namespace Waher.IoTGateway
 					XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.GatewayConfiguration.xsd", typeof(Gateway).Assembly));
 
 				IDatabaseProvider DatabaseProvider = null;
+				ClientCertificates ClientCertificates = ClientCertificates.NotUsed;
+				bool TrustClientCertificates = false;
 
 				foreach (XmlNode N in Config.DocumentElement.ChildNodes)
 				{
@@ -336,6 +339,11 @@ namespace Waher.IoTGateway
 									defaultPageByHostName = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
 
 								defaultPageByHostName[XML.Attribute(E, "host")] = E.InnerText;
+								break;
+
+							case "MutualTls":
+								ClientCertificates = (ClientCertificates)XML.Attribute(E, "clientCertificates", ClientCertificates.NotUsed);
+								TrustClientCertificates = XML.Attribute(E, "trustCertificates", false);
 								break;
 
 							case "ExportExceptions":
@@ -746,6 +754,8 @@ namespace Waher.IoTGateway
 						}
 					}
 				}
+
+				webServer.ConfigureMutualTls(ClientCertificates, TrustClientCertificates, true);
 
 				Types.SetModuleParameter("HTTP", webServer);
 

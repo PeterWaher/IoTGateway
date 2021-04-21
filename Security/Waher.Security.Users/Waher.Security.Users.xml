@@ -313,6 +313,11 @@
             User source.
             </summary>
         </member>
+        <member name="P:Waher.Security.Users.Users.LoginAuditor">
+            <summary>
+            Any Login Auditor registered, if any.
+            </summary>
+        </member>
         <member name="M:Waher.Security.Users.Users.TryGetUser(System.String)">
             <summary>
             Tries to get a user with a given user name.

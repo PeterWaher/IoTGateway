@@ -36,6 +36,11 @@ namespace Waher.Security.Users
 		public static IUserSource Source => source;
 
 		/// <summary>
+		/// Any Login Auditor registered, if any.
+		/// </summary>
+		public static LoginAuditor LoginAuditor => loginAuditor;
+
+		/// <summary>
 		/// Tries to get a user with a given user name.
 		/// </summary>
 		/// <param name="UserName">User Name.</param>

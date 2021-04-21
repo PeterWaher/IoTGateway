@@ -62,16 +62,13 @@ namespace Waher.Security.JWT
 					}
 
 					IUser User = await this.users.TryGetUser(UserName);
+					
 					if (User is null)
-					{
 						LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
-						return null;
-					}
 					else
-					{
 						LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
-						return User;
-					}
+				
+					return User;
 				}
 				catch (Exception)
 				{

@@ -14,7 +14,7 @@ namespace Waher.Security.JWT.Functions
 	/// </summary>
 	public class CreateJwt : FunctionOneVariable
 	{
-        internal static readonly JwtFactory factory = new JwtFactory();
+        private static readonly JwtFactory factory = new JwtFactory();
 
         /// <summary>
         /// Creates a Java Web Token (JWT)
@@ -27,6 +27,11 @@ namespace Waher.Security.JWT.Functions
             : base(Argument, Start, Length, Expression)
         {
         }
+
+        /// <summary>
+        /// Token factory used to create tokens.
+        /// </summary>
+        public static JwtFactory Factory => factory;
 
         /// <summary>
         /// Name of the function

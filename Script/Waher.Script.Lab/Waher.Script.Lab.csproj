@@ -229,6 +229,10 @@
       <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
       <Name>Waher.Runtime.Inventory</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Security\Waher.Security.JWT\Waher.Security.JWT.csproj">
+      <Project>{2269e977-2063-471d-8314-2174717aa2ba}</Project>
+      <Name>Waher.Security.JWT</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Script.Content\Waher.Script.Content.csproj">
       <Project>{6055882c-4fbb-4336-98e2-fa7594d6f143}</Project>
       <Name>Waher.Script.Content</Name>

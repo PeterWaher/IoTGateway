@@ -45,7 +45,7 @@ namespace Waher.Security.JWT
 			set
 			{
 				if (value < TimeSpan.Zero)
-					throw new ArgumentOutOfRangeException("Time margins must be zero or positive.", nameof(TimeMargin));
+					throw new ArgumentOutOfRangeException("Time margins must be non-negative.", nameof(TimeMargin));
 
 				this.timeMargin = value;
 			}
@@ -56,11 +56,8 @@ namespace Waher.Security.JWT
 		/// </summary>
 		public void Dispose()
 		{
-			if (!(this.algorithm is null))
-			{
-				this.algorithm.Dispose();
-				this.algorithm = null;
-			}
+			this.algorithm?.Dispose();
+			this.algorithm = null;
 		}
 
 		/// <summary>
@@ -73,14 +70,14 @@ namespace Waher.Security.JWT
 			if (Token.Algorithm is null || !(Token.Algorithm is HmacSha256) || Token.Signature is null)
 				return false;
 
-			if (Token.Expiration != null || Token.NotBefore != null)
+			if (Token.Expiration.HasValue || Token.NotBefore.HasValue)
 			{
 				DateTime Now = DateTime.UtcNow;
 
-				if (Token.Expiration != null && Now >= Token.Expiration.Value + this.timeMargin)
+				if (Token.Expiration.HasValue && Now >= Token.Expiration.Value + this.timeMargin)
 					return false;
 
-				if (Token.NotBefore != null && Now < Token.NotBefore.Value - this.timeMargin)
+				if (Token.NotBefore.HasValue && Now < Token.NotBefore.Value - this.timeMargin)
 					return false;
 			}
 
@@ -110,7 +107,7 @@ namespace Waher.Security.JWT
 		/// <returns>JWT token.</returns>
 		public string Create(IEnumerable<KeyValuePair<string, object>> Claims)
 		{
-			this.algorithm.Sign(this.header, Claims, out string Header, out string Payload, 
+			this.algorithm.Sign(this.header, Claims, out string Header, out string Payload,
 				out string Signature);
 
 			return Header + "." + Payload + "." + Signature;

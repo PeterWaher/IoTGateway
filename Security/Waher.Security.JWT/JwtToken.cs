@@ -83,19 +83,19 @@ namespace Waher.Security.JWT
 					{
 						switch (P.Key)
 						{
-							case "iss":
+							case JwtClaims.Issuer:
 								this.issuer = P.Value as string;
 								break;
 
-							case "sub":
+							case JwtClaims.Subject:
 								this.subject = P.Value as string;
 								break;
 
-							case "jti":
+							case JwtClaims.JwtId:
 								this.id = P.Value as string;
 								break;
 
-							case "aud":
+							case JwtClaims.Audience:
 								if (P.Value is string AudStr)
 									this.audience = AudStr.Split(',');
 								else if (P.Value is Array)
@@ -109,17 +109,17 @@ namespace Waher.Security.JWT
 								}
 								break;
 
-							case "exp":
+							case JwtClaims.ExpirationTime:
 								if (P.Value is int ExpInt)
 									this.expiration = JSON.UnixEpoch.AddSeconds(ExpInt);
 								break;
 
-							case "nbf":
+							case JwtClaims.NotBeforeTime:
 								if (P.Value is int NbfInt)
 									this.notBefore = JSON.UnixEpoch.AddSeconds(NbfInt);
 								break;
 
-							case "iat":
+							case JwtClaims.IssueTime:
 								if (P.Value is int IatInt)
 									this.issuedAt = JSON.UnixEpoch.AddSeconds(IatInt);
 								break;

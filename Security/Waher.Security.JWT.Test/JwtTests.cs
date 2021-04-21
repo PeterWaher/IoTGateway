@@ -24,11 +24,11 @@ namespace Waher.Security.JWT.Test
 			Assert.AreEqual("JWT", Token.Type);
 			Assert.IsTrue(Token.Algorithm is HmacSha256);
 
-			Assert.AreEqual(true, Token.TryGetClaim("iss", out object Issuer));
+			Assert.AreEqual(true, Token.TryGetClaim(JwtClaims.Issuer, out object Issuer));
 			Assert.AreEqual("joe", Issuer);
 			Assert.AreEqual("joe", Token.Issuer);
 
-			Assert.AreEqual(true, Token.TryGetClaim("exp", out object Expires));
+			Assert.AreEqual(true, Token.TryGetClaim(JwtClaims.ExpirationTime, out object Expires));
 			Assert.AreEqual(1300819380, Expires);
 			Assert.AreEqual(new DateTime(2011, 3, 22, 18, 43, 0, DateTimeKind.Utc), Token.Expiration);
 
@@ -43,11 +43,11 @@ namespace Waher.Security.JWT.Test
 
 			Assert.IsNull(Token.Algorithm);
 
-			Assert.AreEqual(true, Token.TryGetClaim("iss", out object Issuer));
+			Assert.AreEqual(true, Token.TryGetClaim(JwtClaims.Issuer, out object Issuer));
 			Assert.AreEqual("joe", Issuer);
 			Assert.AreEqual("joe", Token.Issuer);
 
-			Assert.AreEqual(true, Token.TryGetClaim("exp", out object Expires));
+			Assert.AreEqual(true, Token.TryGetClaim(JwtClaims.ExpirationTime, out object Expires));
 			Assert.AreEqual(1300819380, Expires);
 			Assert.AreEqual(new DateTime(2011, 3, 22, 18, 43, 0, DateTimeKind.Utc), Token.Expiration);
 
@@ -63,7 +63,7 @@ namespace Waher.Security.JWT.Test
 			Assert.AreEqual("JWT", Token.Type);
 			Assert.IsTrue(Token.Algorithm is HmacSha256);
 
-			Assert.AreEqual(true, Token.TryGetClaim("sub", out object Subject));
+			Assert.AreEqual(true, Token.TryGetClaim(JwtClaims.Subject, out object Subject));
 			Assert.AreEqual("1234567890", Subject);
 			Assert.AreEqual("1234567890", Token.Subject);
 
@@ -87,7 +87,7 @@ namespace Waher.Security.JWT.Test
 			Assert.AreEqual("JWT", Token.Type);
 			Assert.IsTrue(Token.Algorithm is HmacSha256);
 
-			Assert.AreEqual(true, Token.TryGetClaim("sub", out object Subject));
+			Assert.AreEqual(true, Token.TryGetClaim(JwtClaims.Subject, out object Subject));
 			Assert.AreEqual("1234567890", Subject);
 			Assert.AreEqual("1234567890", Token.Subject);
 
@@ -110,14 +110,14 @@ namespace Waher.Security.JWT.Test
 			{
 				DateTime Expires = DateTime.Today.ToUniversalTime().AddDays(2);
 				string TokenStr = Factory.Create(
-					new KeyValuePair<string, object>("sub", "test user"),
-					new KeyValuePair<string, object>("exp", Expires));
+					new KeyValuePair<string, object>(JwtClaims.Subject, "test user"),
+					new KeyValuePair<string, object>(JwtClaims.ExpirationTime, Expires));
 				JwtToken Token = new JwtToken(TokenStr);
 
 				Assert.AreEqual("JWT", Token.Type);
 				Assert.IsTrue(Token.Algorithm is HmacSha256);
 
-				Assert.AreEqual(true, Token.TryGetClaim("sub", out object Subject));
+				Assert.AreEqual(true, Token.TryGetClaim(JwtClaims.Subject, out object Subject));
 				Assert.AreEqual("test user", Subject);
 				Assert.AreEqual("test user", Token.Subject);
 

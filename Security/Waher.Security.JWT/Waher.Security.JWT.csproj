@@ -6,14 +6,14 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Helps applications with the creation and validation of Java Web Tokens (JWT), as defined in RFC 7519.</Description>
+    <Description>Helps applications with the creation and validation of Java Web Tokens (JWT), as defined in RFC 7519. Includes OpenID claims.</Description>
     <Copyright>Copyright © Waher Data AB 2017-2021. All rights reserved.</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Security/Waher.Security.JWT</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>Security Authentication JWT</PackageTags>
+    <PackageTags>Security Authentication JWT OpenID</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <Version>1.2.0</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>

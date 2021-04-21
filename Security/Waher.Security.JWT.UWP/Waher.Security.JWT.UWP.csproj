@@ -112,10 +112,14 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Functions\CreateJwt.cs" />
+    <Compile Include="Functions\ValidateJwt.cs" />
     <Compile Include="JwtAuthentication.cs" />
+    <Compile Include="JwtClaims.cs" />
     <Compile Include="JwtCodec.cs" />
     <Compile Include="JwtFactory.cs" />
     <Compile Include="JwtToken.cs" />
+    <Compile Include="OpenIdClaims.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Waher.Security.JWT.UWP.rd.xml" />
   </ItemGroup>
@@ -149,12 +153,14 @@
       <Name>Waher.Security</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Security\Waher.Security.JWT\*.cs" "$(ProjectDir)" /Y
+xcopy "$(SolutionDir)Security\Waher.Security.JWT\Functions\*.cs" "$(ProjectDir)Functions" /Y
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

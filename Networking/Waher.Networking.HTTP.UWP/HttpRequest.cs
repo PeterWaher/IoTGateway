@@ -1,5 +1,8 @@
 ﻿using System;
 using System.IO;
+#if !WINDOWS_UWP
+using System.Security.Cryptography.X509Certificates;
+#endif
 using Waher.Content;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Script;
@@ -131,6 +134,24 @@ namespace Waher.Networking.HTTP
 		{
 			get { return this.remoteEndPoint; }
 		}
+
+#if !WINDOWS_UWP
+		/// <summary>
+		/// Remote client certificate, if any, associated with the request.
+		/// </summary>
+		public X509Certificate RemoteCertificate
+		{
+			get { return this.clientConnection?.Client?.RemoteCertificate; }
+		}
+
+		/// <summary>
+		/// If the Remote client certificate, if any, is valid.
+		/// </summary>
+		public bool RemoteCertificateValid
+		{
+			get { return this.clientConnection?.Client?.RemoteCertificateValid ?? false; }
+		}
+#endif
 
 		/// <summary>
 		/// Disposes of the request.

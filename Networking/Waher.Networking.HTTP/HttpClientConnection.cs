@@ -583,10 +583,8 @@ namespace Waher.Networking.HTTP
 								}
 
 								string Challenge = Scheme.GetChallenge();
-								if (string.IsNullOrEmpty(Challenge))
-									continue;
-
-								Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Challenge));
+								if (!string.IsNullOrEmpty(Challenge))
+									Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Challenge));
 							}
 
 							await this.SendResponse(Request, null, new HttpException(401, "Unauthorized", "Unauthorized access prohibited."), false, Challenges.ToArray());

@@ -116,6 +116,7 @@
   <ItemGroup>
     <Compile Include="Authentication\BasicAuthentication.cs" />
     <Compile Include="Authentication\DigestAuthentication.cs" />
+    <Compile Include="Authentication\MutualTlsAuthentication.cs" />
     <Compile Include="ByteRangeInterval.cs" />
     <Compile Include="CommunicationStatistics.cs" />
     <Compile Include="ContentByteRangeInterval.cs" />

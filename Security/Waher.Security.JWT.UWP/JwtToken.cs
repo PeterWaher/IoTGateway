@@ -98,11 +98,11 @@ namespace Waher.Security.JWT
 							case JwtClaims.Audience:
 								if (P.Value is string AudStr)
 									this.audience = AudStr.Split(',');
-								else if (P.Value is Array)
+								else if (P.Value is Array A)
 								{
 									List<string> Audience = new List<string>();
 
-									foreach (object Item in (Array)P.Value)
+									foreach (object Item in A)
 										Audience.Add(Item.ToString());
 
 									this.audience = Audience.ToArray();

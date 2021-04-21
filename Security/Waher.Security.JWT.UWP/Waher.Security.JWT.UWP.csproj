@@ -136,9 +136,17 @@
       <Project>{5d9d4910-b0d3-4510-a914-d49a548011c7}</Project>
       <Name>Waher.Networking.HTTP.UWP</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
+      <Project>{0286288f-4af3-4e64-a398-24c8957ceb04}</Project>
+      <Name>Waher.Persistence</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
       <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
       <Name>Waher.Runtime.Inventory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
+      <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
+      <Name>Waher.Script</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Security.JWS\Waher.Security.JWS.csproj">
       <Project>{712709ac-748d-43d7-a369-3beb829bf5e3}</Project>

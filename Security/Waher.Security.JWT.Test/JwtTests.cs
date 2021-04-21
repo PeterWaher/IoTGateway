@@ -11,7 +11,7 @@ namespace Waher.Security.JWT.Test
 	public class JwtTests
 	{
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(typeof(IJwsAlgorithm).Assembly);
 		}

@@ -1995,6 +1995,32 @@
             </summary>
             <param name="Variables">Current set of variables.</param>
         </member>
+        <member name="T:Waher.Script.Constants.NowUtc">
+            <summary>
+            Current date and time, UTC Coordinates.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Constants.NowUtc.#ctor">
+            <summary>
+            Current date and time, UTC Coordinates.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Constants.NowUtc.ConstantName">
+            <summary>
+            Name of the constant
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Constants.NowUtc.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the constant, null is returned.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Constants.NowUtc.GetValueElement(Waher.Script.Variables)">
+            <summary>
+            Gets the constant value element.
+            </summary>
+            <param name="Variables">Current set of variables.</param>
+        </member>
         <member name="T:Waher.Script.Constants.Pi">
             <summary>
             π
@@ -2099,6 +2125,32 @@
             </summary>
             <param name="Variables">Current set of variables.</param>
         </member>
+        <member name="T:Waher.Script.Constants.TimeUtc">
+            <summary>
+            Current time, UTC Coordinates.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Constants.TimeUtc.#ctor">
+            <summary>
+            Current time, UTC Coordinates.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Constants.TimeUtc.ConstantName">
+            <summary>
+            Name of the constant
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Constants.TimeUtc.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the constant, null is returned.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Constants.TimeUtc.GetValueElement(Waher.Script.Variables)">
+            <summary>
+            Gets the constant value element.
+            </summary>
+            <param name="Variables">Current set of variables.</param>
+        </member>
         <member name="T:Waher.Script.Constants.Today">
             <summary>
             Current date.
@@ -2120,6 +2172,32 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Constants.Today.GetValueElement(Waher.Script.Variables)">
+            <summary>
+            Gets the constant value element.
+            </summary>
+            <param name="Variables">Current set of variables.</param>
+        </member>
+        <member name="T:Waher.Script.Constants.TodayUtc">
+            <summary>
+            Current date, UTC Coordinates.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Constants.TodayUtc.#ctor">
+            <summary>
+            Current date, UTC Coordinates.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Constants.TodayUtc.ConstantName">
+            <summary>
+            Name of the constant
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Constants.TodayUtc.Aliases">
+            <summary>
+            Optional aliases. If there are no aliases for the constant, null is returned.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Constants.TodayUtc.GetValueElement(Waher.Script.Variables)">
             <summary>
             Gets the constant value element.
             </summary>

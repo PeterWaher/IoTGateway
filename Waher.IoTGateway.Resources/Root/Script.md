@@ -131,9 +131,12 @@ There are also a set of predefined variables:
 
 | Variable               | Description                                              |
 |:----------------------:|----------------------------------------------------------|
-| `Now`                  | Current date and time                                    |
-| `Time`                 | Current time                                             |
-| `Today`                | Current date                                             |
+| `Now`                  | Current date and time, local time coordinates.           |
+| `NowUtc`               | Current date and time, UTC coordinates.                  |
+| `Time`                 | Current time, local time coordinates.                    |
+| `TimeUtc`              | Current time, UTC coordinates.                           |
+| `Today`                | Current date, local time coordinates.                    |
+| `TodayUtc`             | Current date, UTC coordinates.                           |
 
 **Note**: Names are case sensitive. `r` and `R` point to different objects.
 

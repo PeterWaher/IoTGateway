@@ -395,7 +395,7 @@ namespace Waher.Networking
 				{
 					this.disposing = true;
 					this.cancelReading.Cancel();
-					Task.Delay(1000).ContinueWith(this.AbortRead);	// Double-check socket gets cancelled. If not, forcefully close.
+					Task.Delay(1000).ContinueWith(this.AbortRead);  // Double-check socket gets cancelled. If not, forcefully close.
 					return;
 				}
 
@@ -438,7 +438,11 @@ namespace Waher.Networking
 #else
 			this.stream = null;
 			this.tcpClient.Dispose();
+
+			this.remoteCertificate?.Dispose();
+			this.remoteCertificate = null;
 #endif
+
 			if (this.HasSniffers)
 			{
 				foreach (ISniffer Sniffer in this.Sniffers)
@@ -1200,13 +1204,13 @@ namespace Waher.Networking
 		private RemoteCertificateValidationCallback certValidation = null;
 		private X509Certificate remoteCertificate = null;
 
-		private bool ValidateCertificateRequired(object Sender, X509Certificate Certificate, X509Chain Chain, 
+		private bool ValidateCertificateRequired(object Sender, X509Certificate Certificate, X509Chain Chain,
 			SslPolicyErrors SslPolicyErrors)
 		{
 			return this.ValidateCertificate(Sender, Certificate, Chain, SslPolicyErrors, true);
 		}
 
-		private bool ValidateCertificateOptional(object Sender, X509Certificate Certificate, X509Chain Chain, 
+		private bool ValidateCertificateOptional(object Sender, X509Certificate Certificate, X509Chain Chain,
 			SslPolicyErrors SslPolicyErrors)
 		{
 			return this.ValidateCertificate(Sender, Certificate, Chain, SslPolicyErrors, false);
@@ -1217,7 +1221,8 @@ namespace Waher.Networking
 		{
 			bool Result;
 
-			this.remoteCertificate = Certificate;
+			this.remoteCertificate?.Dispose();
+			this.remoteCertificate = null;
 
 			if (SslPolicyErrors == SslPolicyErrors.None)
 				this.remoteCertificateValid = Result = true;
@@ -1245,11 +1250,12 @@ namespace Waher.Networking
 				}
 			}
 
+			byte[] Cert = Certificate?.Export(X509ContentType.Cert);    // Avoids SafeHandle exception when accessing certificate later.
+
 			if (!Result)
 			{
 				if (RequireCertificate)
 				{
-					byte[] Cert = Certificate?.Export(X509ContentType.Cert) ?? new byte[0];
 					StringBuilder Base64 = new StringBuilder();
 					string s;
 					int c = Cert.Length;
@@ -1318,6 +1324,9 @@ namespace Waher.Networking
 					Result = true;
 				}
 			}
+
+			if (!(Cert is null) && Result)
+				this.remoteCertificate = new X509Certificate(Cert);
 
 			return Result;
 		}

@@ -54,7 +54,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public const int DefaultBufferSize = 16384;
 
-		private static readonly Variables globalVariables = new Variables();
+		internal static readonly Variables globalVariables = new Variables();
 
 #if WINDOWS_UWP
 		private LinkedList<KeyValuePair<StreamSocketListener, Guid>> listeners = new LinkedList<KeyValuePair<StreamSocketListener, Guid>>();
@@ -976,9 +976,9 @@ namespace Waher.Networking.HTTP
 			{
 				this.Information("Switching to TLS.");
 
-				await Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls12, 
+				await Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls12,
 					this.clientCertificates, null, this.trustClientCertificates);
-				
+
 				this.Information("TLS established.");
 
 				HttpClientConnection Connection = new HttpClientConnection(this, Client, true, this.Sniffers);
@@ -1567,6 +1567,18 @@ namespace Waher.Networking.HTTP
 			else
 				return null;
 		}
+
+		internal bool SetSession(string SessionId, Variables Variables)
+		{
+			if (this.sessions.ContainsKey(SessionId))
+				return false;
+			else
+			{
+				this.sessions[SessionId] = Variables;
+				return true;
+			}
+		}
+
 
 		private void Sessions_Removed(object Sender, CacheItemEventArgs<string, Variables> e)
 		{

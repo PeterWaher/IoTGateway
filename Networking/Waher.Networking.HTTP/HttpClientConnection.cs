@@ -549,6 +549,15 @@ namespace Waher.Networking.HTTP
 									if (!string.IsNullOrEmpty(HttpSessionID))
 										Request.Session = this.server.GetSession(HttpSessionID);
 								}
+
+								if (Request.Session is null)
+								{
+									Request.Session = new Script.Variables()
+									{
+										{ "Global", HttpServer.globalVariables }
+									};
+									Request.tempSession = true;
+								}
 							}
 
 							IUser User = await Scheme.IsAuthenticated(Request);

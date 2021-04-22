@@ -233,18 +233,29 @@ namespace Waher.Networking.HTTP
 			HttpRequestHeader Header = Request.Header;
 			string Method = Request.Header.Method;
 
-			if (this.UserSessions && Request.Session is null)
+			if (this.UserSessions)
 			{
 				HttpFieldCookie Cookie;
 				string HttpSessionID;
 
-				if ((Cookie = Request.Header.Cookie) is null || string.IsNullOrEmpty(HttpSessionID = Cookie["HttpSessionID"]))
+				if (Request.Session is null)
+				{
+					if ((Cookie = Request.Header.Cookie) is null || string.IsNullOrEmpty(HttpSessionID = Cookie["HttpSessionID"]))
+					{
+						HttpSessionID = Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
+						Response.SetCookie(new Cookie("HttpSessionID", HttpSessionID, null, "/", null, false, true));
+					}
+
+					Request.Session = Server.GetSession(HttpSessionID);
+				}
+				else if (Request.tempSession)
 				{
 					HttpSessionID = Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
 					Response.SetCookie(new Cookie("HttpSessionID", HttpSessionID, null, "/", null, false, true));
-				}
 
-				Request.Session = Server.GetSession(HttpSessionID);
+					Server.SetSession(HttpSessionID, Request.Session);
+					Request.tempSession = false;
+				}
 			}
 
 			switch (Method)

@@ -18,9 +18,9 @@ Script Syntax: https://waher.se/Script.md</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution parsing</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.53</AssemblyVersion>
-    <FileVersion>1.0.53</FileVersion>
-    <Version>1.0.53</Version>
+    <AssemblyVersion>1.0.54</AssemblyVersion>
+    <FileVersion>1.0.54</FileVersion>
+    <Version>1.0.54</Version>
     <PackageIconUrl></PackageIconUrl>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Script\Waher.Script\</UpgradeBackupLocation>

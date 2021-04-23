@@ -45,7 +45,14 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
 		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, Contract Contract)
 		{
-			string s = Contract[this.name].ToString();
+			object Value = Contract[this.name];
+			string s;
+
+			if (Value is bool BooleanValue)
+				s = BooleanValue ? "☑" : "☐";
+			else
+				s = Value?.ToString() ?? string.Empty;
+
 			Markdown.Append(MarkdownDocument.Encode(s));
 		}
 	}

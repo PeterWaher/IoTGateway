@@ -212,12 +212,12 @@ purposes.
 						<xs:attributeGroup ref='signatureAttributes'/>
 					</xs:complexType>
 				</xs:element>
-        <xs:element ref='attachment' minOccurs='0' maxOccurs='unbounded'>
-          <xs:annotation>
-            <xs:documentation>Any attached items associated with the contract.</xs:documentation>
-          </xs:annotation>
-        </xs:element>
-        <xs:element name='status' minOccurs='0' maxOccurs='1'>
+				<xs:element ref='attachment' minOccurs='0' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>Any attached items associated with the contract.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name='status' minOccurs='0' maxOccurs='1'>
 					<xs:annotation>
 						<xs:documentation>The status object is created and managed by the Trust Provider.</xs:documentation>
 						<xs:documentation>Authorized clients can get the latest version of the contract by requesting it from the trust provider, given the id of the contract.</xs:documentation>
@@ -285,14 +285,14 @@ purposes.
 						<xs:attributeGroup ref='signatureAttributes'/>
 					</xs:complexType>
 				</xs:element>
-        <xs:element ref='attachmentRef' minOccurs='0' maxOccurs='unbounded'>
-          <xs:annotation>
-            <xs:documentation>Any downloadable references to attachments assigned to the contract.</xs:documentation>
-            <xs:documentation>As references might change over time, they are not included in signatures.</xs:documentation>
-            <xs:documentation>All meta-data necessary to assert the validity and integrity of attachments are provided using attachment elements above.</xs:documentation>
-          </xs:annotation>
-        </xs:element>
-      </xs:sequence>
+				<xs:element ref='attachmentRef' minOccurs='0' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>Any downloadable references to attachments assigned to the contract.</xs:documentation>
+						<xs:documentation>As references might change over time, they are not included in signatures.</xs:documentation>
+						<xs:documentation>All meta-data necessary to assert the validity and integrity of attachments are provided using attachment elements above.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
 			<xs:attributeGroup ref='visibilityAndDuration'>
 				<xs:annotation>
 					<xs:documentation>Attributes defining visibility and duration of contract.</xs:documentation>
@@ -322,6 +322,11 @@ purposes.
 				<xs:element name='numericalParameter' type='NumericalParameter'>
 					<xs:annotation>
 						<xs:documentation>Numerical parameter.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name='booleanParameter' type='BooleanParameter'>
+					<xs:annotation>
+						<xs:documentation>Boolean parameter.</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 			</xs:choice>
@@ -372,6 +377,21 @@ purposes.
 		<xs:complexContent>
 			<xs:extension base='Parameter'>
 				<xs:attribute name='value' type='xs:double' use='required'>
+					<xs:annotation>
+						<xs:documentation>The value of the parameter.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name='BooleanParameter'>
+		<xs:annotation>
+			<xs:documentation>Type representing a Boolean contractual parameter.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base='Parameter'>
+				<xs:attribute name='value' type='xs:boolean' use='required'>
 					<xs:annotation>
 						<xs:documentation>The value of the parameter.</xs:documentation>
 					</xs:annotation>
@@ -741,8 +761,8 @@ purposes.
 			<xs:documentation>XML is normalized. Unnecessary white space removed. Space characters only allowed whitespace.</xs:documentation>
 			<xs:documentation>The normalized XML, with attributes in alphabetical order, using double quotes, xmlns attributes only when required, &amp;, &lt;, &gt;, &quot; and &apos; consistently escaped, empty elements are closed using /&gt;, and no space when ending empty element, is UTF-8 encoded before being signed.</xs:documentation>
 			<xs:documentation>The contract element never includes the xmlns attribute when calculating the signature.</xs:documentation>
-      <xs:documentation>Note: A client can choose to sign a contract on the same broker/provider as its legal identity is defined on, or on the broker/provider hosting the contract, if they are different. In the first case, the request is forwarded to the second provider hosting the contract, and the response is likewise forwarded back to the client. The first broker takes the opportunity to record the signature as well, in case the request is successful. In the second case, the first broker hosting the legal identity of a successful signature is simply informed by the  broker hosting the contract of the signature via the contractSigned notification message.</xs:documentation>
-    </xs:annotation>
+			<xs:documentation>Note: A client can choose to sign a contract on the same broker/provider as its legal identity is defined on, or on the broker/provider hosting the contract, if they are different. In the first case, the request is forwarded to the second provider hosting the contract, and the response is likewise forwarded back to the client. The first broker takes the opportunity to record the signature as well, in case the request is successful. In the second case, the first broker hosting the legal identity of a successful signature is simply informed by the  broker hosting the contract of the signature via the contractSigned notification message.</xs:documentation>
+		</xs:annotation>
 		<xs:complexType>
 			<xs:attribute name='id' type='xs:string' use='required'>
 				<xs:annotation>
@@ -763,8 +783,8 @@ purposes.
 			</xs:attribute>
 			<xs:attribute name='s' type='xs:base64Binary' use='required'>
 				<xs:annotation>
-          <xs:documentation>Digital signature generated by the corresponding asymmetric cipher algorithm.</xs:documentation>
-        </xs:annotation>
+					<xs:documentation>Digital signature generated by the corresponding asymmetric cipher algorithm.</xs:documentation>
+				</xs:annotation>
 			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
@@ -1411,236 +1431,236 @@ purposes.
 		</xs:choice>
 	</xs:complexType>
 
-  <xs:element name='petitionContract'>
-    <xs:annotation>
-      <xs:documentation>Sent by a client in an iq set to a Trust Provider to petition for the information related to a smart contract managed by the Trust Provider.</xs:documentation>
-      <xs:documentation>The request must be signed using an approved and valid legal identity of the caller. Invalid requests must be rejected.</xs:documentation>
-      <xs:documentation>The Trust Provider will forward the petition to the clients of the corresponding parts of the contract using a normal message containing a petitionContractMsg element.</xs:documentation>
-      <xs:documentation>Expect an empty response on success.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name='id' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>Identifier of the smart contract hosted by the Trust Provider, to which the caller requests access.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='pid' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='purpose' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>A string containing the purpose of the request. This string can be shown to the parts of the contract.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='nonce' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>A nonce value, generated by a cryptographic pseudo random number generator.</xs:documentation>
-          <xs:documentation>Used to introduce sufficient entropy in the request.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='s' type='xs:base64Binary' use='required'>
-        <xs:annotation>
-          <xs:documentation>Digital signature of the request using the legal identity (or one of the approved legal identities) of the caller.</xs:documentation>
-          <xs:documentation>The signature is calculated on the following data: UTF8Encode(pid + ":" + id + ":" + purpose + ":" + nonce + ":" + fromBareJid), where fromBareJid is the Bare JID of the sender.</xs:documentation>
-          <xs:documentation>Note: If a sender has multiple approved legal identities associated with it, the Trust Provider uses the signature to identify which identity has been used to form the signature. It is this identity that is later forwarded to the owner of the requested identity.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
+	<xs:element name='petitionContract'>
+		<xs:annotation>
+			<xs:documentation>Sent by a client in an iq set to a Trust Provider to petition for the information related to a smart contract managed by the Trust Provider.</xs:documentation>
+			<xs:documentation>The request must be signed using an approved and valid legal identity of the caller. Invalid requests must be rejected.</xs:documentation>
+			<xs:documentation>The Trust Provider will forward the petition to the clients of the corresponding parts of the contract using a normal message containing a petitionContractMsg element.</xs:documentation>
+			<xs:documentation>Expect an empty response on success.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the smart contract hosted by the Trust Provider, to which the caller requests access.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='pid' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='purpose' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>A string containing the purpose of the request. This string can be shown to the parts of the contract.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='nonce' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>A nonce value, generated by a cryptographic pseudo random number generator.</xs:documentation>
+					<xs:documentation>Used to introduce sufficient entropy in the request.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='s' type='xs:base64Binary' use='required'>
+				<xs:annotation>
+					<xs:documentation>Digital signature of the request using the legal identity (or one of the approved legal identities) of the caller.</xs:documentation>
+					<xs:documentation>The signature is calculated on the following data: UTF8Encode(pid + ":" + id + ":" + purpose + ":" + nonce + ":" + fromBareJid), where fromBareJid is the Bare JID of the sender.</xs:documentation>
+					<xs:documentation>Note: If a sender has multiple approved legal identities associated with it, the Trust Provider uses the signature to identify which identity has been used to form the signature. It is this identity that is later forwarded to the owner of the requested identity.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
 
-  <xs:element name='petitionContractMsg'>
-    <xs:annotation>
-      <xs:documentation>Sent in a normal message stanza from a Trust Provider to a client, when the Trust Provider has received a petition for a smart contract to which the recipient of this message is part.</xs:documentation>
-      <xs:documentation>The recipient can choose to ignore the message, and respond in its own time, sending an petitionContractResponse element with the response in an IQ set stanza back to the Trust Provider.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref='id:identity' minOccurs='1' maxOccurs='1'>
-          <xs:annotation>
-            <xs:documentation>The legal identity of the entity making the petition.</xs:documentation>
-            <xs:documentation>This information can be used by the recipient of the message to make an informed decision on wether to accept, deny or ignore the request.</xs:documentation>
-          </xs:annotation>
-        </xs:element>
-      </xs:sequence>
-      <xs:attribute name='pid' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='from' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>The Bare JID of the entity requesting the information.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='purpose' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>A string containing the purpose of the request. This string can be shown to the parts of the contract.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
+	<xs:element name='petitionContractMsg'>
+		<xs:annotation>
+			<xs:documentation>Sent in a normal message stanza from a Trust Provider to a client, when the Trust Provider has received a petition for a smart contract to which the recipient of this message is part.</xs:documentation>
+			<xs:documentation>The recipient can choose to ignore the message, and respond in its own time, sending an petitionContractResponse element with the response in an IQ set stanza back to the Trust Provider.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='id:identity' minOccurs='1' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>The legal identity of the entity making the petition.</xs:documentation>
+						<xs:documentation>This information can be used by the recipient of the message to make an informed decision on wether to accept, deny or ignore the request.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name='pid' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='from' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The Bare JID of the entity requesting the information.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='purpose' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>A string containing the purpose of the request. This string can be shown to the parts of the contract.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
 
-  <xs:element name='petitionContractResponse'>
-    <xs:annotation>
-      <xs:documentation>Sent by a client in an iq set to a Trust Provider as an active response to a previous petition for information related to a smart contract to which the client is part.</xs:documentation>
-      <xs:documentation>Expect an empty response on success.</xs:documentation>
-      <xs:documentation>A successfull request will forward the response, and the referenced smart contract if approved, to the entity making the request, by sending a petitionContractResponseMsg element in a normal message stanza.</xs:documentation>
-      <xs:documentation>Note: Only one of the parts need to consent to sharing the contract this time. The rationale is to mimick how we treat contracts in the physical world. Each part has a copy of the contract, and can choose to show this copy to others, for their purposes. The other parts cannot deny this. But at least one of the parts must consent to the petition for the entity making the petition to get access to the corresponding contract.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name='id' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>Identifier of the smart contract referred to by the petition.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='pid' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='jid' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>Bare JID of the entity making the petition.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='response' type='xs:boolean' use='optional' default='false'>
-        <xs:annotation>
-          <xs:documentation>If the Trust Provider can share the smart contract information with the entity making the petition.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
+	<xs:element name='petitionContractResponse'>
+		<xs:annotation>
+			<xs:documentation>Sent by a client in an iq set to a Trust Provider as an active response to a previous petition for information related to a smart contract to which the client is part.</xs:documentation>
+			<xs:documentation>Expect an empty response on success.</xs:documentation>
+			<xs:documentation>A successfull request will forward the response, and the referenced smart contract if approved, to the entity making the request, by sending a petitionContractResponseMsg element in a normal message stanza.</xs:documentation>
+			<xs:documentation>Note: Only one of the parts need to consent to sharing the contract this time. The rationale is to mimick how we treat contracts in the physical world. Each part has a copy of the contract, and can choose to show this copy to others, for their purposes. The other parts cannot deny this. But at least one of the parts must consent to the petition for the entity making the petition to get access to the corresponding contract.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the smart contract referred to by the petition.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='pid' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='jid' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Bare JID of the entity making the petition.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='response' type='xs:boolean' use='optional' default='false'>
+				<xs:annotation>
+					<xs:documentation>If the Trust Provider can share the smart contract information with the entity making the petition.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
 
-  <xs:element name='petitionContractResponseMsg'>
-    <xs:annotation>
-      <xs:documentation>Sent in a normal message stanza from a Trust Provider to a client, when the Trust Provider has received a response on a petition made by the client for a smart contract.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref='contract' minOccurs='0' maxOccurs='1'>
-          <xs:annotation>
-            <xs:documentation>The legal identity requested, if available, and the owner of the identity consented in sharing the information.</xs:documentation>
-            <xs:documentation>This information must only be used for the purposes described in the original petition.</xs:documentation>
-          </xs:annotation>
-        </xs:element>
-      </xs:sequence>
-      <xs:attribute name='pid' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='response' type='xs:boolean' use='required'>
-        <xs:annotation>
-          <xs:documentation>If the Trust Provider can share the smart contract information with the entity making the petition.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
+	<xs:element name='petitionContractResponseMsg'>
+		<xs:annotation>
+			<xs:documentation>Sent in a normal message stanza from a Trust Provider to a client, when the Trust Provider has received a response on a petition made by the client for a smart contract.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='contract' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>The legal identity requested, if available, and the owner of the identity consented in sharing the information.</xs:documentation>
+						<xs:documentation>This information must only be used for the purposes described in the original petition.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name='pid' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='response' type='xs:boolean' use='required'>
+				<xs:annotation>
+					<xs:documentation>If the Trust Provider can share the smart contract information with the entity making the petition.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
 
-  <xs:element name='addAttachment'>
-    <xs:annotation>
-      <xs:documentation>Sent in an iq set stanza from a client to a Trust Provider, to add an attachment to a smart contract that is yet to be signed.</xs:documentation>
-      <xs:documentation>After first signature, contract must not accept new attachments.</xs:documentation>
-      <xs:documentation>Attachments can be photos, documents, or other types of objects that have a well-defined Internet Content Type.</xs:documentation>
-      <xs:documentation>The contents of the attachment may have been uploaded to the Trust Provider using HTTP File Upload (XEP-0363) before this command is sent.</xs:documentation>
-      <xs:documentation>Only the creator of the contract can add attachments to it.</xs:documentation>
-      <xs:documentation>After the file has been registered as an attachment, it must be removed, after first giving time for lost messages and retries, from the temporary storage of the HTTP File Upload service by the Trust Provider, for privacy reasons.</xs:documentation>
-      <xs:documentation>Access privileges to legal identities or smart contracts, automatically infer access privileges to any attachments associated with them.</xs:documentation>
-      <xs:documentation>Expected response element: contract</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name='contractId' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>Smart Contract to which the attachment is to be assigned.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='getUrl' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>The URL of the content. It may previously have been uploaded using HTTP File Upload (XEP-0363).</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='s' type='xs:base64Binary' use='required'>
-        <xs:annotation>
-          <xs:documentation>Signature of the content assigned to the smart contract.</xs:documentation>
-          <xs:documentation>The signature must be made by an approved legal identity of the sender.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
+	<xs:element name='addAttachment'>
+		<xs:annotation>
+			<xs:documentation>Sent in an iq set stanza from a client to a Trust Provider, to add an attachment to a smart contract that is yet to be signed.</xs:documentation>
+			<xs:documentation>After first signature, contract must not accept new attachments.</xs:documentation>
+			<xs:documentation>Attachments can be photos, documents, or other types of objects that have a well-defined Internet Content Type.</xs:documentation>
+			<xs:documentation>The contents of the attachment may have been uploaded to the Trust Provider using HTTP File Upload (XEP-0363) before this command is sent.</xs:documentation>
+			<xs:documentation>Only the creator of the contract can add attachments to it.</xs:documentation>
+			<xs:documentation>After the file has been registered as an attachment, it must be removed, after first giving time for lost messages and retries, from the temporary storage of the HTTP File Upload service by the Trust Provider, for privacy reasons.</xs:documentation>
+			<xs:documentation>Access privileges to legal identities or smart contracts, automatically infer access privileges to any attachments associated with them.</xs:documentation>
+			<xs:documentation>Expected response element: contract</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='contractId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Smart Contract to which the attachment is to be assigned.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='getUrl' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The URL of the content. It may previously have been uploaded using HTTP File Upload (XEP-0363).</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='s' type='xs:base64Binary' use='required'>
+				<xs:annotation>
+					<xs:documentation>Signature of the content assigned to the smart contract.</xs:documentation>
+					<xs:documentation>The signature must be made by an approved legal identity of the sender.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
 
-  <xs:element name='removeAttachment'>
-    <xs:annotation>
-      <xs:documentation>Sent in an iq set stanza from a client to a Trust Provider, to remove an attachment from a smart contract that is proposed or is approved, but before it is being signed.</xs:documentation>
-      <xs:documentation>A client can only remove attachments from its own contracts.</xs:documentation>
-      <xs:documentation>Expected response element: contract</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name='attachmentId' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>Identity of attachment to remove.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-  
-  <xs:element name='attachment'>
-    <xs:annotation>
-      <xs:documentation>Represents an attachment.</xs:documentation>
-      <xs:documentation>An attachment can	be assigned to smart contracts.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name='id' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>The identity of the attachment.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='legalId' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>The legal identity of the uploader of the attachment.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='contentType' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>Internet Content-Type of attachment.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='fileName' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>Filename of attachment.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='s' type='xs:base64Binary' use='required'>
-        <xs:annotation>
-          <xs:documentation>Signature of attachment, made by the uploader.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='timestamp' type='xs:dateTime' use='required'>
-        <xs:annotation>
-          <xs:documentation>Timestamp of attachment upload.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
+	<xs:element name='removeAttachment'>
+		<xs:annotation>
+			<xs:documentation>Sent in an iq set stanza from a client to a Trust Provider, to remove an attachment from a smart contract that is proposed or is approved, but before it is being signed.</xs:documentation>
+			<xs:documentation>A client can only remove attachments from its own contracts.</xs:documentation>
+			<xs:documentation>Expected response element: contract</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='attachmentId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identity of attachment to remove.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
 
-  <xs:element name='attachmentRef'>
-    <xs:annotation>
-      <xs:documentation>Includes information on how to download an attachment.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name='attachmentId' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>The ID of the attachment referenced to.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='url' type='xs:anyURI' use='required'>
-        <xs:annotation>
-          <xs:documentation>An URL to download the attachment.</xs:documentation>
-          <xs:documentation>Attachments must be protected using the IEEE1451.99.Sign WWW-authentication mechanism to make sure only authorized clients can access the attachment.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
+	<xs:element name='attachment'>
+		<xs:annotation>
+			<xs:documentation>Represents an attachment.</xs:documentation>
+			<xs:documentation>An attachment can	be assigned to smart contracts.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The identity of the attachment.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='legalId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The legal identity of the uploader of the attachment.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='contentType' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Internet Content-Type of attachment.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='fileName' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Filename of attachment.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='s' type='xs:base64Binary' use='required'>
+				<xs:annotation>
+					<xs:documentation>Signature of attachment, made by the uploader.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='timestamp' type='xs:dateTime' use='required'>
+				<xs:annotation>
+					<xs:documentation>Timestamp of attachment upload.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='attachmentRef'>
+		<xs:annotation>
+			<xs:documentation>Includes information on how to download an attachment.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='attachmentId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The ID of the attachment referenced to.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='url' type='xs:anyURI' use='required'>
+				<xs:annotation>
+					<xs:documentation>An URL to download the attachment.</xs:documentation>
+					<xs:documentation>Attachments must be protected using the IEEE1451.99.Sign WWW-authentication mechanism to make sure only authorized clients can access the attachment.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
 
 </xs:schema>

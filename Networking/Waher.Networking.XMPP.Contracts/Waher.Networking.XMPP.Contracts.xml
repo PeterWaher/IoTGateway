@@ -50,6 +50,27 @@
             Timestamp of signature. If no signature, value is <see cref="F:System.DateTime.MinValue"/>
             </summary>
         </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.BooleanParameter">
+            <summary>
+            Boolean contractual parameter
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.BooleanParameter.Value">
+            <summary>
+            Parameter value
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.BooleanParameter.ObjectValue">
+            <summary>
+            Parameter value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.BooleanParameter.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the parameter, in normalized form.
+            </summary>
+            <param name="Xml">XML Output</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ClientSignature">
             <summary>
             Represents a digital signature on a contract.

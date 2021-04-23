@@ -691,6 +691,15 @@ namespace Waher.Networking.XMPP.Contracts
 										});
 										break;
 
+									case "booleanParameter":
+										Parameters.Add(new BooleanParameter()
+										{
+											Name = Name,
+											Value = XML.Attribute(E2, "value", false),
+											Descriptions = Descriptions.ToArray()
+										});
+										break;
+
 									default:
 										return null;
 								}

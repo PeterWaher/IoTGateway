@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 #if WINDOWS_UWP
@@ -979,7 +980,31 @@ namespace Waher.Networking.HTTP
 				await Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls12,
 					this.clientCertificates, null, this.trustClientCertificates);
 
-				this.Information("TLS established.");
+				if (this.HasSniffers)
+				{
+					this.Information("TLS established.");
+
+					if (!(Client.RemoteCertificate is null))
+					{
+						if (this.HasSniffers)
+						{
+							StringBuilder sb = new StringBuilder();
+
+							sb.Append("Remote Certificate received. Valid: ");
+							sb.Append(Client.RemoteCertificateValid.ToString());
+							sb.Append(", Subject: ");
+							sb.Append(Client.RemoteCertificate.Subject);
+							sb.Append(", Issuer: ");
+							sb.Append(Client.RemoteCertificate.Issuer);
+							sb.Append(", S/N: ");
+							sb.Append(Convert.ToBase64String(Client.RemoteCertificate.GetSerialNumber()));
+							sb.Append(", Hash: ");
+							sb.Append(Convert.ToBase64String(Client.RemoteCertificate.GetCertHash()));
+
+							this.Information(sb.ToString());
+						}
+					}
+				}
 
 				HttpClientConnection Connection = new HttpClientConnection(this, Client, true, this.Sniffers);
 

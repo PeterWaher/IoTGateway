@@ -34,11 +34,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// ID of contract being signed, as an URI.
 		/// </summary>
-		public Uri ContractIdUri => ContractsClient.LegalIdUri(this.contractId);
+		public Uri ContractIdUri => ContractsClient.ContractIdUri(this.contractId);
 
 		/// <summary>
 		/// ID of contract being signed, as an URI string.
 		/// </summary>
-		public string ContractIdUriString => ContractsClient.LegalIdUriString(this.contractId);
+		public string ContractIdUriString => ContractsClient.ContractIdUriString(this.contractId);
 	}
 }

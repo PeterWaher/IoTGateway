@@ -49,7 +49,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 			string s;
 
 			if (Value is bool BooleanValue)
-				s = BooleanValue ? "☑" : "☐";
+				s = BooleanValue ? "[X]" : "[ ]";
 			else
 				s = Value?.ToString() ?? string.Empty;
 

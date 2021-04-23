@@ -15,7 +15,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
-using SkiaSharp;
 using Waher.Content;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Html;

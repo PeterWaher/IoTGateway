@@ -47,6 +47,7 @@ namespace Waher.IoTGateway.Setup
 		private static readonly object[] approvedContractClientSources = new object[]
 		{
 			"Waher.Service.IoTBroker.Legal.MFA.QuickLogin",
+			"Waher.Service.Abc4Io.Model.Actions.Contract.SignContract",
 			typeof(LegalIdentityConfiguration),
 			GetAttachment
 		};

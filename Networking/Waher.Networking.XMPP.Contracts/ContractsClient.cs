@@ -112,6 +112,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.client.RegisterMessageHandler("contractDeleted", NamespaceSmartContracts, this.ContractDeletedMessageHandler, false);
 			this.client.RegisterMessageHandler("petitionContractMsg", NamespaceSmartContracts, this.PetitionContractMessageHandler, false);
 			this.client.RegisterMessageHandler("petitionContractResponseMsg", NamespaceSmartContracts, this.PetitionContractResponseMessageHandler, false);
+			this.client.RegisterMessageHandler("contractProposal", NamespaceSmartContracts, this.ContractProposalMessageHandler, false);
 
 			this.aes = Aes.Create();
 			this.aes.BlockSize = 128;
@@ -136,6 +137,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.client.UnregisterMessageHandler("contractDeleted", NamespaceSmartContracts, this.ContractDeletedMessageHandler, false);
 			this.client.UnregisterMessageHandler("petitionContractMsg", NamespaceSmartContracts, this.PetitionContractMessageHandler, false);
 			this.client.UnregisterMessageHandler("petitionContractResponseMsg", NamespaceSmartContracts, this.PetitionContractResponseMessageHandler, false);
+			this.client.UnregisterMessageHandler("contractProposal", NamespaceSmartContracts, this.ContractProposalMessageHandler, false);
 
 			this.localKeys?.Dispose();
 			this.localKeys = null;
@@ -3288,6 +3290,75 @@ namespace Waher.Networking.XMPP.Contracts
 
 			return await Result.Task;
 		}
+
+		#endregion
+
+		#region SendContractProposal
+
+		/// <summary>
+		/// Sends a contract proposal to a recipient.
+		/// </summary>
+		/// <param name="ContractId">ID of proposed contract.</param>
+		/// <param name="Role">Proposed role of recipient.</param>
+		/// <param name="To">Recipient Address (Bare or Full JID).</param>
+		public void SendContractProposal(string ContractId, string Role, string To)
+		{
+			this.SendContractProposal(ContractId, Role, To, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a contract proposal to a recipient.
+		/// </summary>
+		/// <param name="ContractId">ID of proposed contract.</param>
+		/// <param name="Role">Proposed role of recipient.</param>
+		/// <param name="To">Recipient Address (Bare or Full JID).</param>
+		/// <param name="Message">Optional message included in message.</param>
+		public void SendContractProposal(string ContractId, string Role, string To, string Message)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<contractProposal xmlns=\"");
+			Xml.Append(NamespaceSmartContracts);
+			Xml.Append("\" contractId=\"");
+			Xml.Append(XML.Encode(ContractId));
+			Xml.Append("\" role=\"");
+			Xml.Append(XML.Encode(Role));
+
+			if (!string.IsNullOrEmpty(Message))
+			{
+				Xml.Append("\" message=\"");
+				Xml.Append(XML.Encode(Message));
+			}
+
+			Xml.Append("\"/>");
+
+			this.client.SendMessage(MessageType.Normal, To, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		private async Task ContractProposalMessageHandler(object Sender, MessageEventArgs e)
+		{
+			ContractProposalEventHandler h = this.ContractProposalReceived;
+			if (!(h is null))
+			{
+				string ContractId = XML.Attribute(e.Content, "contractId");
+				string Role = XML.Attribute(e.Content, "role");
+				string Message = XML.Attribute(e.Content, "message");
+
+				try
+				{
+					await h(this, new ContractProposalEventArgs(e, ContractId, Role, Message));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when a new contract proposal has been received.
+		/// </summary>
+		public event ContractProposalEventHandler ContractProposalReceived = null;
 
 		#endregion
 

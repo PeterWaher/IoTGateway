@@ -1374,6 +1374,28 @@
             <param name="ValidateState">If the state attribute should be validated. (Default=true)</param>
             <returns>Status of validation.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SendContractProposal(System.String,System.String,System.String)">
+            <summary>
+            Sends a contract proposal to a recipient.
+            </summary>
+            <param name="ContractId">ID of proposed contract.</param>
+            <param name="Role">Proposed role of recipient.</param>
+            <param name="To">Recipient Address (Bare or Full JID).</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SendContractProposal(System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends a contract proposal to a recipient.
+            </summary>
+            <param name="ContractId">ID of proposed contract.</param>
+            <param name="Role">Proposed role of recipient.</param>
+            <param name="To">Recipient Address (Bare or Full JID).</param>
+            <param name="Message">Optional message included in message.</param>
+        </member>
+        <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.ContractProposalReceived">
+            <summary>
+            Event raised when a new contract proposal has been received.
+            </summary>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSchemas(Waher.Networking.XMPP.Contracts.SchemaReferencesEventHandler,System.Object)">
             <summary>
             Gets available schemas.
@@ -2179,6 +2201,42 @@
         <member name="P:Waher.Networking.XMPP.Contracts.ContractPetitionResponseEventArgs.Response">
             <summary>
             If accepted (true) or rejected (false).
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.ContractProposalEventHandler">
+            <summary>
+            Delegate for smart contract proposal events.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.ContractProposalEventArgs">
+            <summary>
+            Event arguments for smart contract proposals
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractProposalEventArgs.#ctor(Waher.Networking.XMPP.MessageEventArgs,System.String,System.String,System.String)">
+            <summary>
+            Event arguments for smart contract petitions
+            </summary>
+            <param name="e">Message event arguments.</param>
+            <param name="ContractId">ID of proposed contract.</param>
+            <param name="Role">Proposed role in proposed contract.</param>
+            <param name="Message">Optional message to present to recipient.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractProposalEventArgs.ContractId">
+            <summary>
+            ID of proposed contract.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractProposalEventArgs.Role">
+            <summary>
+            Proposed role in proposed contract.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractProposalEventArgs.MessageText">
+            <summary>
+            Optional message to present to recipient.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractReferenceEventHandler">

@@ -2142,10 +2142,10 @@ insert
 into PersistedEvent 
 object
 {
-	Timestamp=Now, 
-	Message="Kilroy was here", 
-	Object="Here", 
-	Actor="Kilroy"
+	Timestamp:Now, 
+	Message:"Kilroy was here", 
+	Object:"Here", 
+	Actor:"Kilroy"
 }
 ```
 
@@ -2169,16 +2169,16 @@ insert
 into PersistedEvent 
 objects
 [{
-	Timestamp=Now, 
-	Message="Kilroy was here", 
-	Object="Here", 
-	Actor="Kilroy"
+	Timestamp:Now, 
+	Message:"Kilroy was here", 
+	Object:"Here", 
+	Actor:"Kilroy"
 },
 {
-	Timestamp=Now, 
-	Message="Kilroy was here again", 
-	Object="Here", 
-	Actor="Kilroy"
+	Timestamp:Now, 
+	Message:"Kilroy was here again", 
+	Object:"Here", 
+	Actor:"Kilroy"
 }]
 ```
 

@@ -803,6 +803,28 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
+		/// Latest approved Legal Identity ID.
+		/// </summary>
+		public static string LatestApprovedLegalIdentityId
+		{
+			get
+			{
+				if (!HasApprovedLegalIdentities)
+					throw new NotFoundException("Gateway has no approved legal identity.");
+
+				LegalIdentity Latest = null;
+
+				foreach (LegalIdentity Identity in approvedIdentities)
+				{
+					if (Latest is null || Identity.Created > Latest.Created)
+						Latest = Identity;
+				}
+
+				return Latest?.Id;
+			}
+		}
+
+		/// <summary>
 		/// Gets the legal identity that corresponds to a given password, from the corresponding hash digests.
 		/// </summary>
 		/// <param name="Password">Password</param>

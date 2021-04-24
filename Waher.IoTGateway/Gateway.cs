@@ -3563,6 +3563,14 @@ namespace Waher.IoTGateway
 		}
 
 		/// <summary>
+		/// Latest approved Legal Identity ID.
+		/// </summary>
+		public static string LatestApprovedLegalIdentityId
+		{
+			get { return LegalIdentityConfiguration.LatestApprovedLegalIdentityId; }
+		}
+
+		/// <summary>
 		/// Requests the operator to sign a smart contract.
 		/// </summary>
 		/// <param name="Contract">Contract to sign. Must be ready to sign.</param>

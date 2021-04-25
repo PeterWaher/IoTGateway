@@ -79,6 +79,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.JWS", "Secur
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.JWT", "Security\Waher.Security.JWT\Waher.Security.JWT.csproj", "{2269E977-2063-471D-8314-2174717AA2BA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Profiling", "Runtime\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj", "{2F49A001-8C02-4EDF-8F80-F4DDF4708E40}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -205,6 +207,10 @@ Global
 		{2269E977-2063-471D-8314-2174717AA2BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2269E977-2063-471D-8314-2174717AA2BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2269E977-2063-471D-8314-2174717AA2BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F49A001-8C02-4EDF-8F80-F4DDF4708E40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F49A001-8C02-4EDF-8F80-F4DDF4708E40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F49A001-8C02-4EDF-8F80-F4DDF4708E40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F49A001-8C02-4EDF-8F80-F4DDF4708E40}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -227,6 +233,7 @@ Global
 		{D909ADCC-3C62-44EC-A69E-502D9C3C6624} = {EECF8A99-FA34-4A25-B67A-97EC55EE5C7E}
 		{C034A35D-4D48-4B6B-809A-1BE7F37C9850} = {EECF8A99-FA34-4A25-B67A-97EC55EE5C7E}
 		{2269E977-2063-471D-8314-2174717AA2BA} = {EECF8A99-FA34-4A25-B67A-97EC55EE5C7E}
+		{2F49A001-8C02-4EDF-8F80-F4DDF4708E40} = {0D510A76-814B-4D6E-8D13-9C59507F7A7C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09539FCE-8EB5-447C-A9AF-6FA30BE14418}

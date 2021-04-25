@@ -225,9 +225,25 @@
       <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
       <Name>Waher.Events</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence.FilesLW\Waher.Persistence.FilesLW.csproj">
+      <Project>{a88f6f6a-0c2f-4a0c-a999-9359ca3570a8}</Project>
+      <Name>Waher.Persistence.FilesLW</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence.Serialization\Waher.Persistence.Serialization.csproj">
+      <Project>{a67f86b3-a5c7-4f97-824e-bd7c20594a24}</Project>
+      <Name>Waher.Persistence.Serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
+      <Project>{2b2dc5c3-3cbb-41dd-9b69-342c3a8be861}</Project>
+      <Name>Waher.Persistence</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
       <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
       <Name>Waher.Runtime.Inventory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj">
+      <Project>{2f49a001-8c02-4edf-8f80-f4ddf4708e40}</Project>
+      <Name>Waher.Runtime.Profiling</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Security\Waher.Security.JWT\Waher.Security.JWT.csproj">
       <Project>{2269e977-2063-471d-8314-2174717aa2ba}</Project>

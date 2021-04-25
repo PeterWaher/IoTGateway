@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
+using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Vectors;
@@ -32,20 +33,7 @@ namespace Waher.Script.Model
         /// <returns>Function result.</returns>
         public override IElement Evaluate(IElement Argument, Variables Variables)
         {
-            if (Argument is IVector Vector)
-            {
-                if (Vector is DoubleVector DoubleVector)
-                    return this.EvaluateVector(DoubleVector, Variables);
-
-                if (Vector is ComplexVector ComplexVector)
-                    return this.EvaluateVector(ComplexVector, Variables);
-
-                if (Vector is BooleanVector BooleanVector)
-                    return this.EvaluateVector(BooleanVector, Variables);
-
-                return this.EvaluateVector(Vector, Variables);
-            }
-            else
+            if (!(Argument is IVector Vector))
             {
                 if (Argument is IMatrix Matrix)
                 {
@@ -87,9 +75,20 @@ namespace Waher.Script.Model
                         return Argument.Encapsulate(Elements, this);
                     }
                     else
-                        return this.EvaluateVector((IVector)VectorDefinition.Encapsulate(new IElement[] { Argument }, false, this), Variables);
+                        Vector = VectorDefinition.Encapsulate(new IElement[] { Argument }, false, this);
                 }
             }
+
+            if (Vector is DoubleVector DoubleVector)
+                return this.EvaluateVector(DoubleVector, Variables);
+
+            if (Vector is ComplexVector ComplexVector)
+                return this.EvaluateVector(ComplexVector, Variables);
+
+            if (Vector is BooleanVector BooleanVector)
+                return this.EvaluateVector(BooleanVector, Variables);
+
+            return this.EvaluateVector(Vector, Variables);
         }
 
         /// <summary>

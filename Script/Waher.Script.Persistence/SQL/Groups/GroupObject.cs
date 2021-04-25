@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -98,6 +98,8 @@ namespace Waher.Script.Persistence.SQL.Groups
 				}
 				else
 				{
+					Type ItemType = null;
+					Type T;
 					object[] Result = new object[this.objectCount];
 					object Item;
 					int i;
@@ -107,7 +109,10 @@ namespace Waher.Script.Persistence.SQL.Groups
 						Item = this.objects[i];
 
 						if (Item is null)
+						{
 							Result[i] = null;
+							ItemType = null;
+						}
 						else
 						{
 							if (this.properties is null)
@@ -115,16 +120,59 @@ namespace Waher.Script.Persistence.SQL.Groups
 							else
 								this.properties.Object = Item;
 
-							if (this.properties.TryGetValue(Name, out Value))
+							if (this.properties.TryGetValue(Name, out Value) && !(Value is null))
+							{
+								T = Value.GetType();
+								if (i == 0)
+									ItemType = T;
+								else if (T != ItemType)
+									ItemType = null;
+
 								Result[i] = Value;
+							}
 							else
+							{
 								Result[i] = null;
+								ItemType = null;
+							}
 						}
 					}
 
-					this.groupedValues[Name] = Result;
-
-					return Result;
+					if (ItemType == typeof(double))
+					{
+						double[] TypedArray = new double[this.objectCount];
+						Array.Copy(Result, 0, TypedArray, 0, this.objectCount);
+						return TypedArray;
+					}
+					else if (ItemType == typeof(bool))
+					{
+						bool[] TypedArray = new bool[this.objectCount];
+						Array.Copy(Result, 0, TypedArray, 0, this.objectCount);
+						return TypedArray;
+					}
+					else if (ItemType == typeof(string))
+					{
+						string[] TypedArray = new string[this.objectCount];
+						Array.Copy(Result, 0, TypedArray, 0, this.objectCount);
+						return TypedArray;
+					}
+					else if (ItemType == typeof(DateTime))
+					{
+						DateTime[] TypedArray = new DateTime[this.objectCount];
+						Array.Copy(Result, 0, TypedArray, 0, this.objectCount);
+						return TypedArray;
+					}
+					else if (ItemType == typeof(Complex))
+					{
+						Complex[] TypedArray = new Complex[this.objectCount];
+						Array.Copy(Result, 0, TypedArray, 0, this.objectCount);
+						return TypedArray;
+					}
+					else
+					{
+						this.groupedValues[Name] = Result;
+						return Result;
+					}
 				}
 			}
 

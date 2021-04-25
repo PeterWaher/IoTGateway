@@ -506,15 +506,8 @@ namespace Waher.Script.Persistence.SQL.Parsers
 		{
 			if (Node is Function)
 			{
-				return !(Node is Average ||
-					Node is Count ||
-					Node is Max ||
-					Node is Median ||
-					Node is Min ||
-					Node is Product ||
-					Node is StandardDeviation ||
-					Node is Sum ||
-					Node is Variance);
+				return !(Node is FunctionOneVectorVariable ||
+					Node is Count);
 			}
 
 			return true;

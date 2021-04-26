@@ -42,12 +42,12 @@ You are not connected to a broker that supports smart contracts. For this reason
 Roles
 ----------
 
-| Name | Min | Max | Description |
-|:-----|----:|----:|:------------|[[;
+| Name | Min | Max | Can Revoke | Description |
+|:-----|----:|----:|:----------:|:------------|[[;
 
 		foreach Role in Page.Contract.Roles do
 			]]
-| ((MarkdownEncode(Role.Name) )) | ((Role.MinCount)) | ((Role.MaxCount)) | ((OneRow(Role.ToMarkdown(Language, Page.Contract) ) )) |[[;
+| ((MarkdownEncode(Role.Name) )) | ((Role.MinCount)) | ((Role.MaxCount)) | ((Role.CanRevoke ? "✔" : "✗")) | ((OneRow(Role.ToMarkdown(Language, Page.Contract) ) )) |[[;
 
 		]]
 

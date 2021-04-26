@@ -4016,6 +4016,11 @@
             Largest amount of signatures of this role required for a legally binding contract.
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Role.CanRevoke">
+            <summary>
+            If parts having this role, can revoke their signature, once signed.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.SchemaDigest">
             <summary>
             Contains a schema digest

@@ -471,7 +471,8 @@ namespace Waher.Networking.XMPP.Contracts
 						Role Role = new Role()
 						{
 							MinCount = -1,
-							MaxCount = -1
+							MaxCount = -1,
+							CanRevoke = false
 						};
 
 						foreach (XmlAttribute Attr in E.Attributes)
@@ -494,6 +495,13 @@ namespace Waher.Networking.XMPP.Contracts
 								case "maxCount":
 									if (int.TryParse(Attr.Value, out i) && i >= 0)
 										Role.MaxCount = i;
+									else
+										return null;
+									break;
+
+								case "canRevoke":
+									if (CommonTypes.TryParse(Attr.Value, out bool b))
+										Role.CanRevoke = b;
 									else
 										return null;
 									break;
@@ -1137,6 +1145,10 @@ namespace Waher.Networking.XMPP.Contracts
 					Xml.Append(Role.MinCount.ToString());
 					Xml.Append("\" name=\"");
 					Xml.Append(XML.Encode(Role.Name));
+
+					if (Role.CanRevoke)
+						Xml.Append("\" canRevoke=\"true");
+
 					Xml.Append("\">");
 
 					foreach (HumanReadableText Description in Role.Descriptions)

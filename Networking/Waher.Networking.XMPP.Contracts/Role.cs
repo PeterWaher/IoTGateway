@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Networking.XMPP.Contracts.HumanReadable;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -13,6 +10,7 @@ namespace Waher.Networking.XMPP.Contracts
 		private string name = string.Empty;
 		private int minCount = 0;
 		private int maxCount = 0;
+		private bool canRevoke = false;
 
 		/// <summary>
 		/// Name of the role.
@@ -39,6 +37,15 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			get => this.maxCount;
 			set => this.maxCount = value;
+		}
+
+		/// <summary>
+		/// If parts having this role, can revoke their signature, once signed.
+		/// </summary>
+		public bool CanRevoke
+		{
+			get => this.canRevoke;
+			set => this.canRevoke = value;
 		}
 
 	}

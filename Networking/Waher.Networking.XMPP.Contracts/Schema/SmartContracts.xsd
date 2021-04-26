@@ -166,6 +166,14 @@ purposes.
 								<xs:documentation>Maximum amount of signatures allowed for this role.</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
+						<xs:attribute name='canRevoke' type='xs:boolean' use='optional' default='false'>
+							<xs:annotation>
+								<xs:documentation>If parts having this role, can revoke their signature, once signed.</xs:documentation>
+								<xs:documentation>Revoking a signature can be used as a means to model consent-based agreements.</xs:documentation>
+								<xs:documentation>Consent, in a privacy perspective, can typically be revoked.</xs:documentation>
+								<xs:documentation>Revoking a signature is done, by calling obsoleteContract.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
 					</xs:complexType>
 				</xs:element>
 				<xs:element ref='parts' minOccurs='0' maxOccurs='1'>

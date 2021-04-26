@@ -3586,7 +3586,7 @@ namespace Waher.IoTGateway
 
 			// TODO: Check contract server signature is valid.
 
-			foreach (Waher.Networking.XMPP.Contracts.Role R in Contract.Roles)
+			foreach (Networking.XMPP.Contracts.Role R in Contract.Roles)
 			{
 				if (R.Name == Role)
 				{

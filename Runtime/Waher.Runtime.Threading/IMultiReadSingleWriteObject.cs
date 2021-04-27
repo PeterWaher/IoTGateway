@@ -12,13 +12,15 @@ namespace Waher.Runtime.Threading
 		/// Waits until object ready for reading.
 		/// Each call to <see cref="BeginRead"/> must be followed by exactly one call to <see cref="EndRead"/>.
 		/// </summary>
-		Task BeginRead();
+		/// <returns>Number of concurrent readers when returning from locked section of call.</returns>
+		Task<int> BeginRead();
 
 		/// <summary>
 		/// Ends a reading session of the object.
 		/// Must be called once for each call to <see cref="BeginRead"/> or successful call to <see cref="TryBeginRead(int)"/>.
 		/// </summary>
-		Task EndRead();
+		/// <returns>Number of concurrent readers when returning from locked section of call.</returns>
+		Task<int> EndRead();
 
 		/// <summary>
 		/// Waits, at most <paramref name="Timeout"/> milliseconds, until object ready for reading.
@@ -45,5 +47,21 @@ namespace Waher.Runtime.Threading
 		/// </summary>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		Task<bool> TryBeginWrite(int Timeout);
+
+		/// <summary>
+		/// Number of concurrent readers.
+		/// </summary>
+		int NrReaders
+		{
+			get;
+		}
+
+		/// <summary>
+		/// If the object has a writer.
+		/// </summary>
+		bool IsWriting
+		{
+			get;
+		}
 	}
 }

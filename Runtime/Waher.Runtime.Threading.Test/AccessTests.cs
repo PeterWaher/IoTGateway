@@ -14,11 +14,17 @@ namespace Waher.Runtime.Threading.Test
 		{
 			using (MultiReadSingleWriteObject obj = new MultiReadSingleWriteObject())
 			{
+				long Token = obj.Token;
+
 				Assert.AreEqual(0, obj.NrReaders);
+
 				await obj.BeginRead();
 				Assert.AreEqual(1, obj.NrReaders);
+				Assert.AreEqual(Token + 1, obj.Token);
+
 				await obj.EndRead();
 				Assert.AreEqual(0, obj.NrReaders);
+				Assert.AreEqual(Token + 2, obj.Token);
 			}
 		}
 
@@ -27,11 +33,17 @@ namespace Waher.Runtime.Threading.Test
 		{
 			using (MultiReadSingleWriteObject obj = new MultiReadSingleWriteObject())
 			{
+				long Token = obj.Token;
+
 				Assert.IsFalse(obj.IsWriting);
+
 				await obj.BeginWrite();
 				Assert.IsTrue(obj.IsWriting);
+				Assert.AreEqual(Token + 1, obj.Token);
+
 				await obj.EndWrite();
 				Assert.IsFalse(obj.IsWriting);
+				Assert.AreEqual(Token + 2, obj.Token);
 			}
 		}
 
@@ -40,15 +52,25 @@ namespace Waher.Runtime.Threading.Test
 		{
 			using (MultiReadSingleWriteObject obj = new MultiReadSingleWriteObject())
 			{
+				long Token = obj.Token;
+
 				Assert.AreEqual(0, obj.NrReaders);
+
 				await obj.BeginRead();
 				Assert.AreEqual(1, obj.NrReaders);
+				Assert.AreEqual(Token + 1, obj.Token);
+
 				await obj.BeginRead();
 				Assert.AreEqual(2, obj.NrReaders);
+				Assert.AreEqual(Token + 1, obj.Token);
+
 				await obj.EndRead();
 				Assert.AreEqual(1, obj.NrReaders);
+				Assert.AreEqual(Token + 1, obj.Token);
+
 				await obj.EndRead();
 				Assert.AreEqual(0, obj.NrReaders);
+				Assert.AreEqual(Token + 2, obj.Token);
 			}
 		}
 
@@ -59,20 +81,27 @@ namespace Waher.Runtime.Threading.Test
 			{
 				TaskCompletionSource<bool> Done1 = new TaskCompletionSource<bool>();
 				TaskCompletionSource<bool> Done2 = new TaskCompletionSource<bool>();
+				long Token = obj.Token;
 
 				Thread T1 = new Thread(async () =>
 				{
 					try
 					{
 						Assert.AreEqual(0, obj.NrReaders);
+
 						await obj.BeginRead();
 						Assert.AreEqual(1, obj.NrReaders);
 						Assert.IsFalse(obj.IsWriting);
+						Assert.AreEqual(Token + 1, obj.Token);
+
 						Thread.Sleep(2000);
 						Assert.AreEqual(1, obj.NrReaders);
 						Assert.IsFalse(obj.IsWriting);
+						Assert.AreEqual(Token + 1, obj.Token);
+
 						await obj.EndRead();
 						Assert.AreEqual(0, obj.NrReaders);
+
 						Done1.SetResult(true);
 					}
 					catch (Exception ex)
@@ -88,14 +117,19 @@ namespace Waher.Runtime.Threading.Test
 						Thread.Sleep(1000);
 						Assert.AreEqual(1, obj.NrReaders);
 						Assert.IsFalse(obj.IsWriting);
+
 						await obj.BeginWrite();
 						Assert.AreEqual(0, obj.NrReaders);
 						Assert.IsTrue(obj.IsWriting);
+						Assert.AreEqual(Token + 3, obj.Token);
+
 						Thread.Sleep(2000);
 						Assert.AreEqual(0, obj.NrReaders);
 						Assert.IsTrue(obj.IsWriting);
+
 						await obj.EndWrite();
 						Assert.IsFalse(obj.IsWriting);
+
 						Done2.SetResult(true);
 					}
 					catch (Exception ex)
@@ -109,6 +143,7 @@ namespace Waher.Runtime.Threading.Test
 
 				Assert.IsTrue(await Done1.Task);
 				Assert.IsTrue(await Done2.Task);
+				Assert.AreEqual(Token + 4, obj.Token);
 			}
 		}
 
@@ -119,20 +154,26 @@ namespace Waher.Runtime.Threading.Test
 			{
 				TaskCompletionSource<bool> Done1 = new TaskCompletionSource<bool>();
 				TaskCompletionSource<bool> Done2 = new TaskCompletionSource<bool>();
+				long Token = obj.Token;
 
 				Thread T1 = new Thread(async () =>
 				{
 					try
 					{
 						Assert.IsFalse(obj.IsWriting);
+
 						await obj.BeginWrite();
 						Assert.IsTrue(obj.IsWriting);
 						Assert.AreEqual(0, obj.NrReaders);
+						Assert.AreEqual(Token + 1, obj.Token);
+
 						Thread.Sleep(2000);
 						Assert.IsTrue(obj.IsWriting);
 						Assert.AreEqual(0, obj.NrReaders);
+
 						await obj.EndWrite();
 						Assert.IsFalse(obj.IsWriting);
+
 						Done1.SetResult(true);
 					}
 					catch (Exception ex)
@@ -148,12 +189,16 @@ namespace Waher.Runtime.Threading.Test
 						Thread.Sleep(1000);
 						Assert.IsTrue(obj.IsWriting);
 						Assert.AreEqual(0, obj.NrReaders);
+
 						await obj.BeginRead();
 						Assert.IsFalse(obj.IsWriting);
 						Assert.AreEqual(1, obj.NrReaders);
+						Assert.AreEqual(Token + 3, obj.Token);
+
 						Thread.Sleep(2000);
 						Assert.IsFalse(obj.IsWriting);
 						Assert.AreEqual(1, obj.NrReaders);
+
 						await obj.EndRead();
 						Assert.AreEqual(0, obj.NrReaders);
 						Done2.SetResult(true);
@@ -169,6 +214,7 @@ namespace Waher.Runtime.Threading.Test
 
 				Assert.IsTrue(await Done1.Task);
 				Assert.IsTrue(await Done2.Task);
+				Assert.AreEqual(Token + 4, obj.Token);
 			}
 		}
 
@@ -179,18 +225,23 @@ namespace Waher.Runtime.Threading.Test
 			{
 				TaskCompletionSource<bool> Done1 = new TaskCompletionSource<bool>();
 				TaskCompletionSource<bool> Done2 = new TaskCompletionSource<bool>();
+				long Token = obj.Token;
 
 				Thread T1 = new Thread(async () =>
 				{
 					try
 					{
 						Assert.IsFalse(obj.IsWriting);
+
 						await obj.BeginWrite();
 						Assert.IsTrue(obj.IsWriting);
 						Assert.AreEqual(0, obj.NrReaders);
+						Assert.AreEqual(Token + 1, obj.Token);
+
 						Thread.Sleep(2000);
 						Assert.IsTrue(obj.IsWriting);
 						Assert.AreEqual(0, obj.NrReaders);
+
 						await obj.EndWrite();
 						Assert.IsFalse(obj.IsWriting);
 						Done1.SetResult(true);
@@ -208,9 +259,12 @@ namespace Waher.Runtime.Threading.Test
 						Thread.Sleep(1000);
 						Assert.IsTrue(obj.IsWriting);
 						Assert.AreEqual(0, obj.NrReaders);
+
 						await obj.BeginWrite();
 						Assert.IsTrue(obj.IsWriting);
 						Assert.AreEqual(0, obj.NrReaders);
+						Assert.AreEqual(Token + 3, obj.Token);
+
 						await obj.EndWrite();
 						Assert.IsFalse(obj.IsWriting);
 						Done2.SetResult(true);
@@ -226,6 +280,7 @@ namespace Waher.Runtime.Threading.Test
 
 				Assert.IsTrue(await Done1.Task);
 				Assert.IsTrue(await Done2.Task);
+				Assert.AreEqual(Token + 4, obj.Token);
 			}
 		}
 
@@ -236,27 +291,39 @@ namespace Waher.Runtime.Threading.Test
 			{
 				TaskCompletionSource<bool> Done1 = new TaskCompletionSource<bool>();
 				TaskCompletionSource<bool> Done2 = new TaskCompletionSource<bool>();
+				long Token = obj.Token;
 
 				Thread T1 = new Thread(async () =>
 				{
 					try
 					{
 						Assert.AreEqual(0, obj.NrReaders);
+
 						await obj.BeginRead();
 						Assert.AreEqual(1, obj.NrReaders);
 						Assert.IsFalse(obj.IsWriting);
+						Assert.AreEqual(Token + 1, obj.Token);
+
 						await obj.BeginRead();
 						Assert.AreEqual(2, obj.NrReaders);
 						Assert.IsFalse(obj.IsWriting);
+						Assert.AreEqual(Token + 1, obj.Token);
+
 						Thread.Sleep(2000);
 						Assert.AreEqual(2, obj.NrReaders);
 						Assert.IsFalse(obj.IsWriting);
+						Assert.AreEqual(Token + 1, obj.Token);
+
 						await obj.EndRead();
 						Assert.AreEqual(1, obj.NrReaders);
 						Assert.IsFalse(obj.IsWriting);
+						Assert.AreEqual(Token + 1, obj.Token);
+
 						Thread.Sleep(2000);
 						Assert.AreEqual(1, obj.NrReaders);
 						Assert.IsFalse(obj.IsWriting);
+						Assert.AreEqual(Token + 1, obj.Token);
+
 						await obj.EndRead();
 						Assert.AreEqual(0, obj.NrReaders);
 						Done1.SetResult(true);
@@ -274,12 +341,17 @@ namespace Waher.Runtime.Threading.Test
 						Thread.Sleep(1000);
 						Assert.AreEqual(2, obj.NrReaders);
 						Assert.IsFalse(obj.IsWriting);
+
 						await obj.BeginWrite();
 						Assert.AreEqual(0, obj.NrReaders);
 						Assert.IsTrue(obj.IsWriting);
+						Assert.AreEqual(Token + 3, obj.Token);
+
 						Thread.Sleep(2000);
 						Assert.AreEqual(0, obj.NrReaders);
 						Assert.IsTrue(obj.IsWriting);
+						Assert.AreEqual(Token + 3, obj.Token);
+
 						await obj.EndWrite();
 						Assert.IsFalse(obj.IsWriting);
 						Done2.SetResult(true);
@@ -295,6 +367,45 @@ namespace Waher.Runtime.Threading.Test
 
 				Assert.IsTrue(await Done1.Task);
 				Assert.IsTrue(await Done2.Task);
+				Assert.AreEqual(Token + 4, obj.Token);
+			}
+		}
+
+		private class Counter
+		{
+			private readonly object synchObj = new object();
+			private long token;
+
+			public Counter(long StartValue)
+			{
+				this.token = StartValue;
+			}
+
+			public long Token
+			{
+				get
+				{
+					lock (this.synchObj)
+					{
+						return this.token;
+					}
+				}
+			}
+
+			public long PreInc()
+			{
+				lock (this.synchObj)
+				{
+					return ++this.token;
+				}
+			}
+
+			public long PostInc()
+			{
+				lock (this.synchObj)
+				{
+					return this.token++;
+				}
 			}
 		}
 
@@ -308,6 +419,7 @@ namespace Waher.Runtime.Threading.Test
 				int i;
 				int NrReads = 0;
 				int NrWrites = 0;
+				Counter Counter = new Counter(obj.Token);
 
 				for (i = 0; i < 100; i++)
 				{
@@ -331,23 +443,50 @@ namespace Waher.Runtime.Threading.Test
 									await obj.BeginWrite();
 									Assert.AreEqual(0, obj.NrReaders);
 									Assert.IsTrue(obj.IsWriting);
+									Assert.AreEqual(Counter.PreInc(), obj.Token);
 									NrWrites++;
+
 									Thread.Sleep(10);
 									Assert.AreEqual(0, obj.NrReaders);
 									Assert.IsTrue(obj.IsWriting);
+									Assert.AreEqual(Counter.PostInc(), obj.Token);
+
 									await obj.EndWrite();
+
 									Thread.Sleep(j - 100);
 								}
 								else
 								{
-									await obj.BeginRead();
+									bool Recursive = false;
+
+									int NrReaders = await obj.BeginRead();
 									Assert.IsFalse(obj.IsWriting);
-									Assert.IsTrue(obj.NrReaders > 0);
+
+									switch (NrReaders)
+									{
+										case 0:
+											Assert.Fail();
+											break;
+
+										case 1:
+											Assert.AreEqual(Counter.PreInc(), obj.Token);
+											break;
+
+										default:
+											Assert.AreEqual(Counter.Token, obj.Token);
+											Recursive = true;
+											break;
+									}
 									NrReads++;
+
 									Thread.Sleep(10);
 									Assert.IsFalse(obj.IsWriting);
 									Assert.IsTrue(obj.NrReaders > 0);
+
+									Assert.AreEqual(Recursive ? Counter.Token : Counter.PostInc(), obj.Token);
+
 									await obj.EndRead();
+
 									Thread.Sleep(j);
 								}
 							}
@@ -369,6 +508,7 @@ namespace Waher.Runtime.Threading.Test
 
 				Console.Out.WriteLine("Nr reads: " + NrReads.ToString());
 				Console.Out.WriteLine("Nr writes: " + NrWrites.ToString());
+				Assert.AreEqual(Counter.Token, obj.Token);
 			}
 		}
 

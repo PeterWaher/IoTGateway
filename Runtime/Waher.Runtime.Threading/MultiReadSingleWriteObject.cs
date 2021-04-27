@@ -14,6 +14,7 @@ namespace Waher.Runtime.Threading
 		private LinkedList<TaskCompletionSource<bool>> noWriters = new LinkedList<TaskCompletionSource<bool>>();
 		private LinkedList<TaskCompletionSource<bool>> noReadersOrWriters = new LinkedList<TaskCompletionSource<bool>>();
 		private readonly object synchObj = new object();
+		private long token = 0;
 		private int nrReaders = 0;
 		private bool isWriting = false;
 
@@ -113,10 +114,28 @@ namespace Waher.Runtime.Threading
 		}
 
 		/// <summary>
+		/// Returns a token corresponding to the current lock. It is incremented at the start of a lock-cycle
+		/// (when in a state of no locks, to entering the first lock), and when a lock-cyckle ends (when going
+		/// from a locked state, to an unlocked state). The token can be used to check, in nested code, if the 
+		/// object is in an expected lock, or if a new lock is required.
+		/// </summary>
+		public long Token
+		{
+			get
+			{
+				lock (this.synchObj)
+				{
+					return this.token;
+				}
+			}
+		}
+
+		/// <summary>
 		/// Waits until object ready for reading.
 		/// Each call to <see cref="BeginRead"/> must be followed by exactly one call to <see cref="EndRead"/>.
 		/// </summary>
-		public virtual async Task BeginRead()
+		/// <returns>Number of concurrent readers when returning from locked section of call.</returns>
+		public virtual async Task<int> BeginRead()
 		{
 			TaskCompletionSource<bool> Wait = null;
 
@@ -126,8 +145,10 @@ namespace Waher.Runtime.Threading
 				{
 					if (!this.isWriting)
 					{
-						this.nrReaders++;
-						return;
+						if (this.nrReaders == 0)
+							this.token++;
+
+						return ++this.nrReaders;
 					}
 					else
 					{
@@ -144,7 +165,8 @@ namespace Waher.Runtime.Threading
 		/// Ends a reading session of the object.
 		/// Must be called once for each call to <see cref="BeginRead"/> or successful call to <see cref="TryBeginRead(int)"/>.
 		/// </summary>
-		public virtual Task EndRead()
+		/// <returns>Number of concurrent readers when returning from locked section of call.</returns>
+		public virtual Task<int> EndRead()
 		{
 			LinkedList<TaskCompletionSource<bool>> List = null;
 
@@ -154,8 +176,13 @@ namespace Waher.Runtime.Threading
 					throw new InvalidOperationException("Not in a reading state.");
 
 				this.nrReaders--;
-				if (this.nrReaders > 0 || this.noReadersOrWriters.First is null)
-					return Task.CompletedTask;
+				if (this.nrReaders == 0)
+					this.token++;
+				else
+					return Task.FromResult<int>(this.nrReaders);
+
+				if (this.noReadersOrWriters.First is null)
+					return Task.FromResult<int>(0);
 
 				List = this.noReadersOrWriters;
 				this.noReadersOrWriters = new LinkedList<TaskCompletionSource<bool>>();
@@ -164,7 +191,7 @@ namespace Waher.Runtime.Threading
 			foreach (TaskCompletionSource<bool> T in List)
 				T.TrySetResult(true);
 
-			return Task.CompletedTask;
+			return Task.FromResult<int>(0);
 		}
 
 		/// <summary>
@@ -183,6 +210,9 @@ namespace Waher.Runtime.Threading
 				{
 					if (!this.isWriting)
 					{
+						if (this.nrReaders == 0)
+							this.token++;
+
 						this.nrReaders++;
 						return true;
 					}
@@ -237,6 +267,7 @@ namespace Waher.Runtime.Threading
 
 					if (this.nrReaders == 0 && !this.isWriting)
 					{
+						this.token++;
 						this.isWriting = true;
 						return;
 					}
@@ -267,6 +298,7 @@ namespace Waher.Runtime.Threading
 				if (!this.isWriting)
 					throw new InvalidOperationException("Not in a writing state.");
 
+				this.token++;
 				this.isWriting = false;
 
 				if (!(this.noReadersOrWriters.First is null))
@@ -317,6 +349,7 @@ namespace Waher.Runtime.Threading
 
 					if (this.nrReaders == 0 && !this.isWriting)
 					{
+						this.token++;
 						this.isWriting = true;
 						return true;
 					}
@@ -368,6 +401,7 @@ namespace Waher.Runtime.Threading
 			{
 				this.nrReaders = 0;
 				this.isWriting = false;
+				this.token++;
 
 				if (!(this.noReadersOrWriters.First is null))
 				{

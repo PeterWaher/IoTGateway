@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 
@@ -77,20 +74,22 @@ namespace Waher.Runtime.Threading
 		/// Waits until object ready for reading.
 		/// Each call to <see cref="BeginRead"/> must be followed by exactly one call to <see cref="EndRead"/>.
 		/// </summary>
-		public async Task BeginRead()
+		/// <returns>Number of concurrent readers when returning from locked section of call.</returns>
+		public async Task<int> BeginRead()
 		{
 			await Semaphores.BeginRead(this.name);
-			this.nrReaders++;
+			return ++this.nrReaders;
 		}
 
 		/// <summary>
 		/// Ends a reading session of the object.
 		/// Must be called once for each call to <see cref="BeginRead"/> or successful call to <see cref="TryBeginRead(int)"/>.
 		/// </summary>
-		public async Task EndRead()
+		public async Task<int> EndRead()
 		{
+			int Result = --this.nrReaders;
 			await Semaphores.EndRead(this.name);
-			this.nrReaders--;
+			return Result;
 		}
 
 		/// <summary>
@@ -144,6 +143,16 @@ namespace Waher.Runtime.Threading
 			else
 				return false;
 		}
+
+		/// <summary>
+		/// Number of concurrent readers.
+		/// </summary>
+		public int NrReaders => this.nrReaders;
+
+		/// <summary>
+		/// If the object has a writer.
+		/// </summary>
+		public bool IsWriting => this.isWriting;
 
 		/// <summary>
 		/// Disposes of the named semaphore, and releases any locks the object

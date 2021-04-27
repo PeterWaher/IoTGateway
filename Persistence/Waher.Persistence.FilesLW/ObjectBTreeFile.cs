@@ -43,6 +43,7 @@ namespace Waher.Persistence.Files
 		private LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> objectsToLoad = null;
 		private readonly object synchObject = new object();
 		private readonly IRecordHandler recordHandler;
+		private long lockToken = long.MinValue;
 		private ulong nrFullFileScans = 0;
 		private ulong nrSearches = 0;
 		private uint blocksAdded = 0;
@@ -431,11 +432,64 @@ namespace Waher.Persistence.Files
 #endif
 
 		/// <summary>
+		/// Waits until object ready for reading.
+		/// Each call to <see cref="BeginRead"/> must be followed by exactly one call to <see cref="EndRead"/>.
+		/// </summary>
+		/// <returns>Number of concurrent readers when returning from locked section of call.</returns>
+		public override async Task<int> BeginRead()
+		{
+			int Result = await base.BeginRead();
+			this.lockToken = this.Token;
+			return Result;
+		}
+
+		/// <summary>
+		/// Waits, at most <paramref name="Timeout"/> milliseconds, until object ready for reading.
+		/// Each successful call to <see cref="TryBeginRead"/> must be followed by exactly one call to <see cref="EndRead"/>.
+		/// </summary>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		public override async Task<bool> TryBeginRead(int Timeout)
+		{
+			bool Result = await base.TryBeginRead(Timeout);
+
+			if (Result)
+				this.lockToken = this.Token;
+			
+			return Result;
+		}
+
+		/// <summary>
+		/// Waits until object ready for writing.
+		/// Each call to <see cref="BeginWrite"/> must be followed by exactly one call to <see cref="EndWrite"/>.
+		/// </summary>
+		public override async Task BeginWrite()
+		{
+			await base.BeginWrite();
+			this.lockToken = this.Token;
+		}
+
+		/// <summary>
+		/// Waits, at most <paramref name="Timeout"/> milliseconds, until object ready for writing.
+		/// Each successful call to <see cref="TryBeginWrite"/> must be followed by exactly one call to <see cref="EndWrite"/>.
+		/// </summary>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		public override async Task<bool> TryBeginWrite(int Timeout)
+		{
+			bool Result = await base.TryBeginWrite(Timeout);
+
+			if (Result)
+				this.lockToken = this.Token;
+			
+			return Result;
+		}
+
+		/// <summary>
 		/// Ends a reading session of the object.
 		/// Must be called once for each call to <see cref="MultiReadSingleWriteObject.BeginRead"/> or successful call to 
 		/// <see cref="MultiReadSingleWriteObject.TryBeginRead(int)"/>.
 		/// </summary>
-		public override async Task EndRead()
+		/// <returns>Number of concurrent readers when returning from locked section of call.</returns>
+		public override async Task<int> EndRead()
 		{
 #if DEBUG_LOCKS
 			lock (this.synchObject)
@@ -444,7 +498,7 @@ namespace Waher.Persistence.Files
 					readLocks.Clear();
 			}
 #endif
-			await base.EndRead();
+			int Result = await base.EndRead();
 
 			LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> ToLoad;
 
@@ -459,6 +513,8 @@ namespace Waher.Persistence.Files
 				foreach (Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter> P in ToLoad)
 					P.Item3(await this.LoadObject(P.Item1, P.Item2));
 			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -642,14 +698,18 @@ namespace Waher.Persistence.Files
 		/// <returns>Loaded block.</returns>
 		public async Task<byte[]> LoadBlock(uint BlockIndex)
 		{
-			await this.LockRead();
+			bool NeedLock = this.lockToken != this.Token;
+
+			if (NeedLock)
+				await this.LockRead();
 			try
 			{
 				return await this.LoadBlockLocked(BlockIndex, true);
 			}
 			finally
 			{
-				await this.EndRead();
+				if (NeedLock)
+					await this.EndRead();
 			}
 		}
 

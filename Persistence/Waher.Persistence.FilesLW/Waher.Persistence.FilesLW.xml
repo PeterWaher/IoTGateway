@@ -1755,12 +1755,40 @@
             </summary>
             <returns>New GUID.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.BeginRead">
+            <summary>
+            Waits until object ready for reading.
+            Each call to <see cref="M:Waher.Persistence.Files.ObjectBTreeFile.BeginRead"/> must be followed by exactly one call to <see cref="M:Waher.Persistence.Files.ObjectBTreeFile.EndRead"/>.
+            </summary>
+            <returns>Number of concurrent readers when returning from locked section of call.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.TryBeginRead(System.Int32)">
+            <summary>
+            Waits, at most <paramref name="Timeout"/> milliseconds, until object ready for reading.
+            Each successful call to <see cref="M:Waher.Persistence.Files.ObjectBTreeFile.TryBeginRead(System.Int32)"/> must be followed by exactly one call to <see cref="M:Waher.Persistence.Files.ObjectBTreeFile.EndRead"/>.
+            </summary>
+            <param name="Timeout">Timeout, in milliseconds.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.BeginWrite">
+            <summary>
+            Waits until object ready for writing.
+            Each call to <see cref="M:Waher.Persistence.Files.ObjectBTreeFile.BeginWrite"/> must be followed by exactly one call to <see cref="M:Waher.Persistence.Files.ObjectBTreeFile.EndWrite"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.TryBeginWrite(System.Int32)">
+            <summary>
+            Waits, at most <paramref name="Timeout"/> milliseconds, until object ready for writing.
+            Each successful call to <see cref="M:Waher.Persistence.Files.ObjectBTreeFile.TryBeginWrite(System.Int32)"/> must be followed by exactly one call to <see cref="M:Waher.Persistence.Files.ObjectBTreeFile.EndWrite"/>.
+            </summary>
+            <param name="Timeout">Timeout, in milliseconds.</param>
+        </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.EndRead">
             <summary>
             Ends a reading session of the object.
             Must be called once for each call to <see cref="M:Waher.Runtime.Threading.MultiReadSingleWriteObject.BeginRead"/> or successful call to 
             <see cref="M:Waher.Runtime.Threading.MultiReadSingleWriteObject.TryBeginRead(System.Int32)"/>.
             </summary>
+            <returns>Number of concurrent readers when returning from locked section of call.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.EndWrite">
             <summary>

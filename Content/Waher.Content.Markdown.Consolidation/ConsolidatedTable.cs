@@ -216,7 +216,7 @@ namespace Waher.Content.Markdown.Consolidation
 
 				for (i = 0; i < this.nrHeaderRows; i++)
 				{
-					Markdown.Append("| Source |");
+					Markdown.Append("| Nr | Source |");
 
 					for (j = 0; j < this.nrColumns; j++)
 					{
@@ -238,7 +238,7 @@ namespace Waher.Content.Markdown.Consolidation
 					Markdown.AppendLine();
 				}
 
-				Markdown.Append("|:--|");
+				Markdown.Append("|--:|:--|");
 
 				for (j = 0; j < this.nrColumns; j++)
 				{
@@ -269,7 +269,9 @@ namespace Waher.Content.Markdown.Consolidation
 
 				for (i = 0; i < this.nrCellRows; i++)
 				{
-					Markdown.Append("| `");
+					Markdown.Append("| ");
+					Markdown.Append((i + 1).ToString());
+					Markdown.Append(" | `");
 
 					if (this.sources.TryGetValue(i, out string Source))
 						Markdown.Append(Source);

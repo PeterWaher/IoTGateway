@@ -205,6 +205,9 @@ namespace Waher.Networking.XMPP
 		/// <returns>If the item is in the group.</returns>
 		public bool IsInGroup(string Group, bool IgnoreCase)
 		{
+			if (this.groups is null)
+				return false;
+
 			foreach (string s in this.groups)
 			{
 				if (string.Compare(s, Group, IgnoreCase) == 0)
@@ -215,6 +218,49 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// Checks if the roster item is in any of an array of groups.
+		/// </summary>
+		/// <param name="Groups">Group anmes.</param>
+		/// <returns>If the item is in any of the specified groups.</returns>
+		public bool IsInAnyGroup(string[] Groups)
+		{
+			return this.IsInAnyGroup(Groups, false);
+		}
+
+		/// <summary>
+		/// Checks if the roster item is in any of an array of groups.
+		/// </summary>
+		/// <param name="Groups">Group anmes.</param>
+		/// <param name="IgnoreCase">If comparison should be case insensitive (default=false).</param>
+		/// <returns>If the item is in any of the specified groups.</returns>
+		public bool IsInAnyGroup(string[] Groups, bool IgnoreCase)
+		{
+			if (Groups is null || Groups.Length == 0)
+				return true;
+
+			if (this.groups is null)
+				return false;
+
+			Dictionary<string, bool> Ordered;
+
+			if (IgnoreCase)
+				Ordered = new Dictionary<string, bool>(StringComparer.CurrentCultureIgnoreCase);
+			else
+				Ordered = new Dictionary<string, bool>();
+
+			foreach (string Group in Groups)
+				Ordered[Group] = true;
+
+			foreach (string Group in this.groups)
+			{
+				if (Ordered.ContainsKey(Group))
+					return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>roup
 		/// Current subscription state.
 		/// </summary>
 		public SubscriptionState State

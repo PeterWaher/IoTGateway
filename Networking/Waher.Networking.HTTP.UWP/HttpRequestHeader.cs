@@ -455,5 +455,26 @@ namespace Waher.Networking.HTTP
 			return Result.ToString();
 		}
 
+		/// <summary>
+		/// Checks if an alternative is acceptable to the client sending a request.
+		/// </summary>
+		/// <param name="Alternative">Alternative to check.</param>
+		/// <returns>If content of the given type is acceptable to the client.</returns>
+		public bool IsAcceptable(string Alternative)
+		{
+			return this.accept?.IsAcceptable(Alternative) ?? true;
+		}
+
+		/// <summary>
+		/// Checks if an alternative is acceptable to the client sending a request.
+		/// </summary>
+		/// <param name="Alternative">Alternative to check.</param>
+		/// <returns>If content of the given type is acceptable to the client.</returns>
+		public void AssertAcceptable(string Alternative)
+		{
+			if (!this.IsAcceptable(Alternative))
+				throw new NotAcceptableException("Not acceptable response format: " + Alternative);
+		}
+
 	}
 }

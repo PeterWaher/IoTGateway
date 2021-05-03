@@ -178,6 +178,7 @@ namespace Waher.Networking.HTTP
 			set
 			{
 				this.AssertHeaderOpen();
+				this.Request.Header.AssertAcceptable(value);
 				this.contentType = value;
 			}
 		}

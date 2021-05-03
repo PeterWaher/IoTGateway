@@ -284,6 +284,26 @@ namespace Waher.Networking.XMPP.PEP
 			}
 		}
 
+		/// <summary>
+		/// Tries to parse a personal event from its XML representation.
+		/// </summary>
+		/// <param name="Xml">XML representation of event.</param>
+		/// <param name="Event">Parsed event, if recognized.</param>
+		/// <returns>If the XML could be parsed as a personal event.</returns>
+		public static bool TryParse(XmlElement Xml, out IPersonalEvent Event)
+		{
+			if (personalEventTypes.TryGetValue(Xml.LocalName + " " + Xml.NamespaceURI, out IPersonalEvent PersonalEvent))
+			{
+				Event = PersonalEvent.Parse(Xml);
+				return true;
+			}
+			else
+			{
+				Event = null;
+				return false;
+			}
+		}
+
 		private async Task PubSubClient_ItemRetracted(object Sender, ItemNotificationEventArgs e)
 		{
 			if (this.hasPubSubComponent && e.From.IndexOf('@') < 0)

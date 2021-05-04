@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using Waher.Content;
+using Waher.Networking.HTTP.HeaderFields;
 
 namespace Waher.Networking.HTTP
 {
@@ -11,9 +12,9 @@ namespace Waher.Networking.HTTP
 	{
 		private readonly KeyValuePair<string, string>[] headerFields;
 		private readonly int statusCode;
-		private readonly object contentObject = null;
 		private readonly byte[] content = null;
 		private readonly string contentType = null;
+		private object contentObject = null;
 
 		/// <summary>
 		/// Base class of all HTTP Exceptions.
@@ -79,7 +80,29 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Any content object to return. The object will be encoded before being sent.
 		/// </summary>
-		public object ContentObject => this.contentObject;
+		public object ContentObject
+		{
+			get
+			{
+				if (!(this.contentObject is null))
+					return this.contentObject;
+
+				if (this.content is null)
+					return null;
+
+				try
+				{
+					HttpFieldContentType ContentType = new HttpFieldContentType("Content-Type", this.contentType);
+					this.contentObject = InternetContent.Decode(ContentType.Type, this.content, ContentType.Encoding, null, null);
+				}
+				catch (Exception)
+				{
+					this.contentObject = this.content;
+				}
+
+				return this.contentObject;
+			}
+		}
 
 		/// <summary>
 		/// Any encoded content to return.

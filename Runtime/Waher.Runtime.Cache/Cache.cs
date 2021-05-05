@@ -51,12 +51,21 @@ namespace Waher.Runtime.Cache
 			this.maxTimeUnused = MaxTimeUnused;
 			this.standalone = Standalone;
 
+			Caches.Register(this.id, this);
+		}
+
+		private void CreateTimerLocked()
+		{
 			if (this.maxTimeUsed < TimeSpan.MaxValue || this.maxTimeUnused < TimeSpan.MaxValue)
-				this.timer = new Timer(this.TimerCallback, null, 5000, 5000);
+			{
+				int Interval = Math.Min((int)((this.maxTimeUnused.TotalMilliseconds / 2) + 0.5), 5000);
+				if (Interval < 100)
+					Interval = 100;
+
+				this.timer = new Timer(this.TimerCallback, null, Interval, Interval);
+			}
 			else
 				this.timer = null;
-
-			Caches.Register(this.id, this);
 		}
 
 		/// <summary>
@@ -65,10 +74,6 @@ namespace Waher.Runtime.Cache
 		public void Dispose()
 		{
 			Caches.Unregister(this.id);
-
-			this.timer?.Dispose();
-			this.timer = null;
-
 			this.Clear();
 		}
 
@@ -112,6 +117,12 @@ namespace Waher.Runtime.Cache
 								this.keysByCreation.Remove(Item.Created);
 								this.keysByLastUsage.Remove(Item.LastUsed);
 							}
+
+							if (this.valuesByKey.Count == 0)
+							{
+								this.timer?.Dispose();
+								this.timer = null;
+							}
 						}
 					}
 
@@ -137,6 +148,12 @@ namespace Waher.Runtime.Cache
 								this.valuesByKey.Remove(Item.Key);
 								this.keysByCreation.Remove(Item.Created);
 								this.keysByLastUsage.Remove(Item.LastUsed);
+							}
+
+							if (this.valuesByKey.Count == 0)
+							{
+								this.timer?.Dispose();
+								this.timer = null;
 							}
 						}
 					}
@@ -383,6 +400,9 @@ namespace Waher.Runtime.Cache
 				this.valuesByKey[Key] = Item;
 				this.keysByCreation[TP] = Key;
 				this.keysByLastUsage[TP] = Key;
+
+				if (this.timer is null)
+					this.CreateTimerLocked();
 			}
 
 			if (!(Prev is null))
@@ -423,6 +443,12 @@ namespace Waher.Runtime.Cache
 				this.valuesByKey.Remove(Item.Key);
 				this.keysByCreation.Remove(Item.Created);
 				this.keysByLastUsage.Remove(Item.LastUsed);
+
+				if (this.valuesByKey.Count == 0)
+				{
+					this.timer?.Dispose();
+					this.timer = null;
+				}
 			}
 
 			this.OnRemoved(Key, Item.Value, RemovedReason.Manual);
@@ -449,6 +475,9 @@ namespace Waher.Runtime.Cache
 				this.valuesByKey.Clear();
 				this.keysByLastUsage.Clear();
 				this.keysByCreation.Clear();
+
+				this.timer?.Dispose();
+				this.timer = null;
 			}
 
 			foreach (CacheItem<KeyType, ValueType> Item in Values)

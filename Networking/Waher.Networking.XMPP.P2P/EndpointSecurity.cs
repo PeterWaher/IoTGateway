@@ -1515,6 +1515,104 @@ namespace Waher.Networking.XMPP.P2P
 		}
 
 		/// <summary>
+		/// Sends an IQ Get stanza
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="E2ETransmission">End-to-end Encryption options</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Xml">Payload XML</param>
+		/// <param name="Timeout">Timeout in milliseconds.</param>
+		/// <returns>Response XML element.</returns>
+		/// <exception cref="TimeoutException">If a timeout occurred.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public XmlElement IqGet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, int Timeout)
+		{
+			Task<XmlElement> Result = this.IqGetAsync(Client, E2ETransmission, To, Xml);
+
+			if (!Result.Wait(Timeout))
+				throw new TimeoutException();
+
+			return Result.Result;
+		}
+
+		/// <summary>
+		/// Sends an IQ Get stanza
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="E2ETransmission">End-to-end Encryption options</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Xml">Payload XML</param>
+		/// <returns>Response XML element.</returns>
+		/// <exception cref="TimeoutException">If a timeout occurred.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public Task<XmlElement> IqGetAsync(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml)
+		{
+			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
+
+			this.SendIqGet(Client, E2ETransmission, To, Xml, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Response);
+				else
+					Result.SetException(e.StanzaError ?? new XmppException("Unable to perform IQ Get."));
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
+		/// Sends an IQ Set stanza
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="E2ETransmission">End-to-end Encryption options</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Xml">Payload XML</param>
+		/// <param name="Timeout">Timeout in milliseconds.</param>
+		/// <returns>Response XML element.</returns>
+		/// <exception cref="TimeoutException">If a timeout occurred.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public XmlElement IqSet(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml, int Timeout)
+		{
+			Task<XmlElement> Result = this.IqSetAsync(Client, E2ETransmission, To, Xml);
+
+			if (!Result.Wait(Timeout))
+				throw new TimeoutException();
+
+			return Result.Result;
+		}
+
+		/// <summary>
+		/// Sends an IQ Set stanza
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="E2ETransmission">End-to-end Encryption options</param>
+		/// <param name="To">To attribute</param>
+		/// <param name="Xml">Payload XML</param>
+		/// <returns>Response XML element.</returns>
+		/// <exception cref="TimeoutException">If a timeout occurred.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public Task<XmlElement> IqSetAsync(XmppClient Client, E2ETransmission E2ETransmission, string To, string Xml)
+		{
+			TaskCompletionSource<XmlElement> Result = new TaskCompletionSource<XmlElement>();
+
+			this.SendIqSet(Client, E2ETransmission, To, Xml, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Response);
+				else
+					Result.SetException(e.StanzaError ?? new XmppException("Unable to perform IQ Set."));
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
 		/// Appends E2E information to XML.
 		/// </summary>
 		/// <param name="Xml">XML Output.</param>

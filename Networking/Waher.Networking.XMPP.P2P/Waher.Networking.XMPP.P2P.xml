@@ -1762,6 +1762,56 @@
             E2E information is first synchronized, and the operation retried, before conceding failure.</param>
             <returns>ID of IQ stanza, if none provided in <paramref name="Id"/>.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.IqGet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,System.Int32)">
+            <summary>
+            Sends an IQ Get stanza
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="E2ETransmission">End-to-end Encryption options</param>
+            <param name="To">To attribute</param>
+            <param name="Xml">Payload XML</param>
+            <param name="Timeout">Timeout in milliseconds.</param>
+            <returns>Response XML element.</returns>
+            <exception cref="T:System.TimeoutException">If a timeout occurred.</exception>
+            <exception cref="T:Waher.Networking.XMPP.XmppException">If an IQ error is returned.</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.IqGetAsync(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String)">
+            <summary>
+            Sends an IQ Get stanza
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="E2ETransmission">End-to-end Encryption options</param>
+            <param name="To">To attribute</param>
+            <param name="Xml">Payload XML</param>
+            <returns>Response XML element.</returns>
+            <exception cref="T:System.TimeoutException">If a timeout occurred.</exception>
+            <exception cref="T:Waher.Networking.XMPP.XmppException">If an IQ error is returned.</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.IqSet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,System.Int32)">
+            <summary>
+            Sends an IQ Set stanza
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="E2ETransmission">End-to-end Encryption options</param>
+            <param name="To">To attribute</param>
+            <param name="Xml">Payload XML</param>
+            <param name="Timeout">Timeout in milliseconds.</param>
+            <returns>Response XML element.</returns>
+            <exception cref="T:System.TimeoutException">If a timeout occurred.</exception>
+            <exception cref="T:Waher.Networking.XMPP.XmppException">If an IQ error is returned.</exception>
+        </member>
+        <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.IqSetAsync(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String)">
+            <summary>
+            Sends an IQ Set stanza
+            </summary>
+            <param name="Client">XMPP Client</param>
+            <param name="E2ETransmission">End-to-end Encryption options</param>
+            <param name="To">To attribute</param>
+            <param name="Xml">Payload XML</param>
+            <returns>Response XML element.</returns>
+            <exception cref="T:System.TimeoutException">If a timeout occurred.</exception>
+            <exception cref="T:Waher.Networking.XMPP.XmppException">If an IQ error is returned.</exception>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.AppendE2eInfo(System.Text.StringBuilder)">
             <summary>
             Appends E2E information to XML.

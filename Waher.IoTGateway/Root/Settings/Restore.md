@@ -58,7 +58,7 @@ existing data with the contents of the backup file. If not checked, the backup f
 <fieldset id="SelectedCollections" style="display:none">
 <legend>Collections</legend>
 <div id='Collections'>
-{{foreach CollectionName in Database.GetCollections().Result do ]]
+{{foreach CollectionName in Waher.Persistence.Database.GetCollections().Result do ]]
 <p>
 <input type="checkbox" name="Collection_((CollectionName))" data-collection="((CollectionName))" id="Collection_((CollectionName))"/>
 <label for="Collection_((CollectionName))" title="If checked, objects in collection ((CollectionName)) will be restored.">((CollectionName))</label>

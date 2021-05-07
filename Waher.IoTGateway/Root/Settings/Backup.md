@@ -146,7 +146,7 @@ the Analyze button to analyze the database and generate a report.
 <fieldset id="SelectedCollections" style="display:none">
 <legend>Collections</legend>
 <div id='Collections'>
-{{foreach CollectionName in Database.GetCollections().Result do ]]
+{{foreach CollectionName in Waher.Persistence.Database.GetCollections().Result do ]]
 <p>
 <input type="checkbox" name="Collection_((CollectionName))" data-collection="((CollectionName))" id="Collection_((CollectionName))"/>
 <label for="Collection_((CollectionName))" title="If checked, objects in collection ((CollectionName)) will be exported.">((CollectionName))</label>

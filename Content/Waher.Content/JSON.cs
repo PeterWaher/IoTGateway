@@ -684,74 +684,69 @@ namespace Waher.Content
 					Encode(Obj, Indent, Json, null);
 				else if (Object is IEnumerable<KeyValuePair<string, IElement>> Obj2)
 					Encode(Obj2, Indent, Json);
-				else if (Object is IEnumerable E)
+				else if (Object is ObjectMatrix M && !(M.ColumnNames is null))
 				{
-					IEnumerator e = E.GetEnumerator();
-					bool First = true;
+					string[] Names = M.ColumnNames;
+					int Rows = M.Rows;
+					int Columns = M.Columns;
+					int x, y;
 
 					Json.Append('[');
 
 					if (Indent.HasValue)
 						Indent++;
 
-					while (e.MoveNext())
+					for (y = 0; y < Rows; y++)
 					{
-						if (First)
-							First = false;
-						else
+						if (y > 0)
 							Json.Append(',');
 
 						if (Indent.HasValue)
 						{
 							Json.AppendLine();
 							Json.Append(new string('\t', Indent.Value));
+							Indent++;
 						}
 
-						Encode(e.Current, Indent, Json);
-					}
+						Json.Append('{');
 
-					if (!First && Indent.HasValue)
-					{
-						Json.AppendLine();
-						Indent--;
-						Json.Append(new string('\t', Indent.Value));
-					}
-
-					Json.Append(']');
-				}
-				else if (Object is ObjectMatrix M && !(M.ColumnNames is null))
-				{
-					bool First = true;
-
-					Json.Append('[');
-
-					if (Indent.HasValue)
-						Indent++;
-
-					foreach (IElement Element in M.VectorElements)
-					{
-						if (First)
+						for (x = 0; x < Columns; x++)
 						{
-							First = false;
-							Encode(M.ColumnNames, Indent, Json);
-						}
+							if (x > 0)
+								Json.Append(',');
 
-						Json.Append(',');
+							if (Indent.HasValue)
+							{
+								Json.AppendLine();
+								Json.Append(new string('\t', Indent.Value));
+							}
+
+							Json.Append('"');
+							Json.Append(Encode(Names[x]));
+							Json.Append("\":");
+							Encode(M.GetElement(x, y).AssociatedObjectValue, Indent, Json);
+						}
 
 						if (Indent.HasValue)
 						{
 							Json.AppendLine();
 							Json.Append(new string('\t', Indent.Value));
+							Indent--;
 						}
 
-						Encode(Element.AssociatedObjectValue, Indent, Json);
+						Json.Append('}');
 					}
 
-					if (!First && Indent.HasValue)
+
+					if (Indent.HasValue)
 					{
-						Json.AppendLine();
 						Indent--;
-						Json.Append(new string('\t', Indent.Value));
+
+						if (Rows > 0 && Columns > 0)
+						{
+							Json.AppendLine();
+							Json.Append(new string('\t', Indent.Value));
+						}
 					}
 
 					Json.Append(']');
@@ -779,6 +774,41 @@ namespace Waher.Content
 						}
 
 						Encode(Element.AssociatedObjectValue, Indent, Json);
+					}
+
+					if (!First && Indent.HasValue)
+					{
+						Json.AppendLine();
+						Indent--;
+						Json.Append(new string('\t', Indent.Value));
+					}
+
+					Json.Append(']');
+				}
+				else if (Object is IEnumerable E)
+				{
+					IEnumerator e = E.GetEnumerator();
+					bool First = true;
+
+					Json.Append('[');
+
+					if (Indent.HasValue)
+						Indent++;
+
+					while (e.MoveNext())
+					{
+						if (First)
+							First = false;
+						else
+							Json.Append(',');
+
+						if (Indent.HasValue)
+						{
+							Json.AppendLine();
+							Json.Append(new string('\t', Indent.Value));
+						}
+
+						Encode(e.Current, Indent, Json);
 					}
 
 					if (!First && Indent.HasValue)

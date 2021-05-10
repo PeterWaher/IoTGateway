@@ -2,6 +2,8 @@
 using System.Text;
 using Waher.Content;
 using Waher.Persistence.Attributes;
+using Waher.Script.Objects;
+using Waher.Script.Units;
 
 namespace Waher.Things.SensorData
 {
@@ -228,6 +230,17 @@ namespace Waher.Things.SensorData
 			get
 			{
 				return this.value;
+			}
+		}
+
+		/// <summary>
+		/// Physical Quantity
+		/// </summary>
+		public PhysicalQuantity Quantity
+		{
+			get
+			{
+				return new PhysicalQuantity(this.value, new Unit(this.unit));
 			}
 		}
 

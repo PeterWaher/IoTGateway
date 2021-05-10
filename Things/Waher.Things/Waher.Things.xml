@@ -4347,6 +4347,11 @@
             Possible values are either double values or string values.
             </summary>
         </member>
+        <member name="P:Waher.Things.SensorData.QuantityField.Quantity">
+            <summary>
+            Physical Quantity
+            </summary>
+        </member>
         <member name="T:Waher.Things.SensorData.StringField">
             <summary>
             Represents a string value.
@@ -5121,6 +5126,34 @@
             <summary>
             <see cref="M:System.Object.ToString"/>
             </summary>
+        </member>
+        <member name="T:Waher.Things.TypeConverters.QuantityFieldToPhysicalQuantity">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.QuantityField"/> to a <see cref="T:Waher.Script.Objects.PhysicalQuantity"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.QuantityFieldToPhysicalQuantity.#ctor">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.QuantityField"/> to a <see cref="T:Waher.Script.Objects.PhysicalQuantity"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.QuantityFieldToPhysicalQuantity.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.QuantityFieldToPhysicalQuantity.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.QuantityFieldToPhysicalQuantity.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToPhysicalQuantity.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToPhysicalQuantity.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToPhysicalQuantity.From"/>.</exception>
         </member>
     </members>
 </doc>

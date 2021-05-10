@@ -42,7 +42,7 @@ namespace Waher.Script
 		private static Dictionary<string, IConstant> constants = null;
 		private static Dictionary<string, IKeyWord> customKeyWords = null;
 		private static readonly Dictionary<Type, ICustomStringOutput> output = new Dictionary<Type, ICustomStringOutput>();
-		private static readonly Dictionary<string, bool> keywords = GetKeywords();
+		internal static readonly Dictionary<string, bool> keywords = GetKeywords();
 
 		private ScriptNode root;
 		private readonly string script;
@@ -2944,6 +2944,10 @@ namespace Waher.Script
 					if (ch != ')')
 						throw new SyntaxException("Expected ).", this.pos, this.script);
 
+					ch = this.NextChar();
+					while (ch > 0 && (ch <= ' ' || ch == 160))
+						ch = this.NextChar();
+
 					if (ch == '^')
 					{
 						ch = this.NextChar();
@@ -2980,12 +2984,12 @@ namespace Waher.Script
 					else if (ch == '²')
 					{
 						Exponent = 2;
-						this.NextChar();
+						ch = this.NextChar();
 					}
 					else if (ch == '³')
 					{
 						Exponent = 3;
-						this.NextChar();
+						ch = this.NextChar();
 					}
 					else
 						Exponent = 1;
@@ -3000,8 +3004,6 @@ namespace Waher.Script
 						foreach (KeyValuePair<AtomicUnit, int> Factor in Unit.Factors)
 							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Factor.Key, Factor.Value * Exponent));
 					}
-
-					ch = this.NextChar();
 				}
 				else
 				{

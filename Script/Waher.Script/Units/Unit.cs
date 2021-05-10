@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Events;
@@ -43,6 +42,24 @@ namespace Waher.Script.Units
 		/// <summary>
 		/// Represents a unit.
 		/// </summary>
+		/// <param name="Prefix">Associated prefix.</param>
+		/// <param name="Factors">Sequence of atomic unit factors, and their corresponding exponents.</param>
+		public Unit(Prefix Prefix, params KeyValuePair<string, int>[] Factors)
+		{
+			this.prefix = Prefix;
+
+			int i, c = Factors.Length;
+			KeyValuePair<AtomicUnit, int>[] Factors2 = new KeyValuePair<AtomicUnit, int>[c];
+
+			for (i = 0; i < c; i++)
+				Factors2[i] = new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Factors[i].Key), Factors[i].Value);
+
+			this.factors = Factors2;
+		}
+
+		/// <summary>
+		/// Represents a unit.
+		/// </summary>
 		/// <param name="AtomicUnits">Sequence of atomic units.</param>
 		public Unit(params string[] AtomicUnits)
 			: this(Prefix.None, AtomicUnits)
@@ -58,12 +75,293 @@ namespace Waher.Script.Units
 		{
 			this.prefix = Prefix;
 
-			LinkedList<KeyValuePair<AtomicUnit, int>> Factors = new LinkedList<KeyValuePair<Units.AtomicUnit, int>>();
+			int i, c = AtomicUnits.Length;
+			KeyValuePair<AtomicUnit, int>[] Factors = new KeyValuePair<AtomicUnit, int>[c];
 
-			foreach (string s in AtomicUnits)
-				Factors.AddLast(new KeyValuePair<Units.AtomicUnit, int>(new AtomicUnit(s), 1));
+			for (i = 0; i < c; i++)
+				Factors[i] = new KeyValuePair<AtomicUnit, int>(new AtomicUnit(AtomicUnits[i]), 1);
 
 			this.factors = Factors;
+		}
+
+		/// <summary>
+		/// Parses a unit string.
+		/// </summary>
+		/// <param name="UnitString">Unit string</param>
+		/// <returns>Parsed unit.</returns>
+		public static Unit Parse(string UnitString)
+		{
+			if (TryParse(UnitString, out Unit Unit))
+				return Unit;
+			else
+				throw new Exceptions.ScriptException("Unable to parse unit: " + UnitString);
+		}
+
+		/// <summary>
+		/// Tries to parse a string into a unit.
+		/// </summary>
+		/// <param name="UnitString">String expression</param>
+		/// <param name="Unit">Parsed unit.</param>
+		/// <returns>If string could be parsed into a unit.</returns>
+		public static bool TryParse(string UnitString, out Unit Unit)
+		{
+			int Pos = 0;
+			int Len = UnitString?.Length ?? 0;
+
+			if (!TryParse(UnitString, ref Pos, Len, true, out Unit))
+				return false;
+
+			if (Pos < Len)
+				return false;
+
+			return true;
+		}
+
+		private static bool TryParse(string UnitString, ref int Pos, int Len, bool PermitPrefix, out Unit Unit)
+		{
+			Unit = null;
+			if (Pos >= Len)
+				return false;
+
+			Prefix Prefix;
+			LinkedList<KeyValuePair<AtomicUnit, int>> Factors = new LinkedList<KeyValuePair<AtomicUnit, int>>();
+			KeyValuePair<AtomicUnit, int>[] CompoundFactors;
+			string Name, Name2, s;
+			int Exponent;
+			int Start = Pos;
+			int i;
+			char ch = UnitString[Pos++];
+			bool LastDivision = false;
+
+			if (PermitPrefix)
+			{
+				if (ch == 'd' && Pos < Len && UnitString[Pos] == 'a')
+				{
+					Pos++;
+					Prefix = Prefix.Deka;
+				}
+				else if (!Prefixes.TryParsePrefix(ch, out Prefix))
+					Pos--;
+
+				i = Pos;
+				ch = Pos < Len ? UnitString[Pos++] : (char)0;
+			}
+			else
+			{
+				Prefix = Prefix.None;
+				i = Pos - 1;
+			}
+
+			if (!char.IsLetter(ch) && Prefix != Prefix.None)
+			{
+				Pos = i = Start;
+				Prefix = Prefix.None;
+				ch = Pos < Len ? UnitString[Pos++] : (char)0;
+			}
+			else if (ch == '/')
+			{
+				LastDivision = true;
+				ch = Pos < Len ? UnitString[Pos++] : (char)0;
+				while (ch > 0 && (ch <= ' ' || ch == 160))
+					ch = Pos < Len ? UnitString[Pos++] : (char)0;
+			}
+
+			while (char.IsLetter(ch) || ch == '(')
+			{
+				if (ch == '(')
+				{
+					if (!TryParse(UnitString, ref Pos, Len, false, out Unit Unit2))
+						return false;
+
+					ch = Pos < Len ? UnitString[Pos++] : (char)0;
+					while (ch > 0 && (ch <= ' ' || ch == 160))
+						ch = Pos < Len ? UnitString[Pos++] : (char)0;
+
+					if (ch != ')')
+						return false;
+
+					ch = Pos < Len ? UnitString[Pos++] : (char)0;
+					while (ch > 0 && (ch <= ' ' || ch == 160))
+						ch = Pos < Len ? UnitString[Pos++] : (char)0;
+
+					if (ch == '^')
+					{
+						ch = Pos < Len ? UnitString[Pos++] : (char)0;
+						while (ch > 0 && (ch <= ' ' || ch == 160))
+							ch = Pos < Len ? UnitString[Pos++] : (char)0;
+
+						if (ch == '-' || char.IsDigit(ch))
+						{
+							i = Pos - 1;
+
+							if (ch == '-')
+								ch = Pos < Len ? UnitString[Pos++] : (char)0;
+
+							while (char.IsDigit(ch))
+								ch = Pos < Len ? UnitString[Pos++] : (char)0;
+
+							if (ch == 0)
+								s = UnitString.Substring(i, Pos - i);
+							else
+								s = UnitString.Substring(i, Pos - i - 1);
+
+							if (!int.TryParse(s, out Exponent))
+								return false;
+						}
+						else
+							return false;
+					}
+					else if (ch == '²')
+					{
+						Exponent = 2;
+						ch = Pos < Len ? UnitString[Pos++] : (char)0;
+					}
+					else if (ch == '³')
+					{
+						Exponent = 3;
+						ch = Pos < Len ? UnitString[Pos++] : (char)0;
+					}
+					else
+						Exponent = 1;
+
+					if (LastDivision)
+					{
+						foreach (KeyValuePair<AtomicUnit, int> Factor in Unit2.Factors)
+							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Factor.Key, -Factor.Value * Exponent));
+					}
+					else
+					{
+						foreach (KeyValuePair<AtomicUnit, int> Factor in Unit2.Factors)
+							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Factor.Key, Factor.Value * Exponent));
+					}
+				}
+				else
+				{
+					while (char.IsLetter(ch))
+						ch = Pos < Len ? UnitString[Pos++] : (char)0;
+
+					if (ch == 0)
+						Name = UnitString.Substring(i, Pos - i);
+					else
+						Name = UnitString.Substring(i, Pos - i - 1);
+
+					if (PermitPrefix)
+					{
+						if (Expression.keywords.ContainsKey(Name2 = UnitString.Substring(Start, i - Start) + Name))
+							return false;
+						else if (Unit.TryGetCompoundUnit(Name2, out CompoundFactors))
+						{
+							Prefix = Prefix.None;
+							Name = Name2;
+						}
+						else if (Unit.ContainsDerivedOrBaseUnit(Name2))
+						{
+							Prefix = Prefix.None;
+							Name = Name2;
+							CompoundFactors = null;
+						}
+						else if (!Unit.TryGetCompoundUnit(Name, out CompoundFactors))
+							CompoundFactors = null;
+					}
+					else if (!Unit.TryGetCompoundUnit(Name, out CompoundFactors))
+						CompoundFactors = null;
+
+					while (ch > 0 && (ch <= ' ' || ch == 160))
+						ch = Pos < Len ? UnitString[Pos++] : (char)0;
+
+					if (ch == '^')
+					{
+						ch = Pos < Len ? UnitString[Pos++] : (char)0;
+						while (ch > 0 && (ch <= ' ' || ch == 160))
+							ch = Pos < Len ? UnitString[Pos++] : (char)0;
+
+						if (ch == '-' || char.IsDigit(ch))
+						{
+							i = Pos - 1;
+
+							if (ch == '-')
+								ch = Pos < Len ? UnitString[Pos++] : (char)0;
+
+							while (char.IsDigit(ch))
+								ch = Pos < Len ? UnitString[Pos++] : (char)0;
+
+							if (ch == 0)
+								s = UnitString.Substring(i, Pos - i);
+							else
+								s = UnitString.Substring(i, Pos - i - 1);
+
+							if (!int.TryParse(s, out Exponent))
+								return false;
+						}
+						else
+							return false;
+					}
+					else if (ch == '²')
+					{
+						Exponent = 2;
+						ch = Pos < Len ? UnitString[Pos++] : (char)0;
+					}
+					else if (ch == '³')
+					{
+						Exponent = 3;
+						ch = Pos < Len ? UnitString[Pos++] : (char)0;
+					}
+					else
+						Exponent = 1;
+
+					if (CompoundFactors is null)
+					{
+						if (LastDivision)
+							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), -Exponent));
+						else
+							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), Exponent));
+					}
+					else
+					{
+						if (LastDivision)
+						{
+							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors)
+								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, -Segment.Value * Exponent));
+						}
+						else
+						{
+							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors)
+								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, Segment.Value * Exponent));
+						}
+					}
+				}
+
+				while (ch > 0 && (ch <= ' ' || ch == 160))
+					ch = Pos < Len ? UnitString[Pos++] : (char)0;
+
+				if (ch == '*' || ch == '⋅')
+					LastDivision = false;
+				else if (ch == '/')
+					LastDivision = true;
+				else if (ch == ')')
+				{
+					Pos--;
+					break;
+				}
+				else if (ch == 0)
+					break;
+				else
+					return false;
+
+				ch = Pos < Len ? UnitString[Pos++] : (char)0;
+				while (ch > 0 && (ch <= ' ' || ch == 160))
+					ch = Pos < Len ? UnitString[Pos++] : (char)0;
+
+				i = Pos - 1;
+				PermitPrefix = false;
+			}
+
+			if (Factors.First is null)
+				return false;
+
+			Unit = new Unit(Prefix, Factors);
+
+			return true;
 		}
 
 		/// <summary>

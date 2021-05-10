@@ -70,6 +70,7 @@
   <ItemGroup>
     <Compile Include="Data\Customer.cs" />
     <Compile Include="Data\Order.cs" />
+    <Compile Include="UnitParsingTests.cs" />
     <Compile Include="ScriptSqlTests.cs" />
     <Compile Include="ScriptXmlTests.cs" />
     <Compile Include="ScriptEvaluationTests.cs" />

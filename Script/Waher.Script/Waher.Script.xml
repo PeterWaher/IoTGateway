@@ -19708,6 +19708,13 @@
             <param name="Prefix">Associated prefix.</param>
             <param name="Factors">Sequence of atomic unit factors, and their corresponding exponents.</param>
         </member>
+        <member name="M:Waher.Script.Units.Unit.#ctor(Waher.Script.Units.Prefix,System.Collections.Generic.KeyValuePair{System.String,System.Int32}[])">
+            <summary>
+            Represents a unit.
+            </summary>
+            <param name="Prefix">Associated prefix.</param>
+            <param name="Factors">Sequence of atomic unit factors, and their corresponding exponents.</param>
+        </member>
         <member name="M:Waher.Script.Units.Unit.#ctor(System.String[])">
             <summary>
             Represents a unit.
@@ -19720,6 +19727,21 @@
             </summary>
             <param name="Prefix">Associated prefix.</param>
             <param name="AtomicUnits">Sequence of atomic units.</param>
+        </member>
+        <member name="M:Waher.Script.Units.Unit.Parse(System.String)">
+            <summary>
+            Parses a unit string.
+            </summary>
+            <param name="UnitString">Unit string</param>
+            <returns>Parsed unit.</returns>
+        </member>
+        <member name="M:Waher.Script.Units.Unit.TryParse(System.String,Waher.Script.Units.Unit@)">
+            <summary>
+            Tries to parse a string into a unit.
+            </summary>
+            <param name="UnitString">String expression</param>
+            <param name="Unit">Parsed unit.</param>
+            <returns>If string could be parsed into a unit.</returns>
         </member>
         <member name="P:Waher.Script.Units.Unit.Prefix">
             <summary>

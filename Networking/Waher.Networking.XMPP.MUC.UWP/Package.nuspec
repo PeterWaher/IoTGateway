@@ -15,11 +15,11 @@
 		<copyright>Copyright © Waher Data AB 2020-2021. All rights reserved.</copyright>
 		<tags>networking communication xmpp muc Multi-User Chat XEP-0045 uwp</tags>
 		<dependencies>
-			<dependency id="Waher.Content" version="1.1.1"/>
+			<dependency id="Waher.Content" version="1.1.2"/>
 			<dependency id="Waher.Content.Xml" version="1.1.0"/>
 			<dependency id="Waher.Events" version="1.0.14"/>
 			<dependency id="Waher.Networking.UWP" version="1.1.0"/>
-			<dependency id="Waher.Networking.XMPP.UWP" version="1.1.13"/>
+			<dependency id="Waher.Networking.XMPP.UWP" version="1.1.14"/>
 		</dependencies>
 	</metadata>
 	<files>

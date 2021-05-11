@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Script.TypeConversion
 {
@@ -55,6 +54,24 @@ namespace Waher.Script.TypeConversion
 				Value = this.converters[i].Convert(Value);
 
 			return Value;
+		}
+
+		/// <summary>
+		/// Converts the object in <paramref name="Value"/> to an object of type <see cref="To"/>, encapsulated in an
+		/// <see cref="IElement"/>.
+		/// </summary>
+		/// <param name="Value">Object to be converted.</param>
+		/// <returns>Object of type <see cref="To"/>, encapsulated in an <see cref="IElement"/>.</returns>
+		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
+		public IElement ConvertToElement(object Value)
+		{
+			int i;
+			int c1 = c - 1;
+
+			for (i = 0; i < c1; i++)
+				Value = this.converters[i].Convert(Value);
+
+			return this.converters[c1].ConvertToElement(Value);
 		}
 	}
 }

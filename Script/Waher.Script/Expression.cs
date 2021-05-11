@@ -4687,17 +4687,17 @@ namespace Waher.Script
 		/// <returns>If elements have been upgraded to become compatible.</returns>
 		public static bool UpgradeSemiGroup(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet Set2, ScriptNode Node)
 		{
-			// TODO: Implement pluggable upgrades and a shortest path search to find optimal upgrades.
-
 			if (UpgradeField(ref E1, ref Set1, ref E2, ref Set2, Node))
 				return true;
-			else if (E1 is StringValue)
+
+			if (E1 is StringValue)
 			{
 				E2 = new StringValue(E2.AssociatedObjectValue?.ToString() ?? string.Empty);
 				Set2 = StringValues.Instance;
 				return true;
 			}
-			else if (E2 is StringValue)
+
+			if (E2 is StringValue)
 			{
 				E1 = new StringValue(E1.AssociatedObjectValue?.ToString() ?? string.Empty);
 				Set1 = StringValues.Instance;
@@ -4718,29 +4718,33 @@ namespace Waher.Script
 		/// <returns>If elements have been upgraded to become compatible.</returns>
 		public static bool UpgradeField(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet Set2, ScriptNode Node)
 		{
-			// TODO: Implement pluggable upgrades and a shortest path search to find optimal upgrades.
+			object O1 = E1?.AssociatedObjectValue;
+			object O2 = E2?.AssociatedObjectValue;
+			Type T1 = O1?.GetType() ?? typeof(object);
+			Type T2 = O2?.GetType() ?? typeof(object);
 
-			if (E1 is ComplexNumber)
+			if (T1 == T2)
+				return true;
+
+			if (TryConvert(E1, T2, out IElement E1asT2))
 			{
-				if (E2 is DoubleNumber D2)
-				{
-					E2 = new ComplexNumber(D2.Value);
-					Set2 = ComplexNumbers.Instance;
-					return true;
-				}
+				E1 = E1asT2;
+				Set1 = E1asT2.AssociatedSet;
+				return true;
 			}
-			else if (E2 is ComplexNumber)
+
+			if (TryConvert(E2, T1, out IElement E2asT1))
 			{
-				if (E1 is DoubleNumber D1)
-				{
-					E1 = new ComplexNumber(D1.Value);
-					Set1 = ComplexNumbers.Instance;
-					return true;
-				}
+				E2 = E2asT1;
+				Set2 = E2asT1.AssociatedSet;
+				return true;
 			}
-			else if (E1 is ObjectValue O1 && O1.AssociatedObjectValue is Enum Enum1 && E2 is DoubleNumber)
+
+			// TODO: Update to common extension field
+
+			if (E1 is ObjectValue OV1 && OV1.AssociatedObjectValue is Enum Enum1 && E2 is DoubleNumber)
 			{
-				Type T1 = Enum.GetUnderlyingType(Enum1.GetType());
+				T1 = Enum.GetUnderlyingType(Enum1.GetType());
 				if (T1 == typeof(int))
 				{
 					E1 = new DoubleNumber(Convert.ToInt32(Enum1));
@@ -4748,9 +4752,9 @@ namespace Waher.Script
 					return true;
 				}
 			}
-			else if (E2 is ObjectValue O2 && O2.AssociatedObjectValue is Enum Enum2 && E1 is DoubleNumber)
+			else if (E2 is ObjectValue OV2 && OV2.AssociatedObjectValue is Enum Enum2 && E1 is DoubleNumber)
 			{
-				Type T2 = Enum.GetUnderlyingType(Enum2.GetType());
+				T2 = Enum.GetUnderlyingType(Enum2.GetType());
 				if (T2 == typeof(int))
 				{
 					E2 = new DoubleNumber(Convert.ToInt32(Enum2));
@@ -4759,7 +4763,7 @@ namespace Waher.Script
 				}
 			}
 
-			return false;   // TODO: Implement Upgrade()
+			return false;
 		}
 
 		/// <summary>
@@ -4786,6 +4790,9 @@ namespace Waher.Script
 			if (Obj is null)
 				return null;
 
+			if (TryConvert(Obj, DesiredType, out object Result))
+				return Result;
+				
 			Type T = Obj.GetType();
 			if (T == DesiredType)
 				return Obj;
@@ -4800,9 +4807,9 @@ namespace Waher.Script
 					Array Source = (Array)Obj;
 					int c = Source.Length;
 					int i;
-					
+
 					Dest = (Array)Activator.CreateInstance(DesiredType, c);
-					
+
 					for (i = 0; i < c; i++)
 						Dest.SetValue(ConvertTo(Source.GetValue(i), DesiredItemType, Node), i);
 				}
@@ -4814,8 +4821,8 @@ namespace Waher.Script
 
 				return Dest;
 			}
-			else
-				return Convert.ChangeType(Obj, DesiredType);    // TODO: Implement .NET type conversion.
+			
+			return Convert.ChangeType(Obj, DesiredType);
 		}
 
 		/// <summary>
@@ -4971,6 +4978,59 @@ namespace Waher.Script
 				return true;
 			}
 
+			if (TryGetTypeConverter(T,DesiredType,out ITypeConverter Converter))
+			{
+				Result = Converter.Convert(Value);
+				return true;
+			}
+			else
+			{
+				Result = null;
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Tries to convert an element <paramref name="Value"/> to an element whose associated object is of type 
+		/// <paramref name="DesiredType"/>.
+		/// </summary>
+		/// <param name="Value">Element to convert.</param>
+		/// <param name="DesiredType">Desired type of associated object.</param>
+		/// <param name="Result">Conversion result.</param>
+		/// <returns>If conversion was successful.</returns>
+		public static bool TryConvert(IElement Value, Type DesiredType, out IElement Result)
+		{
+			object Obj = Value?.AssociatedObjectValue;
+			if (Obj is null)
+			{
+				Result = ObjectValue.Null;
+				return !DesiredType.GetTypeInfo().IsValueType;
+			}
+
+			Type T = Obj.GetType();
+
+			if (TryGetTypeConverter(T, DesiredType, out ITypeConverter Converter))
+			{
+				Result = Converter.ConvertToElement(Obj);
+				return true;
+			}
+			else
+			{
+				Result = null;
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Tries to get a type converter, converting objects from type <paramref name="From"/> to objects of type
+		/// <paramref name="To"/>.
+		/// </summary>
+		/// <param name="From">Start type.</param>
+		/// <param name="To">Desired type.</param>
+		/// <param name="Converter">Type Converter found, or null if not found.</param>
+		/// <returns>If a type converter could be found, or constructed from existing converters.</returns>
+		public static bool TryGetTypeConverter(Type From, Type To, out ITypeConverter Converter)
+		{
 			if (converters is null)
 			{
 				Dictionary<Type, Dictionary<Type, ITypeConverter>> Converters = GetTypeConverters();
@@ -4984,19 +5044,16 @@ namespace Waher.Script
 
 			lock (converters)
 			{
-				if (!converters.TryGetValue(T, out Dictionary<Type, ITypeConverter> Converters))
+				if (!converters.TryGetValue(From, out Dictionary<Type, ITypeConverter> Converters))
 				{
-					Result = null;
+					Converter = null;
 					return false;
 				}
 
-				if (Converters.TryGetValue(DesiredType, out ITypeConverter Converter))
-				{
-					Result = Converter?.Convert(Value);
-					return !(Result is null);
-				}
+				if (Converters.TryGetValue(To, out Converter))
+					return !(Converter is null);
 
-				Dictionary<Type, bool> Explored = new Dictionary<Type, bool>() { { T, true } };
+				Dictionary<Type, bool> Explored = new Dictionary<Type, bool>() { { From, true } };
 				LinkedList<ITypeConverter> Search = new LinkedList<ITypeConverter>();
 
 				foreach (ITypeConverter Converter3 in Converters.Values)
@@ -5015,7 +5072,7 @@ namespace Waher.Script
 
 					if (converters.TryGetValue(C.To, out Dictionary<Type, ITypeConverter> Converters2) && !(Converters2 is null))
 					{
-						if (Converters2.TryGetValue(DesiredType, out ITypeConverter Converter2))
+						if (Converters2.TryGetValue(To, out ITypeConverter Converter2))
 						{
 							ConversionSequence ConversionSequence;
 
@@ -5031,8 +5088,7 @@ namespace Waher.Script
 							else
 								ConversionSequence = new ConversionSequence(C, Converter2);
 
-							Converters[DesiredType] = ConversionSequence;
-							Result = ConversionSequence.Convert(Value);
+							Converters[To] = ConversionSequence;
 							return true;
 						}
 
@@ -5047,8 +5103,8 @@ namespace Waher.Script
 					}
 				}
 
-				Converters[DesiredType] = null;
-				Result = null;
+				Converters[To] = null;
+				Converter = null;
 				return false;
 			}
 		}
@@ -5150,6 +5206,8 @@ namespace Waher.Script
 			EndsWith
 			StartsWith
 			Transform
+			Last(s,n)
+			First(s,n)
 
 			Vectors:
 			Axis

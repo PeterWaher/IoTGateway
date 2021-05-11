@@ -5127,6 +5127,376 @@
             <see cref="M:System.Object.ToString"/>
             </summary>
         </member>
+        <member name="T:Waher.Things.TypeConverters.BooleanFieldToBoolean">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.BooleanField"/> to a <see cref="T:System.Boolean"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.BooleanFieldToBoolean.#ctor">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.BooleanField"/> to a <see cref="T:System.Boolean"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.BooleanFieldToBoolean.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.BooleanFieldToBoolean.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.BooleanFieldToBoolean.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.BooleanFieldToBoolean.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.BooleanFieldToBoolean.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.BooleanFieldToBoolean.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.BooleanFieldToBoolean.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.BooleanFieldToBoolean.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.BooleanFieldToBoolean.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.BooleanFieldToBoolean.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Things.TypeConverters.DateFieldToDate">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.DateField"/> to a <see cref="T:System.DateTime"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.DateFieldToDate.#ctor">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.DateField"/> to a <see cref="T:System.DateTime"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.DateFieldToDate.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.DateFieldToDate.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.DateFieldToDate.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.DateFieldToDate.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.DateFieldToDate.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.DateFieldToDate.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.DateFieldToDate.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.DateFieldToDate.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.DateFieldToDate.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.DateFieldToDate.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Things.TypeConverters.DateTimeFieldToDateTime">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.DateTimeField"/> to a <see cref="T:System.DateTime"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.DateTimeFieldToDateTime.#ctor">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.DateTimeField"/> to a <see cref="T:System.DateTime"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.DateTimeFieldToDateTime.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.DateTimeFieldToDateTime.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.DateTimeFieldToDateTime.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.DateTimeFieldToDateTime.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.DateTimeFieldToDateTime.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.DateTimeFieldToDateTime.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.DateTimeFieldToDateTime.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.DateTimeFieldToDateTime.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.DateTimeFieldToDateTime.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.DateTimeFieldToDateTime.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Things.TypeConverters.DurationFieldToDuration">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.DurationField"/> to a <see cref="T:Waher.Content.Duration"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.DurationFieldToDuration.#ctor">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.DurationField"/> to a <see cref="T:Waher.Content.Duration"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.DurationFieldToDuration.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.DurationFieldToDuration.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.DurationFieldToDuration.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.DurationFieldToDuration.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.DurationFieldToDuration.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.DurationFieldToDuration.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.DurationFieldToDuration.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.DurationFieldToDuration.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.DurationFieldToDuration.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.DurationFieldToDuration.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Things.TypeConverters.EnumFieldToEnum">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.EnumField"/> to a <see cref="T:System.Enum"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.EnumFieldToEnum.#ctor">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.EnumField"/> to a <see cref="T:System.Enum"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.EnumFieldToEnum.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.EnumFieldToEnum.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.EnumFieldToEnum.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.EnumFieldToEnum.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.EnumFieldToEnum.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.EnumFieldToEnum.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.EnumFieldToEnum.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.EnumFieldToEnum.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.EnumFieldToEnum.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.EnumFieldToEnum.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Things.TypeConverters.Int32FieldToDouble">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.Int32Field"/> to a <see cref="T:System.Double"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.Int32FieldToDouble.#ctor">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.Int32Field"/> to a <see cref="T:System.Double"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.Int32FieldToDouble.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.Int32FieldToDouble.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.Int32FieldToDouble.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.Int32FieldToDouble.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.Int32FieldToDouble.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.Int32FieldToDouble.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.Int32FieldToDouble.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.Int32FieldToDouble.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.Int32FieldToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.Int32FieldToDouble.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Things.TypeConverters.Int32FieldToInt32">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.Int32Field"/> to a <see cref="T:System.Int32"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.Int32FieldToInt32.#ctor">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.Int32Field"/> to a <see cref="T:System.Int32"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.Int32FieldToInt32.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.Int32FieldToInt32.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.Int32FieldToInt32.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.Int32FieldToInt32.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.Int32FieldToInt32.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.Int32FieldToInt32.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.Int32FieldToInt32.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.Int32FieldToInt32.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.Int32FieldToInt32.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.Int32FieldToInt32.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Things.TypeConverters.Int64FieldToDouble">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.Int64Field"/> to a <see cref="T:System.Double"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.Int64FieldToDouble.#ctor">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.Int64Field"/> to a <see cref="T:System.Double"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.Int64FieldToDouble.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.Int64FieldToDouble.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.Int64FieldToDouble.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.Int64FieldToDouble.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.Int64FieldToDouble.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.Int64FieldToDouble.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.Int64FieldToDouble.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.Int64FieldToDouble.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.Int64FieldToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.Int64FieldToDouble.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Things.TypeConverters.Int64FieldToInt64">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.Int64Field"/> to a <see cref="T:System.Int64"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.Int64FieldToInt64.#ctor">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.Int64Field"/> to a <see cref="T:System.Int64"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.Int64FieldToInt64.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.Int64FieldToInt64.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.Int64FieldToInt64.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.Int64FieldToInt64.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.Int64FieldToInt64.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.Int64FieldToInt64.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.Int64FieldToInt64.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.Int64FieldToInt64.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.Int64FieldToInt64.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.Int64FieldToInt64.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Things.TypeConverters.QuantityFieldToDouble">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.QuantityField"/> to a <see cref="T:System.Double"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.QuantityFieldToDouble.#ctor">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.QuantityField"/> to a <see cref="T:System.Double"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.QuantityFieldToDouble.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.QuantityFieldToDouble.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.QuantityFieldToDouble.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToDouble.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToDouble.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToDouble.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.QuantityFieldToDouble.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToDouble.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToDouble.From"/>.</exception>
+        </member>
         <member name="T:Waher.Things.TypeConverters.QuantityFieldToPhysicalQuantity">
             <summary>
             Converts a <see cref="T:Waher.Things.SensorData.QuantityField"/> to a <see cref="T:Waher.Script.Objects.PhysicalQuantity"/>.
@@ -5154,6 +5524,89 @@
             <param name="Value">Object to be converted.</param>
             <returns>Object of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToPhysicalQuantity.To"/>.</returns>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToPhysicalQuantity.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.QuantityFieldToPhysicalQuantity.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToPhysicalQuantity.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToPhysicalQuantity.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.QuantityFieldToPhysicalQuantity.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Things.TypeConverters.StringFieldToString">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.StringField"/> to a <see cref="T:System.String"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.StringFieldToString.#ctor">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.StringField"/> to a <see cref="T:System.String"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.StringFieldToString.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.StringFieldToString.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.StringFieldToString.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.StringFieldToString.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.StringFieldToString.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.StringFieldToString.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.StringFieldToString.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.StringFieldToString.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.StringFieldToString.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.StringFieldToString.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Things.TypeConverters.TimeFieldToTimeSpan">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.TimeField"/> to a <see cref="T:System.TimeSpan"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.TimeFieldToTimeSpan.#ctor">
+            <summary>
+            Converts a <see cref="T:Waher.Things.SensorData.TimeField"/> to a <see cref="T:System.TimeSpan"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.TimeFieldToTimeSpan.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.TypeConverters.TimeFieldToTimeSpan.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.TimeFieldToTimeSpan.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.TimeFieldToTimeSpan.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.TimeFieldToTimeSpan.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.TimeFieldToTimeSpan.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Things.TypeConverters.TimeFieldToTimeSpan.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Things.TypeConverters.TimeFieldToTimeSpan.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Things.TypeConverters.TimeFieldToTimeSpan.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Things.TypeConverters.TimeFieldToTimeSpan.From"/>.</exception>
         </member>
     </members>
 </doc>

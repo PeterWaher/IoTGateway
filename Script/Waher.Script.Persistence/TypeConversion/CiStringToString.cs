@@ -1,5 +1,7 @@
 ﻿using System;
 using Waher.Persistence;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Objects;
 using Waher.Script.TypeConversion;
 
 namespace Waher.Script.Persistence.TypeConversion
@@ -31,6 +33,21 @@ namespace Waher.Script.Persistence.TypeConversion
 				throw new ArgumentException("Expected case-insensitive string.", nameof(Value));
 
 			return CiString.Value;
+		}
+
+		/// <summary>
+		/// Converts the object in <paramref name="Value"/> to an object of type <see cref="To"/>, encapsulated in an
+		/// <see cref="IElement"/>.
+		/// </summary>
+		/// <param name="Value">Object to be converted.</param>
+		/// <returns>Object of type <see cref="To"/>, encapsulated in an <see cref="IElement"/>.</returns>
+		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
+		public IElement ConvertToElement(object Value)
+		{
+			if (!(Value is CaseInsensitiveString CiString))
+				throw new ArgumentException("Expected case-insensitive string.", nameof(Value));
+
+			return new StringValue(CiString.Value);
 		}
 	}
 }

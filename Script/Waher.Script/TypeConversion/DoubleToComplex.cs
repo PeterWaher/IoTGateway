@@ -1,32 +1,24 @@
 ﻿using System;
+using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
-using Waher.Script.TypeConversion;
-using Waher.Things.SensorData;
 
-namespace Waher.Things.TypeConverters
+namespace Waher.Script.TypeConversion
 {
 	/// <summary>
-	/// Converts a <see cref="Int64Field"/> to a <see cref="Double"/>.
+	/// Converts double numbers to complex numbers
 	/// </summary>
-	public class Int64FieldToDouble : ITypeConverter
+	public class DoubleToComplex : ITypeConverter
 	{
-		/// <summary>
-		/// Converts a <see cref="Int64Field"/> to a <see cref="Double"/>.
-		/// </summary>
-		public Int64FieldToDouble()
-		{
-		}
-
 		/// <summary>
 		/// Converter converts objects of this type.
 		/// </summary>
-		public Type From => typeof(Int64Field);
+		public Type From => typeof(double);
 
 		/// <summary>
 		/// Converter converts objects to this type.
 		/// </summary>
-		public Type To => typeof(Double);
+		public Type To => typeof(Complex);
 
 		/// <summary>
 		/// Converts the object in <paramref name="Value"/> to an object of type <see cref="To"/>.
@@ -36,10 +28,10 @@ namespace Waher.Things.TypeConverters
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public object Convert(object Value)
 		{
-			if (Value is Int64Field Field)
-				return (double)Field.Value;
+			if (Value is double d)
+				return new Complex(d, 0);
 			else
-				throw new ArgumentException("Not a Int64Field.", nameof(Value));
+				throw new ArgumentException("Expected double value.", nameof(Value));
 		}
 
 		/// <summary>
@@ -51,10 +43,10 @@ namespace Waher.Things.TypeConverters
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of type <see cref="From"/>.</exception>
 		public IElement ConvertToElement(object Value)
 		{
-			if (Value is Int64Field Field)
-				return new DoubleNumber(Field.Value);
+			if (Value is double d)
+				return new ComplexNumber(d, 0);
 			else
-				throw new ArgumentException("Not a Int64Field.", nameof(Value));
+				throw new ArgumentException("Expected double value.", nameof(Value));
 		}
 	}
 }

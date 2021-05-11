@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Reflection;
-using System.Text;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;

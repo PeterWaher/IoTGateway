@@ -2631,6 +2631,26 @@
             <param name="Result">Conversion result.</param>
             <returns>If conversion was successful.</returns>
         </member>
+        <member name="M:Waher.Script.Expression.TryConvert(Waher.Script.Abstraction.Elements.IElement,System.Type,Waher.Script.Abstraction.Elements.IElement@)">
+            <summary>
+            Tries to convert an element <paramref name="Value"/> to an element whose associated object is of type 
+            <paramref name="DesiredType"/>.
+            </summary>
+            <param name="Value">Element to convert.</param>
+            <param name="DesiredType">Desired type of associated object.</param>
+            <param name="Result">Conversion result.</param>
+            <returns>If conversion was successful.</returns>
+        </member>
+        <member name="M:Waher.Script.Expression.TryGetTypeConverter(System.Type,System.Type,Waher.Script.TypeConversion.ITypeConverter@)">
+            <summary>
+            Tries to get a type converter, converting objects from type <paramref name="From"/> to objects of type
+            <paramref name="To"/>.
+            </summary>
+            <param name="From">Start type.</param>
+            <param name="To">Desired type.</param>
+            <param name="Converter">Type Converter found, or null if not found.</param>
+            <returns>If a type converter could be found, or constructed from existing converters.</returns>
+        </member>
         <member name="T:Waher.Script.Functions.Analytic.ArcCos">
             <summary>
             ArcCos(x)
@@ -18881,6 +18901,47 @@
             <returns>Object of type <see cref="P:Waher.Script.TypeConversion.ConversionSequence.To"/>.</returns>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.ConversionSequence.From"/>.</exception>
         </member>
+        <member name="M:Waher.Script.TypeConversion.ConversionSequence.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.ConversionSequence.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.ConversionSequence.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.ConversionSequence.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Script.TypeConversion.DoubleToComplex">
+            <summary>
+            Converts double numbers to complex numbers
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.DoubleToComplex.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.DoubleToComplex.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.DoubleToComplex.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.DoubleToComplex.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.DoubleToComplex.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.DoubleToComplex.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.DoubleToComplex.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.DoubleToComplex.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.DoubleToComplex.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.DoubleToComplex.From"/>.</exception>
+        </member>
         <member name="T:Waher.Script.TypeConversion.ITypeConverter">
             <summary>
             Converts an object of one type to an object of another type.
@@ -18902,6 +18963,15 @@
             </summary>
             <param name="Value">Object to be converted.</param>
             <returns>Object of type <see cref="P:Waher.Script.TypeConversion.ITypeConverter.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.ITypeConverter.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.ITypeConverter.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.ITypeConverter.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.ITypeConverter.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.ITypeConverter.From"/>.</exception>
         </member>
         <member name="T:Waher.Script.Units.AtomicUnit">

@@ -47,13 +47,10 @@ namespace Waher.Script.Model
 		{
 			if (Operand is DoubleNumber DOp)
 				return this.Evaluate(DOp.Value);
+			else if (Expression.TryConvert<double>(Operand.AssociatedObjectValue, out double d))
+				return this.Evaluate(d);
 			else
-			{
-				if (Operand is PhysicalQuantity PhysicalQuantity)
-					return this.Evaluate(PhysicalQuantity.Magnitude);
-				else
-					throw new ScriptRuntimeException("Scalar operands must be double values or physical magnitudes.", this);
-			}
+				throw new ScriptRuntimeException("Scalar operands must be double values or physical magnitudes.", this);
 		}
 
 		/// <summary>

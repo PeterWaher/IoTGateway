@@ -84,10 +84,19 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
 		{
-			if (Left is BooleanValue BL && Right is BooleanValue BR)
-				return this.Evaluate(BL.Value, BR.Value);
-			else
+			bool l, r;
+
+			if (Left is BooleanValue BL)
+				l = BL.Value;
+			else if (!Expression.TryConvert<bool>(Left.AssociatedObjectValue, out l))
 				throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+
+			if (Right is BooleanValue BR)
+				r = BR.Value;
+			else if (!Expression.TryConvert<bool>(Right.AssociatedObjectValue, out r))
+				throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+
+			return this.Evaluate(l, r);
 		}
 
 		/// <summary>

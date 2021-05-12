@@ -18867,6 +18867,38 @@
             Current status of execution.
             </summary>
         </member>
+        <member name="T:Waher.Script.TypeConversion.BooleanToDouble">
+            <summary>
+            Converts a Boolean value to a double number.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.BooleanToDouble.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.BooleanToDouble.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.BooleanToDouble.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.BooleanToDouble.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.BooleanToDouble.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.BooleanToDouble.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.BooleanToDouble.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.BooleanToDouble.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.BooleanToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.BooleanToDouble.From"/>.</exception>
+        </member>
         <member name="T:Waher.Script.TypeConversion.ConversionSequence">
             <summary>
             Performs a sequence of type conversions to convert an object from one type to another.
@@ -18973,6 +19005,38 @@
             <param name="Value">Object to be converted.</param>
             <returns>Object of type <see cref="P:Waher.Script.TypeConversion.ITypeConverter.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.ITypeConverter.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Script.TypeConversion.PhysicalQuantityToDouble">
+            <summary>
+            Converts a <see cref="T:Waher.Script.Objects.PhysicalQuantity"/> to a double number.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.PhysicalQuantityToDouble.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.PhysicalQuantityToDouble.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.PhysicalQuantityToDouble.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.PhysicalQuantityToDouble.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.PhysicalQuantityToDouble.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.PhysicalQuantityToDouble.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.PhysicalQuantityToDouble.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.PhysicalQuantityToDouble.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.PhysicalQuantityToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.PhysicalQuantityToDouble.From"/>.</exception>
         </member>
         <member name="T:Waher.Script.Units.AtomicUnit">
             <summary>

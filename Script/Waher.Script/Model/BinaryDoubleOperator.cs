@@ -48,40 +48,19 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
 		{
-			DoubleNumber DL = Left as DoubleNumber;
-			DoubleNumber DR = Right as DoubleNumber;
+			double l, r;
 
-			if (!(DL is null) && !(DR is null))
-				return this.Evaluate(DL.Value, DR.Value);
-			else
-			{
-				double l, r;
-				PhysicalQuantity Q;
+			if (Left is DoubleNumber DL)
+				l = DL.Value;
+			else if (!Expression.TryConvert<double>(Left.AssociatedObjectValue, out l))
+				throw new ScriptRuntimeException("Scalar operands must be double values.", this);
 
-				if (!(DL is null))
-					l = DL.Value;
-				else
-				{
-					Q = Left as PhysicalQuantity;
-					if (!(Q is null))
-						l = Q.Magnitude;
-					else
-						throw new ScriptRuntimeException("Scalar operands must be double values or physical magnitudes.", this);
-				}
+			if (Right is DoubleNumber DR)
+				r = DR.Value;
+			else if (!Expression.TryConvert<double>(Right.AssociatedObjectValue, out r))
+				throw new ScriptRuntimeException("Scalar operands must be double values.", this);
 
-				if (!(DR is null))
-					r = DR.Value;
-				else
-				{
-					Q = Right as PhysicalQuantity;
-					if (!(Q is null))
-						r = Q.Magnitude;
-					else
-						throw new ScriptRuntimeException("Scalar operands must be double values or physical magnitudes.", this);
-				}
-
-				return this.Evaluate(l, r);
-			}
+			return this.Evaluate(l, r);
 		}
 
 		/// <summary>

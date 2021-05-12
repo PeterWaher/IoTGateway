@@ -47,6 +47,8 @@ namespace Waher.Script.Model
 		{
 			if (Operand is BooleanValue BOp)
 				return this.Evaluate(BOp.Value);
+			else if (Expression.TryConvert<bool>(Operand.AssociatedObjectValue, out bool b))
+				return this.Evaluate(b);
 			else
 				throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
 		}

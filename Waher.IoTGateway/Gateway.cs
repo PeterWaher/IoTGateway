@@ -846,8 +846,15 @@ namespace Waher.IoTGateway
 
 				await ClientEvents.PushEvent(ClientEvents.GetTabIDs(), "Reload", string.Empty);
 
-				coapEndpoint = new CoapEndpoint();
-				Types.SetModuleParameter("CoAP", coapEndpoint);
+				try
+				{
+					coapEndpoint = new CoapEndpoint();
+					Types.SetModuleParameter("CoAP", coapEndpoint);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
 
 				IDataSource[] Sources;
 
@@ -1380,7 +1387,8 @@ namespace Waher.IoTGateway
 			else
 				certificate = null;
 
-			Users.Register(ComputeUserPasswordHash, "DIGEST-SHA3-256", LoginAuditor, true);
+			if (!Users.HashMethodLocked)
+				Users.Register(ComputeUserPasswordHash, "DIGEST-SHA3-256", LoginAuditor, true);
 
 			await Privileges.LoadAll();
 			await Roles.LoadAll();

@@ -124,6 +124,11 @@ namespace Waher.Security.Users
 		public static string HashMethodTypeName => hashMethodTypeName;
 
 		/// <summary>
+		/// If the Hash Method has been registered and locked.
+		/// </summary>
+		public static bool HashMethodLocked => hashMethodLocked;
+
+		/// <summary>
 		/// Computes a hash of a password.
 		/// </summary>
 		/// <param name="UserName">User name.</param>

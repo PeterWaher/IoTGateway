@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Events;
-using Waher.Runtime.Profiling;
 using Waher.Runtime.Threading;
 
 namespace Waher.Persistence.Files

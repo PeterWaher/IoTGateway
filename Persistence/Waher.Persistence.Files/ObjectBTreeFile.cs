@@ -1,5 +1,4 @@
-﻿//#define DEBUG_LOCKS
-#define ASSERT_LOCKS
+﻿#define ASSERT_LOCKS
 
 using System;
 using System.Collections;
@@ -26,10 +25,11 @@ namespace Waher.Persistence.Files
 	/// <summary>
 	/// This class manages a binary file where objects are persisted in a B-tree.
 	/// </summary>
-	public class ObjectBTreeFile : MultiReadSingleWriteObject, ICollection<object>
+	public class ObjectBTreeFile : IDisposable
 	{
 		internal const int BlockHeaderSize = 14;
 
+		private readonly MultiReadSingleWriteObject fileAccess;
 		private IndexBTreeFile[] indices = new IndexBTreeFile[0];
 		private List<IndexBTreeFile> indexList = new List<IndexBTreeFile>();
 		private SortedDictionary<uint, bool> emptyBlocks = null;
@@ -69,11 +69,12 @@ namespace Waher.Persistence.Files
 		private byte[] ivSeed;
 		private int ivSeedLen;
 		private readonly bool encrypted;
+		private readonly bool mainSynch;
 		private bool indicesCreated = false;
 
 		private ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize,
 			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted,
-			IRecordHandler RecordHandler)
+			IRecordHandler RecordHandler, MultiReadSingleWriteObject FileAccess)
 		{
 			this.provider = Provider;
 			this.id = Provider.GetNewFileId();
@@ -87,6 +88,8 @@ namespace Waher.Persistence.Files
 			this.timeoutMilliseconds = TimeoutMilliseconds;
 			this.genericSerializer = new GenericObjectSerializer(Provider);
 			this.encrypted = Encrypted;
+			this.mainSynch = FileAccess is null;
+			this.fileAccess = FileAccess ?? new MultiReadSingleWriteObject();
 
 			if (RecordHandler is null)
 				this.recordHandler = new PrimaryRecords(this.inlineObjectSizeLimit);
@@ -137,7 +140,7 @@ namespace Waher.Persistence.Files
 		internal static Task<ObjectBTreeFile> Create(string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlobBlockSize,
 			FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted)
 		{
-			return Create(FileName, CollectionName, BlobFileName, BlockSize, BlobBlockSize, Provider, Encoding, TimeoutMilliseconds, Encrypted, null);
+			return Create(FileName, CollectionName, BlobFileName, BlockSize, BlobBlockSize, Provider, Encoding, TimeoutMilliseconds, Encrypted, null, null);
 		}
 
 		/// <summary>
@@ -159,9 +162,10 @@ namespace Waher.Persistence.Files
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		/// <param name="RecordHandler">Record handler to use.</param>
+		/// <param name="FileAccess">File Access synchronization object.</param>
 		internal static async Task<ObjectBTreeFile> Create(string FileName, string CollectionName, string BlobFileName, int BlockSize,
 			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted,
-			IRecordHandler RecordHandler)
+			IRecordHandler RecordHandler, MultiReadSingleWriteObject FileAccess)
 		{
 			FileOfBlocks.CheckBlockSize(BlockSize);
 			FileOfBlocks.CheckBlockSize(BlobBlockSize);
@@ -170,7 +174,7 @@ namespace Waher.Persistence.Files
 				throw new ArgumentOutOfRangeException("The timeout must be positive.", nameof(TimeoutMilliseconds));
 
 			ObjectBTreeFile Result = new ObjectBTreeFile(FileName, CollectionName, BlobFileName, BlockSize, BlobBlockSize, Provider,
-				Encoding, TimeoutMilliseconds, Encrypted, RecordHandler);
+				Encoding, TimeoutMilliseconds, Encrypted, RecordHandler, FileAccess);
 
 			if (Result.encrypted)
 			{
@@ -191,7 +195,7 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public override void Dispose()
+		public void Dispose()
 		{
 			this.file?.Dispose();
 
@@ -208,11 +212,12 @@ namespace Waher.Persistence.Files
 
 			this.provider.RemoveBlocks(this.id);
 
-			base.Dispose();
+			this.fileAccess?.Dispose();
 		}
 
 		internal IRecordHandler RecordHandler => this.recordHandler;
 		internal GenericObjectSerializer GenericSerializer => this.genericSerializer;
+		internal MultiReadSingleWriteObject FileAccess => this.fileAccess;
 
 		/// <summary>
 		/// Identifier of the file.
@@ -299,6 +304,11 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		internal uint BlobBlockLimit => this.blobBlockLimit;
 
+		/// <summary>
+		/// If the file is the main synchronization file of a collection (true) or a secondary file (false).
+		/// </summary>
+		internal bool MainSynch => this.mainSynch;
+
 		#region GUIDs for databases
 
 		/// <summary>
@@ -316,131 +326,22 @@ namespace Waher.Persistence.Files
 
 		#region Locks
 
-		internal Task Lock(LockType LockType)
-		{
-			switch (LockType)
-			{
-				case LockType.Read:
-					return this.LockRead();
-
-				case LockType.Write:
-					return this.LockWrite();
-
-				case LockType.None:
-				default:
-					return Task.CompletedTask;
-			}
-		}
-
-		internal Task EndLock(LockType LockType)
-		{
-			switch (LockType)
-			{
-				case LockType.Read:
-					return this.EndRead();
-
-				case LockType.Write:
-					return this.EndWrite();
-
-				case LockType.None:
-				default:
-					return Task.CompletedTask;
-			}
-		}
-
-		internal async Task LockRead()
-		{
-#if DEBUG_LOCKS
-			string StackTrace = Environment.StackTrace;
-
-			if (!await this.TryBeginRead(this.timeoutMilliseconds))
-			{
-				throw new TimeoutException("Unable to get read access to collection " + this.collectionName + ". Locked from:\r\n\r\n" + this.LockedFrom() +
-					"\r\n\r\nCurrent attempt:\r\n\r\n" + Log.CleanStackTrace(StackTrace));
-			}
-
-			lock (this.synchObject)
-			{
-				if (this.readLocks.TryGetValue(StackTrace, out int i))
-					this.readLocks[StackTrace] = ++i;
-				else
-					this.readLocks[StackTrace] = 1;
-
-				this.nrReaders++;
-			}
-#else
-			if (!await this.TryBeginRead(this.timeoutMilliseconds))
-				throw new TimeoutException("Unable to get read access to collection " + this.collectionName + ".");
-#endif
-		}
-
-		internal async Task LockWrite()
-		{
-#if DEBUG_LOCKS
-			string StackTrace = Environment.StackTrace;
-
-			if (!await this.TryBeginWrite(this.timeoutMilliseconds))
-			{
-				throw new TimeoutException("Unable to get write access to collection " + this.collectionName + ". Locked from:\r\n\r\n" + this.LockedFrom() +
-					"\r\n\r\nCurrent attempt:\r\n\r\n" + Log.CleanStackTrace(StackTrace));
-			}
-
-			writeLock = StackTrace;
-#else
-			if (!await this.TryBeginWrite(this.timeoutMilliseconds))
-				throw new TimeoutException("Unable to get write access to collection " + this.collectionName + ".");
-#endif
-		}
-
-#if DEBUG_LOCKS
-		private string LockedFrom()
-		{
-			StringBuilder sb = new StringBuilder();
-
-			lock (this.synchObject)
-			{
-				foreach (KeyValuePair<string, int> P in readLocks)
-				{
-					sb.Append("Read lock:");
-					if (P.Value > 1)
-					{
-						sb.Append(" (");
-						sb.Append(P.Value.ToString());
-						sb.Append(" times)");
-					}
-
-					sb.AppendLine();
-					sb.AppendLine();
-					sb.AppendLine(Log.CleanStackTrace(P.Key));
-					sb.AppendLine();
-				}
-
-				if (!string.IsNullOrEmpty(writeLock))
-				{
-					sb.AppendLine("Write lock:");
-					sb.AppendLine();
-					sb.AppendLine(Log.CleanStackTrace(writeLock));
-				}
-			}
-
-			return sb.ToString();
-		}
-
-		private int nrReaders = 0;
-		private readonly Dictionary<string, int> readLocks = new Dictionary<string, int>();
-		private string writeLock = string.Empty;
-#endif
-
 		/// <summary>
 		/// Waits until object ready for reading.
 		/// Each call to <see cref="BeginRead"/> must be followed by exactly one call to <see cref="EndRead"/>.
 		/// </summary>
-		/// <returns>Number of concurrent readers when returning from locked section of call.</returns>
-		public override async Task<int> BeginRead()
+		/// <exception cref="TimeoutException">If read access could not be given within the <see cref="TimeoutMilliseconds"/> time.</exception>
+		public async Task BeginRead()
 		{
-			int Result = await base.BeginRead();
-			this.lockToken = this.Token;
-			return Result;
+			if (this.mainSynch)
+			{
+				if (!await this.fileAccess.TryBeginRead(this.timeoutMilliseconds))
+					throw new TimeoutException("Unable to get read access to " + this.collectionName);
+
+				this.lockToken = this.fileAccess.Token;
+			}
+			else
+				throw new InvalidOperationException("Secondary files are automatically locked with the primary file.");
 		}
 
 		/// <summary>
@@ -448,24 +349,37 @@ namespace Waher.Persistence.Files
 		/// Each successful call to <see cref="TryBeginRead"/> must be followed by exactly one call to <see cref="EndRead"/>.
 		/// </summary>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
-		public override async Task<bool> TryBeginRead(int Timeout)
+		public async Task<bool> TryBeginRead(int Timeout)
 		{
-			bool Result = await base.TryBeginRead(Timeout);
+			if (this.mainSynch)
+			{
+				bool Result = await this.fileAccess.TryBeginRead(Timeout);
 
-			if (Result)
-				this.lockToken = this.Token;
-			
-			return Result;
+				if (Result)
+					this.lockToken = this.fileAccess.Token;
+
+				return Result;
+			}
+			else
+				throw new InvalidOperationException("Secondary files are automatically locked with the primary file.");
 		}
 
 		/// <summary>
 		/// Waits until object ready for writing.
 		/// Each call to <see cref="BeginWrite"/> must be followed by exactly one call to <see cref="EndWrite"/>.
 		/// </summary>
-		public override async Task BeginWrite()
+		/// <exception cref="TimeoutException">If write access could not be given within the <see cref="TimeoutMilliseconds"/> time.</exception>
+		public async Task BeginWrite()
 		{
-			await base.BeginWrite();
-			this.lockToken = this.Token;
+			if (this.mainSynch)
+			{
+				if (!await this.fileAccess.TryBeginWrite(this.timeoutMilliseconds))
+					throw new TimeoutException("Unable to get write access to " + this.collectionName);
+
+				this.lockToken = this.fileAccess.Token;
+			}
+			else
+				throw new InvalidOperationException("Secondary files are automatically locked with the primary file.");
 		}
 
 		/// <summary>
@@ -473,14 +387,19 @@ namespace Waher.Persistence.Files
 		/// Each successful call to <see cref="TryBeginWrite"/> must be followed by exactly one call to <see cref="EndWrite"/>.
 		/// </summary>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
-		public override async Task<bool> TryBeginWrite(int Timeout)
+		public async Task<bool> TryBeginWrite(int Timeout)
 		{
-			bool Result = await base.TryBeginWrite(Timeout);
+			if (this.mainSynch)
+			{
+				bool Result = await this.fileAccess.TryBeginWrite(Timeout);
 
-			if (Result)
-				this.lockToken = this.Token;
-			
-			return Result;
+				if (Result)
+					this.lockToken = this.fileAccess.Token;
+
+				return Result;
+			}
+			else
+				throw new InvalidOperationException("Secondary files are automatically locked with the primary file.");
 		}
 
 		/// <summary>
@@ -489,32 +408,30 @@ namespace Waher.Persistence.Files
 		/// <see cref="MultiReadSingleWriteObject.TryBeginRead(int)"/>.
 		/// </summary>
 		/// <returns>Number of concurrent readers when returning from locked section of call.</returns>
-		public override async Task<int> EndRead()
+		public async Task<int> EndRead()
 		{
-#if DEBUG_LOCKS
-			lock (this.synchObject)
+			if (this.mainSynch)
 			{
-				if (--this.nrReaders == 0)
-					readLocks.Clear();
+				int Result = await this.fileAccess.EndRead();
+
+				LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> ToLoad;
+
+				lock (this.synchObject)
+				{
+					ToLoad = this.objectsToLoad;
+					this.objectsToLoad = null;
+				}
+
+				if (!(ToLoad is null))
+				{
+					foreach (Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter> P in ToLoad)
+						P.Item3(await this.LoadObject(P.Item1, P.Item2));
+				}
+
+				return Result;
 			}
-#endif
-			int Result = await base.EndRead();
-
-			LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> ToLoad;
-
-			lock (this.synchObject)
-			{
-				ToLoad = this.objectsToLoad;
-				this.objectsToLoad = null;
-			}
-
-			if (!(ToLoad is null))
-			{
-				foreach (Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter> P in ToLoad)
-					P.Item3(await this.LoadObject(P.Item1, P.Item2));
-			}
-
-			return Result;
+			else
+				throw new InvalidOperationException("Secondary files are automatically locked with the primary file.");
 		}
 
 		/// <summary>
@@ -522,7 +439,45 @@ namespace Waher.Persistence.Files
 		/// Must be called once for each call to <see cref="MultiReadSingleWriteObject.BeginWrite"/> or successful call to 
 		/// <see cref="MultiReadSingleWriteObject.TryBeginWrite(int)"/>.
 		/// </summary>
-		public override async Task EndWrite()
+		public async Task EndWrite()
+		{
+			if (!this.mainSynch)
+				throw new InvalidOperationException("Secondary files are automatically locked with the primary file.");
+
+			if (!(this.indices is null))
+			{
+				foreach (IndexBTreeFile Index in this.indices)
+					await Index.EndWritePriv();
+			}
+
+			await this.EndWritePriv();
+
+			LinkedList<KeyValuePair<object, ObjectSerializer>> ToSave;
+			LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> ToLoad;
+
+			lock (this.synchObject)
+			{
+				ToSave = this.objectsToSave;
+				this.objectsToSave = null;
+
+				ToLoad = this.objectsToLoad;
+				this.objectsToLoad = null;
+			}
+
+			if (!(ToSave is null))
+			{
+				foreach (KeyValuePair<object, ObjectSerializer> P in ToSave)
+					await this.SaveNewObject(P.Key, P.Value);
+			}
+
+			if (!(ToLoad is null))
+			{
+				foreach (Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter> P in ToLoad)
+					P.Item3(await this.LoadObject(P.Item1, P.Item2));
+			}
+		}
+
+		internal async Task EndWritePriv()
 		{
 			bool EmptyBlocks = !(this.emptyBlocks is null);
 			bool SaveBlocks = !(this.blocksToSave is null) && this.blocksToSave.Count > 0 && !this.provider.InBulkMode(this);
@@ -563,49 +518,18 @@ namespace Waher.Persistence.Files
 				}
 				finally
 				{
-#if DEBUG_LOCKS
-					writeLock = string.Empty;
-#endif
-					await base.EndWrite();
+					if (this.mainSynch)
+						await this.fileAccess.EndWrite();
 				}
 			}
-			else
-			{
-#if DEBUG_LOCKS
-				writeLock = string.Empty;
-#endif
-				await base.EndWrite();
-			}
-
-			LinkedList<KeyValuePair<object, ObjectSerializer>> ToSave;
-			LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> ToLoad;
-
-			lock (this.synchObject)
-			{
-				ToSave = this.objectsToSave;
-				this.objectsToSave = null;
-
-				ToLoad = this.objectsToLoad;
-				this.objectsToLoad = null;
-			}
-
-			if (!(ToSave is null))
-			{
-				foreach (KeyValuePair<object, ObjectSerializer> P in ToSave)
-					await this.SaveNewObject(P.Key, P.Value);
-			}
-
-			if (!(ToLoad is null))
-			{
-				foreach (Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter> P in ToLoad)
-					P.Item3(await this.LoadObject(P.Item1, P.Item2));
-			}
+			else if (this.mainSynch)
+				await this.fileAccess.EndWrite();
 		}
 
 		private async Task SaveUnsavedLocked()
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			if (!(this.blocksToSave is null))
 			{
@@ -634,7 +558,7 @@ namespace Waher.Persistence.Files
 		private async Task<Tuple<uint, byte[]>> CreateNewBlockLocked()
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			byte[] Block = null;
 			uint BlockIndex = uint.MaxValue;
@@ -672,14 +596,17 @@ namespace Waher.Persistence.Files
 
 		private async Task CreateFirstBlock()
 		{
-			await this.LockWrite();
+			if (this.mainSynch)
+				await this.BeginWrite();
+
 			try
 			{
 				await this.CreateNewBlockLocked();
 			}
 			finally
 			{
-				await this.EndWrite();
+				if (this.mainSynch)
+					await this.EndWrite();
 			}
 		}
 
@@ -698,10 +625,10 @@ namespace Waher.Persistence.Files
 		/// <returns>Loaded block.</returns>
 		public async Task<byte[]> LoadBlock(uint BlockIndex)
 		{
-			bool NeedLock = this.lockToken != this.Token;
+			bool NeedLock = this.lockToken != this.fileAccess.Token;
 
 			if (NeedLock)
-				await this.LockRead();
+				await this.BeginRead();
 			try
 			{
 				return await this.LoadBlockLocked(BlockIndex, true);
@@ -716,7 +643,7 @@ namespace Waher.Persistence.Files
 		internal async Task<byte[]> LoadBlockLocked(uint BlockIndex, bool AddToCache)
 		{
 #if ASSERT_LOCKS
-			this.AssertReadingOrWriting();
+			this.fileAccess.AssertReadingOrWriting();
 #endif
 			if (this.provider.TryGetBlock(this.id, BlockIndex, out byte[] Block))
 			{
@@ -755,7 +682,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Block to save.</returns>
 		public async Task SaveBlock(uint BlockIndex, byte[] Block)
 		{
-			await this.LockWrite();
+			await this.BeginWrite();
 			try
 			{
 				this.QueueSaveBlockLocked(BlockIndex, Block);
@@ -769,7 +696,7 @@ namespace Waher.Persistence.Files
 		internal void QueueSaveBlockLocked(uint BlockIndex, byte[] Block)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			if (Block is null || Block.Length != this.blockSize)
 				throw Database.FlagForRepair(this.collectionName, "Block not of the correct block size.");
@@ -803,7 +730,7 @@ namespace Waher.Persistence.Files
 		internal async Task DoSaveBlockLocked(uint BlockIndex, byte[] Block)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			byte[] EncryptedBlock;
 
@@ -842,7 +769,7 @@ namespace Waher.Persistence.Files
 		private void RegisterEmptyBlockLocked(uint Block)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			if (this.emptyBlocks is null)
 				this.emptyBlocks = new SortedDictionary<uint, bool>(new ReverseOrder());
@@ -861,7 +788,7 @@ namespace Waher.Persistence.Files
 		private async Task RemoveEmptyBlocksLocked()
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			if (!(this.emptyBlocks is null))
 			{
@@ -951,7 +878,7 @@ namespace Waher.Persistence.Files
 		internal async Task<byte[]> SaveBlobLocked(byte[] Bin)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			if (this.blobFile is null)
 				throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
@@ -1023,7 +950,7 @@ namespace Waher.Persistence.Files
 		internal async Task<BinaryDeserializer> LoadBlobLocked(byte[] Block, int Pos, BitArray BlobBlocksReferenced, FileStatistics Statistics)
 		{
 #if ASSERT_LOCKS
-			this.AssertReadingOrWriting();
+			this.fileAccess.AssertReadingOrWriting();
 #endif
 			if (this.blobFile is null)
 				throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
@@ -1114,7 +1041,7 @@ namespace Waher.Persistence.Files
 		internal async Task DeleteBlobLocked(byte[] Bin, int Offset)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			if (this.blobFile is null)
 				throw new FileException("BLOBs not supported in this file.", this.fileName, this.collectionName);
@@ -1346,18 +1273,18 @@ namespace Waher.Persistence.Files
 		{
 			Guid ObjectId;
 
-			await this.LockWrite();
+			await this.BeginWrite();
 			try
 			{
 				ObjectId = await this.SaveNewObjectLocked(Object, Serializer);
+
+				foreach (IndexBTreeFile Index in this.indices)
+					await Index.SaveNewObjectLocked(ObjectId, Object, Serializer);
 			}
 			finally
 			{
 				await this.EndWrite();
 			}
-
-			foreach (IndexBTreeFile Index in this.indices)
-				await Index.SaveNewObject(ObjectId, Object, Serializer);
 
 			return ObjectId;
 		}
@@ -1369,14 +1296,14 @@ namespace Waher.Persistence.Files
 		internal async Task<Guid> SaveNewObjectLocked(object Object)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			Type ObjectType = Object.GetType();
 			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(ObjectType);
 			Guid ObjectId = await this.SaveNewObjectLocked(Object, Serializer);
 
 			foreach (IndexBTreeFile Index in this.indices)
-				await Index.SaveNewObject(ObjectId, Object, Serializer);
+				await Index.SaveNewObjectLocked(ObjectId, Object, Serializer);
 
 			return ObjectId;
 		}
@@ -1390,25 +1317,25 @@ namespace Waher.Persistence.Files
 		{
 			LinkedList<Guid> ObjectIds = new LinkedList<Guid>();
 
-			await this.LockWrite();
+			await this.BeginWrite();
 			try
 			{
 				foreach (object Object in Objects)
 					ObjectIds.AddLast(await this.SaveNewObjectLocked(Object, Serializer));
+
+				foreach (IndexBTreeFile Index in this.indices)
+					await Index.SaveNewObjectsLocked(ObjectIds, Objects, Serializer);
 			}
 			finally
 			{
 				await this.EndWrite();
 			}
-
-			foreach (IndexBTreeFile Index in this.indices)
-				await Index.SaveNewObjects(ObjectIds, Objects, Serializer);
 		}
 
 		internal async Task<Guid> SaveNewObjectLocked(object Object, ObjectSerializer Serializer)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			BinarySerializer Writer;
 			Guid ObjectId;
@@ -1430,7 +1357,7 @@ namespace Waher.Persistence.Files
 		internal async Task SaveNewObjectLocked(byte[] Bin, BlockInfo Info)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			if (Bin.Length > this.inlineObjectSizeLimit)
 			{
@@ -1463,7 +1390,7 @@ namespace Waher.Persistence.Files
 		internal async Task<Tuple<Guid, BlockInfo>> PrepareObjectIdForSaveLocked(object Object, ObjectSerializer Serializer)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			bool HasObjectId = await Serializer.HasObjectId(Object);
 			BlockInfo Leaf;
@@ -1496,7 +1423,7 @@ namespace Waher.Persistence.Files
 			uint ChildRightLink, uint ChildRightLinkSize, bool IncSize, bool LastObject)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			int Used = Header.BytesUsed;
 			int PayloadSize = (int)(Used + 4 + Bin.Length);
@@ -1731,7 +1658,7 @@ namespace Waher.Persistence.Files
 		private async Task UpdateParentLinksLocked(uint BlockIndex, byte[] Block)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
 			object ObjectId;
@@ -1771,7 +1698,7 @@ namespace Waher.Persistence.Files
 		private async Task CheckChildParentLinkLocked(uint ChildLink, uint NewParentLink)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			byte[] ChildBlock = await this.LoadBlockLocked(ChildLink, true);
 
@@ -1786,7 +1713,7 @@ namespace Waher.Persistence.Files
 		internal async Task<BlockInfo> FindLeafNodeLocked(object ObjectId)
 		{
 #if ASSERT_LOCKS
-			this.AssertReadingOrWriting();
+			this.fileAccess.AssertReadingOrWriting();
 #endif
 			uint BlockIndex = 0;
 			bool LastObject = true;
@@ -1885,7 +1812,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Serializer">Object serializer. If not provided, the serializer will be deduced from information stored in the file.</param>
 		public async Task<object> LoadObject(Guid ObjectId, IObjectSerializer Serializer)
 		{
-			await this.LockRead();
+			await this.BeginRead();
 			try
 			{
 				return await this.LoadObjectLocked(ObjectId, Serializer);
@@ -1907,7 +1834,7 @@ namespace Waher.Persistence.Files
 
 		internal async Task<object> TryLoadObject(Guid ObjectId, IObjectSerializer Serializer)
 		{
-			await this.LockRead();
+			await this.BeginRead();
 			try
 			{
 				return await this.TryLoadObjectLocked(ObjectId, Serializer);
@@ -1941,7 +1868,7 @@ namespace Waher.Persistence.Files
 		private async Task<object> ParseObjectLocked(BlockInfo Info, IObjectSerializer Serializer)
 		{
 #if ASSERT_LOCKS
-			this.AssertReadingOrWriting();
+			this.fileAccess.AssertReadingOrWriting();
 #endif
 			int Pos = Info.InternalPosition + 4;
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Info.Block, this.blockLimit, Pos);
@@ -1978,7 +1905,7 @@ namespace Waher.Persistence.Files
 		internal async Task<BlockInfo> FindNodeLocked(object ObjectId)
 		{
 #if ASSERT_LOCKS
-			this.AssertReadingOrWriting();
+			this.fileAccess.AssertReadingOrWriting();
 #endif
 			uint BlockIndex = 0;
 
@@ -2086,7 +2013,7 @@ namespace Waher.Persistence.Files
 		{
 			object Old;
 
-			await this.LockWrite();
+			await this.BeginWrite();
 			try
 			{
 				BlockInfo Info = await this.FindNodeLocked(ObjectId);
@@ -2100,14 +2027,14 @@ namespace Waher.Persistence.Files
 				byte[] Bin = Writer.GetSerialization();
 
 				await this.ReplaceObjectLocked(Bin, Info, true);
+
+				foreach (IndexBTreeFile Index in this.indices)
+					await Index.UpdateObjectLocked(ObjectId, Old, Object, Serializer);
 			}
 			finally
 			{
 				await this.EndWrite();
 			}
-
-			foreach (IndexBTreeFile Index in this.indices)
-				await Index.UpdateObject(ObjectId, Old, Object, Serializer);
 		}
 
 		/// <summary>
@@ -2125,7 +2052,7 @@ namespace Waher.Persistence.Files
 			LinkedList<object> Olds = new LinkedList<object>();
 			object Old;
 
-			await this.LockWrite();
+			await this.BeginWrite();
 			try
 			{
 				IEnumerator<Guid> e1 = ObjectIds.GetEnumerator();
@@ -2146,20 +2073,20 @@ namespace Waher.Persistence.Files
 
 					await this.ReplaceObjectLocked(Bin, Info, true);
 				}
+
+				foreach (IndexBTreeFile Index in this.indices)
+					await Index.UpdateObjectsLocked(ObjectIds, Olds, Objects, Serializer);
 			}
 			finally
 			{
 				await this.EndWrite();
 			}
-
-			foreach (IndexBTreeFile Index in this.indices)
-				await Index.UpdateObjects(ObjectIds, Olds, Objects, Serializer);
 		}
 
 		internal async Task ReplaceObjectLocked(byte[] Bin, BlockInfo Info, bool DeleteBlob)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			byte[] Block = Info.Block;
 			BlockHeader Header = Info.Header;
@@ -2423,18 +2350,18 @@ namespace Waher.Persistence.Files
 		{
 			object DeletedObject;
 
-			await this.LockWrite();
+			await this.BeginWrite();
 			try
 			{
 				DeletedObject = await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
+
+				foreach (IndexBTreeFile Index in this.indices)
+					await Index.DeleteObjectLocked(ObjectId, DeletedObject, Serializer);
 			}
 			finally
 			{
 				await this.EndWrite();
 			}
-
-			foreach (IndexBTreeFile Index in this.indices)
-				await Index.DeleteObject(ObjectId, DeletedObject, Serializer);
 
 			return DeletedObject;
 		}
@@ -2450,19 +2377,19 @@ namespace Waher.Persistence.Files
 		{
 			LinkedList<object> DeletedObjects = new LinkedList<object>();
 
-			await this.LockWrite();
+			await this.BeginWrite();
 			try
 			{
 				foreach (Guid ObjectId in ObjectIds)
 					DeletedObjects.AddLast(await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0));
+
+				foreach (IndexBTreeFile Index in this.indices)
+					await Index.DeleteObjectsLocked(ObjectIds, DeletedObjects, Serializer);
 			}
 			finally
 			{
 				await this.EndWrite();
 			}
-
-			foreach (IndexBTreeFile Index in this.indices)
-				await Index.DeleteObjects(ObjectIds, DeletedObjects, Serializer);
 
 			return DeletedObjects;
 		}
@@ -2471,7 +2398,7 @@ namespace Waher.Persistence.Files
 			IObjectSerializer Serializer, object OldObject, int MergeCount)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			BlockInfo Info = await this.FindNodeLocked(ObjectId);
 			if (Info is null)
@@ -2797,7 +2724,7 @@ namespace Waher.Persistence.Files
 		private async Task RebalanceEmptyBlockLocked(uint BlockIndex, byte[] Block, BlockHeader Header)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			byte[] Object;
 
@@ -2874,7 +2801,7 @@ namespace Waher.Persistence.Files
 		private async Task MergeEmptyBlockWithSiblingLocked(uint ChildBlockIndex, uint ParentBlockIndex)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			byte[] ParentBlock = await this.LoadBlockLocked(ParentBlockIndex, true);
 			BinaryDeserializer ParentReader = new BinaryDeserializer(this.collectionName, this.encoding, ParentBlock, this.blockLimit);
@@ -3004,7 +2931,7 @@ namespace Waher.Persistence.Files
 		private async Task<MergeResult> MergeBlocksLocked(uint LeftIndex, byte[] Separator, uint RightIndex)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			byte[] LeftBlock = await this.LoadBlockLocked(LeftIndex, true);
 			byte[] RightBlock = await this.LoadBlockLocked(RightIndex, true);
@@ -3015,7 +2942,7 @@ namespace Waher.Persistence.Files
 		private async Task<MergeResult> MergeBlocksLocked(byte[] Left, byte[] Separator, byte[] Right)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			BlockSplitterLast Splitter = new BlockSplitterLast(this.blockSize);
 			uint LeftLastLink = BitConverter.ToUInt32(Left, 6);
@@ -3177,7 +3104,7 @@ namespace Waher.Persistence.Files
 		private async Task<byte[]> TryExtractLargestObjectLocked(uint BlockIndex, bool AllowRotation, bool AllowMerge)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
@@ -3322,7 +3249,7 @@ namespace Waher.Persistence.Files
 		private async Task<byte[]> TryExtractSmallestObjectLocked(uint BlockIndex, bool AllowRotation, bool AllowMerge)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
@@ -3481,7 +3408,7 @@ namespace Waher.Persistence.Files
 		private async Task<byte[]> RotateLeftLocked(uint ChildIndex, uint BlockIndex)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
@@ -3595,7 +3522,7 @@ namespace Waher.Persistence.Files
 		private async Task<byte[]> RotateRightLocked(uint ChildIndex, uint BlockIndex)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, true);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
@@ -3723,7 +3650,7 @@ namespace Waher.Persistence.Files
 		private async Task DecreaseSizeLocked(uint BlockIndex, uint Delta)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			if (Delta == 0)
 				return;
@@ -3758,7 +3685,7 @@ namespace Waher.Persistence.Files
 		private async Task IncreaseSizeLocked(uint BlockIndex)
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			while (true)
 			{
@@ -3795,7 +3722,7 @@ namespace Waher.Persistence.Files
 			Dictionary<Guid, bool> ObjectIds = new Dictionary<Guid, bool>();
 			FileStatistics Statistics;
 
-			await this.LockWrite();
+			await this.BeginWrite();
 			try
 			{
 				Statistics = await this.ComputeStatisticsLocked(ObjectIds, null);
@@ -3832,7 +3759,7 @@ namespace Waher.Persistence.Files
 		/// <returns>File statistics and found Object IDs.</returns>
 		public virtual async Task<KeyValuePair<FileStatistics, Dictionary<Guid, bool>>> ComputeStatistics()
 		{
-			await this.LockWrite();
+			await this.BeginWrite();
 			try
 			{
 				return await this.ComputeStatisticsLocked();
@@ -3847,7 +3774,7 @@ namespace Waher.Persistence.Files
 		/// Goes through the entire file and computes statistics abouts its composition.
 		/// </summary>
 		/// <returns>File statistics and found Object IDs.</returns>
-		internal virtual async Task<KeyValuePair<FileStatistics, Dictionary<Guid, bool>>> ComputeStatisticsLocked()
+		public virtual async Task<KeyValuePair<FileStatistics, Dictionary<Guid, bool>>> ComputeStatisticsLocked()
 		{
 			Dictionary<Guid, bool> ObjectIds = new Dictionary<Guid, bool>();
 			FileStatistics Result = await this.ComputeStatisticsLocked(ObjectIds, null);
@@ -3857,7 +3784,7 @@ namespace Waher.Persistence.Files
 		internal async Task<FileStatistics> ComputeStatisticsLocked(Dictionary<Guid, bool> ObjectIds, Dictionary<Guid, bool> ExistingIds)
 		{
 #if ASSERT_LOCKS
-			this.AssertReadingOrWriting();
+			this.fileAccess.AssertReadingOrWriting();
 #endif
 			this.blockLimit = this.file.BlockLimit + this.blocksAdded;
 			this.blobBlockLimit = this.blobFile is null ? 0 : this.blobFile.BlockLimit;
@@ -4196,7 +4123,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Asynchronous task object.</returns>
 		public async Task ExportGraphXML(XmlWriter XmlOutput, bool Properties)
 		{
-			await this.LockWrite();
+			await this.BeginWrite();
 			try
 			{
 				BinaryDeserializer Reader = null;
@@ -4268,9 +4195,9 @@ namespace Waher.Persistence.Files
 			foreach (IndexBTreeFile Index in this.indices)
 			{
 				XmlOutput.WriteStartElement("IndexFile");
-				XmlOutput.WriteAttributeString("fileName", Index.IndexFile.fileName);
+				XmlOutput.WriteAttributeString("fileName", Index.FileName);
 
-				await Index.IndexFile.ExportGraphXML(XmlOutput, false);
+				await Index.ExportGraphXML(XmlOutput, false);
 
 				XmlOutput.WriteEndElement();
 			}
@@ -4281,7 +4208,7 @@ namespace Waher.Persistence.Files
 		private async Task ExportGraphXMLLocked(uint BlockIndex, XmlWriter XmlOutput, bool Properties)
 		{
 #if ASSERT_LOCKS
-			this.AssertReadingOrWriting();
+			this.fileAccess.AssertReadingOrWriting();
 #endif
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, false);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, this.blockLimit);
@@ -4370,7 +4297,7 @@ namespace Waher.Persistence.Files
 		private void ExportGraphXMLLocked(XmlWriter XmlOutput, GenericObject Object)
 		{
 #if ASSERT_LOCKS
-			this.AssertReadingOrWriting();
+			this.fileAccess.AssertReadingOrWriting();
 #endif
 			LinkedList<KeyValuePair<string, Array>> Arrays = null;
 			LinkedList<KeyValuePair<string, GenericObject>> Objects = null;
@@ -4439,7 +4366,7 @@ namespace Waher.Persistence.Files
 		private void ExportGraphXMLLocked(XmlWriter XmlOutput, object Item)
 		{
 #if ASSERT_LOCKS
-			this.AssertReadingOrWriting();
+			this.fileAccess.AssertReadingOrWriting();
 #endif
 			uint TypeCode = ObjectSerializer.GetFieldDataTypeCode(Item);
 
@@ -4566,7 +4493,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Total number of objects in subtree.</returns>
 		public async Task<ulong> GetObjectCount(uint BlockIndex, bool IncludeChildren)
 		{
-			await this.LockRead();
+			await this.BeginRead();
 			try
 			{
 				return await this.GetObjectCountLocked(BlockIndex, IncludeChildren);
@@ -4577,10 +4504,10 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task<ulong> GetObjectCountLocked(uint BlockIndex, bool IncludeChildren)
+		internal async Task<ulong> GetObjectCountLocked(uint BlockIndex, bool IncludeChildren)
 		{
 #if ASSERT_LOCKS
-			this.AssertReadingOrWriting();
+			this.fileAccess.AssertReadingOrWriting();
 #endif
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, false);
 			uint BlockSize;
@@ -4636,7 +4563,7 @@ namespace Waher.Persistence.Files
 		private async Task<uint> GetObjectCount32Locked(uint BlockIndex)
 		{
 #if ASSERT_LOCKS
-			this.AssertReadingOrWriting();
+			this.fileAccess.AssertReadingOrWriting();
 #endif
 			byte[] Block = await this.LoadBlockLocked(BlockIndex, false);
 			return BitConverter.ToUInt32(Block, 2);
@@ -4650,7 +4577,7 @@ namespace Waher.Persistence.Files
 		/// <exception cref="KeyNotFoundException">If the object is not found.</exception>
 		public async Task<ulong> GetRank(Guid ObjectId)
 		{
-			await this.LockRead();
+			await this.BeginRead();
 			try
 			{
 				return await this.GetRankLocked(ObjectId);
@@ -4664,7 +4591,7 @@ namespace Waher.Persistence.Files
 		internal async Task<ulong> GetRankLocked(object ObjectId)
 		{
 #if ASSERT_LOCKS
-			this.AssertReadingOrWriting();
+			this.fileAccess.AssertReadingOrWriting();
 #endif
 			BlockInfo Info = await this.FindNodeLocked(ObjectId);
 			if (Info is null)
@@ -4757,16 +4684,6 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// <see cref="ICollection{Object}.Contains(Object)"/>
-		/// </summary>
-		public bool Contains(object item)
-		{
-			Task<bool> Task = this.ContainsAsync(item);
-			FilesProvider.Wait(Task, this.timeoutMilliseconds);
-			return Task.Result;
-		}
-
-		/// <summary>
 		/// Checks if an item is stored in the file.
 		/// </summary>
 		/// <param name="Item">Object to check for.</param>
@@ -4785,7 +4702,7 @@ namespace Waher.Persistence.Files
 			Guid ObjectId = await Serializer.GetObjectId(Item, false);
 			GenericObject Obj;
 
-			await this.LockRead();
+			await this.BeginRead();
 			try
 			{
 				Obj = await this.TryLoadObjectLocked(ObjectId, this.genericSerializer) as GenericObject;
@@ -4821,33 +4738,6 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// <see cref="ICollection{Object}.CopyTo(Object[], int)"/>
-		/// </summary>
-		public void CopyTo(object[] array, int arrayIndex)
-		{
-			foreach (Object Item in this)
-				array[arrayIndex++] = Item;
-		}
-
-		/// <summary>
-		/// <see cref="ICollection{Object}.Count"/>
-		/// </summary>
-		public int Count
-		{
-			get
-			{
-				Task<ulong> Task = this.GetObjectCount(0, true);
-				FilesProvider.Wait(Task, this.timeoutMilliseconds);
-
-				ulong Result = Task.Result;
-				if (Result > int.MaxValue)
-					return int.MaxValue;
-				else
-					return (int)Result;
-			}
-		}
-
-		/// <summary>
 		/// Number of objects in file.
 		/// </summary>
 		public Task<ulong> CountAsync => this.GetObjectCount(0, true);
@@ -4864,20 +4754,12 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// <see cref="ICollection{Object}.Clear"/>
-		/// </summary>
-		public void Clear()
-		{
-			FilesProvider.Wait(this.ClearAsync(), this.timeoutMilliseconds);
-		}
-
-		/// <summary>
 		/// Clears the database of all objects.
 		/// </summary>
 		/// <returns>Task object.</returns>
 		public async Task ClearAsync()
 		{
-			await this.LockWrite();
+			await this.BeginWrite();
 			try
 			{
 				await this.ClearAsyncLocked();
@@ -4891,7 +4773,7 @@ namespace Waher.Persistence.Files
 		internal async Task ClearAsyncLocked()
 		{
 #if ASSERT_LOCKS
-			this.AssertWriting();
+			this.fileAccess.AssertWriting();
 #endif
 			await this.file.Truncate(0);
 
@@ -4901,7 +4783,7 @@ namespace Waher.Persistence.Files
 			if (!(this.indices is null))
 			{
 				foreach (IndexBTreeFile IndexFile in this.indices)
-					await IndexFile.ClearAsync();
+					await IndexFile.ClearAsyncLocked();
 			}
 
 			this.provider.RemoveBlocks(this.id);
@@ -4920,81 +4802,22 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Returns an untyped enumerator that iterates through the collection.
 		/// 
-		/// For a typed enumerator, call the <see cref="GetTypedEnumeratorAsync{T}(LockType)"/> method.
+		/// For a typed enumerator, call the <see cref="GetTypedEnumeratorAsyncLocked{T}()"/> method.
 		/// </summary>
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
-		public async Task<IEnumerator<object>> GetEnumeratorAsync()
+		public async Task<ObjectBTreeFileCursor<object>> GetEnumeratorAsyncLocked()
 		{
-			return await ObjectBTreeFileEnumerator<object>.Create(this, this.recordHandler, null);
-		}
-
-		/// <summary>
-		/// Returns an untyped enumerator that iterates through the collection.
-		/// 
-		/// For a typed enumerator, call the <see cref="GetTypedEnumeratorAsync{T}(LockType)"/> method.
-		/// </summary>
-		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
-		public IEnumerator<object> GetEnumerator()
-		{
-			return this.GetEnumeratorAsync().Result;
-		}
-
-		/// <summary>
-		/// Returns an untyped enumerator that iterates through the collection.
-		/// 
-		/// For a typed enumerator, call the <see cref="GetTypedEnumeratorAsync{T}(LockType)"/> method.
-		/// </summary>
-		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return this.GetEnumeratorAsync().Result;
+			return await ObjectBTreeFileCursor<object>.CreateLocked(this, this.recordHandler, null);
 		}
 
 		/// <summary>
 		/// Returns an typed enumerator that iterates through the collection. The typed enumerator uses
 		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.
 		/// </summary>
-		/// <param name="LockType">
-		/// If locked access to the file is requested, and of what type.
-		/// 
-		/// If unlocked access is desired, any change to the database will invalidate the enumerator, and further access to the
-		/// enumerator will cause an <see cref="InvalidOperationException"/> to be thrown.
-		/// 
-		/// If read locked access is desired, the database cannot be updated, until the enumerator has been disposed.
-		/// If write locked access is desired, the database cannot be accessed at all, until the enumerator has been disposed.
-		/// 
-		/// Make sure to call the <see cref="ObjectBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release 
-		/// the database lock after use.
-		/// </param>
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
-		public async Task<ObjectBTreeFileEnumerator<T>> GetTypedEnumeratorAsync<T>(LockType LockType)
+		public Task<ObjectBTreeFileCursor<T>> GetTypedEnumeratorAsyncLocked<T>()
 		{
-			ObjectBTreeFileEnumerator<T> e = await ObjectBTreeFileEnumerator<T>.Create(this, this.recordHandler, null);
-			if (LockType != LockType.None)
-				await e.Lock(LockType);
-
-			return e;
-		}
-
-		/// <summary>
-		/// Removes the first occurrence of a specific object from the System.Collections.Generic.ICollection{T}.
-		/// </summary>
-		/// <param name="item">The object to remove from the System.Collections.Generic.ICollection{T}.</param>
-		/// <returns>true if item was successfully removed from the System.Collections.Generic.ICollection{T}; 
-		/// otherwise, false. This method also returns false if item is not found in the original 
-		/// System.Collections.Generic.ICollection{T}.</returns>
-		public bool Remove(object item)
-		{
-			try
-			{
-				Task<object> T = this.DeleteObject(item);
-				FilesProvider.Wait(T, this.timeoutMilliseconds);
-				return true;
-			}
-			catch (Exception)
-			{
-				return false;
-			}
+			return ObjectBTreeFileCursor<T>.CreateLocked(this, this.recordHandler, null);
 		}
 
 		#endregion
@@ -5007,8 +4830,12 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="Index">Index file to add.</param>
 		/// <param name="Regenerate">If the index is to be regenerated.</param>
-		public async Task AddIndex(IndexBTreeFile Index, bool Regenerate)
+		internal async Task AddIndexLocked(IndexBTreeFile Index, bool Regenerate)
 		{
+#if ASSERT_LOCKS
+			this.fileAccess.AssertWriting();
+#endif
+
 			lock (this.synchObject)
 			{
 				this.indexList.Add(Index);
@@ -5016,7 +4843,7 @@ namespace Waher.Persistence.Files
 			}
 
 			if (Regenerate)
-				await Index.Regenerate();
+				await Index.RegenerateLocked();
 		}
 
 		/// <summary>
@@ -5221,31 +5048,10 @@ namespace Waher.Persistence.Files
 		#region Searching
 
 		/// <summary>
-		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// Checks that indices have been loaded and are active for searching.
 		/// </summary>
-		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
-		/// <param name="Offset">Result offset.</param>
-		/// <param name="MaxCount">Maximum number of objects to return.</param>
-		/// <param name="Filter">Optional filter. Can be null.</param>
-		/// <param name="LockType">
-		/// If locked access to the file is requested, and of what type.
-		/// 
-		/// If unlocked access is desired, any change to the database will invalidate the enumerator, and further access to the
-		/// enumerator will cause an <see cref="InvalidOperationException"/> to be thrown.
-		/// 
-		/// If read locked access is desired, the database cannot be updated, until the enumerator has been disposed.
-		/// If write locked access is desired, the database cannot be accessed at all, until the enumerator has been disposed.
-		/// 
-		/// Make sure to call the <see cref="ObjectBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release 
-		/// the database lock after use.
-		/// </param>
-		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
-		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		/// <returns>Objects found.</returns>
-		public async Task<ICursor<T>> Find<T>(int Offset, int MaxCount, Filter Filter, LockType LockType, params string[] SortOrder)
+		public async Task CheckIndicesInitialized<T>()
 		{
-			this.nrSearches++;
-
 			if (!this.indicesCreated)
 			{
 				ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(typeof(T));
@@ -5259,128 +5065,121 @@ namespace Waher.Persistence.Files
 					this.indicesCreated = true;
 				}
 			}
-
-			ICursor<T> Result = null;
-
-			if (LockType != LockType.None)
-				await this.Lock(LockType);
-
-			try
-			{
-				if (Filter is null)
-				{
-					Result = null;
-
-					if (!(SortOrder is null) && SortOrder.Length > 0)
-					{
-						IndexBTreeFile Index = this.FindBestIndex(SortOrder);
-
-						if (Index is null)
-						{
-							if (await this.provider.GetObjectSerializer(typeof(T)) is ObjectSerializer Serializer &&
-								!(Serializer is null) &&
-								Serializer.HasObjectIdField)
-							{
-								if (SortOrder[0] == Serializer.ObjectIdMemberName)
-								{
-									Result = await this.GetTypedEnumeratorAsync<T>(LockType.None);
-									Result = new Searching.ObjectIdCursor<T>(Result, Serializer.ObjectIdMemberName);
-								}
-								else if (SortOrder[0] == "-" + Serializer.ObjectIdMemberName)
-								{
-									Result = await this.GetTypedEnumeratorAsync<T>(LockType.None);
-									Result = new Searching.ObjectIdCursor<T>(Result, Serializer.ObjectIdMemberName);
-									Result = new Searching.ReversedCursor<T>(Result, this.timeoutMilliseconds);
-								}
-							}
-						}
-						else
-						{
-							if (Index.SameSortOrder(null, SortOrder))
-								Result = await Index.GetTypedEnumerator<T>(LockType, false);
-							else if (Index.ReverseSortOrder(null, SortOrder))
-								Result = new Searching.ReversedCursor<T>(await Index.GetTypedEnumerator<T>(LockType, false), this.timeoutMilliseconds);
-						}
-					}
-
-					if (Result is null)
-					{
-						this.nrFullFileScans++;
-						Result = await this.GetTypedEnumeratorAsync<T>(LockType.None);
-
-						if (!(SortOrder is null) && SortOrder.Length > 0)
-							Result = await this.Sort<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true);
-					}
-
-					if (Offset > 0 || MaxCount < int.MaxValue)
-						Result = new Searching.PagesCursor<T>(Offset, MaxCount, Result, this.timeoutMilliseconds);
-				}
-				else
-				{
-					Result = await this.ConvertFilterToCursor<T>(Filter.Normalize(), LockType, false, SortOrder);
-
-					if (!(SortOrder is null) && SortOrder.Length > 0)
-						Result = await this.Sort<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true);   // false);
-
-					if (Offset > 0 || MaxCount < int.MaxValue)
-						Result = new Searching.PagesCursor<T>(Offset, MaxCount, Result, this.timeoutMilliseconds);
-				}
-			}
-			catch (Exception ex)
-			{
-				Result?.Dispose();
-
-				if (LockType != LockType.None)
-					await this.EndLock(LockType);
-
-				ExceptionDispatchInfo.Capture(ex).Throw();
-			}
-
-			if (LockType != LockType.None)
-				return new Searching.ParentLockedCursor<T>(Result, this.timeoutMilliseconds, this, LockType);
-			else
-				return Result;
 		}
 
-		private async Task<ICursor<T>> Sort<T>(ICursor<T> Result, string[] ConstantFields, string[] SortOrder, bool CanReverse)
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<ICursor<T>> FindLocked<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			ICursor<T> Result;
+
+			this.nrSearches++;
+
+			if (!this.indicesCreated)
+				throw new InvalidOperationException("Indices not initialized.");
+
+			if (Filter is null)
+			{
+				Result = null;
+
+				if (!(SortOrder is null) && SortOrder.Length > 0)
+				{
+					IndexBTreeFile Index = this.FindBestIndex(SortOrder);
+
+					if (Index is null)
+					{
+						if (await this.provider.GetObjectSerializer(typeof(T)) is ObjectSerializer Serializer &&
+							!(Serializer is null) &&
+							Serializer.HasObjectIdField)
+						{
+							if (SortOrder[0] == Serializer.ObjectIdMemberName)
+							{
+								Result = await this.GetTypedEnumeratorAsyncLocked<T>();
+								Result = new Searching.ObjectIdCursor<T>(Result, Serializer.ObjectIdMemberName);
+							}
+							else if (SortOrder[0] == "-" + Serializer.ObjectIdMemberName)
+							{
+								Result = await this.GetTypedEnumeratorAsyncLocked<T>();
+								Result = new Searching.ObjectIdCursor<T>(Result, Serializer.ObjectIdMemberName);
+								Result = new Searching.ReversedCursor<T>(Result);
+							}
+						}
+					}
+					else
+					{
+						if (Index.SameSortOrder(null, SortOrder))
+							Result = await Index.GetTypedEnumeratorLocked<T>();
+						else if (Index.ReverseSortOrder(null, SortOrder))
+							Result = new Searching.ReversedCursor<T>(await Index.GetTypedEnumeratorLocked<T>());
+					}
+				}
+
+				if (Result is null)
+				{
+					this.nrFullFileScans++;
+					Result = await this.GetTypedEnumeratorAsyncLocked<T>();
+
+					if (!(SortOrder is null) && SortOrder.Length > 0)
+						Result = await this.SortLocked<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true);
+				}
+
+				if (Offset > 0 || MaxCount < int.MaxValue)
+					Result = new Searching.PagesCursor<T>(Offset, MaxCount, Result);
+			}
+			else
+			{
+				Result = await this.ConvertFilterToCursorLocked<T>(Filter.Normalize(), SortOrder);
+
+				if (!(SortOrder is null) && SortOrder.Length > 0)
+					Result = await this.SortLocked<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true);   // false);
+
+				if (Offset > 0 || MaxCount < int.MaxValue)
+					Result = new Searching.PagesCursor<T>(Offset, MaxCount, Result);
+			}
+
+			return Result;
+		}
+
+		private async Task<ICursor<T>> SortLocked<T>(ICursor<T> Result, string[] ConstantFields, string[] SortOrder, bool CanReverse)
 		{
 			if (Result.SameSortOrder(ConstantFields, SortOrder))
 				return Result;
 
 			if (CanReverse && Result.ReverseSortOrder(ConstantFields, SortOrder))
-				return new Searching.ReversedCursor<T>(Result, this.timeoutMilliseconds);
+				return new Searching.ReversedCursor<T>(Result);
 
-			try
+			Log.Notice("Sort order in search result did not match index.",
+				this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
+				string.Empty, Log.CleanStackTrace(Environment.StackTrace),
+				new KeyValuePair<string, object>("Collection", this.collectionName),
+				new KeyValuePair<string, object>("ConstantFields", ToString(ConstantFields)),
+				new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+
+			SortedDictionary<Searching.SortedReference<T>, bool> SortedObjects;
+			IndexRecords Records;
+			byte[] Key;
+
+			Records = new IndexRecords(this.collectionName, this.encoding, int.MaxValue, SortOrder);
+			SortedObjects = new SortedDictionary<Searching.SortedReference<T>, bool>();
+
+			while (await Result.MoveNextAsyncLocked())
 			{
-				Log.Notice("Sort order in search result did not match index.",
-					this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
-					string.Empty, Log.CleanStackTrace(Environment.StackTrace),
-					new KeyValuePair<string, object>("Collection", this.collectionName),
-					new KeyValuePair<string, object>("ConstantFields", ToString(ConstantFields)),
-					new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+				if (!Result.CurrentTypeCompatible)
+					continue;
 
-				SortedDictionary<Searching.SortedReference<T>, bool> SortedObjects;
-				IndexRecords Records;
-				byte[] Key;
-
-				Records = new IndexRecords(this.collectionName, this.encoding, int.MaxValue, SortOrder);
-				SortedObjects = new SortedDictionary<Searching.SortedReference<T>, bool>();
-
-				while (await Result.MoveNextAsync())
-				{
-					if (!Result.CurrentTypeCompatible)
-						continue;
-
-					Key = await Records.Serialize(Result.CurrentObjectId, Result.Current, Result.CurrentSerializer, MissingFieldAction.Null);
-					SortedObjects[new Searching.SortedReference<T>(Key, Records, Result.Current, Result.CurrentSerializer, Result.CurrentObjectId)] = true;
-				}
-
-				return new Searching.SortedCursor<T>(SortedObjects, Records, this.timeoutMilliseconds);
+				Key = await Records.Serialize(Result.CurrentObjectId, Result.Current, Result.CurrentSerializer, MissingFieldAction.Null);
+				SortedObjects[new Searching.SortedReference<T>(Key, Records, Result.Current, Result.CurrentSerializer, Result.CurrentObjectId)] = true;
 			}
-			finally
-			{
-				Result.Dispose();
-			}
+
+			return new Searching.SortedCursor<T>(SortedObjects, Records);
 		}
 
 		private string ToString(string[] SortOrder)
@@ -5406,7 +5205,7 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		internal async Task<ICursor<T>> ConvertFilterToCursor<T>(Filter Filter, LockType LockType, bool LockParent, string[] SortOrder)
+		internal async Task<ICursor<T>> ConvertFilterToCursorLocked<T>(Filter Filter, string[] SortOrder)
 		{
 			Searching.IApplicableFilter ApplicableFilter;
 
@@ -5487,7 +5286,7 @@ namespace Waher.Persistence.Files
 							{
 								if (ChildFilters[i] is FilterFieldValue FilterFieldValue &&
 									FilterFieldValue.FieldName == Serializer.ObjectIdMemberName &&
-									!((Cursor = await this.TryGetObjectIdCursor<T>(FilterFieldValue, Serializer, LockType, LockParent)) is null))
+									!((Cursor = await this.TryGetObjectIdCursorLocked<T>(FilterFieldValue, Serializer)) is null))
 								{
 									Filter Rest;
 
@@ -5510,7 +5309,7 @@ namespace Waher.Persistence.Files
 
 									ApplicableFilter = this.ConvertFilter(Rest);
 									return new Searching.FilteredCursor<T>(Cursor, ApplicableFilter,
-										false, true, this.timeoutMilliseconds, this.provider);
+										false, true, this.provider);
 								}
 							}
 						}
@@ -5524,8 +5323,8 @@ namespace Waher.Persistence.Files
 							new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
 
 						ApplicableFilter = this.ConvertFilter(Filter);
-						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None),
-							ApplicableFilter, false, true, this.timeoutMilliseconds, this.provider);
+						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsyncLocked<T>(),
+							ApplicableFilter, false, true, this.provider);
 					}
 
 					Searching.RangeInfo[] RangeInfo = new Searching.RangeInfo[NrFields];
@@ -5634,9 +5433,9 @@ namespace Waher.Persistence.Files
 					}
 
 					if (Consistent)
-						return new Searching.RangesCursor<T>(Index, RangeInfo, AdditionalFields?.ToArray(), LockType, LockParent, this.provider);
+						return new Searching.RangesCursor<T>(Index, RangeInfo, AdditionalFields?.ToArray(), this.provider);
 					else
-						return new Searching.UnionCursor<T>(new Filter[0], this, LockType, LockParent);   // Empty result set.
+						return new Searching.UnionCursor<T>(new Filter[0], this);   // Empty result set.
 				}
 				else if (Filter is FilterOr)
 				{
@@ -5662,11 +5461,11 @@ namespace Waher.Persistence.Files
 							new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
 
 						ApplicableFilter = this.ConvertFilter(Filter);
-						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None),
-							ApplicableFilter, false, true, this.timeoutMilliseconds, this.provider);
+						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsyncLocked<T>(),
+							ApplicableFilter, false, true, this.provider);
 					}
 					else
-						return new Searching.UnionCursor<T>(ChildFilters, this, LockType, LockParent);
+						return new Searching.UnionCursor<T>(ChildFilters, this);
 				}
 				else
 					throw this.UnknownFilterType(Filter);
@@ -5688,11 +5487,11 @@ namespace Waher.Persistence.Files
 							new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
 
 						ApplicableFilter = this.ConvertFilter(Filter);
-						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None),
-							ApplicableFilter, false, true, this.timeoutMilliseconds, this.provider);
+						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsyncLocked<T>(),
+							ApplicableFilter, false, true, this.provider);
 					}
 					else
-						return await this.ConvertFilterToCursor<T>(NegatedFilter, LockType, LockParent, SortOrder);
+						return await this.ConvertFilterToCursorLocked<T>(NegatedFilter, SortOrder);
 				}
 				else
 					throw this.UnknownFilterType(Filter);
@@ -5710,7 +5509,7 @@ namespace Waher.Persistence.Files
 						Serializer.HasObjectIdField &&
 						Serializer.ObjectIdMemberName == FilterFieldValue.FieldName)
 					{
-						Cursor = await this.TryGetObjectIdCursor<T>(FilterFieldValue, Serializer, LockType, LockParent);
+						Cursor = await this.TryGetObjectIdCursorLocked<T>(FilterFieldValue, Serializer);
 						if (!(Cursor is null))
 							return Cursor;
 					}
@@ -5724,8 +5523,8 @@ namespace Waher.Persistence.Files
 						new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
 
 					ApplicableFilter = this.ConvertFilter(Filter);
-					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None),
-						ApplicableFilter, false, true, this.timeoutMilliseconds, this.provider);
+					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsyncLocked<T>(),
+						ApplicableFilter, false, true, this.provider);
 				}
 				else if (Filter is FilterFieldEqualTo)
 				{
@@ -5736,13 +5535,13 @@ namespace Waher.Persistence.Files
 					if (Index.SameSortOrder(ApplicableFilter.ConstantFields, SortOrder))
 					{
 						UntilFirstFail = true;
-						Cursor = await Index.FindFirstGreaterOrEqualTo<T>(LockType, LockParent, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value));
+						Cursor = await Index.FindFirstGreaterOrEqualToLocked<T>(new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value));
 					}
 					else if (Index.ReverseSortOrder(ApplicableFilter.ConstantFields, SortOrder))
 					{
 						UntilFirstFail = true;
-						Cursor = new Searching.ReversedCursor<T>(await Index.FindLastLesserOrEqualTo<T>(LockType, LockParent,
-							new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)), this.timeoutMilliseconds);
+						Cursor = new Searching.ReversedCursor<T>(await Index.FindLastLesserOrEqualToLocked<T>(
+							new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)));
 					}
 					else
 					{
@@ -5754,10 +5553,10 @@ namespace Waher.Persistence.Files
 							new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
 
 						UntilFirstFail = false;
-						Cursor = await Index.FindFirstGreaterOrEqualTo<T>(LockType, LockParent, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value));
+						Cursor = await Index.FindFirstGreaterOrEqualToLocked<T>(new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value));
 					}
 
-					return new Searching.FilteredCursor<T>(Cursor, ApplicableFilter, UntilFirstFail, true, this.timeoutMilliseconds, this.provider);
+					return new Searching.FilteredCursor<T>(Cursor, ApplicableFilter, UntilFirstFail, true, this.provider);
 				}
 				else if (Filter is FilterFieldNotEqualTo)
 				{
@@ -5770,8 +5569,8 @@ namespace Waher.Persistence.Files
 						new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
 
 					ApplicableFilter = this.ConvertFilter(Filter);
-					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None),
-						ApplicableFilter, false, true, this.timeoutMilliseconds, this.provider);
+					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsyncLocked<T>(),
+						ApplicableFilter, false, true, this.provider);
 				}
 				else
 				{
@@ -5784,14 +5583,14 @@ namespace Waher.Persistence.Files
 						if (IsSorted && Index.ReverseSortOrder(ApplicableFilter.ConstantFields, SortOrder))
 						{
 							return new Searching.FilteredCursor<T>(
-								await Index.GetTypedEnumerator<T>(LockType, LockParent),
-								ApplicableFilter, true, false, this.timeoutMilliseconds, this.provider);
+								await Index.GetTypedEnumeratorLocked<T>(),
+								ApplicableFilter, true, false, this.provider);
 						}
 						else
 						{
 							return new Searching.FilteredCursor<T>(
-								await Index.FindFirstGreaterOrEqualTo<T>(LockType, LockParent, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
-								null, false, true, this.timeoutMilliseconds, this.provider);
+								await Index.FindFirstGreaterOrEqualToLocked<T>(new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
+								null, false, true, this.provider);
 						}
 					}
 					else if (Filter is FilterFieldLesserOrEqualTo)
@@ -5799,14 +5598,14 @@ namespace Waher.Persistence.Files
 						if (IsSorted && Index.SameSortOrder(ApplicableFilter.ConstantFields, SortOrder))
 						{
 							return new Searching.FilteredCursor<T>(
-								await Index.GetTypedEnumerator<T>(LockType, LockParent),
-								ApplicableFilter, true, true, this.timeoutMilliseconds, this.provider);
+								await Index.GetTypedEnumeratorLocked<T>(),
+								ApplicableFilter, true, true, this.provider);
 						}
 						else
 						{
 							return new Searching.FilteredCursor<T>(
-								await Index.FindLastLesserOrEqualTo<T>(LockType, LockParent, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
-								null, false, false, this.timeoutMilliseconds, this.provider);
+								await Index.FindLastLesserOrEqualToLocked<T>(new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
+								null, false, false, this.provider);
 						}
 					}
 					else if (Filter is FilterFieldGreaterThan)
@@ -5814,14 +5613,14 @@ namespace Waher.Persistence.Files
 						if (IsSorted && Index.ReverseSortOrder(ApplicableFilter.ConstantFields, SortOrder))
 						{
 							return new Searching.FilteredCursor<T>(
-								await Index.GetTypedEnumerator<T>(LockType, LockParent),
-								ApplicableFilter, true, false, this.timeoutMilliseconds, this.provider);
+								await Index.GetTypedEnumeratorLocked<T>(),
+								ApplicableFilter, true, false, this.provider);
 						}
 						else
 						{
 							return new Searching.FilteredCursor<T>(
-								await Index.FindFirstGreaterThan<T>(LockType, LockParent, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
-								null, false, true, this.timeoutMilliseconds, this.provider);
+								await Index.FindFirstGreaterThanLocked<T>(new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
+								null, false, true, this.provider);
 						}
 					}
 					else if (Filter is FilterFieldLesserThan)
@@ -5829,14 +5628,14 @@ namespace Waher.Persistence.Files
 						if (IsSorted && Index.SameSortOrder(ApplicableFilter.ConstantFields, SortOrder))
 						{
 							return new Searching.FilteredCursor<T>(
-								await Index.GetTypedEnumerator<T>(LockType, LockParent),
-								ApplicableFilter, true, true, this.timeoutMilliseconds, this.provider);
+								await Index.GetTypedEnumeratorLocked<T>(),
+								ApplicableFilter, true, true, this.provider);
 						}
 						else
 						{
 							return new Searching.FilteredCursor<T>(
-							await Index.FindLastLesserThan<T>(LockType, LockParent, new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
-							null, false, false, this.timeoutMilliseconds, this.provider);
+							await Index.FindLastLesserThanLocked<T>(new KeyValuePair<string, object>(FilterFieldValue.FieldName, Value)),
+							null, false, false, this.provider);
 						}
 					}
 					else
@@ -5860,12 +5659,12 @@ namespace Waher.Persistence.Files
 						new KeyValuePair<string, object>("Filter", Filter?.ToString()),
 						new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
 
-					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None), FilterFieldLikeRegEx2,
-						false, true, this.timeoutMilliseconds, this.provider);
+					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsyncLocked<T>(), FilterFieldLikeRegEx2,
+						false, true, this.provider);
 				}
 				else
 				{
-					ICursor<T> Cursor = await Index.FindFirstGreaterOrEqualTo<T>(LockType, LockParent,
+					ICursor<T> Cursor = await Index.FindFirstGreaterOrEqualToLocked<T>(
 						new KeyValuePair<string, object>(FilterFieldLikeRegEx.FieldName, ConstantPrefix));
 
 					int c = ConstantPrefix.Length - 1;
@@ -5877,11 +5676,10 @@ namespace Waher.Persistence.Files
 
 						Cursor = new Searching.FilteredCursor<T>(Cursor,
 							new Searching.FilterFieldLesserThan(FilterFieldLikeRegEx.FieldName, ConstantPrefix2),
-							true, true, this.timeoutMilliseconds, Provider);
+							true, true, Provider);
 					}
 
-					return new Searching.FilteredCursor<T>(Cursor, FilterFieldLikeRegEx2, false, true,
-						this.timeoutMilliseconds, this.provider);
+					return new Searching.FilteredCursor<T>(Cursor, FilterFieldLikeRegEx2, false, true, this.provider);
 				}
 			}
 			else if (Filter is ICustomFilter CustomFilter)
@@ -5894,15 +5692,15 @@ namespace Waher.Persistence.Files
 					new KeyValuePair<string, object>("Filter", Filter?.ToString()),
 					new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
 
-				return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None), new Searching.FilterCustom(CustomFilter),
-					false, true, this.timeoutMilliseconds, this.provider);
+				return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsyncLocked<T>(), new Searching.FilterCustom(CustomFilter),
+					false, true, this.provider);
 			}
 			else
 				throw this.UnknownFilterType(Filter);
 		}
 
-		private async Task<ICursor<T>> TryGetObjectIdCursor<T>(FilterFieldValue FilterFieldValue,
-			ObjectSerializer Serializer, LockType LockType, bool LockParent)
+		private async Task<ICursor<T>> TryGetObjectIdCursorLocked<T>(FilterFieldValue FilterFieldValue,
+			ObjectSerializer Serializer)
 		{
 			object Value = FilterFieldValue.Value;
 			Guid ObjectId;
@@ -5936,7 +5734,7 @@ namespace Waher.Persistence.Files
 				if (Searching.Comparison.Increment(ref ObjectId))
 				{
 					BlockInfo Info = (await this.FindNodeLocked(ObjectId)) ?? await this.FindLeafNodeLocked(ObjectId);
-					ObjectBTreeFileEnumerator<T> e = await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None);
+					ObjectBTreeFileCursor<T> e = await this.GetTypedEnumeratorAsyncLocked<T>();
 					e.SetStartingPoint(Info);
 
 					return new Searching.ObjectIdCursor<T>(e, FilterFieldValue.FieldName);
@@ -5945,7 +5743,7 @@ namespace Waher.Persistence.Files
 			else if (FilterFieldValue is FilterFieldGreaterOrEqualTo)
 			{
 				BlockInfo Info = (await this.FindNodeLocked(ObjectId)) ?? await this.FindLeafNodeLocked(ObjectId);
-				ObjectBTreeFileEnumerator<T> e = await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None);
+				ObjectBTreeFileCursor<T> e = await this.GetTypedEnumeratorAsyncLocked<T>();
 				e.SetStartingPoint(Info);
 
 				return new Searching.ObjectIdCursor<T>(e, FilterFieldValue.FieldName);
@@ -5953,22 +5751,22 @@ namespace Waher.Persistence.Files
 			else if (FilterFieldValue is FilterFieldLesserThan)
 			{
 				BlockInfo Info = (await this.FindNodeLocked(ObjectId)) ?? await this.FindLeafNodeLocked(ObjectId);
-				ObjectBTreeFileEnumerator<T> e = await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None);
+				ObjectBTreeFileCursor<T> e = await this.GetTypedEnumeratorAsyncLocked<T>();
 				e.SetStartingPoint(Info);
 
 				return new Searching.ReversedCursor<T>(
-					new Searching.ObjectIdCursor<T>(e, FilterFieldValue.FieldName), this.timeoutMilliseconds);
+					new Searching.ObjectIdCursor<T>(e, FilterFieldValue.FieldName));
 			}
 			else if (FilterFieldValue is FilterFieldLesserOrEqualTo)
 			{
 				if (Searching.Comparison.Increment(ref ObjectId))
 				{
 					BlockInfo Info = (await this.FindNodeLocked(ObjectId)) ?? await this.FindLeafNodeLocked(ObjectId);
-					ObjectBTreeFileEnumerator<T> e = await this.GetTypedEnumeratorAsync<T>(LockParent ? LockType : LockType.None);
+					ObjectBTreeFileCursor<T> e = await this.GetTypedEnumeratorAsyncLocked<T>();
 					e.SetStartingPoint(Info);
 
 					return new Searching.ReversedCursor<T>(
-						new Searching.ObjectIdCursor<T>(e, FilterFieldValue.FieldName), this.timeoutMilliseconds);
+						new Searching.ObjectIdCursor<T>(e, FilterFieldValue.FieldName));
 				}
 			}
 

@@ -25,7 +25,7 @@ namespace Waher.Persistence.Files.Searching
 		/// Gets the element in the collection at the current position of the enumerator.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNextAsync()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
 		public T Current
 		{
 			get
@@ -61,7 +61,7 @@ namespace Waher.Persistence.Files.Searching
 		/// Gets the Object ID of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNextAsync()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
 		public Guid CurrentObjectId
 		{
 			get
@@ -83,7 +83,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>true if the enumerator was successfully advanced to the next element; false if
 		/// the enumerator has passed the end of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		public Task<bool> MoveNextAsync()
+		public Task<bool> MoveNextAsyncLocked()
 		{
 			return Task.FromResult<bool>(false);
 		}
@@ -94,7 +94,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>true if the enumerator was successfully advanced to the previous element; false if
 		/// the enumerator has passed the beginning of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		public Task<bool> MovePreviousAsync()
+		public Task<bool> MovePreviousAsyncLocked()
 		{
 			return Task.FromResult<bool>(false);
 		}
@@ -103,12 +103,6 @@ namespace Waher.Persistence.Files.Searching
 		{
 			T[] A = new T[0];
 			return (IEnumerator<T>)A.GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			T[] A = new T[0];
-			return A.GetEnumerator();
 		}
 
 		/// <summary>

@@ -1118,7 +1118,7 @@ namespace Waher.Persistence.Files
 
 			foreach (ObjectBTreeFile File in Files)
 			{
-				await File.LockWrite();
+				await File.BeginWrite();
 				await File.EndWrite();   // Saves unsaved data.
 			}
 
@@ -1133,7 +1133,9 @@ namespace Waher.Persistence.Files
 					return false;
 				else
 				{
-					this.hasUnsavedData[Caller] = true;
+					if (Caller.MainSynch)
+						this.hasUnsavedData[Caller] = true;
+
 					return true;
 				}
 			}
@@ -1295,7 +1297,17 @@ namespace Waher.Persistence.Files
 					continue;
 
 				if (Regenerate)
-					await I.Regenerate();
+				{
+					await File.BeginWrite();
+					try
+					{
+						await I.RegenerateLocked();
+					}
+					finally
+					{
+						await File.EndWrite();
+					}
+				}
 
 				return I;
 			}
@@ -1311,9 +1323,17 @@ namespace Waher.Persistence.Files
 			if (!Exists && RegenerationOptions == RegenerationOptions.RegenerateIfFileNotFound)
 				Regenerate = true;
 
-			IndexFile = await IndexBTreeFile.Create(s, File, this, FieldNames);
+			await File.BeginWrite();
+			try
+			{
+				IndexFile = await IndexBTreeFile.Create(s, File, this, FieldNames);
 
-			await File.AddIndex(IndexFile, Regenerate);
+				await File.AddIndexLocked(IndexFile, Regenerate);
+			}
+			finally
+			{
+				await File.EndWrite();
+			}
 
 			sb.Clear();
 
@@ -1461,10 +1481,7 @@ namespace Waher.Persistence.Files
 		private async Task LoadConfiguration()
 		{
 			LinkedList<string> ToRemove = null;
-			List<KeyValuePair<string, object>> Items = new List<KeyValuePair<string, object>>();
-
-			foreach (KeyValuePair<string, object> P in this.master)
-				Items.Add(P);
+			KeyValuePair<string, object>[] Items = await this.master.ToArrayAsync();
 
 			foreach (KeyValuePair<string, object> P in Items)
 			{
@@ -1887,14 +1904,14 @@ namespace Waher.Persistence.Files
 				try
 				{
 					ObjectId = await File.SaveNewObjectLocked(Value, Serializer);
+
+					foreach (IndexBTreeFile Index in File.Indices)
+						await Index.SaveNewObjectLocked(ObjectId, Value, Serializer);
 				}
 				finally
 				{
 					await File.EndWrite();
 				}
-
-				foreach (IndexBTreeFile Index in File.Indices)
-					await Index.SaveNewObject(ObjectId, Value, Serializer);
 			}
 			else
 			{
@@ -2010,17 +2027,25 @@ namespace Waher.Persistence.Files
 		{
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null));
-			using (ICursor<T> ResultSet = await File.Find<T>(Offset, MaxCount, Filter, LockType.Read, SortOrder))
+
+			await File.CheckIndicesInitialized<T>();
+			await File.BeginRead();
+			try
 			{
-				return await this.LoadAll<T>(ResultSet);
+				ICursor<T> ResultSet = await File.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
+				return await this.LoadAllLocked<T>(ResultSet);
+			}
+			finally
+			{
+				await File.EndRead();
 			}
 		}
 
-		private async Task<IEnumerable<T>> LoadAll<T>(ICursor<T> ResultSet)
+		private async Task<IEnumerable<T>> LoadAllLocked<T>(ICursor<T> ResultSet)
 		{
 			LinkedList<T> Result = new LinkedList<T>();
 
-			while (await ResultSet.MoveNextAsync())
+			while (await ResultSet.MoveNextAsyncLocked())
 			{
 				if (ResultSet.CurrentTypeCompatible)
 					Result.AddLast(ResultSet.Current);
@@ -2056,9 +2081,17 @@ namespace Waher.Persistence.Files
 		public async Task<IEnumerable<object>> Find(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
 			ObjectBTreeFile File = await this.GetFile(Collection);
-			using (ICursor<object> ResultSet = await File.Find<object>(Offset, MaxCount, Filter, LockType.Read, SortOrder))
+
+			await File.CheckIndicesInitialized<object>();
+			await File.BeginRead();
+			try
 			{
-				return await this.LoadAll<object>(ResultSet);
+				ICursor<object> ResultSet = await File.FindLocked<object>(Offset, MaxCount, Filter, SortOrder);
+				return await this.LoadAllLocked<object>(ResultSet);
+			}
+			finally
+			{
+				await File.EndRead();
 			}
 		}
 
@@ -2092,9 +2125,13 @@ namespace Waher.Persistence.Files
 		{
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null));
-			using (ICursor<T> ResultSet = await File.Find<T>(Offset, MaxCount, Filter, LockType.Write, SortOrder))
+
+			await File.CheckIndicesInitialized<T>();
+			await File.BeginWrite();
+			try
 			{
-				IEnumerable<T> Result = await this.LoadAll<T>(ResultSet);
+				ICursor<T> ResultSet = await File.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
+				IEnumerable<T> Result = await this.LoadAllLocked<T>(ResultSet);
 
 				foreach (T Object in Result)
 				{
@@ -2104,6 +2141,10 @@ namespace Waher.Persistence.Files
 				}
 
 				return Result;
+			}
+			finally
+			{
+				await File.EndWrite();
 			}
 		}
 
@@ -2134,9 +2175,13 @@ namespace Waher.Persistence.Files
 		public async Task<IEnumerable<object>> FindDelete(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
 			ObjectBTreeFile File = await this.GetFile(Collection);
-			using (ICursor<object> ResultSet = await File.Find<object>(Offset, MaxCount, Filter, LockType.Write, SortOrder))
+
+			await File.CheckIndicesInitialized<object>();
+			await File.BeginWrite();
+			try
 			{
-				IEnumerable<object> Result = await this.LoadAll<object>(ResultSet);
+				ICursor<object> ResultSet = await File.FindLocked<object>(Offset, MaxCount, Filter, SortOrder);
+				IEnumerable<object> Result = await this.LoadAllLocked<object>(ResultSet);
 				ObjectSerializer Serializer = null;
 				Type LastType = null;
 				Type Type;
@@ -2157,6 +2202,10 @@ namespace Waher.Persistence.Files
 				}
 
 				return Result;
+			}
+			finally
+			{
+				await File.EndWrite();
 			}
 		}
 
@@ -2470,11 +2519,13 @@ namespace Waher.Persistence.Files
 							}
 						}
 
-						using (ObjectBTreeFileEnumerator<GenericObject> e = await File.GetTypedEnumeratorAsync<GenericObject>(LockType.Read))
+						await File.BeginRead();
+						try
 						{
+							ObjectBTreeFileCursor<GenericObject> e = await File.GetTypedEnumeratorAsyncLocked<GenericObject>();
 							GenericObject Obj;
 
-							while (await e.MoveNextAsync())
+							while (await e.MoveNextAsyncLocked())
 							{
 								if (e.CurrentTypeCompatible)
 								{
@@ -2498,6 +2549,10 @@ namespace Waher.Persistence.Files
 								else if (!(e.CurrentObjectId is null))
 									await Output.ReportError("Unable to load object " + e.CurrentObjectId.ToString() + ".");
 							}
+						}
+						finally
+						{
+							await File.EndRead();
 						}
 					}
 					catch (Exception ex)
@@ -2602,7 +2657,6 @@ namespace Waher.Persistence.Files
 			string[] CollectionNames)
 		{
 			SortedDictionary<string, bool> CollectionsWithErrors = new SortedDictionary<string, bool>();
-			bool IsLocked;
 
 			Output.WriteStartDocument();
 
@@ -2620,7 +2674,6 @@ namespace Waher.Persistence.Files
 					continue;
 
 				await File.BeginWrite();
-				IsLocked = true;
 				try
 				{
 					Database.BeginRepair(File.CollectionName);
@@ -2763,14 +2816,17 @@ namespace Waher.Persistence.Files
 								await File.ClearAsyncLocked();
 
 								foreach (IndexBTreeFile Index in File.Indices)
-									await Index.ClearAsync();
+									await Index.ClearAsyncLocked();
 
 								await this.StartBulk();
 								c = 0;
 
-								using (ObjectBTreeFileEnumerator<object> e = await TempFile.GetTypedEnumeratorAsync<object>(LockType.Read))
+								await TempFile.BeginRead();
+								try
 								{
-									while (await e.MoveNextAsync())
+									ObjectBTreeFileCursor<object> e = await TempFile.GetTypedEnumeratorAsyncLocked<object>();
+								
+									while (await e.MoveNextAsyncLocked())
 									{
 										if (e.CurrentTypeCompatible)
 										{
@@ -2785,6 +2841,10 @@ namespace Waher.Persistence.Files
 											}
 										}
 									}
+								}
+								finally
+								{
+									await TempFile.EndRead();
 								}
 							}
 							finally
@@ -2857,9 +2917,6 @@ namespace Waher.Persistence.Files
 					else
 						ObjectIds = P.Value;
 
-					await File.EndWrite();
-					IsLocked = false;
-
 					Output.WriteStartElement("File");
 					Output.WriteAttributeString("id", File.Id.ToString());
 					Output.WriteAttributeString("collectionName", File.CollectionName);
@@ -2879,28 +2936,28 @@ namespace Waher.Persistence.Files
 					foreach (IndexBTreeFile Index in File.Indices)
 					{
 						Output.WriteStartElement("Index");
-						Output.WriteAttributeString("id", Index.IndexFile.Id.ToString());
-						Output.WriteAttributeString("fileName", GetRelativePath(ProgramDataFolder, Index.IndexFile.FileName));
-						Output.WriteAttributeString("blockSize", Index.IndexFile.BlockSize.ToString());
-						Output.WriteAttributeString("blobFileName", Index.IndexFile.BlobFileName);
-						Output.WriteAttributeString("blobBlockSize", Index.IndexFile.BlobBlockSize.ToString());
-						Output.WriteAttributeString("count", (await Index.IndexFile.CountAsync).ToString());
-						Output.WriteAttributeString("encoding", Index.IndexFile.Encoding.WebName);
-						Output.WriteAttributeString("encrypted", Encode(Index.IndexFile.Encrypted));
-						Output.WriteAttributeString("inlineObjectSizeLimit", Index.IndexFile.InlineObjectSizeLimit.ToString());
-						Output.WriteAttributeString("isReadOnly", Encode(Index.IndexFile.IsReadOnly));
-						Output.WriteAttributeString("timeoutMs", Index.IndexFile.TimeoutMilliseconds.ToString());
+						Output.WriteAttributeString("id", Index.Id.ToString());
+						Output.WriteAttributeString("fileName", GetRelativePath(ProgramDataFolder, Index.FileName));
+						Output.WriteAttributeString("blockSize", Index.BlockSize.ToString());
+						Output.WriteAttributeString("blobFileName", Index.BlobFileName);
+						Output.WriteAttributeString("blobBlockSize", Index.BlobBlockSize.ToString());
+						Output.WriteAttributeString("count", (await Index.CountAsync).ToString());
+						Output.WriteAttributeString("encoding", Index.Encoding.WebName);
+						Output.WriteAttributeString("encrypted", Encode(Index.Encrypted));
+						Output.WriteAttributeString("inlineObjectSizeLimit", Index.InlineObjectSizeLimit.ToString());
+						Output.WriteAttributeString("isReadOnly", Encode(Index.IsReadOnly));
+						Output.WriteAttributeString("timeoutMs", Index.TimeoutMilliseconds.ToString());
 
 						foreach (string Field in Index.FieldNames)
 							Output.WriteElementString("Field", Field);
 
-						IndexStat = await Index.ComputeStatistics(ObjectIds);
+						IndexStat = await Index.ComputeStatisticsLocked(ObjectIds);
 
 						if (Repair && (IndexStat.IsCorrupt || FileStat.IsCorrupt))
 						{
-							await Index.Regenerate();
+							await Index.RegenerateLocked();
 
-							IndexStat = await Index.ComputeStatistics(ObjectIds);
+							IndexStat = await Index.ComputeStatisticsLocked(ObjectIds);
 							IndexStat.LogComment("Index was regenerated due to errors found.");
 						}
 
@@ -2917,9 +2974,7 @@ namespace Waher.Persistence.Files
 				finally
 				{
 					Database.EndRepair(File.CollectionName);
-
-					if (IsLocked)
-						await File.EndWrite();
+					await File.EndWrite();
 				}
 			}
 
@@ -3199,7 +3254,7 @@ namespace Waher.Persistence.Files
 
 		private async Task RemoveIndex(ObjectBTreeFile File, IndexBTreeFile IndexFile)
 		{
-			string s = IndexFile.IndexFile.FileName;
+			string s = IndexFile.FileName;
 			bool Exists = System.IO.File.Exists(s);
 
 			if (!(IndexFile is null))

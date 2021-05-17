@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Storage;
@@ -17,7 +15,6 @@ namespace Waher.Persistence.Files.Searching
 		private readonly SortedDictionary<SortedReference<T>, bool> sortedObjects;
 		private readonly IndexRecords recordHandler;
 		private SortedDictionary<SortedReference<T>, bool>.KeyCollection.Enumerator e;
-		private readonly int timeoutMilliseconds;
 		private bool initialized = false;
 
 		/// <summary>
@@ -25,20 +22,17 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		/// <param name="SortedObjects">Sorted set of objects.</param>
 		/// <param name="RecordHandler">Record handler.</param>
-		/// <param name="TimeoutMilliseconds">Time to wait to get access to underlying database.</param>
-		internal SortedCursor(SortedDictionary<SortedReference<T>, bool> SortedObjects, IndexRecords RecordHandler,
-			int TimeoutMilliseconds)
+		internal SortedCursor(SortedDictionary<SortedReference<T>, bool> SortedObjects, IndexRecords RecordHandler)
 		{
 			this.sortedObjects = SortedObjects;
 			this.recordHandler = RecordHandler;
-			this.timeoutMilliseconds = TimeoutMilliseconds;
 		}
 
 		/// <summary>
 		/// Gets the element in the collection at the current position of the enumerator.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNextAsync()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
 		public T Current
 		{
 			get
@@ -74,7 +68,7 @@ namespace Waher.Persistence.Files.Searching
 		/// Gets the Object ID of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNextAsync()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
 		public Guid CurrentObjectId
 		{
 			get
@@ -97,7 +91,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>true if the enumerator was successfully advanced to the next element; false if
 		/// the enumerator has passed the end of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		public Task<bool> MoveNextAsync()
+		public Task<bool> MoveNextAsyncLocked()
 		{
 			if (!this.initialized)
 			{
@@ -114,19 +108,9 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>true if the enumerator was successfully advanced to the previous element; false if
 		/// the enumerator has passed the beginning of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		public Task<bool> MovePreviousAsync()
+		public Task<bool> MovePreviousAsyncLocked()
 		{
-			return this.MoveNextAsync();	// Ordering only in one direction.
-		}
-
-		public IEnumerator<T> GetEnumerator()
-		{
-			return new CursorEnumerator<T>(this, this.timeoutMilliseconds);
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return new CursorEnumerator<T>(this, this.timeoutMilliseconds);
+			return this.MoveNextAsyncLocked();	// Ordering only in one direction.
 		}
 
 		/// <summary>

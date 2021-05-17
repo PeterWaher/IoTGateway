@@ -1,28 +1,38 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Waher.Persistence.Files
 {
 	/// <summary>
+	/// Delegate for reset methods.
+	/// </summary>
+	/// <typeparam name="T">Type argument</typeparam>
+	/// <param name="ExistingCursor">Existing cursor</param>
+	/// <returns>New cursor, or existing cursor reset to starting position.</returns>
+	public delegate ICursor<T> GetNewCursorCallback<T>(ICursor<T> ExistingCursor);
+
+	/// <summary>
 	/// Cursor enumerator
 	/// </summary>
 	public class CursorEnumerator<T> : IEnumerator<T>, IEnumerator
 	{
-		private readonly ICursor<T> cursor;
 		private readonly int timeoutMilliseconds;
+		private readonly GetNewCursorCallback<T> resetFunction;
+		private ICursor<T> cursor;
 
 		/// <summary>
 		/// Cursor enumerator
 		/// </summary>
 		/// <param name="Cursor">Cursor.</param>
+		/// <param name="ResetFunction">Reset function.</param>
 		/// <param name="TimeoutMilliseconds">Time to wait to get access to underlying database.</param>
-		public CursorEnumerator(ICursor<T> Cursor, int TimeoutMilliseconds)
+		public CursorEnumerator(ICursor<T> Cursor, GetNewCursorCallback<T> ResetFunction, int TimeoutMilliseconds)
 		{
 			this.cursor = Cursor;
 			this.timeoutMilliseconds = TimeoutMilliseconds;
+			this.resetFunction = ResetFunction;
 		}
 
 		/// <summary>
@@ -52,7 +62,6 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void Dispose()
 		{
-			this.cursor.Dispose();
 		}
 
 		/// <summary>
@@ -61,7 +70,7 @@ namespace Waher.Persistence.Files
 		/// <returns>true if the enumerator was successfully advanced to the next element; false if the enumerator has passed the end of the collection.</returns>
 		public bool MoveNext()
 		{
-			Task<bool> Task = this.cursor.MoveNextAsync();
+			Task<bool> Task = this.cursor.MoveNextAsyncLocked();
 			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 			return Task.Result;
 		}
@@ -71,7 +80,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void Reset()
 		{
-			throw new InvalidOperationException("Forward-only cursors cannot be reset.");
+			this.cursor = this.resetFunction(this.cursor);
 		}
 	}
 }

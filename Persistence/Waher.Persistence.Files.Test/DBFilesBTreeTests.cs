@@ -60,11 +60,11 @@ namespace Waher.Persistence.FilesLW.Test
 		public static void AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(
-                typeof(FilesProvider).Assembly,
-                typeof(ObjectSerializer).Assembly,
-                typeof(DBFilesBTreeTests).Assembly, 
-                typeof(Expression).Assembly,
-                typeof(Script.Persistence.SQL.Select).Assembly);
+				typeof(FilesProvider).Assembly,
+				typeof(ObjectSerializer).Assembly,
+				typeof(DBFilesBTreeTests).Assembly,
+				typeof(Expression).Assembly,
+				typeof(Script.Persistence.SQL.Select).Assembly);
 		}
 
 		[TestInitialize]
@@ -365,7 +365,21 @@ namespace Waher.Persistence.FilesLW.Test
 		internal static async Task<FileStatistics> AssertConsistent(ObjectBTreeFile File, FilesProvider Provider, int? ExpectedNrObjects, object LastObjectAdded,
 			bool WriteStat)
 		{
-			KeyValuePair<FileStatistics, Dictionary<Guid, bool>> P = await File.ComputeStatistics();
+			await File.BeginWrite();
+			try
+			{
+				return await AssertConsistentLocked(File, Provider, ExpectedNrObjects, LastObjectAdded, WriteStat);
+			}
+			finally
+			{
+				await File.EndWrite();
+			}
+		}
+
+		internal static async Task<FileStatistics> AssertConsistentLocked(ObjectBTreeFile File, FilesProvider Provider, int? ExpectedNrObjects, object LastObjectAdded,
+			bool WriteStat)
+		{
+			KeyValuePair<FileStatistics, Dictionary<Guid, bool>> P = await File.ComputeStatisticsLocked();
 			FileStatistics Statistics = P.Key;
 
 			if (WriteStat)
@@ -432,7 +446,7 @@ namespace Waher.Persistence.FilesLW.Test
 			}
 
 			foreach (IndexBTreeFile Index in File.Indices)
-				await AssertConsistent(Index.IndexFile, Provider, ExpectedNrObjects, null, WriteStat);
+				await AssertConsistentLocked(Index.IndexFileLocked, Provider, ExpectedNrObjects, null, WriteStat);
 
 			return Statistics;
 		}
@@ -686,8 +700,8 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj2 = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
 			AssertEx.NotSame(Guid.Empty, ObjectId);
-			Assert.IsTrue(this.file.Contains(Obj));
-			Assert.IsFalse(this.file.Contains(Obj2));
+			Assert.IsTrue(await this.file.ContainsAsync(Obj));
+			Assert.IsFalse(await this.file.ContainsAsync(Obj2));
 		}
 
 		[TestMethod]
@@ -696,7 +710,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
 			AssertEx.NotSame(Guid.Empty, ObjectId);
-			Console.Out.WriteLine(this.file.Count.ToString());
+			Console.Out.WriteLine((await this.file.CountAsync).ToString());
 		}
 
 		[TestMethod]
@@ -705,9 +719,9 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
 			AssertEx.NotSame(Guid.Empty, ObjectId);
-			Assert.IsTrue(this.file.Contains(Obj));
-			this.file.Clear();
-			Assert.IsFalse(this.file.Contains(Obj));
+			Assert.IsTrue(await this.file.ContainsAsync(Obj));
+			await this.file.ClearAsync();
+			Assert.IsFalse(await this.file.ContainsAsync(Obj));
 		}
 
 		[TestMethod]
@@ -716,13 +730,24 @@ namespace Waher.Persistence.FilesLW.Test
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Guid? Prev = null;
 
-			foreach (Simple Obj in this.file)
+			await this.file.BeginRead();
+			try
 			{
-				if (Prev.HasValue)
-					AssertEx.Less(Prev.Value, Obj.ObjectId);
+				ObjectBTreeFileCursor<object> e = await this.file.GetEnumeratorAsyncLocked();
 
-				Prev = Obj.ObjectId;
-				Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				while (await e.MoveNextAsyncLocked())
+				{
+					Simple Obj = (Simple)e.Current;
+					if (Prev.HasValue)
+						AssertEx.Less(Prev.Value, Obj.ObjectId);
+
+					Prev = Obj.ObjectId;
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			AssertEx.Same(0, Objects.Count);
@@ -736,9 +761,12 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			ulong Rank = 0;
 
-			using (ObjectBTreeFileEnumerator<Simple> e = await this.file.GetTypedEnumeratorAsync<Simple>(LockType.None))
+			await this.file.BeginRead();
+			try
 			{
-				while (await e.MoveNextAsync())
+				ObjectBTreeFileCursor<Simple> e = await this.file.GetTypedEnumeratorAsyncLocked<Simple>();
+
+				while (await e.MoveNextAsyncLocked())
 				{
 					Obj = e.Current;
 					if (Prev.HasValue)
@@ -747,9 +775,13 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
-					AssertEx.Same(Rank++, e.CurrentRank);
+					AssertEx.Same(Rank++, await e.GetCurrentRankLocked());
 					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			AssertEx.Same(0, Objects.Count);
@@ -763,9 +795,12 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			ulong Rank = 0;
 
-			using (ObjectBTreeFileEnumerator<Simple> e = await this.file.GetTypedEnumeratorAsync<Simple>(LockType.Read))
+			await this.file.BeginRead();
+			try
 			{
-				while (await e.MoveNextAsync())
+				ObjectBTreeFileCursor<Simple> e = await this.file.GetTypedEnumeratorAsyncLocked<Simple>();
+
+				while (await e.MoveNextAsyncLocked())
 				{
 					Obj = e.Current;
 					if (Prev.HasValue)
@@ -774,9 +809,13 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
-					AssertEx.Same(Rank++, e.CurrentRank);
+					AssertEx.Same(Rank++, await e.GetCurrentRankLocked());
 					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			AssertEx.Same(0, Objects.Count);
@@ -789,14 +828,13 @@ namespace Waher.Persistence.FilesLW.Test
 			await this.CreateObjects(Math.Min(ObjectsToEnumerate, 1000));
 			Simple Obj;
 
-			using (ObjectBTreeFileEnumerator<Simple> e = await this.file.GetTypedEnumeratorAsync<Simple>(LockType.None))
+			ObjectBTreeFileCursor<Simple> e = await this.file.GetTypedEnumeratorAsyncLocked<Simple>();
+
+			while (await e.MoveNextAsyncLocked())
 			{
-				while (await e.MoveNextAsync())
-				{
-					Obj = e.Current;
-					Obj = CreateSimple(this.MaxStringLength);
-					await this.file.SaveNewObject(Obj);
-				}
+				Simple _ = e.Current;
+				Obj = CreateSimple(this.MaxStringLength);
+				await this.file.SaveNewObject(Obj);
 			}
 		}
 
@@ -808,9 +846,12 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			ulong Rank = ObjectsToEnumerate;
 
-			using (ObjectBTreeFileEnumerator<Simple> e = await this.file.GetTypedEnumeratorAsync<Simple>(LockType.Read))
+			await this.file.BeginRead();
+			try
 			{
-				while (e.MovePrevious())
+				ObjectBTreeFileCursor<Simple> e = await this.file.GetTypedEnumeratorAsyncLocked<Simple>();
+
+				while (await e.MovePreviousAsyncLocked())
 				{
 					Obj = e.Current;
 					if (Prev.HasValue)
@@ -819,9 +860,13 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
-					AssertEx.Same(--Rank, e.CurrentRank);
+					AssertEx.Same(--Rank, await e.GetCurrentRankLocked());
 					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			AssertEx.Same(0, Objects.Count);
@@ -865,9 +910,12 @@ namespace Waher.Persistence.FilesLW.Test
 
 				if (i < 10 || (gen.Next(0, 2) == 0 && i <= c - 10))
 				{
-					using (ObjectBTreeFileEnumerator<Simple> e = await this.file.GetTypedEnumeratorAsync<Simple>(LockType.Read))
+					await this.file.BeginRead();
+					try
 					{
-						Assert.IsTrue(await e.GoToObject((uint)i));
+						ObjectBTreeFileCursor<Simple> e = await this.file.GetTypedEnumeratorAsyncLocked<Simple>();
+
+						Assert.IsTrue(await e.GoToObjectLocked((uint)i));
 
 						do
 						{
@@ -878,17 +926,24 @@ namespace Waher.Persistence.FilesLW.Test
 							Prev = Obj.ObjectId;
 							DBFilesObjectSerializationTests.AssertEqual(Ordered[i + j], Obj);
 
-							AssertEx.Same(i + j, e.CurrentRank);
+							AssertEx.Same(i + j, await e.GetCurrentRankLocked());
 							AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 						}
-						while (await e.MoveNextAsync() && j++ < 10);
+						while (await e.MoveNextAsyncLocked() && j++ < 10);
+					}
+					finally
+					{
+						await this.file.EndRead();
 					}
 				}
 				else
 				{
-					using (ObjectBTreeFileEnumerator<Simple> e = await this.file.GetTypedEnumeratorAsync<Simple>(LockType.Read))
+					await this.file.BeginRead();
+					try
 					{
-						Assert.IsTrue(await e.GoToObject((uint)i));
+						ObjectBTreeFileCursor<Simple> e = await this.file.GetTypedEnumeratorAsyncLocked<Simple>();
+
+						Assert.IsTrue(await e.GoToObjectLocked((uint)i));
 
 						do
 						{
@@ -899,10 +954,14 @@ namespace Waher.Persistence.FilesLW.Test
 							Prev = Obj.ObjectId;
 							DBFilesObjectSerializationTests.AssertEqual(Ordered[i - j], Obj);
 
-							AssertEx.Same(i - j, e.CurrentRank);
+							AssertEx.Same(i - j, await e.GetCurrentRankLocked());
 							AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 						}
-						while (e.MovePrevious() && j++ < 10);
+						while (await e.MovePreviousAsyncLocked() && j++ < 10);
+					}
+					finally
+					{
+						await this.file.EndRead();
 					}
 				}
 			}
@@ -929,9 +988,12 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			ulong Rank = 0;
 
-			using (ObjectBTreeFileEnumerator<Simple> e = await this.file.GetTypedEnumeratorAsync<Simple>(LockType.None))
+			await this.file.BeginRead();
+			try
 			{
-				while (await e.MoveNextAsync())
+				ObjectBTreeFileCursor<Simple> e = await this.file.GetTypedEnumeratorAsyncLocked<Simple>();
+
+				while (await e.MoveNextAsyncLocked())
 				{
 					Obj = e.Current;
 					if (Prev.HasValue)
@@ -940,14 +1002,14 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.ContainsKey(Obj.ObjectId));
 
-					AssertEx.Same(Rank++, e.CurrentRank);
+					AssertEx.Same(Rank++, await e.GetCurrentRankLocked());
 					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
 
 				e.Reset();
 				Prev = null;
 
-				while (e.MovePrevious())
+				while (await e.MovePreviousAsyncLocked())
 				{
 					Obj = e.Current;
 					if (Prev.HasValue)
@@ -956,9 +1018,13 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
-					AssertEx.Same(--Rank, e.CurrentRank);
+					AssertEx.Same(--Rank, await e.GetCurrentRankLocked());
 					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			AssertEx.Same(0, Objects.Count);

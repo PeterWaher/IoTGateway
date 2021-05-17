@@ -61,7 +61,7 @@ namespace Waher.Persistence.Files
 
 			Result.dictionaryFile = await ObjectBTreeFile.Create(FileName, Result.collectionName, BlobFileName,
 				Result.provider.BlockSize, Result.provider.BlobBlockSize, Result.provider, Result.encoding, Result.timeoutMilliseconds,
-				Result.provider.Encrypted, Result.recordHandler);
+				Result.provider.Encrypted, Result.recordHandler, null);
 
 			return Result;
 		}
@@ -105,7 +105,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			await this.dictionaryFile.LockRead();
+			await this.dictionaryFile.BeginRead();
 			try
 			{
 				BlockInfo Info = await this.dictionaryFile.FindNodeLocked(key);
@@ -157,7 +157,7 @@ namespace Waher.Persistence.Files
 			Type Type = value?.GetType() ?? typeof(object);
 			IObjectSerializer Serializer = await this.provider.GetObjectSerializer(Type);
 
-			await this.dictionaryFile.LockWrite();
+			await this.dictionaryFile.BeginWrite();
 			try
 			{
 				byte[] Bin = await this.SerializeLocked(key, value, Serializer);
@@ -241,7 +241,7 @@ namespace Waher.Persistence.Files
 
 			object DeletedObject;
 
-			await this.dictionaryFile.LockWrite();
+			await this.dictionaryFile.BeginWrite();
 			try
 			{
 				DeletedObject = await this.dictionaryFile.DeleteObjectLocked(key, false, true, this.keyValueSerializer, null, 0);
@@ -300,7 +300,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			await this.dictionaryFile.LockRead();
+			await this.dictionaryFile.BeginRead();
 			try
 			{
 				object Result = await this.dictionaryFile.TryLoadObjectLocked(key, this.keyValueSerializer);
@@ -336,7 +336,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			await this.dictionaryFile.LockRead();
+			await this.dictionaryFile.BeginRead();
 			try
 			{
 				return (KeyValuePair<string, object>)await this.dictionaryFile.LoadObjectLocked(key, this.keyValueSerializer);
@@ -398,13 +398,28 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
 		{
-			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.GetEnumerator(LockType.Read);
+			Task Task = this.CopyToAsync(array, arrayIndex);
 			FilesProvider.Wait(Task, this.timeoutMilliseconds);
+		}
 
-			using (ObjectBTreeFileEnumerator<KeyValuePair<string, object>> e = Task.Result)
+		/// <summary>
+		/// Copies the contents of the dicitionary to an array.
+		/// </summary>
+		/// <param name="array">Array</param>
+		/// <param name="arrayIndex">Start index</param>
+		public async Task CopyToAsync(KeyValuePair<string, object>[] array, int arrayIndex)
+		{
+			await this.dictionaryFile.BeginRead();
+			try
 			{
-				while (e.MoveNext())
+				ObjectBTreeFileCursor<KeyValuePair<string, object>> e = await this.GetEnumeratorLocked();
+
+				while (await e.MoveNextAsyncLocked())
 					array[arrayIndex++] = e.Current;
+			}
+			finally
+			{
+				await this.dictionaryFile.EndRead();
 			}
 		}
 
@@ -425,14 +440,21 @@ namespace Waher.Persistence.Files
 		/// <returns>Array of key-value pairs.</returns>
 		public async Task<KeyValuePair<string, object>[]> ToArrayAsync()
 		{
-			List<KeyValuePair<string, object>> Result = new List<KeyValuePair<string, object>>();
-			using (ObjectBTreeFileEnumerator<KeyValuePair<string, object>> e = await this.GetEnumerator(LockType.Read))
+			await this.dictionaryFile.BeginRead();
+			try
 			{
-				while (await e.MoveNextAsync())
-					Result.Add(e.Current);
-			}
+				List<KeyValuePair<string, object>> Result = new List<KeyValuePair<string, object>>();
+				ObjectBTreeFileCursor<KeyValuePair<string, object>> e = await this.GetEnumeratorLocked();
 
-			return Result.ToArray();
+				while (await e.MoveNextAsyncLocked())
+					Result.Add(e.Current);
+
+				return Result.ToArray();
+			}
+			finally
+			{
+				await this.dictionaryFile.EndRead();
+			}
 		}
 
 		/// <summary>
@@ -451,9 +473,24 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
 		{
-			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.GetEnumerator(LockType.None);
+			ObjectBTreeFileCursor<KeyValuePair<string, object>> Cursor = this.GetCursor();
+			CursorEnumerator<KeyValuePair<string, object>> e = new CursorEnumerator<KeyValuePair<string, object>>(Cursor, this.ResetCursor, this.timeoutMilliseconds);
+			return e;
+		}
+
+		private ObjectBTreeFileCursor<KeyValuePair<string, object>> GetCursor()
+		{
+			Task<ObjectBTreeFileCursor<KeyValuePair<string, object>>> Task = this.GetEnumeratorLocked();
 			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 			return Task.Result;
+		}
+
+		private ICursor<KeyValuePair<string, object>> ResetCursor(ICursor<KeyValuePair<string, object>> Cursor)
+		{
+			if (Cursor is ObjectBTreeFileCursor<KeyValuePair<string, object>> e)
+				e.GoToFirstLocked().Wait();
+
+			return Cursor;
 		}
 
 		/// <summary>
@@ -461,46 +498,18 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.GetEnumerator(LockType.None);
-			FilesProvider.Wait(Task, this.timeoutMilliseconds);
-			return Task.Result;
+			ObjectBTreeFileCursor<KeyValuePair<string, object>> Cursor = this.GetCursor();
+			CursorEnumerator<KeyValuePair<string, object>> e = new CursorEnumerator<KeyValuePair<string, object>>(Cursor, this.ResetCursor, this.timeoutMilliseconds);
+			return e;
 		}
 
 		/// <summary>
 		/// Gets an enumerator for all entries in the dictionary.
 		/// </summary>
-		/// <param name="LockType">
-		/// If locked access to the file is requested, and of what type.
-		/// 
-		/// If unlocked access is desired, any change to the database will invalidate the enumerator, and further access to the
-		/// enumerator will cause an <see cref="InvalidOperationException"/> to be thrown.
-		/// 
-		/// If read locked access is desired, the database cannot be updated, until the enumerator has been disposed.
-		/// If write locked access is desired, the database cannot be accessed at all, until the enumerator has been disposed.
-		/// 
-		/// Make sure to call the <see cref="ObjectBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release 
-		/// the database lock after use.
-		/// </param>
 		/// <returns>Enumerator</returns>
-		public async Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> GetEnumerator(LockType LockType)
+		public Task<ObjectBTreeFileCursor<KeyValuePair<string, object>>> GetEnumeratorLocked()
 		{
-			ObjectBTreeFileEnumerator<KeyValuePair<string, object>> Result = null;
-
-			try
-			{
-				Result = await ObjectBTreeFileEnumerator<KeyValuePair<string, object>>.Create(this.dictionaryFile, this.recordHandler, this.keyValueSerializer);
-				if (LockType != LockType.None)
-					await Result.Lock(LockType);
-			}
-			catch (Exception ex)
-			{
-				Result?.Dispose();
-				Result = null;
-
-				System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
-			}
-
-			return Result;
+			return ObjectBTreeFileCursor<KeyValuePair<string, object>>.CreateLocked(this.dictionaryFile, this.recordHandler, this.keyValueSerializer);
 		}
 
 		/// <summary>
@@ -560,7 +569,7 @@ namespace Waher.Persistence.Files
 		{
 			get
 			{
-				return this.dictionaryFile.Count;
+				return (int)this.dictionaryFile.CountAsync.Result;
 			}
 		}
 

@@ -48,13 +48,28 @@ namespace Waher.Persistence.Files
 
 		public void CopyTo(string[] array, int arrayIndex)
 		{
-			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.dictionary.GetEnumerator(LockType.Read);
+			Task Task = this.CopyToAsync(array, arrayIndex);
 			FilesProvider.Wait(Task, this.dictionary.DictionaryFile.TimeoutMilliseconds);
+		}
 
-			using (ObjectBTreeFileEnumerator<KeyValuePair<string, object>> e = Task.Result)
+		/// <summary>
+		/// Copies the keys of the dicitionary to an array.
+		/// </summary>
+		/// <param name="array">Array</param>
+		/// <param name="arrayIndex">Start index</param>
+		public async Task CopyToAsync(string[] array, int arrayIndex)
+		{
+			await this.dictionary.DictionaryFile.BeginRead();
+			try
 			{
-				while (e.MoveNext())
+				ObjectBTreeFileCursor<KeyValuePair<string, object>> e = await this.dictionary.GetEnumeratorLocked();
+
+				while (await e.MoveNextAsyncLocked())
 					array[arrayIndex++] = e.Current.Key;
+			}
+			finally
+			{
+				await this.dictionary.DictionaryFile.EndRead();
 			}
 		}
 

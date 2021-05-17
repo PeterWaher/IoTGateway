@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 
@@ -31,7 +30,7 @@ namespace Waher.Persistence.Files.Searching
 		/// Gets the element in the collection at the current position of the enumerator.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNextAsync()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
 		public T Current
 		{
 			get
@@ -67,7 +66,7 @@ namespace Waher.Persistence.Files.Searching
 		/// Gets the Object ID of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNextAsync()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
 		public Guid CurrentObjectId
 		{
 			get
@@ -81,7 +80,6 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		public void Dispose()
 		{
-			this.cursor.Dispose();
 		}
 
 		/// <summary>
@@ -90,9 +88,9 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>true if the enumerator was successfully advanced to the next element; false if
 		/// the enumerator has passed the end of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		public Task<bool> MoveNextAsync()
+		public Task<bool> MoveNextAsyncLocked()
 		{
-			return this.cursor.MoveNextAsync();
+			return this.cursor.MoveNextAsyncLocked();
 		}
 
 		/// <summary>
@@ -101,19 +99,9 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>true if the enumerator was successfully advanced to the previous element; false if
 		/// the enumerator has passed the beginning of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		public Task<bool> MovePreviousAsync()
+		public Task<bool> MovePreviousAsyncLocked()
 		{
-			return this.cursor.MovePreviousAsync();
-		}
-
-		public IEnumerator<T> GetEnumerator()
-		{
-			return this.cursor.GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return this.cursor.GetEnumerator();
+			return this.cursor.MovePreviousAsyncLocked();
 		}
 
 		/// <summary>

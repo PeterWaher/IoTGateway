@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence.Files.Searching
@@ -24,8 +21,6 @@ namespace Waher.Persistence.Files.Searching
 		private readonly FilesProvider provider;
 		private readonly int nrRanges;
 		private int limitsUpdatedAt;
-		private readonly LockType lockType;
-		private readonly bool lockParent;
 		private readonly bool firstAscending;
 		private readonly bool[] ascending;
 
@@ -36,17 +31,12 @@ namespace Waher.Persistence.Files.Searching
 		/// <param name="Index">Index.</param>
 		/// <param name="Ranges">Ranges to enumerate.</param>
 		/// <param name="AdditionalFilters">Additional filters.</param>
-		/// <param name="LockType">If locked access is desired.</param>
-		/// <param name="LockParent">If parent file is to be locked as well.</param>
 		/// <param name="Provider">Files provider.</param>
-		public RangesCursor(IndexBTreeFile Index, RangeInfo[] Ranges, IApplicableFilter[] AdditionalFilters,
-			LockType LockType, bool LockParent, FilesProvider Provider)
+		public RangesCursor(IndexBTreeFile Index, RangeInfo[] Ranges, IApplicableFilter[] AdditionalFilters, FilesProvider Provider)
 		{
 			this.index = Index;
 			this.ranges = Ranges;
 			this.additionalfilters = AdditionalFilters;
-			this.lockType = LockType;
-			this.lockParent = LockParent;
 			this.currentRange = null;
 			this.ascending = Index.Ascending;
 			this.firstAscending = this.ascending[0];
@@ -65,7 +55,7 @@ namespace Waher.Persistence.Files.Searching
 		/// Gets the element in the collection at the current position of the enumerator.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNextAsync()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
 		public T Current
 		{
 			get
@@ -112,7 +102,7 @@ namespace Waher.Persistence.Files.Searching
 		/// Gets the Object ID of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNextAsync()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
 		public Guid CurrentObjectId
 		{
 			get
@@ -126,7 +116,6 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		public void Dispose()
 		{
-			this.currentRange?.Dispose();
 			this.currentRange = null;
 		}
 
@@ -136,7 +125,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>true if the enumerator was successfully advanced to the next element; false if
 		/// the enumerator has passed the end of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		public async Task<bool> MoveNextAsync()
+		public async Task<bool> MoveNextAsyncLocked()
 		{
 			int i;
 
@@ -233,18 +222,17 @@ namespace Waher.Persistence.Files.Searching
 					}
 
 					if (this.firstAscending)
-						this.currentRange = await this.index.FindFirstGreaterOrEqualTo<T>(this.lockType, this.lockParent, SearchParameters.ToArray());
+						this.currentRange = await this.index.FindFirstGreaterOrEqualToLocked<T>(SearchParameters.ToArray());
 					else
-						this.currentRange = await this.index.FindLastLesserOrEqualTo<T>(this.lockType, this.lockParent, SearchParameters.ToArray());
+						this.currentRange = await this.index.FindLastLesserOrEqualToLocked<T>(SearchParameters.ToArray());
 
 					this.startRangeFilters = StartFilters?.ToArray();
 					this.endRangeFilters = EndFilters?.ToArray();
 					this.limitsUpdatedAt = this.nrRanges;
 				}
 
-				if (!await this.currentRange.MoveNextAsync())
+				if (!await this.currentRange.MoveNextAsyncLocked())
 				{
-					this.currentRange.Dispose();
 					this.currentRange = null;
 
 					if (this.limitsUpdatedAt >= this.nrRanges)
@@ -342,7 +330,6 @@ namespace Waher.Persistence.Files.Searching
 					return true;
 				else if (!(OutOfStartRangeField is null) || !(OutOfEndRangeField is null))
 				{
-					this.currentRange.Dispose();
 					this.currentRange = null;
 
 					if (this.limitsUpdatedAt >= this.nrRanges)
@@ -357,7 +344,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>true if the enumerator was successfully advanced to the previous element; false if
 		/// the enumerator has passed the beginning of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		public async Task<bool> MovePreviousAsync()
+		public async Task<bool> MovePreviousAsyncLocked()
 		{
 			int i;
 
@@ -454,18 +441,17 @@ namespace Waher.Persistence.Files.Searching
 					}
 
 					if (this.firstAscending)
-						this.currentRange = await this.index.FindLastLesserOrEqualTo<T>(this.lockType, this.lockParent, SearchParameters.ToArray());
+						this.currentRange = await this.index.FindLastLesserOrEqualToLocked<T>(SearchParameters.ToArray());
 					else
-						this.currentRange = await this.index.FindFirstGreaterOrEqualTo<T>(this.lockType, this.lockParent, SearchParameters.ToArray());
+						this.currentRange = await this.index.FindFirstGreaterOrEqualToLocked<T>(SearchParameters.ToArray());
 
 					this.startRangeFilters = StartFilters?.ToArray();
 					this.endRangeFilters = EndFilters?.ToArray();
 					this.limitsUpdatedAt = this.nrRanges;
 				}
 
-				if (!await this.currentRange.MovePreviousAsync())
+				if (!await this.currentRange.MovePreviousAsyncLocked())
 				{
-					this.currentRange.Dispose();
 					this.currentRange = null;
 
 					if (this.limitsUpdatedAt >= this.nrRanges)
@@ -563,23 +549,12 @@ namespace Waher.Persistence.Files.Searching
 					return true;
 				else if (!(OutOfStartRangeField is null) || !(OutOfEndRangeField is null))
 				{
-					this.currentRange.Dispose();
 					this.currentRange = null;
 
 					if (this.limitsUpdatedAt >= this.nrRanges)
 						return false;
 				}
 			}
-		}
-
-		public IEnumerator<T> GetEnumerator()
-		{
-			return new CursorEnumerator<T>(this, this.index.IndexFile.TimeoutMilliseconds);
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return new CursorEnumerator<T>(this, this.index.IndexFile.TimeoutMilliseconds);
 		}
 
 		/// <summary>

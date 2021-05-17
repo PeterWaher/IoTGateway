@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 
@@ -10,13 +9,13 @@ namespace Waher.Persistence.Files
 	/// Interface for typed cursors.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public interface ICursor<T> : IEnumerable<T>, IDisposable
+	public interface ICursor<T>
 	{
 		/// <summary>
 		/// Gets the element in the collection at the current position of the enumerator.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNextAsync()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
 		T Current
 		{
 			get;
@@ -43,7 +42,7 @@ namespace Waher.Persistence.Files
 		/// Gets the Object ID of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNextAsync()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
 		Guid CurrentObjectId
 		{
 			get;
@@ -55,7 +54,7 @@ namespace Waher.Persistence.Files
 		/// <returns>true if the enumerator was successfully advanced to the next element; false if
 		/// the enumerator has passed the end of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		Task<bool> MoveNextAsync();
+		Task<bool> MoveNextAsyncLocked();
 
 		/// <summary>
 		/// Advances the enumerator to the previous element of the collection.
@@ -63,7 +62,7 @@ namespace Waher.Persistence.Files
 		/// <returns>true if the enumerator was successfully advanced to the previous element; false if
 		/// the enumerator has passed the beginning of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		Task<bool> MovePreviousAsync();
+		Task<bool> MovePreviousAsyncLocked();
 
 		/// <summary>
 		/// If the index ordering corresponds to a given sort order.

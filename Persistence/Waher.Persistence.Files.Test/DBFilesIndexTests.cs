@@ -54,7 +54,7 @@ namespace Waher.Persistence.FilesLW.Test
 #else
 			this.provider = await FilesProvider.CreateAsync(DBFilesBTreeTests.Folder, DBFilesBTreeTests.CollectionName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
 #endif
-				
+
 			this.file = await this.provider.GetFile(DBFilesBTreeTests.CollectionName);
 
 			this.index1 = await this.provider.GetIndexFile(this.file, RegenerationOptions.DontRegenerate, "Byte", "-DateTime");
@@ -94,67 +94,87 @@ namespace Waher.Persistence.FilesLW.Test
 			SortedDictionary<Guid, bool> Objects3 = new SortedDictionary<Guid, bool>();
 			Simple Prev = null;
 
-			foreach (Simple Obj in this.index1)
+			await this.file.BeginRead();
+			try
 			{
-				Objects2[Obj.ObjectId] = true;
-				Objects3[Obj.ObjectId] = true;
+				ICursor<object> e = await this.index1.GetCursorAsyncLocked();
 
-				if (Prev != null)
-					AssertEx.Less(this.Index1Compare(Prev, Obj), 0);
+				while (await e.MoveNextAsyncLocked())
+				{
+					Simple Obj = (Simple)e.Current;
 
-				Prev = Obj;
-				Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+					Objects2[Obj.ObjectId] = true;
+					Objects3[Obj.ObjectId] = true;
+
+					if (Prev != null)
+						AssertEx.Less(this.Index1Compare(Prev, Obj), 0);
+
+					Prev = Obj;
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				AssertEx.Same(0, Objects.Count);
+
+				Prev = null;
+				e = await this.index2.GetCursorAsyncLocked();
+
+				while (await e.MoveNextAsyncLocked())
+				{
+					Simple Obj = (Simple)e.Current;
+
+					if (Prev != null)
+						AssertEx.Less(this.Index2Compare(Prev, Obj), 0);
+
+					Prev = Obj;
+					Assert.IsTrue(Objects2.Remove(Obj.ObjectId));
+				}
+
+				AssertEx.Same(0, Objects2.Count);
+
+				Prev = null;
+				e = await this.index3.GetCursorAsyncLocked();
+
+				while (await e.MoveNextAsyncLocked())
+				{
+					Simple Obj = (Simple)e.Current;
+
+					if (Prev != null)
+						AssertEx.Less(this.Index3Compare(Prev, Obj), 0);
+
+					Prev = Obj;
+					Assert.IsTrue(Objects3.Remove(Obj.ObjectId));
+				}
 			}
-
-			AssertEx.Same(0, Objects.Count);
-
-			Prev = null;
-			foreach (Simple Obj in this.index2)
+			finally
 			{
-				if (Prev != null)
-					AssertEx.Less(this.Index2Compare(Prev, Obj), 0);
-
-				Prev = Obj;
-				Assert.IsTrue(Objects2.Remove(Obj.ObjectId));
-			}
-
-			AssertEx.Same(0, Objects2.Count);
-
-			Prev = null;
-			foreach (Simple Obj in this.index3)
-			{
-				if (Prev != null)
-					AssertEx.Less(this.Index3Compare(Prev, Obj), 0);
-
-				Prev = Obj;
-				Assert.IsTrue(Objects3.Remove(Obj.ObjectId));
+				await this.file.EndRead();
 			}
 
 			AssertEx.Same(0, Objects3.Count);
 		}
 
-		private int Index1Compare(GenericObject Obj1, GenericObject Obj2)
-		{
-			int i = ((IComparable)Obj1["Byte"]).CompareTo(Obj2["Byte"]);
-			if (i != 0)
-				return i;
-
-			i = ((IComparable)Obj1["DateTime"]).CompareTo(Obj2["DateTime"]);
-			if (i != 0)
-				return -i;
-
-			return 0;
-		}
-
-		private int Index2Compare(GenericObject Obj1, GenericObject Obj2)
-		{
-			return ((IComparable)Obj1["ShortString"]).CompareTo(Obj2["ShortString"]);
-		}
-
-		private int Index3Compare(GenericObject Obj1, GenericObject Obj2)
-		{
-			return ((IComparable)Obj1["CIString"]).CompareTo(Obj2["CIString"]);
-		}
+		//private int Index1Compare(GenericObject Obj1, GenericObject Obj2)
+		//{
+		//	int i = ((IComparable)Obj1["Byte"]).CompareTo(Obj2["Byte"]);
+		//	if (i != 0)
+		//		return i;
+		//
+		//	i = ((IComparable)Obj1["DateTime"]).CompareTo(Obj2["DateTime"]);
+		//	if (i != 0)
+		//		return -i;
+		//
+		//	return 0;
+		//}
+		//
+		//private int Index2Compare(GenericObject Obj1, GenericObject Obj2)
+		//{
+		//	return ((IComparable)Obj1["ShortString"]).CompareTo(Obj2["ShortString"]);
+		//}
+		//
+		//private int Index3Compare(GenericObject Obj1, GenericObject Obj2)
+		//{
+		//	return ((IComparable)Obj1["CIString"]).CompareTo(Obj2["CIString"]);
+		//}
 
 		[TestMethod]
 		public async Task DBFiles_Index_Test_02_TypedEnumeration()
@@ -166,9 +186,12 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			ulong Rank = 0;
 
-			using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(LockType.None, false))
+			await this.file.BeginRead();
+			try
 			{
-				while (await e.MoveNextAsync())
+				IndexBTreeFileCursor<Simple> e = await this.index1.GetTypedEnumeratorLocked<Simple>();
+
+				while (await e.MoveNextAsyncLocked())
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
@@ -181,18 +204,17 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
-					AssertEx.Same(Rank++, e.CurrentRank);
+					AssertEx.Same(Rank++, await e.GetCurrentRankLocked());
 					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
-			}
 
-			AssertEx.Same(0, Objects.Count);
+				AssertEx.Same(0, Objects.Count);
 
-			Prev = null;
-			Rank = 0;
-			using (IndexBTreeFileEnumerator<Simple> e = await this.index2.GetTypedEnumerator<Simple>(LockType.None, false))
-			{
-				while (await e.MoveNextAsync())
+				Prev = null;
+				Rank = 0;
+				e = await this.index2.GetTypedEnumeratorLocked<Simple>();
+
+				while (await e.MoveNextAsyncLocked())
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
@@ -202,18 +224,17 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj;
 					Assert.IsTrue(Objects2.Remove(Obj.ObjectId));
 
-					AssertEx.Same(Rank++, e.CurrentRank);
+					AssertEx.Same(Rank++, await e.GetCurrentRankLocked());
 					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
-			}
 
-			AssertEx.Same(0, Objects2.Count);
+				AssertEx.Same(0, Objects2.Count);
 
-			Prev = null;
-			Rank = 0;
-			using (IndexBTreeFileEnumerator<Simple> e = await this.index3.GetTypedEnumerator<Simple>(LockType.None, false))
-			{
-				while (await e.MoveNextAsync())
+				Prev = null;
+				Rank = 0;
+				e = await this.index3.GetTypedEnumeratorLocked<Simple>();
+
+				while (await e.MoveNextAsyncLocked())
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
@@ -223,9 +244,13 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj;
 					Assert.IsTrue(Objects3.Remove(Obj.ObjectId));
 
-					AssertEx.Same(Rank++, e.CurrentRank);
+					AssertEx.Same(Rank++, await e.GetCurrentRankLocked());
 					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			AssertEx.Same(0, Objects3.Count);
@@ -264,9 +289,12 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			ulong Rank = 0;
 
-			using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(LockType.Read, true))
+			await this.file.BeginRead();
+			try
 			{
-				while (await e.MoveNextAsync())
+				IndexBTreeFileCursor<Simple> e = await this.index1.GetTypedEnumeratorLocked<Simple>();
+
+				while (await e.MoveNextAsyncLocked())
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
@@ -279,18 +307,25 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
-					AssertEx.Same(Rank++, e.CurrentRank);
+					AssertEx.Same(Rank++, await e.GetCurrentRankLocked());
 					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			AssertEx.Same(0, Objects.Count);
 
-			Prev = null;
-			Rank = 0;
-			using (IndexBTreeFileEnumerator<Simple> e = await this.index2.GetTypedEnumerator<Simple>(LockType.Read, true))
+			await this.file.BeginRead();
+			try
 			{
-				while (await e.MoveNextAsync())
+				Prev = null;
+				Rank = 0;
+				IndexBTreeFileCursor<Simple> e = await this.index2.GetTypedEnumeratorLocked<Simple>();
+
+				while (await e.MoveNextAsyncLocked())
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
@@ -300,18 +335,25 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj;
 					Assert.IsTrue(Objects2.Remove(Obj.ObjectId));
 
-					AssertEx.Same(Rank++, e.CurrentRank);
+					AssertEx.Same(Rank++, await e.GetCurrentRankLocked());
 					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			AssertEx.Same(0, Objects2.Count);
 
-			Prev = null;
-			Rank = 0;
-			using (IndexBTreeFileEnumerator<Simple> e = await this.index3.GetTypedEnumerator<Simple>(LockType.Read, true))
+			await this.file.BeginRead();
+			try
 			{
-				while (await e.MoveNextAsync())
+				Prev = null;
+				Rank = 0;
+				IndexBTreeFileCursor<Simple> e = await this.index3.GetTypedEnumeratorLocked<Simple>();
+
+				while (await e.MoveNextAsyncLocked())
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
@@ -321,9 +363,13 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj;
 					Assert.IsTrue(Objects3.Remove(Obj.ObjectId));
 
-					AssertEx.Same(Rank++, e.CurrentRank);
+					AssertEx.Same(Rank++, await e.GetCurrentRankLocked());
 					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			AssertEx.Same(0, Objects3.Count);
@@ -336,15 +382,22 @@ namespace Waher.Persistence.FilesLW.Test
 			await this.CreateObjects(Math.Min(ObjectsToEnumerate, 1000));
 			Simple Obj;
 
-			using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(LockType.Read, true))
+			await this.file.BeginRead();
+			try
 			{
-				while (await e.MoveNextAsync())
+				IndexBTreeFileCursor<Simple> e = await this.index1.GetTypedEnumeratorLocked<Simple>();
+
+				while (await e.MoveNextAsyncLocked())
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
 					Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
 					await this.file.SaveNewObject(Obj);
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 		}
 
@@ -358,9 +411,12 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			ulong Rank = ObjectsToEnumerate;
 
-			using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(LockType.Read, true))
+			await this.file.BeginRead();
+			try
 			{
-				while (e.MovePrevious())
+				IndexBTreeFileCursor<Simple> e = await this.index1.GetTypedEnumeratorLocked<Simple>();
+
+				while (await e.MovePreviousAsyncLocked())
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
@@ -372,18 +428,25 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
-					AssertEx.Same(--Rank, e.CurrentRank);
+					AssertEx.Same(--Rank, await e.GetCurrentRankLocked());
 					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			AssertEx.Same(0, Objects.Count);
 
-			Prev = null;
-			Rank = ObjectsToEnumerate;
-			using (IndexBTreeFileEnumerator<Simple> e = await this.index2.GetTypedEnumerator<Simple>(LockType.Read, true))
+			await this.file.BeginRead();
+			try
 			{
-				while (e.MovePrevious())
+				Prev = null;
+				Rank = ObjectsToEnumerate;
+				IndexBTreeFileCursor<Simple> e = await this.index2.GetTypedEnumeratorLocked<Simple>();
+
+				while (await e.MovePreviousAsyncLocked())
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
@@ -393,18 +456,25 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj;
 					Assert.IsTrue(Objects2.Remove(Obj.ObjectId));
 
-					AssertEx.Same(--Rank, e.CurrentRank);
+					AssertEx.Same(--Rank, await e.GetCurrentRankLocked());
 					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			AssertEx.Same(0, Objects2.Count);
 
-			Prev = null;
-			Rank = ObjectsToEnumerate;
-			using (IndexBTreeFileEnumerator<Simple> e = await this.index3.GetTypedEnumerator<Simple>(LockType.Read, true))
+			await this.file.BeginRead();
+			try
 			{
-				while (e.MovePrevious())
+				Prev = null;
+				Rank = ObjectsToEnumerate;
+				IndexBTreeFileCursor<Simple> e = await this.index3.GetTypedEnumeratorLocked<Simple>();
+
+				while (await e.MovePreviousAsyncLocked())
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
@@ -414,9 +484,13 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj;
 					Assert.IsTrue(Objects3.Remove(Obj.ObjectId));
 
-					AssertEx.Same(--Rank, e.CurrentRank);
+					AssertEx.Same(--Rank, await e.GetCurrentRankLocked());
 					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			AssertEx.Same(0, Objects3.Count);
@@ -463,9 +537,12 @@ namespace Waher.Persistence.FilesLW.Test
 
 				if (i < 10 || (gen.Next(0, 2) == 0 && i <= c - 10))
 				{
-					using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(LockType.Read, true))
+					await this.file.BeginRead();
+					try
 					{
-						Assert.IsTrue(await e.GoToObject((uint)i));
+						IndexBTreeFileCursor<Simple> e = await this.index1.GetTypedEnumeratorLocked<Simple>();
+
+						Assert.IsTrue(await e.GoToObjectLocked((uint)i));
 
 						do
 						{
@@ -477,17 +554,24 @@ namespace Waher.Persistence.FilesLW.Test
 							Prev = Obj;
 							DBFilesObjectSerializationTests.AssertEqual(Ordered[i + j], Obj);
 
-							AssertEx.Same(i + j, e.CurrentRank);
+							AssertEx.Same(i + j, await e.GetCurrentRankLocked());
 							AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 						}
-						while (await e.MoveNextAsync() && j++ < 10);
+						while (await e.MoveNextAsyncLocked() && j++ < 10);
+					}
+					finally
+					{
+						await this.file.EndRead();
 					}
 				}
 				else
 				{
-					using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(LockType.Read, true))
+					await this.file.BeginRead();
+					try
 					{
-						Assert.IsTrue(await e.GoToObject((uint)i));
+						IndexBTreeFileCursor<Simple> e = await this.index1.GetTypedEnumeratorLocked<Simple>();
+
+						Assert.IsTrue(await e.GoToObjectLocked((uint)i));
 
 						do
 						{
@@ -499,10 +583,14 @@ namespace Waher.Persistence.FilesLW.Test
 							Prev = Obj;
 							DBFilesObjectSerializationTests.AssertEqual(Ordered[i - j], Obj);
 
-							AssertEx.Same(i - j, e.CurrentRank);
+							AssertEx.Same(i - j, await e.GetCurrentRankLocked());
 							AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 						}
-						while (e.MovePrevious() && j++ < 10);
+						while (await e.MovePreviousAsyncLocked() && j++ < 10);
+					}
+					finally
+					{
+						await this.file.EndRead();
 					}
 				}
 			}
@@ -528,8 +616,16 @@ namespace Waher.Persistence.FilesLW.Test
 			ObjectsSorted.Values.CopyTo(Ordered, 0);
 			int i;
 
-			for (i = 0; i < c; i++)
-				AssertEx.Same(i, await this.index1.GetRank(Ordered[i].ObjectId));
+			await this.file.BeginRead();
+			try
+			{
+				for (i = 0; i < c; i++)
+					AssertEx.Same(i, await this.index1.GetRankLocked(Ordered[i].ObjectId));
+			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -540,9 +636,12 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			ulong Rank = 0;
 
-			using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(LockType.None, false))
+			await this.file.BeginRead();
+			try
 			{
-				while (await e.MoveNextAsync())
+				IndexBTreeFileCursor<Simple> e = await this.index1.GetTypedEnumeratorLocked<Simple>();
+
+				while (await e.MoveNextAsyncLocked())
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
@@ -552,14 +651,14 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj;
 					Assert.IsTrue(Objects.ContainsKey(Obj.ObjectId));
 
-					AssertEx.Same(Rank++, e.CurrentRank);
+					AssertEx.Same(Rank++, await e.GetCurrentRankLocked());
 					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
 
 				e.Reset();
 				Prev = null;
 
-				while (e.MovePrevious())
+				while (await e.MovePreviousAsyncLocked())
 				{
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
@@ -569,9 +668,13 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
-					AssertEx.Same(--Rank, e.CurrentRank);
+					AssertEx.Same(--Rank, await e.GetCurrentRankLocked());
 					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			AssertEx.Same(0, Objects.Count);
@@ -634,11 +737,14 @@ namespace Waher.Persistence.FilesLW.Test
 				DBFilesObjectSerializationTests.AssertEqual(Objects[i], Obj);
 			}
 
-			using (IndexBTreeFileEnumerator<Simple> e = await this.index1.GetTypedEnumerator<Simple>(LockType.Read, true))
+			await this.file.BeginRead();
+			try
 			{
+				IndexBTreeFileCursor<Simple> e = await this.index1.GetTypedEnumeratorLocked<Simple>();
+
 				Obj = null;
 
-				while (await e.MoveNextAsync())
+				while (await e.MoveNextAsyncLocked())
 				{
 					AssertEx.Same(e.Current.ObjectId, e.CurrentObjectId);
 					Assert.IsTrue(Ordered.Remove(e.Current.ObjectId));
@@ -648,6 +754,10 @@ namespace Waher.Persistence.FilesLW.Test
 
 					Obj = e.Current;
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			AssertEx.Same(0, Ordered.Count);
@@ -712,8 +822,8 @@ namespace Waher.Persistence.FilesLW.Test
 
 			FileStatistics Stat = await DBFilesBTreeTests.AssertConsistent(this.file, this.provider, null, null, true);
 
-			AssertEx.Same(0, this.file.Count);
-			AssertEx.Same(0, this.index1.IndexFile.Count);
+			AssertEx.Same(0, await this.file.CountAsync);
+			AssertEx.Same(0, await this.index1.CountAsync);
 			AssertEx.Same(1, Stat.NrBlocks);
 			AssertEx.Same(0, Stat.NrBlobBlocks);
 		}
@@ -724,11 +834,11 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
 			AssertEx.NotSame(Guid.Empty, ObjectId);
-			Assert.IsTrue(this.file.Contains(Obj));
-			this.file.Clear();
-			Assert.IsFalse(this.file.Contains(Obj));
-			AssertEx.Same(0, this.file.Count);
-			AssertEx.Same(0, this.index1.IndexFile.Count);
+			Assert.IsTrue(await this.file.ContainsAsync(Obj));
+			await this.file.ClearAsync();
+			Assert.IsFalse(await this.file.ContainsAsync(Obj));
+			AssertEx.Same(0, await this.file.CountAsync);
+			AssertEx.Same(0, await this.index1.CountAsync);
 		}
 
 		[TestMethod]
@@ -739,10 +849,13 @@ namespace Waher.Persistence.FilesLW.Test
 
 			for (i = 0; i < 256; i++)
 			{
-				using (IndexBTreeFileEnumerator<Simple> e = await this.index1.FindFirstGreaterOrEqualTo<Simple>(LockType.Read, true,
-					new KeyValuePair<string, object>("Byte", i)))
+				await this.file.BeginRead();
+				try
 				{
-					while (await e.MoveNextAsync())
+					IndexBTreeFileCursor<Simple> e = await this.index1.FindFirstGreaterOrEqualToLocked<Simple>(
+						new KeyValuePair<string, object>("Byte", i));
+
+					while (await e.MoveNextAsyncLocked())
 					{
 						AssertEx.GreaterOrEqual(e.Current.Byte, i);
 						if (e.Current.Byte > i)
@@ -751,12 +864,16 @@ namespace Waher.Persistence.FilesLW.Test
 
 					e.Reset();
 
-					while (e.MovePrevious())
+					while (await e.MovePreviousAsyncLocked())
 					{
 						AssertEx.Less(e.Current.Byte, i);
 						if (e.Current.Byte < i - 1)
 							break;
 					}
+				}
+				finally
+				{
+					await this.file.EndRead();
 				}
 			}
 		}
@@ -769,10 +886,13 @@ namespace Waher.Persistence.FilesLW.Test
 
 			for (i = 0; i < 256; i++)
 			{
-				using (IndexBTreeFileEnumerator<Simple> e = await this.index1.FindLastLesserOrEqualTo<Simple>(LockType.Read, true,
-					new KeyValuePair<string, object>("Byte", i)))
+				await this.file.BeginRead();
+				try
 				{
-					while (e.MovePrevious())
+					IndexBTreeFileCursor<Simple> e = await this.index1.FindLastLesserOrEqualToLocked<Simple>(
+						new KeyValuePair<string, object>("Byte", i));
+
+					while (await e.MovePreviousAsyncLocked())
 					{
 						AssertEx.LessOrEqual(e.Current.Byte, i);
 						if (e.Current.Byte < i)
@@ -781,12 +901,16 @@ namespace Waher.Persistence.FilesLW.Test
 
 					e.Reset();
 
-					while (await e.MoveNextAsync())
+					while (await e.MoveNextAsyncLocked())
 					{
 						AssertEx.Greater(e.Current.Byte, i);
 						if (e.Current.Byte > i + 1)
 							break;
 					}
+				}
+				finally
+				{
+					await this.file.EndRead();
 				}
 			}
 		}
@@ -796,11 +920,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldEqualTo("Byte", 100), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterFieldEqualTo("Byte", 100));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -811,6 +938,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					AssertEx.NotSame(Obj2.Byte, 100);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -818,11 +949,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldNotEqualTo("Byte", 100), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterFieldNotEqualTo("Byte", 100));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -833,6 +967,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					AssertEx.Same(Obj2.Byte, 100);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -840,11 +978,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldGreaterOrEqualTo("Byte", 100), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterFieldGreaterOrEqualTo("Byte", 100));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -855,6 +996,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					AssertEx.Less(Obj2.Byte, 100);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -862,11 +1007,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLesserOrEqualTo("Byte", 100), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterFieldLesserOrEqualTo("Byte", 100));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -877,6 +1025,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					AssertEx.Greater(Obj2.Byte, 100);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -884,11 +1036,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldGreaterThan("Byte", 100), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterFieldGreaterThan("Byte", 100));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -899,6 +1054,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					AssertEx.LessOrEqual(Obj2.Byte, 100);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -906,11 +1065,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLesserThan("Byte", 100), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterFieldLesserThan("Byte", 100));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -921,6 +1083,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					AssertEx.GreaterOrEqual(Obj2.Byte, 100);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -928,11 +1094,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLikeRegEx("ShortString", "A.*B.*"), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterFieldLikeRegEx("ShortString", "A.*B.*"));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -944,6 +1113,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					Assert.IsFalse(Obj2.ShortString.StartsWith("A") && Obj2.ShortString.Contains("B"));
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -951,11 +1124,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLikeRegEx("ShortString", "[AB].*"), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterFieldLikeRegEx("ShortString", "[AB].*"));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -966,6 +1142,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					Assert.IsFalse(Obj2.ShortString.StartsWith("A") || Obj2.ShortString.StartsWith("B"));
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -973,11 +1153,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldEqualTo("Byte", 100)), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldEqualTo("Byte", 100)));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -988,6 +1171,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					AssertEx.Same(Obj2.Byte, 100);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -995,11 +1182,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldNotEqualTo("Byte", 100)), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldNotEqualTo("Byte", 100)));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1010,6 +1200,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					AssertEx.NotSame(Obj2.Byte, 100);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -1017,11 +1211,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldGreaterOrEqualTo("Byte", 100)), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldGreaterOrEqualTo("Byte", 100)));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1032,6 +1229,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					AssertEx.GreaterOrEqual(Obj2.Byte, 100);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -1039,11 +1240,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldLesserOrEqualTo("Byte", 100)), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldLesserOrEqualTo("Byte", 100)));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1054,6 +1258,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					AssertEx.LessOrEqual(Obj2.Byte, 100);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -1061,11 +1269,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldGreaterThan("Byte", 100)), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldGreaterThan("Byte", 100)));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1076,6 +1287,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					AssertEx.Greater(Obj2.Byte, 100);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -1083,11 +1298,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldLesserThan("Byte", 100)), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldLesserThan("Byte", 100)));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1098,6 +1316,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					AssertEx.Less(Obj2.Byte, 100);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -1105,11 +1327,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldLikeRegEx("ShortString", "A.*B.*")), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldLikeRegEx("ShortString", "A.*B.*")));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1120,6 +1345,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					Assert.IsTrue(Obj2.ShortString.StartsWith("A") && Obj2.ShortString.Contains("B"));
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -1127,11 +1356,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldLikeRegEx("ShortString", "[AB].*")), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldLikeRegEx("ShortString", "[AB].*")));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1142,6 +1374,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					Assert.IsTrue(Obj2.ShortString.StartsWith("A") || Obj2.ShortString.StartsWith("B"));
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -1149,11 +1385,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterNot(new FilterFieldEqualTo("Byte", 100))), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterNot(new FilterNot(new FilterFieldEqualTo("Byte", 100))));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1164,6 +1403,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					AssertEx.NotSame(Obj2.Byte, 100);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -1171,14 +1414,17 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterOr(
-				new FilterFieldEqualTo("Byte", 100),
-				new FilterFieldEqualTo("Byte", 200),
-				new FilterFieldLikeRegEx("ShortString", "A.*")), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterOr(
+					new FilterFieldEqualTo("Byte", 100),
+					new FilterFieldEqualTo("Byte", 200),
+					new FilterFieldLikeRegEx("ShortString", "A.*")));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1189,6 +1435,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					Assert.IsFalse(Obj2.Byte == 100 || Obj2.Byte == 200 || Obj2.ShortString.StartsWith("A"));
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -1196,13 +1446,16 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
-				new FilterFieldGreaterOrEqualTo("Byte", 100),
-				new FilterFieldLesserOrEqualTo("Byte", 200)), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterAnd(
+					new FilterFieldGreaterOrEqualTo("Byte", 100),
+					new FilterFieldLesserOrEqualTo("Byte", 200)));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1214,6 +1467,10 @@ namespace Waher.Persistence.FilesLW.Test
 				foreach (Simple Obj2 in Objects.Values)
 					Assert.IsTrue(Obj2.Byte < 100 || Obj2.Byte > 200);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -1221,13 +1478,16 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
-				new FilterFieldGreaterThan("Byte", 100),
-				new FilterFieldLesserThan("Byte", 200)), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterAnd(
+					new FilterFieldGreaterThan("Byte", 100),
+					new FilterFieldLesserThan("Byte", 200)));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1238,6 +1498,10 @@ namespace Waher.Persistence.FilesLW.Test
 
 				foreach (Simple Obj2 in Objects.Values)
 					Assert.IsTrue(Obj2.Byte <= 100 || Obj2.Byte >= 200);
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 		}
 
@@ -1276,13 +1540,17 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Console.Out.WriteLine(sb.ToString());
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
-				new FilterFieldGreaterOrEqualTo("Byte", 100),
-				new FilterFieldLesserOrEqualTo("Byte", 200),
-				new FilterFieldGreaterOrEqualTo("DateTime", MinDT),
-				new FilterFieldLesserOrEqualTo("DateTime", MaxDT)), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterAnd(
+					new FilterFieldGreaterOrEqualTo("Byte", 100),
+					new FilterFieldLesserOrEqualTo("Byte", 200),
+					new FilterFieldGreaterOrEqualTo("DateTime", MinDT),
+					new FilterFieldLesserOrEqualTo("DateTime", MaxDT)));
+
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					RecNr++;
 
@@ -1309,6 +1577,10 @@ namespace Waher.Persistence.FilesLW.Test
 						NrFalseNegatives++;
 				}
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 
 			Assert.AreEqual(0, NrFalsePositives);
 			Assert.AreEqual(0, NrFalseNegatives);
@@ -1334,13 +1606,17 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			bool b;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
-				new FilterFieldGreaterThan("Byte", 100),
-				new FilterFieldLesserThan("Byte", 200),
-				new FilterFieldGreaterThan("DateTime", MinDT),
-				new FilterFieldLesserThan("DateTime", MaxDT)), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterAnd(
+					new FilterFieldGreaterThan("Byte", 100),
+					new FilterFieldLesserThan("Byte", 200),
+					new FilterFieldGreaterThan("DateTime", MinDT),
+					new FilterFieldLesserThan("DateTime", MaxDT)));
+
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1357,6 +1633,10 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsTrue(b);
 				}
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 		}
 
 		[TestMethod]
@@ -1366,14 +1646,18 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			bool b;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
-				new FilterFieldGreaterThan("Byte", 100),
-				new FilterFieldLesserThan("Byte", 200),
-				new FilterFieldGreaterThan("DateTime", MinDT),
-				new FilterFieldLesserThan("DateTime", MaxDT),
-				new FilterFieldLikeRegEx("ShortString", "[A-Z].*")), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterAnd(
+					new FilterFieldGreaterThan("Byte", 100),
+					new FilterFieldLesserThan("Byte", 200),
+					new FilterFieldGreaterThan("DateTime", MinDT),
+					new FilterFieldLesserThan("DateTime", MaxDT),
+					new FilterFieldLikeRegEx("ShortString", "[A-Z].*")));
+
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1384,12 +1668,16 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsTrue(Obj.ShortString[0] >= 'A' && Obj.ShortString[0] <= 'Z');
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 
-				foreach (Simple Obj2 in Objects.Values)
-				{
-					b = Obj2.Byte <= 100 || Obj2.Byte >= 200 || Obj2.DateTime <= MinDT || Obj2.DateTime >= MaxDT || Obj2.ShortString[0] < 'A' || Obj2.ShortString[0] > 'Z';
-					Assert.IsTrue(b);
-				}
+			foreach (Simple Obj2 in Objects.Values)
+			{
+				b = Obj2.Byte <= 100 || Obj2.Byte >= 200 || Obj2.DateTime <= MinDT || Obj2.DateTime >= MaxDT || Obj2.ShortString[0] < 'A' || Obj2.ShortString[0] > 'Z';
+				Assert.IsTrue(b);
 			}
 		}
 
@@ -1400,11 +1688,15 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			bool b;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
-				new FilterFieldGreaterThan("Byte", 100),
-				new FilterFieldGreaterThan("DateTime", MinDT)), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterAnd(
+					new FilterFieldGreaterThan("Byte", 100),
+					new FilterFieldGreaterThan("DateTime", MinDT)));
+
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1412,12 +1704,16 @@ namespace Waher.Persistence.FilesLW.Test
 					AssertEx.Greater(Obj.DateTime, MinDT);
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 
-				foreach (Simple Obj2 in Objects.Values)
-				{
-					b = Obj2.Byte <= 100 || Obj2.DateTime <= MinDT;
-					Assert.IsTrue(b);
-				}
+			foreach (Simple Obj2 in Objects.Values)
+			{
+				b = Obj2.Byte <= 100 || Obj2.DateTime <= MinDT;
+				Assert.IsTrue(b);
 			}
 		}
 
@@ -1428,24 +1724,33 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			bool b;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
-				new FilterFieldGreaterThan("Byte", 100),
-				new FilterFieldLesserThan("DateTime", MaxDT)), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterAnd(
+					new FilterFieldGreaterThan("Byte", 100),
+					new FilterFieldLesserThan("DateTime", MaxDT)));
 				{
-					Obj = Cursor.Current;
-					Assert.IsNotNull(Obj);
-					AssertEx.Greater(Obj.Byte, 100);
-					AssertEx.Less(Obj.DateTime, MaxDT);
-					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+					while (await Cursor.MoveNextAsyncLocked())
+					{
+						Obj = Cursor.Current;
+						Assert.IsNotNull(Obj);
+						AssertEx.Greater(Obj.Byte, 100);
+						AssertEx.Less(Obj.DateTime, MaxDT);
+						Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+					}
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 
-				foreach (Simple Obj2 in Objects.Values)
-				{
-					b = Obj2.Byte <= 100 || Obj2.DateTime >= MaxDT;
-					Assert.IsTrue(b);
-				}
+			foreach (Simple Obj2 in Objects.Values)
+			{
+				b = Obj2.Byte <= 100 || Obj2.DateTime >= MaxDT;
+				Assert.IsTrue(b);
 			}
 		}
 
@@ -1456,11 +1761,15 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			bool b;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
-				new FilterFieldLesserThan("Byte", 200),
-				new FilterFieldGreaterThan("DateTime", MinDT)), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterAnd(
+					new FilterFieldLesserThan("Byte", 200),
+					new FilterFieldGreaterThan("DateTime", MinDT)));
+
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1468,12 +1777,16 @@ namespace Waher.Persistence.FilesLW.Test
 					AssertEx.Greater(Obj.DateTime, MinDT);
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 
-				foreach (Simple Obj2 in Objects.Values)
-				{
-					b = Obj2.Byte >= 200 || Obj2.DateTime <= MinDT;
-					Assert.IsTrue(b);
-				}
+			foreach (Simple Obj2 in Objects.Values)
+			{
+				b = Obj2.Byte >= 200 || Obj2.DateTime <= MinDT;
+				Assert.IsTrue(b);
 			}
 		}
 
@@ -1484,11 +1797,15 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			bool b;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
-				new FilterFieldLesserThan("Byte", 200),
-				new FilterFieldLesserThan("DateTime", MaxDT)), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterAnd(
+					new FilterFieldLesserThan("Byte", 200),
+					new FilterFieldLesserThan("DateTime", MaxDT)));
+
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1496,12 +1813,16 @@ namespace Waher.Persistence.FilesLW.Test
 					AssertEx.Less(Obj.DateTime, MaxDT);
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 
-				foreach (Simple Obj2 in Objects.Values)
-				{
-					b = Obj2.Byte >= 200 || Obj2.DateTime >= MaxDT;
-					Assert.IsTrue(b);
-				}
+			foreach (Simple Obj2 in Objects.Values)
+			{
+				b = Obj2.Byte >= 200 || Obj2.DateTime >= MaxDT;
+				Assert.IsTrue(b);
 			}
 		}
 
@@ -1512,14 +1833,18 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			bool b;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
-				new FilterFieldGreaterThan("DateTime", MinDT),
-				new FilterFieldLesserThan("DateTime", MaxDT),
-				new FilterOr(
-					new FilterFieldGreaterThan("Byte", 200),
-					new FilterFieldLesserThan("Byte", 100))), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterAnd(
+					new FilterFieldGreaterThan("DateTime", MinDT),
+					new FilterFieldLesserThan("DateTime", MaxDT),
+					new FilterOr(
+					new FilterFieldGreaterThan("Byte", 200),
+					new FilterFieldLesserThan("Byte", 100))));
+
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1528,12 +1853,16 @@ namespace Waher.Persistence.FilesLW.Test
 					AssertEx.Less(Obj.DateTime, MaxDT);
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 
-				foreach (Simple Obj2 in Objects.Values)
-				{
-					b = Obj2.DateTime <= MinDT || Obj2.DateTime >= MaxDT || (Obj2.Byte >= 100 && Obj2.Byte <= 200);
-					Assert.IsTrue(b);
-				}
+			foreach (Simple Obj2 in Objects.Values)
+			{
+				b = Obj2.DateTime <= MinDT || Obj2.DateTime >= MaxDT || (Obj2.Byte >= 100 && Obj2.Byte <= 200);
+				Assert.IsTrue(b);
 			}
 		}
 
@@ -1543,13 +1872,16 @@ namespace Waher.Persistence.FilesLW.Test
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			FileStatistics StatBefore = (await this.file.ComputeStatistics()).Key;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterOr(
-				new FilterFieldLikeRegEx("ShortString", "[AB].*"),
-				new FilterFieldLikeRegEx("ShortString", "[XY].*")), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterOr(
+					new FilterFieldLikeRegEx("ShortString", "[AB].*"),
+					new FilterFieldLikeRegEx("ShortString", "[XY].*")));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1559,6 +1891,10 @@ namespace Waher.Persistence.FilesLW.Test
 
 				foreach (Simple Obj2 in Objects.Values)
 					Assert.IsFalse("ABXY".IndexOf(Obj2.ShortString[0]) >= 0);
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			FileStatistics StatAfter = (await this.file.ComputeStatistics()).Key;
@@ -1574,14 +1910,18 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			bool b;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
-				new FilterFieldGreaterThan("DateTime", MinDT),
-				new FilterFieldLesserThan("DateTime", MaxDT),
-				new FilterOr(
-					new FilterFieldGreaterThan("Byte", 200),
-					new FilterFieldLesserThan("Byte", 100))), LockType.Read, "SByte", "ShortString"))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterAnd(
+					new FilterFieldGreaterThan("DateTime", MinDT),
+					new FilterFieldLesserThan("DateTime", MaxDT),
+					new FilterOr(
+					new FilterFieldGreaterThan("Byte", 200),
+					new FilterFieldLesserThan("Byte", 100))), "SByte", "ShortString");
+
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1598,12 +1938,16 @@ namespace Waher.Persistence.FilesLW.Test
 
 					Prev = Obj;
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 
-				foreach (Simple Obj2 in Objects.Values)
-				{
-					b = Obj2.DateTime <= MinDT || Obj2.DateTime >= MaxDT || (Obj2.Byte >= 100 && Obj2.Byte <= 200);
-					Assert.IsTrue(b);
-				}
+			foreach (Simple Obj2 in Objects.Values)
+			{
+				b = Obj2.DateTime <= MinDT || Obj2.DateTime >= MaxDT || (Obj2.Byte >= 100 && Obj2.Byte <= 200);
+				Assert.IsTrue(b);
 			}
 		}
 
@@ -1614,32 +1958,46 @@ namespace Waher.Persistence.FilesLW.Test
 			List<Simple> Ordered = new List<Simple>();
 			int i;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
-				new FilterFieldGreaterThan("DateTime", MinDT),
-				new FilterFieldLesserThan("DateTime", MaxDT),
-				new FilterOr(
-					new FilterFieldGreaterThan("Byte", 200),
-					new FilterFieldLesserThan("Byte", 100))), LockType.Read, "SByte", "ShortString"))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterAnd(
+					new FilterFieldGreaterThan("DateTime", MinDT),
+					new FilterFieldLesserThan("DateTime", MaxDT),
+					new FilterOr(
+					new FilterFieldGreaterThan("Byte", 200),
+					new FilterFieldLesserThan("Byte", 100))), "SByte", "ShortString");
+
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Ordered.Add(Cursor.Current);
 				}
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 
 			i = 20;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(20, 10, new FilterAnd(
-				new FilterFieldGreaterThan("DateTime", MinDT),
-				new FilterFieldLesserThan("DateTime", MaxDT),
-				new FilterOr(
-					new FilterFieldGreaterThan("Byte", 200),
-					new FilterFieldLesserThan("Byte", 100))), LockType.Read, "SByte", "ShortString"))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
-				{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(20, 10, new FilterAnd(
+					new FilterFieldGreaterThan("DateTime", MinDT),
+					new FilterFieldLesserThan("DateTime", MaxDT),
+					new FilterOr(
+					new FilterFieldGreaterThan("Byte", 200),
+					new FilterFieldLesserThan("Byte", 100))), "SByte", "ShortString");
+
+				while (await Cursor.MoveNextAsyncLocked())
 					DBFilesObjectSerializationTests.AssertEqual(Ordered[i++], Cursor.Current);
-				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			AssertEx.LessOrEqual(i, 40);
@@ -1650,21 +2008,28 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Default> Objects = await this.CreateDefaultObjects(ObjectsToEnumerate);
 
-			using (ICursor<Default> Cursor = await this.file.Find<Default>(0, int.MaxValue, new FilterFieldLesserOrEqualTo("Byte", 10), LockType.Read))
+			await this.file.CheckIndicesInitialized<Default>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Default> Cursor = await this.file.FindLocked<Default>(0, int.MaxValue, new FilterFieldLesserOrEqualTo("Byte", 10));
 				Default Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
 					AssertEx.LessOrEqual(Obj.Byte, 10);
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
-
-				foreach (Default Obj2 in Objects.Values)
-					AssertEx.Greater(Obj2.Byte, 10);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
+
+			foreach (Default Obj2 in Objects.Values)
+				AssertEx.Greater(Obj2.Byte, 10);
 		}
 
 		private async Task<SortedDictionary<Guid, Default>> CreateDefaultObjects(int NrObjects)
@@ -1690,37 +2055,51 @@ namespace Waher.Persistence.FilesLW.Test
 			SortedDictionary<Guid, Default> Objects1 = await this.CreateDefaultObjects(ObjectsToEnumerate);
 			SortedDictionary<Guid, Simple> Objects2 = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Default> Cursor = await this.file.Find<Default>(0, int.MaxValue, new FilterFieldLesserOrEqualTo("Byte", 10), LockType.Read))
+			await this.file.CheckIndicesInitialized<Default>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Default> Cursor = await this.file.FindLocked<Default>(0, int.MaxValue, new FilterFieldLesserOrEqualTo("Byte", 10));
 				Default Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
 					AssertEx.LessOrEqual(Obj.Byte, 10);
 					Assert.IsTrue(Objects1.Remove(Obj.ObjectId));
 				}
-
-				foreach (Default Obj2 in Objects1.Values)
-					AssertEx.Greater(Obj2.Byte, 10);
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLesserOrEqualTo("Byte", 10), LockType.Read))
+			foreach (Default Obj2 in Objects1.Values)
+				AssertEx.Greater(Obj2.Byte, 10);
+
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterFieldLesserOrEqualTo("Byte", 10));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
 					AssertEx.LessOrEqual(Obj.Byte, 10);
 					Assert.IsTrue(Objects2.Remove(Obj.ObjectId));
 				}
-
-				foreach (Simple Obj2 in Objects2.Values)
-					AssertEx.Greater(Obj2.Byte, 10);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
+
+			foreach (Simple Obj2 in Objects2.Values)
+				AssertEx.Greater(Obj2.Byte, 10);
 		}
 
 		[TestMethod]
@@ -1728,11 +2107,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLikeRegEx("CIString", "A.*B.*"), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterFieldLikeRegEx("CIString", "A.*B.*"));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1740,10 +2122,14 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsTrue(Obj.CIString.Contains("B"));
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
-
-				foreach (Simple Obj2 in Objects.Values)
-					Assert.IsFalse(Obj2.CIString.StartsWith("A") && Obj2.CIString.Contains("B"));
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
+
+			foreach (Simple Obj2 in Objects.Values)
+				Assert.IsFalse(Obj2.CIString.StartsWith("A") && Obj2.CIString.Contains("B"));
 		}
 
 		[TestMethod]
@@ -1751,21 +2137,28 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLikeRegEx("CIString", "[AB].*"), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterFieldLikeRegEx("CIString", "[AB].*"));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
 					Assert.IsTrue(Obj.CIString.StartsWith("A") || Obj.CIString.StartsWith("B"));
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
-
-				foreach (Simple Obj2 in Objects.Values)
-					Assert.IsFalse(Obj2.CIString.StartsWith("A") || Obj2.CIString.StartsWith("B"));
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
+
+			foreach (Simple Obj2 in Objects.Values)
+				Assert.IsFalse(Obj2.CIString.StartsWith("A") || Obj2.CIString.StartsWith("B"));
 		}
 
 		[TestMethod]
@@ -1773,22 +2166,29 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue,
-				new FilterNot(new FilterFieldLikeRegEx("CIString", "A.*B.*")), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue,
+					new FilterNot(new FilterFieldLikeRegEx("CIString", "A.*B.*")));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
 					Assert.IsFalse(Obj.CIString.StartsWith("A") && Obj.CIString.Contains("B"));
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
-
-				foreach (Simple Obj2 in Objects.Values)
-					Assert.IsTrue(Obj2.CIString.StartsWith("A") && Obj2.CIString.Contains("B"));
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
+
+			foreach (Simple Obj2 in Objects.Values)
+				Assert.IsTrue(Obj2.CIString.StartsWith("A") && Obj2.CIString.Contains("B"));
 		}
 
 		[TestMethod]
@@ -1796,21 +2196,28 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldLikeRegEx("CIString", "[AB].*")), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldLikeRegEx("CIString", "[AB].*")));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
 					Assert.IsFalse(Obj.CIString.StartsWith("A") || Obj.CIString.StartsWith("B"));
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
-
-				foreach (Simple Obj2 in Objects.Values)
-					Assert.IsTrue(Obj2.CIString.StartsWith("A") || Obj2.CIString.StartsWith("B"));
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
+
+			foreach (Simple Obj2 in Objects.Values)
+				Assert.IsTrue(Obj2.CIString.StartsWith("A") || Obj2.CIString.StartsWith("B"));
 		}
 
 		[TestMethod]
@@ -1818,24 +2225,31 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterOr(
-				new FilterFieldEqualTo("Byte", 100),
-				new FilterFieldEqualTo("Byte", 200),
-				new FilterFieldLikeRegEx("CIString", "A.*")), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterOr(
+					new FilterFieldEqualTo("Byte", 100),
+					new FilterFieldEqualTo("Byte", 200),
+					new FilterFieldLikeRegEx("CIString", "A.*")));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
 					Assert.IsTrue(Obj.Byte == 100 || Obj.Byte == 200 || Obj.CIString.StartsWith("A"));
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
-
-				foreach (Simple Obj2 in Objects.Values)
-					Assert.IsFalse(Obj2.Byte == 100 || Obj2.Byte == 200 || Obj2.CIString.StartsWith("A"));
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
+
+			foreach (Simple Obj2 in Objects.Values)
+				Assert.IsFalse(Obj2.Byte == 100 || Obj2.Byte == 200 || Obj2.CIString.StartsWith("A"));
 		}
 
 		[TestMethod]
@@ -1845,14 +2259,18 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			bool b;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
-				new FilterFieldGreaterThan("Byte", 100),
-				new FilterFieldLesserThan("Byte", 200),
-				new FilterFieldGreaterThan("DateTime", MinDT),
-				new FilterFieldLesserThan("DateTime", MaxDT),
-				new FilterFieldLikeRegEx("CIString", "[A-Z].*")), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterAnd(
+					new FilterFieldGreaterThan("Byte", 100),
+					new FilterFieldLesserThan("Byte", 200),
+					new FilterFieldGreaterThan("DateTime", MinDT),
+					new FilterFieldLesserThan("DateTime", MaxDT),
+					new FilterFieldLikeRegEx("CIString", "[A-Z].*")));
+
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1864,12 +2282,16 @@ namespace Waher.Persistence.FilesLW.Test
 						char.ToUpper(Obj.CIString[0]) <= 'Z');
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 
-				foreach (Simple Obj2 in Objects.Values)
-				{
-					b = Obj2.Byte <= 100 || Obj2.Byte >= 200 || Obj2.DateTime <= MinDT || Obj2.DateTime >= MaxDT || Obj2.CIString[0] < 'A' || Obj2.CIString[0] > 'Z';
-					Assert.IsTrue(b);
-				}
+			foreach (Simple Obj2 in Objects.Values)
+			{
+				b = Obj2.Byte <= 100 || Obj2.Byte >= 200 || Obj2.DateTime <= MinDT || Obj2.DateTime >= MaxDT || Obj2.CIString[0] < 'A' || Obj2.CIString[0] > 'Z';
+				Assert.IsTrue(b);
 			}
 		}
 
@@ -1879,24 +2301,31 @@ namespace Waher.Persistence.FilesLW.Test
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			FileStatistics StatBefore = (await this.file.ComputeStatistics()).Key;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterOr(
-				new FilterFieldLikeRegEx("CIString", "[AB].*"),
-				new FilterFieldLikeRegEx("CIString", "[XY].*")), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterOr(
+					new FilterFieldLikeRegEx("CIString", "[AB].*"),
+					new FilterFieldLikeRegEx("CIString", "[XY].*")));
 				Simple Obj;
 				CaseInsensitiveString s = "ABXY";
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
 					Assert.IsTrue(s.IndexOf(Obj.CIString[0]) >= 0);
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
-
-				foreach (Simple Obj2 in Objects.Values)
-					Assert.IsFalse("ABXY".IndexOf(Obj2.CIString[0]) >= 0);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
+
+			foreach (Simple Obj2 in Objects.Values)
+				Assert.IsFalse("ABXY".IndexOf(Obj2.CIString[0]) >= 0);
 
 			FileStatistics StatAfter = (await this.file.ComputeStatistics()).Key;
 			ulong NrFullFileScans = StatAfter.NrFullFileScans - StatBefore.NrFullFileScans;
@@ -1911,14 +2340,18 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj;
 			bool b;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
-				new FilterFieldGreaterThan("DateTime", MinDT),
-				new FilterFieldLesserThan("DateTime", MaxDT),
-				new FilterOr(
-					new FilterFieldGreaterThan("Byte", 200),
-					new FilterFieldLesserThan("Byte", 100))), LockType.Read, "SByte", "CIString"))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterAnd(
+					new FilterFieldGreaterThan("DateTime", MinDT),
+					new FilterFieldLesserThan("DateTime", MaxDT),
+					new FilterOr(
+					new FilterFieldGreaterThan("Byte", 200),
+					new FilterFieldLesserThan("Byte", 100))), "SByte", "CIString");
+
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -1935,12 +2368,16 @@ namespace Waher.Persistence.FilesLW.Test
 
 					Prev = Obj;
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 
-				foreach (Simple Obj2 in Objects.Values)
-				{
-					b = Obj2.DateTime <= MinDT || Obj2.DateTime >= MaxDT || (Obj2.Byte >= 100 && Obj2.Byte <= 200);
-					Assert.IsTrue(b);
-				}
+			foreach (Simple Obj2 in Objects.Values)
+			{
+				b = Obj2.DateTime <= MinDT || Obj2.DateTime >= MaxDT || (Obj2.Byte >= 100 && Obj2.Byte <= 200);
+				Assert.IsTrue(b);
 			}
 		}
 
@@ -1951,32 +2388,47 @@ namespace Waher.Persistence.FilesLW.Test
 			List<Simple> Ordered = new List<Simple>();
 			int i;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
-				new FilterFieldGreaterThan("DateTime", MinDT),
-				new FilterFieldLesserThan("DateTime", MaxDT),
-				new FilterOr(
-					new FilterFieldGreaterThan("Byte", 200),
-					new FilterFieldLesserThan("Byte", 100))), LockType.Read, "SByte", "CIString"))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterAnd(
+					new FilterFieldGreaterThan("DateTime", MinDT),
+					new FilterFieldLesserThan("DateTime", MaxDT),
+					new FilterOr(
+					new FilterFieldGreaterThan("Byte", 200),
+					new FilterFieldLesserThan("Byte", 100))), "SByte", "CIString");
+
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Ordered.Add(Cursor.Current);
 				}
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
 
 			i = 20;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(20, 10, new FilterAnd(
-				new FilterFieldGreaterThan("DateTime", MinDT),
-				new FilterFieldLesserThan("DateTime", MaxDT),
-				new FilterOr(
-					new FilterFieldGreaterThan("Byte", 200),
-					new FilterFieldLesserThan("Byte", 100))), LockType.Read, "SByte", "CIString"))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(20, 10, new FilterAnd(
+					new FilterFieldGreaterThan("DateTime", MinDT),
+					new FilterFieldLesserThan("DateTime", MaxDT),
+					new FilterOr(
+					new FilterFieldGreaterThan("Byte", 200),
+					new FilterFieldLesserThan("Byte", 100))), "SByte", "CIString");
 				{
-					DBFilesObjectSerializationTests.AssertEqual(Ordered[i++], Cursor.Current);
+					while (await Cursor.MoveNextAsyncLocked())
+						DBFilesObjectSerializationTests.AssertEqual(Ordered[i++], Cursor.Current);
 				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			AssertEx.LessOrEqual(i, 40);
@@ -1987,14 +2439,19 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue,
-				new FilterCustom<Simple>((Obj) => Obj.Byte + Obj.SByte > 0),
-				LockType.Read, "SByte", "CIString"))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
-				{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue,
+					new FilterCustom<Simple>((Obj) => Obj.Byte + Obj.SByte > 0), "SByte", "CIString");
+
+				while (await Cursor.MoveNextAsyncLocked())
 					Objects.Remove(Cursor.CurrentObjectId);
-				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			foreach (Simple Obj in Objects.Values)
@@ -2006,16 +2463,22 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
-				new FilterFieldGreaterThan("DateTime", MinDT),
-				new FilterFieldLesserThan("DateTime", MaxDT),
-				new FilterCustom<Simple>((Obj) => Obj.Byte + Obj.SByte > 0)),
-				LockType.Read, "SByte", "CIString"))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
-				{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterAnd(
+					new FilterFieldGreaterThan("DateTime", MinDT),
+					new FilterFieldLesserThan("DateTime", MaxDT),
+					new FilterCustom<Simple>((Obj) => Obj.Byte + Obj.SByte > 0)),
+					"SByte", "CIString");
+
+				while (await Cursor.MoveNextAsyncLocked())
 					Objects.Remove(Cursor.CurrentObjectId);
-				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			foreach (Simple Obj in Objects.Values)
@@ -2032,15 +2495,21 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
-				new FilterCustom<Simple>((Obj) => Obj.Byte > Obj.SByte),
-				new FilterCustom<Simple>((Obj) => Obj.Byte + Obj.SByte > 0)),
-				LockType.Read, "SByte", "CIString"))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
-				while (await Cursor.MoveNextAsync())
-				{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterAnd(
+					new FilterCustom<Simple>((Obj) => Obj.Byte > Obj.SByte),
+					new FilterCustom<Simple>((Obj) => Obj.Byte + Obj.SByte > 0)),
+					"SByte", "CIString");
+
+				while (await Cursor.MoveNextAsyncLocked())
 					Objects.Remove(Cursor.CurrentObjectId);
-				}
+			}
+			finally
+			{
+				await this.file.EndRead();
 			}
 
 			foreach (Simple Obj in Objects.Values)
@@ -2060,21 +2529,28 @@ namespace Waher.Persistence.FilesLW.Test
 			int i = ObjectsToEnumerate / 2;
 			Guid Id = Guids[i];
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldEqualTo("ObjectId", Id), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterFieldEqualTo("ObjectId", Id));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
 					AssertEx.Same(Obj.ObjectId, Id);
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
-
-				foreach (Simple Obj2 in Objects.Values)
-					AssertEx.NotSame(Obj2.ObjectId, Id);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
+
+			foreach (Simple Obj2 in Objects.Values)
+				AssertEx.NotSame(Obj2.ObjectId, Id);
 		}
 
 		[TestMethod]
@@ -2086,21 +2562,28 @@ namespace Waher.Persistence.FilesLW.Test
 			int i = ObjectsToEnumerate / 2;
 			Guid Id = Guids[i];
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldGreaterThan("ObjectId", Id), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterFieldGreaterThan("ObjectId", Id));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
 					AssertEx.Greater(Obj.ObjectId, Id);
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
-
-				foreach (Simple Obj2 in Objects.Values)
-					AssertEx.LessOrEqual(Obj2.ObjectId, Id);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
+
+			foreach (Simple Obj2 in Objects.Values)
+				AssertEx.LessOrEqual(Obj2.ObjectId, Id);
 		}
 
 		[TestMethod]
@@ -2112,21 +2595,28 @@ namespace Waher.Persistence.FilesLW.Test
 			int i = ObjectsToEnumerate / 2;
 			Guid Id = Guids[i];
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldGreaterOrEqualTo("ObjectId", Id), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterFieldGreaterOrEqualTo("ObjectId", Id));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
 					AssertEx.GreaterOrEqual(Obj.ObjectId, Id);
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
-
-				foreach (Simple Obj2 in Objects.Values)
-					AssertEx.Less(Obj2.ObjectId, Id);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
+
+			foreach (Simple Obj2 in Objects.Values)
+				AssertEx.Less(Obj2.ObjectId, Id);
 		}
 
 		[TestMethod]
@@ -2138,21 +2628,28 @@ namespace Waher.Persistence.FilesLW.Test
 			int i = ObjectsToEnumerate / 2;
 			Guid Id = Guids[i];
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLesserThan("ObjectId", Id), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterFieldLesserThan("ObjectId", Id));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
 					AssertEx.Less(Obj.ObjectId, Id);
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
-
-				foreach (Simple Obj2 in Objects.Values)
-					AssertEx.GreaterOrEqual(Obj2.ObjectId, Id);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
+
+			foreach (Simple Obj2 in Objects.Values)
+				AssertEx.GreaterOrEqual(Obj2.ObjectId, Id);
 		}
 
 		[TestMethod]
@@ -2164,21 +2661,28 @@ namespace Waher.Persistence.FilesLW.Test
 			int i = ObjectsToEnumerate / 2;
 			Guid Id = Guids[i];
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLesserOrEqualTo("ObjectId", Id), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue, new FilterFieldLesserOrEqualTo("ObjectId", Id));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
 					AssertEx.LessOrEqual(Obj.ObjectId, Id);
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
-
-				foreach (Simple Obj2 in Objects.Values)
-					AssertEx.Greater(Obj2.ObjectId, Id);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
+
+			foreach (Simple Obj2 in Objects.Values)
+				AssertEx.Greater(Obj2.ObjectId, Id);
 		}
 
 		[TestMethod]
@@ -2190,14 +2694,17 @@ namespace Waher.Persistence.FilesLW.Test
 			int i = ObjectsToEnumerate / 2;
 			Guid Id = Guids[i];
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue,
-				new FilterAnd(
-				new FilterFieldGreaterOrEqualTo("ObjectId", Id),
-				new FilterCustom<Simple>(Obj => Sum(Obj.ObjectId) >= 0x80)), LockType.Read))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue,
+					new FilterAnd(
+					new FilterFieldGreaterOrEqualTo("ObjectId", Id),
+					new FilterCustom<Simple>(O => Sum(O.ObjectId) >= 0x80)));
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -2205,10 +2712,14 @@ namespace Waher.Persistence.FilesLW.Test
 					AssertEx.GreaterOrEqual(Sum(Obj.ObjectId), 0x80);
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
-
-				foreach (Simple Obj2 in Objects.Values)
-					Assert.IsTrue(Obj2.ObjectId.CompareTo(Id) < 0 || Sum(Obj2.ObjectId) < 0x80);
 			}
+			finally
+			{
+				await this.file.EndRead();
+			}
+
+			foreach (Simple Obj2 in Objects.Values)
+				Assert.IsTrue(Obj2.ObjectId.CompareTo(Id) < 0 || Sum(Obj2.ObjectId) < 0x80);
 		}
 
 		private static byte Sum(Guid ID)
@@ -2227,12 +2738,15 @@ namespace Waher.Persistence.FilesLW.Test
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Guid Last = Guid.Empty;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue,
-				new FilterCustom<Simple>(Obj => Sum(Obj.ObjectId) >= 0x80), LockType.Read, "ObjectId"))
+			await this.file.CheckIndicesInitialized<Simple>();
+			await this.file.BeginRead();
+			try
 			{
+				ICursor<Simple> Cursor = await this.file.FindLocked<Simple>(0, int.MaxValue,
+					new FilterCustom<Simple>(O => Sum(O.ObjectId) >= 0x80), "ObjectId");
 				Simple Obj;
 
-				while (await Cursor.MoveNextAsync())
+				while (await Cursor.MoveNextAsyncLocked())
 				{
 					Obj = Cursor.Current;
 					Assert.IsNotNull(Obj);
@@ -2241,11 +2755,14 @@ namespace Waher.Persistence.FilesLW.Test
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 					Last = Obj.ObjectId;
 				}
-
-				foreach (Simple Obj2 in Objects.Values)
-					Assert.IsTrue(Sum(Obj2.ObjectId) < 0x80);
 			}
-		}
+			finally
+			{
+				await this.file.EndRead();
+			}
 
+			foreach (Simple Obj2 in Objects.Values)
+				Assert.IsTrue(Sum(Obj2.ObjectId) < 0x80);
+		}
 	}
 }

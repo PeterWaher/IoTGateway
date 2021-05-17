@@ -7,36 +7,14 @@ using Waher.Persistence.Exceptions;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Storage;
 using Waher.Runtime.Inventory;
-using Waher.Events;
 
 namespace Waher.Persistence.Files
 {
 	/// <summary>
-	/// Type of lock requested.
-	/// </summary>
-	public enum LockType
-	{
-		/// <summary>
-		/// No lock
-		/// </summary>
-		None,
-
-		/// <summary>
-		/// Lock for reading
-		/// </summary>
-		Read,
-
-		/// <summary>
-		/// Lock for writing
-		/// </summary>
-		Write
-	}
-
-	/// <summary>
 	/// Enumerates object in a <see cref="ObjectBTreeFile"/> in GUID order. You can use the enumerator to enumerate objects
 	/// forwards and backwards, as well as skip a given number of objects.
 	/// </summary>
-	public class ObjectBTreeFileEnumerator<T> : IEnumerator<T>, ICursor<T>, IAsyncEnumerator
+	public class ObjectBTreeFileCursor<T> : ICursor<T>
 	{
 		private ObjectBTreeFile file;
 		private BlockHeader currentHeader;
@@ -54,19 +32,17 @@ namespace Waher.Persistence.Files
 		private ulong blockUpdateCounter;
 		private uint currentBlockIndex;
 		private int currentObjPos;
-		private int timeoutMilliseconds;
-		private LockType lockType;
 		private bool hasCurrent;
 		private bool currentTypeCompatible;
 
-		internal static Task<ObjectBTreeFileEnumerator<T>> Create(ObjectBTreeFile File, IRecordHandler RecordHandler)
+		internal static Task<ObjectBTreeFileCursor<T>> CreateLocked(ObjectBTreeFile File, IRecordHandler RecordHandler)
 		{
-			return Create(File, RecordHandler, null);
+			return CreateLocked(File, RecordHandler, null);
 		}
 
-		internal static async Task<ObjectBTreeFileEnumerator<T>> Create(ObjectBTreeFile File, IRecordHandler RecordHandler, IObjectSerializer DefaultSerializer)
+		internal static async Task<ObjectBTreeFileCursor<T>> CreateLocked(ObjectBTreeFile File, IRecordHandler RecordHandler, IObjectSerializer DefaultSerializer)
 		{
-			ObjectBTreeFileEnumerator<T> Result = new ObjectBTreeFileEnumerator<T>()
+			ObjectBTreeFileCursor<T> Result = new ObjectBTreeFileCursor<T>()
 			{
 				file = File,
 				currentBlockIndex = 0,
@@ -74,11 +50,9 @@ namespace Waher.Persistence.Files
 				currentReader = null,
 				currentHeader = null,
 				blockUpdateCounter = File.BlockUpdateCounter,
-				lockType = LockType.None,
 				recordHandler = RecordHandler,
 				startingPoint = null,
 				defaultSerializer = DefaultSerializer,
-				timeoutMilliseconds = File.TimeoutMilliseconds,
 				objectIdMemberName = null,
 				fieldCount = 0
 			};
@@ -104,71 +78,17 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// Locks the underlying file (if not locked).
-		/// </summary>
-		internal async Task Lock(LockType LockType)
-		{
-			if (this.lockType == LockType.None)
-			{
-				switch (LockType)
-				{
-					case LockType.Read:
-						await this.file.LockRead();
-						break;
-
-					case LockType.Write:
-						await this.file.LockWrite();
-						break;
-				}
-
-				this.lockType = LockType;
-				this.blockUpdateCounter = this.file.BlockUpdateCounter;
-			}
-			else if (this.lockType != LockType)
-				throw new InvalidOperationException("Already locked.");
-		}
-
-		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
-		public async void Dispose()
+		public void Dispose()
 		{
-			try
-			{
-				await this.DisposeAsync();
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-			}
-		}
-
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		public Task DisposeAsync()
-		{
-			LockType Temp = this.lockType;
-			this.lockType = LockType.None;
-
-			switch (Temp)
-			{
-				case LockType.Read:
-					return this.file.EndRead();
-
-				case LockType.Write:
-					return this.file.EndWrite();
-
-				default:
-					return Task.CompletedTask;
-			}
 		}
 
 		/// <summary>
 		/// Gets the element in the collection at the current position of the enumerator.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNext()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
 		public T Current
 		{
 			get
@@ -210,26 +130,10 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// Gets the element in the collection at the current position of the enumerator.
-		/// </summary>
-		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNext()"/> to start the enumeration after creating or resetting it.</exception>
-		object IEnumerator.Current
-		{
-			get
-			{
-				if (this.hasCurrent)
-					return this.current;
-				else
-					throw new InvalidOperationException("Enumeration not started. Call MoveNext() first.");
-			}
-		}
-
-		/// <summary>
 		/// Gets the Object ID of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNext()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
 		public object CurrentObjectId
 		{
 			get
@@ -245,7 +149,7 @@ namespace Waher.Persistence.Files
 		/// Gets the Object ID of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNext()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
 		Guid ICursor<T>.CurrentObjectId
 		{
 			get
@@ -260,41 +164,16 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Gets the rank of the current object.
 		/// </summary>
-		public ulong CurrentRank
-		{
-			get
-			{
-				Task<ulong> Task = this.GetCurrentRank();
-				FilesProvider.Wait(Task, this.timeoutMilliseconds);
-				return Task.Result;
-			}
-		}
-
-		/// <summary>
-		/// Gets the rank of the current object.
-		/// </summary>
-		public async Task<ulong> GetCurrentRank()
+		public async Task<ulong> GetCurrentRankLocked()
 		{
 			if (this.hasCurrent)
 			{
 				if (!this.currentRank.HasValue)
 				{
-					if (this.lockType != LockType.None)
-						this.currentRank = await this.file.GetRankLocked(this.currentObjectId);
-					else if (this.blockUpdateCounter != this.file.BlockUpdateCounter)
+					if (this.blockUpdateCounter != this.file.BlockUpdateCounter)
 						throw new InvalidOperationException("Contents of file has been changed.");
-					else
-					{
-						await this.file.LockRead();
-						try
-						{
-							this.currentRank = await this.file.GetRankLocked(this.currentObjectId);
-						}
-						finally
-						{
-							await this.file.EndRead();
-						}
-					}
+
+					this.currentRank = await this.file.GetRankLocked(this.currentObjectId);
 				}
 
 				return this.currentRank.Value;
@@ -309,20 +188,7 @@ namespace Waher.Persistence.Files
 		/// <returns>true if the enumerator was successfully advanced to the next element; false if
 		/// the enumerator has passed the end of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		public bool MoveNext()
-		{
-			Task<bool> Task = this.MoveNextAsync();
-			FilesProvider.Wait(Task, this.timeoutMilliseconds);
-			return Task.Result;
-		}
-
-		/// <summary>
-		/// Advances the enumerator to the next element of the collection.
-		/// </summary>
-		/// <returns>true if the enumerator was successfully advanced to the next element; false if
-		/// the enumerator has passed the end of the collection.</returns>
-		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		public async Task<bool> MoveNextAsync()
+		public async Task<bool> MoveNextAsyncLocked()
 		{
 			if (this.blockUpdateCounter != this.file.BlockUpdateCounter)
 				throw new InvalidOperationException("Contents of file has been changed.");
@@ -333,10 +199,10 @@ namespace Waher.Persistence.Files
 				{
 					this.GoToStartingPoint(this.startingPoint);
 					this.hasCurrent = true;
-					return await this.MoveNextAsync();
+					return await this.MoveNextAsyncLocked();
 				}
 				else
-					return await this.GoToFirst();
+					return await this.GoToFirstLocked();
 			}
 
 			if (this.currentRank.HasValue)
@@ -350,13 +216,13 @@ namespace Waher.Persistence.Files
 			{
 				BlockLink = this.currentReader.ReadBlockLink();
 				if (BlockLink != 0)
-					return await this.GoToFirst(BlockLink);
+					return await this.GoToFirstLocked(BlockLink);
 
 				Pos = this.currentReader.Position;
 				ObjectId = this.recordHandler.GetKey(this.currentReader);
 				if (!(ObjectId is null))
 				{
-					await this.LoadObject(ObjectId, Pos);
+					await this.LoadObjectLocked(ObjectId, Pos);
 					return true;
 				}
 			}
@@ -365,7 +231,7 @@ namespace Waher.Persistence.Files
 
 			BlockLink = this.currentHeader.LastBlockIndex;
 			if (BlockLink != 0)
-				return await this.GoToFirst(BlockLink);
+				return await this.GoToFirstLocked(BlockLink);
 
 			do
 			{
@@ -376,7 +242,7 @@ namespace Waher.Persistence.Files
 					return false;
 				}
 
-				this.currentBlock = await this.LoadBlock(BlockLink);
+				this.currentBlock = await this.LoadBlockLocked(BlockLink);
 				this.currentReader.Restart(this.currentBlock, 0);
 
 				BlockHeader ParentHeader = new BlockHeader(this.currentReader);
@@ -416,7 +282,7 @@ namespace Waher.Persistence.Files
 					this.currentBlockIndex = BlockLink;
 					this.currentHeader = ParentHeader;
 
-					await this.LoadObject(ObjectId, Pos);
+					await this.LoadObjectLocked(ObjectId, Pos);
 					return true;
 				}
 			}
@@ -443,13 +309,13 @@ namespace Waher.Persistence.Files
 		/// Goes to the first object.
 		/// </summary>
 		/// <returns>If a first object was found.</returns>
-		public Task<bool> GoToFirst()
+		internal Task<bool> GoToFirstLocked()
 		{
 			this.currentRank = 0;
-			return this.GoToFirst(0);
+			return this.GoToFirstLocked(0);
 		}
 
-		private async Task<bool> GoToFirst(uint StartBlock)
+		private async Task<bool> GoToFirstLocked(uint StartBlock)
 		{
 			object ObjectId;
 			uint BlockLink;
@@ -461,7 +327,7 @@ namespace Waher.Persistence.Files
 			do
 			{
 				this.currentBlockIndex = BlockLink;
-				this.currentBlock = await this.LoadBlock(this.currentBlockIndex);
+				this.currentBlock = await this.LoadBlockLocked(this.currentBlockIndex);
 
 				if (this.currentReader is null)
 					this.currentReader = new BinaryDeserializer(this.file.CollectionName, this.file.Encoding, this.currentBlock, this.file.BlockLimit);
@@ -488,7 +354,7 @@ namespace Waher.Persistence.Files
 					int Len;
 
 					this.currentBlockIndex = this.currentHeader.ParentBlockIndex;
-					this.currentBlock = await this.LoadBlock(this.currentBlockIndex);
+					this.currentBlock = await this.LoadBlockLocked(this.currentBlockIndex);
 					this.currentReader.Restart(this.currentBlock, 0);
 					this.currentHeader = new BlockHeader(this.currentReader);
 
@@ -521,21 +387,8 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			await this.LoadObject(ObjectId, Pos);
+			await this.LoadObjectLocked(ObjectId, Pos);
 			return true;
-		}
-
-		/// <summary>
-		/// Advances the enumerator to the previous element of the collection.
-		/// </summary>
-		/// <returns>true if the enumerator was successfully advanced to the previous element; false if
-		/// the enumerator has passed the end of the collection.</returns>
-		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		public bool MovePrevious()
-		{
-			Task<bool> Task = this.MovePreviousAsync();
-			FilesProvider.Wait(Task, this.timeoutMilliseconds);
-			return Task.Result;
 		}
 
 		/// <summary>
@@ -544,7 +397,7 @@ namespace Waher.Persistence.Files
 		/// <returns>true if the enumerator was successfully advanced to the previous element; false if
 		/// the enumerator has passed the beginning of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		public async Task<bool> MovePreviousAsync()
+		public async Task<bool> MovePreviousAsyncLocked()
 		{
 			if (this.blockUpdateCounter != this.file.BlockUpdateCounter)
 				throw new InvalidOperationException("Contents of file has been changed.");
@@ -555,10 +408,10 @@ namespace Waher.Persistence.Files
 				{
 					this.GoToStartingPoint(this.startingPoint);
 					this.hasCurrent = true;
-					return await this.MovePreviousAsync();
+					return await this.MovePreviousAsyncLocked();
 				}
 				else
-					return await this.GoToLast();
+					return await this.GoToLastLocked();
 			}
 
 			if (this.currentRank.HasValue)
@@ -593,23 +446,23 @@ namespace Waher.Persistence.Files
 
 				if (BlockLink == 0)
 				{
-					await this.LoadObject(ObjectId, Pos);
+					await this.LoadObjectLocked(ObjectId, Pos);
 					return true;
 				}
 				else
-					return await this.GoToLast(BlockLink);
+					return await this.GoToLastLocked(BlockLink);
 			}
 			else
 			{
 				BlockLink = this.currentReader.ReadBlockLink();
 				if (BlockLink != 0)
-					return await this.GoToLast(BlockLink);
+					return await this.GoToLastLocked(BlockLink);
 			}
 
 			while (this.currentBlockIndex != 0)
 			{
 				ParentBlockLink = this.currentHeader.ParentBlockIndex;
-				this.currentBlock = await this.LoadBlock(ParentBlockLink);
+				this.currentBlock = await this.LoadBlockLocked(ParentBlockLink);
 				this.currentReader.Restart(this.currentBlock, 0);
 				this.currentHeader = new BlockHeader(this.currentReader);
 
@@ -637,7 +490,7 @@ namespace Waher.Persistence.Files
 					while (this.currentReader.BytesLeft >= 4);
 
 					this.currentBlockIndex = ParentBlockLink;
-					await this.LoadObject(LastObjectId, LastPos);
+					await this.LoadObjectLocked(LastObjectId, LastPos);
 					return true;
 				}
 				else
@@ -674,7 +527,7 @@ namespace Waher.Persistence.Files
 
 					if (LastPos != 0)
 					{
-						await this.LoadObject(LastObjectId, LastPos);
+						await this.LoadObjectLocked(LastObjectId, LastPos);
 						return true;
 					}
 				}
@@ -688,13 +541,13 @@ namespace Waher.Persistence.Files
 		/// Goes to the last object.
 		/// </summary>
 		/// <returns>If a last object was found.</returns>
-		public Task<bool> GoToLast()
+		internal Task<bool> GoToLastLocked()
 		{
 			this.currentRank = null;
-			return this.GoToLast(0);
+			return this.GoToLastLocked(0);
 		}
 
-		private async Task<bool> GoToLast(uint StartBlock)
+		private async Task<bool> GoToLastLocked(uint StartBlock)
 		{
 			object ObjectId;
 			uint BlockLink;
@@ -708,7 +561,7 @@ namespace Waher.Persistence.Files
 			do
 			{
 				this.currentBlockIndex = BlockLink;
-				this.currentBlock = await this.LoadBlock(this.currentBlockIndex);
+				this.currentBlock = await this.LoadBlockLocked(this.currentBlockIndex);
 
 				if (this.currentReader is null)
 					this.currentReader = new BinaryDeserializer(this.file.CollectionName, this.file.Encoding, this.currentBlock, this.file.BlockLimit);
@@ -748,7 +601,7 @@ namespace Waher.Persistence.Files
 				while (IsEmpty && this.currentBlockIndex != 0)
 				{
 					this.currentBlockIndex = this.currentHeader.ParentBlockIndex;
-					this.currentBlock = await this.LoadBlock(this.currentBlockIndex);
+					this.currentBlock = await this.LoadBlockLocked(this.currentBlockIndex);
 					this.currentReader.Restart(this.currentBlock, 0);
 					this.currentHeader = new BlockHeader(this.currentReader);
 
@@ -782,11 +635,11 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			await this.LoadObject(ObjectId, LastPos + 4);
+			await this.LoadObjectLocked(ObjectId, LastPos + 4);
 			return true;
 		}
 
-		private async Task LoadObject(object ObjectId, int Start)
+		private async Task LoadObjectLocked(object ObjectId, int Start)
 		{
 			this.currentSerializer = this.defaultSerializer;
 
@@ -810,22 +663,10 @@ namespace Waher.Persistence.Files
 					{
 						this.currentReader.SkipUInt32();
 
-						if (this.lockType != LockType.None)
-							Reader = await this.file.LoadBlobLocked(this.currentBlock, Start, null, null);
-						else if (this.blockUpdateCounter != this.file.BlockUpdateCounter)
+						if (this.blockUpdateCounter != this.file.BlockUpdateCounter)
 							throw new InvalidOperationException("Contents of file has been changed.");
-						else
-						{
-							await this.file.LockRead();
-							try
-							{
-								Reader = await this.file.LoadBlobLocked(this.currentBlock, Start, null, null);
-							}
-							finally
-							{
-								await this.file.EndRead();
-							}
-						}
+
+						Reader = await this.file.LoadBlobLocked(this.currentBlock, Start, null, null);
 
 						Start = 0;
 					}
@@ -885,14 +726,12 @@ namespace Waher.Persistence.Files
 			this.hasCurrent = true;
 		}
 
-		private async Task<byte[]> LoadBlock(uint BlockIndex)
+		private Task<byte[]> LoadBlockLocked(uint BlockIndex)
 		{
-			if (this.lockType != LockType.None)
-				return await this.file.LoadBlockLocked(BlockIndex, true);
-			else if (this.blockUpdateCounter != this.file.BlockUpdateCounter)
+			if (this.blockUpdateCounter != this.file.BlockUpdateCounter)
 				throw new InvalidOperationException("Contents of file has been changed.");
-			else
-				return await this.file.LoadBlock(BlockIndex);
+
+			return this.file.LoadBlockLocked(BlockIndex, true);
 		}
 
 		/// <summary>
@@ -901,7 +740,7 @@ namespace Waher.Persistence.Files
 		/// <param name="ObjectId">Object ID</param>
 		/// <returns>If the corresponding object was found. If so, the <see cref="Current"/> property will contain the corresponding
 		/// object.</returns>
-		public async Task<bool> GoToObject(object ObjectId)
+		public async Task<bool> GoToObjectLocked(object ObjectId)
 		{
 			uint BlockIndex = 0;
 			object ObjectId2;
@@ -916,7 +755,7 @@ namespace Waher.Persistence.Files
 			while (true)
 			{
 				this.currentBlockIndex = BlockIndex;
-				this.currentBlock = await this.LoadBlock(this.currentBlockIndex);
+				this.currentBlock = await this.LoadBlockLocked(this.currentBlockIndex);
 
 				if (this.currentReader is null)
 					this.currentReader = new BinaryDeserializer(this.file.CollectionName, this.file.Encoding, this.currentBlock, this.file.BlockLimit);
@@ -948,7 +787,7 @@ namespace Waher.Persistence.Files
 
 				if (Comparison == 0)                                       // Object ID found.
 				{
-					await this.LoadObject(ObjectId2, Pos + 4);
+					await this.LoadObjectLocked(ObjectId2, Pos + 4);
 					return true;
 				}
 				else if (IsEmpty || Comparison > 0)
@@ -980,9 +819,9 @@ namespace Waher.Persistence.Files
 		/// <param name="ObjectIndex">Order of object in database.</param>
 		/// <returns>If the corresponding object was found. If so, the <see cref="Current"/> property will contain the corresponding
 		/// object.</returns>
-		public async Task<bool> GoToObject(ulong ObjectIndex)
+		public async Task<bool> GoToObjectLocked(ulong ObjectIndex)
 		{
-			ulong? Index = await this.GoToObject(ObjectIndex, 0);
+			ulong? Index = await this.GoToObjectLocked(ObjectIndex, 0);
 
 			if (Index.HasValue && Index.Value == ObjectIndex + 1)
 			{
@@ -997,11 +836,11 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task<ulong?> GoToObject(ulong ObjectIndex, uint BlockIndex)
+		private async Task<ulong?> GoToObjectLocked(ulong ObjectIndex, uint BlockIndex)
 		{
 			if (ObjectIndex == 0)
 			{
-				if (await this.GoToFirst(BlockIndex))
+				if (await this.GoToFirstLocked(BlockIndex))
 					return 1;
 				else
 					return null;
@@ -1013,7 +852,7 @@ namespace Waher.Persistence.Files
 			uint BlockLink;
 			bool IsEmpty;
 
-			byte[] Block = await this.LoadBlock(BlockIndex);
+			byte[] Block = await this.LoadBlockLocked(BlockIndex);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.file.CollectionName, this.file.Encoding, Block, this.file.BlockLimit);
 			BlockHeader Header = new BlockHeader(Reader);
 			ulong Count = 0;
@@ -1038,7 +877,7 @@ namespace Waher.Persistence.Files
 
 				if (BlockLink != 0)
 				{
-					SubtreeCount = await this.GoToObject(ObjectIndex - Count, BlockLink);
+					SubtreeCount = await this.GoToObjectLocked(ObjectIndex - Count, BlockLink);
 					if (SubtreeCount.HasValue)
 					{
 						Count += SubtreeCount.Value;
@@ -1056,7 +895,7 @@ namespace Waher.Persistence.Files
 					this.currentReader = Reader;
 					this.currentHeader = Header;
 
-					await this.LoadObject(ObjectId, Pos + 4);
+					await this.LoadObjectLocked(ObjectId, Pos + 4);
 					return Count;
 				}
 			}
@@ -1064,7 +903,7 @@ namespace Waher.Persistence.Files
 
 			if (Header.LastBlockIndex != 0)
 			{
-				SubtreeCount = await this.GoToObject(ObjectIndex - Count, Header.LastBlockIndex);
+				SubtreeCount = await this.GoToObjectLocked(ObjectIndex - Count, Header.LastBlockIndex);
 				if (SubtreeCount.HasValue)
 				{
 					Count += SubtreeCount.Value;
@@ -1109,15 +948,15 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="NrObjects">Number of objects to skip forward (positive) or backward (negative).</param>
 		/// <returns>If the skip operation was successful and a new object is available in <see cref="Current"/>.</returns>
-		public async Task<bool> Skip(long NrObjects)
+		internal async Task<bool> SkipLocked(long NrObjects)
 		{
-			long Rank = (long)await this.GetCurrentRank();
+			long Rank = (long)await this.GetCurrentRankLocked();
 
 			Rank += NrObjects;
 			if (Rank < 0)
 				return false;
 
-			if (!await this.GoToObject((ulong)Rank))
+			if (!await this.GoToObjectLocked((ulong)Rank))
 				return false;
 
 			return true;
@@ -1128,7 +967,7 @@ namespace Waher.Persistence.Files
 		/// <see cref="Reset(Bookmark)"/> method.
 		/// </summary>
 		/// <returns>Bookmark</returns>
-		public async Task<Bookmark> GetBookmark()
+		internal async Task<Bookmark> GetBookmarkLocked()
 		{
 			if (!this.hasCurrent)
 			{
@@ -1136,7 +975,7 @@ namespace Waher.Persistence.Files
 					return new Bookmark(this.file, this.startingPoint);
 				else
 				{
-					if (!await this.GoToFirst())
+					if (!await this.GoToFirstLocked())
 						return null;
 
 					BlockInfo Position = new BlockInfo(this.currentHeader, this.currentBlock, this.currentBlockIndex, this.currentObjPos, false);
@@ -1147,22 +986,6 @@ namespace Waher.Persistence.Files
 			}
 			else
 				return new Bookmark(this.file, new BlockInfo(this.currentHeader, this.currentBlock, this.currentBlockIndex, this.currentObjPos, false));
-		}
-
-		/// <summary>
-		/// <see cref="IEnumerable{T}.GetEnumerator()"/>
-		/// </summary>
-		public IEnumerator<T> GetEnumerator()
-		{
-			return new CursorEnumerator<T>(this, this.file.TimeoutMilliseconds);
-		}
-
-		/// <summary>
-		/// <see cref="IEnumerable{T}.GetEnumerator()"/>
-		/// </summary>
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return new CursorEnumerator<T>(this, this.file.TimeoutMilliseconds);
 		}
 
 		/// <summary>

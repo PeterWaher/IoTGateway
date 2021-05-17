@@ -321,7 +321,7 @@ namespace Waher.Persistence.Files.Storage
 				return 1;
 			else
 			{
-				uint BlockLimit = this.index?.IndexFile?.BlockLimit ?? uint.MaxValue;
+				uint BlockLimit = this.index?.BlockLimit ?? uint.MaxValue;
 				BinaryDeserializer xReader = new BinaryDeserializer(this.collectionName, this.encoding, x, BlockLimit);
 				BinaryDeserializer yReader = new BinaryDeserializer(this.collectionName, this.encoding, y, BlockLimit);
 				uint xType, yType;
@@ -2209,7 +2209,7 @@ namespace Waher.Persistence.Files.Storage
 		public void ExportKey(object ObjectId, XmlWriter Output)
 		{
 			byte[] Bin = (byte[])ObjectId;
-			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin, this.index?.IndexFile?.BlockLimit ?? uint.MaxValue);
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin, this.index?.BlockLimit ?? uint.MaxValue);
 
 			if (Reader.BytesLeft > 0 && Reader.ReadBit())
 			{

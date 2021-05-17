@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
-using System.Collections;
 
 namespace Waher.Persistence.Files.Searching
 {
@@ -21,8 +19,6 @@ namespace Waher.Persistence.Files.Searching
 		private readonly ObjectBTreeFile file;
 		private int currentCursorPosition = 0;
 		private readonly int nrCursors;
-		private readonly LockType lockType;
-		private readonly bool lockParent;
 
 		/// <summary>
 		/// Provides a cursor that joins results from multiple cursors. It only returns an object once, regardless of how many times
@@ -30,23 +26,19 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		/// <param name="ChildFilters">Child filters.</param>
 		/// <param name="File">File being searched.</param>
-		/// <param name="LockType">If locked access is desired.</param>
-		/// <param name="LockParent">If parent file is to be locked as well.</param>
-		public UnionCursor(Filter[] ChildFilters, ObjectBTreeFile File, LockType LockType, bool LockParent)
+		public UnionCursor(Filter[] ChildFilters, ObjectBTreeFile File)
 		{
 			this.childFilters = ChildFilters;
 			this.nrCursors = this.childFilters.Length;
 			this.file = File;
 			this.currentCursor = null;
-			this.lockType = LockType;
-			this.lockParent = LockParent;
 		}
 
 		/// <summary>
 		/// Gets the element in the collection at the current position of the enumerator.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNextAsync()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
 		public T Current
 		{
 			get
@@ -93,7 +85,7 @@ namespace Waher.Persistence.Files.Searching
 		/// Gets the Object ID of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNextAsync()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsyncLocked()"/> to start the enumeration after creating or resetting it.</exception>
 		public Guid CurrentObjectId
 		{
 			get
@@ -107,7 +99,6 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		public void Dispose()
 		{
-			this.currentCursor?.Dispose();
 			this.currentCursor = null;
 		}
 
@@ -117,7 +108,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>true if the enumerator was successfully advanced to the next element; false if
 		/// the enumerator has passed the end of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		public async Task<bool> MoveNextAsync()
+		public async Task<bool> MoveNextAsyncLocked()
 		{
 			Guid ObjectId;
 
@@ -128,12 +119,11 @@ namespace Waher.Persistence.Files.Searching
 					if (this.currentCursorPosition >= this.nrCursors)
 						return false;
 
-					this.currentCursor = await this.file.ConvertFilterToCursor<T>(this.childFilters[this.currentCursorPosition++], this.lockType, this.lockParent, null);
+					this.currentCursor = await this.file.ConvertFilterToCursorLocked<T>(this.childFilters[this.currentCursorPosition++], null);
 				}
 
-				if (!await this.currentCursor.MoveNextAsync())
+				if (!await this.currentCursor.MoveNextAsyncLocked())
 				{
-					this.currentCursor.Dispose();
 					this.currentCursor = null;
 					continue;
 				}
@@ -156,19 +146,9 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>true if the enumerator was successfully advanced to the previous element; false if
 		/// the enumerator has passed the beginning of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		public Task<bool> MovePreviousAsync()
+		public Task<bool> MovePreviousAsyncLocked()
 		{
-			return this.MoveNextAsync();    // Union operator not ordered.
-		}
-
-		public IEnumerator<T> GetEnumerator()
-		{
-			return new CursorEnumerator<T>(this, this.file.TimeoutMilliseconds);
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return new CursorEnumerator<T>(this, this.file.TimeoutMilliseconds);
+			return this.MoveNextAsyncLocked();    // Union operator not ordered.
 		}
 
 		/// <summary>

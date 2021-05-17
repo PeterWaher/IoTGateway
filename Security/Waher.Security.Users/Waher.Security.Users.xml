@@ -347,6 +347,11 @@
             Hash Digest Computation Method Type Name.
             </summary>
         </member>
+        <member name="P:Waher.Security.Users.Users.HashMethodLocked">
+            <summary>
+            If the Hash Method has been registered and locked.
+            </summary>
+        </member>
         <member name="M:Waher.Security.Users.Users.ComputeHash(System.String,System.String)">
             <summary>
             Computes a hash of a password.

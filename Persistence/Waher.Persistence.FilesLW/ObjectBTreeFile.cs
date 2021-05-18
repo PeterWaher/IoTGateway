@@ -5055,7 +5055,7 @@ namespace Waher.Persistence.Files
 			if (!this.indicesCreated)
 			{
 				ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(typeof(T));
-				string CollectionName = await Serializer.CollectionName(null);
+				string CollectionName = await Serializer.CollectionName(null) ?? this.collectionName;
 				ObjectBTreeFile File = await this.provider.GetFile(CollectionName);
 				if (File == this)
 				{

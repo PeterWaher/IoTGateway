@@ -58,6 +58,7 @@
 							tr td:nth-of-type(2)
 							{
 								text-align:left;
+								word-break: break-all;
 							}
 
 							table, th, td

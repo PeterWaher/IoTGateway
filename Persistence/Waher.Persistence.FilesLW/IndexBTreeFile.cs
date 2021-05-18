@@ -130,7 +130,7 @@ namespace Waher.Persistence.Files
 			await this.objectFile.BeginRead();
 			try
 			{
-				return await this.indexFile.CountAsync;
+				return await this.indexFile.GetObjectCountLocked(0, true);
 			}
 			finally
 			{

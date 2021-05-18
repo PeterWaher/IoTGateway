@@ -4504,7 +4504,7 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task<ulong> GetObjectCountLocked(uint BlockIndex, bool IncludeChildren)
+		internal async Task<ulong> GetObjectCountLocked(uint BlockIndex, bool IncludeChildren)
 		{
 #if ASSERT_LOCKS
 			this.fileAccess.AssertReadingOrWriting();

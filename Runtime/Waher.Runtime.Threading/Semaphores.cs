@@ -56,7 +56,7 @@ namespace Waher.Runtime.Threading
 
 		/// <summary>
 		/// Ends a reading session of the semaphore identified by <paramref name="Key"/>.
-		/// Must be called once for each call to <see cref="BeginRead"/> or successful call to <see cref="TryBeginRead(int)"/>
+		/// Must be called once for each call to <see cref="BeginRead"/> or successful call to <see cref="TryBeginRead(string, int)"/>
 		/// with the same <paramref name="Key"/>.
 		/// </summary>
 		/// <param name="Key">Semaphore key.</param>
@@ -93,7 +93,7 @@ namespace Waher.Runtime.Threading
 
 		/// <summary>
 		/// Ends a writing session of the semaphore identified by <paramref name="Key"/>.
-		/// Must be called once for each call to <see cref="BeginWrite"/> or successful call to <see cref="TryBeginWrite(int)"/>
+		/// Must be called once for each call to <see cref="BeginWrite"/> or successful call to <see cref="TryBeginWrite(string, int)"/>
 		/// with the same <paramref name="Key"/>.
 		/// </summary>
 		/// <param name="Key">Semaphore key.</param>

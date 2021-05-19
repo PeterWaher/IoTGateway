@@ -147,7 +147,7 @@ namespace Waher.Content.QR.Encoding
 		/// <param name="X2">Right coordinate.</param>
 		/// <param name="Y">Y coordinate.</param>
 		/// <param name="Dot">If pixels should be lit (true) or cleared (false).</param>
-		/// <param name="Toggle">If pixels should be set and cleared consecutively.</param>
+		/// <param name="Dotted">If pixels should be set and cleared consecutively.</param>
 		public void HLine(int X1, int X2, int Y, bool Dot, bool Dotted)
 		{
 			while (X1 <= X2)
@@ -166,7 +166,7 @@ namespace Waher.Content.QR.Encoding
 		/// <param name="Y1">Top coordinate.</param>
 		/// <param name="Y2">Bottom coordinate.</param>
 		/// <param name="Dot">If pixels should be lit (true) or cleared (false).</param>
-		/// <param name="Toggle">If pixels should be set and cleared consecutively.</param>
+		/// <param name="Dotted">If pixels should be set and cleared consecutively.</param>
 		public void VLine(int X, int Y1, int Y2, bool Dot, bool Dotted)
 		{
 			while (Y1 <= Y2)
@@ -725,7 +725,7 @@ namespace Waher.Content.QR.Encoding
 		/// <summary>
 		/// Mask function 1
 		/// </summary>
-		/// <param name="x">Zero-based X-coordinte.</param>
+		/// <param name="_">Zero-based X-coordinte.</param>
 		/// <param name="y">Zero-based Y-coordinte.</param>
 		/// <returns>If the bit should be swapped.</returns>
 		public static bool Mask1(int _, int y) => (y & 1) == 0;
@@ -734,7 +734,7 @@ namespace Waher.Content.QR.Encoding
 		/// Mask function 2
 		/// </summary>
 		/// <param name="x">Zero-based X-coordinte.</param>
-		/// <param name="y">Zero-based Y-coordinte.</param>
+		/// <param name="_">Zero-based Y-coordinte.</param>
 		/// <returns>If the bit should be swapped.</returns>
 		public static bool Mask2(int x, int _) => (x % 3) == 0;
 

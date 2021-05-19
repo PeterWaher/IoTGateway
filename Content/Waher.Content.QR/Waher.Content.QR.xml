@@ -155,7 +155,7 @@
             <param name="X2">Right coordinate.</param>
             <param name="Y">Y coordinate.</param>
             <param name="Dot">If pixels should be lit (true) or cleared (false).</param>
-            <param name="Toggle">If pixels should be set and cleared consecutively.</param>
+            <param name="Dotted">If pixels should be set and cleared consecutively.</param>
         </member>
         <member name="M:Waher.Content.QR.Encoding.QrMatrix.VLine(System.Int32,System.Int32,System.Int32,System.Boolean,System.Boolean)">
             <summary>
@@ -165,7 +165,7 @@
             <param name="Y1">Top coordinate.</param>
             <param name="Y2">Bottom coordinate.</param>
             <param name="Dot">If pixels should be lit (true) or cleared (false).</param>
-            <param name="Toggle">If pixels should be set and cleared consecutively.</param>
+            <param name="Dotted">If pixels should be set and cleared consecutively.</param>
         </member>
         <member name="P:Waher.Content.QR.Encoding.QrMatrix.NrDefinedDots">
             <summary>
@@ -273,7 +273,7 @@
             <summary>
             Mask function 1
             </summary>
-            <param name="x">Zero-based X-coordinte.</param>
+            <param name="_">Zero-based X-coordinte.</param>
             <param name="y">Zero-based Y-coordinte.</param>
             <returns>If the bit should be swapped.</returns>
         </member>
@@ -282,7 +282,7 @@
             Mask function 2
             </summary>
             <param name="x">Zero-based X-coordinte.</param>
-            <param name="y">Zero-based Y-coordinte.</param>
+            <param name="_">Zero-based Y-coordinte.</param>
             <returns>If the bit should be swapped.</returns>
         </member>
         <member name="M:Waher.Content.QR.Encoding.QrMatrix.Mask3(System.Int32,System.Int32)">
@@ -742,7 +742,7 @@
             <summary>
             Checks if a text string can be encoded using the alphanumeric encoding.
             </summary>
-            <param name="Text">Text string to encode.</param>
+            <param name="_">Text string to encode.</param>
             <returns>If the encoder can be used.</returns>
         </member>
         <member name="M:Waher.Content.QR.Serialization.ByteEncoder.GetBytes(System.String)">

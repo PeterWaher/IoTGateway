@@ -26,7 +26,7 @@ namespace Waher.Content.QR.Serialization
 		/// <summary>
 		/// Checks if a text string can be encoded using the alphanumeric encoding.
 		/// </summary>
-		/// <param name="Text">Text string to encode.</param>
+		/// <param name="_">Text string to encode.</param>
 		/// <returns>If the encoder can be used.</returns>
 		public static bool CanEncode(string _)
 		{

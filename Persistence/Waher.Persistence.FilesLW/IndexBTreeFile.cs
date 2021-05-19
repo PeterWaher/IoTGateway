@@ -125,6 +125,11 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public Task<ulong> CountAsync => this.GetCountAsync();
 
+		/// <summary>
+		/// Number of objects in file.
+		/// </summary>
+		internal Task<ulong> CountAsyncLocked => this.indexFile.GetObjectCountLocked(0, true);
+
 		private async Task<ulong> GetCountAsync()
 		{
 			await this.objectFile.BeginRead();

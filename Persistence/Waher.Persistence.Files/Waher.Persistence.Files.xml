@@ -1249,6 +1249,11 @@
             Number of objects in file.
             </summary>
         </member>
+        <member name="P:Waher.Persistence.Files.IndexBTreeFile.CountAsyncLocked">
+            <summary>
+            Number of objects in file.
+            </summary>
+        </member>
         <member name="M:Waher.Persistence.Files.IndexBTreeFile.SameSortOrder(System.String[],System.String[])">
             <summary>
             If the index ordering corresponds to a given sort order.
@@ -2068,6 +2073,11 @@
             <returns>If the object is stored in the file.</returns>
         </member>
         <member name="P:Waher.Persistence.Files.ObjectBTreeFile.CountAsync">
+            <summary>
+            Number of objects in file.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Files.ObjectBTreeFile.CountAsyncLocked">
             <summary>
             Number of objects in file.
             </summary>

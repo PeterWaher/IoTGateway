@@ -293,7 +293,7 @@ namespace Waher.Events.Persistence
 			if (string.IsNullOrEmpty(PersistedEvent.Facility))
 				PersistedEvent.Facility = this.defaultFacility;
 
-			await Database.Insert(PersistedEvent);
+			await Database.InsertLazy(PersistedEvent);
 		}
 
 		/// <summary>

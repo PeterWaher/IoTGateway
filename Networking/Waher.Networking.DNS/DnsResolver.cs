@@ -485,7 +485,7 @@ namespace Waher.Networking.DNS
 					Thread?.NewState("Store");
 					try
 					{
-						await Database.Insert(Response);
+						await Database.InsertLazy(Response);
 					}
 					catch (Exception ex)
 					{

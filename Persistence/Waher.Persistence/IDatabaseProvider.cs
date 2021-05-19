@@ -31,6 +31,24 @@ namespace Waher.Persistence
 		Task Insert(IEnumerable<object> Objects);
 
 		/// <summary>
+		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		Task InsertLazy(object Object);
+
+		/// <summary>
+		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		Task InsertLazy(params object[] Objects);
+
+		/// <summary>
+		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		Task InsertLazy(IEnumerable<object> Objects);
+
+		/// <summary>
 		/// Finds objects of a given class <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>

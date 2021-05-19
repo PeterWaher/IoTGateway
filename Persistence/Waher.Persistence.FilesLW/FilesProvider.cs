@@ -1893,35 +1893,9 @@ namespace Waher.Persistence.Files
 		/// <returns>GUID identifying the saved object.</returns>
 		public async Task<Guid> SaveNewObject(object Value)
 		{
-			Type ValueType = Value.GetType();
-			ObjectSerializer Serializer = await this.GetObjectSerializerEx(ValueType);
-
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(Value);
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(Value));
-			Guid ObjectId;
-
-			if (await File.TryBeginWrite(0))
-			{
-				try
-				{
-					ObjectId = await File.SaveNewObjectLocked(Value, Serializer);
-
-					foreach (IndexBTreeFile Index in File.Indices)
-						await Index.SaveNewObjectLocked(ObjectId, Value, Serializer);
-				}
-				finally
-				{
-					await File.EndWrite();
-				}
-			}
-			else
-			{
-				Tuple<Guid, BlockInfo> Rec = await File.PrepareObjectIdForSaveLocked(Value, Serializer);
-
-				ObjectId = Rec.Item1;
-				File.QueueForSave(Value, Serializer);
-			}
-
-			return ObjectId;
+			return await File.SaveNewObject(Value, Serializer, true);
 		}
 
 		#endregion
@@ -1936,7 +1910,7 @@ namespace Waher.Persistence.Files
 		{
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(Object);
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(Object));
-			await File.SaveNewObject(Object, Serializer);
+			await File.SaveNewObject(Object, Serializer, false);
 		}
 
 		/// <summary>
@@ -1945,14 +1919,53 @@ namespace Waher.Persistence.Files
 		/// <param name="Objects">Objects to insert.</param>
 		public Task Insert(params object[] Objects)
 		{
-			return this.Insert((IEnumerable<object>)Objects);
+			return this.Insert((IEnumerable<object>)Objects, false);
 		}
 
 		/// <summary>
 		/// Inserts a collection of objects into the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public async Task Insert(IEnumerable<object> Objects)
+		public Task Insert(IEnumerable<object> Objects)
+		{
+			return this.Insert(Objects, false);
+		}
+
+		/// <summary>
+		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public async Task InsertLazy(object Object)
+		{
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(Object);
+			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(Object));
+			await File.SaveNewObject(Object, Serializer, true);
+		}
+
+		/// <summary>
+		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public Task InsertLazy(params object[] Objects)
+		{
+			return this.Insert((IEnumerable<object>)Objects, true);
+		}
+
+		/// <summary>
+		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public Task InsertLazy(IEnumerable<object> Objects)
+		{
+			return this.Insert(Objects, true);
+		}
+
+		/// <summary>
+		/// Inserts a collection of objects into the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		/// <param name="Lazy">If Lazy insert is used, i.e. sufficiant that object is inserted at next opportuity.</param>
+		private async Task Insert(IEnumerable<object> Objects, bool Lazy)
 		{
 			LinkedList<object> List = new LinkedList<object>();
 			ObjectSerializer Serializer = null;
@@ -1969,7 +1982,7 @@ namespace Waher.Persistence.Files
 				{
 					if (!(List.First is null))
 					{
-						await File.SaveNewObjects(List, Serializer);
+						await File.SaveNewObjects(List, Serializer, Lazy);
 						List.Clear();
 					}
 
@@ -1982,7 +1995,7 @@ namespace Waher.Persistence.Files
 				{
 					if (!(List.First is null))
 					{
-						await File.SaveNewObjects(List, Serializer);
+						await File.SaveNewObjects(List, Serializer, Lazy);
 						List.Clear();
 					}
 
@@ -1994,7 +2007,7 @@ namespace Waher.Persistence.Files
 			}
 
 			if (!(List.First is null))
-				await File.SaveNewObjects(List, Serializer);
+				await File.SaveNewObjects(List, Serializer, Lazy);
 		}
 
 		/// <summary>
@@ -2783,7 +2796,7 @@ namespace Waher.Persistence.Files
 													{
 														try
 														{
-															await TempFile.SaveNewObject(Obj);
+															await TempFile.SaveNewObject(Obj, true);
 															ObjectIds[Guid] = true;
 														}
 														catch (Exception ex)

@@ -681,6 +681,31 @@
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.InsertLazy(System.Object)">
+            <summary>
+            Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+            </summary>
+            <param name="Object">Object to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.InsertLazy(System.Object[])">
+            <summary>
+            Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.InsertLazy(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.Insert(System.Collections.Generic.IEnumerable{System.Object},System.Boolean)">
+            <summary>
+            Inserts a collection of objects into the database.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+            <param name="Lazy">If Lazy insert is used, i.e. sufficiant that object is inserted at next opportuity.</param>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.Find``1(System.Int32,System.Int32,System.String[])">
             <summary>
             Finds objects of a given class <typeparamref name="T"/>.
@@ -1695,18 +1720,20 @@
             This counter gets updated each time a block is updated in the file.
             </summary>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.SaveNewObject(System.Object)">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.SaveNewObject(System.Object,System.Boolean)">
             <summary>
             Saves a new object to the file.
             </summary>
             <param name="Object">Object to persist.</param>
+            <param name="Lazy">If Lazy insert is used, i.e. sufficiant that object is inserted at next opportuity.</param>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.SaveNewObject(System.Object,Waher.Persistence.Serialization.ObjectSerializer)">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.SaveNewObject(System.Object,Waher.Persistence.Serialization.ObjectSerializer,System.Boolean)">
             <summary>
             Saves a new object to the file.
             </summary>
             <param name="Object">Object to persist.</param>
             <param name="Serializer">Object serializer. If not provided, the serializer registered for the corresponding type will be used.</param>
+            <param name="Lazy">If Lazy insert is used, i.e. sufficiant that object is inserted at next opportuity.</param>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.SaveNewObjectLocked(System.Object)">
             <summary>
@@ -1714,12 +1741,13 @@
             </summary>
             <param name="Object">Object to persist.</param>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.SaveNewObjects(System.Collections.Generic.IEnumerable{System.Object},Waher.Persistence.Serialization.ObjectSerializer)">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.SaveNewObjects(System.Collections.Generic.IEnumerable{System.Object},Waher.Persistence.Serialization.ObjectSerializer,System.Boolean)">
             <summary>
             Saves a new set of objects to the file.
             </summary>
             <param name="Objects">Objects to persist.</param>
             <param name="Serializer">Object serializer. If not provided, the serializer registered for the corresponding type will be used.</param>
+            <param name="Lazy">If Lazy insert is used, i.e. sufficiant that object is inserted at next opportuity.</param>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.LoadObject(System.Guid)">
             <summary>
@@ -1900,11 +1928,6 @@
             <param name="ObjectId">Object ID</param>
             <returns>Rank of object in database.</returns>
             <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found.</exception>
-        </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.Add(System.Object)">
-            <summary>
-            <see cref="M:System.Collections.Generic.ICollection`1.Add(`0)"/>
-            </summary>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.ContainsAsync(System.Object)">
             <summary>

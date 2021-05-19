@@ -392,7 +392,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
 					Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
-					await this.file.SaveNewObject(Obj);
+					await this.file.SaveNewObject(Obj, false);
 				}
 			}
 			finally
@@ -505,7 +505,7 @@ namespace Waher.Persistence.FilesLW.Test
 			while (NrObjects > 0)
 			{
 				Simple Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
-				Guid ObjectId = await this.file.SaveNewObject(Obj);
+				Guid ObjectId = await this.file.SaveNewObject(Obj, false);
 				Result[ObjectId] = Obj;
 				NrObjects--;
 			}
@@ -710,7 +710,7 @@ namespace Waher.Persistence.FilesLW.Test
 			for (i = 0; i < c; i++)
 			{
 				Objects[i] = Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
-				await this.file.SaveNewObject(Obj);
+				await this.file.SaveNewObject(Obj, false);
 				Ordered[Obj.ObjectId] = Obj;
 			}
 
@@ -805,7 +805,7 @@ namespace Waher.Persistence.FilesLW.Test
 			for (i = 0; i < c; i++)
 			{
 				Objects[i] = Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
-				await this.file.SaveNewObject(Obj);
+				await this.file.SaveNewObject(Obj, false);
 			}
 
 			while (c > 0)
@@ -832,7 +832,7 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_Index_Test_17_Clear()
 		{
 			Simple Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
-			Guid ObjectId = await this.file.SaveNewObject(Obj);
+			Guid ObjectId = await this.file.SaveNewObject(Obj, false);
 			AssertEx.NotSame(Guid.Empty, ObjectId);
 			Assert.IsTrue(await this.file.ContainsAsync(Obj));
 			await this.file.ClearAsync();
@@ -2039,7 +2039,7 @@ namespace Waher.Persistence.FilesLW.Test
 			while (NrObjects > 0)
 			{
 				Default Obj = DBFilesBTreeTests.CreateDefault(this.MaxStringLength);
-				Guid ObjectId = await this.file.SaveNewObject(Obj);
+				Guid ObjectId = await this.file.SaveNewObject(Obj, false);
 				Result[ObjectId] = Obj;
 				NrObjects--;
 			}

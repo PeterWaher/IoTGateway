@@ -414,19 +414,8 @@ namespace Waher.Persistence.Files
 			{
 				int Result = await this.fileAccess.EndRead();
 
-				LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> ToLoad;
-
-				lock (this.synchObject)
-				{
-					ToLoad = this.objectsToLoad;
-					this.objectsToLoad = null;
-				}
-
-				if (!(ToLoad is null))
-				{
-					foreach (Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter> P in ToLoad)
-						P.Item3(await this.LoadObject(P.Item1, P.Item2));
-				}
+				if (Result == 0)
+					await this.CheckPending();
 
 				return Result;
 			}
@@ -451,7 +440,11 @@ namespace Waher.Persistence.Files
 			}
 
 			await this.EndWritePriv();
+			await this.CheckPending();
+		}
 
+		private async Task CheckPending()
+		{
 			LinkedList<KeyValuePair<object, ObjectSerializer>> ToSave;
 			LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> ToLoad;
 
@@ -467,7 +460,7 @@ namespace Waher.Persistence.Files
 			if (!(ToSave is null))
 			{
 				foreach (KeyValuePair<object, ObjectSerializer> P in ToSave)
-					await this.SaveNewObject(P.Key, P.Value);
+					await this.SaveNewObject(P.Key, P.Value, true);
 			}
 
 			if (!(ToLoad is null))
@@ -1256,12 +1249,13 @@ namespace Waher.Persistence.Files
 		/// Saves a new object to the file.
 		/// </summary>
 		/// <param name="Object">Object to persist.</param>
-		public async Task<Guid> SaveNewObject(object Object)
+		/// <param name="Lazy">If Lazy insert is used, i.e. sufficiant that object is inserted at next opportuity.</param>
+		public async Task<Guid> SaveNewObject(object Object, bool Lazy)
 		{
 			Type ObjectType = Object.GetType();
 			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(ObjectType);
 
-			return await this.SaveNewObject(Object, Serializer);
+			return await this.SaveNewObject(Object, Serializer, Lazy);
 		}
 
 		/// <summary>
@@ -1269,21 +1263,49 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="Object">Object to persist.</param>
 		/// <param name="Serializer">Object serializer. If not provided, the serializer registered for the corresponding type will be used.</param>
-		public async Task<Guid> SaveNewObject(object Object, ObjectSerializer Serializer)
+		/// <param name="Lazy">If Lazy insert is used, i.e. sufficiant that object is inserted at next opportuity.</param>
+		public async Task<Guid> SaveNewObject(object Object, ObjectSerializer Serializer, bool Lazy)
 		{
 			Guid ObjectId;
 
-			await this.BeginWrite();
-			try
+			if (Lazy)
 			{
-				ObjectId = await this.SaveNewObjectLocked(Object, Serializer);
+				if (await this.TryBeginWrite(0))
+				{
+					try
+					{
+						ObjectId = await this.SaveNewObjectLocked(Object, Serializer);
 
-				foreach (IndexBTreeFile Index in this.indices)
-					await Index.SaveNewObjectLocked(ObjectId, Object, Serializer);
+						foreach (IndexBTreeFile Index in this.indices)
+							await Index.SaveNewObjectLocked(ObjectId, Object, Serializer);
+					}
+					finally
+					{
+						await this.EndWrite();
+					}
+				}
+				else
+				{
+					Tuple<Guid, BlockInfo> Rec = await this.PrepareObjectIdForSaveLocked(Object, Serializer);
+
+					ObjectId = Rec.Item1;
+					this.QueueForSave(Object, Serializer);
+				}
 			}
-			finally
+			else
 			{
-				await this.EndWrite();
+				await this.BeginWrite();
+				try
+				{
+					ObjectId = await this.SaveNewObjectLocked(Object, Serializer);
+
+					foreach (IndexBTreeFile Index in this.indices)
+						await Index.SaveNewObjectLocked(ObjectId, Object, Serializer);
+				}
+				finally
+				{
+					await this.EndWrite();
+				}
 			}
 
 			return ObjectId;
@@ -1313,7 +1335,8 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="Objects">Objects to persist.</param>
 		/// <param name="Serializer">Object serializer. If not provided, the serializer registered for the corresponding type will be used.</param>
-		public async Task SaveNewObjects(IEnumerable<object> Objects, ObjectSerializer Serializer)
+		/// <param name="Lazy">If Lazy insert is used, i.e. sufficiant that object is inserted at next opportuity.</param>
+		public async Task SaveNewObjects(IEnumerable<object> Objects, ObjectSerializer Serializer, bool Lazy)
 		{
 			LinkedList<Guid> ObjectIds = new LinkedList<Guid>();
 
@@ -1376,7 +1399,7 @@ namespace Waher.Persistence.Files
 			await this.InsertObjectLocked(Info.BlockIndex, Info.Header, Info.Block, Bin, Info.InternalPosition, 0, 0, true, Info.LastObject);
 		}
 
-		internal void QueueForSave(object Object, ObjectSerializer Serializer)
+		private void QueueForSave(object Object, ObjectSerializer Serializer)
 		{
 			lock (this.synchObject)
 			{
@@ -1387,7 +1410,7 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		internal async Task<Tuple<Guid, BlockInfo>> PrepareObjectIdForSaveLocked(object Object, ObjectSerializer Serializer)
+		private async Task<Tuple<Guid, BlockInfo>> PrepareObjectIdForSaveLocked(object Object, ObjectSerializer Serializer)
 		{
 #if ASSERT_LOCKS
 			this.fileAccess.AssertWriting();
@@ -4667,21 +4690,6 @@ namespace Waher.Persistence.Files
 		#endregion
 
 		#region ICollection<object>
-
-		/// <summary>
-		/// <see cref="ICollection{Object}.Add(Object)"/>
-		/// </summary>
-		public async void Add(object item)
-		{
-			try
-			{
-				await this.SaveNewObject(item);
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-			}
-		}
 
 		/// <summary>
 		/// Checks if an item is stored in the file.

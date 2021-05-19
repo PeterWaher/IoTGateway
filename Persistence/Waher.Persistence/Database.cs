@@ -113,6 +113,12 @@ namespace Waher.Persistence
 			}
 		}
 
+		private static void RaiseInserted(IEnumerable<object> Objects)
+		{
+			foreach (object Object in Objects)
+				RaiseInserted(Object);
+		}
+
 		/// <summary>
 		/// Event raised when an object has been inserted.
 		/// </summary>
@@ -125,9 +131,7 @@ namespace Waher.Persistence
 		public async static Task Insert(params object[] Objects)
 		{
 			await Provider.Insert(Objects);
-
-			foreach (object Object in Objects)
-				RaiseInserted(Object);
+			RaiseInserted(Objects);
 		}
 
 		/// <summary>
@@ -137,9 +141,37 @@ namespace Waher.Persistence
 		public async static Task Insert(IEnumerable<object> Objects)
 		{
 			await Provider.Insert(Objects);
+			RaiseInserted(Objects);
+		}
 
-			foreach (object Object in Objects)
-				RaiseInserted(Object);
+		/// <summary>
+		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public static async Task InsertLazy(object Object)
+		{
+			await Provider.InsertLazy(Object);
+			RaiseInserted(Object);
+		}
+
+		/// <summary>
+		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public static async Task InsertLazy(params object[] Objects)
+		{
+			await Provider.InsertLazy(Objects);
+			RaiseInserted(Objects);
+		}
+
+		/// <summary>
+		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public static async Task InsertLazy(IEnumerable<object> Objects)
+		{
+			await Provider.InsertLazy(Objects);
+			RaiseInserted(Objects);
 		}
 
 		/// <summary>
@@ -376,6 +408,12 @@ namespace Waher.Persistence
 			}
 		}
 
+		private static void RaiseUpdated(IEnumerable<object> Objects)
+		{
+			foreach (object Object in Objects)
+				RaiseUpdated(Object);
+		}
+
 		/// <summary>
 		/// Event raised when an object has been updated.
 		/// </summary>
@@ -388,9 +426,7 @@ namespace Waher.Persistence
 		public async static Task Update(params object[] Objects)
 		{
 			await Provider.Update(Objects);
-
-			foreach (object Object in Objects)
-				RaiseUpdated(Object);
+			RaiseUpdated(Objects);
 		}
 
 		/// <summary>
@@ -400,9 +436,7 @@ namespace Waher.Persistence
 		public async static Task Update(IEnumerable<object> Objects)
 		{
 			await Provider.Update(Objects);
-
-			foreach (object Object in Objects)
-				RaiseUpdated(Object);
+			RaiseUpdated(Objects);
 		}
 
 		/// <summary>
@@ -431,8 +465,7 @@ namespace Waher.Persistence
 			else
 				await Provider.Delete(Objects);
 
-			foreach (object Object in Objects)
-				RaiseDeleted(Object);
+			RaiseDeleted(Objects);
 		}
 
 		/// <summary>
@@ -442,9 +475,7 @@ namespace Waher.Persistence
 		public async static Task Delete(IEnumerable<object> Objects)
 		{
 			await Provider.Delete(Objects);
-
-			foreach (object Object in Objects)
-				RaiseDeleted(Object);
+			RaiseDeleted(Objects);
 		}
 
 		private static void RaiseDeleted(object Object)
@@ -461,6 +492,12 @@ namespace Waher.Persistence
 					// Ignore
 				}
 			}
+		}
+
+		private static void RaiseDeleted(IEnumerable<object> Objects)
+		{
+			foreach (object Object in Objects)
+				RaiseDeleted(Object);
 		}
 
 		/// <summary>

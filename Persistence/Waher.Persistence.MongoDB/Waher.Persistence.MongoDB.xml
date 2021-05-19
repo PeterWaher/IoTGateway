@@ -177,6 +177,24 @@
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.InsertLazy(System.Object)">
+            <summary>
+            Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+            </summary>
+            <param name="Object">Object to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.InsertLazy(System.Object[])">
+            <summary>
+            Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.InsertLazy(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
         <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Find``1(System.Int32,System.Int32,System.String[])">
             <summary>
             Finds objects of a given class <typeparamref name="T"/>.

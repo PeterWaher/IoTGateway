@@ -52,7 +52,7 @@ namespace Waher.Script.Persistence.Functions
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
 		{
-			Database.Insert(Argument.AssociatedObjectValue).Wait();
+			Database.InsertLazy(Argument.AssociatedObjectValue).Wait();
 			return Argument;
 		}
 

@@ -413,6 +413,24 @@ namespace Waher.Persistence.MongoDB
 		}
 
 		/// <summary>
+		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public Task InsertLazy(object Object) => this.Insert(Object);
+
+		/// <summary>
+		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public Task InsertLazy(params object[] Objects) => this.Insert(Objects);
+
+		/// <summary>
+		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public Task InsertLazy(IEnumerable<object> Objects) => this.Insert(Objects);
+
+		/// <summary>
 		/// Finds objects of a given class <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>

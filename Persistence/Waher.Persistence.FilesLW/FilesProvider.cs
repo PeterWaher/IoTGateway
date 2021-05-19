@@ -2937,12 +2937,20 @@ namespace Waher.Persistence.Files
 					Output.WriteAttributeString("blockSize", File.BlockSize.ToString());
 					Output.WriteAttributeString("blobFileName", GetRelativePath(ProgramDataFolder, File.BlobFileName));
 					Output.WriteAttributeString("blobBlockSize", File.BlobBlockSize.ToString());
-					Output.WriteAttributeString("count", (await File.CountAsyncLocked).ToString());
 					Output.WriteAttributeString("encoding", File.Encoding.WebName);
 					Output.WriteAttributeString("encrypted", Encode(File.Encrypted));
 					Output.WriteAttributeString("inlineObjectSizeLimit", File.InlineObjectSizeLimit.ToString());
 					Output.WriteAttributeString("isReadOnly", Encode(File.IsReadOnly));
 					Output.WriteAttributeString("timeoutMs", File.TimeoutMilliseconds.ToString());
+
+					try
+					{
+						Output.WriteAttributeString("count", (await File.CountAsyncLocked).ToString());
+					}
+					catch (Exception ex)
+					{
+						Log.Alert(ex);
+					}
 
 					WriteStat(Output, FileStat);
 
@@ -2954,12 +2962,20 @@ namespace Waher.Persistence.Files
 						Output.WriteAttributeString("blockSize", Index.BlockSize.ToString());
 						Output.WriteAttributeString("blobFileName", Index.BlobFileName);
 						Output.WriteAttributeString("blobBlockSize", Index.BlobBlockSize.ToString());
-						Output.WriteAttributeString("count", (await Index.CountAsyncLocked).ToString());
 						Output.WriteAttributeString("encoding", Index.Encoding.WebName);
 						Output.WriteAttributeString("encrypted", Encode(Index.Encrypted));
 						Output.WriteAttributeString("inlineObjectSizeLimit", Index.InlineObjectSizeLimit.ToString());
 						Output.WriteAttributeString("isReadOnly", Encode(Index.IsReadOnly));
 						Output.WriteAttributeString("timeoutMs", Index.TimeoutMilliseconds.ToString());
+
+						try
+						{
+							Output.WriteAttributeString("count", (await Index.CountAsyncLocked).ToString());
+						}
+						catch (Exception ex)
+						{
+							Log.Alert(ex);
+						}
 
 						foreach (string Field in Index.FieldNames)
 							Output.WriteElementString("Field", Field);
@@ -2983,6 +2999,10 @@ namespace Waher.Persistence.Files
 						await File.ExportGraphXML(Output, true);
 
 					Output.WriteEndElement();
+				}
+				catch (Exception ex)
+				{
+					Log.Alert(ex);
 				}
 				finally
 				{

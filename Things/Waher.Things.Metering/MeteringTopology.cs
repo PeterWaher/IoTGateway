@@ -214,10 +214,10 @@ namespace Waher.Things.Metering
 
 			foreach (MeteringNode Node in await Database.Find<MeteringNode>(new FilterFieldEqualTo("ParentId", Guid.Empty)))
 			{
-				if (Node is Root)
+				if (Node is Root Root)
 				{
 					if (Result is null)
-						Result = (Root)Node;
+						Result = Root;
 					else
 						await Database.Delete(Node);
 				}
@@ -316,7 +316,7 @@ namespace Waher.Things.Metering
 
 		internal static async Task NewEvent(SourceEvent Event)
 		{
-			await Database.Insert(Event);
+			await Database.InsertLazy(Event);
 
 			try
 			{

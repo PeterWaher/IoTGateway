@@ -1084,7 +1084,7 @@ namespace Waher.Persistence.Files
 					return Task.CompletedTask;
 			}
 
-			return this.SaveUnsaved();
+			return this.SaveUnsaved(false);
 		}
 
 		/// <summary>
@@ -1101,18 +1101,32 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task<bool> SaveUnsaved()
+		private async Task<bool> SaveUnsaved(bool AllFiles)
 		{
 			ObjectBTreeFile[] Files;
+			int c;
 
 			lock (this.synchObj)
 			{
-				int c = this.hasUnsavedData.Count;
-				if (c == 0)
-					return false;
+				if (AllFiles)
+				{
+					c = this.files.Count;
+					if (c == 0)
+						return false;
 
-				Files = new ObjectBTreeFile[c];
-				this.hasUnsavedData.Keys.CopyTo(Files, 0);
+					Files = new ObjectBTreeFile[c];
+					this.files.Values.CopyTo(Files, 0);
+				}
+				else
+				{
+					c = this.hasUnsavedData.Count;
+					if (c == 0)
+						return false;
+
+					Files = new ObjectBTreeFile[c];
+					this.hasUnsavedData.Keys.CopyTo(Files, 0);
+				}
+			
 				this.hasUnsavedData.Clear();
 			}
 
@@ -3406,7 +3420,7 @@ namespace Waher.Persistence.Files
 				this.bulkCount = 0;
 			}
 
-			while (await this.SaveUnsaved())
+			while (await this.SaveUnsaved(true))
 				;
 
 			this.Dispose();
@@ -3417,7 +3431,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public async Task Flush()
 		{
-			while (await this.SaveUnsaved())
+			while (await this.SaveUnsaved(true))
 				;
 		}
 

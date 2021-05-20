@@ -63,6 +63,8 @@ namespace Waher.Persistence.Files
 				Result.provider.BlockSize, Result.provider.BlobBlockSize, Result.provider, Result.encoding, Result.timeoutMilliseconds,
 				Result.provider.Encrypted, Result.recordHandler, null);
 
+			Provider.Register(Result);
+
 			return Result;
 		}
 
@@ -71,6 +73,8 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void Dispose()
 		{
+			this.provider.Unregister(this);
+
 			this.dictionaryFile?.Dispose();
 			this.dictionaryFile = null;
 

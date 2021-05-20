@@ -63,6 +63,7 @@ namespace Waher.Persistence.Files
 		private readonly Dictionary<string, ObjectBTreeFile> files = new Dictionary<string, ObjectBTreeFile>();
 		private readonly Dictionary<string, LabelFile> labelFiles = new Dictionary<string, LabelFile>();
 		private readonly Dictionary<ObjectBTreeFile, bool> hasUnsavedData = new Dictionary<ObjectBTreeFile, bool>();
+		private readonly Dictionary<StringDictionary, bool> dictionaries = new Dictionary<StringDictionary, bool>();
 		private StringDictionary master;
 		private Cache<long, byte[]> blocks;
 		private readonly object synchObj = new object();
@@ -1106,18 +1107,31 @@ namespace Waher.Persistence.Files
 			ObjectBTreeFile[] Files;
 			int c;
 
-			lock (this.synchObj)
+			if (AllFiles)
 			{
-				if (AllFiles)
+				lock (this.files)
 				{
-					c = this.files.Count;
-					if (c == 0)
+					List<ObjectBTreeFile> List = new List<ObjectBTreeFile>();
+					List.AddRange(this.files.Values);
+					List.Add(this.master.DictionaryFile);
+
+					foreach (StringDictionary Dictionary in this.dictionaries.Keys)
+						List.Add(Dictionary.DictionaryFile);
+
+					if (List.Count == 0)
 						return false;
 
-					Files = new ObjectBTreeFile[c];
-					this.files.Values.CopyTo(Files, 0);
+					Files = List.ToArray();
 				}
-				else
+
+				lock (this.synchObj)
+				{
+					this.hasUnsavedData.Clear();
+				}
+			}
+			else
+			{
+				lock (this.synchObj)
 				{
 					c = this.hasUnsavedData.Count;
 					if (c == 0)
@@ -1125,9 +1139,9 @@ namespace Waher.Persistence.Files
 
 					Files = new ObjectBTreeFile[c];
 					this.hasUnsavedData.Keys.CopyTo(Files, 0);
+
+					this.hasUnsavedData.Clear();
 				}
-			
-				this.hasUnsavedData.Clear();
 			}
 
 			foreach (ObjectBTreeFile File in Files)
@@ -2458,6 +2472,22 @@ namespace Waher.Persistence.Files
 			return await StringDictionary.Create(FileName + ".dict", FileName + ".dblob", Collection, this, false);
 		}
 
+		internal void Register(StringDictionary Dictionary)
+		{
+			lock (this.files)
+			{
+				this.dictionaries[Dictionary] = true;
+			}
+		}
+
+		internal void Unregister(StringDictionary Dictionary)
+		{
+			lock (this.files)
+			{
+				this.dictionaries.Remove(Dictionary);
+			}
+		}
+
 		/// <summary>
 		/// Creates a generalized representation of an object.
 		/// </summary>
@@ -2916,7 +2946,7 @@ namespace Waher.Persistence.Files
 								try
 								{
 									ObjectBTreeFileCursor<object> e = await TempFile.GetTypedEnumeratorAsyncLocked<object>();
-								
+
 									while (await e.MoveNextAsyncLocked())
 									{
 										if (e.CurrentTypeCompatible)

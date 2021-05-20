@@ -191,7 +191,7 @@ namespace Waher.Networking.DNS
 			LinkedList<KeyValuePair<string, IPEndPoint>> Backup = null;
 			TYPE? ExpectedType;
 			IPEndPoint Destination = null;
-			int Timeout = 2000;     // Local timeout
+			int Timeout = 5000;     // Local timeout
 
 			if (Enum.TryParse<TYPE>(TYPE.ToString(), out TYPE T))
 				ExpectedType = T;

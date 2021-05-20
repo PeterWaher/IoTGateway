@@ -321,19 +321,20 @@ namespace Waher.Networking.DNS.Communication
 			Question[] Questions, IPEndPoint Destination, int Timeout)
 		{
 			TaskCompletionSource<DnsMessage> Result = new TaskCompletionSource<DnsMessage>();
-			DateTime TP;
-
-			TP = this.scheduler.Add(DateTime.Now.AddMilliseconds(Timeout), (P) =>
-			{
-				((TaskCompletionSource<DnsMessage>)P).TrySetException(
-					new TimeoutException("No DNS response returned within the given time."));
-			}, Result);
+			DateTime TP = DateTime.MinValue;
 
 			this.SendRequest(OpCode, Recursive, Questions, Destination, (sender, e) =>
 			{
 				this.scheduler?.Remove(TP);
 
 				((TaskCompletionSource<DnsMessage>)e.State).TrySetResult(e.Message);
+			}, Result);
+
+			TP = DateTime.Now.AddMilliseconds(Timeout);
+			TP = this.scheduler.Add(TP, (P) =>
+			{
+				((TaskCompletionSource<DnsMessage>)P).TrySetException(
+					new TimeoutException("No DNS response returned within the given time."));
 			}, Result);
 
 			return Result.Task;

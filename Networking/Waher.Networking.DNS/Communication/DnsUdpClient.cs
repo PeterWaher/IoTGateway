@@ -13,15 +13,15 @@ namespace Waher.Networking.DNS.Communication
 	/// </summary>
 	public class DnsUdpClient : DnsClient
 	{
-        private static readonly IPAddress[] defaultDnsAddresses = new IPAddress[]
-        {
-            IPAddress.Parse("8.8.8.8"),                 // Use Google Public DNS IP addresses as default, if no DNS addresses found.
+		private static readonly IPAddress[] defaultDnsAddresses = new IPAddress[]
+		{
+			IPAddress.Parse("8.8.8.8"),                 // Use Google Public DNS IP addresses as default, if no DNS addresses found.
             IPAddress.Parse("8.8.4.4"),
-            IPAddress.Parse("2001:4860:4860::8888"),
-            IPAddress.Parse("2001:4860:4860::8844")
-        };
+			IPAddress.Parse("2001:4860:4860::8888"),
+			IPAddress.Parse("2001:4860:4860::8844")
+		};
 
-        private readonly IPEndPoint dnsEndpoint;
+		private readonly IPEndPoint dnsEndpoint;
 		private UdpClient udp = null;
 
 		/// <summary>
@@ -30,67 +30,68 @@ namespace Waher.Networking.DNS.Communication
 		public DnsUdpClient()
 			: base()
 		{
-            int Step;
+			KeyValuePair<IPAddress, IPAddress> P = this.FindDnsAddress();
+			IPAddress Address = P.Value;
+			AddressFamily Family = Address.AddressFamily;
 
-            for (Step = 0; Step < 2; Step++)
-            {
-                foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
-                {
-                    if (Interface.OperationalStatus != OperationalStatus.Up)
-                        continue;
+			this.dnsEndpoint = new IPEndPoint(P.Key, DnsResolver.DefaultDnsPort);
 
-                    if (Interface.NetworkInterfaceType == NetworkInterfaceType.Loopback)
-                        continue;
+			this.udp = new UdpClient(Family)
+			{
+				//DontFragment = true,
+				MulticastLoopback = false
+			};
 
-                    IPInterfaceProperties Properties = Interface.GetIPProperties();
-                    int c;
+			this.udp.Ttl = 30;
+			this.udp.Client.Bind(new IPEndPoint(Address, 0));
 
-                    if ((c = Properties.DnsAddresses?.Count ?? 0) == 0 && Step == 0)
-                        continue;
+			this.BeginReceive();
+			this.Init();
+		}
 
-                    foreach (UnicastIPAddressInformation UnicastAddress in Properties.UnicastAddresses)
-                    {
-                        IEnumerable<IPAddress> DnsAddresses = (IEnumerable<IPAddress>)Properties.DnsAddresses ?? defaultDnsAddresses;
+		private KeyValuePair<IPAddress, IPAddress> FindDnsAddress()
+		{
+			IPAddress Result = null;
+			IPAddress Local = null;
+			int Step;
 
-                        foreach (IPAddress DnsAddress in DnsAddresses)
-                        {
-                            this.dnsEndpoint = new IPEndPoint(DnsAddress, DnsResolver.DefaultDnsPort);
+			for (Step = 0; Step < 2; Step++)
+			{
+				foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
+				{
+					if (Interface.OperationalStatus != OperationalStatus.Up)
+						continue;
 
-                            AddressFamily AddressFamily = this.dnsEndpoint.AddressFamily;
-                            if (UnicastAddress.Address.AddressFamily != AddressFamily)
-                                continue;
+					if (Interface.NetworkInterfaceType == NetworkInterfaceType.Loopback)
+						continue;
 
-                            IPAddress Address = UnicastAddress.Address;
+					IPInterfaceProperties Properties = Interface.GetIPProperties();
+					int c;
 
-                            try
-                            {
-                                this.udp = new UdpClient(AddressFamily)
-                                {
-                                    //DontFragment = true,
-                                    MulticastLoopback = false
-                                };
-                            }
-                            catch (NotSupportedException)
-                            {
-                                continue;
-                            }
-                            catch (Exception ex)
-                            {
-                                Log.Critical(ex);
-                                continue;
-                            }
+					if ((c = Properties.DnsAddresses?.Count ?? 0) == 0 && Step == 0)
+						continue;
 
-                            this.udp.Ttl = 30;
-                            this.udp.Client.Bind(new IPEndPoint(Address, 0));
+					foreach (UnicastIPAddressInformation UnicastAddress in Properties.UnicastAddresses)
+					{
+						IEnumerable<IPAddress> DnsAddresses = (IEnumerable<IPAddress>)Properties.DnsAddresses ?? defaultDnsAddresses;
 
-                            this.BeginReceive();
-                            this.Init();
+						foreach (IPAddress DnsAddress in DnsAddresses)
+						{
+							if (UnicastAddress.Address.AddressFamily != DnsAddress.AddressFamily)
+								continue;
 
-                            return;
-                        }
-                    }
-                }
-            }
+							Result = DnsAddress;
+							Local = UnicastAddress.Address;
+
+							if (Result.AddressFamily == AddressFamily.InterNetwork)
+								return new KeyValuePair<IPAddress, IPAddress>(Result, Local);
+						}
+					}
+				}
+			}
+
+			if (!(Result is null))
+				return new KeyValuePair<IPAddress, IPAddress>(Result, Local);
 
 			throw new NotSupportedException("No route to DNS server found.");
 		}

@@ -325,6 +325,24 @@
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.UpdateLazy(System.Object)">
+            <summary>
+            Updates an object in the database, if unlocked. If locked, object will be updated at next opportunity.
+            </summary>
+            <param name="Object">Object to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.UpdateLazy(System.Object[])">
+            <summary>
+            Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.UpdateLazy(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
         <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Delete(System.Object)">
             <summary>
             Deletes an object in the database.
@@ -340,6 +358,24 @@
         <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Delete(System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
             Deletes a collection of objects in the database.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.DeleteLazy(System.Object)">
+            <summary>
+            Deletes an object in the database, if unlocked. If locked, object will be deleted at next opportunity.
+            </summary>
+            <param name="Object">Object to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.DeleteLazy(System.Object[])">
+            <summary>
+            Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.DeleteLazy(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>

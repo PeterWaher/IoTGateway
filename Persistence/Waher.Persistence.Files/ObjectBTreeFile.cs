@@ -5,7 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -39,8 +38,8 @@ namespace Waher.Persistence.Files
 		private readonly FileOfBlocks blobFile;
 		private readonly Encoding encoding;
 		private SortedDictionary<uint, byte[]> blocksToSave = null;
-		private LinkedList<KeyValuePair<object, ObjectSerializer>> objectsToSave = null;
-		private LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> objectsToLoad = null;
+		private LinkedList<SaveRec> objectsToSave = null;
+		private LinkedList<LoadRec> objectsToLoad = null;
 		private readonly object synchObject = new object();
 		private readonly IRecordHandler recordHandler;
 		private long lockToken = long.MinValue;
@@ -71,6 +70,27 @@ namespace Waher.Persistence.Files
 		private readonly bool encrypted;
 		private readonly bool mainSynch;
 		private bool indicesCreated = false;
+
+		private enum SaveOp
+		{
+			Insert,
+			Update,
+			Delete
+		}
+
+		private class SaveRec
+		{
+			public object Object;
+			public ObjectSerializer Serializer;
+			public SaveOp Operation;
+		}
+
+		private class LoadRec
+		{
+			public Guid ObjectId;
+			public ObjectSerializer Serializer;
+			public EmbeddedObjectSetter Setter;
+		}
 
 		private ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize,
 			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted,
@@ -445,8 +465,8 @@ namespace Waher.Persistence.Files
 
 		private async Task CheckPending()
 		{
-			LinkedList<KeyValuePair<object, ObjectSerializer>> ToSave;
-			LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> ToLoad;
+			LinkedList<SaveRec> ToSave;
+			LinkedList<LoadRec> ToLoad;
 
 			lock (this.synchObject)
 			{
@@ -459,14 +479,29 @@ namespace Waher.Persistence.Files
 
 			if (!(ToSave is null))
 			{
-				foreach (KeyValuePair<object, ObjectSerializer> P in ToSave)
-					await this.SaveNewObject(P.Key, P.Value, true);
+				foreach (SaveRec Rec in ToSave)
+				{
+					switch (Rec.Operation)
+					{
+						case SaveOp.Insert:
+							await this.SaveNewObject(Rec.Object, Rec.Serializer, true);
+							break;
+
+						case SaveOp.Update:
+							await this.UpdateObject(Rec.Object, Rec.Serializer, true);
+							break;
+
+						case SaveOp.Delete:
+							await this.DeleteObject(Rec.Object, Rec.Serializer, true);
+							break;
+					}
+				}
 			}
 
 			if (!(ToLoad is null))
 			{
-				foreach (Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter> P in ToLoad)
-					P.Item3(await this.LoadObject(P.Item1, P.Item2));
+				foreach (LoadRec Rec in ToLoad)
+					Rec.Setter(await this.LoadObject(Rec.ObjectId, Rec.Serializer));
 			}
 		}
 
@@ -1275,9 +1310,6 @@ namespace Waher.Persistence.Files
 					try
 					{
 						ObjectId = await this.SaveNewObjectLocked(Object, Serializer);
-
-						foreach (IndexBTreeFile Index in this.indices)
-							await Index.SaveNewObjectLocked(ObjectId, Object, Serializer);
 					}
 					finally
 					{
@@ -1289,7 +1321,7 @@ namespace Waher.Persistence.Files
 					Tuple<Guid, BlockInfo> Rec = await this.PrepareObjectIdForSaveLocked(Object, Serializer);
 
 					ObjectId = Rec.Item1;
-					this.QueueForSave(Object, Serializer);
+					this.QueueForSave(Object, Serializer, SaveOp.Insert);
 				}
 			}
 			else
@@ -1298,9 +1330,6 @@ namespace Waher.Persistence.Files
 				try
 				{
 					ObjectId = await this.SaveNewObjectLocked(Object, Serializer);
-
-					foreach (IndexBTreeFile Index in this.indices)
-						await Index.SaveNewObjectLocked(ObjectId, Object, Serializer);
 				}
 				finally
 				{
@@ -1322,12 +1351,8 @@ namespace Waher.Persistence.Files
 #endif
 			Type ObjectType = Object.GetType();
 			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(ObjectType);
-			Guid ObjectId = await this.SaveNewObjectLocked(Object, Serializer);
-
-			foreach (IndexBTreeFile Index in this.indices)
-				await Index.SaveNewObjectLocked(ObjectId, Object, Serializer);
-
-			return ObjectId;
+			
+			return await this.SaveNewObjectLocked(Object, Serializer);
 		}
 
 		/// <summary>
@@ -1340,18 +1365,35 @@ namespace Waher.Persistence.Files
 		{
 			LinkedList<Guid> ObjectIds = new LinkedList<Guid>();
 
-			await this.BeginWrite();
-			try
+			if (Lazy)
 			{
-				foreach (object Object in Objects)
-					ObjectIds.AddLast(await this.SaveNewObjectLocked(Object, Serializer));
-
-				foreach (IndexBTreeFile Index in this.indices)
-					await Index.SaveNewObjectsLocked(ObjectIds, Objects, Serializer);
+				if (await this.TryBeginWrite(0))
+				{
+					try
+					{
+						foreach (object Object in Objects)
+							await this.SaveNewObjectLocked(Object, Serializer);
+					}
+					finally
+					{
+						await this.EndWrite();
+					}
+				}
+				else
+					this.QueueForSave(Objects, Serializer, SaveOp.Insert);
 			}
-			finally
+			else
 			{
-				await this.EndWrite();
+				await this.BeginWrite();
+				try
+				{
+					foreach (object Object in Objects)
+						ObjectIds.AddLast(await this.SaveNewObjectLocked(Object, Serializer));
+				}
+				finally
+				{
+					await this.EndWrite();
+				}
 			}
 		}
 
@@ -1373,6 +1415,12 @@ namespace Waher.Persistence.Files
 			Bin = Writer.GetSerialization();
 
 			await this.SaveNewObjectLocked(Bin, Leaf);
+
+			if (!(this.indices is null))
+			{
+				foreach (IndexBTreeFile Index in this.indices)
+					await Index.SaveNewObjectLocked(ObjectId, Object, Serializer);
+			}
 
 			return ObjectId;
 		}
@@ -1399,14 +1447,38 @@ namespace Waher.Persistence.Files
 			await this.InsertObjectLocked(Info.BlockIndex, Info.Header, Info.Block, Bin, Info.InternalPosition, 0, 0, true, Info.LastObject);
 		}
 
-		private void QueueForSave(object Object, ObjectSerializer Serializer)
+		private void QueueForSave(object Object, ObjectSerializer Serializer, SaveOp Operation)
 		{
 			lock (this.synchObject)
 			{
 				if (this.objectsToSave is null)
-					this.objectsToSave = new LinkedList<KeyValuePair<object, ObjectSerializer>>();
+					this.objectsToSave = new LinkedList<SaveRec>();
 
-				this.objectsToSave.AddLast(new KeyValuePair<object, ObjectSerializer>(Object, Serializer));
+				this.objectsToSave.AddLast(new SaveRec()
+				{
+					Object = Object,
+					Serializer = Serializer,
+					Operation = Operation
+				});
+			}
+		}
+
+		private void QueueForSave(IEnumerable<object> Objects, ObjectSerializer Serializer, SaveOp Operation)
+		{
+			lock (this.synchObject)
+			{
+				if (this.objectsToSave is null)
+					this.objectsToSave = new LinkedList<SaveRec>();
+
+				foreach (object Object in Objects)
+				{
+					this.objectsToSave.AddLast(new SaveRec()
+					{
+						Object = Object,
+						Serializer = Serializer,
+						Operation = Operation
+					});
+				}
 			}
 		}
 
@@ -1882,9 +1954,14 @@ namespace Waher.Persistence.Files
 			lock (this.synchObject)
 			{
 				if (this.objectsToLoad is null)
-					this.objectsToLoad = new LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>>();
+					this.objectsToLoad = new LinkedList<LoadRec>();
 
-				this.objectsToLoad.AddLast(new Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>(ObjectId, Serializer, Setter));
+				this.objectsToLoad.AddLast(new LoadRec()
+				{
+					ObjectId = ObjectId,
+					Serializer = Serializer,
+					Setter = Setter
+				});
 			}
 		}
 
@@ -1996,15 +2073,16 @@ namespace Waher.Persistence.Files
 		/// Updates an object in the database, using the object serializer corresponding to the type of object being updated.
 		/// </summary>
 		/// <param name="Object">Object to update.</param>
+		/// <param name="Lazy">If update can be done at next convenient time.</param>
 		/// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
 		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
 		/// or if the corresponding property type is not supported.</exception>
 		/// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
-		public async Task UpdateObject(object Object)
+		public async Task UpdateObject(object Object, bool Lazy)
 		{
 			Type ObjectType = Object.GetType();
 			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(ObjectType);
-			await this.UpdateObject(Object, Serializer);
+			await this.UpdateObject(Object, Serializer, Lazy);
 		}
 
 		/// <summary>
@@ -2012,97 +2090,106 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="Object">Object to update.</param>
 		/// <param name="Serializer">Object serializer to use.</param>
+		/// <param name="Lazy">If update can be done at next convenient time.</param>
 		/// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
 		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
 		/// or if the corresponding property type is not supported.</exception>
 		/// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
-		public async Task UpdateObject(object Object, ObjectSerializer Serializer)
+		public async Task UpdateObject(object Object, ObjectSerializer Serializer, bool Lazy)
+		{
+			if (Lazy)
+			{
+				if (await this.TryBeginWrite(0))
+				{
+					try
+					{
+						await this.UpdateObjectLocked(Object, Serializer);
+					}
+					finally
+					{
+						await this.EndWrite();
+					}
+				}
+				else
+					this.QueueForSave(Object, Serializer, SaveOp.Update);
+			}
+			else
+			{
+				await this.BeginWrite();
+				try
+				{
+					await this.UpdateObjectLocked(Object, Serializer);
+				}
+				finally
+				{
+					await this.EndWrite();
+				}
+			}
+		}
+
+		private async Task UpdateObjectLocked(object Object, ObjectSerializer Serializer)
 		{
 			Guid ObjectId = await Serializer.GetObjectId(Object, false);
-			await this.UpdateObject(ObjectId, Object, Serializer);
-		}
+			BlockInfo Info = await this.FindNodeLocked(ObjectId);
+			if (Info is null)
+				throw new KeyNotFoundException("Object not found.");
 
-		/// <summary>
-		/// Updates an object in the database.
-		/// </summary>
-		/// <param name="ObjectId">Object ID of object to update.</param>
-		/// <param name="Object">Object to update.</param>
-		/// <param name="Serializer">Object serializer to use.</param>
-		/// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
-		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
-		/// or if the corresponding property type is not supported.</exception>
-		/// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
-		public async Task UpdateObject(Guid ObjectId, object Object, IObjectSerializer Serializer)
-		{
-			object Old;
+			object Old = await this.ParseObjectLocked(Info, Serializer);
 
-			await this.BeginWrite();
-			try
+			BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
+			await Serializer.Serialize(Writer, false, false, Object);
+			byte[] Bin = Writer.GetSerialization();
+
+			await this.ReplaceObjectLocked(Bin, Info, true);
+
+			if (!(this.indices is null))
 			{
-				BlockInfo Info = await this.FindNodeLocked(ObjectId);
-				if (Info is null)
-					throw new KeyNotFoundException("Object not found.");
-
-				Old = await this.ParseObjectLocked(Info, Serializer);
-
-				BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
-				await Serializer.Serialize(Writer, false, false, Object);
-				byte[] Bin = Writer.GetSerialization();
-
-				await this.ReplaceObjectLocked(Bin, Info, true);
-
 				foreach (IndexBTreeFile Index in this.indices)
 					await Index.UpdateObjectLocked(ObjectId, Old, Object, Serializer);
-			}
-			finally
-			{
-				await this.EndWrite();
 			}
 		}
 
 		/// <summary>
 		/// Updates a set of objects in the database.
 		/// </summary>
-		/// <param name="ObjectIds">Object IDs of objects to update.</param>
 		/// <param name="Objects">Objects to update.</param>
 		/// <param name="Serializer">Object serializer to use.</param>
+		/// <param name="Lazy">If update can be done at next convenient time.</param>
 		/// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
 		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
 		/// or if the corresponding property type is not supported.</exception>
 		/// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
-		public async Task UpdateObjects(IEnumerable<Guid> ObjectIds, IEnumerable<object> Objects, IObjectSerializer Serializer)
+		public async Task UpdateObjects(IEnumerable<object> Objects, ObjectSerializer Serializer, bool Lazy)
 		{
-			LinkedList<object> Olds = new LinkedList<object>();
-			object Old;
-
-			await this.BeginWrite();
-			try
+			if (Lazy)
 			{
-				IEnumerator<Guid> e1 = ObjectIds.GetEnumerator();
-				IEnumerator<object> e2 = Objects.GetEnumerator();
-
-				while (e1.MoveNext() && e2.MoveNext())
+				if (await this.TryBeginWrite(0))
 				{
-					BlockInfo Info = await this.FindNodeLocked(e1.Current);
-					if (Info is null)
-						throw new KeyNotFoundException("Object not found.");
-
-					Old = await this.ParseObjectLocked(Info, Serializer);
-					Olds.AddLast(Old);
-
-					BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
-					await Serializer.Serialize(Writer, false, false, e2.Current);
-					byte[] Bin = Writer.GetSerialization();
-
-					await this.ReplaceObjectLocked(Bin, Info, true);
+					try
+					{
+						foreach (object Object in Objects)
+							await this.UpdateObjectLocked(Object, Serializer);
+					}
+					finally
+					{
+						await this.EndWrite();
+					}
 				}
-
-				foreach (IndexBTreeFile Index in this.indices)
-					await Index.UpdateObjectsLocked(ObjectIds, Olds, Objects, Serializer);
+				else
+					this.QueueForSave(Objects, Serializer, SaveOp.Update);
 			}
-			finally
+			else
 			{
-				await this.EndWrite();
+				await this.BeginWrite();
+				try
+				{
+					foreach (object Object in Objects)
+						await this.UpdateObjectLocked(Object, Serializer);
+				}
+				finally
+				{
+					await this.EndWrite();
+				}
 			}
 		}
 
@@ -2323,32 +2410,67 @@ namespace Waher.Persistence.Files
 		/// the Object ID of the object.
 		/// </summary>
 		/// <param name="Object">Object to delete.</param>
-		/// <returns>Object that was deleted.</returns>
+		/// <param name="Lazy">If deletion can be done at next convenient time.</param>
 		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
 		/// or if the corresponding property type is not supported.</exception>
 		/// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
-		public async Task<object> DeleteObject(object Object)
+		public async Task DeleteObject(object Object, bool Lazy)
 		{
 			Type ObjectType = Object.GetType();
 			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(ObjectType);
 
-			return await this.DeleteObject(Object, Serializer);
+			await this.DeleteObject(Object, Serializer, Lazy);
 		}
 
 		/// <summary>
-		/// Deletes an object from the database, using the object serializer corresponding to the type of object being updated, to find
-		/// the Object ID of the object.
+		/// Deletes an object from the database.
 		/// </summary>
 		/// <param name="Object">Object to delete.</param>
-		/// <param name="Serializer">Object serializer to use.</param>
-		/// <returns>Object that was deleted.</returns>
-		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
-		/// or if the corresponding property type is not supported.</exception>
+		/// <param name="Serializer">Binary serializer.</param>
+		/// <param name="Lazy">If deletion can be done at next convenient time.</param>
 		/// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
-		public async Task<object> DeleteObject(object Object, ObjectSerializer Serializer)
+		public async Task DeleteObject(object Object, ObjectSerializer Serializer, bool Lazy)
+		{
+			if (Lazy)
+			{
+				if (await this.TryBeginWrite(0))
+				{
+					try
+					{
+						await this.DeleteObjectLocked(Object, Serializer);
+					}
+					finally
+					{
+						await this.EndWrite();
+					}
+				}
+				else
+					this.QueueForSave(Object, Serializer, SaveOp.Delete);
+			}
+			else
+			{
+				await this.BeginWrite();
+				try
+				{
+					await this.DeleteObjectLocked(Object, Serializer);
+				}
+				finally
+				{
+					await this.EndWrite();
+				}
+			}
+		}
+
+		private async Task DeleteObjectLocked(object Object, ObjectSerializer Serializer)
 		{
 			Guid ObjectId = await Serializer.GetObjectId(Object, false);
-			return await this.DeleteObject(ObjectId, (IObjectSerializer)Serializer);
+			await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
+
+			if (!(this.indices is null))
+			{
+				foreach (IndexBTreeFile Index in this.indices)
+					await Index.DeleteObjectLocked(ObjectId, Object, Serializer);
+			}
 		}
 
 		/// <summary>
@@ -2357,64 +2479,66 @@ namespace Waher.Persistence.Files
 		/// <param name="ObjectId">Object ID of the object to delete.</param>
 		/// <returns>Object that was deleted.</returns>
 		/// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
-		public Task<object> DeleteObject(Guid ObjectId)
+		public async Task<object> DeleteObject(Guid ObjectId)
 		{
-			return this.DeleteObject(ObjectId, (IObjectSerializer)this.genericSerializer);
-		}
-
-		/// <summary>
-		/// Deletes an object from the database.
-		/// </summary>
-		/// <param name="ObjectId">Object ID of the object to delete.</param>
-		/// <param name="Serializer">Binary serializer.</param>
-		/// <returns>Object that was deleted.</returns>
-		/// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
-		public async Task<object> DeleteObject(Guid ObjectId, IObjectSerializer Serializer)
-		{
-			object DeletedObject;
-
 			await this.BeginWrite();
 			try
 			{
-				DeletedObject = await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
+				object DeletedObject = await this.DeleteObjectLocked(ObjectId, false, true, this.genericSerializer, null, 0);
 
-				foreach (IndexBTreeFile Index in this.indices)
-					await Index.DeleteObjectLocked(ObjectId, DeletedObject, Serializer);
+				if (!(this.indices is null))
+				{
+					foreach (IndexBTreeFile Index in this.indices)
+						await Index.DeleteObjectLocked(ObjectId, DeletedObject, this.genericSerializer);
+				}
+
+				return DeletedObject;
 			}
 			finally
 			{
 				await this.EndWrite();
 			}
-
-			return DeletedObject;
 		}
 
 		/// <summary>
 		/// Deletes a set of objects from the database.
 		/// </summary>
-		/// <param name="ObjectIds">Object IDs of the objects to delete.</param>
+		/// <param name="Objects">Objects to delete.</param>
 		/// <param name="Serializer">Binary serializer.</param>
-		/// <returns>Object that was deleted.</returns>
+		/// <param name="Lazy">If deletion can be done at next convenient time.</param>
 		/// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
-		public async Task<IEnumerable<object>> DeleteObjects(IEnumerable<Guid> ObjectIds, IObjectSerializer Serializer)
+		public async Task DeleteObjects(IEnumerable<object> Objects, ObjectSerializer Serializer, bool Lazy)
 		{
-			LinkedList<object> DeletedObjects = new LinkedList<object>();
-
-			await this.BeginWrite();
-			try
+			if (Lazy)
 			{
-				foreach (Guid ObjectId in ObjectIds)
-					DeletedObjects.AddLast(await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0));
-
-				foreach (IndexBTreeFile Index in this.indices)
-					await Index.DeleteObjectsLocked(ObjectIds, DeletedObjects, Serializer);
+				if (await this.TryBeginWrite(0))
+				{
+					try
+					{
+						foreach (object Object in Objects)
+							await this.DeleteObjectLocked(Object, Serializer);
+					}
+					finally
+					{
+						await this.EndWrite();
+					}
+				}
+				else
+					this.QueueForSave(Objects, Serializer, SaveOp.Delete);
 			}
-			finally
+			else
 			{
-				await this.EndWrite();
+				await this.BeginWrite();
+				try
+				{
+					foreach (object Object in Objects)
+						await this.DeleteObjectLocked(Object, Serializer);
+				}
+				finally
+				{
+					await this.EndWrite();
+				}
 			}
-
-			return DeletedObjects;
 		}
 
 		internal async Task<object> DeleteObjectLocked(object ObjectId, bool MergeNodes, bool DeleteAnyBlob,
@@ -4215,14 +4339,17 @@ namespace Waher.Persistence.Files
 				await this.EndWrite();
 			}
 
-			foreach (IndexBTreeFile Index in this.indices)
+			if (!(this.indices is null))
 			{
-				XmlOutput.WriteStartElement("IndexFile");
-				XmlOutput.WriteAttributeString("fileName", Index.FileName);
+				foreach (IndexBTreeFile Index in this.indices)
+				{
+					XmlOutput.WriteStartElement("IndexFile");
+					XmlOutput.WriteAttributeString("fileName", Index.FileName);
 
-				await Index.ExportGraphXML(XmlOutput, false);
+					await Index.ExportGraphXML(XmlOutput, false);
 
-				XmlOutput.WriteEndElement();
+					XmlOutput.WriteEndElement();
+				}
 			}
 
 			XmlOutput.WriteEndElement();

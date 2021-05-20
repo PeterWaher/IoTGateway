@@ -1198,6 +1198,24 @@ namespace Waher.Persistence.MongoDB
 		}
 
 		/// <summary>
+		/// Updates an object in the database, if unlocked. If locked, object will be updated at next opportunity.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public Task UpdateLazy(object Object) => this.Update(Object);
+
+		/// <summary>
+		/// Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public Task UpdateLazy(params object[] Objects) => this.Update(Objects);
+
+		/// <summary>
+		/// Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public Task UpdateLazy(IEnumerable<object> Objects) => this.Update(Objects);
+
+		/// <summary>
 		/// Deletes an object in the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
@@ -1234,6 +1252,24 @@ namespace Waher.Persistence.MongoDB
 			foreach (object Obj in Objects)
 				await this.Delete(Obj);
 		}
+
+		/// <summary>
+		/// Deletes an object in the database, if unlocked. If locked, object will be deleted at next opportunity.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public Task DeleteLazy(object Object) => this.Delete(Object);
+
+		/// <summary>
+		/// Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public Task DeleteLazy(params object[] Objects) => this.Delete(Objects);
+
+		/// <summary>
+		/// Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public Task DeleteLazy(IEnumerable<object> Objects) => this.Delete(Objects);
 
 		/// <summary>
 		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.

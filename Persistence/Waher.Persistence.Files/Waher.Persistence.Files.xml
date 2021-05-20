@@ -947,6 +947,24 @@
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.UpdateLazy(System.Object)">
+            <summary>
+            Updates an object in the database, if unlocked. If locked, object will be updated at next opportunity.
+            </summary>
+            <param name="Object">Object to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.UpdateLazy(System.Object[])">
+            <summary>
+            Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.UpdateLazy(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.Delete(System.Object)">
             <summary>
             Deletes an object in the database.
@@ -962,6 +980,24 @@
         <member name="M:Waher.Persistence.Files.FilesProvider.Delete(System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
             Deletes a collection of objects in the database.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.DeleteLazy(System.Object)">
+            <summary>
+            Deletes an object in the database, if unlocked. If locked, object will be deleted at next opportunity.
+            </summary>
+            <param name="Object">Object to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.DeleteLazy(System.Object[])">
+            <summary>
+            Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
+            </summary>
+            <param name="Objects">Objects to insert.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.DeleteLazy(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
@@ -1912,72 +1948,59 @@
             <param name="ObjectId">ID of object to load.</param>
             <param name="Serializer">Object serializer. If not provided, the serializer will be deduced from information stored in the file.</param>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.UpdateObject(System.Object)">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.UpdateObject(System.Object,System.Boolean)">
             <summary>
             Updates an object in the database, using the object serializer corresponding to the type of object being updated.
             </summary>
             <param name="Object">Object to update.</param>
+            <param name="Lazy">If update can be done at next convenient time.</param>
             <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
             <exception cref="T:System.NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
             or if the corresponding property type is not supported.</exception>
             <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.UpdateObject(System.Object,Waher.Persistence.Serialization.ObjectSerializer)">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.UpdateObject(System.Object,Waher.Persistence.Serialization.ObjectSerializer,System.Boolean)">
             <summary>
             Updates an object in the database.
             </summary>
             <param name="Object">Object to update.</param>
             <param name="Serializer">Object serializer to use.</param>
+            <param name="Lazy">If update can be done at next convenient time.</param>
             <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
             <exception cref="T:System.NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
             or if the corresponding property type is not supported.</exception>
             <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.UpdateObject(System.Guid,System.Object,Waher.Persistence.Serialization.IObjectSerializer)">
-            <summary>
-            Updates an object in the database.
-            </summary>
-            <param name="ObjectId">Object ID of object to update.</param>
-            <param name="Object">Object to update.</param>
-            <param name="Serializer">Object serializer to use.</param>
-            <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
-            <exception cref="T:System.NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
-            or if the corresponding property type is not supported.</exception>
-            <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
-        </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.UpdateObjects(System.Collections.Generic.IEnumerable{System.Guid},System.Collections.Generic.IEnumerable{System.Object},Waher.Persistence.Serialization.IObjectSerializer)">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.UpdateObjects(System.Collections.Generic.IEnumerable{System.Object},Waher.Persistence.Serialization.ObjectSerializer,System.Boolean)">
             <summary>
             Updates a set of objects in the database.
             </summary>
-            <param name="ObjectIds">Object IDs of objects to update.</param>
             <param name="Objects">Objects to update.</param>
             <param name="Serializer">Object serializer to use.</param>
+            <param name="Lazy">If update can be done at next convenient time.</param>
             <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
             <exception cref="T:System.NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
             or if the corresponding property type is not supported.</exception>
             <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.DeleteObject(System.Object)">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.DeleteObject(System.Object,System.Boolean)">
             <summary>
             Deletes an object from the database, using the object serializer corresponding to the type of object being updated, to find
             the Object ID of the object.
             </summary>
             <param name="Object">Object to delete.</param>
-            <returns>Object that was deleted.</returns>
+            <param name="Lazy">If deletion can be done at next convenient time.</param>
             <exception cref="T:System.NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
             or if the corresponding property type is not supported.</exception>
             <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.DeleteObject(System.Object,Waher.Persistence.Serialization.ObjectSerializer)">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.DeleteObject(System.Object,Waher.Persistence.Serialization.ObjectSerializer,System.Boolean)">
             <summary>
-            Deletes an object from the database, using the object serializer corresponding to the type of object being updated, to find
-            the Object ID of the object.
+            Deletes an object from the database.
             </summary>
             <param name="Object">Object to delete.</param>
-            <param name="Serializer">Object serializer to use.</param>
-            <returns>Object that was deleted.</returns>
-            <exception cref="T:System.NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
-            or if the corresponding property type is not supported.</exception>
+            <param name="Serializer">Binary serializer.</param>
+            <param name="Lazy">If deletion can be done at next convenient time.</param>
             <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.DeleteObject(System.Guid)">
@@ -1988,22 +2011,13 @@
             <returns>Object that was deleted.</returns>
             <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.DeleteObject(System.Guid,Waher.Persistence.Serialization.IObjectSerializer)">
-            <summary>
-            Deletes an object from the database.
-            </summary>
-            <param name="ObjectId">Object ID of the object to delete.</param>
-            <param name="Serializer">Binary serializer.</param>
-            <returns>Object that was deleted.</returns>
-            <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
-        </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.DeleteObjects(System.Collections.Generic.IEnumerable{System.Guid},Waher.Persistence.Serialization.IObjectSerializer)">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.DeleteObjects(System.Collections.Generic.IEnumerable{System.Object},Waher.Persistence.Serialization.ObjectSerializer,System.Boolean)">
             <summary>
             Deletes a set of objects from the database.
             </summary>
-            <param name="ObjectIds">Object IDs of the objects to delete.</param>
+            <param name="Objects">Objects to delete.</param>
             <param name="Serializer">Binary serializer.</param>
-            <returns>Object that was deleted.</returns>
+            <param name="Lazy">If deletion can be done at next convenient time.</param>
             <exception cref="T:System.Collections.Generic.KeyNotFoundException">If the object is not found in the database.</exception>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.GetCurrentStateReport(System.Boolean,System.Boolean)">

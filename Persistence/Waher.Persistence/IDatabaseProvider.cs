@@ -115,6 +115,24 @@ namespace Waher.Persistence
 		Task Update(IEnumerable<object> Objects);
 
 		/// <summary>
+		/// Updates an object in the database, if unlocked. If locked, object will be updated at next opportunity.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		Task UpdateLazy(object Object);
+
+		/// <summary>
+		/// Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		Task UpdateLazy(params object[] Objects);
+
+		/// <summary>
+		/// Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		Task UpdateLazy(IEnumerable<object> Objects);
+
+		/// <summary>
 		/// Deletes an object in the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
@@ -131,6 +149,24 @@ namespace Waher.Persistence
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
 		Task Delete(IEnumerable<object> Objects);
+
+		/// <summary>
+		/// Deletes an object in the database, if unlocked. If locked, object will be deleted at next opportunity.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		Task DeleteLazy(object Object);
+
+		/// <summary>
+		/// Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		Task DeleteLazy(params object[] Objects);
+
+		/// <summary>
+		/// Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		Task DeleteLazy(IEnumerable<object> Objects);
 
 		/// <summary>
 		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.

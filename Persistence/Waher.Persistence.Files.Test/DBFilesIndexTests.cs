@@ -721,7 +721,7 @@ namespace Waher.Persistence.FilesLW.Test
 				Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
 				Obj.ObjectId = Objects[i].ObjectId;
 
-				await this.file.UpdateObject(Obj);
+				await this.file.UpdateObject(Obj, false);
 
 				Objects[i] = Obj;
 
@@ -817,7 +817,7 @@ namespace Waher.Persistence.FilesLW.Test
 				if (i < c)
 					Array.Copy(Objects, i + 1, Objects, i, c - i);
 
-				await this.file.DeleteObject(Obj);
+				await this.file.DeleteObject(Obj, false);
 			}
 
 			FileStatistics Stat = await DBFilesBTreeTests.AssertConsistent(this.file, this.provider, null, null, true);

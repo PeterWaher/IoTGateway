@@ -130,7 +130,11 @@ namespace Waher.Persistence
 		/// <param name="Objects">Objects to insert.</param>
 		public async static Task Insert(params object[] Objects)
 		{
-			await Provider.Insert(Objects);
+			if (Objects.Length == 1)
+				await Provider.Insert(Objects[0]);
+			else
+				await Provider.Insert(Objects);
+
 			RaiseInserted(Objects);
 		}
 
@@ -160,7 +164,11 @@ namespace Waher.Persistence
 		/// <param name="Objects">Objects to insert.</param>
 		public static async Task InsertLazy(params object[] Objects)
 		{
-			await Provider.InsertLazy(Objects);
+			if (Objects.Length == 1)
+				await Provider.InsertLazy(Objects[0]);
+			else
+				await Provider.InsertLazy(Objects);
+
 			RaiseInserted(Objects);
 		}
 
@@ -425,7 +433,11 @@ namespace Waher.Persistence
 		/// <param name="Objects">Objects to insert.</param>
 		public async static Task Update(params object[] Objects)
 		{
-			await Provider.Update(Objects);
+			if (Objects.Length == 1)
+				await Provider.Update(Objects[0]);
+			else
+				await Provider.Update(Objects);
+
 			RaiseUpdated(Objects);
 		}
 
@@ -436,6 +448,40 @@ namespace Waher.Persistence
 		public async static Task Update(IEnumerable<object> Objects)
 		{
 			await Provider.Update(Objects);
+			RaiseUpdated(Objects);
+		}
+
+		/// <summary>
+		/// Updates an object in the database, if unlocked. If locked, object will be updated at next opportunity.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public async static Task UpdateLazy(object Object)
+		{
+			await Provider.UpdateLazy(Object);
+			RaiseUpdated(Object);
+		}
+
+		/// <summary>
+		/// Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async static Task UpdateLazy(params object[] Objects)
+		{
+			if (Objects.Length == 1)
+				await Provider.UpdateLazy(Objects[0]);
+			else
+				await Provider.UpdateLazy(Objects);
+
+			RaiseUpdated(Objects);
+		}
+
+		/// <summary>
+		/// Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async static Task UpdateLazy(IEnumerable<object> Objects)
+		{
+			await Provider.UpdateLazy(Objects);
 			RaiseUpdated(Objects);
 		}
 
@@ -475,6 +521,40 @@ namespace Waher.Persistence
 		public async static Task Delete(IEnumerable<object> Objects)
 		{
 			await Provider.Delete(Objects);
+			RaiseDeleted(Objects);
+		}
+
+		/// <summary>
+		/// Deletes an object in the database, if unlocked. If locked, object will be deleted at next opportunity.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public async static Task DeleteLazy(object Object)
+		{
+			await Provider.DeleteLazy(Object);
+			RaiseDeleted(Object);
+		}
+
+		/// <summary>
+		/// Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async static Task DeleteLazy(params object[] Objects)
+		{
+			if (Objects.Length == 1)
+				await Provider.DeleteLazy(Objects[0]);
+			else
+				await Provider.DeleteLazy(Objects);
+
+			RaiseDeleted(Objects);
+		}
+
+		/// <summary>
+		/// Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async static Task DeleteLazy(IEnumerable<object> Objects)
+		{
+			await Provider.DeleteLazy(Objects);
 			RaiseDeleted(Objects);
 		}
 

@@ -134,6 +134,24 @@ namespace Waher.Persistence
 		public Task Update(IEnumerable<object> Objects) => Task.CompletedTask;
 
 		/// <summary>
+		/// Updates an object in the database, if unlocked. If locked, object will be updated at next opportunity.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public Task UpdateLazy(object Object) => Task.CompletedTask;
+
+		/// <summary>
+		/// Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public Task UpdateLazy(params object[] Objects) => Task.CompletedTask;
+
+		/// <summary>
+		/// Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public Task UpdateLazy(IEnumerable<object> Objects) => Task.CompletedTask;
+
+		/// <summary>
 		/// Deletes an object in the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
@@ -150,6 +168,24 @@ namespace Waher.Persistence
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
 		public Task Delete(IEnumerable<object> Objects) => Task.CompletedTask;
+
+		/// <summary>
+		/// Deletes an object in the database, if unlocked. If locked, object will be deleted at next opportunity.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public Task DeleteLazy(object Object) => Task.CompletedTask;
+
+		/// <summary>
+		/// Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public Task DeleteLazy(params object[] Objects) => Task.CompletedTask;
+
+		/// <summary>
+		/// Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public Task DeleteLazy(IEnumerable<object> Objects) => Task.CompletedTask;
 
 		/// <summary>
 		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.

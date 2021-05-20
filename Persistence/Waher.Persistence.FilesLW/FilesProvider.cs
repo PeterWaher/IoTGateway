@@ -2230,7 +2230,7 @@ namespace Waher.Persistence.Files
 		{
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(Object.GetType());
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(Object));
-			await File.UpdateObject(Object, Serializer);
+			await File.UpdateObject(Object, Serializer, false);
 		}
 
 		/// <summary>
@@ -2239,17 +2239,50 @@ namespace Waher.Persistence.Files
 		/// <param name="Objects">Objects to insert.</param>
 		public Task Update(params object[] Objects)
 		{
-			return this.Update((IEnumerable<object>)Objects);
+			return this.Update((IEnumerable<object>)Objects, false);
 		}
 
 		/// <summary>
 		/// Updates a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public async Task Update(IEnumerable<object> Objects)
+		public Task Update(IEnumerable<object> Objects)
+		{
+			return this.Update(Objects, false);
+		}
+
+		/// <summary>
+		/// Updates an object in the database, if unlocked. If locked, object will be updated at next opportunity.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public async Task UpdateLazy(object Object)
+		{
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(Object.GetType());
+			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(Object));
+			await File.UpdateObject(Object, Serializer, true);
+		}
+
+		/// <summary>
+		/// Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public Task UpdateLazy(params object[] Objects)
+		{
+			return this.Update((IEnumerable<object>)Objects, true);
+		}
+
+		/// <summary>
+		/// Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public Task UpdateLazy(IEnumerable<object> Objects)
+		{
+			return this.Update(Objects, true);
+		}
+
+		private async Task Update(IEnumerable<object> Objects, bool Lazy)
 		{
 			LinkedList<object> List = new LinkedList<object>();
-			LinkedList<Guid> ObjectIds = new LinkedList<Guid>();
 			ObjectSerializer Serializer = null;
 			ObjectBTreeFile File = null;
 			string CollectionName = null;
@@ -2264,9 +2297,8 @@ namespace Waher.Persistence.Files
 				{
 					if (!(List.First is null))
 					{
-						await File.UpdateObjects(ObjectIds, List, Serializer);
+						await File.UpdateObjects(List, Serializer, Lazy);
 						List.Clear();
-						ObjectIds.Clear();
 					}
 
 					T = T2;
@@ -2278,21 +2310,19 @@ namespace Waher.Persistence.Files
 				{
 					if (!(List.First is null))
 					{
-						await File.UpdateObjects(ObjectIds, List, Serializer);
+						await File.UpdateObjects(List, Serializer, Lazy);
 						List.Clear();
-						ObjectIds.Clear();
 					}
 
 					CollectionName = CollectionName2;
 					File = await this.GetFile(CollectionName);
 				}
 
-				ObjectIds.AddLast(await Serializer.GetObjectId(Object, false));
 				List.AddLast(Object);
 			}
 
 			if (!(List.First is null))
-				await File.UpdateObjects(ObjectIds, List, Serializer);
+				await File.UpdateObjects(List, Serializer, Lazy);
 		}
 
 		/// <summary>
@@ -2303,7 +2333,7 @@ namespace Waher.Persistence.Files
 		{
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(Object.GetType());
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(Object));
-			await File.DeleteObject(Object, Serializer);
+			await File.DeleteObject(Object, Serializer, false);
 		}
 
 		/// <summary>
@@ -2312,16 +2342,50 @@ namespace Waher.Persistence.Files
 		/// <param name="Objects">Objects to insert.</param>
 		public Task Delete(params object[] Objects)
 		{
-			return this.Delete((IEnumerable<object>)Objects);
+			return this.Delete((IEnumerable<object>)Objects, false);
 		}
 
 		/// <summary>
 		/// Deletes a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public async Task Delete(IEnumerable<object> Objects)
+		public Task Delete(IEnumerable<object> Objects)
 		{
-			LinkedList<Guid> List = new LinkedList<Guid>();
+			return this.Delete(Objects, false);
+		}
+
+		/// <summary>
+		/// Deletes an object in the database, if unlocked. If locked, object will be deleted at next opportunity.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public async Task DeleteLazy(object Object)
+		{
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(Object.GetType());
+			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(Object));
+			await File.DeleteObject(Object, Serializer, true);
+		}
+
+		/// <summary>
+		/// Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public Task DeleteLazy(params object[] Objects)
+		{
+			return this.Delete((IEnumerable<object>)Objects, true);
+		}
+
+		/// <summary>
+		/// Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public Task DeleteLazy(IEnumerable<object> Objects)
+		{
+			return this.Delete(Objects, true);
+		}
+
+		private async Task Delete(IEnumerable<object> Objects, bool Lazy)
+		{
+			LinkedList<object> List = new LinkedList<object>();
 			ObjectSerializer Serializer = null;
 			ObjectBTreeFile File = null;
 			string CollectionName = null;
@@ -2336,7 +2400,7 @@ namespace Waher.Persistence.Files
 				{
 					if (!(List.First is null))
 					{
-						await File.DeleteObjects(List, Serializer);
+						await File.DeleteObjects(List, Serializer, Lazy);
 						List.Clear();
 					}
 
@@ -2349,7 +2413,7 @@ namespace Waher.Persistence.Files
 				{
 					if (!(List.First is null))
 					{
-						await File.DeleteObjects(List, Serializer);
+						await File.DeleteObjects(List, Serializer, Lazy);
 						List.Clear();
 					}
 
@@ -2357,11 +2421,11 @@ namespace Waher.Persistence.Files
 					File = await this.GetFile(CollectionName);
 				}
 
-				List.AddLast(await Serializer.GetObjectId(Object, false));
+				List.AddLast(Object);
 			}
 
 			if (!(List.First is null))
-				await File.DeleteObjects(List, Serializer);
+				await File.DeleteObjects(List, Serializer, Lazy);
 		}
 
 		/// <summary>

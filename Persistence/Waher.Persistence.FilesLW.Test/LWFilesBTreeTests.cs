@@ -1035,7 +1035,7 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_BTree_Test_25_UpdateUnsavedObject()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
-			await this.file.UpdateObject(Obj);
+			await this.file.UpdateObject(Obj, false);
 		}
 
 		[TestMethod]
@@ -1044,7 +1044,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Obj.ObjectId = Guid.NewGuid();
-			await this.file.UpdateObject(Obj);
+			await this.file.UpdateObject(Obj, false);
 		}
 
 		[TestMethod]
@@ -1061,7 +1061,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Simple Obj3 = CreateSimple(this.MaxStringLength);
 			Obj3.ObjectId = ObjectId;
-			await this.file.UpdateObject(Obj3);
+			await this.file.UpdateObject(Obj3, false);
 
 			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeAfter.xml"));
 
@@ -1112,7 +1112,7 @@ namespace Waher.Persistence.FilesLW.Test
 				Obj = CreateSimple(this.MaxStringLength);
 				Obj.ObjectId = Objects[i].ObjectId;
 
-				await this.file.UpdateObject(Obj);
+				await this.file.UpdateObject(Obj, false);
 
 				Objects[i] = Obj;
 
@@ -1236,7 +1236,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 						Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeBefore.xml"));
 						Console.Out.WriteLine(Obj.ObjectId);
-						await this.file.DeleteObject(Obj);
+						await this.file.DeleteObject(Obj, false);
 						//Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeAfter.xml"));
 						await AssertConsistent(this.file, this.provider, null, null, true);
 
@@ -1255,7 +1255,7 @@ namespace Waher.Persistence.FilesLW.Test
 					}
 				}
 				else
-					await this.file.DeleteObject(Obj);
+					await this.file.DeleteObject(Obj, false);
 
 				if (BulkSize > 1 && c % BulkSize == 0)
 				{

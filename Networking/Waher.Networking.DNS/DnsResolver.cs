@@ -390,7 +390,7 @@ namespace Waher.Networking.DNS
 
 					if (!(Response is null) && (Response.Expires <= DateTime.Now || Response.Raw is null))
 					{
-						await Database.Delete(Response);
+						await Database.DeleteLazy(Response);
 						Response = null;
 					}
 				}

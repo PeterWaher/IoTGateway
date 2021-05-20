@@ -2063,6 +2063,14 @@
             <param name="Properties">If object properties should be exported as well.</param>
             <returns>Asynchronous task object.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.ExportGraphXMLLocked(System.Xml.XmlWriter,System.Boolean)">
+            <summary>
+            Exports the structure of the file to XML.
+            </summary>
+            <param name="XmlOutput">XML Output</param>
+            <param name="Properties">If object properties should be exported as well.</param>
+            <returns>Asynchronous task object.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.GetObjectCount(System.UInt32,System.Boolean)">
             <summary>
             Get number of objects in subtree spanned by <paramref name="BlockIndex">BlockIndex</paramref>.

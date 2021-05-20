@@ -4273,70 +4273,81 @@ namespace Waher.Persistence.Files
 			await this.BeginWrite();
 			try
 			{
-				BinaryDeserializer Reader = null;
-				long NrBlocks = this.file.BlockLimit + this.blocksAdded;
-				byte[] BlobBlock = new byte[this.blobBlockSize];
-				byte[] DecryptedBlock;
-				uint Link;
-
-				this.blockLimit = (uint)NrBlocks;
-
-				XmlOutput.WriteStartElement("Collection", "http://waher.se/Schema/Persistence/Files.xsd");
-				XmlOutput.WriteAttributeString("name", this.collectionName);
-
-				XmlOutput.WriteStartElement("BTreeFile");
-				XmlOutput.WriteAttributeString("fileName", this.fileName);
-
-				await this.ExportGraphXMLLocked(0, XmlOutput, Properties);
-
-				XmlOutput.WriteEndElement();
-
-				if (!(this.blobFile is null))
-				{
-					XmlOutput.WriteStartElement("BlobFile");
-					XmlOutput.WriteAttributeString("fileName", this.blobFileName);
-
-					for (uint BlobBlockIndex = 0; BlobBlockIndex < this.blobFile.BlockLimit; BlobBlockIndex++)
-					{
-						await this.blobFile.LoadBlock(BlobBlockIndex, BlobBlock);
-						this.nrBlobBlockLoads++;
-
-						if (this.encrypted)
-						{
-							using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
-							{
-								DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
-							}
-						}
-						else
-							DecryptedBlock = (byte[])BlobBlock.Clone();
-
-						if (Reader is null)
-							Reader = new BinaryDeserializer(this.collectionName, this.encoding, DecryptedBlock, this.blockLimit);
-						else
-							Reader.Restart(DecryptedBlock, 0);
-
-						XmlOutput.WriteStartElement("Block");
-						XmlOutput.WriteAttributeString("index", BlobBlockIndex.ToString());
-						this.recordHandler.ExportKey(this.recordHandler.GetKey(Reader), XmlOutput);
-
-						Link = Reader.ReadUInt32();
-						if (Link != uint.MaxValue)
-							XmlOutput.WriteAttributeString("prev", Link.ToString());
-
-						Link = Reader.ReadUInt32();
-						if (Link != uint.MaxValue)
-							XmlOutput.WriteAttributeString("next", Link.ToString());
-
-						XmlOutput.WriteEndElement();
-					}
-
-					XmlOutput.WriteEndElement();
-				}
+				await this.ExportGraphXMLLocked(XmlOutput, Properties);
 			}
 			finally
 			{
 				await this.EndWrite();
+			}
+		}
+
+		/// <summary>
+		/// Exports the structure of the file to XML.
+		/// </summary>
+		/// <param name="XmlOutput">XML Output</param>
+		/// <param name="Properties">If object properties should be exported as well.</param>
+		/// <returns>Asynchronous task object.</returns>
+		internal async Task ExportGraphXMLLocked(XmlWriter XmlOutput, bool Properties)
+		{
+			BinaryDeserializer Reader = null;
+			long NrBlocks = this.file.BlockLimit + this.blocksAdded;
+			byte[] BlobBlock = new byte[this.blobBlockSize];
+			byte[] DecryptedBlock;
+			uint Link;
+
+			this.blockLimit = (uint)NrBlocks;
+
+			XmlOutput.WriteStartElement("Collection", "http://waher.se/Schema/Persistence/Files.xsd");
+			XmlOutput.WriteAttributeString("name", this.collectionName);
+
+			XmlOutput.WriteStartElement("BTreeFile");
+			XmlOutput.WriteAttributeString("fileName", this.fileName);
+
+			await this.ExportGraphXMLLocked(0, XmlOutput, Properties);
+
+			XmlOutput.WriteEndElement();
+
+			if (!(this.blobFile is null))
+			{
+				XmlOutput.WriteStartElement("BlobFile");
+				XmlOutput.WriteAttributeString("fileName", this.blobFileName);
+
+				for (uint BlobBlockIndex = 0; BlobBlockIndex < this.blobFile.BlockLimit; BlobBlockIndex++)
+				{
+					await this.blobFile.LoadBlock(BlobBlockIndex, BlobBlock);
+					this.nrBlobBlockLoads++;
+
+					if (this.encrypted)
+					{
+						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(((long)BlobBlockIndex) * this.blobBlockSize)))
+						{
+							DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
+						}
+					}
+					else
+						DecryptedBlock = (byte[])BlobBlock.Clone();
+
+					if (Reader is null)
+						Reader = new BinaryDeserializer(this.collectionName, this.encoding, DecryptedBlock, this.blockLimit);
+					else
+						Reader.Restart(DecryptedBlock, 0);
+
+					XmlOutput.WriteStartElement("Block");
+					XmlOutput.WriteAttributeString("index", BlobBlockIndex.ToString());
+					this.recordHandler.ExportKey(this.recordHandler.GetKey(Reader), XmlOutput);
+
+					Link = Reader.ReadUInt32();
+					if (Link != uint.MaxValue)
+						XmlOutput.WriteAttributeString("prev", Link.ToString());
+
+					Link = Reader.ReadUInt32();
+					if (Link != uint.MaxValue)
+						XmlOutput.WriteAttributeString("next", Link.ToString());
+
+					XmlOutput.WriteEndElement();
+				}
+
+				XmlOutput.WriteEndElement();
 			}
 
 			if (!(this.indices is null))
@@ -4346,7 +4357,7 @@ namespace Waher.Persistence.Files
 					XmlOutput.WriteStartElement("IndexFile");
 					XmlOutput.WriteAttributeString("fileName", Index.FileName);
 
-					await Index.ExportGraphXML(XmlOutput, false);
+					await Index.ExportGraphXMLLocked(XmlOutput, false);
 
 					XmlOutput.WriteEndElement();
 				}

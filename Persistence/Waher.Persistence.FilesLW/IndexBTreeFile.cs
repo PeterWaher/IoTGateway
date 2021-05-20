@@ -110,9 +110,9 @@ namespace Waher.Persistence.Files
 			return this.objectFile.TryLoadObjectLocked(ObjectId, Serializer);
 		}
 
-		internal Task ExportGraphXML(XmlWriter Output, bool Properties)
+		internal Task ExportGraphXMLLocked(XmlWriter Output, bool Properties)
 		{
-			return this.indexFile.ExportGraphXML(Output, Properties);
+			return this.indexFile.ExportGraphXMLLocked(Output, Properties);
 		}
 
 		internal Task EndWritePriv()

@@ -529,6 +529,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public void DBFiles_StringDictionary_19_100000_Random()
 		{
 			Random Rnd = new Random();

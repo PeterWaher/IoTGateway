@@ -3420,8 +3420,10 @@ namespace Waher.Persistence.Files
 				this.bulkCount = 0;
 			}
 
-			while (await this.SaveUnsaved(true))
-				;
+			bool First = true;
+
+			while (await this.SaveUnsaved(First))
+				First = false;
 
 			this.Dispose();
 		}
@@ -3431,8 +3433,10 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public async Task Flush()
 		{
-			while (await this.SaveUnsaved(true))
-				;
+			bool First = true;
+
+			while (await this.SaveUnsaved(First))
+				First = false;
 		}
 
 		private void WriteTimestamp(string FileName)

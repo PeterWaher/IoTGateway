@@ -1340,6 +1340,52 @@ namespace Waher.Persistence.MongoDB
 		}
 
 		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		public Task DeleteLazy<T>(int Offset, int MaxCount, params string[] SortOrder)
+			where T : class => this.FindDelete<T>(Offset, MaxCount, SortOrder);
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		public Task DeleteLazy<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class => this.FindDelete<T>(Offset, MaxCount, Filter, SortOrder);
+
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		public Task DeleteLazy(string Collection, int Offset, int MaxCount, params string[] SortOrder) 
+			=> this.FindDelete(Collection, Offset, MaxCount, SortOrder);
+
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		public Task DeleteLazy(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			=> this.FindDelete(Collection, Offset, MaxCount, Filter, SortOrder);
+
+		/// <summary>
 		/// Clears a collection of all objects.
 		/// </summary>
 		/// <param name="CollectionName">Name of collection to clear.</param>

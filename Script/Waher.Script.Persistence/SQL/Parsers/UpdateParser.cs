@@ -32,7 +32,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 		/// <summary>
 		/// Any keywords used internally by the custom parser.
 		/// </summary>
-		public string[] InternalKeywords => new string[] { "SET", "WHERE" };
+		public string[] InternalKeywords => new string[] { "LAZY", "SET", "WHERE" };
 
 		/// <summary>
 		/// Tries to parse a script node.
@@ -46,10 +46,16 @@ namespace Waher.Script.Persistence.SQL.Parsers
 
 			try
 			{
+				string s = Parser.PeekNextToken().ToUpper();
+				bool Lazy = s == "LAZY";
+
+				if (Lazy)
+					Parser.NextToken();
+
 				if (!SelectParser.TryParseSources(Parser, out SourceDefinition Source))
 					return false;
 
-				string s = Parser.NextToken().ToUpper();
+				s = Parser.NextToken().ToUpper();
 				if (s != "SET")
 					return false;
 
@@ -83,7 +89,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 					Where = Parser.ParseOrs();
 				}
 
-				Result = new Update(Source, SetOperations.ToArray(), Where, Parser.Start, Parser.Length, Parser.Expression);
+				Result = new Update(Source, SetOperations.ToArray(), Where, Lazy, Parser.Start, Parser.Length, Parser.Expression);
 
 				return true;
 			}

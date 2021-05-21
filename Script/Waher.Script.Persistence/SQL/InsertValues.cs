@@ -20,6 +20,7 @@ namespace Waher.Script.Persistence.SQL
 		private ElementList columns;
 		private ElementList values;
 		private readonly int nrFields;
+		private readonly bool lazy;
 
 		/// <summary>
 		/// Executes an INSERT ... VALUES ... statement against the object database.
@@ -27,10 +28,11 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Source">Source to update objects from.</param>
 		/// <param name="Columns">Columns</param>
 		/// <param name="Values">Values</param>
+		/// <param name="Lazy">If operation can be completed at next opportune time.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public InsertValues(SourceDefinition Source, ElementList Columns, ElementList Values, int Start, int Length, Expression Expression)
+		public InsertValues(SourceDefinition Source, ElementList Columns, ElementList Values, bool Lazy, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			if ((this.nrFields = Columns.Elements.Length) != Values.Elements.Length)
@@ -39,6 +41,7 @@ namespace Waher.Script.Persistence.SQL
 			this.source = Source;
 			this.columns = Columns;
 			this.values = Values;
+			this.lazy = Lazy;
 		}
 
 		/// <summary>
@@ -76,7 +79,7 @@ namespace Waher.Script.Persistence.SQL
 				Obj[Column] = E.AssociatedObjectValue;
 			}
 
-			await Source.Insert(Obj);
+			await Source.Insert(this.lazy, Obj);
 
 			return new ObjectValue(Obj);
 		}

@@ -17,6 +17,7 @@ namespace Waher.Script.Persistence.SQL
 		private SourceDefinition source;
 		private ScriptNode where;
 		private ObjectProperties properties = null;
+		private readonly bool lazy;
 
 		/// <summary>
 		/// Executes an UPDATE statement against the object database.
@@ -24,15 +25,17 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Source">Source to update objects from.</param>
 		/// <param name="SetOperations">Set operations to perform.</param>
 		/// <param name="Where">Optional where clause</param>
+		/// <param name="Lazy">If operation can be completed at next opportune time.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Update(SourceDefinition Source, Assignment[] SetOperations, ScriptNode Where, int Start, int Length, Expression Expression)
+		public Update(SourceDefinition Source, Assignment[] SetOperations, ScriptNode Where, bool Lazy, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.source = Source;
 			this.setOperations = SetOperations;
 			this.where = Where;
+			this.lazy = Lazy;
 		}
 
 		/// <summary>
@@ -72,7 +75,7 @@ namespace Waher.Script.Persistence.SQL
 				Count++;
 			}
 
-			await Source.Update(ToUpdate);
+			await Source.Update(this.lazy, ToUpdate);
 
 			return new DoubleNumber(Count);
 		}

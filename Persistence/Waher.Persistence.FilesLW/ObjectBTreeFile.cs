@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -71,18 +72,19 @@ namespace Waher.Persistence.Files
 		private readonly bool mainSynch;
 		private bool indicesCreated = false;
 
-		private enum SaveOp
+		private enum WriteOp
 		{
 			Insert,
 			Update,
-			Delete
+			Delete,
+			FindDelete
 		}
 
 		private class SaveRec
 		{
 			public object Object;
 			public ObjectSerializer Serializer;
-			public SaveOp Operation;
+			public WriteOp Operation;
 		}
 
 		private class LoadRec
@@ -483,16 +485,32 @@ namespace Waher.Persistence.Files
 				{
 					switch (Rec.Operation)
 					{
-						case SaveOp.Insert:
+						case WriteOp.Insert:
 							await this.SaveNewObject(Rec.Object, Rec.Serializer, true);
 							break;
 
-						case SaveOp.Update:
+						case WriteOp.Update:
 							await this.UpdateObject(Rec.Object, Rec.Serializer, true);
 							break;
 
-						case SaveOp.Delete:
+						case WriteOp.Delete:
 							await this.DeleteObject(Rec.Object, Rec.Serializer, true);
+							break;
+
+						case WriteOp.FindDelete:
+							if (Rec.Object is FindDeleteLazyRec FindDeleteLazyRec)
+							{
+								int Offset = FindDeleteLazyRec.Offset;
+								int MaxCount = FindDeleteLazyRec.MaxCount;
+								Filter Filter = FindDeleteLazyRec.Filter;
+								string[] SortOrder = FindDeleteLazyRec.SortOrder;
+								ObjectSerializer Serializer = FindDeleteLazyRec.Serializer;
+
+								if (Serializer is null)
+									await this.FindDelete(Offset, MaxCount, Filter, true, SortOrder);
+								else
+									await this.FindDeleteLocked(FindDeleteLazyRec.T, Offset, MaxCount, Filter, Serializer, SortOrder);
+							}
 							break;
 					}
 				}
@@ -1321,7 +1339,7 @@ namespace Waher.Persistence.Files
 					Tuple<Guid, BlockInfo> Rec = await this.PrepareObjectIdForSaveLocked(Object, Serializer);
 
 					ObjectId = Rec.Item1;
-					this.QueueForSave(Object, Serializer, SaveOp.Insert);
+					this.QueueForSave(Object, Serializer, WriteOp.Insert);
 				}
 			}
 			else
@@ -1351,7 +1369,7 @@ namespace Waher.Persistence.Files
 #endif
 			Type ObjectType = Object.GetType();
 			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(ObjectType);
-			
+
 			return await this.SaveNewObjectLocked(Object, Serializer);
 		}
 
@@ -1380,7 +1398,7 @@ namespace Waher.Persistence.Files
 					}
 				}
 				else
-					this.QueueForSave(Objects, Serializer, SaveOp.Insert);
+					this.QueueForSave(Objects, Serializer, WriteOp.Insert);
 			}
 			else
 			{
@@ -1447,7 +1465,7 @@ namespace Waher.Persistence.Files
 			await this.InsertObjectLocked(Info.BlockIndex, Info.Header, Info.Block, Bin, Info.InternalPosition, 0, 0, true, Info.LastObject);
 		}
 
-		private void QueueForSave(object Object, ObjectSerializer Serializer, SaveOp Operation)
+		private void QueueForSave(object Object, ObjectSerializer Serializer, WriteOp Operation)
 		{
 			lock (this.synchObject)
 			{
@@ -1463,7 +1481,7 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private void QueueForSave(IEnumerable<object> Objects, ObjectSerializer Serializer, SaveOp Operation)
+		private void QueueForSave(IEnumerable<object> Objects, ObjectSerializer Serializer, WriteOp Operation)
 		{
 			lock (this.synchObject)
 			{
@@ -2111,7 +2129,7 @@ namespace Waher.Persistence.Files
 					}
 				}
 				else
-					this.QueueForSave(Object, Serializer, SaveOp.Update);
+					this.QueueForSave(Object, Serializer, WriteOp.Update);
 			}
 			else
 			{
@@ -2176,7 +2194,7 @@ namespace Waher.Persistence.Files
 					}
 				}
 				else
-					this.QueueForSave(Objects, Serializer, SaveOp.Update);
+					this.QueueForSave(Objects, Serializer, WriteOp.Update);
 			}
 			else
 			{
@@ -2445,7 +2463,7 @@ namespace Waher.Persistence.Files
 					}
 				}
 				else
-					this.QueueForSave(Object, Serializer, SaveOp.Delete);
+					this.QueueForSave(Object, Serializer, WriteOp.Delete);
 			}
 			else
 			{
@@ -2524,7 +2542,7 @@ namespace Waher.Persistence.Files
 					}
 				}
 				else
-					this.QueueForSave(Objects, Serializer, SaveOp.Delete);
+					this.QueueForSave(Objects, Serializer, WriteOp.Delete);
 			}
 			else
 			{
@@ -6271,6 +6289,200 @@ namespace Waher.Persistence.Files
 		private Exception UnknownFilterType(Filter Filter)
 		{
 			return new NotSupportedException("Filters of type " + Filter.GetType().FullName + " not supported.");
+		}
+
+		#endregion
+
+		#region Finding and Deleting
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="Serializer">Object serializer.</param>
+		/// <param name="Lazy">If operation can be performed at next opportune time.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<IEnumerable<T>> FindDelete<T>(int Offset, int MaxCount, Filter Filter, ObjectSerializer Serializer, bool Lazy, params string[] SortOrder)
+			where T : class
+		{
+			await this.CheckIndicesInitialized<T>();
+
+			if (Lazy)
+			{
+				if (await this.TryBeginWrite(0))
+				{
+					try
+					{
+						return await this.FindDeleteLocked<T>(Offset, MaxCount, Filter, Serializer, SortOrder);
+					}
+					finally
+					{
+						await this.EndWrite();
+					}
+				}
+				else
+				{
+					this.QueueForSave(new FindDeleteLazyRec()
+					{
+						T = typeof(T),
+						Offset = Offset,
+						MaxCount = MaxCount,
+						Filter = Filter,
+						Serializer = Serializer,
+						SortOrder = SortOrder
+					}, Serializer, WriteOp.FindDelete);
+
+					return null;
+				}
+			}
+			else
+			{
+				await this.BeginWrite();
+				try
+				{
+					return await this.FindDeleteLocked<T>(Offset, MaxCount, Filter, Serializer, SortOrder);
+				}
+				finally
+				{
+					await this.EndWrite();
+				}
+			}
+		}
+
+		private class FindDeleteLazyRec
+		{
+			public Type T;
+			public int Offset;
+			public int MaxCount;
+			public Filter Filter;
+			public ObjectSerializer Serializer;
+			public string[] SortOrder;
+		}
+
+		private async Task<IEnumerable<T>> FindDeleteLocked<T>(int Offset, int MaxCount, Filter Filter, ObjectSerializer Serializer, params string[] SortOrder)
+			where T : class
+		{
+			ICursor<T> ResultSet = await this.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
+			IEnumerable<T> Result = await FilesProvider.LoadAllLocked<T>(ResultSet);
+
+			foreach (T Object in Result)
+			{
+				Guid ObjectId = await Serializer.GetObjectId(Object, false);
+				if (ObjectId != Guid.Empty)
+					await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection.
+		/// </summary>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="Lazy">If operation can be performed at next opportune time.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<IEnumerable<object>> FindDelete(int Offset, int MaxCount, Filter Filter, bool Lazy, params string[] SortOrder)
+		{
+			await this.CheckIndicesInitialized<object>();
+
+			if (Lazy)
+			{
+				if (await this.TryBeginWrite(0))
+				{
+					try
+					{
+						return await this.FindDeleteLocked(Offset, MaxCount, Filter, SortOrder);
+					}
+					finally
+					{
+						await this.EndWrite();
+					}
+				}
+				else
+				{
+					this.QueueForSave(new FindDeleteLazyRec()
+					{
+						T = typeof(object),
+						Offset = Offset,
+						MaxCount = MaxCount,
+						Filter = Filter,
+						Serializer = null,
+						SortOrder = SortOrder
+					}, null, WriteOp.FindDelete);
+
+					return null;
+				}
+			}
+			else
+			{
+				await this.BeginWrite();
+				try
+				{
+					return await this.FindDeleteLocked(Offset, MaxCount, Filter, SortOrder);
+				}
+				finally
+				{
+					await this.EndWrite();
+				}
+			}
+		}
+
+		private async Task<IEnumerable<object>> FindDeleteLocked(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			ICursor<object> ResultSet = await this.FindLocked<object>(Offset, MaxCount, Filter, SortOrder);
+			IEnumerable<object> Result = await FilesProvider.LoadAllLocked<object>(ResultSet);
+			ObjectSerializer Serializer = null;
+			Type LastType = null;
+			Type Type;
+
+			foreach (object Object in Result)
+			{
+				Type = Object.GetType();
+
+				if (Serializer is null || Type != LastType)
+				{
+					Serializer = await this.provider.GetObjectSerializerEx(Type);
+					LastType = Type;
+				}
+
+				Guid ObjectId = await Serializer.GetObjectId(Object, false);
+				if (ObjectId != Guid.Empty)
+					await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
+			}
+
+			return Result;
+		}
+
+		private async Task<IEnumerable<object>> FindDeleteLocked(Type T, int Offset, int MaxCount, Filter Filter, ObjectSerializer Serializer, params string[] SortOrder)
+		{
+			TypeInfo TI = T.GetTypeInfo();
+			FilterCustom<object> TypeFilter= new FilterCustom<object>(o => TI.IsAssignableFrom(o.GetType().GetTypeInfo()));
+
+			if (Filter is null)
+				Filter = TypeFilter;
+			else
+				Filter = new FilterAnd(Filter, TypeFilter);
+			
+			ICursor<object> ResultSet = await this.FindLocked<object>(Offset, MaxCount, Filter, SortOrder);
+			IEnumerable<object> Result = await FilesProvider.LoadAllLocked<object>(ResultSet);
+
+			foreach (object Object in Result)
+			{
+				Guid ObjectId = await Serializer.GetObjectId(Object, false);
+				if (ObjectId != Guid.Empty)
+					await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
+			}
+
+			return Result;
 		}
 
 		#endregion

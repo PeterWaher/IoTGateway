@@ -109,23 +109,28 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <summary>
 		/// Finds and Deletes a set of objects.
 		/// </summary>
+		/// <param name="Lazy">If operation can be completed at next opportune time.</param>
 		/// <param name="Offset">Offset at which to return elements.</param>
 		/// <param name="Top">Maximum number of elements to return.</param>
 		/// <param name="Where">Filter conditions.</param>
 		/// <param name="Variables">Current set of variables.</param>
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
-		public async Task<int> FindDelete(int Offset, int Top, ScriptNode Where, Variables Variables,
+		/// <returns>Number of objects deleted, if known.</returns>
+		public async Task<int?> FindDelete(bool Lazy, int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
 			Filter Filter = TypeSource.Convert(Where, Variables, this.Name);
 
 			object[] FindParameters = new object[] { Offset, Top, Filter, Convert(Order) };
-			object Obj = FindDeleteMethod.MakeGenericMethod(this.type).Invoke(null, FindParameters);
+			object Obj = (Lazy ? DeleteLazyMethod : FindDeleteMethod).MakeGenericMethod(this.type).Invoke(null, FindParameters);
 			if (!(Obj is Task Task))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
 
 			await Task;
+
+			if (Lazy)
+				return null;
 
 			PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
 			if (PI is null)
@@ -144,9 +149,10 @@ namespace Waher.Script.Persistence.SQL.Sources
 		}
 
 		private static MethodInfo findDeleteMethod = null;
+		private static MethodInfo deleteLazyMethod = null;
 
 		/// <summary>
-		/// Generic object database Find method: <see cref="Database.FindDelete{T}(int, int, Filter, string[])"/>
+		/// Generic object database FindDelete method: <see cref="Database.FindDelete{T}(int, int, Filter, string[])"/>
 		/// </summary>
 		public static MethodInfo FindDeleteMethod
 		{
@@ -177,6 +183,41 @@ namespace Waher.Script.Persistence.SQL.Sources
 				}
 
 				return findDeleteMethod;
+			}
+		}
+
+		/// <summary>
+		/// Generic object database DeleteLazy method: <see cref="Database.DeleteLazy{T}(int, int, Filter, string[])"/>
+		/// </summary>
+		public static MethodInfo DeleteLazyMethod
+		{
+			get
+			{
+				if (deleteLazyMethod is null)
+				{
+					foreach (MethodInfo MI in typeof(Database).GetTypeInfo().GetDeclaredMethods("DeleteLazy"))
+					{
+						if (!MI.ContainsGenericParameters)
+							continue;
+
+						ParameterInfo[] Parameters = MI.GetParameters();
+						if (Parameters.Length != 4 ||
+							Parameters[0].ParameterType != typeof(int) ||
+							Parameters[1].ParameterType != typeof(int) ||
+							Parameters[2].ParameterType != typeof(Filter) ||
+							Parameters[3].ParameterType != typeof(string[]))
+						{
+							continue;
+						}
+
+						deleteLazyMethod = MI;
+					}
+
+					if (deleteLazyMethod is null)
+						throw new InvalidOperationException("Appropriate Database.DeleteLazy method not found.");
+				}
+
+				return deleteLazyMethod;
 			}
 		}
 
@@ -416,19 +457,21 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <summary>
 		/// Updates a set of objects.
 		/// </summary>
+		/// <param name="Lazy">If operation can be completed at next opportune time.</param>
 		/// <param name="Objects">Objects to update</param>
-		public Task Update(IEnumerable<object> Objects)
+		public Task Update(bool Lazy, IEnumerable<object> Objects)
 		{
-			return Database.Update(Objects);
+			return Lazy ? Database.UpdateLazy(Objects) : Database.Update(Objects);
 		}
 
 		/// <summary>
 		/// Inserts an object.
 		/// </summary>
+		/// <param name="Lazy">If operation can be completed at next opportune time.</param>
 		/// <param name="Object">Object to insert.</param>
-		public Task Insert(object Object)
+		public Task Insert(bool Lazy, object Object)
 		{
-			return Database.Insert(Object);
+			return Lazy ? Database.InsertLazy(Object) : Database.Insert(Object);
 		}
 
 		/// <summary>

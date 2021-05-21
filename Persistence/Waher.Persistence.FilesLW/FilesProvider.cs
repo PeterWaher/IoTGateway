@@ -2074,7 +2074,7 @@ namespace Waher.Persistence.Files
 			try
 			{
 				ICursor<T> ResultSet = await File.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
-				return await this.LoadAllLocked<T>(ResultSet);
+				return await LoadAllLocked<T>(ResultSet);
 			}
 			finally
 			{
@@ -2082,7 +2082,7 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task<IEnumerable<T>> LoadAllLocked<T>(ICursor<T> ResultSet)
+		internal static async Task<IEnumerable<T>> LoadAllLocked<T>(ICursor<T> ResultSet)
 		{
 			LinkedList<T> Result = new LinkedList<T>();
 
@@ -2128,7 +2128,7 @@ namespace Waher.Persistence.Files
 			try
 			{
 				ICursor<object> ResultSet = await File.FindLocked<object>(Offset, MaxCount, Filter, SortOrder);
-				return await this.LoadAllLocked<object>(ResultSet);
+				return await LoadAllLocked<object>(ResultSet);
 			}
 			finally
 			{
@@ -2167,26 +2167,7 @@ namespace Waher.Persistence.Files
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null));
 
-			await File.CheckIndicesInitialized<T>();
-			await File.BeginWrite();
-			try
-			{
-				ICursor<T> ResultSet = await File.FindLocked<T>(Offset, MaxCount, Filter, SortOrder);
-				IEnumerable<T> Result = await this.LoadAllLocked<T>(ResultSet);
-
-				foreach (T Object in Result)
-				{
-					Guid ObjectId = await Serializer.GetObjectId(Object, false);
-					if (ObjectId != Guid.Empty)
-						await File.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
-				}
-
-				return Result;
-			}
-			finally
-			{
-				await File.EndWrite();
-			}
+			return await File.FindDelete<T>(Offset, MaxCount, Filter, Serializer, false, SortOrder);
 		}
 
 		/// <summary>
@@ -2216,38 +2197,67 @@ namespace Waher.Persistence.Files
 		public async Task<IEnumerable<object>> FindDelete(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
 			ObjectBTreeFile File = await this.GetFile(Collection);
+			return await File.FindDelete(Offset, MaxCount, Filter, false, SortOrder);
+		}
 
-			await File.CheckIndicesInitialized<object>();
-			await File.BeginWrite();
-			try
-			{
-				ICursor<object> ResultSet = await File.FindLocked<object>(Offset, MaxCount, Filter, SortOrder);
-				IEnumerable<object> Result = await this.LoadAllLocked<object>(ResultSet);
-				ObjectSerializer Serializer = null;
-				Type LastType = null;
-				Type Type;
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		public Task DeleteLazy<T>(int Offset, int MaxCount, params string[] SortOrder)
+			where T : class
+		{
+			return this.DeleteLazy<T>(Offset, MaxCount, null, SortOrder);
+		}
 
-				foreach (object Object in Result)
-				{
-					Type = Object.GetType();
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		public async Task DeleteLazy<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
+			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null));
 
-					if (Serializer is null || Type != LastType)
-					{
-						Serializer = await this.GetObjectSerializerEx(Type);
-						LastType = Type;
-					}
+			await File.FindDelete<T>(Offset, MaxCount, Filter, Serializer, true, SortOrder);
+		}
 
-					Guid ObjectId = await Serializer.GetObjectId(Object, false);
-					if (ObjectId != Guid.Empty)
-						await File.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
-				}
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		public Task DeleteLazy(string Collection, int Offset, int MaxCount, params string[] SortOrder)
+		{
+			return this.DeleteLazy(Collection, Offset, MaxCount, null, SortOrder);
+		}
 
-				return Result;
-			}
-			finally
-			{
-				await File.EndWrite();
-			}
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		public async Task DeleteLazy(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			ObjectBTreeFile File = await this.GetFile(Collection);
+			await File.FindDelete(Offset, MaxCount, Filter, true, SortOrder);
 		}
 
 		/// <summary>

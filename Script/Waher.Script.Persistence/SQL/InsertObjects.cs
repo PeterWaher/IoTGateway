@@ -20,20 +20,23 @@ namespace Waher.Script.Persistence.SQL
 	{
 		private SourceDefinition source;
 		private ElementList objects;
+		private readonly bool lazy;
 
 		/// <summary>
 		/// Executes an INSERT ... OBJECT[S] ... statement against the object database.
 		/// </summary>
 		/// <param name="Source">Source to update objects from.</param>
 		/// <param name="Objects">Objects</param>
+		/// <param name="Lazy">If operation can be completed at next opportune time.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public InsertObjects(SourceDefinition Source, ElementList Objects, int Start, int Length, Expression Expression)
+		public InsertObjects(SourceDefinition Source, ElementList Objects, bool Lazy, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.source = Source;
 			this.objects = Objects;
+			this.lazy = Lazy;
 		}
 
 		/// <summary>
@@ -97,7 +100,7 @@ namespace Waher.Script.Persistence.SQL
 							Item = Obj2;
 						}
 
-						await Source.Insert(Item);
+						await Source.Insert(this.lazy, Item);
 						Count++;
 
 						Result.Add(new ObjectValue(Item));

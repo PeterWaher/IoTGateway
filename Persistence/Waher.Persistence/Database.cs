@@ -713,6 +713,118 @@ namespace Waher.Persistence
 		}
 
 		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static Task DeleteLazy<T>(params string[] SortOrder)
+			where T : class
+		{
+			return DeleteLazy<T>(0, int.MaxValue, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static Task DeleteLazy<T>(int Offset, int MaxCount, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.DeleteLazy<T>(Offset, MaxCount, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static Task DeleteLazy<T>(Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return DeleteLazy<T>(0, int.MaxValue, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static Task DeleteLazy<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+			where T : class
+		{
+			return Provider.DeleteLazy<T>(Offset, MaxCount, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static Task DeleteLazy(string Collection, params string[] SortOrder)
+		{
+			return DeleteLazy(Collection, 0, int.MaxValue, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static Task DeleteLazy(string Collection, int Offset, int MaxCount, params string[] SortOrder)
+		{
+			return Provider.DeleteLazy(Collection, Offset, MaxCount, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static Task DeleteLazy(string Collection, Filter Filter, params string[] SortOrder)
+		{
+			return DeleteLazy(Collection, 0, int.MaxValue, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects in a given collection and deletes them in the same atomic operation.
+		/// </summary>
+		/// <param name="Collection">Name of collection to search.</param>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static Task DeleteLazy(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			return Provider.DeleteLazy(Collection, Offset, MaxCount, Filter, SortOrder);
+		}
+
+		/// <summary>
 		/// Tries to load an object given its Object ID <paramref name="ObjectId"/> and its class type <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Base type.</typeparam>

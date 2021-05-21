@@ -32,7 +32,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 		/// <summary>
 		/// Any keywords used internally by the custom parser.
 		/// </summary>
-		public string[] InternalKeywords => new string[] { "INTO", "VALUES", "OBJECT", "OBJECTS" };
+		public string[] InternalKeywords => new string[] { "LAZY", "INTO", "VALUES", "OBJECT", "OBJECTS" };
 
 		/// <summary>
 		/// Tries to parse a script node.
@@ -47,6 +47,11 @@ namespace Waher.Script.Persistence.SQL.Parsers
 			try
 			{
 				string s = Parser.NextToken().ToUpper();
+				bool Lazy = s == "LAZY";
+
+				if (Lazy)
+					s = Parser.NextToken().ToUpper();
+
 				if (s != "INTO")
 					return false;
 
@@ -81,7 +86,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 						if (Parser.NextToken() != ")")
 							return false;
 
-						Result = new InsertValues(Source, Columns, Values, Parser.Start, Parser.Length, Parser.Expression);
+						Result = new InsertValues(Source, Columns, Values, Lazy, Parser.Start, Parser.Length, Parser.Expression);
 						return true;
 
 					case "SELECT":
@@ -89,7 +94,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 						if (!(Node is Select Select))
 							return false;
 
-						Result = new InsertSelect(Source, Select, Parser.Start, Parser.Position, Parser.Expression);
+						Result = new InsertSelect(Source, Select, Lazy, Parser.Start, Parser.Position, Parser.Expression);
 						return true;
 
 					case "OBJECT":
@@ -100,7 +105,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 						if (!(Node is ElementList Objects))
 							Objects = new ElementList(new ScriptNode[] { Node }, Node.Start, Node.Length, Node.Expression);
 
-						Result = new InsertObjects(Source, Objects, Parser.Start, Parser.Length, Parser.Expression);
+						Result = new InsertObjects(Source, Objects, Lazy, Parser.Start, Parser.Length, Parser.Expression);
 						return true;
 
 					default:

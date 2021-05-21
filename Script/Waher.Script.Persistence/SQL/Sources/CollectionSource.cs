@@ -54,41 +54,53 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <summary>
 		/// Finds and Deletes a set of objects.
 		/// </summary>
+		/// <param name="Lazy">If operation can be completed at next opportune time.</param>
 		/// <param name="Offset">Offset at which to return elements.</param>
 		/// <param name="Top">Maximum number of elements to return.</param>
 		/// <param name="Where">Filter conditions.</param>
 		/// <param name="Variables">Current set of variables.</param>
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
-		public async Task<int> FindDelete(int Offset, int Top, ScriptNode Where, Variables Variables,
+		/// <returns>Number of objects deleted, if known.</returns>
+		public async Task<int?> FindDelete(bool Lazy, int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
 			Filter Filter = TypeSource.Convert(Where, Variables, this.Name);
-			IEnumerable<object> Objects = await Database.FindDelete(this.collectionName, Offset, Top, Filter, TypeSource.Convert(Order));
-			int Count = 0;
+			if (Lazy)
+			{
+				await Database.DeleteLazy(this.collectionName, Offset, Top, Filter, TypeSource.Convert(Order));
+				return null;
+			}
+			else
+			{
+				IEnumerable<object> Objects = await Database.FindDelete(this.collectionName, Offset, Top, Filter, TypeSource.Convert(Order));
+				int Count = 0;
 
-			foreach (object Obj in Objects)
-				Count++;
-			
-			return Count;
+				foreach (object Obj in Objects)
+					Count++;
+
+				return Count;
+			}
 		}
 
 		/// <summary>
 		/// Updates a set of objects.
 		/// </summary>
+		/// <param name="Lazy">If operation can be completed at next opportune time.</param>
 		/// <param name="Objects">Objects to update</param>
-		public Task Update(IEnumerable<object> Objects)
+		public Task Update(bool Lazy, IEnumerable<object> Objects)
 		{
-			return Database.Update(Objects);
+			return Lazy ? Database.UpdateLazy(Objects) : Database.Update(Objects);
 		}
 
 		/// <summary>
 		/// Inserts an object.
 		/// </summary>
+		/// <param name="Lazy">If operation can be completed at next opportune time.</param>
 		/// <param name="Object">Object to insert.</param>
-		public Task Insert(object Object)
+		public Task Insert(bool Lazy, object Object)
 		{
-			return Database.Insert(Object);
+			return Lazy ? Database.InsertLazy(Object) : Database.Insert(Object);
 		}
 
 		/// <summary>

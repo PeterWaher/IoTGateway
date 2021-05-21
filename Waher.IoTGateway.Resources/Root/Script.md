@@ -2059,7 +2059,7 @@ SQL `INSERT` statements can be executed against the object database. The inserte
 Syntax:
 
 ```
-INSERT
+INSERT [LAZY]
 INTO Source
 (
 	Column1[, 
@@ -2096,6 +2096,9 @@ values
 )
 ```
 
+**Note**: Lazy inserts (or updates, deletions) are done when able. The statement may return before
+the operation completes. The operation will be executed at the next opportune time.
+
 #### INSERT SELECT
 
 You can insert multiple objects into a data source by combining an `INSERT` and a `SELECT`
@@ -2104,7 +2107,7 @@ statement.
 Syntax:
 
 ```
-INSERT
+INSERT [LAZY]
 INTO Source
 SELECT ...
 ```
@@ -2130,7 +2133,7 @@ You can insert an object ex nihilo into a collection using the `INSERT ... OBJEC
 Syntax:
 
 ```
-INSERT
+INSERT [LAZY]
 INTO Source
 OBJECT ...
 ```
@@ -2157,7 +2160,7 @@ You can insert a vector or set of objects ex nihilo into a collection using the
 Syntax:
 
 ```
-INSERT
+INSERT [LAZY]
 INTO Source
 OBJECTS [Object1, ..., ObjectN]
 ```
@@ -2191,7 +2194,7 @@ Simplified SQL `UPDATE` statements can be executed against the object database. 
 Syntax:
 
 ```
-UPDATE
+UPDATE [LAZY]
 	source
 SET
 	property=value[,
@@ -2218,7 +2221,7 @@ Simplified SQL `DELETE` statements can be executed against the object database. 
 Syntax:
 
 ```
-DELETE
+DELETE [LAZY]
 FROM
 	source
 [WHERE

@@ -448,12 +448,13 @@
             Executes a DELETE statement against the object database.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Delete.#ctor(Waher.Script.Persistence.SQL.SourceDefinition,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Persistence.SQL.Delete.#ctor(Waher.Script.Persistence.SQL.SourceDefinition,Waher.Script.Model.ScriptNode,System.Boolean,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Executes a DELETE statement against the object database.
             </summary>
             <param name="Source">Source to delete from.</param>
             <param name="Where">Optional where clause</param>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
@@ -733,27 +734,31 @@
             <param name="Node">Script node performing the evaluation.</param>
             <returns>Enumerator.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.IDataSource.FindDelete(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.IDataSource.FindDelete(System.Boolean,System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
             Finds and Deletes a set of objects.
             </summary>
             <param name="Offset">Offset at which to return elements.</param>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Top">Maximum number of elements to return.</param>
             <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
             <param name="Order">Order at which to order the result set.</param>
             <param name="Node">Script node performing the evaluation.</param>
+            <returns>Number of objects deleted, if known.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.IDataSource.Update(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:Waher.Script.Persistence.SQL.IDataSource.Update(System.Boolean,System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
             Updates a set of objects.
             </summary>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Objects">Objects to update</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.IDataSource.Insert(System.Object)">
+        <member name="M:Waher.Script.Persistence.SQL.IDataSource.Insert(System.Boolean,System.Object)">
             <summary>
             Inserts an object.
             </summary>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Object">Object to insert.</param>
         </member>
         <member name="P:Waher.Script.Persistence.SQL.IDataSource.CollectionName">
@@ -808,12 +813,13 @@
             Executes an INSERT ... OBJECT[S] ... statement against the object database.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.InsertObjects.#ctor(Waher.Script.Persistence.SQL.SourceDefinition,Waher.Script.Operators.ElementList,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Persistence.SQL.InsertObjects.#ctor(Waher.Script.Persistence.SQL.SourceDefinition,Waher.Script.Operators.ElementList,System.Boolean,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Executes an INSERT ... OBJECT[S] ... statement against the object database.
             </summary>
             <param name="Source">Source to update objects from.</param>
             <param name="Objects">Objects</param>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
@@ -857,12 +863,13 @@
             Executes an INSERT SELECT statement against the object database.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.InsertSelect.#ctor(Waher.Script.Persistence.SQL.SourceDefinition,Waher.Script.Persistence.SQL.Select,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Persistence.SQL.InsertSelect.#ctor(Waher.Script.Persistence.SQL.SourceDefinition,Waher.Script.Persistence.SQL.Select,System.Boolean,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Executes an INSERT SELECT statement against the object database.
             </summary>
             <param name="Source">Source to update objects from.</param>
             <param name="Select">SELECT statement.</param>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
@@ -906,13 +913,14 @@
             Executes an INSERT ... VALUES ... statement against the object database.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.InsertValues.#ctor(Waher.Script.Persistence.SQL.SourceDefinition,Waher.Script.Operators.ElementList,Waher.Script.Operators.ElementList,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Persistence.SQL.InsertValues.#ctor(Waher.Script.Persistence.SQL.SourceDefinition,Waher.Script.Operators.ElementList,Waher.Script.Operators.ElementList,System.Boolean,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Executes an INSERT ... VALUES ... statement against the object database.
             </summary>
             <param name="Source">Source to update objects from.</param>
             <param name="Columns">Columns</param>
             <param name="Values">Values</param>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
@@ -1723,27 +1731,31 @@
             <param name="Node">Script node performing the evaluation.</param>
             <returns>Enumerator.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.FindDelete(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.FindDelete(System.Boolean,System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
             Finds and Deletes a set of objects.
             </summary>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Offset">Offset at which to return elements.</param>
             <param name="Top">Maximum number of elements to return.</param>
             <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
             <param name="Order">Order at which to order the result set.</param>
             <param name="Node">Script node performing the evaluation.</param>
+            <returns>Number of objects deleted, if known.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.Update(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.Update(System.Boolean,System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
             Updates a set of objects.
             </summary>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Objects">Objects to update</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.Insert(System.Object)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.Insert(System.Boolean,System.Object)">
             <summary>
             Inserts an object.
             </summary>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Object">Object to insert.</param>
         </member>
         <member name="P:Waher.Script.Persistence.SQL.Sources.CollectionSource.CollectionName">
@@ -1920,27 +1932,31 @@
             <param name="Node">Script node performing the evaluation.</param>
             <returns>Enumerator.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.Update(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.Update(System.Boolean,System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
             Updates a set of objects.
             </summary>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Objects">Objects to update</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.FindDelete(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.FindDelete(System.Boolean,System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
             Finds and Deletes a set of objects.
             </summary>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Offset">Offset at which to return elements.</param>
             <param name="Top">Maximum number of elements to return.</param>
             <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
             <param name="Order">Order at which to order the result set.</param>
             <param name="Node">Script node performing the evaluation.</param>
+            <returns>Number of objects deleted, if known.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.Insert(System.Object)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.Insert(System.Boolean,System.Object)">
             <summary>
             Inserts an object.
             </summary>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Object">Object to insert.</param>
         </member>
         <member name="P:Waher.Script.Persistence.SQL.Sources.JoinedSource.CollectionName">
@@ -2116,32 +2132,41 @@
             Generic object database Find method: <see cref="M:Waher.Persistence.Database.Find``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.FindDelete(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.FindDelete(System.Boolean,System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
             Finds and Deletes a set of objects.
             </summary>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Offset">Offset at which to return elements.</param>
             <param name="Top">Maximum number of elements to return.</param>
             <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
             <param name="Order">Order at which to order the result set.</param>
             <param name="Node">Script node performing the evaluation.</param>
+            <returns>Number of objects deleted, if known.</returns>
         </member>
         <member name="P:Waher.Script.Persistence.SQL.Sources.TypeSource.FindDeleteMethod">
             <summary>
-            Generic object database Find method: <see cref="M:Waher.Persistence.Database.FindDelete``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
+            Generic object database FindDelete method: <see cref="M:Waher.Persistence.Database.FindDelete``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.Update(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="P:Waher.Script.Persistence.SQL.Sources.TypeSource.DeleteLazyMethod">
+            <summary>
+            Generic object database DeleteLazy method: <see cref="M:Waher.Persistence.Database.DeleteLazy``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.Update(System.Boolean,System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
             Updates a set of objects.
             </summary>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Objects">Objects to update</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.Insert(System.Object)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.Insert(System.Boolean,System.Object)">
             <summary>
             Inserts an object.
             </summary>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Object">Object to insert.</param>
         </member>
         <member name="P:Waher.Script.Persistence.SQL.Sources.TypeSource.CollectionName">
@@ -2223,27 +2248,31 @@
             <param name="Node">Script node performing the evaluation.</param>
             <returns>Enumerator.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.Update(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.Update(System.Boolean,System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
             Updates a set of objects.
             </summary>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Objects">Objects to update</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.FindDelete(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.FindDelete(System.Boolean,System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
             Finds and Deletes a set of objects.
             </summary>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Offset">Offset at which to return elements.</param>
             <param name="Top">Maximum number of elements to return.</param>
             <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
             <param name="Order">Order at which to order the result set.</param>
             <param name="Node">Script node performing the evaluation.</param>
+            <returns>Number of objects deleted, if known.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.Insert(System.Object)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.Insert(System.Boolean,System.Object)">
             <summary>
             Inserts an object.
             </summary>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Object">Object to insert.</param>
         </member>
         <member name="P:Waher.Script.Persistence.SQL.Sources.VectorSource.CollectionName">
@@ -2329,27 +2358,31 @@
             <param name="Node">Script node performing the evaluation.</param>
             <returns>Enumerator.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.Update(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.Update(System.Boolean,System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
             Updates a set of objects.
             </summary>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Objects">Objects to update</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.FindDelete(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.FindDelete(System.Boolean,System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
             Finds and Deletes a set of objects.
             </summary>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Offset">Offset at which to return elements.</param>
             <param name="Top">Maximum number of elements to return.</param>
             <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
             <param name="Order">Order at which to order the result set.</param>
             <param name="Node">Script node performing the evaluation.</param>
+            <returns>Number of objects deleted, if known.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.Insert(System.Object)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.Insert(System.Boolean,System.Object)">
             <summary>
             Inserts an object.
             </summary>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Object">Object to insert.</param>
         </member>
         <member name="P:Waher.Script.Persistence.SQL.Sources.XmlSource.CollectionName">
@@ -2405,13 +2438,14 @@
             Executes an UPDATE statement against the object database.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Update.#ctor(Waher.Script.Persistence.SQL.SourceDefinition,Waher.Script.Operators.Assignments.Assignment[],Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Persistence.SQL.Update.#ctor(Waher.Script.Persistence.SQL.SourceDefinition,Waher.Script.Operators.Assignments.Assignment[],Waher.Script.Model.ScriptNode,System.Boolean,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Executes an UPDATE statement against the object database.
             </summary>
             <param name="Source">Source to update objects from.</param>
             <param name="SetOperations">Set operations to perform.</param>
             <param name="Where">Optional where clause</param>
+            <param name="Lazy">If operation can be completed at next opportune time.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>

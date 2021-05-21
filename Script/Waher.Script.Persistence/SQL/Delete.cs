@@ -15,20 +15,23 @@ namespace Waher.Script.Persistence.SQL
 	{
 		private SourceDefinition source;
 		private ScriptNode where;
+		private readonly bool lazy;
 
 		/// <summary>
 		/// Executes a DELETE statement against the object database.
 		/// </summary>
 		/// <param name="Source">Source to delete from.</param>
 		/// <param name="Where">Optional where clause</param>
+		/// <param name="Lazy">If operation can be completed at next opportune time.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Delete(SourceDefinition Source, ScriptNode Where, int Start, int Length, Expression Expression)
+		public Delete(SourceDefinition Source, ScriptNode Where, bool Lazy, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.source = Source;
 			this.where = Where;
+			this.lazy = Lazy;
 		}
 
 		/// <summary>
@@ -50,9 +53,12 @@ namespace Waher.Script.Persistence.SQL
 		public async Task<IElement> EvaluateAsync(Variables Variables)
 		{
 			IDataSource Source = this.source.GetSource(Variables);
-			int Count = await Source.FindDelete(0, int.MaxValue, this.where, Variables, new	KeyValuePair<VariableReference, bool>[0], this);
+			int? Count = await Source.FindDelete(this.lazy, 0, int.MaxValue, this.where, Variables, new	KeyValuePair<VariableReference, bool>[0], this);
 
-			return new DoubleNumber(Count);
+			if (Count.HasValue)
+				return new DoubleNumber(Count.Value);
+			else
+				return ObjectValue.Null;
 		}
 
 		/// <summary>

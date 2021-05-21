@@ -169,16 +169,20 @@ namespace Waher.Content.Markdown.Consolidation
 					case DocumentType.SingleNumber:
 					case DocumentType.SingleLine:
 
-						Markdown.AppendLine("| Source | Response |");
+						Markdown.AppendLine("| Nr | Source | Response |");
 
 						if (this.type == DocumentType.SingleNumber)
-							Markdown.AppendLine("|:-------|-------:|");
+							Markdown.AppendLine("|---:|:-------|-------:|");
 						else
-							Markdown.AppendLine("|:-------|:-------|");
+							Markdown.AppendLine("|---:|:-------|:-------|");
+
+						int Nr = 0;
 
 						foreach (KeyValuePair<string, SourceState> P in this.sources)
 						{
-							Markdown.Append("| `");
+							Markdown.Append("| ");
+							Markdown.Append((++Nr).ToString());
+							Markdown.Append(" | `");
 							Markdown.Append(P.Key);
 							Markdown.Append("` | ");
 							Markdown.Append(P.Value.FirstText);
@@ -188,19 +192,23 @@ namespace Waher.Content.Markdown.Consolidation
 
 					case DocumentType.SingleParagraph:
 
-						Markdown.AppendLine("| Source | Response |");
-						Markdown.AppendLine("|:-------|:-------|");
+						Markdown.AppendLine("| Nr | Source | Response |");
+						Markdown.AppendLine("|---:|:-------|:-------|");
+
+						Nr = 0;
 
 						foreach (KeyValuePair<string, SourceState> P in this.sources)
 						{
-							Markdown.Append("| `");
+							Markdown.Append("| ");
+							Markdown.Append((++Nr).ToString());
+							Markdown.Append(" | `");
 							Markdown.Append(P.Key);
 							Markdown.Append("` | ");
 
 							foreach (string Row in P.Value.FirstDocument.Rows)
 							{
 								Markdown.Append(Row);
-								Markdown.Append(' ');
+								Markdown.Append("<br/>");
 							}
 
 							Markdown.AppendLine("|");

@@ -240,6 +240,7 @@ namespace Waher.Client.WPF
 			databaseProvider?.Dispose();
 			databaseProvider = null;
 		}
+
 		private void ConnectTo_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			this.MainView.ConnectTo_Executed(sender, e);

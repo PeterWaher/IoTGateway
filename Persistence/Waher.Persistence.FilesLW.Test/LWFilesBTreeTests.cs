@@ -289,7 +289,7 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_BTree_Test_01_SaveNew()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
-			Guid ObjectId = await this.file.SaveNewObject(Obj, false);
+			Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
 			AssertEx.NotSame(Guid.Empty, ObjectId);
 
 			await AssertConsistent(this.file, this.provider, 1, Obj, true);
@@ -310,7 +310,7 @@ namespace Waher.Persistence.FilesLW.Test
 				int i, c = 0;
 
 				Simple Obj = CreateSimple(this.MaxStringLength);
-				Guid ObjectId = await this.file.SaveNewObject(LastObjectAdded = Obj, false);
+				Guid ObjectId = await this.file.SaveNewObject(LastObjectAdded = Obj, false, null);
 				AssertEx.NotSame(Guid.Empty, ObjectId);
 
 				Objects.Add(Obj);
@@ -326,7 +326,7 @@ namespace Waher.Persistence.FilesLW.Test
 					await this.TestInitialize();
 
 					Obj = CreateSimple(this.MaxStringLength);
-					ObjectId = await this.file.SaveNewObject(LastObjectAdded = Obj, false);
+					ObjectId = await this.file.SaveNewObject(LastObjectAdded = Obj, false, null);
 					AssertEx.NotSame(Guid.Empty, ObjectId);
 
 					//FileStatistics Stat = await AssertConsistent(this.file, this.provider, null, Obj, false);
@@ -468,9 +468,9 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_BTree_Test_02_SaveOld()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
-			Guid ObjectId = await this.file.SaveNewObject(Obj, false);
+			Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
 			AssertEx.NotSame(Guid.Empty, ObjectId);
-			await this.file.SaveNewObject(Obj, false);
+			await this.file.SaveNewObject(Obj, false, null);
 
 			await AssertConsistent(this.file, this.provider, 1, Obj, true);
 		}
@@ -479,7 +479,7 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_BTree_Test_03_LoadUntyped()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
-			Guid ObjectId = await this.file.SaveNewObject(Obj, false);
+			Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
 			AssertEx.NotSame(Guid.Empty, ObjectId);
 
 			GenericObject GenObj = (GenericObject)await this.file.LoadObject(ObjectId);
@@ -515,7 +515,7 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_BTree_Test_03_LoadTyped()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
-			Guid ObjectId = await this.file.SaveNewObject(Obj, false);
+			Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
 			AssertEx.NotSame(Guid.Empty, ObjectId);
 
 			Simple Obj2 = await this.file.LoadObject<Simple>(ObjectId);
@@ -529,7 +529,7 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_BTree_Test_04_LoadUntyped()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
-			Guid ObjectId = await this.file.SaveNewObject(Obj, false);
+			Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
 			AssertEx.NotSame(Guid.Empty, ObjectId);
 
 			GenericObject Obj2 = (GenericObject)await this.file.LoadObject(ObjectId);
@@ -568,9 +568,9 @@ namespace Waher.Persistence.FilesLW.Test
 				}
 
 				if (ArraySize > 1)
-					await this.file.SaveNewObjects(Block, Serializer, false);
+					await this.file.SaveNewObjects(Block, Serializer, false, null);
 				else
-					await this.file.SaveNewObject(Block[0], false);
+					await this.file.SaveNewObject(Block[0], false, null);
 
 				if (BulkSize > 1 && i % BulkSize == 0)
 				{
@@ -698,7 +698,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Simple Obj2 = CreateSimple(this.MaxStringLength);
-			Guid ObjectId = await this.file.SaveNewObject(Obj, false);
+			Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
 			AssertEx.NotSame(Guid.Empty, ObjectId);
 			Assert.IsTrue(await this.file.ContainsAsync(Obj));
 			Assert.IsFalse(await this.file.ContainsAsync(Obj2));
@@ -708,7 +708,7 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_BTree_Test_15_Count()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
-			Guid ObjectId = await this.file.SaveNewObject(Obj, false);
+			Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
 			AssertEx.NotSame(Guid.Empty, ObjectId);
 			Console.Out.WriteLine((await this.file.CountAsync).ToString());
 		}
@@ -717,7 +717,7 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_BTree_Test_16_Clear()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
-			Guid ObjectId = await this.file.SaveNewObject(Obj, false);
+			Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
 			AssertEx.NotSame(Guid.Empty, ObjectId);
 			Assert.IsTrue(await this.file.ContainsAsync(Obj));
 			await this.file.ClearAsync();
@@ -834,7 +834,7 @@ namespace Waher.Persistence.FilesLW.Test
 			{
 				Simple _ = e.Current;
 				Obj = CreateSimple(this.MaxStringLength);
-				await this.file.SaveNewObject(Obj, false);
+				await this.file.SaveNewObject(Obj, false, null);
 			}
 		}
 
@@ -881,7 +881,7 @@ namespace Waher.Persistence.FilesLW.Test
 			while (NrObjects > 0)
 			{
 				Simple Obj = CreateSimple(this.MaxStringLength);
-				Guid ObjectId = await this.file.SaveNewObject(Obj, false);
+				Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
 				Result[ObjectId] = Obj;
 				NrObjects--;
 			}
@@ -1035,7 +1035,7 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_BTree_Test_25_UpdateUnsavedObject()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
-			await this.file.UpdateObject(Obj, false);
+			await this.file.UpdateObject(Obj, false, null);
 		}
 
 		[TestMethod]
@@ -1044,14 +1044,14 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Obj.ObjectId = Guid.NewGuid();
-			await this.file.UpdateObject(Obj, false);
+			await this.file.UpdateObject(Obj, false, null);
 		}
 
 		[TestMethod]
 		public async Task DBFiles_BTree_Test_27_UpdateObject()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
-			Guid ObjectId = await this.file.SaveNewObject(Obj, false);
+			Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
 			AssertEx.NotSame(Guid.Empty, ObjectId);
 
 			Simple Obj2 = await this.file.LoadObject<Simple>(ObjectId);
@@ -1061,7 +1061,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Simple Obj3 = CreateSimple(this.MaxStringLength);
 			Obj3.ObjectId = ObjectId;
-			await this.file.UpdateObject(Obj3, false);
+			await this.file.UpdateObject(Obj3, false, null);
 
 			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeAfter.xml"));
 
@@ -1101,7 +1101,7 @@ namespace Waher.Persistence.FilesLW.Test
 			for (i = 0; i < c; i++)
 			{
 				Objects[i] = Obj = CreateSimple(this.MaxStringLength);
-				await this.file.SaveNewObject(Obj, false);
+				await this.file.SaveNewObject(Obj, false, null);
 			}
 
 			//await AssertConsistent(this.file, this.provider, null, null, true);
@@ -1112,7 +1112,7 @@ namespace Waher.Persistence.FilesLW.Test
 				Obj = CreateSimple(this.MaxStringLength);
 				Obj.ObjectId = Objects[i].ObjectId;
 
-				await this.file.UpdateObject(Obj, false);
+				await this.file.UpdateObject(Obj, false, null);
 
 				Objects[i] = Obj;
 
@@ -1193,7 +1193,7 @@ namespace Waher.Persistence.FilesLW.Test
 				}
 
 				Objects[i] = Obj = CreateSimple(this.MaxStringLength);
-				await this.file.SaveNewObject(Obj, false);
+				await this.file.SaveNewObject(Obj, false, null);
 			}
 
 			if (BulkSize > 1)
@@ -1236,7 +1236,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 						Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeBefore.xml"));
 						Console.Out.WriteLine(Obj.ObjectId);
-						await this.file.DeleteObject(Obj, false);
+						await this.file.DeleteObject(Obj, false, null);
 						//Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeAfter.xml"));
 						await AssertConsistent(this.file, this.provider, null, null, true);
 
@@ -1255,7 +1255,7 @@ namespace Waher.Persistence.FilesLW.Test
 					}
 				}
 				else
-					await this.file.DeleteObject(Obj, false);
+					await this.file.DeleteObject(Obj, false, null);
 
 				if (BulkSize > 1 && c % BulkSize == 0)
 				{

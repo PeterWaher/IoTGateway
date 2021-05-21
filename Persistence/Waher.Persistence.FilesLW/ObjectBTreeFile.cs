@@ -85,6 +85,27 @@ namespace Waher.Persistence.Files
 			public object Object;
 			public ObjectSerializer Serializer;
 			public WriteOp Operation;
+			public ObjectCallback ObjectCallback;
+			public ObjectsCallback ObjectsCallback;
+
+			public void Raise(object Object)
+			{
+				if (this.ObjectCallback is null)
+					this.ObjectsCallback?.Invoke(new object[] { Object });
+				else
+					this.ObjectCallback(Object);
+			}
+
+			public void Raise(IEnumerable<object> Objects)
+			{
+				if (this.ObjectCallback is null)
+					this.ObjectsCallback?.Invoke(Objects);
+				else
+				{
+					foreach (object Object in Objects)
+						this.ObjectCallback(Object);
+				}
+			}
 		}
 
 		private class LoadRec
@@ -486,15 +507,15 @@ namespace Waher.Persistence.Files
 					switch (Rec.Operation)
 					{
 						case WriteOp.Insert:
-							await this.SaveNewObject(Rec.Object, Rec.Serializer, true);
+							await this.SaveNewObject(Rec.Object, Rec.Serializer, true, Rec.Raise);
 							break;
 
 						case WriteOp.Update:
-							await this.UpdateObject(Rec.Object, Rec.Serializer, true);
+							await this.UpdateObject(Rec.Object, Rec.Serializer, true, Rec.Raise);
 							break;
 
 						case WriteOp.Delete:
-							await this.DeleteObject(Rec.Object, Rec.Serializer, true);
+							await this.DeleteObject(Rec.Object, Rec.Serializer, true, Rec.Raise);
 							break;
 
 						case WriteOp.FindDelete:
@@ -507,9 +528,25 @@ namespace Waher.Persistence.Files
 								ObjectSerializer Serializer = FindDeleteLazyRec.Serializer;
 
 								if (Serializer is null)
-									await this.FindDelete(Offset, MaxCount, Filter, true, SortOrder);
+									await this.FindDelete(Offset, MaxCount, Filter, true, SortOrder, Rec.Raise);
 								else
-									await this.FindDeleteLocked(FindDeleteLazyRec.T, Offset, MaxCount, Filter, Serializer, SortOrder);
+								{
+									if (await this.TryBeginWrite(0))
+									{
+										try
+										{ 
+											await this.FindDeleteLocked(FindDeleteLazyRec.T, Offset, MaxCount, Filter, Serializer, SortOrder);
+										}
+										finally
+										{
+											await this.EndWrite();
+										}
+									}
+									else if (Rec.ObjectCallback is null)
+										this.QueueForSave(FindDeleteLazyRec, Serializer, Rec.ObjectsCallback, Rec.Operation);
+									else
+										this.QueueForSave(FindDeleteLazyRec, Serializer, Rec.ObjectCallback, Rec.Operation);
+								}
 							}
 							break;
 					}
@@ -1303,12 +1340,13 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="Object">Object to persist.</param>
 		/// <param name="Lazy">If Lazy insert is used, i.e. sufficiant that object is inserted at next opportuity.</param>
-		public async Task<Guid> SaveNewObject(object Object, bool Lazy)
+		/// <param name="Callback">Method to call when operation completed.</param>
+		public async Task<Guid> SaveNewObject(object Object, bool Lazy, ObjectCallback Callback)
 		{
 			Type ObjectType = Object.GetType();
 			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(ObjectType);
 
-			return await this.SaveNewObject(Object, Serializer, Lazy);
+			return await this.SaveNewObject(Object, Serializer, Lazy, Callback);
 		}
 
 		/// <summary>
@@ -1317,7 +1355,8 @@ namespace Waher.Persistence.Files
 		/// <param name="Object">Object to persist.</param>
 		/// <param name="Serializer">Object serializer. If not provided, the serializer registered for the corresponding type will be used.</param>
 		/// <param name="Lazy">If Lazy insert is used, i.e. sufficiant that object is inserted at next opportuity.</param>
-		public async Task<Guid> SaveNewObject(object Object, ObjectSerializer Serializer, bool Lazy)
+		/// <param name="Callback">Method to call when operation completed.</param>
+		public async Task<Guid> SaveNewObject(object Object, ObjectSerializer Serializer, bool Lazy, ObjectCallback Callback)
 		{
 			Guid ObjectId;
 
@@ -1339,7 +1378,9 @@ namespace Waher.Persistence.Files
 					Tuple<Guid, BlockInfo> Rec = await this.PrepareObjectIdForSaveLocked(Object, Serializer);
 
 					ObjectId = Rec.Item1;
-					this.QueueForSave(Object, Serializer, WriteOp.Insert);
+					this.QueueForSave(Object, Serializer, Callback, WriteOp.Insert);
+
+					return ObjectId;
 				}
 			}
 			else
@@ -1354,6 +1395,8 @@ namespace Waher.Persistence.Files
 					await this.EndWrite();
 				}
 			}
+
+			Callback?.Invoke(Object);
 
 			return ObjectId;
 		}
@@ -1379,7 +1422,8 @@ namespace Waher.Persistence.Files
 		/// <param name="Objects">Objects to persist.</param>
 		/// <param name="Serializer">Object serializer. If not provided, the serializer registered for the corresponding type will be used.</param>
 		/// <param name="Lazy">If Lazy insert is used, i.e. sufficiant that object is inserted at next opportuity.</param>
-		public async Task SaveNewObjects(IEnumerable<object> Objects, ObjectSerializer Serializer, bool Lazy)
+		/// <param name="Callback">Method to call when operation completed.</param>
+		public async Task SaveNewObjects(IEnumerable<object> Objects, ObjectSerializer Serializer, bool Lazy, ObjectsCallback Callback)
 		{
 			LinkedList<Guid> ObjectIds = new LinkedList<Guid>();
 
@@ -1398,7 +1442,10 @@ namespace Waher.Persistence.Files
 					}
 				}
 				else
-					this.QueueForSave(Objects, Serializer, WriteOp.Insert);
+				{
+					this.QueueForSave(Objects, Serializer, Callback, WriteOp.Insert);
+					return;
+				}
 			}
 			else
 			{
@@ -1413,6 +1460,8 @@ namespace Waher.Persistence.Files
 					await this.EndWrite();
 				}
 			}
+		
+			Callback?.Invoke(Objects);
 		}
 
 		internal async Task<Guid> SaveNewObjectLocked(object Object, ObjectSerializer Serializer)
@@ -1465,7 +1514,7 @@ namespace Waher.Persistence.Files
 			await this.InsertObjectLocked(Info.BlockIndex, Info.Header, Info.Block, Bin, Info.InternalPosition, 0, 0, true, Info.LastObject);
 		}
 
-		private void QueueForSave(object Object, ObjectSerializer Serializer, WriteOp Operation)
+		private void QueueForSave(object Object, ObjectSerializer Serializer, ObjectCallback Callback, WriteOp Operation)
 		{
 			lock (this.synchObject)
 			{
@@ -1476,12 +1525,13 @@ namespace Waher.Persistence.Files
 				{
 					Object = Object,
 					Serializer = Serializer,
-					Operation = Operation
+					Operation = Operation,
+					ObjectCallback = Callback
 				});
 			}
 		}
 
-		private void QueueForSave(IEnumerable<object> Objects, ObjectSerializer Serializer, WriteOp Operation)
+		private void QueueForSave(IEnumerable<object> Objects, ObjectSerializer Serializer, ObjectsCallback Callback, WriteOp Operation)
 		{
 			lock (this.synchObject)
 			{
@@ -1494,9 +1544,27 @@ namespace Waher.Persistence.Files
 					{
 						Object = Object,
 						Serializer = Serializer,
-						Operation = Operation
+						Operation = Operation,
+						ObjectsCallback = Callback
 					});
 				}
+			}
+		}
+
+		private void QueueForSave(FindDeleteLazyRec Rec, ObjectSerializer Serializer, ObjectsCallback Callback, WriteOp Operation)
+		{
+			lock (this.synchObject)
+			{
+				if (this.objectsToSave is null)
+					this.objectsToSave = new LinkedList<SaveRec>();
+
+				this.objectsToSave.AddLast(new SaveRec()
+				{
+					Object = Rec,
+					Serializer = Serializer,
+					Operation = Operation,
+					ObjectsCallback = Callback
+				});
 			}
 		}
 
@@ -2092,15 +2160,16 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="Object">Object to update.</param>
 		/// <param name="Lazy">If update can be done at next convenient time.</param>
+		/// <param name="Callback">Method to call when operation completed.</param>
 		/// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
 		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
 		/// or if the corresponding property type is not supported.</exception>
 		/// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
-		public async Task UpdateObject(object Object, bool Lazy)
+		public async Task UpdateObject(object Object, bool Lazy, ObjectCallback Callback)
 		{
 			Type ObjectType = Object.GetType();
 			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(ObjectType);
-			await this.UpdateObject(Object, Serializer, Lazy);
+			await this.UpdateObject(Object, Serializer, Lazy, Callback);
 		}
 
 		/// <summary>
@@ -2109,11 +2178,12 @@ namespace Waher.Persistence.Files
 		/// <param name="Object">Object to update.</param>
 		/// <param name="Serializer">Object serializer to use.</param>
 		/// <param name="Lazy">If update can be done at next convenient time.</param>
+		/// <param name="Callback">Method to call when operation completed.</param>
 		/// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
 		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
 		/// or if the corresponding property type is not supported.</exception>
 		/// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
-		public async Task UpdateObject(object Object, ObjectSerializer Serializer, bool Lazy)
+		public async Task UpdateObject(object Object, ObjectSerializer Serializer, bool Lazy, ObjectCallback Callback)
 		{
 			if (Lazy)
 			{
@@ -2129,7 +2199,10 @@ namespace Waher.Persistence.Files
 					}
 				}
 				else
-					this.QueueForSave(Object, Serializer, WriteOp.Update);
+				{
+					this.QueueForSave(Object, Serializer, Callback, WriteOp.Update);
+					return;
+				}
 			}
 			else
 			{
@@ -2143,6 +2216,8 @@ namespace Waher.Persistence.Files
 					await this.EndWrite();
 				}
 			}
+		
+			Callback?.Invoke(Object);
 		}
 
 		private async Task UpdateObjectLocked(object Object, ObjectSerializer Serializer)
@@ -2173,11 +2248,12 @@ namespace Waher.Persistence.Files
 		/// <param name="Objects">Objects to update.</param>
 		/// <param name="Serializer">Object serializer to use.</param>
 		/// <param name="Lazy">If update can be done at next convenient time.</param>
+		/// <param name="Callback">Method to call when operation completed.</param>
 		/// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
 		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
 		/// or if the corresponding property type is not supported.</exception>
 		/// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
-		public async Task UpdateObjects(IEnumerable<object> Objects, ObjectSerializer Serializer, bool Lazy)
+		public async Task UpdateObjects(IEnumerable<object> Objects, ObjectSerializer Serializer, bool Lazy, ObjectsCallback Callback)
 		{
 			if (Lazy)
 			{
@@ -2194,7 +2270,10 @@ namespace Waher.Persistence.Files
 					}
 				}
 				else
-					this.QueueForSave(Objects, Serializer, WriteOp.Update);
+				{
+					this.QueueForSave(Objects, Serializer, Callback, WriteOp.Update);
+					return;
+				}
 			}
 			else
 			{
@@ -2209,6 +2288,8 @@ namespace Waher.Persistence.Files
 					await this.EndWrite();
 				}
 			}
+		
+			Callback?.Invoke(Objects);
 		}
 
 		internal async Task ReplaceObjectLocked(byte[] Bin, BlockInfo Info, bool DeleteBlob)
@@ -2429,15 +2510,16 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="Object">Object to delete.</param>
 		/// <param name="Lazy">If deletion can be done at next convenient time.</param>
+		/// <param name="Callback">Method to call when operation completed.</param>
 		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
 		/// or if the corresponding property type is not supported.</exception>
 		/// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
-		public async Task DeleteObject(object Object, bool Lazy)
+		public async Task DeleteObject(object Object, bool Lazy, ObjectCallback Callback)
 		{
 			Type ObjectType = Object.GetType();
 			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(ObjectType);
 
-			await this.DeleteObject(Object, Serializer, Lazy);
+			await this.DeleteObject(Object, Serializer, Lazy, Callback);
 		}
 
 		/// <summary>
@@ -2446,8 +2528,9 @@ namespace Waher.Persistence.Files
 		/// <param name="Object">Object to delete.</param>
 		/// <param name="Serializer">Binary serializer.</param>
 		/// <param name="Lazy">If deletion can be done at next convenient time.</param>
+		/// <param name="Callback">Method to call when operation completed.</param>
 		/// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
-		public async Task DeleteObject(object Object, ObjectSerializer Serializer, bool Lazy)
+		public async Task DeleteObject(object Object, ObjectSerializer Serializer, bool Lazy, ObjectCallback Callback)
 		{
 			if (Lazy)
 			{
@@ -2463,7 +2546,10 @@ namespace Waher.Persistence.Files
 					}
 				}
 				else
-					this.QueueForSave(Object, Serializer, WriteOp.Delete);
+				{
+					this.QueueForSave(Object, Serializer, Callback, WriteOp.Delete);
+					return;
+				}
 			}
 			else
 			{
@@ -2477,6 +2563,8 @@ namespace Waher.Persistence.Files
 					await this.EndWrite();
 				}
 			}
+		
+			Callback?.Invoke(Object);
 		}
 
 		private async Task DeleteObjectLocked(object Object, ObjectSerializer Serializer)
@@ -2524,8 +2612,9 @@ namespace Waher.Persistence.Files
 		/// <param name="Objects">Objects to delete.</param>
 		/// <param name="Serializer">Binary serializer.</param>
 		/// <param name="Lazy">If deletion can be done at next convenient time.</param>
+		/// <param name="Callback">Method to call when operation completed.</param>
 		/// <exception cref="KeyNotFoundException">If the object is not found in the database.</exception>
-		public async Task DeleteObjects(IEnumerable<object> Objects, ObjectSerializer Serializer, bool Lazy)
+		public async Task DeleteObjects(IEnumerable<object> Objects, ObjectSerializer Serializer, bool Lazy, ObjectsCallback Callback)
 		{
 			if (Lazy)
 			{
@@ -2542,7 +2631,10 @@ namespace Waher.Persistence.Files
 					}
 				}
 				else
-					this.QueueForSave(Objects, Serializer, WriteOp.Delete);
+				{
+					this.QueueForSave(Objects, Serializer, Callback, WriteOp.Delete);
+					return;
+				}
 			}
 			else
 			{
@@ -2557,6 +2649,8 @@ namespace Waher.Persistence.Files
 					await this.EndWrite();
 				}
 			}
+
+			Callback?.Invoke(Objects);
 		}
 
 		internal async Task<object> DeleteObjectLocked(object ObjectId, bool MergeNodes, bool DeleteAnyBlob,
@@ -6305,12 +6399,15 @@ namespace Waher.Persistence.Files
 		/// <param name="Serializer">Object serializer.</param>
 		/// <param name="Lazy">If operation can be performed at next opportune time.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// <param name="Callback">Method to call when operation completed.</param>
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public async Task<IEnumerable<T>> FindDelete<T>(int Offset, int MaxCount, Filter Filter, ObjectSerializer Serializer, bool Lazy, params string[] SortOrder)
+		public async Task<IEnumerable<T>> FindDelete<T>(int Offset, int MaxCount, Filter Filter, ObjectSerializer Serializer, bool Lazy, string[] SortOrder, ObjectsCallback Callback)
 			where T : class
 		{
 			await this.CheckIndicesInitialized<T>();
+
+			IEnumerable<T> Objects;
 
 			if (Lazy)
 			{
@@ -6318,7 +6415,7 @@ namespace Waher.Persistence.Files
 				{
 					try
 					{
-						return await this.FindDeleteLocked<T>(Offset, MaxCount, Filter, Serializer, SortOrder);
+						Objects = await this.FindDeleteLocked<T>(Offset, MaxCount, Filter, Serializer, SortOrder);
 					}
 					finally
 					{
@@ -6335,7 +6432,7 @@ namespace Waher.Persistence.Files
 						Filter = Filter,
 						Serializer = Serializer,
 						SortOrder = SortOrder
-					}, Serializer, WriteOp.FindDelete);
+					}, Serializer, Callback, WriteOp.FindDelete);
 
 					return null;
 				}
@@ -6345,13 +6442,17 @@ namespace Waher.Persistence.Files
 				await this.BeginWrite();
 				try
 				{
-					return await this.FindDeleteLocked<T>(Offset, MaxCount, Filter, Serializer, SortOrder);
+					Objects = await this.FindDeleteLocked<T>(Offset, MaxCount, Filter, Serializer, SortOrder);
 				}
 				finally
 				{
 					await this.EndWrite();
 				}
 			}
+
+			Callback?.Invoke(Objects);
+
+			return Objects;
 		}
 
 		private class FindDeleteLazyRec
@@ -6388,11 +6489,14 @@ namespace Waher.Persistence.Files
 		/// <param name="Filter">Optional filter. Can be null.</param>
 		/// <param name="Lazy">If operation can be performed at next opportune time.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// <param name="Callback">Method to call when operation completed.</param>
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public async Task<IEnumerable<object>> FindDelete(int Offset, int MaxCount, Filter Filter, bool Lazy, params string[] SortOrder)
+		public async Task<IEnumerable<object>> FindDelete(int Offset, int MaxCount, Filter Filter, bool Lazy, string[] SortOrder, ObjectsCallback Callback)
 		{
 			await this.CheckIndicesInitialized<object>();
+
+			IEnumerable<object> Objects;
 
 			if (Lazy)
 			{
@@ -6400,7 +6504,7 @@ namespace Waher.Persistence.Files
 				{
 					try
 					{
-						return await this.FindDeleteLocked(Offset, MaxCount, Filter, SortOrder);
+						Objects = await this.FindDeleteLocked(Offset, MaxCount, Filter, SortOrder);
 					}
 					finally
 					{
@@ -6417,7 +6521,7 @@ namespace Waher.Persistence.Files
 						Filter = Filter,
 						Serializer = null,
 						SortOrder = SortOrder
-					}, null, WriteOp.FindDelete);
+					}, null, Callback, WriteOp.FindDelete);
 
 					return null;
 				}
@@ -6427,13 +6531,17 @@ namespace Waher.Persistence.Files
 				await this.BeginWrite();
 				try
 				{
-					return await this.FindDeleteLocked(Offset, MaxCount, Filter, SortOrder);
+					Objects = await this.FindDeleteLocked(Offset, MaxCount, Filter, SortOrder);
 				}
 				finally
 				{
 					await this.EndWrite();
 				}
 			}
+
+			Callback?.Invoke(Objects);
+
+			return Objects;
 		}
 
 		private async Task<IEnumerable<object>> FindDeleteLocked(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)

@@ -41,19 +41,22 @@ namespace Waher.Persistence
 		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		public Task InsertLazy(object Object) => Task.CompletedTask;
+		/// <param name="Callback">Method to call when operation completed.</param>
+		public Task InsertLazy(object Object, ObjectCallback Callback) => Task.CompletedTask;
 
 		/// <summary>
 		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public Task InsertLazy(params object[] Objects) => Task.CompletedTask;
+		/// <param name="Callback">Method to call when operation completed.</param>
+		public Task InsertLazy(object[] Objects, ObjectsCallback Callback) => Task.CompletedTask;
 
 		/// <summary>
 		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public Task InsertLazy(IEnumerable<object> Objects) => Task.CompletedTask;
+		/// <param name="Callback">Method to call when operation completed.</param>
+		public Task InsertLazy(IEnumerable<object> Objects, ObjectsCallback Callback) => Task.CompletedTask;
 
 		/// <summary>
 		/// Finds objects of a given class <typeparamref name="T"/>.
@@ -137,19 +140,22 @@ namespace Waher.Persistence
 		/// Updates an object in the database, if unlocked. If locked, object will be updated at next opportunity.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		public Task UpdateLazy(object Object) => Task.CompletedTask;
+		/// <param name="Callback">Method to call when operation completed.</param>
+		public Task UpdateLazy(object Object, ObjectCallback Callback) => Task.CompletedTask;
 
 		/// <summary>
 		/// Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public Task UpdateLazy(params object[] Objects) => Task.CompletedTask;
+		/// <param name="Callback">Method to call when operation completed.</param>
+		public Task UpdateLazy(object[] Objects, ObjectsCallback Callback) => Task.CompletedTask;
 
 		/// <summary>
 		/// Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public Task UpdateLazy(IEnumerable<object> Objects) => Task.CompletedTask;
+		/// <param name="Callback">Method to call when operation completed.</param>
+		public Task UpdateLazy(IEnumerable<object> Objects, ObjectsCallback Callback) => Task.CompletedTask;
 
 		/// <summary>
 		/// Deletes an object in the database.
@@ -173,19 +179,22 @@ namespace Waher.Persistence
 		/// Deletes an object in the database, if unlocked. If locked, object will be deleted at next opportunity.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		public Task DeleteLazy(object Object) => Task.CompletedTask;
+		/// <param name="Callback">Method to call when operation completed.</param>
+		public Task DeleteLazy(object Object, ObjectCallback Callback) => Task.CompletedTask;
 
 		/// <summary>
 		/// Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public Task DeleteLazy(params object[] Objects) => Task.CompletedTask;
+		/// <param name="Callback">Method to call when operation completed.</param>
+		public Task DeleteLazy(object[] Objects, ObjectsCallback Callback) => Task.CompletedTask;
 
 		/// <summary>
 		/// Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public Task DeleteLazy(IEnumerable<object> Objects) => Task.CompletedTask;
+		/// <param name="Callback">Method to call when operation completed.</param>
+		public Task DeleteLazy(IEnumerable<object> Objects, ObjectsCallback Callback) => Task.CompletedTask;
 
 		/// <summary>
 		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
@@ -255,7 +264,8 @@ namespace Waher.Persistence
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		public Task DeleteLazy<T>(int Offset, int MaxCount, params string[] SortOrder)
+		/// <param name="Callback">Method to call when operation completed.</param>
+		public Task DeleteLazy<T>(int Offset, int MaxCount, string[] SortOrder, ObjectsCallback Callback)
 			where T : class => Task.CompletedTask;
 
 		/// <summary>
@@ -267,7 +277,8 @@ namespace Waher.Persistence
 		/// <param name="Filter">Optional filter. Can be null.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		public Task DeleteLazy<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		/// <param name="Callback">Method to call when operation completed.</param>
+		public Task DeleteLazy<T>(int Offset, int MaxCount, Filter Filter, string[] SortOrder, ObjectsCallback Callback)
 			where T : class => Task.CompletedTask;
 
 		/// <summary>
@@ -278,7 +289,8 @@ namespace Waher.Persistence
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		public Task DeleteLazy(string Collection, int Offset, int MaxCount, params string[] SortOrder) => Task.CompletedTask;
+		/// <param name="Callback">Method to call when operation completed.</param>
+		public Task DeleteLazy(string Collection, int Offset, int MaxCount, string[] SortOrder, ObjectsCallback Callback) => Task.CompletedTask;
 
 		/// <summary>
 		/// Finds objects in a given collection and deletes them in the same atomic operation.
@@ -289,7 +301,8 @@ namespace Waher.Persistence
 		/// <param name="Filter">Optional filter. Can be null.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		public Task DeleteLazy(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder) => Task.CompletedTask;
+		/// <param name="Callback">Method to call when operation completed.</param>
+		public Task DeleteLazy(string Collection, int Offset, int MaxCount, Filter Filter, string[] SortOrder, ObjectsCallback Callback) => Task.CompletedTask;
 
 		/// <summary>
 		/// Tries to load an object given its Object ID <paramref name="ObjectId"/> and its class type <typeparamref name="T"/>.

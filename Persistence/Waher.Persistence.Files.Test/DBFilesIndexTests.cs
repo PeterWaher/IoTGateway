@@ -392,7 +392,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Obj = e.Current;
 					Assert.IsNotNull(Obj);
 					Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
-					await this.file.SaveNewObject(Obj, false);
+					await this.file.SaveNewObject(Obj, false, null);
 				}
 			}
 			finally
@@ -505,7 +505,7 @@ namespace Waher.Persistence.FilesLW.Test
 			while (NrObjects > 0)
 			{
 				Simple Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
-				Guid ObjectId = await this.file.SaveNewObject(Obj, false);
+				Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
 				Result[ObjectId] = Obj;
 				NrObjects--;
 			}
@@ -710,7 +710,7 @@ namespace Waher.Persistence.FilesLW.Test
 			for (i = 0; i < c; i++)
 			{
 				Objects[i] = Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
-				await this.file.SaveNewObject(Obj, false);
+				await this.file.SaveNewObject(Obj, false, null);
 				Ordered[Obj.ObjectId] = Obj;
 			}
 
@@ -721,7 +721,7 @@ namespace Waher.Persistence.FilesLW.Test
 				Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
 				Obj.ObjectId = Objects[i].ObjectId;
 
-				await this.file.UpdateObject(Obj, false);
+				await this.file.UpdateObject(Obj, false, null);
 
 				Objects[i] = Obj;
 
@@ -805,7 +805,7 @@ namespace Waher.Persistence.FilesLW.Test
 			for (i = 0; i < c; i++)
 			{
 				Objects[i] = Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
-				await this.file.SaveNewObject(Obj, false);
+				await this.file.SaveNewObject(Obj, false, null);
 			}
 
 			while (c > 0)
@@ -817,7 +817,7 @@ namespace Waher.Persistence.FilesLW.Test
 				if (i < c)
 					Array.Copy(Objects, i + 1, Objects, i, c - i);
 
-				await this.file.DeleteObject(Obj, false);
+				await this.file.DeleteObject(Obj, false, null);
 			}
 
 			FileStatistics Stat = await DBFilesBTreeTests.AssertConsistent(this.file, this.provider, null, null, true);
@@ -832,7 +832,7 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_Index_Test_17_Clear()
 		{
 			Simple Obj = DBFilesBTreeTests.CreateSimple(this.MaxStringLength);
-			Guid ObjectId = await this.file.SaveNewObject(Obj, false);
+			Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
 			AssertEx.NotSame(Guid.Empty, ObjectId);
 			Assert.IsTrue(await this.file.ContainsAsync(Obj));
 			await this.file.ClearAsync();
@@ -2039,7 +2039,7 @@ namespace Waher.Persistence.FilesLW.Test
 			while (NrObjects > 0)
 			{
 				Default Obj = DBFilesBTreeTests.CreateDefault(this.MaxStringLength);
-				Guid ObjectId = await this.file.SaveNewObject(Obj, false);
+				Guid ObjectId = await this.file.SaveNewObject(Obj, false, null);
 				Result[ObjectId] = Obj;
 				NrObjects--;
 			}

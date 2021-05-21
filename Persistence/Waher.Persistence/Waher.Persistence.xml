@@ -4097,6 +4097,18 @@
             the enumerator has passed the end of the collection.</returns>
             <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
         </member>
+        <member name="T:Waher.Persistence.ObjectCallback">
+            <summary>
+            Method called when a process has completed for an object.
+            </summary>
+            <param name="Object">Object</param>
+        </member>
+        <member name="T:Waher.Persistence.ObjectsCallback">
+            <summary>
+            Method called when a process has completed for a set of objects.
+            </summary>
+            <param name="Objects">Objects</param>
+        </member>
         <member name="T:Waher.Persistence.IDatabaseProvider">
             <summary>
             Interface for database providers that can be plugged into the static <see cref="T:Waher.Persistence.Database"/> class.
@@ -4120,23 +4132,26 @@
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
-        <member name="M:Waher.Persistence.IDatabaseProvider.InsertLazy(System.Object)">
+        <member name="M:Waher.Persistence.IDatabaseProvider.InsertLazy(System.Object,Waher.Persistence.ObjectCallback)">
             <summary>
             Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
             </summary>
             <param name="Object">Object to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.IDatabaseProvider.InsertLazy(System.Object[])">
+        <member name="M:Waher.Persistence.IDatabaseProvider.InsertLazy(System.Object[],Waher.Persistence.ObjectsCallback)">
             <summary>
             Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
             </summary>
             <param name="Objects">Objects to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.IDatabaseProvider.InsertLazy(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:Waher.Persistence.IDatabaseProvider.InsertLazy(System.Collections.Generic.IEnumerable{System.Object},Waher.Persistence.ObjectsCallback)">
             <summary>
             Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
             </summary>
             <param name="Objects">Objects to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
         <member name="M:Waher.Persistence.IDatabaseProvider.Find``1(System.Int32,System.Int32,System.String[])">
             <summary>
@@ -4202,23 +4217,26 @@
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
-        <member name="M:Waher.Persistence.IDatabaseProvider.UpdateLazy(System.Object)">
+        <member name="M:Waher.Persistence.IDatabaseProvider.UpdateLazy(System.Object,Waher.Persistence.ObjectCallback)">
             <summary>
             Updates an object in the database, if unlocked. If locked, object will be updated at next opportunity.
             </summary>
             <param name="Object">Object to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.IDatabaseProvider.UpdateLazy(System.Object[])">
+        <member name="M:Waher.Persistence.IDatabaseProvider.UpdateLazy(System.Object[],Waher.Persistence.ObjectsCallback)">
             <summary>
             Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
             </summary>
             <param name="Objects">Objects to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.IDatabaseProvider.UpdateLazy(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:Waher.Persistence.IDatabaseProvider.UpdateLazy(System.Collections.Generic.IEnumerable{System.Object},Waher.Persistence.ObjectsCallback)">
             <summary>
             Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
             </summary>
             <param name="Objects">Objects to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
         <member name="M:Waher.Persistence.IDatabaseProvider.Delete(System.Object)">
             <summary>
@@ -4238,23 +4256,26 @@
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
-        <member name="M:Waher.Persistence.IDatabaseProvider.DeleteLazy(System.Object)">
+        <member name="M:Waher.Persistence.IDatabaseProvider.DeleteLazy(System.Object,Waher.Persistence.ObjectCallback)">
             <summary>
             Deletes an object in the database, if unlocked. If locked, object will be deleted at next opportunity.
             </summary>
             <param name="Object">Object to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.IDatabaseProvider.DeleteLazy(System.Object[])">
+        <member name="M:Waher.Persistence.IDatabaseProvider.DeleteLazy(System.Object[],Waher.Persistence.ObjectsCallback)">
             <summary>
             Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
             </summary>
             <param name="Objects">Objects to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.IDatabaseProvider.DeleteLazy(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:Waher.Persistence.IDatabaseProvider.DeleteLazy(System.Collections.Generic.IEnumerable{System.Object},Waher.Persistence.ObjectsCallback)">
             <summary>
             Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
             </summary>
             <param name="Objects">Objects to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
         <member name="M:Waher.Persistence.IDatabaseProvider.FindDelete``1(System.Int32,System.Int32,System.String[])">
             <summary>
@@ -4302,7 +4323,7 @@
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
             <returns>Objects found.</returns>
         </member>
-        <member name="M:Waher.Persistence.IDatabaseProvider.DeleteLazy``1(System.Int32,System.Int32,System.String[])">
+        <member name="M:Waher.Persistence.IDatabaseProvider.DeleteLazy``1(System.Int32,System.Int32,System.String[],Waher.Persistence.ObjectsCallback)">
             <summary>
             Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
             </summary>
@@ -4311,8 +4332,9 @@
             <param name="MaxCount">Maximum number of objects to return.</param>
             <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.IDatabaseProvider.DeleteLazy``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
+        <member name="M:Waher.Persistence.IDatabaseProvider.DeleteLazy``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[],Waher.Persistence.ObjectsCallback)">
             <summary>
             Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
             </summary>
@@ -4322,8 +4344,9 @@
             <param name="Filter">Optional filter. Can be null.</param>
             <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.IDatabaseProvider.DeleteLazy(System.String,System.Int32,System.Int32,System.String[])">
+        <member name="M:Waher.Persistence.IDatabaseProvider.DeleteLazy(System.String,System.Int32,System.Int32,System.String[],Waher.Persistence.ObjectsCallback)">
             <summary>
             Finds objects in a given collection and deletes them in the same atomic operation.
             </summary>
@@ -4332,8 +4355,9 @@
             <param name="MaxCount">Maximum number of objects to return.</param>
             <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.IDatabaseProvider.DeleteLazy(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
+        <member name="M:Waher.Persistence.IDatabaseProvider.DeleteLazy(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[],Waher.Persistence.ObjectsCallback)">
             <summary>
             Finds objects in a given collection and deletes them in the same atomic operation.
             </summary>
@@ -4343,6 +4367,7 @@
             <param name="Filter">Optional filter. Can be null.</param>
             <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
         <member name="M:Waher.Persistence.IDatabaseProvider.TryLoadObject``1(System.Object)">
             <summary>
@@ -4846,23 +4871,26 @@
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
-        <member name="M:Waher.Persistence.NullDatabaseProvider.InsertLazy(System.Object)">
+        <member name="M:Waher.Persistence.NullDatabaseProvider.InsertLazy(System.Object,Waher.Persistence.ObjectCallback)">
             <summary>
             Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
             </summary>
             <param name="Object">Object to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.NullDatabaseProvider.InsertLazy(System.Object[])">
+        <member name="M:Waher.Persistence.NullDatabaseProvider.InsertLazy(System.Object[],Waher.Persistence.ObjectsCallback)">
             <summary>
             Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
             </summary>
             <param name="Objects">Objects to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.NullDatabaseProvider.InsertLazy(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:Waher.Persistence.NullDatabaseProvider.InsertLazy(System.Collections.Generic.IEnumerable{System.Object},Waher.Persistence.ObjectsCallback)">
             <summary>
             Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
             </summary>
             <param name="Objects">Objects to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
         <member name="M:Waher.Persistence.NullDatabaseProvider.Find``1(System.Int32,System.Int32,System.String[])">
             <summary>
@@ -4928,23 +4956,26 @@
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
-        <member name="M:Waher.Persistence.NullDatabaseProvider.UpdateLazy(System.Object)">
+        <member name="M:Waher.Persistence.NullDatabaseProvider.UpdateLazy(System.Object,Waher.Persistence.ObjectCallback)">
             <summary>
             Updates an object in the database, if unlocked. If locked, object will be updated at next opportunity.
             </summary>
             <param name="Object">Object to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.NullDatabaseProvider.UpdateLazy(System.Object[])">
+        <member name="M:Waher.Persistence.NullDatabaseProvider.UpdateLazy(System.Object[],Waher.Persistence.ObjectsCallback)">
             <summary>
             Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
             </summary>
             <param name="Objects">Objects to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.NullDatabaseProvider.UpdateLazy(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:Waher.Persistence.NullDatabaseProvider.UpdateLazy(System.Collections.Generic.IEnumerable{System.Object},Waher.Persistence.ObjectsCallback)">
             <summary>
             Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
             </summary>
             <param name="Objects">Objects to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
         <member name="M:Waher.Persistence.NullDatabaseProvider.Delete(System.Object)">
             <summary>
@@ -4964,23 +4995,26 @@
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
-        <member name="M:Waher.Persistence.NullDatabaseProvider.DeleteLazy(System.Object)">
+        <member name="M:Waher.Persistence.NullDatabaseProvider.DeleteLazy(System.Object,Waher.Persistence.ObjectCallback)">
             <summary>
             Deletes an object in the database, if unlocked. If locked, object will be deleted at next opportunity.
             </summary>
             <param name="Object">Object to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.NullDatabaseProvider.DeleteLazy(System.Object[])">
+        <member name="M:Waher.Persistence.NullDatabaseProvider.DeleteLazy(System.Object[],Waher.Persistence.ObjectsCallback)">
             <summary>
             Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
             </summary>
             <param name="Objects">Objects to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.NullDatabaseProvider.DeleteLazy(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:Waher.Persistence.NullDatabaseProvider.DeleteLazy(System.Collections.Generic.IEnumerable{System.Object},Waher.Persistence.ObjectsCallback)">
             <summary>
             Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
             </summary>
             <param name="Objects">Objects to insert.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
         <member name="M:Waher.Persistence.NullDatabaseProvider.FindDelete``1(System.Int32,System.Int32,System.String[])">
             <summary>
@@ -5028,7 +5062,7 @@
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
             <returns>Objects found.</returns>
         </member>
-        <member name="M:Waher.Persistence.NullDatabaseProvider.DeleteLazy``1(System.Int32,System.Int32,System.String[])">
+        <member name="M:Waher.Persistence.NullDatabaseProvider.DeleteLazy``1(System.Int32,System.Int32,System.String[],Waher.Persistence.ObjectsCallback)">
             <summary>
             Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
             </summary>
@@ -5037,8 +5071,9 @@
             <param name="MaxCount">Maximum number of objects to return.</param>
             <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.NullDatabaseProvider.DeleteLazy``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
+        <member name="M:Waher.Persistence.NullDatabaseProvider.DeleteLazy``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[],Waher.Persistence.ObjectsCallback)">
             <summary>
             Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
             </summary>
@@ -5048,8 +5083,9 @@
             <param name="Filter">Optional filter. Can be null.</param>
             <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.NullDatabaseProvider.DeleteLazy(System.String,System.Int32,System.Int32,System.String[])">
+        <member name="M:Waher.Persistence.NullDatabaseProvider.DeleteLazy(System.String,System.Int32,System.Int32,System.String[],Waher.Persistence.ObjectsCallback)">
             <summary>
             Finds objects in a given collection and deletes them in the same atomic operation.
             </summary>
@@ -5058,8 +5094,9 @@
             <param name="MaxCount">Maximum number of objects to return.</param>
             <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.NullDatabaseProvider.DeleteLazy(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
+        <member name="M:Waher.Persistence.NullDatabaseProvider.DeleteLazy(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[],Waher.Persistence.ObjectsCallback)">
             <summary>
             Finds objects in a given collection and deletes them in the same atomic operation.
             </summary>
@@ -5069,6 +5106,7 @@
             <param name="Filter">Optional filter. Can be null.</param>
             <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+            <param name="Callback">Method to call when operation completed.</param>
         </member>
         <member name="M:Waher.Persistence.NullDatabaseProvider.TryLoadObject``1(System.Object)">
             <summary>

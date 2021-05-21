@@ -154,8 +154,7 @@ namespace Waher.Persistence
 		/// <param name="Object">Object to insert.</param>
 		public static async Task InsertLazy(object Object)
 		{
-			await Provider.InsertLazy(Object);
-			RaiseInserted(Object);
+			await Provider.InsertLazy(Object, RaiseInserted);
 		}
 
 		/// <summary>
@@ -165,11 +164,9 @@ namespace Waher.Persistence
 		public static async Task InsertLazy(params object[] Objects)
 		{
 			if (Objects.Length == 1)
-				await Provider.InsertLazy(Objects[0]);
+				await Provider.InsertLazy(Objects[0], RaiseInserted);
 			else
-				await Provider.InsertLazy(Objects);
-
-			RaiseInserted(Objects);
+				await Provider.InsertLazy(Objects, RaiseInserted);
 		}
 
 		/// <summary>
@@ -178,8 +175,7 @@ namespace Waher.Persistence
 		/// <param name="Objects">Objects to insert.</param>
 		public static async Task InsertLazy(IEnumerable<object> Objects)
 		{
-			await Provider.InsertLazy(Objects);
-			RaiseInserted(Objects);
+			await Provider.InsertLazy(Objects, RaiseInserted);
 		}
 
 		/// <summary>
@@ -457,8 +453,7 @@ namespace Waher.Persistence
 		/// <param name="Object">Object to insert.</param>
 		public async static Task UpdateLazy(object Object)
 		{
-			await Provider.UpdateLazy(Object);
-			RaiseUpdated(Object);
+			await Provider.UpdateLazy(Object, RaiseUpdated);
 		}
 
 		/// <summary>
@@ -468,11 +463,9 @@ namespace Waher.Persistence
 		public async static Task UpdateLazy(params object[] Objects)
 		{
 			if (Objects.Length == 1)
-				await Provider.UpdateLazy(Objects[0]);
+				await Provider.UpdateLazy(Objects[0], RaiseUpdated);
 			else
-				await Provider.UpdateLazy(Objects);
-
-			RaiseUpdated(Objects);
+				await Provider.UpdateLazy(Objects, RaiseUpdated);
 		}
 
 		/// <summary>
@@ -481,8 +474,7 @@ namespace Waher.Persistence
 		/// <param name="Objects">Objects to insert.</param>
 		public async static Task UpdateLazy(IEnumerable<object> Objects)
 		{
-			await Provider.UpdateLazy(Objects);
-			RaiseUpdated(Objects);
+			await Provider.UpdateLazy(Objects, RaiseUpdated);
 		}
 
 		/// <summary>
@@ -530,8 +522,7 @@ namespace Waher.Persistence
 		/// <param name="Object">Object to insert.</param>
 		public async static Task DeleteLazy(object Object)
 		{
-			await Provider.DeleteLazy(Object);
-			RaiseDeleted(Object);
+			await Provider.DeleteLazy(Object, RaiseDeleted);
 		}
 
 		/// <summary>
@@ -541,11 +532,9 @@ namespace Waher.Persistence
 		public async static Task DeleteLazy(params object[] Objects)
 		{
 			if (Objects.Length == 1)
-				await Provider.DeleteLazy(Objects[0]);
+				await Provider.DeleteLazy(Objects[0], RaiseDeleted);
 			else
-				await Provider.DeleteLazy(Objects);
-
-			RaiseDeleted(Objects);
+				await Provider.DeleteLazy(Objects, RaiseDeleted);
 		}
 
 		/// <summary>
@@ -554,8 +543,7 @@ namespace Waher.Persistence
 		/// <param name="Objects">Objects to insert.</param>
 		public async static Task DeleteLazy(IEnumerable<object> Objects)
 		{
-			await Provider.DeleteLazy(Objects);
-			RaiseDeleted(Objects);
+			await Provider.DeleteLazy(Objects, RaiseDeleted);
 		}
 
 		private static void RaiseDeleted(object Object)
@@ -737,7 +725,7 @@ namespace Waher.Persistence
 		public static Task DeleteLazy<T>(int Offset, int MaxCount, params string[] SortOrder)
 			where T : class
 		{
-			return Provider.DeleteLazy<T>(Offset, MaxCount, SortOrder);
+			return Provider.DeleteLazy<T>(Offset, MaxCount, SortOrder, RaiseDeleted);
 		}
 
 		/// <summary>
@@ -767,7 +755,7 @@ namespace Waher.Persistence
 		public static Task DeleteLazy<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 			where T : class
 		{
-			return Provider.DeleteLazy<T>(Offset, MaxCount, Filter, SortOrder);
+			return Provider.DeleteLazy<T>(Offset, MaxCount, Filter, SortOrder, RaiseDeleted);
 		}
 
 		/// <summary>
@@ -793,7 +781,7 @@ namespace Waher.Persistence
 		/// <returns>Objects found.</returns>
 		public static Task DeleteLazy(string Collection, int Offset, int MaxCount, params string[] SortOrder)
 		{
-			return Provider.DeleteLazy(Collection, Offset, MaxCount, SortOrder);
+			return Provider.DeleteLazy(Collection, Offset, MaxCount, SortOrder, RaiseDeleted);
 		}
 
 		/// <summary>
@@ -821,7 +809,7 @@ namespace Waher.Persistence
 		/// <returns>Objects found.</returns>
 		public static Task DeleteLazy(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
-			return Provider.DeleteLazy(Collection, Offset, MaxCount, Filter, SortOrder);
+			return Provider.DeleteLazy(Collection, Offset, MaxCount, Filter, SortOrder, RaiseDeleted);
 		}
 
 		/// <summary>

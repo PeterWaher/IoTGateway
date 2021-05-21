@@ -16,7 +16,6 @@ using Waher.Persistence.MongoDB.Serialization;
 using Waher.Persistence.MongoDB.Serialization.ReferenceTypes;
 using Waher.Persistence.MongoDB.Serialization.ValueTypes;
 using Waher.Runtime.Cache;
-using System.Collections;
 
 namespace Waher.Persistence.MongoDB
 {
@@ -416,19 +415,22 @@ namespace Waher.Persistence.MongoDB
 		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		public Task InsertLazy(object Object) => this.Insert(Object);
+		public Task InsertLazy(object Object, ObjectCallback Callback)
+			=> this.Process(Object, this.Insert(Object), Callback);
 
 		/// <summary>
 		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public Task InsertLazy(params object[] Objects) => this.Insert(Objects);
+		public Task InsertLazy(object[] Objects, ObjectsCallback Callback)
+			=> this.Process(Objects, this.Insert(Objects), Callback);
 
 		/// <summary>
 		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public Task InsertLazy(IEnumerable<object> Objects) => this.Insert(Objects);
+		public Task InsertLazy(IEnumerable<object> Objects, ObjectsCallback Callback)
+			=> this.Process(Objects, this.Insert(Objects), Callback);
 
 		/// <summary>
 		/// Finds objects of a given class <typeparamref name="T"/>.
@@ -1201,19 +1203,22 @@ namespace Waher.Persistence.MongoDB
 		/// Updates an object in the database, if unlocked. If locked, object will be updated at next opportunity.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		public Task UpdateLazy(object Object) => this.Update(Object);
+		public Task UpdateLazy(object Object, ObjectCallback Callback)
+			=> this.Process(Object, this.Update(Object), Callback);
 
 		/// <summary>
 		/// Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public Task UpdateLazy(params object[] Objects) => this.Update(Objects);
+		public Task UpdateLazy(object[] Objects, ObjectsCallback Callback)
+			=> this.Process(Objects, this.Update(Objects), Callback);
 
 		/// <summary>
 		/// Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public Task UpdateLazy(IEnumerable<object> Objects) => this.Update(Objects);
+		public Task UpdateLazy(IEnumerable<object> Objects, ObjectsCallback Callback)
+			=> this.Process(Objects, this.Update(Objects), Callback);
 
 		/// <summary>
 		/// Deletes an object in the database.
@@ -1253,23 +1258,38 @@ namespace Waher.Persistence.MongoDB
 				await this.Delete(Obj);
 		}
 
+		private async Task Process(object Object, Task Op, ObjectCallback Callback)
+		{
+			await Op;
+			Callback?.Invoke(Object);
+		}
+
+		private async Task Process(IEnumerable<object> Objects, Task Op, ObjectsCallback Callback)
+		{
+			await Op;
+			Callback?.Invoke(Objects);
+		}
+
 		/// <summary>
 		/// Deletes an object in the database, if unlocked. If locked, object will be deleted at next opportunity.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		public Task DeleteLazy(object Object) => this.Delete(Object);
+		public Task DeleteLazy(object Object, ObjectCallback Callback)
+			=> this.Process(Object, this.Delete(Object), Callback);
 
 		/// <summary>
 		/// Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public Task DeleteLazy(params object[] Objects) => this.Delete(Objects);
+		public Task DeleteLazy(object[] Objects, ObjectsCallback Callback)
+			=> this.Process(Objects, this.Delete(Objects), Callback);
 
 		/// <summary>
 		/// Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public Task DeleteLazy(IEnumerable<object> Objects) => this.Delete(Objects);
+		public Task DeleteLazy(IEnumerable<object> Objects, ObjectsCallback Callback)
+			=> this.Process(Objects, this.Delete(Objects), Callback);
 
 		/// <summary>
 		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
@@ -1347,8 +1367,12 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		public Task DeleteLazy<T>(int Offset, int MaxCount, params string[] SortOrder)
-			where T : class => this.FindDelete<T>(Offset, MaxCount, SortOrder);
+		public async Task DeleteLazy<T>(int Offset, int MaxCount, string[] SortOrder, ObjectsCallback Callback)
+			where T : class
+		{
+			IEnumerable<T> Objects = await this.FindDelete<T>(Offset, MaxCount, SortOrder);
+			Callback?.Invoke(Objects);
+		}
 
 		/// <summary>
 		/// Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
@@ -1359,8 +1383,12 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="Filter">Optional filter. Can be null.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		public Task DeleteLazy<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
-			where T : class => this.FindDelete<T>(Offset, MaxCount, Filter, SortOrder);
+		public async Task DeleteLazy<T>(int Offset, int MaxCount, Filter Filter, string[] SortOrder, ObjectsCallback Callback)
+			where T : class
+		{
+			IEnumerable<T> Objects = await this.FindDelete<T>(Offset, MaxCount, Filter, SortOrder);
+			Callback?.Invoke(Objects);
+		}
 
 		/// <summary>
 		/// Finds objects in a given collection and deletes them in the same atomic operation.
@@ -1370,8 +1398,11 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		public Task DeleteLazy(string Collection, int Offset, int MaxCount, params string[] SortOrder) 
-			=> this.FindDelete(Collection, Offset, MaxCount, SortOrder);
+		public async Task DeleteLazy(string Collection, int Offset, int MaxCount, string[] SortOrder, ObjectsCallback Callback)
+		{
+			IEnumerable<object> Objects = await this.FindDelete(Collection, Offset, MaxCount, SortOrder);
+			Callback?.Invoke(Objects);
+		}
 
 		/// <summary>
 		/// Finds objects in a given collection and deletes them in the same atomic operation.
@@ -1382,8 +1413,11 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="Filter">Optional filter. Can be null.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-		public Task DeleteLazy(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
-			=> this.FindDelete(Collection, Offset, MaxCount, Filter, SortOrder);
+		public async Task DeleteLazy(string Collection, int Offset, int MaxCount, Filter Filter, string[] SortOrder, ObjectsCallback Callback)
+		{
+			IEnumerable<object> Objects = await this.FindDelete(Collection, Offset, MaxCount, Filter, SortOrder);
+			Callback?.Invoke(Objects);
+		}
 
 		/// <summary>
 		/// Clears a collection of all objects.
@@ -1715,7 +1749,7 @@ namespace Waher.Persistence.MongoDB
 		/// <returns>Persistent dictionary</returns>
 		public Task<IPersistentDictionary> GetDictionary(string Collection)
 		{
-			return Task.FromResult<IPersistentDictionary>(new StringDictionary(Collection, this));	// TODO
+			return Task.FromResult<IPersistentDictionary>(new StringDictionary(Collection, this));  // TODO
 		}
 
 		/// <summary>

@@ -1,6 +1,9 @@
-﻿using System;
+﻿#define ASSERT_LOCKS
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.ExceptionServices;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -482,21 +485,6 @@ namespace Waher.Persistence.Files
 			return e;
 		}
 
-		private ObjectBTreeFileCursor<KeyValuePair<string, object>> GetCursor()
-		{
-			Task<ObjectBTreeFileCursor<KeyValuePair<string, object>>> Task = this.GetEnumeratorLocked();
-			FilesProvider.Wait(Task, this.timeoutMilliseconds);
-			return Task.Result;
-		}
-
-		private ICursor<KeyValuePair<string, object>> ResetCursor(ICursor<KeyValuePair<string, object>> Cursor)
-		{
-			if (Cursor is ObjectBTreeFileCursor<KeyValuePair<string, object>> e)
-				e.GoToFirstLocked().Wait();
-
-			return Cursor;
-		}
-
 		/// <summary>
 		/// <see cref="IEnumerable.GetEnumerator"/>
 		/// </summary>
@@ -507,13 +495,51 @@ namespace Waher.Persistence.Files
 			return e;
 		}
 
+		private ObjectBTreeFileCursor<KeyValuePair<string, object>> GetCursor()
+		{
+			Task<ObjectBTreeFileCursor<KeyValuePair<string, object>>> Task = this.GetCursorAsync();
+			FilesProvider.Wait(Task, this.timeoutMilliseconds);
+			return Task.Result;
+		}
+
+		private async Task<ObjectBTreeFileCursor<KeyValuePair<string, object>>> GetCursorAsync()
+		{
+			ObjectBTreeFileCursor<KeyValuePair<string, object>> Result;
+
+			try
+			{
+				await this.dictionaryFile.BeginRead();
+				Result = await this.GetEnumeratorLocked();
+				Result.readLock = true;
+			}
+			catch (Exception ex)
+			{
+				await this.dictionaryFile.EndRead();
+				ExceptionDispatchInfo.Capture(ex).Throw();
+				Result = null;
+			}
+
+			return Result;
+		}
+
 		/// <summary>
 		/// Gets an enumerator for all entries in the dictionary.
 		/// </summary>
 		/// <returns>Enumerator</returns>
 		public Task<ObjectBTreeFileCursor<KeyValuePair<string, object>>> GetEnumeratorLocked()
 		{
+#if ASSERT_LOCKS
+			this.dictionaryFile.fileAccess.AssertReadingOrWriting();
+#endif
 			return ObjectBTreeFileCursor<KeyValuePair<string, object>>.CreateLocked(this.dictionaryFile, this.recordHandler, this.keyValueSerializer);
+		}
+
+		private ICursor<KeyValuePair<string, object>> ResetCursor(ICursor<KeyValuePair<string, object>> Cursor)
+		{
+			if (Cursor is ObjectBTreeFileCursor<KeyValuePair<string, object>> e)
+				e.GoToFirstLocked().Wait();
+
+			return Cursor;
 		}
 
 		/// <summary>

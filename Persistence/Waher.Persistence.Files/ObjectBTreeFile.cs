@@ -29,7 +29,7 @@ namespace Waher.Persistence.Files
 	{
 		internal const int BlockHeaderSize = 14;
 
-		private readonly MultiReadSingleWriteObject fileAccess;
+		internal readonly MultiReadSingleWriteObject fileAccess;
 		private IndexBTreeFile[] indices = new IndexBTreeFile[0];
 		private List<IndexBTreeFile> indexList = new List<IndexBTreeFile>();
 		private SortedDictionary<uint, bool> emptyBlocks = null;

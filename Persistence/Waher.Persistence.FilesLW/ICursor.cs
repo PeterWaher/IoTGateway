@@ -9,7 +9,7 @@ namespace Waher.Persistence.Files
 	/// Interface for typed cursors.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public interface ICursor<T>
+	public interface ICursor<T> : IAsyncEnumerator
 	{
 		/// <summary>
 		/// Gets the element in the collection at the current position of the enumerator.

@@ -14,7 +14,7 @@ namespace Waher.Persistence.Files
 	/// Enumerates object in a <see cref="ObjectBTreeFile"/> in GUID order. You can use the enumerator to enumerate objects
 	/// forwards and backwards, as well as skip a given number of objects.
 	/// </summary>
-	public class ObjectBTreeFileCursor<T> : ICursor<T>
+	public class ObjectBTreeFileCursor<T> : ICursor<T>, IDisposable
 	{
 		private ObjectBTreeFile file;
 		private BlockHeader currentHeader;
@@ -34,6 +34,7 @@ namespace Waher.Persistence.Files
 		private int currentObjPos;
 		private bool hasCurrent;
 		private bool currentTypeCompatible;
+		internal bool readLock = false;
 
 		internal static Task<ObjectBTreeFileCursor<T>> CreateLocked(ObjectBTreeFile File, IRecordHandler RecordHandler)
 		{
@@ -82,6 +83,11 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void Dispose()
 		{
+			if (this.readLock)
+			{
+				Task _ = this.file.EndRead();
+				this.readLock = false;
+			}
 		}
 
 		/// <summary>
@@ -181,6 +187,15 @@ namespace Waher.Persistence.Files
 			else
 				throw new InvalidOperationException("Enumeration not started. Call MoveNext() first.");
 		}
+
+		/// <summary>
+		/// Advances the enumerator to the next element of the collection.
+		/// Note: Enumerator only works if object is locked.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the next element; false if
+		/// the enumerator has passed the end of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		Task<bool> IAsyncEnumerator.MoveNextAsync() => this.MoveNextAsyncLocked();
 
 		/// <summary>
 		/// Advances the enumerator to the next element of the collection.

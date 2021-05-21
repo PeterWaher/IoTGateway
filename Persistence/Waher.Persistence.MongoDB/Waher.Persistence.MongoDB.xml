@@ -177,19 +177,19 @@
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
-        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.InsertLazy(System.Object)">
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.InsertLazy(System.Object,Waher.Persistence.ObjectCallback)">
             <summary>
             Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
             </summary>
             <param name="Object">Object to insert.</param>
         </member>
-        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.InsertLazy(System.Object[])">
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.InsertLazy(System.Object[],Waher.Persistence.ObjectsCallback)">
             <summary>
             Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
-        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.InsertLazy(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.InsertLazy(System.Collections.Generic.IEnumerable{System.Object},Waher.Persistence.ObjectsCallback)">
             <summary>
             Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
             </summary>
@@ -325,19 +325,19 @@
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
-        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.UpdateLazy(System.Object)">
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.UpdateLazy(System.Object,Waher.Persistence.ObjectCallback)">
             <summary>
             Updates an object in the database, if unlocked. If locked, object will be updated at next opportunity.
             </summary>
             <param name="Object">Object to insert.</param>
         </member>
-        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.UpdateLazy(System.Object[])">
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.UpdateLazy(System.Object[],Waher.Persistence.ObjectsCallback)">
             <summary>
             Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
-        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.UpdateLazy(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.UpdateLazy(System.Collections.Generic.IEnumerable{System.Object},Waher.Persistence.ObjectsCallback)">
             <summary>
             Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
             </summary>
@@ -361,19 +361,19 @@
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
-        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.DeleteLazy(System.Object)">
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.DeleteLazy(System.Object,Waher.Persistence.ObjectCallback)">
             <summary>
             Deletes an object in the database, if unlocked. If locked, object will be deleted at next opportunity.
             </summary>
             <param name="Object">Object to insert.</param>
         </member>
-        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.DeleteLazy(System.Object[])">
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.DeleteLazy(System.Object[],Waher.Persistence.ObjectsCallback)">
             <summary>
             Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
             </summary>
             <param name="Objects">Objects to insert.</param>
         </member>
-        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.DeleteLazy(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.DeleteLazy(System.Collections.Generic.IEnumerable{System.Object},Waher.Persistence.ObjectsCallback)">
             <summary>
             Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
             </summary>
@@ -424,6 +424,48 @@
             <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
             If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
             <returns>Objects found.</returns>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.DeleteLazy``1(System.Int32,System.Int32,System.String[],Waher.Persistence.ObjectsCallback)">
+            <summary>
+            Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+            </summary>
+            <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.DeleteLazy``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[],Waher.Persistence.ObjectsCallback)">
+            <summary>
+            Finds objects of a given class <typeparamref name="T"/> and deletes them in the same atomic operation.
+            </summary>
+            <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="Filter">Optional filter. Can be null.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.DeleteLazy(System.String,System.Int32,System.Int32,System.String[],Waher.Persistence.ObjectsCallback)">
+            <summary>
+            Finds objects in a given collection and deletes them in the same atomic operation.
+            </summary>
+            <param name="Collection">Name of collection to search.</param>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.DeleteLazy(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[],Waher.Persistence.ObjectsCallback)">
+            <summary>
+            Finds objects in a given collection and deletes them in the same atomic operation.
+            </summary>
+            <param name="Collection">Name of collection to search.</param>
+            <param name="Offset">Result offset.</param>
+            <param name="MaxCount">Maximum number of objects to return.</param>
+            <param name="Filter">Optional filter. Can be null.</param>
+            <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+            If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
         </member>
         <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Clear(System.String)">
             <summary>

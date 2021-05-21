@@ -1113,7 +1113,9 @@ namespace Waher.Persistence.Files
 				{
 					List<ObjectBTreeFile> List = new List<ObjectBTreeFile>();
 					List.AddRange(this.files.Values);
-					List.Add(this.master.DictionaryFile);
+
+					if (!(this.master is null))
+						List.Add(this.master.DictionaryFile);
 
 					foreach (StringDictionary Dictionary in this.dictionaries.Keys)
 						List.Add(Dictionary.DictionaryFile);
@@ -1923,7 +1925,7 @@ namespace Waher.Persistence.Files
 		{
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(Value);
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(Value));
-			return await File.SaveNewObject(Value, Serializer, true, null);
+			return await File.SaveNewObject(Value, Serializer, false, null);
 		}
 
 		#endregion
@@ -2938,7 +2940,6 @@ namespace Waher.Persistence.Files
 															Exceptions.AddLast(ex);
 															continue;
 														}
-
 
 														c++;
 														if (c >= 1000)

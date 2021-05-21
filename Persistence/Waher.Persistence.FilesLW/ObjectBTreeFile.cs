@@ -1375,12 +1375,8 @@ namespace Waher.Persistence.Files
 				}
 				else
 				{
-					Tuple<Guid, BlockInfo> Rec = await this.PrepareObjectIdForSaveLocked(Object, Serializer);
-
-					ObjectId = Rec.Item1;
 					this.QueueForSave(Object, Serializer, Callback, WriteOp.Insert);
-
-					return ObjectId;
+					return Guid.Empty;
 				}
 			}
 			else

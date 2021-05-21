@@ -62,6 +62,8 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void Dispose()
 		{
+			if (this.cursor is IDisposable Disposable)
+				Disposable.Dispose();
 		}
 
 		/// <summary>

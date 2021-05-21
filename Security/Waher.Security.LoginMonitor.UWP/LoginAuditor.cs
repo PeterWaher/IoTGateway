@@ -119,7 +119,7 @@ namespace Waher.Security.LoginMonitor
 					EP.WhoIs = await WhoIsClient.Query(Address);
 
 				await EP.Annotate();
-				await Database.Update(EP);
+				await Database.UpdateLazy(EP);
 			}
 
 			return EP;
@@ -181,9 +181,9 @@ namespace Waher.Security.LoginMonitor
 			}
 
 			if (Created)
-				await Database.Insert(EP);
+				await Database.InsertLazy(EP);
 			else if (Updated)
-				await Database.Update(EP);
+				await Database.UpdateLazy(EP);
 
 			return EP;
 		}
@@ -205,7 +205,7 @@ namespace Waher.Security.LoginMonitor
 			EP.LastProtocol = Protocol;
 			EP.Reset(false);
 
-			await Database.Update(EP);
+			await Database.UpdateLazy(EP);
 		}
 
 		/// <summary>
@@ -262,7 +262,7 @@ namespace Waher.Security.LoginMonitor
 				}
 			}
 
-			await Database.Update(EP);
+			await Database.UpdateLazy(EP);
 
 			return EP.Blocked;
 		}
@@ -326,7 +326,7 @@ namespace Waher.Security.LoginMonitor
 
 				Log.Alert(sb.ToString(), EP.Endpoint, this.ObjectID, "RemoteEndpointBlocked", EventLevel.Major, Tags);
 
-				await Database.Update(EP);
+				await Database.UpdateLazy(EP);
 			}
 		}
 
@@ -420,7 +420,7 @@ namespace Waher.Security.LoginMonitor
 
 			EP.Reset(true);
 
-			await Database.Update(EP);
+			await Database.UpdateLazy(EP);
 		}
 
 		/// <summary>

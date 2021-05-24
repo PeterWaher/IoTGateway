@@ -39,11 +39,8 @@ namespace Waher.Persistence.FilesLW.Test
 		[ClassCleanup]
 		public static void ClassCleanup()
 		{
-			if (provider != null)
-			{
-				provider.Dispose();
-				provider = null;
-			}
+			provider?.Dispose();
+			provider = null;
 		}
 
 		[TestMethod]
@@ -279,7 +276,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(Classes.Nullable));
 			object Value;
-			
+
 			Assert.IsNotNull(Value = await S.TryGetFieldValue("Boolean1", Obj));
 			AssertEx.Same(Obj.Boolean1, Value);
 			Value = await S.TryGetFieldValue("Boolean2", Obj);
@@ -533,7 +530,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(Default));
 			object Value;
-			
+
 			Assert.IsNotNull(Value = await S.TryGetFieldValue("Boolean1", Obj));
 			AssertEx.Same(Obj.Boolean1, Value);
 			Assert.IsNotNull(Value = await S.TryGetFieldValue("Boolean2", Obj));
@@ -992,7 +989,7 @@ namespace Waher.Persistence.FilesLW.Test
 					Int = 10000000
 				},
 				EmbeddedNull = null,
-				MultipleEmbedded = new Embedded[] 
+				MultipleEmbedded = new Embedded[]
 				{
 					new Embedded()
 					{
@@ -1013,7 +1010,7 @@ namespace Waher.Persistence.FilesLW.Test
 						Int = 40000000
 					}
 				},
-				MultipleEmbeddedNullable = new Embedded[] 
+				MultipleEmbeddedNullable = new Embedded[]
 				{
 					new Embedded()
 					{

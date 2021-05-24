@@ -227,7 +227,7 @@ namespace Waher.Persistence.Files
 				Result.ivSeedLen = Result.ivSeed.Length;
 			}
 
-			if (!Result.file.FilePreExisting)
+			if (!Result.file.FilePreExisting || Result.file.Length == 0)
 				await Result.CreateFirstBlock();
 
 			Result.blockLimit = Result.file.BlockLimit;

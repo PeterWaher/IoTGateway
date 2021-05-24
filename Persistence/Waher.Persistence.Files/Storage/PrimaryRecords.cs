@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Persistence.Serialization;
@@ -12,7 +11,6 @@ namespace Waher.Persistence.Files.Storage
 	/// </summary>
 	public class PrimaryRecords : IRecordHandler
 	{
-		private int recordStart;
 		private readonly int inlineObjectSizeLimit;
 
 		/// <summary>
@@ -22,7 +20,6 @@ namespace Waher.Persistence.Files.Storage
 		public PrimaryRecords(int InlineObjectSizeLimit)
 		{
 			this.inlineObjectSizeLimit = InlineObjectSizeLimit;
-			this.recordStart = 0;
 		}
 
 		/// <summary>
@@ -34,8 +31,6 @@ namespace Waher.Persistence.Files.Storage
 		{
 			if (Reader.BytesLeft < 17)
 				return null;
-
-			this.recordStart = Reader.Position;
 
 			Guid Result = Reader.ReadGuid();
 
@@ -55,7 +50,6 @@ namespace Waher.Persistence.Files.Storage
 			if (Reader.BytesLeft < 17)
 				return false;
 
-			this.recordStart = Reader.Position;
 			Guid Result = Reader.ReadGuid();
 
 			if (Result.Equals(Guid.Empty))
@@ -81,8 +75,10 @@ namespace Waher.Persistence.Files.Storage
 		/// <returns>Size of the payload.</returns>
 		public Task<int> GetPayloadSize(BinaryDeserializer Reader)
 		{
+			int Pos = Reader.Position;
 			int Len = (int)Reader.ReadVariableLengthUInt64();
-			if (Reader.Position - this.recordStart + Len > this.inlineObjectSizeLimit)
+
+			if (16 + Reader.Position - Pos + Len > this.inlineObjectSizeLimit)
 				return Task.FromResult<int>(4);
 			else
 				return Task.FromResult<int>(Len);
@@ -95,8 +91,10 @@ namespace Waher.Persistence.Files.Storage
 		/// <returns>Size of the payload, and if the object is a BLOB.</returns>
 		public Task<KeyValuePair<int, bool>> GetPayloadSizeEx(BinaryDeserializer Reader)
 		{
+			int Pos = Reader.Position;
 			int Len = (int)Reader.ReadVariableLengthUInt64();
-			if (Reader.Position - this.recordStart + Len > this.inlineObjectSizeLimit)
+
+			if (16 + Reader.Position - Pos + Len > this.inlineObjectSizeLimit)
 				return Task.FromResult<KeyValuePair<int, bool>>(new KeyValuePair<int, bool>(4, true));
 			else
 				return Task.FromResult<KeyValuePair<int, bool>>(new KeyValuePair<int, bool>(Len, false));
@@ -109,8 +107,10 @@ namespace Waher.Persistence.Files.Storage
 		/// <returns>If the following object is a BLOB.</returns>
 		public Task<bool> IsBlob(BinaryDeserializer Reader)
 		{
+			int Pos = Reader.Position;
 			int Len = (int)Reader.ReadVariableLengthUInt64();
-			return Task.FromResult<bool>(Reader.Position - this.recordStart + Len > this.inlineObjectSizeLimit);
+
+			return Task.FromResult<bool>(16 + Reader.Position - Pos + Len > this.inlineObjectSizeLimit);
 		}
 
 		/// <summary>

@@ -121,10 +121,12 @@ namespace Waher.Persistence.Files
 				throw new ArgumentException("Block too small.", nameof(Block));
 
 			int NrRead;
+			long OrgLen;
 
 			await this.fileAccess.BeginRead();
 			try
 			{
+				OrgLen = this.file.Length;
 				long Pos = ((long)BlockIndex) * this.blockSize;
 
 				if (Pos != this.file.Seek(Pos, SeekOrigin.Begin))

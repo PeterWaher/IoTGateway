@@ -6,10 +6,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
-using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Events.Console;
-using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence;
 using Waher.Persistence.Files;
@@ -212,18 +211,17 @@ namespace Waher.IoTGateway.Console
 
 		private async static Task<IDatabaseProvider> GetDatabase(XmlElement DatabaseConfig)
 		{
-			if (!CommonTypes.TryParse(DatabaseConfig.Attributes["encrypted"].Value, out bool Encrypted))
-				Encrypted = true;
+			string Folder = Path.Combine(Gateway.AppDataFolder, XML.Attribute(DatabaseConfig, "folder", "Data"));
+			string DefaultCollectionName = XML.Attribute(DatabaseConfig, "defaultCollectionName", "Default");
+			int BlockSize = XML.Attribute(DatabaseConfig, "blockSize", 8192);
+			int BlocksInCache = XML.Attribute(DatabaseConfig, "blocksInCache", 10000);
+			int BlobBlockSize = XML.Attribute(DatabaseConfig, "blobBlockSize", 8192);
+			int TimeoutMs = XML.Attribute(DatabaseConfig, "timeoutMs", 3600000);
+			bool Encrypted = XML.Attribute(DatabaseConfig, "encrypted", true);
+			bool Compiled = XML.Attribute(DatabaseConfig, "compiled", true);
 
-			FilesProvider Result = await FilesProvider.CreateAsync(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
-				DatabaseConfig.Attributes["defaultCollectionName"].Value,
-				int.Parse(DatabaseConfig.Attributes["blockSize"].Value),
-				int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
-				int.Parse(DatabaseConfig.Attributes["blobBlockSize"].Value), Encoding.UTF8,
-				int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
-				Encrypted, true);
-
-			return Result;
+			return await FilesProvider.CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize,
+				Encoding.UTF8, TimeoutMs, Encrypted, Compiled);
 		}
 
 		private static async Task RegistrationSuccessful(MetaDataTag[] MetaData, RegistrationEventArgs e)

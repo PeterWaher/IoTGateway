@@ -88,6 +88,11 @@
 								<xs:documentation>If the database is encrypted.</xs:documentation>
 							</xs:annotation>
 						</xs:attribute>
+						<xs:attribute name="compiled" type="xs:boolean" use="optional" default="true">
+							<xs:annotation>
+								<xs:documentation>If object serializers should be compiled or not.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
 					</xs:complexType>
 				</xs:element>
 				<xs:element name="Ports">

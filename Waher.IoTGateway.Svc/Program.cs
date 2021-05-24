@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.XMPP.Provisioning;
@@ -36,11 +37,11 @@ namespace Waher.IoTGateway.Svc
 	/// -localsystem         Installed service will run using the Local System account.
 	/// -localservice        Installed service will run using the Local Service account (default).
 	/// -networkservice      Installed service will run using the Network Service account.
-    /// -instance INSTANCE   Name of instance. Default is the empty string. Parallel instances of the IoT Gateway can execute, provided they are given separate instance names.
+	/// -instance INSTANCE   Name of instance. Default is the empty string. Parallel instances of the IoT Gateway can execute, provided they are given separate instance names.
 	/// </summary>
 	public class Program
 	{
-        private static string instanceName = string.Empty;
+		private static string instanceName = string.Empty;
 
 		public static string InstanceName => instanceName;
 
@@ -131,8 +132,8 @@ namespace Waher.IoTGateway.Svc
 				string ServiceName = "IoT Gateway Service";
 				string DisplayName = ServiceName;
 				string Description = "Windows Service hosting the Waher IoT Gateway.";
-                string Arg;
-                ServiceStartType StartType = ServiceStartType.Disabled;
+				string Arg;
+				ServiceStartType StartType = ServiceStartType.Disabled;
 				Win32ServiceCredentials Credentials = Win32ServiceCredentials.LocalService;
 				bool Install = false;
 				bool Uninstall = false;
@@ -223,18 +224,18 @@ namespace Waher.IoTGateway.Svc
 							Credentials = Win32ServiceCredentials.NetworkService;
 							break;
 
-                        case "-instance":
-                            i++;
-                            if (i >= c)
-                            {
-                                Error = true;
-                                break;
-                            }
+						case "-instance":
+							i++;
+							if (i >= c)
+							{
+								Error = true;
+								break;
+							}
 
-                            instanceName = args[i];
-                            break;
+							instanceName = args[i];
+							break;
 
-                        default:
+						default:
 							Error = true;
 							break;
 					}
@@ -265,11 +266,11 @@ namespace Waher.IoTGateway.Svc
 					Console.Out.WriteLine("                     (default).");
 					Console.Out.WriteLine("-networkservice      Installed service will run using the Network Service");
 					Console.Out.WriteLine("                     account.");
-                    Console.Out.WriteLine("-instance INSTANCE   Name of instance. Default is the empty string. Parallel");
-                    Console.Out.WriteLine("                     instances of the IoT Gateway can execute, provided they");
-                    Console.Out.WriteLine("                     are given separate instance names.");
+					Console.Out.WriteLine("-instance INSTANCE   Name of instance. Default is the empty string. Parallel");
+					Console.Out.WriteLine("                     instances of the IoT Gateway can execute, provided they");
+					Console.Out.WriteLine("                     are given separate instance names.");
 
-                    return -1;
+					return -1;
 				}
 
 				if (Install && Uninstall)
@@ -313,7 +314,7 @@ namespace Waher.IoTGateway.Svc
 						RunAsService(ServiceName);
 					}
 
-					return 1;	// Allows the service to be restarted.
+					return 1;   // Allows the service to be restarted.
 				}
 			}
 			catch (Exception ex)
@@ -417,18 +418,17 @@ namespace Waher.IoTGateway.Svc
 
 		internal async static Task<IDatabaseProvider> GetDatabase(XmlElement DatabaseConfig)
 		{
-			if (!CommonTypes.TryParse(DatabaseConfig.Attributes["encrypted"].Value, out bool Encrypted))
-				Encrypted = true;
+			string Folder = Path.Combine(Gateway.AppDataFolder, XML.Attribute(DatabaseConfig, "folder", "Data"));
+			string DefaultCollectionName = XML.Attribute(DatabaseConfig, "defaultCollectionName", "Default");
+			int BlockSize = XML.Attribute(DatabaseConfig, "blockSize", 8192);
+			int BlocksInCache = XML.Attribute(DatabaseConfig, "blocksInCache", 10000);
+			int BlobBlockSize = XML.Attribute(DatabaseConfig, "blobBlockSize", 8192);
+			int TimeoutMs = XML.Attribute(DatabaseConfig, "timeoutMs", 3600000);
+			bool Encrypted = XML.Attribute(DatabaseConfig, "encrypted", true);
+			bool Compiled = XML.Attribute(DatabaseConfig, "compiled", true);
 
-			FilesProvider Result = await FilesProvider.CreateAsync(Gateway.AppDataFolder + DatabaseConfig.Attributes["folder"].Value,
-				DatabaseConfig.Attributes["defaultCollectionName"].Value,
-				int.Parse(DatabaseConfig.Attributes["blockSize"].Value),
-				int.Parse(DatabaseConfig.Attributes["blocksInCache"].Value),
-				int.Parse(DatabaseConfig.Attributes["blobBlockSize"].Value), Encoding.UTF8,
-				int.Parse(DatabaseConfig.Attributes["timeoutMs"].Value),
-				Encrypted, true);
-
-			return Result;
+			return await FilesProvider.CreateAsync(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, 
+				Encoding.UTF8, TimeoutMs, Encrypted, Compiled);
 		}
 
 		internal static async Task RegistrationSuccessful(MetaDataTag[] MetaData, RegistrationEventArgs e)

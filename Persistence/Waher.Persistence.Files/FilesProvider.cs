@@ -2079,7 +2079,10 @@ namespace Waher.Persistence.Files
 			where T : class
 		{
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
-			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null));
+			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null), false);
+
+			if (File is null)
+				return new T[0];
 
 			await File.CheckIndicesInitialized<T>();
 			await File.BeginRead();
@@ -2133,7 +2136,10 @@ namespace Waher.Persistence.Files
 		/// <returns>Objects found.</returns>
 		public async Task<IEnumerable<object>> Find(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
-			ObjectBTreeFile File = await this.GetFile(Collection);
+			ObjectBTreeFile File = await this.GetFile(Collection, false);
+
+			if (File is null)
+				return new object[0];
 
 			await File.CheckIndicesInitialized<object>();
 			await File.BeginRead();
@@ -2177,7 +2183,10 @@ namespace Waher.Persistence.Files
 			where T : class
 		{
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
-			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null));
+			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null), false);
+
+			if (File is null)
+				return new T[0];
 
 			return await File.FindDelete<T>(Offset, MaxCount, Filter, Serializer, false, SortOrder, null);
 		}
@@ -2208,7 +2217,11 @@ namespace Waher.Persistence.Files
 		/// <returns>Objects found.</returns>
 		public async Task<IEnumerable<object>> FindDelete(string Collection, int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
-			ObjectBTreeFile File = await this.GetFile(Collection);
+			ObjectBTreeFile File = await this.GetFile(Collection, false);
+
+			if (File is null)
+				return new object[0];
+
 			return await File.FindDelete(Offset, MaxCount, Filter, false, SortOrder, null);
 		}
 
@@ -2241,8 +2254,10 @@ namespace Waher.Persistence.Files
 			where T : class
 		{
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(typeof(T));
-			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null));
-			await File.FindDelete<T>(Offset, MaxCount, Filter, Serializer, true, SortOrder, Callback);
+			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(null), false);
+
+			if (!(File is null))
+				await File.FindDelete<T>(Offset, MaxCount, Filter, Serializer, true, SortOrder, Callback);
 		}
 
 		/// <summary>
@@ -2271,8 +2286,10 @@ namespace Waher.Persistence.Files
 		/// <param name="Callback">Method to call when operation completed.</param>
 		public async Task DeleteLazy(string Collection, int Offset, int MaxCount, Filter Filter, string[] SortOrder, ObjectsCallback Callback)
 		{
-			ObjectBTreeFile File = await this.GetFile(Collection);
-			await File.FindDelete(Offset, MaxCount, Filter, true, SortOrder, Callback);
+			ObjectBTreeFile File = await this.GetFile(Collection, false);
+
+			if (!(File is null))
+				await File.FindDelete(Offset, MaxCount, Filter, true, SortOrder, Callback);
 		}
 
 		/// <summary>

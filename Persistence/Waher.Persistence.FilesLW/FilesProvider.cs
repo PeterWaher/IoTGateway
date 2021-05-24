@@ -1043,7 +1043,13 @@ namespace Waher.Persistence.Files
 		/// <returns>If block was found in cache.</returns>
 		internal bool TryGetBlock(int FileId, uint BlockIndex, out byte[] Block)
 		{
-			return this.blocks.TryGetValue(this.GetBlockKey(FileId, BlockIndex), out Block);
+			if (!(this.blocks is null))
+				return this.blocks.TryGetValue(this.GetBlockKey(FileId, BlockIndex), out Block);
+			else
+			{
+				Block = null;
+				return false;
+			}
 		}
 
 		/// <summary>

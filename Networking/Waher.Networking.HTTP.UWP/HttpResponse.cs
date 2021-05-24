@@ -179,7 +179,7 @@ namespace Waher.Networking.HTTP
 			{
 				this.AssertHeaderOpen();
 
-				if (!string.IsNullOrEmpty(value))
+				if (!string.IsNullOrEmpty(value) && this.statusCode >= 200 && this.statusCode < 300)
 					this.Request.Header.AssertAcceptable(value);
 
 				this.contentType = value;

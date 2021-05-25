@@ -1939,17 +1939,23 @@ namespace Waher.Persistence.Files
 			if (NestedLocks.HasLock(File, out bool WriteLock))
 			{
 				if (WriteLock)
-					return await File.SaveNewObjectLocked(Value, Serializer);
+					return await File.SaveNewObjectLocked(Value, Serializer, NestedLocks);
 				else
 					throw new InvalidOperationException("Not in a writing state.");
 			}
 			else
 			{
-				NestedLocks.AddLock(File, true);
-				Guid Id = await File.SaveNewObject(Value, Serializer, false, null);
-				NestedLocks.RemoveLock(File);
-
-				return Id;
+				await File.BeginWrite();
+				try
+				{
+					NestedLocks.AddLock(File, true);
+					return await File.SaveNewObjectLocked(Value, Serializer, NestedLocks);
+				}
+				finally
+				{
+					NestedLocks.RemoveLock(File);
+					await File.EndWrite();
+				}
 			}
 		}
 
@@ -3017,7 +3023,9 @@ namespace Waher.Persistence.Files
 									{
 										if (e.CurrentTypeCompatible)
 										{
-											await File.SaveNewObjectLocked(e.Current);
+											object State = NestedLocks.CreateIfNested(File, true, e.CurrentSerializer);
+
+											await File.SaveNewObjectLocked(e.Current, State);
 
 											c++;
 											if (c >= 1000)

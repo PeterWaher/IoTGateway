@@ -1983,11 +1983,12 @@
             <param name="Lazy">If Lazy insert is used, i.e. sufficiant that object is inserted at next opportuity.</param>
             <param name="Callback">Method to call when operation completed.</param>
         </member>
-        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.SaveNewObjectLocked(System.Object)">
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.SaveNewObjectLocked(System.Object,System.Object)">
             <summary>
             Saves a new object to the file (which is locked).
             </summary>
             <param name="Object">Object to persist.</param>
+            <param name="State">State object, passed on in recursive calls.</param>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.SaveNewObjects(System.Collections.Generic.IEnumerable{System.Object},Waher.Persistence.Serialization.ObjectSerializer,System.Boolean,Waher.Persistence.ObjectsCallback)">
             <summary>
@@ -4460,6 +4461,13 @@
             </summary>
             <param name="File">Locked file.</param>
             <returns>If lock was removed.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.Storage.NestedLocks.HasBeenTouched(Waher.Persistence.Files.ObjectBTreeFile)">
+            <summary>
+            If a file has been touched in a nested operation.
+            </summary>
+            <param name="File">File being checked.</param>
+            <returns>If the file has been touched.</returns>
         </member>
         <member name="T:Waher.Persistence.Files.Storage.PrimaryRecords">
             <summary>

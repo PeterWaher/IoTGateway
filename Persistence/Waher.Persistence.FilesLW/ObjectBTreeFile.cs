@@ -1366,7 +1366,7 @@ namespace Waher.Persistence.Files
 				{
 					try
 					{
-						ObjectId = await this.SaveNewObjectLocked(Object, Serializer);
+						ObjectId = await this.SaveNewObjectLocked(Object, Serializer, NestedLocks.CreateIfNested(this, true, Serializer));
 					}
 					finally
 					{
@@ -1384,7 +1384,7 @@ namespace Waher.Persistence.Files
 				await this.BeginWrite();
 				try
 				{
-					ObjectId = await this.SaveNewObjectLocked(Object, Serializer);
+					ObjectId = await this.SaveNewObjectLocked(Object, Serializer, NestedLocks.CreateIfNested(this, true, Serializer));
 				}
 				finally
 				{
@@ -1401,7 +1401,8 @@ namespace Waher.Persistence.Files
 		/// Saves a new object to the file (which is locked).
 		/// </summary>
 		/// <param name="Object">Object to persist.</param>
-		internal async Task<Guid> SaveNewObjectLocked(object Object)
+		/// <param name="State">State object, passed on in recursive calls.</param>
+		internal async Task<Guid> SaveNewObjectLocked(object Object, object State)
 		{
 #if ASSERT_LOCKS
 			this.fileAccess.AssertWriting();
@@ -1409,7 +1410,7 @@ namespace Waher.Persistence.Files
 			Type ObjectType = Object.GetType();
 			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(ObjectType);
 
-			return await this.SaveNewObjectLocked(Object, Serializer);
+			return await this.SaveNewObjectLocked(Object, Serializer, State);
 		}
 
 		/// <summary>
@@ -1427,10 +1428,12 @@ namespace Waher.Persistence.Files
 			{
 				if (await this.TryBeginWrite(0))
 				{
+					NestedLocks State = NestedLocks.CreateIfNested(this, true, Serializer);
+
 					try
 					{
 						foreach (object Object in Objects)
-							await this.SaveNewObjectLocked(Object, Serializer);
+							await this.SaveNewObjectLocked(Object, Serializer, State);
 					}
 					finally
 					{
@@ -1448,8 +1451,10 @@ namespace Waher.Persistence.Files
 				await this.BeginWrite();
 				try
 				{
+					NestedLocks State = NestedLocks.CreateIfNested(this, true, Serializer);
+
 					foreach (object Object in Objects)
-						ObjectIds.AddLast(await this.SaveNewObjectLocked(Object, Serializer));
+						ObjectIds.AddLast(await this.SaveNewObjectLocked(Object, Serializer, State));
 				}
 				finally
 				{
@@ -1460,7 +1465,7 @@ namespace Waher.Persistence.Files
 			Callback?.Invoke(Objects);
 		}
 
-		internal async Task<Guid> SaveNewObjectLocked(object Object, ObjectSerializer Serializer)
+		internal async Task<Guid> SaveNewObjectLocked(object Object, ObjectSerializer Serializer, object State)
 		{
 #if ASSERT_LOCKS
 			this.fileAccess.AssertWriting();
@@ -1472,10 +1477,17 @@ namespace Waher.Persistence.Files
 			Tuple<Guid, BlockInfo> Rec = await this.PrepareObjectIdForSaveLocked(Object, Serializer);
 			ObjectId = Rec.Item1;
 			BlockInfo Leaf = Rec.Item2;
+			bool Nested = Serializer.HasByReference;
+			
+			if (Nested && State is null)
+				State = NestedLocks.CreateIfNested(this, true, Serializer);
 
 			Writer = new BinarySerializer(this.collectionName, this.encoding);
-			await Serializer.Serialize(Writer, false, false, Object, NestedLocks.CreateIfNested(this, true, Serializer));
+			await Serializer.Serialize(Writer, false, false, Object, State);
 			Bin = Writer.GetSerialization();
+
+			if (Serializer.HasByReference && State is NestedLocks Locks && Locks.HasBeenTouched(this))
+				Leaf = await this.FindLeafNodeLocked(ObjectId);
 
 			await this.SaveNewObjectLocked(Bin, Leaf);
 

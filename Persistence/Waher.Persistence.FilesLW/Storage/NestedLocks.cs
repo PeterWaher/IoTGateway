@@ -12,6 +12,7 @@ namespace Waher.Persistence.Files.Storage
 		private readonly ObjectBTreeFile file;
 		private int count;
 		private Dictionary<ObjectBTreeFile, int> additionalLocks = null;
+		private Dictionary<ObjectBTreeFile, bool> touched = null;
 
 		/// <summary>
 		/// Maintains a list of locks acquired for the current operation.
@@ -61,6 +62,11 @@ namespace Waher.Persistence.Files.Storage
 		/// <returns>If a lock has been acquired.</returns>
 		public bool HasLock(ObjectBTreeFile File, out bool WriteLock)
 		{
+			if (this.touched is null)
+				this.touched = new Dictionary<ObjectBTreeFile, bool>();
+
+			this.touched[File] = true;
+
 			if (File == this.file)
 			{
 				WriteLock = this.count > 0;
@@ -92,6 +98,11 @@ namespace Waher.Persistence.Files.Storage
 		/// <param name="WriteLock">true=Write lock, false=Read lock.</param>
 		public void AddLock(ObjectBTreeFile File, bool WriteLock)
 		{
+			if (this.touched is null)
+				this.touched = new Dictionary<ObjectBTreeFile, bool>();
+
+			this.touched[File] = true;
+
 			if (File == this.file)
 			{
 				if (WriteLock ^ (this.count > 0))
@@ -163,6 +174,16 @@ namespace Waher.Persistence.Files.Storage
 
 				return true;
 			}
+		}
+
+		/// <summary>
+		/// If a file has been touched in a nested operation.
+		/// </summary>
+		/// <param name="File">File being checked.</param>
+		/// <returns>If the file has been touched.</returns>
+		public bool HasBeenTouched(ObjectBTreeFile File)
+		{
+			return this.touched?.ContainsKey(File) ?? false;
 		}
 
 	}

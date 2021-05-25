@@ -215,14 +215,15 @@ namespace Waher.Persistence.Serialization
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public async Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		/// <param name="State">State object, passed on in recursive calls.</param>
+		public async Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value, object State)
 		{
 			KeyValuePair<string, object> TypedValue = (KeyValuePair<string, object>)Value;
 			IObjectSerializer Serializer = await this.context.GetObjectSerializer(TypedValue.Value?.GetType() ?? typeof(object));
 
 			Writer.WriteBit(true);
 			Writer.Write(TypedValue.Key);
-			await Serializer.Serialize(Writer, true, true, TypedValue.Value);
+			await Serializer.Serialize(Writer, true, true, TypedValue.Value, State);
 		}
 
 		/// <summary>

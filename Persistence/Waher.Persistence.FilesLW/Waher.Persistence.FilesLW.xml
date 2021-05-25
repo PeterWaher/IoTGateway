@@ -664,11 +664,12 @@
             <exception cref="T:System.NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
             or if the corresponding property type is not supported.</exception>
         </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.SaveNewObject(System.Object)">
+        <member name="M:Waher.Persistence.Files.FilesProvider.SaveNewObject(System.Object,System.Object)">
             <summary>
             Saves an unsaved object, and returns a new GUID identifying the saved object.
             </summary>
             <param name="Value">Object to save.</param>
+            <param name="State">State object, passed on in recursive calls.</param>
             <returns>GUID identifying the saved object.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.Insert(System.Object)">
@@ -1998,6 +1999,14 @@
             <param name="Properties">If object properties should be exported as well.</param>
             <returns>Graph XML.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.ExportGraphXML(System.Boolean,System.Boolean)">
+            <summary>
+            Exports the structure of the file to XML.
+            </summary>
+            <param name="Properties">If object properties should be exported as well.</param>
+            <param name="Locked">If a write lock has been taken already.</param>
+            <returns>Graph XML.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.ExportGraphXML(System.Text.StringBuilder,System.Boolean)">
             <summary>
             Exports the structure of the file to XML.
@@ -2006,12 +2015,30 @@
             <param name="Properties">If object properties should be exported as well.</param>
             <returns>Asynchronous task object.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.ExportGraphXML(System.Text.StringBuilder,System.Boolean,System.Boolean)">
+            <summary>
+            Exports the structure of the file to XML.
+            </summary>
+            <param name="Output">XML Output</param>
+            <param name="Properties">If object properties should be exported as well.</param>
+            <param name="Locked">If a write lock has been taken already.</param>
+            <returns>Asynchronous task object.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.ExportGraphXML(System.Xml.XmlWriter,System.Boolean)">
             <summary>
             Exports the structure of the file to XML.
             </summary>
             <param name="XmlOutput">XML Output</param>
             <param name="Properties">If object properties should be exported as well.</param>
+            <returns>Asynchronous task object.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.ExportGraphXML(System.Xml.XmlWriter,System.Boolean,System.Boolean)">
+            <summary>
+            Exports the structure of the file to XML.
+            </summary>
+            <param name="XmlOutput">XML Output</param>
+            <param name="Properties">If object properties should be exported as well.</param>
+            <param name="Locked">If a write lock has been taken already.</param>
             <returns>Asynchronous task object.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.ExportGraphXMLLocked(System.Xml.XmlWriter,System.Boolean)">
@@ -4248,6 +4275,60 @@
             <param name="BlobReference">Binary BLOB reference.</param>
             <param name="BlobData">Original BLOB data.</param>
             <returns>Encoded BLOB reference.</returns>
+        </member>
+        <member name="T:Waher.Persistence.Files.Storage.NestedLocks">
+            <summary>
+            Maintains a list of locks granted for the current operation.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.Storage.NestedLocks.#ctor(Waher.Persistence.Files.ObjectBTreeFile,System.Boolean)">
+            <summary>
+            Maintains a list of locks acquired for the current operation.
+            </summary>
+            <param name="File">Top-most file in nested operation.</param>
+            <param name="WriteLock">true=Write lock, false=Read lock.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.Storage.NestedLocks.CreateIfNested(Waher.Persistence.Files.ObjectBTreeFile,System.Boolean,Waher.Persistence.Serialization.IObjectSerializer)">
+            <summary>
+            Creates an instance of <see cref="T:Waher.Persistence.Files.Storage.NestedLocks"/>, if the serializer in
+            <paramref name="Serializer"/> indicates nested serialization is to be
+            performed.
+            </summary>
+            <param name="File">Top-most file in nested operation.</param>
+            <param name="WriteLock">true=Write lock, false=Read lock.</param>
+            <param name="Serializer">Top-most serializer in nested operation.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.Storage.NestedLocks.CreateIfNested(Waher.Persistence.Files.ObjectBTreeFile,System.Boolean,Waher.Persistence.Serialization.ObjectSerializer)">
+            <summary>
+            Creates an instance of <see cref="T:Waher.Persistence.Files.Storage.NestedLocks"/>, if the serializer in
+            <paramref name="Serializer"/> indicates nested serialization is to be
+            performed.
+            </summary>
+            <param name="File">Top-most file in nested operation.</param>
+            <param name="WriteLock">true=Write lock, false=Read lock.</param>
+            <param name="Serializer">Top-most serializer in nested operation.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.Storage.NestedLocks.HasLock(Waher.Persistence.Files.ObjectBTreeFile,System.Boolean@)">
+            <summary>
+            Checks if a lock has been acquired during the current operation.
+            </summary>
+            <param name="File">File being quieried.</param>
+            <param name="WriteLock">true=Write lock, false=Read lock.</param>
+            <returns>If a lock has been acquired.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.Storage.NestedLocks.AddLock(Waher.Persistence.Files.ObjectBTreeFile,System.Boolean)">
+            <summary>
+            Adds information about a nested lock being acquired.
+            </summary>
+            <param name="File">Locked file.</param>
+            <param name="WriteLock">true=Write lock, false=Read lock.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.Storage.NestedLocks.RemoveLock(Waher.Persistence.Files.ObjectBTreeFile)">
+            <summary>
+            Removes a nested lock.
+            </summary>
+            <param name="File">Locked file.</param>
+            <returns>If lock was removed.</returns>
         </member>
         <member name="T:Waher.Persistence.Files.Storage.PrimaryRecords">
             <summary>

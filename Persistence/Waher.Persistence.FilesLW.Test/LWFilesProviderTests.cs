@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.ExceptionServices;
 using System.Text;
-using System.Xml;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Content;
-using Waher.Persistence.Serialization;
-using Waher.Persistence.Files.Statistics;
-using Waher.Runtime.Inventory;
 
 #if !LW
 using Waher.Persistence.Files.Test.Classes;
@@ -67,7 +59,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			ObjectBTreeFile File = await this.provider.GetFile("Default");
 			await DBFilesBTreeTests.AssertConsistent(File, this.provider, 3, Obj, true);
-			Console.Out.WriteLine(await DBFilesBTreeTests.ExportXML(File, "Data\\BTree.xml"));
+			Console.Out.WriteLine(await DBFilesBTreeTests.ExportXML(File, "Data\\BTree.xml", false));
 
 			Assert.AreNotEqual(Guid.Empty, Obj.ObjectId);
 			Assert.AreNotEqual(Guid.Empty, Obj.Default.ObjectId);

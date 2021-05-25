@@ -67,7 +67,7 @@ namespace Waher.Persistence.FilesLW.Test
 			this.file = await this.provider.GetFile(DBFilesBTreeTests.CollectionName);
 			this.start = DateTime.Now;
 
-			await DBFilesBTreeTests.ExportXML(this.file, "Data\\BTreeBefore.xml");
+			await DBFilesBTreeTests.ExportXML(this.file, "Data\\BTreeBefore.xml", false);
 		}
 
 		[TestCleanup]
@@ -137,11 +137,11 @@ namespace Waher.Persistence.FilesLW.Test
 			}
 			catch (Exception ex)
 			{
-				Console.Out.WriteLine(await DBFilesBTreeTests.ExportXML(this.file, "Data\\BTreeError.xml"));
+				Console.Out.WriteLine(await DBFilesBTreeTests.ExportXML(this.file, "Data\\BTreeError.xml", false));
 				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 
-			Console.Out.WriteLine(await DBFilesBTreeTests.ExportXML(this.file, "Data\\BTreeAfter.xml"));
+			Console.Out.WriteLine(await DBFilesBTreeTests.ExportXML(this.file, "Data\\BTreeAfter.xml", false));
 
 			await DBFilesBTreeTests.AssertConsistent(this.file, this.provider, (int)(StatBefore.NrObjects - 1), null, true);
 		}

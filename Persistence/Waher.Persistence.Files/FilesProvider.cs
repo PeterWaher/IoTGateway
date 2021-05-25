@@ -821,7 +821,7 @@ namespace Waher.Persistence.Files
 
 			IObjectSerializer Serializer = await this.GetObjectSerializer(Object.GetType());
 			if (Serializer is ObjectSerializer SerializerEx && await SerializerEx.HasObjectId(Object))
-				return await SerializerEx.GetObjectId(Object, false);
+				return await SerializerEx.GetObjectId(Object, false, null);
 			else
 				return null;
 		}
@@ -1919,19 +1919,38 @@ namespace Waher.Persistence.Files
 		public async Task<Guid> GetObjectId(object Value, bool InsertIfNotFound)
 		{
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(Value);
-			return await Serializer.GetObjectId(Value, InsertIfNotFound);
+			return await Serializer.GetObjectId(Value, InsertIfNotFound, null);
 		}
 
 		/// <summary>
 		/// Saves an unsaved object, and returns a new GUID identifying the saved object.
 		/// </summary>
 		/// <param name="Value">Object to save.</param>
+		/// <param name="State">State object, passed on in recursive calls.</param>
 		/// <returns>GUID identifying the saved object.</returns>
-		public async Task<Guid> SaveNewObject(object Value)
+		public async Task<Guid> SaveNewObject(object Value, object State)
 		{
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(Value);
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(Value));
-			return await File.SaveNewObject(Value, Serializer, false, null);
+
+			if (!(State is NestedLocks NestedLocks))
+				return await File.SaveNewObject(Value, Serializer, false, null);
+
+			if (NestedLocks.HasLock(File, out bool WriteLock))
+			{
+				if (WriteLock)
+					return await File.SaveNewObjectLocked(Value, Serializer);
+				else
+					throw new InvalidOperationException("Not in a writing state.");
+			}
+			else
+			{
+				NestedLocks.AddLock(File, true);
+				Guid Id = await File.SaveNewObject(Value, Serializer, false, null);
+				NestedLocks.RemoveLock(File);
+
+				return Id;
+			}
 		}
 
 		#endregion
@@ -2550,7 +2569,7 @@ namespace Waher.Persistence.Files
 			string CollectionName = await Serializer.CollectionName(Object);
 			BinarySerializer Output = new BinarySerializer(CollectionName, Encoding.UTF8);
 
-			await Serializer.Serialize(Output, true, false, Object);
+			await Serializer.Serialize(Output, true, false, Object, null);
 
 			Output.FlushBits();
 			byte[] Bin = Output.GetSerialization();

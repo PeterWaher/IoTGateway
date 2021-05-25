@@ -89,8 +89,9 @@ namespace Waher.Persistence.Serialization
 		/// Saves an unsaved object, and returns a new GUID identifying the saved object.
 		/// </summary>
 		/// <param name="Value">Object to save.</param>
+		/// <param name="State">State object, passed on in recursive calls.</param>
 		/// <returns>GUID identifying the saved object.</returns>
-		Task<Guid> SaveNewObject(object Value);
+		Task<Guid> SaveNewObject(object Value, object State);
 
 		/// <summary>
 		/// Tries to load an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
@@ -110,6 +111,5 @@ namespace Waher.Persistence.Serialization
 		/// <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
 		/// <returns>Loaded object.</returns>
 		Task<object> TryLoadObject(Type T, Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter);
-
 	}
 }

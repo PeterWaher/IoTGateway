@@ -49,7 +49,8 @@ namespace Waher.Persistence.Serialization
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public abstract Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value);
+		/// <param name="State">State object, passed on in recursive calls.</param>
+		public abstract Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value, object State);
 
 		/// <summary>
 		/// Gets the value of a field or property of an object, given its name.
@@ -977,7 +978,8 @@ namespace Waher.Persistence.Serialization
 		/// <param name="Context">Serialization context.</param>
 		/// <param name="Writer">Serializer.</param>
 		/// <param name="Value">Value to serialize.</param>
-		public static async Task WriteArray<T>(ISerializerContext Context, ISerializer Writer, T[] Value)
+		/// <param name="State">State object, passed on in recursive calls.</param>
+		public static async Task WriteArray<T>(ISerializerContext Context, ISerializer Writer, T[] Value, object State)
 		{
 			if (Value is null)
 				Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
@@ -1014,7 +1016,7 @@ namespace Waher.Persistence.Serialization
 							LastType = ItemType;
 						}
 
-						await S.Serialize(Writer, Nullable, true, Item);
+						await S.Serialize(Writer, Nullable, true, Item, State);
 					}
 				}
 			}
@@ -1027,7 +1029,8 @@ namespace Waher.Persistence.Serialization
 		/// <param name="Context">Serialization context.</param>
 		/// <param name="Writer">Serializer.</param>
 		/// <param name="Value">Value to serialize.</param>
-		public static async Task WriteArray(Type T, ISerializerContext Context, ISerializer Writer, Array Value)
+		/// <param name="State">State object, passed on in recursive calls.</param>
+		public static async Task WriteArray(Type T, ISerializerContext Context, ISerializer Writer, Array Value, object State)
 		{
 			if (Value is null)
 				Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
@@ -1064,7 +1067,7 @@ namespace Waher.Persistence.Serialization
 							LastType = ItemType;
 						}
 
-						await S.Serialize(Writer, Nullable, true, Item);
+						await S.Serialize(Writer, Nullable, true, Item, State);
 					}
 				}
 			}

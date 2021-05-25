@@ -546,7 +546,8 @@ namespace Waher.Persistence.Serialization
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public override async Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		/// <param name="State">State object, passed on in recursive calls.</param>
+		public override async Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value, object State)
 		{
 			if (Value is null)
 			{
@@ -629,11 +630,11 @@ namespace Waher.Persistence.Serialization
 					else
 					{
 						if (Obj is GenericObject)
-							await this.Serialize(Writer, true, true, Obj);
+							await this.Serialize(Writer, true, true, Obj, State);
 						else
 						{
 							Serializer = await this.Context.GetObjectSerializer(Obj.GetType());
-							await Serializer.Serialize(Writer, true, true, Obj);
+							await Serializer.Serialize(Writer, true, true, Obj, State);
 						}
 					}
 				}
@@ -660,7 +661,7 @@ namespace Waher.Persistence.Serialization
 			else
 			{
 				IObjectSerializer Serializer = await this.Context.GetObjectSerializer(Value?.GetType() ?? typeof(object));
-				await Serializer.Serialize(Writer, WriteTypeCode, Embedded, Value);
+				await Serializer.Serialize(Writer, WriteTypeCode, Embedded, Value, State);
 			}
 		}
 
@@ -746,10 +747,11 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		/// <param name="Value">Object reference.</param>
 		/// <param name="InsertIfNotFound">Insert object into database with new Object ID, if no Object ID is set.</param>
+		/// <param name="State">State object, passed on in recursive calls.</param>
 		/// <returns>Object ID for <paramref name="Value"/>.</returns>
 		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
 		/// or if the corresponding property type is not supported.</exception>
-		public override async Task<Guid> GetObjectId(object Value, bool InsertIfNotFound)
+		public override async Task<Guid> GetObjectId(object Value, bool InsertIfNotFound, object State)
 		{
 			if (Value is GenericObject Obj)
 			{
@@ -759,7 +761,7 @@ namespace Waher.Persistence.Serialization
 				if (!InsertIfNotFound)
 					throw new Exception("Object has no Object ID defined.");
 
-				Guid ObjectId = await this.Context.SaveNewObject(Obj);
+				Guid ObjectId = await this.Context.SaveNewObject(Obj, State);
 
 				Obj.ObjectId = ObjectId;
 
@@ -770,7 +772,7 @@ namespace Waher.Persistence.Serialization
 				if (!(await this.Context.GetObjectSerializer(Value.GetType()) is ObjectSerializer Serializer2))
 					throw new Exception("Unable to set Object ID");
 
-				return await Serializer2.GetObjectId(Value, InsertIfNotFound);
+				return await Serializer2.GetObjectId(Value, InsertIfNotFound, State);
 			}
 			else
 				throw new NotSupportedException("Objects of type " + Value.GetType().FullName + " not supported.");

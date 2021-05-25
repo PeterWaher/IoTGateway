@@ -534,7 +534,7 @@ namespace Waher.Persistence.Files
 									if (await this.TryBeginWrite(0))
 									{
 										try
-										{ 
+										{
 											await this.FindDeleteLocked(FindDeleteLazyRec.T, Offset, MaxCount, Filter, Serializer, SortOrder);
 										}
 										finally
@@ -1456,7 +1456,7 @@ namespace Waher.Persistence.Files
 					await this.EndWrite();
 				}
 			}
-		
+
 			Callback?.Invoke(Objects);
 		}
 
@@ -1474,7 +1474,7 @@ namespace Waher.Persistence.Files
 			BlockInfo Leaf = Rec.Item2;
 
 			Writer = new BinarySerializer(this.collectionName, this.encoding);
-			await Serializer.Serialize(Writer, false, false, Object);
+			await Serializer.Serialize(Writer, false, false, Object, NestedLocks.CreateIfNested(this, true, Serializer));
 			Bin = Writer.GetSerialization();
 
 			await this.SaveNewObjectLocked(Bin, Leaf);
@@ -1575,7 +1575,7 @@ namespace Waher.Persistence.Files
 
 			if (HasObjectId)
 			{
-				ObjectId = await Serializer.GetObjectId(Object, false);
+				ObjectId = await Serializer.GetObjectId(Object, false, NestedLocks.CreateIfNested(this, true, Serializer));
 				Leaf = await this.FindLeafNodeLocked(ObjectId);
 
 				if (Leaf is null)
@@ -2212,13 +2212,13 @@ namespace Waher.Persistence.Files
 					await this.EndWrite();
 				}
 			}
-		
+
 			Callback?.Invoke(Object);
 		}
 
 		private async Task UpdateObjectLocked(object Object, ObjectSerializer Serializer)
 		{
-			Guid ObjectId = await Serializer.GetObjectId(Object, false);
+			Guid ObjectId = await Serializer.GetObjectId(Object, false, NestedLocks.CreateIfNested(this, true, Serializer));
 			BlockInfo Info = await this.FindNodeLocked(ObjectId);
 			if (Info is null)
 				throw new KeyNotFoundException("Object not found.");
@@ -2226,7 +2226,7 @@ namespace Waher.Persistence.Files
 			object Old = await this.ParseObjectLocked(Info, Serializer);
 
 			BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
-			await Serializer.Serialize(Writer, false, false, Object);
+			await Serializer.Serialize(Writer, false, false, Object, NestedLocks.CreateIfNested(this, true, Serializer));
 			byte[] Bin = Writer.GetSerialization();
 
 			await this.ReplaceObjectLocked(Bin, Info, true);
@@ -2284,7 +2284,7 @@ namespace Waher.Persistence.Files
 					await this.EndWrite();
 				}
 			}
-		
+
 			Callback?.Invoke(Objects);
 		}
 
@@ -2559,13 +2559,13 @@ namespace Waher.Persistence.Files
 					await this.EndWrite();
 				}
 			}
-		
+
 			Callback?.Invoke(Object);
 		}
 
 		private async Task DeleteObjectLocked(object Object, ObjectSerializer Serializer)
 		{
-			Guid ObjectId = await Serializer.GetObjectId(Object, false);
+			Guid ObjectId = await Serializer.GetObjectId(Object, false, NestedLocks.CreateIfNested(this, true, Serializer));
 			await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
 
 			if (!(this.indices is null))
@@ -4335,10 +4335,21 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="Properties">If object properties should be exported as well.</param>
 		/// <returns>Graph XML.</returns>
-		public async Task<string> ExportGraphXML(bool Properties)
+		public Task<string> ExportGraphXML(bool Properties)
+		{
+			return this.ExportGraphXML(Properties, false);
+		}
+
+		/// <summary>
+		/// Exports the structure of the file to XML.
+		/// </summary>
+		/// <param name="Properties">If object properties should be exported as well.</param>
+		/// <param name="Locked">If a write lock has been taken already.</param>
+		/// <returns>Graph XML.</returns>
+		public async Task<string> ExportGraphXML(bool Properties, bool Locked)
 		{
 			StringBuilder Output = new StringBuilder();
-			await this.ExportGraphXML(Output, Properties);
+			await this.ExportGraphXML(Output, Properties, Locked);
 			return Output.ToString();
 		}
 
@@ -4348,7 +4359,19 @@ namespace Waher.Persistence.Files
 		/// <param name="Output">XML Output</param>
 		/// <param name="Properties">If object properties should be exported as well.</param>
 		/// <returns>Asynchronous task object.</returns>
-		public async Task ExportGraphXML(StringBuilder Output, bool Properties)
+		public Task ExportGraphXML(StringBuilder Output, bool Properties)
+		{
+			return this.ExportGraphXML(Output, Properties, false);
+		}
+
+		/// <summary>
+		/// Exports the structure of the file to XML.
+		/// </summary>
+		/// <param name="Output">XML Output</param>
+		/// <param name="Properties">If object properties should be exported as well.</param>
+		/// <param name="Locked">If a write lock has been taken already.</param>
+		/// <returns>Asynchronous task object.</returns>
+		public async Task ExportGraphXML(StringBuilder Output, bool Properties, bool Locked)
 		{
 			XmlWriterSettings Settings = new XmlWriterSettings()
 			{
@@ -4365,7 +4388,7 @@ namespace Waher.Persistence.Files
 
 			using (XmlWriter w = XmlWriter.Create(Output, Settings))
 			{
-				await this.ExportGraphXML(w, Properties);
+				await this.ExportGraphXML(w, Properties, Locked);
 				w.Flush();
 			}
 		}
@@ -4376,16 +4399,30 @@ namespace Waher.Persistence.Files
 		/// <param name="XmlOutput">XML Output</param>
 		/// <param name="Properties">If object properties should be exported as well.</param>
 		/// <returns>Asynchronous task object.</returns>
-		public async Task ExportGraphXML(XmlWriter XmlOutput, bool Properties)
+		public Task ExportGraphXML(XmlWriter XmlOutput, bool Properties)
 		{
-			await this.BeginWrite();
+			return this.ExportGraphXML(XmlOutput, Properties, false);
+		}
+
+		/// <summary>
+		/// Exports the structure of the file to XML.
+		/// </summary>
+		/// <param name="XmlOutput">XML Output</param>
+		/// <param name="Properties">If object properties should be exported as well.</param>
+		/// <param name="Locked">If a write lock has been taken already.</param>
+		/// <returns>Asynchronous task object.</returns>
+		public async Task ExportGraphXML(XmlWriter XmlOutput, bool Properties, bool Locked)
+		{
+			if (!Locked)
+				await this.BeginWrite();
 			try
 			{
 				await this.ExportGraphXMLLocked(XmlOutput, Properties);
 			}
 			finally
 			{
-				await this.EndWrite();
+				if (!Locked)
+					await this.EndWrite();
 			}
 		}
 
@@ -4953,7 +4990,7 @@ namespace Waher.Persistence.Files
 			if (!await Serializer.HasObjectId(Item))
 				return false;
 
-			Guid ObjectId = await Serializer.GetObjectId(Item, false);
+			Guid ObjectId = await Serializer.GetObjectId(Item, false, null);
 			GenericObject Obj;
 
 			await this.BeginRead();
@@ -4976,7 +5013,7 @@ namespace Waher.Persistence.Files
 			try
 			{
 				BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
-				await Serializer.Serialize(Writer, false, false, Item);
+				await Serializer.Serialize(Writer, false, false, Item, null);
 				byte[] Bin = Writer.GetSerialization();
 
 				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin, this.blockLimit);
@@ -6469,7 +6506,7 @@ namespace Waher.Persistence.Files
 
 			foreach (T Object in Result)
 			{
-				Guid ObjectId = await Serializer.GetObjectId(Object, false);
+				Guid ObjectId = await Serializer.GetObjectId(Object, false, NestedLocks.CreateIfNested(this, true, Serializer));
 				if (ObjectId != Guid.Empty)
 					await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
 			}
@@ -6558,7 +6595,7 @@ namespace Waher.Persistence.Files
 					LastType = Type;
 				}
 
-				Guid ObjectId = await Serializer.GetObjectId(Object, false);
+				Guid ObjectId = await Serializer.GetObjectId(Object, false, NestedLocks.CreateIfNested(this, true, Serializer));
 				if (ObjectId != Guid.Empty)
 					await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
 			}
@@ -6569,19 +6606,19 @@ namespace Waher.Persistence.Files
 		private async Task<IEnumerable<object>> FindDeleteLocked(Type T, int Offset, int MaxCount, Filter Filter, ObjectSerializer Serializer, params string[] SortOrder)
 		{
 			TypeInfo TI = T.GetTypeInfo();
-			FilterCustom<object> TypeFilter= new FilterCustom<object>(o => TI.IsAssignableFrom(o.GetType().GetTypeInfo()));
+			FilterCustom<object> TypeFilter = new FilterCustom<object>(o => TI.IsAssignableFrom(o.GetType().GetTypeInfo()));
 
 			if (Filter is null)
 				Filter = TypeFilter;
 			else
 				Filter = new FilterAnd(Filter, TypeFilter);
-			
+
 			ICursor<object> ResultSet = await this.FindLocked<object>(Offset, MaxCount, Filter, SortOrder);
 			IEnumerable<object> Result = await FilesProvider.LoadAllLocked<object>(ResultSet);
 
 			foreach (object Object in Result)
 			{
-				Guid ObjectId = await Serializer.GetObjectId(Object, false);
+				Guid ObjectId = await Serializer.GetObjectId(Object, false, NestedLocks.CreateIfNested(this, true, Serializer));
 				if (ObjectId != Guid.Empty)
 					await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null, 0);
 			}

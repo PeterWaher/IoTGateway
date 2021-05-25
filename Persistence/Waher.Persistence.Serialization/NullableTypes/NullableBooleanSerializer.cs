@@ -66,7 +66,8 @@ namespace Waher.Persistence.Serialization.NullableTypes
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public override Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		/// <param name="State">State object, passed on in recursive calls.</param>
+		public override Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value, object State)
 		{
 			bool? Value2 = (bool?)Value;
 

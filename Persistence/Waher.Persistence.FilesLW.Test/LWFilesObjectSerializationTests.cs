@@ -125,7 +125,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			await S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
@@ -150,7 +150,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			await GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -320,7 +320,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			await S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -360,7 +360,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			await GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -459,7 +459,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			await S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -499,7 +499,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			await GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -574,7 +574,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			await S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -615,7 +615,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			await GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -717,7 +717,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			await S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -758,7 +758,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			await GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -800,7 +800,7 @@ namespace Waher.Persistence.FilesLW.Test
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(SimpleArrays));
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			await S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -840,7 +840,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			await GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -905,7 +905,7 @@ namespace Waher.Persistence.FilesLW.Test
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(NullableArrays));
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			await S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -943,7 +943,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			await GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -1034,7 +1034,7 @@ namespace Waher.Persistence.FilesLW.Test
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(Container));
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			await S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
@@ -1077,7 +1077,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			await GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -1127,7 +1127,7 @@ namespace Waher.Persistence.FilesLW.Test
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(ObjectIdString));
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			await S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(string.IsNullOrEmpty(Obj.ObjectId));
 
@@ -1151,7 +1151,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			await GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -1182,7 +1182,7 @@ namespace Waher.Persistence.FilesLW.Test
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(ObjectIdByteArray));
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			await S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsNotNull(Obj.ObjectId);
 
@@ -1206,7 +1206,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			await GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -1248,8 +1248,8 @@ namespace Waher.Persistence.FilesLW.Test
 			ISerializer Writer1 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 			ISerializer Writer2 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			await S1.Serialize(Writer1, false, false, Obj1);
-			await S2.Serialize(Writer2, false, false, Obj2);
+			await S1.Serialize(Writer1, false, false, Obj1, null);
+			await S2.Serialize(Writer2, false, false, Obj2, null);
 
 			Assert.IsFalse(Obj1.ObjectId.Equals(Guid.Empty));
 			Assert.IsFalse(Obj2.ObjectId.Equals(Guid.Empty));
@@ -1287,8 +1287,8 @@ namespace Waher.Persistence.FilesLW.Test
 			Writer1.Restart();
 			Writer2.Restart();
 
-			await GS.Serialize(Writer1, false, false, GenObj1);
-			await GS.Serialize(Writer2, false, false, GenObj2);
+			await GS.Serialize(Writer1, false, false, GenObj1, null);
+			await GS.Serialize(Writer2, false, false, GenObj2, null);
 
 			Data1 = Writer1.GetSerialization();
 			Data2 = Writer2.GetSerialization();
@@ -1344,8 +1344,8 @@ namespace Waher.Persistence.FilesLW.Test
 			ISerializer Writer1 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 			ISerializer Writer2 = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			await S1.Serialize(Writer1, false, false, Obj1);
-			await S2.Serialize(Writer2, false, false, Obj2);
+			await S1.Serialize(Writer1, false, false, Obj1, null);
+			await S2.Serialize(Writer2, false, false, Obj2, null);
 
 			Assert.IsFalse(Obj1.ObjectId.Equals(Guid.Empty));
 			Assert.IsFalse(Obj2.ObjectId.Equals(Guid.Empty));
@@ -1383,8 +1383,8 @@ namespace Waher.Persistence.FilesLW.Test
 			Writer1.Restart();
 			Writer2.Restart();
 
-			await GS.Serialize(Writer1, false, false, GenObj1);
-			await GS.Serialize(Writer2, false, false, GenObj2);
+			await GS.Serialize(Writer1, false, false, GenObj1, null);
+			await GS.Serialize(Writer2, false, false, GenObj2, null);
 
 			Data1 = Writer1.GetSerialization();
 			Data2 = Writer2.GetSerialization();
@@ -1429,7 +1429,7 @@ namespace Waher.Persistence.FilesLW.Test
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(CollectionTest));
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(await ((ObjectSerializer)S).CollectionName(Obj), Encoding.UTF8), Console.Out);
 
-			await S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -1452,7 +1452,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			await GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -1501,7 +1501,7 @@ namespace Waher.Persistence.FilesLW.Test
 			IObjectSerializer S = await provider.GetObjectSerializer(typeof(ArraysOfArrays));
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			await S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj, null);
 
 			byte[] Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -1541,7 +1541,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			await GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);
@@ -1635,7 +1635,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
 
-			await S.Serialize(Writer, false, false, Obj);
+			await S.Serialize(Writer, false, false, Obj, null);
 
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
@@ -1657,7 +1657,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Writer.Restart();
 
-			await GS.Serialize(Writer, false, false, GenObj);
+			await GS.Serialize(Writer, false, false, GenObj, null);
 
 			Data = Writer.GetSerialization();
 			this.WriteData(Data);

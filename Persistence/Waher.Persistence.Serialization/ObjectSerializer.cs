@@ -188,6 +188,7 @@ namespace Waher.Persistence.Serialization
 		private bool archiveDynamic = false;
 		private bool isNullable;
 		private bool normalized;
+		private bool hasByRef = false;
 
 		internal ObjectSerializer(ISerializerContext Context, Type Type)    // Note order.
 		{
@@ -609,7 +610,10 @@ namespace Waher.Persistence.Serialization
 							}
 						}
 						else if (Attr is ByReferenceAttribute)
+						{
 							ByReference = true;
+							this.hasByRef = true;
+						}
 						else if (Attr is ObjectIdAttribute)
 						{
 							this.objectIdFieldInfo = FI;
@@ -710,6 +714,13 @@ namespace Waher.Persistence.Serialization
 						CSharp.Append(" = await this.context.GetObjectSerializer(typeof(");
 						this.AppendType(MemberType, CSharp);
 						CSharp.AppendLine("));");
+
+						if (!this.hasByRef)
+						{
+							IObjectSerializer Nested = await this.context.GetObjectSerializer(MemberType);
+							if (Nested is ObjectSerializer Nested2 && Nested2.HasByReference)
+								this.hasByRef = true;
+						}
 					}
 				}
 
@@ -1471,13 +1482,13 @@ namespace Waher.Persistence.Serialization
 
 				CSharp.AppendLine("\t\t}");
 				CSharp.AppendLine();
-				CSharp.AppendLine("\t\tpublic override async Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object UntypedValue)");
+				CSharp.AppendLine("\t\tpublic override async Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object UntypedValue, object State)");
 				CSharp.AppendLine("\t\t{");
 				CSharp.AppendLine("\t\t\tType T = UntypedValue?.GetType();");
 				CSharp.AppendLine("\t\t\tif (!(T is null) && T != typeof(" + this.type.FullName + "))");
 				CSharp.AppendLine("\t\t\t{");
 				CSharp.AppendLine("\t\t\t\tIObjectSerializer Serializer = await this.context.GetObjectSerializer(T);");
-				CSharp.AppendLine("\t\t\t\tawait Serializer.Serialize(Writer, WriteTypeCode, Embedded, UntypedValue);");
+				CSharp.AppendLine("\t\t\t\tawait Serializer.Serialize(Writer, WriteTypeCode, Embedded, UntypedValue, State);");
 				CSharp.AppendLine("\t\t\t\treturn;");
 				CSharp.AppendLine("\t\t\t}");
 				CSharp.AppendLine();
@@ -2027,7 +2038,7 @@ namespace Waher.Persistence.Serialization
 											CSharp.Append(GenericParameterName(MemberType));
 											CSharp.Append(">(this.context, Writer, Value.");
 											CSharp.Append(Member.Name);
-											CSharp.AppendLine(");");
+											CSharp.AppendLine(", State);");
 										}
 									}
 									else if (ByReference)
@@ -2045,7 +2056,7 @@ namespace Waher.Persistence.Serialization
 										CSharp.Append(Indent2);
 										CSharp.AppendLine("\tObjectSerializer Serializer" + Member.Name + " = (ObjectSerializer)await this.context.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
 										CSharp.Append(Indent2);
-										CSharp.AppendLine("\tGuid " + Member.Name + "Id = await Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true);");
+										CSharp.AppendLine("\tGuid " + Member.Name + "Id = await Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true, State);");
 										CSharp.Append(Indent2);
 										CSharp.AppendLine("\tWriter.Write(" + Member.Name + "Id);");
 										CSharp.Append(Indent2);
@@ -2132,7 +2143,7 @@ namespace Waher.Persistence.Serialization
 										CSharp.Append(Member.Name);
 										if (Nullable)
 											CSharp.Append(".Value");
-										CSharp.AppendLine(");");
+										CSharp.AppendLine(", State);");
 									}
 									break;
 							}
@@ -2399,7 +2410,10 @@ namespace Waher.Persistence.Serialization
 							}
 						}
 						else if (Attr is ByReferenceAttribute)
+						{
 							Member.ByReference = true;
+							this.hasByRef = true;
+						}
 						else if (Attr is ObjectIdAttribute)
 						{
 							this.objectIdMember = Member;
@@ -2422,7 +2436,11 @@ namespace Waher.Persistence.Serialization
 						this.membersByName[ShortName] = Member;
 
 					if (Member.IsNestedObject)
+					{
 						Member.NestedSerializer = await this.context.GetObjectSerializer(Member.MemberType);
+						if (Member.NestedSerializer is ObjectSerializer Nested2 && Nested2.HasByReference)
+							this.hasByRef = true;
+					}
 				}
 #if NETSTANDARD1_5
 			}
@@ -2517,6 +2535,14 @@ namespace Waher.Persistence.Serialization
 		public bool IsNullable
 		{
 			get { return this.isNullable; }
+		}
+
+		/// <summary>
+		/// If objects serialized by the serializer include subobjects by reference.
+		/// </summary>
+		public bool HasByReference
+		{
+			get { return this.hasByRef; }
 		}
 
 		/// <summary>
@@ -3203,11 +3229,12 @@ namespace Waher.Persistence.Serialization
 		/// <param name="WriteTypeCode">If a type code is to be written.</param>
 		/// <param name="Embedded">If the object is embedded in another object.</param>
 		/// <param name="Value">Value to serialize.</param>
-		public virtual async Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		/// <param name="State">State object, passed on in recursive calls.</param>
+		public virtual async Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value, object State)
 		{
 #if NETSTANDARD1_5
 			if (this.compiled)
-				await this.customSerializer.Serialize(Writer, WriteTypeCode, Embedded, Value);
+				await this.customSerializer.Serialize(Writer, WriteTypeCode, Embedded, Value, State);
 			else
 			{
 #endif
@@ -3215,7 +3242,7 @@ namespace Waher.Persistence.Serialization
 				if (!(T is null) && T != this.type)
 				{
 					IObjectSerializer Serializer = await this.context.GetObjectSerializer(T);
-					await Serializer.Serialize(Writer, WriteTypeCode, Embedded, Value);
+					await Serializer.Serialize(Writer, WriteTypeCode, Embedded, Value, State);
 					return;
 				}
 
@@ -3392,7 +3419,7 @@ namespace Waher.Persistence.Serialization
 								throw new SerializationException("Invalid member type: " + Member.MemberType.FullName, this.type);
 
 							case TYPE_ARRAY:
-								await GeneratedObjectSerializerBase.WriteArray(Member.MemberType.GetElementType(), this.context, Writer, (Array)MemberValue);
+								await GeneratedObjectSerializerBase.WriteArray(Member.MemberType.GetElementType(), this.context, Writer, (Array)MemberValue, State);
 								break;
 
 							case TYPE_BYTEARRAY:
@@ -3425,13 +3452,13 @@ namespace Waher.Persistence.Serialization
 									if (Member.NestedSerializer is ObjectSerializer ObjectSerializer)
 									{
 										Writer.WriteBits(TYPE_GUID, 6);
-										Writer.Write(await ObjectSerializer.GetObjectId(MemberValue, true));
+										Writer.Write(await ObjectSerializer.GetObjectId(MemberValue, true, State));
 									}
 									else
 										throw new SerializationException("Objects of type " + Member.MemberType.FullName + " cannot be stored by reference.", this.type);
 								}
 								else
-									await Member.NestedSerializer.Serialize(Writer, true, true, MemberValue);
+									await Member.NestedSerializer.Serialize(Writer, true, true, MemberValue, State);
 								break;
 						}
 					}
@@ -3656,10 +3683,11 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		/// <param name="Value">Object reference.</param>
 		/// <param name="InsertIfNotFound">Insert object into database with new Object ID, if no Object ID is set.</param>
+		/// <param name="State">State object, passed on in recursive calls.</param>
 		/// <returns>Object ID for <paramref name="Value"/>.</returns>
 		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
 		/// or if the corresponding property type is not supported.</exception>
-		public virtual async Task<Guid> GetObjectId(object Value, bool InsertIfNotFound)
+		public virtual async Task<Guid> GetObjectId(object Value, bool InsertIfNotFound, object State)
 		{
 			object Obj;
 
@@ -3689,7 +3717,7 @@ namespace Waher.Persistence.Serialization
 				if (!InsertIfNotFound)
 					throw new SerializationException("Object has no Object ID defined.", this.type);
 
-				Guid ObjectId = await this.context.SaveNewObject(Value);
+				Guid ObjectId = await this.context.SaveNewObject(Value, State);
 				Type T;
 
 #if NETSTANDARD1_5

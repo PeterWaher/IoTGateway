@@ -61,7 +61,8 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 		/// <param name="WriteTypeCode">If a type code is to be output.</param>
 		/// <param name="Embedded">If the object is embedded into another.</param>
 		/// <param name="Value">The actual object to serialize.</param>
-		public override async Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		/// <param name="State">State object, passed on in recursive calls.</param>
+		public override async Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value, object State)
 		{
 			if (Value is null)
 			{
@@ -104,7 +105,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 							LastType = ItemType;
 						}
 
-						await S.Serialize(Writer, Nullable, true, Item);
+						await S.Serialize(Writer, Nullable, true, Item, State);
 					}
 				}
 			}

@@ -293,7 +293,7 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.NotSame(Guid.Empty, ObjectId);
 
 			await AssertConsistent(this.file, this.provider, 1, Obj, true);
-			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTree.xml"));
+			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTree.xml", false));
 		}
 
 		[TestMethod]
@@ -352,9 +352,9 @@ namespace Waher.Persistence.FilesLW.Test
 			}
 		}
 
-		internal static async Task<string> ExportXML(ObjectBTreeFile File, string XmlFileName)
+		internal static async Task<string> ExportXML(ObjectBTreeFile File, string XmlFileName, bool Locked)
 		{
-			string Xml = await File.ExportGraphXML(false);
+			string Xml = await File.ExportGraphXML(false, Locked);
 
 			if (!string.IsNullOrEmpty(XmlFileName))
 				System.IO.File.WriteAllText(XmlFileName, Xml);
@@ -428,7 +428,7 @@ namespace Waher.Persistence.FilesLW.Test
 				if (Statistics.IsCorrupt || !Statistics.IsBalanced)
 				{
 					Console.Out.WriteLine();
-					Console.Out.WriteLine(await ExportXML(File, "Data\\BTreeError.xml"));
+					Console.Out.WriteLine(await ExportXML(File, "Data\\BTreeError.xml", true));
 					Console.Out.WriteLine();
 
 					Assert.IsFalse(Statistics.IsCorrupt, "Database is corrupt.");
@@ -457,7 +457,7 @@ namespace Waher.Persistence.FilesLW.Test
 			{
 				IObjectSerializer Serializer = await Provider.GetObjectSerializer(LastObjectAdded.GetType());
 				BinarySerializer Writer = new BinarySerializer(CollectionName, Encoding.UTF8);
-				await Serializer.Serialize(Writer, false, false, LastObjectAdded);
+				await Serializer.Serialize(Writer, false, false, LastObjectAdded, null);
 				byte[] Bin = Writer.GetSerialization();
 				File.WriteAllBytes(ObjFileName, Bin);
 			}
@@ -647,7 +647,7 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_BTree_Test_07_SaveNew_1000()
 		{
 			await this.TestMultiple(1000, 100, 1000, false, null);
-			await ExportXML(this.file, "Data\\BTree.xml");
+			await ExportXML(this.file, "Data\\BTree.xml", false);
 		}
 
 		[TestMethod]
@@ -655,7 +655,7 @@ namespace Waher.Persistence.FilesLW.Test
 		public async Task DBFiles_BTree_Test_08_SaveNew_10000()
 		{
 			await this.TestMultiple(10000, 100, 1000, false, null);
-			await ExportXML(this.file, "Data\\BTree.xml");
+			await ExportXML(this.file, "Data\\BTree.xml", false);
 		}
 
 		[TestMethod]
@@ -1057,19 +1057,19 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj2 = await this.file.LoadObject<Simple>(ObjectId);
 			DBFilesObjectSerializationTests.AssertEqual(Obj, Obj2);
 
-			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeBefore.xml"));
+			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeBefore.xml", false));
 
 			Simple Obj3 = CreateSimple(this.MaxStringLength);
 			Obj3.ObjectId = ObjectId;
 			await this.file.UpdateObject(Obj3, false, null);
 
-			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeAfter.xml"));
+			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeAfter.xml", false));
 
 			Obj2 = await this.file.LoadObject<Simple>(ObjectId);
 			DBFilesObjectSerializationTests.AssertEqual(Obj3, Obj2);
 
 			await AssertConsistent(this.file, this.provider, null, null, true);
-			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTree.xml"));
+			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTree.xml", false));
 		}
 
 		[TestMethod]
@@ -1234,7 +1234,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 						File.WriteAllText(BlockSizeFileName, this.BlockSize.ToString());
 
-						Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeBefore.xml"));
+						Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeBefore.xml", false));
 						Console.Out.WriteLine(Obj.ObjectId);
 						await this.file.DeleteObject(Obj, false, null);
 						//Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeAfter.xml"));
@@ -1249,7 +1249,7 @@ namespace Waher.Persistence.FilesLW.Test
 					catch (Exception ex)
 					{
 						if (this.file != null)
-							Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeError.xml"));
+							Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeError.xml", false));
 
 						ExceptionDispatchInfo.Capture(ex).Throw();
 					}

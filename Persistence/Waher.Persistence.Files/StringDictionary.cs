@@ -209,7 +209,8 @@ namespace Waher.Persistence.Files
 			Writer.WriteBit(true);
 			Writer.Write(Key);
 
-			await Serializer.Serialize(Writer, true, true, Value);
+			await Serializer.Serialize(Writer, true, true, Value,
+				NestedLocks.CreateIfNested(this.dictionaryFile, true, Serializer));
 
 			return Writer.GetSerialization();
 		}

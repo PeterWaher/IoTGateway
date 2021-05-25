@@ -86,6 +86,34 @@
             <param name="Markdown">Markdown document.</param>
             <returns>If the source is new.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.Add(System.String,Waher.Content.Markdown.MarkdownDocument,System.String)">
+            <summary>
+            Adds incoming markdown information.
+            </summary>
+            <param name="Source">Source of information.</param>
+            <param name="Markdown">Markdown document.</param>
+            <param name="Id">Optional ID of document.</param>
+            <returns>If the source is new.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.Update(System.String,Waher.Content.Markdown.MarkdownDocument,System.String)">
+            <summary>
+            Updates incoming markdown information.
+            </summary>
+            <param name="Source">Source of information.</param>
+            <param name="Markdown">Markdown document.</param>
+            <param name="Id">Optional ID of document.</param>
+            <returns>If the source is new.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.Add(System.String,Waher.Content.Markdown.MarkdownDocument,System.String,System.Boolean)">
+            <summary>
+            Adds incoming markdown information.
+            </summary>
+            <param name="Source">Source of information.</param>
+            <param name="Markdown">Markdown document.</param>
+            <param name="Id">Optional ID of document.</param>
+            <param name="Update">If a document should be updated.</param>
+            <returns>If the source is new.</returns>
+        </member>
         <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.GenerateMarkdown">
             <summary>
             Generates consolidated markdown from all sources.
@@ -154,9 +182,16 @@
             Information about a document.
             </summary>
         </member>
-        <member name="M:Waher.Content.Markdown.Consolidation.DocumentInformation.#ctor(Waher.Content.Markdown.MarkdownDocument)">
+        <member name="M:Waher.Content.Markdown.Consolidation.DocumentInformation.#ctor(Waher.Content.Markdown.MarkdownDocument,System.String)">
             <summary>
             Information about a document.
+            </summary>
+            <param name="Markdown">Markdown document</param>
+            <param name="Id">Optional ID of document</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.DocumentInformation.Id">
+            <summary>
+            ID of record.
             </summary>
         </member>
         <member name="P:Waher.Content.Markdown.Consolidation.DocumentInformation.Markdown">
@@ -215,11 +250,20 @@
             Available documents from source.
             </summary>
         </member>
-        <member name="M:Waher.Content.Markdown.Consolidation.SourceState.Add(Waher.Content.Markdown.MarkdownDocument)">
+        <member name="M:Waher.Content.Markdown.Consolidation.SourceState.Add(Waher.Content.Markdown.MarkdownDocument,System.String)">
             <summary>
             Adds a markdown document from the source.
             </summary>
             <param name="Markdown">Markdown document.</param>
+            <param name="Id">Optional ID of document.</param>
+            <returns>Consolidated document type.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.SourceState.Update(Waher.Content.Markdown.MarkdownDocument,System.String)">
+            <summary>
+            Updates a markdown document from the source. If not found, it is added.
+            </summary>
+            <param name="Markdown">Markdown document.</param>
+            <param name="Id">Optional ID of document.</param>
             <returns>Consolidated document type.</returns>
         </member>
     </members>

@@ -73,6 +73,44 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <returns>If the source is new.</returns>
 		public bool Add(string Source, MarkdownDocument Markdown)
 		{
+			return this.Add(Source, Markdown, string.Empty);
+		}
+
+		/// <summary>
+		/// Adds incoming markdown information.
+		/// </summary>
+		/// <param name="Source">Source of information.</param>
+		/// <param name="Markdown">Markdown document.</param>
+		/// <param name="Id">Optional ID of document.</param>
+		/// <returns>If the source is new.</returns>
+		public bool Add(string Source, MarkdownDocument Markdown, string Id)
+		{
+			return this.Add(Source, Markdown, Id, false);
+		}
+
+		/// <summary>
+		/// Updates incoming markdown information.
+		/// </summary>
+		/// <param name="Source">Source of information.</param>
+		/// <param name="Markdown">Markdown document.</param>
+		/// <param name="Id">Optional ID of document.</param>
+		/// <returns>If the source is new.</returns>
+		public bool Update(string Source, MarkdownDocument Markdown, string Id)
+		{
+			return this.Add(Source, Markdown, Id, true);
+		}
+
+		/// <summary>
+		/// Adds incoming markdown information.
+		/// </summary>
+		/// <param name="Source">Source of information.</param>
+		/// <param name="Markdown">Markdown document.</param>
+		/// <param name="Id">Optional ID of document.</param>
+		/// <param name="Update">If a document should be updated.</param>
+		/// <returns>If the source is new.</returns>
+		private bool Add(string Source, MarkdownDocument Markdown, string Id, bool Update)
+		{
+			DocumentType Type;
 			bool Result;
 
 			lock (this.sources)
@@ -83,7 +121,10 @@ namespace Waher.Content.Markdown.Consolidation
 					this.sources[Source] = State;
 				}
 
-				DocumentType Type = State.Add(Markdown);
+				if (Update)
+					Type = State.Update(Markdown, Id);
+				else
+					Type = State.Add(Markdown, Id);
 
 				if ((int)(this.type & Type) != 0)
 					this.type = (DocumentType)Math.Max((int)this.type, (int)Type);

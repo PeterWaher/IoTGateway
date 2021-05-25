@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Content.Markdown.Consolidation
 {
@@ -68,13 +67,58 @@ namespace Waher.Content.Markdown.Consolidation
 		/// Adds a markdown document from the source.
 		/// </summary>
 		/// <param name="Markdown">Markdown document.</param>
+		/// <param name="Id">Optional ID of document.</param>
 		/// <returns>Consolidated document type.</returns>
-		public DocumentType Add(MarkdownDocument Markdown)
+		public DocumentType Add(MarkdownDocument Markdown, string Id)
 		{
-			DocumentInformation Info = new DocumentInformation(Markdown);
+			DocumentInformation Info = new DocumentInformation(Markdown, Id);
 
 			lock (this.documents)
 			{
+				this.documents.Add(Info);
+				this.nrDocuments++;
+
+				if (this.nrDocuments == 1)
+					this.type = Info.Type;
+				else
+					this.type = DocumentType.Complex;
+
+				return this.type;
+			}
+		}
+
+		/// <summary>
+		/// Updates a markdown document from the source. If not found, it is added.
+		/// </summary>
+		/// <param name="Markdown">Markdown document.</param>
+		/// <param name="Id">Optional ID of document.</param>
+		/// <returns>Consolidated document type.</returns>
+		public DocumentType Update(MarkdownDocument Markdown, string Id)
+		{
+			if (string.IsNullOrEmpty(Id))
+				return this.Add(Markdown, Id);
+
+			DocumentInformation Info = new DocumentInformation(Markdown, Id);
+			DocumentInformation Info2;
+			int i, c;
+
+			lock (this.documents)
+			{
+				c = this.documents.Count;
+				for (i = 0; i < c; i++)
+				{
+					Info2 = this.documents[i];
+					if (Info2.Id == Id)
+					{
+						this.documents[i] = Info;
+
+						if (this.nrDocuments == 1)
+							this.type = Info.Type;
+
+						return this.type;
+					}
+				}
+
 				this.documents.Add(Info);
 				this.nrDocuments++;
 

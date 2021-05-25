@@ -72,11 +72,14 @@ namespace Waher.Content.Markdown.Consolidation
 		private readonly Type graphType;
 		private readonly Graph graph;
 		private readonly Table table;
+		private readonly string id;
 
 		/// <summary>
 		/// Information about a document.
 		/// </summary>
-		public DocumentInformation(MarkdownDocument Markdown)
+		/// <param name="Markdown">Markdown document</param>
+		/// <param name="Id">Optional ID of document</param>
+		public DocumentInformation(MarkdownDocument Markdown, string Id)
 		{
 			MarkdownElement First = null;
 			int i = 0;
@@ -94,6 +97,7 @@ namespace Waher.Content.Markdown.Consolidation
 			}
 
 			this.markdown = Markdown;
+			this.id = Id;
 
 			string s = Markdown.MarkdownText.Trim().Replace("\r\n", "\n").Replace('\r', '\n');
 			this.rows = s.Split('\n');
@@ -205,6 +209,11 @@ namespace Waher.Content.Markdown.Consolidation
 			else
 				return CommonTypes.TryParse(s, out double _);
 		}
+
+		/// <summary>
+		/// ID of record.
+		/// </summary>
+		public string Id => this.id;
 
 		/// <summary>
 		/// Markdown document.

@@ -539,7 +539,7 @@ namespace Waher.Networking.HTTP
 		public async Task SendResponse(Exception ex)
 		{
 			if (this.HeaderSent)
-				Log.Critical(ex);
+				this.clientConnection?.Error(ex.Message);
 			else
 			{
 				try
@@ -590,7 +590,7 @@ namespace Waher.Networking.HTTP
 					}
 					else
 					{
-						Log.Critical(ex);
+						this.clientConnection?.Error(ex.Message);
 
 						if (ex is System.NotImplementedException)
 						{
@@ -645,9 +645,10 @@ namespace Waher.Networking.HTTP
 
 					await this.SendResponse();
 				}
-				catch (Exception)
+				catch (Exception ex2)
 				{
-					Log.Critical(ex);
+					this.clientConnection?.Error(ex.Message);
+					this.clientConnection?.Error(ex2.Message);
 				}
 			}
 		}

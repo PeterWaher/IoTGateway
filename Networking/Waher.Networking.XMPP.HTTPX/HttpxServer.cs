@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Xml;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
-using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Runtime.Temporary;

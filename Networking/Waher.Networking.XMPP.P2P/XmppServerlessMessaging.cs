@@ -645,7 +645,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Xml">XML Output.</param>
 		public void AppendP2pInfo(StringBuilder Xml)
 		{
-			if (this.p2pNetwork != null && this.p2pNetwork.State == PeerToPeerNetworkState.Ready)
+			if (!(this.p2pNetwork is null) && this.p2pNetwork.State == PeerToPeerNetworkState.Ready)
 			{
 				Xml.Append("<p2p xmlns='");
 				Xml.Append(EndpointSecurity.IoTHarmonizationP2P);
@@ -706,7 +706,7 @@ namespace Waher.Networking.XMPP.P2P
 				}
 			}
 
-			if (ExtIp != null && ExtPort.HasValue && LocIp != null && LocPort.HasValue)
+			if (!(ExtIp is null) && ExtPort.HasValue && !(LocIp is null) && LocPort.HasValue)
 			{
 				this.ReportPeerAddresses(FullJID, ExtIp, ExtPort.Value, LocIp, LocPort.Value);
 				return true;

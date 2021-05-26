@@ -1007,7 +1007,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 				foreach (object Item in Value)
 				{
-					if (Item == null)
+					if (Item is null)
 					{
 						if (Nullable)
 							Writer.WriteNull();

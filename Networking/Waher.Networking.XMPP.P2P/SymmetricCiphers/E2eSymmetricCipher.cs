@@ -458,7 +458,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
             {
                 Decrypted = this.Decrypt(Encrypted, Key, IV, AssociatedData);
 
-                if (Decrypted != null &&
+                if (!(Decrypted is null) &&
                     ((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
                     (!Sender.SupportsSignatures && SignatureLen == 0)))
                 {
@@ -483,7 +483,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
                     {
                         Decrypted = this.Decrypt(Encrypted, Key, IV, AssociatedData);
 
-                        if (Decrypted != null &&
+                        if (!(Decrypted is null) &&
                             ((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
                             (!Sender.SupportsSignatures && SignatureLen == 0)))
                         {
@@ -872,7 +872,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
             {
                 Decrypted = this.Decrypt(Encrypted, Key, IV, AssociatedData);
 
-                if (Decrypted != null &&
+                if (!(Decrypted is null) &&
                     ((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
                     (!Sender.SupportsSignatures && Signature is null)))
                 {
@@ -897,7 +897,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
                     {
                         Decrypted = this.Decrypt(Encrypted, Key, IV, AssociatedData);
 
-                        if (Decrypted != null &&
+                        if (!(Decrypted is null) &&
                             ((Sender.SupportsSignatures && Sender.Verify(Decrypted, Signature)) ||
                             (!Sender.SupportsSignatures && Signature is null)))
                         {

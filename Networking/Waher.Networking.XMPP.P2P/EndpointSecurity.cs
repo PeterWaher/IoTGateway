@@ -868,7 +868,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			string Xml = Cipher.Decrypt(Id, Type, From, To, E2eElement, RemoteEndpoint, LocalEndpoint);
 
-			if (Xml != null && Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool b && b)
+			if (!(Xml is null) && Client.HasSniffers && Client.TryGetTag("ShowE2E", out object Obj) && Obj is bool b && b)
 				Client.Information(Xml);
 
 			return Xml;
@@ -1637,7 +1637,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			this.client.SendIqSet(FullJID, this.GetE2eXml(), async (Sender, e) =>
 			{
-				if (e.Ok && e.FirstElement != null)
+				if (e.Ok && !(e.FirstElement is null))
 					await this.ParseE2e(e.FirstElement, FullJID);
 
 				if (!(Callback is null))
@@ -1675,7 +1675,7 @@ namespace Waher.Networking.XMPP.P2P
 			XmlElement E2E = null;
 			XmlElement P2P = null;
 
-			if (E != null && E.LocalName == "synchE2e" && E.NamespaceURI == IoTHarmonizationE2E)
+			if (!(E is null) && E.LocalName == "synchE2e" && E.NamespaceURI == IoTHarmonizationE2E)
 			{
 				foreach (XmlNode N in E.ChildNodes)
 				{

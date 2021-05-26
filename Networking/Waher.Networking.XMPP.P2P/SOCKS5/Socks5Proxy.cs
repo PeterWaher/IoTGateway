@@ -335,7 +335,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						Xml.Append(this.destinationJid);
 						Xml.Append("</activate></query>");
 
-						if (this.proxy.e2e != null)
+						if (!(this.proxy.e2e is null))
 						{
 							this.proxy.e2e.SendIqSet(this.proxy.client, E2ETransmission.NormalIfNotE2E, this.proxy.jid, Xml.ToString(),
 								this.proxy.ActivationResponse, this);
@@ -362,7 +362,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			{
 				XmlElement E = e.FirstElement;
 
-				if (E != null && E.LocalName == "query" && E.NamespaceURI == Namespace && XML.Attribute(E, "sid") == Rec.streamId)
+				if (!(E is null) && E.LocalName == "query" && E.NamespaceURI == Namespace && XML.Attribute(E, "sid") == Rec.streamId)
 				{
 					XmlElement E2;
 					string StreamHostUsed = null;
@@ -553,7 +553,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						this.streams.Remove(State.streamId);
 					}
 
-					if (State.eventargs2.CloseCallback != null)
+					if (!(State.eventargs2.CloseCallback is null))
 					{
 						try
 						{

@@ -191,7 +191,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			for (i = 0; i < this.columns; i++)
 			{
 				E = Elements[i];
-				if (E == null)
+				if (E is null)
 					continue;
 
 				E.GenerateMarkdown(sb);

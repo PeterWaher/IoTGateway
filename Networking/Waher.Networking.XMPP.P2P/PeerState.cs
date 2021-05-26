@@ -798,7 +798,7 @@ namespace Waher.Networking.XMPP.P2P
 
 		internal bool HasCallbacks
 		{
-			get { return this.callbacks != null; }
+			get { return !(this.callbacks is null); }
 		}
 
 		internal void ClearCallbacks()
@@ -845,7 +845,7 @@ namespace Waher.Networking.XMPP.P2P
 					Result = Task.FromResult<bool>(false);
 				}
 
-				//if (Result && this.callbacks != null)
+				//if (Result && !(this.callbacks is null))
 				//	this.CallCallbacks();
 			}
 

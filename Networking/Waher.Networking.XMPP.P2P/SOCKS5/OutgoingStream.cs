@@ -140,7 +140,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				this.tempStream.Position = this.tempStream.Length;
 				await this.tempStream.WriteAsync(Data, Offset, Count);
 
-				if (this.client != null && !this.isWriting && this.tempStream.Length - this.pos >= this.blockSize)
+				if (!(this.client is null) && !this.isWriting && this.tempStream.Length - this.pos >= this.blockSize)
 					await this.WriteBlockLocked();
 			}
 			finally
@@ -284,7 +284,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 				try
 				{
-					if (this.client != null && !this.isWriting)
+					if (!(this.client is null) && !this.isWriting)
 					{
 						if (this.tempStream.Length > this.pos)
 							await this.WriteBlockLocked();

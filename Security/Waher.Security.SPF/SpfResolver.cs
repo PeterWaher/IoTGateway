@@ -206,18 +206,18 @@ namespace Waher.Security.SPF
 							switch (Mechanism.Qualifier)
 							{
 								case SpfQualifier.Pass: return new KeyValuePair<SpfResult, string>(SpfResult.Pass, null);
-								case SpfQualifier.Fail: return new KeyValuePair<SpfResult, string>(SpfResult.Fail, Explanation == null ? null : await Explanation.Evaluate());
+								case SpfQualifier.Fail: return new KeyValuePair<SpfResult, string>(SpfResult.Fail, Explanation is null ? null : await Explanation.Evaluate());
 								case SpfQualifier.Neutral: return new KeyValuePair<SpfResult, string>(SpfResult.Neutral, null);
-								case SpfQualifier.SoftFail: return new KeyValuePair<SpfResult, string>(SpfResult.SoftFail, Explanation == null ? null : await Explanation.Evaluate());
+								case SpfQualifier.SoftFail: return new KeyValuePair<SpfResult, string>(SpfResult.SoftFail, Explanation is null ? null : await Explanation.Evaluate());
 							}
 							break;
 
 						case SpfResult.TemporaryError:
-							return new KeyValuePair<SpfResult, string>(SpfResult.TemporaryError, Explanation == null ? null : await Explanation.Evaluate());
+							return new KeyValuePair<SpfResult, string>(SpfResult.TemporaryError, Explanation is null ? null : await Explanation.Evaluate());
 
 						case SpfResult.None:
 						case SpfResult.PermanentError:
-							return new KeyValuePair<SpfResult, string>(SpfResult.PermanentError, Explanation == null ? null : await Explanation.Evaluate());
+							return new KeyValuePair<SpfResult, string>(SpfResult.PermanentError, Explanation is null ? null : await Explanation.Evaluate());
 					}
 				}
 
@@ -232,11 +232,11 @@ namespace Waher.Security.SPF
 						KeyValuePair<SpfResult, string> Result = await SpfResolver.CheckHost(Term, SpfExpressions);
 
 						if (Result.Key == SpfResult.None)
-							return new KeyValuePair<SpfResult, string>(SpfResult.PermanentError, Explanation == null ? null : await Explanation.Evaluate());
+							return new KeyValuePair<SpfResult, string>(SpfResult.PermanentError, Explanation is null ? null : await Explanation.Evaluate());
 						else if (Result.Key != SpfResult.Pass && Result.Key != SpfResult.Neutral &&
 							string.IsNullOrEmpty(Result.Value))
 						{
-							return new KeyValuePair<SpfResult, string>(Result.Key, Explanation == null ? null : await Explanation.Evaluate());
+							return new KeyValuePair<SpfResult, string>(Result.Key, Explanation is null ? null : await Explanation.Evaluate());
 						}
 						else
 							return Result;

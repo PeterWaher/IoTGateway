@@ -51,7 +51,7 @@ namespace Waher.Script.Operators.Arithmetics
 		{
 			IElement Result;
 
-			if (Left is ISemiGroupElement LE && !(!(Right is ISemiGroupElement RE)))
+			if (Left is ISemiGroupElement LE && Right is ISemiGroupElement RE)
 			{
 				Result = LE.AddRight(RE);
 				if (!(Result is null))

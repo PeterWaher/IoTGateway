@@ -51,7 +51,7 @@ namespace Waher.Script.Operators.Arithmetics
 			IElement Result;
 			IRingElement Temp;
 
-			if (Left is IRingElement LE && !(!(Right is IRingElement RE)))
+			if (Left is IRingElement LE && Right is IRingElement RE)
 			{
 				Temp = RE.Invert();
 				if (!(Temp is null))

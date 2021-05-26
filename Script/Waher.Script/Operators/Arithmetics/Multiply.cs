@@ -50,7 +50,7 @@ namespace Waher.Script.Operators.Arithmetics
 		{
 			IElement Result;
 
-			if (Left is IRingElement LE && !(!(Right is IRingElement RE)))
+			if (Left is IRingElement LE && Right is IRingElement RE)
 			{
 				Result = LE.MultiplyRight(RE);
 				if (!(Result is null))

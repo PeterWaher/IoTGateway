@@ -4687,9 +4687,6 @@ namespace Waher.Script
 		/// <returns>If elements have been upgraded to become compatible.</returns>
 		public static bool UpgradeSemiGroup(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet Set2, ScriptNode Node)
 		{
-			if (UpgradeField(ref E1, ref Set1, ref E2, ref Set2, Node))
-				return true;
-
 			if (E1 is StringValue)
 			{
 				E2 = new StringValue(E2.AssociatedObjectValue?.ToString() ?? string.Empty);
@@ -4703,6 +4700,9 @@ namespace Waher.Script
 				Set1 = StringValues.Instance;
 				return true;
 			}
+
+			if (UpgradeField(ref E1, ref Set1, ref E2, ref Set2, Node))
+				return true;
 
 			return false;
 		}

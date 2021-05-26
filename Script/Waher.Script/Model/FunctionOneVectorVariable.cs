@@ -75,9 +75,31 @@ namespace Waher.Script.Model
                         return Argument.Encapsulate(Elements, this);
                     }
                     else
-                        Vector = VectorDefinition.Encapsulate(new IElement[] { Argument }, false, this);
+                        return this.EvaluateNonVector(Argument, Variables);
                 }
             }
+
+            if (Vector is DoubleVector DoubleVector)
+                return this.EvaluateVector(DoubleVector, Variables);
+
+            if (Vector is ComplexVector ComplexVector)
+                return this.EvaluateVector(ComplexVector, Variables);
+
+            if (Vector is BooleanVector BooleanVector)
+                return this.EvaluateVector(BooleanVector, Variables);
+
+            return this.EvaluateVector(Vector, Variables);
+        }
+
+        /// <summary>
+        /// Evaluates the function on a non-vector. By default, the non-vector argument is converted to a vector of length 1.
+        /// </summary>
+        /// <param name="Argument">Non-vector argument.</param>
+        /// <param name="Variables">Variables.</param>
+        /// <returns>Result</returns>
+        protected virtual IElement EvaluateNonVector(IElement Argument, Variables Variables)
+        {
+            IVector Vector = VectorDefinition.Encapsulate(new IElement[] { Argument }, false, this);
 
             if (Vector is DoubleVector DoubleVector)
                 return this.EvaluateVector(DoubleVector, Variables);

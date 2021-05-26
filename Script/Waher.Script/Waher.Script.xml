@@ -7637,6 +7637,14 @@
             Name of the function
             </summary>
         </member>
+        <member name="M:Waher.Script.Functions.Vectors.Reverse.EvaluateNonVector(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a non-vector. By default, the non-vector argument is converted to a vector of length 1.
+            </summary>
+            <param name="Argument">Non-vector argument.</param>
+            <param name="Variables">Variables.</param>
+            <returns>Result</returns>
+        </member>
         <member name="M:Waher.Script.Functions.Vectors.Reverse.EvaluateVector(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a vector argument.
@@ -8990,6 +8998,14 @@
             <param name="Argument">Function argument.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneVectorVariable.EvaluateNonVector(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a non-vector. By default, the non-vector argument is converted to a vector of length 1.
+            </summary>
+            <param name="Argument">Non-vector argument.</param>
+            <param name="Variables">Variables.</param>
+            <returns>Result</returns>
         </member>
         <member name="M:Waher.Script.Model.FunctionOneVectorVariable.EvaluateVector(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Variables)">
             <summary>

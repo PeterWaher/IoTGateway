@@ -32,13 +32,37 @@ namespace Waher.Script.Functions.Vectors
             get { return "reverse"; }
         }
 
-        /// <summary>
-        /// Evaluates the function on a vector argument.
-        /// </summary>
-        /// <param name="Argument">Function argument.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public override IElement EvaluateVector(IVector Argument, Variables Variables)
+		/// <summary>
+		/// Evaluates the function on a non-vector. By default, the non-vector argument is converted to a vector of length 1.
+		/// </summary>
+		/// <param name="Argument">Non-vector argument.</param>
+		/// <param name="Variables">Variables.</param>
+		/// <returns>Result</returns>
+		protected override IElement EvaluateNonVector(IElement Argument, Variables Variables)
+		{
+			if (Argument is StringValue S)
+			{
+				string s = S.Value;
+				if (string.IsNullOrEmpty(s))
+					return S;
+
+				char[] Characters = s.ToCharArray();
+
+				System.Array.Reverse(Characters);
+
+				return new StringValue(new string(Characters));
+			}
+			else
+				return base.EvaluateNonVector(Argument, Variables);
+		}
+
+		/// <summary>
+		/// Evaluates the function on a vector argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateVector(IVector Argument, Variables Variables)
         {
 			int i, c = Argument.Dimension;
 			IElement[] E = new IElement[c];

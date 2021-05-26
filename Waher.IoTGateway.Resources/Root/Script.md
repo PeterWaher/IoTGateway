@@ -962,6 +962,7 @@ The following functions operate on vectors:
 | `Or(v)`       | Logical or binary OR of all elements in vector | `Or([1,2,3,4,5])`, `Or([true,false,true])` |
 | `Prod(v)`     | Alias for `Product(v)` | `Prod([1,2,3,4,5])` |
 | `Product(v)`  | Product of elements in the vector `v`. | `Product([1,2,3,4,5])` |
+| `Reverse(s)`  | Returns a string with the characters of the string `s` reversed. | `Reverse("Hello World")` |
 | `Reverse(v)`  | Returns a vector with the elements of the original vector `v` in reverse order. | `Reverse([1,2,3,4,5])` |
 | `Right(v,N)`  | Returns a vector with the right-most `N` elements. If the vector `v` is shorter, the entire vector is returned. | `Right(v,3)` |
 | `Sort(v[,x1[,x2][,x3][,x4][,x5][,x6][,x7][,x8][,x9]])`   | Sorts a vector `v`. `x1`-`x9` are optional, and can be index values, field names or lambda expressions, and determine how to sort the vector `v`. Negative index numbers, or property of field names beginning with a hyphen `-` are sorted in decending order. Index numbers are one-based, as opposed to normal index values that are zero-based. | `Sort(v,"Field")` |

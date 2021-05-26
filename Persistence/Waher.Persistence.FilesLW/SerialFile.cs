@@ -138,7 +138,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Binary block (decrypted if file is encrypted), and the position of the following block.</returns>
 		public async Task<KeyValuePair<byte[], long>> ReadBlock(long Position)
 		{
-			await this.fileAccess.BeginRead();
+			await this.fileAccess.BeginWrite();	// Unique access required
 			try
 			{
 				byte[] Block = await this.ReadBlockLocked(Position, MinBlockSize);
@@ -178,7 +178,7 @@ namespace Waher.Persistence.Files
 			}
 			finally
 			{
-				await this.fileAccess.EndRead();
+				await this.fileAccess.EndWrite();
 			}
 		}
 

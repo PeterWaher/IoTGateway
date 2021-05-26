@@ -121,12 +121,10 @@ namespace Waher.Persistence.Files
 				throw new ArgumentException("Block too small.", nameof(Block));
 
 			int NrRead;
-			long OrgLen;
 
-			await this.fileAccess.BeginRead();
+			await this.fileAccess.BeginWrite(); // Unique access required
 			try
 			{
-				OrgLen = this.file.Length;
 				long Pos = ((long)BlockIndex) * this.blockSize;
 
 				if (Pos != this.file.Seek(Pos, SeekOrigin.Begin))
@@ -136,14 +134,14 @@ namespace Waher.Persistence.Files
 					NrRead = await this.file.ReadAsync(Block, 0, this.blockSize);
 				else
 					NrRead = this.file.Read(Block, 0, this.blockSize);
+
+				if (this.blockSize != NrRead)
+					throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");
 			}
 			finally
 			{
-				await this.fileAccess.EndRead();
+				await this.fileAccess.EndWrite();
 			}
-
-			if (this.blockSize != NrRead)
-				throw Database.FlagForRepair(this.collectionName, "Read past end of file " + this.fileName + ".");
 		}
 
 		/// <summary>

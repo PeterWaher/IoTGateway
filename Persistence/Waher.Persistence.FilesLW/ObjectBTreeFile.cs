@@ -1478,7 +1478,7 @@ namespace Waher.Persistence.Files
 			ObjectId = Rec.Item1;
 			BlockInfo Leaf = Rec.Item2;
 			bool Nested = Serializer.HasByReference;
-			
+
 			if (Nested && State is null)
 				State = NestedLocks.CreateIfNested(this, true, Serializer);
 

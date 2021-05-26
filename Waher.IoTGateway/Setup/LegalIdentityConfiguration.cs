@@ -231,10 +231,13 @@ namespace Waher.IoTGateway.Setup
 
 			set
 			{
-				if (this.protectWithPassword)
-					Assert.CallFromSource(approvedSources);
+				if (this.protectWithPassword != value)
+				{
+					if (this.protectWithPassword)
+						Assert.CallFromSource(approvedSources);
 
-				this.protectWithPassword = value;
+					this.protectWithPassword = value;
+				}
 			}
 		}
 

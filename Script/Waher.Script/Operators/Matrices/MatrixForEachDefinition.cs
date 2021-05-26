@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Abstraction.Sets;
-using Waher.Script.Exceptions;
-using Waher.Script.Model;
-using Waher.Script.Objects;
 using Waher.Script.Operators.Conditional;
 using Waher.Script.Operators.Vectors;
 

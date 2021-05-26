@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -45,8 +44,8 @@ namespace Waher.Script.Operators.Conditional
 		public override IElement Evaluate(Variables Variables)
 		{
 			IElement S = this.left.Evaluate(Variables);
-			ICollection<IElement> Elements = S as ICollection<IElement>;
-			if (Elements is null)
+			
+			if (!(S is ICollection<IElement> Elements))
 			{
 				if (S is IVector Vector)
 					Elements = Vector.VectorElements;

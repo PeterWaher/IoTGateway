@@ -1,11 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Abstraction.Sets;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 using Waher.Script.Operators.Conditional;
 
 namespace Waher.Script.Operators.Vectors
@@ -46,17 +43,29 @@ namespace Waher.Script.Operators.Vectors
         public override IElement Evaluate(Variables Variables)
 		{
             IElement S = this.left.Evaluate(Variables);
+            LinkedList<IElement> Elements2 = new LinkedList<IElement>();
+            
             if (!(S is ICollection<IElement> Elements))
             {
                 if (S is IVector Vector)
                     Elements = Vector.VectorElements;
                 else if (!S.IsScalar)
                     Elements = S.ChildElements;
+                else if (S.AssociatedObjectValue is IEnumerable Enumerable)
+                {
+                    IEnumerator e = Enumerable.GetEnumerator();
+
+                    while (e.MoveNext())
+                    {
+                        Variables[this.variableName] = e.Current;
+                        Elements2.AddLast(this.right.Evaluate(Variables));
+                    }
+
+                    return this.Encapsulate(Elements2);
+                }
                 else
                     Elements = new IElement[] { S };
             }
-
-            LinkedList<IElement> Elements2 = new LinkedList<IElement>();
 
             foreach (IElement Element in Elements)
             {

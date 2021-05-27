@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Sets;
 
 namespace Waher.Script.Abstraction.Elements

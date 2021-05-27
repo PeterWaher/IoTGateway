@@ -22,6 +22,7 @@ namespace Waher.Script.Graphs
 		private readonly int height;
 		private readonly float origoX;
 		private readonly float origoY;
+		private readonly bool elementwise;
 
 		/// <summary>
 		/// Contains information about the current drawing area.
@@ -36,8 +37,9 @@ namespace Waher.Script.Graphs
 		/// <param name="Height">Height of drawing area.</param>
 		/// <param name="OrigoX">X-coordinate of the origo.</param>
 		/// <param name="OrigoY">Y-coordinate of the origo.</param>
+		/// <param name="Elementwise">If graph was generated using element-wise addition operations.</param>
 		public DrawingArea(IElement MinX, IElement MaxX, IElement MinY, IElement MaxY, int OffsetX, int OffsetY, int Width, int Height,
-			float OrigoX, float OrigoY)
+			float OrigoX, float OrigoY, bool Elementwise)
 		{
 			this.minX = MinX;
 			this.maxX = MaxX;
@@ -49,6 +51,7 @@ namespace Waher.Script.Graphs
 			this.height = Height;
 			this.origoX = OrigoX;
 			this.origoY = OrigoY;
+			this.elementwise = Elementwise;
 		}
 
 		/// <summary>
@@ -102,6 +105,11 @@ namespace Waher.Script.Graphs
 		public float OrigoY => this.origoY;
 
 		/// <summary>
+		/// If graph was generated using element-wise addition operations.
+		/// </summary>
+		public bool Elementwise => this.elementwise;
+
+		/// <summary>
 		/// Optional fixed X-Label positions.
 		/// </summary>
 		public Dictionary<string, double> XLabelPositions
@@ -126,8 +134,8 @@ namespace Waher.Script.Graphs
 		/// <param name="VectorY">Y-vector.</param>
 		public SKPoint[] Scale(IVector VectorX, IVector VectorY)
 		{
-			return Graph.Scale(VectorX, VectorY, this.minX, this.maxX, this.minY, this.maxY, 
-				this.offsetX, this.offsetY, this.width, this.height, this.xLabelPositions, 
+			return Graph.Scale(VectorX, VectorY, this.minX, this.maxX, this.minY, this.maxY,
+				this.offsetX, this.offsetY, this.width, this.height, this.xLabelPositions,
 				this.yLabelPositions);
 		}
 

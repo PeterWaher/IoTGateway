@@ -337,7 +337,7 @@ namespace Waher.Content.Markdown.Consolidation
 									if (G is null)
 										G = Doc.Graph;
 									else
-										G = (Graph)G.AddRight(Doc.Graph);
+										G = (Graph)G.AddRightElementWise(Doc.Graph);
 								}
 							}
 

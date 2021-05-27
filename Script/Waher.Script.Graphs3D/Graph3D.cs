@@ -349,6 +349,37 @@ namespace Waher.Script.Graphs3D
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override ISemiGroupElement AddRight(ISemiGroupElement Element)
 		{
+			return this.AddRight(Element, false);
+		}
+
+		/// <summary>
+		/// Tries to add an element to the current element, from the left, element-wise.
+		/// </summary>
+		/// <param name="Element">Element to add.</param>
+		/// <returns>Result, if understood, null otherwise.</returns>
+		public override ISemiGroupElementWise AddLeftElementWise(ISemiGroupElementWise Element)
+		{
+			return Element.AddRightElementWise(this);
+		}
+
+		/// <summary>
+		/// Tries to add an element to the current element, from the right, element-wise.
+		/// </summary>
+		/// <param name="Element">Element to add.</param>
+		/// <returns>Result, if understood, null otherwise.</returns>
+		public override ISemiGroupElementWise AddRightElementWise(ISemiGroupElementWise Element)
+		{
+			return this.AddRight(Element, true) as ISemiGroupElementWise;
+		}
+
+		/// <summary>
+		/// Tries to add an element to the current element, from the right.
+		/// </summary>
+		/// <param name="Element">Element to add.</param>
+		/// <param name="ElementWise">If element-wise addition is to be performed.</param>
+		/// <returns>Result, if understood, null otherwise.</returns>
+		protected ISemiGroupElement AddRight(ISemiGroupElement Element, bool ElementWise)
+		{
 			if (this.x.First is null)
 				return Element;
 

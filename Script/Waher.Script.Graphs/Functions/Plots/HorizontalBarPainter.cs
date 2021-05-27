@@ -60,7 +60,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 					y0 = Point.Y - HalfBarHeight + 1;
 					x0 = Point.X;
 					y1 = Point.Y + HalfBarHeight - 1;
-					x1 = PrevPoints != null ? PrevPoints[i++].X : DrawingArea.OrigoX;
+					x1 = !(PrevPoints is null) ? PrevPoints[i++].X : DrawingArea.OrigoX;
 
 					Canvas.DrawRect(new SKRect(x0, y0, x1, y1), Brush);
 				}

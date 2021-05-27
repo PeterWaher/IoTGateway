@@ -751,6 +751,25 @@
             Associated Semi-Group.
             </summary>
         </member>
+        <member name="T:Waher.Script.Abstraction.Elements.ISemiGroupElementWise">
+            <summary>
+            Basic interface for all types of element-wise semigroup elements.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Abstraction.Elements.ISemiGroupElementWise.AddLeftElementWise(Waher.Script.Abstraction.Elements.ISemiGroupElementWise)">
+            <summary>
+            Tries to add an element to the current element, from the left, element-wise.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Abstraction.Elements.ISemiGroupElementWise.AddRightElementWise(Waher.Script.Abstraction.Elements.ISemiGroupElementWise)">
+            <summary>
+            Tries to add an element to the current element, from the right, element-wise.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
         <member name="T:Waher.Script.Abstraction.Elements.IVector">
             <summary>
             Basic interface for vectors.

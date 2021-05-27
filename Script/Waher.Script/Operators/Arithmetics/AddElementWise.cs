@@ -38,8 +38,19 @@ namespace Waher.Script.Operators.Arithmetics
 		{
 			if (Left is DoubleNumber DL && Right is DoubleNumber DR)
 				return new DoubleNumber(DL.Value + DR.Value);
-			else
-				return Add.EvaluateAddition(Left, Right, this);
+
+			if (Left is ISemiGroupElementWise LE && Right is ISemiGroupElementWise RE)
+			{
+				ISemiGroupElementWise Result = LE.AddRightElementWise(RE);
+				if (!(Result is null))
+					return Result;
+
+				Result = RE.AddLeftElementWise(LE);
+				if (!(Result is null))
+					return Result;
+			}
+
+			return Add.EvaluateAddition(Left, Right, this);
 		}
 
 		/// <summary>

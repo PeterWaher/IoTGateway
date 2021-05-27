@@ -73,7 +73,7 @@ namespace Waher.Script.Graphs
 	/// <summary>
 	/// Base class for graphs.
 	/// </summary>
-	public abstract class Graph : SemiGroupElement
+	public abstract class Graph : SemiGroupElement, ISemiGroupElementWise
 	{
 		/// <summary>
 		/// http://waher.se/Schema/Graph.xsd
@@ -132,6 +132,26 @@ namespace Waher.Script.Graphs
 		}
 
 		/// <summary>
+		/// Tries to add an element to the current element, from the left, element-wise.
+		/// </summary>
+		/// <param name="Element">Element to add.</param>
+		/// <returns>Result, if understood, null otherwise.</returns>
+		public virtual ISemiGroupElementWise AddLeftElementWise(ISemiGroupElementWise Element)
+		{
+			return this.AddLeft(Element) as ISemiGroupElementWise;
+		}
+
+		/// <summary>
+		/// Tries to add an element to the current element, from the right, element-wise.
+		/// </summary>
+		/// <param name="Element">Element to add.</param>
+		/// <returns>Result, if understood, null otherwise.</returns>
+		public virtual ISemiGroupElementWise AddRightElementWise(ISemiGroupElementWise Element)
+		{
+			return this.AddRight(Element) as ISemiGroupElementWise;
+		}
+
+		/// <summary>
 		/// Gets default graph settings for drawing the graph.
 		/// </summary>
 		/// <param name="Variables">Current set of variables, where graph settings might be available.</param>
@@ -159,7 +179,7 @@ namespace Waher.Script.Graphs
 			if (DefaultHeight.HasValue)
 				Settings.Height = DefaultHeight.Value;
 
-			if ((Size = this.RecommendedBitmapSize) != null)
+			if (!((Size = this.RecommendedBitmapSize) is null))
 			{
 				Settings.Width = Size.Item1;
 				Settings.Height = Size.Item2;

@@ -21,8 +21,8 @@ namespace Waher.Script.Graphs
 	/// </summary>
 	public class Graph2D : Graph
 	{
-		private readonly LinkedList<IVector> x = new LinkedList<IVector>();
-		private readonly LinkedList<IVector> y = new LinkedList<IVector>();
+		private LinkedList<IVector> x = new LinkedList<IVector>();
+		private LinkedList<IVector> y = new LinkedList<IVector>();
 		private readonly LinkedList<object[]> parameters = new LinkedList<object[]>();
 		private readonly LinkedList<IPainter2D> painters = new LinkedList<IPainter2D>();
 		private IElement minX, maxX;
@@ -35,6 +35,7 @@ namespace Waher.Script.Graphs
 		private bool showXAxis = true;
 		private bool showYAxis = true;
 		private bool showGrid = true;
+		private bool elementwise = false;
 		//private readonly bool showZeroX = false;
 		//private readonly bool showZeroY = false;
 
@@ -126,7 +127,7 @@ namespace Waher.Script.Graphs
 
 					if (ex.AssociatedObjectValue is null || ey.AssociatedObjectValue is null)
 					{
-						if (X2.First != null)
+						if (!(X2.First is null))
 						{
 							this.AddSegment(X, Y, X2, Y2, Node, Painter, Parameters);
 							X2 = new LinkedList<IElement>();
@@ -140,7 +141,7 @@ namespace Waher.Script.Graphs
 					}
 				}
 
-				if (X2.First != null)
+				if (!(X2.First is null))
 					this.AddSegment(X, Y, X2, Y2, Node, Painter, Parameters);
 			}
 			else
@@ -169,11 +170,8 @@ namespace Waher.Script.Graphs
 				this.axisTypeX = X2V.GetType();
 				this.axisTypeY = Y2V.GetType();
 			}
-			else
-			{
-				if (X2V.GetType() != this.axisTypeX || Y2V.GetType() != this.axisTypeY)
-					throw new ScriptException("Incompatible types of series.");
-			}
+			else if (X2V.GetType() != this.axisTypeX || Y2V.GetType() != this.axisTypeY)
+				throw new ScriptException("Incompatible types of series.");
 
 			this.x.AddLast(X2V);
 			this.y.AddLast(Y2V);
@@ -235,6 +233,14 @@ namespace Waher.Script.Graphs
 		public IElement MaxY
 		{
 			get { return this.maxY; }
+		}
+
+		/// <summary>
+		/// If graph was generated using element-wise addition operations.
+		/// </summary>
+		public bool Elementwise
+		{
+			get { return this.elementwise; }
 		}
 
 		/// <summary>
@@ -308,6 +314,37 @@ namespace Waher.Script.Graphs
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override ISemiGroupElement AddRight(ISemiGroupElement Element)
 		{
+			return this.AddRight(Element, false);
+		}
+
+		/// <summary>
+		/// Tries to add an element to the current element, from the left, element-wise.
+		/// </summary>
+		/// <param name="Element">Element to add.</param>
+		/// <returns>Result, if understood, null otherwise.</returns>
+		public override ISemiGroupElementWise AddLeftElementWise(ISemiGroupElementWise Element)
+		{
+			return Element.AddRightElementWise(this);
+		}
+
+		/// <summary>
+		/// Tries to add an element to the current element, from the right, element-wise.
+		/// </summary>
+		/// <param name="Element">Element to add.</param>
+		/// <returns>Result, if understood, null otherwise.</returns>
+		public override ISemiGroupElementWise AddRightElementWise(ISemiGroupElementWise Element)
+		{
+			return this.AddRight(Element, true) as ISemiGroupElementWise;
+		}
+
+		/// <summary>
+		/// Tries to add an element to the current element, from the right.
+		/// </summary>
+		/// <param name="Element">Element to add.</param>
+		/// <param name="ElementWise">If element-wise addition is to be performed.</param>
+		/// <returns>Result, if understood, null otherwise.</returns>
+		protected ISemiGroupElement AddRight(ISemiGroupElement Element, bool ElementWise)
+		{
 			if (this.x.First is null)
 				return Element;
 
@@ -319,6 +356,10 @@ namespace Waher.Script.Graphs
 
 			Graph2D Result = new Graph2D()
 			{
+				minX = this.minX,
+				maxX = this.maxX,
+				minY = this.minY,
+				maxY = this.maxY,
 				axisTypeX = this.axisTypeX,
 				axisTypeY = this.axisTypeY,
 				title = this.title,
@@ -339,20 +380,34 @@ namespace Waher.Script.Graphs
 			foreach (object[] P in this.parameters)
 				Result.parameters.AddLast(P);
 
-			foreach (IVector v in G.x)
-			{
-				if (v.GetType() != this.axisTypeX)
-					throw new ScriptException("Incompatible types of series.");
+			if (G.axisTypeX != this.axisTypeX || G.axisTypeY != this.axisTypeY)
+				throw new ScriptException("Incompatible types of series.");
 
-				Result.x.AddLast(v);
+			if (ElementWise)
+			{
+				GetLabels(ref Result.minX, ref Result.maxX, this.x, 2, out LabelType XLabelType);
+				GetLabels(ref Result.minY, ref Result.maxY, this.y, 2, out LabelType YLabelType);
+
+				if (XLabelType == LabelType.String && (YLabelType == LabelType.Double || YLabelType == LabelType.PhysicalQuantity))
+					ElementwiseAccumulatedAddition(ref Result.x, ref Result.y, G.x, G.y, ref Result.minX, ref Result.maxX, ref Result.minY, ref Result.maxY, G.minX, G.maxX);
+				else if (YLabelType == LabelType.String && (XLabelType == LabelType.Double || XLabelType == LabelType.PhysicalQuantity))
+					ElementwiseAccumulatedAddition(ref Result.y, ref Result.x, G.y, G.x, ref Result.minY, ref Result.maxY, ref Result.minX, ref Result.maxX, G.minY, G.maxY);
+				else
+					ElementWise = false;
 			}
 
-			foreach (IVector v in G.y)
+			if (!ElementWise)
 			{
-				if (v.GetType() != this.axisTypeY)
-					throw new ScriptException("Incompatible types of series.");
+				foreach (IVector v in G.x)
+					Result.x.AddLast(v);
 
-				Result.y.AddLast(v);
+				foreach (IVector v in G.y)
+					Result.y.AddLast(v);
+
+				Result.minX = Min.CalcMin((IVector)VectorDefinition.Encapsulate(new IElement[] { Result.minX, G.minX }, false, null), null);
+				Result.maxX = Max.CalcMax((IVector)VectorDefinition.Encapsulate(new IElement[] { Result.maxX, G.maxX }, false, null), null);
+				Result.minY = Min.CalcMin((IVector)VectorDefinition.Encapsulate(new IElement[] { Result.minY, G.minY }, false, null), null);
+				Result.maxY = Max.CalcMax((IVector)VectorDefinition.Encapsulate(new IElement[] { Result.maxY, G.maxY }, false, null), null);
 			}
 
 			foreach (IPainter2D Painter in G.painters)
@@ -361,15 +416,104 @@ namespace Waher.Script.Graphs
 			foreach (object[] P in G.parameters)
 				Result.parameters.AddLast(P);
 
-			Result.minX = Min.CalcMin((IVector)VectorDefinition.Encapsulate(new IElement[] { this.minX, G.minX }, false, null), null);
-			Result.maxX = Max.CalcMax((IVector)VectorDefinition.Encapsulate(new IElement[] { this.maxX, G.maxX }, false, null), null);
-			Result.minY = Min.CalcMin((IVector)VectorDefinition.Encapsulate(new IElement[] { this.minY, G.minY }, false, null), null);
-			Result.maxY = Max.CalcMax((IVector)VectorDefinition.Encapsulate(new IElement[] { this.maxY, G.maxY }, false, null), null);
-
 			Result.showXAxis |= G.showXAxis;
 			Result.showYAxis |= G.showYAxis;
+			Result.elementwise = ElementWise;
 
 			return Result;
+		}
+
+		private static void ElementwiseAccumulatedAddition(ref LinkedList<IVector> DestFixed, ref LinkedList<IVector> DestValues,
+			LinkedList<IVector> AddFixed, LinkedList<IVector> AddValues, ref IElement MinFixed, ref IElement MaxFixed,
+			ref IElement MinValues, ref IElement MaxValues, IElement AddMinFixed, IElement AddMaxFixed)
+		{
+			Dictionary<string, IElement> Values = new Dictionary<string, IElement>();
+			IEnumerator<IVector> vX = DestFixed.GetEnumerator();
+			IEnumerator<IVector> vY = DestValues.GetEnumerator();
+			IEnumerator<IElement> eX;
+			IEnumerator<IElement> eY;
+			IVector X;
+			IVector Y;
+			LinkedList<IElement> Y2;
+
+			while (vX.MoveNext() && vY.MoveNext())
+			{
+				X = vX.Current;
+				Y = vY.Current;
+
+				eX = X.ChildElements.GetEnumerator();
+				eY = Y.ChildElements.GetEnumerator();
+
+				while (eX.MoveNext() && eY.MoveNext())
+					Values[eX.Current.AssociatedObjectValue?.ToString() ?? string.Empty] = eY.Current;
+			}
+
+			vX = AddFixed.GetEnumerator();
+			vY = AddValues.GetEnumerator();
+
+			while (vX.MoveNext() && vY.MoveNext())
+			{
+				X = vX.Current;
+				Y = vY.Current;
+				Y2 = new LinkedList<IElement>();
+
+				eX = X.ChildElements.GetEnumerator();
+				eY = Y.ChildElements.GetEnumerator();
+
+				while (eX.MoveNext() && eY.MoveNext())
+				{
+					if (Values.TryGetValue(eX.Current.AssociatedObjectValue?.ToString() ?? string.Empty, out IElement Value))
+						Y2.AddLast(Operators.Arithmetics.Add.EvaluateAddition(Value, eY.Current, null));
+					else
+						Y2.AddLast(eY.Current);
+				}
+
+				DestFixed.AddLast(X);
+				DestValues.AddLast(Y = (IVector)Y.Encapsulate(Y2, null));
+
+				MinValues = Min.CalcMin((IVector)VectorDefinition.Encapsulate(new IElement[] { MinValues, Min.CalcMin(Y, null) }, false, null), null);
+				MaxValues = Max.CalcMax((IVector)VectorDefinition.Encapsulate(new IElement[] { MaxValues, Max.CalcMax(Y, null) }, false, null), null);
+			}
+
+			MinFixed = Min.CalcMin((IVector)VectorDefinition.Encapsulate(new IElement[] { MinFixed, AddMinFixed }, false, null), null);
+			MaxFixed = Max.CalcMax((IVector)VectorDefinition.Encapsulate(new IElement[] { MaxFixed, AddMaxFixed }, false, null), null);
+
+			IVector Labels = GetLabels(ref MinFixed, ref MaxFixed, DestFixed, 2, out LabelType LabelType);
+			string[] Strings = LabelStrings(Labels, LabelType);
+			LinkedList<IVector> NormalizedX = new LinkedList<IVector>();
+			LinkedList<IVector> NormalizedY = new LinkedList<IVector>();
+			Dictionary<string, IElement> Sorted = new Dictionary<string, IElement>();
+			IElement Zero = (MinValues.AssociatedSet as Group)?.AdditiveIdentity ?? DoubleNumber.ZeroElement;
+
+			vX = DestFixed.GetEnumerator();
+			vY = DestValues.GetEnumerator();
+
+			while (vX.MoveNext() && vY.MoveNext())
+			{
+				X = vX.Current;
+				Y = vY.Current;
+				Y2 = new LinkedList<IElement>();
+
+				eX = X.ChildElements.GetEnumerator();
+				eY = Y.ChildElements.GetEnumerator();
+
+				while (eX.MoveNext() && eY.MoveNext())
+					Sorted[eX.Current.AssociatedObjectValue?.ToString() ?? string.Empty] = eY.Current;
+
+				foreach (string s in Strings)
+				{
+					if (Sorted.TryGetValue(s, out IElement E))
+						Y2.AddLast(E);
+					else
+						Y2.AddLast(Zero);
+				}
+
+				NormalizedX.AddLast(Labels);
+				NormalizedY.AddLast((IVector)Y.Encapsulate(Y2, null));
+			}
+
+			DestFixed = NormalizedX;
+			DestValues = NormalizedY;
 		}
 
 		/// <summary>
@@ -600,7 +744,7 @@ namespace Waher.Script.Graphs
 				else
 					OrigoY = 0;
 
-				DrawingArea DrawingArea = new DrawingArea(this.minX, this.maxX, this.minY, this.maxY, x3, y3, w, -h, (float)OrigoX, (float)OrigoY);
+				DrawingArea DrawingArea = new DrawingArea(this.minX, this.maxX, this.minY, this.maxY, x3, y3, w, -h, (float)OrigoX, (float)OrigoY, this.elementwise);
 				double[] LabelYY = DrawingArea.ScaleY(YLabels);
 				Dictionary<string, double> YLabelPositions = YLabelType == LabelType.String ? new Dictionary<string, double>() : null;
 				int i = 0;
@@ -747,7 +891,7 @@ namespace Waher.Script.Graphs
 				{
 					Points = DrawingArea.Scale(ex.Current, ey.Current);
 
-					if (PrevPainter != null && ePainters.Current.GetType() == PrevPainter.GetType())
+					if (!(PrevPainter is null) && ePainters.Current.GetType() == PrevPainter.GetType())
 						ePainters.Current.DrawGraph(Canvas, Points, eParameters.Current, PrevPoints, PrevParameters, DrawingArea);
 					else
 						ePainters.Current.DrawGraph(Canvas, Points, eParameters.Current, null, null, DrawingArea);

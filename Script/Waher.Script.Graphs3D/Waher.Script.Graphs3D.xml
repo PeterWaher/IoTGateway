@@ -1901,6 +1901,28 @@
             <param name="Element">Element to add.</param>
             <returns>Result, if understood, null otherwise.</returns>
         </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.AddLeftElementWise(Waher.Script.Abstraction.Elements.ISemiGroupElementWise)">
+            <summary>
+            Tries to add an element to the current element, from the left, element-wise.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.AddRightElementWise(Waher.Script.Abstraction.Elements.ISemiGroupElementWise)">
+            <summary>
+            Tries to add an element to the current element, from the right, element-wise.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs3D.Graph3D.AddRight(Waher.Script.Abstraction.Elements.ISemiGroupElement,System.Boolean)">
+            <summary>
+            Tries to add an element to the current element, from the right.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <param name="ElementWise">If element-wise addition is to be performed.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
         <member name="M:Waher.Script.Graphs3D.Graph3D.Equals(System.Object)">
             <summary>
             <see cref="M:System.Object.Equals(System.Object)"/>

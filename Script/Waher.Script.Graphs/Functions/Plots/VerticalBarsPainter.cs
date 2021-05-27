@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SkiaSharp;
 
 namespace Waher.Script.Graphs.Functions.Plots
@@ -60,7 +61,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 					x0 = Point.X - HalfBarWidth + 1;
 					y0 = Point.Y;
 					x1 = Point.X + HalfBarWidth - 1;
-					y1 = PrevPoints != null ? PrevPoints[i++].Y : DrawingArea.OrigoY;
+					y1 = !(PrevPoints is null) ? PrevPoints[i++].Y : DrawingArea.OrigoY;
 
 					Canvas.DrawRect(new SKRect(x0, y0, x1, y1), Brush);
 				}

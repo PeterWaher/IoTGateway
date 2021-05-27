@@ -9,7 +9,7 @@
             Contains information about the current drawing area.
             </summary>
         </member>
-        <member name="M:Waher.Script.Graphs.DrawingArea.#ctor(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Int32,System.Int32,System.Int32,System.Int32,System.Single,System.Single)">
+        <member name="M:Waher.Script.Graphs.DrawingArea.#ctor(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Int32,System.Int32,System.Int32,System.Int32,System.Single,System.Single,System.Boolean)">
             <summary>
             Contains information about the current drawing area.
             </summary>
@@ -23,6 +23,7 @@
             <param name="Height">Height of drawing area.</param>
             <param name="OrigoX">X-coordinate of the origo.</param>
             <param name="OrigoY">Y-coordinate of the origo.</param>
+            <param name="Elementwise">If graph was generated using element-wise addition operations.</param>
         </member>
         <member name="P:Waher.Script.Graphs.DrawingArea.MinX">
             <summary>
@@ -72,6 +73,11 @@
         <member name="P:Waher.Script.Graphs.DrawingArea.OrigoY">
             <summary>
             Y-coordinate for the origo.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.DrawingArea.Elementwise">
+            <summary>
+            If graph was generated using element-wise addition operations.
             </summary>
         </member>
         <member name="P:Waher.Script.Graphs.DrawingArea.XLabelPositions">
@@ -1458,6 +1464,20 @@
             Associated Semi-Group.
             </summary>
         </member>
+        <member name="M:Waher.Script.Graphs.Graph.AddLeftElementWise(Waher.Script.Abstraction.Elements.ISemiGroupElementWise)">
+            <summary>
+            Tries to add an element to the current element, from the left, element-wise.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.AddRightElementWise(Waher.Script.Abstraction.Elements.ISemiGroupElementWise)">
+            <summary>
+            Tries to add an element to the current element, from the right, element-wise.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
         <member name="M:Waher.Script.Graphs.Graph.GetSettings(Waher.Script.Variables)">
             <summary>
             Gets default graph settings for drawing the graph.
@@ -1880,6 +1900,11 @@
             Largest Y-value.
             </summary>
         </member>
+        <member name="P:Waher.Script.Graphs.Graph2D.Elementwise">
+            <summary>
+            If graph was generated using element-wise addition operations.
+            </summary>
+        </member>
         <member name="P:Waher.Script.Graphs.Graph2D.Title">
             <summary>
             Title for graph.
@@ -1922,6 +1947,28 @@
             Tries to add an element to the current element, from the right.
             </summary>
             <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.AddLeftElementWise(Waher.Script.Abstraction.Elements.ISemiGroupElementWise)">
+            <summary>
+            Tries to add an element to the current element, from the left, element-wise.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.AddRightElementWise(Waher.Script.Abstraction.Elements.ISemiGroupElementWise)">
+            <summary>
+            Tries to add an element to the current element, from the right, element-wise.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.AddRight(Waher.Script.Abstraction.Elements.ISemiGroupElement,System.Boolean)">
+            <summary>
+            Tries to add an element to the current element, from the right.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <param name="ElementWise">If element-wise addition is to be performed.</param>
             <returns>Result, if understood, null otherwise.</returns>
         </member>
         <member name="M:Waher.Script.Graphs.Graph2D.Equals(System.Object)">

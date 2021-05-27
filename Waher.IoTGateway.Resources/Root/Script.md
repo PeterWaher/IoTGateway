@@ -1153,6 +1153,30 @@ plot2dcurvearea(x,y,rgba(255,0,0,64))+
    scatter2d(x,y2,"Blue",5)
 }
 
+Graph-types having string labels on one axis, and values on another, can be added using element-wise addition operator `.+` as well. 
+When this operator is used, not only are the graphs added, but the internal values are accumulated as well. Example:
+
+	Labels:=["A","B","C","D","E","F"];
+	Colors:=["Red","Green","Blue","Yellow","Magenta","LightGray"];
+	G:=[foreach x in 0..5 do VerticalBars(Labels,Uniform(0,10,6),Alpha(Colors[x],192))];
+	G[0].+G[1].+G[2].+G[3].+G[4].+G[5];
+
+{
+Labels:=["A","B","C","D","E","F"];
+Colors:=["Red","Green","Blue","Yellow","Magenta","LightGray"];
+G:=[foreach x in 0..5 do VerticalBars(Labels,Uniform(0,10,6),Alpha(Colors[x],192))];
+G[0].+G[1].+G[2].+G[3].+G[4].+G[5];
+}
+
+Normal addition, using the same values is achieved easilly as follows. The half-transparent bars are painted one on-top of the other,
+as they occupy the same numerical space.
+
+	Sum(G)
+
+{
+	Sum(G)
+}
+
 Use the `GraphWidth` and `GraphHeight` variables to control graph output size. The following example shows
 how to construct a [Sparkline](https://en.wikipedia.org/wiki/Sparkline) graph:
 

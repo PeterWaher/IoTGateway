@@ -292,15 +292,18 @@ namespace Waher.Script.Graphs
 		/// <param name="OffsetY">Y-offset to area.</param>
 		/// <param name="Width">Width of area.</param>
 		/// <param name="Height">Height of area.</param>
+		/// <param name="XLabelPositions">Optional fixed X-label positions.</param>
+		/// <param name="YLabelPositions">Optional fixed Y-label positions.</param>
 		/// <returns>Sequence of points.</returns>
 		public static SKPoint[] Scale(IVector VectorX, IVector VectorY, IElement MinX, IElement MaxX,
-			IElement MinY, IElement MaxY, double OffsetX, double OffsetY, double Width, double Height)
+			IElement MinY, IElement MaxY, double OffsetX, double OffsetY, double Width, double Height,
+			Dictionary<string,double> XLabelPositions, Dictionary<string, double> YLabelPositions)
 		{
 			if (VectorX.Dimension != VectorY.Dimension)
 				throw new ScriptException("Dimension mismatch.");
 
-			double[] X = Scale(VectorX, MinX, MaxX, OffsetX, Width);
-			double[] Y = Scale(VectorY, MinY, MaxY, OffsetY, Height);
+			double[] X = Scale(VectorX, MinX, MaxX, OffsetX, Width, XLabelPositions);
+			double[] Y = Scale(VectorY, MinY, MaxY, OffsetY, Height, YLabelPositions);
 			int i, c = X.Length;
 			SKPoint[] Points = new SKPoint[c];
 
@@ -318,8 +321,10 @@ namespace Waher.Script.Graphs
 		/// <param name="Max">Largest value.</param>
 		/// <param name="Offset">Offset to area.</param>
 		/// <param name="Size">Size of area.</param>
+		/// <param name="LabelPositions">Optional fixed label positions.</param>
 		/// <returns>Vector distributed in the available area.</returns>
-		public static double[] Scale(IVector Vector, IElement Min, IElement Max, double Offset, double Size)
+		public static double[] Scale(IVector Vector, IElement Min, IElement Max, double Offset, 
+			double Size, Dictionary<string,double> LabelPositions)
 		{
 			if (Vector is DoubleVector DV)
 			{
@@ -367,50 +372,44 @@ namespace Waher.Script.Graphs
 
 					return Scale(Vector2, MinQ.Magnitude, MaxQ.Magnitude, MinQ.Unit, Offset, Size);
 				}
-				else
+				else if (Min is DoubleNumber MinD && Max is DoubleNumber MaxD)
 				{
-					if (Min is DoubleNumber MinD && Max is DoubleNumber MaxD)
+					int i = 0;
+					int c = Vector.Dimension;
+					double[] Vector2 = new double[c];
+					DoubleNumber D;
+
+					foreach (IElement E in Vector.ChildElements)
 					{
-						int i = 0;
-						int c = Vector.Dimension;
-						double[] Vector2 = new double[c];
-						DoubleNumber D;
+						D = E as DoubleNumber;
+						if (D is null)
+							throw new ScriptException("Incompatible values.");
 
-						foreach (IElement E in Vector.ChildElements)
-						{
-							D = E as DoubleNumber;
-							if (D is null)
-								throw new ScriptException("Incompatible values.");
-
-							Vector2[i++] = D.Value;
-						}
-
-						return Scale(Vector2, MinD.Value, MaxD.Value, Offset, Size);
+						Vector2[i++] = D.Value;
 					}
-					else
-					{
-						if (Min is DateTimeValue MinDT && Max is DateTimeValue MaxDT)
-						{
-							int i = 0;
-							int c = Vector.Dimension;
-							DateTime[] Vector2 = new DateTime[c];
-							DateTimeValue DT;
 
-							foreach (IElement E in Vector.ChildElements)
-							{
-								DT = E as DateTimeValue;
-								if (DT is null)
-									throw new ScriptException("Incompatible values.");
-
-								Vector2[i++] = DT.Value;
-							}
-
-							return Scale(Vector2, MinDT.Value, MaxDT.Value, Offset, Size);
-						}
-						else
-							return Scale(OV.Values, Offset, Size);
-					}
+					return Scale(Vector2, MinD.Value, MaxD.Value, Offset, Size);
 				}
+				else if (Min is DateTimeValue MinDT && Max is DateTimeValue MaxDT)
+				{
+					int i = 0;
+					int c = Vector.Dimension;
+					DateTime[] Vector2 = new DateTime[c];
+					DateTimeValue DT;
+
+					foreach (IElement E in Vector.ChildElements)
+					{
+						DT = E as DateTimeValue;
+						if (DT is null)
+							throw new ScriptException("Incompatible values.");
+
+						Vector2[i++] = DT.Value;
+					}
+
+					return Scale(Vector2, MinDT.Value, MaxDT.Value, Offset, Size);
+				}
+				else
+					return Scale(OV.Values, Offset, Size, LabelPositions);
 			}
 			else
 				throw new ScriptException("Invalid vector type.");
@@ -468,8 +467,10 @@ namespace Waher.Script.Graphs
 		/// <param name="Vector">Vector.</param>
 		/// <param name="Offset">Offset to area.</param>
 		/// <param name="Size">Size of area.</param>
+		/// <param name="LabelPositions">Optional fixed label positions.</param>
 		/// <returns>Vector distributed in the available area.</returns>
-		public static double[] Scale(object[] Vector, double Offset, double Size)
+		public static double[] Scale(IElement[] Vector, double Offset, double Size, 
+			Dictionary<string, double> LabelPositions)
 		{
 			int i, c = Vector.Length;
 			double[] v = new double[c];
@@ -477,7 +478,20 @@ namespace Waher.Script.Graphs
 			for (i = 0; i < c; i++)
 				v[i] = i + 0.5;
 
-			return Scale(v, 0, c, Offset, Size);
+			double[] Result = Scale(v, 0, c, Offset, Size);
+
+			if (!(LabelPositions is null))
+			{
+				for (i = 0; i < c; i++)
+				{
+					string s = Vector[i].AssociatedObjectValue?.ToString() ?? string.Empty;
+
+					if (LabelPositions.TryGetValue(s, out double d))
+						Result[i] = d;
+				}
+			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -1126,6 +1140,24 @@ namespace Waher.Script.Graphs
 				default:
 					return Label.AssociatedObjectValue.ToString();
 			}
+		}
+
+		/// <summary>
+		/// Converts a vector of labels to a string array.
+		/// </summary>
+		/// <param name="Labels">Labels</param>
+		/// <param name="LabelType">Type of label.</param>
+		/// <returns>String-representation of elements.</returns>
+		public static string[] LabelStrings(IVector Labels, LabelType LabelType)
+		{
+			int i = 0;
+			int c = Labels.Dimension;
+			string[] Result = new string[c];
+
+			foreach (IElement Label in Labels.ChildElements)
+				Result[i++] = LabelString(Label, LabelType);
+
+			return Result;
 		}
 
 		/// <summary>

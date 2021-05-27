@@ -32,7 +32,8 @@ namespace Waher.Script.Graphs.Functions.Plots
 				};
 				Path = new SKPath();
 
-				float HalfBarWidth = (DrawingArea.Width - Points.Length) * 0.45f / Points.Length;
+				int Count = DrawingArea.XLabelPositions?.Count ?? Points.Length;
+				float HalfBarWidth = (DrawingArea.Width - Count) * 0.45f / Count;
 				float x0, y0, x1, y1;
 				int i, c;
 

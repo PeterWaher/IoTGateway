@@ -611,17 +611,17 @@ namespace Waher.Script.Graphs3D
 			}
 
 			if (this.minX.AssociatedSet is IAbelianGroup AgX)
-				OrigoX = (float)Scale(new ObjectVector(AgX.AdditiveIdentity), this.minX, this.maxX, OffsetX, Width)[0];
+				OrigoX = (float)Scale(new ObjectVector(AgX.AdditiveIdentity), this.minX, this.maxX, OffsetX, Width, null)[0];
 			else
 				OrigoX = null;
 
 			if (this.minY.AssociatedSet is IAbelianGroup AgY)
-				OrigoY = (float)Scale(new ObjectVector(AgY.AdditiveIdentity), this.minY, this.maxY, OffsetY, Height)[0];
+				OrigoY = (float)Scale(new ObjectVector(AgY.AdditiveIdentity), this.minY, this.maxY, OffsetY, Height, null)[0];
 			else
 				OrigoY = null;
 
 			if (this.minZ.AssociatedSet is IAbelianGroup AgZ)
-				OrigoZ = (float)Scale(new ObjectVector(AgZ.AdditiveIdentity), this.maxZ, this.minZ, OffsetZ, Depth)[0];
+				OrigoZ = (float)Scale(new ObjectVector(AgZ.AdditiveIdentity), this.maxZ, this.minZ, OffsetZ, Depth, null)[0];
 			else
 				OrigoZ = null;
 
@@ -632,6 +632,55 @@ namespace Waher.Script.Graphs3D
 			DrawingVolume DrawingVolume = new DrawingVolume(this.minX, this.maxX,
 				this.minY, this.maxY, this.minZ, this.maxZ, OffsetX, OffsetY, OffsetZ,
 				Width, Height, Depth, OrigoX, OrigoY, OrigoZ);
+
+			Dictionary<string, double> XLabelPositions = XLabelType == LabelType.String ? new Dictionary<string, double>() : null;
+			Dictionary<string, double> YLabelPositions = YLabelType == LabelType.String ? new Dictionary<string, double>() : null;
+			Dictionary<string, double> ZLabelPositions = ZLabelType == LabelType.String ? new Dictionary<string, double>() : null;
+			double[] LabelXX = DrawingVolume.ScaleX(XLabels);
+			double[] LabelYY = DrawingVolume.ScaleY(YLabels);
+			double[] LabelZZ = DrawingVolume.ScaleZ(ZLabels);
+			string[] XLabelStrings = LabelStrings(XLabels, XLabelType);
+			string[] YLabelStrings = LabelStrings(YLabels, YLabelType);
+			string[] ZLabelStrings = LabelStrings(ZLabels, ZLabelType);
+			string s;
+			int i;
+
+			if (!(XLabelPositions is null))
+			{
+				i = 0;
+
+				foreach (IElement Label in XLabels.ChildElements)
+				{
+					s = XLabelStrings[i];
+					XLabelPositions[s] = LabelXX[i++];
+				}
+			}
+
+			if (!(YLabelPositions is null))
+			{
+				i = 0;
+
+				foreach (IElement Label in YLabels.ChildElements)
+				{
+					s = YLabelStrings[i];
+					YLabelPositions[s] = LabelYY[i++];
+				}
+			}
+
+			if (!(ZLabelPositions is null))
+			{
+				i = 0;
+
+				foreach (IElement Label in ZLabels.ChildElements)
+				{
+					s = ZLabelStrings[i];
+					ZLabelPositions[s] = LabelZZ[i++];
+				}
+			}
+
+			DrawingVolume.XLabelPositions = XLabelPositions;
+			DrawingVolume.YLabelPositions = YLabelPositions;
+			DrawingVolume.ZLabelPositions = ZLabelPositions;
 
 			Canvas3D Canvas = new Canvas3D(Settings.Width, Settings.Height, this.overSampling, Settings.BackgroundColor);
 
@@ -670,18 +719,17 @@ namespace Waher.Script.Graphs3D
 			}
 
 			Matrix4x4 M = Canvas.ModelTransformation;
-			double[] LabelXX = DrawingVolume.ScaleX(XLabels);
 			float LabelMargin = (float)Settings.LabelFontSize * 0.1f;
 			float TextSize0 = (float)Settings.LabelFontSize * 5;
 			float TextSize = this.CalcTextSize(LabelXX, TextSize0);
 			SKSize Size;
-			string s;
 			float f;
-			int i = 0;
+
+			i = 0;
 
 			foreach (IElement Label in XLabels.ChildElements)
 			{
-				s = LabelString(Label, XLabelType);
+				s = XLabelStrings[i];
 				Size = Canvas.TextDimensions(s, Settings.FontName, TextSize);
 
 				f = (float)LabelXX[i++];
@@ -738,14 +786,12 @@ namespace Waher.Script.Graphs3D
 				Canvas.ModelTransformation = M;
 			}
 
-			double[] LabelZZ = DrawingVolume.ScaleZ(ZLabels);
-
 			i = 0;
 			TextSize = this.CalcTextSize(LabelZZ, TextSize0);
 
 			foreach (IElement Label in ZLabels.ChildElements)
 			{
-				s = LabelString(Label, ZLabelType);
+				s = ZLabelStrings[i];
 				Size = Canvas.TextDimensions(s, Settings.FontName, TextSize);
 
 				f = (float)LabelZZ[i++];
@@ -802,14 +848,12 @@ namespace Waher.Script.Graphs3D
 				Canvas.ModelTransformation = M;
 			}
 
-			double[] LabelYY = DrawingVolume.ScaleY(YLabels);
-
 			i = 0;
 			TextSize = this.CalcTextSize(LabelYY, TextSize0);
 
 			foreach (IElement Label in YLabels.ChildElements)
 			{
-				s = LabelString(Label, YLabelType);
+				s = YLabelStrings[i];
 				Size = Canvas.TextDimensions(s, Settings.FontName, TextSize);
 
 				f = (float)LabelYY[i++];
@@ -1043,11 +1087,15 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Width">Width of volume.</param>
 		/// <param name="Height">Height of volume.</param>
 		/// <param name="Depth">Depth of volume.</param>
+		/// <param name="XLabelPositions">Optional fixed X-label positions.</param>
+		/// <param name="YLabelPositions">Optional fixed Y-label positions.</param>
+		/// <param name="ZLabelPositions">Optional fixed Z-label positions.</param>
 		/// <returns>Mesh of point vectors.</returns>
 		public static Vector4[,] Scale(IMatrix MatrixX, IMatrix MatrixY, IMatrix MatrixZ,
 			IElement MinX, IElement MaxX, IElement MinY, IElement MaxY,
 			IElement MinZ, IElement MaxZ, double OffsetX, double OffsetY, double OffsetZ,
-			double Width, double Height, double Depth)
+			double Width, double Height, double Depth, Dictionary<string, double> XLabelPositions,
+			Dictionary<string, double> YLabelPositions, Dictionary<string, double> ZLabelPositions)
 		{
 			int Columns = MatrixX.Columns;
 			int Rows = MatrixX.Rows;
@@ -1058,9 +1106,9 @@ namespace Waher.Script.Graphs3D
 				throw new ScriptException("Dimension mismatch.");
 			}
 
-			double[,] X = Scale(MatrixX, MinX, MaxX, OffsetX, Width);
-			double[,] Y = Scale(MatrixY, MinY, MaxY, OffsetY, Height);
-			double[,] Z = Scale(MatrixZ, MinZ, MaxZ, OffsetZ, Depth);
+			double[,] X = Scale(MatrixX, MinX, MaxX, OffsetX, Width, XLabelPositions);
+			double[,] Y = Scale(MatrixY, MinY, MaxY, OffsetY, Height, YLabelPositions);
+			double[,] Z = Scale(MatrixZ, MinZ, MaxZ, OffsetZ, Depth, ZLabelPositions);
 			int i, j;
 			Vector4[,] Points = new Vector4[Columns, Rows];
 
@@ -1081,8 +1129,10 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Max">Largest value.</param>
 		/// <param name="Offset">Offset to volume.</param>
 		/// <param name="Size">Size of volume.</param>
+		/// <param name="LabelPositions">Optional fixed label positions.</param>
 		/// <returns>Matrix distributed in the available volume.</returns>
-		public static double[,] Scale(IMatrix Matrix, IElement Min, IElement Max, double Offset, double Size)
+		public static double[,] Scale(IMatrix Matrix, IElement Min, IElement Max, double Offset,
+			double Size, Dictionary<string, double> LabelPositions)
 		{
 			if (Matrix is DoubleMatrix DM)
 			{
@@ -1163,7 +1213,7 @@ namespace Waher.Script.Graphs3D
 							return Scale(Matrix2, MinDT.Value, MaxDT.Value, Offset, Size);
 						}
 						else
-							return Scale(OM.Values, Offset, Size);
+							return Scale(OM.Values, Offset, Size, LabelPositions);
 					}
 				}
 			}
@@ -1261,8 +1311,10 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Matrix">Matrix.</param>
 		/// <param name="Offset">Offset to volume.</param>
 		/// <param name="Size">Size of area.</param>
+		/// <param name="LabelPositions">Optional fixed label positions.</param>
 		/// <returns>Matrix distributed in the available volume.</returns>
-		public static double[,] Scale(object[,] Matrix, double Offset, double Size)
+		public static double[,] Scale(object[,] Matrix, double Offset, double Size,
+			Dictionary<string, double> LabelPositions)
 		{
 			Dictionary<object, int> Values = new Dictionary<object, int>();
 			int Index = 0;
@@ -1287,7 +1339,23 @@ namespace Waher.Script.Graphs3D
 				}
 			}
 
-			return Scale(v, 0, c, Offset, Size);
+			double[,] Result = Scale(v, 0, c, Offset, Size);
+
+			if (!(LabelPositions is null))
+			{
+				for (i = 0; i < c; i++)
+				{
+					for (j = 0; j < r; j++)
+					{
+						string s = Matrix[i, j]?.ToString() ?? string.Empty;
+
+						if (LabelPositions.TryGetValue(s, out double d))
+							Result[i, j] = d;
+					}
+				}
+			}
+
+			return Result;
 		}
 
 		/// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 
@@ -9,6 +10,8 @@ namespace Waher.Script.Graphs
 	/// </summary>
 	public class DrawingArea
 	{
+		private Dictionary<string, double> xLabelPositions = null;
+		private Dictionary<string, double> yLabelPositions = null;
 		private readonly IElement minX;
 		private readonly IElement maxX;
 		private readonly IElement minY;
@@ -51,111 +54,69 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// Smallest value of X.
 		/// </summary>
-		public IElement MinX
-		{
-			get
-			{
-				return this.minX;
-			}
-		}
+		public IElement MinX => this.minX;
 
 		/// <summary>
 		/// Largest value of X.
 		/// </summary>
-		public IElement MaxX
-		{
-			get
-			{
-				return this.maxX;
-			}
-		}
+		public IElement MaxX => this.maxX;
 
 		/// <summary>
 		/// Smallest value of Y.
 		/// </summary>
-		public IElement MinY
-		{
-			get
-			{
-				return this.minY;
-			}
-		}
+		public IElement MinY => this.minY;
 
 		/// <summary>
 		/// Largest value of Y.
 		/// </summary>
-		public IElement MaxY
-		{
-			get
-			{
-				return this.maxY;
-			}
-		}
+		public IElement MaxY => this.maxY;
 
 		/// <summary>
 		/// X-offset of drawing area, relative to the canvas origin.
 		/// </summary>
-		public int OffsetX
-		{
-			get
-			{
-				return this.offsetX;
-			}
-		}
+		public int OffsetX => this.offsetX;
 
 		/// <summary>
 		/// Y-offset of drawing area, relative to the canvas origin.
 		/// </summary>
-		public int OffsetY
-		{
-			get
-			{
-				return this.offsetY;
-			}
-		}
+		public int OffsetY => this.offsetY;
 
 		/// <summary>
 		/// Width of drawing area.
 		/// </summary>
-		public int Width
-		{
-			get
-			{
-				return this.width;
-			}
-		}
+		public int Width => this.width;
 
 		/// <summary>
 		/// Height of drawing area.
 		/// </summary>
-		public int Height
-		{
-			get
-			{
-				return this.height;
-			}
-		}
+		public int Height => this.height;
 
 		/// <summary>
 		/// X-coordinate for the origo.
 		/// </summary>
-		public float OrigoX
-		{
-			get
-			{
-				return this.origoX;
-			}
-		}
+		public float OrigoX => this.origoX;
 
 		/// <summary>
 		/// Y-coordinate for the origo.
 		/// </summary>
-		public float OrigoY
+		public float OrigoY => this.origoY;
+
+		/// <summary>
+		/// Optional fixed X-Label positions.
+		/// </summary>
+		public Dictionary<string, double> XLabelPositions
 		{
-			get
-			{
-				return this.origoY;
-			}
+			get => this.xLabelPositions;
+			set => this.xLabelPositions = value;
+		}
+
+		/// <summary>
+		/// Optional fixed Y-Label positions.
+		/// </summary>
+		public Dictionary<string, double> YLabelPositions
+		{
+			get => this.yLabelPositions;
+			set => this.yLabelPositions = value;
 		}
 
 		/// <summary>
@@ -165,7 +126,9 @@ namespace Waher.Script.Graphs
 		/// <param name="VectorY">Y-vector.</param>
 		public SKPoint[] Scale(IVector VectorX, IVector VectorY)
 		{
-			return Graph.Scale(VectorX, VectorY, this.minX, this.maxX, this.minY, this.maxY, this.offsetX, this.offsetY, this.width, this.height);
+			return Graph.Scale(VectorX, VectorY, this.minX, this.maxX, this.minY, this.maxY, 
+				this.offsetX, this.offsetY, this.width, this.height, this.xLabelPositions, 
+				this.yLabelPositions);
 		}
 
 		/// <summary>
@@ -174,7 +137,7 @@ namespace Waher.Script.Graphs
 		/// <param name="Vector">Vector.</param>
 		public double[] ScaleX(IVector Vector)
 		{
-			return Graph.Scale(Vector, this.minX, this.maxX, this.offsetX, this.width);
+			return Graph.Scale(Vector, this.minX, this.maxX, this.offsetX, this.width, this.xLabelPositions);
 		}
 
 		/// <summary>
@@ -183,7 +146,7 @@ namespace Waher.Script.Graphs
 		/// <param name="Vector">Vector.</param>
 		public double[] ScaleY(IVector Vector)
 		{
-			return Graph.Scale(Vector, this.minY, this.maxY, this.offsetY, this.height);
+			return Graph.Scale(Vector, this.minY, this.maxY, this.offsetY, this.height, this.yLabelPositions);
 		}
 
 

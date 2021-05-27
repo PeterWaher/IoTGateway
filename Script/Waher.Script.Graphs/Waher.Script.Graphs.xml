@@ -74,6 +74,16 @@
             Y-coordinate for the origo.
             </summary>
         </member>
+        <member name="P:Waher.Script.Graphs.DrawingArea.XLabelPositions">
+            <summary>
+            Optional fixed X-Label positions.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.DrawingArea.YLabelPositions">
+            <summary>
+            Optional fixed Y-Label positions.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Graphs.DrawingArea.Scale(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IVector)">
             <summary>
             Scales two vectors of equal size to points in a rectangular area.
@@ -1528,7 +1538,7 @@
             The recommended bitmap size of the graph, if such is available, or null if not.
             </summary>
         </member>
-        <member name="M:Waher.Script.Graphs.Graph.Scale(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Double,System.Double,System.Double,System.Double)">
+        <member name="M:Waher.Script.Graphs.Graph.Scale(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Double,System.Double,System.Double,System.Double,System.Collections.Generic.Dictionary{System.String,System.Double},System.Collections.Generic.Dictionary{System.String,System.Double})">
             <summary>
             Scales two vectors of equal size to points in a rectangular area.
             </summary>
@@ -1542,9 +1552,11 @@
             <param name="OffsetY">Y-offset to area.</param>
             <param name="Width">Width of area.</param>
             <param name="Height">Height of area.</param>
+            <param name="XLabelPositions">Optional fixed X-label positions.</param>
+            <param name="YLabelPositions">Optional fixed Y-label positions.</param>
             <returns>Sequence of points.</returns>
         </member>
-        <member name="M:Waher.Script.Graphs.Graph.Scale(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Double,System.Double)">
+        <member name="M:Waher.Script.Graphs.Graph.Scale(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Double,System.Double,System.Collections.Generic.Dictionary{System.String,System.Double})">
             <summary>
             Scales a vector to fit a given area.
             </summary>
@@ -1553,6 +1565,7 @@
             <param name="Max">Largest value.</param>
             <param name="Offset">Offset to area.</param>
             <param name="Size">Size of area.</param>
+            <param name="LabelPositions">Optional fixed label positions.</param>
             <returns>Vector distributed in the available area.</returns>
         </member>
         <member name="M:Waher.Script.Graphs.Graph.Scale(System.Double[],System.Double,System.Double,System.Double,System.Double)">
@@ -1582,13 +1595,14 @@
             Reference time stamp when converting <see cref="T:System.DateTime"/> to <see cref="T:System.Double"/>.
             </summary>
         </member>
-        <member name="M:Waher.Script.Graphs.Graph.Scale(System.Object[],System.Double,System.Double)">
+        <member name="M:Waher.Script.Graphs.Graph.Scale(Waher.Script.Abstraction.Elements.IElement[],System.Double,System.Double,System.Collections.Generic.Dictionary{System.String,System.Double})">
             <summary>
             Scales a vector to fit a given area.
             </summary>
             <param name="Vector">Vector.</param>
             <param name="Offset">Offset to area.</param>
             <param name="Size">Size of area.</param>
+            <param name="LabelPositions">Optional fixed label positions.</param>
             <returns>Vector distributed in the available area.</returns>
         </member>
         <member name="M:Waher.Script.Graphs.Graph.Scale(Waher.Script.Objects.PhysicalQuantity[],System.Double,System.Double,Waher.Script.Units.Unit,System.Double,System.Double)">
@@ -1734,6 +1748,14 @@
             <param name="Label">Label</param>
             <param name="LabelType">Type of label.</param>
             <returns>String-representation.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.LabelStrings(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Graphs.LabelType)">
+            <summary>
+            Converts a vector of labels to a string array.
+            </summary>
+            <param name="Labels">Labels</param>
+            <param name="LabelType">Type of label.</param>
+            <returns>String-representation of elements.</returns>
         </member>
         <member name="M:Waher.Script.Graphs.Graph.GetIso8601WeekOfYear(System.DateTime)">
             <summary>

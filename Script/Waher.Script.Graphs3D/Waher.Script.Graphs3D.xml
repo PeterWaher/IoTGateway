@@ -918,6 +918,21 @@
             Z-coordinate for the origo.
             </summary>
         </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.XLabelPositions">
+            <summary>
+            Optional fixed X-Label positions.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.YLabelPositions">
+            <summary>
+            Optional fixed Y-Label positions.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs3D.DrawingVolume.ZLabelPositions">
+            <summary>
+            Optional fixed Z-Label positions.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Graphs3D.DrawingVolume.Scale(Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IMatrix)">
             <summary>
             Scales three matrices of equal size to point vectors in space.
@@ -1916,7 +1931,7 @@
             <param name="LabelType">Type of labels produced.</param>
             <returns>Vector of labels.</returns>
         </member>
-        <member name="M:Waher.Script.Graphs3D.Graph3D.Scale(Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">
+        <member name="M:Waher.Script.Graphs3D.Graph3D.Scale(Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Collections.Generic.Dictionary{System.String,System.Double},System.Collections.Generic.Dictionary{System.String,System.Double},System.Collections.Generic.Dictionary{System.String,System.Double})">
             <summary>
             Scales three matrices of equal size to point vectors in space.
             </summary>
@@ -1935,9 +1950,12 @@
             <param name="Width">Width of volume.</param>
             <param name="Height">Height of volume.</param>
             <param name="Depth">Depth of volume.</param>
+            <param name="XLabelPositions">Optional fixed X-label positions.</param>
+            <param name="YLabelPositions">Optional fixed Y-label positions.</param>
+            <param name="ZLabelPositions">Optional fixed Z-label positions.</param>
             <returns>Mesh of point vectors.</returns>
         </member>
-        <member name="M:Waher.Script.Graphs3D.Graph3D.Scale(Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Double,System.Double)">
+        <member name="M:Waher.Script.Graphs3D.Graph3D.Scale(Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Double,System.Double,System.Collections.Generic.Dictionary{System.String,System.Double})">
             <summary>
             Scales a matrix to fit a given volume.
             </summary>
@@ -1946,6 +1964,7 @@
             <param name="Max">Largest value.</param>
             <param name="Offset">Offset to volume.</param>
             <param name="Size">Size of volume.</param>
+            <param name="LabelPositions">Optional fixed label positions.</param>
             <returns>Matrix distributed in the available volume.</returns>
         </member>
         <member name="M:Waher.Script.Graphs3D.Graph3D.Scale(System.Double[0:,0:],System.Double,System.Double,System.Double,System.Double)">
@@ -1982,13 +2001,14 @@
             <param name="Size">Size of area.</param>
             <returns>Matrix distributed in the available volume.</returns>
         </member>
-        <member name="M:Waher.Script.Graphs3D.Graph3D.Scale(System.Object[0:,0:],System.Double,System.Double)">
+        <member name="M:Waher.Script.Graphs3D.Graph3D.Scale(System.Object[0:,0:],System.Double,System.Double,System.Collections.Generic.Dictionary{System.String,System.Double})">
             <summary>
             Scales a matrix to fit a given volume.
             </summary>
             <param name="Matrix">Matrix.</param>
             <param name="Offset">Offset to volume.</param>
             <param name="Size">Size of area.</param>
+            <param name="LabelPositions">Optional fixed label positions.</param>
             <returns>Matrix distributed in the available volume.</returns>
         </member>
         <member name="M:Waher.Script.Graphs3D.Graph3D.GetBitmapClickScript(System.Double,System.Double,System.Object[])">

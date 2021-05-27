@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs;
@@ -10,6 +11,9 @@ namespace Waher.Script.Graphs3D
 	/// </summary>
 	public class DrawingVolume
 	{
+		private Dictionary<string, double> xLabelPositions = null;
+		private Dictionary<string, double> yLabelPositions = null;
+		private Dictionary<string, double> zLabelPositions = null;
 		private readonly IElement minX;
 		private readonly IElement maxX;
 		private readonly IElement minY;
@@ -147,6 +151,33 @@ namespace Waher.Script.Graphs3D
 		public float? OrigoZ => this.origoZ;
 
 		/// <summary>
+		/// Optional fixed X-Label positions.
+		/// </summary>
+		public Dictionary<string, double> XLabelPositions
+		{
+			get => this.xLabelPositions;
+			set => this.xLabelPositions = value;
+		}
+
+		/// <summary>
+		/// Optional fixed Y-Label positions.
+		/// </summary>
+		public Dictionary<string, double> YLabelPositions
+		{
+			get => this.yLabelPositions;
+			set => this.yLabelPositions = value;
+		}
+
+		/// <summary>
+		/// Optional fixed Z-Label positions.
+		/// </summary>
+		public Dictionary<string, double> ZLabelPositions
+		{
+			get => this.zLabelPositions;
+			set => this.zLabelPositions = value;
+		}
+
+		/// <summary>
 		/// Scales three matrices of equal size to point vectors in space.
 		/// </summary>
 		/// <param name="MatrixX">X-matrix.</param>
@@ -157,7 +188,8 @@ namespace Waher.Script.Graphs3D
 			return Graph3D.Scale(MatrixX, MatrixY, MatrixZ, this.minX, this.maxX,
 				this.minY, this.maxY, this.minZ, this.maxZ,
 				this.offsetX, this.offsetY, this.offsetZ,
-				this.width, this.height, this.depth);
+				this.width, this.height, this.depth,
+				this.xLabelPositions, this.yLabelPositions, this.zLabelPositions);
 		}
 
 		/// <summary>
@@ -166,7 +198,7 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Matrix">Matrix.</param>
 		public double[,] ScaleX(IMatrix Matrix)
 		{
-			return Graph3D.Scale(Matrix, this.minX, this.maxX, this.offsetX, this.width);
+			return Graph3D.Scale(Matrix, this.minX, this.maxX, this.offsetX, this.width, this.xLabelPositions);
 		}
 
 		/// <summary>
@@ -175,7 +207,7 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Vector">Vector.</param>
 		public double[] ScaleX(IVector Vector)
 		{
-			return Graph2D.Scale(Vector, this.minX, this.maxX, this.offsetX, this.width);
+			return Graph2D.Scale(Vector, this.minX, this.maxX, this.offsetX, this.width, this.xLabelPositions);
 		}
 
 		/// <summary>
@@ -184,7 +216,7 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Matrix">Matrix.</param>
 		public double[,] ScaleY(IMatrix Matrix)
 		{
-			return Graph3D.Scale(Matrix, this.minY, this.maxY, this.offsetY, this.height);
+			return Graph3D.Scale(Matrix, this.minY, this.maxY, this.offsetY, this.height, this.yLabelPositions);
 		}
 
 		/// <summary>
@@ -193,7 +225,7 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Vector">Vector.</param>
 		public double[] ScaleY(IVector Vector)
 		{
-			return Graph2D.Scale(Vector, this.minY, this.maxY, this.offsetY, this.height);
+			return Graph2D.Scale(Vector, this.minY, this.maxY, this.offsetY, this.height, this.yLabelPositions);
 		}
 
 		/// <summary>
@@ -202,7 +234,7 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Matrix">Matrix.</param>
 		public double[,] ScaleZ(IMatrix Matrix)
 		{
-			return Graph3D.Scale(Matrix, this.maxZ, this.minZ, this.offsetZ, this.depth);
+			return Graph3D.Scale(Matrix, this.maxZ, this.minZ, this.offsetZ, this.depth, this.zLabelPositions);
 		}
 
 		/// <summary>
@@ -211,7 +243,7 @@ namespace Waher.Script.Graphs3D
 		/// <param name="Vector">Vector.</param>
 		public double[] ScaleZ(IVector Vector)
 		{
-			return Graph2D.Scale(Vector, this.maxZ, this.minZ, this.offsetZ, this.depth);
+			return Graph2D.Scale(Vector, this.maxZ, this.minZ, this.offsetZ, this.depth, this.zLabelPositions);
 		}
 
 		/// <summary>

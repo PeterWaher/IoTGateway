@@ -483,6 +483,7 @@ namespace Waher.Script.Graphs
 					y1 += (int)(Settings.LabelFontSize * 2 + 0.5);
 
 				IVector YLabels = GetLabels(ref this.minY, ref this.maxY, this.y, Settings.ApproxNrLabelsY, out LabelType YLabelType);
+				string[] YLabelStrings = LabelStrings(YLabels, YLabelType);
 				SKPaint Font = new SKPaint()
 				{
 					FilterQuality = SKFilterQuality.High,
@@ -512,6 +513,7 @@ namespace Waher.Script.Graphs
 				x3 = (int)Math.Ceiling(x1 + MaxSize) + Settings.MarginLabel;
 
 				IVector XLabels = GetLabels(ref this.minX, ref this.maxX, this.x, Settings.ApproxNrLabelsX, out LabelType XLabelType);
+				string[] XLabelStrings = LabelStrings(XLabels, XLabelType);
 				MaxSize = 0;
 
 				if (this.showXAxis)
@@ -589,25 +591,32 @@ namespace Waher.Script.Graphs
 				double OrigoY;
 
 				if (this.minX.AssociatedSet is IAbelianGroup AgX)
-					OrigoX = Scale(new ObjectVector(AgX.AdditiveIdentity), this.minX, this.maxX, x3, w)[0];
+					OrigoX = Scale(new ObjectVector(AgX.AdditiveIdentity), this.minX, this.maxX, x3, w, null)[0];
 				else
 					OrigoX = 0;
 
 				if (this.minY.AssociatedSet is IAbelianGroup AgY)
-					OrigoY = Scale(new ObjectVector(AgY.AdditiveIdentity), this.minY, this.maxY, y3, -h)[0];
+					OrigoY = Scale(new ObjectVector(AgY.AdditiveIdentity), this.minY, this.maxY, y3, -h, null)[0];
 				else
 					OrigoY = 0;
 
 				DrawingArea DrawingArea = new DrawingArea(this.minX, this.maxX, this.minY, this.maxY, x3, y3, w, -h, (float)OrigoX, (float)OrigoY);
 				double[] LabelYY = DrawingArea.ScaleY(YLabels);
+				Dictionary<string, double> YLabelPositions = YLabelType == LabelType.String ? new Dictionary<string, double>() : null;
 				int i = 0;
 				float f;
+				double d;
 				string s;
 
 				foreach (IElement Label in YLabels.ChildElements)
 				{
-					Font.MeasureText(s = LabelString(Label, YLabelType), ref Bounds);
-					f = (float)LabelYY[i++];
+					s = YLabelStrings[i];
+					Font.MeasureText(s, ref Bounds);
+					d = LabelYY[i++];
+					f = (float)d;
+
+					if (!(YLabelPositions is null))
+						YLabelPositions[s] = d;
 
 					if (this.showGrid)
 					{
@@ -625,12 +634,18 @@ namespace Waher.Script.Graphs
 				}
 
 				double[] LabelXX = DrawingArea.ScaleX(XLabels);
+				Dictionary<string, double> XLabelPositions = XLabelType == LabelType.String ? new Dictionary<string, double>() : null;
 				i = 0;
 
 				foreach (IElement Label in XLabels.ChildElements)
 				{
-					Font.MeasureText(s = LabelString(Label, XLabelType), ref Bounds);
-					f = (float)LabelXX[i++];
+					s = XLabelStrings[i];
+					Font.MeasureText(s, ref Bounds);
+					d = LabelXX[i++];
+					f = (float)d;
+
+					if (!(XLabelPositions is null))
+						XLabelPositions[s] = d;
 
 					if (this.showGrid)
 					{
@@ -652,6 +667,9 @@ namespace Waher.Script.Graphs
 						Canvas.DrawText(s, f, y3 + Settings.MarginLabel + (float)Settings.LabelFontSize, Font);
 					}
 				}
+
+				DrawingArea.XLabelPositions = XLabelPositions;
+				DrawingArea.YLabelPositions = YLabelPositions;
 
 				Font.Dispose();
 				Font = null;

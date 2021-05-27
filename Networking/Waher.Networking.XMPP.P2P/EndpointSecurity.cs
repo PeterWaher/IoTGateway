@@ -1479,10 +1479,15 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="PkiSynchronized">If E2E information has been synchronized. If not, and a forbidden response is returned,
 		/// E2E information is first synchronized, and the operation retried, before conceding failure.</param>
 		/// <returns>ID of IQ stanza, if none provided in <paramref name="Id"/>.</returns>
+		/// <exception cref="ObjectDisposedException">If endpoint security object has been disposed.</exception>
+		/// <exception cref="InvalidOperationException">If E2E transmission is asserted, but no E2E-encrypted channel could be established.</exception>
 		protected uint SendIq(XmppClient Client, E2ETransmission E2ETransmission, string Id, string To, string Xml,
 			string Type, IqResultEventHandlerAsync Callback, object State, int RetryTimeout, int NrRetries, bool DropOff,
 			int MaxRetryTimeout, bool PkiSynchronized)
 		{
+			if (this.client is null)
+				throw new ObjectDisposedException("Endpoint security object disposed.");
+
 			if (string.IsNullOrEmpty(Id))
 				Id = Client.NextId();
 

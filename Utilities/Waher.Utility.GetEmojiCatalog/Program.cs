@@ -1,18 +1,15 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Text;
 using System.Net;
-using System.Xml;
 using System.Xml.Xsl;
 using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Events.Console;
-using Waher.Networking;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Utility.GetEmojiCatalog
 {
-	class Program
+	public class Program
 	{
 		static void Main(string[] _)
 		{
@@ -24,6 +21,8 @@ namespace Waher.Utility.GetEmojiCatalog
 
 			try
 			{
+				Types.Initialize(typeof(Program).Assembly);
+
 				if (!File.Exists("table.htm") || (DateTime.Now - File.GetLastWriteTime("table.htm")).TotalHours >= 1.0)
 				{
 					Log.Informational("Downloading table.");

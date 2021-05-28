@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Waher.Content.Emoji
 {
@@ -14,20 +16,169 @@ namespace Waher.Content.Emoji
 		/// </summary>
 		public static readonly string[] EmojiShortNames = new string[]
 		{
-			"hash",
-			"keycap_star",
-			"zero",
-			"one",
-			"two",
-			"three",
-			"four",
-			"five",
-			"six",
-			"seven",
-			"eight",
-			"nine",
 			"copyright",
 			"registered",
+			"bangbang",
+			"interrobang",
+			"tm",
+			"information_source",
+			"left_right_arrow",
+			"arrow_up_down",
+			"arrow_upper_left",
+			"arrow_upper_right",
+			"arrow_lower_right",
+			"arrow_lower_left",
+			"leftwards_arrow_with_hook",
+			"arrow_right_hook",
+			"watch",
+			"hourglass",
+			"keyboard",
+			"fast_forward",
+			"rewind",
+			"arrow_double_up",
+			"arrow_double_down",
+			"black_right_pointing_double_triangle_with_vertical_bar",
+			"black_left_pointing_double_triangle_with_vertical_bar",
+			"black_right_pointing_triangle_with_double_vertical_bar",
+			"alarm_clock",
+			"stopwatch",
+			"timer_clock",
+			"hourglass_flowing_sand",
+			"double_vertical_bar",
+			"black_square_for_stop",
+			"black_circle_for_record",
+			"m",
+			"black_small_square",
+			"white_small_square",
+			"arrow_forward",
+			"arrow_backward",
+			"white_medium_square",
+			"black_medium_square",
+			"white_medium_small_square",
+			"black_medium_small_square",
+			"sunny",
+			"cloud",
+			"umbrella",
+			"showman",
+			"comet",
+			"phone",
+			"ballot_box_with_check",
+			"umbrella_rain",
+			"coffee",
+			"shamrock",
+			"point_up",
+			"skull_and_crossbones",
+			"radioactive_sign",
+			"biohazard_sign",
+			"orthodox_cross",
+			"star_and_crescent",
+			"peace_symbol",
+			"yin_yang",
+			"wheel_of_dharma",
+			"white_frowning_face",
+			"relaxed",
+			"aries",
+			"taurus",
+			"gemini",
+			"cancer",
+			"leo",
+			"virgo",
+			"libra",
+			"scorpius",
+			"sagittarius",
+			"capricorn",
+			"aquarius",
+			"pisces",
+			"spades",
+			"clubs",
+			"hearts",
+			"diamonds",
+			"hotsprings",
+			"recycle",
+			"wheelchair",
+			"hammer_and_pick",
+			"anchor",
+			"crossed_swords",
+			"scales",
+			"alembic",
+			"gear",
+			"atom_symbol",
+			"fleur_de_lis",
+			"warning",
+			"zap",
+			"white_circle",
+			"black_circle",
+			"coffin",
+			"funeral_urn",
+			"soccer",
+			"baseball",
+			"snowman",
+			"partly_sunny",
+			"thunder_cloud_and_rain",
+			"ophiuchus",
+			"pick",
+			"helmet_with_white_cross",
+			"chains",
+			"no_entry",
+			"shinto_shrine",
+			"church",
+			"mountain",
+			"umbrella_on_ground",
+			"fountain",
+			"golf",
+			"ferry",
+			"boat",
+			"skier",
+			"ice_skate",
+			"person_with_ball",
+			"tent",
+			"fuelpump",
+			"scissors",
+			"white_check_mark",
+			"airplane",
+			"email",
+			"fist",
+			"hand",
+			"v",
+			"writing_hand",
+			"pencil2",
+			"black_nib",
+			"heavy_check_mark",
+			"heavy_multiplication_x",
+			"latin_cross",
+			"star_of_david",
+			"sparkles",
+			"eight_spoked_asterisk",
+			"eight_pointed_black_star",
+			"snowflake",
+			"sparkle",
+			"x",
+			"negative_squared_cross_mark",
+			"question",
+			"grey_question",
+			"grey_exclamation",
+			"exclamation",
+			"heavy_heart_exclamation_mark_ornament",
+			"heart",
+			"heavy_plus_sign",
+			"heavy_minus_sign",
+			"heavy_division_sign",
+			"arrow_right",
+			"curly_loop",
+			"loop",
+			"arrow_heading_up",
+			"arrow_heading_down",
+			"arrow_left",
+			"arrow_up",
+			"arrow_down",
+			"black_large_square",
+			"white_large_square",
+			"star",
+			"o",
+			"wavy_dash",
+			"part_alternation_mark",
+			"congratulations",
+			"secret",
 			"mahjong",
 			"black_joker",
 			"a",
@@ -45,264 +196,6 @@ namespace Waher.Content.Emoji
 			"sos",
 			"up",
 			"vs",
-			"flag-ac",
-			"flag-ad",
-			"flag-ae",
-			"flag-af",
-			"flag-ag",
-			"flag-ai",
-			"flag-al",
-			"flag-am",
-			"flag-ao",
-			"flag-aq",
-			"flag-ar",
-			"flag-as",
-			"flag-at",
-			"flag-au",
-			"flag-aw",
-			"flag-ax",
-			"flag-az",
-			"flag-ba",
-			"flag-bb",
-			"flag-bd",
-			"flag-be",
-			"flag-bf",
-			"flag-bg",
-			"flag-bh",
-			"flag-bi",
-			"flag-bj",
-			"flag-bl",
-			"flag-bm",
-			"flag-bn",
-			"flag-bo",
-			"flag-bq",
-			"flag-br",
-			"flag-bs",
-			"flag-bt",
-			"flag-bv",
-			"flag-bw",
-			"flag-by",
-			"flag-bz",
-			"flag-ca",
-			"flag-cc",
-			"flag-cd",
-			"flag-cf",
-			"flag-cg",
-			"flag-ch",
-			"flag-ci",
-			"flag-ck",
-			"flag-cl",
-			"flag-cm",
-			"cn",
-			"flag-co",
-			"flag-cp",
-			"flag-cr",
-			"flag-cu",
-			"flag-cv",
-			"flag-cw",
-			"flag-cx",
-			"flag-cy",
-			"flag-cz",
-			"de",
-			"flag-dg",
-			"flag-dj",
-			"flag-dk",
-			"flag-dm",
-			"flag-do",
-			"flag-dz",
-			"flag-ea",
-			"flag-ec",
-			"flag-ee",
-			"flag-eg",
-			"flag-eh",
-			"flag-er",
-			"es",
-			"flag-et",
-			"flag-eu",
-			"flag-fi",
-			"flag-fj",
-			"flag-fk",
-			"flag-fm",
-			"flag-fo",
-			"fr",
-			"flag-ga",
-			"gb",
-			"flag-gd",
-			"flag-ge",
-			"flag-gf",
-			"flag-gg",
-			"flag-gh",
-			"flag-gi",
-			"flag-gl",
-			"flag-gm",
-			"flag-gn",
-			"flag-gp",
-			"flag-gq",
-			"flag-gr",
-			"flag-gs",
-			"flag-gt",
-			"flag-gu",
-			"flag-gw",
-			"flag-gy",
-			"flag-hk",
-			"flag-hm",
-			"flag-hn",
-			"flag-hr",
-			"flag-ht",
-			"flag-hu",
-			"flag-ic",
-			"flag-id",
-			"flag-ie",
-			"flag-il",
-			"flag-im",
-			"flag-in",
-			"flag-io",
-			"flag-iq",
-			"flag-ir",
-			"flag-is",
-			"it",
-			"flag-je",
-			"flag-jm",
-			"flag-jo",
-			"jp",
-			"flag-ke",
-			"flag-kg",
-			"flag-kh",
-			"flag-ki",
-			"flag-km",
-			"flag-kn",
-			"flag-kp",
-			"kr",
-			"flag-kw",
-			"flag-ky",
-			"flag-kz",
-			"flag-la",
-			"flag-lb",
-			"flag-lc",
-			"flag-li",
-			"flag-lk",
-			"flag-lr",
-			"flag-ls",
-			"flag-lt",
-			"flag-lu",
-			"flag-lv",
-			"flag-ly",
-			"flag-ma",
-			"flag-mc",
-			"flag-md",
-			"flag-me",
-			"flag-mf",
-			"flag-mg",
-			"flag-mh",
-			"flag-mk",
-			"flag-ml",
-			"flag-mm",
-			"flag-mn",
-			"flag-mo",
-			"flag-mp",
-			"flag-mq",
-			"flag-mr",
-			"flag-ms",
-			"flag-mt",
-			"flag-mu",
-			"flag-mv",
-			"flag-mw",
-			"flag-mx",
-			"flag-my",
-			"flag-mz",
-			"flag-na",
-			"flag-nc",
-			"flag-ne",
-			"flag-nf",
-			"flag-ng",
-			"flag-ni",
-			"flag-nl",
-			"flag-no",
-			"flag-np",
-			"flag-nr",
-			"flag-nu",
-			"flag-nz",
-			"flag-om",
-			"flag-pa",
-			"flag-pe",
-			"flag-pf",
-			"flag-pg",
-			"flag-ph",
-			"flag-pk",
-			"flag-pl",
-			"flag-pm",
-			"flag-pn",
-			"flag-pr",
-			"flag-ps",
-			"flag-pt",
-			"flag-pw",
-			"flag-py",
-			"flag-qa",
-			"flag-re",
-			"flag-ro",
-			"flag-rs",
-			"ru",
-			"flag-rw",
-			"flag-sa",
-			"flag-sb",
-			"flag-sc",
-			"flag-sd",
-			"flag-se",
-			"flag-sg",
-			"flag-sh",
-			"flag-si",
-			"flag-sj",
-			"flag-sk",
-			"flag-sl",
-			"flag-sm",
-			"flag-sn",
-			"flag-so",
-			"flag-sr",
-			"flag-ss",
-			"flag-st",
-			"flag-sv",
-			"flag-sx",
-			"flag-sy",
-			"flag-sz",
-			"flag-ta",
-			"flag-tc",
-			"flag-td",
-			"flag-tf",
-			"flag-tg",
-			"flag-th",
-			"flag-tj",
-			"flag-tk",
-			"flag-tl",
-			"flag-tm",
-			"flag-tn",
-			"flag-to",
-			"flag-tr",
-			"flag-tt",
-			"flag-tv",
-			"flag-tw",
-			"flag-tz",
-			"flag-ua",
-			"flag-ug",
-			"flag-um",
-			"flag-un",
-			"us",
-			"flag-uy",
-			"flag-uz",
-			"flag-va",
-			"flag-vc",
-			"flag-ve",
-			"flag-vg",
-			"flag-vi",
-			"flag-vn",
-			"flag-vu",
-			"flag-wf",
-			"flag-ws",
-			"flag-xk",
-			"flag-ye",
-			"flag-yt",
-			"flag-za",
-			"flag-zm",
-			"flag-zw",
 			"koko",
 			"sa",
 			"u7121",
@@ -431,7 +324,7 @@ namespace Waher.Content.Emoji
 			"cake",
 			"bento",
 			"stew",
-			"fried_egg",
+			"egg",
 			"fork_and_knife",
 			"tea",
 			"sake",
@@ -506,25 +399,15 @@ namespace Waher.Content.Emoji
 			"basketball",
 			"checkered_flag",
 			"snowboarder",
-			"woman-running",
-			"man-running",
 			"runner",
-			"woman-surfing",
-			"man-surfing",
 			"surfer",
 			"sports_medal",
 			"trophy",
 			"horse_racing",
 			"football",
 			"rugby_football",
-			"woman-swimming",
-			"man-swimming",
 			"swimmer",
-			"woman-lifting-weights",
-			"man-lifting-weights",
 			"weight_lifter",
-			"woman-golfing",
-			"man-golfing",
 			"golfer",
 			"racing_motorcycle",
 			"racing_car",
@@ -562,13 +445,7 @@ namespace Waher.Content.Emoji
 			"izakaya_lantern",
 			"japanese_castle",
 			"european_castle",
-			"rainbow-flag",
-			"transgender_flag",
 			"waving_white_flag",
-			"pirate_flag",
-			"flag-england",
-			"flag-scotland",
-			"flag-wales",
 			"waving_black_flag",
 			"rosette",
 			"label",
@@ -588,7 +465,6 @@ namespace Waher.Content.Emoji
 			"tiger2",
 			"leopard",
 			"rabbit2",
-			"black_cat",
 			"cat2",
 			"dragon",
 			"crocodile",
@@ -602,7 +478,6 @@ namespace Waher.Content.Emoji
 			"monkey",
 			"rooster",
 			"chicken",
-			"service_dog",
 			"dog2",
 			"pig2",
 			"boar",
@@ -641,14 +516,12 @@ namespace Waher.Content.Emoji
 			"frog",
 			"hamster",
 			"wolf",
-			"polar_bear",
 			"bear",
 			"panda_face",
 			"pig_nose",
 			"feet",
 			"chipmunk",
 			"eyes",
-			"eye-in-speech-bubble",
 			"eye",
 			"ear",
 			"nose",
@@ -688,112 +561,21 @@ namespace Waher.Content.Emoji
 			"busts_in_silhouette",
 			"boy",
 			"girl",
-			"male-farmer",
-			"male-cook",
-			"man_feeding_baby",
-			"male-student",
-			"male-singer",
-			"male-artist",
-			"male-teacher",
-			"male-factory-worker",
-			"man-boy-boy",
-			"man-boy",
-			"man-girl-boy",
-			"man-girl-girl",
-			"man-girl",
-			"man-man-boy",
-			"man-man-boy-boy",
-			"man-man-girl",
-			"man-man-girl-boy",
-			"man-man-girl-girl",
-			"man-woman-boy",
-			"man-woman-boy-boy",
-			"man-woman-girl",
-			"man-woman-girl-boy",
-			"man-woman-girl-girl",
-			"male-technologist",
-			"male-office-worker",
-			"male-mechanic",
-			"male-scientist",
-			"male-astronaut",
-			"male-firefighter",
-			"man_with_probing_cane",
-			"red_haired_man",
-			"curly_haired_man",
-			"bald_man",
-			"white_haired_man",
-			"man_in_motorized_wheelchair",
-			"man_in_manual_wheelchair",
-			"male-doctor",
-			"male-judge",
-			"male-pilot",
-			"man-heart-man",
-			"man-kiss-man",
 			"man",
-			"female-farmer",
-			"female-cook",
-			"woman_feeding_baby",
-			"female-student",
-			"female-singer",
-			"female-artist",
-			"female-teacher",
-			"female-factory-worker",
-			"woman-boy-boy",
-			"woman-boy",
-			"woman-girl-boy",
-			"woman-girl-girl",
-			"woman-girl",
-			"woman-woman-boy",
-			"woman-woman-boy-boy",
-			"woman-woman-girl",
-			"woman-woman-girl-boy",
-			"woman-woman-girl-girl",
-			"female-technologist",
-			"female-office-worker",
-			"female-mechanic",
-			"female-scientist",
-			"female-astronaut",
-			"female-firefighter",
-			"woman_with_probing_cane",
-			"red_haired_woman",
-			"curly_haired_woman",
-			"bald_woman",
-			"white_haired_woman",
-			"woman_in_motorized_wheelchair",
-			"woman_in_manual_wheelchair",
-			"female-doctor",
-			"female-judge",
-			"female-pilot",
-			"woman-heart-man",
-			"woman-heart-woman",
-			"woman-kiss-man",
-			"woman-kiss-woman",
 			"woman",
 			"family",
 			"couple",
 			"two_men_holding_hands",
 			"two_women_holding_hands",
-			"female-police-officer",
-			"male-police-officer",
 			"cop",
-			"woman-with-bunny-ears-partying",
-			"man-with-bunny-ears-partying",
 			"dancers",
-			"woman_with_veil",
-			"man_with_veil",
 			"bride_with_veil",
-			"blond-haired-woman",
-			"blond-haired-man",
 			"person_with_blond_hair",
 			"man_with_gua_pi_mao",
-			"woman-wearing-turban",
-			"man-wearing-turban",
 			"man_with_turban",
 			"older_man",
 			"older_woman",
 			"baby",
-			"female-construction-worker",
-			"male-construction-worker",
 			"construction_worker",
 			"princess",
 			"japanese_ogre",
@@ -804,20 +586,12 @@ namespace Waher.Content.Emoji
 			"space_invader",
 			"imp",
 			"skull",
-			"woman-tipping-hand",
-			"man-tipping-hand",
 			"information_desk_person",
-			"female-guard",
-			"male-guard",
 			"guardsman",
 			"dancer",
 			"lipstick",
 			"nail_care",
-			"woman-getting-massage",
-			"man-getting-massage",
 			"massage",
-			"woman-getting-haircut",
-			"man-getting-haircut",
 			"haircut",
 			"barber",
 			"syringe",
@@ -908,7 +682,7 @@ namespace Waher.Content.Emoji
 			"telephone_receiver",
 			"pager",
 			"fax",
-			"satellite_antenna",
+			"satellite",
 			"loudspeaker",
 			"mega",
 			"outbox_tray",
@@ -1034,14 +808,11 @@ namespace Waher.Content.Emoji
 			"mantelpiece_clock",
 			"hole",
 			"man_in_business_suit_levitating",
-			"female-detective",
-			"male-detective",
 			"sleuth_or_spy",
 			"dark_sunglasses",
 			"spider",
 			"spider_web",
 			"joystick",
-			"man_dancing",
 			"linked_paperclips",
 			"lower_left_ballpoint_pen",
 			"lower_left_fountain_pen",
@@ -1050,7 +821,6 @@ namespace Waher.Content.Emoji
 			"raised_hand_with_fingers_splayed",
 			"middle_finger",
 			"spock-hand",
-			"black_heart",
 			"desktop_computer",
 			"printer",
 			"three_button_mouse",
@@ -1145,27 +915,15 @@ namespace Waher.Content.Emoji
 			"slightly_smiling_face",
 			"upside_down_face",
 			"face_with_rolling_eyes",
-			"woman-gesturing-no",
-			"man-gesturing-no",
 			"no_good",
-			"woman-gesturing-ok",
-			"man-gesturing-ok",
 			"ok_woman",
-			"woman-bowing",
-			"man-bowing",
 			"bow",
 			"see_no_evil",
 			"hear_no_evil",
 			"speak_no_evil",
-			"woman-raising-hand",
-			"man-raising-hand",
 			"raising_hand",
 			"raised_hands",
-			"woman-frowning",
-			"man-frowning",
 			"person_frowning",
-			"woman-pouting",
-			"man-pouting",
 			"person_with_pouting_face",
 			"pray",
 			"rocket",
@@ -1203,8 +961,6 @@ namespace Waher.Content.Emoji
 			"mountain_cableway",
 			"aerial_tramway",
 			"ship",
-			"woman-rowing-boat",
-			"man-rowing-boat",
 			"rowboat",
 			"speedboat",
 			"traffic_light",
@@ -1222,14 +978,8 @@ namespace Waher.Content.Emoji
 			"non-potable_water",
 			"bike",
 			"no_bicycles",
-			"woman-biking",
-			"man-biking",
 			"bicyclist",
-			"woman-mountain-biking",
-			"man-mountain-biking",
 			"mountain_bicyclist",
-			"woman-walking",
-			"man-walking",
 			"walking",
 			"no_pedestrians",
 			"children_crossing",
@@ -1252,11 +1002,6 @@ namespace Waher.Content.Emoji
 			"bellhop_bell",
 			"bed",
 			"place_of_worship",
-			"octagonal_sign",
-			"shopping_trolley",
-			"hindu_temple",
-			"hut",
-			"elevator",
 			"hammer_and_wrench",
 			"shield",
 			"oil_drum",
@@ -1266,33 +1011,8 @@ namespace Waher.Content.Emoji
 			"small_airplane",
 			"airplane_departure",
 			"airplane_arriving",
-			"satellite",
+			"satellite2",
 			"passenger_ship",
-			"scooter",
-			"motor_scooter",
-			"canoe",
-			"sled",
-			"flying_saucer",
-			"skateboard",
-			"auto_rickshaw",
-			"pickup_truck",
-			"roller_skate",
-			"large_orange_circle",
-			"large_yellow_circle",
-			"large_green_circle",
-			"large_purple_circle",
-			"large_brown_circle",
-			"large_red_square",
-			"large_blue_square",
-			"large_orange_square",
-			"large_yellow_square",
-			"large_green_square",
-			"large_purple_square",
-			"large_brown_square",
-			"pinched_fingers",
-			"white_heart",
-			"brown_heart",
-			"pinching_hand",
 			"zipper_mouth_face",
 			"money_mouth_face",
 			"face_with_thermometer",
@@ -1302,526 +1022,299 @@ namespace Waher.Content.Emoji
 			"robot_face",
 			"hugging_face",
 			"the_horns",
-			"call_me_hand",
-			"raised_back_of_hand",
-			"left-facing_fist",
-			"right-facing_fist",
-			"handshake",
-			"crossed_fingers",
-			"i_love_you_hand_sign",
-			"face_with_cowboy_hat",
-			"clown_face",
-			"nauseated_face",
-			"rolling_on_the_floor_laughing",
-			"drooling_face",
-			"lying_face",
-			"woman-facepalming",
-			"man-facepalming",
-			"face_palm",
-			"sneezing_face",
-			"face_with_raised_eyebrow",
-			"star-struck",
-			"zany_face",
-			"shushing_face",
-			"face_with_symbols_on_mouth",
-			"face_with_hand_over_mouth",
-			"face_vomiting",
-			"exploding_head",
-			"pregnant_woman",
-			"breast-feeding",
-			"palms_up_together",
-			"selfie",
-			"prince",
-			"woman_in_tuxedo",
-			"man_in_tuxedo",
-			"mrs_claus",
-			"woman-shrugging",
-			"man-shrugging",
-			"shrug",
-			"woman-cartwheeling",
-			"man-cartwheeling",
-			"person_doing_cartwheel",
-			"woman-juggling",
-			"man-juggling",
-			"juggling",
-			"fencer",
-			"woman-wrestling",
-			"man-wrestling",
-			"wrestlers",
-			"woman-playing-water-polo",
-			"man-playing-water-polo",
-			"water_polo",
-			"woman-playing-handball",
-			"man-playing-handball",
-			"handball",
-			"diving_mask",
-			"wilted_flower",
-			"drum_with_drumsticks",
-			"clinking_glasses",
-			"tumbler_glass",
-			"spoon",
-			"goal_net",
-			"first_place_medal",
-			"second_place_medal",
-			"third_place_medal",
-			"boxing_glove",
-			"martial_arts_uniform",
-			"curling_stone",
-			"lacrosse",
-			"softball",
-			"flying_disc",
-			"croissant",
-			"avocado",
-			"cucumber",
-			"bacon",
-			"potato",
-			"carrot",
-			"baguette_bread",
-			"green_salad",
-			"shallow_pan_of_food",
-			"stuffed_flatbread",
-			"egg",
-			"glass_of_milk",
-			"peanuts",
-			"kiwifruit",
-			"pancakes",
-			"dumpling",
-			"fortune_cookie",
-			"takeout_box",
-			"chopsticks",
-			"bowl_with_spoon",
-			"cup_with_straw",
-			"coconut",
-			"broccoli",
-			"pie",
-			"pretzel",
-			"cut_of_meat",
-			"sandwich",
-			"canned_food",
-			"leafy_green",
-			"mango",
-			"moon_cake",
-			"bagel",
-			"smiling_face_with_3_hearts",
-			"yawning_face",
-			"smiling_face_with_tear",
-			"partying_face",
-			"woozy_face",
-			"hot_face",
-			"cold_face",
-			"ninja",
-			"disguised_face",
-			"pleading_face",
-			"sari",
-			"lab_coat",
-			"goggles",
-			"hiking_boot",
-			"womans_flat_shoe",
 			"crab",
 			"lion_face",
 			"scorpion",
 			"turkey",
 			"unicorn_face",
-			"eagle",
-			"duck",
-			"bat",
-			"shark",
-			"owl",
-			"fox_face",
-			"butterfly",
-			"deer",
-			"gorilla",
-			"lizard",
-			"rhinoceros",
-			"shrimp",
-			"squid",
-			"giraffe_face",
-			"zebra_face",
-			"hedgehog",
-			"sauropod",
-			"t-rex",
-			"cricket",
-			"kangaroo",
-			"llama",
-			"peacock",
-			"hippopotamus",
-			"parrot",
-			"raccoon",
-			"lobster",
-			"mosquito",
-			"microbe",
-			"badger",
-			"swan",
-			"mammoth",
-			"dodo",
-			"sloth",
-			"otter",
-			"orangutan",
-			"skunk",
-			"flamingo",
-			"oyster",
-			"beaver",
-			"bison",
-			"seal",
-			"guide_dog",
-			"probing_cane",
-			"bone",
-			"leg",
-			"foot",
-			"tooth",
-			"female_superhero",
-			"male_superhero",
-			"superhero",
-			"female_supervillain",
-			"male_supervillain",
-			"supervillain",
-			"safety_vest",
-			"ear_with_hearing_aid",
-			"motorized_wheelchair",
-			"manual_wheelchair",
-			"mechanical_arm",
-			"mechanical_leg",
 			"cheese_wedge",
-			"cupcake",
-			"salt",
-			"beverage_box",
-			"garlic",
-			"onion",
-			"falafel",
-			"waffle",
-			"butter",
-			"mate_drink",
-			"ice_cube",
-			"bubble_tea",
-			"woman_standing",
-			"man_standing",
-			"standing_person",
-			"woman_kneeling",
-			"man_kneeling",
-			"kneeling_person",
-			"deaf_woman",
-			"deaf_man",
-			"deaf_person",
-			"face_with_monocle",
-			"farmer",
-			"cook",
-			"person_feeding_baby",
-			"mx_claus",
-			"student",
-			"singer",
-			"artist",
-			"teacher",
-			"factory_worker",
-			"technologist",
-			"office_worker",
-			"mechanic",
-			"scientist",
-			"astronaut",
-			"firefighter",
-			"people_holding_hands",
-			"person_with_probing_cane",
-			"red_haired_person",
-			"curly_haired_person",
-			"bald_person",
-			"white_haired_person",
-			"person_in_motorized_wheelchair",
-			"person_in_manual_wheelchair",
-			"health_worker",
-			"judge",
-			"pilot",
-			"adult",
-			"child",
-			"older_adult",
-			"bearded_person",
-			"person_with_headscarf",
-			"woman_in_steamy_room",
-			"man_in_steamy_room",
-			"person_in_steamy_room",
-			"woman_climbing",
-			"man_climbing",
-			"person_climbing",
-			"woman_in_lotus_position",
-			"man_in_lotus_position",
-			"person_in_lotus_position",
-			"female_mage",
-			"male_mage",
-			"mage",
-			"female_fairy",
-			"male_fairy",
-			"fairy",
-			"female_vampire",
-			"male_vampire",
-			"vampire",
-			"mermaid",
-			"merman",
-			"merperson",
-			"female_elf",
-			"male_elf",
-			"elf",
-			"female_genie",
-			"male_genie",
-			"genie",
-			"female_zombie",
-			"male_zombie",
-			"zombie",
-			"brain",
-			"orange_heart",
-			"billed_cap",
-			"scarf",
-			"gloves",
-			"coat",
-			"socks",
-			"red_envelope",
-			"firecracker",
-			"jigsaw",
-			"test_tube",
-			"petri_dish",
-			"dna",
-			"compass",
-			"abacus",
-			"fire_extinguisher",
-			"toolbox",
-			"bricks",
-			"magnet",
-			"luggage",
-			"lotion_bottle",
-			"thread",
-			"yarn",
-			"safety_pin",
-			"teddy_bear",
-			"broom",
-			"basket",
-			"roll_of_paper",
-			"soap",
-			"sponge",
-			"receipt",
-			"nazar_amulet",
-			"ballet_shoes",
-			"one-piece_swimsuit",
-			"briefs",
-			"shorts",
-			"thong_sandal",
-			"drop_of_blood",
-			"adhesive_bandage",
-			"stethoscope",
-			"yo-yo",
-			"kite",
-			"parachute",
-			"boomerang",
-			"magic_wand",
-			"pinata",
-			"nesting_dolls",
-			"ringed_planet",
-			"chair",
-			"razor",
-			"axe",
-			"diya_lamp",
-			"banjo",
-			"military_helmet",
-			"accordion",
-			"long_drum",
-			"coin",
-			"carpentry_saw",
-			"screwdriver",
-			"ladder",
-			"hook",
-			"mirror",
-			"window",
-			"plunger",
-			"sewing_needle",
-			"knot",
-			"bucket",
-			"mouse_trap",
-			"toothbrush",
-			"headstone",
-			"placard",
-			"rock",
-			"fly",
-			"worm",
-			"cockroach",
-			"potted_plant",
-			"wood",
-			"feather",
-			"anatomical_heart",
-			"lungs",
-			"people_hugging",
-			"blueberries",
-			"bell_pepper",
-			"olive",
-			"flatbread",
-			"tamale",
-			"fondue",
-			"teapot",
-			"bangbang",
-			"interrobang",
-			"tm",
-			"information_source",
-			"left_right_arrow",
-			"arrow_up_down",
-			"arrow_upper_left",
-			"arrow_upper_right",
-			"arrow_lower_right",
-			"arrow_lower_left",
-			"leftwards_arrow_with_hook",
-			"arrow_right_hook",
-			"watch",
-			"hourglass",
-			"keyboard",
-			"eject",
-			"fast_forward",
-			"rewind",
-			"arrow_double_up",
-			"arrow_double_down",
-			"black_right_pointing_double_triangle_with_vertical_bar",
-			"black_left_pointing_double_triangle_with_vertical_bar",
-			"black_right_pointing_triangle_with_double_vertical_bar",
-			"alarm_clock",
-			"stopwatch",
-			"timer_clock",
-			"hourglass_flowing_sand",
-			"double_vertical_bar",
-			"black_square_for_stop",
-			"black_circle_for_record",
-			"m",
-			"black_small_square",
-			"white_small_square",
-			"arrow_forward",
-			"arrow_backward",
-			"white_medium_square",
-			"black_medium_square",
-			"white_medium_small_square",
-			"black_medium_small_square",
-			"sunny",
-			"cloud",
-			"umbrella",
-			"snowman",
-			"comet",
-			"phone",
-			"ballot_box_with_check",
-			"umbrella_with_rain_drops",
-			"coffee",
-			"shamrock",
-			"point_up",
-			"skull_and_crossbones",
-			"radioactive_sign",
-			"biohazard_sign",
-			"orthodox_cross",
-			"star_and_crescent",
-			"peace_symbol",
-			"yin_yang",
-			"wheel_of_dharma",
-			"white_frowning_face",
-			"relaxed",
-			"female_sign",
-			"male_sign",
-			"aries",
-			"taurus",
-			"gemini",
-			"cancer",
-			"leo",
-			"virgo",
-			"libra",
-			"scorpius",
-			"sagittarius",
-			"capricorn",
-			"aquarius",
-			"pisces",
-			"chess_pawn",
-			"spades",
-			"clubs",
-			"hearts",
-			"diamonds",
-			"hotsprings",
-			"recycle",
-			"infinity",
-			"wheelchair",
-			"hammer_and_pick",
-			"anchor",
-			"crossed_swords",
-			"medical_symbol",
-			"scales",
-			"alembic",
-			"gear",
-			"atom_symbol",
-			"fleur_de_lis",
-			"warning",
-			"zap",
-			"transgender_symbol",
-			"white_circle",
-			"black_circle",
-			"coffin",
-			"funeral_urn",
-			"soccer",
-			"baseball",
-			"snowman_without_snow",
-			"partly_sunny",
-			"thunder_cloud_and_rain",
-			"ophiuchus",
-			"pick",
-			"helmet_with_white_cross",
-			"chains",
-			"no_entry",
-			"shinto_shrine",
-			"church",
-			"mountain",
-			"umbrella_on_ground",
-			"fountain",
-			"golf",
-			"ferry",
-			"boat",
-			"skier",
-			"ice_skate",
-			"woman-bouncing-ball",
-			"man-bouncing-ball",
-			"person_with_ball",
-			"tent",
-			"fuelpump",
-			"scissors",
-			"white_check_mark",
-			"airplane",
-			"email",
-			"fist",
-			"hand",
-			"v",
-			"writing_hand",
-			"pencil2",
-			"black_nib",
-			"heavy_check_mark",
-			"heavy_multiplication_x",
-			"latin_cross",
-			"star_of_david",
-			"sparkles",
-			"eight_spoked_asterisk",
-			"eight_pointed_black_star",
-			"snowflake",
-			"sparkle",
-			"x",
-			"negative_squared_cross_mark",
-			"question",
-			"grey_question",
-			"grey_exclamation",
-			"exclamation",
-			"heavy_heart_exclamation_mark_ornament",
-			"heart",
-			"heavy_plus_sign",
-			"heavy_minus_sign",
-			"heavy_division_sign",
-			"arrow_right",
-			"curly_loop",
-			"loop",
-			"arrow_heading_up",
-			"arrow_heading_down",
-			"arrow_left",
-			"arrow_up",
-			"arrow_down",
-			"black_large_square",
-			"white_large_square",
-			"star",
-			"o",
-			"wavy_dash",
-			"part_alternation_mark",
-			"congratulations",
-			"secret"
+			"hash",
+			"keycap_star",
+			"zero",
+			"one",
+			"two",
+			"three",
+			"four",
+			"five",
+			"six",
+			"seven",
+			"eight",
+			"nine",
+			"flag-ac",
+			"flag-ad",
+			"flag-ae",
+			"flag-af",
+			"flag-ag",
+			"flag-ai",
+			"flag-al",
+			"flag-am",
+			"flag-ao",
+			"flag-aq",
+			"flag-ar",
+			"flag-as",
+			"flag-at",
+			"flag-au",
+			"flag-aw",
+			"flag-ax",
+			"flag-az",
+			"flag-ba",
+			"flag-bb",
+			"flag-bd",
+			"flag-be",
+			"flag-bf",
+			"flag-bg",
+			"flag-bh",
+			"flag-bi",
+			"flag-bj",
+			"flag-bl",
+			"flag-bm",
+			"flag-bn",
+			"flag-bo",
+			"flag-bq",
+			"flag-br",
+			"flag-bs",
+			"flag-bt",
+			"flag-bv",
+			"flag-bw",
+			"flag-by",
+			"flag-bz",
+			"flag-ca",
+			"flag-cc",
+			"flag-cd",
+			"flag-cf",
+			"flag-cg",
+			"flag-ch",
+			"flag-ci",
+			"flag-ck",
+			"flag-cl",
+			"flag-cm",
+			"flag-cn",
+			"flag-co",
+			"flag-cp",
+			"flag-cr",
+			"flag-cu",
+			"flag-cv",
+			"flag-cw",
+			"flag-cx",
+			"flag-cy",
+			"flag-cz",
+			"flag-de",
+			"flag-dg",
+			"flag-dj",
+			"flag-dk",
+			"flag-dm",
+			"flag-do",
+			"flag-dz",
+			"flag-ea",
+			"flag-ec",
+			"flag-ee",
+			"flag-eg",
+			"flag-eh",
+			"flag-er",
+			"flag-es",
+			"flag-et",
+			"flag-eu",
+			"flag-fi",
+			"flag-fj",
+			"flag-fk",
+			"flag-fm",
+			"flag-fo",
+			"flag-fr",
+			"flag-ga",
+			"flag-gb",
+			"flag-gd",
+			"flag-ge",
+			"flag-gf",
+			"flag-gg",
+			"flag-gh",
+			"flag-gi",
+			"flag-gl",
+			"flag-gm",
+			"flag-gn",
+			"flag-gp",
+			"flag-gq",
+			"flag-gr",
+			"flag-gs",
+			"flag-gt",
+			"flag-gu",
+			"flag-gw",
+			"flag-gy",
+			"flag-hk",
+			"flag-hm",
+			"flag-hn",
+			"flag-hr",
+			"flag-ht",
+			"flag-hu",
+			"flag-ic",
+			"flag-id",
+			"flag-ie",
+			"flag-il",
+			"flag-im",
+			"flag-in",
+			"flag-io",
+			"flag-iq",
+			"flag-ir",
+			"flag-is",
+			"flag-it",
+			"flag-je",
+			"flag-jm",
+			"flag-jo",
+			"flag-jp",
+			"flag-ke",
+			"flag-kg",
+			"flag-kh",
+			"flag-ki",
+			"flag-km",
+			"flag-kn",
+			"flag-kp",
+			"flag-kr",
+			"flag-kw",
+			"flag-ky",
+			"flag-kz",
+			"flag-la",
+			"flag-lb",
+			"flag-lc",
+			"flag-li",
+			"flag-lk",
+			"flag-lr",
+			"flag-ls",
+			"flag-lt",
+			"flag-lu",
+			"flag-lv",
+			"flag-ly",
+			"flag-ma",
+			"flag-mc",
+			"flag-md",
+			"flag-me",
+			"flag-mf",
+			"flag-mg",
+			"flag-mh",
+			"flag-mk",
+			"flag-ml",
+			"flag-mm",
+			"flag-mn",
+			"flag-mo",
+			"flag-mp",
+			"flag-mq",
+			"flag-mr",
+			"flag-ms",
+			"flag-mt",
+			"flag-mu",
+			"flag-mv",
+			"flag-mw",
+			"flag-mx",
+			"flag-my",
+			"flag-mz",
+			"flag-na",
+			"flag-nc",
+			"flag-ne",
+			"flag-nf",
+			"flag-ng",
+			"flag-ni",
+			"flag-nl",
+			"flag-no",
+			"flag-np",
+			"flag-nr",
+			"flag-nu",
+			"flag-nz",
+			"flag-om",
+			"flag-pa",
+			"flag-pe",
+			"flag-pf",
+			"flag-pg",
+			"flag-ph",
+			"flag-pk",
+			"flag-pl",
+			"flag-pm",
+			"flag-pn",
+			"flag-pr",
+			"flag-ps",
+			"flag-pt",
+			"flag-pw",
+			"flag-py",
+			"flag-qa",
+			"flag-re",
+			"flag-ro",
+			"flag-rs",
+			"flag-ru",
+			"flag-rw",
+			"flag-sa",
+			"flag-sb",
+			"flag-sc",
+			"flag-sd",
+			"flag-se",
+			"flag-sg",
+			"flag-sh",
+			"flag-si",
+			"flag-sj",
+			"flag-sk",
+			"flag-sl",
+			"flag-sm",
+			"flag-sn",
+			"flag-so",
+			"flag-sr",
+			"flag-ss",
+			"flag-st",
+			"flag-sv",
+			"flag-sx",
+			"flag-sy",
+			"flag-sz",
+			"flag-ta",
+			"flag-tc",
+			"flag-td",
+			"flag-tf",
+			"flag-tg",
+			"flag-th",
+			"flag-tj",
+			"flag-tk",
+			"flag-tl",
+			"flag-tm",
+			"flag-tn",
+			"flag-to",
+			"flag-tr",
+			"flag-tt",
+			"flag-tv",
+			"flag-tw",
+			"flag-tz",
+			"flag-ua",
+			"flag-ug",
+			"flag-um",
+			"flag-us",
+			"flag-uy",
+			"flag-uz",
+			"flag-va",
+			"flag-vc",
+			"flag-ve",
+			"flag-vg",
+			"flag-vi",
+			"flag-vn",
+			"flag-vu",
+			"flag-wf",
+			"flag-ws",
+			"flag-xk",
+			"flag-ye",
+			"flag-yt",
+			"flag-za",
+			"flag-zm",
+			"flag-zw",
+			"man-man-boy",
+			"man-man-boy-boy",
+			"man-man-girl",
+			"man-man-girl-boy",
+			"man-man-girl-girl",
+			"man-woman-boy-boy",
+			"man-woman-girl",
+			"man-woman-girl-boy",
+			"man-woman-girl-girl",
+			"man-heart-man",
+			"man-kiss-man",
+			"woman-woman-boy",
+			"woman-woman-boy-boy",
+			"woman-woman-girl",
+			"woman-woman-girl-boy",
+			"woman-woman-girl-girl",
+			"woman-heart-woman",
+			"woman-kiss-woman"
 		};
 
 		/// <summary>
@@ -1842,20 +1335,169 @@ namespace Waher.Content.Emoji
 
 			switch (ShortName)
 			{
-				case "hash": Emoji = Emoji_hash; break;
-				case "keycap_star": Emoji = Emoji_keycap_star; break;
-				case "zero": Emoji = Emoji_zero; break;
-				case "one": Emoji = Emoji_one; break;
-				case "two": Emoji = Emoji_two; break;
-				case "three": Emoji = Emoji_three; break;
-				case "four": Emoji = Emoji_four; break;
-				case "five": Emoji = Emoji_five; break;
-				case "six": Emoji = Emoji_six; break;
-				case "seven": Emoji = Emoji_seven; break;
-				case "eight": Emoji = Emoji_eight; break;
-				case "nine": Emoji = Emoji_nine; break;
 				case "copyright": Emoji = Emoji_copyright; break;
 				case "registered": Emoji = Emoji_registered; break;
+				case "bangbang": Emoji = Emoji_bangbang; break;
+				case "interrobang": Emoji = Emoji_interrobang; break;
+				case "tm": Emoji = Emoji_tm; break;
+				case "information_source": Emoji = Emoji_information_source; break;
+				case "left_right_arrow": Emoji = Emoji_left_right_arrow; break;
+				case "arrow_up_down": Emoji = Emoji_arrow_up_down; break;
+				case "arrow_upper_left": Emoji = Emoji_arrow_upper_left; break;
+				case "arrow_upper_right": Emoji = Emoji_arrow_upper_right; break;
+				case "arrow_lower_right": Emoji = Emoji_arrow_lower_right; break;
+				case "arrow_lower_left": Emoji = Emoji_arrow_lower_left; break;
+				case "leftwards_arrow_with_hook": Emoji = Emoji_leftwards_arrow_with_hook; break;
+				case "arrow_right_hook": Emoji = Emoji_arrow_right_hook; break;
+				case "watch": Emoji = Emoji_watch; break;
+				case "hourglass": Emoji = Emoji_hourglass; break;
+				case "keyboard": Emoji = Emoji_keyboard; break;
+				case "fast_forward": Emoji = Emoji_fast_forward; break;
+				case "rewind": Emoji = Emoji_rewind; break;
+				case "arrow_double_up": Emoji = Emoji_arrow_double_up; break;
+				case "arrow_double_down": Emoji = Emoji_arrow_double_down; break;
+				case "black_right_pointing_double_triangle_with_vertical_bar": Emoji = Emoji_black_right_pointing_double_triangle_with_vertical_bar; break;
+				case "black_left_pointing_double_triangle_with_vertical_bar": Emoji = Emoji_black_left_pointing_double_triangle_with_vertical_bar; break;
+				case "black_right_pointing_triangle_with_double_vertical_bar": Emoji = Emoji_black_right_pointing_triangle_with_double_vertical_bar; break;
+				case "alarm_clock": Emoji = Emoji_alarm_clock; break;
+				case "stopwatch": Emoji = Emoji_stopwatch; break;
+				case "timer_clock": Emoji = Emoji_timer_clock; break;
+				case "hourglass_flowing_sand": Emoji = Emoji_hourglass_flowing_sand; break;
+				case "double_vertical_bar": Emoji = Emoji_double_vertical_bar; break;
+				case "black_square_for_stop": Emoji = Emoji_black_square_for_stop; break;
+				case "black_circle_for_record": Emoji = Emoji_black_circle_for_record; break;
+				case "m": Emoji = Emoji_m; break;
+				case "black_small_square": Emoji = Emoji_black_small_square; break;
+				case "white_small_square": Emoji = Emoji_white_small_square; break;
+				case "arrow_forward": Emoji = Emoji_arrow_forward; break;
+				case "arrow_backward": Emoji = Emoji_arrow_backward; break;
+				case "white_medium_square": Emoji = Emoji_white_medium_square; break;
+				case "black_medium_square": Emoji = Emoji_black_medium_square; break;
+				case "white_medium_small_square": Emoji = Emoji_white_medium_small_square; break;
+				case "black_medium_small_square": Emoji = Emoji_black_medium_small_square; break;
+				case "sunny": Emoji = Emoji_sunny; break;
+				case "cloud": Emoji = Emoji_cloud; break;
+				case "umbrella": Emoji = Emoji_umbrella; break;
+				case "showman": Emoji = Emoji_showman; break;
+				case "comet": Emoji = Emoji_comet; break;
+				case "phone": Emoji = Emoji_phone; break;
+				case "ballot_box_with_check": Emoji = Emoji_ballot_box_with_check; break;
+				case "umbrella_rain": Emoji = Emoji_umbrella_rain; break;
+				case "coffee": Emoji = Emoji_coffee; break;
+				case "shamrock": Emoji = Emoji_shamrock; break;
+				case "point_up": Emoji = Emoji_point_up; break;
+				case "skull_and_crossbones": Emoji = Emoji_skull_and_crossbones; break;
+				case "radioactive_sign": Emoji = Emoji_radioactive_sign; break;
+				case "biohazard_sign": Emoji = Emoji_biohazard_sign; break;
+				case "orthodox_cross": Emoji = Emoji_orthodox_cross; break;
+				case "star_and_crescent": Emoji = Emoji_star_and_crescent; break;
+				case "peace_symbol": Emoji = Emoji_peace_symbol; break;
+				case "yin_yang": Emoji = Emoji_yin_yang; break;
+				case "wheel_of_dharma": Emoji = Emoji_wheel_of_dharma; break;
+				case "white_frowning_face": Emoji = Emoji_white_frowning_face; break;
+				case "relaxed": Emoji = Emoji_relaxed; break;
+				case "aries": Emoji = Emoji_aries; break;
+				case "taurus": Emoji = Emoji_taurus; break;
+				case "gemini": Emoji = Emoji_gemini; break;
+				case "cancer": Emoji = Emoji_cancer; break;
+				case "leo": Emoji = Emoji_leo; break;
+				case "virgo": Emoji = Emoji_virgo; break;
+				case "libra": Emoji = Emoji_libra; break;
+				case "scorpius": Emoji = Emoji_scorpius; break;
+				case "sagittarius": Emoji = Emoji_sagittarius; break;
+				case "capricorn": Emoji = Emoji_capricorn; break;
+				case "aquarius": Emoji = Emoji_aquarius; break;
+				case "pisces": Emoji = Emoji_pisces; break;
+				case "spades": Emoji = Emoji_spades; break;
+				case "clubs": Emoji = Emoji_clubs; break;
+				case "hearts": Emoji = Emoji_hearts; break;
+				case "diamonds": Emoji = Emoji_diamonds; break;
+				case "hotsprings": Emoji = Emoji_hotsprings; break;
+				case "recycle": Emoji = Emoji_recycle; break;
+				case "wheelchair": Emoji = Emoji_wheelchair; break;
+				case "hammer_and_pick": Emoji = Emoji_hammer_and_pick; break;
+				case "anchor": Emoji = Emoji_anchor; break;
+				case "crossed_swords": Emoji = Emoji_crossed_swords; break;
+				case "scales": Emoji = Emoji_scales; break;
+				case "alembic": Emoji = Emoji_alembic; break;
+				case "gear": Emoji = Emoji_gear; break;
+				case "atom_symbol": Emoji = Emoji_atom_symbol; break;
+				case "fleur_de_lis": Emoji = Emoji_fleur_de_lis; break;
+				case "warning": Emoji = Emoji_warning; break;
+				case "zap": Emoji = Emoji_zap; break;
+				case "white_circle": Emoji = Emoji_white_circle; break;
+				case "black_circle": Emoji = Emoji_black_circle; break;
+				case "coffin": Emoji = Emoji_coffin; break;
+				case "funeral_urn": Emoji = Emoji_funeral_urn; break;
+				case "soccer": Emoji = Emoji_soccer; break;
+				case "baseball": Emoji = Emoji_baseball; break;
+				case "snowman": Emoji = Emoji_snowman; break;
+				case "partly_sunny": Emoji = Emoji_partly_sunny; break;
+				case "thunder_cloud_and_rain": Emoji = Emoji_thunder_cloud_and_rain; break;
+				case "ophiuchus": Emoji = Emoji_ophiuchus; break;
+				case "pick": Emoji = Emoji_pick; break;
+				case "helmet_with_white_cross": Emoji = Emoji_helmet_with_white_cross; break;
+				case "chains": Emoji = Emoji_chains; break;
+				case "no_entry": Emoji = Emoji_no_entry; break;
+				case "shinto_shrine": Emoji = Emoji_shinto_shrine; break;
+				case "church": Emoji = Emoji_church; break;
+				case "mountain": Emoji = Emoji_mountain; break;
+				case "umbrella_on_ground": Emoji = Emoji_umbrella_on_ground; break;
+				case "fountain": Emoji = Emoji_fountain; break;
+				case "golf": Emoji = Emoji_golf; break;
+				case "ferry": Emoji = Emoji_ferry; break;
+				case "boat": Emoji = Emoji_boat; break;
+				case "skier": Emoji = Emoji_skier; break;
+				case "ice_skate": Emoji = Emoji_ice_skate; break;
+				case "person_with_ball": Emoji = Emoji_person_with_ball; break;
+				case "tent": Emoji = Emoji_tent; break;
+				case "fuelpump": Emoji = Emoji_fuelpump; break;
+				case "scissors": Emoji = Emoji_scissors; break;
+				case "white_check_mark": Emoji = Emoji_white_check_mark; break;
+				case "airplane": Emoji = Emoji_airplane; break;
+				case "email": Emoji = Emoji_email; break;
+				case "fist": Emoji = Emoji_fist; break;
+				case "hand": Emoji = Emoji_hand; break;
+				case "v": Emoji = Emoji_v; break;
+				case "writing_hand": Emoji = Emoji_writing_hand; break;
+				case "pencil2": Emoji = Emoji_pencil2; break;
+				case "black_nib": Emoji = Emoji_black_nib; break;
+				case "heavy_check_mark": Emoji = Emoji_heavy_check_mark; break;
+				case "heavy_multiplication_x": Emoji = Emoji_heavy_multiplication_x; break;
+				case "latin_cross": Emoji = Emoji_latin_cross; break;
+				case "star_of_david": Emoji = Emoji_star_of_david; break;
+				case "sparkles": Emoji = Emoji_sparkles; break;
+				case "eight_spoked_asterisk": Emoji = Emoji_eight_spoked_asterisk; break;
+				case "eight_pointed_black_star": Emoji = Emoji_eight_pointed_black_star; break;
+				case "snowflake": Emoji = Emoji_snowflake; break;
+				case "sparkle": Emoji = Emoji_sparkle; break;
+				case "x": Emoji = Emoji_x; break;
+				case "negative_squared_cross_mark": Emoji = Emoji_negative_squared_cross_mark; break;
+				case "question": Emoji = Emoji_question; break;
+				case "grey_question": Emoji = Emoji_grey_question; break;
+				case "grey_exclamation": Emoji = Emoji_grey_exclamation; break;
+				case "exclamation": Emoji = Emoji_exclamation; break;
+				case "heavy_heart_exclamation_mark_ornament": Emoji = Emoji_heavy_heart_exclamation_mark_ornament; break;
+				case "heart": Emoji = Emoji_heart; break;
+				case "heavy_plus_sign": Emoji = Emoji_heavy_plus_sign; break;
+				case "heavy_minus_sign": Emoji = Emoji_heavy_minus_sign; break;
+				case "heavy_division_sign": Emoji = Emoji_heavy_division_sign; break;
+				case "arrow_right": Emoji = Emoji_arrow_right; break;
+				case "curly_loop": Emoji = Emoji_curly_loop; break;
+				case "loop": Emoji = Emoji_loop; break;
+				case "arrow_heading_up": Emoji = Emoji_arrow_heading_up; break;
+				case "arrow_heading_down": Emoji = Emoji_arrow_heading_down; break;
+				case "arrow_left": Emoji = Emoji_arrow_left; break;
+				case "arrow_up": Emoji = Emoji_arrow_up; break;
+				case "arrow_down": Emoji = Emoji_arrow_down; break;
+				case "black_large_square": Emoji = Emoji_black_large_square; break;
+				case "white_large_square": Emoji = Emoji_white_large_square; break;
+				case "star": Emoji = Emoji_star; break;
+				case "o": Emoji = Emoji_o; break;
+				case "wavy_dash": Emoji = Emoji_wavy_dash; break;
+				case "part_alternation_mark": Emoji = Emoji_part_alternation_mark; break;
+				case "congratulations": Emoji = Emoji_congratulations; break;
+				case "secret": Emoji = Emoji_secret; break;
 				case "mahjong": Emoji = Emoji_mahjong; break;
 				case "black_joker": Emoji = Emoji_black_joker; break;
 				case "a": Emoji = Emoji_a; break;
@@ -1873,264 +1515,6 @@ namespace Waher.Content.Emoji
 				case "sos": Emoji = Emoji_sos; break;
 				case "up": Emoji = Emoji_up; break;
 				case "vs": Emoji = Emoji_vs; break;
-				case "flag-ac": Emoji = Emoji_flag_ac; break;
-				case "flag-ad": Emoji = Emoji_flag_ad; break;
-				case "flag-ae": Emoji = Emoji_flag_ae; break;
-				case "flag-af": Emoji = Emoji_flag_af; break;
-				case "flag-ag": Emoji = Emoji_flag_ag; break;
-				case "flag-ai": Emoji = Emoji_flag_ai; break;
-				case "flag-al": Emoji = Emoji_flag_al; break;
-				case "flag-am": Emoji = Emoji_flag_am; break;
-				case "flag-ao": Emoji = Emoji_flag_ao; break;
-				case "flag-aq": Emoji = Emoji_flag_aq; break;
-				case "flag-ar": Emoji = Emoji_flag_ar; break;
-				case "flag-as": Emoji = Emoji_flag_as; break;
-				case "flag-at": Emoji = Emoji_flag_at; break;
-				case "flag-au": Emoji = Emoji_flag_au; break;
-				case "flag-aw": Emoji = Emoji_flag_aw; break;
-				case "flag-ax": Emoji = Emoji_flag_ax; break;
-				case "flag-az": Emoji = Emoji_flag_az; break;
-				case "flag-ba": Emoji = Emoji_flag_ba; break;
-				case "flag-bb": Emoji = Emoji_flag_bb; break;
-				case "flag-bd": Emoji = Emoji_flag_bd; break;
-				case "flag-be": Emoji = Emoji_flag_be; break;
-				case "flag-bf": Emoji = Emoji_flag_bf; break;
-				case "flag-bg": Emoji = Emoji_flag_bg; break;
-				case "flag-bh": Emoji = Emoji_flag_bh; break;
-				case "flag-bi": Emoji = Emoji_flag_bi; break;
-				case "flag-bj": Emoji = Emoji_flag_bj; break;
-				case "flag-bl": Emoji = Emoji_flag_bl; break;
-				case "flag-bm": Emoji = Emoji_flag_bm; break;
-				case "flag-bn": Emoji = Emoji_flag_bn; break;
-				case "flag-bo": Emoji = Emoji_flag_bo; break;
-				case "flag-bq": Emoji = Emoji_flag_bq; break;
-				case "flag-br": Emoji = Emoji_flag_br; break;
-				case "flag-bs": Emoji = Emoji_flag_bs; break;
-				case "flag-bt": Emoji = Emoji_flag_bt; break;
-				case "flag-bv": Emoji = Emoji_flag_bv; break;
-				case "flag-bw": Emoji = Emoji_flag_bw; break;
-				case "flag-by": Emoji = Emoji_flag_by; break;
-				case "flag-bz": Emoji = Emoji_flag_bz; break;
-				case "flag-ca": Emoji = Emoji_flag_ca; break;
-				case "flag-cc": Emoji = Emoji_flag_cc; break;
-				case "flag-cd": Emoji = Emoji_flag_cd; break;
-				case "flag-cf": Emoji = Emoji_flag_cf; break;
-				case "flag-cg": Emoji = Emoji_flag_cg; break;
-				case "flag-ch": Emoji = Emoji_flag_ch; break;
-				case "flag-ci": Emoji = Emoji_flag_ci; break;
-				case "flag-ck": Emoji = Emoji_flag_ck; break;
-				case "flag-cl": Emoji = Emoji_flag_cl; break;
-				case "flag-cm": Emoji = Emoji_flag_cm; break;
-				case "cn": Emoji = Emoji_cn; break;
-				case "flag-co": Emoji = Emoji_flag_co; break;
-				case "flag-cp": Emoji = Emoji_flag_cp; break;
-				case "flag-cr": Emoji = Emoji_flag_cr; break;
-				case "flag-cu": Emoji = Emoji_flag_cu; break;
-				case "flag-cv": Emoji = Emoji_flag_cv; break;
-				case "flag-cw": Emoji = Emoji_flag_cw; break;
-				case "flag-cx": Emoji = Emoji_flag_cx; break;
-				case "flag-cy": Emoji = Emoji_flag_cy; break;
-				case "flag-cz": Emoji = Emoji_flag_cz; break;
-				case "de": Emoji = Emoji_de; break;
-				case "flag-dg": Emoji = Emoji_flag_dg; break;
-				case "flag-dj": Emoji = Emoji_flag_dj; break;
-				case "flag-dk": Emoji = Emoji_flag_dk; break;
-				case "flag-dm": Emoji = Emoji_flag_dm; break;
-				case "flag-do": Emoji = Emoji_flag_do; break;
-				case "flag-dz": Emoji = Emoji_flag_dz; break;
-				case "flag-ea": Emoji = Emoji_flag_ea; break;
-				case "flag-ec": Emoji = Emoji_flag_ec; break;
-				case "flag-ee": Emoji = Emoji_flag_ee; break;
-				case "flag-eg": Emoji = Emoji_flag_eg; break;
-				case "flag-eh": Emoji = Emoji_flag_eh; break;
-				case "flag-er": Emoji = Emoji_flag_er; break;
-				case "es": Emoji = Emoji_es; break;
-				case "flag-et": Emoji = Emoji_flag_et; break;
-				case "flag-eu": Emoji = Emoji_flag_eu; break;
-				case "flag-fi": Emoji = Emoji_flag_fi; break;
-				case "flag-fj": Emoji = Emoji_flag_fj; break;
-				case "flag-fk": Emoji = Emoji_flag_fk; break;
-				case "flag-fm": Emoji = Emoji_flag_fm; break;
-				case "flag-fo": Emoji = Emoji_flag_fo; break;
-				case "fr": Emoji = Emoji_fr; break;
-				case "flag-ga": Emoji = Emoji_flag_ga; break;
-				case "gb": Emoji = Emoji_gb; break;
-				case "flag-gd": Emoji = Emoji_flag_gd; break;
-				case "flag-ge": Emoji = Emoji_flag_ge; break;
-				case "flag-gf": Emoji = Emoji_flag_gf; break;
-				case "flag-gg": Emoji = Emoji_flag_gg; break;
-				case "flag-gh": Emoji = Emoji_flag_gh; break;
-				case "flag-gi": Emoji = Emoji_flag_gi; break;
-				case "flag-gl": Emoji = Emoji_flag_gl; break;
-				case "flag-gm": Emoji = Emoji_flag_gm; break;
-				case "flag-gn": Emoji = Emoji_flag_gn; break;
-				case "flag-gp": Emoji = Emoji_flag_gp; break;
-				case "flag-gq": Emoji = Emoji_flag_gq; break;
-				case "flag-gr": Emoji = Emoji_flag_gr; break;
-				case "flag-gs": Emoji = Emoji_flag_gs; break;
-				case "flag-gt": Emoji = Emoji_flag_gt; break;
-				case "flag-gu": Emoji = Emoji_flag_gu; break;
-				case "flag-gw": Emoji = Emoji_flag_gw; break;
-				case "flag-gy": Emoji = Emoji_flag_gy; break;
-				case "flag-hk": Emoji = Emoji_flag_hk; break;
-				case "flag-hm": Emoji = Emoji_flag_hm; break;
-				case "flag-hn": Emoji = Emoji_flag_hn; break;
-				case "flag-hr": Emoji = Emoji_flag_hr; break;
-				case "flag-ht": Emoji = Emoji_flag_ht; break;
-				case "flag-hu": Emoji = Emoji_flag_hu; break;
-				case "flag-ic": Emoji = Emoji_flag_ic; break;
-				case "flag-id": Emoji = Emoji_flag_id; break;
-				case "flag-ie": Emoji = Emoji_flag_ie; break;
-				case "flag-il": Emoji = Emoji_flag_il; break;
-				case "flag-im": Emoji = Emoji_flag_im; break;
-				case "flag-in": Emoji = Emoji_flag_in; break;
-				case "flag-io": Emoji = Emoji_flag_io; break;
-				case "flag-iq": Emoji = Emoji_flag_iq; break;
-				case "flag-ir": Emoji = Emoji_flag_ir; break;
-				case "flag-is": Emoji = Emoji_flag_is; break;
-				case "it": Emoji = Emoji_it; break;
-				case "flag-je": Emoji = Emoji_flag_je; break;
-				case "flag-jm": Emoji = Emoji_flag_jm; break;
-				case "flag-jo": Emoji = Emoji_flag_jo; break;
-				case "jp": Emoji = Emoji_jp; break;
-				case "flag-ke": Emoji = Emoji_flag_ke; break;
-				case "flag-kg": Emoji = Emoji_flag_kg; break;
-				case "flag-kh": Emoji = Emoji_flag_kh; break;
-				case "flag-ki": Emoji = Emoji_flag_ki; break;
-				case "flag-km": Emoji = Emoji_flag_km; break;
-				case "flag-kn": Emoji = Emoji_flag_kn; break;
-				case "flag-kp": Emoji = Emoji_flag_kp; break;
-				case "kr": Emoji = Emoji_kr; break;
-				case "flag-kw": Emoji = Emoji_flag_kw; break;
-				case "flag-ky": Emoji = Emoji_flag_ky; break;
-				case "flag-kz": Emoji = Emoji_flag_kz; break;
-				case "flag-la": Emoji = Emoji_flag_la; break;
-				case "flag-lb": Emoji = Emoji_flag_lb; break;
-				case "flag-lc": Emoji = Emoji_flag_lc; break;
-				case "flag-li": Emoji = Emoji_flag_li; break;
-				case "flag-lk": Emoji = Emoji_flag_lk; break;
-				case "flag-lr": Emoji = Emoji_flag_lr; break;
-				case "flag-ls": Emoji = Emoji_flag_ls; break;
-				case "flag-lt": Emoji = Emoji_flag_lt; break;
-				case "flag-lu": Emoji = Emoji_flag_lu; break;
-				case "flag-lv": Emoji = Emoji_flag_lv; break;
-				case "flag-ly": Emoji = Emoji_flag_ly; break;
-				case "flag-ma": Emoji = Emoji_flag_ma; break;
-				case "flag-mc": Emoji = Emoji_flag_mc; break;
-				case "flag-md": Emoji = Emoji_flag_md; break;
-				case "flag-me": Emoji = Emoji_flag_me; break;
-				case "flag-mf": Emoji = Emoji_flag_mf; break;
-				case "flag-mg": Emoji = Emoji_flag_mg; break;
-				case "flag-mh": Emoji = Emoji_flag_mh; break;
-				case "flag-mk": Emoji = Emoji_flag_mk; break;
-				case "flag-ml": Emoji = Emoji_flag_ml; break;
-				case "flag-mm": Emoji = Emoji_flag_mm; break;
-				case "flag-mn": Emoji = Emoji_flag_mn; break;
-				case "flag-mo": Emoji = Emoji_flag_mo; break;
-				case "flag-mp": Emoji = Emoji_flag_mp; break;
-				case "flag-mq": Emoji = Emoji_flag_mq; break;
-				case "flag-mr": Emoji = Emoji_flag_mr; break;
-				case "flag-ms": Emoji = Emoji_flag_ms; break;
-				case "flag-mt": Emoji = Emoji_flag_mt; break;
-				case "flag-mu": Emoji = Emoji_flag_mu; break;
-				case "flag-mv": Emoji = Emoji_flag_mv; break;
-				case "flag-mw": Emoji = Emoji_flag_mw; break;
-				case "flag-mx": Emoji = Emoji_flag_mx; break;
-				case "flag-my": Emoji = Emoji_flag_my; break;
-				case "flag-mz": Emoji = Emoji_flag_mz; break;
-				case "flag-na": Emoji = Emoji_flag_na; break;
-				case "flag-nc": Emoji = Emoji_flag_nc; break;
-				case "flag-ne": Emoji = Emoji_flag_ne; break;
-				case "flag-nf": Emoji = Emoji_flag_nf; break;
-				case "flag-ng": Emoji = Emoji_flag_ng; break;
-				case "flag-ni": Emoji = Emoji_flag_ni; break;
-				case "flag-nl": Emoji = Emoji_flag_nl; break;
-				case "flag-no": Emoji = Emoji_flag_no; break;
-				case "flag-np": Emoji = Emoji_flag_np; break;
-				case "flag-nr": Emoji = Emoji_flag_nr; break;
-				case "flag-nu": Emoji = Emoji_flag_nu; break;
-				case "flag-nz": Emoji = Emoji_flag_nz; break;
-				case "flag-om": Emoji = Emoji_flag_om; break;
-				case "flag-pa": Emoji = Emoji_flag_pa; break;
-				case "flag-pe": Emoji = Emoji_flag_pe; break;
-				case "flag-pf": Emoji = Emoji_flag_pf; break;
-				case "flag-pg": Emoji = Emoji_flag_pg; break;
-				case "flag-ph": Emoji = Emoji_flag_ph; break;
-				case "flag-pk": Emoji = Emoji_flag_pk; break;
-				case "flag-pl": Emoji = Emoji_flag_pl; break;
-				case "flag-pm": Emoji = Emoji_flag_pm; break;
-				case "flag-pn": Emoji = Emoji_flag_pn; break;
-				case "flag-pr": Emoji = Emoji_flag_pr; break;
-				case "flag-ps": Emoji = Emoji_flag_ps; break;
-				case "flag-pt": Emoji = Emoji_flag_pt; break;
-				case "flag-pw": Emoji = Emoji_flag_pw; break;
-				case "flag-py": Emoji = Emoji_flag_py; break;
-				case "flag-qa": Emoji = Emoji_flag_qa; break;
-				case "flag-re": Emoji = Emoji_flag_re; break;
-				case "flag-ro": Emoji = Emoji_flag_ro; break;
-				case "flag-rs": Emoji = Emoji_flag_rs; break;
-				case "ru": Emoji = Emoji_ru; break;
-				case "flag-rw": Emoji = Emoji_flag_rw; break;
-				case "flag-sa": Emoji = Emoji_flag_sa; break;
-				case "flag-sb": Emoji = Emoji_flag_sb; break;
-				case "flag-sc": Emoji = Emoji_flag_sc; break;
-				case "flag-sd": Emoji = Emoji_flag_sd; break;
-				case "flag-se": Emoji = Emoji_flag_se; break;
-				case "flag-sg": Emoji = Emoji_flag_sg; break;
-				case "flag-sh": Emoji = Emoji_flag_sh; break;
-				case "flag-si": Emoji = Emoji_flag_si; break;
-				case "flag-sj": Emoji = Emoji_flag_sj; break;
-				case "flag-sk": Emoji = Emoji_flag_sk; break;
-				case "flag-sl": Emoji = Emoji_flag_sl; break;
-				case "flag-sm": Emoji = Emoji_flag_sm; break;
-				case "flag-sn": Emoji = Emoji_flag_sn; break;
-				case "flag-so": Emoji = Emoji_flag_so; break;
-				case "flag-sr": Emoji = Emoji_flag_sr; break;
-				case "flag-ss": Emoji = Emoji_flag_ss; break;
-				case "flag-st": Emoji = Emoji_flag_st; break;
-				case "flag-sv": Emoji = Emoji_flag_sv; break;
-				case "flag-sx": Emoji = Emoji_flag_sx; break;
-				case "flag-sy": Emoji = Emoji_flag_sy; break;
-				case "flag-sz": Emoji = Emoji_flag_sz; break;
-				case "flag-ta": Emoji = Emoji_flag_ta; break;
-				case "flag-tc": Emoji = Emoji_flag_tc; break;
-				case "flag-td": Emoji = Emoji_flag_td; break;
-				case "flag-tf": Emoji = Emoji_flag_tf; break;
-				case "flag-tg": Emoji = Emoji_flag_tg; break;
-				case "flag-th": Emoji = Emoji_flag_th; break;
-				case "flag-tj": Emoji = Emoji_flag_tj; break;
-				case "flag-tk": Emoji = Emoji_flag_tk; break;
-				case "flag-tl": Emoji = Emoji_flag_tl; break;
-				case "flag-tm": Emoji = Emoji_flag_tm; break;
-				case "flag-tn": Emoji = Emoji_flag_tn; break;
-				case "flag-to": Emoji = Emoji_flag_to; break;
-				case "flag-tr": Emoji = Emoji_flag_tr; break;
-				case "flag-tt": Emoji = Emoji_flag_tt; break;
-				case "flag-tv": Emoji = Emoji_flag_tv; break;
-				case "flag-tw": Emoji = Emoji_flag_tw; break;
-				case "flag-tz": Emoji = Emoji_flag_tz; break;
-				case "flag-ua": Emoji = Emoji_flag_ua; break;
-				case "flag-ug": Emoji = Emoji_flag_ug; break;
-				case "flag-um": Emoji = Emoji_flag_um; break;
-				case "flag-un": Emoji = Emoji_flag_un; break;
-				case "us": Emoji = Emoji_us; break;
-				case "flag-uy": Emoji = Emoji_flag_uy; break;
-				case "flag-uz": Emoji = Emoji_flag_uz; break;
-				case "flag-va": Emoji = Emoji_flag_va; break;
-				case "flag-vc": Emoji = Emoji_flag_vc; break;
-				case "flag-ve": Emoji = Emoji_flag_ve; break;
-				case "flag-vg": Emoji = Emoji_flag_vg; break;
-				case "flag-vi": Emoji = Emoji_flag_vi; break;
-				case "flag-vn": Emoji = Emoji_flag_vn; break;
-				case "flag-vu": Emoji = Emoji_flag_vu; break;
-				case "flag-wf": Emoji = Emoji_flag_wf; break;
-				case "flag-ws": Emoji = Emoji_flag_ws; break;
-				case "flag-xk": Emoji = Emoji_flag_xk; break;
-				case "flag-ye": Emoji = Emoji_flag_ye; break;
-				case "flag-yt": Emoji = Emoji_flag_yt; break;
-				case "flag-za": Emoji = Emoji_flag_za; break;
-				case "flag-zm": Emoji = Emoji_flag_zm; break;
-				case "flag-zw": Emoji = Emoji_flag_zw; break;
 				case "koko": Emoji = Emoji_koko; break;
 				case "sa": Emoji = Emoji_sa; break;
 				case "u7121": Emoji = Emoji_u7121; break;
@@ -2259,7 +1643,7 @@ namespace Waher.Content.Emoji
 				case "cake": Emoji = Emoji_cake; break;
 				case "bento": Emoji = Emoji_bento; break;
 				case "stew": Emoji = Emoji_stew; break;
-				case "fried_egg": Emoji = Emoji_fried_egg; break;
+				case "egg": Emoji = Emoji_egg; break;
 				case "fork_and_knife": Emoji = Emoji_fork_and_knife; break;
 				case "tea": Emoji = Emoji_tea; break;
 				case "sake": Emoji = Emoji_sake; break;
@@ -2334,25 +1718,15 @@ namespace Waher.Content.Emoji
 				case "basketball": Emoji = Emoji_basketball; break;
 				case "checkered_flag": Emoji = Emoji_checkered_flag; break;
 				case "snowboarder": Emoji = Emoji_snowboarder; break;
-				case "woman-running": Emoji = Emoji_woman_running; break;
-				case "man-running": Emoji = Emoji_man_running; break;
 				case "runner": Emoji = Emoji_runner; break;
-				case "woman-surfing": Emoji = Emoji_woman_surfing; break;
-				case "man-surfing": Emoji = Emoji_man_surfing; break;
 				case "surfer": Emoji = Emoji_surfer; break;
 				case "sports_medal": Emoji = Emoji_sports_medal; break;
 				case "trophy": Emoji = Emoji_trophy; break;
 				case "horse_racing": Emoji = Emoji_horse_racing; break;
 				case "football": Emoji = Emoji_football; break;
 				case "rugby_football": Emoji = Emoji_rugby_football; break;
-				case "woman-swimming": Emoji = Emoji_woman_swimming; break;
-				case "man-swimming": Emoji = Emoji_man_swimming; break;
 				case "swimmer": Emoji = Emoji_swimmer; break;
-				case "woman-lifting-weights": Emoji = Emoji_woman_lifting_weights; break;
-				case "man-lifting-weights": Emoji = Emoji_man_lifting_weights; break;
 				case "weight_lifter": Emoji = Emoji_weight_lifter; break;
-				case "woman-golfing": Emoji = Emoji_woman_golfing; break;
-				case "man-golfing": Emoji = Emoji_man_golfing; break;
 				case "golfer": Emoji = Emoji_golfer; break;
 				case "racing_motorcycle": Emoji = Emoji_racing_motorcycle; break;
 				case "racing_car": Emoji = Emoji_racing_car; break;
@@ -2390,13 +1764,7 @@ namespace Waher.Content.Emoji
 				case "izakaya_lantern": Emoji = Emoji_izakaya_lantern; break;
 				case "japanese_castle": Emoji = Emoji_japanese_castle; break;
 				case "european_castle": Emoji = Emoji_european_castle; break;
-				case "rainbow-flag": Emoji = Emoji_rainbow_flag; break;
-				case "transgender_flag": Emoji = Emoji_transgender_flag; break;
 				case "waving_white_flag": Emoji = Emoji_waving_white_flag; break;
-				case "pirate_flag": Emoji = Emoji_pirate_flag; break;
-				case "flag-england": Emoji = Emoji_flag_england; break;
-				case "flag-scotland": Emoji = Emoji_flag_scotland; break;
-				case "flag-wales": Emoji = Emoji_flag_wales; break;
 				case "waving_black_flag": Emoji = Emoji_waving_black_flag; break;
 				case "rosette": Emoji = Emoji_rosette; break;
 				case "label": Emoji = Emoji_label; break;
@@ -2416,7 +1784,6 @@ namespace Waher.Content.Emoji
 				case "tiger2": Emoji = Emoji_tiger2; break;
 				case "leopard": Emoji = Emoji_leopard; break;
 				case "rabbit2": Emoji = Emoji_rabbit2; break;
-				case "black_cat": Emoji = Emoji_black_cat; break;
 				case "cat2": Emoji = Emoji_cat2; break;
 				case "dragon": Emoji = Emoji_dragon; break;
 				case "crocodile": Emoji = Emoji_crocodile; break;
@@ -2430,7 +1797,6 @@ namespace Waher.Content.Emoji
 				case "monkey": Emoji = Emoji_monkey; break;
 				case "rooster": Emoji = Emoji_rooster; break;
 				case "chicken": Emoji = Emoji_chicken; break;
-				case "service_dog": Emoji = Emoji_service_dog; break;
 				case "dog2": Emoji = Emoji_dog2; break;
 				case "pig2": Emoji = Emoji_pig2; break;
 				case "boar": Emoji = Emoji_boar; break;
@@ -2469,14 +1835,12 @@ namespace Waher.Content.Emoji
 				case "frog": Emoji = Emoji_frog; break;
 				case "hamster": Emoji = Emoji_hamster; break;
 				case "wolf": Emoji = Emoji_wolf; break;
-				case "polar_bear": Emoji = Emoji_polar_bear; break;
 				case "bear": Emoji = Emoji_bear; break;
 				case "panda_face": Emoji = Emoji_panda_face; break;
 				case "pig_nose": Emoji = Emoji_pig_nose; break;
 				case "feet": Emoji = Emoji_feet; break;
 				case "chipmunk": Emoji = Emoji_chipmunk; break;
 				case "eyes": Emoji = Emoji_eyes; break;
-				case "eye-in-speech-bubble": Emoji = Emoji_eye_in_speech_bubble; break;
 				case "eye": Emoji = Emoji_eye; break;
 				case "ear": Emoji = Emoji_ear; break;
 				case "nose": Emoji = Emoji_nose; break;
@@ -2516,112 +1880,21 @@ namespace Waher.Content.Emoji
 				case "busts_in_silhouette": Emoji = Emoji_busts_in_silhouette; break;
 				case "boy": Emoji = Emoji_boy; break;
 				case "girl": Emoji = Emoji_girl; break;
-				case "male-farmer": Emoji = Emoji_male_farmer; break;
-				case "male-cook": Emoji = Emoji_male_cook; break;
-				case "man_feeding_baby": Emoji = Emoji_man_feeding_baby; break;
-				case "male-student": Emoji = Emoji_male_student; break;
-				case "male-singer": Emoji = Emoji_male_singer; break;
-				case "male-artist": Emoji = Emoji_male_artist; break;
-				case "male-teacher": Emoji = Emoji_male_teacher; break;
-				case "male-factory-worker": Emoji = Emoji_male_factory_worker; break;
-				case "man-boy-boy": Emoji = Emoji_man_boy_boy; break;
-				case "man-boy": Emoji = Emoji_man_boy; break;
-				case "man-girl-boy": Emoji = Emoji_man_girl_boy; break;
-				case "man-girl-girl": Emoji = Emoji_man_girl_girl; break;
-				case "man-girl": Emoji = Emoji_man_girl; break;
-				case "man-man-boy": Emoji = Emoji_man_man_boy; break;
-				case "man-man-boy-boy": Emoji = Emoji_man_man_boy_boy; break;
-				case "man-man-girl": Emoji = Emoji_man_man_girl; break;
-				case "man-man-girl-boy": Emoji = Emoji_man_man_girl_boy; break;
-				case "man-man-girl-girl": Emoji = Emoji_man_man_girl_girl; break;
-				case "man-woman-boy": Emoji = Emoji_man_woman_boy; break;
-				case "man-woman-boy-boy": Emoji = Emoji_man_woman_boy_boy; break;
-				case "man-woman-girl": Emoji = Emoji_man_woman_girl; break;
-				case "man-woman-girl-boy": Emoji = Emoji_man_woman_girl_boy; break;
-				case "man-woman-girl-girl": Emoji = Emoji_man_woman_girl_girl; break;
-				case "male-technologist": Emoji = Emoji_male_technologist; break;
-				case "male-office-worker": Emoji = Emoji_male_office_worker; break;
-				case "male-mechanic": Emoji = Emoji_male_mechanic; break;
-				case "male-scientist": Emoji = Emoji_male_scientist; break;
-				case "male-astronaut": Emoji = Emoji_male_astronaut; break;
-				case "male-firefighter": Emoji = Emoji_male_firefighter; break;
-				case "man_with_probing_cane": Emoji = Emoji_man_with_probing_cane; break;
-				case "red_haired_man": Emoji = Emoji_red_haired_man; break;
-				case "curly_haired_man": Emoji = Emoji_curly_haired_man; break;
-				case "bald_man": Emoji = Emoji_bald_man; break;
-				case "white_haired_man": Emoji = Emoji_white_haired_man; break;
-				case "man_in_motorized_wheelchair": Emoji = Emoji_man_in_motorized_wheelchair; break;
-				case "man_in_manual_wheelchair": Emoji = Emoji_man_in_manual_wheelchair; break;
-				case "male-doctor": Emoji = Emoji_male_doctor; break;
-				case "male-judge": Emoji = Emoji_male_judge; break;
-				case "male-pilot": Emoji = Emoji_male_pilot; break;
-				case "man-heart-man": Emoji = Emoji_man_heart_man; break;
-				case "man-kiss-man": Emoji = Emoji_man_kiss_man; break;
 				case "man": Emoji = Emoji_man; break;
-				case "female-farmer": Emoji = Emoji_female_farmer; break;
-				case "female-cook": Emoji = Emoji_female_cook; break;
-				case "woman_feeding_baby": Emoji = Emoji_woman_feeding_baby; break;
-				case "female-student": Emoji = Emoji_female_student; break;
-				case "female-singer": Emoji = Emoji_female_singer; break;
-				case "female-artist": Emoji = Emoji_female_artist; break;
-				case "female-teacher": Emoji = Emoji_female_teacher; break;
-				case "female-factory-worker": Emoji = Emoji_female_factory_worker; break;
-				case "woman-boy-boy": Emoji = Emoji_woman_boy_boy; break;
-				case "woman-boy": Emoji = Emoji_woman_boy; break;
-				case "woman-girl-boy": Emoji = Emoji_woman_girl_boy; break;
-				case "woman-girl-girl": Emoji = Emoji_woman_girl_girl; break;
-				case "woman-girl": Emoji = Emoji_woman_girl; break;
-				case "woman-woman-boy": Emoji = Emoji_woman_woman_boy; break;
-				case "woman-woman-boy-boy": Emoji = Emoji_woman_woman_boy_boy; break;
-				case "woman-woman-girl": Emoji = Emoji_woman_woman_girl; break;
-				case "woman-woman-girl-boy": Emoji = Emoji_woman_woman_girl_boy; break;
-				case "woman-woman-girl-girl": Emoji = Emoji_woman_woman_girl_girl; break;
-				case "female-technologist": Emoji = Emoji_female_technologist; break;
-				case "female-office-worker": Emoji = Emoji_female_office_worker; break;
-				case "female-mechanic": Emoji = Emoji_female_mechanic; break;
-				case "female-scientist": Emoji = Emoji_female_scientist; break;
-				case "female-astronaut": Emoji = Emoji_female_astronaut; break;
-				case "female-firefighter": Emoji = Emoji_female_firefighter; break;
-				case "woman_with_probing_cane": Emoji = Emoji_woman_with_probing_cane; break;
-				case "red_haired_woman": Emoji = Emoji_red_haired_woman; break;
-				case "curly_haired_woman": Emoji = Emoji_curly_haired_woman; break;
-				case "bald_woman": Emoji = Emoji_bald_woman; break;
-				case "white_haired_woman": Emoji = Emoji_white_haired_woman; break;
-				case "woman_in_motorized_wheelchair": Emoji = Emoji_woman_in_motorized_wheelchair; break;
-				case "woman_in_manual_wheelchair": Emoji = Emoji_woman_in_manual_wheelchair; break;
-				case "female-doctor": Emoji = Emoji_female_doctor; break;
-				case "female-judge": Emoji = Emoji_female_judge; break;
-				case "female-pilot": Emoji = Emoji_female_pilot; break;
-				case "woman-heart-man": Emoji = Emoji_woman_heart_man; break;
-				case "woman-heart-woman": Emoji = Emoji_woman_heart_woman; break;
-				case "woman-kiss-man": Emoji = Emoji_woman_kiss_man; break;
-				case "woman-kiss-woman": Emoji = Emoji_woman_kiss_woman; break;
 				case "woman": Emoji = Emoji_woman; break;
 				case "family": Emoji = Emoji_family; break;
 				case "couple": Emoji = Emoji_couple; break;
 				case "two_men_holding_hands": Emoji = Emoji_two_men_holding_hands; break;
 				case "two_women_holding_hands": Emoji = Emoji_two_women_holding_hands; break;
-				case "female-police-officer": Emoji = Emoji_female_police_officer; break;
-				case "male-police-officer": Emoji = Emoji_male_police_officer; break;
 				case "cop": Emoji = Emoji_cop; break;
-				case "woman-with-bunny-ears-partying": Emoji = Emoji_woman_with_bunny_ears_partying; break;
-				case "man-with-bunny-ears-partying": Emoji = Emoji_man_with_bunny_ears_partying; break;
 				case "dancers": Emoji = Emoji_dancers; break;
-				case "woman_with_veil": Emoji = Emoji_woman_with_veil; break;
-				case "man_with_veil": Emoji = Emoji_man_with_veil; break;
 				case "bride_with_veil": Emoji = Emoji_bride_with_veil; break;
-				case "blond-haired-woman": Emoji = Emoji_blond_haired_woman; break;
-				case "blond-haired-man": Emoji = Emoji_blond_haired_man; break;
 				case "person_with_blond_hair": Emoji = Emoji_person_with_blond_hair; break;
 				case "man_with_gua_pi_mao": Emoji = Emoji_man_with_gua_pi_mao; break;
-				case "woman-wearing-turban": Emoji = Emoji_woman_wearing_turban; break;
-				case "man-wearing-turban": Emoji = Emoji_man_wearing_turban; break;
 				case "man_with_turban": Emoji = Emoji_man_with_turban; break;
 				case "older_man": Emoji = Emoji_older_man; break;
 				case "older_woman": Emoji = Emoji_older_woman; break;
 				case "baby": Emoji = Emoji_baby; break;
-				case "female-construction-worker": Emoji = Emoji_female_construction_worker; break;
-				case "male-construction-worker": Emoji = Emoji_male_construction_worker; break;
 				case "construction_worker": Emoji = Emoji_construction_worker; break;
 				case "princess": Emoji = Emoji_princess; break;
 				case "japanese_ogre": Emoji = Emoji_japanese_ogre; break;
@@ -2632,20 +1905,12 @@ namespace Waher.Content.Emoji
 				case "space_invader": Emoji = Emoji_space_invader; break;
 				case "imp": Emoji = Emoji_imp; break;
 				case "skull": Emoji = Emoji_skull; break;
-				case "woman-tipping-hand": Emoji = Emoji_woman_tipping_hand; break;
-				case "man-tipping-hand": Emoji = Emoji_man_tipping_hand; break;
 				case "information_desk_person": Emoji = Emoji_information_desk_person; break;
-				case "female-guard": Emoji = Emoji_female_guard; break;
-				case "male-guard": Emoji = Emoji_male_guard; break;
 				case "guardsman": Emoji = Emoji_guardsman; break;
 				case "dancer": Emoji = Emoji_dancer; break;
 				case "lipstick": Emoji = Emoji_lipstick; break;
 				case "nail_care": Emoji = Emoji_nail_care; break;
-				case "woman-getting-massage": Emoji = Emoji_woman_getting_massage; break;
-				case "man-getting-massage": Emoji = Emoji_man_getting_massage; break;
 				case "massage": Emoji = Emoji_massage; break;
-				case "woman-getting-haircut": Emoji = Emoji_woman_getting_haircut; break;
-				case "man-getting-haircut": Emoji = Emoji_man_getting_haircut; break;
 				case "haircut": Emoji = Emoji_haircut; break;
 				case "barber": Emoji = Emoji_barber; break;
 				case "syringe": Emoji = Emoji_syringe; break;
@@ -2736,7 +2001,7 @@ namespace Waher.Content.Emoji
 				case "telephone_receiver": Emoji = Emoji_telephone_receiver; break;
 				case "pager": Emoji = Emoji_pager; break;
 				case "fax": Emoji = Emoji_fax; break;
-				case "satellite_antenna": Emoji = Emoji_satellite_antenna; break;
+				case "satellite": Emoji = Emoji_satellite; break;
 				case "loudspeaker": Emoji = Emoji_loudspeaker; break;
 				case "mega": Emoji = Emoji_mega; break;
 				case "outbox_tray": Emoji = Emoji_outbox_tray; break;
@@ -2862,14 +2127,11 @@ namespace Waher.Content.Emoji
 				case "mantelpiece_clock": Emoji = Emoji_mantelpiece_clock; break;
 				case "hole": Emoji = Emoji_hole; break;
 				case "man_in_business_suit_levitating": Emoji = Emoji_man_in_business_suit_levitating; break;
-				case "female-detective": Emoji = Emoji_female_detective; break;
-				case "male-detective": Emoji = Emoji_male_detective; break;
 				case "sleuth_or_spy": Emoji = Emoji_sleuth_or_spy; break;
 				case "dark_sunglasses": Emoji = Emoji_dark_sunglasses; break;
 				case "spider": Emoji = Emoji_spider; break;
 				case "spider_web": Emoji = Emoji_spider_web; break;
 				case "joystick": Emoji = Emoji_joystick; break;
-				case "man_dancing": Emoji = Emoji_man_dancing; break;
 				case "linked_paperclips": Emoji = Emoji_linked_paperclips; break;
 				case "lower_left_ballpoint_pen": Emoji = Emoji_lower_left_ballpoint_pen; break;
 				case "lower_left_fountain_pen": Emoji = Emoji_lower_left_fountain_pen; break;
@@ -2878,7 +2140,6 @@ namespace Waher.Content.Emoji
 				case "raised_hand_with_fingers_splayed": Emoji = Emoji_raised_hand_with_fingers_splayed; break;
 				case "middle_finger": Emoji = Emoji_middle_finger; break;
 				case "spock-hand": Emoji = Emoji_spock_hand; break;
-				case "black_heart": Emoji = Emoji_black_heart; break;
 				case "desktop_computer": Emoji = Emoji_desktop_computer; break;
 				case "printer": Emoji = Emoji_printer; break;
 				case "three_button_mouse": Emoji = Emoji_three_button_mouse; break;
@@ -2973,27 +2234,15 @@ namespace Waher.Content.Emoji
 				case "slightly_smiling_face": Emoji = Emoji_slightly_smiling_face; break;
 				case "upside_down_face": Emoji = Emoji_upside_down_face; break;
 				case "face_with_rolling_eyes": Emoji = Emoji_face_with_rolling_eyes; break;
-				case "woman-gesturing-no": Emoji = Emoji_woman_gesturing_no; break;
-				case "man-gesturing-no": Emoji = Emoji_man_gesturing_no; break;
 				case "no_good": Emoji = Emoji_no_good; break;
-				case "woman-gesturing-ok": Emoji = Emoji_woman_gesturing_ok; break;
-				case "man-gesturing-ok": Emoji = Emoji_man_gesturing_ok; break;
 				case "ok_woman": Emoji = Emoji_ok_woman; break;
-				case "woman-bowing": Emoji = Emoji_woman_bowing; break;
-				case "man-bowing": Emoji = Emoji_man_bowing; break;
 				case "bow": Emoji = Emoji_bow; break;
 				case "see_no_evil": Emoji = Emoji_see_no_evil; break;
 				case "hear_no_evil": Emoji = Emoji_hear_no_evil; break;
 				case "speak_no_evil": Emoji = Emoji_speak_no_evil; break;
-				case "woman-raising-hand": Emoji = Emoji_woman_raising_hand; break;
-				case "man-raising-hand": Emoji = Emoji_man_raising_hand; break;
 				case "raising_hand": Emoji = Emoji_raising_hand; break;
 				case "raised_hands": Emoji = Emoji_raised_hands; break;
-				case "woman-frowning": Emoji = Emoji_woman_frowning; break;
-				case "man-frowning": Emoji = Emoji_man_frowning; break;
 				case "person_frowning": Emoji = Emoji_person_frowning; break;
-				case "woman-pouting": Emoji = Emoji_woman_pouting; break;
-				case "man-pouting": Emoji = Emoji_man_pouting; break;
 				case "person_with_pouting_face": Emoji = Emoji_person_with_pouting_face; break;
 				case "pray": Emoji = Emoji_pray; break;
 				case "rocket": Emoji = Emoji_rocket; break;
@@ -3031,8 +2280,6 @@ namespace Waher.Content.Emoji
 				case "mountain_cableway": Emoji = Emoji_mountain_cableway; break;
 				case "aerial_tramway": Emoji = Emoji_aerial_tramway; break;
 				case "ship": Emoji = Emoji_ship; break;
-				case "woman-rowing-boat": Emoji = Emoji_woman_rowing_boat; break;
-				case "man-rowing-boat": Emoji = Emoji_man_rowing_boat; break;
 				case "rowboat": Emoji = Emoji_rowboat; break;
 				case "speedboat": Emoji = Emoji_speedboat; break;
 				case "traffic_light": Emoji = Emoji_traffic_light; break;
@@ -3050,14 +2297,8 @@ namespace Waher.Content.Emoji
 				case "non-potable_water": Emoji = Emoji_non_potable_water; break;
 				case "bike": Emoji = Emoji_bike; break;
 				case "no_bicycles": Emoji = Emoji_no_bicycles; break;
-				case "woman-biking": Emoji = Emoji_woman_biking; break;
-				case "man-biking": Emoji = Emoji_man_biking; break;
 				case "bicyclist": Emoji = Emoji_bicyclist; break;
-				case "woman-mountain-biking": Emoji = Emoji_woman_mountain_biking; break;
-				case "man-mountain-biking": Emoji = Emoji_man_mountain_biking; break;
 				case "mountain_bicyclist": Emoji = Emoji_mountain_bicyclist; break;
-				case "woman-walking": Emoji = Emoji_woman_walking; break;
-				case "man-walking": Emoji = Emoji_man_walking; break;
 				case "walking": Emoji = Emoji_walking; break;
 				case "no_pedestrians": Emoji = Emoji_no_pedestrians; break;
 				case "children_crossing": Emoji = Emoji_children_crossing; break;
@@ -3080,11 +2321,6 @@ namespace Waher.Content.Emoji
 				case "bellhop_bell": Emoji = Emoji_bellhop_bell; break;
 				case "bed": Emoji = Emoji_bed; break;
 				case "place_of_worship": Emoji = Emoji_place_of_worship; break;
-				case "octagonal_sign": Emoji = Emoji_octagonal_sign; break;
-				case "shopping_trolley": Emoji = Emoji_shopping_trolley; break;
-				case "hindu_temple": Emoji = Emoji_hindu_temple; break;
-				case "hut": Emoji = Emoji_hut; break;
-				case "elevator": Emoji = Emoji_elevator; break;
 				case "hammer_and_wrench": Emoji = Emoji_hammer_and_wrench; break;
 				case "shield": Emoji = Emoji_shield; break;
 				case "oil_drum": Emoji = Emoji_oil_drum; break;
@@ -3094,33 +2330,8 @@ namespace Waher.Content.Emoji
 				case "small_airplane": Emoji = Emoji_small_airplane; break;
 				case "airplane_departure": Emoji = Emoji_airplane_departure; break;
 				case "airplane_arriving": Emoji = Emoji_airplane_arriving; break;
-				case "satellite": Emoji = Emoji_satellite; break;
+				case "satellite2": Emoji = Emoji_satellite2; break;
 				case "passenger_ship": Emoji = Emoji_passenger_ship; break;
-				case "scooter": Emoji = Emoji_scooter; break;
-				case "motor_scooter": Emoji = Emoji_motor_scooter; break;
-				case "canoe": Emoji = Emoji_canoe; break;
-				case "sled": Emoji = Emoji_sled; break;
-				case "flying_saucer": Emoji = Emoji_flying_saucer; break;
-				case "skateboard": Emoji = Emoji_skateboard; break;
-				case "auto_rickshaw": Emoji = Emoji_auto_rickshaw; break;
-				case "pickup_truck": Emoji = Emoji_pickup_truck; break;
-				case "roller_skate": Emoji = Emoji_roller_skate; break;
-				case "large_orange_circle": Emoji = Emoji_large_orange_circle; break;
-				case "large_yellow_circle": Emoji = Emoji_large_yellow_circle; break;
-				case "large_green_circle": Emoji = Emoji_large_green_circle; break;
-				case "large_purple_circle": Emoji = Emoji_large_purple_circle; break;
-				case "large_brown_circle": Emoji = Emoji_large_brown_circle; break;
-				case "large_red_square": Emoji = Emoji_large_red_square; break;
-				case "large_blue_square": Emoji = Emoji_large_blue_square; break;
-				case "large_orange_square": Emoji = Emoji_large_orange_square; break;
-				case "large_yellow_square": Emoji = Emoji_large_yellow_square; break;
-				case "large_green_square": Emoji = Emoji_large_green_square; break;
-				case "large_purple_square": Emoji = Emoji_large_purple_square; break;
-				case "large_brown_square": Emoji = Emoji_large_brown_square; break;
-				case "pinched_fingers": Emoji = Emoji_pinched_fingers; break;
-				case "white_heart": Emoji = Emoji_white_heart; break;
-				case "brown_heart": Emoji = Emoji_brown_heart; break;
-				case "pinching_hand": Emoji = Emoji_pinching_hand; break;
 				case "zipper_mouth_face": Emoji = Emoji_zipper_mouth_face; break;
 				case "money_mouth_face": Emoji = Emoji_money_mouth_face; break;
 				case "face_with_thermometer": Emoji = Emoji_face_with_thermometer; break;
@@ -3130,600 +2341,1118 @@ namespace Waher.Content.Emoji
 				case "robot_face": Emoji = Emoji_robot_face; break;
 				case "hugging_face": Emoji = Emoji_hugging_face; break;
 				case "the_horns": Emoji = Emoji_the_horns; break;
-				case "call_me_hand": Emoji = Emoji_call_me_hand; break;
-				case "raised_back_of_hand": Emoji = Emoji_raised_back_of_hand; break;
-				case "left-facing_fist": Emoji = Emoji_left_facing_fist; break;
-				case "right-facing_fist": Emoji = Emoji_right_facing_fist; break;
-				case "handshake": Emoji = Emoji_handshake; break;
-				case "crossed_fingers": Emoji = Emoji_crossed_fingers; break;
-				case "i_love_you_hand_sign": Emoji = Emoji_i_love_you_hand_sign; break;
-				case "face_with_cowboy_hat": Emoji = Emoji_face_with_cowboy_hat; break;
-				case "clown_face": Emoji = Emoji_clown_face; break;
-				case "nauseated_face": Emoji = Emoji_nauseated_face; break;
-				case "rolling_on_the_floor_laughing": Emoji = Emoji_rolling_on_the_floor_laughing; break;
-				case "drooling_face": Emoji = Emoji_drooling_face; break;
-				case "lying_face": Emoji = Emoji_lying_face; break;
-				case "woman-facepalming": Emoji = Emoji_woman_facepalming; break;
-				case "man-facepalming": Emoji = Emoji_man_facepalming; break;
-				case "face_palm": Emoji = Emoji_face_palm; break;
-				case "sneezing_face": Emoji = Emoji_sneezing_face; break;
-				case "face_with_raised_eyebrow": Emoji = Emoji_face_with_raised_eyebrow; break;
-				case "star-struck": Emoji = Emoji_star_struck; break;
-				case "zany_face": Emoji = Emoji_zany_face; break;
-				case "shushing_face": Emoji = Emoji_shushing_face; break;
-				case "face_with_symbols_on_mouth": Emoji = Emoji_face_with_symbols_on_mouth; break;
-				case "face_with_hand_over_mouth": Emoji = Emoji_face_with_hand_over_mouth; break;
-				case "face_vomiting": Emoji = Emoji_face_vomiting; break;
-				case "exploding_head": Emoji = Emoji_exploding_head; break;
-				case "pregnant_woman": Emoji = Emoji_pregnant_woman; break;
-				case "breast-feeding": Emoji = Emoji_breast_feeding; break;
-				case "palms_up_together": Emoji = Emoji_palms_up_together; break;
-				case "selfie": Emoji = Emoji_selfie; break;
-				case "prince": Emoji = Emoji_prince; break;
-				case "woman_in_tuxedo": Emoji = Emoji_woman_in_tuxedo; break;
-				case "man_in_tuxedo": Emoji = Emoji_man_in_tuxedo; break;
-				case "mrs_claus": Emoji = Emoji_mrs_claus; break;
-				case "woman-shrugging": Emoji = Emoji_woman_shrugging; break;
-				case "man-shrugging": Emoji = Emoji_man_shrugging; break;
-				case "shrug": Emoji = Emoji_shrug; break;
-				case "woman-cartwheeling": Emoji = Emoji_woman_cartwheeling; break;
-				case "man-cartwheeling": Emoji = Emoji_man_cartwheeling; break;
-				case "person_doing_cartwheel": Emoji = Emoji_person_doing_cartwheel; break;
-				case "woman-juggling": Emoji = Emoji_woman_juggling; break;
-				case "man-juggling": Emoji = Emoji_man_juggling; break;
-				case "juggling": Emoji = Emoji_juggling; break;
-				case "fencer": Emoji = Emoji_fencer; break;
-				case "woman-wrestling": Emoji = Emoji_woman_wrestling; break;
-				case "man-wrestling": Emoji = Emoji_man_wrestling; break;
-				case "wrestlers": Emoji = Emoji_wrestlers; break;
-				case "woman-playing-water-polo": Emoji = Emoji_woman_playing_water_polo; break;
-				case "man-playing-water-polo": Emoji = Emoji_man_playing_water_polo; break;
-				case "water_polo": Emoji = Emoji_water_polo; break;
-				case "woman-playing-handball": Emoji = Emoji_woman_playing_handball; break;
-				case "man-playing-handball": Emoji = Emoji_man_playing_handball; break;
-				case "handball": Emoji = Emoji_handball; break;
-				case "diving_mask": Emoji = Emoji_diving_mask; break;
-				case "wilted_flower": Emoji = Emoji_wilted_flower; break;
-				case "drum_with_drumsticks": Emoji = Emoji_drum_with_drumsticks; break;
-				case "clinking_glasses": Emoji = Emoji_clinking_glasses; break;
-				case "tumbler_glass": Emoji = Emoji_tumbler_glass; break;
-				case "spoon": Emoji = Emoji_spoon; break;
-				case "goal_net": Emoji = Emoji_goal_net; break;
-				case "first_place_medal": Emoji = Emoji_first_place_medal; break;
-				case "second_place_medal": Emoji = Emoji_second_place_medal; break;
-				case "third_place_medal": Emoji = Emoji_third_place_medal; break;
-				case "boxing_glove": Emoji = Emoji_boxing_glove; break;
-				case "martial_arts_uniform": Emoji = Emoji_martial_arts_uniform; break;
-				case "curling_stone": Emoji = Emoji_curling_stone; break;
-				case "lacrosse": Emoji = Emoji_lacrosse; break;
-				case "softball": Emoji = Emoji_softball; break;
-				case "flying_disc": Emoji = Emoji_flying_disc; break;
-				case "croissant": Emoji = Emoji_croissant; break;
-				case "avocado": Emoji = Emoji_avocado; break;
-				case "cucumber": Emoji = Emoji_cucumber; break;
-				case "bacon": Emoji = Emoji_bacon; break;
-				case "potato": Emoji = Emoji_potato; break;
-				case "carrot": Emoji = Emoji_carrot; break;
-				case "baguette_bread": Emoji = Emoji_baguette_bread; break;
-				case "green_salad": Emoji = Emoji_green_salad; break;
-				case "shallow_pan_of_food": Emoji = Emoji_shallow_pan_of_food; break;
-				case "stuffed_flatbread": Emoji = Emoji_stuffed_flatbread; break;
-				case "egg": Emoji = Emoji_egg; break;
-				case "glass_of_milk": Emoji = Emoji_glass_of_milk; break;
-				case "peanuts": Emoji = Emoji_peanuts; break;
-				case "kiwifruit": Emoji = Emoji_kiwifruit; break;
-				case "pancakes": Emoji = Emoji_pancakes; break;
-				case "dumpling": Emoji = Emoji_dumpling; break;
-				case "fortune_cookie": Emoji = Emoji_fortune_cookie; break;
-				case "takeout_box": Emoji = Emoji_takeout_box; break;
-				case "chopsticks": Emoji = Emoji_chopsticks; break;
-				case "bowl_with_spoon": Emoji = Emoji_bowl_with_spoon; break;
-				case "cup_with_straw": Emoji = Emoji_cup_with_straw; break;
-				case "coconut": Emoji = Emoji_coconut; break;
-				case "broccoli": Emoji = Emoji_broccoli; break;
-				case "pie": Emoji = Emoji_pie; break;
-				case "pretzel": Emoji = Emoji_pretzel; break;
-				case "cut_of_meat": Emoji = Emoji_cut_of_meat; break;
-				case "sandwich": Emoji = Emoji_sandwich; break;
-				case "canned_food": Emoji = Emoji_canned_food; break;
-				case "leafy_green": Emoji = Emoji_leafy_green; break;
-				case "mango": Emoji = Emoji_mango; break;
-				case "moon_cake": Emoji = Emoji_moon_cake; break;
-				case "bagel": Emoji = Emoji_bagel; break;
-				case "smiling_face_with_3_hearts": Emoji = Emoji_smiling_face_with_3_hearts; break;
-				case "yawning_face": Emoji = Emoji_yawning_face; break;
-				case "smiling_face_with_tear": Emoji = Emoji_smiling_face_with_tear; break;
-				case "partying_face": Emoji = Emoji_partying_face; break;
-				case "woozy_face": Emoji = Emoji_woozy_face; break;
-				case "hot_face": Emoji = Emoji_hot_face; break;
-				case "cold_face": Emoji = Emoji_cold_face; break;
-				case "ninja": Emoji = Emoji_ninja; break;
-				case "disguised_face": Emoji = Emoji_disguised_face; break;
-				case "pleading_face": Emoji = Emoji_pleading_face; break;
-				case "sari": Emoji = Emoji_sari; break;
-				case "lab_coat": Emoji = Emoji_lab_coat; break;
-				case "goggles": Emoji = Emoji_goggles; break;
-				case "hiking_boot": Emoji = Emoji_hiking_boot; break;
-				case "womans_flat_shoe": Emoji = Emoji_womans_flat_shoe; break;
 				case "crab": Emoji = Emoji_crab; break;
 				case "lion_face": Emoji = Emoji_lion_face; break;
 				case "scorpion": Emoji = Emoji_scorpion; break;
 				case "turkey": Emoji = Emoji_turkey; break;
 				case "unicorn_face": Emoji = Emoji_unicorn_face; break;
-				case "eagle": Emoji = Emoji_eagle; break;
-				case "duck": Emoji = Emoji_duck; break;
-				case "bat": Emoji = Emoji_bat; break;
-				case "shark": Emoji = Emoji_shark; break;
-				case "owl": Emoji = Emoji_owl; break;
-				case "fox_face": Emoji = Emoji_fox_face; break;
-				case "butterfly": Emoji = Emoji_butterfly; break;
-				case "deer": Emoji = Emoji_deer; break;
-				case "gorilla": Emoji = Emoji_gorilla; break;
-				case "lizard": Emoji = Emoji_lizard; break;
-				case "rhinoceros": Emoji = Emoji_rhinoceros; break;
-				case "shrimp": Emoji = Emoji_shrimp; break;
-				case "squid": Emoji = Emoji_squid; break;
-				case "giraffe_face": Emoji = Emoji_giraffe_face; break;
-				case "zebra_face": Emoji = Emoji_zebra_face; break;
-				case "hedgehog": Emoji = Emoji_hedgehog; break;
-				case "sauropod": Emoji = Emoji_sauropod; break;
-				case "t-rex": Emoji = Emoji_t_rex; break;
-				case "cricket": Emoji = Emoji_cricket; break;
-				case "kangaroo": Emoji = Emoji_kangaroo; break;
-				case "llama": Emoji = Emoji_llama; break;
-				case "peacock": Emoji = Emoji_peacock; break;
-				case "hippopotamus": Emoji = Emoji_hippopotamus; break;
-				case "parrot": Emoji = Emoji_parrot; break;
-				case "raccoon": Emoji = Emoji_raccoon; break;
-				case "lobster": Emoji = Emoji_lobster; break;
-				case "mosquito": Emoji = Emoji_mosquito; break;
-				case "microbe": Emoji = Emoji_microbe; break;
-				case "badger": Emoji = Emoji_badger; break;
-				case "swan": Emoji = Emoji_swan; break;
-				case "mammoth": Emoji = Emoji_mammoth; break;
-				case "dodo": Emoji = Emoji_dodo; break;
-				case "sloth": Emoji = Emoji_sloth; break;
-				case "otter": Emoji = Emoji_otter; break;
-				case "orangutan": Emoji = Emoji_orangutan; break;
-				case "skunk": Emoji = Emoji_skunk; break;
-				case "flamingo": Emoji = Emoji_flamingo; break;
-				case "oyster": Emoji = Emoji_oyster; break;
-				case "beaver": Emoji = Emoji_beaver; break;
-				case "bison": Emoji = Emoji_bison; break;
-				case "seal": Emoji = Emoji_seal; break;
-				case "guide_dog": Emoji = Emoji_guide_dog; break;
-				case "probing_cane": Emoji = Emoji_probing_cane; break;
-				case "bone": Emoji = Emoji_bone; break;
-				case "leg": Emoji = Emoji_leg; break;
-				case "foot": Emoji = Emoji_foot; break;
-				case "tooth": Emoji = Emoji_tooth; break;
-				case "female_superhero": Emoji = Emoji_female_superhero; break;
-				case "male_superhero": Emoji = Emoji_male_superhero; break;
-				case "superhero": Emoji = Emoji_superhero; break;
-				case "female_supervillain": Emoji = Emoji_female_supervillain; break;
-				case "male_supervillain": Emoji = Emoji_male_supervillain; break;
-				case "supervillain": Emoji = Emoji_supervillain; break;
-				case "safety_vest": Emoji = Emoji_safety_vest; break;
-				case "ear_with_hearing_aid": Emoji = Emoji_ear_with_hearing_aid; break;
-				case "motorized_wheelchair": Emoji = Emoji_motorized_wheelchair; break;
-				case "manual_wheelchair": Emoji = Emoji_manual_wheelchair; break;
-				case "mechanical_arm": Emoji = Emoji_mechanical_arm; break;
-				case "mechanical_leg": Emoji = Emoji_mechanical_leg; break;
 				case "cheese_wedge": Emoji = Emoji_cheese_wedge; break;
-				case "cupcake": Emoji = Emoji_cupcake; break;
-				case "salt": Emoji = Emoji_salt; break;
-				case "beverage_box": Emoji = Emoji_beverage_box; break;
-				case "garlic": Emoji = Emoji_garlic; break;
-				case "onion": Emoji = Emoji_onion; break;
-				case "falafel": Emoji = Emoji_falafel; break;
-				case "waffle": Emoji = Emoji_waffle; break;
-				case "butter": Emoji = Emoji_butter; break;
-				case "mate_drink": Emoji = Emoji_mate_drink; break;
-				case "ice_cube": Emoji = Emoji_ice_cube; break;
-				case "bubble_tea": Emoji = Emoji_bubble_tea; break;
-				case "woman_standing": Emoji = Emoji_woman_standing; break;
-				case "man_standing": Emoji = Emoji_man_standing; break;
-				case "standing_person": Emoji = Emoji_standing_person; break;
-				case "woman_kneeling": Emoji = Emoji_woman_kneeling; break;
-				case "man_kneeling": Emoji = Emoji_man_kneeling; break;
-				case "kneeling_person": Emoji = Emoji_kneeling_person; break;
-				case "deaf_woman": Emoji = Emoji_deaf_woman; break;
-				case "deaf_man": Emoji = Emoji_deaf_man; break;
-				case "deaf_person": Emoji = Emoji_deaf_person; break;
-				case "face_with_monocle": Emoji = Emoji_face_with_monocle; break;
-				case "farmer": Emoji = Emoji_farmer; break;
-				case "cook": Emoji = Emoji_cook; break;
-				case "person_feeding_baby": Emoji = Emoji_person_feeding_baby; break;
-				case "mx_claus": Emoji = Emoji_mx_claus; break;
-				case "student": Emoji = Emoji_student; break;
-				case "singer": Emoji = Emoji_singer; break;
-				case "artist": Emoji = Emoji_artist; break;
-				case "teacher": Emoji = Emoji_teacher; break;
-				case "factory_worker": Emoji = Emoji_factory_worker; break;
-				case "technologist": Emoji = Emoji_technologist; break;
-				case "office_worker": Emoji = Emoji_office_worker; break;
-				case "mechanic": Emoji = Emoji_mechanic; break;
-				case "scientist": Emoji = Emoji_scientist; break;
-				case "astronaut": Emoji = Emoji_astronaut; break;
-				case "firefighter": Emoji = Emoji_firefighter; break;
-				case "people_holding_hands": Emoji = Emoji_people_holding_hands; break;
-				case "person_with_probing_cane": Emoji = Emoji_person_with_probing_cane; break;
-				case "red_haired_person": Emoji = Emoji_red_haired_person; break;
-				case "curly_haired_person": Emoji = Emoji_curly_haired_person; break;
-				case "bald_person": Emoji = Emoji_bald_person; break;
-				case "white_haired_person": Emoji = Emoji_white_haired_person; break;
-				case "person_in_motorized_wheelchair": Emoji = Emoji_person_in_motorized_wheelchair; break;
-				case "person_in_manual_wheelchair": Emoji = Emoji_person_in_manual_wheelchair; break;
-				case "health_worker": Emoji = Emoji_health_worker; break;
-				case "judge": Emoji = Emoji_judge; break;
-				case "pilot": Emoji = Emoji_pilot; break;
-				case "adult": Emoji = Emoji_adult; break;
-				case "child": Emoji = Emoji_child; break;
-				case "older_adult": Emoji = Emoji_older_adult; break;
-				case "bearded_person": Emoji = Emoji_bearded_person; break;
-				case "person_with_headscarf": Emoji = Emoji_person_with_headscarf; break;
-				case "woman_in_steamy_room": Emoji = Emoji_woman_in_steamy_room; break;
-				case "man_in_steamy_room": Emoji = Emoji_man_in_steamy_room; break;
-				case "person_in_steamy_room": Emoji = Emoji_person_in_steamy_room; break;
-				case "woman_climbing": Emoji = Emoji_woman_climbing; break;
-				case "man_climbing": Emoji = Emoji_man_climbing; break;
-				case "person_climbing": Emoji = Emoji_person_climbing; break;
-				case "woman_in_lotus_position": Emoji = Emoji_woman_in_lotus_position; break;
-				case "man_in_lotus_position": Emoji = Emoji_man_in_lotus_position; break;
-				case "person_in_lotus_position": Emoji = Emoji_person_in_lotus_position; break;
-				case "female_mage": Emoji = Emoji_female_mage; break;
-				case "male_mage": Emoji = Emoji_male_mage; break;
-				case "mage": Emoji = Emoji_mage; break;
-				case "female_fairy": Emoji = Emoji_female_fairy; break;
-				case "male_fairy": Emoji = Emoji_male_fairy; break;
-				case "fairy": Emoji = Emoji_fairy; break;
-				case "female_vampire": Emoji = Emoji_female_vampire; break;
-				case "male_vampire": Emoji = Emoji_male_vampire; break;
-				case "vampire": Emoji = Emoji_vampire; break;
-				case "mermaid": Emoji = Emoji_mermaid; break;
-				case "merman": Emoji = Emoji_merman; break;
-				case "merperson": Emoji = Emoji_merperson; break;
-				case "female_elf": Emoji = Emoji_female_elf; break;
-				case "male_elf": Emoji = Emoji_male_elf; break;
-				case "elf": Emoji = Emoji_elf; break;
-				case "female_genie": Emoji = Emoji_female_genie; break;
-				case "male_genie": Emoji = Emoji_male_genie; break;
-				case "genie": Emoji = Emoji_genie; break;
-				case "female_zombie": Emoji = Emoji_female_zombie; break;
-				case "male_zombie": Emoji = Emoji_male_zombie; break;
-				case "zombie": Emoji = Emoji_zombie; break;
-				case "brain": Emoji = Emoji_brain; break;
-				case "orange_heart": Emoji = Emoji_orange_heart; break;
-				case "billed_cap": Emoji = Emoji_billed_cap; break;
-				case "scarf": Emoji = Emoji_scarf; break;
-				case "gloves": Emoji = Emoji_gloves; break;
-				case "coat": Emoji = Emoji_coat; break;
-				case "socks": Emoji = Emoji_socks; break;
-				case "red_envelope": Emoji = Emoji_red_envelope; break;
-				case "firecracker": Emoji = Emoji_firecracker; break;
-				case "jigsaw": Emoji = Emoji_jigsaw; break;
-				case "test_tube": Emoji = Emoji_test_tube; break;
-				case "petri_dish": Emoji = Emoji_petri_dish; break;
-				case "dna": Emoji = Emoji_dna; break;
-				case "compass": Emoji = Emoji_compass; break;
-				case "abacus": Emoji = Emoji_abacus; break;
-				case "fire_extinguisher": Emoji = Emoji_fire_extinguisher; break;
-				case "toolbox": Emoji = Emoji_toolbox; break;
-				case "bricks": Emoji = Emoji_bricks; break;
-				case "magnet": Emoji = Emoji_magnet; break;
-				case "luggage": Emoji = Emoji_luggage; break;
-				case "lotion_bottle": Emoji = Emoji_lotion_bottle; break;
-				case "thread": Emoji = Emoji_thread; break;
-				case "yarn": Emoji = Emoji_yarn; break;
-				case "safety_pin": Emoji = Emoji_safety_pin; break;
-				case "teddy_bear": Emoji = Emoji_teddy_bear; break;
-				case "broom": Emoji = Emoji_broom; break;
-				case "basket": Emoji = Emoji_basket; break;
-				case "roll_of_paper": Emoji = Emoji_roll_of_paper; break;
-				case "soap": Emoji = Emoji_soap; break;
-				case "sponge": Emoji = Emoji_sponge; break;
-				case "receipt": Emoji = Emoji_receipt; break;
-				case "nazar_amulet": Emoji = Emoji_nazar_amulet; break;
-				case "ballet_shoes": Emoji = Emoji_ballet_shoes; break;
-				case "one-piece_swimsuit": Emoji = Emoji_one_piece_swimsuit; break;
-				case "briefs": Emoji = Emoji_briefs; break;
-				case "shorts": Emoji = Emoji_shorts; break;
-				case "thong_sandal": Emoji = Emoji_thong_sandal; break;
-				case "drop_of_blood": Emoji = Emoji_drop_of_blood; break;
-				case "adhesive_bandage": Emoji = Emoji_adhesive_bandage; break;
-				case "stethoscope": Emoji = Emoji_stethoscope; break;
-				case "yo-yo": Emoji = Emoji_yo_yo; break;
-				case "kite": Emoji = Emoji_kite; break;
-				case "parachute": Emoji = Emoji_parachute; break;
-				case "boomerang": Emoji = Emoji_boomerang; break;
-				case "magic_wand": Emoji = Emoji_magic_wand; break;
-				case "pinata": Emoji = Emoji_pinata; break;
-				case "nesting_dolls": Emoji = Emoji_nesting_dolls; break;
-				case "ringed_planet": Emoji = Emoji_ringed_planet; break;
-				case "chair": Emoji = Emoji_chair; break;
-				case "razor": Emoji = Emoji_razor; break;
-				case "axe": Emoji = Emoji_axe; break;
-				case "diya_lamp": Emoji = Emoji_diya_lamp; break;
-				case "banjo": Emoji = Emoji_banjo; break;
-				case "military_helmet": Emoji = Emoji_military_helmet; break;
-				case "accordion": Emoji = Emoji_accordion; break;
-				case "long_drum": Emoji = Emoji_long_drum; break;
-				case "coin": Emoji = Emoji_coin; break;
-				case "carpentry_saw": Emoji = Emoji_carpentry_saw; break;
-				case "screwdriver": Emoji = Emoji_screwdriver; break;
-				case "ladder": Emoji = Emoji_ladder; break;
-				case "hook": Emoji = Emoji_hook; break;
-				case "mirror": Emoji = Emoji_mirror; break;
-				case "window": Emoji = Emoji_window; break;
-				case "plunger": Emoji = Emoji_plunger; break;
-				case "sewing_needle": Emoji = Emoji_sewing_needle; break;
-				case "knot": Emoji = Emoji_knot; break;
-				case "bucket": Emoji = Emoji_bucket; break;
-				case "mouse_trap": Emoji = Emoji_mouse_trap; break;
-				case "toothbrush": Emoji = Emoji_toothbrush; break;
-				case "headstone": Emoji = Emoji_headstone; break;
-				case "placard": Emoji = Emoji_placard; break;
-				case "rock": Emoji = Emoji_rock; break;
-				case "fly": Emoji = Emoji_fly; break;
-				case "worm": Emoji = Emoji_worm; break;
-				case "cockroach": Emoji = Emoji_cockroach; break;
-				case "potted_plant": Emoji = Emoji_potted_plant; break;
-				case "wood": Emoji = Emoji_wood; break;
-				case "feather": Emoji = Emoji_feather; break;
-				case "anatomical_heart": Emoji = Emoji_anatomical_heart; break;
-				case "lungs": Emoji = Emoji_lungs; break;
-				case "people_hugging": Emoji = Emoji_people_hugging; break;
-				case "blueberries": Emoji = Emoji_blueberries; break;
-				case "bell_pepper": Emoji = Emoji_bell_pepper; break;
-				case "olive": Emoji = Emoji_olive; break;
-				case "flatbread": Emoji = Emoji_flatbread; break;
-				case "tamale": Emoji = Emoji_tamale; break;
-				case "fondue": Emoji = Emoji_fondue; break;
-				case "teapot": Emoji = Emoji_teapot; break;
-				case "bangbang": Emoji = Emoji_bangbang; break;
-				case "interrobang": Emoji = Emoji_interrobang; break;
-				case "tm": Emoji = Emoji_tm; break;
-				case "information_source": Emoji = Emoji_information_source; break;
-				case "left_right_arrow": Emoji = Emoji_left_right_arrow; break;
-				case "arrow_up_down": Emoji = Emoji_arrow_up_down; break;
-				case "arrow_upper_left": Emoji = Emoji_arrow_upper_left; break;
-				case "arrow_upper_right": Emoji = Emoji_arrow_upper_right; break;
-				case "arrow_lower_right": Emoji = Emoji_arrow_lower_right; break;
-				case "arrow_lower_left": Emoji = Emoji_arrow_lower_left; break;
-				case "leftwards_arrow_with_hook": Emoji = Emoji_leftwards_arrow_with_hook; break;
-				case "arrow_right_hook": Emoji = Emoji_arrow_right_hook; break;
-				case "watch": Emoji = Emoji_watch; break;
-				case "hourglass": Emoji = Emoji_hourglass; break;
-				case "keyboard": Emoji = Emoji_keyboard; break;
-				case "eject": Emoji = Emoji_eject; break;
-				case "fast_forward": Emoji = Emoji_fast_forward; break;
-				case "rewind": Emoji = Emoji_rewind; break;
-				case "arrow_double_up": Emoji = Emoji_arrow_double_up; break;
-				case "arrow_double_down": Emoji = Emoji_arrow_double_down; break;
-				case "black_right_pointing_double_triangle_with_vertical_bar": Emoji = Emoji_black_right_pointing_double_triangle_with_vertical_bar; break;
-				case "black_left_pointing_double_triangle_with_vertical_bar": Emoji = Emoji_black_left_pointing_double_triangle_with_vertical_bar; break;
-				case "black_right_pointing_triangle_with_double_vertical_bar": Emoji = Emoji_black_right_pointing_triangle_with_double_vertical_bar; break;
-				case "alarm_clock": Emoji = Emoji_alarm_clock; break;
-				case "stopwatch": Emoji = Emoji_stopwatch; break;
-				case "timer_clock": Emoji = Emoji_timer_clock; break;
-				case "hourglass_flowing_sand": Emoji = Emoji_hourglass_flowing_sand; break;
-				case "double_vertical_bar": Emoji = Emoji_double_vertical_bar; break;
-				case "black_square_for_stop": Emoji = Emoji_black_square_for_stop; break;
-				case "black_circle_for_record": Emoji = Emoji_black_circle_for_record; break;
-				case "m": Emoji = Emoji_m; break;
-				case "black_small_square": Emoji = Emoji_black_small_square; break;
-				case "white_small_square": Emoji = Emoji_white_small_square; break;
-				case "arrow_forward": Emoji = Emoji_arrow_forward; break;
-				case "arrow_backward": Emoji = Emoji_arrow_backward; break;
-				case "white_medium_square": Emoji = Emoji_white_medium_square; break;
-				case "black_medium_square": Emoji = Emoji_black_medium_square; break;
-				case "white_medium_small_square": Emoji = Emoji_white_medium_small_square; break;
-				case "black_medium_small_square": Emoji = Emoji_black_medium_small_square; break;
-				case "sunny": Emoji = Emoji_sunny; break;
-				case "cloud": Emoji = Emoji_cloud; break;
-				case "umbrella": Emoji = Emoji_umbrella; break;
-				case "snowman": Emoji = Emoji_snowman; break;
-				case "comet": Emoji = Emoji_comet; break;
-				case "phone": Emoji = Emoji_phone; break;
-				case "ballot_box_with_check": Emoji = Emoji_ballot_box_with_check; break;
-				case "umbrella_with_rain_drops": Emoji = Emoji_umbrella_with_rain_drops; break;
-				case "coffee": Emoji = Emoji_coffee; break;
-				case "shamrock": Emoji = Emoji_shamrock; break;
-				case "point_up": Emoji = Emoji_point_up; break;
-				case "skull_and_crossbones": Emoji = Emoji_skull_and_crossbones; break;
-				case "radioactive_sign": Emoji = Emoji_radioactive_sign; break;
-				case "biohazard_sign": Emoji = Emoji_biohazard_sign; break;
-				case "orthodox_cross": Emoji = Emoji_orthodox_cross; break;
-				case "star_and_crescent": Emoji = Emoji_star_and_crescent; break;
-				case "peace_symbol": Emoji = Emoji_peace_symbol; break;
-				case "yin_yang": Emoji = Emoji_yin_yang; break;
-				case "wheel_of_dharma": Emoji = Emoji_wheel_of_dharma; break;
-				case "white_frowning_face": Emoji = Emoji_white_frowning_face; break;
-				case "relaxed": Emoji = Emoji_relaxed; break;
-				case "female_sign": Emoji = Emoji_female_sign; break;
-				case "male_sign": Emoji = Emoji_male_sign; break;
-				case "aries": Emoji = Emoji_aries; break;
-				case "taurus": Emoji = Emoji_taurus; break;
-				case "gemini": Emoji = Emoji_gemini; break;
-				case "cancer": Emoji = Emoji_cancer; break;
-				case "leo": Emoji = Emoji_leo; break;
-				case "virgo": Emoji = Emoji_virgo; break;
-				case "libra": Emoji = Emoji_libra; break;
-				case "scorpius": Emoji = Emoji_scorpius; break;
-				case "sagittarius": Emoji = Emoji_sagittarius; break;
-				case "capricorn": Emoji = Emoji_capricorn; break;
-				case "aquarius": Emoji = Emoji_aquarius; break;
-				case "pisces": Emoji = Emoji_pisces; break;
-				case "chess_pawn": Emoji = Emoji_chess_pawn; break;
-				case "spades": Emoji = Emoji_spades; break;
-				case "clubs": Emoji = Emoji_clubs; break;
-				case "hearts": Emoji = Emoji_hearts; break;
-				case "diamonds": Emoji = Emoji_diamonds; break;
-				case "hotsprings": Emoji = Emoji_hotsprings; break;
-				case "recycle": Emoji = Emoji_recycle; break;
-				case "infinity": Emoji = Emoji_infinity; break;
-				case "wheelchair": Emoji = Emoji_wheelchair; break;
-				case "hammer_and_pick": Emoji = Emoji_hammer_and_pick; break;
-				case "anchor": Emoji = Emoji_anchor; break;
-				case "crossed_swords": Emoji = Emoji_crossed_swords; break;
-				case "medical_symbol": Emoji = Emoji_medical_symbol; break;
-				case "scales": Emoji = Emoji_scales; break;
-				case "alembic": Emoji = Emoji_alembic; break;
-				case "gear": Emoji = Emoji_gear; break;
-				case "atom_symbol": Emoji = Emoji_atom_symbol; break;
-				case "fleur_de_lis": Emoji = Emoji_fleur_de_lis; break;
-				case "warning": Emoji = Emoji_warning; break;
-				case "zap": Emoji = Emoji_zap; break;
-				case "transgender_symbol": Emoji = Emoji_transgender_symbol; break;
-				case "white_circle": Emoji = Emoji_white_circle; break;
-				case "black_circle": Emoji = Emoji_black_circle; break;
-				case "coffin": Emoji = Emoji_coffin; break;
-				case "funeral_urn": Emoji = Emoji_funeral_urn; break;
-				case "soccer": Emoji = Emoji_soccer; break;
-				case "baseball": Emoji = Emoji_baseball; break;
-				case "snowman_without_snow": Emoji = Emoji_snowman_without_snow; break;
-				case "partly_sunny": Emoji = Emoji_partly_sunny; break;
-				case "thunder_cloud_and_rain": Emoji = Emoji_thunder_cloud_and_rain; break;
-				case "ophiuchus": Emoji = Emoji_ophiuchus; break;
-				case "pick": Emoji = Emoji_pick; break;
-				case "helmet_with_white_cross": Emoji = Emoji_helmet_with_white_cross; break;
-				case "chains": Emoji = Emoji_chains; break;
-				case "no_entry": Emoji = Emoji_no_entry; break;
-				case "shinto_shrine": Emoji = Emoji_shinto_shrine; break;
-				case "church": Emoji = Emoji_church; break;
-				case "mountain": Emoji = Emoji_mountain; break;
-				case "umbrella_on_ground": Emoji = Emoji_umbrella_on_ground; break;
-				case "fountain": Emoji = Emoji_fountain; break;
-				case "golf": Emoji = Emoji_golf; break;
-				case "ferry": Emoji = Emoji_ferry; break;
-				case "boat": Emoji = Emoji_boat; break;
-				case "skier": Emoji = Emoji_skier; break;
-				case "ice_skate": Emoji = Emoji_ice_skate; break;
-				case "woman-bouncing-ball": Emoji = Emoji_woman_bouncing_ball; break;
-				case "man-bouncing-ball": Emoji = Emoji_man_bouncing_ball; break;
-				case "person_with_ball": Emoji = Emoji_person_with_ball; break;
-				case "tent": Emoji = Emoji_tent; break;
-				case "fuelpump": Emoji = Emoji_fuelpump; break;
-				case "scissors": Emoji = Emoji_scissors; break;
-				case "white_check_mark": Emoji = Emoji_white_check_mark; break;
-				case "airplane": Emoji = Emoji_airplane; break;
-				case "email": Emoji = Emoji_email; break;
-				case "fist": Emoji = Emoji_fist; break;
-				case "hand": Emoji = Emoji_hand; break;
-				case "v": Emoji = Emoji_v; break;
-				case "writing_hand": Emoji = Emoji_writing_hand; break;
-				case "pencil2": Emoji = Emoji_pencil2; break;
-				case "black_nib": Emoji = Emoji_black_nib; break;
-				case "heavy_check_mark": Emoji = Emoji_heavy_check_mark; break;
-				case "heavy_multiplication_x": Emoji = Emoji_heavy_multiplication_x; break;
-				case "latin_cross": Emoji = Emoji_latin_cross; break;
-				case "star_of_david": Emoji = Emoji_star_of_david; break;
-				case "sparkles": Emoji = Emoji_sparkles; break;
-				case "eight_spoked_asterisk": Emoji = Emoji_eight_spoked_asterisk; break;
-				case "eight_pointed_black_star": Emoji = Emoji_eight_pointed_black_star; break;
-				case "snowflake": Emoji = Emoji_snowflake; break;
-				case "sparkle": Emoji = Emoji_sparkle; break;
-				case "x": Emoji = Emoji_x; break;
-				case "negative_squared_cross_mark": Emoji = Emoji_negative_squared_cross_mark; break;
-				case "question": Emoji = Emoji_question; break;
-				case "grey_question": Emoji = Emoji_grey_question; break;
-				case "grey_exclamation": Emoji = Emoji_grey_exclamation; break;
-				case "exclamation": Emoji = Emoji_exclamation; break;
-				case "heavy_heart_exclamation_mark_ornament": Emoji = Emoji_heavy_heart_exclamation_mark_ornament; break;
-				case "heart": Emoji = Emoji_heart; break;
-				case "heavy_plus_sign": Emoji = Emoji_heavy_plus_sign; break;
-				case "heavy_minus_sign": Emoji = Emoji_heavy_minus_sign; break;
-				case "heavy_division_sign": Emoji = Emoji_heavy_division_sign; break;
-				case "arrow_right": Emoji = Emoji_arrow_right; break;
-				case "curly_loop": Emoji = Emoji_curly_loop; break;
-				case "loop": Emoji = Emoji_loop; break;
-				case "arrow_heading_up": Emoji = Emoji_arrow_heading_up; break;
-				case "arrow_heading_down": Emoji = Emoji_arrow_heading_down; break;
-				case "arrow_left": Emoji = Emoji_arrow_left; break;
-				case "arrow_up": Emoji = Emoji_arrow_up; break;
-				case "arrow_down": Emoji = Emoji_arrow_down; break;
-				case "black_large_square": Emoji = Emoji_black_large_square; break;
-				case "white_large_square": Emoji = Emoji_white_large_square; break;
-				case "star": Emoji = Emoji_star; break;
-				case "o": Emoji = Emoji_o; break;
-				case "wavy_dash": Emoji = Emoji_wavy_dash; break;
-				case "part_alternation_mark": Emoji = Emoji_part_alternation_mark; break;
-				case "congratulations": Emoji = Emoji_congratulations; break;
-				case "secret": Emoji = Emoji_secret; break;
+				case "hash": Emoji = Emoji_hash; break;
+				case "keycap_star": Emoji = Emoji_keycap_star; break;
+				case "zero": Emoji = Emoji_zero; break;
+				case "one": Emoji = Emoji_one; break;
+				case "two": Emoji = Emoji_two; break;
+				case "three": Emoji = Emoji_three; break;
+				case "four": Emoji = Emoji_four; break;
+				case "five": Emoji = Emoji_five; break;
+				case "six": Emoji = Emoji_six; break;
+				case "seven": Emoji = Emoji_seven; break;
+				case "eight": Emoji = Emoji_eight; break;
+				case "nine": Emoji = Emoji_nine; break;
+				case "flag-ac": Emoji = Emoji_flag_ac; break;
+				case "flag-ad": Emoji = Emoji_flag_ad; break;
+				case "flag-ae": Emoji = Emoji_flag_ae; break;
+				case "flag-af": Emoji = Emoji_flag_af; break;
+				case "flag-ag": Emoji = Emoji_flag_ag; break;
+				case "flag-ai": Emoji = Emoji_flag_ai; break;
+				case "flag-al": Emoji = Emoji_flag_al; break;
+				case "flag-am": Emoji = Emoji_flag_am; break;
+				case "flag-ao": Emoji = Emoji_flag_ao; break;
+				case "flag-aq": Emoji = Emoji_flag_aq; break;
+				case "flag-ar": Emoji = Emoji_flag_ar; break;
+				case "flag-as": Emoji = Emoji_flag_as; break;
+				case "flag-at": Emoji = Emoji_flag_at; break;
+				case "flag-au": Emoji = Emoji_flag_au; break;
+				case "flag-aw": Emoji = Emoji_flag_aw; break;
+				case "flag-ax": Emoji = Emoji_flag_ax; break;
+				case "flag-az": Emoji = Emoji_flag_az; break;
+				case "flag-ba": Emoji = Emoji_flag_ba; break;
+				case "flag-bb": Emoji = Emoji_flag_bb; break;
+				case "flag-bd": Emoji = Emoji_flag_bd; break;
+				case "flag-be": Emoji = Emoji_flag_be; break;
+				case "flag-bf": Emoji = Emoji_flag_bf; break;
+				case "flag-bg": Emoji = Emoji_flag_bg; break;
+				case "flag-bh": Emoji = Emoji_flag_bh; break;
+				case "flag-bi": Emoji = Emoji_flag_bi; break;
+				case "flag-bj": Emoji = Emoji_flag_bj; break;
+				case "flag-bl": Emoji = Emoji_flag_bl; break;
+				case "flag-bm": Emoji = Emoji_flag_bm; break;
+				case "flag-bn": Emoji = Emoji_flag_bn; break;
+				case "flag-bo": Emoji = Emoji_flag_bo; break;
+				case "flag-bq": Emoji = Emoji_flag_bq; break;
+				case "flag-br": Emoji = Emoji_flag_br; break;
+				case "flag-bs": Emoji = Emoji_flag_bs; break;
+				case "flag-bt": Emoji = Emoji_flag_bt; break;
+				case "flag-bv": Emoji = Emoji_flag_bv; break;
+				case "flag-bw": Emoji = Emoji_flag_bw; break;
+				case "flag-by": Emoji = Emoji_flag_by; break;
+				case "flag-bz": Emoji = Emoji_flag_bz; break;
+				case "flag-ca": Emoji = Emoji_flag_ca; break;
+				case "flag-cc": Emoji = Emoji_flag_cc; break;
+				case "flag-cd": Emoji = Emoji_flag_cd; break;
+				case "flag-cf": Emoji = Emoji_flag_cf; break;
+				case "flag-cg": Emoji = Emoji_flag_cg; break;
+				case "flag-ch": Emoji = Emoji_flag_ch; break;
+				case "flag-ci": Emoji = Emoji_flag_ci; break;
+				case "flag-ck": Emoji = Emoji_flag_ck; break;
+				case "flag-cl": Emoji = Emoji_flag_cl; break;
+				case "flag-cm": Emoji = Emoji_flag_cm; break;
+				case "flag-cn": Emoji = Emoji_flag_cn; break;
+				case "flag-co": Emoji = Emoji_flag_co; break;
+				case "flag-cp": Emoji = Emoji_flag_cp; break;
+				case "flag-cr": Emoji = Emoji_flag_cr; break;
+				case "flag-cu": Emoji = Emoji_flag_cu; break;
+				case "flag-cv": Emoji = Emoji_flag_cv; break;
+				case "flag-cw": Emoji = Emoji_flag_cw; break;
+				case "flag-cx": Emoji = Emoji_flag_cx; break;
+				case "flag-cy": Emoji = Emoji_flag_cy; break;
+				case "flag-cz": Emoji = Emoji_flag_cz; break;
+				case "flag-de": Emoji = Emoji_flag_de; break;
+				case "flag-dg": Emoji = Emoji_flag_dg; break;
+				case "flag-dj": Emoji = Emoji_flag_dj; break;
+				case "flag-dk": Emoji = Emoji_flag_dk; break;
+				case "flag-dm": Emoji = Emoji_flag_dm; break;
+				case "flag-do": Emoji = Emoji_flag_do; break;
+				case "flag-dz": Emoji = Emoji_flag_dz; break;
+				case "flag-ea": Emoji = Emoji_flag_ea; break;
+				case "flag-ec": Emoji = Emoji_flag_ec; break;
+				case "flag-ee": Emoji = Emoji_flag_ee; break;
+				case "flag-eg": Emoji = Emoji_flag_eg; break;
+				case "flag-eh": Emoji = Emoji_flag_eh; break;
+				case "flag-er": Emoji = Emoji_flag_er; break;
+				case "flag-es": Emoji = Emoji_flag_es; break;
+				case "flag-et": Emoji = Emoji_flag_et; break;
+				case "flag-eu": Emoji = Emoji_flag_eu; break;
+				case "flag-fi": Emoji = Emoji_flag_fi; break;
+				case "flag-fj": Emoji = Emoji_flag_fj; break;
+				case "flag-fk": Emoji = Emoji_flag_fk; break;
+				case "flag-fm": Emoji = Emoji_flag_fm; break;
+				case "flag-fo": Emoji = Emoji_flag_fo; break;
+				case "flag-fr": Emoji = Emoji_flag_fr; break;
+				case "flag-ga": Emoji = Emoji_flag_ga; break;
+				case "flag-gb": Emoji = Emoji_flag_gb; break;
+				case "flag-gd": Emoji = Emoji_flag_gd; break;
+				case "flag-ge": Emoji = Emoji_flag_ge; break;
+				case "flag-gf": Emoji = Emoji_flag_gf; break;
+				case "flag-gg": Emoji = Emoji_flag_gg; break;
+				case "flag-gh": Emoji = Emoji_flag_gh; break;
+				case "flag-gi": Emoji = Emoji_flag_gi; break;
+				case "flag-gl": Emoji = Emoji_flag_gl; break;
+				case "flag-gm": Emoji = Emoji_flag_gm; break;
+				case "flag-gn": Emoji = Emoji_flag_gn; break;
+				case "flag-gp": Emoji = Emoji_flag_gp; break;
+				case "flag-gq": Emoji = Emoji_flag_gq; break;
+				case "flag-gr": Emoji = Emoji_flag_gr; break;
+				case "flag-gs": Emoji = Emoji_flag_gs; break;
+				case "flag-gt": Emoji = Emoji_flag_gt; break;
+				case "flag-gu": Emoji = Emoji_flag_gu; break;
+				case "flag-gw": Emoji = Emoji_flag_gw; break;
+				case "flag-gy": Emoji = Emoji_flag_gy; break;
+				case "flag-hk": Emoji = Emoji_flag_hk; break;
+				case "flag-hm": Emoji = Emoji_flag_hm; break;
+				case "flag-hn": Emoji = Emoji_flag_hn; break;
+				case "flag-hr": Emoji = Emoji_flag_hr; break;
+				case "flag-ht": Emoji = Emoji_flag_ht; break;
+				case "flag-hu": Emoji = Emoji_flag_hu; break;
+				case "flag-ic": Emoji = Emoji_flag_ic; break;
+				case "flag-id": Emoji = Emoji_flag_id; break;
+				case "flag-ie": Emoji = Emoji_flag_ie; break;
+				case "flag-il": Emoji = Emoji_flag_il; break;
+				case "flag-im": Emoji = Emoji_flag_im; break;
+				case "flag-in": Emoji = Emoji_flag_in; break;
+				case "flag-io": Emoji = Emoji_flag_io; break;
+				case "flag-iq": Emoji = Emoji_flag_iq; break;
+				case "flag-ir": Emoji = Emoji_flag_ir; break;
+				case "flag-is": Emoji = Emoji_flag_is; break;
+				case "flag-it": Emoji = Emoji_flag_it; break;
+				case "flag-je": Emoji = Emoji_flag_je; break;
+				case "flag-jm": Emoji = Emoji_flag_jm; break;
+				case "flag-jo": Emoji = Emoji_flag_jo; break;
+				case "flag-jp": Emoji = Emoji_flag_jp; break;
+				case "flag-ke": Emoji = Emoji_flag_ke; break;
+				case "flag-kg": Emoji = Emoji_flag_kg; break;
+				case "flag-kh": Emoji = Emoji_flag_kh; break;
+				case "flag-ki": Emoji = Emoji_flag_ki; break;
+				case "flag-km": Emoji = Emoji_flag_km; break;
+				case "flag-kn": Emoji = Emoji_flag_kn; break;
+				case "flag-kp": Emoji = Emoji_flag_kp; break;
+				case "flag-kr": Emoji = Emoji_flag_kr; break;
+				case "flag-kw": Emoji = Emoji_flag_kw; break;
+				case "flag-ky": Emoji = Emoji_flag_ky; break;
+				case "flag-kz": Emoji = Emoji_flag_kz; break;
+				case "flag-la": Emoji = Emoji_flag_la; break;
+				case "flag-lb": Emoji = Emoji_flag_lb; break;
+				case "flag-lc": Emoji = Emoji_flag_lc; break;
+				case "flag-li": Emoji = Emoji_flag_li; break;
+				case "flag-lk": Emoji = Emoji_flag_lk; break;
+				case "flag-lr": Emoji = Emoji_flag_lr; break;
+				case "flag-ls": Emoji = Emoji_flag_ls; break;
+				case "flag-lt": Emoji = Emoji_flag_lt; break;
+				case "flag-lu": Emoji = Emoji_flag_lu; break;
+				case "flag-lv": Emoji = Emoji_flag_lv; break;
+				case "flag-ly": Emoji = Emoji_flag_ly; break;
+				case "flag-ma": Emoji = Emoji_flag_ma; break;
+				case "flag-mc": Emoji = Emoji_flag_mc; break;
+				case "flag-md": Emoji = Emoji_flag_md; break;
+				case "flag-me": Emoji = Emoji_flag_me; break;
+				case "flag-mf": Emoji = Emoji_flag_mf; break;
+				case "flag-mg": Emoji = Emoji_flag_mg; break;
+				case "flag-mh": Emoji = Emoji_flag_mh; break;
+				case "flag-mk": Emoji = Emoji_flag_mk; break;
+				case "flag-ml": Emoji = Emoji_flag_ml; break;
+				case "flag-mm": Emoji = Emoji_flag_mm; break;
+				case "flag-mn": Emoji = Emoji_flag_mn; break;
+				case "flag-mo": Emoji = Emoji_flag_mo; break;
+				case "flag-mp": Emoji = Emoji_flag_mp; break;
+				case "flag-mq": Emoji = Emoji_flag_mq; break;
+				case "flag-mr": Emoji = Emoji_flag_mr; break;
+				case "flag-ms": Emoji = Emoji_flag_ms; break;
+				case "flag-mt": Emoji = Emoji_flag_mt; break;
+				case "flag-mu": Emoji = Emoji_flag_mu; break;
+				case "flag-mv": Emoji = Emoji_flag_mv; break;
+				case "flag-mw": Emoji = Emoji_flag_mw; break;
+				case "flag-mx": Emoji = Emoji_flag_mx; break;
+				case "flag-my": Emoji = Emoji_flag_my; break;
+				case "flag-mz": Emoji = Emoji_flag_mz; break;
+				case "flag-na": Emoji = Emoji_flag_na; break;
+				case "flag-nc": Emoji = Emoji_flag_nc; break;
+				case "flag-ne": Emoji = Emoji_flag_ne; break;
+				case "flag-nf": Emoji = Emoji_flag_nf; break;
+				case "flag-ng": Emoji = Emoji_flag_ng; break;
+				case "flag-ni": Emoji = Emoji_flag_ni; break;
+				case "flag-nl": Emoji = Emoji_flag_nl; break;
+				case "flag-no": Emoji = Emoji_flag_no; break;
+				case "flag-np": Emoji = Emoji_flag_np; break;
+				case "flag-nr": Emoji = Emoji_flag_nr; break;
+				case "flag-nu": Emoji = Emoji_flag_nu; break;
+				case "flag-nz": Emoji = Emoji_flag_nz; break;
+				case "flag-om": Emoji = Emoji_flag_om; break;
+				case "flag-pa": Emoji = Emoji_flag_pa; break;
+				case "flag-pe": Emoji = Emoji_flag_pe; break;
+				case "flag-pf": Emoji = Emoji_flag_pf; break;
+				case "flag-pg": Emoji = Emoji_flag_pg; break;
+				case "flag-ph": Emoji = Emoji_flag_ph; break;
+				case "flag-pk": Emoji = Emoji_flag_pk; break;
+				case "flag-pl": Emoji = Emoji_flag_pl; break;
+				case "flag-pm": Emoji = Emoji_flag_pm; break;
+				case "flag-pn": Emoji = Emoji_flag_pn; break;
+				case "flag-pr": Emoji = Emoji_flag_pr; break;
+				case "flag-ps": Emoji = Emoji_flag_ps; break;
+				case "flag-pt": Emoji = Emoji_flag_pt; break;
+				case "flag-pw": Emoji = Emoji_flag_pw; break;
+				case "flag-py": Emoji = Emoji_flag_py; break;
+				case "flag-qa": Emoji = Emoji_flag_qa; break;
+				case "flag-re": Emoji = Emoji_flag_re; break;
+				case "flag-ro": Emoji = Emoji_flag_ro; break;
+				case "flag-rs": Emoji = Emoji_flag_rs; break;
+				case "flag-ru": Emoji = Emoji_flag_ru; break;
+				case "flag-rw": Emoji = Emoji_flag_rw; break;
+				case "flag-sa": Emoji = Emoji_flag_sa; break;
+				case "flag-sb": Emoji = Emoji_flag_sb; break;
+				case "flag-sc": Emoji = Emoji_flag_sc; break;
+				case "flag-sd": Emoji = Emoji_flag_sd; break;
+				case "flag-se": Emoji = Emoji_flag_se; break;
+				case "flag-sg": Emoji = Emoji_flag_sg; break;
+				case "flag-sh": Emoji = Emoji_flag_sh; break;
+				case "flag-si": Emoji = Emoji_flag_si; break;
+				case "flag-sj": Emoji = Emoji_flag_sj; break;
+				case "flag-sk": Emoji = Emoji_flag_sk; break;
+				case "flag-sl": Emoji = Emoji_flag_sl; break;
+				case "flag-sm": Emoji = Emoji_flag_sm; break;
+				case "flag-sn": Emoji = Emoji_flag_sn; break;
+				case "flag-so": Emoji = Emoji_flag_so; break;
+				case "flag-sr": Emoji = Emoji_flag_sr; break;
+				case "flag-ss": Emoji = Emoji_flag_ss; break;
+				case "flag-st": Emoji = Emoji_flag_st; break;
+				case "flag-sv": Emoji = Emoji_flag_sv; break;
+				case "flag-sx": Emoji = Emoji_flag_sx; break;
+				case "flag-sy": Emoji = Emoji_flag_sy; break;
+				case "flag-sz": Emoji = Emoji_flag_sz; break;
+				case "flag-ta": Emoji = Emoji_flag_ta; break;
+				case "flag-tc": Emoji = Emoji_flag_tc; break;
+				case "flag-td": Emoji = Emoji_flag_td; break;
+				case "flag-tf": Emoji = Emoji_flag_tf; break;
+				case "flag-tg": Emoji = Emoji_flag_tg; break;
+				case "flag-th": Emoji = Emoji_flag_th; break;
+				case "flag-tj": Emoji = Emoji_flag_tj; break;
+				case "flag-tk": Emoji = Emoji_flag_tk; break;
+				case "flag-tl": Emoji = Emoji_flag_tl; break;
+				case "flag-tm": Emoji = Emoji_flag_tm; break;
+				case "flag-tn": Emoji = Emoji_flag_tn; break;
+				case "flag-to": Emoji = Emoji_flag_to; break;
+				case "flag-tr": Emoji = Emoji_flag_tr; break;
+				case "flag-tt": Emoji = Emoji_flag_tt; break;
+				case "flag-tv": Emoji = Emoji_flag_tv; break;
+				case "flag-tw": Emoji = Emoji_flag_tw; break;
+				case "flag-tz": Emoji = Emoji_flag_tz; break;
+				case "flag-ua": Emoji = Emoji_flag_ua; break;
+				case "flag-ug": Emoji = Emoji_flag_ug; break;
+				case "flag-um": Emoji = Emoji_flag_um; break;
+				case "flag-us": Emoji = Emoji_flag_us; break;
+				case "flag-uy": Emoji = Emoji_flag_uy; break;
+				case "flag-uz": Emoji = Emoji_flag_uz; break;
+				case "flag-va": Emoji = Emoji_flag_va; break;
+				case "flag-vc": Emoji = Emoji_flag_vc; break;
+				case "flag-ve": Emoji = Emoji_flag_ve; break;
+				case "flag-vg": Emoji = Emoji_flag_vg; break;
+				case "flag-vi": Emoji = Emoji_flag_vi; break;
+				case "flag-vn": Emoji = Emoji_flag_vn; break;
+				case "flag-vu": Emoji = Emoji_flag_vu; break;
+				case "flag-wf": Emoji = Emoji_flag_wf; break;
+				case "flag-ws": Emoji = Emoji_flag_ws; break;
+				case "flag-xk": Emoji = Emoji_flag_xk; break;
+				case "flag-ye": Emoji = Emoji_flag_ye; break;
+				case "flag-yt": Emoji = Emoji_flag_yt; break;
+				case "flag-za": Emoji = Emoji_flag_za; break;
+				case "flag-zm": Emoji = Emoji_flag_zm; break;
+				case "flag-zw": Emoji = Emoji_flag_zw; break;
+				case "man-man-boy": Emoji = Emoji_man_man_boy; break;
+				case "man-man-boy-boy": Emoji = Emoji_man_man_boy_boy; break;
+				case "man-man-girl": Emoji = Emoji_man_man_girl; break;
+				case "man-man-girl-boy": Emoji = Emoji_man_man_girl_boy; break;
+				case "man-man-girl-girl": Emoji = Emoji_man_man_girl_girl; break;
+				case "man-woman-boy-boy": Emoji = Emoji_man_woman_boy_boy; break;
+				case "man-woman-girl": Emoji = Emoji_man_woman_girl; break;
+				case "man-woman-girl-boy": Emoji = Emoji_man_woman_girl_boy; break;
+				case "man-woman-girl-girl": Emoji = Emoji_man_woman_girl_girl; break;
+				case "man-heart-man": Emoji = Emoji_man_heart_man; break;
+				case "man-kiss-man": Emoji = Emoji_man_kiss_man; break;
+				case "woman-woman-boy": Emoji = Emoji_woman_woman_boy; break;
+				case "woman-woman-boy-boy": Emoji = Emoji_woman_woman_boy_boy; break;
+				case "woman-woman-girl": Emoji = Emoji_woman_woman_girl; break;
+				case "woman-woman-girl-boy": Emoji = Emoji_woman_woman_girl_boy; break;
+				case "woman-woman-girl-girl": Emoji = Emoji_woman_woman_girl_girl; break;
+				case "woman-heart-woman": Emoji = Emoji_woman_heart_woman; break;
+				case "woman-kiss-woman": Emoji = Emoji_woman_kiss_woman; break;
 			}
 
-			return (Emoji != null);
+			return (!(Emoji is null));
 		}
 
 		/// <summary>
-		/// :hash: #️⃣ hash key
+		/// :copyright: © copyright sign
 		/// </summary>
-		public static readonly EmojiInfo Emoji_hash = new EmojiInfo("hash", "0023-fe0f-20e3.png", "hash key", "#️⃣", true, true, true, false);
+		public static readonly EmojiInfo Emoji_copyright = new EmojiInfo("copyright", "00a9.png", "copyright sign", "©", true, true, false, true);
 
 		/// <summary>
-		/// :keycap_star: *️⃣ 
+		/// :registered: ® registered sign
 		/// </summary>
-		public static readonly EmojiInfo Emoji_keycap_star = new EmojiInfo("keycap_star", "002a-fe0f-20e3.png", "", "*️⃣", true, true, true, false);
+		public static readonly EmojiInfo Emoji_registered = new EmojiInfo("registered", "00ae.png", "registered sign", "®", true, true, false, true);
 
 		/// <summary>
-		/// :zero: 0️⃣ keycap 0
+		/// :bangbang: ‼ double exclamation mark
 		/// </summary>
-		public static readonly EmojiInfo Emoji_zero = new EmojiInfo("zero", "0030-fe0f-20e3.png", "keycap 0", "0️⃣", true, true, true, false);
+		public static readonly EmojiInfo Emoji_bangbang = new EmojiInfo("bangbang", "203c.png", "double exclamation mark", "‼", true, true, true, true);
 
 		/// <summary>
-		/// :one: 1️⃣ keycap 1
+		/// :interrobang: ⁉ exclamation question mark
 		/// </summary>
-		public static readonly EmojiInfo Emoji_one = new EmojiInfo("one", "0031-fe0f-20e3.png", "keycap 1", "1️⃣", true, true, true, false);
+		public static readonly EmojiInfo Emoji_interrobang = new EmojiInfo("interrobang", "2049.png", "exclamation question mark", "⁉", true, true, true, true);
 
 		/// <summary>
-		/// :two: 2️⃣ keycap 2
+		/// :tm: ™ trade mark sign
 		/// </summary>
-		public static readonly EmojiInfo Emoji_two = new EmojiInfo("two", "0032-fe0f-20e3.png", "keycap 2", "2️⃣", true, true, true, false);
+		public static readonly EmojiInfo Emoji_tm = new EmojiInfo("tm", "2122.png", "trade mark sign", "™", true, true, false, true);
 
 		/// <summary>
-		/// :three: 3️⃣ keycap 3
+		/// :information_source: ℹ information source
 		/// </summary>
-		public static readonly EmojiInfo Emoji_three = new EmojiInfo("three", "0033-fe0f-20e3.png", "keycap 3", "3️⃣", true, true, true, false);
+		public static readonly EmojiInfo Emoji_information_source = new EmojiInfo("information_source", "2139.png", "information source", "ℹ", true, true, true, true);
 
 		/// <summary>
-		/// :four: 4️⃣ keycap 4
+		/// :left_right_arrow: ↔ left right arrow
 		/// </summary>
-		public static readonly EmojiInfo Emoji_four = new EmojiInfo("four", "0034-fe0f-20e3.png", "keycap 4", "4️⃣", true, true, true, false);
+		public static readonly EmojiInfo Emoji_left_right_arrow = new EmojiInfo("left_right_arrow", "2194.png", "left right arrow", "↔", true, true, true, true);
 
 		/// <summary>
-		/// :five: 5️⃣ keycap 5
+		/// :arrow_up_down: ↕ up down arrow
 		/// </summary>
-		public static readonly EmojiInfo Emoji_five = new EmojiInfo("five", "0035-fe0f-20e3.png", "keycap 5", "5️⃣", true, true, true, false);
+		public static readonly EmojiInfo Emoji_arrow_up_down = new EmojiInfo("arrow_up_down", "2195.png", "up down arrow", "↕", true, true, true, true);
 
 		/// <summary>
-		/// :six: 6️⃣ keycap 6
+		/// :arrow_upper_left: ↖ north west arrow
 		/// </summary>
-		public static readonly EmojiInfo Emoji_six = new EmojiInfo("six", "0036-fe0f-20e3.png", "keycap 6", "6️⃣", true, true, true, false);
+		public static readonly EmojiInfo Emoji_arrow_upper_left = new EmojiInfo("arrow_upper_left", "2196.png", "north west arrow", "↖", true, true, true, true);
 
 		/// <summary>
-		/// :seven: 7️⃣ keycap 7
+		/// :arrow_upper_right: ↗ north east arrow
 		/// </summary>
-		public static readonly EmojiInfo Emoji_seven = new EmojiInfo("seven", "0037-fe0f-20e3.png", "keycap 7", "7️⃣", true, true, true, false);
+		public static readonly EmojiInfo Emoji_arrow_upper_right = new EmojiInfo("arrow_upper_right", "2197.png", "north east arrow", "↗", true, true, true, true);
 
 		/// <summary>
-		/// :eight: 8️⃣ keycap 8
+		/// :arrow_lower_right: ↘ south east arrow
 		/// </summary>
-		public static readonly EmojiInfo Emoji_eight = new EmojiInfo("eight", "0038-fe0f-20e3.png", "keycap 8", "8️⃣", true, true, true, false);
+		public static readonly EmojiInfo Emoji_arrow_lower_right = new EmojiInfo("arrow_lower_right", "2198.png", "south east arrow", "↘", true, true, true, true);
 
 		/// <summary>
-		/// :nine: 9️⃣ keycap 9
+		/// :arrow_lower_left: ↙ south west arrow
 		/// </summary>
-		public static readonly EmojiInfo Emoji_nine = new EmojiInfo("nine", "0039-fe0f-20e3.png", "keycap 9", "9️⃣", true, true, true, false);
+		public static readonly EmojiInfo Emoji_arrow_lower_left = new EmojiInfo("arrow_lower_left", "2199.png", "south west arrow", "↙", true, true, true, true);
 
 		/// <summary>
-		/// :copyright: ©️ copyright sign
+		/// :leftwards_arrow_with_hook: ↩ leftwards arrow with hook
 		/// </summary>
-		public static readonly EmojiInfo Emoji_copyright = new EmojiInfo("copyright", "00a9-fe0f.png", "copyright sign", "©️", true, true, true, false);
+		public static readonly EmojiInfo Emoji_leftwards_arrow_with_hook = new EmojiInfo("leftwards_arrow_with_hook", "21a9.png", "leftwards arrow with hook", "↩", true, true, true, true);
 
 		/// <summary>
-		/// :registered: ®️ registered sign
+		/// :arrow_right_hook: ↪ rightwards arrow with hook
 		/// </summary>
-		public static readonly EmojiInfo Emoji_registered = new EmojiInfo("registered", "00ae-fe0f.png", "registered sign", "®️", true, true, true, false);
+		public static readonly EmojiInfo Emoji_arrow_right_hook = new EmojiInfo("arrow_right_hook", "21aa.png", "rightwards arrow with hook", "↪", true, true, true, true);
+
+		/// <summary>
+		/// :watch: ⌚ watch
+		/// </summary>
+		public static readonly EmojiInfo Emoji_watch = new EmojiInfo("watch", "231a.png", "watch", "⌚", true, true, true, true);
+
+		/// <summary>
+		/// :hourglass: ⌛ hourglass
+		/// </summary>
+		public static readonly EmojiInfo Emoji_hourglass = new EmojiInfo("hourglass", "231b.png", "hourglass", "⌛", true, true, true, true);
+
+		/// <summary>
+		/// :keyboard: ⌨ keyboard
+		/// </summary>
+		public static readonly EmojiInfo Emoji_keyboard = new EmojiInfo("keyboard", "2328.png", "keyboard", "⌨", true, true, true, false);
+
+		/// <summary>
+		/// :fast_forward: ⏩ black right-pointing double triangle
+		/// </summary>
+		public static readonly EmojiInfo Emoji_fast_forward = new EmojiInfo("fast_forward", "23e9.png", "black right-pointing double triangle", "⏩", true, true, true, true);
+
+		/// <summary>
+		/// :rewind: ⏪ black left-pointing double triangle
+		/// </summary>
+		public static readonly EmojiInfo Emoji_rewind = new EmojiInfo("rewind", "23ea.png", "black left-pointing double triangle", "⏪", true, true, true, true);
+
+		/// <summary>
+		/// :arrow_double_up: ⏫ black up-pointing double triangle
+		/// </summary>
+		public static readonly EmojiInfo Emoji_arrow_double_up = new EmojiInfo("arrow_double_up", "23eb.png", "black up-pointing double triangle", "⏫", true, true, true, true);
+
+		/// <summary>
+		/// :arrow_double_down: ⏬ black down-pointing double triangle
+		/// </summary>
+		public static readonly EmojiInfo Emoji_arrow_double_down = new EmojiInfo("arrow_double_down", "23ec.png", "black down-pointing double triangle", "⏬", true, true, true, true);
+
+		/// <summary>
+		/// :black_right_pointing_double_triangle_with_vertical_bar: ⏭ black right-pointing double triangle with vertical bar
+		/// </summary>
+		public static readonly EmojiInfo Emoji_black_right_pointing_double_triangle_with_vertical_bar = new EmojiInfo("black_right_pointing_double_triangle_with_vertical_bar", "23ed.png", "black right-pointing double triangle with vertical bar", "⏭", true, true, true, false);
+
+		/// <summary>
+		/// :black_left_pointing_double_triangle_with_vertical_bar: ⏮ black left-pointing double triangle with vertical bar
+		/// </summary>
+		public static readonly EmojiInfo Emoji_black_left_pointing_double_triangle_with_vertical_bar = new EmojiInfo("black_left_pointing_double_triangle_with_vertical_bar", "23ee.png", "black left-pointing double triangle with vertical bar", "⏮", true, true, true, false);
+
+		/// <summary>
+		/// :black_right_pointing_triangle_with_double_vertical_bar: ⏯ black right-pointing triangle with double vertical bar
+		/// </summary>
+		public static readonly EmojiInfo Emoji_black_right_pointing_triangle_with_double_vertical_bar = new EmojiInfo("black_right_pointing_triangle_with_double_vertical_bar", "23ef.png", "black right-pointing triangle with double vertical bar", "⏯", true, true, true, false);
+
+		/// <summary>
+		/// :alarm_clock: ⏰ alarm clock
+		/// </summary>
+		public static readonly EmojiInfo Emoji_alarm_clock = new EmojiInfo("alarm_clock", "23f0.png", "alarm clock", "⏰", true, true, true, true);
+
+		/// <summary>
+		/// :stopwatch: ⏱ stopwatch
+		/// </summary>
+		public static readonly EmojiInfo Emoji_stopwatch = new EmojiInfo("stopwatch", "23f1.png", "stopwatch", "⏱", true, true, true, false);
+
+		/// <summary>
+		/// :timer_clock: ⏲ timer clock
+		/// </summary>
+		public static readonly EmojiInfo Emoji_timer_clock = new EmojiInfo("timer_clock", "23f2.png", "timer clock", "⏲", true, true, true, false);
+
+		/// <summary>
+		/// :hourglass_flowing_sand: ⏳ hourglass with flowing sand
+		/// </summary>
+		public static readonly EmojiInfo Emoji_hourglass_flowing_sand = new EmojiInfo("hourglass_flowing_sand", "23f3.png", "hourglass with flowing sand", "⏳", true, true, true, true);
+
+		/// <summary>
+		/// :double_vertical_bar: ⏸ double vertical bar
+		/// </summary>
+		public static readonly EmojiInfo Emoji_double_vertical_bar = new EmojiInfo("double_vertical_bar", "23f8.png", "double vertical bar", "⏸", true, true, true, false);
+
+		/// <summary>
+		/// :black_square_for_stop: ⏹ black square for stop
+		/// </summary>
+		public static readonly EmojiInfo Emoji_black_square_for_stop = new EmojiInfo("black_square_for_stop", "23f9.png", "black square for stop", "⏹", true, true, true, false);
+
+		/// <summary>
+		/// :black_circle_for_record: ⏺ black circle for record
+		/// </summary>
+		public static readonly EmojiInfo Emoji_black_circle_for_record = new EmojiInfo("black_circle_for_record", "23fa.png", "black circle for record", "⏺", true, true, true, false);
+
+		/// <summary>
+		/// :m: Ⓜ circled latin capital letter m
+		/// </summary>
+		public static readonly EmojiInfo Emoji_m = new EmojiInfo("m", "24c2.png", "circled latin capital letter m", "Ⓜ", true, true, true, true);
+
+		/// <summary>
+		/// :black_small_square: ▪ black small square
+		/// </summary>
+		public static readonly EmojiInfo Emoji_black_small_square = new EmojiInfo("black_small_square", "25aa.png", "black small square", "▪", true, true, true, true);
+
+		/// <summary>
+		/// :white_small_square: ▫ white small square
+		/// </summary>
+		public static readonly EmojiInfo Emoji_white_small_square = new EmojiInfo("white_small_square", "25ab.png", "white small square", "▫", true, true, true, true);
+
+		/// <summary>
+		/// :arrow_forward: ▶ black right-pointing triangle
+		/// </summary>
+		public static readonly EmojiInfo Emoji_arrow_forward = new EmojiInfo("arrow_forward", "25b6.png", "black right-pointing triangle", "▶", true, true, true, true);
+
+		/// <summary>
+		/// :arrow_backward: ◀ black left-pointing triangle
+		/// </summary>
+		public static readonly EmojiInfo Emoji_arrow_backward = new EmojiInfo("arrow_backward", "25c0.png", "black left-pointing triangle", "◀", true, true, true, true);
+
+		/// <summary>
+		/// :white_medium_square: ◻ white medium square
+		/// </summary>
+		public static readonly EmojiInfo Emoji_white_medium_square = new EmojiInfo("white_medium_square", "25fb.png", "white medium square", "◻", true, true, true, true);
+
+		/// <summary>
+		/// :black_medium_square: ◼ black medium square
+		/// </summary>
+		public static readonly EmojiInfo Emoji_black_medium_square = new EmojiInfo("black_medium_square", "25fc.png", "black medium square", "◼", true, true, true, true);
+
+		/// <summary>
+		/// :white_medium_small_square: ◽ white medium small square
+		/// </summary>
+		public static readonly EmojiInfo Emoji_white_medium_small_square = new EmojiInfo("white_medium_small_square", "25fd.png", "white medium small square", "◽", true, true, true, true);
+
+		/// <summary>
+		/// :black_medium_small_square: ◾ black medium small square
+		/// </summary>
+		public static readonly EmojiInfo Emoji_black_medium_small_square = new EmojiInfo("black_medium_small_square", "25fe.png", "black medium small square", "◾", true, true, true, true);
+
+		/// <summary>
+		/// :sunny: ☀ black sun with rays
+		/// </summary>
+		public static readonly EmojiInfo Emoji_sunny = new EmojiInfo("sunny", "2600.png", "black sun with rays", "☀", true, true, true, true);
+
+		/// <summary>
+		/// :cloud: ☁ cloud
+		/// </summary>
+		public static readonly EmojiInfo Emoji_cloud = new EmojiInfo("cloud", "2601.png", "cloud", "☁", true, true, true, true);
+
+		/// <summary>
+		/// :umbrella: ☂ umbrella
+		/// </summary>
+		public static readonly EmojiInfo Emoji_umbrella = new EmojiInfo("umbrella", "2602.png", "umbrella", "☂", true, true, true, false);
+
+		/// <summary>
+		/// :showman: ☃ snowman
+		/// </summary>
+		public static readonly EmojiInfo Emoji_showman = new EmojiInfo("showman", "2603.png", "snowman", "☃", true, true, true, false);
+
+		/// <summary>
+		/// :comet: ☄ comet
+		/// </summary>
+		public static readonly EmojiInfo Emoji_comet = new EmojiInfo("comet", "2604.png", "comet", "☄", true, true, true, false);
+
+		/// <summary>
+		/// :phone: ☎ black telephone
+		/// </summary>
+		public static readonly EmojiInfo Emoji_phone = new EmojiInfo("phone", "260e.png", "black telephone", "☎", true, true, true, true);
+
+		/// <summary>
+		/// :ballot_box_with_check: ☑ ballot box with check
+		/// </summary>
+		public static readonly EmojiInfo Emoji_ballot_box_with_check = new EmojiInfo("ballot_box_with_check", "2611.png", "ballot box with check", "☑", true, true, true, true);
+
+		/// <summary>
+		/// :umbrella: ☔ umbrella with rain drops
+		/// </summary>
+		public static readonly EmojiInfo Emoji_umbrella_rain = new EmojiInfo("umbrella", "2614.png", "umbrella with rain drops", "☔", true, true, true, true);
+
+		/// <summary>
+		/// :coffee: ☕ hot beverage
+		/// </summary>
+		public static readonly EmojiInfo Emoji_coffee = new EmojiInfo("coffee", "2615.png", "hot beverage", "☕", true, true, true, true);
+
+		/// <summary>
+		/// :shamrock: ☘ shamrock
+		/// </summary>
+		public static readonly EmojiInfo Emoji_shamrock = new EmojiInfo("shamrock", "2618.png", "shamrock", "☘", true, true, true, false);
+
+		/// <summary>
+		/// :point_up: ☝ white up pointing index
+		/// </summary>
+		public static readonly EmojiInfo Emoji_point_up = new EmojiInfo("point_up", "261d.png", "white up pointing index", "☝", true, true, true, true);
+
+		/// <summary>
+		/// :skull_and_crossbones: ☠ skull and crossbones
+		/// </summary>
+		public static readonly EmojiInfo Emoji_skull_and_crossbones = new EmojiInfo("skull_and_crossbones", "2620.png", "skull and crossbones", "☠", true, true, true, false);
+
+		/// <summary>
+		/// :radioactive_sign: ☢ radioactive sign
+		/// </summary>
+		public static readonly EmojiInfo Emoji_radioactive_sign = new EmojiInfo("radioactive_sign", "2622.png", "radioactive sign", "☢", true, true, true, false);
+
+		/// <summary>
+		/// :biohazard_sign: ☣ biohazard sign
+		/// </summary>
+		public static readonly EmojiInfo Emoji_biohazard_sign = new EmojiInfo("biohazard_sign", "2623.png", "biohazard sign", "☣", true, true, true, false);
+
+		/// <summary>
+		/// :orthodox_cross: ☦ orthodox cross
+		/// </summary>
+		public static readonly EmojiInfo Emoji_orthodox_cross = new EmojiInfo("orthodox_cross", "2626.png", "orthodox cross", "☦", true, true, true, false);
+
+		/// <summary>
+		/// :star_and_crescent: ☪ star and crescent
+		/// </summary>
+		public static readonly EmojiInfo Emoji_star_and_crescent = new EmojiInfo("star_and_crescent", "262a.png", "star and crescent", "☪", true, true, true, false);
+
+		/// <summary>
+		/// :peace_symbol: ☮ peace symbol
+		/// </summary>
+		public static readonly EmojiInfo Emoji_peace_symbol = new EmojiInfo("peace_symbol", "262e.png", "peace symbol", "☮", true, true, true, false);
+
+		/// <summary>
+		/// :yin_yang: ☯ yin yang
+		/// </summary>
+		public static readonly EmojiInfo Emoji_yin_yang = new EmojiInfo("yin_yang", "262f.png", "yin yang", "☯", true, true, true, false);
+
+		/// <summary>
+		/// :wheel_of_dharma: ☸ wheel of dharma
+		/// </summary>
+		public static readonly EmojiInfo Emoji_wheel_of_dharma = new EmojiInfo("wheel_of_dharma", "2638.png", "wheel of dharma", "☸", true, true, true, false);
+
+		/// <summary>
+		/// :white_frowning_face: ☹ white frowning face
+		/// </summary>
+		public static readonly EmojiInfo Emoji_white_frowning_face = new EmojiInfo("white_frowning_face", "2639.png", "white frowning face", "☹", true, true, true, false);
+
+		/// <summary>
+		/// :relaxed: ☺ white smiling face
+		/// </summary>
+		public static readonly EmojiInfo Emoji_relaxed = new EmojiInfo("relaxed", "263a.png", "white smiling face", "☺", true, true, true, true);
+
+		/// <summary>
+		/// :aries: ♈ aries
+		/// </summary>
+		public static readonly EmojiInfo Emoji_aries = new EmojiInfo("aries", "2648.png", "aries", "♈", true, true, true, true);
+
+		/// <summary>
+		/// :taurus: ♉ taurus
+		/// </summary>
+		public static readonly EmojiInfo Emoji_taurus = new EmojiInfo("taurus", "2649.png", "taurus", "♉", true, true, true, true);
+
+		/// <summary>
+		/// :gemini: ♊ gemini
+		/// </summary>
+		public static readonly EmojiInfo Emoji_gemini = new EmojiInfo("gemini", "264a.png", "gemini", "♊", true, true, true, true);
+
+		/// <summary>
+		/// :cancer: ♋ cancer
+		/// </summary>
+		public static readonly EmojiInfo Emoji_cancer = new EmojiInfo("cancer", "264b.png", "cancer", "♋", true, true, true, true);
+
+		/// <summary>
+		/// :leo: ♌ leo
+		/// </summary>
+		public static readonly EmojiInfo Emoji_leo = new EmojiInfo("leo", "264c.png", "leo", "♌", true, true, true, true);
+
+		/// <summary>
+		/// :virgo: ♍ virgo
+		/// </summary>
+		public static readonly EmojiInfo Emoji_virgo = new EmojiInfo("virgo", "264d.png", "virgo", "♍", true, true, true, true);
+
+		/// <summary>
+		/// :libra: ♎ libra
+		/// </summary>
+		public static readonly EmojiInfo Emoji_libra = new EmojiInfo("libra", "264e.png", "libra", "♎", true, true, true, true);
+
+		/// <summary>
+		/// :scorpius: ♏ scorpius
+		/// </summary>
+		public static readonly EmojiInfo Emoji_scorpius = new EmojiInfo("scorpius", "264f.png", "scorpius", "♏", true, true, true, true);
+
+		/// <summary>
+		/// :sagittarius: ♐ sagittarius
+		/// </summary>
+		public static readonly EmojiInfo Emoji_sagittarius = new EmojiInfo("sagittarius", "2650.png", "sagittarius", "♐", true, true, true, true);
+
+		/// <summary>
+		/// :capricorn: ♑ capricorn
+		/// </summary>
+		public static readonly EmojiInfo Emoji_capricorn = new EmojiInfo("capricorn", "2651.png", "capricorn", "♑", true, true, true, true);
+
+		/// <summary>
+		/// :aquarius: ♒ aquarius
+		/// </summary>
+		public static readonly EmojiInfo Emoji_aquarius = new EmojiInfo("aquarius", "2652.png", "aquarius", "♒", true, true, true, true);
+
+		/// <summary>
+		/// :pisces: ♓ pisces
+		/// </summary>
+		public static readonly EmojiInfo Emoji_pisces = new EmojiInfo("pisces", "2653.png", "pisces", "♓", true, true, true, true);
+
+		/// <summary>
+		/// :spades: ♠ black spade suit
+		/// </summary>
+		public static readonly EmojiInfo Emoji_spades = new EmojiInfo("spades", "2660.png", "black spade suit", "♠", true, true, true, true);
+
+		/// <summary>
+		/// :clubs: ♣ black club suit
+		/// </summary>
+		public static readonly EmojiInfo Emoji_clubs = new EmojiInfo("clubs", "2663.png", "black club suit", "♣", true, true, true, true);
+
+		/// <summary>
+		/// :hearts: ♥ black heart suit
+		/// </summary>
+		public static readonly EmojiInfo Emoji_hearts = new EmojiInfo("hearts", "2665.png", "black heart suit", "♥", true, true, true, true);
+
+		/// <summary>
+		/// :diamonds: ♦ black diamond suit
+		/// </summary>
+		public static readonly EmojiInfo Emoji_diamonds = new EmojiInfo("diamonds", "2666.png", "black diamond suit", "♦", true, true, true, true);
+
+		/// <summary>
+		/// :hotsprings: ♨ hot springs
+		/// </summary>
+		public static readonly EmojiInfo Emoji_hotsprings = new EmojiInfo("hotsprings", "2668.png", "hot springs", "♨", true, true, true, true);
+
+		/// <summary>
+		/// :recycle: ♻ black universal recycling symbol
+		/// </summary>
+		public static readonly EmojiInfo Emoji_recycle = new EmojiInfo("recycle", "267b.png", "black universal recycling symbol", "♻", true, true, true, true);
+
+		/// <summary>
+		/// :wheelchair: ♿ wheelchair symbol
+		/// </summary>
+		public static readonly EmojiInfo Emoji_wheelchair = new EmojiInfo("wheelchair", "267f.png", "wheelchair symbol", "♿", true, true, true, true);
+
+		/// <summary>
+		/// :hammer_and_pick: ⚒ hammer and pick
+		/// </summary>
+		public static readonly EmojiInfo Emoji_hammer_and_pick = new EmojiInfo("hammer_and_pick", "2692.png", "hammer and pick", "⚒", true, true, true, false);
+
+		/// <summary>
+		/// :anchor: ⚓ anchor
+		/// </summary>
+		public static readonly EmojiInfo Emoji_anchor = new EmojiInfo("anchor", "2693.png", "anchor", "⚓", true, true, true, true);
+
+		/// <summary>
+		/// :crossed_swords: ⚔ crossed swords
+		/// </summary>
+		public static readonly EmojiInfo Emoji_crossed_swords = new EmojiInfo("crossed_swords", "2694.png", "crossed swords", "⚔", true, true, true, false);
+
+		/// <summary>
+		/// :scales: ⚖ scales
+		/// </summary>
+		public static readonly EmojiInfo Emoji_scales = new EmojiInfo("scales", "2696.png", "scales", "⚖", true, true, true, false);
+
+		/// <summary>
+		/// :alembic: ⚗ alembic
+		/// </summary>
+		public static readonly EmojiInfo Emoji_alembic = new EmojiInfo("alembic", "2697.png", "alembic", "⚗", true, true, true, false);
+
+		/// <summary>
+		/// :gear: ⚙ gear
+		/// </summary>
+		public static readonly EmojiInfo Emoji_gear = new EmojiInfo("gear", "2699.png", "gear", "⚙", true, true, true, false);
+
+		/// <summary>
+		/// :atom_symbol: ⚛ atom symbol
+		/// </summary>
+		public static readonly EmojiInfo Emoji_atom_symbol = new EmojiInfo("atom_symbol", "269b.png", "atom symbol", "⚛", true, true, true, false);
+
+		/// <summary>
+		/// :fleur_de_lis: ⚜ fleur-de-lis
+		/// </summary>
+		public static readonly EmojiInfo Emoji_fleur_de_lis = new EmojiInfo("fleur_de_lis", "269c.png", "fleur-de-lis", "⚜", true, true, true, false);
+
+		/// <summary>
+		/// :warning: ⚠ warning sign
+		/// </summary>
+		public static readonly EmojiInfo Emoji_warning = new EmojiInfo("warning", "26a0.png", "warning sign", "⚠", true, true, true, true);
+
+		/// <summary>
+		/// :zap: ⚡ high voltage sign
+		/// </summary>
+		public static readonly EmojiInfo Emoji_zap = new EmojiInfo("zap", "26a1.png", "high voltage sign", "⚡", true, true, true, true);
+
+		/// <summary>
+		/// :white_circle: ⚪ medium white circle
+		/// </summary>
+		public static readonly EmojiInfo Emoji_white_circle = new EmojiInfo("white_circle", "26aa.png", "medium white circle", "⚪", true, true, true, true);
+
+		/// <summary>
+		/// :black_circle: ⚫ medium black circle
+		/// </summary>
+		public static readonly EmojiInfo Emoji_black_circle = new EmojiInfo("black_circle", "26ab.png", "medium black circle", "⚫", true, true, true, true);
+
+		/// <summary>
+		/// :coffin: ⚰ coffin
+		/// </summary>
+		public static readonly EmojiInfo Emoji_coffin = new EmojiInfo("coffin", "26b0.png", "coffin", "⚰", true, true, true, false);
+
+		/// <summary>
+		/// :funeral_urn: ⚱ funeral urn
+		/// </summary>
+		public static readonly EmojiInfo Emoji_funeral_urn = new EmojiInfo("funeral_urn", "26b1.png", "funeral urn", "⚱", true, true, true, false);
+
+		/// <summary>
+		/// :soccer: ⚽ soccer ball
+		/// </summary>
+		public static readonly EmojiInfo Emoji_soccer = new EmojiInfo("soccer", "26bd.png", "soccer ball", "⚽", true, true, true, true);
+
+		/// <summary>
+		/// :baseball: ⚾ baseball
+		/// </summary>
+		public static readonly EmojiInfo Emoji_baseball = new EmojiInfo("baseball", "26be.png", "baseball", "⚾", true, true, true, true);
+
+		/// <summary>
+		/// :snowman: ⛄ snowman without snow
+		/// </summary>
+		public static readonly EmojiInfo Emoji_snowman = new EmojiInfo("snowman", "26c4.png", "snowman without snow", "⛄", true, true, true, true);
+
+		/// <summary>
+		/// :partly_sunny: ⛅ sun behind cloud
+		/// </summary>
+		public static readonly EmojiInfo Emoji_partly_sunny = new EmojiInfo("partly_sunny", "26c5.png", "sun behind cloud", "⛅", true, true, true, true);
+
+		/// <summary>
+		/// :thunder_cloud_and_rain: ⛈ thunder cloud and rain
+		/// </summary>
+		public static readonly EmojiInfo Emoji_thunder_cloud_and_rain = new EmojiInfo("thunder_cloud_and_rain", "26c8.png", "thunder cloud and rain", "⛈", true, true, true, false);
+
+		/// <summary>
+		/// :ophiuchus: ⛎ ophiuchus
+		/// </summary>
+		public static readonly EmojiInfo Emoji_ophiuchus = new EmojiInfo("ophiuchus", "26ce.png", "ophiuchus", "⛎", true, true, true, true);
+
+		/// <summary>
+		/// :pick: ⛏ pick
+		/// </summary>
+		public static readonly EmojiInfo Emoji_pick = new EmojiInfo("pick", "26cf.png", "pick", "⛏", true, true, true, false);
+
+		/// <summary>
+		/// :helmet_with_white_cross: ⛑ helmet with white cross
+		/// </summary>
+		public static readonly EmojiInfo Emoji_helmet_with_white_cross = new EmojiInfo("helmet_with_white_cross", "26d1.png", "helmet with white cross", "⛑", true, true, true, false);
+
+		/// <summary>
+		/// :chains: ⛓ chains
+		/// </summary>
+		public static readonly EmojiInfo Emoji_chains = new EmojiInfo("chains", "26d3.png", "chains", "⛓", true, true, true, false);
+
+		/// <summary>
+		/// :no_entry: ⛔ no entry
+		/// </summary>
+		public static readonly EmojiInfo Emoji_no_entry = new EmojiInfo("no_entry", "26d4.png", "no entry", "⛔", true, true, true, true);
+
+		/// <summary>
+		/// :shinto_shrine: ⛩ shinto shrine
+		/// </summary>
+		public static readonly EmojiInfo Emoji_shinto_shrine = new EmojiInfo("shinto_shrine", "26e9.png", "shinto shrine", "⛩", true, true, true, false);
+
+		/// <summary>
+		/// :church: ⛪ church
+		/// </summary>
+		public static readonly EmojiInfo Emoji_church = new EmojiInfo("church", "26ea.png", "church", "⛪", true, true, true, true);
+
+		/// <summary>
+		/// :mountain: ⛰ mountain
+		/// </summary>
+		public static readonly EmojiInfo Emoji_mountain = new EmojiInfo("mountain", "26f0.png", "mountain", "⛰", true, true, true, false);
+
+		/// <summary>
+		/// :umbrella_on_ground: ⛱ umbrella on ground
+		/// </summary>
+		public static readonly EmojiInfo Emoji_umbrella_on_ground = new EmojiInfo("umbrella_on_ground", "26f1.png", "umbrella on ground", "⛱", true, true, true, false);
+
+		/// <summary>
+		/// :fountain: ⛲ fountain
+		/// </summary>
+		public static readonly EmojiInfo Emoji_fountain = new EmojiInfo("fountain", "26f2.png", "fountain", "⛲", true, true, true, true);
+
+		/// <summary>
+		/// :golf: ⛳ flag in hole
+		/// </summary>
+		public static readonly EmojiInfo Emoji_golf = new EmojiInfo("golf", "26f3.png", "flag in hole", "⛳", true, true, true, true);
+
+		/// <summary>
+		/// :ferry: ⛴ ferry
+		/// </summary>
+		public static readonly EmojiInfo Emoji_ferry = new EmojiInfo("ferry", "26f4.png", "ferry", "⛴", true, true, true, false);
+
+		/// <summary>
+		/// :boat: ⛵ sailboat
+		/// </summary>
+		public static readonly EmojiInfo Emoji_boat = new EmojiInfo("boat", "26f5.png", "sailboat", "⛵", true, true, true, true);
+
+		/// <summary>
+		/// :skier: ⛷ skier
+		/// </summary>
+		public static readonly EmojiInfo Emoji_skier = new EmojiInfo("skier", "26f7.png", "skier", "⛷", true, true, true, false);
+
+		/// <summary>
+		/// :ice_skate: ⛸ ice skate
+		/// </summary>
+		public static readonly EmojiInfo Emoji_ice_skate = new EmojiInfo("ice_skate", "26f8.png", "ice skate", "⛸", true, true, true, false);
+
+		/// <summary>
+		/// :person_with_ball: ⛹ person with ball
+		/// </summary>
+		public static readonly EmojiInfo Emoji_person_with_ball = new EmojiInfo("person_with_ball", "26f9.png", "person with ball", "⛹", true, true, true, false);
+
+		/// <summary>
+		/// :tent: ⛺ tent
+		/// </summary>
+		public static readonly EmojiInfo Emoji_tent = new EmojiInfo("tent", "26fa.png", "tent", "⛺", true, true, true, true);
+
+		/// <summary>
+		/// :fuelpump: ⛽ fuel pump
+		/// </summary>
+		public static readonly EmojiInfo Emoji_fuelpump = new EmojiInfo("fuelpump", "26fd.png", "fuel pump", "⛽", true, true, true, true);
+
+		/// <summary>
+		/// :scissors: ✂ black scissors
+		/// </summary>
+		public static readonly EmojiInfo Emoji_scissors = new EmojiInfo("scissors", "2702.png", "black scissors", "✂", true, true, true, true);
+
+		/// <summary>
+		/// :white_check_mark: ✅ white heavy check mark
+		/// </summary>
+		public static readonly EmojiInfo Emoji_white_check_mark = new EmojiInfo("white_check_mark", "2705.png", "white heavy check mark", "✅", true, true, true, true);
+
+		/// <summary>
+		/// :airplane: ✈ airplane
+		/// </summary>
+		public static readonly EmojiInfo Emoji_airplane = new EmojiInfo("airplane", "2708.png", "airplane", "✈", true, true, true, true);
+
+		/// <summary>
+		/// :email: ✉ envelope
+		/// </summary>
+		public static readonly EmojiInfo Emoji_email = new EmojiInfo("email", "2709.png", "envelope", "✉", true, true, true, true);
+
+		/// <summary>
+		/// :fist: ✊ raised fist
+		/// </summary>
+		public static readonly EmojiInfo Emoji_fist = new EmojiInfo("fist", "270a.png", "raised fist", "✊", true, true, true, true);
+
+		/// <summary>
+		/// :hand: ✋ raised hand
+		/// </summary>
+		public static readonly EmojiInfo Emoji_hand = new EmojiInfo("hand", "270b.png", "raised hand", "✋", true, true, true, true);
+
+		/// <summary>
+		/// :v: ✌ victory hand
+		/// </summary>
+		public static readonly EmojiInfo Emoji_v = new EmojiInfo("v", "270c.png", "victory hand", "✌", true, true, true, true);
+
+		/// <summary>
+		/// :writing_hand: ✍ writing hand
+		/// </summary>
+		public static readonly EmojiInfo Emoji_writing_hand = new EmojiInfo("writing_hand", "270d.png", "writing hand", "✍", true, true, true, false);
+
+		/// <summary>
+		/// :pencil2: ✏ pencil
+		/// </summary>
+		public static readonly EmojiInfo Emoji_pencil2 = new EmojiInfo("pencil2", "270f.png", "pencil", "✏", true, true, true, true);
+
+		/// <summary>
+		/// :black_nib: ✒ black nib
+		/// </summary>
+		public static readonly EmojiInfo Emoji_black_nib = new EmojiInfo("black_nib", "2712.png", "black nib", "✒", true, true, true, true);
+
+		/// <summary>
+		/// :heavy_check_mark: ✔ heavy check mark
+		/// </summary>
+		public static readonly EmojiInfo Emoji_heavy_check_mark = new EmojiInfo("heavy_check_mark", "2714.png", "heavy check mark", "✔", true, true, true, true);
+
+		/// <summary>
+		/// :heavy_multiplication_x: ✖ heavy multiplication x
+		/// </summary>
+		public static readonly EmojiInfo Emoji_heavy_multiplication_x = new EmojiInfo("heavy_multiplication_x", "2716.png", "heavy multiplication x", "✖", true, true, true, true);
+
+		/// <summary>
+		/// :latin_cross: ✝ latin cross
+		/// </summary>
+		public static readonly EmojiInfo Emoji_latin_cross = new EmojiInfo("latin_cross", "271d.png", "latin cross", "✝", true, true, true, false);
+
+		/// <summary>
+		/// :star_of_david: ✡ star of david
+		/// </summary>
+		public static readonly EmojiInfo Emoji_star_of_david = new EmojiInfo("star_of_david", "2721.png", "star of david", "✡", true, true, true, false);
+
+		/// <summary>
+		/// :sparkles: ✨ sparkles
+		/// </summary>
+		public static readonly EmojiInfo Emoji_sparkles = new EmojiInfo("sparkles", "2728.png", "sparkles", "✨", true, true, true, true);
+
+		/// <summary>
+		/// :eight_spoked_asterisk: ✳ eight spoked asterisk
+		/// </summary>
+		public static readonly EmojiInfo Emoji_eight_spoked_asterisk = new EmojiInfo("eight_spoked_asterisk", "2733.png", "eight spoked asterisk", "✳", true, true, true, true);
+
+		/// <summary>
+		/// :eight_pointed_black_star: ✴ eight pointed black star
+		/// </summary>
+		public static readonly EmojiInfo Emoji_eight_pointed_black_star = new EmojiInfo("eight_pointed_black_star", "2734.png", "eight pointed black star", "✴", true, true, true, true);
+
+		/// <summary>
+		/// :snowflake: ❄ snowflake
+		/// </summary>
+		public static readonly EmojiInfo Emoji_snowflake = new EmojiInfo("snowflake", "2744.png", "snowflake", "❄", true, true, true, true);
+
+		/// <summary>
+		/// :sparkle: ❇ sparkle
+		/// </summary>
+		public static readonly EmojiInfo Emoji_sparkle = new EmojiInfo("sparkle", "2747.png", "sparkle", "❇", true, true, true, true);
+
+		/// <summary>
+		/// :x: ❌ cross mark
+		/// </summary>
+		public static readonly EmojiInfo Emoji_x = new EmojiInfo("x", "274c.png", "cross mark", "❌", true, true, true, true);
+
+		/// <summary>
+		/// :negative_squared_cross_mark: ❎ negative squared cross mark
+		/// </summary>
+		public static readonly EmojiInfo Emoji_negative_squared_cross_mark = new EmojiInfo("negative_squared_cross_mark", "274e.png", "negative squared cross mark", "❎", true, true, true, true);
+
+		/// <summary>
+		/// :question: ❓ black question mark ornament
+		/// </summary>
+		public static readonly EmojiInfo Emoji_question = new EmojiInfo("question", "2753.png", "black question mark ornament", "❓", true, true, true, true);
+
+		/// <summary>
+		/// :grey_question: ❔ white question mark ornament
+		/// </summary>
+		public static readonly EmojiInfo Emoji_grey_question = new EmojiInfo("grey_question", "2754.png", "white question mark ornament", "❔", true, true, true, true);
+
+		/// <summary>
+		/// :grey_exclamation: ❕ white exclamation mark ornament
+		/// </summary>
+		public static readonly EmojiInfo Emoji_grey_exclamation = new EmojiInfo("grey_exclamation", "2755.png", "white exclamation mark ornament", "❕", true, true, true, true);
+
+		/// <summary>
+		/// :exclamation: ❗ heavy exclamation mark symbol
+		/// </summary>
+		public static readonly EmojiInfo Emoji_exclamation = new EmojiInfo("exclamation", "2757.png", "heavy exclamation mark symbol", "❗", true, true, true, true);
+
+		/// <summary>
+		/// :heavy_heart_exclamation_mark_ornament: ❣ heavy heart exclamation mark ornament
+		/// </summary>
+		public static readonly EmojiInfo Emoji_heavy_heart_exclamation_mark_ornament = new EmojiInfo("heavy_heart_exclamation_mark_ornament", "2763.png", "heavy heart exclamation mark ornament", "❣", true, true, true, false);
+
+		/// <summary>
+		/// :heart: ❤ heavy black heart
+		/// </summary>
+		public static readonly EmojiInfo Emoji_heart = new EmojiInfo("heart", "2764.png", "heavy black heart", "❤", true, true, true, true);
+
+		/// <summary>
+		/// :heavy_plus_sign: ➕ heavy plus sign
+		/// </summary>
+		public static readonly EmojiInfo Emoji_heavy_plus_sign = new EmojiInfo("heavy_plus_sign", "2795.png", "heavy plus sign", "➕", true, true, true, true);
+
+		/// <summary>
+		/// :heavy_minus_sign: ➖ heavy minus sign
+		/// </summary>
+		public static readonly EmojiInfo Emoji_heavy_minus_sign = new EmojiInfo("heavy_minus_sign", "2796.png", "heavy minus sign", "➖", true, true, true, true);
+
+		/// <summary>
+		/// :heavy_division_sign: ➗ heavy division sign
+		/// </summary>
+		public static readonly EmojiInfo Emoji_heavy_division_sign = new EmojiInfo("heavy_division_sign", "2797.png", "heavy division sign", "➗", true, true, true, true);
+
+		/// <summary>
+		/// :arrow_right: ➡ black rightwards arrow
+		/// </summary>
+		public static readonly EmojiInfo Emoji_arrow_right = new EmojiInfo("arrow_right", "27a1.png", "black rightwards arrow", "➡", true, true, true, true);
+
+		/// <summary>
+		/// :curly_loop: ➰ curly loop
+		/// </summary>
+		public static readonly EmojiInfo Emoji_curly_loop = new EmojiInfo("curly_loop", "27b0.png", "curly loop", "➰", true, true, true, true);
+
+		/// <summary>
+		/// :loop: ➿ double curly loop
+		/// </summary>
+		public static readonly EmojiInfo Emoji_loop = new EmojiInfo("loop", "27bf.png", "double curly loop", "➿", true, true, true, true);
+
+		/// <summary>
+		/// :arrow_heading_up: ⤴ arrow pointing rightwards then curving upwards
+		/// </summary>
+		public static readonly EmojiInfo Emoji_arrow_heading_up = new EmojiInfo("arrow_heading_up", "2934.png", "arrow pointing rightwards then curving upwards", "⤴", true, true, true, true);
+
+		/// <summary>
+		/// :arrow_heading_down: ⤵ arrow pointing rightwards then curving downwards
+		/// </summary>
+		public static readonly EmojiInfo Emoji_arrow_heading_down = new EmojiInfo("arrow_heading_down", "2935.png", "arrow pointing rightwards then curving downwards", "⤵", true, true, true, true);
+
+		/// <summary>
+		/// :arrow_left: ⬅ leftwards black arrow
+		/// </summary>
+		public static readonly EmojiInfo Emoji_arrow_left = new EmojiInfo("arrow_left", "2b05.png", "leftwards black arrow", "⬅", true, true, true, true);
+
+		/// <summary>
+		/// :arrow_up: ⬆ upwards black arrow
+		/// </summary>
+		public static readonly EmojiInfo Emoji_arrow_up = new EmojiInfo("arrow_up", "2b06.png", "upwards black arrow", "⬆", true, true, true, true);
+
+		/// <summary>
+		/// :arrow_down: ⬇ downwards black arrow
+		/// </summary>
+		public static readonly EmojiInfo Emoji_arrow_down = new EmojiInfo("arrow_down", "2b07.png", "downwards black arrow", "⬇", true, true, true, true);
+
+		/// <summary>
+		/// :black_large_square: ⬛ black large square
+		/// </summary>
+		public static readonly EmojiInfo Emoji_black_large_square = new EmojiInfo("black_large_square", "2b1b.png", "black large square", "⬛", true, true, true, true);
+
+		/// <summary>
+		/// :white_large_square: ⬜ white large square
+		/// </summary>
+		public static readonly EmojiInfo Emoji_white_large_square = new EmojiInfo("white_large_square", "2b1c.png", "white large square", "⬜", true, true, true, true);
+
+		/// <summary>
+		/// :star: ⭐ white medium star
+		/// </summary>
+		public static readonly EmojiInfo Emoji_star = new EmojiInfo("star", "2b50.png", "white medium star", "⭐", true, true, true, true);
+
+		/// <summary>
+		/// :o: ⭕ heavy large circle
+		/// </summary>
+		public static readonly EmojiInfo Emoji_o = new EmojiInfo("o", "2b55.png", "heavy large circle", "⭕", true, true, true, true);
+
+		/// <summary>
+		/// :wavy_dash: 〰 wavy dash
+		/// </summary>
+		public static readonly EmojiInfo Emoji_wavy_dash = new EmojiInfo("wavy_dash", "3030.png", "wavy dash", "〰", true, true, true, true);
+
+		/// <summary>
+		/// :part_alternation_mark: 〽 part alternation mark
+		/// </summary>
+		public static readonly EmojiInfo Emoji_part_alternation_mark = new EmojiInfo("part_alternation_mark", "303d.png", "part alternation mark", "〽", true, true, true, true);
+
+		/// <summary>
+		/// :congratulations: ㊗ circled ideograph congratulation
+		/// </summary>
+		public static readonly EmojiInfo Emoji_congratulations = new EmojiInfo("congratulations", "3297.png", "circled ideograph congratulation", "㊗", true, true, true, true);
+
+		/// <summary>
+		/// :secret: ㊙ circled ideograph secret
+		/// </summary>
+		public static readonly EmojiInfo Emoji_secret = new EmojiInfo("secret", "3299.png", "circled ideograph secret", "㊙", true, true, true, true);
 
 		/// <summary>
 		/// :mahjong: 🀄 mahjong tile red dragon
@@ -3736,24 +3465,24 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_black_joker = new EmojiInfo("black_joker", "1f0cf.png", "playing card black joker", "🃏", true, true, true, true);
 
 		/// <summary>
-		/// :a: 🅰️ negative squared latin capital letter a
+		/// :a: 🅰 negative squared latin capital letter a
 		/// </summary>
-		public static readonly EmojiInfo Emoji_a = new EmojiInfo("a", "1f170-fe0f.png", "negative squared latin capital letter a", "🅰️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_a = new EmojiInfo("a", "1f170.png", "negative squared latin capital letter a", "🅰", true, true, true, true);
 
 		/// <summary>
-		/// :b: 🅱️ negative squared latin capital letter b
+		/// :b: 🅱 negative squared latin capital letter b
 		/// </summary>
-		public static readonly EmojiInfo Emoji_b = new EmojiInfo("b", "1f171-fe0f.png", "negative squared latin capital letter b", "🅱️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_b = new EmojiInfo("b", "1f171.png", "negative squared latin capital letter b", "🅱", true, true, true, true);
 
 		/// <summary>
-		/// :o2: 🅾️ negative squared latin capital letter o
+		/// :o2: 🅾 negative squared latin capital letter o
 		/// </summary>
-		public static readonly EmojiInfo Emoji_o2 = new EmojiInfo("o2", "1f17e-fe0f.png", "negative squared latin capital letter o", "🅾️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_o2 = new EmojiInfo("o2", "1f17e.png", "negative squared latin capital letter o", "🅾", true, true, true, true);
 
 		/// <summary>
-		/// :parking: 🅿️ negative squared latin capital letter p
+		/// :parking: 🅿 negative squared latin capital letter p
 		/// </summary>
-		public static readonly EmojiInfo Emoji_parking = new EmojiInfo("parking", "1f17f-fe0f.png", "negative squared latin capital letter p", "🅿️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_parking = new EmojiInfo("parking", "1f17f.png", "negative squared latin capital letter p", "🅿", true, true, true, true);
 
 		/// <summary>
 		/// :ab: 🆎 negative squared ab
@@ -3811,1304 +3540,14 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_vs = new EmojiInfo("vs", "1f19a.png", "squared vs", "🆚", true, true, true, true);
 
 		/// <summary>
-		/// :flag-ac: 🇦🇨 ascension island flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ac = new EmojiInfo("flag-ac", "1f1e6-1f1e8.png", "ascension island flag", "🇦🇨", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ad: 🇦🇩 andorra flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ad = new EmojiInfo("flag-ad", "1f1e6-1f1e9.png", "andorra flag", "🇦🇩", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ae: 🇦🇪 united arab emirates flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ae = new EmojiInfo("flag-ae", "1f1e6-1f1ea.png", "united arab emirates flag", "🇦🇪", true, true, true, true);
-
-		/// <summary>
-		/// :flag-af: 🇦🇫 afghanistan flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_af = new EmojiInfo("flag-af", "1f1e6-1f1eb.png", "afghanistan flag", "🇦🇫", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ag: 🇦🇬 antigua &amp; barbuda flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ag = new EmojiInfo("flag-ag", "1f1e6-1f1ec.png", "antigua &amp; barbuda flag", "🇦🇬", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ai: 🇦🇮 anguilla flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ai = new EmojiInfo("flag-ai", "1f1e6-1f1ee.png", "anguilla flag", "🇦🇮", true, true, true, true);
-
-		/// <summary>
-		/// :flag-al: 🇦🇱 albania flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_al = new EmojiInfo("flag-al", "1f1e6-1f1f1.png", "albania flag", "🇦🇱", true, true, true, true);
-
-		/// <summary>
-		/// :flag-am: 🇦🇲 armenia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_am = new EmojiInfo("flag-am", "1f1e6-1f1f2.png", "armenia flag", "🇦🇲", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ao: 🇦🇴 angola flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ao = new EmojiInfo("flag-ao", "1f1e6-1f1f4.png", "angola flag", "🇦🇴", true, true, true, true);
-
-		/// <summary>
-		/// :flag-aq: 🇦🇶 antarctica flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_aq = new EmojiInfo("flag-aq", "1f1e6-1f1f6.png", "antarctica flag", "🇦🇶", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ar: 🇦🇷 argentina flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ar = new EmojiInfo("flag-ar", "1f1e6-1f1f7.png", "argentina flag", "🇦🇷", true, true, true, true);
-
-		/// <summary>
-		/// :flag-as: 🇦🇸 american samoa flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_as = new EmojiInfo("flag-as", "1f1e6-1f1f8.png", "american samoa flag", "🇦🇸", true, true, true, true);
-
-		/// <summary>
-		/// :flag-at: 🇦🇹 austria flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_at = new EmojiInfo("flag-at", "1f1e6-1f1f9.png", "austria flag", "🇦🇹", true, true, true, true);
-
-		/// <summary>
-		/// :flag-au: 🇦🇺 australia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_au = new EmojiInfo("flag-au", "1f1e6-1f1fa.png", "australia flag", "🇦🇺", true, true, true, true);
-
-		/// <summary>
-		/// :flag-aw: 🇦🇼 aruba flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_aw = new EmojiInfo("flag-aw", "1f1e6-1f1fc.png", "aruba flag", "🇦🇼", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ax: 🇦🇽 åland islands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ax = new EmojiInfo("flag-ax", "1f1e6-1f1fd.png", "åland islands flag", "🇦🇽", true, true, true, true);
-
-		/// <summary>
-		/// :flag-az: 🇦🇿 azerbaijan flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_az = new EmojiInfo("flag-az", "1f1e6-1f1ff.png", "azerbaijan flag", "🇦🇿", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ba: 🇧🇦 bosnia &amp; herzegovina flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ba = new EmojiInfo("flag-ba", "1f1e7-1f1e6.png", "bosnia &amp; herzegovina flag", "🇧🇦", true, true, true, true);
-
-		/// <summary>
-		/// :flag-bb: 🇧🇧 barbados flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_bb = new EmojiInfo("flag-bb", "1f1e7-1f1e7.png", "barbados flag", "🇧🇧", true, true, true, true);
-
-		/// <summary>
-		/// :flag-bd: 🇧🇩 bangladesh flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_bd = new EmojiInfo("flag-bd", "1f1e7-1f1e9.png", "bangladesh flag", "🇧🇩", true, true, true, true);
-
-		/// <summary>
-		/// :flag-be: 🇧🇪 belgium flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_be = new EmojiInfo("flag-be", "1f1e7-1f1ea.png", "belgium flag", "🇧🇪", true, true, true, true);
-
-		/// <summary>
-		/// :flag-bf: 🇧🇫 burkina faso flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_bf = new EmojiInfo("flag-bf", "1f1e7-1f1eb.png", "burkina faso flag", "🇧🇫", true, true, true, true);
-
-		/// <summary>
-		/// :flag-bg: 🇧🇬 bulgaria flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_bg = new EmojiInfo("flag-bg", "1f1e7-1f1ec.png", "bulgaria flag", "🇧🇬", true, true, true, true);
-
-		/// <summary>
-		/// :flag-bh: 🇧🇭 bahrain flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_bh = new EmojiInfo("flag-bh", "1f1e7-1f1ed.png", "bahrain flag", "🇧🇭", true, true, true, true);
-
-		/// <summary>
-		/// :flag-bi: 🇧🇮 burundi flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_bi = new EmojiInfo("flag-bi", "1f1e7-1f1ee.png", "burundi flag", "🇧🇮", true, true, true, true);
-
-		/// <summary>
-		/// :flag-bj: 🇧🇯 benin flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_bj = new EmojiInfo("flag-bj", "1f1e7-1f1ef.png", "benin flag", "🇧🇯", true, true, true, true);
-
-		/// <summary>
-		/// :flag-bl: 🇧🇱 st. barthélemy flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_bl = new EmojiInfo("flag-bl", "1f1e7-1f1f1.png", "st. barthélemy flag", "🇧🇱", true, true, true, true);
-
-		/// <summary>
-		/// :flag-bm: 🇧🇲 bermuda flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_bm = new EmojiInfo("flag-bm", "1f1e7-1f1f2.png", "bermuda flag", "🇧🇲", true, true, true, true);
-
-		/// <summary>
-		/// :flag-bn: 🇧🇳 brunei flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_bn = new EmojiInfo("flag-bn", "1f1e7-1f1f3.png", "brunei flag", "🇧🇳", true, true, true, true);
-
-		/// <summary>
-		/// :flag-bo: 🇧🇴 bolivia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_bo = new EmojiInfo("flag-bo", "1f1e7-1f1f4.png", "bolivia flag", "🇧🇴", true, true, true, true);
-
-		/// <summary>
-		/// :flag-bq: 🇧🇶 caribbean netherlands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_bq = new EmojiInfo("flag-bq", "1f1e7-1f1f6.png", "caribbean netherlands flag", "🇧🇶", true, true, true, true);
-
-		/// <summary>
-		/// :flag-br: 🇧🇷 brazil flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_br = new EmojiInfo("flag-br", "1f1e7-1f1f7.png", "brazil flag", "🇧🇷", true, true, true, true);
-
-		/// <summary>
-		/// :flag-bs: 🇧🇸 bahamas flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_bs = new EmojiInfo("flag-bs", "1f1e7-1f1f8.png", "bahamas flag", "🇧🇸", true, true, true, true);
-
-		/// <summary>
-		/// :flag-bt: 🇧🇹 bhutan flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_bt = new EmojiInfo("flag-bt", "1f1e7-1f1f9.png", "bhutan flag", "🇧🇹", true, true, true, true);
-
-		/// <summary>
-		/// :flag-bv: 🇧🇻 bouvet island flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_bv = new EmojiInfo("flag-bv", "1f1e7-1f1fb.png", "bouvet island flag", "🇧🇻", true, true, true, true);
-
-		/// <summary>
-		/// :flag-bw: 🇧🇼 botswana flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_bw = new EmojiInfo("flag-bw", "1f1e7-1f1fc.png", "botswana flag", "🇧🇼", true, true, true, true);
-
-		/// <summary>
-		/// :flag-by: 🇧🇾 belarus flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_by = new EmojiInfo("flag-by", "1f1e7-1f1fe.png", "belarus flag", "🇧🇾", true, true, true, true);
-
-		/// <summary>
-		/// :flag-bz: 🇧🇿 belize flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_bz = new EmojiInfo("flag-bz", "1f1e7-1f1ff.png", "belize flag", "🇧🇿", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ca: 🇨🇦 canada flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ca = new EmojiInfo("flag-ca", "1f1e8-1f1e6.png", "canada flag", "🇨🇦", true, true, true, true);
-
-		/// <summary>
-		/// :flag-cc: 🇨🇨 cocos (keeling) islands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_cc = new EmojiInfo("flag-cc", "1f1e8-1f1e8.png", "cocos (keeling) islands flag", "🇨🇨", true, true, true, true);
-
-		/// <summary>
-		/// :flag-cd: 🇨🇩 congo - kinshasa flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_cd = new EmojiInfo("flag-cd", "1f1e8-1f1e9.png", "congo - kinshasa flag", "🇨🇩", true, true, true, true);
-
-		/// <summary>
-		/// :flag-cf: 🇨🇫 central african republic flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_cf = new EmojiInfo("flag-cf", "1f1e8-1f1eb.png", "central african republic flag", "🇨🇫", true, true, true, true);
-
-		/// <summary>
-		/// :flag-cg: 🇨🇬 congo - brazzaville flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_cg = new EmojiInfo("flag-cg", "1f1e8-1f1ec.png", "congo - brazzaville flag", "🇨🇬", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ch: 🇨🇭 switzerland flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ch = new EmojiInfo("flag-ch", "1f1e8-1f1ed.png", "switzerland flag", "🇨🇭", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ci: 🇨🇮 côte d’ivoire flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ci = new EmojiInfo("flag-ci", "1f1e8-1f1ee.png", "côte d’ivoire flag", "🇨🇮", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ck: 🇨🇰 cook islands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ck = new EmojiInfo("flag-ck", "1f1e8-1f1f0.png", "cook islands flag", "🇨🇰", true, true, true, true);
-
-		/// <summary>
-		/// :flag-cl: 🇨🇱 chile flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_cl = new EmojiInfo("flag-cl", "1f1e8-1f1f1.png", "chile flag", "🇨🇱", true, true, true, true);
-
-		/// <summary>
-		/// :flag-cm: 🇨🇲 cameroon flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_cm = new EmojiInfo("flag-cm", "1f1e8-1f1f2.png", "cameroon flag", "🇨🇲", true, true, true, true);
-
-		/// <summary>
-		/// :cn: 🇨🇳 china flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_cn = new EmojiInfo("cn", "1f1e8-1f1f3.png", "china flag", "🇨🇳", true, true, true, true);
-
-		/// <summary>
-		/// :flag-co: 🇨🇴 colombia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_co = new EmojiInfo("flag-co", "1f1e8-1f1f4.png", "colombia flag", "🇨🇴", true, true, true, true);
-
-		/// <summary>
-		/// :flag-cp: 🇨🇵 clipperton island flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_cp = new EmojiInfo("flag-cp", "1f1e8-1f1f5.png", "clipperton island flag", "🇨🇵", true, true, true, true);
-
-		/// <summary>
-		/// :flag-cr: 🇨🇷 costa rica flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_cr = new EmojiInfo("flag-cr", "1f1e8-1f1f7.png", "costa rica flag", "🇨🇷", true, true, true, true);
-
-		/// <summary>
-		/// :flag-cu: 🇨🇺 cuba flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_cu = new EmojiInfo("flag-cu", "1f1e8-1f1fa.png", "cuba flag", "🇨🇺", true, true, true, true);
-
-		/// <summary>
-		/// :flag-cv: 🇨🇻 cape verde flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_cv = new EmojiInfo("flag-cv", "1f1e8-1f1fb.png", "cape verde flag", "🇨🇻", true, true, true, true);
-
-		/// <summary>
-		/// :flag-cw: 🇨🇼 curaçao flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_cw = new EmojiInfo("flag-cw", "1f1e8-1f1fc.png", "curaçao flag", "🇨🇼", true, true, true, true);
-
-		/// <summary>
-		/// :flag-cx: 🇨🇽 christmas island flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_cx = new EmojiInfo("flag-cx", "1f1e8-1f1fd.png", "christmas island flag", "🇨🇽", true, true, true, true);
-
-		/// <summary>
-		/// :flag-cy: 🇨🇾 cyprus flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_cy = new EmojiInfo("flag-cy", "1f1e8-1f1fe.png", "cyprus flag", "🇨🇾", true, true, true, true);
-
-		/// <summary>
-		/// :flag-cz: 🇨🇿 czechia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_cz = new EmojiInfo("flag-cz", "1f1e8-1f1ff.png", "czechia flag", "🇨🇿", true, true, true, true);
-
-		/// <summary>
-		/// :de: 🇩🇪 germany flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_de = new EmojiInfo("de", "1f1e9-1f1ea.png", "germany flag", "🇩🇪", true, true, true, true);
-
-		/// <summary>
-		/// :flag-dg: 🇩🇬 diego garcia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_dg = new EmojiInfo("flag-dg", "1f1e9-1f1ec.png", "diego garcia flag", "🇩🇬", true, true, true, true);
-
-		/// <summary>
-		/// :flag-dj: 🇩🇯 djibouti flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_dj = new EmojiInfo("flag-dj", "1f1e9-1f1ef.png", "djibouti flag", "🇩🇯", true, true, true, true);
-
-		/// <summary>
-		/// :flag-dk: 🇩🇰 denmark flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_dk = new EmojiInfo("flag-dk", "1f1e9-1f1f0.png", "denmark flag", "🇩🇰", true, true, true, true);
-
-		/// <summary>
-		/// :flag-dm: 🇩🇲 dominica flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_dm = new EmojiInfo("flag-dm", "1f1e9-1f1f2.png", "dominica flag", "🇩🇲", true, true, true, true);
-
-		/// <summary>
-		/// :flag-do: 🇩🇴 dominican republic flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_do = new EmojiInfo("flag-do", "1f1e9-1f1f4.png", "dominican republic flag", "🇩🇴", true, true, true, true);
-
-		/// <summary>
-		/// :flag-dz: 🇩🇿 algeria flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_dz = new EmojiInfo("flag-dz", "1f1e9-1f1ff.png", "algeria flag", "🇩🇿", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ea: 🇪🇦 ceuta &amp; melilla flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ea = new EmojiInfo("flag-ea", "1f1ea-1f1e6.png", "ceuta &amp; melilla flag", "🇪🇦", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ec: 🇪🇨 ecuador flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ec = new EmojiInfo("flag-ec", "1f1ea-1f1e8.png", "ecuador flag", "🇪🇨", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ee: 🇪🇪 estonia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ee = new EmojiInfo("flag-ee", "1f1ea-1f1ea.png", "estonia flag", "🇪🇪", true, true, true, true);
-
-		/// <summary>
-		/// :flag-eg: 🇪🇬 egypt flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_eg = new EmojiInfo("flag-eg", "1f1ea-1f1ec.png", "egypt flag", "🇪🇬", true, true, true, true);
-
-		/// <summary>
-		/// :flag-eh: 🇪🇭 western sahara flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_eh = new EmojiInfo("flag-eh", "1f1ea-1f1ed.png", "western sahara flag", "🇪🇭", true, true, true, true);
-
-		/// <summary>
-		/// :flag-er: 🇪🇷 eritrea flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_er = new EmojiInfo("flag-er", "1f1ea-1f1f7.png", "eritrea flag", "🇪🇷", true, true, true, true);
-
-		/// <summary>
-		/// :es: 🇪🇸 spain flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_es = new EmojiInfo("es", "1f1ea-1f1f8.png", "spain flag", "🇪🇸", true, true, true, true);
-
-		/// <summary>
-		/// :flag-et: 🇪🇹 ethiopia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_et = new EmojiInfo("flag-et", "1f1ea-1f1f9.png", "ethiopia flag", "🇪🇹", true, true, true, true);
-
-		/// <summary>
-		/// :flag-eu: 🇪🇺 european union flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_eu = new EmojiInfo("flag-eu", "1f1ea-1f1fa.png", "european union flag", "🇪🇺", true, true, true, true);
-
-		/// <summary>
-		/// :flag-fi: 🇫🇮 finland flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_fi = new EmojiInfo("flag-fi", "1f1eb-1f1ee.png", "finland flag", "🇫🇮", true, true, true, true);
-
-		/// <summary>
-		/// :flag-fj: 🇫🇯 fiji flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_fj = new EmojiInfo("flag-fj", "1f1eb-1f1ef.png", "fiji flag", "🇫🇯", true, true, true, true);
-
-		/// <summary>
-		/// :flag-fk: 🇫🇰 falkland islands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_fk = new EmojiInfo("flag-fk", "1f1eb-1f1f0.png", "falkland islands flag", "🇫🇰", true, true, true, true);
-
-		/// <summary>
-		/// :flag-fm: 🇫🇲 micronesia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_fm = new EmojiInfo("flag-fm", "1f1eb-1f1f2.png", "micronesia flag", "🇫🇲", true, true, true, true);
-
-		/// <summary>
-		/// :flag-fo: 🇫🇴 faroe islands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_fo = new EmojiInfo("flag-fo", "1f1eb-1f1f4.png", "faroe islands flag", "🇫🇴", true, true, true, true);
-
-		/// <summary>
-		/// :fr: 🇫🇷 france flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_fr = new EmojiInfo("fr", "1f1eb-1f1f7.png", "france flag", "🇫🇷", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ga: 🇬🇦 gabon flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ga = new EmojiInfo("flag-ga", "1f1ec-1f1e6.png", "gabon flag", "🇬🇦", true, true, true, true);
-
-		/// <summary>
-		/// :gb: 🇬🇧 united kingdom flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_gb = new EmojiInfo("gb", "1f1ec-1f1e7.png", "united kingdom flag", "🇬🇧", true, true, true, true);
-
-		/// <summary>
-		/// :flag-gd: 🇬🇩 grenada flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_gd = new EmojiInfo("flag-gd", "1f1ec-1f1e9.png", "grenada flag", "🇬🇩", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ge: 🇬🇪 georgia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ge = new EmojiInfo("flag-ge", "1f1ec-1f1ea.png", "georgia flag", "🇬🇪", true, true, true, true);
-
-		/// <summary>
-		/// :flag-gf: 🇬🇫 french guiana flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_gf = new EmojiInfo("flag-gf", "1f1ec-1f1eb.png", "french guiana flag", "🇬🇫", true, true, true, true);
-
-		/// <summary>
-		/// :flag-gg: 🇬🇬 guernsey flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_gg = new EmojiInfo("flag-gg", "1f1ec-1f1ec.png", "guernsey flag", "🇬🇬", true, true, true, true);
-
-		/// <summary>
-		/// :flag-gh: 🇬🇭 ghana flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_gh = new EmojiInfo("flag-gh", "1f1ec-1f1ed.png", "ghana flag", "🇬🇭", true, true, true, true);
-
-		/// <summary>
-		/// :flag-gi: 🇬🇮 gibraltar flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_gi = new EmojiInfo("flag-gi", "1f1ec-1f1ee.png", "gibraltar flag", "🇬🇮", true, true, true, true);
-
-		/// <summary>
-		/// :flag-gl: 🇬🇱 greenland flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_gl = new EmojiInfo("flag-gl", "1f1ec-1f1f1.png", "greenland flag", "🇬🇱", true, true, true, true);
-
-		/// <summary>
-		/// :flag-gm: 🇬🇲 gambia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_gm = new EmojiInfo("flag-gm", "1f1ec-1f1f2.png", "gambia flag", "🇬🇲", true, true, true, true);
-
-		/// <summary>
-		/// :flag-gn: 🇬🇳 guinea flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_gn = new EmojiInfo("flag-gn", "1f1ec-1f1f3.png", "guinea flag", "🇬🇳", true, true, true, true);
-
-		/// <summary>
-		/// :flag-gp: 🇬🇵 guadeloupe flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_gp = new EmojiInfo("flag-gp", "1f1ec-1f1f5.png", "guadeloupe flag", "🇬🇵", true, true, true, true);
-
-		/// <summary>
-		/// :flag-gq: 🇬🇶 equatorial guinea flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_gq = new EmojiInfo("flag-gq", "1f1ec-1f1f6.png", "equatorial guinea flag", "🇬🇶", true, true, true, true);
-
-		/// <summary>
-		/// :flag-gr: 🇬🇷 greece flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_gr = new EmojiInfo("flag-gr", "1f1ec-1f1f7.png", "greece flag", "🇬🇷", true, true, true, true);
-
-		/// <summary>
-		/// :flag-gs: 🇬🇸 south georgia &amp; south sandwich islands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_gs = new EmojiInfo("flag-gs", "1f1ec-1f1f8.png", "south georgia &amp; south sandwich islands flag", "🇬🇸", true, true, true, true);
-
-		/// <summary>
-		/// :flag-gt: 🇬🇹 guatemala flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_gt = new EmojiInfo("flag-gt", "1f1ec-1f1f9.png", "guatemala flag", "🇬🇹", true, true, true, true);
-
-		/// <summary>
-		/// :flag-gu: 🇬🇺 guam flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_gu = new EmojiInfo("flag-gu", "1f1ec-1f1fa.png", "guam flag", "🇬🇺", true, true, true, true);
-
-		/// <summary>
-		/// :flag-gw: 🇬🇼 guinea-bissau flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_gw = new EmojiInfo("flag-gw", "1f1ec-1f1fc.png", "guinea-bissau flag", "🇬🇼", true, true, true, true);
-
-		/// <summary>
-		/// :flag-gy: 🇬🇾 guyana flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_gy = new EmojiInfo("flag-gy", "1f1ec-1f1fe.png", "guyana flag", "🇬🇾", true, true, true, true);
-
-		/// <summary>
-		/// :flag-hk: 🇭🇰 hong kong sar china flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_hk = new EmojiInfo("flag-hk", "1f1ed-1f1f0.png", "hong kong sar china flag", "🇭🇰", true, true, true, true);
-
-		/// <summary>
-		/// :flag-hm: 🇭🇲 heard &amp; mcdonald islands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_hm = new EmojiInfo("flag-hm", "1f1ed-1f1f2.png", "heard &amp; mcdonald islands flag", "🇭🇲", true, true, true, true);
-
-		/// <summary>
-		/// :flag-hn: 🇭🇳 honduras flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_hn = new EmojiInfo("flag-hn", "1f1ed-1f1f3.png", "honduras flag", "🇭🇳", true, true, true, true);
-
-		/// <summary>
-		/// :flag-hr: 🇭🇷 croatia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_hr = new EmojiInfo("flag-hr", "1f1ed-1f1f7.png", "croatia flag", "🇭🇷", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ht: 🇭🇹 haiti flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ht = new EmojiInfo("flag-ht", "1f1ed-1f1f9.png", "haiti flag", "🇭🇹", true, true, true, true);
-
-		/// <summary>
-		/// :flag-hu: 🇭🇺 hungary flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_hu = new EmojiInfo("flag-hu", "1f1ed-1f1fa.png", "hungary flag", "🇭🇺", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ic: 🇮🇨 canary islands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ic = new EmojiInfo("flag-ic", "1f1ee-1f1e8.png", "canary islands flag", "🇮🇨", true, true, true, true);
-
-		/// <summary>
-		/// :flag-id: 🇮🇩 indonesia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_id = new EmojiInfo("flag-id", "1f1ee-1f1e9.png", "indonesia flag", "🇮🇩", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ie: 🇮🇪 ireland flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ie = new EmojiInfo("flag-ie", "1f1ee-1f1ea.png", "ireland flag", "🇮🇪", true, true, true, true);
-
-		/// <summary>
-		/// :flag-il: 🇮🇱 israel flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_il = new EmojiInfo("flag-il", "1f1ee-1f1f1.png", "israel flag", "🇮🇱", true, true, true, true);
-
-		/// <summary>
-		/// :flag-im: 🇮🇲 isle of man flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_im = new EmojiInfo("flag-im", "1f1ee-1f1f2.png", "isle of man flag", "🇮🇲", true, true, true, true);
-
-		/// <summary>
-		/// :flag-in: 🇮🇳 india flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_in = new EmojiInfo("flag-in", "1f1ee-1f1f3.png", "india flag", "🇮🇳", true, true, true, true);
-
-		/// <summary>
-		/// :flag-io: 🇮🇴 british indian ocean territory flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_io = new EmojiInfo("flag-io", "1f1ee-1f1f4.png", "british indian ocean territory flag", "🇮🇴", true, true, true, true);
-
-		/// <summary>
-		/// :flag-iq: 🇮🇶 iraq flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_iq = new EmojiInfo("flag-iq", "1f1ee-1f1f6.png", "iraq flag", "🇮🇶", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ir: 🇮🇷 iran flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ir = new EmojiInfo("flag-ir", "1f1ee-1f1f7.png", "iran flag", "🇮🇷", true, true, true, true);
-
-		/// <summary>
-		/// :flag-is: 🇮🇸 iceland flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_is = new EmojiInfo("flag-is", "1f1ee-1f1f8.png", "iceland flag", "🇮🇸", true, true, true, true);
-
-		/// <summary>
-		/// :it: 🇮🇹 italy flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_it = new EmojiInfo("it", "1f1ee-1f1f9.png", "italy flag", "🇮🇹", true, true, true, true);
-
-		/// <summary>
-		/// :flag-je: 🇯🇪 jersey flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_je = new EmojiInfo("flag-je", "1f1ef-1f1ea.png", "jersey flag", "🇯🇪", true, true, true, true);
-
-		/// <summary>
-		/// :flag-jm: 🇯🇲 jamaica flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_jm = new EmojiInfo("flag-jm", "1f1ef-1f1f2.png", "jamaica flag", "🇯🇲", true, true, true, true);
-
-		/// <summary>
-		/// :flag-jo: 🇯🇴 jordan flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_jo = new EmojiInfo("flag-jo", "1f1ef-1f1f4.png", "jordan flag", "🇯🇴", true, true, true, true);
-
-		/// <summary>
-		/// :jp: 🇯🇵 japan flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_jp = new EmojiInfo("jp", "1f1ef-1f1f5.png", "japan flag", "🇯🇵", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ke: 🇰🇪 kenya flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ke = new EmojiInfo("flag-ke", "1f1f0-1f1ea.png", "kenya flag", "🇰🇪", true, true, true, true);
-
-		/// <summary>
-		/// :flag-kg: 🇰🇬 kyrgyzstan flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_kg = new EmojiInfo("flag-kg", "1f1f0-1f1ec.png", "kyrgyzstan flag", "🇰🇬", true, true, true, true);
-
-		/// <summary>
-		/// :flag-kh: 🇰🇭 cambodia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_kh = new EmojiInfo("flag-kh", "1f1f0-1f1ed.png", "cambodia flag", "🇰🇭", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ki: 🇰🇮 kiribati flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ki = new EmojiInfo("flag-ki", "1f1f0-1f1ee.png", "kiribati flag", "🇰🇮", true, true, true, true);
-
-		/// <summary>
-		/// :flag-km: 🇰🇲 comoros flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_km = new EmojiInfo("flag-km", "1f1f0-1f1f2.png", "comoros flag", "🇰🇲", true, true, true, true);
-
-		/// <summary>
-		/// :flag-kn: 🇰🇳 st. kitts &amp; nevis flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_kn = new EmojiInfo("flag-kn", "1f1f0-1f1f3.png", "st. kitts &amp; nevis flag", "🇰🇳", true, true, true, true);
-
-		/// <summary>
-		/// :flag-kp: 🇰🇵 north korea flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_kp = new EmojiInfo("flag-kp", "1f1f0-1f1f5.png", "north korea flag", "🇰🇵", true, true, true, true);
-
-		/// <summary>
-		/// :kr: 🇰🇷 south korea flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_kr = new EmojiInfo("kr", "1f1f0-1f1f7.png", "south korea flag", "🇰🇷", true, true, true, true);
-
-		/// <summary>
-		/// :flag-kw: 🇰🇼 kuwait flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_kw = new EmojiInfo("flag-kw", "1f1f0-1f1fc.png", "kuwait flag", "🇰🇼", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ky: 🇰🇾 cayman islands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ky = new EmojiInfo("flag-ky", "1f1f0-1f1fe.png", "cayman islands flag", "🇰🇾", true, true, true, true);
-
-		/// <summary>
-		/// :flag-kz: 🇰🇿 kazakhstan flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_kz = new EmojiInfo("flag-kz", "1f1f0-1f1ff.png", "kazakhstan flag", "🇰🇿", true, true, true, true);
-
-		/// <summary>
-		/// :flag-la: 🇱🇦 laos flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_la = new EmojiInfo("flag-la", "1f1f1-1f1e6.png", "laos flag", "🇱🇦", true, true, true, true);
-
-		/// <summary>
-		/// :flag-lb: 🇱🇧 lebanon flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_lb = new EmojiInfo("flag-lb", "1f1f1-1f1e7.png", "lebanon flag", "🇱🇧", true, true, true, true);
-
-		/// <summary>
-		/// :flag-lc: 🇱🇨 st. lucia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_lc = new EmojiInfo("flag-lc", "1f1f1-1f1e8.png", "st. lucia flag", "🇱🇨", true, true, true, true);
-
-		/// <summary>
-		/// :flag-li: 🇱🇮 liechtenstein flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_li = new EmojiInfo("flag-li", "1f1f1-1f1ee.png", "liechtenstein flag", "🇱🇮", true, true, true, true);
-
-		/// <summary>
-		/// :flag-lk: 🇱🇰 sri lanka flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_lk = new EmojiInfo("flag-lk", "1f1f1-1f1f0.png", "sri lanka flag", "🇱🇰", true, true, true, true);
-
-		/// <summary>
-		/// :flag-lr: 🇱🇷 liberia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_lr = new EmojiInfo("flag-lr", "1f1f1-1f1f7.png", "liberia flag", "🇱🇷", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ls: 🇱🇸 lesotho flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ls = new EmojiInfo("flag-ls", "1f1f1-1f1f8.png", "lesotho flag", "🇱🇸", true, true, true, true);
-
-		/// <summary>
-		/// :flag-lt: 🇱🇹 lithuania flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_lt = new EmojiInfo("flag-lt", "1f1f1-1f1f9.png", "lithuania flag", "🇱🇹", true, true, true, true);
-
-		/// <summary>
-		/// :flag-lu: 🇱🇺 luxembourg flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_lu = new EmojiInfo("flag-lu", "1f1f1-1f1fa.png", "luxembourg flag", "🇱🇺", true, true, true, true);
-
-		/// <summary>
-		/// :flag-lv: 🇱🇻 latvia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_lv = new EmojiInfo("flag-lv", "1f1f1-1f1fb.png", "latvia flag", "🇱🇻", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ly: 🇱🇾 libya flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ly = new EmojiInfo("flag-ly", "1f1f1-1f1fe.png", "libya flag", "🇱🇾", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ma: 🇲🇦 morocco flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ma = new EmojiInfo("flag-ma", "1f1f2-1f1e6.png", "morocco flag", "🇲🇦", true, true, true, true);
-
-		/// <summary>
-		/// :flag-mc: 🇲🇨 monaco flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_mc = new EmojiInfo("flag-mc", "1f1f2-1f1e8.png", "monaco flag", "🇲🇨", true, true, true, true);
-
-		/// <summary>
-		/// :flag-md: 🇲🇩 moldova flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_md = new EmojiInfo("flag-md", "1f1f2-1f1e9.png", "moldova flag", "🇲🇩", true, true, true, true);
-
-		/// <summary>
-		/// :flag-me: 🇲🇪 montenegro flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_me = new EmojiInfo("flag-me", "1f1f2-1f1ea.png", "montenegro flag", "🇲🇪", true, true, true, true);
-
-		/// <summary>
-		/// :flag-mf: 🇲🇫 st. martin flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_mf = new EmojiInfo("flag-mf", "1f1f2-1f1eb.png", "st. martin flag", "🇲🇫", true, true, true, true);
-
-		/// <summary>
-		/// :flag-mg: 🇲🇬 madagascar flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_mg = new EmojiInfo("flag-mg", "1f1f2-1f1ec.png", "madagascar flag", "🇲🇬", true, true, true, true);
-
-		/// <summary>
-		/// :flag-mh: 🇲🇭 marshall islands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_mh = new EmojiInfo("flag-mh", "1f1f2-1f1ed.png", "marshall islands flag", "🇲🇭", true, true, true, true);
-
-		/// <summary>
-		/// :flag-mk: 🇲🇰 north macedonia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_mk = new EmojiInfo("flag-mk", "1f1f2-1f1f0.png", "north macedonia flag", "🇲🇰", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ml: 🇲🇱 mali flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ml = new EmojiInfo("flag-ml", "1f1f2-1f1f1.png", "mali flag", "🇲🇱", true, true, true, true);
-
-		/// <summary>
-		/// :flag-mm: 🇲🇲 myanmar (burma) flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_mm = new EmojiInfo("flag-mm", "1f1f2-1f1f2.png", "myanmar (burma) flag", "🇲🇲", true, true, true, true);
-
-		/// <summary>
-		/// :flag-mn: 🇲🇳 mongolia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_mn = new EmojiInfo("flag-mn", "1f1f2-1f1f3.png", "mongolia flag", "🇲🇳", true, true, true, true);
-
-		/// <summary>
-		/// :flag-mo: 🇲🇴 macao sar china flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_mo = new EmojiInfo("flag-mo", "1f1f2-1f1f4.png", "macao sar china flag", "🇲🇴", true, true, true, true);
-
-		/// <summary>
-		/// :flag-mp: 🇲🇵 northern mariana islands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_mp = new EmojiInfo("flag-mp", "1f1f2-1f1f5.png", "northern mariana islands flag", "🇲🇵", true, true, true, true);
-
-		/// <summary>
-		/// :flag-mq: 🇲🇶 martinique flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_mq = new EmojiInfo("flag-mq", "1f1f2-1f1f6.png", "martinique flag", "🇲🇶", true, true, true, true);
-
-		/// <summary>
-		/// :flag-mr: 🇲🇷 mauritania flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_mr = new EmojiInfo("flag-mr", "1f1f2-1f1f7.png", "mauritania flag", "🇲🇷", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ms: 🇲🇸 montserrat flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ms = new EmojiInfo("flag-ms", "1f1f2-1f1f8.png", "montserrat flag", "🇲🇸", true, true, true, true);
-
-		/// <summary>
-		/// :flag-mt: 🇲🇹 malta flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_mt = new EmojiInfo("flag-mt", "1f1f2-1f1f9.png", "malta flag", "🇲🇹", true, true, true, true);
-
-		/// <summary>
-		/// :flag-mu: 🇲🇺 mauritius flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_mu = new EmojiInfo("flag-mu", "1f1f2-1f1fa.png", "mauritius flag", "🇲🇺", true, true, true, true);
-
-		/// <summary>
-		/// :flag-mv: 🇲🇻 maldives flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_mv = new EmojiInfo("flag-mv", "1f1f2-1f1fb.png", "maldives flag", "🇲🇻", true, true, true, true);
-
-		/// <summary>
-		/// :flag-mw: 🇲🇼 malawi flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_mw = new EmojiInfo("flag-mw", "1f1f2-1f1fc.png", "malawi flag", "🇲🇼", true, true, true, true);
-
-		/// <summary>
-		/// :flag-mx: 🇲🇽 mexico flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_mx = new EmojiInfo("flag-mx", "1f1f2-1f1fd.png", "mexico flag", "🇲🇽", true, true, true, true);
-
-		/// <summary>
-		/// :flag-my: 🇲🇾 malaysia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_my = new EmojiInfo("flag-my", "1f1f2-1f1fe.png", "malaysia flag", "🇲🇾", true, true, true, true);
-
-		/// <summary>
-		/// :flag-mz: 🇲🇿 mozambique flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_mz = new EmojiInfo("flag-mz", "1f1f2-1f1ff.png", "mozambique flag", "🇲🇿", true, true, true, true);
-
-		/// <summary>
-		/// :flag-na: 🇳🇦 namibia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_na = new EmojiInfo("flag-na", "1f1f3-1f1e6.png", "namibia flag", "🇳🇦", true, true, true, true);
-
-		/// <summary>
-		/// :flag-nc: 🇳🇨 new caledonia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_nc = new EmojiInfo("flag-nc", "1f1f3-1f1e8.png", "new caledonia flag", "🇳🇨", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ne: 🇳🇪 niger flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ne = new EmojiInfo("flag-ne", "1f1f3-1f1ea.png", "niger flag", "🇳🇪", true, true, true, true);
-
-		/// <summary>
-		/// :flag-nf: 🇳🇫 norfolk island flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_nf = new EmojiInfo("flag-nf", "1f1f3-1f1eb.png", "norfolk island flag", "🇳🇫", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ng: 🇳🇬 nigeria flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ng = new EmojiInfo("flag-ng", "1f1f3-1f1ec.png", "nigeria flag", "🇳🇬", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ni: 🇳🇮 nicaragua flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ni = new EmojiInfo("flag-ni", "1f1f3-1f1ee.png", "nicaragua flag", "🇳🇮", true, true, true, true);
-
-		/// <summary>
-		/// :flag-nl: 🇳🇱 netherlands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_nl = new EmojiInfo("flag-nl", "1f1f3-1f1f1.png", "netherlands flag", "🇳🇱", true, true, true, true);
-
-		/// <summary>
-		/// :flag-no: 🇳🇴 norway flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_no = new EmojiInfo("flag-no", "1f1f3-1f1f4.png", "norway flag", "🇳🇴", true, true, true, true);
-
-		/// <summary>
-		/// :flag-np: 🇳🇵 nepal flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_np = new EmojiInfo("flag-np", "1f1f3-1f1f5.png", "nepal flag", "🇳🇵", true, true, true, true);
-
-		/// <summary>
-		/// :flag-nr: 🇳🇷 nauru flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_nr = new EmojiInfo("flag-nr", "1f1f3-1f1f7.png", "nauru flag", "🇳🇷", true, true, true, true);
-
-		/// <summary>
-		/// :flag-nu: 🇳🇺 niue flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_nu = new EmojiInfo("flag-nu", "1f1f3-1f1fa.png", "niue flag", "🇳🇺", true, true, true, true);
-
-		/// <summary>
-		/// :flag-nz: 🇳🇿 new zealand flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_nz = new EmojiInfo("flag-nz", "1f1f3-1f1ff.png", "new zealand flag", "🇳🇿", true, true, true, true);
-
-		/// <summary>
-		/// :flag-om: 🇴🇲 oman flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_om = new EmojiInfo("flag-om", "1f1f4-1f1f2.png", "oman flag", "🇴🇲", true, true, true, true);
-
-		/// <summary>
-		/// :flag-pa: 🇵🇦 panama flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_pa = new EmojiInfo("flag-pa", "1f1f5-1f1e6.png", "panama flag", "🇵🇦", true, true, true, true);
-
-		/// <summary>
-		/// :flag-pe: 🇵🇪 peru flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_pe = new EmojiInfo("flag-pe", "1f1f5-1f1ea.png", "peru flag", "🇵🇪", true, true, true, true);
-
-		/// <summary>
-		/// :flag-pf: 🇵🇫 french polynesia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_pf = new EmojiInfo("flag-pf", "1f1f5-1f1eb.png", "french polynesia flag", "🇵🇫", true, true, true, true);
-
-		/// <summary>
-		/// :flag-pg: 🇵🇬 papua new guinea flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_pg = new EmojiInfo("flag-pg", "1f1f5-1f1ec.png", "papua new guinea flag", "🇵🇬", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ph: 🇵🇭 philippines flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ph = new EmojiInfo("flag-ph", "1f1f5-1f1ed.png", "philippines flag", "🇵🇭", true, true, true, true);
-
-		/// <summary>
-		/// :flag-pk: 🇵🇰 pakistan flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_pk = new EmojiInfo("flag-pk", "1f1f5-1f1f0.png", "pakistan flag", "🇵🇰", true, true, true, true);
-
-		/// <summary>
-		/// :flag-pl: 🇵🇱 poland flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_pl = new EmojiInfo("flag-pl", "1f1f5-1f1f1.png", "poland flag", "🇵🇱", true, true, true, true);
-
-		/// <summary>
-		/// :flag-pm: 🇵🇲 st. pierre &amp; miquelon flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_pm = new EmojiInfo("flag-pm", "1f1f5-1f1f2.png", "st. pierre &amp; miquelon flag", "🇵🇲", true, true, true, true);
-
-		/// <summary>
-		/// :flag-pn: 🇵🇳 pitcairn islands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_pn = new EmojiInfo("flag-pn", "1f1f5-1f1f3.png", "pitcairn islands flag", "🇵🇳", true, true, true, true);
-
-		/// <summary>
-		/// :flag-pr: 🇵🇷 puerto rico flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_pr = new EmojiInfo("flag-pr", "1f1f5-1f1f7.png", "puerto rico flag", "🇵🇷", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ps: 🇵🇸 palestinian territories flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ps = new EmojiInfo("flag-ps", "1f1f5-1f1f8.png", "palestinian territories flag", "🇵🇸", true, true, true, true);
-
-		/// <summary>
-		/// :flag-pt: 🇵🇹 portugal flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_pt = new EmojiInfo("flag-pt", "1f1f5-1f1f9.png", "portugal flag", "🇵🇹", true, true, true, true);
-
-		/// <summary>
-		/// :flag-pw: 🇵🇼 palau flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_pw = new EmojiInfo("flag-pw", "1f1f5-1f1fc.png", "palau flag", "🇵🇼", true, true, true, true);
-
-		/// <summary>
-		/// :flag-py: 🇵🇾 paraguay flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_py = new EmojiInfo("flag-py", "1f1f5-1f1fe.png", "paraguay flag", "🇵🇾", true, true, true, true);
-
-		/// <summary>
-		/// :flag-qa: 🇶🇦 qatar flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_qa = new EmojiInfo("flag-qa", "1f1f6-1f1e6.png", "qatar flag", "🇶🇦", true, true, true, true);
-
-		/// <summary>
-		/// :flag-re: 🇷🇪 réunion flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_re = new EmojiInfo("flag-re", "1f1f7-1f1ea.png", "réunion flag", "🇷🇪", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ro: 🇷🇴 romania flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ro = new EmojiInfo("flag-ro", "1f1f7-1f1f4.png", "romania flag", "🇷🇴", true, true, true, true);
-
-		/// <summary>
-		/// :flag-rs: 🇷🇸 serbia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_rs = new EmojiInfo("flag-rs", "1f1f7-1f1f8.png", "serbia flag", "🇷🇸", true, true, true, true);
-
-		/// <summary>
-		/// :ru: 🇷🇺 russia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_ru = new EmojiInfo("ru", "1f1f7-1f1fa.png", "russia flag", "🇷🇺", true, true, true, true);
-
-		/// <summary>
-		/// :flag-rw: 🇷🇼 rwanda flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_rw = new EmojiInfo("flag-rw", "1f1f7-1f1fc.png", "rwanda flag", "🇷🇼", true, true, true, true);
-
-		/// <summary>
-		/// :flag-sa: 🇸🇦 saudi arabia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_sa = new EmojiInfo("flag-sa", "1f1f8-1f1e6.png", "saudi arabia flag", "🇸🇦", true, true, true, true);
-
-		/// <summary>
-		/// :flag-sb: 🇸🇧 solomon islands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_sb = new EmojiInfo("flag-sb", "1f1f8-1f1e7.png", "solomon islands flag", "🇸🇧", true, true, true, true);
-
-		/// <summary>
-		/// :flag-sc: 🇸🇨 seychelles flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_sc = new EmojiInfo("flag-sc", "1f1f8-1f1e8.png", "seychelles flag", "🇸🇨", true, true, true, true);
-
-		/// <summary>
-		/// :flag-sd: 🇸🇩 sudan flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_sd = new EmojiInfo("flag-sd", "1f1f8-1f1e9.png", "sudan flag", "🇸🇩", true, true, true, true);
-
-		/// <summary>
-		/// :flag-se: 🇸🇪 sweden flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_se = new EmojiInfo("flag-se", "1f1f8-1f1ea.png", "sweden flag", "🇸🇪", true, true, true, true);
-
-		/// <summary>
-		/// :flag-sg: 🇸🇬 singapore flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_sg = new EmojiInfo("flag-sg", "1f1f8-1f1ec.png", "singapore flag", "🇸🇬", true, true, true, true);
-
-		/// <summary>
-		/// :flag-sh: 🇸🇭 st. helena flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_sh = new EmojiInfo("flag-sh", "1f1f8-1f1ed.png", "st. helena flag", "🇸🇭", true, true, true, true);
-
-		/// <summary>
-		/// :flag-si: 🇸🇮 slovenia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_si = new EmojiInfo("flag-si", "1f1f8-1f1ee.png", "slovenia flag", "🇸🇮", true, true, true, true);
-
-		/// <summary>
-		/// :flag-sj: 🇸🇯 svalbard &amp; jan mayen flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_sj = new EmojiInfo("flag-sj", "1f1f8-1f1ef.png", "svalbard &amp; jan mayen flag", "🇸🇯", true, true, true, true);
-
-		/// <summary>
-		/// :flag-sk: 🇸🇰 slovakia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_sk = new EmojiInfo("flag-sk", "1f1f8-1f1f0.png", "slovakia flag", "🇸🇰", true, true, true, true);
-
-		/// <summary>
-		/// :flag-sl: 🇸🇱 sierra leone flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_sl = new EmojiInfo("flag-sl", "1f1f8-1f1f1.png", "sierra leone flag", "🇸🇱", true, true, true, true);
-
-		/// <summary>
-		/// :flag-sm: 🇸🇲 san marino flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_sm = new EmojiInfo("flag-sm", "1f1f8-1f1f2.png", "san marino flag", "🇸🇲", true, true, true, true);
-
-		/// <summary>
-		/// :flag-sn: 🇸🇳 senegal flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_sn = new EmojiInfo("flag-sn", "1f1f8-1f1f3.png", "senegal flag", "🇸🇳", true, true, true, true);
-
-		/// <summary>
-		/// :flag-so: 🇸🇴 somalia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_so = new EmojiInfo("flag-so", "1f1f8-1f1f4.png", "somalia flag", "🇸🇴", true, true, true, true);
-
-		/// <summary>
-		/// :flag-sr: 🇸🇷 suriname flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_sr = new EmojiInfo("flag-sr", "1f1f8-1f1f7.png", "suriname flag", "🇸🇷", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ss: 🇸🇸 south sudan flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ss = new EmojiInfo("flag-ss", "1f1f8-1f1f8.png", "south sudan flag", "🇸🇸", true, true, true, true);
-
-		/// <summary>
-		/// :flag-st: 🇸🇹 são tomé &amp; príncipe flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_st = new EmojiInfo("flag-st", "1f1f8-1f1f9.png", "são tomé &amp; príncipe flag", "🇸🇹", true, true, true, true);
-
-		/// <summary>
-		/// :flag-sv: 🇸🇻 el salvador flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_sv = new EmojiInfo("flag-sv", "1f1f8-1f1fb.png", "el salvador flag", "🇸🇻", true, true, true, true);
-
-		/// <summary>
-		/// :flag-sx: 🇸🇽 sint maarten flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_sx = new EmojiInfo("flag-sx", "1f1f8-1f1fd.png", "sint maarten flag", "🇸🇽", true, true, true, true);
-
-		/// <summary>
-		/// :flag-sy: 🇸🇾 syria flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_sy = new EmojiInfo("flag-sy", "1f1f8-1f1fe.png", "syria flag", "🇸🇾", true, true, true, true);
-
-		/// <summary>
-		/// :flag-sz: 🇸🇿 eswatini flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_sz = new EmojiInfo("flag-sz", "1f1f8-1f1ff.png", "eswatini flag", "🇸🇿", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ta: 🇹🇦 tristan da cunha flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ta = new EmojiInfo("flag-ta", "1f1f9-1f1e6.png", "tristan da cunha flag", "🇹🇦", true, true, true, true);
-
-		/// <summary>
-		/// :flag-tc: 🇹🇨 turks &amp; caicos islands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_tc = new EmojiInfo("flag-tc", "1f1f9-1f1e8.png", "turks &amp; caicos islands flag", "🇹🇨", true, true, true, true);
-
-		/// <summary>
-		/// :flag-td: 🇹🇩 chad flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_td = new EmojiInfo("flag-td", "1f1f9-1f1e9.png", "chad flag", "🇹🇩", true, true, true, true);
-
-		/// <summary>
-		/// :flag-tf: 🇹🇫 french southern territories flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_tf = new EmojiInfo("flag-tf", "1f1f9-1f1eb.png", "french southern territories flag", "🇹🇫", true, true, true, true);
-
-		/// <summary>
-		/// :flag-tg: 🇹🇬 togo flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_tg = new EmojiInfo("flag-tg", "1f1f9-1f1ec.png", "togo flag", "🇹🇬", true, true, true, true);
-
-		/// <summary>
-		/// :flag-th: 🇹🇭 thailand flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_th = new EmojiInfo("flag-th", "1f1f9-1f1ed.png", "thailand flag", "🇹🇭", true, true, true, true);
-
-		/// <summary>
-		/// :flag-tj: 🇹🇯 tajikistan flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_tj = new EmojiInfo("flag-tj", "1f1f9-1f1ef.png", "tajikistan flag", "🇹🇯", true, true, true, true);
-
-		/// <summary>
-		/// :flag-tk: 🇹🇰 tokelau flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_tk = new EmojiInfo("flag-tk", "1f1f9-1f1f0.png", "tokelau flag", "🇹🇰", true, true, true, true);
-
-		/// <summary>
-		/// :flag-tl: 🇹🇱 timor-leste flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_tl = new EmojiInfo("flag-tl", "1f1f9-1f1f1.png", "timor-leste flag", "🇹🇱", true, true, true, true);
-
-		/// <summary>
-		/// :flag-tm: 🇹🇲 turkmenistan flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_tm = new EmojiInfo("flag-tm", "1f1f9-1f1f2.png", "turkmenistan flag", "🇹🇲", true, true, true, true);
-
-		/// <summary>
-		/// :flag-tn: 🇹🇳 tunisia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_tn = new EmojiInfo("flag-tn", "1f1f9-1f1f3.png", "tunisia flag", "🇹🇳", true, true, true, true);
-
-		/// <summary>
-		/// :flag-to: 🇹🇴 tonga flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_to = new EmojiInfo("flag-to", "1f1f9-1f1f4.png", "tonga flag", "🇹🇴", true, true, true, true);
-
-		/// <summary>
-		/// :flag-tr: 🇹🇷 turkey flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_tr = new EmojiInfo("flag-tr", "1f1f9-1f1f7.png", "turkey flag", "🇹🇷", true, true, true, true);
-
-		/// <summary>
-		/// :flag-tt: 🇹🇹 trinidad &amp; tobago flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_tt = new EmojiInfo("flag-tt", "1f1f9-1f1f9.png", "trinidad &amp; tobago flag", "🇹🇹", true, true, true, true);
-
-		/// <summary>
-		/// :flag-tv: 🇹🇻 tuvalu flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_tv = new EmojiInfo("flag-tv", "1f1f9-1f1fb.png", "tuvalu flag", "🇹🇻", true, true, true, true);
-
-		/// <summary>
-		/// :flag-tw: 🇹🇼 taiwan flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_tw = new EmojiInfo("flag-tw", "1f1f9-1f1fc.png", "taiwan flag", "🇹🇼", true, true, true, true);
-
-		/// <summary>
-		/// :flag-tz: 🇹🇿 tanzania flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_tz = new EmojiInfo("flag-tz", "1f1f9-1f1ff.png", "tanzania flag", "🇹🇿", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ua: 🇺🇦 ukraine flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ua = new EmojiInfo("flag-ua", "1f1fa-1f1e6.png", "ukraine flag", "🇺🇦", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ug: 🇺🇬 uganda flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ug = new EmojiInfo("flag-ug", "1f1fa-1f1ec.png", "uganda flag", "🇺🇬", true, true, true, true);
-
-		/// <summary>
-		/// :flag-um: 🇺🇲 u.s. outlying islands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_um = new EmojiInfo("flag-um", "1f1fa-1f1f2.png", "u.s. outlying islands flag", "🇺🇲", true, true, true, true);
-
-		/// <summary>
-		/// :flag-un: 🇺🇳 united nations flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_un = new EmojiInfo("flag-un", "1f1fa-1f1f3.png", "united nations flag", "🇺🇳", true, true, true, true);
-
-		/// <summary>
-		/// :us: 🇺🇸 united states flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_us = new EmojiInfo("us", "1f1fa-1f1f8.png", "united states flag", "🇺🇸", true, true, true, true);
-
-		/// <summary>
-		/// :flag-uy: 🇺🇾 uruguay flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_uy = new EmojiInfo("flag-uy", "1f1fa-1f1fe.png", "uruguay flag", "🇺🇾", true, true, true, true);
-
-		/// <summary>
-		/// :flag-uz: 🇺🇿 uzbekistan flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_uz = new EmojiInfo("flag-uz", "1f1fa-1f1ff.png", "uzbekistan flag", "🇺🇿", true, true, true, true);
-
-		/// <summary>
-		/// :flag-va: 🇻🇦 vatican city flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_va = new EmojiInfo("flag-va", "1f1fb-1f1e6.png", "vatican city flag", "🇻🇦", true, true, true, true);
-
-		/// <summary>
-		/// :flag-vc: 🇻🇨 st. vincent &amp; grenadines flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_vc = new EmojiInfo("flag-vc", "1f1fb-1f1e8.png", "st. vincent &amp; grenadines flag", "🇻🇨", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ve: 🇻🇪 venezuela flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ve = new EmojiInfo("flag-ve", "1f1fb-1f1ea.png", "venezuela flag", "🇻🇪", true, true, true, true);
-
-		/// <summary>
-		/// :flag-vg: 🇻🇬 british virgin islands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_vg = new EmojiInfo("flag-vg", "1f1fb-1f1ec.png", "british virgin islands flag", "🇻🇬", true, true, true, true);
-
-		/// <summary>
-		/// :flag-vi: 🇻🇮 u.s. virgin islands flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_vi = new EmojiInfo("flag-vi", "1f1fb-1f1ee.png", "u.s. virgin islands flag", "🇻🇮", true, true, true, true);
-
-		/// <summary>
-		/// :flag-vn: 🇻🇳 vietnam flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_vn = new EmojiInfo("flag-vn", "1f1fb-1f1f3.png", "vietnam flag", "🇻🇳", true, true, true, true);
-
-		/// <summary>
-		/// :flag-vu: 🇻🇺 vanuatu flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_vu = new EmojiInfo("flag-vu", "1f1fb-1f1fa.png", "vanuatu flag", "🇻🇺", true, true, true, true);
-
-		/// <summary>
-		/// :flag-wf: 🇼🇫 wallis &amp; futuna flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_wf = new EmojiInfo("flag-wf", "1f1fc-1f1eb.png", "wallis &amp; futuna flag", "🇼🇫", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ws: 🇼🇸 samoa flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ws = new EmojiInfo("flag-ws", "1f1fc-1f1f8.png", "samoa flag", "🇼🇸", true, true, true, true);
-
-		/// <summary>
-		/// :flag-xk: 🇽🇰 kosovo flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_xk = new EmojiInfo("flag-xk", "1f1fd-1f1f0.png", "kosovo flag", "🇽🇰", true, true, true, true);
-
-		/// <summary>
-		/// :flag-ye: 🇾🇪 yemen flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_ye = new EmojiInfo("flag-ye", "1f1fe-1f1ea.png", "yemen flag", "🇾🇪", true, true, true, true);
-
-		/// <summary>
-		/// :flag-yt: 🇾🇹 mayotte flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_yt = new EmojiInfo("flag-yt", "1f1fe-1f1f9.png", "mayotte flag", "🇾🇹", true, true, true, true);
-
-		/// <summary>
-		/// :flag-za: 🇿🇦 south africa flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_za = new EmojiInfo("flag-za", "1f1ff-1f1e6.png", "south africa flag", "🇿🇦", true, true, true, true);
-
-		/// <summary>
-		/// :flag-zm: 🇿🇲 zambia flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_zm = new EmojiInfo("flag-zm", "1f1ff-1f1f2.png", "zambia flag", "🇿🇲", true, true, true, true);
-
-		/// <summary>
-		/// :flag-zw: 🇿🇼 zimbabwe flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_zw = new EmojiInfo("flag-zw", "1f1ff-1f1fc.png", "zimbabwe flag", "🇿🇼", true, true, true, true);
-
-		/// <summary>
 		/// :koko: 🈁 squared katakana koko
 		/// </summary>
 		public static readonly EmojiInfo Emoji_koko = new EmojiInfo("koko", "1f201.png", "squared katakana koko", "🈁", true, true, true, true);
 
 		/// <summary>
-		/// :sa: 🈂️ squared katakana sa
+		/// :sa: 🈂 squared katakana sa
 		/// </summary>
-		public static readonly EmojiInfo Emoji_sa = new EmojiInfo("sa", "1f202-fe0f.png", "squared katakana sa", "🈂️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_sa = new EmojiInfo("sa", "1f202.png", "squared katakana sa", "🈂", true, true, true, true);
 
 		/// <summary>
 		/// :u7121: 🈚 squared cjk unified ideograph-7121
@@ -5146,9 +3585,9 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_u6709 = new EmojiInfo("u6709", "1f236.png", "squared cjk unified ideograph-6709", "🈶", true, true, true, true);
 
 		/// <summary>
-		/// :u6708: 🈷️ squared cjk unified ideograph-6708
+		/// :u6708: 🈷 squared cjk unified ideograph-6708
 		/// </summary>
-		public static readonly EmojiInfo Emoji_u6708 = new EmojiInfo("u6708", "1f237-fe0f.png", "squared cjk unified ideograph-6708", "🈷️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_u6708 = new EmojiInfo("u6708", "1f237.png", "squared cjk unified ideograph-6708", "🈷", true, true, true, true);
 
 		/// <summary>
 		/// :u7533: 🈸 squared cjk unified ideograph-7533
@@ -5341,69 +3780,69 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_stars = new EmojiInfo("stars", "1f320.png", "shooting star", "🌠", true, true, true, true);
 
 		/// <summary>
-		/// :thermometer: 🌡️ 
+		/// :thermometer: 🌡 thermometer
 		/// </summary>
-		public static readonly EmojiInfo Emoji_thermometer = new EmojiInfo("thermometer", "1f321-fe0f.png", "", "🌡️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_thermometer = new EmojiInfo("thermometer", "1f321.png", "thermometer", "🌡", true, true, true, true);
 
 		/// <summary>
-		/// :mostly_sunny: 🌤️ 
+		/// :mostly_sunny: 🌤 white sun with small cloud
 		/// </summary>
-		public static readonly EmojiInfo Emoji_mostly_sunny = new EmojiInfo("mostly_sunny", "1f324-fe0f.png", "", "🌤️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_mostly_sunny = new EmojiInfo("mostly_sunny", "1f324.png", "white sun with small cloud", "🌤", true, true, true, false);
 
 		/// <summary>
-		/// :barely_sunny: 🌥️ 
+		/// :barely_sunny: 🌥 white sun behind cloud
 		/// </summary>
-		public static readonly EmojiInfo Emoji_barely_sunny = new EmojiInfo("barely_sunny", "1f325-fe0f.png", "", "🌥️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_barely_sunny = new EmojiInfo("barely_sunny", "1f325.png", "white sun behind cloud", "🌥", true, true, true, false);
 
 		/// <summary>
-		/// :partly_sunny_rain: 🌦️ 
+		/// :partly_sunny_rain: 🌦 white sun behind cloud with rain
 		/// </summary>
-		public static readonly EmojiInfo Emoji_partly_sunny_rain = new EmojiInfo("partly_sunny_rain", "1f326-fe0f.png", "", "🌦️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_partly_sunny_rain = new EmojiInfo("partly_sunny_rain", "1f326.png", "white sun behind cloud with rain", "🌦", true, true, true, false);
 
 		/// <summary>
-		/// :rain_cloud: 🌧️ 
+		/// :rain_cloud: 🌧 cloud with rain
 		/// </summary>
-		public static readonly EmojiInfo Emoji_rain_cloud = new EmojiInfo("rain_cloud", "1f327-fe0f.png", "", "🌧️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_rain_cloud = new EmojiInfo("rain_cloud", "1f327.png", "cloud with rain", "🌧", true, true, true, true);
 
 		/// <summary>
-		/// :snow_cloud: 🌨️ 
+		/// :snow_cloud: 🌨 cloud with snow
 		/// </summary>
-		public static readonly EmojiInfo Emoji_snow_cloud = new EmojiInfo("snow_cloud", "1f328-fe0f.png", "", "🌨️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_snow_cloud = new EmojiInfo("snow_cloud", "1f328.png", "cloud with snow", "🌨", true, true, true, true);
 
 		/// <summary>
-		/// :lightning: 🌩️ 
+		/// :lightning: 🌩 cloud with lightning
 		/// </summary>
-		public static readonly EmojiInfo Emoji_lightning = new EmojiInfo("lightning", "1f329-fe0f.png", "", "🌩️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_lightning = new EmojiInfo("lightning", "1f329.png", "cloud with lightning", "🌩", true, true, true, true);
 
 		/// <summary>
-		/// :tornado: 🌪️ 
+		/// :tornado: 🌪 cloud with tornado
 		/// </summary>
-		public static readonly EmojiInfo Emoji_tornado = new EmojiInfo("tornado", "1f32a-fe0f.png", "", "🌪️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_tornado = new EmojiInfo("tornado", "1f32a.png", "cloud with tornado", "🌪", true, true, true, true);
 
 		/// <summary>
-		/// :fog: 🌫️ 
+		/// :fog: 🌫 fog
 		/// </summary>
-		public static readonly EmojiInfo Emoji_fog = new EmojiInfo("fog", "1f32b-fe0f.png", "", "🌫️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_fog = new EmojiInfo("fog", "1f32b.png", "fog", "🌫", true, true, true, true);
 
 		/// <summary>
-		/// :wind_blowing_face: 🌬️ 
+		/// :wind_blowing_face: 🌬 wind blowing face
 		/// </summary>
-		public static readonly EmojiInfo Emoji_wind_blowing_face = new EmojiInfo("wind_blowing_face", "1f32c-fe0f.png", "", "🌬️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_wind_blowing_face = new EmojiInfo("wind_blowing_face", "1f32c.png", "wind blowing face", "🌬", true, true, true, true);
 
 		/// <summary>
 		/// :hotdog: 🌭 hot dog
 		/// </summary>
-		public static readonly EmojiInfo Emoji_hotdog = new EmojiInfo("hotdog", "1f32d.png", "hot dog", "🌭", true, true, true, true);
+		public static readonly EmojiInfo Emoji_hotdog = new EmojiInfo("hotdog", "1f32d.png", "hot dog", "🌭", true, true, true, false);
 
 		/// <summary>
 		/// :taco: 🌮 taco
 		/// </summary>
-		public static readonly EmojiInfo Emoji_taco = new EmojiInfo("taco", "1f32e.png", "taco", "🌮", true, true, true, true);
+		public static readonly EmojiInfo Emoji_taco = new EmojiInfo("taco", "1f32e.png", "taco", "🌮", true, true, true, false);
 
 		/// <summary>
 		/// :burrito: 🌯 burrito
 		/// </summary>
-		public static readonly EmojiInfo Emoji_burrito = new EmojiInfo("burrito", "1f32f.png", "burrito", "🌯", true, true, true, true);
+		public static readonly EmojiInfo Emoji_burrito = new EmojiInfo("burrito", "1f32f.png", "burrito", "🌯", true, true, true, false);
 
 		/// <summary>
 		/// :chestnut: 🌰 chestnut
@@ -5436,9 +3875,9 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_cactus = new EmojiInfo("cactus", "1f335.png", "cactus", "🌵", true, true, true, true);
 
 		/// <summary>
-		/// :hot_pepper: 🌶️ 
+		/// :hot_pepper: 🌶 hot pepper
 		/// </summary>
-		public static readonly EmojiInfo Emoji_hot_pepper = new EmojiInfo("hot_pepper", "1f336-fe0f.png", "", "🌶️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_hot_pepper = new EmojiInfo("hot_pepper", "1f336.png", "hot pepper", "🌶", true, true, true, true);
 
 		/// <summary>
 		/// :tulip: 🌷 tulip
@@ -5741,9 +4180,9 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_stew = new EmojiInfo("stew", "1f372.png", "pot of food", "🍲", true, true, true, true);
 
 		/// <summary>
-		/// :fried_egg: 🍳 cooking
+		/// :egg: 🍳 cooking
 		/// </summary>
-		public static readonly EmojiInfo Emoji_fried_egg = new EmojiInfo("fried_egg", "1f373.png", "cooking", "🍳", true, true, true, true);
+		public static readonly EmojiInfo Emoji_egg = new EmojiInfo("egg", "1f373.png", "cooking", "🍳", true, true, true, true);
 
 		/// <summary>
 		/// :fork_and_knife: 🍴 fork and knife
@@ -5791,19 +4230,19 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_baby_bottle = new EmojiInfo("baby_bottle", "1f37c.png", "baby bottle", "🍼", true, true, true, true);
 
 		/// <summary>
-		/// :knife_fork_plate: 🍽️ 
+		/// :knife_fork_plate: 🍽 fork and knife with plate
 		/// </summary>
-		public static readonly EmojiInfo Emoji_knife_fork_plate = new EmojiInfo("knife_fork_plate", "1f37d-fe0f.png", "", "🍽️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_knife_fork_plate = new EmojiInfo("knife_fork_plate", "1f37d.png", "fork and knife with plate", "🍽", true, true, true, true);
 
 		/// <summary>
 		/// :champagne: 🍾 bottle with popping cork
 		/// </summary>
-		public static readonly EmojiInfo Emoji_champagne = new EmojiInfo("champagne", "1f37e.png", "bottle with popping cork", "🍾", true, true, true, true);
+		public static readonly EmojiInfo Emoji_champagne = new EmojiInfo("champagne", "1f37e.png", "bottle with popping cork", "🍾", true, true, true, false);
 
 		/// <summary>
 		/// :popcorn: 🍿 popcorn
 		/// </summary>
-		public static readonly EmojiInfo Emoji_popcorn = new EmojiInfo("popcorn", "1f37f.png", "popcorn", "🍿", true, true, true, true);
+		public static readonly EmojiInfo Emoji_popcorn = new EmojiInfo("popcorn", "1f37f.png", "popcorn", "🍿", true, true, true, false);
 
 		/// <summary>
 		/// :ribbon: 🎀 ribbon
@@ -5906,39 +4345,39 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_mortar_board = new EmojiInfo("mortar_board", "1f393.png", "graduation cap", "🎓", true, true, true, true);
 
 		/// <summary>
-		/// :medal: 🎖️ 
+		/// :medal: 🎖 military medal
 		/// </summary>
-		public static readonly EmojiInfo Emoji_medal = new EmojiInfo("medal", "1f396-fe0f.png", "", "🎖️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_medal = new EmojiInfo("medal", "1f396.png", "military medal", "🎖", true, true, true, true);
 
 		/// <summary>
-		/// :reminder_ribbon: 🎗️ 
+		/// :reminder_ribbon: 🎗 reminder ribbon
 		/// </summary>
-		public static readonly EmojiInfo Emoji_reminder_ribbon = new EmojiInfo("reminder_ribbon", "1f397-fe0f.png", "", "🎗️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_reminder_ribbon = new EmojiInfo("reminder_ribbon", "1f397.png", "reminder ribbon", "🎗", true, true, true, true);
 
 		/// <summary>
-		/// :studio_microphone: 🎙️ 
+		/// :studio_microphone: 🎙 studio microphone
 		/// </summary>
-		public static readonly EmojiInfo Emoji_studio_microphone = new EmojiInfo("studio_microphone", "1f399-fe0f.png", "", "🎙️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_studio_microphone = new EmojiInfo("studio_microphone", "1f399.png", "studio microphone", "🎙", true, true, true, true);
 
 		/// <summary>
-		/// :level_slider: 🎚️ 
+		/// :level_slider: 🎚 level slider
 		/// </summary>
-		public static readonly EmojiInfo Emoji_level_slider = new EmojiInfo("level_slider", "1f39a-fe0f.png", "", "🎚️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_level_slider = new EmojiInfo("level_slider", "1f39a.png", "level slider", "🎚", true, true, true, true);
 
 		/// <summary>
-		/// :control_knobs: 🎛️ 
+		/// :control_knobs: 🎛 control knobs
 		/// </summary>
-		public static readonly EmojiInfo Emoji_control_knobs = new EmojiInfo("control_knobs", "1f39b-fe0f.png", "", "🎛️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_control_knobs = new EmojiInfo("control_knobs", "1f39b.png", "control knobs", "🎛", true, true, true, true);
 
 		/// <summary>
-		/// :film_frames: 🎞️ 
+		/// :film_frames: 🎞 film frames
 		/// </summary>
-		public static readonly EmojiInfo Emoji_film_frames = new EmojiInfo("film_frames", "1f39e-fe0f.png", "", "🎞️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_film_frames = new EmojiInfo("film_frames", "1f39e.png", "film frames", "🎞", true, true, true, true);
 
 		/// <summary>
-		/// :admission_tickets: 🎟️ 
+		/// :admission_tickets: 🎟 admission tickets
 		/// </summary>
-		public static readonly EmojiInfo Emoji_admission_tickets = new EmojiInfo("admission_tickets", "1f39f-fe0f.png", "", "🎟️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_admission_tickets = new EmojiInfo("admission_tickets", "1f39f.png", "admission tickets", "🎟", true, true, true, true);
 
 		/// <summary>
 		/// :carousel_horse: 🎠 carousel horse
@@ -6116,29 +4555,9 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_snowboarder = new EmojiInfo("snowboarder", "1f3c2.png", "snowboarder", "🏂", true, true, true, true);
 
 		/// <summary>
-		/// :woman-running: 🏃‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_running = new EmojiInfo("woman-running", "1f3c3-200d-2640-fe0f.png", "", "🏃‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-running: 🏃‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_running = new EmojiInfo("man-running", "1f3c3-200d-2642-fe0f.png", "", "🏃‍♂️", true, true, true, true);
-
-		/// <summary>
 		/// :runner: 🏃 runner
 		/// </summary>
 		public static readonly EmojiInfo Emoji_runner = new EmojiInfo("runner", "1f3c3.png", "runner", "🏃", true, true, true, true);
-
-		/// <summary>
-		/// :woman-surfing: 🏄‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_surfing = new EmojiInfo("woman-surfing", "1f3c4-200d-2640-fe0f.png", "", "🏄‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-surfing: 🏄‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_surfing = new EmojiInfo("man-surfing", "1f3c4-200d-2642-fe0f.png", "", "🏄‍♂️", true, true, true, true);
 
 		/// <summary>
 		/// :surfer: 🏄 surfer
@@ -6171,144 +4590,114 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_rugby_football = new EmojiInfo("rugby_football", "1f3c9.png", "rugby football", "🏉", true, true, true, true);
 
 		/// <summary>
-		/// :woman-swimming: 🏊‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_swimming = new EmojiInfo("woman-swimming", "1f3ca-200d-2640-fe0f.png", "", "🏊‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-swimming: 🏊‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_swimming = new EmojiInfo("man-swimming", "1f3ca-200d-2642-fe0f.png", "", "🏊‍♂️", true, true, true, true);
-
-		/// <summary>
 		/// :swimmer: 🏊 swimmer
 		/// </summary>
 		public static readonly EmojiInfo Emoji_swimmer = new EmojiInfo("swimmer", "1f3ca.png", "swimmer", "🏊", true, true, true, true);
 
 		/// <summary>
-		/// :woman-lifting-weights: 🏋️‍♀️ 
+		/// :weight_lifter: 🏋 weight lifter
 		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_lifting_weights = new EmojiInfo("woman-lifting-weights", "1f3cb-fe0f-200d-2640-fe0f.png", "", "🏋️‍♀️", true, true, true, false);
+		public static readonly EmojiInfo Emoji_weight_lifter = new EmojiInfo("weight_lifter", "1f3cb.png", "weight lifter", "🏋", true, true, true, true);
 
 		/// <summary>
-		/// :man-lifting-weights: 🏋️‍♂️ 
+		/// :golfer: 🏌 golfer
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_lifting_weights = new EmojiInfo("man-lifting-weights", "1f3cb-fe0f-200d-2642-fe0f.png", "", "🏋️‍♂️", true, true, true, false);
+		public static readonly EmojiInfo Emoji_golfer = new EmojiInfo("golfer", "1f3cc.png", "golfer", "🏌", true, true, true, true);
 
 		/// <summary>
-		/// :weight_lifter: 🏋️ 
+		/// :racing_motorcycle: 🏍 racing motorcycle
 		/// </summary>
-		public static readonly EmojiInfo Emoji_weight_lifter = new EmojiInfo("weight_lifter", "1f3cb-fe0f.png", "", "🏋️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_racing_motorcycle = new EmojiInfo("racing_motorcycle", "1f3cd.png", "racing motorcycle", "🏍", true, true, true, true);
 
 		/// <summary>
-		/// :woman-golfing: 🏌️‍♀️ 
+		/// :racing_car: 🏎 racing car
 		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_golfing = new EmojiInfo("woman-golfing", "1f3cc-fe0f-200d-2640-fe0f.png", "", "🏌️‍♀️", true, true, true, false);
-
-		/// <summary>
-		/// :man-golfing: 🏌️‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_golfing = new EmojiInfo("man-golfing", "1f3cc-fe0f-200d-2642-fe0f.png", "", "🏌️‍♂️", true, true, true, false);
-
-		/// <summary>
-		/// :golfer: 🏌️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_golfer = new EmojiInfo("golfer", "1f3cc-fe0f.png", "", "🏌️", true, true, true, true);
-
-		/// <summary>
-		/// :racing_motorcycle: 🏍️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_racing_motorcycle = new EmojiInfo("racing_motorcycle", "1f3cd-fe0f.png", "", "🏍️", true, true, true, true);
-
-		/// <summary>
-		/// :racing_car: 🏎️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_racing_car = new EmojiInfo("racing_car", "1f3ce-fe0f.png", "", "🏎️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_racing_car = new EmojiInfo("racing_car", "1f3ce.png", "racing car", "🏎", true, true, true, true);
 
 		/// <summary>
 		/// :cricket_bat_and_ball: 🏏 cricket bat and ball
 		/// </summary>
-		public static readonly EmojiInfo Emoji_cricket_bat_and_ball = new EmojiInfo("cricket_bat_and_ball", "1f3cf.png", "cricket bat and ball", "🏏", true, true, true, true);
+		public static readonly EmojiInfo Emoji_cricket_bat_and_ball = new EmojiInfo("cricket_bat_and_ball", "1f3cf.png", "cricket bat and ball", "🏏", true, true, true, false);
 
 		/// <summary>
 		/// :volleyball: 🏐 volleyball
 		/// </summary>
-		public static readonly EmojiInfo Emoji_volleyball = new EmojiInfo("volleyball", "1f3d0.png", "volleyball", "🏐", true, true, true, true);
+		public static readonly EmojiInfo Emoji_volleyball = new EmojiInfo("volleyball", "1f3d0.png", "volleyball", "🏐", true, true, true, false);
 
 		/// <summary>
 		/// :field_hockey_stick_and_ball: 🏑 field hockey stick and ball
 		/// </summary>
-		public static readonly EmojiInfo Emoji_field_hockey_stick_and_ball = new EmojiInfo("field_hockey_stick_and_ball", "1f3d1.png", "field hockey stick and ball", "🏑", true, true, true, true);
+		public static readonly EmojiInfo Emoji_field_hockey_stick_and_ball = new EmojiInfo("field_hockey_stick_and_ball", "1f3d1.png", "field hockey stick and ball", "🏑", true, true, true, false);
 
 		/// <summary>
 		/// :ice_hockey_stick_and_puck: 🏒 ice hockey stick and puck
 		/// </summary>
-		public static readonly EmojiInfo Emoji_ice_hockey_stick_and_puck = new EmojiInfo("ice_hockey_stick_and_puck", "1f3d2.png", "ice hockey stick and puck", "🏒", true, true, true, true);
+		public static readonly EmojiInfo Emoji_ice_hockey_stick_and_puck = new EmojiInfo("ice_hockey_stick_and_puck", "1f3d2.png", "ice hockey stick and puck", "🏒", true, true, true, false);
 
 		/// <summary>
 		/// :table_tennis_paddle_and_ball: 🏓 table tennis paddle and ball
 		/// </summary>
-		public static readonly EmojiInfo Emoji_table_tennis_paddle_and_ball = new EmojiInfo("table_tennis_paddle_and_ball", "1f3d3.png", "table tennis paddle and ball", "🏓", true, true, true, true);
+		public static readonly EmojiInfo Emoji_table_tennis_paddle_and_ball = new EmojiInfo("table_tennis_paddle_and_ball", "1f3d3.png", "table tennis paddle and ball", "🏓", true, true, true, false);
 
 		/// <summary>
-		/// :snow_capped_mountain: 🏔️ 
+		/// :snow_capped_mountain: 🏔 snow capped mountain
 		/// </summary>
-		public static readonly EmojiInfo Emoji_snow_capped_mountain = new EmojiInfo("snow_capped_mountain", "1f3d4-fe0f.png", "", "🏔️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_snow_capped_mountain = new EmojiInfo("snow_capped_mountain", "1f3d4.png", "snow capped mountain", "🏔", true, true, true, true);
 
 		/// <summary>
-		/// :camping: 🏕️ 
+		/// :camping: 🏕 camping
 		/// </summary>
-		public static readonly EmojiInfo Emoji_camping = new EmojiInfo("camping", "1f3d5-fe0f.png", "", "🏕️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_camping = new EmojiInfo("camping", "1f3d5.png", "camping", "🏕", true, true, true, true);
 
 		/// <summary>
-		/// :beach_with_umbrella: 🏖️ 
+		/// :beach_with_umbrella: 🏖 beach with umbrella
 		/// </summary>
-		public static readonly EmojiInfo Emoji_beach_with_umbrella = new EmojiInfo("beach_with_umbrella", "1f3d6-fe0f.png", "", "🏖️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_beach_with_umbrella = new EmojiInfo("beach_with_umbrella", "1f3d6.png", "beach with umbrella", "🏖", true, true, true, true);
 
 		/// <summary>
-		/// :building_construction: 🏗️ 
+		/// :building_construction: 🏗 building construction
 		/// </summary>
-		public static readonly EmojiInfo Emoji_building_construction = new EmojiInfo("building_construction", "1f3d7-fe0f.png", "", "🏗️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_building_construction = new EmojiInfo("building_construction", "1f3d7.png", "building construction", "🏗", true, true, true, true);
 
 		/// <summary>
-		/// :house_buildings: 🏘️ 
+		/// :house_buildings: 🏘 house buildings
 		/// </summary>
-		public static readonly EmojiInfo Emoji_house_buildings = new EmojiInfo("house_buildings", "1f3d8-fe0f.png", "", "🏘️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_house_buildings = new EmojiInfo("house_buildings", "1f3d8.png", "house buildings", "🏘", true, true, true, true);
 
 		/// <summary>
-		/// :cityscape: 🏙️ 
+		/// :cityscape: 🏙 cityscape
 		/// </summary>
-		public static readonly EmojiInfo Emoji_cityscape = new EmojiInfo("cityscape", "1f3d9-fe0f.png", "", "🏙️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_cityscape = new EmojiInfo("cityscape", "1f3d9.png", "cityscape", "🏙", true, true, true, true);
 
 		/// <summary>
-		/// :derelict_house_building: 🏚️ 
+		/// :derelict_house_building: 🏚 derelict house building
 		/// </summary>
-		public static readonly EmojiInfo Emoji_derelict_house_building = new EmojiInfo("derelict_house_building", "1f3da-fe0f.png", "", "🏚️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_derelict_house_building = new EmojiInfo("derelict_house_building", "1f3da.png", "derelict house building", "🏚", true, true, true, true);
 
 		/// <summary>
-		/// :classical_building: 🏛️ 
+		/// :classical_building: 🏛 classical building
 		/// </summary>
-		public static readonly EmojiInfo Emoji_classical_building = new EmojiInfo("classical_building", "1f3db-fe0f.png", "", "🏛️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_classical_building = new EmojiInfo("classical_building", "1f3db.png", "classical building", "🏛", true, true, true, true);
 
 		/// <summary>
-		/// :desert: 🏜️ 
+		/// :desert: 🏜 desert
 		/// </summary>
-		public static readonly EmojiInfo Emoji_desert = new EmojiInfo("desert", "1f3dc-fe0f.png", "", "🏜️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_desert = new EmojiInfo("desert", "1f3dc.png", "desert", "🏜", true, true, true, true);
 
 		/// <summary>
-		/// :desert_island: 🏝️ 
+		/// :desert_island: 🏝 desert island
 		/// </summary>
-		public static readonly EmojiInfo Emoji_desert_island = new EmojiInfo("desert_island", "1f3dd-fe0f.png", "", "🏝️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_desert_island = new EmojiInfo("desert_island", "1f3dd.png", "desert island", "🏝", true, true, true, true);
 
 		/// <summary>
-		/// :national_park: 🏞️ 
+		/// :national_park: 🏞 national park
 		/// </summary>
-		public static readonly EmojiInfo Emoji_national_park = new EmojiInfo("national_park", "1f3de-fe0f.png", "", "🏞️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_national_park = new EmojiInfo("national_park", "1f3de.png", "national park", "🏞", true, true, true, true);
 
 		/// <summary>
-		/// :stadium: 🏟️ 
+		/// :stadium: 🏟 stadium
 		/// </summary>
-		public static readonly EmojiInfo Emoji_stadium = new EmojiInfo("stadium", "1f3df-fe0f.png", "", "🏟️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_stadium = new EmojiInfo("stadium", "1f3df.png", "stadium", "🏟", true, true, true, true);
 
 		/// <summary>
 		/// :house: 🏠 house building
@@ -6396,39 +4785,9 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_european_castle = new EmojiInfo("european_castle", "1f3f0.png", "european castle", "🏰", true, true, true, true);
 
 		/// <summary>
-		/// :rainbow-flag: 🏳️‍🌈 
+		/// :waving_white_flag: 🏳 waving white flag
 		/// </summary>
-		public static readonly EmojiInfo Emoji_rainbow_flag = new EmojiInfo("rainbow-flag", "1f3f3-fe0f-200d-1f308.png", "", "🏳️‍🌈", true, true, true, true);
-
-		/// <summary>
-		/// :transgender_flag: 🏳️‍⚧️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_transgender_flag = new EmojiInfo("transgender_flag", "1f3f3-fe0f-200d-26a7-fe0f.png", "", "🏳️‍⚧️", true, true, true, false);
-
-		/// <summary>
-		/// :waving_white_flag: 🏳️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_waving_white_flag = new EmojiInfo("waving_white_flag", "1f3f3-fe0f.png", "", "🏳️", true, true, true, true);
-
-		/// <summary>
-		/// :pirate_flag: 🏴‍☠️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_pirate_flag = new EmojiInfo("pirate_flag", "1f3f4-200d-2620-fe0f.png", "", "🏴‍☠️", true, true, true, true);
-
-		/// <summary>
-		/// :flag-england: 🏴󠁧󠁢󠁥󠁮󠁧󠁿 england flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_england = new EmojiInfo("flag-england", "1f3f4-e0067-e0062-e0065-e006e-e0067-e007f.png", "england flag", "🏴󠁧󠁢󠁥󠁮󠁧󠁿", true, true, true, true);
-
-		/// <summary>
-		/// :flag-scotland: 🏴󠁧󠁢󠁳󠁣󠁴󠁿 scotland flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_scotland = new EmojiInfo("flag-scotland", "1f3f4-e0067-e0062-e0073-e0063-e0074-e007f.png", "scotland flag", "🏴󠁧󠁢󠁳󠁣󠁴󠁿", true, true, true, true);
-
-		/// <summary>
-		/// :flag-wales: 🏴󠁧󠁢󠁷󠁬󠁳󠁿 wales flag
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flag_wales = new EmojiInfo("flag-wales", "1f3f4-e0067-e0062-e0077-e006c-e0073-e007f.png", "wales flag", "🏴󠁧󠁢󠁷󠁬󠁳󠁿", true, true, true, true);
+		public static readonly EmojiInfo Emoji_waving_white_flag = new EmojiInfo("waving_white_flag", "1f3f3.png", "waving white flag", "🏳", true, true, true, true);
 
 		/// <summary>
 		/// :waving_black_flag: 🏴 waving black flag
@@ -6436,54 +4795,54 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_waving_black_flag = new EmojiInfo("waving_black_flag", "1f3f4.png", "waving black flag", "🏴", true, true, true, true);
 
 		/// <summary>
-		/// :rosette: 🏵️ 
+		/// :rosette: 🏵 rosette
 		/// </summary>
-		public static readonly EmojiInfo Emoji_rosette = new EmojiInfo("rosette", "1f3f5-fe0f.png", "", "🏵️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_rosette = new EmojiInfo("rosette", "1f3f5.png", "rosette", "🏵", true, true, true, true);
 
 		/// <summary>
-		/// :label: 🏷️ 
+		/// :label: 🏷 label
 		/// </summary>
-		public static readonly EmojiInfo Emoji_label = new EmojiInfo("label", "1f3f7-fe0f.png", "", "🏷️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_label = new EmojiInfo("label", "1f3f7.png", "label", "🏷", true, true, true, true);
 
 		/// <summary>
 		/// :badminton_racquet_and_shuttlecock: 🏸 badminton racquet and shuttlecock
 		/// </summary>
-		public static readonly EmojiInfo Emoji_badminton_racquet_and_shuttlecock = new EmojiInfo("badminton_racquet_and_shuttlecock", "1f3f8.png", "badminton racquet and shuttlecock", "🏸", true, true, true, true);
+		public static readonly EmojiInfo Emoji_badminton_racquet_and_shuttlecock = new EmojiInfo("badminton_racquet_and_shuttlecock", "1f3f8.png", "badminton racquet and shuttlecock", "🏸", true, true, true, false);
 
 		/// <summary>
 		/// :bow_and_arrow: 🏹 bow and arrow
 		/// </summary>
-		public static readonly EmojiInfo Emoji_bow_and_arrow = new EmojiInfo("bow_and_arrow", "1f3f9.png", "bow and arrow", "🏹", true, true, true, true);
+		public static readonly EmojiInfo Emoji_bow_and_arrow = new EmojiInfo("bow_and_arrow", "1f3f9.png", "bow and arrow", "🏹", true, true, true, false);
 
 		/// <summary>
 		/// :amphora: 🏺 amphora
 		/// </summary>
-		public static readonly EmojiInfo Emoji_amphora = new EmojiInfo("amphora", "1f3fa.png", "amphora", "🏺", true, true, true, true);
+		public static readonly EmojiInfo Emoji_amphora = new EmojiInfo("amphora", "1f3fa.png", "amphora", "🏺", true, true, true, false);
 
 		/// <summary>
 		/// :skin-tone-2: 🏻 emoji modifier fitzpatrick type-1-2
 		/// </summary>
-		public static readonly EmojiInfo Emoji_skin_tone_2 = new EmojiInfo("skin-tone-2", "1f3fb.png", "emoji modifier fitzpatrick type-1-2", "🏻", true, true, true, true);
+		public static readonly EmojiInfo Emoji_skin_tone_2 = new EmojiInfo("skin-tone-2", "1f3fb.png", "emoji modifier fitzpatrick type-1-2", "🏻", true, false, true, false);
 
 		/// <summary>
 		/// :skin-tone-3: 🏼 emoji modifier fitzpatrick type-3
 		/// </summary>
-		public static readonly EmojiInfo Emoji_skin_tone_3 = new EmojiInfo("skin-tone-3", "1f3fc.png", "emoji modifier fitzpatrick type-3", "🏼", true, true, true, true);
+		public static readonly EmojiInfo Emoji_skin_tone_3 = new EmojiInfo("skin-tone-3", "1f3fc.png", "emoji modifier fitzpatrick type-3", "🏼", true, false, true, false);
 
 		/// <summary>
 		/// :skin-tone-4: 🏽 emoji modifier fitzpatrick type-4
 		/// </summary>
-		public static readonly EmojiInfo Emoji_skin_tone_4 = new EmojiInfo("skin-tone-4", "1f3fd.png", "emoji modifier fitzpatrick type-4", "🏽", true, true, true, true);
+		public static readonly EmojiInfo Emoji_skin_tone_4 = new EmojiInfo("skin-tone-4", "1f3fd.png", "emoji modifier fitzpatrick type-4", "🏽", true, false, true, false);
 
 		/// <summary>
 		/// :skin-tone-5: 🏾 emoji modifier fitzpatrick type-5
 		/// </summary>
-		public static readonly EmojiInfo Emoji_skin_tone_5 = new EmojiInfo("skin-tone-5", "1f3fe.png", "emoji modifier fitzpatrick type-5", "🏾", true, true, true, true);
+		public static readonly EmojiInfo Emoji_skin_tone_5 = new EmojiInfo("skin-tone-5", "1f3fe.png", "emoji modifier fitzpatrick type-5", "🏾", true, false, true, false);
 
 		/// <summary>
 		/// :skin-tone-6: 🏿 emoji modifier fitzpatrick type-6
 		/// </summary>
-		public static readonly EmojiInfo Emoji_skin_tone_6 = new EmojiInfo("skin-tone-6", "1f3ff.png", "emoji modifier fitzpatrick type-6", "🏿", true, true, true, true);
+		public static readonly EmojiInfo Emoji_skin_tone_6 = new EmojiInfo("skin-tone-6", "1f3ff.png", "emoji modifier fitzpatrick type-6", "🏿", true, false, true, false);
 
 		/// <summary>
 		/// :rat: 🐀 rat
@@ -6524,11 +4883,6 @@ namespace Waher.Content.Emoji
 		/// :rabbit2: 🐇 rabbit
 		/// </summary>
 		public static readonly EmojiInfo Emoji_rabbit2 = new EmojiInfo("rabbit2", "1f407.png", "rabbit", "🐇", true, true, true, true);
-
-		/// <summary>
-		/// :black_cat: 🐈‍⬛ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_black_cat = new EmojiInfo("black_cat", "1f408-200d-2b1b.png", "", "🐈‍⬛", true, true, true, true);
 
 		/// <summary>
 		/// :cat2: 🐈 cat
@@ -6594,11 +4948,6 @@ namespace Waher.Content.Emoji
 		/// :chicken: 🐔 chicken
 		/// </summary>
 		public static readonly EmojiInfo Emoji_chicken = new EmojiInfo("chicken", "1f414.png", "chicken", "🐔", true, true, true, true);
-
-		/// <summary>
-		/// :service_dog: 🐕‍🦺 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_service_dog = new EmojiInfo("service_dog", "1f415-200d-1f9ba.png", "", "🐕‍🦺", true, true, true, true);
 
 		/// <summary>
 		/// :dog2: 🐕 dog
@@ -6791,11 +5140,6 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_wolf = new EmojiInfo("wolf", "1f43a.png", "wolf face", "🐺", true, true, true, true);
 
 		/// <summary>
-		/// :polar_bear: 🐻‍❄️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_polar_bear = new EmojiInfo("polar_bear", "1f43b-200d-2744-fe0f.png", "", "🐻‍❄️", true, true, true, true);
-
-		/// <summary>
 		/// :bear: 🐻 bear face
 		/// </summary>
 		public static readonly EmojiInfo Emoji_bear = new EmojiInfo("bear", "1f43b.png", "bear face", "🐻", true, true, true, true);
@@ -6816,9 +5160,9 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_feet = new EmojiInfo("feet", "1f43e.png", "paw prints", "🐾", true, true, true, true);
 
 		/// <summary>
-		/// :chipmunk: 🐿️ 
+		/// :chipmunk: 🐿 chipmunk
 		/// </summary>
-		public static readonly EmojiInfo Emoji_chipmunk = new EmojiInfo("chipmunk", "1f43f-fe0f.png", "", "🐿️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_chipmunk = new EmojiInfo("chipmunk", "1f43f.png", "chipmunk", "🐿", true, true, true, true);
 
 		/// <summary>
 		/// :eyes: 👀 eyes
@@ -6826,14 +5170,9 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_eyes = new EmojiInfo("eyes", "1f440.png", "eyes", "👀", true, true, true, true);
 
 		/// <summary>
-		/// :eye-in-speech-bubble: 👁️‍🗨️ 
+		/// :eye: 👁 eye
 		/// </summary>
-		public static readonly EmojiInfo Emoji_eye_in_speech_bubble = new EmojiInfo("eye-in-speech-bubble", "1f441-fe0f-200d-1f5e8-fe0f.png", "", "👁️‍🗨️", true, true, false, false);
-
-		/// <summary>
-		/// :eye: 👁️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_eye = new EmojiInfo("eye", "1f441-fe0f.png", "", "👁️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_eye = new EmojiInfo("eye", "1f441.png", "eye", "👁", true, true, true, true);
 
 		/// <summary>
 		/// :ear: 👂 ear
@@ -7026,404 +5365,9 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_girl = new EmojiInfo("girl", "1f467.png", "girl", "👧", true, true, true, true);
 
 		/// <summary>
-		/// :male-farmer: 👨‍🌾 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_farmer = new EmojiInfo("male-farmer", "1f468-200d-1f33e.png", "", "👨‍🌾", true, true, true, true);
-
-		/// <summary>
-		/// :male-cook: 👨‍🍳 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_cook = new EmojiInfo("male-cook", "1f468-200d-1f373.png", "", "👨‍🍳", true, true, true, true);
-
-		/// <summary>
-		/// :man_feeding_baby: 👨‍🍼 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_feeding_baby = new EmojiInfo("man_feeding_baby", "1f468-200d-1f37c.png", "", "👨‍🍼", true, true, true, true);
-
-		/// <summary>
-		/// :male-student: 👨‍🎓 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_student = new EmojiInfo("male-student", "1f468-200d-1f393.png", "", "👨‍🎓", true, true, true, true);
-
-		/// <summary>
-		/// :male-singer: 👨‍🎤 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_singer = new EmojiInfo("male-singer", "1f468-200d-1f3a4.png", "", "👨‍🎤", true, true, true, true);
-
-		/// <summary>
-		/// :male-artist: 👨‍🎨 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_artist = new EmojiInfo("male-artist", "1f468-200d-1f3a8.png", "", "👨‍🎨", true, true, true, true);
-
-		/// <summary>
-		/// :male-teacher: 👨‍🏫 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_teacher = new EmojiInfo("male-teacher", "1f468-200d-1f3eb.png", "", "👨‍🏫", true, true, true, true);
-
-		/// <summary>
-		/// :male-factory-worker: 👨‍🏭 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_factory_worker = new EmojiInfo("male-factory-worker", "1f468-200d-1f3ed.png", "", "👨‍🏭", true, true, true, true);
-
-		/// <summary>
-		/// :man-boy-boy: 👨‍👦‍👦 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_boy_boy = new EmojiInfo("man-boy-boy", "1f468-200d-1f466-200d-1f466.png", "", "👨‍👦‍👦", true, true, true, true);
-
-		/// <summary>
-		/// :man-boy: 👨‍👦 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_boy = new EmojiInfo("man-boy", "1f468-200d-1f466.png", "", "👨‍👦", true, true, true, true);
-
-		/// <summary>
-		/// :man-girl-boy: 👨‍👧‍👦 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_girl_boy = new EmojiInfo("man-girl-boy", "1f468-200d-1f467-200d-1f466.png", "", "👨‍👧‍👦", true, true, true, true);
-
-		/// <summary>
-		/// :man-girl-girl: 👨‍👧‍👧 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_girl_girl = new EmojiInfo("man-girl-girl", "1f468-200d-1f467-200d-1f467.png", "", "👨‍👧‍👧", true, true, true, true);
-
-		/// <summary>
-		/// :man-girl: 👨‍👧 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_girl = new EmojiInfo("man-girl", "1f468-200d-1f467.png", "", "👨‍👧", true, true, true, true);
-
-		/// <summary>
-		/// :man-man-boy: 👨‍👨‍👦 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_man_boy = new EmojiInfo("man-man-boy", "1f468-200d-1f468-200d-1f466.png", "", "👨‍👨‍👦", true, true, true, true);
-
-		/// <summary>
-		/// :man-man-boy-boy: 👨‍👨‍👦‍👦 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_man_boy_boy = new EmojiInfo("man-man-boy-boy", "1f468-200d-1f468-200d-1f466-200d-1f466.png", "", "👨‍👨‍👦‍👦", true, true, true, true);
-
-		/// <summary>
-		/// :man-man-girl: 👨‍👨‍👧 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_man_girl = new EmojiInfo("man-man-girl", "1f468-200d-1f468-200d-1f467.png", "", "👨‍👨‍👧", true, true, true, true);
-
-		/// <summary>
-		/// :man-man-girl-boy: 👨‍👨‍👧‍👦 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_man_girl_boy = new EmojiInfo("man-man-girl-boy", "1f468-200d-1f468-200d-1f467-200d-1f466.png", "", "👨‍👨‍👧‍👦", true, true, true, true);
-
-		/// <summary>
-		/// :man-man-girl-girl: 👨‍👨‍👧‍👧 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_man_girl_girl = new EmojiInfo("man-man-girl-girl", "1f468-200d-1f468-200d-1f467-200d-1f467.png", "", "👨‍👨‍👧‍👧", true, true, true, true);
-
-		/// <summary>
-		/// :man-woman-boy: 👨‍👩‍👦 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_woman_boy = new EmojiInfo("man-woman-boy", "1f468-200d-1f469-200d-1f466.png", "", "👨‍👩‍👦", true, true, true, true);
-
-		/// <summary>
-		/// :man-woman-boy-boy: 👨‍👩‍👦‍👦 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_woman_boy_boy = new EmojiInfo("man-woman-boy-boy", "1f468-200d-1f469-200d-1f466-200d-1f466.png", "", "👨‍👩‍👦‍👦", true, true, true, true);
-
-		/// <summary>
-		/// :man-woman-girl: 👨‍👩‍👧 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_woman_girl = new EmojiInfo("man-woman-girl", "1f468-200d-1f469-200d-1f467.png", "", "👨‍👩‍👧", true, true, true, true);
-
-		/// <summary>
-		/// :man-woman-girl-boy: 👨‍👩‍👧‍👦 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_woman_girl_boy = new EmojiInfo("man-woman-girl-boy", "1f468-200d-1f469-200d-1f467-200d-1f466.png", "", "👨‍👩‍👧‍👦", true, true, true, true);
-
-		/// <summary>
-		/// :man-woman-girl-girl: 👨‍👩‍👧‍👧 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_woman_girl_girl = new EmojiInfo("man-woman-girl-girl", "1f468-200d-1f469-200d-1f467-200d-1f467.png", "", "👨‍👩‍👧‍👧", true, true, true, true);
-
-		/// <summary>
-		/// :male-technologist: 👨‍💻 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_technologist = new EmojiInfo("male-technologist", "1f468-200d-1f4bb.png", "", "👨‍💻", true, true, true, true);
-
-		/// <summary>
-		/// :male-office-worker: 👨‍💼 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_office_worker = new EmojiInfo("male-office-worker", "1f468-200d-1f4bc.png", "", "👨‍💼", true, true, true, true);
-
-		/// <summary>
-		/// :male-mechanic: 👨‍🔧 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_mechanic = new EmojiInfo("male-mechanic", "1f468-200d-1f527.png", "", "👨‍🔧", true, true, true, true);
-
-		/// <summary>
-		/// :male-scientist: 👨‍🔬 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_scientist = new EmojiInfo("male-scientist", "1f468-200d-1f52c.png", "", "👨‍🔬", true, true, true, true);
-
-		/// <summary>
-		/// :male-astronaut: 👨‍🚀 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_astronaut = new EmojiInfo("male-astronaut", "1f468-200d-1f680.png", "", "👨‍🚀", true, true, true, true);
-
-		/// <summary>
-		/// :male-firefighter: 👨‍🚒 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_firefighter = new EmojiInfo("male-firefighter", "1f468-200d-1f692.png", "", "👨‍🚒", true, true, true, true);
-
-		/// <summary>
-		/// :man_with_probing_cane: 👨‍🦯 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_with_probing_cane = new EmojiInfo("man_with_probing_cane", "1f468-200d-1f9af.png", "", "👨‍🦯", true, true, true, true);
-
-		/// <summary>
-		/// :red_haired_man: 👨‍🦰 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_red_haired_man = new EmojiInfo("red_haired_man", "1f468-200d-1f9b0.png", "", "👨‍🦰", true, true, true, true);
-
-		/// <summary>
-		/// :curly_haired_man: 👨‍🦱 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_curly_haired_man = new EmojiInfo("curly_haired_man", "1f468-200d-1f9b1.png", "", "👨‍🦱", true, true, true, true);
-
-		/// <summary>
-		/// :bald_man: 👨‍🦲 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_bald_man = new EmojiInfo("bald_man", "1f468-200d-1f9b2.png", "", "👨‍🦲", true, true, true, true);
-
-		/// <summary>
-		/// :white_haired_man: 👨‍🦳 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_white_haired_man = new EmojiInfo("white_haired_man", "1f468-200d-1f9b3.png", "", "👨‍🦳", true, true, true, true);
-
-		/// <summary>
-		/// :man_in_motorized_wheelchair: 👨‍🦼 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_in_motorized_wheelchair = new EmojiInfo("man_in_motorized_wheelchair", "1f468-200d-1f9bc.png", "", "👨‍🦼", true, true, true, true);
-
-		/// <summary>
-		/// :man_in_manual_wheelchair: 👨‍🦽 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_in_manual_wheelchair = new EmojiInfo("man_in_manual_wheelchair", "1f468-200d-1f9bd.png", "", "👨‍🦽", true, true, true, true);
-
-		/// <summary>
-		/// :male-doctor: 👨‍⚕️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_doctor = new EmojiInfo("male-doctor", "1f468-200d-2695-fe0f.png", "", "👨‍⚕️", true, true, true, true);
-
-		/// <summary>
-		/// :male-judge: 👨‍⚖️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_judge = new EmojiInfo("male-judge", "1f468-200d-2696-fe0f.png", "", "👨‍⚖️", true, true, true, true);
-
-		/// <summary>
-		/// :male-pilot: 👨‍✈️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_pilot = new EmojiInfo("male-pilot", "1f468-200d-2708-fe0f.png", "", "👨‍✈️", true, true, true, true);
-
-		/// <summary>
-		/// :man-heart-man: 👨‍❤️‍👨 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_heart_man = new EmojiInfo("man-heart-man", "1f468-200d-2764-fe0f-200d-1f468.png", "", "👨‍❤️‍👨", true, true, true, true);
-
-		/// <summary>
-		/// :man-kiss-man: 👨‍❤️‍💋‍👨 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_kiss_man = new EmojiInfo("man-kiss-man", "1f468-200d-2764-fe0f-200d-1f48b-200d-1f468.png", "", "👨‍❤️‍💋‍👨", true, true, true, true);
-
-		/// <summary>
 		/// :man: 👨 man
 		/// </summary>
 		public static readonly EmojiInfo Emoji_man = new EmojiInfo("man", "1f468.png", "man", "👨", true, true, true, true);
-
-		/// <summary>
-		/// :female-farmer: 👩‍🌾 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_farmer = new EmojiInfo("female-farmer", "1f469-200d-1f33e.png", "", "👩‍🌾", true, true, true, true);
-
-		/// <summary>
-		/// :female-cook: 👩‍🍳 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_cook = new EmojiInfo("female-cook", "1f469-200d-1f373.png", "", "👩‍🍳", true, true, true, true);
-
-		/// <summary>
-		/// :woman_feeding_baby: 👩‍🍼 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_feeding_baby = new EmojiInfo("woman_feeding_baby", "1f469-200d-1f37c.png", "", "👩‍🍼", true, true, true, true);
-
-		/// <summary>
-		/// :female-student: 👩‍🎓 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_student = new EmojiInfo("female-student", "1f469-200d-1f393.png", "", "👩‍🎓", true, true, true, true);
-
-		/// <summary>
-		/// :female-singer: 👩‍🎤 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_singer = new EmojiInfo("female-singer", "1f469-200d-1f3a4.png", "", "👩‍🎤", true, true, true, true);
-
-		/// <summary>
-		/// :female-artist: 👩‍🎨 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_artist = new EmojiInfo("female-artist", "1f469-200d-1f3a8.png", "", "👩‍🎨", true, true, true, true);
-
-		/// <summary>
-		/// :female-teacher: 👩‍🏫 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_teacher = new EmojiInfo("female-teacher", "1f469-200d-1f3eb.png", "", "👩‍🏫", true, true, true, true);
-
-		/// <summary>
-		/// :female-factory-worker: 👩‍🏭 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_factory_worker = new EmojiInfo("female-factory-worker", "1f469-200d-1f3ed.png", "", "👩‍🏭", true, true, true, true);
-
-		/// <summary>
-		/// :woman-boy-boy: 👩‍👦‍👦 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_boy_boy = new EmojiInfo("woman-boy-boy", "1f469-200d-1f466-200d-1f466.png", "", "👩‍👦‍👦", true, true, true, true);
-
-		/// <summary>
-		/// :woman-boy: 👩‍👦 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_boy = new EmojiInfo("woman-boy", "1f469-200d-1f466.png", "", "👩‍👦", true, true, true, true);
-
-		/// <summary>
-		/// :woman-girl-boy: 👩‍👧‍👦 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_girl_boy = new EmojiInfo("woman-girl-boy", "1f469-200d-1f467-200d-1f466.png", "", "👩‍👧‍👦", true, true, true, true);
-
-		/// <summary>
-		/// :woman-girl-girl: 👩‍👧‍👧 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_girl_girl = new EmojiInfo("woman-girl-girl", "1f469-200d-1f467-200d-1f467.png", "", "👩‍👧‍👧", true, true, true, true);
-
-		/// <summary>
-		/// :woman-girl: 👩‍👧 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_girl = new EmojiInfo("woman-girl", "1f469-200d-1f467.png", "", "👩‍👧", true, true, true, true);
-
-		/// <summary>
-		/// :woman-woman-boy: 👩‍👩‍👦 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_woman_boy = new EmojiInfo("woman-woman-boy", "1f469-200d-1f469-200d-1f466.png", "", "👩‍👩‍👦", true, true, true, true);
-
-		/// <summary>
-		/// :woman-woman-boy-boy: 👩‍👩‍👦‍👦 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_woman_boy_boy = new EmojiInfo("woman-woman-boy-boy", "1f469-200d-1f469-200d-1f466-200d-1f466.png", "", "👩‍👩‍👦‍👦", true, true, true, true);
-
-		/// <summary>
-		/// :woman-woman-girl: 👩‍👩‍👧 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_woman_girl = new EmojiInfo("woman-woman-girl", "1f469-200d-1f469-200d-1f467.png", "", "👩‍👩‍👧", true, true, true, true);
-
-		/// <summary>
-		/// :woman-woman-girl-boy: 👩‍👩‍👧‍👦 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_woman_girl_boy = new EmojiInfo("woman-woman-girl-boy", "1f469-200d-1f469-200d-1f467-200d-1f466.png", "", "👩‍👩‍👧‍👦", true, true, true, true);
-
-		/// <summary>
-		/// :woman-woman-girl-girl: 👩‍👩‍👧‍👧 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_woman_girl_girl = new EmojiInfo("woman-woman-girl-girl", "1f469-200d-1f469-200d-1f467-200d-1f467.png", "", "👩‍👩‍👧‍👧", true, true, true, true);
-
-		/// <summary>
-		/// :female-technologist: 👩‍💻 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_technologist = new EmojiInfo("female-technologist", "1f469-200d-1f4bb.png", "", "👩‍💻", true, true, true, true);
-
-		/// <summary>
-		/// :female-office-worker: 👩‍💼 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_office_worker = new EmojiInfo("female-office-worker", "1f469-200d-1f4bc.png", "", "👩‍💼", true, true, true, true);
-
-		/// <summary>
-		/// :female-mechanic: 👩‍🔧 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_mechanic = new EmojiInfo("female-mechanic", "1f469-200d-1f527.png", "", "👩‍🔧", true, true, true, true);
-
-		/// <summary>
-		/// :female-scientist: 👩‍🔬 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_scientist = new EmojiInfo("female-scientist", "1f469-200d-1f52c.png", "", "👩‍🔬", true, true, true, true);
-
-		/// <summary>
-		/// :female-astronaut: 👩‍🚀 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_astronaut = new EmojiInfo("female-astronaut", "1f469-200d-1f680.png", "", "👩‍🚀", true, true, true, true);
-
-		/// <summary>
-		/// :female-firefighter: 👩‍🚒 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_firefighter = new EmojiInfo("female-firefighter", "1f469-200d-1f692.png", "", "👩‍🚒", true, true, true, true);
-
-		/// <summary>
-		/// :woman_with_probing_cane: 👩‍🦯 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_with_probing_cane = new EmojiInfo("woman_with_probing_cane", "1f469-200d-1f9af.png", "", "👩‍🦯", true, true, true, true);
-
-		/// <summary>
-		/// :red_haired_woman: 👩‍🦰 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_red_haired_woman = new EmojiInfo("red_haired_woman", "1f469-200d-1f9b0.png", "", "👩‍🦰", true, true, true, true);
-
-		/// <summary>
-		/// :curly_haired_woman: 👩‍🦱 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_curly_haired_woman = new EmojiInfo("curly_haired_woman", "1f469-200d-1f9b1.png", "", "👩‍🦱", true, true, true, true);
-
-		/// <summary>
-		/// :bald_woman: 👩‍🦲 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_bald_woman = new EmojiInfo("bald_woman", "1f469-200d-1f9b2.png", "", "👩‍🦲", true, true, true, true);
-
-		/// <summary>
-		/// :white_haired_woman: 👩‍🦳 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_white_haired_woman = new EmojiInfo("white_haired_woman", "1f469-200d-1f9b3.png", "", "👩‍🦳", true, true, true, true);
-
-		/// <summary>
-		/// :woman_in_motorized_wheelchair: 👩‍🦼 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_in_motorized_wheelchair = new EmojiInfo("woman_in_motorized_wheelchair", "1f469-200d-1f9bc.png", "", "👩‍🦼", true, true, true, true);
-
-		/// <summary>
-		/// :woman_in_manual_wheelchair: 👩‍🦽 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_in_manual_wheelchair = new EmojiInfo("woman_in_manual_wheelchair", "1f469-200d-1f9bd.png", "", "👩‍🦽", true, true, true, true);
-
-		/// <summary>
-		/// :female-doctor: 👩‍⚕️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_doctor = new EmojiInfo("female-doctor", "1f469-200d-2695-fe0f.png", "", "👩‍⚕️", true, true, true, true);
-
-		/// <summary>
-		/// :female-judge: 👩‍⚖️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_judge = new EmojiInfo("female-judge", "1f469-200d-2696-fe0f.png", "", "👩‍⚖️", true, true, true, true);
-
-		/// <summary>
-		/// :female-pilot: 👩‍✈️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_pilot = new EmojiInfo("female-pilot", "1f469-200d-2708-fe0f.png", "", "👩‍✈️", true, true, true, true);
-
-		/// <summary>
-		/// :woman-heart-man: 👩‍❤️‍👨 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_heart_man = new EmojiInfo("woman-heart-man", "1f469-200d-2764-fe0f-200d-1f468.png", "", "👩‍❤️‍👨", true, true, true, true);
-
-		/// <summary>
-		/// :woman-heart-woman: 👩‍❤️‍👩 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_heart_woman = new EmojiInfo("woman-heart-woman", "1f469-200d-2764-fe0f-200d-1f469.png", "", "👩‍❤️‍👩", true, true, true, true);
-
-		/// <summary>
-		/// :woman-kiss-man: 👩‍❤️‍💋‍👨 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_kiss_man = new EmojiInfo("woman-kiss-man", "1f469-200d-2764-fe0f-200d-1f48b-200d-1f468.png", "", "👩‍❤️‍💋‍👨", true, true, true, true);
-
-		/// <summary>
-		/// :woman-kiss-woman: 👩‍❤️‍💋‍👩 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_kiss_woman = new EmojiInfo("woman-kiss-woman", "1f469-200d-2764-fe0f-200d-1f48b-200d-1f469.png", "", "👩‍❤️‍💋‍👩", true, true, true, true);
 
 		/// <summary>
 		/// :woman: 👩 woman
@@ -7451,29 +5395,9 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_two_women_holding_hands = new EmojiInfo("two_women_holding_hands", "1f46d.png", "two women holding hands", "👭", true, true, true, true);
 
 		/// <summary>
-		/// :female-police-officer: 👮‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_police_officer = new EmojiInfo("female-police-officer", "1f46e-200d-2640-fe0f.png", "", "👮‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :male-police-officer: 👮‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_police_officer = new EmojiInfo("male-police-officer", "1f46e-200d-2642-fe0f.png", "", "👮‍♂️", true, true, true, true);
-
-		/// <summary>
 		/// :cop: 👮 police officer
 		/// </summary>
 		public static readonly EmojiInfo Emoji_cop = new EmojiInfo("cop", "1f46e.png", "police officer", "👮", true, true, true, true);
-
-		/// <summary>
-		/// :woman-with-bunny-ears-partying: 👯‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_with_bunny_ears_partying = new EmojiInfo("woman-with-bunny-ears-partying", "1f46f-200d-2640-fe0f.png", "", "👯‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-with-bunny-ears-partying: 👯‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_with_bunny_ears_partying = new EmojiInfo("man-with-bunny-ears-partying", "1f46f-200d-2642-fe0f.png", "", "👯‍♂️", true, true, true, true);
 
 		/// <summary>
 		/// :dancers: 👯 woman with bunny ears
@@ -7481,29 +5405,9 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_dancers = new EmojiInfo("dancers", "1f46f.png", "woman with bunny ears", "👯", true, true, true, true);
 
 		/// <summary>
-		/// :woman_with_veil: 👰‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_with_veil = new EmojiInfo("woman_with_veil", "1f470-200d-2640-fe0f.png", "", "👰‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man_with_veil: 👰‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_with_veil = new EmojiInfo("man_with_veil", "1f470-200d-2642-fe0f.png", "", "👰‍♂️", true, true, true, true);
-
-		/// <summary>
 		/// :bride_with_veil: 👰 bride with veil
 		/// </summary>
 		public static readonly EmojiInfo Emoji_bride_with_veil = new EmojiInfo("bride_with_veil", "1f470.png", "bride with veil", "👰", true, true, true, true);
-
-		/// <summary>
-		/// :blond-haired-woman: 👱‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_blond_haired_woman = new EmojiInfo("blond-haired-woman", "1f471-200d-2640-fe0f.png", "", "👱‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :blond-haired-man: 👱‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_blond_haired_man = new EmojiInfo("blond-haired-man", "1f471-200d-2642-fe0f.png", "", "👱‍♂️", true, true, true, true);
 
 		/// <summary>
 		/// :person_with_blond_hair: 👱 person with blond hair
@@ -7514,16 +5418,6 @@ namespace Waher.Content.Emoji
 		/// :man_with_gua_pi_mao: 👲 man with gua pi mao
 		/// </summary>
 		public static readonly EmojiInfo Emoji_man_with_gua_pi_mao = new EmojiInfo("man_with_gua_pi_mao", "1f472.png", "man with gua pi mao", "👲", true, true, true, true);
-
-		/// <summary>
-		/// :woman-wearing-turban: 👳‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_wearing_turban = new EmojiInfo("woman-wearing-turban", "1f473-200d-2640-fe0f.png", "", "👳‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-wearing-turban: 👳‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_wearing_turban = new EmojiInfo("man-wearing-turban", "1f473-200d-2642-fe0f.png", "", "👳‍♂️", true, true, true, true);
 
 		/// <summary>
 		/// :man_with_turban: 👳 man with turban
@@ -7544,16 +5438,6 @@ namespace Waher.Content.Emoji
 		/// :baby: 👶 baby
 		/// </summary>
 		public static readonly EmojiInfo Emoji_baby = new EmojiInfo("baby", "1f476.png", "baby", "👶", true, true, true, true);
-
-		/// <summary>
-		/// :female-construction-worker: 👷‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_construction_worker = new EmojiInfo("female-construction-worker", "1f477-200d-2640-fe0f.png", "", "👷‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :male-construction-worker: 👷‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_construction_worker = new EmojiInfo("male-construction-worker", "1f477-200d-2642-fe0f.png", "", "👷‍♂️", true, true, true, true);
 
 		/// <summary>
 		/// :construction_worker: 👷 construction worker
@@ -7606,29 +5490,9 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_skull = new EmojiInfo("skull", "1f480.png", "skull", "💀", true, true, true, true);
 
 		/// <summary>
-		/// :woman-tipping-hand: 💁‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_tipping_hand = new EmojiInfo("woman-tipping-hand", "1f481-200d-2640-fe0f.png", "", "💁‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-tipping-hand: 💁‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_tipping_hand = new EmojiInfo("man-tipping-hand", "1f481-200d-2642-fe0f.png", "", "💁‍♂️", true, true, true, true);
-
-		/// <summary>
 		/// :information_desk_person: 💁 information desk person
 		/// </summary>
 		public static readonly EmojiInfo Emoji_information_desk_person = new EmojiInfo("information_desk_person", "1f481.png", "information desk person", "💁", true, true, true, true);
-
-		/// <summary>
-		/// :female-guard: 💂‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_guard = new EmojiInfo("female-guard", "1f482-200d-2640-fe0f.png", "", "💂‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :male-guard: 💂‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_guard = new EmojiInfo("male-guard", "1f482-200d-2642-fe0f.png", "", "💂‍♂️", true, true, true, true);
 
 		/// <summary>
 		/// :guardsman: 💂 guardsman
@@ -7651,29 +5515,9 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_nail_care = new EmojiInfo("nail_care", "1f485.png", "nail polish", "💅", true, true, true, true);
 
 		/// <summary>
-		/// :woman-getting-massage: 💆‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_getting_massage = new EmojiInfo("woman-getting-massage", "1f486-200d-2640-fe0f.png", "", "💆‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-getting-massage: 💆‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_getting_massage = new EmojiInfo("man-getting-massage", "1f486-200d-2642-fe0f.png", "", "💆‍♂️", true, true, true, true);
-
-		/// <summary>
 		/// :massage: 💆 face massage
 		/// </summary>
 		public static readonly EmojiInfo Emoji_massage = new EmojiInfo("massage", "1f486.png", "face massage", "💆", true, true, true, true);
-
-		/// <summary>
-		/// :woman-getting-haircut: 💇‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_getting_haircut = new EmojiInfo("woman-getting-haircut", "1f487-200d-2640-fe0f.png", "", "💇‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-getting-haircut: 💇‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_getting_haircut = new EmojiInfo("man-getting-haircut", "1f487-200d-2642-fe0f.png", "", "💇‍♂️", true, true, true, true);
 
 		/// <summary>
 		/// :haircut: 💇 haircut
@@ -8126,9 +5970,9 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_fax = new EmojiInfo("fax", "1f4e0.png", "fax machine", "📠", true, true, true, true);
 
 		/// <summary>
-		/// :satellite_antenna: 📡 satellite antenna
+		/// :satellite: 📡 satellite antenna
 		/// </summary>
-		public static readonly EmojiInfo Emoji_satellite_antenna = new EmojiInfo("satellite_antenna", "1f4e1.png", "satellite antenna", "📡", true, true, true, true);
+		public static readonly EmojiInfo Emoji_satellite = new EmojiInfo("satellite", "1f4e1.png", "satellite antenna", "📡", true, true, true, true);
 
 		/// <summary>
 		/// :loudspeaker: 📢 public address loudspeaker
@@ -8266,14 +6110,14 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_vhs = new EmojiInfo("vhs", "1f4fc.png", "videocassette", "📼", true, true, true, true);
 
 		/// <summary>
-		/// :film_projector: 📽️ 
+		/// :film_projector: 📽 film projector
 		/// </summary>
-		public static readonly EmojiInfo Emoji_film_projector = new EmojiInfo("film_projector", "1f4fd-fe0f.png", "", "📽️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_film_projector = new EmojiInfo("film_projector", "1f4fd.png", "film projector", "📽", true, true, true, true);
 
 		/// <summary>
 		/// :prayer_beads: 📿 prayer beads
 		/// </summary>
-		public static readonly EmojiInfo Emoji_prayer_beads = new EmojiInfo("prayer_beads", "1f4ff.png", "prayer beads", "📿", true, true, true, true);
+		public static readonly EmojiInfo Emoji_prayer_beads = new EmojiInfo("prayer_beads", "1f4ff.png", "prayer beads", "📿", true, true, true, false);
 
 		/// <summary>
 		/// :twisted_rightwards_arrows: 🔀 twisted rightwards arrows
@@ -8586,34 +6430,34 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_arrow_down_small = new EmojiInfo("arrow_down_small", "1f53d.png", "down-pointing small red triangle", "🔽", true, true, true, true);
 
 		/// <summary>
-		/// :om_symbol: 🕉️ 
+		/// :om_symbol: 🕉 om symbol
 		/// </summary>
-		public static readonly EmojiInfo Emoji_om_symbol = new EmojiInfo("om_symbol", "1f549-fe0f.png", "", "🕉️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_om_symbol = new EmojiInfo("om_symbol", "1f549.png", "om symbol", "🕉", true, true, true, true);
 
 		/// <summary>
-		/// :dove_of_peace: 🕊️ 
+		/// :dove_of_peace: 🕊 dove of peace
 		/// </summary>
-		public static readonly EmojiInfo Emoji_dove_of_peace = new EmojiInfo("dove_of_peace", "1f54a-fe0f.png", "", "🕊️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_dove_of_peace = new EmojiInfo("dove_of_peace", "1f54a.png", "dove of peace", "🕊", true, true, true, true);
 
 		/// <summary>
 		/// :kaaba: 🕋 kaaba
 		/// </summary>
-		public static readonly EmojiInfo Emoji_kaaba = new EmojiInfo("kaaba", "1f54b.png", "kaaba", "🕋", true, true, true, true);
+		public static readonly EmojiInfo Emoji_kaaba = new EmojiInfo("kaaba", "1f54b.png", "kaaba", "🕋", true, true, true, false);
 
 		/// <summary>
 		/// :mosque: 🕌 mosque
 		/// </summary>
-		public static readonly EmojiInfo Emoji_mosque = new EmojiInfo("mosque", "1f54c.png", "mosque", "🕌", true, true, true, true);
+		public static readonly EmojiInfo Emoji_mosque = new EmojiInfo("mosque", "1f54c.png", "mosque", "🕌", true, true, true, false);
 
 		/// <summary>
 		/// :synagogue: 🕍 synagogue
 		/// </summary>
-		public static readonly EmojiInfo Emoji_synagogue = new EmojiInfo("synagogue", "1f54d.png", "synagogue", "🕍", true, true, true, true);
+		public static readonly EmojiInfo Emoji_synagogue = new EmojiInfo("synagogue", "1f54d.png", "synagogue", "🕍", true, true, true, false);
 
 		/// <summary>
 		/// :menorah_with_nine_branches: 🕎 menorah with nine branches
 		/// </summary>
-		public static readonly EmojiInfo Emoji_menorah_with_nine_branches = new EmojiInfo("menorah_with_nine_branches", "1f54e.png", "menorah with nine branches", "🕎", true, true, true, true);
+		public static readonly EmojiInfo Emoji_menorah_with_nine_branches = new EmojiInfo("menorah_with_nine_branches", "1f54e.png", "menorah with nine branches", "🕎", true, true, true, false);
 
 		/// <summary>
 		/// :clock1: 🕐 clock face one oclock
@@ -8736,94 +6580,79 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_clock1230 = new EmojiInfo("clock1230", "1f567.png", "clock face twelve-thirty", "🕧", true, true, true, true);
 
 		/// <summary>
-		/// :candle: 🕯️ 
+		/// :candle: 🕯 candle
 		/// </summary>
-		public static readonly EmojiInfo Emoji_candle = new EmojiInfo("candle", "1f56f-fe0f.png", "", "🕯️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_candle = new EmojiInfo("candle", "1f56f.png", "candle", "🕯", true, true, true, true);
 
 		/// <summary>
-		/// :mantelpiece_clock: 🕰️ 
+		/// :mantelpiece_clock: 🕰 mantelpiece clock
 		/// </summary>
-		public static readonly EmojiInfo Emoji_mantelpiece_clock = new EmojiInfo("mantelpiece_clock", "1f570-fe0f.png", "", "🕰️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_mantelpiece_clock = new EmojiInfo("mantelpiece_clock", "1f570.png", "mantelpiece clock", "🕰", true, true, true, true);
 
 		/// <summary>
-		/// :hole: 🕳️ 
+		/// :hole: 🕳 hole
 		/// </summary>
-		public static readonly EmojiInfo Emoji_hole = new EmojiInfo("hole", "1f573-fe0f.png", "", "🕳️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_hole = new EmojiInfo("hole", "1f573.png", "hole", "🕳", true, true, true, true);
 
 		/// <summary>
-		/// :man_in_business_suit_levitating: 🕴️ 
+		/// :man_in_business_suit_levitating: 🕴 man in business suit levitating
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_in_business_suit_levitating = new EmojiInfo("man_in_business_suit_levitating", "1f574-fe0f.png", "", "🕴️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_in_business_suit_levitating = new EmojiInfo("man_in_business_suit_levitating", "1f574.png", "man in business suit levitating", "🕴", true, true, true, true);
 
 		/// <summary>
-		/// :female-detective: 🕵️‍♀️ 
+		/// :sleuth_or_spy: 🕵 sleuth or spy
 		/// </summary>
-		public static readonly EmojiInfo Emoji_female_detective = new EmojiInfo("female-detective", "1f575-fe0f-200d-2640-fe0f.png", "", "🕵️‍♀️", true, true, true, false);
+		public static readonly EmojiInfo Emoji_sleuth_or_spy = new EmojiInfo("sleuth_or_spy", "1f575.png", "sleuth or spy", "🕵", true, true, true, true);
 
 		/// <summary>
-		/// :male-detective: 🕵️‍♂️ 
+		/// :dark_sunglasses: 🕶 dark sunglasses
 		/// </summary>
-		public static readonly EmojiInfo Emoji_male_detective = new EmojiInfo("male-detective", "1f575-fe0f-200d-2642-fe0f.png", "", "🕵️‍♂️", true, true, true, false);
+		public static readonly EmojiInfo Emoji_dark_sunglasses = new EmojiInfo("dark_sunglasses", "1f576.png", "dark sunglasses", "🕶", true, true, true, true);
 
 		/// <summary>
-		/// :sleuth_or_spy: 🕵️ 
+		/// :spider: 🕷 spider
 		/// </summary>
-		public static readonly EmojiInfo Emoji_sleuth_or_spy = new EmojiInfo("sleuth_or_spy", "1f575-fe0f.png", "", "🕵️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_spider = new EmojiInfo("spider", "1f577.png", "spider", "🕷", true, true, true, true);
 
 		/// <summary>
-		/// :dark_sunglasses: 🕶️ 
+		/// :spider_web: 🕸 spider web
 		/// </summary>
-		public static readonly EmojiInfo Emoji_dark_sunglasses = new EmojiInfo("dark_sunglasses", "1f576-fe0f.png", "", "🕶️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_spider_web = new EmojiInfo("spider_web", "1f578.png", "spider web", "🕸", true, true, true, true);
 
 		/// <summary>
-		/// :spider: 🕷️ 
+		/// :joystick: 🕹 joystick
 		/// </summary>
-		public static readonly EmojiInfo Emoji_spider = new EmojiInfo("spider", "1f577-fe0f.png", "", "🕷️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_joystick = new EmojiInfo("joystick", "1f579.png", "joystick", "🕹", true, true, true, true);
 
 		/// <summary>
-		/// :spider_web: 🕸️ 
+		/// :linked_paperclips: 🖇 linked paperclips
 		/// </summary>
-		public static readonly EmojiInfo Emoji_spider_web = new EmojiInfo("spider_web", "1f578-fe0f.png", "", "🕸️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_linked_paperclips = new EmojiInfo("linked_paperclips", "1f587.png", "linked paperclips", "🖇", true, true, true, true);
 
 		/// <summary>
-		/// :joystick: 🕹️ 
+		/// :lower_left_ballpoint_pen: 🖊 lower left ballpoint pen
 		/// </summary>
-		public static readonly EmojiInfo Emoji_joystick = new EmojiInfo("joystick", "1f579-fe0f.png", "", "🕹️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_lower_left_ballpoint_pen = new EmojiInfo("lower_left_ballpoint_pen", "1f58a.png", "lower left ballpoint pen", "🖊", true, true, true, true);
 
 		/// <summary>
-		/// :man_dancing: 🕺 man dancing
+		/// :lower_left_fountain_pen: 🖋 lower left fountain pen
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_dancing = new EmojiInfo("man_dancing", "1f57a.png", "man dancing", "🕺", true, true, true, true);
+		public static readonly EmojiInfo Emoji_lower_left_fountain_pen = new EmojiInfo("lower_left_fountain_pen", "1f58b.png", "lower left fountain pen", "🖋", true, true, true, true);
 
 		/// <summary>
-		/// :linked_paperclips: 🖇️ 
+		/// :lower_left_paintbrush: 🖌 lower left paintbrush
 		/// </summary>
-		public static readonly EmojiInfo Emoji_linked_paperclips = new EmojiInfo("linked_paperclips", "1f587-fe0f.png", "", "🖇️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_lower_left_paintbrush = new EmojiInfo("lower_left_paintbrush", "1f58c.png", "lower left paintbrush", "🖌", true, true, true, true);
 
 		/// <summary>
-		/// :lower_left_ballpoint_pen: 🖊️ 
+		/// :lower_left_crayon: 🖍 lower left crayon
 		/// </summary>
-		public static readonly EmojiInfo Emoji_lower_left_ballpoint_pen = new EmojiInfo("lower_left_ballpoint_pen", "1f58a-fe0f.png", "", "🖊️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_lower_left_crayon = new EmojiInfo("lower_left_crayon", "1f58d.png", "lower left crayon", "🖍", true, true, true, true);
 
 		/// <summary>
-		/// :lower_left_fountain_pen: 🖋️ 
+		/// :raised_hand_with_fingers_splayed: 🖐 raised hand with fingers splayed
 		/// </summary>
-		public static readonly EmojiInfo Emoji_lower_left_fountain_pen = new EmojiInfo("lower_left_fountain_pen", "1f58b-fe0f.png", "", "🖋️", true, true, true, true);
-
-		/// <summary>
-		/// :lower_left_paintbrush: 🖌️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_lower_left_paintbrush = new EmojiInfo("lower_left_paintbrush", "1f58c-fe0f.png", "", "🖌️", true, true, true, true);
-
-		/// <summary>
-		/// :lower_left_crayon: 🖍️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_lower_left_crayon = new EmojiInfo("lower_left_crayon", "1f58d-fe0f.png", "", "🖍️", true, true, true, true);
-
-		/// <summary>
-		/// :raised_hand_with_fingers_splayed: 🖐️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_raised_hand_with_fingers_splayed = new EmojiInfo("raised_hand_with_fingers_splayed", "1f590-fe0f.png", "", "🖐️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_raised_hand_with_fingers_splayed = new EmojiInfo("raised_hand_with_fingers_splayed", "1f590.png", "raised hand with fingers splayed", "🖐", true, true, true, true);
 
 		/// <summary>
 		/// :middle_finger: 🖕 reversed hand with middle finger extended
@@ -8836,109 +6665,104 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_spock_hand = new EmojiInfo("spock-hand", "1f596.png", "raised hand with part between middle and ring fingers", "🖖", true, true, true, true);
 
 		/// <summary>
-		/// :black_heart: 🖤 black heart
+		/// :desktop_computer: 🖥 desktop computer
 		/// </summary>
-		public static readonly EmojiInfo Emoji_black_heart = new EmojiInfo("black_heart", "1f5a4.png", "black heart", "🖤", true, true, true, true);
+		public static readonly EmojiInfo Emoji_desktop_computer = new EmojiInfo("desktop_computer", "1f5a5.png", "desktop computer", "🖥", true, true, true, true);
 
 		/// <summary>
-		/// :desktop_computer: 🖥️ 
+		/// :printer: 🖨 printer
 		/// </summary>
-		public static readonly EmojiInfo Emoji_desktop_computer = new EmojiInfo("desktop_computer", "1f5a5-fe0f.png", "", "🖥️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_printer = new EmojiInfo("printer", "1f5a8.png", "printer", "🖨", true, true, true, true);
 
 		/// <summary>
-		/// :printer: 🖨️ 
+		/// :three_button_mouse: 🖱 three button mouse
 		/// </summary>
-		public static readonly EmojiInfo Emoji_printer = new EmojiInfo("printer", "1f5a8-fe0f.png", "", "🖨️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_three_button_mouse = new EmojiInfo("three_button_mouse", "1f5b1.png", "three button mouse", "🖱", true, true, true, false);
 
 		/// <summary>
-		/// :three_button_mouse: 🖱️ 
+		/// :trackball: 🖲 trackball
 		/// </summary>
-		public static readonly EmojiInfo Emoji_three_button_mouse = new EmojiInfo("three_button_mouse", "1f5b1-fe0f.png", "", "🖱️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_trackball = new EmojiInfo("trackball", "1f5b2.png", "trackball", "🖲", true, true, true, true);
 
 		/// <summary>
-		/// :trackball: 🖲️ 
+		/// :frame_with_picture: 🖼 frame with picture
 		/// </summary>
-		public static readonly EmojiInfo Emoji_trackball = new EmojiInfo("trackball", "1f5b2-fe0f.png", "", "🖲️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_frame_with_picture = new EmojiInfo("frame_with_picture", "1f5bc.png", "frame with picture", "🖼", true, true, true, true);
 
 		/// <summary>
-		/// :frame_with_picture: 🖼️ 
+		/// :card_index_dividers: 🗂 card index dividers
 		/// </summary>
-		public static readonly EmojiInfo Emoji_frame_with_picture = new EmojiInfo("frame_with_picture", "1f5bc-fe0f.png", "", "🖼️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_card_index_dividers = new EmojiInfo("card_index_dividers", "1f5c2.png", "card index dividers", "🗂", true, true, true, true);
 
 		/// <summary>
-		/// :card_index_dividers: 🗂️ 
+		/// :card_file_box: 🗃 card file box
 		/// </summary>
-		public static readonly EmojiInfo Emoji_card_index_dividers = new EmojiInfo("card_index_dividers", "1f5c2-fe0f.png", "", "🗂️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_card_file_box = new EmojiInfo("card_file_box", "1f5c3.png", "card file box", "🗃", true, true, true, true);
 
 		/// <summary>
-		/// :card_file_box: 🗃️ 
+		/// :file_cabinet: 🗄 file cabinet
 		/// </summary>
-		public static readonly EmojiInfo Emoji_card_file_box = new EmojiInfo("card_file_box", "1f5c3-fe0f.png", "", "🗃️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_file_cabinet = new EmojiInfo("file_cabinet", "1f5c4.png", "file cabinet", "🗄", true, true, true, true);
 
 		/// <summary>
-		/// :file_cabinet: 🗄️ 
+		/// :wastebasket: 🗑 wastebasket
 		/// </summary>
-		public static readonly EmojiInfo Emoji_file_cabinet = new EmojiInfo("file_cabinet", "1f5c4-fe0f.png", "", "🗄️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_wastebasket = new EmojiInfo("wastebasket", "1f5d1.png", "wastebasket", "🗑", true, true, true, true);
 
 		/// <summary>
-		/// :wastebasket: 🗑️ 
+		/// :spiral_note_pad: 🗒 spiral note pad
 		/// </summary>
-		public static readonly EmojiInfo Emoji_wastebasket = new EmojiInfo("wastebasket", "1f5d1-fe0f.png", "", "🗑️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_spiral_note_pad = new EmojiInfo("spiral_note_pad", "1f5d2.png", "spiral note pad", "🗒", true, true, true, true);
 
 		/// <summary>
-		/// :spiral_note_pad: 🗒️ 
+		/// :spiral_calendar_pad: 🗓 spiral calendar pad
 		/// </summary>
-		public static readonly EmojiInfo Emoji_spiral_note_pad = new EmojiInfo("spiral_note_pad", "1f5d2-fe0f.png", "", "🗒️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_spiral_calendar_pad = new EmojiInfo("spiral_calendar_pad", "1f5d3.png", "spiral calendar pad", "🗓", true, true, true, true);
 
 		/// <summary>
-		/// :spiral_calendar_pad: 🗓️ 
+		/// :compression: 🗜 compression
 		/// </summary>
-		public static readonly EmojiInfo Emoji_spiral_calendar_pad = new EmojiInfo("spiral_calendar_pad", "1f5d3-fe0f.png", "", "🗓️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_compression = new EmojiInfo("compression", "1f5dc.png", "compression", "🗜", true, true, true, true);
 
 		/// <summary>
-		/// :compression: 🗜️ 
+		/// :old_key: 🗝 old key
 		/// </summary>
-		public static readonly EmojiInfo Emoji_compression = new EmojiInfo("compression", "1f5dc-fe0f.png", "", "🗜️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_old_key = new EmojiInfo("old_key", "1f5dd.png", "old key", "🗝", true, true, true, true);
 
 		/// <summary>
-		/// :old_key: 🗝️ 
+		/// :rolled_up_newspaper: 🗞 rolled-up newspaper
 		/// </summary>
-		public static readonly EmojiInfo Emoji_old_key = new EmojiInfo("old_key", "1f5dd-fe0f.png", "", "🗝️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_rolled_up_newspaper = new EmojiInfo("rolled_up_newspaper", "1f5de.png", "rolled-up newspaper", "🗞", true, true, true, true);
 
 		/// <summary>
-		/// :rolled_up_newspaper: 🗞️ 
+		/// :dagger_knife: 🗡 dagger knife
 		/// </summary>
-		public static readonly EmojiInfo Emoji_rolled_up_newspaper = new EmojiInfo("rolled_up_newspaper", "1f5de-fe0f.png", "", "🗞️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_dagger_knife = new EmojiInfo("dagger_knife", "1f5e1.png", "dagger knife", "🗡", true, true, true, true);
 
 		/// <summary>
-		/// :dagger_knife: 🗡️ 
+		/// :speaking_head_in_silhouette: 🗣 speaking head in silhouette
 		/// </summary>
-		public static readonly EmojiInfo Emoji_dagger_knife = new EmojiInfo("dagger_knife", "1f5e1-fe0f.png", "", "🗡️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_speaking_head_in_silhouette = new EmojiInfo("speaking_head_in_silhouette", "1f5e3.png", "speaking head in silhouette", "🗣", true, true, true, true);
 
 		/// <summary>
-		/// :speaking_head_in_silhouette: 🗣️ 
+		/// :left_speech_bubble: 🗨 left speech bubble
 		/// </summary>
-		public static readonly EmojiInfo Emoji_speaking_head_in_silhouette = new EmojiInfo("speaking_head_in_silhouette", "1f5e3-fe0f.png", "", "🗣️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_left_speech_bubble = new EmojiInfo("left_speech_bubble", "1f5e8.png", "left speech bubble", "🗨", true, true, true, true);
 
 		/// <summary>
-		/// :left_speech_bubble: 🗨️ 
+		/// :right_anger_bubble: 🗯 right anger bubble
 		/// </summary>
-		public static readonly EmojiInfo Emoji_left_speech_bubble = new EmojiInfo("left_speech_bubble", "1f5e8-fe0f.png", "", "🗨️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_right_anger_bubble = new EmojiInfo("right_anger_bubble", "1f5ef.png", "right anger bubble", "🗯", true, true, true, true);
 
 		/// <summary>
-		/// :right_anger_bubble: 🗯️ 
+		/// :ballot_box_with_ballot: 🗳 ballot box with ballot
 		/// </summary>
-		public static readonly EmojiInfo Emoji_right_anger_bubble = new EmojiInfo("right_anger_bubble", "1f5ef-fe0f.png", "", "🗯️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_ballot_box_with_ballot = new EmojiInfo("ballot_box_with_ballot", "1f5f3.png", "ballot box with ballot", "🗳", true, true, true, true);
 
 		/// <summary>
-		/// :ballot_box_with_ballot: 🗳️ 
+		/// :world_map: 🗺 world map
 		/// </summary>
-		public static readonly EmojiInfo Emoji_ballot_box_with_ballot = new EmojiInfo("ballot_box_with_ballot", "1f5f3-fe0f.png", "", "🗳️", true, true, true, true);
-
-		/// <summary>
-		/// :world_map: 🗺️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_world_map = new EmojiInfo("world_map", "1f5fa-fe0f.png", "", "🗺️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_world_map = new EmojiInfo("world_map", "1f5fa.png", "world map", "🗺", true, true, true, true);
 
 		/// <summary>
 		/// :mount_fuji: 🗻 mount fuji
@@ -9303,22 +7127,12 @@ namespace Waher.Content.Emoji
 		/// <summary>
 		/// :upside_down_face: 🙃 upside-down face
 		/// </summary>
-		public static readonly EmojiInfo Emoji_upside_down_face = new EmojiInfo("upside_down_face", "1f643.png", "upside-down face", "🙃", true, true, true, true);
+		public static readonly EmojiInfo Emoji_upside_down_face = new EmojiInfo("upside_down_face", "1f643.png", "upside-down face", "🙃", true, true, true, false);
 
 		/// <summary>
 		/// :face_with_rolling_eyes: 🙄 face with rolling eyes
 		/// </summary>
-		public static readonly EmojiInfo Emoji_face_with_rolling_eyes = new EmojiInfo("face_with_rolling_eyes", "1f644.png", "face with rolling eyes", "🙄", true, true, true, true);
-
-		/// <summary>
-		/// :woman-gesturing-no: 🙅‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_gesturing_no = new EmojiInfo("woman-gesturing-no", "1f645-200d-2640-fe0f.png", "", "🙅‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-gesturing-no: 🙅‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_gesturing_no = new EmojiInfo("man-gesturing-no", "1f645-200d-2642-fe0f.png", "", "🙅‍♂️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_face_with_rolling_eyes = new EmojiInfo("face_with_rolling_eyes", "1f644.png", "face with rolling eyes", "🙄", true, true, true, false);
 
 		/// <summary>
 		/// :no_good: 🙅 face with no good gesture
@@ -9326,29 +7140,9 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_no_good = new EmojiInfo("no_good", "1f645.png", "face with no good gesture", "🙅", true, true, true, true);
 
 		/// <summary>
-		/// :woman-gesturing-ok: 🙆‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_gesturing_ok = new EmojiInfo("woman-gesturing-ok", "1f646-200d-2640-fe0f.png", "", "🙆‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-gesturing-ok: 🙆‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_gesturing_ok = new EmojiInfo("man-gesturing-ok", "1f646-200d-2642-fe0f.png", "", "🙆‍♂️", true, true, true, true);
-
-		/// <summary>
 		/// :ok_woman: 🙆 face with ok gesture
 		/// </summary>
 		public static readonly EmojiInfo Emoji_ok_woman = new EmojiInfo("ok_woman", "1f646.png", "face with ok gesture", "🙆", true, true, true, true);
-
-		/// <summary>
-		/// :woman-bowing: 🙇‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_bowing = new EmojiInfo("woman-bowing", "1f647-200d-2640-fe0f.png", "", "🙇‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-bowing: 🙇‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_bowing = new EmojiInfo("man-bowing", "1f647-200d-2642-fe0f.png", "", "🙇‍♂️", true, true, true, true);
 
 		/// <summary>
 		/// :bow: 🙇 person bowing deeply
@@ -9371,16 +7165,6 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_speak_no_evil = new EmojiInfo("speak_no_evil", "1f64a.png", "speak-no-evil monkey", "🙊", true, true, true, true);
 
 		/// <summary>
-		/// :woman-raising-hand: 🙋‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_raising_hand = new EmojiInfo("woman-raising-hand", "1f64b-200d-2640-fe0f.png", "", "🙋‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-raising-hand: 🙋‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_raising_hand = new EmojiInfo("man-raising-hand", "1f64b-200d-2642-fe0f.png", "", "🙋‍♂️", true, true, true, true);
-
-		/// <summary>
 		/// :raising_hand: 🙋 happy person raising one hand
 		/// </summary>
 		public static readonly EmojiInfo Emoji_raising_hand = new EmojiInfo("raising_hand", "1f64b.png", "happy person raising one hand", "🙋", true, true, true, true);
@@ -9391,29 +7175,9 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_raised_hands = new EmojiInfo("raised_hands", "1f64c.png", "person raising both hands in celebration", "🙌", true, true, true, true);
 
 		/// <summary>
-		/// :woman-frowning: 🙍‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_frowning = new EmojiInfo("woman-frowning", "1f64d-200d-2640-fe0f.png", "", "🙍‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-frowning: 🙍‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_frowning = new EmojiInfo("man-frowning", "1f64d-200d-2642-fe0f.png", "", "🙍‍♂️", true, true, true, true);
-
-		/// <summary>
 		/// :person_frowning: 🙍 person frowning
 		/// </summary>
 		public static readonly EmojiInfo Emoji_person_frowning = new EmojiInfo("person_frowning", "1f64d.png", "person frowning", "🙍", true, true, true, true);
-
-		/// <summary>
-		/// :woman-pouting: 🙎‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_pouting = new EmojiInfo("woman-pouting", "1f64e-200d-2640-fe0f.png", "", "🙎‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-pouting: 🙎‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_pouting = new EmojiInfo("man-pouting", "1f64e-200d-2642-fe0f.png", "", "🙎‍♂️", true, true, true, true);
 
 		/// <summary>
 		/// :person_with_pouting_face: 🙎 person with pouting face
@@ -9601,16 +7365,6 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_ship = new EmojiInfo("ship", "1f6a2.png", "ship", "🚢", true, true, true, true);
 
 		/// <summary>
-		/// :woman-rowing-boat: 🚣‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_rowing_boat = new EmojiInfo("woman-rowing-boat", "1f6a3-200d-2640-fe0f.png", "", "🚣‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-rowing-boat: 🚣‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_rowing_boat = new EmojiInfo("man-rowing-boat", "1f6a3-200d-2642-fe0f.png", "", "🚣‍♂️", true, true, true, true);
-
-		/// <summary>
 		/// :rowboat: 🚣 rowboat
 		/// </summary>
 		public static readonly EmojiInfo Emoji_rowboat = new EmojiInfo("rowboat", "1f6a3.png", "rowboat", "🚣", true, true, true, true);
@@ -9696,44 +7450,14 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_no_bicycles = new EmojiInfo("no_bicycles", "1f6b3.png", "no bicycles", "🚳", true, true, true, true);
 
 		/// <summary>
-		/// :woman-biking: 🚴‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_biking = new EmojiInfo("woman-biking", "1f6b4-200d-2640-fe0f.png", "", "🚴‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-biking: 🚴‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_biking = new EmojiInfo("man-biking", "1f6b4-200d-2642-fe0f.png", "", "🚴‍♂️", true, true, true, true);
-
-		/// <summary>
 		/// :bicyclist: 🚴 bicyclist
 		/// </summary>
 		public static readonly EmojiInfo Emoji_bicyclist = new EmojiInfo("bicyclist", "1f6b4.png", "bicyclist", "🚴", true, true, true, true);
 
 		/// <summary>
-		/// :woman-mountain-biking: 🚵‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_mountain_biking = new EmojiInfo("woman-mountain-biking", "1f6b5-200d-2640-fe0f.png", "", "🚵‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-mountain-biking: 🚵‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_mountain_biking = new EmojiInfo("man-mountain-biking", "1f6b5-200d-2642-fe0f.png", "", "🚵‍♂️", true, true, true, true);
-
-		/// <summary>
 		/// :mountain_bicyclist: 🚵 mountain bicyclist
 		/// </summary>
 		public static readonly EmojiInfo Emoji_mountain_bicyclist = new EmojiInfo("mountain_bicyclist", "1f6b5.png", "mountain bicyclist", "🚵", true, true, true, true);
-
-		/// <summary>
-		/// :woman-walking: 🚶‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_walking = new EmojiInfo("woman-walking", "1f6b6-200d-2640-fe0f.png", "", "🚶‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-walking: 🚶‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_walking = new EmojiInfo("man-walking", "1f6b6-200d-2642-fe0f.png", "", "🚶‍♂️", true, true, true, true);
 
 		/// <summary>
 		/// :walking: 🚶 pedestrian
@@ -9816,9 +7540,9 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_left_luggage = new EmojiInfo("left_luggage", "1f6c5.png", "left luggage", "🛅", true, true, true, true);
 
 		/// <summary>
-		/// :couch_and_lamp: 🛋️ 
+		/// :couch_and_lamp: 🛋 couch and lamp
 		/// </summary>
-		public static readonly EmojiInfo Emoji_couch_and_lamp = new EmojiInfo("couch_and_lamp", "1f6cb-fe0f.png", "", "🛋️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_couch_and_lamp = new EmojiInfo("couch_and_lamp", "1f6cb.png", "couch and lamp", "🛋", true, true, true, true);
 
 		/// <summary>
 		/// :sleeping_accommodation: 🛌 sleeping accommodation
@@ -9826,84 +7550,59 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_sleeping_accommodation = new EmojiInfo("sleeping_accommodation", "1f6cc.png", "sleeping accommodation", "🛌", true, true, true, true);
 
 		/// <summary>
-		/// :shopping_bags: 🛍️ 
+		/// :shopping_bags: 🛍 shopping bags
 		/// </summary>
-		public static readonly EmojiInfo Emoji_shopping_bags = new EmojiInfo("shopping_bags", "1f6cd-fe0f.png", "", "🛍️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_shopping_bags = new EmojiInfo("shopping_bags", "1f6cd.png", "shopping bags", "🛍", true, true, true, true);
 
 		/// <summary>
-		/// :bellhop_bell: 🛎️ 
+		/// :bellhop_bell: 🛎 bellhop bell
 		/// </summary>
-		public static readonly EmojiInfo Emoji_bellhop_bell = new EmojiInfo("bellhop_bell", "1f6ce-fe0f.png", "", "🛎️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_bellhop_bell = new EmojiInfo("bellhop_bell", "1f6ce.png", "bellhop bell", "🛎", true, true, true, true);
 
 		/// <summary>
-		/// :bed: 🛏️ 
+		/// :bed: 🛏 bed
 		/// </summary>
-		public static readonly EmojiInfo Emoji_bed = new EmojiInfo("bed", "1f6cf-fe0f.png", "", "🛏️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_bed = new EmojiInfo("bed", "1f6cf.png", "bed", "🛏", true, true, true, true);
 
 		/// <summary>
 		/// :place_of_worship: 🛐 place of worship
 		/// </summary>
-		public static readonly EmojiInfo Emoji_place_of_worship = new EmojiInfo("place_of_worship", "1f6d0.png", "place of worship", "🛐", true, true, true, true);
+		public static readonly EmojiInfo Emoji_place_of_worship = new EmojiInfo("place_of_worship", "1f6d0.png", "place of worship", "🛐", true, true, true, false);
 
 		/// <summary>
-		/// :octagonal_sign: 🛑 octagonal sign
+		/// :hammer_and_wrench: 🛠 hammer and wrench
 		/// </summary>
-		public static readonly EmojiInfo Emoji_octagonal_sign = new EmojiInfo("octagonal_sign", "1f6d1.png", "octagonal sign", "🛑", true, true, true, true);
+		public static readonly EmojiInfo Emoji_hammer_and_wrench = new EmojiInfo("hammer_and_wrench", "1f6e0.png", "hammer and wrench", "🛠", true, true, true, true);
 
 		/// <summary>
-		/// :shopping_trolley: 🛒 shopping trolley
+		/// :shield: 🛡 shield
 		/// </summary>
-		public static readonly EmojiInfo Emoji_shopping_trolley = new EmojiInfo("shopping_trolley", "1f6d2.png", "shopping trolley", "🛒", true, true, true, true);
+		public static readonly EmojiInfo Emoji_shield = new EmojiInfo("shield", "1f6e1.png", "shield", "🛡", true, true, true, true);
 
 		/// <summary>
-		/// :hindu_temple: 🛕 hindu temple
+		/// :oil_drum: 🛢 oil drum
 		/// </summary>
-		public static readonly EmojiInfo Emoji_hindu_temple = new EmojiInfo("hindu_temple", "1f6d5.png", "hindu temple", "🛕", true, true, true, true);
+		public static readonly EmojiInfo Emoji_oil_drum = new EmojiInfo("oil_drum", "1f6e2.png", "oil drum", "🛢", true, true, true, true);
 
 		/// <summary>
-		/// :hut: 🛖 hut
+		/// :motorway: 🛣 motorway
 		/// </summary>
-		public static readonly EmojiInfo Emoji_hut = new EmojiInfo("hut", "1f6d6.png", "hut", "🛖", true, true, true, true);
+		public static readonly EmojiInfo Emoji_motorway = new EmojiInfo("motorway", "1f6e3.png", "motorway", "🛣", true, true, true, true);
 
 		/// <summary>
-		/// :elevator: 🛗 elevator
+		/// :railway_track: 🛤 railway track
 		/// </summary>
-		public static readonly EmojiInfo Emoji_elevator = new EmojiInfo("elevator", "1f6d7.png", "elevator", "🛗", true, true, true, true);
+		public static readonly EmojiInfo Emoji_railway_track = new EmojiInfo("railway_track", "1f6e4.png", "railway track", "🛤", true, true, true, true);
 
 		/// <summary>
-		/// :hammer_and_wrench: 🛠️ 
+		/// :motor_boat: 🛥 motor boat
 		/// </summary>
-		public static readonly EmojiInfo Emoji_hammer_and_wrench = new EmojiInfo("hammer_and_wrench", "1f6e0-fe0f.png", "", "🛠️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_motor_boat = new EmojiInfo("motor_boat", "1f6e5.png", "motor boat", "🛥", true, true, true, true);
 
 		/// <summary>
-		/// :shield: 🛡️ 
+		/// :small_airplane: 🛩 small airplane
 		/// </summary>
-		public static readonly EmojiInfo Emoji_shield = new EmojiInfo("shield", "1f6e1-fe0f.png", "", "🛡️", true, true, true, true);
-
-		/// <summary>
-		/// :oil_drum: 🛢️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_oil_drum = new EmojiInfo("oil_drum", "1f6e2-fe0f.png", "", "🛢️", true, true, true, true);
-
-		/// <summary>
-		/// :motorway: 🛣️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_motorway = new EmojiInfo("motorway", "1f6e3-fe0f.png", "", "🛣️", true, true, true, true);
-
-		/// <summary>
-		/// :railway_track: 🛤️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_railway_track = new EmojiInfo("railway_track", "1f6e4-fe0f.png", "", "🛤️", true, true, true, true);
-
-		/// <summary>
-		/// :motor_boat: 🛥️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_motor_boat = new EmojiInfo("motor_boat", "1f6e5-fe0f.png", "", "🛥️", true, true, true, true);
-
-		/// <summary>
-		/// :small_airplane: 🛩️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_small_airplane = new EmojiInfo("small_airplane", "1f6e9-fe0f.png", "", "🛩️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_small_airplane = new EmojiInfo("small_airplane", "1f6e9.png", "small airplane", "🛩", true, true, true, true);
 
 		/// <summary>
 		/// :airplane_departure: 🛫 airplane departure
@@ -9916,2784 +7615,1524 @@ namespace Waher.Content.Emoji
 		public static readonly EmojiInfo Emoji_airplane_arriving = new EmojiInfo("airplane_arriving", "1f6ec.png", "airplane arriving", "🛬", true, true, true, true);
 
 		/// <summary>
-		/// :satellite: 🛰️ 
+		/// :satellite: 🛰 satellite
 		/// </summary>
-		public static readonly EmojiInfo Emoji_satellite = new EmojiInfo("satellite", "1f6f0-fe0f.png", "", "🛰️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_satellite2 = new EmojiInfo("satellite", "1f6f0.png", "satellite", "🛰", true, true, true, true);
 
 		/// <summary>
-		/// :passenger_ship: 🛳️ 
+		/// :passenger_ship: 🛳 passenger ship
 		/// </summary>
-		public static readonly EmojiInfo Emoji_passenger_ship = new EmojiInfo("passenger_ship", "1f6f3-fe0f.png", "", "🛳️", true, true, true, true);
-
-		/// <summary>
-		/// :scooter: 🛴 scooter
-		/// </summary>
-		public static readonly EmojiInfo Emoji_scooter = new EmojiInfo("scooter", "1f6f4.png", "scooter", "🛴", true, true, true, true);
-
-		/// <summary>
-		/// :motor_scooter: 🛵 motor scooter
-		/// </summary>
-		public static readonly EmojiInfo Emoji_motor_scooter = new EmojiInfo("motor_scooter", "1f6f5.png", "motor scooter", "🛵", true, true, true, true);
-
-		/// <summary>
-		/// :canoe: 🛶 canoe
-		/// </summary>
-		public static readonly EmojiInfo Emoji_canoe = new EmojiInfo("canoe", "1f6f6.png", "canoe", "🛶", true, true, true, true);
-
-		/// <summary>
-		/// :sled: 🛷 sled
-		/// </summary>
-		public static readonly EmojiInfo Emoji_sled = new EmojiInfo("sled", "1f6f7.png", "sled", "🛷", true, true, true, true);
-
-		/// <summary>
-		/// :flying_saucer: 🛸 flying saucer
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flying_saucer = new EmojiInfo("flying_saucer", "1f6f8.png", "flying saucer", "🛸", true, true, true, true);
-
-		/// <summary>
-		/// :skateboard: 🛹 skateboard
-		/// </summary>
-		public static readonly EmojiInfo Emoji_skateboard = new EmojiInfo("skateboard", "1f6f9.png", "skateboard", "🛹", true, true, true, true);
-
-		/// <summary>
-		/// :auto_rickshaw: 🛺 auto rickshaw
-		/// </summary>
-		public static readonly EmojiInfo Emoji_auto_rickshaw = new EmojiInfo("auto_rickshaw", "1f6fa.png", "auto rickshaw", "🛺", true, true, true, true);
-
-		/// <summary>
-		/// :pickup_truck: 🛻 pickup truck
-		/// </summary>
-		public static readonly EmojiInfo Emoji_pickup_truck = new EmojiInfo("pickup_truck", "1f6fb.png", "pickup truck", "🛻", true, true, true, true);
-
-		/// <summary>
-		/// :roller_skate: 🛼 roller skate
-		/// </summary>
-		public static readonly EmojiInfo Emoji_roller_skate = new EmojiInfo("roller_skate", "1f6fc.png", "roller skate", "🛼", true, true, true, true);
-
-		/// <summary>
-		/// :large_orange_circle: 🟠 large orange circle
-		/// </summary>
-		public static readonly EmojiInfo Emoji_large_orange_circle = new EmojiInfo("large_orange_circle", "1f7e0.png", "large orange circle", "🟠", true, true, true, true);
-
-		/// <summary>
-		/// :large_yellow_circle: 🟡 large yellow circle
-		/// </summary>
-		public static readonly EmojiInfo Emoji_large_yellow_circle = new EmojiInfo("large_yellow_circle", "1f7e1.png", "large yellow circle", "🟡", true, true, true, true);
-
-		/// <summary>
-		/// :large_green_circle: 🟢 large green circle
-		/// </summary>
-		public static readonly EmojiInfo Emoji_large_green_circle = new EmojiInfo("large_green_circle", "1f7e2.png", "large green circle", "🟢", true, true, true, true);
-
-		/// <summary>
-		/// :large_purple_circle: 🟣 large purple circle
-		/// </summary>
-		public static readonly EmojiInfo Emoji_large_purple_circle = new EmojiInfo("large_purple_circle", "1f7e3.png", "large purple circle", "🟣", true, true, true, true);
-
-		/// <summary>
-		/// :large_brown_circle: 🟤 large brown circle
-		/// </summary>
-		public static readonly EmojiInfo Emoji_large_brown_circle = new EmojiInfo("large_brown_circle", "1f7e4.png", "large brown circle", "🟤", true, true, true, true);
-
-		/// <summary>
-		/// :large_red_square: 🟥 large red square
-		/// </summary>
-		public static readonly EmojiInfo Emoji_large_red_square = new EmojiInfo("large_red_square", "1f7e5.png", "large red square", "🟥", true, true, true, true);
-
-		/// <summary>
-		/// :large_blue_square: 🟦 large blue square
-		/// </summary>
-		public static readonly EmojiInfo Emoji_large_blue_square = new EmojiInfo("large_blue_square", "1f7e6.png", "large blue square", "🟦", true, true, true, true);
-
-		/// <summary>
-		/// :large_orange_square: 🟧 large orange square
-		/// </summary>
-		public static readonly EmojiInfo Emoji_large_orange_square = new EmojiInfo("large_orange_square", "1f7e7.png", "large orange square", "🟧", true, true, true, true);
-
-		/// <summary>
-		/// :large_yellow_square: 🟨 large yellow square
-		/// </summary>
-		public static readonly EmojiInfo Emoji_large_yellow_square = new EmojiInfo("large_yellow_square", "1f7e8.png", "large yellow square", "🟨", true, true, true, true);
-
-		/// <summary>
-		/// :large_green_square: 🟩 large green square
-		/// </summary>
-		public static readonly EmojiInfo Emoji_large_green_square = new EmojiInfo("large_green_square", "1f7e9.png", "large green square", "🟩", true, true, true, true);
-
-		/// <summary>
-		/// :large_purple_square: 🟪 large purple square
-		/// </summary>
-		public static readonly EmojiInfo Emoji_large_purple_square = new EmojiInfo("large_purple_square", "1f7ea.png", "large purple square", "🟪", true, true, true, true);
-
-		/// <summary>
-		/// :large_brown_square: 🟫 large brown square
-		/// </summary>
-		public static readonly EmojiInfo Emoji_large_brown_square = new EmojiInfo("large_brown_square", "1f7eb.png", "large brown square", "🟫", true, true, true, true);
-
-		/// <summary>
-		/// :pinched_fingers: 🤌 pinched fingers
-		/// </summary>
-		public static readonly EmojiInfo Emoji_pinched_fingers = new EmojiInfo("pinched_fingers", "1f90c.png", "pinched fingers", "🤌", true, true, true, true);
-
-		/// <summary>
-		/// :white_heart: 🤍 white heart
-		/// </summary>
-		public static readonly EmojiInfo Emoji_white_heart = new EmojiInfo("white_heart", "1f90d.png", "white heart", "🤍", true, true, true, true);
-
-		/// <summary>
-		/// :brown_heart: 🤎 brown heart
-		/// </summary>
-		public static readonly EmojiInfo Emoji_brown_heart = new EmojiInfo("brown_heart", "1f90e.png", "brown heart", "🤎", true, true, true, true);
-
-		/// <summary>
-		/// :pinching_hand: 🤏 pinching hand
-		/// </summary>
-		public static readonly EmojiInfo Emoji_pinching_hand = new EmojiInfo("pinching_hand", "1f90f.png", "pinching hand", "🤏", true, true, true, true);
+		public static readonly EmojiInfo Emoji_passenger_ship = new EmojiInfo("passenger_ship", "1f6f3.png", "passenger ship", "🛳", true, true, true, true);
 
 		/// <summary>
 		/// :zipper_mouth_face: 🤐 zipper-mouth face
 		/// </summary>
-		public static readonly EmojiInfo Emoji_zipper_mouth_face = new EmojiInfo("zipper_mouth_face", "1f910.png", "zipper-mouth face", "🤐", true, true, true, true);
+		public static readonly EmojiInfo Emoji_zipper_mouth_face = new EmojiInfo("zipper_mouth_face", "1f910.png", "zipper-mouth face", "🤐", true, true, true, false);
 
 		/// <summary>
 		/// :money_mouth_face: 🤑 money-mouth face
 		/// </summary>
-		public static readonly EmojiInfo Emoji_money_mouth_face = new EmojiInfo("money_mouth_face", "1f911.png", "money-mouth face", "🤑", true, true, true, true);
+		public static readonly EmojiInfo Emoji_money_mouth_face = new EmojiInfo("money_mouth_face", "1f911.png", "money-mouth face", "🤑", true, true, true, false);
 
 		/// <summary>
 		/// :face_with_thermometer: 🤒 face with thermometer
 		/// </summary>
-		public static readonly EmojiInfo Emoji_face_with_thermometer = new EmojiInfo("face_with_thermometer", "1f912.png", "face with thermometer", "🤒", true, true, true, true);
+		public static readonly EmojiInfo Emoji_face_with_thermometer = new EmojiInfo("face_with_thermometer", "1f912.png", "face with thermometer", "🤒", true, true, true, false);
 
 		/// <summary>
 		/// :nerd_face: 🤓 nerd face
 		/// </summary>
-		public static readonly EmojiInfo Emoji_nerd_face = new EmojiInfo("nerd_face", "1f913.png", "nerd face", "🤓", true, true, true, true);
+		public static readonly EmojiInfo Emoji_nerd_face = new EmojiInfo("nerd_face", "1f913.png", "nerd face", "🤓", true, true, true, false);
 
 		/// <summary>
 		/// :thinking_face: 🤔 thinking face
 		/// </summary>
-		public static readonly EmojiInfo Emoji_thinking_face = new EmojiInfo("thinking_face", "1f914.png", "thinking face", "🤔", true, true, true, true);
+		public static readonly EmojiInfo Emoji_thinking_face = new EmojiInfo("thinking_face", "1f914.png", "thinking face", "🤔", true, true, true, false);
 
 		/// <summary>
 		/// :face_with_head_bandage: 🤕 face with head-bandage
 		/// </summary>
-		public static readonly EmojiInfo Emoji_face_with_head_bandage = new EmojiInfo("face_with_head_bandage", "1f915.png", "face with head-bandage", "🤕", true, true, true, true);
+		public static readonly EmojiInfo Emoji_face_with_head_bandage = new EmojiInfo("face_with_head_bandage", "1f915.png", "face with head-bandage", "🤕", true, true, true, false);
 
 		/// <summary>
 		/// :robot_face: 🤖 robot face
 		/// </summary>
-		public static readonly EmojiInfo Emoji_robot_face = new EmojiInfo("robot_face", "1f916.png", "robot face", "🤖", true, true, true, true);
+		public static readonly EmojiInfo Emoji_robot_face = new EmojiInfo("robot_face", "1f916.png", "robot face", "🤖", true, true, true, false);
 
 		/// <summary>
 		/// :hugging_face: 🤗 hugging face
 		/// </summary>
-		public static readonly EmojiInfo Emoji_hugging_face = new EmojiInfo("hugging_face", "1f917.png", "hugging face", "🤗", true, true, true, true);
+		public static readonly EmojiInfo Emoji_hugging_face = new EmojiInfo("hugging_face", "1f917.png", "hugging face", "🤗", true, true, true, false);
 
 		/// <summary>
 		/// :the_horns: 🤘 sign of the horns
 		/// </summary>
-		public static readonly EmojiInfo Emoji_the_horns = new EmojiInfo("the_horns", "1f918.png", "sign of the horns", "🤘", true, true, true, true);
-
-		/// <summary>
-		/// :call_me_hand: 🤙 call me hand
-		/// </summary>
-		public static readonly EmojiInfo Emoji_call_me_hand = new EmojiInfo("call_me_hand", "1f919.png", "call me hand", "🤙", true, true, true, true);
-
-		/// <summary>
-		/// :raised_back_of_hand: 🤚 raised back of hand
-		/// </summary>
-		public static readonly EmojiInfo Emoji_raised_back_of_hand = new EmojiInfo("raised_back_of_hand", "1f91a.png", "raised back of hand", "🤚", true, true, true, true);
-
-		/// <summary>
-		/// :left-facing_fist: 🤛 left-facing fist
-		/// </summary>
-		public static readonly EmojiInfo Emoji_left_facing_fist = new EmojiInfo("left-facing_fist", "1f91b.png", "left-facing fist", "🤛", true, true, true, true);
-
-		/// <summary>
-		/// :right-facing_fist: 🤜 right-facing fist
-		/// </summary>
-		public static readonly EmojiInfo Emoji_right_facing_fist = new EmojiInfo("right-facing_fist", "1f91c.png", "right-facing fist", "🤜", true, true, true, true);
-
-		/// <summary>
-		/// :handshake: 🤝 handshake
-		/// </summary>
-		public static readonly EmojiInfo Emoji_handshake = new EmojiInfo("handshake", "1f91d.png", "handshake", "🤝", true, true, true, true);
-
-		/// <summary>
-		/// :crossed_fingers: 🤞 hand with index and middle fingers crossed
-		/// </summary>
-		public static readonly EmojiInfo Emoji_crossed_fingers = new EmojiInfo("crossed_fingers", "1f91e.png", "hand with index and middle fingers crossed", "🤞", true, true, true, true);
-
-		/// <summary>
-		/// :i_love_you_hand_sign: 🤟 i love you hand sign
-		/// </summary>
-		public static readonly EmojiInfo Emoji_i_love_you_hand_sign = new EmojiInfo("i_love_you_hand_sign", "1f91f.png", "i love you hand sign", "🤟", true, true, true, true);
-
-		/// <summary>
-		/// :face_with_cowboy_hat: 🤠 face with cowboy hat
-		/// </summary>
-		public static readonly EmojiInfo Emoji_face_with_cowboy_hat = new EmojiInfo("face_with_cowboy_hat", "1f920.png", "face with cowboy hat", "🤠", true, true, true, true);
-
-		/// <summary>
-		/// :clown_face: 🤡 clown face
-		/// </summary>
-		public static readonly EmojiInfo Emoji_clown_face = new EmojiInfo("clown_face", "1f921.png", "clown face", "🤡", true, true, true, true);
-
-		/// <summary>
-		/// :nauseated_face: 🤢 nauseated face
-		/// </summary>
-		public static readonly EmojiInfo Emoji_nauseated_face = new EmojiInfo("nauseated_face", "1f922.png", "nauseated face", "🤢", true, true, true, true);
-
-		/// <summary>
-		/// :rolling_on_the_floor_laughing: 🤣 rolling on the floor laughing
-		/// </summary>
-		public static readonly EmojiInfo Emoji_rolling_on_the_floor_laughing = new EmojiInfo("rolling_on_the_floor_laughing", "1f923.png", "rolling on the floor laughing", "🤣", true, true, true, true);
-
-		/// <summary>
-		/// :drooling_face: 🤤 drooling face
-		/// </summary>
-		public static readonly EmojiInfo Emoji_drooling_face = new EmojiInfo("drooling_face", "1f924.png", "drooling face", "🤤", true, true, true, true);
-
-		/// <summary>
-		/// :lying_face: 🤥 lying face
-		/// </summary>
-		public static readonly EmojiInfo Emoji_lying_face = new EmojiInfo("lying_face", "1f925.png", "lying face", "🤥", true, true, true, true);
-
-		/// <summary>
-		/// :woman-facepalming: 🤦‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_facepalming = new EmojiInfo("woman-facepalming", "1f926-200d-2640-fe0f.png", "", "🤦‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-facepalming: 🤦‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_facepalming = new EmojiInfo("man-facepalming", "1f926-200d-2642-fe0f.png", "", "🤦‍♂️", true, true, true, true);
-
-		/// <summary>
-		/// :face_palm: 🤦 face palm
-		/// </summary>
-		public static readonly EmojiInfo Emoji_face_palm = new EmojiInfo("face_palm", "1f926.png", "face palm", "🤦", true, true, true, true);
-
-		/// <summary>
-		/// :sneezing_face: 🤧 sneezing face
-		/// </summary>
-		public static readonly EmojiInfo Emoji_sneezing_face = new EmojiInfo("sneezing_face", "1f927.png", "sneezing face", "🤧", true, true, true, true);
-
-		/// <summary>
-		/// :face_with_raised_eyebrow: 🤨 face with one eyebrow raised
-		/// </summary>
-		public static readonly EmojiInfo Emoji_face_with_raised_eyebrow = new EmojiInfo("face_with_raised_eyebrow", "1f928.png", "face with one eyebrow raised", "🤨", true, true, true, true);
-
-		/// <summary>
-		/// :star-struck: 🤩 grinning face with star eyes
-		/// </summary>
-		public static readonly EmojiInfo Emoji_star_struck = new EmojiInfo("star-struck", "1f929.png", "grinning face with star eyes", "🤩", true, true, true, true);
-
-		/// <summary>
-		/// :zany_face: 🤪 grinning face with one large and one small eye
-		/// </summary>
-		public static readonly EmojiInfo Emoji_zany_face = new EmojiInfo("zany_face", "1f92a.png", "grinning face with one large and one small eye", "🤪", true, true, true, true);
-
-		/// <summary>
-		/// :shushing_face: 🤫 face with finger covering closed lips
-		/// </summary>
-		public static readonly EmojiInfo Emoji_shushing_face = new EmojiInfo("shushing_face", "1f92b.png", "face with finger covering closed lips", "🤫", true, true, true, true);
-
-		/// <summary>
-		/// :face_with_symbols_on_mouth: 🤬 serious face with symbols covering mouth
-		/// </summary>
-		public static readonly EmojiInfo Emoji_face_with_symbols_on_mouth = new EmojiInfo("face_with_symbols_on_mouth", "1f92c.png", "serious face with symbols covering mouth", "🤬", true, true, true, true);
-
-		/// <summary>
-		/// :face_with_hand_over_mouth: 🤭 smiling face with smiling eyes and hand covering mouth
-		/// </summary>
-		public static readonly EmojiInfo Emoji_face_with_hand_over_mouth = new EmojiInfo("face_with_hand_over_mouth", "1f92d.png", "smiling face with smiling eyes and hand covering mouth", "🤭", true, true, true, true);
-
-		/// <summary>
-		/// :face_vomiting: 🤮 face with open mouth vomiting
-		/// </summary>
-		public static readonly EmojiInfo Emoji_face_vomiting = new EmojiInfo("face_vomiting", "1f92e.png", "face with open mouth vomiting", "🤮", true, true, true, true);
-
-		/// <summary>
-		/// :exploding_head: 🤯 shocked face with exploding head
-		/// </summary>
-		public static readonly EmojiInfo Emoji_exploding_head = new EmojiInfo("exploding_head", "1f92f.png", "shocked face with exploding head", "🤯", true, true, true, true);
-
-		/// <summary>
-		/// :pregnant_woman: 🤰 pregnant woman
-		/// </summary>
-		public static readonly EmojiInfo Emoji_pregnant_woman = new EmojiInfo("pregnant_woman", "1f930.png", "pregnant woman", "🤰", true, true, true, true);
-
-		/// <summary>
-		/// :breast-feeding: 🤱 breast-feeding
-		/// </summary>
-		public static readonly EmojiInfo Emoji_breast_feeding = new EmojiInfo("breast-feeding", "1f931.png", "breast-feeding", "🤱", true, true, true, true);
-
-		/// <summary>
-		/// :palms_up_together: 🤲 palms up together
-		/// </summary>
-		public static readonly EmojiInfo Emoji_palms_up_together = new EmojiInfo("palms_up_together", "1f932.png", "palms up together", "🤲", true, true, true, true);
-
-		/// <summary>
-		/// :selfie: 🤳 selfie
-		/// </summary>
-		public static readonly EmojiInfo Emoji_selfie = new EmojiInfo("selfie", "1f933.png", "selfie", "🤳", true, true, true, true);
-
-		/// <summary>
-		/// :prince: 🤴 prince
-		/// </summary>
-		public static readonly EmojiInfo Emoji_prince = new EmojiInfo("prince", "1f934.png", "prince", "🤴", true, true, true, true);
-
-		/// <summary>
-		/// :woman_in_tuxedo: 🤵‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_in_tuxedo = new EmojiInfo("woman_in_tuxedo", "1f935-200d-2640-fe0f.png", "", "🤵‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man_in_tuxedo: 🤵 man in tuxedo
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_in_tuxedo = new EmojiInfo("man_in_tuxedo", "1f935.png", "man in tuxedo", "🤵", true, true, true, true);
-
-		/// <summary>
-		/// :mrs_claus: 🤶 mother christmas
-		/// </summary>
-		public static readonly EmojiInfo Emoji_mrs_claus = new EmojiInfo("mrs_claus", "1f936.png", "mother christmas", "🤶", true, true, true, true);
-
-		/// <summary>
-		/// :woman-shrugging: 🤷‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_shrugging = new EmojiInfo("woman-shrugging", "1f937-200d-2640-fe0f.png", "", "🤷‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-shrugging: 🤷‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_shrugging = new EmojiInfo("man-shrugging", "1f937-200d-2642-fe0f.png", "", "🤷‍♂️", true, true, true, true);
-
-		/// <summary>
-		/// :shrug: 🤷 shrug
-		/// </summary>
-		public static readonly EmojiInfo Emoji_shrug = new EmojiInfo("shrug", "1f937.png", "shrug", "🤷", true, true, true, true);
-
-		/// <summary>
-		/// :woman-cartwheeling: 🤸‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_cartwheeling = new EmojiInfo("woman-cartwheeling", "1f938-200d-2640-fe0f.png", "", "🤸‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-cartwheeling: 🤸‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_cartwheeling = new EmojiInfo("man-cartwheeling", "1f938-200d-2642-fe0f.png", "", "🤸‍♂️", true, true, true, true);
-
-		/// <summary>
-		/// :person_doing_cartwheel: 🤸 person doing cartwheel
-		/// </summary>
-		public static readonly EmojiInfo Emoji_person_doing_cartwheel = new EmojiInfo("person_doing_cartwheel", "1f938.png", "person doing cartwheel", "🤸", true, true, true, true);
-
-		/// <summary>
-		/// :woman-juggling: 🤹‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_juggling = new EmojiInfo("woman-juggling", "1f939-200d-2640-fe0f.png", "", "🤹‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-juggling: 🤹‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_juggling = new EmojiInfo("man-juggling", "1f939-200d-2642-fe0f.png", "", "🤹‍♂️", true, true, true, true);
-
-		/// <summary>
-		/// :juggling: 🤹 juggling
-		/// </summary>
-		public static readonly EmojiInfo Emoji_juggling = new EmojiInfo("juggling", "1f939.png", "juggling", "🤹", true, true, true, true);
-
-		/// <summary>
-		/// :fencer: 🤺 fencer
-		/// </summary>
-		public static readonly EmojiInfo Emoji_fencer = new EmojiInfo("fencer", "1f93a.png", "fencer", "🤺", true, true, true, true);
-
-		/// <summary>
-		/// :woman-wrestling: 🤼‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_wrestling = new EmojiInfo("woman-wrestling", "1f93c-200d-2640-fe0f.png", "", "🤼‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-wrestling: 🤼‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_wrestling = new EmojiInfo("man-wrestling", "1f93c-200d-2642-fe0f.png", "", "🤼‍♂️", true, true, true, true);
-
-		/// <summary>
-		/// :wrestlers: 🤼 wrestlers
-		/// </summary>
-		public static readonly EmojiInfo Emoji_wrestlers = new EmojiInfo("wrestlers", "1f93c.png", "wrestlers", "🤼", true, true, true, true);
-
-		/// <summary>
-		/// :woman-playing-water-polo: 🤽‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_playing_water_polo = new EmojiInfo("woman-playing-water-polo", "1f93d-200d-2640-fe0f.png", "", "🤽‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-playing-water-polo: 🤽‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_playing_water_polo = new EmojiInfo("man-playing-water-polo", "1f93d-200d-2642-fe0f.png", "", "🤽‍♂️", true, true, true, true);
-
-		/// <summary>
-		/// :water_polo: 🤽 water polo
-		/// </summary>
-		public static readonly EmojiInfo Emoji_water_polo = new EmojiInfo("water_polo", "1f93d.png", "water polo", "🤽", true, true, true, true);
-
-		/// <summary>
-		/// :woman-playing-handball: 🤾‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_playing_handball = new EmojiInfo("woman-playing-handball", "1f93e-200d-2640-fe0f.png", "", "🤾‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :man-playing-handball: 🤾‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_playing_handball = new EmojiInfo("man-playing-handball", "1f93e-200d-2642-fe0f.png", "", "🤾‍♂️", true, true, true, true);
-
-		/// <summary>
-		/// :handball: 🤾 handball
-		/// </summary>
-		public static readonly EmojiInfo Emoji_handball = new EmojiInfo("handball", "1f93e.png", "handball", "🤾", true, true, true, true);
-
-		/// <summary>
-		/// :diving_mask: 🤿 diving mask
-		/// </summary>
-		public static readonly EmojiInfo Emoji_diving_mask = new EmojiInfo("diving_mask", "1f93f.png", "diving mask", "🤿", true, true, true, true);
-
-		/// <summary>
-		/// :wilted_flower: 🥀 wilted flower
-		/// </summary>
-		public static readonly EmojiInfo Emoji_wilted_flower = new EmojiInfo("wilted_flower", "1f940.png", "wilted flower", "🥀", true, true, true, true);
-
-		/// <summary>
-		/// :drum_with_drumsticks: 🥁 drum with drumsticks
-		/// </summary>
-		public static readonly EmojiInfo Emoji_drum_with_drumsticks = new EmojiInfo("drum_with_drumsticks", "1f941.png", "drum with drumsticks", "🥁", true, true, true, true);
-
-		/// <summary>
-		/// :clinking_glasses: 🥂 clinking glasses
-		/// </summary>
-		public static readonly EmojiInfo Emoji_clinking_glasses = new EmojiInfo("clinking_glasses", "1f942.png", "clinking glasses", "🥂", true, true, true, true);
-
-		/// <summary>
-		/// :tumbler_glass: 🥃 tumbler glass
-		/// </summary>
-		public static readonly EmojiInfo Emoji_tumbler_glass = new EmojiInfo("tumbler_glass", "1f943.png", "tumbler glass", "🥃", true, true, true, true);
-
-		/// <summary>
-		/// :spoon: 🥄 spoon
-		/// </summary>
-		public static readonly EmojiInfo Emoji_spoon = new EmojiInfo("spoon", "1f944.png", "spoon", "🥄", true, true, true, true);
-
-		/// <summary>
-		/// :goal_net: 🥅 goal net
-		/// </summary>
-		public static readonly EmojiInfo Emoji_goal_net = new EmojiInfo("goal_net", "1f945.png", "goal net", "🥅", true, true, true, true);
-
-		/// <summary>
-		/// :first_place_medal: 🥇 first place medal
-		/// </summary>
-		public static readonly EmojiInfo Emoji_first_place_medal = new EmojiInfo("first_place_medal", "1f947.png", "first place medal", "🥇", true, true, true, true);
-
-		/// <summary>
-		/// :second_place_medal: 🥈 second place medal
-		/// </summary>
-		public static readonly EmojiInfo Emoji_second_place_medal = new EmojiInfo("second_place_medal", "1f948.png", "second place medal", "🥈", true, true, true, true);
-
-		/// <summary>
-		/// :third_place_medal: 🥉 third place medal
-		/// </summary>
-		public static readonly EmojiInfo Emoji_third_place_medal = new EmojiInfo("third_place_medal", "1f949.png", "third place medal", "🥉", true, true, true, true);
-
-		/// <summary>
-		/// :boxing_glove: 🥊 boxing glove
-		/// </summary>
-		public static readonly EmojiInfo Emoji_boxing_glove = new EmojiInfo("boxing_glove", "1f94a.png", "boxing glove", "🥊", true, true, true, true);
-
-		/// <summary>
-		/// :martial_arts_uniform: 🥋 martial arts uniform
-		/// </summary>
-		public static readonly EmojiInfo Emoji_martial_arts_uniform = new EmojiInfo("martial_arts_uniform", "1f94b.png", "martial arts uniform", "🥋", true, true, true, true);
-
-		/// <summary>
-		/// :curling_stone: 🥌 curling stone
-		/// </summary>
-		public static readonly EmojiInfo Emoji_curling_stone = new EmojiInfo("curling_stone", "1f94c.png", "curling stone", "🥌", true, true, true, true);
-
-		/// <summary>
-		/// :lacrosse: 🥍 lacrosse stick and ball
-		/// </summary>
-		public static readonly EmojiInfo Emoji_lacrosse = new EmojiInfo("lacrosse", "1f94d.png", "lacrosse stick and ball", "🥍", true, true, true, true);
-
-		/// <summary>
-		/// :softball: 🥎 softball
-		/// </summary>
-		public static readonly EmojiInfo Emoji_softball = new EmojiInfo("softball", "1f94e.png", "softball", "🥎", true, true, true, true);
-
-		/// <summary>
-		/// :flying_disc: 🥏 flying disc
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flying_disc = new EmojiInfo("flying_disc", "1f94f.png", "flying disc", "🥏", true, true, true, true);
-
-		/// <summary>
-		/// :croissant: 🥐 croissant
-		/// </summary>
-		public static readonly EmojiInfo Emoji_croissant = new EmojiInfo("croissant", "1f950.png", "croissant", "🥐", true, true, true, true);
-
-		/// <summary>
-		/// :avocado: 🥑 avocado
-		/// </summary>
-		public static readonly EmojiInfo Emoji_avocado = new EmojiInfo("avocado", "1f951.png", "avocado", "🥑", true, true, true, true);
-
-		/// <summary>
-		/// :cucumber: 🥒 cucumber
-		/// </summary>
-		public static readonly EmojiInfo Emoji_cucumber = new EmojiInfo("cucumber", "1f952.png", "cucumber", "🥒", true, true, true, true);
-
-		/// <summary>
-		/// :bacon: 🥓 bacon
-		/// </summary>
-		public static readonly EmojiInfo Emoji_bacon = new EmojiInfo("bacon", "1f953.png", "bacon", "🥓", true, true, true, true);
-
-		/// <summary>
-		/// :potato: 🥔 potato
-		/// </summary>
-		public static readonly EmojiInfo Emoji_potato = new EmojiInfo("potato", "1f954.png", "potato", "🥔", true, true, true, true);
-
-		/// <summary>
-		/// :carrot: 🥕 carrot
-		/// </summary>
-		public static readonly EmojiInfo Emoji_carrot = new EmojiInfo("carrot", "1f955.png", "carrot", "🥕", true, true, true, true);
-
-		/// <summary>
-		/// :baguette_bread: 🥖 baguette bread
-		/// </summary>
-		public static readonly EmojiInfo Emoji_baguette_bread = new EmojiInfo("baguette_bread", "1f956.png", "baguette bread", "🥖", true, true, true, true);
-
-		/// <summary>
-		/// :green_salad: 🥗 green salad
-		/// </summary>
-		public static readonly EmojiInfo Emoji_green_salad = new EmojiInfo("green_salad", "1f957.png", "green salad", "🥗", true, true, true, true);
-
-		/// <summary>
-		/// :shallow_pan_of_food: 🥘 shallow pan of food
-		/// </summary>
-		public static readonly EmojiInfo Emoji_shallow_pan_of_food = new EmojiInfo("shallow_pan_of_food", "1f958.png", "shallow pan of food", "🥘", true, true, true, true);
-
-		/// <summary>
-		/// :stuffed_flatbread: 🥙 stuffed flatbread
-		/// </summary>
-		public static readonly EmojiInfo Emoji_stuffed_flatbread = new EmojiInfo("stuffed_flatbread", "1f959.png", "stuffed flatbread", "🥙", true, true, true, true);
-
-		/// <summary>
-		/// :egg: 🥚 egg
-		/// </summary>
-		public static readonly EmojiInfo Emoji_egg = new EmojiInfo("egg", "1f95a.png", "egg", "🥚", true, true, true, true);
-
-		/// <summary>
-		/// :glass_of_milk: 🥛 glass of milk
-		/// </summary>
-		public static readonly EmojiInfo Emoji_glass_of_milk = new EmojiInfo("glass_of_milk", "1f95b.png", "glass of milk", "🥛", true, true, true, true);
-
-		/// <summary>
-		/// :peanuts: 🥜 peanuts
-		/// </summary>
-		public static readonly EmojiInfo Emoji_peanuts = new EmojiInfo("peanuts", "1f95c.png", "peanuts", "🥜", true, true, true, true);
-
-		/// <summary>
-		/// :kiwifruit: 🥝 kiwifruit
-		/// </summary>
-		public static readonly EmojiInfo Emoji_kiwifruit = new EmojiInfo("kiwifruit", "1f95d.png", "kiwifruit", "🥝", true, true, true, true);
-
-		/// <summary>
-		/// :pancakes: 🥞 pancakes
-		/// </summary>
-		public static readonly EmojiInfo Emoji_pancakes = new EmojiInfo("pancakes", "1f95e.png", "pancakes", "🥞", true, true, true, true);
-
-		/// <summary>
-		/// :dumpling: 🥟 dumpling
-		/// </summary>
-		public static readonly EmojiInfo Emoji_dumpling = new EmojiInfo("dumpling", "1f95f.png", "dumpling", "🥟", true, true, true, true);
-
-		/// <summary>
-		/// :fortune_cookie: 🥠 fortune cookie
-		/// </summary>
-		public static readonly EmojiInfo Emoji_fortune_cookie = new EmojiInfo("fortune_cookie", "1f960.png", "fortune cookie", "🥠", true, true, true, true);
-
-		/// <summary>
-		/// :takeout_box: 🥡 takeout box
-		/// </summary>
-		public static readonly EmojiInfo Emoji_takeout_box = new EmojiInfo("takeout_box", "1f961.png", "takeout box", "🥡", true, true, true, true);
-
-		/// <summary>
-		/// :chopsticks: 🥢 chopsticks
-		/// </summary>
-		public static readonly EmojiInfo Emoji_chopsticks = new EmojiInfo("chopsticks", "1f962.png", "chopsticks", "🥢", true, true, true, true);
-
-		/// <summary>
-		/// :bowl_with_spoon: 🥣 bowl with spoon
-		/// </summary>
-		public static readonly EmojiInfo Emoji_bowl_with_spoon = new EmojiInfo("bowl_with_spoon", "1f963.png", "bowl with spoon", "🥣", true, true, true, true);
-
-		/// <summary>
-		/// :cup_with_straw: 🥤 cup with straw
-		/// </summary>
-		public static readonly EmojiInfo Emoji_cup_with_straw = new EmojiInfo("cup_with_straw", "1f964.png", "cup with straw", "🥤", true, true, true, true);
-
-		/// <summary>
-		/// :coconut: 🥥 coconut
-		/// </summary>
-		public static readonly EmojiInfo Emoji_coconut = new EmojiInfo("coconut", "1f965.png", "coconut", "🥥", true, true, true, true);
-
-		/// <summary>
-		/// :broccoli: 🥦 broccoli
-		/// </summary>
-		public static readonly EmojiInfo Emoji_broccoli = new EmojiInfo("broccoli", "1f966.png", "broccoli", "🥦", true, true, true, true);
-
-		/// <summary>
-		/// :pie: 🥧 pie
-		/// </summary>
-		public static readonly EmojiInfo Emoji_pie = new EmojiInfo("pie", "1f967.png", "pie", "🥧", true, true, true, true);
-
-		/// <summary>
-		/// :pretzel: 🥨 pretzel
-		/// </summary>
-		public static readonly EmojiInfo Emoji_pretzel = new EmojiInfo("pretzel", "1f968.png", "pretzel", "🥨", true, true, true, true);
-
-		/// <summary>
-		/// :cut_of_meat: 🥩 cut of meat
-		/// </summary>
-		public static readonly EmojiInfo Emoji_cut_of_meat = new EmojiInfo("cut_of_meat", "1f969.png", "cut of meat", "🥩", true, true, true, true);
-
-		/// <summary>
-		/// :sandwich: 🥪 sandwich
-		/// </summary>
-		public static readonly EmojiInfo Emoji_sandwich = new EmojiInfo("sandwich", "1f96a.png", "sandwich", "🥪", true, true, true, true);
-
-		/// <summary>
-		/// :canned_food: 🥫 canned food
-		/// </summary>
-		public static readonly EmojiInfo Emoji_canned_food = new EmojiInfo("canned_food", "1f96b.png", "canned food", "🥫", true, true, true, true);
-
-		/// <summary>
-		/// :leafy_green: 🥬 leafy green
-		/// </summary>
-		public static readonly EmojiInfo Emoji_leafy_green = new EmojiInfo("leafy_green", "1f96c.png", "leafy green", "🥬", true, true, true, true);
-
-		/// <summary>
-		/// :mango: 🥭 mango
-		/// </summary>
-		public static readonly EmojiInfo Emoji_mango = new EmojiInfo("mango", "1f96d.png", "mango", "🥭", true, true, true, true);
-
-		/// <summary>
-		/// :moon_cake: 🥮 moon cake
-		/// </summary>
-		public static readonly EmojiInfo Emoji_moon_cake = new EmojiInfo("moon_cake", "1f96e.png", "moon cake", "🥮", true, true, true, true);
-
-		/// <summary>
-		/// :bagel: 🥯 bagel
-		/// </summary>
-		public static readonly EmojiInfo Emoji_bagel = new EmojiInfo("bagel", "1f96f.png", "bagel", "🥯", true, true, true, true);
-
-		/// <summary>
-		/// :smiling_face_with_3_hearts: 🥰 smiling face with smiling eyes and three hearts
-		/// </summary>
-		public static readonly EmojiInfo Emoji_smiling_face_with_3_hearts = new EmojiInfo("smiling_face_with_3_hearts", "1f970.png", "smiling face with smiling eyes and three hearts", "🥰", true, true, true, true);
-
-		/// <summary>
-		/// :yawning_face: 🥱 yawning face
-		/// </summary>
-		public static readonly EmojiInfo Emoji_yawning_face = new EmojiInfo("yawning_face", "1f971.png", "yawning face", "🥱", true, true, true, true);
-
-		/// <summary>
-		/// :smiling_face_with_tear: 🥲 smiling face with tear
-		/// </summary>
-		public static readonly EmojiInfo Emoji_smiling_face_with_tear = new EmojiInfo("smiling_face_with_tear", "1f972.png", "smiling face with tear", "🥲", true, true, true, true);
-
-		/// <summary>
-		/// :partying_face: 🥳 face with party horn and party hat
-		/// </summary>
-		public static readonly EmojiInfo Emoji_partying_face = new EmojiInfo("partying_face", "1f973.png", "face with party horn and party hat", "🥳", true, true, true, true);
-
-		/// <summary>
-		/// :woozy_face: 🥴 face with uneven eyes and wavy mouth
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woozy_face = new EmojiInfo("woozy_face", "1f974.png", "face with uneven eyes and wavy mouth", "🥴", true, true, true, true);
-
-		/// <summary>
-		/// :hot_face: 🥵 overheated face
-		/// </summary>
-		public static readonly EmojiInfo Emoji_hot_face = new EmojiInfo("hot_face", "1f975.png", "overheated face", "🥵", true, true, true, true);
-
-		/// <summary>
-		/// :cold_face: 🥶 freezing face
-		/// </summary>
-		public static readonly EmojiInfo Emoji_cold_face = new EmojiInfo("cold_face", "1f976.png", "freezing face", "🥶", true, true, true, true);
-
-		/// <summary>
-		/// :ninja: 🥷 ninja
-		/// </summary>
-		public static readonly EmojiInfo Emoji_ninja = new EmojiInfo("ninja", "1f977.png", "ninja", "🥷", true, true, true, true);
-
-		/// <summary>
-		/// :disguised_face: 🥸 disguised face
-		/// </summary>
-		public static readonly EmojiInfo Emoji_disguised_face = new EmojiInfo("disguised_face", "1f978.png", "disguised face", "🥸", true, true, true, true);
-
-		/// <summary>
-		/// :pleading_face: 🥺 face with pleading eyes
-		/// </summary>
-		public static readonly EmojiInfo Emoji_pleading_face = new EmojiInfo("pleading_face", "1f97a.png", "face with pleading eyes", "🥺", true, true, true, true);
-
-		/// <summary>
-		/// :sari: 🥻 sari
-		/// </summary>
-		public static readonly EmojiInfo Emoji_sari = new EmojiInfo("sari", "1f97b.png", "sari", "🥻", true, true, true, true);
-
-		/// <summary>
-		/// :lab_coat: 🥼 lab coat
-		/// </summary>
-		public static readonly EmojiInfo Emoji_lab_coat = new EmojiInfo("lab_coat", "1f97c.png", "lab coat", "🥼", true, true, true, true);
-
-		/// <summary>
-		/// :goggles: 🥽 goggles
-		/// </summary>
-		public static readonly EmojiInfo Emoji_goggles = new EmojiInfo("goggles", "1f97d.png", "goggles", "🥽", true, true, true, true);
-
-		/// <summary>
-		/// :hiking_boot: 🥾 hiking boot
-		/// </summary>
-		public static readonly EmojiInfo Emoji_hiking_boot = new EmojiInfo("hiking_boot", "1f97e.png", "hiking boot", "🥾", true, true, true, true);
-
-		/// <summary>
-		/// :womans_flat_shoe: 🥿 flat shoe
-		/// </summary>
-		public static readonly EmojiInfo Emoji_womans_flat_shoe = new EmojiInfo("womans_flat_shoe", "1f97f.png", "flat shoe", "🥿", true, true, true, true);
+		public static readonly EmojiInfo Emoji_the_horns = new EmojiInfo("the_horns", "1f918.png", "sign of the horns", "🤘", true, true, true, false);
 
 		/// <summary>
 		/// :crab: 🦀 crab
 		/// </summary>
-		public static readonly EmojiInfo Emoji_crab = new EmojiInfo("crab", "1f980.png", "crab", "🦀", true, true, true, true);
+		public static readonly EmojiInfo Emoji_crab = new EmojiInfo("crab", "1f980.png", "crab", "🦀", true, true, true, false);
 
 		/// <summary>
 		/// :lion_face: 🦁 lion face
 		/// </summary>
-		public static readonly EmojiInfo Emoji_lion_face = new EmojiInfo("lion_face", "1f981.png", "lion face", "🦁", true, true, true, true);
+		public static readonly EmojiInfo Emoji_lion_face = new EmojiInfo("lion_face", "1f981.png", "lion face", "🦁", true, true, true, false);
 
 		/// <summary>
 		/// :scorpion: 🦂 scorpion
 		/// </summary>
-		public static readonly EmojiInfo Emoji_scorpion = new EmojiInfo("scorpion", "1f982.png", "scorpion", "🦂", true, true, true, true);
+		public static readonly EmojiInfo Emoji_scorpion = new EmojiInfo("scorpion", "1f982.png", "scorpion", "🦂", true, true, true, false);
 
 		/// <summary>
 		/// :turkey: 🦃 turkey
 		/// </summary>
-		public static readonly EmojiInfo Emoji_turkey = new EmojiInfo("turkey", "1f983.png", "turkey", "🦃", true, true, true, true);
+		public static readonly EmojiInfo Emoji_turkey = new EmojiInfo("turkey", "1f983.png", "turkey", "🦃", true, true, true, false);
 
 		/// <summary>
 		/// :unicorn_face: 🦄 unicorn face
 		/// </summary>
-		public static readonly EmojiInfo Emoji_unicorn_face = new EmojiInfo("unicorn_face", "1f984.png", "unicorn face", "🦄", true, true, true, true);
-
-		/// <summary>
-		/// :eagle: 🦅 eagle
-		/// </summary>
-		public static readonly EmojiInfo Emoji_eagle = new EmojiInfo("eagle", "1f985.png", "eagle", "🦅", true, true, true, true);
-
-		/// <summary>
-		/// :duck: 🦆 duck
-		/// </summary>
-		public static readonly EmojiInfo Emoji_duck = new EmojiInfo("duck", "1f986.png", "duck", "🦆", true, true, true, true);
-
-		/// <summary>
-		/// :bat: 🦇 bat
-		/// </summary>
-		public static readonly EmojiInfo Emoji_bat = new EmojiInfo("bat", "1f987.png", "bat", "🦇", true, true, true, true);
-
-		/// <summary>
-		/// :shark: 🦈 shark
-		/// </summary>
-		public static readonly EmojiInfo Emoji_shark = new EmojiInfo("shark", "1f988.png", "shark", "🦈", true, true, true, true);
-
-		/// <summary>
-		/// :owl: 🦉 owl
-		/// </summary>
-		public static readonly EmojiInfo Emoji_owl = new EmojiInfo("owl", "1f989.png", "owl", "🦉", true, true, true, true);
-
-		/// <summary>
-		/// :fox_face: 🦊 fox face
-		/// </summary>
-		public static readonly EmojiInfo Emoji_fox_face = new EmojiInfo("fox_face", "1f98a.png", "fox face", "🦊", true, true, true, true);
-
-		/// <summary>
-		/// :butterfly: 🦋 butterfly
-		/// </summary>
-		public static readonly EmojiInfo Emoji_butterfly = new EmojiInfo("butterfly", "1f98b.png", "butterfly", "🦋", true, true, true, true);
-
-		/// <summary>
-		/// :deer: 🦌 deer
-		/// </summary>
-		public static readonly EmojiInfo Emoji_deer = new EmojiInfo("deer", "1f98c.png", "deer", "🦌", true, true, true, true);
-
-		/// <summary>
-		/// :gorilla: 🦍 gorilla
-		/// </summary>
-		public static readonly EmojiInfo Emoji_gorilla = new EmojiInfo("gorilla", "1f98d.png", "gorilla", "🦍", true, true, true, true);
-
-		/// <summary>
-		/// :lizard: 🦎 lizard
-		/// </summary>
-		public static readonly EmojiInfo Emoji_lizard = new EmojiInfo("lizard", "1f98e.png", "lizard", "🦎", true, true, true, true);
-
-		/// <summary>
-		/// :rhinoceros: 🦏 rhinoceros
-		/// </summary>
-		public static readonly EmojiInfo Emoji_rhinoceros = new EmojiInfo("rhinoceros", "1f98f.png", "rhinoceros", "🦏", true, true, true, true);
-
-		/// <summary>
-		/// :shrimp: 🦐 shrimp
-		/// </summary>
-		public static readonly EmojiInfo Emoji_shrimp = new EmojiInfo("shrimp", "1f990.png", "shrimp", "🦐", true, true, true, true);
-
-		/// <summary>
-		/// :squid: 🦑 squid
-		/// </summary>
-		public static readonly EmojiInfo Emoji_squid = new EmojiInfo("squid", "1f991.png", "squid", "🦑", true, true, true, true);
-
-		/// <summary>
-		/// :giraffe_face: 🦒 giraffe face
-		/// </summary>
-		public static readonly EmojiInfo Emoji_giraffe_face = new EmojiInfo("giraffe_face", "1f992.png", "giraffe face", "🦒", true, true, true, true);
-
-		/// <summary>
-		/// :zebra_face: 🦓 zebra face
-		/// </summary>
-		public static readonly EmojiInfo Emoji_zebra_face = new EmojiInfo("zebra_face", "1f993.png", "zebra face", "🦓", true, true, true, true);
-
-		/// <summary>
-		/// :hedgehog: 🦔 hedgehog
-		/// </summary>
-		public static readonly EmojiInfo Emoji_hedgehog = new EmojiInfo("hedgehog", "1f994.png", "hedgehog", "🦔", true, true, true, true);
-
-		/// <summary>
-		/// :sauropod: 🦕 sauropod
-		/// </summary>
-		public static readonly EmojiInfo Emoji_sauropod = new EmojiInfo("sauropod", "1f995.png", "sauropod", "🦕", true, true, true, true);
-
-		/// <summary>
-		/// :t-rex: 🦖 t-rex
-		/// </summary>
-		public static readonly EmojiInfo Emoji_t_rex = new EmojiInfo("t-rex", "1f996.png", "t-rex", "🦖", true, true, true, true);
-
-		/// <summary>
-		/// :cricket: 🦗 cricket
-		/// </summary>
-		public static readonly EmojiInfo Emoji_cricket = new EmojiInfo("cricket", "1f997.png", "cricket", "🦗", true, true, true, true);
-
-		/// <summary>
-		/// :kangaroo: 🦘 kangaroo
-		/// </summary>
-		public static readonly EmojiInfo Emoji_kangaroo = new EmojiInfo("kangaroo", "1f998.png", "kangaroo", "🦘", true, true, true, true);
-
-		/// <summary>
-		/// :llama: 🦙 llama
-		/// </summary>
-		public static readonly EmojiInfo Emoji_llama = new EmojiInfo("llama", "1f999.png", "llama", "🦙", true, true, true, true);
-
-		/// <summary>
-		/// :peacock: 🦚 peacock
-		/// </summary>
-		public static readonly EmojiInfo Emoji_peacock = new EmojiInfo("peacock", "1f99a.png", "peacock", "🦚", true, true, true, true);
-
-		/// <summary>
-		/// :hippopotamus: 🦛 hippopotamus
-		/// </summary>
-		public static readonly EmojiInfo Emoji_hippopotamus = new EmojiInfo("hippopotamus", "1f99b.png", "hippopotamus", "🦛", true, true, true, true);
-
-		/// <summary>
-		/// :parrot: 🦜 parrot
-		/// </summary>
-		public static readonly EmojiInfo Emoji_parrot = new EmojiInfo("parrot", "1f99c.png", "parrot", "🦜", true, true, true, true);
-
-		/// <summary>
-		/// :raccoon: 🦝 raccoon
-		/// </summary>
-		public static readonly EmojiInfo Emoji_raccoon = new EmojiInfo("raccoon", "1f99d.png", "raccoon", "🦝", true, true, true, true);
-
-		/// <summary>
-		/// :lobster: 🦞 lobster
-		/// </summary>
-		public static readonly EmojiInfo Emoji_lobster = new EmojiInfo("lobster", "1f99e.png", "lobster", "🦞", true, true, true, true);
-
-		/// <summary>
-		/// :mosquito: 🦟 mosquito
-		/// </summary>
-		public static readonly EmojiInfo Emoji_mosquito = new EmojiInfo("mosquito", "1f99f.png", "mosquito", "🦟", true, true, true, true);
-
-		/// <summary>
-		/// :microbe: 🦠 microbe
-		/// </summary>
-		public static readonly EmojiInfo Emoji_microbe = new EmojiInfo("microbe", "1f9a0.png", "microbe", "🦠", true, true, true, true);
-
-		/// <summary>
-		/// :badger: 🦡 badger
-		/// </summary>
-		public static readonly EmojiInfo Emoji_badger = new EmojiInfo("badger", "1f9a1.png", "badger", "🦡", true, true, true, true);
-
-		/// <summary>
-		/// :swan: 🦢 swan
-		/// </summary>
-		public static readonly EmojiInfo Emoji_swan = new EmojiInfo("swan", "1f9a2.png", "swan", "🦢", true, true, true, true);
-
-		/// <summary>
-		/// :mammoth: 🦣 mammoth
-		/// </summary>
-		public static readonly EmojiInfo Emoji_mammoth = new EmojiInfo("mammoth", "1f9a3.png", "mammoth", "🦣", true, true, true, true);
-
-		/// <summary>
-		/// :dodo: 🦤 dodo
-		/// </summary>
-		public static readonly EmojiInfo Emoji_dodo = new EmojiInfo("dodo", "1f9a4.png", "dodo", "🦤", true, true, true, true);
-
-		/// <summary>
-		/// :sloth: 🦥 sloth
-		/// </summary>
-		public static readonly EmojiInfo Emoji_sloth = new EmojiInfo("sloth", "1f9a5.png", "sloth", "🦥", true, true, true, true);
-
-		/// <summary>
-		/// :otter: 🦦 otter
-		/// </summary>
-		public static readonly EmojiInfo Emoji_otter = new EmojiInfo("otter", "1f9a6.png", "otter", "🦦", true, true, true, true);
-
-		/// <summary>
-		/// :orangutan: 🦧 orangutan
-		/// </summary>
-		public static readonly EmojiInfo Emoji_orangutan = new EmojiInfo("orangutan", "1f9a7.png", "orangutan", "🦧", true, true, true, true);
-
-		/// <summary>
-		/// :skunk: 🦨 skunk
-		/// </summary>
-		public static readonly EmojiInfo Emoji_skunk = new EmojiInfo("skunk", "1f9a8.png", "skunk", "🦨", true, true, true, true);
-
-		/// <summary>
-		/// :flamingo: 🦩 flamingo
-		/// </summary>
-		public static readonly EmojiInfo Emoji_flamingo = new EmojiInfo("flamingo", "1f9a9.png", "flamingo", "🦩", true, true, true, true);
-
-		/// <summary>
-		/// :oyster: 🦪 oyster
-		/// </summary>
-		public static readonly EmojiInfo Emoji_oyster = new EmojiInfo("oyster", "1f9aa.png", "oyster", "🦪", true, true, true, true);
-
-		/// <summary>
-		/// :beaver: 🦫 beaver
-		/// </summary>
-		public static readonly EmojiInfo Emoji_beaver = new EmojiInfo("beaver", "1f9ab.png", "beaver", "🦫", true, true, true, true);
-
-		/// <summary>
-		/// :bison: 🦬 bison
-		/// </summary>
-		public static readonly EmojiInfo Emoji_bison = new EmojiInfo("bison", "1f9ac.png", "bison", "🦬", true, true, true, true);
-
-		/// <summary>
-		/// :seal: 🦭 seal
-		/// </summary>
-		public static readonly EmojiInfo Emoji_seal = new EmojiInfo("seal", "1f9ad.png", "seal", "🦭", true, true, true, true);
-
-		/// <summary>
-		/// :guide_dog: 🦮 guide dog
-		/// </summary>
-		public static readonly EmojiInfo Emoji_guide_dog = new EmojiInfo("guide_dog", "1f9ae.png", "guide dog", "🦮", true, true, true, true);
-
-		/// <summary>
-		/// :probing_cane: 🦯 probing cane
-		/// </summary>
-		public static readonly EmojiInfo Emoji_probing_cane = new EmojiInfo("probing_cane", "1f9af.png", "probing cane", "🦯", true, true, true, true);
-
-		/// <summary>
-		/// :bone: 🦴 bone
-		/// </summary>
-		public static readonly EmojiInfo Emoji_bone = new EmojiInfo("bone", "1f9b4.png", "bone", "🦴", true, true, true, true);
-
-		/// <summary>
-		/// :leg: 🦵 leg
-		/// </summary>
-		public static readonly EmojiInfo Emoji_leg = new EmojiInfo("leg", "1f9b5.png", "leg", "🦵", true, true, true, true);
-
-		/// <summary>
-		/// :foot: 🦶 foot
-		/// </summary>
-		public static readonly EmojiInfo Emoji_foot = new EmojiInfo("foot", "1f9b6.png", "foot", "🦶", true, true, true, true);
-
-		/// <summary>
-		/// :tooth: 🦷 tooth
-		/// </summary>
-		public static readonly EmojiInfo Emoji_tooth = new EmojiInfo("tooth", "1f9b7.png", "tooth", "🦷", true, true, true, true);
-
-		/// <summary>
-		/// :female_superhero: 🦸‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_superhero = new EmojiInfo("female_superhero", "1f9b8-200d-2640-fe0f.png", "", "🦸‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :male_superhero: 🦸‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_superhero = new EmojiInfo("male_superhero", "1f9b8-200d-2642-fe0f.png", "", "🦸‍♂️", true, true, true, true);
-
-		/// <summary>
-		/// :superhero: 🦸 superhero
-		/// </summary>
-		public static readonly EmojiInfo Emoji_superhero = new EmojiInfo("superhero", "1f9b8.png", "superhero", "🦸", true, true, true, true);
-
-		/// <summary>
-		/// :female_supervillain: 🦹‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_female_supervillain = new EmojiInfo("female_supervillain", "1f9b9-200d-2640-fe0f.png", "", "🦹‍♀️", true, true, true, true);
-
-		/// <summary>
-		/// :male_supervillain: 🦹‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_male_supervillain = new EmojiInfo("male_supervillain", "1f9b9-200d-2642-fe0f.png", "", "🦹‍♂️", true, true, true, true);
-
-		/// <summary>
-		/// :supervillain: 🦹 supervillain
-		/// </summary>
-		public static readonly EmojiInfo Emoji_supervillain = new EmojiInfo("supervillain", "1f9b9.png", "supervillain", "🦹", true, true, true, true);
-
-		/// <summary>
-		/// :safety_vest: 🦺 safety vest
-		/// </summary>
-		public static readonly EmojiInfo Emoji_safety_vest = new EmojiInfo("safety_vest", "1f9ba.png", "safety vest", "🦺", true, true, true, true);
-
-		/// <summary>
-		/// :ear_with_hearing_aid: 🦻 ear with hearing aid
-		/// </summary>
-		public static readonly EmojiInfo Emoji_ear_with_hearing_aid = new EmojiInfo("ear_with_hearing_aid", "1f9bb.png", "ear with hearing aid", "🦻", true, true, true, true);
-
-		/// <summary>
-		/// :motorized_wheelchair: 🦼 motorized wheelchair
-		/// </summary>
-		public static readonly EmojiInfo Emoji_motorized_wheelchair = new EmojiInfo("motorized_wheelchair", "1f9bc.png", "motorized wheelchair", "🦼", true, true, true, true);
-
-		/// <summary>
-		/// :manual_wheelchair: 🦽 manual wheelchair
-		/// </summary>
-		public static readonly EmojiInfo Emoji_manual_wheelchair = new EmojiInfo("manual_wheelchair", "1f9bd.png", "manual wheelchair", "🦽", true, true, true, true);
-
-		/// <summary>
-		/// :mechanical_arm: 🦾 mechanical arm
-		/// </summary>
-		public static readonly EmojiInfo Emoji_mechanical_arm = new EmojiInfo("mechanical_arm", "1f9be.png", "mechanical arm", "🦾", true, true, true, true);
-
-		/// <summary>
-		/// :mechanical_leg: 🦿 mechanical leg
-		/// </summary>
-		public static readonly EmojiInfo Emoji_mechanical_leg = new EmojiInfo("mechanical_leg", "1f9bf.png", "mechanical leg", "🦿", true, true, true, true);
+		public static readonly EmojiInfo Emoji_unicorn_face = new EmojiInfo("unicorn_face", "1f984.png", "unicorn face", "🦄", true, true, true, false);
 
 		/// <summary>
 		/// :cheese_wedge: 🧀 cheese wedge
 		/// </summary>
-		public static readonly EmojiInfo Emoji_cheese_wedge = new EmojiInfo("cheese_wedge", "1f9c0.png", "cheese wedge", "🧀", true, true, true, true);
+		public static readonly EmojiInfo Emoji_cheese_wedge = new EmojiInfo("cheese_wedge", "1f9c0.png", "cheese wedge", "🧀", true, true, true, false);
 
 		/// <summary>
-		/// :cupcake: 🧁 cupcake
+		/// :hash: #⃣ hash key
 		/// </summary>
-		public static readonly EmojiInfo Emoji_cupcake = new EmojiInfo("cupcake", "1f9c1.png", "cupcake", "🧁", true, true, true, true);
+		public static readonly EmojiInfo Emoji_hash = new EmojiInfo("hash", "0023-20e3.png", "hash key", "#⃣", true, true, true, true);
 
 		/// <summary>
-		/// :salt: 🧂 salt shaker
+		/// :keycap_star: *⃣ 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_salt = new EmojiInfo("salt", "1f9c2.png", "salt shaker", "🧂", true, true, true, true);
+		public static readonly EmojiInfo Emoji_keycap_star = new EmojiInfo("keycap_star", "002a-20e3.png", "", "*⃣", true, true, true, false);
 
 		/// <summary>
-		/// :beverage_box: 🧃 beverage box
+		/// :zero: 0⃣ keycap 0
 		/// </summary>
-		public static readonly EmojiInfo Emoji_beverage_box = new EmojiInfo("beverage_box", "1f9c3.png", "beverage box", "🧃", true, true, true, true);
+		public static readonly EmojiInfo Emoji_zero = new EmojiInfo("zero", "0030-20e3.png", "keycap 0", "0⃣", true, true, true, true);
 
 		/// <summary>
-		/// :garlic: 🧄 garlic
+		/// :one: 1⃣ keycap 1
 		/// </summary>
-		public static readonly EmojiInfo Emoji_garlic = new EmojiInfo("garlic", "1f9c4.png", "garlic", "🧄", true, true, true, true);
+		public static readonly EmojiInfo Emoji_one = new EmojiInfo("one", "0031-20e3.png", "keycap 1", "1⃣", true, true, true, true);
 
 		/// <summary>
-		/// :onion: 🧅 onion
+		/// :two: 2⃣ keycap 2
 		/// </summary>
-		public static readonly EmojiInfo Emoji_onion = new EmojiInfo("onion", "1f9c5.png", "onion", "🧅", true, true, true, true);
+		public static readonly EmojiInfo Emoji_two = new EmojiInfo("two", "0032-20e3.png", "keycap 2", "2⃣", true, true, true, true);
 
 		/// <summary>
-		/// :falafel: 🧆 falafel
+		/// :three: 3⃣ keycap 3
 		/// </summary>
-		public static readonly EmojiInfo Emoji_falafel = new EmojiInfo("falafel", "1f9c6.png", "falafel", "🧆", true, true, true, true);
+		public static readonly EmojiInfo Emoji_three = new EmojiInfo("three", "0033-20e3.png", "keycap 3", "3⃣", true, true, true, true);
 
 		/// <summary>
-		/// :waffle: 🧇 waffle
+		/// :four: 4⃣ keycap 4
 		/// </summary>
-		public static readonly EmojiInfo Emoji_waffle = new EmojiInfo("waffle", "1f9c7.png", "waffle", "🧇", true, true, true, true);
+		public static readonly EmojiInfo Emoji_four = new EmojiInfo("four", "0034-20e3.png", "keycap 4", "4⃣", true, true, true, true);
 
 		/// <summary>
-		/// :butter: 🧈 butter
+		/// :five: 5⃣ keycap 5
 		/// </summary>
-		public static readonly EmojiInfo Emoji_butter = new EmojiInfo("butter", "1f9c8.png", "butter", "🧈", true, true, true, true);
+		public static readonly EmojiInfo Emoji_five = new EmojiInfo("five", "0035-20e3.png", "keycap 5", "5⃣", true, true, true, true);
 
 		/// <summary>
-		/// :mate_drink: 🧉 mate drink
+		/// :six: 6⃣ keycap 6
 		/// </summary>
-		public static readonly EmojiInfo Emoji_mate_drink = new EmojiInfo("mate_drink", "1f9c9.png", "mate drink", "🧉", true, true, true, true);
+		public static readonly EmojiInfo Emoji_six = new EmojiInfo("six", "0036-20e3.png", "keycap 6", "6⃣", true, true, true, true);
 
 		/// <summary>
-		/// :ice_cube: 🧊 ice cube
+		/// :seven: 7⃣ keycap 7
 		/// </summary>
-		public static readonly EmojiInfo Emoji_ice_cube = new EmojiInfo("ice_cube", "1f9ca.png", "ice cube", "🧊", true, true, true, true);
+		public static readonly EmojiInfo Emoji_seven = new EmojiInfo("seven", "0037-20e3.png", "keycap 7", "7⃣", true, true, true, true);
 
 		/// <summary>
-		/// :bubble_tea: 🧋 bubble tea
+		/// :eight: 8⃣ keycap 8
 		/// </summary>
-		public static readonly EmojiInfo Emoji_bubble_tea = new EmojiInfo("bubble_tea", "1f9cb.png", "bubble tea", "🧋", true, true, true, true);
+		public static readonly EmojiInfo Emoji_eight = new EmojiInfo("eight", "0038-20e3.png", "keycap 8", "8⃣", true, true, true, true);
 
 		/// <summary>
-		/// :woman_standing: 🧍‍♀️ 
+		/// :nine: 9⃣ keycap 9
 		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_standing = new EmojiInfo("woman_standing", "1f9cd-200d-2640-fe0f.png", "", "🧍‍♀️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_nine = new EmojiInfo("nine", "0039-20e3.png", "keycap 9", "9⃣", true, true, true, true);
 
 		/// <summary>
-		/// :man_standing: 🧍‍♂️ 
+		/// :flag-ac: 🇦🇨 regional indicator symbol letters ac
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_standing = new EmojiInfo("man_standing", "1f9cd-200d-2642-fe0f.png", "", "🧍‍♂️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ac = new EmojiInfo("flag-ac", "1f1e6-1f1e8.png", "regional indicator symbol letters ac", "🇦🇨", true, false, true, true);
 
 		/// <summary>
-		/// :standing_person: 🧍 standing person
+		/// :flag-ad: 🇦🇩 regional indicator symbol letters ad
 		/// </summary>
-		public static readonly EmojiInfo Emoji_standing_person = new EmojiInfo("standing_person", "1f9cd.png", "standing person", "🧍", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ad = new EmojiInfo("flag-ad", "1f1e6-1f1e9.png", "regional indicator symbol letters ad", "🇦🇩", true, true, true, true);
 
 		/// <summary>
-		/// :woman_kneeling: 🧎‍♀️ 
+		/// :flag-ae: 🇦🇪 regional indicator symbol letters ae
 		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_kneeling = new EmojiInfo("woman_kneeling", "1f9ce-200d-2640-fe0f.png", "", "🧎‍♀️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ae = new EmojiInfo("flag-ae", "1f1e6-1f1ea.png", "regional indicator symbol letters ae", "🇦🇪", true, true, true, true);
 
 		/// <summary>
-		/// :man_kneeling: 🧎‍♂️ 
+		/// :flag-af: 🇦🇫 regional indicator symbol letters af
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_kneeling = new EmojiInfo("man_kneeling", "1f9ce-200d-2642-fe0f.png", "", "🧎‍♂️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_af = new EmojiInfo("flag-af", "1f1e6-1f1eb.png", "regional indicator symbol letters af", "🇦🇫", true, true, true, true);
 
 		/// <summary>
-		/// :kneeling_person: 🧎 kneeling person
+		/// :flag-ag: 🇦🇬 regional indicator symbol letters ag
 		/// </summary>
-		public static readonly EmojiInfo Emoji_kneeling_person = new EmojiInfo("kneeling_person", "1f9ce.png", "kneeling person", "🧎", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ag = new EmojiInfo("flag-ag", "1f1e6-1f1ec.png", "regional indicator symbol letters ag", "🇦🇬", true, true, true, true);
 
 		/// <summary>
-		/// :deaf_woman: 🧏‍♀️ 
+		/// :flag-ai: 🇦🇮 regional indicator symbol letters ai
 		/// </summary>
-		public static readonly EmojiInfo Emoji_deaf_woman = new EmojiInfo("deaf_woman", "1f9cf-200d-2640-fe0f.png", "", "🧏‍♀️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ai = new EmojiInfo("flag-ai", "1f1e6-1f1ee.png", "regional indicator symbol letters ai", "🇦🇮", true, true, true, true);
 
 		/// <summary>
-		/// :deaf_man: 🧏‍♂️ 
+		/// :flag-al: 🇦🇱 regional indicator symbol letters al
 		/// </summary>
-		public static readonly EmojiInfo Emoji_deaf_man = new EmojiInfo("deaf_man", "1f9cf-200d-2642-fe0f.png", "", "🧏‍♂️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_al = new EmojiInfo("flag-al", "1f1e6-1f1f1.png", "regional indicator symbol letters al", "🇦🇱", true, true, true, true);
 
 		/// <summary>
-		/// :deaf_person: 🧏 deaf person
+		/// :flag-am: 🇦🇲 regional indicator symbol letters am
 		/// </summary>
-		public static readonly EmojiInfo Emoji_deaf_person = new EmojiInfo("deaf_person", "1f9cf.png", "deaf person", "🧏", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_am = new EmojiInfo("flag-am", "1f1e6-1f1f2.png", "regional indicator symbol letters am", "🇦🇲", true, true, true, true);
 
 		/// <summary>
-		/// :face_with_monocle: 🧐 face with monocle
+		/// :flag-ao: 🇦🇴 regional indicator symbol letters ao
 		/// </summary>
-		public static readonly EmojiInfo Emoji_face_with_monocle = new EmojiInfo("face_with_monocle", "1f9d0.png", "face with monocle", "🧐", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ao = new EmojiInfo("flag-ao", "1f1e6-1f1f4.png", "regional indicator symbol letters ao", "🇦🇴", true, true, true, true);
 
 		/// <summary>
-		/// :farmer: 🧑‍🌾 
+		/// :flag-aq: 🇦🇶 regional indicator symbol letters aq
 		/// </summary>
-		public static readonly EmojiInfo Emoji_farmer = new EmojiInfo("farmer", "1f9d1-200d-1f33e.png", "", "🧑‍🌾", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_aq = new EmojiInfo("flag-aq", "1f1e6-1f1f6.png", "regional indicator symbol letters aq", "🇦🇶", true, false, true, false);
 
 		/// <summary>
-		/// :cook: 🧑‍🍳 
+		/// :flag-ar: 🇦🇷 regional indicator symbol letters ar
 		/// </summary>
-		public static readonly EmojiInfo Emoji_cook = new EmojiInfo("cook", "1f9d1-200d-1f373.png", "", "🧑‍🍳", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ar = new EmojiInfo("flag-ar", "1f1e6-1f1f7.png", "regional indicator symbol letters ar", "🇦🇷", true, true, true, true);
 
 		/// <summary>
-		/// :person_feeding_baby: 🧑‍🍼 
+		/// :flag-as: 🇦🇸 regional indicator symbol letters as
 		/// </summary>
-		public static readonly EmojiInfo Emoji_person_feeding_baby = new EmojiInfo("person_feeding_baby", "1f9d1-200d-1f37c.png", "", "🧑‍🍼", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_as = new EmojiInfo("flag-as", "1f1e6-1f1f8.png", "regional indicator symbol letters as", "🇦🇸", true, true, true, false);
 
 		/// <summary>
-		/// :mx_claus: 🧑‍🎄 
+		/// :flag-at: 🇦🇹 regional indicator symbol letters at
 		/// </summary>
-		public static readonly EmojiInfo Emoji_mx_claus = new EmojiInfo("mx_claus", "1f9d1-200d-1f384.png", "", "🧑‍🎄", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_at = new EmojiInfo("flag-at", "1f1e6-1f1f9.png", "regional indicator symbol letters at", "🇦🇹", true, true, true, true);
 
 		/// <summary>
-		/// :student: 🧑‍🎓 
+		/// :flag-au: 🇦🇺 regional indicator symbol letters au
 		/// </summary>
-		public static readonly EmojiInfo Emoji_student = new EmojiInfo("student", "1f9d1-200d-1f393.png", "", "🧑‍🎓", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_au = new EmojiInfo("flag-au", "1f1e6-1f1fa.png", "regional indicator symbol letters au", "🇦🇺", true, true, true, true);
 
 		/// <summary>
-		/// :singer: 🧑‍🎤 
+		/// :flag-aw: 🇦🇼 regional indicator symbol letters aw
 		/// </summary>
-		public static readonly EmojiInfo Emoji_singer = new EmojiInfo("singer", "1f9d1-200d-1f3a4.png", "", "🧑‍🎤", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_aw = new EmojiInfo("flag-aw", "1f1e6-1f1fc.png", "regional indicator symbol letters aw", "🇦🇼", true, true, true, true);
 
 		/// <summary>
-		/// :artist: 🧑‍🎨 
+		/// :flag-ax: 🇦🇽 regional indicator symbol letters ax
 		/// </summary>
-		public static readonly EmojiInfo Emoji_artist = new EmojiInfo("artist", "1f9d1-200d-1f3a8.png", "", "🧑‍🎨", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ax = new EmojiInfo("flag-ax", "1f1e6-1f1fd.png", "regional indicator symbol letters ax", "🇦🇽", true, true, true, false);
 
 		/// <summary>
-		/// :teacher: 🧑‍🏫 
+		/// :flag-az: 🇦🇿 regional indicator symbol letters az
 		/// </summary>
-		public static readonly EmojiInfo Emoji_teacher = new EmojiInfo("teacher", "1f9d1-200d-1f3eb.png", "", "🧑‍🏫", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_az = new EmojiInfo("flag-az", "1f1e6-1f1ff.png", "regional indicator symbol letters az", "🇦🇿", true, true, true, true);
 
 		/// <summary>
-		/// :factory_worker: 🧑‍🏭 
+		/// :flag-ba: 🇧🇦 regional indicator symbol letters ba
 		/// </summary>
-		public static readonly EmojiInfo Emoji_factory_worker = new EmojiInfo("factory_worker", "1f9d1-200d-1f3ed.png", "", "🧑‍🏭", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ba = new EmojiInfo("flag-ba", "1f1e7-1f1e6.png", "regional indicator symbol letters ba", "🇧🇦", true, true, true, true);
 
 		/// <summary>
-		/// :technologist: 🧑‍💻 
+		/// :flag-bb: 🇧🇧 regional indicator symbol letters bb
 		/// </summary>
-		public static readonly EmojiInfo Emoji_technologist = new EmojiInfo("technologist", "1f9d1-200d-1f4bb.png", "", "🧑‍💻", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_bb = new EmojiInfo("flag-bb", "1f1e7-1f1e7.png", "regional indicator symbol letters bb", "🇧🇧", true, true, true, true);
 
 		/// <summary>
-		/// :office_worker: 🧑‍💼 
+		/// :flag-bd: 🇧🇩 regional indicator symbol letters bd
 		/// </summary>
-		public static readonly EmojiInfo Emoji_office_worker = new EmojiInfo("office_worker", "1f9d1-200d-1f4bc.png", "", "🧑‍💼", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_bd = new EmojiInfo("flag-bd", "1f1e7-1f1e9.png", "regional indicator symbol letters bd", "🇧🇩", true, true, true, true);
 
 		/// <summary>
-		/// :mechanic: 🧑‍🔧 
+		/// :flag-be: 🇧🇪 regional indicator symbol letters be
 		/// </summary>
-		public static readonly EmojiInfo Emoji_mechanic = new EmojiInfo("mechanic", "1f9d1-200d-1f527.png", "", "🧑‍🔧", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_be = new EmojiInfo("flag-be", "1f1e7-1f1ea.png", "regional indicator symbol letters be", "🇧🇪", true, true, true, true);
 
 		/// <summary>
-		/// :scientist: 🧑‍🔬 
+		/// :flag-bf: 🇧🇫 regional indicator symbol letters bf
 		/// </summary>
-		public static readonly EmojiInfo Emoji_scientist = new EmojiInfo("scientist", "1f9d1-200d-1f52c.png", "", "🧑‍🔬", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_bf = new EmojiInfo("flag-bf", "1f1e7-1f1eb.png", "regional indicator symbol letters bf", "🇧🇫", true, true, true, true);
 
 		/// <summary>
-		/// :astronaut: 🧑‍🚀 
+		/// :flag-bg: 🇧🇬 regional indicator symbol letters bg
 		/// </summary>
-		public static readonly EmojiInfo Emoji_astronaut = new EmojiInfo("astronaut", "1f9d1-200d-1f680.png", "", "🧑‍🚀", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_bg = new EmojiInfo("flag-bg", "1f1e7-1f1ec.png", "regional indicator symbol letters bg", "🇧🇬", true, true, true, true);
 
 		/// <summary>
-		/// :firefighter: 🧑‍🚒 
+		/// :flag-bh: 🇧🇭 regional indicator symbol letters bh
 		/// </summary>
-		public static readonly EmojiInfo Emoji_firefighter = new EmojiInfo("firefighter", "1f9d1-200d-1f692.png", "", "🧑‍🚒", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_bh = new EmojiInfo("flag-bh", "1f1e7-1f1ed.png", "regional indicator symbol letters bh", "🇧🇭", true, true, true, true);
 
 		/// <summary>
-		/// :people_holding_hands: 🧑‍🤝‍🧑 
+		/// :flag-bi: 🇧🇮 regional indicator symbol letters bi
 		/// </summary>
-		public static readonly EmojiInfo Emoji_people_holding_hands = new EmojiInfo("people_holding_hands", "1f9d1-200d-1f91d-200d-1f9d1.png", "", "🧑‍🤝‍🧑", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_bi = new EmojiInfo("flag-bi", "1f1e7-1f1ee.png", "regional indicator symbol letters bi", "🇧🇮", true, true, true, true);
 
 		/// <summary>
-		/// :person_with_probing_cane: 🧑‍🦯 
+		/// :flag-bj: 🇧🇯 regional indicator symbol letters bj
 		/// </summary>
-		public static readonly EmojiInfo Emoji_person_with_probing_cane = new EmojiInfo("person_with_probing_cane", "1f9d1-200d-1f9af.png", "", "🧑‍🦯", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_bj = new EmojiInfo("flag-bj", "1f1e7-1f1ef.png", "regional indicator symbol letters bj", "🇧🇯", true, true, true, true);
 
 		/// <summary>
-		/// :red_haired_person: 🧑‍🦰 
+		/// :flag-bl: 🇧🇱 regional indicator symbol letters bl
 		/// </summary>
-		public static readonly EmojiInfo Emoji_red_haired_person = new EmojiInfo("red_haired_person", "1f9d1-200d-1f9b0.png", "", "🧑‍🦰", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_bl = new EmojiInfo("flag-bl", "1f1e7-1f1f1.png", "regional indicator symbol letters bl", "🇧🇱", true, false, true, false);
 
 		/// <summary>
-		/// :curly_haired_person: 🧑‍🦱 
+		/// :flag-bm: 🇧🇲 regional indicator symbol letters bm
 		/// </summary>
-		public static readonly EmojiInfo Emoji_curly_haired_person = new EmojiInfo("curly_haired_person", "1f9d1-200d-1f9b1.png", "", "🧑‍🦱", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_bm = new EmojiInfo("flag-bm", "1f1e7-1f1f2.png", "regional indicator symbol letters bm", "🇧🇲", true, true, true, true);
 
 		/// <summary>
-		/// :bald_person: 🧑‍🦲 
+		/// :flag-bn: 🇧🇳 regional indicator symbol letters bn
 		/// </summary>
-		public static readonly EmojiInfo Emoji_bald_person = new EmojiInfo("bald_person", "1f9d1-200d-1f9b2.png", "", "🧑‍🦲", true, true, true, false);
+		public static readonly EmojiInfo Emoji_flag_bn = new EmojiInfo("flag-bn", "1f1e7-1f1f3.png", "regional indicator symbol letters bn", "🇧🇳", true, true, true, true);
 
 		/// <summary>
-		/// :white_haired_person: 🧑‍🦳 
+		/// :flag-bo: 🇧🇴 regional indicator symbol letters bo
 		/// </summary>
-		public static readonly EmojiInfo Emoji_white_haired_person = new EmojiInfo("white_haired_person", "1f9d1-200d-1f9b3.png", "", "🧑‍🦳", true, true, true, false);
+		public static readonly EmojiInfo Emoji_flag_bo = new EmojiInfo("flag-bo", "1f1e7-1f1f4.png", "regional indicator symbol letters bo", "🇧🇴", true, true, true, true);
 
 		/// <summary>
-		/// :person_in_motorized_wheelchair: 🧑‍🦼 
+		/// :flag-bq: 🇧🇶 regional indicator symbol letters bq
 		/// </summary>
-		public static readonly EmojiInfo Emoji_person_in_motorized_wheelchair = new EmojiInfo("person_in_motorized_wheelchair", "1f9d1-200d-1f9bc.png", "", "🧑‍🦼", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_bq = new EmojiInfo("flag-bq", "1f1e7-1f1f6.png", "regional indicator symbol letters bq", "🇧🇶", true, false, true, false);
 
 		/// <summary>
-		/// :person_in_manual_wheelchair: 🧑‍🦽 
+		/// :flag-br: 🇧🇷 regional indicator symbol letters br
 		/// </summary>
-		public static readonly EmojiInfo Emoji_person_in_manual_wheelchair = new EmojiInfo("person_in_manual_wheelchair", "1f9d1-200d-1f9bd.png", "", "🧑‍🦽", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_br = new EmojiInfo("flag-br", "1f1e7-1f1f7.png", "regional indicator symbol letters br", "🇧🇷", true, true, true, true);
 
 		/// <summary>
-		/// :health_worker: 🧑‍⚕️ 
+		/// :flag-bs: 🇧🇸 regional indicator symbol letters bs
 		/// </summary>
-		public static readonly EmojiInfo Emoji_health_worker = new EmojiInfo("health_worker", "1f9d1-200d-2695-fe0f.png", "", "🧑‍⚕️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_bs = new EmojiInfo("flag-bs", "1f1e7-1f1f8.png", "regional indicator symbol letters bs", "🇧🇸", true, true, true, true);
 
 		/// <summary>
-		/// :judge: 🧑‍⚖️ 
+		/// :flag-bt: 🇧🇹 regional indicator symbol letters bt
 		/// </summary>
-		public static readonly EmojiInfo Emoji_judge = new EmojiInfo("judge", "1f9d1-200d-2696-fe0f.png", "", "🧑‍⚖️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_bt = new EmojiInfo("flag-bt", "1f1e7-1f1f9.png", "regional indicator symbol letters bt", "🇧🇹", true, true, true, true);
 
 		/// <summary>
-		/// :pilot: 🧑‍✈️ 
+		/// :flag-bv: 🇧🇻 regional indicator symbol letters bv
 		/// </summary>
-		public static readonly EmojiInfo Emoji_pilot = new EmojiInfo("pilot", "1f9d1-200d-2708-fe0f.png", "", "🧑‍✈️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_bv = new EmojiInfo("flag-bv", "1f1e7-1f1fb.png", "regional indicator symbol letters bv", "🇧🇻", true, false, true, false);
 
 		/// <summary>
-		/// :adult: 🧑 adult
+		/// :flag-bw: 🇧🇼 regional indicator symbol letters bw
 		/// </summary>
-		public static readonly EmojiInfo Emoji_adult = new EmojiInfo("adult", "1f9d1.png", "adult", "🧑", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_bw = new EmojiInfo("flag-bw", "1f1e7-1f1fc.png", "regional indicator symbol letters bw", "🇧🇼", true, true, true, true);
 
 		/// <summary>
-		/// :child: 🧒 child
+		/// :flag-by: 🇧🇾 regional indicator symbol letters by
 		/// </summary>
-		public static readonly EmojiInfo Emoji_child = new EmojiInfo("child", "1f9d2.png", "child", "🧒", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_by = new EmojiInfo("flag-by", "1f1e7-1f1fe.png", "regional indicator symbol letters by", "🇧🇾", true, true, true, true);
 
 		/// <summary>
-		/// :older_adult: 🧓 older adult
+		/// :flag-bz: 🇧🇿 regional indicator symbol letters bz
 		/// </summary>
-		public static readonly EmojiInfo Emoji_older_adult = new EmojiInfo("older_adult", "1f9d3.png", "older adult", "🧓", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_bz = new EmojiInfo("flag-bz", "1f1e7-1f1ff.png", "regional indicator symbol letters bz", "🇧🇿", true, true, true, true);
 
 		/// <summary>
-		/// :bearded_person: 🧔 bearded person
+		/// :flag-ca: 🇨🇦 regional indicator symbol letters ca
 		/// </summary>
-		public static readonly EmojiInfo Emoji_bearded_person = new EmojiInfo("bearded_person", "1f9d4.png", "bearded person", "🧔", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ca = new EmojiInfo("flag-ca", "1f1e8-1f1e6.png", "regional indicator symbol letters ca", "🇨🇦", true, true, true, true);
 
 		/// <summary>
-		/// :person_with_headscarf: 🧕 person with headscarf
+		/// :flag-cc: 🇨🇨 regional indicator symbol letters cc
 		/// </summary>
-		public static readonly EmojiInfo Emoji_person_with_headscarf = new EmojiInfo("person_with_headscarf", "1f9d5.png", "person with headscarf", "🧕", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_cc = new EmojiInfo("flag-cc", "1f1e8-1f1e8.png", "regional indicator symbol letters cc", "🇨🇨", true, true, true, false);
 
 		/// <summary>
-		/// :woman_in_steamy_room: 🧖‍♀️ 
+		/// :flag-cd: 🇨🇩 regional indicator symbol letters cd
 		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_in_steamy_room = new EmojiInfo("woman_in_steamy_room", "1f9d6-200d-2640-fe0f.png", "", "🧖‍♀️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_cd = new EmojiInfo("flag-cd", "1f1e8-1f1e9.png", "regional indicator symbol letters cd", "🇨🇩", true, true, true, true);
 
 		/// <summary>
-		/// :man_in_steamy_room: 🧖‍♂️ 
+		/// :flag-cf: 🇨🇫 regional indicator symbol letters cf
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_in_steamy_room = new EmojiInfo("man_in_steamy_room", "1f9d6-200d-2642-fe0f.png", "", "🧖‍♂️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_cf = new EmojiInfo("flag-cf", "1f1e8-1f1eb.png", "regional indicator symbol letters cf", "🇨🇫", true, true, true, true);
 
 		/// <summary>
-		/// :person_in_steamy_room: 🧖 person in steamy room
+		/// :flag-cg: 🇨🇬 regional indicator symbol letters cg
 		/// </summary>
-		public static readonly EmojiInfo Emoji_person_in_steamy_room = new EmojiInfo("person_in_steamy_room", "1f9d6.png", "person in steamy room", "🧖", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_cg = new EmojiInfo("flag-cg", "1f1e8-1f1ec.png", "regional indicator symbol letters cg", "🇨🇬", true, true, true, true);
 
 		/// <summary>
-		/// :woman_climbing: 🧗‍♀️ 
+		/// :flag-ch: 🇨🇭 regional indicator symbol letters ch
 		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_climbing = new EmojiInfo("woman_climbing", "1f9d7-200d-2640-fe0f.png", "", "🧗‍♀️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ch = new EmojiInfo("flag-ch", "1f1e8-1f1ed.png", "regional indicator symbol letters ch", "🇨🇭", true, true, true, true);
 
 		/// <summary>
-		/// :man_climbing: 🧗‍♂️ 
+		/// :flag-ci: 🇨🇮 regional indicator symbol letters ci
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_climbing = new EmojiInfo("man_climbing", "1f9d7-200d-2642-fe0f.png", "", "🧗‍♂️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ci = new EmojiInfo("flag-ci", "1f1e8-1f1ee.png", "regional indicator symbol letters ci", "🇨🇮", true, true, true, true);
 
 		/// <summary>
-		/// :person_climbing: 🧗 person climbing
+		/// :flag-ck: 🇨🇰 regional indicator symbol letters ck
 		/// </summary>
-		public static readonly EmojiInfo Emoji_person_climbing = new EmojiInfo("person_climbing", "1f9d7.png", "person climbing", "🧗", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ck = new EmojiInfo("flag-ck", "1f1e8-1f1f0.png", "regional indicator symbol letters ck", "🇨🇰", true, true, true, false);
 
 		/// <summary>
-		/// :woman_in_lotus_position: 🧘‍♀️ 
+		/// :flag-cl: 🇨🇱 regional indicator symbol letters cl
 		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_in_lotus_position = new EmojiInfo("woman_in_lotus_position", "1f9d8-200d-2640-fe0f.png", "", "🧘‍♀️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_cl = new EmojiInfo("flag-cl", "1f1e8-1f1f1.png", "regional indicator symbol letters cl", "🇨🇱", true, true, true, true);
 
 		/// <summary>
-		/// :man_in_lotus_position: 🧘‍♂️ 
+		/// :flag-cm: 🇨🇲 regional indicator symbol letters cm
 		/// </summary>
-		public static readonly EmojiInfo Emoji_man_in_lotus_position = new EmojiInfo("man_in_lotus_position", "1f9d8-200d-2642-fe0f.png", "", "🧘‍♂️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_cm = new EmojiInfo("flag-cm", "1f1e8-1f1f2.png", "regional indicator symbol letters cm", "🇨🇲", true, true, true, true);
 
 		/// <summary>
-		/// :person_in_lotus_position: 🧘 person in lotus position
+		/// :flag-cn: 🇨🇳 regional indicator symbol letters cn
 		/// </summary>
-		public static readonly EmojiInfo Emoji_person_in_lotus_position = new EmojiInfo("person_in_lotus_position", "1f9d8.png", "person in lotus position", "🧘", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_cn = new EmojiInfo("flag-cn", "1f1e8-1f1f3.png", "regional indicator symbol letters cn", "🇨🇳", true, true, true, true);
 
 		/// <summary>
-		/// :female_mage: 🧙‍♀️ 
+		/// :flag-co: 🇨🇴 regional indicator symbol letters co
 		/// </summary>
-		public static readonly EmojiInfo Emoji_female_mage = new EmojiInfo("female_mage", "1f9d9-200d-2640-fe0f.png", "", "🧙‍♀️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_co = new EmojiInfo("flag-co", "1f1e8-1f1f4.png", "regional indicator symbol letters co", "🇨🇴", true, true, true, true);
 
 		/// <summary>
-		/// :male_mage: 🧙‍♂️ 
+		/// :flag-cp: 🇨🇵 regional indicator symbol letters cp
 		/// </summary>
-		public static readonly EmojiInfo Emoji_male_mage = new EmojiInfo("male_mage", "1f9d9-200d-2642-fe0f.png", "", "🧙‍♂️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_cp = new EmojiInfo("flag-cp", "1f1e8-1f1f5.png", "regional indicator symbol letters cp", "🇨🇵", true, false, true, false);
 
 		/// <summary>
-		/// :mage: 🧙 mage
+		/// :flag-cr: 🇨🇷 regional indicator symbol letters cr
 		/// </summary>
-		public static readonly EmojiInfo Emoji_mage = new EmojiInfo("mage", "1f9d9.png", "mage", "🧙", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_cr = new EmojiInfo("flag-cr", "1f1e8-1f1f7.png", "regional indicator symbol letters cr", "🇨🇷", true, true, true, true);
 
 		/// <summary>
-		/// :female_fairy: 🧚‍♀️ 
+		/// :flag-cu: 🇨🇺 regional indicator symbol letters cu
 		/// </summary>
-		public static readonly EmojiInfo Emoji_female_fairy = new EmojiInfo("female_fairy", "1f9da-200d-2640-fe0f.png", "", "🧚‍♀️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_cu = new EmojiInfo("flag-cu", "1f1e8-1f1fa.png", "regional indicator symbol letters cu", "🇨🇺", true, true, true, true);
 
 		/// <summary>
-		/// :male_fairy: 🧚‍♂️ 
+		/// :flag-cv: 🇨🇻 regional indicator symbol letters cv
 		/// </summary>
-		public static readonly EmojiInfo Emoji_male_fairy = new EmojiInfo("male_fairy", "1f9da-200d-2642-fe0f.png", "", "🧚‍♂️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_cv = new EmojiInfo("flag-cv", "1f1e8-1f1fb.png", "regional indicator symbol letters cv", "🇨🇻", true, true, true, true);
 
 		/// <summary>
-		/// :fairy: 🧚 fairy
+		/// :flag-cw: 🇨🇼 regional indicator symbol letters cw
 		/// </summary>
-		public static readonly EmojiInfo Emoji_fairy = new EmojiInfo("fairy", "1f9da.png", "fairy", "🧚", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_cw = new EmojiInfo("flag-cw", "1f1e8-1f1fc.png", "regional indicator symbol letters cw", "🇨🇼", true, true, true, false);
 
 		/// <summary>
-		/// :female_vampire: 🧛‍♀️ 
+		/// :flag-cx: 🇨🇽 regional indicator symbol letters cx
 		/// </summary>
-		public static readonly EmojiInfo Emoji_female_vampire = new EmojiInfo("female_vampire", "1f9db-200d-2640-fe0f.png", "", "🧛‍♀️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_cx = new EmojiInfo("flag-cx", "1f1e8-1f1fd.png", "regional indicator symbol letters cx", "🇨🇽", true, true, true, false);
 
 		/// <summary>
-		/// :male_vampire: 🧛‍♂️ 
+		/// :flag-cy: 🇨🇾 regional indicator symbol letters cy
 		/// </summary>
-		public static readonly EmojiInfo Emoji_male_vampire = new EmojiInfo("male_vampire", "1f9db-200d-2642-fe0f.png", "", "🧛‍♂️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_cy = new EmojiInfo("flag-cy", "1f1e8-1f1fe.png", "regional indicator symbol letters cy", "🇨🇾", true, true, true, true);
 
 		/// <summary>
-		/// :vampire: 🧛 vampire
+		/// :flag-cz: 🇨🇿 regional indicator symbol letters cz
 		/// </summary>
-		public static readonly EmojiInfo Emoji_vampire = new EmojiInfo("vampire", "1f9db.png", "vampire", "🧛", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_cz = new EmojiInfo("flag-cz", "1f1e8-1f1ff.png", "regional indicator symbol letters cz", "🇨🇿", true, true, true, true);
 
 		/// <summary>
-		/// :mermaid: 🧜‍♀️ 
+		/// :flag-de: 🇩🇪 regional indicator symbol letters de
 		/// </summary>
-		public static readonly EmojiInfo Emoji_mermaid = new EmojiInfo("mermaid", "1f9dc-200d-2640-fe0f.png", "", "🧜‍♀️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_de = new EmojiInfo("flag-de", "1f1e9-1f1ea.png", "regional indicator symbol letters de", "🇩🇪", true, true, true, true);
 
 		/// <summary>
-		/// :merman: 🧜‍♂️ 
+		/// :flag-dg: 🇩🇬 regional indicator symbol letters dg
 		/// </summary>
-		public static readonly EmojiInfo Emoji_merman = new EmojiInfo("merman", "1f9dc-200d-2642-fe0f.png", "", "🧜‍♂️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_dg = new EmojiInfo("flag-dg", "1f1e9-1f1ec.png", "regional indicator symbol letters dg", "🇩🇬", true, false, true, false);
 
 		/// <summary>
-		/// :merperson: 🧜 merperson
+		/// :flag-dj: 🇩🇯 regional indicator symbol letters dj
 		/// </summary>
-		public static readonly EmojiInfo Emoji_merperson = new EmojiInfo("merperson", "1f9dc.png", "merperson", "🧜", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_dj = new EmojiInfo("flag-dj", "1f1e9-1f1ef.png", "regional indicator symbol letters dj", "🇩🇯", true, true, true, true);
 
 		/// <summary>
-		/// :female_elf: 🧝‍♀️ 
+		/// :flag-dk: 🇩🇰 regional indicator symbol letters dk
 		/// </summary>
-		public static readonly EmojiInfo Emoji_female_elf = new EmojiInfo("female_elf", "1f9dd-200d-2640-fe0f.png", "", "🧝‍♀️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_dk = new EmojiInfo("flag-dk", "1f1e9-1f1f0.png", "regional indicator symbol letters dk", "🇩🇰", true, true, true, true);
 
 		/// <summary>
-		/// :male_elf: 🧝‍♂️ 
+		/// :flag-dm: 🇩🇲 regional indicator symbol letters dm
 		/// </summary>
-		public static readonly EmojiInfo Emoji_male_elf = new EmojiInfo("male_elf", "1f9dd-200d-2642-fe0f.png", "", "🧝‍♂️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_dm = new EmojiInfo("flag-dm", "1f1e9-1f1f2.png", "regional indicator symbol letters dm", "🇩🇲", true, true, true, true);
 
 		/// <summary>
-		/// :elf: 🧝 elf
+		/// :flag-do: 🇩🇴 regional indicator symbol letters do
 		/// </summary>
-		public static readonly EmojiInfo Emoji_elf = new EmojiInfo("elf", "1f9dd.png", "elf", "🧝", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_do = new EmojiInfo("flag-do", "1f1e9-1f1f4.png", "regional indicator symbol letters do", "🇩🇴", true, true, true, true);
 
 		/// <summary>
-		/// :female_genie: 🧞‍♀️ 
+		/// :flag-dz: 🇩🇿 regional indicator symbol letters dz
 		/// </summary>
-		public static readonly EmojiInfo Emoji_female_genie = new EmojiInfo("female_genie", "1f9de-200d-2640-fe0f.png", "", "🧞‍♀️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_dz = new EmojiInfo("flag-dz", "1f1e9-1f1ff.png", "regional indicator symbol letters dz", "🇩🇿", true, true, true, true);
 
 		/// <summary>
-		/// :male_genie: 🧞‍♂️ 
+		/// :flag-ea: 🇪🇦 regional indicator symbol letters ea
 		/// </summary>
-		public static readonly EmojiInfo Emoji_male_genie = new EmojiInfo("male_genie", "1f9de-200d-2642-fe0f.png", "", "🧞‍♂️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ea = new EmojiInfo("flag-ea", "1f1ea-1f1e6.png", "regional indicator symbol letters ea", "🇪🇦", true, false, true, false);
 
 		/// <summary>
-		/// :genie: 🧞 genie
+		/// :flag-ec: 🇪🇨 regional indicator symbol letters ec
 		/// </summary>
-		public static readonly EmojiInfo Emoji_genie = new EmojiInfo("genie", "1f9de.png", "genie", "🧞", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ec = new EmojiInfo("flag-ec", "1f1ea-1f1e8.png", "regional indicator symbol letters ec", "🇪🇨", true, true, true, true);
 
 		/// <summary>
-		/// :female_zombie: 🧟‍♀️ 
+		/// :flag-ee: 🇪🇪 regional indicator symbol letters ee
 		/// </summary>
-		public static readonly EmojiInfo Emoji_female_zombie = new EmojiInfo("female_zombie", "1f9df-200d-2640-fe0f.png", "", "🧟‍♀️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ee = new EmojiInfo("flag-ee", "1f1ea-1f1ea.png", "regional indicator symbol letters ee", "🇪🇪", true, true, true, true);
 
 		/// <summary>
-		/// :male_zombie: 🧟‍♂️ 
+		/// :flag-eg: 🇪🇬 regional indicator symbol letters eg
 		/// </summary>
-		public static readonly EmojiInfo Emoji_male_zombie = new EmojiInfo("male_zombie", "1f9df-200d-2642-fe0f.png", "", "🧟‍♂️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_eg = new EmojiInfo("flag-eg", "1f1ea-1f1ec.png", "regional indicator symbol letters eg", "🇪🇬", true, true, true, true);
 
 		/// <summary>
-		/// :zombie: 🧟 zombie
+		/// :flag-eh: 🇪🇭 regional indicator symbol letters eh
 		/// </summary>
-		public static readonly EmojiInfo Emoji_zombie = new EmojiInfo("zombie", "1f9df.png", "zombie", "🧟", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_eh = new EmojiInfo("flag-eh", "1f1ea-1f1ed.png", "regional indicator symbol letters eh", "🇪🇭", true, false, true, true);
 
 		/// <summary>
-		/// :brain: 🧠 brain
+		/// :flag-er: 🇪🇷 regional indicator symbol letters er
 		/// </summary>
-		public static readonly EmojiInfo Emoji_brain = new EmojiInfo("brain", "1f9e0.png", "brain", "🧠", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_er = new EmojiInfo("flag-er", "1f1ea-1f1f7.png", "regional indicator symbol letters er", "🇪🇷", true, true, true, true);
 
 		/// <summary>
-		/// :orange_heart: 🧡 orange heart
+		/// :flag-es: 🇪🇸 regional indicator symbol letters es
 		/// </summary>
-		public static readonly EmojiInfo Emoji_orange_heart = new EmojiInfo("orange_heart", "1f9e1.png", "orange heart", "🧡", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_es = new EmojiInfo("flag-es", "1f1ea-1f1f8.png", "regional indicator symbol letters es", "🇪🇸", true, true, true, true);
 
 		/// <summary>
-		/// :billed_cap: 🧢 billed cap
+		/// :flag-et: 🇪🇹 regional indicator symbol letters et
 		/// </summary>
-		public static readonly EmojiInfo Emoji_billed_cap = new EmojiInfo("billed_cap", "1f9e2.png", "billed cap", "🧢", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_et = new EmojiInfo("flag-et", "1f1ea-1f1f9.png", "regional indicator symbol letters et", "🇪🇹", true, true, true, true);
 
 		/// <summary>
-		/// :scarf: 🧣 scarf
+		/// :flag-eu: 🇪🇺 regional indicator symbol letters eu
 		/// </summary>
-		public static readonly EmojiInfo Emoji_scarf = new EmojiInfo("scarf", "1f9e3.png", "scarf", "🧣", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_eu = new EmojiInfo("flag-eu", "1f1ea-1f1fa.png", "regional indicator symbol letters eu", "🇪🇺", true, true, true, false);
 
 		/// <summary>
-		/// :gloves: 🧤 gloves
+		/// :flag-fi: 🇫🇮 regional indicator symbol letters fi
 		/// </summary>
-		public static readonly EmojiInfo Emoji_gloves = new EmojiInfo("gloves", "1f9e4.png", "gloves", "🧤", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_fi = new EmojiInfo("flag-fi", "1f1eb-1f1ee.png", "regional indicator symbol letters fi", "🇫🇮", true, true, true, true);
 
 		/// <summary>
-		/// :coat: 🧥 coat
+		/// :flag-fj: 🇫🇯 regional indicator symbol letters fj
 		/// </summary>
-		public static readonly EmojiInfo Emoji_coat = new EmojiInfo("coat", "1f9e5.png", "coat", "🧥", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_fj = new EmojiInfo("flag-fj", "1f1eb-1f1ef.png", "regional indicator symbol letters fj", "🇫🇯", true, true, true, true);
 
 		/// <summary>
-		/// :socks: 🧦 socks
+		/// :flag-fk: 🇫🇰 regional indicator symbol letters fk
 		/// </summary>
-		public static readonly EmojiInfo Emoji_socks = new EmojiInfo("socks", "1f9e6.png", "socks", "🧦", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_fk = new EmojiInfo("flag-fk", "1f1eb-1f1f0.png", "regional indicator symbol letters fk", "🇫🇰", true, false, true, true);
 
 		/// <summary>
-		/// :red_envelope: 🧧 red gift envelope
+		/// :flag-fm: 🇫🇲 regional indicator symbol letters fm
 		/// </summary>
-		public static readonly EmojiInfo Emoji_red_envelope = new EmojiInfo("red_envelope", "1f9e7.png", "red gift envelope", "🧧", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_fm = new EmojiInfo("flag-fm", "1f1eb-1f1f2.png", "regional indicator symbol letters fm", "🇫🇲", true, true, true, true);
 
 		/// <summary>
-		/// :firecracker: 🧨 firecracker
+		/// :flag-fo: 🇫🇴 regional indicator symbol letters fo
 		/// </summary>
-		public static readonly EmojiInfo Emoji_firecracker = new EmojiInfo("firecracker", "1f9e8.png", "firecracker", "🧨", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_fo = new EmojiInfo("flag-fo", "1f1eb-1f1f4.png", "regional indicator symbol letters fo", "🇫🇴", true, true, true, true);
 
 		/// <summary>
-		/// :jigsaw: 🧩 jigsaw puzzle piece
+		/// :flag-fr: 🇫🇷 regional indicator symbol letters fr
 		/// </summary>
-		public static readonly EmojiInfo Emoji_jigsaw = new EmojiInfo("jigsaw", "1f9e9.png", "jigsaw puzzle piece", "🧩", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_fr = new EmojiInfo("flag-fr", "1f1eb-1f1f7.png", "regional indicator symbol letters fr", "🇫🇷", true, true, true, true);
 
 		/// <summary>
-		/// :test_tube: 🧪 test tube
+		/// :flag-ga: 🇬🇦 regional indicator symbol letters ga
 		/// </summary>
-		public static readonly EmojiInfo Emoji_test_tube = new EmojiInfo("test_tube", "1f9ea.png", "test tube", "🧪", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ga = new EmojiInfo("flag-ga", "1f1ec-1f1e6.png", "regional indicator symbol letters ga", "🇬🇦", true, true, true, true);
 
 		/// <summary>
-		/// :petri_dish: 🧫 petri dish
+		/// :flag-gb: 🇬🇧 regional indicator symbol letters gb
 		/// </summary>
-		public static readonly EmojiInfo Emoji_petri_dish = new EmojiInfo("petri_dish", "1f9eb.png", "petri dish", "🧫", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_gb = new EmojiInfo("flag-gb", "1f1ec-1f1e7.png", "regional indicator symbol letters gb", "🇬🇧", true, true, true, true);
 
 		/// <summary>
-		/// :dna: 🧬 dna double helix
+		/// :flag-gd: 🇬🇩 regional indicator symbol letters gd
 		/// </summary>
-		public static readonly EmojiInfo Emoji_dna = new EmojiInfo("dna", "1f9ec.png", "dna double helix", "🧬", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_gd = new EmojiInfo("flag-gd", "1f1ec-1f1e9.png", "regional indicator symbol letters gd", "🇬🇩", true, true, true, true);
 
 		/// <summary>
-		/// :compass: 🧭 compass
+		/// :flag-ge: 🇬🇪 regional indicator symbol letters ge
 		/// </summary>
-		public static readonly EmojiInfo Emoji_compass = new EmojiInfo("compass", "1f9ed.png", "compass", "🧭", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ge = new EmojiInfo("flag-ge", "1f1ec-1f1ea.png", "regional indicator symbol letters ge", "🇬🇪", true, true, true, true);
 
 		/// <summary>
-		/// :abacus: 🧮 abacus
+		/// :flag-gf: 🇬🇫 regional indicator symbol letters gf
 		/// </summary>
-		public static readonly EmojiInfo Emoji_abacus = new EmojiInfo("abacus", "1f9ee.png", "abacus", "🧮", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_gf = new EmojiInfo("flag-gf", "1f1ec-1f1eb.png", "regional indicator symbol letters gf", "🇬🇫", true, false, true, false);
 
 		/// <summary>
-		/// :fire_extinguisher: 🧯 fire extinguisher
+		/// :flag-gg: 🇬🇬 regional indicator symbol letters gg
 		/// </summary>
-		public static readonly EmojiInfo Emoji_fire_extinguisher = new EmojiInfo("fire_extinguisher", "1f9ef.png", "fire extinguisher", "🧯", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_gg = new EmojiInfo("flag-gg", "1f1ec-1f1ec.png", "regional indicator symbol letters gg", "🇬🇬", true, true, true, false);
 
 		/// <summary>
-		/// :toolbox: 🧰 toolbox
+		/// :flag-gh: 🇬🇭 regional indicator symbol letters gh
 		/// </summary>
-		public static readonly EmojiInfo Emoji_toolbox = new EmojiInfo("toolbox", "1f9f0.png", "toolbox", "🧰", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_gh = new EmojiInfo("flag-gh", "1f1ec-1f1ed.png", "regional indicator symbol letters gh", "🇬🇭", true, true, true, true);
 
 		/// <summary>
-		/// :bricks: 🧱 brick
+		/// :flag-gi: 🇬🇮 regional indicator symbol letters gi
 		/// </summary>
-		public static readonly EmojiInfo Emoji_bricks = new EmojiInfo("bricks", "1f9f1.png", "brick", "🧱", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_gi = new EmojiInfo("flag-gi", "1f1ec-1f1ee.png", "regional indicator symbol letters gi", "🇬🇮", true, true, true, true);
 
 		/// <summary>
-		/// :magnet: 🧲 magnet
+		/// :flag-gl: 🇬🇱 regional indicator symbol letters gl
 		/// </summary>
-		public static readonly EmojiInfo Emoji_magnet = new EmojiInfo("magnet", "1f9f2.png", "magnet", "🧲", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_gl = new EmojiInfo("flag-gl", "1f1ec-1f1f1.png", "regional indicator symbol letters gl", "🇬🇱", true, true, true, true);
 
 		/// <summary>
-		/// :luggage: 🧳 luggage
+		/// :flag-gm: 🇬🇲 regional indicator symbol letters gm
 		/// </summary>
-		public static readonly EmojiInfo Emoji_luggage = new EmojiInfo("luggage", "1f9f3.png", "luggage", "🧳", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_gm = new EmojiInfo("flag-gm", "1f1ec-1f1f2.png", "regional indicator symbol letters gm", "🇬🇲", true, true, true, true);
 
 		/// <summary>
-		/// :lotion_bottle: 🧴 lotion bottle
+		/// :flag-gn: 🇬🇳 regional indicator symbol letters gn
 		/// </summary>
-		public static readonly EmojiInfo Emoji_lotion_bottle = new EmojiInfo("lotion_bottle", "1f9f4.png", "lotion bottle", "🧴", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_gn = new EmojiInfo("flag-gn", "1f1ec-1f1f3.png", "regional indicator symbol letters gn", "🇬🇳", true, true, true, true);
 
 		/// <summary>
-		/// :thread: 🧵 spool of thread
+		/// :flag-gp: 🇬🇵 regional indicator symbol letters gp
 		/// </summary>
-		public static readonly EmojiInfo Emoji_thread = new EmojiInfo("thread", "1f9f5.png", "spool of thread", "🧵", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_gp = new EmojiInfo("flag-gp", "1f1ec-1f1f5.png", "regional indicator symbol letters gp", "🇬🇵", true, false, true, false);
 
 		/// <summary>
-		/// :yarn: 🧶 ball of yarn
+		/// :flag-gq: 🇬🇶 regional indicator symbol letters gq
 		/// </summary>
-		public static readonly EmojiInfo Emoji_yarn = new EmojiInfo("yarn", "1f9f6.png", "ball of yarn", "🧶", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_gq = new EmojiInfo("flag-gq", "1f1ec-1f1f6.png", "regional indicator symbol letters gq", "🇬🇶", true, true, true, true);
 
 		/// <summary>
-		/// :safety_pin: 🧷 safety pin
+		/// :flag-gr: 🇬🇷 regional indicator symbol letters gr
 		/// </summary>
-		public static readonly EmojiInfo Emoji_safety_pin = new EmojiInfo("safety_pin", "1f9f7.png", "safety pin", "🧷", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_gr = new EmojiInfo("flag-gr", "1f1ec-1f1f7.png", "regional indicator symbol letters gr", "🇬🇷", true, true, true, true);
 
 		/// <summary>
-		/// :teddy_bear: 🧸 teddy bear
+		/// :flag-gs: 🇬🇸 regional indicator symbol letters gs
 		/// </summary>
-		public static readonly EmojiInfo Emoji_teddy_bear = new EmojiInfo("teddy_bear", "1f9f8.png", "teddy bear", "🧸", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_gs = new EmojiInfo("flag-gs", "1f1ec-1f1f8.png", "regional indicator symbol letters gs", "🇬🇸", true, false, true, false);
 
 		/// <summary>
-		/// :broom: 🧹 broom
+		/// :flag-gt: 🇬🇹 regional indicator symbol letters gt
 		/// </summary>
-		public static readonly EmojiInfo Emoji_broom = new EmojiInfo("broom", "1f9f9.png", "broom", "🧹", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_gt = new EmojiInfo("flag-gt", "1f1ec-1f1f9.png", "regional indicator symbol letters gt", "🇬🇹", true, true, true, true);
 
 		/// <summary>
-		/// :basket: 🧺 basket
+		/// :flag-gu: 🇬🇺 regional indicator symbol letters gu
 		/// </summary>
-		public static readonly EmojiInfo Emoji_basket = new EmojiInfo("basket", "1f9fa.png", "basket", "🧺", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_gu = new EmojiInfo("flag-gu", "1f1ec-1f1fa.png", "regional indicator symbol letters gu", "🇬🇺", true, true, true, true);
 
 		/// <summary>
-		/// :roll_of_paper: 🧻 roll of paper
+		/// :flag-gw: 🇬🇼 regional indicator symbol letters gw
 		/// </summary>
-		public static readonly EmojiInfo Emoji_roll_of_paper = new EmojiInfo("roll_of_paper", "1f9fb.png", "roll of paper", "🧻", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_gw = new EmojiInfo("flag-gw", "1f1ec-1f1fc.png", "regional indicator symbol letters gw", "🇬🇼", true, true, true, true);
 
 		/// <summary>
-		/// :soap: 🧼 bar of soap
+		/// :flag-gy: 🇬🇾 regional indicator symbol letters gy
 		/// </summary>
-		public static readonly EmojiInfo Emoji_soap = new EmojiInfo("soap", "1f9fc.png", "bar of soap", "🧼", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_gy = new EmojiInfo("flag-gy", "1f1ec-1f1fe.png", "regional indicator symbol letters gy", "🇬🇾", true, true, true, true);
 
 		/// <summary>
-		/// :sponge: 🧽 sponge
+		/// :flag-hk: 🇭🇰 regional indicator symbol letters hk
 		/// </summary>
-		public static readonly EmojiInfo Emoji_sponge = new EmojiInfo("sponge", "1f9fd.png", "sponge", "🧽", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_hk = new EmojiInfo("flag-hk", "1f1ed-1f1f0.png", "regional indicator symbol letters hk", "🇭🇰", true, true, true, true);
 
 		/// <summary>
-		/// :receipt: 🧾 receipt
+		/// :flag-hm: 🇭🇲 regional indicator symbol letters hm
 		/// </summary>
-		public static readonly EmojiInfo Emoji_receipt = new EmojiInfo("receipt", "1f9fe.png", "receipt", "🧾", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_hm = new EmojiInfo("flag-hm", "1f1ed-1f1f2.png", "regional indicator symbol letters hm", "🇭🇲", true, false, true, false);
 
 		/// <summary>
-		/// :nazar_amulet: 🧿 nazar amulet
+		/// :flag-hn: 🇭🇳 regional indicator symbol letters hn
 		/// </summary>
-		public static readonly EmojiInfo Emoji_nazar_amulet = new EmojiInfo("nazar_amulet", "1f9ff.png", "nazar amulet", "🧿", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_hn = new EmojiInfo("flag-hn", "1f1ed-1f1f3.png", "regional indicator symbol letters hn", "🇭🇳", true, true, true, true);
 
 		/// <summary>
-		/// :ballet_shoes: 🩰 ballet shoes
+		/// :flag-hr: 🇭🇷 regional indicator symbol letters hr
 		/// </summary>
-		public static readonly EmojiInfo Emoji_ballet_shoes = new EmojiInfo("ballet_shoes", "1fa70.png", "ballet shoes", "🩰", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_hr = new EmojiInfo("flag-hr", "1f1ed-1f1f7.png", "regional indicator symbol letters hr", "🇭🇷", true, true, true, true);
 
 		/// <summary>
-		/// :one-piece_swimsuit: 🩱 one-piece swimsuit
+		/// :flag-ht: 🇭🇹 regional indicator symbol letters ht
 		/// </summary>
-		public static readonly EmojiInfo Emoji_one_piece_swimsuit = new EmojiInfo("one-piece_swimsuit", "1fa71.png", "one-piece swimsuit", "🩱", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ht = new EmojiInfo("flag-ht", "1f1ed-1f1f9.png", "regional indicator symbol letters ht", "🇭🇹", true, true, true, true);
 
 		/// <summary>
-		/// :briefs: 🩲 briefs
+		/// :flag-hu: 🇭🇺 regional indicator symbol letters hu
 		/// </summary>
-		public static readonly EmojiInfo Emoji_briefs = new EmojiInfo("briefs", "1fa72.png", "briefs", "🩲", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_hu = new EmojiInfo("flag-hu", "1f1ed-1f1fa.png", "regional indicator symbol letters hu", "🇭🇺", true, true, true, true);
 
 		/// <summary>
-		/// :shorts: 🩳 shorts
+		/// :flag-ic: 🇮🇨 regional indicator symbol letters ic
 		/// </summary>
-		public static readonly EmojiInfo Emoji_shorts = new EmojiInfo("shorts", "1fa73.png", "shorts", "🩳", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ic = new EmojiInfo("flag-ic", "1f1ee-1f1e8.png", "regional indicator symbol letters ic", "🇮🇨", true, false, true, false);
 
 		/// <summary>
-		/// :thong_sandal: 🩴 thong sandal
+		/// :flag-id: 🇮🇩 regional indicator symbol letters id
 		/// </summary>
-		public static readonly EmojiInfo Emoji_thong_sandal = new EmojiInfo("thong_sandal", "1fa74.png", "thong sandal", "🩴", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_id = new EmojiInfo("flag-id", "1f1ee-1f1e9.png", "regional indicator symbol letters id", "🇮🇩", true, true, true, true);
 
 		/// <summary>
-		/// :drop_of_blood: 🩸 drop of blood
+		/// :flag-ie: 🇮🇪 regional indicator symbol letters ie
 		/// </summary>
-		public static readonly EmojiInfo Emoji_drop_of_blood = new EmojiInfo("drop_of_blood", "1fa78.png", "drop of blood", "🩸", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ie = new EmojiInfo("flag-ie", "1f1ee-1f1ea.png", "regional indicator symbol letters ie", "🇮🇪", true, true, true, true);
 
 		/// <summary>
-		/// :adhesive_bandage: 🩹 adhesive bandage
+		/// :flag-il: 🇮🇱 regional indicator symbol letters il
 		/// </summary>
-		public static readonly EmojiInfo Emoji_adhesive_bandage = new EmojiInfo("adhesive_bandage", "1fa79.png", "adhesive bandage", "🩹", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_il = new EmojiInfo("flag-il", "1f1ee-1f1f1.png", "regional indicator symbol letters il", "🇮🇱", true, true, true, true);
 
 		/// <summary>
-		/// :stethoscope: 🩺 stethoscope
+		/// :flag-im: 🇮🇲 regional indicator symbol letters im
 		/// </summary>
-		public static readonly EmojiInfo Emoji_stethoscope = new EmojiInfo("stethoscope", "1fa7a.png", "stethoscope", "🩺", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_im = new EmojiInfo("flag-im", "1f1ee-1f1f2.png", "regional indicator symbol letters im", "🇮🇲", true, true, true, false);
 
 		/// <summary>
-		/// :yo-yo: 🪀 yo-yo
+		/// :flag-in: 🇮🇳 regional indicator symbol letters in
 		/// </summary>
-		public static readonly EmojiInfo Emoji_yo_yo = new EmojiInfo("yo-yo", "1fa80.png", "yo-yo", "🪀", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_in = new EmojiInfo("flag-in", "1f1ee-1f1f3.png", "regional indicator symbol letters in", "🇮🇳", true, true, true, true);
 
 		/// <summary>
-		/// :kite: 🪁 kite
+		/// :flag-io: 🇮🇴 regional indicator symbol letters io
 		/// </summary>
-		public static readonly EmojiInfo Emoji_kite = new EmojiInfo("kite", "1fa81.png", "kite", "🪁", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_io = new EmojiInfo("flag-io", "1f1ee-1f1f4.png", "regional indicator symbol letters io", "🇮🇴", true, true, true, false);
 
 		/// <summary>
-		/// :parachute: 🪂 parachute
+		/// :flag-iq: 🇮🇶 regional indicator symbol letters iq
 		/// </summary>
-		public static readonly EmojiInfo Emoji_parachute = new EmojiInfo("parachute", "1fa82.png", "parachute", "🪂", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_iq = new EmojiInfo("flag-iq", "1f1ee-1f1f6.png", "regional indicator symbol letters iq", "🇮🇶", true, true, true, true);
 
 		/// <summary>
-		/// :boomerang: 🪃 boomerang
+		/// :flag-ir: 🇮🇷 regional indicator symbol letters ir
 		/// </summary>
-		public static readonly EmojiInfo Emoji_boomerang = new EmojiInfo("boomerang", "1fa83.png", "boomerang", "🪃", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ir = new EmojiInfo("flag-ir", "1f1ee-1f1f7.png", "regional indicator symbol letters ir", "🇮🇷", true, true, true, true);
 
 		/// <summary>
-		/// :magic_wand: 🪄 magic wand
+		/// :flag-is: 🇮🇸 regional indicator symbol letters is
 		/// </summary>
-		public static readonly EmojiInfo Emoji_magic_wand = new EmojiInfo("magic_wand", "1fa84.png", "magic wand", "🪄", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_is = new EmojiInfo("flag-is", "1f1ee-1f1f8.png", "regional indicator symbol letters is", "🇮🇸", true, true, true, true);
 
 		/// <summary>
-		/// :pinata: 🪅 pinata
+		/// :flag-it: 🇮🇹 regional indicator symbol letters it
 		/// </summary>
-		public static readonly EmojiInfo Emoji_pinata = new EmojiInfo("pinata", "1fa85.png", "pinata", "🪅", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_it = new EmojiInfo("flag-it", "1f1ee-1f1f9.png", "regional indicator symbol letters it", "🇮🇹", true, true, true, true);
 
 		/// <summary>
-		/// :nesting_dolls: 🪆 nesting dolls
+		/// :flag-je: 🇯🇪 regional indicator symbol letters je
 		/// </summary>
-		public static readonly EmojiInfo Emoji_nesting_dolls = new EmojiInfo("nesting_dolls", "1fa86.png", "nesting dolls", "🪆", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_je = new EmojiInfo("flag-je", "1f1ef-1f1ea.png", "regional indicator symbol letters je", "🇯🇪", true, true, true, true);
 
 		/// <summary>
-		/// :ringed_planet: 🪐 ringed planet
+		/// :flag-jm: 🇯🇲 regional indicator symbol letters jm
 		/// </summary>
-		public static readonly EmojiInfo Emoji_ringed_planet = new EmojiInfo("ringed_planet", "1fa90.png", "ringed planet", "🪐", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_jm = new EmojiInfo("flag-jm", "1f1ef-1f1f2.png", "regional indicator symbol letters jm", "🇯🇲", true, true, true, true);
 
 		/// <summary>
-		/// :chair: 🪑 chair
+		/// :flag-jo: 🇯🇴 regional indicator symbol letters jo
 		/// </summary>
-		public static readonly EmojiInfo Emoji_chair = new EmojiInfo("chair", "1fa91.png", "chair", "🪑", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_jo = new EmojiInfo("flag-jo", "1f1ef-1f1f4.png", "regional indicator symbol letters jo", "🇯🇴", true, true, true, true);
 
 		/// <summary>
-		/// :razor: 🪒 razor
+		/// :flag-jp: 🇯🇵 regional indicator symbol letters jp
 		/// </summary>
-		public static readonly EmojiInfo Emoji_razor = new EmojiInfo("razor", "1fa92.png", "razor", "🪒", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_jp = new EmojiInfo("flag-jp", "1f1ef-1f1f5.png", "regional indicator symbol letters jp", "🇯🇵", true, true, true, true);
 
 		/// <summary>
-		/// :axe: 🪓 axe
+		/// :flag-ke: 🇰🇪 regional indicator symbol letters ke
 		/// </summary>
-		public static readonly EmojiInfo Emoji_axe = new EmojiInfo("axe", "1fa93.png", "axe", "🪓", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ke = new EmojiInfo("flag-ke", "1f1f0-1f1ea.png", "regional indicator symbol letters ke", "🇰🇪", true, true, true, true);
 
 		/// <summary>
-		/// :diya_lamp: 🪔 diya lamp
+		/// :flag-kg: 🇰🇬 regional indicator symbol letters kg
 		/// </summary>
-		public static readonly EmojiInfo Emoji_diya_lamp = new EmojiInfo("diya_lamp", "1fa94.png", "diya lamp", "🪔", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_kg = new EmojiInfo("flag-kg", "1f1f0-1f1ec.png", "regional indicator symbol letters kg", "🇰🇬", true, true, true, true);
 
 		/// <summary>
-		/// :banjo: 🪕 banjo
+		/// :flag-kh: 🇰🇭 regional indicator symbol letters kh
 		/// </summary>
-		public static readonly EmojiInfo Emoji_banjo = new EmojiInfo("banjo", "1fa95.png", "banjo", "🪕", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_kh = new EmojiInfo("flag-kh", "1f1f0-1f1ed.png", "regional indicator symbol letters kh", "🇰🇭", true, true, true, true);
 
 		/// <summary>
-		/// :military_helmet: 🪖 military helmet
+		/// :flag-ki: 🇰🇮 regional indicator symbol letters ki
 		/// </summary>
-		public static readonly EmojiInfo Emoji_military_helmet = new EmojiInfo("military_helmet", "1fa96.png", "military helmet", "🪖", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ki = new EmojiInfo("flag-ki", "1f1f0-1f1ee.png", "regional indicator symbol letters ki", "🇰🇮", true, true, true, true);
 
 		/// <summary>
-		/// :accordion: 🪗 accordion
+		/// :flag-km: 🇰🇲 regional indicator symbol letters km
 		/// </summary>
-		public static readonly EmojiInfo Emoji_accordion = new EmojiInfo("accordion", "1fa97.png", "accordion", "🪗", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_km = new EmojiInfo("flag-km", "1f1f0-1f1f2.png", "regional indicator symbol letters km", "🇰🇲", true, true, true, true);
 
 		/// <summary>
-		/// :long_drum: 🪘 long drum
+		/// :flag-kn: 🇰🇳 regional indicator symbol letters kn
 		/// </summary>
-		public static readonly EmojiInfo Emoji_long_drum = new EmojiInfo("long_drum", "1fa98.png", "long drum", "🪘", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_kn = new EmojiInfo("flag-kn", "1f1f0-1f1f3.png", "regional indicator symbol letters kn", "🇰🇳", true, true, true, true);
 
 		/// <summary>
-		/// :coin: 🪙 coin
+		/// :flag-kp: 🇰🇵 regional indicator symbol letters kp
 		/// </summary>
-		public static readonly EmojiInfo Emoji_coin = new EmojiInfo("coin", "1fa99.png", "coin", "🪙", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_kp = new EmojiInfo("flag-kp", "1f1f0-1f1f5.png", "regional indicator symbol letters kp", "🇰🇵", true, true, true, true);
 
 		/// <summary>
-		/// :carpentry_saw: 🪚 carpentry saw
+		/// :flag-kr: 🇰🇷 regional indicator symbol letters kr
 		/// </summary>
-		public static readonly EmojiInfo Emoji_carpentry_saw = new EmojiInfo("carpentry_saw", "1fa9a.png", "carpentry saw", "🪚", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_kr = new EmojiInfo("flag-kr", "1f1f0-1f1f7.png", "regional indicator symbol letters kr", "🇰🇷", true, true, true, true);
 
 		/// <summary>
-		/// :screwdriver: 🪛 screwdriver
+		/// :flag-kw: 🇰🇼 regional indicator symbol letters kw
 		/// </summary>
-		public static readonly EmojiInfo Emoji_screwdriver = new EmojiInfo("screwdriver", "1fa9b.png", "screwdriver", "🪛", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_kw = new EmojiInfo("flag-kw", "1f1f0-1f1fc.png", "regional indicator symbol letters kw", "🇰🇼", true, true, true, true);
 
 		/// <summary>
-		/// :ladder: 🪜 ladder
+		/// :flag-ky: 🇰🇾 regional indicator symbol letters ky
 		/// </summary>
-		public static readonly EmojiInfo Emoji_ladder = new EmojiInfo("ladder", "1fa9c.png", "ladder", "🪜", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ky = new EmojiInfo("flag-ky", "1f1f0-1f1fe.png", "regional indicator symbol letters ky", "🇰🇾", true, true, true, true);
 
 		/// <summary>
-		/// :hook: 🪝 hook
+		/// :flag-kz: 🇰🇿 regional indicator symbol letters kz
 		/// </summary>
-		public static readonly EmojiInfo Emoji_hook = new EmojiInfo("hook", "1fa9d.png", "hook", "🪝", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_kz = new EmojiInfo("flag-kz", "1f1f0-1f1ff.png", "regional indicator symbol letters kz", "🇰🇿", true, true, true, true);
 
 		/// <summary>
-		/// :mirror: 🪞 mirror
+		/// :flag-la: 🇱🇦 regional indicator symbol letters la
 		/// </summary>
-		public static readonly EmojiInfo Emoji_mirror = new EmojiInfo("mirror", "1fa9e.png", "mirror", "🪞", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_la = new EmojiInfo("flag-la", "1f1f1-1f1e6.png", "regional indicator symbol letters la", "🇱🇦", true, true, true, true);
 
 		/// <summary>
-		/// :window: 🪟 window
+		/// :flag-lb: 🇱🇧 regional indicator symbol letters lb
 		/// </summary>
-		public static readonly EmojiInfo Emoji_window = new EmojiInfo("window", "1fa9f.png", "window", "🪟", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_lb = new EmojiInfo("flag-lb", "1f1f1-1f1e7.png", "regional indicator symbol letters lb", "🇱🇧", true, true, true, true);
 
 		/// <summary>
-		/// :plunger: 🪠 plunger
+		/// :flag-lc: 🇱🇨 regional indicator symbol letters lc
 		/// </summary>
-		public static readonly EmojiInfo Emoji_plunger = new EmojiInfo("plunger", "1faa0.png", "plunger", "🪠", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_lc = new EmojiInfo("flag-lc", "1f1f1-1f1e8.png", "regional indicator symbol letters lc", "🇱🇨", true, true, true, true);
 
 		/// <summary>
-		/// :sewing_needle: 🪡 sewing needle
+		/// :flag-li: 🇱🇮 regional indicator symbol letters li
 		/// </summary>
-		public static readonly EmojiInfo Emoji_sewing_needle = new EmojiInfo("sewing_needle", "1faa1.png", "sewing needle", "🪡", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_li = new EmojiInfo("flag-li", "1f1f1-1f1ee.png", "regional indicator symbol letters li", "🇱🇮", true, true, true, true);
 
 		/// <summary>
-		/// :knot: 🪢 knot
+		/// :flag-lk: 🇱🇰 regional indicator symbol letters lk
 		/// </summary>
-		public static readonly EmojiInfo Emoji_knot = new EmojiInfo("knot", "1faa2.png", "knot", "🪢", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_lk = new EmojiInfo("flag-lk", "1f1f1-1f1f0.png", "regional indicator symbol letters lk", "🇱🇰", true, true, true, true);
 
 		/// <summary>
-		/// :bucket: 🪣 bucket
+		/// :flag-lr: 🇱🇷 regional indicator symbol letters lr
 		/// </summary>
-		public static readonly EmojiInfo Emoji_bucket = new EmojiInfo("bucket", "1faa3.png", "bucket", "🪣", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_lr = new EmojiInfo("flag-lr", "1f1f1-1f1f7.png", "regional indicator symbol letters lr", "🇱🇷", true, true, true, true);
 
 		/// <summary>
-		/// :mouse_trap: 🪤 mouse trap
+		/// :flag-ls: 🇱🇸 regional indicator symbol letters ls
 		/// </summary>
-		public static readonly EmojiInfo Emoji_mouse_trap = new EmojiInfo("mouse_trap", "1faa4.png", "mouse trap", "🪤", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ls = new EmojiInfo("flag-ls", "1f1f1-1f1f8.png", "regional indicator symbol letters ls", "🇱🇸", true, true, true, true);
 
 		/// <summary>
-		/// :toothbrush: 🪥 toothbrush
+		/// :flag-lt: 🇱🇹 regional indicator symbol letters lt
 		/// </summary>
-		public static readonly EmojiInfo Emoji_toothbrush = new EmojiInfo("toothbrush", "1faa5.png", "toothbrush", "🪥", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_lt = new EmojiInfo("flag-lt", "1f1f1-1f1f9.png", "regional indicator symbol letters lt", "🇱🇹", true, true, true, true);
 
 		/// <summary>
-		/// :headstone: 🪦 headstone
+		/// :flag-lu: 🇱🇺 regional indicator symbol letters lu
 		/// </summary>
-		public static readonly EmojiInfo Emoji_headstone = new EmojiInfo("headstone", "1faa6.png", "headstone", "🪦", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_lu = new EmojiInfo("flag-lu", "1f1f1-1f1fa.png", "regional indicator symbol letters lu", "🇱🇺", true, true, true, true);
 
 		/// <summary>
-		/// :placard: 🪧 placard
+		/// :flag-lv: 🇱🇻 regional indicator symbol letters lv
 		/// </summary>
-		public static readonly EmojiInfo Emoji_placard = new EmojiInfo("placard", "1faa7.png", "placard", "🪧", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_lv = new EmojiInfo("flag-lv", "1f1f1-1f1fb.png", "regional indicator symbol letters lv", "🇱🇻", true, true, true, true);
 
 		/// <summary>
-		/// :rock: 🪨 rock
+		/// :flag-ly: 🇱🇾 regional indicator symbol letters ly
 		/// </summary>
-		public static readonly EmojiInfo Emoji_rock = new EmojiInfo("rock", "1faa8.png", "rock", "🪨", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ly = new EmojiInfo("flag-ly", "1f1f1-1f1fe.png", "regional indicator symbol letters ly", "🇱🇾", true, true, true, true);
 
 		/// <summary>
-		/// :fly: 🪰 fly
+		/// :flag-ma: 🇲🇦 regional indicator symbol letters ma
 		/// </summary>
-		public static readonly EmojiInfo Emoji_fly = new EmojiInfo("fly", "1fab0.png", "fly", "🪰", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ma = new EmojiInfo("flag-ma", "1f1f2-1f1e6.png", "regional indicator symbol letters ma", "🇲🇦", true, true, true, true);
 
 		/// <summary>
-		/// :worm: 🪱 worm
+		/// :flag-mc: 🇲🇨 regional indicator symbol letters mc
 		/// </summary>
-		public static readonly EmojiInfo Emoji_worm = new EmojiInfo("worm", "1fab1.png", "worm", "🪱", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_mc = new EmojiInfo("flag-mc", "1f1f2-1f1e8.png", "regional indicator symbol letters mc", "🇲🇨", true, true, true, true);
 
 		/// <summary>
-		/// :cockroach: 🪳 cockroach
+		/// :flag-md: 🇲🇩 regional indicator symbol letters md
 		/// </summary>
-		public static readonly EmojiInfo Emoji_cockroach = new EmojiInfo("cockroach", "1fab3.png", "cockroach", "🪳", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_md = new EmojiInfo("flag-md", "1f1f2-1f1e9.png", "regional indicator symbol letters md", "🇲🇩", true, true, true, true);
 
 		/// <summary>
-		/// :potted_plant: 🪴 potted plant
+		/// :flag-me: 🇲🇪 regional indicator symbol letters me
 		/// </summary>
-		public static readonly EmojiInfo Emoji_potted_plant = new EmojiInfo("potted_plant", "1fab4.png", "potted plant", "🪴", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_me = new EmojiInfo("flag-me", "1f1f2-1f1ea.png", "regional indicator symbol letters me", "🇲🇪", true, true, true, true);
 
 		/// <summary>
-		/// :wood: 🪵 wood
+		/// :flag-mf: 🇲🇫 regional indicator symbol letters mf
 		/// </summary>
-		public static readonly EmojiInfo Emoji_wood = new EmojiInfo("wood", "1fab5.png", "wood", "🪵", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_mf = new EmojiInfo("flag-mf", "1f1f2-1f1eb.png", "regional indicator symbol letters mf", "🇲🇫", true, false, true, false);
 
 		/// <summary>
-		/// :feather: 🪶 feather
+		/// :flag-mg: 🇲🇬 regional indicator symbol letters mg
 		/// </summary>
-		public static readonly EmojiInfo Emoji_feather = new EmojiInfo("feather", "1fab6.png", "feather", "🪶", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_mg = new EmojiInfo("flag-mg", "1f1f2-1f1ec.png", "regional indicator symbol letters mg", "🇲🇬", true, true, true, true);
 
 		/// <summary>
-		/// :anatomical_heart: 🫀 anatomical heart
+		/// :flag-mh: 🇲🇭 regional indicator symbol letters mh
 		/// </summary>
-		public static readonly EmojiInfo Emoji_anatomical_heart = new EmojiInfo("anatomical_heart", "1fac0.png", "anatomical heart", "🫀", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_mh = new EmojiInfo("flag-mh", "1f1f2-1f1ed.png", "regional indicator symbol letters mh", "🇲🇭", true, true, true, true);
 
 		/// <summary>
-		/// :lungs: 🫁 lungs
+		/// :flag-mk: 🇲🇰 regional indicator symbol letters mk
 		/// </summary>
-		public static readonly EmojiInfo Emoji_lungs = new EmojiInfo("lungs", "1fac1.png", "lungs", "🫁", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_mk = new EmojiInfo("flag-mk", "1f1f2-1f1f0.png", "regional indicator symbol letters mk", "🇲🇰", true, true, true, true);
 
 		/// <summary>
-		/// :people_hugging: 🫂 people hugging
+		/// :flag-ml: 🇲🇱 regional indicator symbol letters ml
 		/// </summary>
-		public static readonly EmojiInfo Emoji_people_hugging = new EmojiInfo("people_hugging", "1fac2.png", "people hugging", "🫂", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ml = new EmojiInfo("flag-ml", "1f1f2-1f1f1.png", "regional indicator symbol letters ml", "🇲🇱", true, true, true, true);
 
 		/// <summary>
-		/// :blueberries: 🫐 blueberries
+		/// :flag-mm: 🇲🇲 regional indicator symbol letters mm
 		/// </summary>
-		public static readonly EmojiInfo Emoji_blueberries = new EmojiInfo("blueberries", "1fad0.png", "blueberries", "🫐", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_mm = new EmojiInfo("flag-mm", "1f1f2-1f1f2.png", "regional indicator symbol letters mm", "🇲🇲", true, true, true, true);
 
 		/// <summary>
-		/// :bell_pepper: 🫑 bell pepper
+		/// :flag-mn: 🇲🇳 regional indicator symbol letters mn
 		/// </summary>
-		public static readonly EmojiInfo Emoji_bell_pepper = new EmojiInfo("bell_pepper", "1fad1.png", "bell pepper", "🫑", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_mn = new EmojiInfo("flag-mn", "1f1f2-1f1f3.png", "regional indicator symbol letters mn", "🇲🇳", true, true, true, true);
 
 		/// <summary>
-		/// :olive: 🫒 olive
+		/// :flag-mo: 🇲🇴 regional indicator symbol letters mo
 		/// </summary>
-		public static readonly EmojiInfo Emoji_olive = new EmojiInfo("olive", "1fad2.png", "olive", "🫒", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_mo = new EmojiInfo("flag-mo", "1f1f2-1f1f4.png", "regional indicator symbol letters mo", "🇲🇴", true, true, true, true);
 
 		/// <summary>
-		/// :flatbread: 🫓 flatbread
+		/// :flag-mp: 🇲🇵 regional indicator symbol letters mp
 		/// </summary>
-		public static readonly EmojiInfo Emoji_flatbread = new EmojiInfo("flatbread", "1fad3.png", "flatbread", "🫓", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_mp = new EmojiInfo("flag-mp", "1f1f2-1f1f5.png", "regional indicator symbol letters mp", "🇲🇵", true, true, true, false);
 
 		/// <summary>
-		/// :tamale: 🫔 tamale
+		/// :flag-mq: 🇲🇶 regional indicator symbol letters mq
 		/// </summary>
-		public static readonly EmojiInfo Emoji_tamale = new EmojiInfo("tamale", "1fad4.png", "tamale", "🫔", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_mq = new EmojiInfo("flag-mq", "1f1f2-1f1f6.png", "regional indicator symbol letters mq", "🇲🇶", true, false, true, false);
 
 		/// <summary>
-		/// :fondue: 🫕 fondue
+		/// :flag-mr: 🇲🇷 regional indicator symbol letters mr
 		/// </summary>
-		public static readonly EmojiInfo Emoji_fondue = new EmojiInfo("fondue", "1fad5.png", "fondue", "🫕", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_mr = new EmojiInfo("flag-mr", "1f1f2-1f1f7.png", "regional indicator symbol letters mr", "🇲🇷", true, true, true, true);
 
 		/// <summary>
-		/// :teapot: 🫖 teapot
+		/// :flag-ms: 🇲🇸 regional indicator symbol letters ms
 		/// </summary>
-		public static readonly EmojiInfo Emoji_teapot = new EmojiInfo("teapot", "1fad6.png", "teapot", "🫖", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ms = new EmojiInfo("flag-ms", "1f1f2-1f1f8.png", "regional indicator symbol letters ms", "🇲🇸", true, true, true, true);
 
 		/// <summary>
-		/// :bangbang: ‼️ double exclamation mark
+		/// :flag-mt: 🇲🇹 regional indicator symbol letters mt
 		/// </summary>
-		public static readonly EmojiInfo Emoji_bangbang = new EmojiInfo("bangbang", "203c-fe0f.png", "double exclamation mark", "‼️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_mt = new EmojiInfo("flag-mt", "1f1f2-1f1f9.png", "regional indicator symbol letters mt", "🇲🇹", true, true, true, true);
 
 		/// <summary>
-		/// :interrobang: ⁉️ exclamation question mark
+		/// :flag-mu: 🇲🇺 regional indicator symbol letters mu
 		/// </summary>
-		public static readonly EmojiInfo Emoji_interrobang = new EmojiInfo("interrobang", "2049-fe0f.png", "exclamation question mark", "⁉️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_mu = new EmojiInfo("flag-mu", "1f1f2-1f1fa.png", "regional indicator symbol letters mu", "🇲🇺", true, true, true, true);
 
 		/// <summary>
-		/// :tm: ™️ trade mark sign
+		/// :flag-mv: 🇲🇻 regional indicator symbol letters mv
 		/// </summary>
-		public static readonly EmojiInfo Emoji_tm = new EmojiInfo("tm", "2122-fe0f.png", "trade mark sign", "™️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_mv = new EmojiInfo("flag-mv", "1f1f2-1f1fb.png", "regional indicator symbol letters mv", "🇲🇻", true, true, true, true);
 
 		/// <summary>
-		/// :information_source: ℹ️ information source
+		/// :flag-mw: 🇲🇼 regional indicator symbol letters mw
 		/// </summary>
-		public static readonly EmojiInfo Emoji_information_source = new EmojiInfo("information_source", "2139-fe0f.png", "information source", "ℹ️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_mw = new EmojiInfo("flag-mw", "1f1f2-1f1fc.png", "regional indicator symbol letters mw", "🇲🇼", true, true, true, true);
 
 		/// <summary>
-		/// :left_right_arrow: ↔️ left right arrow
+		/// :flag-mx: 🇲🇽 regional indicator symbol letters mx
 		/// </summary>
-		public static readonly EmojiInfo Emoji_left_right_arrow = new EmojiInfo("left_right_arrow", "2194-fe0f.png", "left right arrow", "↔️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_mx = new EmojiInfo("flag-mx", "1f1f2-1f1fd.png", "regional indicator symbol letters mx", "🇲🇽", true, true, true, true);
 
 		/// <summary>
-		/// :arrow_up_down: ↕️ up down arrow
+		/// :flag-my: 🇲🇾 regional indicator symbol letters my
 		/// </summary>
-		public static readonly EmojiInfo Emoji_arrow_up_down = new EmojiInfo("arrow_up_down", "2195-fe0f.png", "up down arrow", "↕️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_my = new EmojiInfo("flag-my", "1f1f2-1f1fe.png", "regional indicator symbol letters my", "🇲🇾", true, true, true, true);
 
 		/// <summary>
-		/// :arrow_upper_left: ↖️ north west arrow
+		/// :flag-mz: 🇲🇿 regional indicator symbol letters mz
 		/// </summary>
-		public static readonly EmojiInfo Emoji_arrow_upper_left = new EmojiInfo("arrow_upper_left", "2196-fe0f.png", "north west arrow", "↖️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_mz = new EmojiInfo("flag-mz", "1f1f2-1f1ff.png", "regional indicator symbol letters mz", "🇲🇿", true, true, true, true);
 
 		/// <summary>
-		/// :arrow_upper_right: ↗️ north east arrow
+		/// :flag-na: 🇳🇦 regional indicator symbol letters na
 		/// </summary>
-		public static readonly EmojiInfo Emoji_arrow_upper_right = new EmojiInfo("arrow_upper_right", "2197-fe0f.png", "north east arrow", "↗️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_na = new EmojiInfo("flag-na", "1f1f3-1f1e6.png", "regional indicator symbol letters na", "🇳🇦", true, true, true, true);
 
 		/// <summary>
-		/// :arrow_lower_right: ↘️ south east arrow
+		/// :flag-nc: 🇳🇨 regional indicator symbol letters nc
 		/// </summary>
-		public static readonly EmojiInfo Emoji_arrow_lower_right = new EmojiInfo("arrow_lower_right", "2198-fe0f.png", "south east arrow", "↘️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_nc = new EmojiInfo("flag-nc", "1f1f3-1f1e8.png", "regional indicator symbol letters nc", "🇳🇨", true, false, true, true);
 
 		/// <summary>
-		/// :arrow_lower_left: ↙️ south west arrow
+		/// :flag-ne: 🇳🇪 regional indicator symbol letters ne
 		/// </summary>
-		public static readonly EmojiInfo Emoji_arrow_lower_left = new EmojiInfo("arrow_lower_left", "2199-fe0f.png", "south west arrow", "↙️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ne = new EmojiInfo("flag-ne", "1f1f3-1f1ea.png", "regional indicator symbol letters ne", "🇳🇪", true, true, true, true);
 
 		/// <summary>
-		/// :leftwards_arrow_with_hook: ↩️ leftwards arrow with hook
+		/// :flag-nf: 🇳🇫 regional indicator symbol letters nf
 		/// </summary>
-		public static readonly EmojiInfo Emoji_leftwards_arrow_with_hook = new EmojiInfo("leftwards_arrow_with_hook", "21a9-fe0f.png", "leftwards arrow with hook", "↩️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_nf = new EmojiInfo("flag-nf", "1f1f3-1f1eb.png", "regional indicator symbol letters nf", "🇳🇫", true, true, true, false);
 
 		/// <summary>
-		/// :arrow_right_hook: ↪️ rightwards arrow with hook
+		/// :flag-ng: 🇳🇬 regional indicator symbol letters ng
 		/// </summary>
-		public static readonly EmojiInfo Emoji_arrow_right_hook = new EmojiInfo("arrow_right_hook", "21aa-fe0f.png", "rightwards arrow with hook", "↪️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ng = new EmojiInfo("flag-ng", "1f1f3-1f1ec.png", "regional indicator symbol letters ng", "🇳🇬", true, true, true, true);
 
 		/// <summary>
-		/// :watch: ⌚ watch
+		/// :flag-ni: 🇳🇮 regional indicator symbol letters ni
 		/// </summary>
-		public static readonly EmojiInfo Emoji_watch = new EmojiInfo("watch", "231a.png", "watch", "⌚", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ni = new EmojiInfo("flag-ni", "1f1f3-1f1ee.png", "regional indicator symbol letters ni", "🇳🇮", true, true, true, true);
 
 		/// <summary>
-		/// :hourglass: ⌛ hourglass
+		/// :flag-nl: 🇳🇱 regional indicator symbol letters nl
 		/// </summary>
-		public static readonly EmojiInfo Emoji_hourglass = new EmojiInfo("hourglass", "231b.png", "hourglass", "⌛", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_nl = new EmojiInfo("flag-nl", "1f1f3-1f1f1.png", "regional indicator symbol letters nl", "🇳🇱", true, true, true, true);
 
 		/// <summary>
-		/// :keyboard: ⌨️ 
+		/// :flag-no: 🇳🇴 regional indicator symbol letters no
 		/// </summary>
-		public static readonly EmojiInfo Emoji_keyboard = new EmojiInfo("keyboard", "2328-fe0f.png", "", "⌨️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_no = new EmojiInfo("flag-no", "1f1f3-1f1f4.png", "regional indicator symbol letters no", "🇳🇴", true, true, true, true);
 
 		/// <summary>
-		/// :eject: ⏏️ 
+		/// :flag-np: 🇳🇵 regional indicator symbol letters np
 		/// </summary>
-		public static readonly EmojiInfo Emoji_eject = new EmojiInfo("eject", "23cf-fe0f.png", "", "⏏️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_np = new EmojiInfo("flag-np", "1f1f3-1f1f5.png", "regional indicator symbol letters np", "🇳🇵", true, true, true, true);
 
 		/// <summary>
-		/// :fast_forward: ⏩ black right-pointing double triangle
+		/// :flag-nr: 🇳🇷 regional indicator symbol letters nr
 		/// </summary>
-		public static readonly EmojiInfo Emoji_fast_forward = new EmojiInfo("fast_forward", "23e9.png", "black right-pointing double triangle", "⏩", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_nr = new EmojiInfo("flag-nr", "1f1f3-1f1f7.png", "regional indicator symbol letters nr", "🇳🇷", true, true, true, true);
 
 		/// <summary>
-		/// :rewind: ⏪ black left-pointing double triangle
+		/// :flag-nu: 🇳🇺 regional indicator symbol letters nu
 		/// </summary>
-		public static readonly EmojiInfo Emoji_rewind = new EmojiInfo("rewind", "23ea.png", "black left-pointing double triangle", "⏪", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_nu = new EmojiInfo("flag-nu", "1f1f3-1f1fa.png", "regional indicator symbol letters nu", "🇳🇺", true, true, true, true);
 
 		/// <summary>
-		/// :arrow_double_up: ⏫ black up-pointing double triangle
+		/// :flag-nz: 🇳🇿 regional indicator symbol letters nz
 		/// </summary>
-		public static readonly EmojiInfo Emoji_arrow_double_up = new EmojiInfo("arrow_double_up", "23eb.png", "black up-pointing double triangle", "⏫", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_nz = new EmojiInfo("flag-nz", "1f1f3-1f1ff.png", "regional indicator symbol letters nz", "🇳🇿", true, true, true, true);
 
 		/// <summary>
-		/// :arrow_double_down: ⏬ black down-pointing double triangle
+		/// :flag-om: 🇴🇲 regional indicator symbol letters om
 		/// </summary>
-		public static readonly EmojiInfo Emoji_arrow_double_down = new EmojiInfo("arrow_double_down", "23ec.png", "black down-pointing double triangle", "⏬", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_om = new EmojiInfo("flag-om", "1f1f4-1f1f2.png", "regional indicator symbol letters om", "🇴🇲", true, true, true, true);
 
 		/// <summary>
-		/// :black_right_pointing_double_triangle_with_vertical_bar: ⏭️ 
+		/// :flag-pa: 🇵🇦 regional indicator symbol letters pa
 		/// </summary>
-		public static readonly EmojiInfo Emoji_black_right_pointing_double_triangle_with_vertical_bar = new EmojiInfo("black_right_pointing_double_triangle_with_vertical_bar", "23ed-fe0f.png", "", "⏭️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_pa = new EmojiInfo("flag-pa", "1f1f5-1f1e6.png", "regional indicator symbol letters pa", "🇵🇦", true, true, true, true);
 
 		/// <summary>
-		/// :black_left_pointing_double_triangle_with_vertical_bar: ⏮️ 
+		/// :flag-pe: 🇵🇪 regional indicator symbol letters pe
 		/// </summary>
-		public static readonly EmojiInfo Emoji_black_left_pointing_double_triangle_with_vertical_bar = new EmojiInfo("black_left_pointing_double_triangle_with_vertical_bar", "23ee-fe0f.png", "", "⏮️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_pe = new EmojiInfo("flag-pe", "1f1f5-1f1ea.png", "regional indicator symbol letters pe", "🇵🇪", true, true, true, true);
 
 		/// <summary>
-		/// :black_right_pointing_triangle_with_double_vertical_bar: ⏯️ 
+		/// :flag-pf: 🇵🇫 regional indicator symbol letters pf
 		/// </summary>
-		public static readonly EmojiInfo Emoji_black_right_pointing_triangle_with_double_vertical_bar = new EmojiInfo("black_right_pointing_triangle_with_double_vertical_bar", "23ef-fe0f.png", "", "⏯️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_pf = new EmojiInfo("flag-pf", "1f1f5-1f1eb.png", "regional indicator symbol letters pf", "🇵🇫", true, true, true, true);
 
 		/// <summary>
-		/// :alarm_clock: ⏰ alarm clock
+		/// :flag-pg: 🇵🇬 regional indicator symbol letters pg
 		/// </summary>
-		public static readonly EmojiInfo Emoji_alarm_clock = new EmojiInfo("alarm_clock", "23f0.png", "alarm clock", "⏰", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_pg = new EmojiInfo("flag-pg", "1f1f5-1f1ec.png", "regional indicator symbol letters pg", "🇵🇬", true, true, true, true);
 
 		/// <summary>
-		/// :stopwatch: ⏱️ 
+		/// :flag-ph: 🇵🇭 regional indicator symbol letters ph
 		/// </summary>
-		public static readonly EmojiInfo Emoji_stopwatch = new EmojiInfo("stopwatch", "23f1-fe0f.png", "", "⏱️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ph = new EmojiInfo("flag-ph", "1f1f5-1f1ed.png", "regional indicator symbol letters ph", "🇵🇭", true, true, true, true);
 
 		/// <summary>
-		/// :timer_clock: ⏲️ 
+		/// :flag-pk: 🇵🇰 regional indicator symbol letters pk
 		/// </summary>
-		public static readonly EmojiInfo Emoji_timer_clock = new EmojiInfo("timer_clock", "23f2-fe0f.png", "", "⏲️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_pk = new EmojiInfo("flag-pk", "1f1f5-1f1f0.png", "regional indicator symbol letters pk", "🇵🇰", true, true, true, true);
 
 		/// <summary>
-		/// :hourglass_flowing_sand: ⏳ hourglass with flowing sand
+		/// :flag-pl: 🇵🇱 regional indicator symbol letters pl
 		/// </summary>
-		public static readonly EmojiInfo Emoji_hourglass_flowing_sand = new EmojiInfo("hourglass_flowing_sand", "23f3.png", "hourglass with flowing sand", "⏳", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_pl = new EmojiInfo("flag-pl", "1f1f5-1f1f1.png", "regional indicator symbol letters pl", "🇵🇱", true, true, true, true);
 
 		/// <summary>
-		/// :double_vertical_bar: ⏸️ 
+		/// :flag-pm: 🇵🇲 regional indicator symbol letters pm
 		/// </summary>
-		public static readonly EmojiInfo Emoji_double_vertical_bar = new EmojiInfo("double_vertical_bar", "23f8-fe0f.png", "", "⏸️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_pm = new EmojiInfo("flag-pm", "1f1f5-1f1f2.png", "regional indicator symbol letters pm", "🇵🇲", true, false, true, false);
 
 		/// <summary>
-		/// :black_square_for_stop: ⏹️ 
+		/// :flag-pn: 🇵🇳 regional indicator symbol letters pn
 		/// </summary>
-		public static readonly EmojiInfo Emoji_black_square_for_stop = new EmojiInfo("black_square_for_stop", "23f9-fe0f.png", "", "⏹️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_pn = new EmojiInfo("flag-pn", "1f1f5-1f1f3.png", "regional indicator symbol letters pn", "🇵🇳", true, true, true, false);
 
 		/// <summary>
-		/// :black_circle_for_record: ⏺️ 
+		/// :flag-pr: 🇵🇷 regional indicator symbol letters pr
 		/// </summary>
-		public static readonly EmojiInfo Emoji_black_circle_for_record = new EmojiInfo("black_circle_for_record", "23fa-fe0f.png", "", "⏺️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_pr = new EmojiInfo("flag-pr", "1f1f5-1f1f7.png", "regional indicator symbol letters pr", "🇵🇷", true, true, true, true);
 
 		/// <summary>
-		/// :m: Ⓜ️ circled latin capital letter m
+		/// :flag-ps: 🇵🇸 regional indicator symbol letters ps
 		/// </summary>
-		public static readonly EmojiInfo Emoji_m = new EmojiInfo("m", "24c2-fe0f.png", "circled latin capital letter m", "Ⓜ️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ps = new EmojiInfo("flag-ps", "1f1f5-1f1f8.png", "regional indicator symbol letters ps", "🇵🇸", true, true, true, true);
 
 		/// <summary>
-		/// :black_small_square: ▪️ black small square
+		/// :flag-pt: 🇵🇹 regional indicator symbol letters pt
 		/// </summary>
-		public static readonly EmojiInfo Emoji_black_small_square = new EmojiInfo("black_small_square", "25aa-fe0f.png", "black small square", "▪️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_pt = new EmojiInfo("flag-pt", "1f1f5-1f1f9.png", "regional indicator symbol letters pt", "🇵🇹", true, true, true, true);
 
 		/// <summary>
-		/// :white_small_square: ▫️ white small square
+		/// :flag-pw: 🇵🇼 regional indicator symbol letters pw
 		/// </summary>
-		public static readonly EmojiInfo Emoji_white_small_square = new EmojiInfo("white_small_square", "25ab-fe0f.png", "white small square", "▫️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_pw = new EmojiInfo("flag-pw", "1f1f5-1f1fc.png", "regional indicator symbol letters pw", "🇵🇼", true, true, true, true);
 
 		/// <summary>
-		/// :arrow_forward: ▶️ black right-pointing triangle
+		/// :flag-py: 🇵🇾 regional indicator symbol letters py
 		/// </summary>
-		public static readonly EmojiInfo Emoji_arrow_forward = new EmojiInfo("arrow_forward", "25b6-fe0f.png", "black right-pointing triangle", "▶️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_py = new EmojiInfo("flag-py", "1f1f5-1f1fe.png", "regional indicator symbol letters py", "🇵🇾", true, true, true, true);
 
 		/// <summary>
-		/// :arrow_backward: ◀️ black left-pointing triangle
+		/// :flag-qa: 🇶🇦 regional indicator symbol letters qa
 		/// </summary>
-		public static readonly EmojiInfo Emoji_arrow_backward = new EmojiInfo("arrow_backward", "25c0-fe0f.png", "black left-pointing triangle", "◀️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_qa = new EmojiInfo("flag-qa", "1f1f6-1f1e6.png", "regional indicator symbol letters qa", "🇶🇦", true, true, true, true);
 
 		/// <summary>
-		/// :white_medium_square: ◻️ white medium square
+		/// :flag-re: 🇷🇪 regional indicator symbol letters re
 		/// </summary>
-		public static readonly EmojiInfo Emoji_white_medium_square = new EmojiInfo("white_medium_square", "25fb-fe0f.png", "white medium square", "◻️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_re = new EmojiInfo("flag-re", "1f1f7-1f1ea.png", "regional indicator symbol letters re", "🇷🇪", true, false, true, false);
 
 		/// <summary>
-		/// :black_medium_square: ◼️ black medium square
+		/// :flag-ro: 🇷🇴 regional indicator symbol letters ro
 		/// </summary>
-		public static readonly EmojiInfo Emoji_black_medium_square = new EmojiInfo("black_medium_square", "25fc-fe0f.png", "black medium square", "◼️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ro = new EmojiInfo("flag-ro", "1f1f7-1f1f4.png", "regional indicator symbol letters ro", "🇷🇴", true, true, true, true);
 
 		/// <summary>
-		/// :white_medium_small_square: ◽ white medium small square
+		/// :flag-rs: 🇷🇸 regional indicator symbol letters rs
 		/// </summary>
-		public static readonly EmojiInfo Emoji_white_medium_small_square = new EmojiInfo("white_medium_small_square", "25fd.png", "white medium small square", "◽", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_rs = new EmojiInfo("flag-rs", "1f1f7-1f1f8.png", "regional indicator symbol letters rs", "🇷🇸", true, true, true, true);
 
 		/// <summary>
-		/// :black_medium_small_square: ◾ black medium small square
+		/// :flag-ru: 🇷🇺 regional indicator symbol letters ru
 		/// </summary>
-		public static readonly EmojiInfo Emoji_black_medium_small_square = new EmojiInfo("black_medium_small_square", "25fe.png", "black medium small square", "◾", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ru = new EmojiInfo("flag-ru", "1f1f7-1f1fa.png", "regional indicator symbol letters ru", "🇷🇺", true, true, true, true);
 
 		/// <summary>
-		/// :sunny: ☀️ black sun with rays
+		/// :flag-rw: 🇷🇼 regional indicator symbol letters rw
 		/// </summary>
-		public static readonly EmojiInfo Emoji_sunny = new EmojiInfo("sunny", "2600-fe0f.png", "black sun with rays", "☀️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_rw = new EmojiInfo("flag-rw", "1f1f7-1f1fc.png", "regional indicator symbol letters rw", "🇷🇼", true, true, true, true);
 
 		/// <summary>
-		/// :cloud: ☁️ cloud
+		/// :flag-sa: 🇸🇦 regional indicator symbol letters sa
 		/// </summary>
-		public static readonly EmojiInfo Emoji_cloud = new EmojiInfo("cloud", "2601-fe0f.png", "cloud", "☁️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_sa = new EmojiInfo("flag-sa", "1f1f8-1f1e6.png", "regional indicator symbol letters sa", "🇸🇦", true, true, true, true);
 
 		/// <summary>
-		/// :umbrella: ☂️ 
+		/// :flag-sb: 🇸🇧 regional indicator symbol letters sb
 		/// </summary>
-		public static readonly EmojiInfo Emoji_umbrella = new EmojiInfo("umbrella", "2602-fe0f.png", "", "☂️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_sb = new EmojiInfo("flag-sb", "1f1f8-1f1e7.png", "regional indicator symbol letters sb", "🇸🇧", true, true, true, true);
 
 		/// <summary>
-		/// :snowman: ☃️ 
+		/// :flag-sc: 🇸🇨 regional indicator symbol letters sc
 		/// </summary>
-		public static readonly EmojiInfo Emoji_snowman = new EmojiInfo("snowman", "2603-fe0f.png", "", "☃️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_sc = new EmojiInfo("flag-sc", "1f1f8-1f1e8.png", "regional indicator symbol letters sc", "🇸🇨", true, true, true, true);
 
 		/// <summary>
-		/// :comet: ☄️ 
+		/// :flag-sd: 🇸🇩 regional indicator symbol letters sd
 		/// </summary>
-		public static readonly EmojiInfo Emoji_comet = new EmojiInfo("comet", "2604-fe0f.png", "", "☄️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_sd = new EmojiInfo("flag-sd", "1f1f8-1f1e9.png", "regional indicator symbol letters sd", "🇸🇩", true, true, true, true);
 
 		/// <summary>
-		/// :phone: ☎️ black telephone
+		/// :flag-se: 🇸🇪 regional indicator symbol letters se
 		/// </summary>
-		public static readonly EmojiInfo Emoji_phone = new EmojiInfo("phone", "260e-fe0f.png", "black telephone", "☎️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_se = new EmojiInfo("flag-se", "1f1f8-1f1ea.png", "regional indicator symbol letters se", "🇸🇪", true, true, true, true);
 
 		/// <summary>
-		/// :ballot_box_with_check: ☑️ ballot box with check
+		/// :flag-sg: 🇸🇬 regional indicator symbol letters sg
 		/// </summary>
-		public static readonly EmojiInfo Emoji_ballot_box_with_check = new EmojiInfo("ballot_box_with_check", "2611-fe0f.png", "ballot box with check", "☑️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_sg = new EmojiInfo("flag-sg", "1f1f8-1f1ec.png", "regional indicator symbol letters sg", "🇸🇬", true, true, true, true);
 
 		/// <summary>
-		/// :umbrella_with_rain_drops: ☔ umbrella with rain drops
+		/// :flag-sh: 🇸🇭 regional indicator symbol letters sh
 		/// </summary>
-		public static readonly EmojiInfo Emoji_umbrella_with_rain_drops = new EmojiInfo("umbrella_with_rain_drops", "2614.png", "umbrella with rain drops", "☔", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_sh = new EmojiInfo("flag-sh", "1f1f8-1f1ed.png", "regional indicator symbol letters sh", "🇸🇭", true, false, true, true);
 
 		/// <summary>
-		/// :coffee: ☕ hot beverage
+		/// :flag-si: 🇸🇮 regional indicator symbol letters si
 		/// </summary>
-		public static readonly EmojiInfo Emoji_coffee = new EmojiInfo("coffee", "2615.png", "hot beverage", "☕", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_si = new EmojiInfo("flag-si", "1f1f8-1f1ee.png", "regional indicator symbol letters si", "🇸🇮", true, true, true, true);
 
 		/// <summary>
-		/// :shamrock: ☘️ 
+		/// :flag-sj: 🇸🇯 regional indicator symbol letters sj
 		/// </summary>
-		public static readonly EmojiInfo Emoji_shamrock = new EmojiInfo("shamrock", "2618-fe0f.png", "", "☘️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_sj = new EmojiInfo("flag-sj", "1f1f8-1f1ef.png", "regional indicator symbol letters sj", "🇸🇯", true, false, true, false);
 
 		/// <summary>
-		/// :point_up: ☝️ white up pointing index
+		/// :flag-sk: 🇸🇰 regional indicator symbol letters sk
 		/// </summary>
-		public static readonly EmojiInfo Emoji_point_up = new EmojiInfo("point_up", "261d-fe0f.png", "white up pointing index", "☝️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_sk = new EmojiInfo("flag-sk", "1f1f8-1f1f0.png", "regional indicator symbol letters sk", "🇸🇰", true, true, true, true);
 
 		/// <summary>
-		/// :skull_and_crossbones: ☠️ 
+		/// :flag-sl: 🇸🇱 regional indicator symbol letters sl
 		/// </summary>
-		public static readonly EmojiInfo Emoji_skull_and_crossbones = new EmojiInfo("skull_and_crossbones", "2620-fe0f.png", "", "☠️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_sl = new EmojiInfo("flag-sl", "1f1f8-1f1f1.png", "regional indicator symbol letters sl", "🇸🇱", true, true, true, true);
 
 		/// <summary>
-		/// :radioactive_sign: ☢️ 
+		/// :flag-sm: 🇸🇲 regional indicator symbol letters sm
 		/// </summary>
-		public static readonly EmojiInfo Emoji_radioactive_sign = new EmojiInfo("radioactive_sign", "2622-fe0f.png", "", "☢️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_sm = new EmojiInfo("flag-sm", "1f1f8-1f1f2.png", "regional indicator symbol letters sm", "🇸🇲", true, true, true, true);
 
 		/// <summary>
-		/// :biohazard_sign: ☣️ 
+		/// :flag-sn: 🇸🇳 regional indicator symbol letters sn
 		/// </summary>
-		public static readonly EmojiInfo Emoji_biohazard_sign = new EmojiInfo("biohazard_sign", "2623-fe0f.png", "", "☣️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_sn = new EmojiInfo("flag-sn", "1f1f8-1f1f3.png", "regional indicator symbol letters sn", "🇸🇳", true, true, true, true);
 
 		/// <summary>
-		/// :orthodox_cross: ☦️ 
+		/// :flag-so: 🇸🇴 regional indicator symbol letters so
 		/// </summary>
-		public static readonly EmojiInfo Emoji_orthodox_cross = new EmojiInfo("orthodox_cross", "2626-fe0f.png", "", "☦️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_so = new EmojiInfo("flag-so", "1f1f8-1f1f4.png", "regional indicator symbol letters so", "🇸🇴", true, true, true, true);
 
 		/// <summary>
-		/// :star_and_crescent: ☪️ 
+		/// :flag-sr: 🇸🇷 regional indicator symbol letters sr
 		/// </summary>
-		public static readonly EmojiInfo Emoji_star_and_crescent = new EmojiInfo("star_and_crescent", "262a-fe0f.png", "", "☪️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_sr = new EmojiInfo("flag-sr", "1f1f8-1f1f7.png", "regional indicator symbol letters sr", "🇸🇷", true, true, true, true);
 
 		/// <summary>
-		/// :peace_symbol: ☮️ 
+		/// :flag-ss: 🇸🇸 regional indicator symbol letters ss
 		/// </summary>
-		public static readonly EmojiInfo Emoji_peace_symbol = new EmojiInfo("peace_symbol", "262e-fe0f.png", "", "☮️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ss = new EmojiInfo("flag-ss", "1f1f8-1f1f8.png", "regional indicator symbol letters ss", "🇸🇸", true, true, true, false);
 
 		/// <summary>
-		/// :yin_yang: ☯️ 
+		/// :flag-st: 🇸🇹 regional indicator symbol letters st
 		/// </summary>
-		public static readonly EmojiInfo Emoji_yin_yang = new EmojiInfo("yin_yang", "262f-fe0f.png", "", "☯️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_st = new EmojiInfo("flag-st", "1f1f8-1f1f9.png", "regional indicator symbol letters st", "🇸🇹", true, true, true, true);
 
 		/// <summary>
-		/// :wheel_of_dharma: ☸️ 
+		/// :flag-sv: 🇸🇻 regional indicator symbol letters sv
 		/// </summary>
-		public static readonly EmojiInfo Emoji_wheel_of_dharma = new EmojiInfo("wheel_of_dharma", "2638-fe0f.png", "", "☸️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_sv = new EmojiInfo("flag-sv", "1f1f8-1f1fb.png", "regional indicator symbol letters sv", "🇸🇻", true, true, true, true);
 
 		/// <summary>
-		/// :white_frowning_face: ☹️ 
+		/// :flag-sx: 🇸🇽 regional indicator symbol letters sx
 		/// </summary>
-		public static readonly EmojiInfo Emoji_white_frowning_face = new EmojiInfo("white_frowning_face", "2639-fe0f.png", "", "☹️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_sx = new EmojiInfo("flag-sx", "1f1f8-1f1fd.png", "regional indicator symbol letters sx", "🇸🇽", true, true, true, false);
 
 		/// <summary>
-		/// :relaxed: ☺️ white smiling face
+		/// :flag-sy: 🇸🇾 regional indicator symbol letters sy
 		/// </summary>
-		public static readonly EmojiInfo Emoji_relaxed = new EmojiInfo("relaxed", "263a-fe0f.png", "white smiling face", "☺️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_sy = new EmojiInfo("flag-sy", "1f1f8-1f1fe.png", "regional indicator symbol letters sy", "🇸🇾", true, true, true, true);
 
 		/// <summary>
-		/// :female_sign: ♀️ 
+		/// :flag-sz: 🇸🇿 regional indicator symbol letters sz
 		/// </summary>
-		public static readonly EmojiInfo Emoji_female_sign = new EmojiInfo("female_sign", "2640-fe0f.png", "", "♀️", false, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_sz = new EmojiInfo("flag-sz", "1f1f8-1f1ff.png", "regional indicator symbol letters sz", "🇸🇿", true, true, true, true);
 
 		/// <summary>
-		/// :male_sign: ♂️ 
+		/// :flag-ta: 🇹🇦 regional indicator symbol letters ta
 		/// </summary>
-		public static readonly EmojiInfo Emoji_male_sign = new EmojiInfo("male_sign", "2642-fe0f.png", "", "♂️", false, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ta = new EmojiInfo("flag-ta", "1f1f9-1f1e6.png", "regional indicator symbol letters ta", "🇹🇦", true, false, true, false);
 
 		/// <summary>
-		/// :aries: ♈ aries
+		/// :flag-tc: 🇹🇨 regional indicator symbol letters tc
 		/// </summary>
-		public static readonly EmojiInfo Emoji_aries = new EmojiInfo("aries", "2648.png", "aries", "♈", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_tc = new EmojiInfo("flag-tc", "1f1f9-1f1e8.png", "regional indicator symbol letters tc", "🇹🇨", true, true, true, false);
 
 		/// <summary>
-		/// :taurus: ♉ taurus
+		/// :flag-td: 🇹🇩 regional indicator symbol letters td
 		/// </summary>
-		public static readonly EmojiInfo Emoji_taurus = new EmojiInfo("taurus", "2649.png", "taurus", "♉", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_td = new EmojiInfo("flag-td", "1f1f9-1f1e9.png", "regional indicator symbol letters td", "🇹🇩", true, true, true, true);
 
 		/// <summary>
-		/// :gemini: ♊ gemini
+		/// :flag-tf: 🇹🇫 regional indicator symbol letters tf
 		/// </summary>
-		public static readonly EmojiInfo Emoji_gemini = new EmojiInfo("gemini", "264a.png", "gemini", "♊", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_tf = new EmojiInfo("flag-tf", "1f1f9-1f1eb.png", "regional indicator symbol letters tf", "🇹🇫", true, false, true, false);
 
 		/// <summary>
-		/// :cancer: ♋ cancer
+		/// :flag-tg: 🇹🇬 regional indicator symbol letters tg
 		/// </summary>
-		public static readonly EmojiInfo Emoji_cancer = new EmojiInfo("cancer", "264b.png", "cancer", "♋", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_tg = new EmojiInfo("flag-tg", "1f1f9-1f1ec.png", "regional indicator symbol letters tg", "🇹🇬", true, true, true, true);
 
 		/// <summary>
-		/// :leo: ♌ leo
+		/// :flag-th: 🇹🇭 regional indicator symbol letters th
 		/// </summary>
-		public static readonly EmojiInfo Emoji_leo = new EmojiInfo("leo", "264c.png", "leo", "♌", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_th = new EmojiInfo("flag-th", "1f1f9-1f1ed.png", "regional indicator symbol letters th", "🇹🇭", true, true, true, true);
 
 		/// <summary>
-		/// :virgo: ♍ virgo
+		/// :flag-tj: 🇹🇯 regional indicator symbol letters tj
 		/// </summary>
-		public static readonly EmojiInfo Emoji_virgo = new EmojiInfo("virgo", "264d.png", "virgo", "♍", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_tj = new EmojiInfo("flag-tj", "1f1f9-1f1ef.png", "regional indicator symbol letters tj", "🇹🇯", true, true, true, true);
 
 		/// <summary>
-		/// :libra: ♎ libra
+		/// :flag-tk: 🇹🇰 regional indicator symbol letters tk
 		/// </summary>
-		public static readonly EmojiInfo Emoji_libra = new EmojiInfo("libra", "264e.png", "libra", "♎", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_tk = new EmojiInfo("flag-tk", "1f1f9-1f1f0.png", "regional indicator symbol letters tk", "🇹🇰", true, true, true, false);
 
 		/// <summary>
-		/// :scorpius: ♏ scorpius
+		/// :flag-tl: 🇹🇱 regional indicator symbol letters tl
 		/// </summary>
-		public static readonly EmojiInfo Emoji_scorpius = new EmojiInfo("scorpius", "264f.png", "scorpius", "♏", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_tl = new EmojiInfo("flag-tl", "1f1f9-1f1f1.png", "regional indicator symbol letters tl", "🇹🇱", true, true, true, true);
 
 		/// <summary>
-		/// :sagittarius: ♐ sagittarius
+		/// :flag-tm: 🇹🇲 regional indicator symbol letters tm
 		/// </summary>
-		public static readonly EmojiInfo Emoji_sagittarius = new EmojiInfo("sagittarius", "2650.png", "sagittarius", "♐", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_tm = new EmojiInfo("flag-tm", "1f1f9-1f1f2.png", "regional indicator symbol letters tm", "🇹🇲", true, true, true, true);
 
 		/// <summary>
-		/// :capricorn: ♑ capricorn
+		/// :flag-tn: 🇹🇳 regional indicator symbol letters tn
 		/// </summary>
-		public static readonly EmojiInfo Emoji_capricorn = new EmojiInfo("capricorn", "2651.png", "capricorn", "♑", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_tn = new EmojiInfo("flag-tn", "1f1f9-1f1f3.png", "regional indicator symbol letters tn", "🇹🇳", true, true, true, true);
 
 		/// <summary>
-		/// :aquarius: ♒ aquarius
+		/// :flag-to: 🇹🇴 regional indicator symbol letters to
 		/// </summary>
-		public static readonly EmojiInfo Emoji_aquarius = new EmojiInfo("aquarius", "2652.png", "aquarius", "♒", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_to = new EmojiInfo("flag-to", "1f1f9-1f1f4.png", "regional indicator symbol letters to", "🇹🇴", true, true, true, true);
 
 		/// <summary>
-		/// :pisces: ♓ pisces
+		/// :flag-tr: 🇹🇷 regional indicator symbol letters tr
 		/// </summary>
-		public static readonly EmojiInfo Emoji_pisces = new EmojiInfo("pisces", "2653.png", "pisces", "♓", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_tr = new EmojiInfo("flag-tr", "1f1f9-1f1f7.png", "regional indicator symbol letters tr", "🇹🇷", true, true, true, true);
 
 		/// <summary>
-		/// :chess_pawn: ♟️ 
+		/// :flag-tt: 🇹🇹 regional indicator symbol letters tt
 		/// </summary>
-		public static readonly EmojiInfo Emoji_chess_pawn = new EmojiInfo("chess_pawn", "265f-fe0f.png", "", "♟️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_tt = new EmojiInfo("flag-tt", "1f1f9-1f1f9.png", "regional indicator symbol letters tt", "🇹🇹", true, true, true, true);
 
 		/// <summary>
-		/// :spades: ♠️ black spade suit
+		/// :flag-tv: 🇹🇻 regional indicator symbol letters tv
 		/// </summary>
-		public static readonly EmojiInfo Emoji_spades = new EmojiInfo("spades", "2660-fe0f.png", "black spade suit", "♠️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_tv = new EmojiInfo("flag-tv", "1f1f9-1f1fb.png", "regional indicator symbol letters tv", "🇹🇻", true, true, true, true);
 
 		/// <summary>
-		/// :clubs: ♣️ black club suit
+		/// :flag-tw: 🇹🇼 regional indicator symbol letters tw
 		/// </summary>
-		public static readonly EmojiInfo Emoji_clubs = new EmojiInfo("clubs", "2663-fe0f.png", "black club suit", "♣️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_tw = new EmojiInfo("flag-tw", "1f1f9-1f1fc.png", "regional indicator symbol letters tw", "🇹🇼", true, true, true, true);
 
 		/// <summary>
-		/// :hearts: ♥️ black heart suit
+		/// :flag-tz: 🇹🇿 regional indicator symbol letters tz
 		/// </summary>
-		public static readonly EmojiInfo Emoji_hearts = new EmojiInfo("hearts", "2665-fe0f.png", "black heart suit", "♥️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_tz = new EmojiInfo("flag-tz", "1f1f9-1f1ff.png", "regional indicator symbol letters tz", "🇹🇿", true, true, true, true);
 
 		/// <summary>
-		/// :diamonds: ♦️ black diamond suit
+		/// :flag-ua: 🇺🇦 regional indicator symbol letters ua
 		/// </summary>
-		public static readonly EmojiInfo Emoji_diamonds = new EmojiInfo("diamonds", "2666-fe0f.png", "black diamond suit", "♦️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ua = new EmojiInfo("flag-ua", "1f1fa-1f1e6.png", "regional indicator symbol letters ua", "🇺🇦", true, true, true, true);
 
 		/// <summary>
-		/// :hotsprings: ♨️ hot springs
+		/// :flag-ug: 🇺🇬 regional indicator symbol letters ug
 		/// </summary>
-		public static readonly EmojiInfo Emoji_hotsprings = new EmojiInfo("hotsprings", "2668-fe0f.png", "hot springs", "♨️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ug = new EmojiInfo("flag-ug", "1f1fa-1f1ec.png", "regional indicator symbol letters ug", "🇺🇬", true, true, true, true);
 
 		/// <summary>
-		/// :recycle: ♻️ black universal recycling symbol
+		/// :flag-um: 🇺🇲 regional indicator symbol letters um
 		/// </summary>
-		public static readonly EmojiInfo Emoji_recycle = new EmojiInfo("recycle", "267b-fe0f.png", "black universal recycling symbol", "♻️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_um = new EmojiInfo("flag-um", "1f1fa-1f1f2.png", "regional indicator symbol letters um", "🇺🇲", true, false, true, false);
 
 		/// <summary>
-		/// :infinity: ♾️ 
+		/// :flag-us: 🇺🇸 regional indicator symbol letters us
 		/// </summary>
-		public static readonly EmojiInfo Emoji_infinity = new EmojiInfo("infinity", "267e-fe0f.png", "", "♾️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_us = new EmojiInfo("flag-us", "1f1fa-1f1f8.png", "regional indicator symbol letters us", "🇺🇸", true, true, true, true);
 
 		/// <summary>
-		/// :wheelchair: ♿ wheelchair symbol
+		/// :flag-uy: 🇺🇾 regional indicator symbol letters uy
 		/// </summary>
-		public static readonly EmojiInfo Emoji_wheelchair = new EmojiInfo("wheelchair", "267f.png", "wheelchair symbol", "♿", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_uy = new EmojiInfo("flag-uy", "1f1fa-1f1fe.png", "regional indicator symbol letters uy", "🇺🇾", true, true, true, true);
 
 		/// <summary>
-		/// :hammer_and_pick: ⚒️ 
+		/// :flag-uz: 🇺🇿 regional indicator symbol letters uz
 		/// </summary>
-		public static readonly EmojiInfo Emoji_hammer_and_pick = new EmojiInfo("hammer_and_pick", "2692-fe0f.png", "", "⚒️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_uz = new EmojiInfo("flag-uz", "1f1fa-1f1ff.png", "regional indicator symbol letters uz", "🇺🇿", true, true, true, true);
 
 		/// <summary>
-		/// :anchor: ⚓ anchor
+		/// :flag-va: 🇻🇦 regional indicator symbol letters va
 		/// </summary>
-		public static readonly EmojiInfo Emoji_anchor = new EmojiInfo("anchor", "2693.png", "anchor", "⚓", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_va = new EmojiInfo("flag-va", "1f1fb-1f1e6.png", "regional indicator symbol letters va", "🇻🇦", true, true, true, true);
 
 		/// <summary>
-		/// :crossed_swords: ⚔️ 
+		/// :flag-vc: 🇻🇨 regional indicator symbol letters vc
 		/// </summary>
-		public static readonly EmojiInfo Emoji_crossed_swords = new EmojiInfo("crossed_swords", "2694-fe0f.png", "", "⚔️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_vc = new EmojiInfo("flag-vc", "1f1fb-1f1e8.png", "regional indicator symbol letters vc", "🇻🇨", true, true, true, true);
 
 		/// <summary>
-		/// :medical_symbol: ⚕️ 
+		/// :flag-ve: 🇻🇪 regional indicator symbol letters ve
 		/// </summary>
-		public static readonly EmojiInfo Emoji_medical_symbol = new EmojiInfo("medical_symbol", "2695-fe0f.png", "", "⚕️", false, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ve = new EmojiInfo("flag-ve", "1f1fb-1f1ea.png", "regional indicator symbol letters ve", "🇻🇪", true, true, true, true);
 
 		/// <summary>
-		/// :scales: ⚖️ 
+		/// :flag-vg: 🇻🇬 regional indicator symbol letters vg
 		/// </summary>
-		public static readonly EmojiInfo Emoji_scales = new EmojiInfo("scales", "2696-fe0f.png", "", "⚖️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_vg = new EmojiInfo("flag-vg", "1f1fb-1f1ec.png", "regional indicator symbol letters vg", "🇻🇬", true, true, true, false);
 
 		/// <summary>
-		/// :alembic: ⚗️ 
+		/// :flag-vi: 🇻🇮 regional indicator symbol letters vi
 		/// </summary>
-		public static readonly EmojiInfo Emoji_alembic = new EmojiInfo("alembic", "2697-fe0f.png", "", "⚗️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_vi = new EmojiInfo("flag-vi", "1f1fb-1f1ee.png", "regional indicator symbol letters vi", "🇻🇮", true, true, true, true);
 
 		/// <summary>
-		/// :gear: ⚙️ 
+		/// :flag-vn: 🇻🇳 regional indicator symbol letters vn
 		/// </summary>
-		public static readonly EmojiInfo Emoji_gear = new EmojiInfo("gear", "2699-fe0f.png", "", "⚙️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_vn = new EmojiInfo("flag-vn", "1f1fb-1f1f3.png", "regional indicator symbol letters vn", "🇻🇳", true, true, true, true);
 
 		/// <summary>
-		/// :atom_symbol: ⚛️ 
+		/// :flag-vu: 🇻🇺 regional indicator symbol letters vu
 		/// </summary>
-		public static readonly EmojiInfo Emoji_atom_symbol = new EmojiInfo("atom_symbol", "269b-fe0f.png", "", "⚛️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_vu = new EmojiInfo("flag-vu", "1f1fb-1f1fa.png", "regional indicator symbol letters vu", "🇻🇺", true, true, true, true);
 
 		/// <summary>
-		/// :fleur_de_lis: ⚜️ 
+		/// :flag-wf: 🇼🇫 regional indicator symbol letters wf
 		/// </summary>
-		public static readonly EmojiInfo Emoji_fleur_de_lis = new EmojiInfo("fleur_de_lis", "269c-fe0f.png", "", "⚜️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_wf = new EmojiInfo("flag-wf", "1f1fc-1f1eb.png", "regional indicator symbol letters wf", "🇼🇫", true, false, true, true);
 
 		/// <summary>
-		/// :warning: ⚠️ warning sign
+		/// :flag-ws: 🇼🇸 regional indicator symbol letters ws
 		/// </summary>
-		public static readonly EmojiInfo Emoji_warning = new EmojiInfo("warning", "26a0-fe0f.png", "warning sign", "⚠️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ws = new EmojiInfo("flag-ws", "1f1fc-1f1f8.png", "regional indicator symbol letters ws", "🇼🇸", true, true, true, true);
 
 		/// <summary>
-		/// :zap: ⚡ high voltage sign
+		/// :flag-xk: 🇽🇰 regional indicator symbol letters xk
 		/// </summary>
-		public static readonly EmojiInfo Emoji_zap = new EmojiInfo("zap", "26a1.png", "high voltage sign", "⚡", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_xk = new EmojiInfo("flag-xk", "1f1fd-1f1f0.png", "regional indicator symbol letters xk", "🇽🇰", true, false, true, true);
 
 		/// <summary>
-		/// :transgender_symbol: ⚧️ 
+		/// :flag-ye: 🇾🇪 regional indicator symbol letters ye
 		/// </summary>
-		public static readonly EmojiInfo Emoji_transgender_symbol = new EmojiInfo("transgender_symbol", "26a7-fe0f.png", "", "⚧️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_ye = new EmojiInfo("flag-ye", "1f1fe-1f1ea.png", "regional indicator symbol letters ye", "🇾🇪", true, true, true, true);
 
 		/// <summary>
-		/// :white_circle: ⚪ medium white circle
+		/// :flag-yt: 🇾🇹 regional indicator symbol letters yt
 		/// </summary>
-		public static readonly EmojiInfo Emoji_white_circle = new EmojiInfo("white_circle", "26aa.png", "medium white circle", "⚪", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_yt = new EmojiInfo("flag-yt", "1f1fe-1f1f9.png", "regional indicator symbol letters yt", "🇾🇹", true, false, true, false);
 
 		/// <summary>
-		/// :black_circle: ⚫ medium black circle
+		/// :flag-za: 🇿🇦 regional indicator symbol letters za
 		/// </summary>
-		public static readonly EmojiInfo Emoji_black_circle = new EmojiInfo("black_circle", "26ab.png", "medium black circle", "⚫", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_za = new EmojiInfo("flag-za", "1f1ff-1f1e6.png", "regional indicator symbol letters za", "🇿🇦", true, true, true, true);
 
 		/// <summary>
-		/// :coffin: ⚰️ 
+		/// :flag-zm: 🇿🇲 regional indicator symbol letters zm
 		/// </summary>
-		public static readonly EmojiInfo Emoji_coffin = new EmojiInfo("coffin", "26b0-fe0f.png", "", "⚰️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_zm = new EmojiInfo("flag-zm", "1f1ff-1f1f2.png", "regional indicator symbol letters zm", "🇿🇲", true, true, true, true);
 
 		/// <summary>
-		/// :funeral_urn: ⚱️ 
+		/// :flag-zw: 🇿🇼 regional indicator symbol letters zw
 		/// </summary>
-		public static readonly EmojiInfo Emoji_funeral_urn = new EmojiInfo("funeral_urn", "26b1-fe0f.png", "", "⚱️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_flag_zw = new EmojiInfo("flag-zw", "1f1ff-1f1fc.png", "regional indicator symbol letters zw", "🇿🇼", true, true, true, true);
 
 		/// <summary>
-		/// :soccer: ⚽ soccer ball
+		/// :man-man-boy: 👨‍👨‍👦 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_soccer = new EmojiInfo("soccer", "26bd.png", "soccer ball", "⚽", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_man_boy = new EmojiInfo("man-man-boy", "1f468-200d-1f468-200d-1f466.png", "", "👨‍👨‍👦", true, true, true, true);
 
 		/// <summary>
-		/// :baseball: ⚾ baseball
+		/// :man-man-boy-boy: 👨‍👨‍👦‍👦 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_baseball = new EmojiInfo("baseball", "26be.png", "baseball", "⚾", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_man_boy_boy = new EmojiInfo("man-man-boy-boy", "1f468-200d-1f468-200d-1f466-200d-1f466.png", "", "👨‍👨‍👦‍👦", true, true, true, true);
 
 		/// <summary>
-		/// :snowman_without_snow: ⛄ snowman without snow
+		/// :man-man-girl: 👨‍👨‍👧 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_snowman_without_snow = new EmojiInfo("snowman_without_snow", "26c4.png", "snowman without snow", "⛄", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_man_girl = new EmojiInfo("man-man-girl", "1f468-200d-1f468-200d-1f467.png", "", "👨‍👨‍👧", true, true, true, true);
 
 		/// <summary>
-		/// :partly_sunny: ⛅ sun behind cloud
+		/// :man-man-girl-boy: 👨‍👨‍👧‍👦 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_partly_sunny = new EmojiInfo("partly_sunny", "26c5.png", "sun behind cloud", "⛅", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_man_girl_boy = new EmojiInfo("man-man-girl-boy", "1f468-200d-1f468-200d-1f467-200d-1f466.png", "", "👨‍👨‍👧‍👦", true, true, true, true);
 
 		/// <summary>
-		/// :thunder_cloud_and_rain: ⛈️ 
+		/// :man-man-girl-girl: 👨‍👨‍👧‍👧 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_thunder_cloud_and_rain = new EmojiInfo("thunder_cloud_and_rain", "26c8-fe0f.png", "", "⛈️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_man_girl_girl = new EmojiInfo("man-man-girl-girl", "1f468-200d-1f468-200d-1f467-200d-1f467.png", "", "👨‍👨‍👧‍👧", true, true, true, true);
 
 		/// <summary>
-		/// :ophiuchus: ⛎ ophiuchus
+		/// :man-woman-boy-boy: 👨‍👩‍👦‍👦 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_ophiuchus = new EmojiInfo("ophiuchus", "26ce.png", "ophiuchus", "⛎", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_woman_boy_boy = new EmojiInfo("man-woman-boy-boy", "1f468-200d-1f469-200d-1f466-200d-1f466.png", "", "👨‍👩‍👦‍👦", true, true, true, true);
 
 		/// <summary>
-		/// :pick: ⛏️ 
+		/// :man-woman-girl: 👨‍👩‍👧 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_pick = new EmojiInfo("pick", "26cf-fe0f.png", "", "⛏️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_woman_girl = new EmojiInfo("man-woman-girl", "1f468-200d-1f469-200d-1f467.png", "", "👨‍👩‍👧", true, true, true, true);
 
 		/// <summary>
-		/// :helmet_with_white_cross: ⛑️ 
+		/// :man-woman-girl-boy: 👨‍👩‍👧‍👦 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_helmet_with_white_cross = new EmojiInfo("helmet_with_white_cross", "26d1-fe0f.png", "", "⛑️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_woman_girl_boy = new EmojiInfo("man-woman-girl-boy", "1f468-200d-1f469-200d-1f467-200d-1f466.png", "", "👨‍👩‍👧‍👦", true, true, true, true);
 
 		/// <summary>
-		/// :chains: ⛓️ 
+		/// :man-woman-girl-girl: 👨‍👩‍👧‍👧 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_chains = new EmojiInfo("chains", "26d3-fe0f.png", "", "⛓️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_woman_girl_girl = new EmojiInfo("man-woman-girl-girl", "1f468-200d-1f469-200d-1f467-200d-1f467.png", "", "👨‍👩‍👧‍👧", true, true, true, true);
 
 		/// <summary>
-		/// :no_entry: ⛔ no entry
+		/// :man-heart-man: 👨‍❤️‍👨 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_no_entry = new EmojiInfo("no_entry", "26d4.png", "no entry", "⛔", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_heart_man = new EmojiInfo("man-heart-man", "1f468-200d-2764-fe0f-200d-1f468.png", "", "👨‍❤️‍👨", true, true, true, false);
 
 		/// <summary>
-		/// :shinto_shrine: ⛩️ 
+		/// :man-kiss-man: 👨‍❤️‍💋‍👨 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_shinto_shrine = new EmojiInfo("shinto_shrine", "26e9-fe0f.png", "", "⛩️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_man_kiss_man = new EmojiInfo("man-kiss-man", "1f468-200d-2764-fe0f-200d-1f48b-200d-1f468.png", "", "👨‍❤️‍💋‍👨", true, true, true, false);
 
 		/// <summary>
-		/// :church: ⛪ church
+		/// :woman-woman-boy: 👩‍👩‍👦 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_church = new EmojiInfo("church", "26ea.png", "church", "⛪", true, true, true, true);
+		public static readonly EmojiInfo Emoji_woman_woman_boy = new EmojiInfo("woman-woman-boy", "1f469-200d-1f469-200d-1f466.png", "", "👩‍👩‍👦", true, true, true, true);
 
 		/// <summary>
-		/// :mountain: ⛰️ 
+		/// :woman-woman-boy-boy: 👩‍👩‍👦‍👦 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_mountain = new EmojiInfo("mountain", "26f0-fe0f.png", "", "⛰️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_woman_woman_boy_boy = new EmojiInfo("woman-woman-boy-boy", "1f469-200d-1f469-200d-1f466-200d-1f466.png", "", "👩‍👩‍👦‍👦", true, true, true, true);
 
 		/// <summary>
-		/// :umbrella_on_ground: ⛱️ 
+		/// :woman-woman-girl: 👩‍👩‍👧 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_umbrella_on_ground = new EmojiInfo("umbrella_on_ground", "26f1-fe0f.png", "", "⛱️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_woman_woman_girl = new EmojiInfo("woman-woman-girl", "1f469-200d-1f469-200d-1f467.png", "", "👩‍👩‍👧", true, true, true, true);
 
 		/// <summary>
-		/// :fountain: ⛲ fountain
+		/// :woman-woman-girl-boy: 👩‍👩‍👧‍👦 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_fountain = new EmojiInfo("fountain", "26f2.png", "fountain", "⛲", true, true, true, true);
+		public static readonly EmojiInfo Emoji_woman_woman_girl_boy = new EmojiInfo("woman-woman-girl-boy", "1f469-200d-1f469-200d-1f467-200d-1f466.png", "", "👩‍👩‍👧‍👦", true, true, true, true);
 
 		/// <summary>
-		/// :golf: ⛳ flag in hole
+		/// :woman-woman-girl-girl: 👩‍👩‍👧‍👧 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_golf = new EmojiInfo("golf", "26f3.png", "flag in hole", "⛳", true, true, true, true);
+		public static readonly EmojiInfo Emoji_woman_woman_girl_girl = new EmojiInfo("woman-woman-girl-girl", "1f469-200d-1f469-200d-1f467-200d-1f467.png", "", "👩‍👩‍👧‍👧", true, true, true, true);
 
 		/// <summary>
-		/// :ferry: ⛴️ 
+		/// :woman-heart-woman: 👩‍❤️‍👩 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_ferry = new EmojiInfo("ferry", "26f4-fe0f.png", "", "⛴️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_woman_heart_woman = new EmojiInfo("woman-heart-woman", "1f469-200d-2764-fe0f-200d-1f469.png", "", "👩‍❤️‍👩", true, true, true, false);
 
 		/// <summary>
-		/// :boat: ⛵ sailboat
+		/// :woman-kiss-woman: 👩‍❤️‍💋‍👩 
 		/// </summary>
-		public static readonly EmojiInfo Emoji_boat = new EmojiInfo("boat", "26f5.png", "sailboat", "⛵", true, true, true, true);
-
-		/// <summary>
-		/// :skier: ⛷️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_skier = new EmojiInfo("skier", "26f7-fe0f.png", "", "⛷️", true, true, true, true);
-
-		/// <summary>
-		/// :ice_skate: ⛸️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_ice_skate = new EmojiInfo("ice_skate", "26f8-fe0f.png", "", "⛸️", true, true, true, true);
-
-		/// <summary>
-		/// :woman-bouncing-ball: ⛹️‍♀️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_woman_bouncing_ball = new EmojiInfo("woman-bouncing-ball", "26f9-fe0f-200d-2640-fe0f.png", "", "⛹️‍♀️", true, true, true, false);
-
-		/// <summary>
-		/// :man-bouncing-ball: ⛹️‍♂️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_man_bouncing_ball = new EmojiInfo("man-bouncing-ball", "26f9-fe0f-200d-2642-fe0f.png", "", "⛹️‍♂️", true, true, true, false);
-
-		/// <summary>
-		/// :person_with_ball: ⛹️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_person_with_ball = new EmojiInfo("person_with_ball", "26f9-fe0f.png", "", "⛹️", true, true, true, true);
-
-		/// <summary>
-		/// :tent: ⛺ tent
-		/// </summary>
-		public static readonly EmojiInfo Emoji_tent = new EmojiInfo("tent", "26fa.png", "tent", "⛺", true, true, true, true);
-
-		/// <summary>
-		/// :fuelpump: ⛽ fuel pump
-		/// </summary>
-		public static readonly EmojiInfo Emoji_fuelpump = new EmojiInfo("fuelpump", "26fd.png", "fuel pump", "⛽", true, true, true, true);
-
-		/// <summary>
-		/// :scissors: ✂️ black scissors
-		/// </summary>
-		public static readonly EmojiInfo Emoji_scissors = new EmojiInfo("scissors", "2702-fe0f.png", "black scissors", "✂️", true, true, true, true);
-
-		/// <summary>
-		/// :white_check_mark: ✅ white heavy check mark
-		/// </summary>
-		public static readonly EmojiInfo Emoji_white_check_mark = new EmojiInfo("white_check_mark", "2705.png", "white heavy check mark", "✅", true, true, true, true);
-
-		/// <summary>
-		/// :airplane: ✈️ airplane
-		/// </summary>
-		public static readonly EmojiInfo Emoji_airplane = new EmojiInfo("airplane", "2708-fe0f.png", "airplane", "✈️", true, true, true, true);
-
-		/// <summary>
-		/// :email: ✉️ envelope
-		/// </summary>
-		public static readonly EmojiInfo Emoji_email = new EmojiInfo("email", "2709-fe0f.png", "envelope", "✉️", true, true, true, true);
-
-		/// <summary>
-		/// :fist: ✊ raised fist
-		/// </summary>
-		public static readonly EmojiInfo Emoji_fist = new EmojiInfo("fist", "270a.png", "raised fist", "✊", true, true, true, true);
-
-		/// <summary>
-		/// :hand: ✋ raised hand
-		/// </summary>
-		public static readonly EmojiInfo Emoji_hand = new EmojiInfo("hand", "270b.png", "raised hand", "✋", true, true, true, true);
-
-		/// <summary>
-		/// :v: ✌️ victory hand
-		/// </summary>
-		public static readonly EmojiInfo Emoji_v = new EmojiInfo("v", "270c-fe0f.png", "victory hand", "✌️", true, true, true, true);
-
-		/// <summary>
-		/// :writing_hand: ✍️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_writing_hand = new EmojiInfo("writing_hand", "270d-fe0f.png", "", "✍️", true, true, true, true);
-
-		/// <summary>
-		/// :pencil2: ✏️ pencil
-		/// </summary>
-		public static readonly EmojiInfo Emoji_pencil2 = new EmojiInfo("pencil2", "270f-fe0f.png", "pencil", "✏️", true, true, true, true);
-
-		/// <summary>
-		/// :black_nib: ✒️ black nib
-		/// </summary>
-		public static readonly EmojiInfo Emoji_black_nib = new EmojiInfo("black_nib", "2712-fe0f.png", "black nib", "✒️", true, true, true, true);
-
-		/// <summary>
-		/// :heavy_check_mark: ✔️ heavy check mark
-		/// </summary>
-		public static readonly EmojiInfo Emoji_heavy_check_mark = new EmojiInfo("heavy_check_mark", "2714-fe0f.png", "heavy check mark", "✔️", true, true, true, true);
-
-		/// <summary>
-		/// :heavy_multiplication_x: ✖️ heavy multiplication x
-		/// </summary>
-		public static readonly EmojiInfo Emoji_heavy_multiplication_x = new EmojiInfo("heavy_multiplication_x", "2716-fe0f.png", "heavy multiplication x", "✖️", true, true, true, true);
-
-		/// <summary>
-		/// :latin_cross: ✝️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_latin_cross = new EmojiInfo("latin_cross", "271d-fe0f.png", "", "✝️", true, true, true, true);
-
-		/// <summary>
-		/// :star_of_david: ✡️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_star_of_david = new EmojiInfo("star_of_david", "2721-fe0f.png", "", "✡️", true, true, true, true);
-
-		/// <summary>
-		/// :sparkles: ✨ sparkles
-		/// </summary>
-		public static readonly EmojiInfo Emoji_sparkles = new EmojiInfo("sparkles", "2728.png", "sparkles", "✨", true, true, true, true);
-
-		/// <summary>
-		/// :eight_spoked_asterisk: ✳️ eight spoked asterisk
-		/// </summary>
-		public static readonly EmojiInfo Emoji_eight_spoked_asterisk = new EmojiInfo("eight_spoked_asterisk", "2733-fe0f.png", "eight spoked asterisk", "✳️", true, true, true, true);
-
-		/// <summary>
-		/// :eight_pointed_black_star: ✴️ eight pointed black star
-		/// </summary>
-		public static readonly EmojiInfo Emoji_eight_pointed_black_star = new EmojiInfo("eight_pointed_black_star", "2734-fe0f.png", "eight pointed black star", "✴️", true, true, true, true);
-
-		/// <summary>
-		/// :snowflake: ❄️ snowflake
-		/// </summary>
-		public static readonly EmojiInfo Emoji_snowflake = new EmojiInfo("snowflake", "2744-fe0f.png", "snowflake", "❄️", true, true, true, true);
-
-		/// <summary>
-		/// :sparkle: ❇️ sparkle
-		/// </summary>
-		public static readonly EmojiInfo Emoji_sparkle = new EmojiInfo("sparkle", "2747-fe0f.png", "sparkle", "❇️", true, true, true, true);
-
-		/// <summary>
-		/// :x: ❌ cross mark
-		/// </summary>
-		public static readonly EmojiInfo Emoji_x = new EmojiInfo("x", "274c.png", "cross mark", "❌", true, true, true, true);
-
-		/// <summary>
-		/// :negative_squared_cross_mark: ❎ negative squared cross mark
-		/// </summary>
-		public static readonly EmojiInfo Emoji_negative_squared_cross_mark = new EmojiInfo("negative_squared_cross_mark", "274e.png", "negative squared cross mark", "❎", true, true, true, true);
-
-		/// <summary>
-		/// :question: ❓ black question mark ornament
-		/// </summary>
-		public static readonly EmojiInfo Emoji_question = new EmojiInfo("question", "2753.png", "black question mark ornament", "❓", true, true, true, true);
-
-		/// <summary>
-		/// :grey_question: ❔ white question mark ornament
-		/// </summary>
-		public static readonly EmojiInfo Emoji_grey_question = new EmojiInfo("grey_question", "2754.png", "white question mark ornament", "❔", true, true, true, true);
-
-		/// <summary>
-		/// :grey_exclamation: ❕ white exclamation mark ornament
-		/// </summary>
-		public static readonly EmojiInfo Emoji_grey_exclamation = new EmojiInfo("grey_exclamation", "2755.png", "white exclamation mark ornament", "❕", true, true, true, true);
-
-		/// <summary>
-		/// :exclamation: ❗ heavy exclamation mark symbol
-		/// </summary>
-		public static readonly EmojiInfo Emoji_exclamation = new EmojiInfo("exclamation", "2757.png", "heavy exclamation mark symbol", "❗", true, true, true, true);
-
-		/// <summary>
-		/// :heavy_heart_exclamation_mark_ornament: ❣️ 
-		/// </summary>
-		public static readonly EmojiInfo Emoji_heavy_heart_exclamation_mark_ornament = new EmojiInfo("heavy_heart_exclamation_mark_ornament", "2763-fe0f.png", "", "❣️", true, true, true, true);
-
-		/// <summary>
-		/// :heart: ❤️ heavy black heart
-		/// </summary>
-		public static readonly EmojiInfo Emoji_heart = new EmojiInfo("heart", "2764-fe0f.png", "heavy black heart", "❤️", true, true, true, true);
-
-		/// <summary>
-		/// :heavy_plus_sign: ➕ heavy plus sign
-		/// </summary>
-		public static readonly EmojiInfo Emoji_heavy_plus_sign = new EmojiInfo("heavy_plus_sign", "2795.png", "heavy plus sign", "➕", true, true, true, true);
-
-		/// <summary>
-		/// :heavy_minus_sign: ➖ heavy minus sign
-		/// </summary>
-		public static readonly EmojiInfo Emoji_heavy_minus_sign = new EmojiInfo("heavy_minus_sign", "2796.png", "heavy minus sign", "➖", true, true, true, true);
-
-		/// <summary>
-		/// :heavy_division_sign: ➗ heavy division sign
-		/// </summary>
-		public static readonly EmojiInfo Emoji_heavy_division_sign = new EmojiInfo("heavy_division_sign", "2797.png", "heavy division sign", "➗", true, true, true, true);
-
-		/// <summary>
-		/// :arrow_right: ➡️ black rightwards arrow
-		/// </summary>
-		public static readonly EmojiInfo Emoji_arrow_right = new EmojiInfo("arrow_right", "27a1-fe0f.png", "black rightwards arrow", "➡️", true, true, true, true);
-
-		/// <summary>
-		/// :curly_loop: ➰ curly loop
-		/// </summary>
-		public static readonly EmojiInfo Emoji_curly_loop = new EmojiInfo("curly_loop", "27b0.png", "curly loop", "➰", true, true, true, true);
-
-		/// <summary>
-		/// :loop: ➿ double curly loop
-		/// </summary>
-		public static readonly EmojiInfo Emoji_loop = new EmojiInfo("loop", "27bf.png", "double curly loop", "➿", true, true, true, true);
-
-		/// <summary>
-		/// :arrow_heading_up: ⤴️ arrow pointing rightwards then curving upwards
-		/// </summary>
-		public static readonly EmojiInfo Emoji_arrow_heading_up = new EmojiInfo("arrow_heading_up", "2934-fe0f.png", "arrow pointing rightwards then curving upwards", "⤴️", true, true, true, true);
-
-		/// <summary>
-		/// :arrow_heading_down: ⤵️ arrow pointing rightwards then curving downwards
-		/// </summary>
-		public static readonly EmojiInfo Emoji_arrow_heading_down = new EmojiInfo("arrow_heading_down", "2935-fe0f.png", "arrow pointing rightwards then curving downwards", "⤵️", true, true, true, true);
-
-		/// <summary>
-		/// :arrow_left: ⬅️ leftwards black arrow
-		/// </summary>
-		public static readonly EmojiInfo Emoji_arrow_left = new EmojiInfo("arrow_left", "2b05-fe0f.png", "leftwards black arrow", "⬅️", true, true, true, true);
-
-		/// <summary>
-		/// :arrow_up: ⬆️ upwards black arrow
-		/// </summary>
-		public static readonly EmojiInfo Emoji_arrow_up = new EmojiInfo("arrow_up", "2b06-fe0f.png", "upwards black arrow", "⬆️", true, true, true, true);
-
-		/// <summary>
-		/// :arrow_down: ⬇️ downwards black arrow
-		/// </summary>
-		public static readonly EmojiInfo Emoji_arrow_down = new EmojiInfo("arrow_down", "2b07-fe0f.png", "downwards black arrow", "⬇️", true, true, true, true);
-
-		/// <summary>
-		/// :black_large_square: ⬛ black large square
-		/// </summary>
-		public static readonly EmojiInfo Emoji_black_large_square = new EmojiInfo("black_large_square", "2b1b.png", "black large square", "⬛", true, true, true, true);
-
-		/// <summary>
-		/// :white_large_square: ⬜ white large square
-		/// </summary>
-		public static readonly EmojiInfo Emoji_white_large_square = new EmojiInfo("white_large_square", "2b1c.png", "white large square", "⬜", true, true, true, true);
-
-		/// <summary>
-		/// :star: ⭐ white medium star
-		/// </summary>
-		public static readonly EmojiInfo Emoji_star = new EmojiInfo("star", "2b50.png", "white medium star", "⭐", true, true, true, true);
-
-		/// <summary>
-		/// :o: ⭕ heavy large circle
-		/// </summary>
-		public static readonly EmojiInfo Emoji_o = new EmojiInfo("o", "2b55.png", "heavy large circle", "⭕", true, true, true, true);
-
-		/// <summary>
-		/// :wavy_dash: 〰️ wavy dash
-		/// </summary>
-		public static readonly EmojiInfo Emoji_wavy_dash = new EmojiInfo("wavy_dash", "3030-fe0f.png", "wavy dash", "〰️", true, true, true, true);
-
-		/// <summary>
-		/// :part_alternation_mark: 〽️ part alternation mark
-		/// </summary>
-		public static readonly EmojiInfo Emoji_part_alternation_mark = new EmojiInfo("part_alternation_mark", "303d-fe0f.png", "part alternation mark", "〽️", true, true, true, true);
-
-		/// <summary>
-		/// :congratulations: ㊗️ circled ideograph congratulation
-		/// </summary>
-		public static readonly EmojiInfo Emoji_congratulations = new EmojiInfo("congratulations", "3297-fe0f.png", "circled ideograph congratulation", "㊗️", true, true, true, true);
-
-		/// <summary>
-		/// :secret: ㊙️ circled ideograph secret
-		/// </summary>
-		public static readonly EmojiInfo Emoji_secret = new EmojiInfo("secret", "3299-fe0f.png", "circled ideograph secret", "㊙️", true, true, true, true);
+		public static readonly EmojiInfo Emoji_woman_kiss_woman = new EmojiInfo("woman-kiss-woman", "1f469-200d-2764-fe0f-200d-1f48b-200d-1f469.png", "", "👩‍❤️‍💋‍👩", true, true, true, false);
 	}
 
 	/// <summary>
@@ -12708,7 +9147,7 @@ namespace Waher.Content.Emoji
 		private readonly bool appleSupport;
 		private readonly bool googleSupport;
 		private readonly bool twitterSupport;
-		private readonly bool facebookSupport;
+		private readonly bool emoji1Support;
 
 		/// <summary>
 		/// Contains information about an emoji.
@@ -12720,9 +9159,9 @@ namespace Waher.Content.Emoji
 		/// <param name="AppleSupport">If the emoji is supported by Apple.</param>
 		/// <param name="GoogleSupport">If the emoji is supported by Google.</param>
 		/// <param name="TwitterSupport">If the emoji is supported by Twitter.</param>
-		/// <param name="FacebookSupport">If the emoji is supported by emoji-1.</param>
+		/// <param name="Emoji1Support">If the emoji is supported by emoji-1.</param>
 		public EmojiInfo(string ShortName, string FileName, string Description, string Unicode,
-			bool AppleSupport, bool GoogleSupport, bool TwitterSupport, bool FacebookSupport)
+			bool AppleSupport, bool GoogleSupport, bool TwitterSupport, bool Emoji1Support)
 		{
 			this.shortName = ShortName;
 			this.fileName = FileName;
@@ -12731,7 +9170,7 @@ namespace Waher.Content.Emoji
 			this.appleSupport = AppleSupport;
 			this.googleSupport = GoogleSupport;
 			this.twitterSupport = TwitterSupport;
-			this.facebookSupport = FacebookSupport;
+			this.emoji1Support = Emoji1Support;
 		}
 
 		/// <summary>
@@ -12772,6 +9211,6 @@ namespace Waher.Content.Emoji
 		/// <summary>
 		/// If the emoji is supported by emoji-1.
 		/// </summary>
-		public bool FacebookSupport { get { return this.facebookSupport; } }
+		public bool Emoji1Support { get { return this.emoji1Support; } }
 	}
 }

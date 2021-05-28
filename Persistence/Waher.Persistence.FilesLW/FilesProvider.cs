@@ -1980,7 +1980,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Objects">Objects to insert.</param>
 		public Task Insert(params object[] Objects)
 		{
-			return this.Insert((IEnumerable<object>)Objects, false);
+			return this.Insert((IEnumerable<object>)Objects, false, null);
 		}
 
 		/// <summary>
@@ -1989,7 +1989,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Objects">Objects to insert.</param>
 		public Task Insert(IEnumerable<object> Objects)
 		{
-			return this.Insert(Objects, false);
+			return this.Insert(Objects, false, null);
 		}
 
 		/// <summary>
@@ -2334,7 +2334,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Objects">Objects to insert.</param>
 		public Task Update(params object[] Objects)
 		{
-			return this.Update((IEnumerable<object>)Objects, false);
+			return this.Update((IEnumerable<object>)Objects, false, null);
 		}
 
 		/// <summary>
@@ -2343,7 +2343,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Objects">Objects to insert.</param>
 		public Task Update(IEnumerable<object> Objects)
 		{
-			return this.Update(Objects, false);
+			return this.Update(Objects, false, null);
 		}
 
 		/// <summary>
@@ -2440,7 +2440,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Objects">Objects to insert.</param>
 		public Task Delete(params object[] Objects)
 		{
-			return this.Delete((IEnumerable<object>)Objects, false);
+			return this.Delete((IEnumerable<object>)Objects, false, null);
 		}
 
 		/// <summary>
@@ -2449,7 +2449,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Objects">Objects to insert.</param>
 		public Task Delete(IEnumerable<object> Objects)
 		{
-			return this.Delete(Objects, false);
+			return this.Delete(Objects, false, null);
 		}
 
 		/// <summary>

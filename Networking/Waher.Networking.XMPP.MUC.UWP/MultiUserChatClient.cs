@@ -1008,9 +1008,28 @@ namespace Waher.Networking.XMPP.MUC
 		public void SendCustomPrivateMessage(string RoomId, string Domain, string NickName,
 			string Xml, string Language, string ThreadId, string ParentThreadId)
 		{
-			this.client.SendMessage(MessageType.Chat, RoomId + "@" + Domain + "/" + NickName,
-				 Xml + "<x xmlns='" + NamespaceMucUser + "'/>", string.Empty,
-				 string.Empty, Language, ThreadId, ParentThreadId);
+			this.SendCustomPrivateMessage(string.Empty, RoomId, Domain, NickName, Xml, Language, ThreadId, ParentThreadId);
+		}
+
+		/// <summary>
+		/// Sends a simple private message to a chat room.
+		/// 
+		/// Note: The client must be an occupant of the chat room before messages
+		/// can be properly propagated to other occupants of the room.
+		/// </summary>
+		/// <param name="MessageId">Message ID</param>
+		/// <param name="RoomId">Room ID</param>
+		/// <param name="Domain">Domain hosting the room.</param>
+		/// <param name="NickName">Nick-name of recipient.</param>
+		/// <param name="Xml">Message body.</param>
+		/// <param name="Language">Language</param>
+		/// <param name="ThreadId">Thread ID</param>
+		/// <param name="ParentThreadId">Parent Thread ID</param>
+		public void SendCustomPrivateMessage(string MessageId, string RoomId, string Domain, string NickName,
+			string Xml, string Language, string ThreadId, string ParentThreadId)
+		{
+			this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, MessageId, RoomId + "@" + Domain + "/" + NickName,
+				 Xml + "<x xmlns='" + NamespaceMucUser + "'/>", string.Empty, string.Empty, Language, ThreadId, ParentThreadId, null, null);
 		}
 
 		#endregion

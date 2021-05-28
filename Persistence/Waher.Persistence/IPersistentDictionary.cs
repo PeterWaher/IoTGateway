@@ -36,6 +36,16 @@ namespace Waher.Persistence
 		Task AddAsync(string key, object value);
 
 		/// <summary>
+		/// Adds an element with the provided key and value to the System.Collections.Generic.IDictionary{string,object}.
+		/// </summary>
+		/// <param name="key">The object to use as the key of the element to add.</param>
+		/// <param name="value">The object to use as the value of the element to add.</param>
+		/// <param name="ReplaceIfExists">If replacement of any existing value is desired.</param>
+		/// <exception cref="ArgumentNullException">key is null</exception>
+		/// <exception cref="ArgumentException">An element with the same key already exists in the System.Collections.Generic.IDictionary{string,object}.</exception>
+		Task AddAsync(string key, object value, bool ReplaceIfExists);
+
+		/// <summary>
 		/// Removes the element with the specified key from the System.Collections.IDictionary object.
 		/// </summary>
 		/// <param name="key">The key of the element to remove.</param>

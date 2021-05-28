@@ -4704,6 +4704,16 @@
             <exception cref="T:System.ArgumentNullException">key is null</exception>
             <exception cref="T:System.ArgumentException">An element with the same key already exists in the System.Collections.Generic.IDictionary{string,object}.</exception>
         </member>
+        <member name="M:Waher.Persistence.IPersistentDictionary.AddAsync(System.String,System.Object,System.Boolean)">
+            <summary>
+            Adds an element with the provided key and value to the System.Collections.Generic.IDictionary{string,object}.
+            </summary>
+            <param name="key">The object to use as the key of the element to add.</param>
+            <param name="value">The object to use as the value of the element to add.</param>
+            <param name="ReplaceIfExists">If replacement of any existing value is desired.</param>
+            <exception cref="T:System.ArgumentNullException">key is null</exception>
+            <exception cref="T:System.ArgumentException">An element with the same key already exists in the System.Collections.Generic.IDictionary{string,object}.</exception>
+        </member>
         <member name="M:Waher.Persistence.IPersistentDictionary.RemoveAsync(System.String)">
             <summary>
             Removes the element with the specified key from the System.Collections.IDictionary object.

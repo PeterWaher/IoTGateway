@@ -54,6 +54,14 @@ namespace Waher.Utility.GetEmojiCatalog
 
 				Log.Informational("Saving C#.");
 				File.WriteAllText("EmojiUtilities.cs", CSharp);
+
+				Log.Informational("Transforming to Markdown.");
+
+				Transform = XSL.LoadTransform("Waher.Utility.GetEmojiCatalog.Transforms.HtmlToMarkdown.xslt");
+				string Markdown = XSL.Transform(Html, Transform);
+
+				Log.Informational("Saving Markdown.");
+				File.WriteAllText("Emojis.md", Markdown);
 			}
 			catch (Exception ex)
 			{

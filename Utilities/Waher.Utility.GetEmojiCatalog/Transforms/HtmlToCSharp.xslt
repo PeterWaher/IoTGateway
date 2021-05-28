@@ -8,8 +8,6 @@
 
     <xsl:template match="/">
 		<xsl:text disable-output-escaping="yes">using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Content.Emoji
 {
@@ -21,12 +19,30 @@ namespace Waher.Content.Emoji
 	public static class EmojiUtilities
 	{
 		/// &lt;summary&gt;
+		/// Recognized emoji short names.
+		/// &lt;/summary&gt;
+		public static readonly string[] EmojiShortNames = new string[]
+		{</xsl:text>
+	<xsl:for-each select="/html/body/table/tbody/tr">
+		<xsl:if test="position()>1">
+			<xsl:text>,</xsl:text>
+		</xsl:if>
+		<xsl:variable name="ShortName" select="td[position()=7]/."/>
+		<xsl:text>
+			"</xsl:text>
+		<xsl:value-of select="substring($ShortName,2,string-length($ShortName)-2)"/>
+		<xsl:text>"</xsl:text>
+	</xsl:for-each>
+	<xsl:text disable-output-escaping="yes">
+		};
+
+		/// &lt;summary&gt;
 		/// Tries to get information about an emoji, given its short name.
 		/// &lt;/summary&gt;
 		/// &lt;param name="ShortName">Emoji short name.&lt;/param&gt;
 		/// &lt;param name="Emoji">Reference to emoji, if found, null otherwise.&lt;/param&gt;
 		/// &lt;returns&gt;If the emoji was reconized.&lt;/returns&gt;
-		public static bool TryGetEmoji(string ShortName, out Emoji Emoji)
+		public static bool TryGetEmoji(string ShortName, out EmojiInfo Emoji)
 		{
 			if (ShortName.StartsWith(":"))
 				ShortName = ShortName.Substring(1);
@@ -65,12 +81,12 @@ namespace Waher.Content.Emoji
 			<xsl:value-of select="td[position()=6]/."/>
 			<xsl:text disable-output-escaping="yes">
 		/// &lt;/summary&gt;
-		public static readonly Emoji Emoji_</xsl:text>
+		public static readonly EmojiInfo Emoji_</xsl:text>
 			<xsl:value-of select="translate(substring($ShortName,2,string-length($ShortName)-2),'-+','_P')"/>
 			<xsl:text> = new EmojiInfo("</xsl:text>
 			<xsl:value-of select="substring($ShortName,2,string-length($ShortName)-2)"/>
 			<xsl:text>", "</xsl:text>
-			<xsl:value-of select="td[position()=14]/."/>
+			<xsl:value-of select="td[position()=9]/."/>
 			<xsl:text>", "</xsl:text>
 			<xsl:value-of select="td[position()=6]/."/>
 			<xsl:text>", "</xsl:text>
@@ -121,14 +137,14 @@ namespace Waher.Content.Emoji
 	/// &lt;/summary&gt;
 	public class EmojiInfo
 	{
-		private string shortName;
-		private string fileName;
-		private string description;
-		private string unicode;
-		private bool appleSupport;
-		private bool googleSupport;
-		private bool twitterSupport;
-		private bool emoji1Support;
+		private readonly string shortName;
+		private readonly string fileName;
+		private readonly string description;
+		private readonly string unicode;
+		private readonly bool appleSupport;
+		private readonly bool googleSupport;
+		private readonly bool twitterSupport;
+		private readonly bool facebookSupport;
 
 		/// &lt;summary&gt;
 		/// Contains information about an emoji.
@@ -140,15 +156,15 @@ namespace Waher.Content.Emoji
 		/// &lt;param name="AppleSupport">If the emoji is supported by Apple.&lt;/param&gt;
 		/// &lt;param name="GoogleSupport">If the emoji is supported by Google.&lt;/param&gt;
 		/// &lt;param name="TwitterSupport">If the emoji is supported by Twitter.&lt;/param&gt;
-		/// &lt;param name="Emoji1Support">If the emoji is supported by emoji-1.&lt;/param&gt;
-		public Emoji(string ShortName, string FileName, string Description, string Unicode, 
-			bool AppleSupport, bool GoogleSupport, bool TwitterSupport, bool Emoji1Support)
+		/// &lt;param name="FacebookSupport">If the emoji is supported by emoji-1.&lt;/param&gt;
+		public EmojiInfo(string ShortName, string FileName, string Description, string Unicode, 
+			bool AppleSupport, bool GoogleSupport, bool TwitterSupport, bool FacebookSupport)
 		{
 			this.shortName = ShortName;
 			this.fileName = FileName;
 			this.description = Description;
 			this.unicode = Unicode;
-			this.emoji1Support = Emoji1Support;
+			this.facebookSupport = FacebookSupport;
 		}
 
 		/// &lt;summary&gt;
@@ -189,7 +205,7 @@ namespace Waher.Content.Emoji
 		/// &lt;summary&gt;
 		/// If the emoji is supported by emoji-1.
 		/// &lt;/summary&gt;
-		public bool Emoji1Support { get { return this.emoji1Support; } }
+		public bool FacebookSupport { get { return this.facebookSupport; } }
 	}
 }
 </xsl:text>

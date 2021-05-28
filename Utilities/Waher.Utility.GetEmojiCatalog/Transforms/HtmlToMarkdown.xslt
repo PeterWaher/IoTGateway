@@ -11,7 +11,9 @@
 Description: List of emojis supported by IoT Gateway Markdown.
 Date: 2016-02-05
 Author: Peter Waher
-Copyright: Waher Data AB
+Master: /Master.md
+
+=========================================================================================================================================
 
 Emojis
 =============
@@ -21,7 +23,7 @@ four versions of the emojis, one SVG version, which is resolution independent, a
 and one with 64x64 pixels. You can include the corresponding emoji using normal image inclusion in markdown. This allows you to control the size of the emoji.
 
 You can also include an emoji, by using a *short name*. Not all of the emojis have a recognized short name. 
-The following table[^List deduced from: <http://unicodey.com/emoji-data/table.htm>] contains the short names recognized by the gateway.
+The following table[^List deduced from: &lt;http://unicodey.com/emoji-data/table.htm&gt;] contains the short names recognized by the gateway.
 If you use the short name to insert a short name, the SVG version of the emoji will be used, with a size set to 24x24 pixels.
 
 | Characters     | Emoji                          |

@@ -8,8 +8,8 @@
     <Company>Waher Data AB</Company>
     <Copyright>Copyright © Waher Data AB 2016-2021. All rights reserved.</Copyright>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.4.0</AssemblyVersion>
-    <FileVersion>1.4.0</FileVersion>
+    <AssemblyVersion>1.4.1</AssemblyVersion>
+    <FileVersion>1.4.1</FileVersion>
     <Authors>Peter Waher</Authors>
     <Product>Waher.IoTGateway</Product>
     <PackageLicenseUrl></PackageLicenseUrl>
@@ -19,7 +19,7 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>persistence object database MongoDB</PackageTags>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <Version>1.4.0</Version>
+    <Version>1.4.1</Version>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 

@@ -1761,6 +1761,8 @@
             <param name="PkiSynchronized">If E2E information has been synchronized. If not, and a forbidden response is returned,
             E2E information is first synchronized, and the operation retried, before conceding failure.</param>
             <returns>ID of IQ stanza, if none provided in <paramref name="Id"/>.</returns>
+            <exception cref="T:System.ObjectDisposedException">If endpoint security object has been disposed.</exception>
+            <exception cref="T:System.InvalidOperationException">If E2E transmission is asserted, but no E2E-encrypted channel could be established.</exception>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.EndpointSecurity.IqGet(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.E2ETransmission,System.String,System.String,System.Int32)">
             <summary>

@@ -1599,6 +1599,22 @@
 								<RemoveFile Id='Removelogo_WaherDataAB_500x97.png' Name='logo-WaherDataAB-500x97.png' On='uninstall'/>
 							</Component>
 						</Directory>
+						<Directory Id='MarkdownLab' Name='MarkdownLab'>
+							<Component Id='MarkdownLabFiles' Guid='05D23AA3-AB3D-4771-9E54-77D49AF3E120'>
+								<CreateFolder>
+									<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+								</CreateFolder>
+								<RemoveFolder Id='RemoveMarkdownLab' On='uninstall' />
+								<File Id='MarkdownLab.css' Name='MarkdownLab.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLab.css' KeyPath='yes'/>
+								<File Id='MarkdownLab.js' Name='MarkdownLab.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLab.js'/>
+								<File Id='MarkdownLab.md' Name='MarkdownLab.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLab.md'/>
+								<File Id='MarkdownLabHtml.md' Name='MarkdownLabHtml.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabHtml.md'/>
+								<RemoveFile Id='RemoveMarkdownLab.css' Name='MarkdownLab.css' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLab.js' Name='MarkdownLab.js' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLab.md' Name='MarkdownLab.md' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLabHtml.md' Name='MarkdownLabHtml.md' On='uninstall'/>
+							</Component>
+						</Directory>
 						<Directory Id='PlantUmlLab' Name='PlantUmlLab'>
 							<Component Id='PlantUmlLabFiles' Guid='48A2AE1F-B266-480C-BCE7-BABAA26F4832'>
 								<CreateFolder>
@@ -1996,6 +2012,7 @@
 				<ComponentRef Id='DefaultFiles'/>
 				<ComponentRef Id='GraphVizLabFiles'/>
 				<ComponentRef Id='GraphVizLabExampleFiles'/>
+				<ComponentRef Id='MarkdownLabFiles'/>
 				<ComponentRef Id='PlantUmlLabFiles'/>
 				<ComponentRef Id='PlantUmlLabExampleFiles'/>
 			</Feature>

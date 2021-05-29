@@ -53,6 +53,7 @@ MenuFooter();
 
 MenuHeader("Lab");
 MenuItem("GraphViz","/GraphVizLab/GraphVizLab.md",["Admin.Lab.Script","Admin.Lab.GraphViz"]);
+MenuItem("Markdown","/MarkdownLab/MarkdownLab.md",["Admin.Lab.Script","Admin.Lab.Markdown"]);
 MenuItem("PlantUML","/PlantUmlLab/PlantUmlLab.md",["Admin.Lab.Script","Admin.Lab.PlantUml"]);
 MenuItem("Script","/Prompt.md","Admin.Lab.Script");
 MenuFooter();

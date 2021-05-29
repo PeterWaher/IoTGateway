@@ -1,0 +1,32 @@
+div#Lab
+{
+    display:flex;
+}
+
+section#MarkdownSection
+{
+    min-width:45%;
+}
+
+div#MarkdownDiv 
+{
+}
+
+textarea
+{
+    min-height:60vh;
+}
+
+section#HtmlSection
+{
+    min-width:45%;
+}
+
+div#HtmlDiv
+{
+}
+
+.invisible
+{
+    display:none
+}

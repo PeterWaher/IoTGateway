@@ -5,7 +5,7 @@ function UmlKeyDown(Control, Event)
 	if (EditTimer)
 		window.clearTimeout(EditTimer);
 
-	EditTimer = window.setTimeout(UpdateGraph, 1000);
+	EditTimer = window.setTimeout(UpdateGraph, 500);
 }
 
 function UpdateGraph()

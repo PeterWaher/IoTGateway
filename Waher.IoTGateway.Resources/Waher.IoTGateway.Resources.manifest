@@ -180,6 +180,12 @@
 			<Content fileName="logo-WaherDataAB-300x58.png"/>
 			<Content fileName="logo-WaherDataAB-400x77.png"/>
 		</Folder>
+		<Folder name="MarkdownLab">
+			<Content fileName="MarkdownLab.js"/>
+			<Content fileName="MarkdownLab.md"/>
+			<Content fileName="MarkdownLabHtml.md"/>
+			<Content fileName="MarkdownLab.css"/>
+		</Folder>
 		<Folder name="PlantUmlLab">
 			<Content fileName="PlantUmlLab.js"/>
 			<Content fileName="PlantUmlLab.md"/>

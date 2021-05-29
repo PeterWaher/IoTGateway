@@ -184,6 +184,10 @@
     <None Remove="Root\Images\Cactus Rose 800x800.png" />
     <None Remove="Root\Index.md" />
     <None Remove="Root\Markdown.md" />
+    <None Remove="Root\MarkdownLab\MarkdownLab.css" />
+    <None Remove="Root\MarkdownLab\MarkdownLab.js" />
+    <None Remove="Root\MarkdownLab\MarkdownLab.md" />
+    <None Remove="Root\MarkdownLab\MarkdownLabHtml.md" />
     <None Remove="Root\Master.md" />
     <None Remove="Root\PlantUmlLab\Examples\Activity.uml" />
     <None Remove="Root\PlantUmlLab\Examples\Archimate.uml" />
@@ -673,6 +677,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\GraphVizLab\GraphVizLabGraph.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\MarkdownLab\MarkdownLab.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\MarkdownLab\MarkdownLab.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\MarkdownLab\MarkdownLab.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\MarkdownLab\MarkdownLabHtml.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\PlantUmlLab\Examples\Activity.uml">

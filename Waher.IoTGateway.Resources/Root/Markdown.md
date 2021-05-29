@@ -14,6 +14,8 @@ additions and modifications. Some of these are introduced in the **IoT Gateway**
 [MultiMarkdown](https://rawgit.com/fletcher/human-markdown-reference/master/index.html) and
 [Markdown Extra](https://michelf.ca/projects/php-markdown/extra/). Below, is a summary of the markdown syntax, as understood by the **IoT Gateway**.
 
+**Note**: You can use the [Markdown Lab](MarkdownLab/MarkdownLab.md) to experiment with Markdown syntax.
+
 ![Table of Contents](ToC)
 
 =========================================================================================================================================================

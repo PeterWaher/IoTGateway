@@ -4424,6 +4424,22 @@ namespace Waher.Script
 		}
 
 		/// <summary>
+		/// Converts a value to a string, that can be parsed as part of an expression.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>String representation of value.</returns>
+		public static string ToString(Enum Value)
+		{
+			StringBuilder Output = new StringBuilder();
+
+			Output.Append(Value.GetType().FullName);
+			Output.Append('.');
+			Output.Append(Value.ToString());
+
+			return Output.ToString();
+		}
+
+		/// <summary>
 		/// Converts a string value to a parsable expression string.
 		/// </summary>
 		/// <param name="s">Value</param>

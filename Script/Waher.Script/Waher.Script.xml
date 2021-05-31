@@ -2511,6 +2511,13 @@
             <param name="Value">Value</param>
             <returns>String representation of value.</returns>
         </member>
+        <member name="M:Waher.Script.Expression.ToString(System.Enum)">
+            <summary>
+            Converts a value to a string, that can be parsed as part of an expression.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation of value.</returns>
+        </member>
         <member name="M:Waher.Script.Expression.ToString(System.String)">
             <summary>
             Converts a string value to a parsable expression string.
@@ -18750,6 +18757,25 @@
             <returns>How well objects of this type are supported.</returns>
         </member>
         <member name="M:Waher.Script.Output.DoubleOutput.GetString(System.Object)">
+            <summary>
+            Gets a string representing a value.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Expression string.</returns>
+        </member>
+        <member name="T:Waher.Script.Output.EnumOutput">
+            <summary>
+            Converts enumeration values to expression strings.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Output.EnumOutput.Supports(System.Type)">
+            <summary>
+            If the interface understands objects such as <paramref name="Object"/>.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>How well objects of this type are supported.</returns>
+        </member>
+        <member name="M:Waher.Script.Output.EnumOutput.GetString(System.Object)">
             <summary>
             Gets a string representing a value.
             </summary>

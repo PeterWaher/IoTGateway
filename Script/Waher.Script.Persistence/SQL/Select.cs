@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Persistence.Serialization;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -22,6 +23,7 @@ namespace Waher.Script.Persistence.SQL
 		private readonly ScriptNode[] groupByNames;
 		private readonly KeyValuePair<ScriptNode, bool>[] orderBy;
 		private readonly bool distinct;
+		private readonly bool generic;
 		private SourceDefinition source;
 		private ScriptNode top;
 		private ScriptNode where;
@@ -42,12 +44,13 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Top">Optional limit on number of records to return</param>
 		/// <param name="Offset">Optional offset into result set where reporting begins</param>
 		/// <param name="Distinct">If only distinct (unique) rows are to be returned.</param>
+		/// <param name="Generic">If objects of type <see cref="GenericObject"/> should be returned.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public Select(ScriptNode[] Columns, ScriptNode[] ColumnNames, SourceDefinition Source, ScriptNode Where, ScriptNode[] GroupBy,
 			ScriptNode[] GroupByNames, ScriptNode Having, KeyValuePair<ScriptNode, bool>[] OrderBy, ScriptNode Top, ScriptNode Offset,
-			bool Distinct, int Start, int Length, Expression Expression)
+			bool Distinct, bool Generic, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.columns = Columns;
@@ -61,6 +64,7 @@ namespace Waher.Script.Persistence.SQL
 			this.orderBy = OrderBy;
 			this.offset = Offset;
 			this.distinct = Distinct;
+			this.generic = Generic;
 
 			if (this.columnNames is null ^ this.columns is null)
 				throw new ArgumentException("Columns and ColumnNames must both be null or not null.", nameof(ColumnNames));
@@ -201,13 +205,13 @@ namespace Waher.Script.Persistence.SQL
 
 			if (this.groupBy is null)
 			{
-				e = await Source.Find(Offset, Top, this.where, Variables, OrderBy.ToArray(), this);
+				e = await Source.Find(Offset, Top, this.generic, this.where, Variables, OrderBy.ToArray(), this);
 				Offset = 0;
 				Top = int.MaxValue;
 			}
 			else
 			{
-				e = await Source.Find(0, int.MaxValue, this.where, Variables, OrderBy.ToArray(), this);
+				e = await Source.Find(0, int.MaxValue, this.generic, this.where, Variables, OrderBy.ToArray(), this);
 				e = new GroupEnumerator(e, Variables, this.groupBy, this.groupByNames);
 			}
 

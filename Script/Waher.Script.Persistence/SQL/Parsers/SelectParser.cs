@@ -35,7 +35,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 		/// <summary>
 		/// Any keywords used internally by the custom parser.
 		/// </summary>
-		public string[] InternalKeywords => new string[] { "AS", "FROM", "INNER", "OUTER", "LEFT", "RIGHT", "JOIN", "FULL", "WHERE", "GROUP", "BY", "HAVING", "ORDER", "TOP", "OFFSET", "ASC", "DESC", "DISTINCT" };
+		public string[] InternalKeywords => new string[] { "AS", "FROM", "INNER", "OUTER", "LEFT", "RIGHT", "JOIN", "FULL", "WHERE", "GROUP", "BY", "HAVING", "ORDER", "TOP", "OFFSET", "ASC", "DESC", "DISTINCT", "GENERIC" };
 
 		/// <summary>
 		/// Tries to parse a script node.
@@ -54,12 +54,13 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				ScriptNode Top = null;
 				string s;
 				bool Distinct = false;
+				bool Generic = false;
 
 				s = Parser.PeekNextToken().ToUpper();
 				if (string.IsNullOrEmpty(s))
 					return false;
 
-				while (s == "TOP" || s == "DISTINCT")
+				while (s == "TOP" || s == "DISTINCT" || s == "GENERIC")
 				{
 					switch (s)
 					{
@@ -72,9 +73,14 @@ namespace Waher.Script.Persistence.SQL.Parsers
 							Parser.NextToken();
 							Distinct = true;
 							break;
+
+						case "GENERIC":
+							Parser.NextToken();
+							Generic = true;
+							break;
 					}
 
-					s = Parser.PeekNextToken();
+					s = Parser.PeekNextToken().ToUpper();
 					if (string.IsNullOrEmpty(s))
 						return false;
 				}
@@ -278,7 +284,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 				}
 
 				Result = new Select(Columns?.ToArray(), ColumnNames?.ToArray(), Source, Where, GroupBy?.ToArray(),
-					GroupByNames?.ToArray(), Having, OrderBy?.ToArray(), Top, Offset, Distinct,
+					GroupByNames?.ToArray(), Having, OrderBy?.ToArray(), Top, Offset, Distinct, Generic,
 					Parser.Start, Parser.Length, Parser.Expression);
 
 				return true;

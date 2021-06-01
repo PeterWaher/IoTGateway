@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Persistence.Serialization;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -58,12 +59,13 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// </summary>
 		/// <param name="Offset">Offset at which to return elements.</param>
 		/// <param name="Top">Maximum number of elements to return.</param>
+		/// <param name="Generic">If objects of type <see cref="GenericObject"/> should be returned.</param>
 		/// <param name="Where">Filter conditions.</param>
 		/// <param name="Variables">Current set of variables.</param>
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>Enumerator.</returns>
-		public Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
+		public Task<IResultSetEnumerator> Find(int Offset, int Top, bool Generic, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
 			XPath WhereXPath = Where as XPath;
@@ -83,7 +85,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			if (!(Obj is IVector Vector))
 				Vector = Operators.Vectors.VectorDefinition.Encapsulate(new IElement[] { Obj }, false, Node);
 
-			return VectorSource.Find(Vector, Offset, Top, null, Variables, Order, Node);
+			return VectorSource.Find(Vector, Offset, Top, Generic, null, Variables, Order, Node);
 		}
 
 		/// <summary>

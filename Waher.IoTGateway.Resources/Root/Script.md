@@ -1948,7 +1948,7 @@ the name of the corresponding column.
 Syntax:
 
 ```
-SELECT [TOP maxcount] [DISTINCT]
+SELECT [TOP maxcount] [DISTINCT] [GENERIC]
 	* |
 	column1 [[as ]name1][, column2 [[as ]name2][, ...]]
 FROM

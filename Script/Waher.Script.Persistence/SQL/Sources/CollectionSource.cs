@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
+using Waher.Persistence.Serialization;
 using Waher.Runtime.Settings;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Persistence.SQL.Sources
@@ -37,18 +35,29 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// </summary>
 		/// <param name="Offset">Offset at which to return elements.</param>
 		/// <param name="Top">Maximum number of elements to return.</param>
+		/// <param name="Generic">If objects of type <see cref="GenericObject"/> should be returned.</param>
 		/// <param name="Where">Filter conditions.</param>
 		/// <param name="Variables">Current set of variables.</param>
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>Enumerator.</returns>
-		public async Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
+		public async Task<IResultSetEnumerator> Find(int Offset, int Top, bool Generic, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
-			IEnumerable<object> Objects = await Database.Find(this.collectionName, Offset, Top,
-				TypeSource.Convert(Where, Variables, this.Name), TypeSource.Convert(Order));
+			if (Generic)
+			{
+				IEnumerable<GenericObject> Objects = await Database.Find<GenericObject>(this.collectionName, Offset, Top,
+					TypeSource.Convert(Where, Variables, this.Name), TypeSource.Convert(Order));
 
-			return new SynchEnumerator(Objects.GetEnumerator());
+				return new SynchEnumerator(Objects.GetEnumerator());
+			}
+			else
+			{
+				IEnumerable<object> Objects = await Database.Find(this.collectionName, Offset, Top,
+					TypeSource.Convert(Where, Variables, this.Name), TypeSource.Convert(Order));
+
+				return new SynchEnumerator(Objects.GetEnumerator());
+			}
 		}
 
 		/// <summary>

@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Waher.Persistence.Serialization;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Order;
+using Waher.Script.Persistence.Functions;
 
 namespace Waher.Script.Persistence.SQL.Sources
 {
@@ -59,20 +61,21 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// </summary>
 		/// <param name="Offset">Offset at which to return elements.</param>
 		/// <param name="Top">Maximum number of elements to return.</param>
+		/// <param name="Generic">If objects of type <see cref="GenericObject"/> should be returned.</param>
 		/// <param name="Where">Filter conditions.</param>
 		/// <param name="Variables">Current set of variables.</param>
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>Enumerator.</returns>
-		public Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
+		public Task<IResultSetEnumerator> Find(int Offset, int Top, bool Generic, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
-			return Find(this.vector, Offset, Top, Where, Variables, Order, Node);
+			return Find(this.vector, Offset, Top, Generic, Where, Variables, Order, Node);
 		}
 
-		internal static async Task<IResultSetEnumerator> Find(IVector Vector, int Offset, int Top, ScriptNode Where, Variables Variables,
+		internal static async Task<IResultSetEnumerator> Find(IVector Vector, int Offset, int Top, bool Generic, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
-		{ 
+		{
 			IResultSetEnumerator e = new SynchEnumerator(Vector.VectorElements.GetEnumerator());
 			int i, c;
 
@@ -85,13 +88,11 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 				while (await e.MoveNextAsync())
 				{
-					if (e.Current is Element E)
-						Items.Add(E);
-					else
-						Items.Add(Expression.Encapsulate(e.Current));
-				}
+					if (!(e.Current is IElement E))
+						E = Expression.Encapsulate(e.Current);
 
-				Items.Add(e.Current as IElement);
+					Items.Add(await Generalize.Evaluate(E));
+				}
 
 				IComparer<IElement> Order2;
 

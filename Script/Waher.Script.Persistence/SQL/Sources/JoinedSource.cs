@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Persistence.Serialization;
 using Waher.Script.Model;
 
 namespace Waher.Script.Persistence.SQL.Sources
@@ -47,12 +48,13 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// </summary>
 		/// <param name="Offset">Offset at which to return elements.</param>
 		/// <param name="Top">Maximum number of elements to return.</param>
+		/// <param name="Generic">If objects of type <see cref="GenericObject"/> should be returned.</param>
 		/// <param name="Where">Filter conditions.</param>
 		/// <param name="Variables">Current set of variables.</param>
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>Enumerator.</returns>
-		public abstract Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
+		public abstract Task<IResultSetEnumerator> Find(int Offset, int Top, bool Generic, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node);
 
 		/// <summary>

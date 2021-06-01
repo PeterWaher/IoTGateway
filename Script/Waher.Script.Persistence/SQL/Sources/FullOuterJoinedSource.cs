@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Persistence.Serialization;
 using Waher.Script.Model;
 
 namespace Waher.Script.Persistence.SQL.Sources
@@ -27,34 +28,33 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// </summary>
 		/// <param name="Offset">Offset at which to return elements.</param>
 		/// <param name="Top">Maximum number of elements to return.</param>
+		/// <param name="Generic">If objects of type <see cref="GenericObject"/> should be returned.</param>
 		/// <param name="Where">Filter conditions.</param>
 		/// <param name="Variables">Current set of variables.</param>
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>Enumerator.</returns>
-		public override async Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
+		public override async Task<IResultSetEnumerator> Find(int Offset, int Top, bool Generic, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
 			ScriptNode LeftWhere = await Reduce(this.Left, Where);
 			KeyValuePair<VariableReference, bool>[] LeftOrder = await Reduce(this.Left, Order);
 
-			IResultSetEnumerator LeftEnum = await this.Left.Find(0, int.MaxValue,
-				LeftWhere, Variables, LeftOrder, Node);
+			IResultSetEnumerator LeftEnum = await this.Left.Find(0, int.MaxValue, Generic, LeftWhere, Variables, LeftOrder, Node);
 
 			ScriptNode RightWhere = await Reduce(this.Right, this.Left, Where);
 
-			LeftEnum = new LeftOuterJoinedSource.LeftOuterJoinEnumerator(LeftEnum, this.Left.Name, this.Right, this.Right.Name,
+			LeftEnum = new LeftOuterJoinedSource.LeftOuterJoinEnumerator(LeftEnum, this.Left.Name, this.Right, this.Right.Name, Generic,
 				this.Combine(RightWhere, this.Conditions), Variables, false);
 
 			ScriptNode RightWhere2 = await Reduce(this.Right, Where);
 			KeyValuePair<VariableReference, bool>[] RightOrder2 = await Reduce(this.Right, Order);
 
-			IResultSetEnumerator RightEnum = await this.Right.Find(0, int.MaxValue,
-				RightWhere2, Variables, RightOrder2, Node);
+			IResultSetEnumerator RightEnum = await this.Right.Find(0, int.MaxValue, Generic, RightWhere2, Variables, RightOrder2, Node);
 
 			ScriptNode LeftWhere2 = await Reduce(this.Left, this.Right, Where);
 
-			RightEnum = new LeftOuterJoinedSource.LeftOuterJoinEnumerator(RightEnum, this.Right.Name, this.Left, this.Left.Name,
+			RightEnum = new LeftOuterJoinedSource.LeftOuterJoinEnumerator(RightEnum, this.Right.Name, this.Left, this.Left.Name, Generic,
 				this.Combine(LeftWhere2, this.Conditions), Variables, true);
 
 			IResultSetEnumerator e = new FullOuterJoinEnumerator(LeftEnum, RightEnum);

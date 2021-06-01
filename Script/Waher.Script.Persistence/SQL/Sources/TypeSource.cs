@@ -2,10 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
+using Waher.Persistence.Serialization;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -43,16 +43,30 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// </summary>
 		/// <param name="Offset">Offset at which to return elements.</param>
 		/// <param name="Top">Maximum number of elements to return.</param>
+		/// <param name="Generic">If objects of type <see cref="GenericObject"/> should be returned.</param>
 		/// <param name="Where">Filter conditions.</param>
 		/// <param name="Variables">Current set of variables.</param>
 		/// <param name="Order">Order at which to order the result set.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>Enumerator.</returns>
-		public async Task<IResultSetEnumerator> Find(int Offset, int Top, ScriptNode Where, Variables Variables,
+		public async Task<IResultSetEnumerator> Find(int Offset, int Top, bool Generic, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
-			object[] FindParameters = new object[] { Offset, Top, Convert(Where, Variables, this.Name), Convert(Order) };
-			object Obj = FindMethod.MakeGenericMethod(this.type).Invoke(null, FindParameters);
+			object[] FindParameters;
+			MethodInfo MI;
+
+			if (Generic)
+			{
+				FindParameters = new object[] { await Database.GetCollection(this.type), Offset, Top, Convert(Where, Variables, this.Name), Convert(Order) };
+				MI = FindMethodGeneric.MakeGenericMethod(typeof(GenericObject));
+			}
+			else
+			{
+				FindParameters = new object[] { Offset, Top, Convert(Where, Variables, this.Name), Convert(Order) };
+				MI = FindMethod.MakeGenericMethod(this.type);
+			}
+
+			object Obj = MI.Invoke(null, FindParameters);
 			if (!(Obj is Task Task))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
 
@@ -70,6 +84,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		}
 
 		private static MethodInfo findMethod = null;
+		private static MethodInfo findMethodGeneric = null;
 
 		/// <summary>
 		/// Generic object database Find method: <see cref="Database.Find{T}(int, int, Filter, string[])"/>
@@ -103,6 +118,42 @@ namespace Waher.Script.Persistence.SQL.Sources
 				}
 
 				return findMethod;
+			}
+		}
+
+		/// <summary>
+		/// Generic object database Find method: <see cref="Database.Find{T}(string, int, int, Filter, string[])"/>
+		/// </summary>
+		public static MethodInfo FindMethodGeneric
+		{
+			get
+			{
+				if (findMethodGeneric is null)
+				{
+					foreach (MethodInfo MI in typeof(Database).GetTypeInfo().GetDeclaredMethods("Find"))
+					{
+						if (!MI.ContainsGenericParameters)
+							continue;
+
+						ParameterInfo[] Parameters = MI.GetParameters();
+						if (Parameters.Length != 5 ||
+							Parameters[0].ParameterType != typeof(string) ||
+							Parameters[1].ParameterType != typeof(int) ||
+							Parameters[2].ParameterType != typeof(int) ||
+							Parameters[3].ParameterType != typeof(Filter) ||
+							Parameters[4].ParameterType != typeof(string[]))
+						{
+							continue;
+						}
+
+						findMethodGeneric = MI;
+					}
+
+					if (findMethodGeneric is null)
+						throw new InvalidOperationException("Appropriate Database.Find method not found.");
+				}
+
+				return findMethodGeneric;
 			}
 		}
 

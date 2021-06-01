@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -54,13 +55,31 @@ namespace Waher.Script.Persistence.Functions
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement Argument, Variables Variables)
 		{
-			object Obj = Argument.AssociatedObjectValue;
+			return Evaluate(Argument).Result;
+		}
 
-			if (Obj is ICollection<KeyValuePair<string, IElement>> GenObj)
+		/// <summary>
+		/// Generalizes the object in <paramref name="E"/>.
+		/// </summary>
+		/// <param name="E">Element</param>
+		/// <returns>Generaized object.</returns>
+		public static Task<IElement> Evaluate(IElement E)
+		{
+			return Evaluate(E.AssociatedObjectValue);
+		}
+
+		/// <summary>
+		/// Generalizes the object in <paramref name="Object"/>.
+		/// </summary>
+		/// <param name="Object">Object</param>
+		/// <returns>Generaized object.</returns>
+		public static async Task<IElement> Evaluate(object Object)
+		{
+			if (Object is ICollection<KeyValuePair<string, IElement>> GenObj)
 				return new ObjectValue(GenObj);
 
-			if (!(Obj is ICollection<KeyValuePair<string, object>> GenObj2))
-				GenObj2 = Database.Generalize(Obj).Result;
+			if (!(Object is ICollection<KeyValuePair<string, object>> GenObj2))
+				GenObj2 = await Database.Generalize(Object);
 
 			return new ObjectValue(GenObj2);
 		}

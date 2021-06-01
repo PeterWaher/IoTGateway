@@ -104,6 +104,20 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.Functions.Generalize.Evaluate(Waher.Script.Abstraction.Elements.IElement)">
+            <summary>
+            Generalizes the object in <paramref name="E"/>.
+            </summary>
+            <param name="E">Element</param>
+            <returns>Generaized object.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.Generalize.Evaluate(System.Object)">
+            <summary>
+            Generalizes the object in <paramref name="Object"/>.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>Generaized object.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.Functions.Pivot">
             <summary>
             Pivots a result matrix so columns become rows, and vice versa. It is similar to the matrix transpose operator, except it takes
@@ -722,12 +736,13 @@
             Interface for data sources that can be used in SQL statements.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.IDataSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.IDataSource.Find(System.Int32,System.Int32,System.Boolean,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
             Finds objects matching filter conditions in <paramref name="Where"/>.
             </summary>
             <param name="Offset">Offset at which to return elements.</param>
             <param name="Top">Maximum number of elements to return.</param>
+            <param name="Generic">If objects of type <see cref="T:Waher.Persistence.Serialization.GenericObject"/> should be returned.</param>
             <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
             <param name="Order">Order at which to order the result set.</param>
@@ -1413,7 +1428,7 @@
             Executes a SELECT statement against the object database.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Select.#ctor(Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Persistence.SQL.SourceDefinition,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[],Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Boolean,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.Persistence.SQL.Select.#ctor(Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Persistence.SQL.SourceDefinition,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNode,System.Collections.Generic.KeyValuePair{Waher.Script.Model.ScriptNode,System.Boolean}[],Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Boolean,System.Boolean,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Executes a SELECT statement against the object database.
             </summary>
@@ -1428,6 +1443,7 @@
             <param name="Top">Optional limit on number of records to return</param>
             <param name="Offset">Optional offset into result set where reporting begins</param>
             <param name="Distinct">If only distinct (unique) rows are to be returned.</param>
+            <param name="Generic">If objects of type <see cref="T:Waher.Persistence.Serialization.GenericObject"/> should be returned.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
@@ -1719,12 +1735,13 @@
             <param name="CollectionName">Collection Name</param>
             <param name="Alias">Alias for source.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.CollectionSource.Find(System.Int32,System.Int32,System.Boolean,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
             Finds objects matching filter conditions in <paramref name="Where"/>.
             </summary>
             <param name="Offset">Offset at which to return elements.</param>
             <param name="Top">Maximum number of elements to return.</param>
+            <param name="Generic">If objects of type <see cref="T:Waher.Persistence.Serialization.GenericObject"/> should be returned.</param>
             <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
             <param name="Order">Order at which to order the result set.</param>
@@ -1819,12 +1836,13 @@
             <param name="Right">Right source</param>
             <param name="Conditions">Conditions for join.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.FullOuterJoinedSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.FullOuterJoinedSource.Find(System.Int32,System.Int32,System.Boolean,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
             Finds objects matching filter conditions in <paramref name="Where"/>.
             </summary>
             <param name="Offset">Offset at which to return elements.</param>
             <param name="Top">Maximum number of elements to return.</param>
+            <param name="Generic">If objects of type <see cref="T:Waher.Persistence.Serialization.GenericObject"/> should be returned.</param>
             <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
             <param name="Order">Order at which to order the result set.</param>
@@ -1844,12 +1862,13 @@
             <param name="Right">Right source</param>
             <param name="Conditions">Conditions for join.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.InnerJoinedSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.InnerJoinedSource.Find(System.Int32,System.Int32,System.Boolean,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
             Finds objects matching filter conditions in <paramref name="Where"/>.
             </summary>
             <param name="Offset">Offset at which to return elements.</param>
             <param name="Top">Maximum number of elements to return.</param>
+            <param name="Generic">If objects of type <see cref="T:Waher.Persistence.Serialization.GenericObject"/> should be returned.</param>
             <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
             <param name="Order">Order at which to order the result set.</param>
@@ -1920,12 +1939,13 @@
             Conditions for join.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedSource.Find(System.Int32,System.Int32,System.Boolean,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
             Finds objects matching filter conditions in <paramref name="Where"/>.
             </summary>
             <param name="Offset">Offset at which to return elements.</param>
             <param name="Top">Maximum number of elements to return.</param>
+            <param name="Generic">If objects of type <see cref="T:Waher.Persistence.Serialization.GenericObject"/> should be returned.</param>
             <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
             <param name="Order">Order at which to order the result set.</param>
@@ -2068,12 +2088,13 @@
             If sources should be flipped in the <see cref="T:Waher.Script.Persistence.SQL.Sources.JoinedObject"/> instances created.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.LeftOuterJoinedSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.LeftOuterJoinedSource.Find(System.Int32,System.Int32,System.Boolean,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
             Finds objects matching filter conditions in <paramref name="Where"/>.
             </summary>
             <param name="Offset">Offset at which to return elements.</param>
             <param name="Top">Maximum number of elements to return.</param>
+            <param name="Generic">If objects of type <see cref="T:Waher.Persistence.Serialization.GenericObject"/> should be returned.</param>
             <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
             <param name="Order">Order at which to order the result set.</param>
@@ -2115,12 +2136,13 @@
             Type definition
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.Find(System.Int32,System.Int32,System.Boolean,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
             Finds objects matching filter conditions in <paramref name="Where"/>.
             </summary>
             <param name="Offset">Offset at which to return elements.</param>
             <param name="Top">Maximum number of elements to return.</param>
+            <param name="Generic">If objects of type <see cref="T:Waher.Persistence.Serialization.GenericObject"/> should be returned.</param>
             <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
             <param name="Order">Order at which to order the result set.</param>
@@ -2130,6 +2152,11 @@
         <member name="P:Waher.Script.Persistence.SQL.Sources.TypeSource.FindMethod">
             <summary>
             Generic object database Find method: <see cref="M:Waher.Persistence.Database.Find``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.Sources.TypeSource.FindMethodGeneric">
+            <summary>
+            Generic object database Find method: <see cref="M:Waher.Persistence.Database.Find``1(System.String,System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])"/>
             </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.TypeSource.FindDelete(System.Boolean,System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
@@ -2236,12 +2263,13 @@
             Vector
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.Find(System.Int32,System.Int32,System.Boolean,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
             Finds objects matching filter conditions in <paramref name="Where"/>.
             </summary>
             <param name="Offset">Offset at which to return elements.</param>
             <param name="Top">Maximum number of elements to return.</param>
+            <param name="Generic">If objects of type <see cref="T:Waher.Persistence.Serialization.GenericObject"/> should be returned.</param>
             <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
             <param name="Order">Order at which to order the result set.</param>
@@ -2346,12 +2374,13 @@
             <param name="Xml">XML</param>
             <param name="Node">Node defining the vector.</param>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.Find(System.Int32,System.Int32,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Persistence.SQL.Sources.XmlSource.Find(System.Int32,System.Int32,System.Boolean,Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{Waher.Script.Model.VariableReference,System.Boolean}[],Waher.Script.Model.ScriptNode)">
             <summary>
             Finds objects matching filter conditions in <paramref name="Where"/>.
             </summary>
             <param name="Offset">Offset at which to return elements.</param>
             <param name="Top">Maximum number of elements to return.</param>
+            <param name="Generic">If objects of type <see cref="T:Waher.Persistence.Serialization.GenericObject"/> should be returned.</param>
             <param name="Where">Filter conditions.</param>
             <param name="Variables">Current set of variables.</param>
             <param name="Order">Order at which to order the result set.</param>

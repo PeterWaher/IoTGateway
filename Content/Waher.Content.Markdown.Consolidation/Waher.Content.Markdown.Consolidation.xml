@@ -114,6 +114,16 @@
             <param name="Update">If a document should be updated.</param>
             <returns>If the source is new.</returns>
         </member>
+        <member name="E:Waher.Content.Markdown.Consolidation.Consolidator.Added">
+            <summary>
+            Event raised when content from a source has been added.
+            </summary>
+        </member>
+        <member name="E:Waher.Content.Markdown.Consolidation.Consolidator.Updated">
+            <summary>
+            Event raised when content from a source has been updated.
+            </summary>
+        </member>
         <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.GenerateMarkdown">
             <summary>
             Generates consolidated markdown from all sources.
@@ -126,6 +136,16 @@
             </summary>
             <param name="N">Number of colors in palette.</param>
             <returns>Palette</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="E:Waher.Content.Markdown.Consolidation.Consolidator.Disposed">
+            <summary>
+            Event raised when consolidator has been disposed.
+            </summary>
         </member>
         <member name="T:Waher.Content.Markdown.Consolidation.DocumentType">
             <summary>
@@ -217,6 +237,29 @@
         <member name="P:Waher.Content.Markdown.Consolidation.DocumentInformation.Rows">
             <summary>
             Rows
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Markdown.Consolidation.SourceEventHandler">
+            <summary>
+            Delegate for source events.
+            </summary>
+            <param name="Sender">Sender of events.</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Consolidation.SourceEventArgs">
+            <summary>
+            Event arguments for source events.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.SourceEventArgs.#ctor(System.String)">
+            <summary>
+            Event arguments for source events.
+            </summary>
+            <param name="Source">Source causing the event to be raised.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.SourceEventArgs.Source">
+            <summary>
+            Source causing the event to be raised.
             </summary>
         </member>
         <member name="T:Waher.Content.Markdown.Consolidation.SourceState">

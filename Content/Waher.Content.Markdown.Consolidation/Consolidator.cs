@@ -5,14 +5,17 @@ using System.Text.RegularExpressions;
 using SkiaSharp;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs;
+using Waher.Script.Objects;
+using Waher.Script.Objects.Matrices;
 
 namespace Waher.Content.Markdown.Consolidation
 {
 	/// <summary>
 	/// Consolidates Markdown from multiple sources, sharing the same thread.
 	/// </summary>
-	public class Consolidator
+	public class Consolidator : IDisposable
 	{
 		private readonly string threadId;
 		private readonly SortedDictionary<string, SourceState> sources = new SortedDictionary<string, SourceState>();
@@ -189,8 +192,38 @@ namespace Waher.Content.Markdown.Consolidation
 				}
 			}
 
+			if (Update)
+				this.Raise(this.Updated, Source);
+			else
+				this.Raise(this.Added, Source);
+
 			return Result;
 		}
+
+		private void Raise(SourceEventHandler Handler, string Source)
+		{
+			if (!(Handler is null))
+			{
+				try
+				{
+					Handler(this, new SourceEventArgs(Source));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when content from a source has been added.
+		/// </summary>
+		public event SourceEventHandler Added = null;
+
+		/// <summary>
+		/// Event raised when content from a source has been updated.
+		/// </summary>
+		public event SourceEventHandler Updated = null;
 
 		/// <summary>
 		/// Generates consolidated markdown from all sources.
@@ -541,5 +574,28 @@ namespace Waher.Content.Markdown.Consolidation
 			}
 		}
 
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public void Dispose()
+		{
+			EventHandler h = this.Disposed;
+			if (!(h is null))
+			{
+				try
+				{
+					h(this, new EventArgs());
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when consolidator has been disposed.
+		/// </summary>
+		public event EventHandler Disposed = null;
 	}
 }

@@ -95,6 +95,23 @@
             <param name="Id">Optional ID of document.</param>
             <returns>If the source is new.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.Add(System.String,System.String)">
+            <summary>
+            Adds incoming markdown information.
+            </summary>
+            <param name="Source">Source of information.</param>
+            <param name="Text">Text input.</param>
+            <returns>If the source is new.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.Add(System.String,System.String,System.String)">
+            <summary>
+            Adds incoming markdown information.
+            </summary>
+            <param name="Source">Source of information.</param>
+            <param name="Text">Text input.</param>
+            <param name="Id">Optional ID of document.</param>
+            <returns>If the source is new.</returns>
+        </member>
         <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.Update(System.String,Waher.Content.Markdown.MarkdownDocument,System.String)">
             <summary>
             Updates incoming markdown information.
@@ -102,6 +119,25 @@
             <param name="Source">Source of information.</param>
             <param name="Markdown">Markdown document.</param>
             <param name="Id">Optional ID of document.</param>
+            <returns>If the source is new.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.Update(System.String,System.String,System.String)">
+            <summary>
+            Updates incoming markdown information.
+            </summary>
+            <param name="Source">Source of information.</param>
+            <param name="Text">Text input.</param>
+            <param name="Id">Optional ID of document.</param>
+            <returns>If the source is new.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.Add(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Adds incoming markdown information.
+            </summary>
+            <param name="Source">Source of information.</param>
+            <param name="Text">Text input.</param>
+            <param name="Id">Optional ID of document.</param>
+            <param name="Update">If a document should be updated.</param>
             <returns>If the source is new.</returns>
         </member>
         <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.Add(System.String,Waher.Content.Markdown.MarkdownDocument,System.String,System.Boolean)">
@@ -237,6 +273,88 @@
         <member name="P:Waher.Content.Markdown.Consolidation.DocumentInformation.Rows">
             <summary>
             Rows
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Markdown.Consolidation.IConsolidator">
+            <summary>
+            Interface for consolidators.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.IConsolidator.Sources">
+            <summary>
+            Consolidated sources.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.IConsolidator.Tag">
+            <summary>
+            External tag object that can be tagged to the object by its owner.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.IConsolidator.Add(System.String,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Adds incoming markdown information.
+            </summary>
+            <param name="Source">Source of information.</param>
+            <param name="Markdown">Markdown document.</param>
+            <returns>If the source is new.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.IConsolidator.Add(System.String,Waher.Content.Markdown.MarkdownDocument,System.String)">
+            <summary>
+            Adds incoming markdown information.
+            </summary>
+            <param name="Source">Source of information.</param>
+            <param name="Markdown">Markdown document.</param>
+            <param name="Id">Optional ID of document.</param>
+            <returns>If the source is new.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.IConsolidator.Add(System.String,System.String)">
+            <summary>
+            Adds incoming markdown information.
+            </summary>
+            <param name="Source">Source of information.</param>
+            <param name="Text">Text input.</param>
+            <returns>If the source is new.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.IConsolidator.Add(System.String,System.String,System.String)">
+            <summary>
+            Adds incoming markdown information.
+            </summary>
+            <param name="Source">Source of information.</param>
+            <param name="Text">Text input.</param>
+            <param name="Id">Optional ID of document.</param>
+            <returns>If the source is new.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.IConsolidator.Update(System.String,Waher.Content.Markdown.MarkdownDocument,System.String)">
+            <summary>
+            Updates incoming markdown information.
+            </summary>
+            <param name="Source">Source of information.</param>
+            <param name="Markdown">Markdown document.</param>
+            <param name="Id">Optional ID of document.</param>
+            <returns>If the source is new.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.IConsolidator.Update(System.String,System.String,System.String)">
+            <summary>
+            Updates incoming markdown information.
+            </summary>
+            <param name="Source">Source of information.</param>
+            <param name="Text">Text input.</param>
+            <param name="Id">Optional ID of document.</param>
+            <returns>If the source is new.</returns>
+        </member>
+        <member name="E:Waher.Content.Markdown.Consolidation.IConsolidator.Added">
+            <summary>
+            Event raised when content from a source has been added.
+            </summary>
+        </member>
+        <member name="E:Waher.Content.Markdown.Consolidation.IConsolidator.Updated">
+            <summary>
+            Event raised when content from a source has been updated.
+            </summary>
+        </member>
+        <member name="E:Waher.Content.Markdown.Consolidation.IConsolidator.Disposed">
+            <summary>
+            Event raised when consolidator has been disposed.
             </summary>
         </member>
         <member name="T:Waher.Content.Markdown.Consolidation.SourceEventHandler">

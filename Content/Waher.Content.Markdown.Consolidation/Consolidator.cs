@@ -15,7 +15,7 @@ namespace Waher.Content.Markdown.Consolidation
 	/// <summary>
 	/// Consolidates Markdown from multiple sources, sharing the same thread.
 	/// </summary>
-	public class Consolidator : IDisposable
+	public class Consolidator : IConsolidator
 	{
 		private readonly string threadId;
 		private readonly SortedDictionary<string, SourceState> sources = new SortedDictionary<string, SourceState>();
@@ -92,6 +92,29 @@ namespace Waher.Content.Markdown.Consolidation
 		}
 
 		/// <summary>
+		/// Adds incoming markdown information.
+		/// </summary>
+		/// <param name="Source">Source of information.</param>
+		/// <param name="Text">Text input.</param>
+		/// <returns>If the source is new.</returns>
+		public bool Add(string Source, string Text)
+		{
+			return this.Add(Source, Text, string.Empty);
+		}
+
+		/// <summary>
+		/// Adds incoming markdown information.
+		/// </summary>
+		/// <param name="Source">Source of information.</param>
+		/// <param name="Text">Text input.</param>
+		/// <param name="Id">Optional ID of document.</param>
+		/// <returns>If the source is new.</returns>
+		public bool Add(string Source, string Text, string Id)
+		{
+			return this.Add(Source, Text, Id, false);
+		}
+
+		/// <summary>
 		/// Updates incoming markdown information.
 		/// </summary>
 		/// <param name="Source">Source of information.</param>
@@ -101,6 +124,32 @@ namespace Waher.Content.Markdown.Consolidation
 		public bool Update(string Source, MarkdownDocument Markdown, string Id)
 		{
 			return this.Add(Source, Markdown, Id, true);
+		}
+
+		/// <summary>
+		/// Updates incoming markdown information.
+		/// </summary>
+		/// <param name="Source">Source of information.</param>
+		/// <param name="Text">Text input.</param>
+		/// <param name="Id">Optional ID of document.</param>
+		/// <returns>If the source is new.</returns>
+		public bool Update(string Source, string Text, string Id)
+		{
+			return this.Add(Source, Text, Id, true);
+		}
+
+		/// <summary>
+		/// Adds incoming markdown information.
+		/// </summary>
+		/// <param name="Source">Source of information.</param>
+		/// <param name="Text">Text input.</param>
+		/// <param name="Id">Optional ID of document.</param>
+		/// <param name="Update">If a document should be updated.</param>
+		/// <returns>If the source is new.</returns>
+		private bool Add(string Source, string Text, string Id, bool Update)
+		{
+			MarkdownDocument Doc = new MarkdownDocument(Text);
+			return this.Add(Source, Doc, Id, Update);
 		}
 
 		/// <summary>

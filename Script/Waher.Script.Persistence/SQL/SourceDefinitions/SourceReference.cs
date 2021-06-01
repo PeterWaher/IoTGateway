@@ -80,6 +80,8 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 					return new XmlSource(Name, Alias, Doc, Source);
 				else if (Value.AssociatedObjectValue is XmlNode N)
 					return new XmlSource(Name, Alias, N, Source);
+				else if (Value.AssociatedObjectValue is IDataSource DataSource)
+					return DataSource;
 			}
 
 			throw new ScriptRuntimeException("Data source type not supported: " + E.AssociatedObjectValue?.GetType()?.FullName, Source);

@@ -2462,6 +2462,39 @@
             Drops the collection from the source.
             </summary>
         </member>
+        <member name="T:Waher.Script.Persistence.SQL.SynchEnumerator">
+            <summary>
+            Synchronous enumerator
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.SynchEnumerator.#ctor(System.Collections.IEnumerator)">
+            <summary>
+            Synchronous enumerator
+            </summary>
+            <param name="e">Underlying enumerator.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.SynchEnumerator.Current">
+            <summary>
+            Current item.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.SynchEnumerator.MoveNext">
+            <summary>
+            Tries to move to next item.
+            </summary>
+            <returns>If successful</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.SynchEnumerator.MoveNextAsync">
+            <summary>
+            Tries to move to next item.
+            </summary>
+            <returns>If successful</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.SynchEnumerator.Reset">
+            <summary>
+            Resets the enumerator
+            </summary>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.Update">
             <summary>
             Executes an UPDATE statement against the object database.

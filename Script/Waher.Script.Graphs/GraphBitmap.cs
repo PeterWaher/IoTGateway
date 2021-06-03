@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using System.Xml;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;

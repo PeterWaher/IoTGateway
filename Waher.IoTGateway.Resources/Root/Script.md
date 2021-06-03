@@ -1735,10 +1735,12 @@ The following functions are available in the `Waher.Content.Markdown` library.
 
 | Function                 | Description | Example |
 |--------------------------|-------------|---------|
+| `FromMarkdown(Markdown)` | Converts a string containing Markdown Representation to a script object. | [Example][FromMarkdownExample] |
 | `LoadMarkdown(FileName)` | Loads a markdown file and preprocesses it before returning it as a string. | [Example][LoadMarkdownExample] |
 | `MarkdownEncode(s)`      | Encodes a string for inclusion in Markdown. | [Example][MarkdownEncodeExample] |
 | `MarkdownToHtml(s)`      | Parses the markdown provided in `s` and converts it to HTML. Only HTML between BODY tags is returned. | [Example][MarkdowntoHtmlExample] |
 | `PreprocessMarkdown(MD)` | Preprocesses a markdown string `MD`, and returns it as a string. | [Example][PreprocessMarkdownExample] |
+| `ToMarkdown(Obj)`        | Converts the object to a string containing the Markdown Representation of the object. | [Example][ToMarkdownExample] |
 
 The following predefined context-specific constants (read-only variables) are available in inline script:
 
@@ -1751,6 +1753,8 @@ The following predefined context-specific constants (read-only variables) are av
 [MarkdownEncodeExample]: Prompt.md?Expression=MarkdownEncode(%22test_sister%22)
 [MarkdowntoHtmlExample]: Prompt.md?Expression=MarkdownToHtml(%22:file_folder:%22)
 [PreprocessMarkdownExample]: Prompt.md?Expression=s%3A%3D%22Hello%20World%21%22%3BPreprocessMarkdown%28%22%2A%7B%7Bs%7D%7D%2A%22%29
+[FromMarkdownExample]: Prompt.md?Expression=FromMarkdown(%22`10%20kWh`%22)
+[ToMarkdownExample]: Prompt.md?Expression=ToMarkdown((x:=-10..10;y:=sin(x);plot2dcurve(x,y)))
 
 #### XSL-related functions (Waher.Content.Xsl)
 
@@ -1852,14 +1856,14 @@ The following functions are available in web pages hosted by the IoT Gateway:
 
 | Function                            | Description |
 |-------------------------------------|-------------|
-| BareJID(JID)                        | Returns the Bare JID of `JID` |
-| ClearCaches()                       | Clears internal caches. |
-| FullJID(JID)                        | Returns the Full JID of `JID`. If `JID` is a Bare JID, the Full JID of the last online presence is returned. |
-| GetTabIDs([Page[,QueryFilter]])     | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Pages can be optionally restricted to a given `Page`, and optionally further restricted by a query filter, as an [object ex-nihilo](#objectExNihilo) specifying query parameters and values. |
-| GetTabIDs(Pages)                    | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Tabs returned must be showing any of the pages provied in the vector `Pages`. |
-| GetTabIDs(User)                     | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Tabs returned must be viewed by the user identitied by the user object `User`. |
-| ReloadPage(...)                     | Reloads all open pages (tabs), defined by its arguments. The same types of arguments as for the `GetTabIDs` function can be used. |
-| PushEvent(..., Event, Data)         | Pushes an event to all open pages (tabs), defined by the arguments defined by `...` (same types of arguments as for the `GetTabIDs` function). Data can be a string, or any object that can be encoded as JSON. The `Event` translates to a Javascript function, with one argument, that will be called. The `Data` will be passed on as the argument. |
+| `BareJID(JID)`                      | Returns the Bare JID of `JID` |
+| `ClearCaches()`                     | Clears internal caches. |
+| `FullJID(JID)`                      | Returns the Full JID of `JID`. If `JID` is a Bare JID, the Full JID of the last online presence is returned. |
+| `GetTabIDs([Page[,QueryFilter]])`   | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Pages can be optionally restricted to a given `Page`, and optionally further restricted by a query filter, as an [object ex-nihilo](#objectExNihilo) specifying query parameters and values. |
+| `GetTabIDs(Pages)`                  | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Tabs returned must be showing any of the pages provied in the vector `Pages`. |
+| `GetTabIDs(User)`                   | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Tabs returned must be viewed by the user identitied by the user object `User`. |
+| `ReloadPage(...)`                   | Reloads all open pages (tabs), defined by its arguments. The same types of arguments as for the `GetTabIDs` function can be used. |
+| `PushEvent(..., Event, Data)`       | Pushes an event to all open pages (tabs), defined by the arguments defined by `...` (same types of arguments as for the `GetTabIDs` function). Data can be a string, or any object that can be encoded as JSON. The `Event` translates to a Javascript function, with one argument, that will be called. The `Data` will be passed on as the argument. |
 
 The following predefined variables are available in web pages hosted by the IoT Gateway:
 
@@ -1909,6 +1913,22 @@ The following functions are available in the `Waher.Service.NeuroLedger` library
 | `PrintSerialize(Vector)`           | Works as `Serialize(Vector)`, except that individual elements are printed to the standard output. This can be used for debugging purposes when transporting serializations across systems.           | `Base64Encode(PrintSerialize([Obj1,Obj2,Obj3]))` |
 | `ToBinary(Object)`                 | Alias for `Serialize`.                                                                                                                                                                               | `Base64Encode(ToBinary(Obj))` |
 | `ToBinary(Vector)`                 | Alias for `Serialize`.                                                                                                                                                                               | `Base64Encode(ToBinary([Obj1,Obj2,Obj3]))` |
+
+#### Neuron Extensions (Waher.Service.IoTBroker)
+
+The following functions are available in the `Waher.Service.IoTBroker` library, which is part of the Neuron^TM.
+
+| Function                                                        | Description                                                                                                                                                                | Example |
+|-----------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+| `Consolidate(RoomId,Domain,Command[Preview[,N]])                | Sends a command `Command` to a MUC room identified by `RoomId` and `Domain`, and consolidates responses into one. `Preview` is a Boolean value, specifying if intermediate results should be previewed or not. If `N` is provided, it defines the number of expected responses, before consolidation is returned. Otherwise the function returns when all online occupants have responded. | `Consolidate("Room","example.com","select Type, Count(*) Nr from PersistedEvent where Timestamp>Now.AddDays(-1) group by Type")` |
+| `Consolidate(RoomId,Domain,Command[Preview[,Sources]])          | Sends a command `Command` to a MUC room identified by `RoomId` and `Domain`, and consolidates responses into one. `Preview` is a Boolean value, specifying if intermediate results should be previewed or not. If `Sources` is provided, it is an array of sources, expected to return responses. Otherwise the function returns when all online occupants have responded. | `Consolidate("Room","example.com","select Type, Count(*) Nr from PersistedEvent where Timestamp>Now.AddDays(-1) group by Type")` |
+| `Consolidate(RoomId,Domain,Command[Preview[,DefaultResponses]]) | Sends a command `Command` to a MUC room identified by `RoomId` and `Domain`, and consolidates responses into one. `Preview` is a Boolean value, specifying if intermediate results should be previewed or not. `DefaultResponses` is an object ex-nihilo defining default responses from sources, unless they respond. If not provided, the function returns when all online occupants have responded. | `Consolidate("Room","example.com","select Type, Count(*) Nr from PersistedEvent where Timestamp>Now.AddDays(-1) group by Type")` |
+
+The following predefined constants are also available:
+
+| Variable                   | Description                                                                  |
+|:--------------------------:|------------------------------------------------------------------------------|
+| `MUC`                      | Gives access to remote data sources hosted by neurons in MUC rooms.          |
 
 =========================================================================================================================================================
 

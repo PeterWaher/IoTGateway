@@ -12,20 +12,28 @@ namespace Waher.Content.Markdown.Consolidation
 		private readonly string source;
 		private DocumentType type = DocumentType.Empty;
 		private int nrDocuments = 0;
+		private readonly bool isDefault;
 
 		/// <summary>
 		/// Maintains the state of one source.
 		/// </summary>
 		/// <param name="Source">Source</param>
-		public SourceState(string Source)
+		/// <param name="IsDefault">If the content is default content (true), or reported content (false).</param>
+		public SourceState(string Source, bool IsDefault)
 		{
 			this.source = Source;
+			this.isDefault = IsDefault;
 		}
 
 		/// <summary>
 		/// Source
 		/// </summary>
 		public string Source => this.source;
+
+		/// <summary>
+		/// If the content is default content (true), or reported content (false).
+		/// </summary>
+		public bool IsDefault => this.isDefault;
 
 		/// <summary>
 		/// First document text.

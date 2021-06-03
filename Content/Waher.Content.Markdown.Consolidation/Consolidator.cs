@@ -5,10 +5,7 @@ using System.Text.RegularExpressions;
 using SkiaSharp;
 using Waher.Content.Xml;
 using Waher.Events;
-using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs;
-using Waher.Script.Objects;
-using Waher.Script.Objects.Matrices;
 
 namespace Waher.Content.Markdown.Consolidation
 {
@@ -26,6 +23,7 @@ namespace Waher.Content.Markdown.Consolidation
 		private object tag = null;
 		private int nrTop = 0;
 		private int nrBottom = 0;
+		private bool filterSources = false;
 
 		/// <summary>
 		/// Consolidates Markdown from multiple sources, sharing the same thread.
@@ -60,6 +58,15 @@ namespace Waher.Content.Markdown.Consolidation
 		}
 
 		/// <summary>
+		/// If input should be restricted to a defined set of sources.
+		/// </summary>
+		public bool FilterSources
+		{
+			get => this.filterSources;
+			set => this.filterSources = value;
+		}
+
+		/// <summary>
 		/// External tag object that can be tagged to the object by its owner.
 		/// </summary>
 		public object Tag
@@ -88,7 +95,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <returns>If the source is new.</returns>
 		public bool Add(string Source, MarkdownDocument Markdown, string Id)
 		{
-			return this.Add(Source, Markdown, Id, false);
+			return this.Add(Source, Markdown, Id, false, false);
 		}
 
 		/// <summary>
@@ -111,7 +118,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <returns>If the source is new.</returns>
 		public bool Add(string Source, string Text, string Id)
 		{
-			return this.Add(Source, Text, Id, false);
+			return this.Add(Source, Text, Id, false, false);
 		}
 
 		/// <summary>
@@ -123,7 +130,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <returns>If the source is new.</returns>
 		public bool Update(string Source, MarkdownDocument Markdown, string Id)
 		{
-			return this.Add(Source, Markdown, Id, true);
+			return this.Add(Source, Markdown, Id, true, false);
 		}
 
 		/// <summary>
@@ -135,7 +142,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <returns>If the source is new.</returns>
 		public bool Update(string Source, string Text, string Id)
 		{
-			return this.Add(Source, Text, Id, true);
+			return this.Add(Source, Text, Id, true, false);
 		}
 
 		/// <summary>
@@ -145,11 +152,34 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Text">Text input.</param>
 		/// <param name="Id">Optional ID of document.</param>
 		/// <param name="Update">If a document should be updated.</param>
+		/// <param name="IsDefault">If the content is default content (true), or reported content (false).</param>
 		/// <returns>If the source is new.</returns>
-		private bool Add(string Source, string Text, string Id, bool Update)
+		private bool Add(string Source, string Text, string Id, bool Update, bool IsDefault)
 		{
 			MarkdownDocument Doc = new MarkdownDocument(Text);
-			return this.Add(Source, Doc, Id, Update);
+			return this.Add(Source, Doc, Id, Update, IsDefault);
+		}
+
+		/// <summary>
+		/// Adds default markdown to present, until a proper response is returned.
+		/// </summary>
+		/// <param name="Source">Source of information.</param>
+		/// <param name="Text">Text input.</param>
+		/// <returns>If the source is new.</returns>
+		public bool AddDefault(string Source, string Text)
+		{
+			return this.Add(Source, Text, string.Empty, false, true);
+		}
+
+		/// <summary>
+		/// Adds default markdown to present, until a proper response is returned.
+		/// </summary>
+		/// <param name="Source">Source of information.</param>
+		/// <param name="Markdown">Markdown document.</param>
+		/// <returns>If the source is new.</returns>
+		public bool AddDefault(string Source, MarkdownDocument Markdown)
+		{
+			return this.Add(Source, Markdown, string.Empty, false, true);
 		}
 
 		/// <summary>
@@ -159,19 +189,26 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Markdown">Markdown document.</param>
 		/// <param name="Id">Optional ID of document.</param>
 		/// <param name="Update">If a document should be updated.</param>
+		/// <param name="IsDefault">If the content is default content (true), or reported content (false).</param>
 		/// <returns>If the source is new.</returns>
-		private bool Add(string Source, MarkdownDocument Markdown, string Id, bool Update)
+		private bool Add(string Source, MarkdownDocument Markdown, string Id, bool Update, bool IsDefault)
 		{
 			DocumentType Type;
 			bool Result;
 
 			lock (this.sources)
 			{
-				if (Result = !this.sources.TryGetValue(Source, out SourceState State))
+				if (Result = !this.sources.TryGetValue(Source, out SourceState State) || State.IsDefault)
 				{
-					State = new SourceState(Source);
+					if (Result && this.filterSources)
+						return false;
+
+					State = new SourceState(Source, IsDefault);
 					this.sources[Source] = State;
 				}
+
+				if (Markdown is null)
+					return false;
 
 				if (Update)
 					Type = State.Update(Markdown, Id);

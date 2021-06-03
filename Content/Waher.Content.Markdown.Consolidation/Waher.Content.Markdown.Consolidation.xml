@@ -73,6 +73,11 @@
             Consolidated sources.
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.Consolidator.FilterSources">
+            <summary>
+            If input should be restricted to a defined set of sources.
+            </summary>
+        </member>
         <member name="P:Waher.Content.Markdown.Consolidation.Consolidator.Tag">
             <summary>
             External tag object that can be tagged to the object by its owner.
@@ -130,7 +135,7 @@
             <param name="Id">Optional ID of document.</param>
             <returns>If the source is new.</returns>
         </member>
-        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.Add(System.String,System.String,System.String,System.Boolean)">
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.Add(System.String,System.String,System.String,System.Boolean,System.Boolean)">
             <summary>
             Adds incoming markdown information.
             </summary>
@@ -138,9 +143,26 @@
             <param name="Text">Text input.</param>
             <param name="Id">Optional ID of document.</param>
             <param name="Update">If a document should be updated.</param>
+            <param name="IsDefault">If the content is default content (true), or reported content (false).</param>
             <returns>If the source is new.</returns>
         </member>
-        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.Add(System.String,Waher.Content.Markdown.MarkdownDocument,System.String,System.Boolean)">
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.AddDefault(System.String,System.String)">
+            <summary>
+            Adds default markdown to present, until a proper response is returned.
+            </summary>
+            <param name="Source">Source of information.</param>
+            <param name="Text">Text input.</param>
+            <returns>If the source is new.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.AddDefault(System.String,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Adds default markdown to present, until a proper response is returned.
+            </summary>
+            <param name="Source">Source of information.</param>
+            <param name="Markdown">Markdown document.</param>
+            <returns>If the source is new.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.Add(System.String,Waher.Content.Markdown.MarkdownDocument,System.String,System.Boolean,System.Boolean)">
             <summary>
             Adds incoming markdown information.
             </summary>
@@ -148,6 +170,7 @@
             <param name="Markdown">Markdown document.</param>
             <param name="Id">Optional ID of document.</param>
             <param name="Update">If a document should be updated.</param>
+            <param name="IsDefault">If the content is default content (true), or reported content (false).</param>
             <returns>If the source is new.</returns>
         </member>
         <member name="E:Waher.Content.Markdown.Consolidation.Consolidator.Added">
@@ -385,15 +408,21 @@
             Maintains the state of one source.
             </summary>
         </member>
-        <member name="M:Waher.Content.Markdown.Consolidation.SourceState.#ctor(System.String)">
+        <member name="M:Waher.Content.Markdown.Consolidation.SourceState.#ctor(System.String,System.Boolean)">
             <summary>
             Maintains the state of one source.
             </summary>
             <param name="Source">Source</param>
+            <param name="IsDefault">If the content is default content (true), or reported content (false).</param>
         </member>
         <member name="P:Waher.Content.Markdown.Consolidation.SourceState.Source">
             <summary>
             Source
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.SourceState.IsDefault">
+            <summary>
+            If the content is default content (true), or reported content (false).
             </summary>
         </member>
         <member name="P:Waher.Content.Markdown.Consolidation.SourceState.FirstText">

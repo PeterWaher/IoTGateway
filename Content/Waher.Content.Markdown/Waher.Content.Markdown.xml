@@ -4,6 +4,48 @@
         <name>Waher.Content.Markdown</name>
     </assembly>
     <members>
+        <member name="T:Waher.Content.Markdown.Functions.FromMarkdown">
+            <summary>
+            Converts markdown to an element.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.FromMarkdown.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Converts markdown to an element.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Functions.FromMarkdown.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.FromMarkdown.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.FromMarkdown.Evaluate(System.String,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Converts a Markdown string to a script element.
+            </summary>
+            <param name="Argument">Argument</param>
+            <param name="Node">Optional script node.</param>
+            <returns>Script element.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.FromMarkdown.Evaluate(Waher.Content.Markdown.Model.MarkdownElement)">
+            <summary>
+            Converts a Markdown element to a script element.
+            </summary>
+            <param name="Element">Markdown element.</param>
+            <returns>Script element.</returns>
+        </member>
         <member name="T:Waher.Content.Markdown.Functions.LoadMarkdown">
             <summary>
             LoadMarkdown(FileName)
@@ -126,6 +168,68 @@
             <param name="Argument">Function argument.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Functions.ToMarkdown">
+            <summary>
+            Converts an element to a markdown string.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.ToMarkdown.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Converts an element to a markdown string.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Functions.ToMarkdown.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.ToMarkdown.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.ToMarkdown.Evaluate(Waher.Script.Abstraction.Elements.IElement)">
+            <summary>
+            Converts an element to a markdown string.
+            </summary>
+            <param name="Argument">Element to convert to markdown.</param>
+            <returns>Markdown representation of element.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.ToMarkdown.MatrixToMarkdown(Waher.Script.Abstraction.Elements.IMatrix)">
+            <summary>
+            Converts a matrix to Markdown.
+            </summary>
+            <param name="Matrix">Matrix</param>
+            <returns>Markdown</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.ToMarkdown.VectorToMarkdown(Waher.Script.Abstraction.Elements.IVector)">
+            <summary>
+            Converts a vector to Markdown.
+            </summary>
+            <param name="Vector">Vector</param>
+            <returns>Markdown</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.ToMarkdown.SetToMarkdown(Waher.Script.Abstraction.Sets.ISet)">
+            <summary>
+            Converts a set to Markdown.
+            </summary>
+            <param name="Set">Set</param>
+            <returns>Markdown</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.ToMarkdown.GraphToMarkdown(Waher.Script.Graphs.Graph)">
+            <summary>
+            Converts a graph to Markdown.
+            </summary>
+            <param name="Graph">Graph</param>
+            <returns>Markdown</returns>
         </member>
         <member name="T:Waher.Content.Markdown.HtmlSettings">
             <summary>
@@ -1188,6 +1292,21 @@
             <param name="End">End index of code.</param>
             <param name="Indent">Additional indenting.</param>
             <param name="Language">Language used.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Model.BlockElements.CodeBlock.Language">
+            <summary>
+            Language
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Model.BlockElements.CodeBlock.Rows">
+            <summary>
+            Rows in code block
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Model.BlockElements.CodeBlock.Handler">
+            <summary>
+            Code block handler.
+            </summary>
         </member>
         <member name="M:Waher.Content.Markdown.Model.BlockElements.CodeBlock.GenerateMarkdown(System.Text.StringBuilder)">
             <summary>
@@ -3042,6 +3161,13 @@
             <param name="Document">Markdown document containing element.</param>
             <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.GraphContent.GetGraph(System.String[])">
+            <summary>
+            Gets a graph object from its XML Code Block representation.
+            </summary>
+            <param name="Rows">Rows</param>
+            <returns>Graph object</returns>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.CodeContent.GraphContent.GeneratePlainText(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates Plain Text for the markdown element.
@@ -3076,6 +3202,15 @@
             <param name="Indent">Additional indenting.</param>
             <param name="Document">Markdown document containing element.</param>
             <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.GraphContent.GenerateImage(System.String[],System.String,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates an image of the contents.
+            </summary>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>Image, if successful, null otherwise.</returns>
         </member>
         <member name="T:Waher.Content.Markdown.Model.ICodeContent">
             <summary>
@@ -3174,6 +3309,20 @@
             <param name="Document">Document that will contain the new element.</param>
             <param name="Text">Assembled text.</param>
             <returns>Assembled markdown element.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Model.IImageCodeContent">
+            <summary>
+            Interface for all markdown handlers of code content that generates an image output.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.IImageCodeContent.GenerateImage(System.String[],System.String,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates an image of the contents.
+            </summary>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>Image, if successful, null otherwise.</returns>
         </member>
         <member name="T:Waher.Content.Markdown.Model.IMultimediaContent">
             <summary>

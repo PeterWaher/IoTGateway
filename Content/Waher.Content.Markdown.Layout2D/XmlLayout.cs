@@ -9,6 +9,7 @@ using Waher.Events;
 using Waher.Layout.Layout2D;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Timing;
+using Waher.Script.Graphs;
 using Waher.Security;
 
 namespace Waher.Content.Markdown.Layout2D
@@ -16,7 +17,7 @@ namespace Waher.Content.Markdown.Layout2D
 	/// <summary>
 	/// Class managing 2D XML Layout integration into Markdown documents.
 	/// </summary>
-	public class XmlLayout : ICodeContent
+	public class XmlLayout : IImageCodeContent
 	{
 		private static readonly Random rnd = new Random();
 		private static Scheduler scheduler = null;
@@ -147,7 +148,7 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, out string Title);
+			string FileName = GetFileName(Language, Rows, out string Title);
 			if (FileName is null)
 				return false;
 
@@ -182,7 +183,14 @@ namespace Waher.Content.Markdown.Layout2D
 			return true;
 		}
 
-		private string GetFileName(string Language, string[] Rows, out string Title)
+		/// <summary>
+		/// Generates an image, saves it, and returns the file name of the image file.
+		/// </summary>
+		/// <param name="Language">Language</param>
+		/// <param name="Rows">Code Block rows</param>
+		/// <param name="Title">Title</param>
+		/// <returns>File name</returns>
+		public static string GetFileName(string Language, string[] Rows, out string Title)
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -252,7 +260,7 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			this.GetFileName(Language, Rows, out string Title);
+			GetFileName(Language, Rows, out string Title);
 			Output.AppendLine(Title);
 
 			return true;
@@ -270,7 +278,7 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, out string Title);
+			string FileName = GetFileName(Language, Rows, out string Title);
 			if (FileName is null)
 				return false;
 
@@ -298,7 +306,7 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, out string _);
+			string FileName = GetFileName(Language, Rows, out string _);
 			if (FileName is null)
 				return false;
 
@@ -307,6 +315,27 @@ namespace Waher.Content.Markdown.Layout2D
 			Output.WriteEndElement();
 
 			return true;
+		}
+
+		/// <summary>
+		/// Generates an image of the contents.
+		/// </summary>
+		/// <param name="Rows">Code rows.</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		/// <returns>Image, if successful, null otherwise.</returns>
+		public PixelInformation GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
+		{
+			string FileName = GetFileName(Language, Rows, out string _);
+			if (FileName is null)
+				return null;
+
+			byte[] Data = File.ReadAllBytes(FileName);
+
+			using (SKBitmap Bitmap = SKBitmap.Decode(Data))
+			{
+				return new PixelInformationPng(Data, Bitmap.Width, Bitmap.Height);
+			}
 		}
 	}
 }

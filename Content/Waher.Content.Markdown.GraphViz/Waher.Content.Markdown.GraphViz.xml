@@ -109,5 +109,14 @@
             <param name="Document">Markdown document containing element.</param>
             <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.GenerateImage(System.String[],System.String,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates an image of the contents.
+            </summary>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>Image, if successful, null otherwise.</returns>
+        </member>
     </members>
 </doc>

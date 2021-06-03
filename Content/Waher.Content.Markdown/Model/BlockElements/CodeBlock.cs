@@ -55,6 +55,21 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			this.handler?.Register(Document);
 		}
 
+		/// <summary>
+		/// Language
+		/// </summary>
+		public string Language => this.language;
+
+		/// <summary>
+		/// Rows in code block
+		/// </summary>
+		public string[] Rows => this.rows;
+
+		/// <summary>
+		/// Code block handler.
+		/// </summary>
+		public ICodeContent Handler => this.handler;
+
 		private static ICodeContent[] codeContents = null;
 
 		static CodeBlock()

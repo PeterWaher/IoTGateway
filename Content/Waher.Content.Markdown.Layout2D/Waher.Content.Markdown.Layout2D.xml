@@ -60,6 +60,15 @@
             <param name="Document">Markdown document containing element.</param>
             <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GetFileName(System.String,System.String[],System.String@)">
+            <summary>
+            Generates an image, saves it, and returns the file name of the image file.
+            </summary>
+            <param name="Language">Language</param>
+            <param name="Rows">Code Block rows</param>
+            <param name="Title">Title</param>
+            <returns>File name</returns>
+        </member>
         <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GeneratePlainText(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates Plain Text for the markdown element.
@@ -94,6 +103,15 @@
             <param name="Indent">Additional indenting.</param>
             <param name="Document">Markdown document containing element.</param>
             <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GenerateImage(System.String[],System.String,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates an image of the contents.
+            </summary>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>Image, if successful, null otherwise.</returns>
         </member>
     </members>
 </doc>

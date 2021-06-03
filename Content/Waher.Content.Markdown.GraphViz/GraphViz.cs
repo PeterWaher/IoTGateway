@@ -4,11 +4,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Xml;
+using SkiaSharp;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Timing;
+using Waher.Script.Graphs;
 using Waher.Security;
 
 namespace Waher.Content.Markdown.GraphViz
@@ -16,7 +18,7 @@ namespace Waher.Content.Markdown.GraphViz
 	/// <summary>
 	/// Class managing GraphViz integration into Markdown documents.
 	/// </summary>
-	public class GraphViz : ICodeContent
+	public class GraphViz : IImageCodeContent
 	{
 		private static readonly Random rnd = new Random();
 		private static Scheduler scheduler = null;
@@ -543,6 +545,27 @@ namespace Waher.Content.Markdown.GraphViz
 			Output.WriteEndElement();
 
 			return true;
+		}
+
+		/// <summary>
+		/// Generates an image of the contents.
+		/// </summary>
+		/// <param name="Rows">Code rows.</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		/// <returns>Image, if successful, null otherwise.</returns>
+		public PixelInformation GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
+		{
+			string FileName = this.GetFileName(Language, Rows, ResultType.Png, out string _, out string _, out string _);
+			if (FileName is null)
+				return null;
+
+			byte[] Data = File.ReadAllBytes(FileName);
+
+			using (SKBitmap Bitmap = SKBitmap.Decode(Data))
+			{
+				return new PixelInformationPng(Data, Bitmap.Width, Bitmap.Height);
+			}
 		}
 	}
 }

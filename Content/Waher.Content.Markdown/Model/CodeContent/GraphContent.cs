@@ -12,7 +12,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 	/// <summary>
 	/// Script graph content.
 	/// </summary>
-	public class GraphContent : ICodeContent
+	public class GraphContent : IImageCodeContent
 	{
 		/// <summary>
 		/// Script graph content.
@@ -67,7 +67,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		{
 			try
 			{
-				Graph G = this.GetGraph(Rows);
+				Graph G = GetGraph(Rows);
 				SpanElements.InlineScript.GenerateHTML(G, Output, true, Document.Settings.Variables ?? new Variables());
 				return true;
 			}
@@ -78,7 +78,12 @@ namespace Waher.Content.Markdown.Model.CodeContent
 			}
 		}
 
-		private Graph GetGraph(string[] Rows)
+		/// <summary>
+		/// Gets a graph object from its XML Code Block representation.
+		/// </summary>
+		/// <param name="Rows">Rows</param>
+		/// <returns>Graph object</returns>
+		public static Graph GetGraph(string[] Rows)
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -129,7 +134,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		{
 			try
 			{
-				Graph G = this.GetGraph(Rows);
+				Graph G = GetGraph(Rows);
 				SpanElements.InlineScript.GeneratePlainText(G, Output, true);
 				return true;
 			}
@@ -155,7 +160,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		{
 			try
 			{
-				Graph G = this.GetGraph(Rows);
+				Graph G = GetGraph(Rows);
 				SpanElements.InlineScript.GenerateXAML(G, Output, TextAlignment, true, Document.Settings.Variables ?? new Variables(), 
 					Document.Settings.XamlSettings);
 				return true;
@@ -182,7 +187,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		{
 			try
 			{
-				Graph G = this.GetGraph(Rows);
+				Graph G = GetGraph(Rows);
 				SpanElements.InlineScript.GenerateXamarinForms(G, Output, TextAlignment, true, 
 					Document.Settings.Variables ?? new Variables(), Document.Settings.XamlSettings);
 				return true;
@@ -193,5 +198,19 @@ namespace Waher.Content.Markdown.Model.CodeContent
 				return false;
 			}
 		}
+
+		/// <summary>
+		/// Generates an image of the contents.
+		/// </summary>
+		/// <param name="Rows">Code rows.</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		/// <returns>Image, if successful, null otherwise.</returns>
+		public PixelInformation GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
+		{
+			Graph G = GetGraph(Rows);
+			return G.CreatePixels(Document.Settings.Variables ?? new Variables());
+		}
+
 	}
 }

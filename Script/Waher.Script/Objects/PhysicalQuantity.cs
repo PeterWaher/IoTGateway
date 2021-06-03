@@ -309,5 +309,36 @@ namespace Waher.Script.Objects
 
 			return this.magnitude.CompareTo(d);
 		}
+
+		/// <summary>
+		/// Tries to parse a string to a physical quantity.
+		/// </summary>
+		/// <param name="s">String</param>
+		/// <param name="Value">Parsed Value</param>
+		/// <returns>If the string could be parsed into a physical quantity.</returns>
+		public static bool TryParse(string s, out PhysicalQuantity Value)
+		{
+			int i = s.Length - 1;
+
+			while (i >= 0 && char.IsWhiteSpace(s[i]))
+				i--;
+
+			int j = i;
+
+			while (i >= 0 && !char.IsWhiteSpace(s[i]))
+				i--;
+
+			if (i < 0 ||
+				!Unit.TryParse(s.Substring(i + 1, j - i), out Unit ParsedUnit) ||
+				!double.TryParse(s.Substring(0, i).Trim().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."), out double ParsedValue))
+			{
+				Value = null;
+				return false;
+			}
+
+			Value = new PhysicalQuantity(ParsedValue, ParsedUnit);
+
+			return true;
+		}
 	}
 }

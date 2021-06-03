@@ -12377,6 +12377,14 @@
             <see cref="M:System.IComparable.CompareTo(System.Object)"/>
             </summary>
         </member>
+        <member name="M:Waher.Script.Objects.PhysicalQuantity.TryParse(System.String,Waher.Script.Objects.PhysicalQuantity@)">
+            <summary>
+            Tries to parse a string to a physical quantity.
+            </summary>
+            <param name="s">String</param>
+            <param name="Value">Parsed Value</param>
+            <returns>If the string could be parsed into a physical quantity.</returns>
+        </member>
         <member name="T:Waher.Script.Objects.RationalNumber">
             <summary>
             Rational Number.

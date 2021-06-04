@@ -1877,6 +1877,54 @@ y:=sin(5*x)*exp(-(x^2/10));
 plot2dcurve(x,y)
 ```
 
+You can use the `preview` function to display a partial result during the calculation. Example:
+
+    ```async:Previewing intermediate results
+    PlotCPU(TP[],CPU[]):=
+    (
+	    G:=plot2dcurve(TP,CPU);
+	    G.Title:="CPU";
+	    G.LabelX:="Time (s)";
+	    G.LabelY:="CPU (%)";
+	    G
+    );
+
+    TP:=[];
+    CPU:=[];
+    Start:=Now;
+    foreach x in 1..60 do
+    (
+	    System.Threading.Thread.Sleep(500);
+	    CPU:=join(CPU,PerformanceCounterValue("Processor","_Total","% Processor Time"));
+	    TP:=join(TP,Now.Subtract(Start).TotalSeconds);
+	    preview(PlotCPU(TP,CPU))
+    );
+    ```
+
+This generates the following animated graph (reload to restart):
+
+```async:Previewing intermediate results
+PlotCPU(TP[],CPU[]):=
+(
+	G:=plot2dcurve(TP,CPU);
+	G.Title:="CPU";
+	G.LabelX:="Time (s)";
+	G.LabelY:="CPU (%)";
+	G
+);
+
+TP:=[];
+CPU:=[];
+Start:=Now;
+foreach x in 1..60 do
+(
+	System.Threading.Thread.Sleep(500);
+	CPU:=join(CPU,PerformanceCounterValue("Processor","_Total","% Processor Time"));
+	TP:=join(TP,Now.Subtract(Start).TotalSeconds);
+	preview(PlotCPU(TP,CPU))
+);
+```
+
 ### Sessions and variables
 
 When a user connects to the server, it will receive a session. This session will maintain all variables that is created in script.

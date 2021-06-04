@@ -75,7 +75,10 @@ namespace Waher.IoTGateway.Svc.ScriptExtensions.Functions
                     Arguments[2].AssociatedObjectValue?.ToString() ?? string.Empty);
             }
 
-            return new DoubleNumber(Result.NextValue());
+            if (Result is null)
+                return ObjectValue.Null;
+            else
+                return new DoubleNumber(Result.NextValue());
         }
     }
 }

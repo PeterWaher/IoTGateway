@@ -1,6 +1,7 @@
 ﻿using System;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
@@ -74,6 +75,9 @@ namespace Waher.IoTGateway.Svc.ScriptExtensions.Functions
                     Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty,
                     Arguments[2].AssociatedObjectValue?.ToString() ?? string.Empty);
             }
+
+            if (Result is null)
+                throw new ScriptRuntimeException("Counter not found.", this);
 
             return new DoubleNumber(Result.Decrement());
         }

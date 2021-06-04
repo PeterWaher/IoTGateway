@@ -33,12 +33,16 @@ namespace Waher.WebService.Script
 		private readonly int timeout;
 		private readonly Variables variables;
 		private readonly StringBuilder printOutput;
+		private readonly object synchObj = new object();
 		private Expression expression;
 		private HttpRequest request;
 		private HttpResponse response;
 		private IUser user;
 		private Timer watchdog = null;
 		private Thread thread = null;
+		private IElement preview = null;
+		private IElement queued = null;
+		private bool sent = false;
 		private int counter;
 		private bool previewing;
 
@@ -89,20 +93,63 @@ namespace Waher.WebService.Script
 			this.expression.OnPreview += Expression_OnPreview;
 		}
 
+		internal void NewResult(IElement Result)
+		{
+			lock (this.synchObj)
+			{
+				if (this.sent)
+				{
+					this.queued = Result;
+					return;
+				}
+				else
+					this.sent = true;
+			}
+
+			this.SendNewResult(Result);
+		}
+
+		private void SendNewResult(IElement Result)
+		{
+			lock (expressions)
+			{
+				expressions.Remove(this.tag);
+			}
+
+			Task.Run(() => this.SendResult(Result, false));
+		}
+
 		private void Expression_OnPreview(object Sender, PreviewEventArgs e)
 		{
-			if (!(this.response?.HeaderSent ?? true))
+			lock (this.synchObj)
 			{
-				this.previewing = true;
-				Task.Run(() => this.SendResponse(e.Preview, true));
+				this.preview = e.Preview;
 			}
 		}
 
 		internal void SetRequestResponse(HttpRequest Request, HttpResponse Response, IUser User)
 		{
-			this.request = Request;
-			this.response = Response;
-			this.user = User;
+			IElement Result;
+
+			lock (this.synchObj)
+			{
+				this.request = Request;
+				this.response = Response;
+				this.user = User;
+
+				if (this.queued is null)
+				{
+					this.sent = false;
+					return;
+				}
+
+				Result = this.queued;
+
+				this.queued = null;
+				this.sent = true;
+			}
+
+			this.SendNewResult(Result);
 		}
 
 		/// <summary>
@@ -180,31 +227,14 @@ namespace Waher.WebService.Script
 					Log.Notice("Script evaluated.", this.request.Resource.ResourceName, this.user.UserName, "ScriptEval", Tags);
 				}
 
-				if (!this.response.HeaderSent)
-				{
-					lock (expressions)
-					{
-						expressions.Remove(this.tag);
-					}
-
-					await this.SendResponse(Result, false);
-				}
+				this.NewResult(Result);
 
 				this.variables.CopyTo(this.request.Session);
 			}
 			catch (ThreadAbortException)
 			{
-				if (!this.response.HeaderSent)
-				{
-					lock (expressions)
-					{
-						expressions.Remove(this.tag);
-					}
-
-					await this.SendResponse(new ObjectValue(
-						new TimeoutException("Script forcefully aborted. You can control the timeout threshold, by setting the Timeout variable to the number of milliseconds to use.")),
-						false);
-				}
+				this.NewResult(new ObjectValue(
+					new TimeoutException("Script forcefully aborted. You can control the timeout threshold, by setting the Timeout variable to the number of milliseconds to use.")));
 			}
 			catch (Exception ex)
 			{
@@ -223,10 +253,33 @@ namespace Waher.WebService.Script
 			try
 			{
 				double ms = this.Milliseconds;
+				bool SendProgress = false;
+				IElement Preview = null;
 
 				this.counter++;
 
-				if (!this.response.HeaderSent && !this.previewing)
+				lock (this.synchObj)
+				{
+					if (!this.sent)
+					{
+						if (!(this.preview is null))
+						{
+							Preview = this.preview;
+							this.preview = null;
+							this.previewing = true;
+							this.sent = true;
+						}
+						else if (!this.previewing)
+						{
+							SendProgress = true;
+							this.sent = true;
+						}
+					}
+				}
+
+				if (!(Preview is null))
+					await this.SendResult(Preview, true);
+				else if (SendProgress)
 				{
 					this.response.SetHeader("X-More", "1");
 					this.response.ContentType = "text/html";
@@ -285,7 +338,7 @@ namespace Waher.WebService.Script
 			}
 		}
 
-		internal async Task SendResponse(IElement Result, bool More)
+		private async Task SendResult(IElement Result, bool More)
 		{
 			this.variables["Ans"] = Result;
 

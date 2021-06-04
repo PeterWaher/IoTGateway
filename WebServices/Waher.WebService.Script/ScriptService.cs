@@ -132,7 +132,7 @@ namespace Waher.WebService.Script
 
 					if (!Exp.ForAll(this.IsAuthorized, User, false))
 					{
-						await State.SendResponse(new ObjectValue(new ForbiddenException("Unauthorized to execute expression.")), false);
+						State.NewResult(new ObjectValue(new ForbiddenException("Unauthorized to execute expression.")));
 						return;
 					}
 
@@ -140,7 +140,7 @@ namespace Waher.WebService.Script
 				}
 				catch (Exception ex)
 				{
-					await State.SendResponse(new ObjectValue(ex), false);
+					State.NewResult(new ObjectValue(ex));
 					return;
 				}
 

@@ -143,6 +143,14 @@ namespace Waher.IoTGateway.CodeContent
 
 		private Task Evaluate(Expression Script, Variables Variables, string Id)
 		{
+			Script.OnPreview += async (sender, e) =>
+			{
+				StringBuilder Html2 = new StringBuilder();
+				InlineScript.GenerateHTML(e.Preview, Html2, true, Variables);
+
+				await ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html2.ToString()), true);
+			};
+
 			object Result = this.Evaluate(Script, Variables);
 
 			StringBuilder Html = new StringBuilder();

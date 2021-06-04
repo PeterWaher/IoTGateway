@@ -1855,29 +1855,7 @@ for each y in 1..15 do
 
 It is possible to execute script on the page asynchronously as well. This is done by adding a *Code Block* of type `async`.
 The `async` can be succeeded by a colon (`:`) and some text that will be displayed while the script is being executed and the
-result loaded to the client. Example:
-
-	```async:The content takes 30 seconds to be generated
-    System.Threading.Thread.Sleep(30000);
-	GraphWidth:=800;
-	GraphHeight:=400;
-	x:=-10..10|0.1;
-	y:=sin(5*x)*exp(-(x^2/10));
-	plot2dcurve(x,y)
-	```
-
-This generates (reload if result has already been returned):
-
-```async:The content takes 30 seconds to be generated
-System.Threading.Thread.Sleep(30000);
-GraphWidth:=800;
-GraphHeight:=400;
-x:=-10..10|0.1;
-y:=sin(5*x)*exp(-(x^2/10));
-plot2dcurve(x,y)
-```
-
-You can use the `preview` function to display a partial result during the calculation. Example:
+result loaded to the client. You can use the `preview` function to display a partial result during the calculation. Example:
 
     ```async:Previewing intermediate results
     PlotCPU(TP[],CPU[]):=
@@ -1901,7 +1879,7 @@ You can use the `preview` function to display a partial result during the calcul
     );
     ```
 
-This generates the following animated graph (reload to restart):
+This generates the following result (reload to restart):
 
 ```async:Previewing intermediate results
 PlotCPU(TP[],CPU[]):=

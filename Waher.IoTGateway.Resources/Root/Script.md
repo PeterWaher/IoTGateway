@@ -2300,6 +2300,7 @@ ON
 	Field2[ ASC|DESC][,
 	...]]
 )
+```
 
 The Index Name can be used at a later stage, for instance, to drop the index.
 
@@ -2329,6 +2330,7 @@ DROP INDEX
 	Name
 ON
 	Source
+```
 
 The Index Name is defined when creating indices using the `CREATE INDEX` command.
 
@@ -2348,6 +2350,7 @@ To drop a collection from the object database, use the `DROP COLLECTION` (or `DR
 ```
 DROP COLLECTION|TABLE
 	Source
+```
 
 Example:
 

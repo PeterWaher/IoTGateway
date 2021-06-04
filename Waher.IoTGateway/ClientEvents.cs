@@ -91,6 +91,9 @@ namespace Waher.IoTGateway
 
 			ContentQueue Queue;
 			string Id = Request.SubPath.Substring(1);
+			string ContentType;
+			byte[] Content;
+			bool More;
 
 			lock (requestsByContentID)
 			{
@@ -102,7 +105,18 @@ namespace Waher.IoTGateway
 						return;
 					}
 
-					requestsByContentID.Remove(Id);
+					More = Queue.More;
+					Content = Queue.Content;
+					ContentType = Queue.ContentType;
+
+					if (More)
+					{
+						Queue.More = false;
+						Queue.Content = null;
+						Queue.ContentType = null;
+					}
+					else
+						requestsByContentID.Remove(Id);
 				}
 				else
 				{
@@ -117,8 +131,9 @@ namespace Waher.IoTGateway
 
 			SetTransparentCorsHeaders(this, Request, Response);
 
-			Response.ContentType = Queue.ContentType;
-			await Response.Write(Queue.Content, 0, Queue.Content.Length);
+			Response.SetHeader("X-More", More ? "1" : "0");
+			Response.ContentType = ContentType;
+			await Response.Write(Content, 0, Content.Length);
 			await Response.SendResponse();
 		}
 
@@ -527,27 +542,51 @@ namespace Waher.IoTGateway
 		/// <param name="Id">Content ID</param>
 		/// <param name="ContentType">Content-Type of result.</param>
 		/// <param name="Result">Binary encoding of result.</param>
-		public static async Task ReportAsynchronousResult(string Id, string ContentType, byte[] Result)
+		public static Task ReportAsynchronousResult(string Id, string ContentType, byte[] Result)
+		{
+			return ReportAsynchronousResult(Id, ContentType, Result, false);
+		}
+
+		/// <summary>
+		/// Reports asynchronously evaluated result back to a client.
+		/// </summary>
+		/// <param name="Id">Content ID</param>
+		/// <param name="ContentType">Content-Type of result.</param>
+		/// <param name="Result">Binary encoding of result.</param>
+		/// <param name="More">If more responses for this ID is expected.</param>
+		public static async Task ReportAsynchronousResult(string Id, string ContentType, byte[] Result, bool More)
 		{
 			try
 			{
 				ContentQueue Queue;
+				HttpResponse Response;
 
 				lock (requestsByContentID)
 				{
 					if (requestsByContentID.TryGetValue(Id, out Queue))
 					{
 						if (Queue.Response is null)
+						{
+							Queue.ContentType = ContentType;
+							Queue.Content = Result;
+							Queue.More = More;
 							return;
+						}
 
-						requestsByContentID.Remove(Id);
+						Response = Queue.Response;
+
+						if (More)
+							Queue.Response = null;
+						else
+							requestsByContentID.Remove(Id);
 					}
 					else
 					{
 						Queue = new ContentQueue(Id)
 						{
 							ContentType = ContentType,
-							Content = Result
+							Content = Result,
+							More = More
 						};
 
 						requestsByContentID[Id] = Queue;
@@ -555,9 +594,10 @@ namespace Waher.IoTGateway
 					}
 				}
 
-				Queue.Response.ContentType = ContentType;
-				await Queue.Response.Write(Result, 0, Result.Length);
-				await Queue.Response.SendResponse();
+				Response.SetHeader("X-More", More ? "1" : "0");
+				Response.ContentType = ContentType;
+				await Response.Write(Result, 0, Result.Length);
+				await Response.SendResponse();
 			}
 			catch (Exception)
 			{
@@ -1096,6 +1136,7 @@ namespace Waher.IoTGateway
 			public string ContentType;
 			public HttpResponse Response = null;
 			public byte[] Content = null;
+			public bool More = false;
 
 			public ContentQueue(string ID)
 			{

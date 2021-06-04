@@ -317,6 +317,13 @@ function LoadContent(Id)
 				{
 					var Div = document.getElementById("id" + Id);
 					Div.innerHTML = xhttp.responseText;
+
+					if (xhttp.getResponseHeader("X-More") === "1")
+					{
+						xhttp.open("GET", "/ClientEvents/" + Id, true);
+						xhttp.send("");
+						return;
+					}
 				}
 				else
 					ShowError(xhttp);

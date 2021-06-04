@@ -148,7 +148,7 @@ namespace Waher.IoTGateway.CodeContent
 			StringBuilder Html = new StringBuilder();
 			InlineScript.GenerateHTML(Result, Html, true, Variables);
 
-			return ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html.ToString()));
+			return ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html.ToString()), false);
 		}
 
 		/// <summary>

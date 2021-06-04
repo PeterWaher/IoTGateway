@@ -1896,7 +1896,7 @@ CPU:=[];
 Start:=Now;
 foreach x in 1..60 do
 (
-	System.Threading.Thread.Sleep(500);
+	System.Threading.Thread.Sleep(1000);
 	CPU:=join(CPU,PerformanceCounterValue("Processor","_Total","% Processor Time"));
 	TP:=join(TP,Now.Subtract(Start).TotalSeconds);
 	preview(PlotCPU(TP,CPU))

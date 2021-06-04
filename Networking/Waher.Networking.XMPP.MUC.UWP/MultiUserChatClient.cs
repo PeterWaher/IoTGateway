@@ -955,8 +955,7 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Xml">Message body.</param>
 		public void SendCustomPrivateMessage(string RoomId, string Domain, string NickName, string Xml)
 		{
-			this.SendCustomPrivateMessage(RoomId, Domain, NickName, Xml, string.Empty,
-				string.Empty, string.Empty);
+			this.SendCustomPrivateMessage(RoomId, Domain, NickName, Xml, string.Empty, string.Empty, string.Empty);
 		}
 
 		/// <summary>

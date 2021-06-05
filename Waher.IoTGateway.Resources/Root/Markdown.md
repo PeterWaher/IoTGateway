@@ -1860,22 +1860,35 @@ result loaded to the client. You can use the `preview` function to display a par
     ```async:Previewing intermediate results
     PlotCPU(TP[],CPU[]):=
     (
-	    G:=plot2dcurve(TP,CPU);
-	    G.Title:="CPU";
-	    G.LabelX:="Time (s)";
-	    G.LabelY:="CPU (%)";
-	    G
+        one:=Ones(count(TP));
+        TP2:=TP.^2;
+        TP3:=TP.^3;
+        M1:=[one,TP];
+        M2:=[one,TP,TP2];
+        M3:=[one,TP,TP2,TP3];
+        [[a1,b1]]:=((CPU[,])*(M1 T))*inv(M1*(M1 T));
+        [[a2,b2,c2]]:=((CPU[,])*(M2 T))*inv(M2*(M2 T));
+        [[a3,b3,c3,d3]]:=((CPU[,])*(M3 T))*inv(M3*(M3 T));
+        G:=plot2dcurve(TP,avg(CPU)*one,"Blue")+
+            plot2dcurve(TP,a1+b1*TP,"Green")+
+            plot2dcurve(TP,a2+b2*TP+c2*TP2,"Yellow")+
+            plot2dcurve(TP,a3+b3*TP+c3*TP2+d3*TP3,"Orange")+
+            plot2dcurve(TP,CPU,"Red",5);
+        G.Title:="CPU";
+        G.LabelX:="Time (s)";
+        G.LabelY:="CPU (%)";
+        G
     );
-
+    
     TP:=[];
     CPU:=[];
     Start:=Now;
     foreach x in 1..60 do
     (
-	    System.Threading.Thread.Sleep(500);
-	    CPU:=join(CPU,PerformanceCounterValue("Processor","_Total","% Processor Time"));
-	    TP:=join(TP,Now.Subtract(Start).TotalSeconds);
-	    preview(PlotCPU(TP,CPU))
+        System.Threading.Thread.Sleep(500);
+        CPU:=join(CPU,PerformanceCounterValue("Processor","_Total","% Processor Time"));
+        TP:=join(TP,Now.Subtract(Start).TotalSeconds);
+        preview(PlotCPU(TP,CPU))
     );
     ```
 
@@ -1884,11 +1897,24 @@ This generates the following result (reload to restart):
 ```async:Previewing intermediate results
 PlotCPU(TP[],CPU[]):=
 (
-	G:=plot2dcurve(TP,CPU);
-	G.Title:="CPU";
-	G.LabelX:="Time (s)";
-	G.LabelY:="CPU (%)";
-	G
+    one:=Ones(count(TP));
+    TP2:=TP.^2;
+    TP3:=TP.^3;
+    M1:=[one,TP];
+    M2:=[one,TP,TP2];
+    M3:=[one,TP,TP2,TP3];
+    [[a1,b1]]:=((CPU[,])*(M1 T))*inv(M1*(M1 T));
+    [[a2,b2,c2]]:=((CPU[,])*(M2 T))*inv(M2*(M2 T));
+    [[a3,b3,c3,d3]]:=((CPU[,])*(M3 T))*inv(M3*(M3 T));
+    G:=plot2dcurve(TP,avg(CPU)*one,"Blue")+
+        plot2dcurve(TP,a1+b1*TP,"Green")+
+        plot2dcurve(TP,a2+b2*TP+c2*TP2,"Yellow")+
+        plot2dcurve(TP,a3+b3*TP+c3*TP2+d3*TP3,"Orange")+
+        plot2dcurve(TP,CPU,"Red",5);
+    G.Title:="CPU";
+    G.LabelX:="Time (s)";
+    G.LabelY:="CPU (%)";
+    G
 );
 
 TP:=[];
@@ -1896,10 +1922,10 @@ CPU:=[];
 Start:=Now;
 foreach x in 1..60 do
 (
-	System.Threading.Thread.Sleep(1000);
-	CPU:=join(CPU,PerformanceCounterValue("Processor","_Total","% Processor Time"));
-	TP:=join(TP,Now.Subtract(Start).TotalSeconds);
-	preview(PlotCPU(TP,CPU))
+    System.Threading.Thread.Sleep(500);
+    CPU:=join(CPU,PerformanceCounterValue("Processor","_Total","% Processor Time"));
+    TP:=join(TP,Now.Subtract(Start).TotalSeconds);
+    preview(PlotCPU(TP,CPU))
 );
 ```
 

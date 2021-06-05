@@ -327,7 +327,7 @@ namespace Waher.Script.Objects.Matrices
 					for (u = x; u < c2; u++)
 					{
 						a = v[x, u];
-						v[x, y] = v[z, u];
+						v[x, u] = v[z, u];
 						v[z, u] = a;
 					}
 				}

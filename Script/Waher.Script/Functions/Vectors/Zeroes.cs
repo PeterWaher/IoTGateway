@@ -38,18 +38,17 @@ namespace Waher.Script.Functions.Vectors
 		}
 
 		/// <summary>
-		/// Evaluates the function.
+		/// Evaluates the function on a scalar argument.
 		/// </summary>
 		/// <param name="Argument">Function argument.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
-		public override IElement Evaluate(IElement Argument, Variables Variables)
+		public override IElement EvaluateScalar(double Argument, Variables Variables)
 		{
-			double n = Expression.ToDouble(Argument.AssociatedObjectValue);
-			int N = (int)n;
+			int N = (int)Argument;
 
-			if (N != n || N < 0)
-				throw new ScriptRuntimeException("Dimension must be non-negative.", this);
+			if (N != Argument || N < 0)
+				throw new ScriptRuntimeException("Dimension must be a non-negative integer.", this);
 
 			double[] E = new double[N];
 

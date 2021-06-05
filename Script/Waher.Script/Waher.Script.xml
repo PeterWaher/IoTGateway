@@ -5015,6 +5015,74 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Functions.Matrices.Ones">
+            <summary>
+            Creates a matrix containing only ones.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matrices.Ones.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a matrix containing only ones.
+            </summary>
+            <param name="Rows">Rows of the resulting matrix.</param>
+            <param name="Columns">Columns of the resulting matrix.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Matrices.Ones.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.Matrices.Ones.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matrices.Ones.EvaluateScalar(System.Double,System.Double,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Functions.Matrices.Zeroes">
+            <summary>
+            Creates a matrix containing only zeroes.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matrices.Zeroes.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a matrix containing only zeroes.
+            </summary>
+            <param name="Rows">Rows of the resulting matrix.</param>
+            <param name="Columns">Columns of the resulting matrix.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Matrices.Zeroes.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.Matrices.Zeroes.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Matrices.Zeroes.EvaluateScalar(System.Double,System.Double,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Functions.Runtime.Create">
             <summary>
             Creates an object of a specific class. The first argument must evaluate to the type that is to be created.
@@ -7515,9 +7583,9 @@
             Name of the function
             </summary>
         </member>
-        <member name="M:Waher.Script.Functions.Vectors.Ones.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+        <member name="M:Waher.Script.Functions.Vectors.Ones.EvaluateScalar(System.Double,Waher.Script.Variables)">
             <summary>
-            Evaluates the function.
+            Evaluates the function on a scalar argument.
             </summary>
             <param name="Argument">Function argument.</param>
             <param name="Variables">Variables collection.</param>
@@ -8229,9 +8297,9 @@
             Name of the function
             </summary>
         </member>
-        <member name="M:Waher.Script.Functions.Vectors.Zeroes.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+        <member name="M:Waher.Script.Functions.Vectors.Zeroes.EvaluateScalar(System.Double,Waher.Script.Variables)">
             <summary>
-            Evaluates the function.
+            Evaluates the function on a scalar argument.
             </summary>
             <param name="Argument">Function argument.</param>
             <param name="Variables">Variables collection.</param>

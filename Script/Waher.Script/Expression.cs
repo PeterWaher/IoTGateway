@@ -5180,7 +5180,6 @@ namespace Waher.Script
 
 		// TODO: Optimize constants
 		// TODO: Integers (0d, 0x, 0o, 0b), Big Integers (0D, 0X, 0O, 0B)
-		// TODO: Upgrade
 		// TODO: Matrix*Vector = Vector
 		// TODO: Vector*Matrix = Vector
 		// TODO: Matrix\Vector = Solutionvector.
@@ -5198,14 +5197,11 @@ namespace Waher.Script
 			Eliminate
 			FlipLeftRight
 			FlipUpDown
-			Identity
 			IsDiagonal
 			IsLowerTriangular
 			IsNullMatrix
 			IsUpperTriangular
 			LookUp
-			Ones
-			Zeroes
 			Rank
 			Reduce
 			Regression

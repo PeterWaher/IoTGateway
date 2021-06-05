@@ -979,12 +979,14 @@ The following functions operate on vectors:
 
 The following functions operate on matrices:
 
-| Function | Description | Example |
-|----------|-------------|---------|
-| `Identity(N)` | Creates an NxN identity matrix. | `Identity(10)` |
-| `Inv(M)` | Alias for `Invert(M)`. | `Inv([[1,1],[0,1]])` |
-| `Inverse(M)` | Alias for `Invert(M)`. | `Inverse([[1,1],[0,1]])` |
-| `Invert(M)` | Inverts `M`. Works on any invertable element. | `Invert([[1,1],[0,1]])` |
+| Function               | Description                                         | Example |
+|------------------------|-----------------------------------------------------|---------|
+| `Identity(N)`          | Creates an NxN identity matrix.                     | `Identity(10)`           |
+| `Inv(M)`               | Alias for `Invert(M)`.                              | `Inv([[1,1],[0,1]])`     |
+| `Inverse(M)`           | Alias for `Invert(M)`.                              | `Inverse([[1,1],[0,1]])` |
+| `Invert(M)`            | Inverts `M`. Works on any invertable element.       | `Invert([[1,1],[0,1]])`  |
+| `Ones(Rows,Columns)`   | Creates an MxN-matrix with all elements set to 1.   | `Ones(5,4)`              |
+| `Zeroes(Rows,Columns)` | Creates an MxN-matrix with all elements set to 0.   | `Zeroes(5,4)`            |
 
 ### Transforms
 

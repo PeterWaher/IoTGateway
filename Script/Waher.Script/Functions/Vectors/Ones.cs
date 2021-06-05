@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -29,27 +26,20 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get
-			{
-				return "Ones";
-			}
-		}
+		public override string FunctionName => "Ones";
 
 		/// <summary>
-		/// Evaluates the function.
+		/// Evaluates the function on a scalar argument.
 		/// </summary>
 		/// <param name="Argument">Function argument.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
-		public override IElement Evaluate(IElement Argument, Variables Variables)
+		public override IElement EvaluateScalar(double Argument, Variables Variables)
 		{
-			double n = Expression.ToDouble(Argument.AssociatedObjectValue);
-			int N = (int)n;
+			int N = (int)Argument;
 
-			if (N != n || N < 0)
-				throw new ScriptRuntimeException("Dimension must be non-negative.", this);
+			if (N != Argument || N < 0)
+				throw new ScriptRuntimeException("Dimension must be a non-negative integer.", this);
 
 			double[] E = new double[N];
 			int i;

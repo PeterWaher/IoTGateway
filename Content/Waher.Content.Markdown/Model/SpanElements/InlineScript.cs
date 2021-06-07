@@ -237,6 +237,11 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 				Output.Append("</tbody></table>");
 			}
+			else if (Result is Array A)
+			{
+				foreach (object Item in A)
+					GenerateHTML(Item, Output, false, Variables);
+			}
 			else
 			{
 				if (AloneInParagraph)

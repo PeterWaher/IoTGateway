@@ -146,7 +146,7 @@ namespace Waher.IoTGateway.CodeContent
 			Script.OnPreview += async (sender, e) =>
 			{
 				StringBuilder Html2 = new StringBuilder();
-				InlineScript.GenerateHTML(e.Preview, Html2, true, Variables);
+				InlineScript.GenerateHTML(e.Preview.AssociatedObjectValue, Html2, true, Variables);
 
 				await ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html2.ToString()), true);
 			};

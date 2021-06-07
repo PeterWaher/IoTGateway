@@ -223,6 +223,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 						{
 							if (Item is string s2)
 								Output.Append(FormatText(XML.HtmlValueEncode(s2)));
+							else if (Item is MarkdownElement Element)
+								Element.GenerateHTML(Output);
 							else
 								Output.Append(FormatText(XML.HtmlValueEncode(Expression.ToString(Item))));
 						}

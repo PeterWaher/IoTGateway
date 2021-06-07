@@ -58,6 +58,28 @@ namespace Waher.Content.Markdown.Consolidation
 		}
 
 		/// <summary>
+		/// Number of sources that have reported content.
+		/// </summary>
+		public int NrReportedSources
+		{
+			get
+			{
+				lock (this.sources)
+				{
+					int Result = 0;
+
+					foreach (SourceState State in this.sources.Values)
+					{
+						if (!State.IsDefault)
+							Result++;
+					}
+
+					return Result;
+				}
+			}
+		}
+
+		/// <summary>
 		/// If input should be restricted to a defined set of sources.
 		/// </summary>
 		public bool FilterSources
@@ -198,7 +220,7 @@ namespace Waher.Content.Markdown.Consolidation
 
 			lock (this.sources)
 			{
-				if (Result = !this.sources.TryGetValue(Source, out SourceState State) || State.IsDefault)
+				if ((Result = !this.sources.TryGetValue(Source, out SourceState State)) || State.IsDefault)
 				{
 					if (Result && this.filterSources)
 						return false;

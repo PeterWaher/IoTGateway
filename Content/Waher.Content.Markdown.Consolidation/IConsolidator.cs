@@ -25,6 +25,14 @@ namespace Waher.Content.Markdown.Consolidation
 		}
 
 		/// <summary>
+		/// Number of sources that have reported content.
+		/// </summary>
+		int NrReportedSources
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Adds incoming markdown information.
 		/// </summary>
 		/// <param name="Source">Source of information.</param>

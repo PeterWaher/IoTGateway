@@ -73,6 +73,11 @@
             Consolidated sources.
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.Consolidator.NrReportedSources">
+            <summary>
+            Number of sources that have reported content.
+            </summary>
+        </member>
         <member name="P:Waher.Content.Markdown.Consolidation.Consolidator.FilterSources">
             <summary>
             If input should be restricted to a defined set of sources.
@@ -311,6 +316,11 @@
         <member name="P:Waher.Content.Markdown.Consolidation.IConsolidator.Tag">
             <summary>
             External tag object that can be tagged to the object by its owner.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Consolidation.IConsolidator.NrReportedSources">
+            <summary>
+            Number of sources that have reported content.
             </summary>
         </member>
         <member name="M:Waher.Content.Markdown.Consolidation.IConsolidator.Add(System.String,Waher.Content.Markdown.MarkdownDocument)">

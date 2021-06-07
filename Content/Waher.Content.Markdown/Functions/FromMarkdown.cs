@@ -171,8 +171,10 @@ namespace Waher.Content.Markdown.Functions
 				return Q;
 			else if (XML.TryParse(s, out DateTime TP))
 				return new DateTimeValue(TP);
-			else
+			else if (Element is Model.SpanElements.InlineText)
 				return new StringValue(s);
+			else
+				return new ObjectValue(Element);
 		}
 	}
 }

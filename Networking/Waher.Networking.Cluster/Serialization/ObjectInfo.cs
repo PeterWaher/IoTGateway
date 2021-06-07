@@ -35,7 +35,7 @@ namespace Waher.Networking.Cluster.Serialization
 					Output.WriteString(T.FullName);
 
 					IProperty P = ClusterEndpoint.GetProperty(T);
-					if (P is ObjectProperty OP)
+					if (P is ObjectProperty _)
 						Info = ClusterEndpoint.GetObjectInfo(T);
 					else
 					{
@@ -78,7 +78,7 @@ namespace Waher.Networking.Cluster.Serialization
 					throw new KeyNotFoundException("Type name not recognized: " + TypeName);
 
 				IProperty P = ClusterEndpoint.GetProperty(T);
-				if (P is ObjectProperty OP)
+				if (P is ObjectProperty _)
 					Info = ClusterEndpoint.GetObjectInfo(T);
 				else
 					return P.Deserialize(Input, T);

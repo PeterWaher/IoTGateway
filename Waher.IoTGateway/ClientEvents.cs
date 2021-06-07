@@ -89,7 +89,6 @@ namespace Waher.IoTGateway
 			if (string.IsNullOrEmpty(Request.SubPath))
 				throw new BadRequestException("Sub-path missing.");
 
-			ContentQueue Queue;
 			string Id = Request.SubPath.Substring(1);
 			string ContentType;
 			byte[] Content;
@@ -97,7 +96,7 @@ namespace Waher.IoTGateway
 
 			lock (requestsByContentID)
 			{
-				if (requestsByContentID.TryGetValue(Id, out Queue))
+				if (requestsByContentID.TryGetValue(Id, out ContentQueue Queue))
 				{
 					if (Queue.Content is null)
 					{
@@ -558,12 +557,11 @@ namespace Waher.IoTGateway
 		{
 			try
 			{
-				ContentQueue Queue;
 				HttpResponse Response;
 
 				lock (requestsByContentID)
 				{
-					if (requestsByContentID.TryGetValue(Id, out Queue))
+					if (requestsByContentID.TryGetValue(Id, out ContentQueue Queue))
 					{
 						if (Queue.Response is null)
 						{
@@ -1329,7 +1327,7 @@ namespace Waher.IoTGateway
 			if (Request.Header.TryGetHeaderField("Access-Control-Request-Headers", out HttpField AccessControlRequestHeaders))
 				Response.SetHeader("Access-Control-Allow-Headers", AccessControlRequestHeaders.Value);
 
-			if (Request.Header.TryGetHeaderField("Access-Control-Request-Method", out HttpField AccessControlRequestMethod))
+			if (Request.Header.TryGetHeaderField("Access-Control-Request-Method", out HttpField _))
 			{
 				StringBuilder Methods = new StringBuilder();
 				bool First = true;

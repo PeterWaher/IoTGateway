@@ -1343,6 +1343,7 @@ namespace Waher.Networking.XMPP
 		private async Task<bool> ParseIncoming(string s)
 		{
 			bool Result = true;
+			string Fragment;
 
 			foreach (char ch in s)
 			{
@@ -1380,9 +1381,12 @@ namespace Waher.Networking.XMPP
 						{
 							this.inputState = 5;
 							this.inputDepth = 1;
-							await this.ProcessStream(this.fragment.ToString());
+
+							Fragment = this.fragment.ToString();
 							this.fragment.Clear();
 							this.fragmentLength = 0;
+
+							await this.ProcessStream(Fragment);
 						}
 						break;
 
@@ -1424,9 +1428,12 @@ namespace Waher.Networking.XMPP
 						{
 							this.inputState++;
 							this.inputDepth = 1;
-							await this.ProcessStream(this.fragment.ToString());
+
+							Fragment = this.fragment.ToString();
 							this.fragment.Clear();
 							this.fragmentLength = 0;
+
+							await this.ProcessStream(Fragment);
 						}
 						break;
 
@@ -1492,11 +1499,12 @@ namespace Waher.Networking.XMPP
 							{
 								if (this.inputDepth == 1)
 								{
-									if (!await this.ProcessFragment(this.fragment.ToString()))
-										Result = false;
-
+									Fragment = this.fragment.ToString();
 									this.fragment.Clear();
 									this.fragmentLength = 0;
+
+									if (!await this.ProcessFragment(Fragment))
+										Result = false;
 								}
 
 								if (this.inputState > 0)
@@ -1534,11 +1542,12 @@ namespace Waher.Networking.XMPP
 						{
 							if (this.inputDepth == 1)
 							{
-								if (!await this.ProcessFragment(this.fragment.ToString()))
-									Result = false;
-
+								Fragment = this.fragment.ToString();
 								this.fragment.Clear();
 								this.fragmentLength = 0;
+
+								if (!await this.ProcessFragment(Fragment))
+									Result = false;
 							}
 
 							if (this.inputState != 0)

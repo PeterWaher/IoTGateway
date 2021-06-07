@@ -28,6 +28,7 @@
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.WebService.Script.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />

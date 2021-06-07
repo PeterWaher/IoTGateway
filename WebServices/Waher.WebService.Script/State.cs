@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using SkiaSharp;
+using Waher.Content.Markdown.Model;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP;
@@ -340,7 +341,8 @@ namespace Waher.WebService.Script
 
 		private async Task SendResult(IElement Result, bool More)
 		{
-			this.variables["Ans"] = Result;
+			if (!More)
+				this.request.Session["Ans"] = Result;
 
 			byte[] Bin;
 			object Obj;
@@ -470,6 +472,8 @@ namespace Waher.WebService.Script
 						{
 							if (Item is string s3)
 								Html.Append(this.FormatText(XML.HtmlValueEncode(s3)));
+							else if (Item is MarkdownElement Element)
+								Element.GenerateHTML(Html);
 							else
 								Html.Append(this.FormatText(XML.HtmlValueEncode(Expression.ToString(Item))));
 						}

@@ -5436,7 +5436,7 @@ namespace Waher.Persistence.Files
 					Result = await this.GetTypedEnumeratorAsyncLocked<T>();
 
 					if (!(SortOrder is null) && SortOrder.Length > 0)
-						Result = await this.SortLocked<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true);
+						Result = await this.SortLocked<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true, false);
 				}
 
 				if (Offset > 0 || MaxCount < int.MaxValue)
@@ -5447,7 +5447,7 @@ namespace Waher.Persistence.Files
 				Result = await this.ConvertFilterToCursorLocked<T>(Filter.Normalize(), SortOrder);
 
 				if (!(SortOrder is null) && SortOrder.Length > 0)
-					Result = await this.SortLocked<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true);   // false);
+					Result = await this.SortLocked<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true, true);
 
 				if (Offset > 0 || MaxCount < int.MaxValue)
 					Result = new Searching.PagesCursor<T>(Offset, MaxCount, Result);
@@ -5456,7 +5456,7 @@ namespace Waher.Persistence.Files
 			return Result;
 		}
 
-		private async Task<ICursor<T>> SortLocked<T>(ICursor<T> Result, string[] ConstantFields, string[] SortOrder, bool CanReverse)
+		private async Task<ICursor<T>> SortLocked<T>(ICursor<T> Result, string[] ConstantFields, string[] SortOrder, bool CanReverse, bool IndexFound)
 		{
 			if (Result.SameSortOrder(ConstantFields, SortOrder))
 				return Result;
@@ -5464,12 +5464,15 @@ namespace Waher.Persistence.Files
 			if (CanReverse && Result.ReverseSortOrder(ConstantFields, SortOrder))
 				return new Searching.ReversedCursor<T>(Result);
 
-			Log.Notice("Sort order in search result did not match index.",
-				this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
-				string.Empty, Log.CleanStackTrace(Environment.StackTrace),
-				new KeyValuePair<string, object>("Collection", this.collectionName),
-				new KeyValuePair<string, object>("ConstantFields", ToString(ConstantFields)),
-				new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+			if (!IndexFound)
+			{
+				Log.Notice("Sort order in search result did not match index.",
+					this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
+					string.Empty, Log.CleanStackTrace(Environment.StackTrace),
+					new KeyValuePair<string, object>("Collection", this.collectionName),
+					new KeyValuePair<string, object>("ConstantFields", ToString(ConstantFields)),
+					new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+			}
 
 			SortedDictionary<Searching.SortedReference<T>, bool> SortedObjects;
 			IndexRecords Records;

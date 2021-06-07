@@ -3663,7 +3663,7 @@ namespace Waher.Script
 				if (this.PeekNextChar() == '}')
 				{
 					this.pos++;
-					return new SetDefinition(new ScriptNode[0], Start, this.pos - Start, this);
+					return new ObjectExNihilo(new LinkedList<KeyValuePair<string, ScriptNode>>(), Start, this.pos - Start, this);
 				}
 
 				bool WsBak = this.canSkipWhitespace;

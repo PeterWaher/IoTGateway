@@ -315,6 +315,11 @@ Member names can be both standard variable references, or constant strings. The 
 		"MemberN": ValueN
 	}
 
+You can also choose to create an empty object, and assign properties dynamically. Example:
+
+	Obj:={};
+	Obj.["a","b","c"]:=1
+
 ### Suffix-operators
 
 Suffix-operators are written after the operand to which they are applied. The following table lists available suffix operators:
@@ -1925,6 +1930,7 @@ The following functions are available in the `Waher.Service.IoTBroker` library, 
 | `Consolidate(RoomId,Domain,Command[Preview[,N]])                | Sends a command `Command` to a MUC room identified by `RoomId` and `Domain`, and consolidates responses into one. `Preview` is a Boolean value, specifying if intermediate results should be previewed or not. If `N` is provided, it defines the number of expected responses, before consolidation is returned. Otherwise the function returns when all online occupants have responded. | `Consolidate("Room","example.com","select Type, Count(*) Nr from PersistedEvent where Timestamp>Now.AddDays(-1) group by Type")` |
 | `Consolidate(RoomId,Domain,Command[Preview[,Sources]])          | Sends a command `Command` to a MUC room identified by `RoomId` and `Domain`, and consolidates responses into one. `Preview` is a Boolean value, specifying if intermediate results should be previewed or not. If `Sources` is provided, it is an array of sources, expected to return responses. Otherwise the function returns when all online occupants have responded. | `Consolidate("Room","example.com","select Type, Count(*) Nr from PersistedEvent where Timestamp>Now.AddDays(-1) group by Type")` |
 | `Consolidate(RoomId,Domain,Command[Preview[,DefaultResponses]]) | Sends a command `Command` to a MUC room identified by `RoomId` and `Domain`, and consolidates responses into one. `Preview` is a Boolean value, specifying if intermediate results should be previewed or not. `DefaultResponses` is an object ex-nihilo defining default responses from sources, unless they respond. If not provided, the function returns when all online occupants have responded. | `Consolidate("Room","example.com","select Type, Count(*) Nr from PersistedEvent where Timestamp>Now.AddDays(-1) group by Type")` |
+| `Occupants(RoomId,Domain)`                                      | Returns an array of nick-names corresponding to occupants in a Multi-User Chat Room. | `Occupants("Room","example.com"` |
 
 The following predefined constants are also available:
 

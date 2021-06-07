@@ -36,14 +36,36 @@ namespace Waher.Script.Operators.Assignments
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
+			IElement Left = this.left.Evaluate(Variables);
 			IElement Middle = this.middle.Evaluate(Variables);
+			IElement Right = this.right.Evaluate(Variables);
+
+			if (Middle.IsScalar)
+				return this.Evaluate(Left, Middle, Right, Variables);
+			else
+			{
+				foreach (IElement MiddleElement in Middle.ChildElements)
+					this.Evaluate(Left, MiddleElement, Right, Variables);
+
+				return Right;
+			}
+		}
+
+		/// <summary>
+		/// Performs scalar dynamic member assignment.
+		/// </summary>
+		/// <param name="Left">Object</param>
+		/// <param name="Middle">Member</param>
+		/// <param name="Right">Value to assign.</param>
+		/// <param name="Variables">Variables</param>
+		/// <returns>Result</returns>
+		public IElement Evaluate(IElement Left, IElement Middle, IElement Right, Variables Variables)
+		{
 			if (!(Middle is StringValue S))
 				throw new ScriptRuntimeException("Member names must be strings.", this);
 
 			string Name = S.Value;
 
-			IElement Left = this.left.Evaluate(Variables);
-			IElement Right = this.right.Evaluate(Variables);
 			object LeftValue = Left.AssociatedObjectValue;
 			Type Type = LeftValue.GetType();
 

@@ -15250,6 +15250,16 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Assignments.DynamicMemberAssignment.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Performs scalar dynamic member assignment.
+            </summary>
+            <param name="Left">Object</param>
+            <param name="Middle">Member</param>
+            <param name="Right">Value to assign.</param>
+            <param name="Variables">Variables</param>
+            <returns>Result</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Assignments.FunctionDefinition">
             <summary>
             Function definition operator.

@@ -856,6 +856,13 @@
             </summary>
             <param name="Action">Action</param>
         </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.TransformXml(System.Xml.XmlDocument)">
+            <summary>
+            Transforms XML to an object that is easier to visualize.
+            </summary>
+            <param name="Xml">XML Document.</param>
+            <returns>Transformed object (possibly the same if no XML Visualizer found).</returns>
+        </member>
         <member name="T:Waher.Content.Markdown.MarkdownSettings">
             <summary>
             Contains settings that the Markdown parser uses to customize its behavior.
@@ -3383,6 +3390,25 @@
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="T:Waher.Content.Markdown.Model.IXmlVisualizer">
+            <summary>
+            Interface for all XML visalizers.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.IXmlVisualizer.Supports(System.Xml.XmlDocument)">
+            <summary>
+            Checks how well the handler supports multimedia content of a given type.
+            </summary>
+            <param name="Xml">XML Document</param>
+            <returns>How well the handler supports the content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.IXmlVisualizer.TransformXml(System.Xml.XmlDocument)">
+            <summary>
+            Transforms the XML document before visualizing it.
+            </summary>
+            <param name="Xml">XML Document.</param>
+            <returns>Transformed object.</returns>
         </member>
         <member name="T:Waher.Content.Markdown.Model.MarkdownElement">
             <summary>

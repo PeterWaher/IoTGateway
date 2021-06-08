@@ -113,5 +113,19 @@
             <param name="Document">Markdown document containing element.</param>
             <returns>Image, if successful, null otherwise.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.Supports(System.Xml.XmlDocument)">
+            <summary>
+            Checks how well the handler supports multimedia content of a given type.
+            </summary>
+            <param name="Xml">XML Document</param>
+            <returns>How well the handler supports the content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.TransformXml(System.Xml.XmlDocument)">
+            <summary>
+            Transforms the XML document before visualizing it.
+            </summary>
+            <param name="Xml">XML Document.</param>
+            <returns>Transformed object.</returns>
+        </member>
     </members>
 </doc>

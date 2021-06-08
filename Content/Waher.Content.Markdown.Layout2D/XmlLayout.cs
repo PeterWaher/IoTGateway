@@ -17,7 +17,7 @@ namespace Waher.Content.Markdown.Layout2D
 	/// <summary>
 	/// Class managing 2D XML Layout integration into Markdown documents.
 	/// </summary>
-	public class XmlLayout : IImageCodeContent
+	public class XmlLayout : IImageCodeContent, IXmlVisualizer
 	{
 		private static readonly Random rnd = new Random();
 		private static Scheduler scheduler = null;
@@ -337,5 +337,36 @@ namespace Waher.Content.Markdown.Layout2D
 				return new PixelInformationPng(Data, Bitmap.Width, Bitmap.Height);
 			}
 		}
+
+		/// <summary>
+		/// Checks how well the handler supports multimedia content of a given type.
+		/// </summary>
+		/// <param name="Xml">XML Document</param>
+		/// <returns>How well the handler supports the content.</returns>
+		public Grade Supports(XmlDocument Xml)
+		{
+			return Xml.DocumentElement.LocalName == Layout2DDocument.LocalName &&
+				Xml.DocumentElement.NamespaceURI == Layout2DDocument.Namespace ? Grade.Excellent : Grade.NotAtAll;
+		}
+
+		/// <summary>
+		/// Transforms the XML document before visualizing it.
+		/// </summary>
+		/// <param name="Xml">XML Document.</param>
+		/// <returns>Transformed object.</returns>
+		public object TransformXml(XmlDocument Xml)
+		{
+			Layout2DDocument LayoutDoc = new Layout2DDocument(Xml);
+			RenderSettings Settings = new RenderSettings()
+			{
+				ImageSize = RenderedImageSize.ResizeImage   // TODO: Theme colors, font, etc.
+			};
+
+			using (SKImage Img = LayoutDoc.Render(Settings, out Map[] _))   // TODO: Maps
+			{
+				return PixelInformation.FromImage(Img);
+			}
+		}
+
 	}
 }

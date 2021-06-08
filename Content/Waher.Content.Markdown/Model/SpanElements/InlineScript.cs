@@ -129,6 +129,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Variables">Current variables.</param>
 		public static void GenerateHTML(object Result, StringBuilder Output, bool AloneInParagraph, Variables Variables)
 		{
+			if (Result is XmlDocument Xml)
+				Result = MarkdownDocument.TransformXml(Xml);
+
 			if (Result is Graph G)
 			{
 				PixelInformation Pixels = G.CreatePixels(Variables, out GraphSettings GraphSettings);
@@ -141,6 +144,24 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.Append(GraphSettings.Width.ToString());
 				Output.Append("\" height=\"");
 				Output.Append(GraphSettings.Height.ToString());
+				Output.Append("\" src=\"data:image/png;base64,");
+				Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
+				Output.Append("\" />");
+
+				if (AloneInParagraph)
+					Output.Append("</figure>");
+			}
+			else if (Result is PixelInformation Pixels)
+			{
+				byte[] Bin = Pixels.EncodeAsPng();
+
+				if (AloneInParagraph)
+					Output.Append("<figure>");
+
+				Output.Append("<img border=\"2\" width=\"");
+				Output.Append(Pixels.Width.ToString());
+				Output.Append("\" height=\"");
+				Output.Append(Pixels.Height.ToString());
 				Output.Append("\" src=\"data:image/png;base64,");
 				Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
 				Output.Append("\" />");

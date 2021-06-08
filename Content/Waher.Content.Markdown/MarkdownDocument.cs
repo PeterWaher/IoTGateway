@@ -6413,6 +6413,21 @@ namespace Waher.Content.Markdown
 			this.asyncTasks = this.asyncTasks.ContinueWith(Prev => Task.Run(Action)).Unwrap();
 		}
 
+		/// <summary>
+		/// Transforms XML to an object that is easier to visualize.
+		/// </summary>
+		/// <param name="Xml">XML Document.</param>
+		/// <returns>Transformed object (possibly the same if no XML Visualizer found).</returns>
+		public static object TransformXml(XmlDocument Xml)
+		{
+			IXmlVisualizer Visualizer = CodeBlock.GetXmlVisualizerHandler(Xml);
+			if (Visualizer is null)
+				return Xml;
+
+			return Visualizer.TransformXml(Xml) ?? Xml;
+		}
+
 		// TODO: Footnotes in included markdown files.
 	}
 }
+

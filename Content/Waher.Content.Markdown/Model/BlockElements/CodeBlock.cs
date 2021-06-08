@@ -51,7 +51,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			this.indent = Indent;
 			this.indentString = this.indent <= 0 ? string.Empty : new string('\t', this.indent);
 			this.language = Language;
-			this.handler = GetHandler(this.language);
+			this.handler = GetCodeBlockHandler(this.language);
 			this.handler?.Register(Document);
 		}
 
@@ -71,6 +71,9 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public ICodeContent Handler => this.handler;
 
 		private static ICodeContent[] codeContents = null;
+		private static IXmlVisualizer[] xmlVisualizers = null;
+		private readonly static Dictionary<string, ICodeContent[]> codeContentHandlers = new Dictionary<string, ICodeContent[]>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly static Dictionary<string, IXmlVisualizer[]> xmlVisualizerHandlers = new Dictionary<string, IXmlVisualizer[]>(StringComparer.CurrentCultureIgnoreCase);
 
 		static CodeBlock()
 		{
@@ -81,6 +84,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		private static void Init()
 		{
 			List<ICodeContent> CodeContents = new List<ICodeContent>();
+			List<IXmlVisualizer> XmlVisualizers = new List<IXmlVisualizer>();
 			TypeInfo TI;
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICodeContent)))
@@ -100,23 +104,46 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				}
 			}
 
-			lock (handlers)
+			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IXmlVisualizer)))
+			{
+				TI = T.GetTypeInfo();
+				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+					continue;
+
+				try
+				{
+					IXmlVisualizer XmlVisualizer = (IXmlVisualizer)Activator.CreateInstance(T);
+					XmlVisualizers.Add(XmlVisualizer);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			lock (codeContentHandlers)
 			{
 				codeContents = CodeContents.ToArray();
-				handlers.Clear();
+				codeContentHandlers.Clear();
+			}
+
+			lock (xmlVisualizerHandlers)
+			{
+				xmlVisualizers = XmlVisualizers.ToArray();
+				xmlVisualizerHandlers.Clear();
 			}
 		}
 
-		private static ICodeContent GetHandler(string Language)
+		internal static ICodeContent GetCodeBlockHandler(string Language)
 		{
 			ICodeContent[] Handlers;
 
 			if (string.IsNullOrEmpty(Language))
 				return null;
 
-			lock (handlers)
+			lock (codeContentHandlers)
 			{
-				if (!handlers.TryGetValue(Language, out Handlers))
+				if (!codeContentHandlers.TryGetValue(Language, out Handlers))
 				{
 					List<ICodeContent> List = new List<ICodeContent>();
 
@@ -131,7 +158,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					else
 						Handlers = null;
 
-					handlers[Language] = Handlers;
+					codeContentHandlers[Language] = Handlers;
 				}
 			}
 
@@ -155,7 +182,54 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			return Best;
 		}
 
-		private readonly static Dictionary<string, ICodeContent[]> handlers = new Dictionary<string, ICodeContent[]>(StringComparer.CurrentCultureIgnoreCase);
+		internal static IXmlVisualizer GetXmlVisualizerHandler(XmlDocument Xml)
+		{
+			if (Xml is null || Xml.DocumentElement is null)
+				return null;
+
+			IXmlVisualizer[] Handlers;
+			string Key = Xml.DocumentElement.NamespaceURI + "#" + Xml.DocumentElement.LocalName;
+
+			lock (xmlVisualizerHandlers)
+			{
+				if (!xmlVisualizerHandlers.TryGetValue(Key, out Handlers))
+				{
+					List<IXmlVisualizer> List = new List<IXmlVisualizer>();
+
+					foreach (IXmlVisualizer Visualizer in xmlVisualizers)
+					{
+						if (Visualizer.Supports(Xml) > Grade.NotAtAll)
+							List.Add(Visualizer);
+					}
+
+					if (List.Count > 0)
+						Handlers = List.ToArray();
+					else
+						Handlers = null;
+
+					xmlVisualizerHandlers[Key] = Handlers;
+				}
+			}
+
+			if (Handlers is null)
+				return null;
+
+			IXmlVisualizer Best = null;
+			Grade BestGrade = Grade.NotAtAll;
+			Grade VisualizerGrade;
+
+			foreach (IXmlVisualizer Visualizer in Handlers)
+			{
+				VisualizerGrade = Visualizer.Supports(Xml);
+				if (VisualizerGrade > BestGrade)
+				{
+					BestGrade = VisualizerGrade;
+					Best = Visualizer;
+				}
+			}
+
+			return Best;
+		}
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.

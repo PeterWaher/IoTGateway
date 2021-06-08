@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Script.Output

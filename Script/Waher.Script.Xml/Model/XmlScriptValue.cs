@@ -3,7 +3,6 @@ using System.Collections;
 using System.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 
 namespace Waher.Script.Xml.Model
 {

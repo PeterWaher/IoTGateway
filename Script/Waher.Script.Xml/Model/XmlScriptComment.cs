@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Xml;
-using Waher.Script.Abstraction.Elements;
-using Waher.Script.Model;
 
 namespace Waher.Script.Xml.Model
 {

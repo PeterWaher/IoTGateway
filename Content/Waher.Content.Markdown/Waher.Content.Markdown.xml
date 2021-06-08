@@ -856,11 +856,12 @@
             </summary>
             <param name="Action">Action</param>
         </member>
-        <member name="M:Waher.Content.Markdown.MarkdownDocument.TransformXml(System.Xml.XmlDocument)">
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.TransformXml(System.Xml.XmlDocument,Waher.Script.Variables)">
             <summary>
             Transforms XML to an object that is easier to visualize.
             </summary>
             <param name="Xml">XML Document.</param>
+            <param name="Variables">Current variables.</param>
             <returns>Transformed object (possibly the same if no XML Visualizer found).</returns>
         </member>
         <member name="T:Waher.Content.Markdown.MarkdownSettings">
@@ -3403,11 +3404,12 @@
             <param name="Xml">XML Document</param>
             <returns>How well the handler supports the content.</returns>
         </member>
-        <member name="M:Waher.Content.Markdown.Model.IXmlVisualizer.TransformXml(System.Xml.XmlDocument)">
+        <member name="M:Waher.Content.Markdown.Model.IXmlVisualizer.TransformXml(System.Xml.XmlDocument,Waher.Script.Variables)">
             <summary>
             Transforms the XML document before visualizing it.
             </summary>
             <param name="Xml">XML Document.</param>
+            <param name="Variables">Current variables.</param>
             <returns>Transformed object.</returns>
         </member>
         <member name="T:Waher.Content.Markdown.Model.MarkdownElement">

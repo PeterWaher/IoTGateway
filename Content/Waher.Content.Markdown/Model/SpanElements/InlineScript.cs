@@ -130,7 +130,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public static void GenerateHTML(object Result, StringBuilder Output, bool AloneInParagraph, Variables Variables)
 		{
 			if (Result is XmlDocument Xml)
-				Result = MarkdownDocument.TransformXml(Xml);
+				Result = MarkdownDocument.TransformXml(Xml, Variables);
 
 			if (Result is Graph G)
 			{

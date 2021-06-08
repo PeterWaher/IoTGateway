@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Xml;
 using Waher.Runtime.Inventory;
+using Waher.Script;
 
 namespace Waher.Content.Markdown.Model
 {
@@ -20,7 +21,8 @@ namespace Waher.Content.Markdown.Model
 		/// Transforms the XML document before visualizing it.
 		/// </summary>
 		/// <param name="Xml">XML Document.</param>
+		/// <param name="Variables">Current variables.</param>
 		/// <returns>Transformed object.</returns>
-		object TransformXml(XmlDocument Xml);
+		object TransformXml(XmlDocument Xml, Variables Variables);
 	}
 }

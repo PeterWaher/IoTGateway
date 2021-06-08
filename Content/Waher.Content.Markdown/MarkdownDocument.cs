@@ -6417,8 +6417,9 @@ namespace Waher.Content.Markdown
 		/// Transforms XML to an object that is easier to visualize.
 		/// </summary>
 		/// <param name="Xml">XML Document.</param>
+		/// <param name="Variables">Current variables.</param>
 		/// <returns>Transformed object (possibly the same if no XML Visualizer found).</returns>
-		public static object TransformXml(XmlDocument Xml)
+		public static object TransformXml(XmlDocument Xml, Variables Variables)
 		{
 			try
 			{
@@ -6426,7 +6427,7 @@ namespace Waher.Content.Markdown
 				if (Visualizer is null)
 					return Xml;
 
-				return Visualizer.TransformXml(Xml) ?? Xml;
+				return Visualizer.TransformXml(Xml, Variables) ?? Xml;
 			}
 			catch (Exception ex)
 			{

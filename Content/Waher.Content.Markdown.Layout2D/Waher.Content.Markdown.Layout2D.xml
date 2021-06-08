@@ -120,11 +120,12 @@
             <param name="Xml">XML Document</param>
             <returns>How well the handler supports the content.</returns>
         </member>
-        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.TransformXml(System.Xml.XmlDocument)">
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.TransformXml(System.Xml.XmlDocument,Waher.Script.Variables)">
             <summary>
             Transforms the XML document before visualizing it.
             </summary>
             <param name="Xml">XML Document.</param>
+            <param name="Variables">Current variables.</param>
             <returns>Transformed object.</returns>
         </member>
     </members>

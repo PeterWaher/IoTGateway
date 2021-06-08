@@ -9,6 +9,7 @@ using Waher.Events;
 using Waher.Layout.Layout2D;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Timing;
+using Waher.Script;
 using Waher.Script.Graphs;
 using Waher.Security;
 
@@ -353,10 +354,11 @@ namespace Waher.Content.Markdown.Layout2D
 		/// Transforms the XML document before visualizing it.
 		/// </summary>
 		/// <param name="Xml">XML Document.</param>
+		/// <param name="Variables">Current variables.</param>
 		/// <returns>Transformed object.</returns>
-		public object TransformXml(XmlDocument Xml)
+		public object TransformXml(XmlDocument Xml, Variables Variables)
 		{
-			Layout2DDocument LayoutDoc = new Layout2DDocument(Xml);
+			Layout2DDocument LayoutDoc = new Layout2DDocument(Xml, Variables);
 			RenderSettings Settings = new RenderSettings()
 			{
 				ImageSize = RenderedImageSize.ResizeImage   // TODO: Theme colors, font, etc.

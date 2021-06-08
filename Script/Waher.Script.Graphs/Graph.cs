@@ -1273,7 +1273,7 @@ namespace Waher.Script.Graphs
 		/// <param name="s">Expression</param>
 		/// <param name="Variables">Current set of variables.</param>
 		/// <returns>Parsed element.</returns>
-		protected IElement Parse(string s, Variables Variables)
+		public static IElement Parse(string s, Variables Variables)
 		{
 			Expression Exp = new Expression(s);
 			IElement Result;

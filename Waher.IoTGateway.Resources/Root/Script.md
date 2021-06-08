@@ -1085,6 +1085,7 @@ will return a vector corresponding to the point under the mouse.
 
 | Function                                | Description                                           | Example                                   |
 |-----------------------------------------|-------------------------------------------------------|-------------------------------------------|
+| `Canvas(Width,Height[Color[,BgColor]])` | Creates a 2D canvas for custom drawing.               | [Example](CanvasExample)                  |
 | `HorizontalBars(Labels,Values[,Color])` | Plots a two-dimensional stacked horizontal bar chart. | [Example][HorizontalBarsExample]          |
 | `Plot2DArea(X,Y[,Color])`               | Plots a stacked area chart.                           | [Example][Plot2DAreaExample]              |
 | `Plot2DCurve(X,Y[,Color[,PenSize]])`    | Plots a smooth two-dimensional curve.                 | [Example][Plot2DCurveExample]             |
@@ -1102,6 +1103,7 @@ will return a vector corresponding to the point under the mouse.
 | `Scatter2D(X,Y[,Color[,BulletSize]])`   | Plots a two-dimensional scatter diagram.              | [Example][Scatter2DExample]               |
 | `VerticalBars(Labels,Values[,Color])`   | Plots a two-dimensional stacked vertical bar chart.   | [Example][VerticalBarsExample]            |
 
+[CanvasExample]: Prompt.md?Expression=Canvas%28500,500,"Red","White"%29
 [HorizontalBarsExample]: Prompt.md?Expression=x%3A%3D0..20%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3BHorizontalBars(%22x%22%2Bx%2Cy%2Crgba(255%2C0%2C0%2C128))%2BHorizontalBars(%22x%22%2Bx%2Cy2%2Crgba(0%2C0%2C255%2C128))%3B
 [Plot2DAreaExample]: Prompt.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2darea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2darea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dline(x%2Cy)%2Bplot2dline(x%2Cy2%2C%22Blue%22)
 [Plot2DCurveExample]: Prompt.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0aplot2dcurve(x,y)

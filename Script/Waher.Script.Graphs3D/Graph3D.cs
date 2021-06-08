@@ -1553,27 +1553,27 @@ namespace Waher.Script.Graphs3D
 						break;
 
 					case "minX":
-						this.minX = this.Parse(Attr.Value, Variables);
+						this.minX = Parse(Attr.Value, Variables);
 						break;
 
 					case "maxX":
-						this.maxX = this.Parse(Attr.Value, Variables);
+						this.maxX = Parse(Attr.Value, Variables);
 						break;
 
 					case "minY":
-						this.minY = this.Parse(Attr.Value, Variables);
+						this.minY = Parse(Attr.Value, Variables);
 						break;
 
 					case "maxY":
-						this.maxY = this.Parse(Attr.Value, Variables);
+						this.maxY = Parse(Attr.Value, Variables);
 						break;
 
 					case "minZ":
-						this.minZ = this.Parse(Attr.Value, Variables);
+						this.minZ = Parse(Attr.Value, Variables);
 						break;
 
 					case "maxZ":
-						this.maxZ = this.Parse(Attr.Value, Variables);
+						this.maxZ = Parse(Attr.Value, Variables);
 						break;
 
 					case "showXAxis":
@@ -1615,19 +1615,19 @@ namespace Waher.Script.Graphs3D
 					switch (E.LocalName)
 					{
 						case "X":
-							this.x.AddLast((IMatrix)this.Parse(E.InnerText, Variables));
+							this.x.AddLast((IMatrix)Parse(E.InnerText, Variables));
 							break;
 
 						case "Y":
-							this.y.AddLast((IMatrix)this.Parse(E.InnerText, Variables));
+							this.y.AddLast((IMatrix)Parse(E.InnerText, Variables));
 							break;
 
 						case "Z":
-							this.z.AddLast((IMatrix)this.Parse(E.InnerText, Variables));
+							this.z.AddLast((IMatrix)Parse(E.InnerText, Variables));
 							break;
 
 						case "Normals":
-							IMatrix M = (IMatrix)this.Parse(E.InnerText, Variables);
+							IMatrix M = (IMatrix)Parse(E.InnerText, Variables);
 
 							int i, j, c, d;
 
@@ -1650,7 +1650,7 @@ namespace Waher.Script.Graphs3D
 							break;
 
 						case "Parameters":
-							IVector v = (IVector)this.Parse(E.InnerText, Variables);
+							IVector v = (IVector)Parse(E.InnerText, Variables);
 							this.parameters.AddLast(this.ToObjectArray(v));
 							break;
 

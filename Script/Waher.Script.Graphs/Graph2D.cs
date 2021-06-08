@@ -1002,19 +1002,19 @@ namespace Waher.Script.Graphs
 						break;
 
 					case "minX":
-						this.minX = this.Parse(Attr.Value, Variables);
+						this.minX = Parse(Attr.Value, Variables);
 						break;
 
 					case "maxX":
-						this.maxX = this.Parse(Attr.Value, Variables);
+						this.maxX = Parse(Attr.Value, Variables);
 						break;
 
 					case "minY":
-						this.minY = this.Parse(Attr.Value, Variables);
+						this.minY = Parse(Attr.Value, Variables);
 						break;
 
 					case "maxY":
-						this.maxY = this.Parse(Attr.Value, Variables);
+						this.maxY = Parse(Attr.Value, Variables);
 						break;
 
 					case "showXAxis":
@@ -1038,15 +1038,15 @@ namespace Waher.Script.Graphs
 					switch (E.LocalName)
 					{
 						case "X":
-							this.x.AddLast((IVector)this.Parse(E.InnerText, Variables));
+							this.x.AddLast((IVector)Parse(E.InnerText, Variables));
 							break;
 
 						case "Y":
-							this.y.AddLast((IVector)this.Parse(E.InnerText, Variables));
+							this.y.AddLast((IVector)Parse(E.InnerText, Variables));
 							break;
 
 						case "Parameters":
-							IVector v = (IVector)this.Parse(E.InnerText, Variables);
+							IVector v = (IVector)Parse(E.InnerText, Variables);
 							this.parameters.AddLast(this.ToObjectArray(v));
 							break;
 

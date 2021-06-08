@@ -4,6 +4,575 @@
         <name>Waher.Script.Graphs</name>
     </assembly>
     <members>
+        <member name="T:Waher.Script.Graphs.Canvas2D.CanvasGraph">
+            <summary>
+            Canvas graph. Permits custom drawing from scrupt.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.#ctor">
+            <summary>
+            Canvas graph. Permits custom drawing from scrupt.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.#ctor(System.Int32,System.Int32,System.Nullable{SkiaSharp.SKColor},System.Nullable{SkiaSharp.SKColor})">
+            <summary>
+            Canvas graph. Permits custom drawing from scrupt.
+            </summary>
+            <param name="Width">Width, in puxels.</param>
+            <param name="Height">Height, in puxels.</param>
+            <param name="BackgroundColor">Background color.</param>
+            <param name="DefaultColor">Default color.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.CanvasGraph.BgColor">
+            <summary>
+            Background color.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.CanvasGraph.DefaultColor">
+            <summary>
+            Default color.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.CanvasGraph.Width">
+            <summary>
+            Width, in puxels.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.CanvasGraph.Height">
+            <summary>
+            Height, in puxels.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.CanvasGraph.UsesDefaultColor">
+            <summary>
+            If graph uses default color
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.TrySetDefaultColor(SkiaSharp.SKColor)">
+            <summary>
+            Tries to set the default color.
+            </summary>
+            <param name="Color">Default color.</param>
+            <returns>If possible to set.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.AddLeft(Waher.Script.Abstraction.Elements.ISemiGroupElement)">
+            <summary>
+            Tries to add an element to the current element, from the left.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.AddRight(Waher.Script.Abstraction.Elements.ISemiGroupElement)">
+            <summary>
+            Tries to add an element to the current element, from the right.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.CreatePixels(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
+            <summary>
+            Creates a bitmap of the graph.
+            </summary>
+            <param name="Settings">Graph settings.</param>
+            <param name="States">State objects that contain graph-specific information about its inner states.
+            These can be used in calls back to the graph object to make actions on the generated graph.</param>
+            <returns>Bitmap</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.ExportGraph(System.Xml.XmlWriter)">
+            <summary>
+            Exports graph specifics to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.ImportGraph(System.Xml.XmlElement)">
+            <summary>
+            Imports graph specifics from XML.
+            </summary>
+            <param name="Xml">XML input.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.GetBitmapClickScript(System.Double,System.Double,System.Object[])">
+            <summary>
+            Gets script corresponding to a point in a generated bitmap representation of the graph.
+            </summary>
+            <param name="X">X-Coordinate.</param>
+            <param name="Y">Y-Coordinate.</param>
+            <param name="States">State objects for the generated bitmap.</param>
+            <returns>Script.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.LineTo(System.Double,System.Double)">
+            <summary>
+            Draws a line to a specific coordinate
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.MoveTo(System.Double,System.Double)">
+            <summary>
+            Draws a line to a specific coordinate
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.Line(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Draws a line between two points.
+            </summary>
+            <param name="x1">X-coordinate of first point.</param>
+            <param name="y1">Y-coordinate of first point.</param>
+            <param name="x2">X-coordinate of second point.</param>
+            <param name="y2">Y-coordinate of second point.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.PenWidth(System.Double)">
+            <summary>
+            Sets the current pen width.
+            </summary>
+            <param name="Width">New pen width</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.Color(SkiaSharp.SKColor)">
+            <summary>
+            Sets the current pen color.
+            </summary>
+            <param name="Color">New pen color</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.Color(System.Object)">
+            <summary>
+            Sets the current pen color.
+            </summary>
+            <param name="Color">New pen color</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.Rectangle(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Draws a rectangle defined by two opposing corner points.
+            </summary>
+            <param name="x1">X-coordinate of first point.</param>
+            <param name="y1">Y-coordinate of first point.</param>
+            <param name="x2">X-coordinate of second point.</param>
+            <param name="y2">Y-coordinate of second point.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.FillRectangle(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Fills a rectangle defined by two opposing corner points.
+            </summary>
+            <param name="x1">X-coordinate of first point.</param>
+            <param name="y1">Y-coordinate of first point.</param>
+            <param name="x2">X-coordinate of second point.</param>
+            <param name="y2">Y-coordinate of second point.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.CanvasOperation">
+            <summary>
+            Abstract base class for canvas operations.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.CanvasOperation.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <summary>
+            Performs a drawing operation.
+            </summary>
+            <param name="Canvas">Current canvas.</param>
+            <param name="State">Current state.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.CanvasOperation.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.CanvasOperation.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.CanvasOperation.ExportGraph(System.Xml.XmlWriter)">
+            <summary>
+            Exports graph specifics to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.CanvasOperation.ImportGraph(System.Xml.XmlElement,Waher.Script.Variables)">
+            <summary>
+            Imports graph specifics from XML.
+            </summary>
+            <param name="Xml">XML input.</param>
+            <param name="Variables">Set of variables.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.CanvasState">
+            <summary>
+            Current drawing state in a canvas graph.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.CanvasState.FgColor">
+            <summary>
+            Foreground color
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.CanvasState.Width">
+            <summary>
+            Pen width
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.CanvasState.BgColor">
+            <summary>
+            Background color
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.CanvasState.X">
+            <summary>
+            Current X-coordinate.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.CanvasState.Y">
+            <summary>
+            Current Y-coordinate.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.CanvasState.Pen">
+            <summary>
+            Current pen
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.CanvasState.Brush">
+            <summary>
+            Current brush
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.FillRectangle">
+            <summary>
+            Fills a rectangle
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.FillRectangle.#ctor">
+            <summary>
+            Fills a rectangle
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.FillRectangle.#ctor(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Fills a rectangle
+            </summary>
+            <param name="X1">First X-coordinate.</param>
+            <param name="Y1">First Y-coordinate.</param>
+            <param name="X2">Second X-coordinate.</param>
+            <param name="Y2">Second Y-coordinate.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.FillRectangle.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.FillRectangle.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.FillRectangle.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.Line">
+            <summary>
+            Draws a line
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Line.#ctor">
+            <summary>
+            Draws a line
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Line.#ctor(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Draws a line
+            </summary>
+            <param name="X1">First X-coordinate.</param>
+            <param name="Y1">First Y-coordinate.</param>
+            <param name="X2">Second X-coordinate.</param>
+            <param name="Y2">Second Y-coordinate.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Line.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Line.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Line.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.LineTo">
+            <summary>
+            Draws a line to a specific coordinate
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.LineTo.#ctor">
+            <summary>
+            Draws a line to a specific coordinate
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.LineTo.#ctor(System.Single,System.Single)">
+            <summary>
+            Draws a line to a specific coordinate
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.LineTo.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.LineTo.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.LineTo.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.MoveTo">
+            <summary>
+            Moves to a new coordinate.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.MoveTo.#ctor">
+            <summary>
+            Moves to a new coordinate.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.MoveTo.#ctor(System.Single,System.Single)">
+            <summary>
+            Moves to a new coordinate.
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.MoveTo.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.MoveTo.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.MoveTo.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.OneColorParameter">
+            <summary>
+            Abstract base class for operations using one color parameter.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneColorParameter.#ctor">
+            <summary>
+            Abstract base class for operations using one color parameter.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneColorParameter.#ctor(SkiaSharp.SKColor)">
+            <summary>
+            Abstract base class for operations using one color parameter.
+            </summary>
+            <param name="Parameter">Parameter.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.OneColorParameter.Parameter">
+            <summary>
+            Parameter
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneColorParameter.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneColorParameter.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneColorParameter.ExportGraph(System.Xml.XmlWriter)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneColorParameter.ImportGraph(System.Xml.XmlElement,Waher.Script.Variables)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate">
+            <summary>
+            Abstract base class for operations using one coordinate
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate.#ctor">
+            <summary>
+            Abstract base class for operations using one coordinate
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate.#ctor(System.Single,System.Single)">
+            <summary>
+            Abstract base class for operations using one coordinate
+            </summary>
+            <param name="X">X-coordinate.</param>
+            <param name="Y">Y-coordinate.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate.X">
+            <summary>
+            X-coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate.Y">
+            <summary>
+            Y-coordinate
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate.ExportGraph(System.Xml.XmlWriter)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneCoordinate.ImportGraph(System.Xml.XmlElement,Waher.Script.Variables)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.OneFloatParameter">
+            <summary>
+            Abstract base class for operations using one floating point parameter.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneFloatParameter.#ctor">
+            <summary>
+            Abstract base class for operations using one floating point parameter.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneFloatParameter.#ctor(System.Single)">
+            <summary>
+            Abstract base class for operations using one floating point parameter.
+            </summary>
+            <param name="Parameter">Parameter.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.OneFloatParameter.Parameter">
+            <summary>
+            Parameter
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneFloatParameter.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneFloatParameter.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneFloatParameter.ExportGraph(System.Xml.XmlWriter)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.OneFloatParameter.ImportGraph(System.Xml.XmlElement,Waher.Script.Variables)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.PenColor">
+            <summary>
+            Sets the current pen color.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenColor.#ctor">
+            <summary>
+            Sets the current pen color.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenColor.#ctor(SkiaSharp.SKColor)">
+            <summary>
+            Sets the current pen color.
+            </summary>
+            <param name="Color">New color.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenColor.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenColor.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenColor.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.PenWidth">
+            <summary>
+            Sets the current pen width.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenWidth.#ctor">
+            <summary>
+            Sets the current pen width.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenWidth.#ctor(System.Single)">
+            <summary>
+            Sets the current pen width.
+            </summary>
+            <param name="Width">New pen width</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenWidth.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenWidth.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.PenWidth.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.Rectangle">
+            <summary>
+            Draws a rectangle
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Rectangle.#ctor">
+            <summary>
+            Draws a rectangle
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Rectangle.#ctor(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Draws a rectangle
+            </summary>
+            <param name="X1">First X-coordinate.</param>
+            <param name="Y1">First Y-coordinate.</param>
+            <param name="X2">Second X-coordinate.</param>
+            <param name="Y2">Second Y-coordinate.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Rectangle.Draw(SkiaSharp.SKCanvas,Waher.Script.Graphs.Canvas2D.Operations.CanvasState)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Rectangle.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.Rectangle.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates">
+            <summary>
+            Abstract base class for operations using two coordinates
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.#ctor">
+            <summary>
+            Abstract base class for operations using two coordinates
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.#ctor(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Abstract base class for operations using two coordinates
+            </summary>
+            <param name="X1">First X-coordinate.</param>
+            <param name="Y1">First Y-coordinate.</param>
+            <param name="X2">Second X-coordinate.</param>
+            <param name="Y2">Second Y-coordinate.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.X2">
+            <summary>
+            X2-coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.Y2">
+            <summary>
+            Y2-coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.Width">
+            <summary>
+            Width
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.Height">
+            <summary>
+            Height
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.ExportGraph(System.Xml.XmlWriter)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Graphs.Canvas2D.Operations.TwoCoordinates.ImportGraph(System.Xml.XmlElement,Waher.Script.Variables)">
+            <inheritdoc/>
+        </member>
         <member name="T:Waher.Script.Graphs.DrawingArea">
             <summary>
             Contains information about the current drawing area.
@@ -120,6 +689,62 @@
             Descales a scaled value along the Y-axis.
             </summary>
             <param name="Value">Scaled value.</param>
+        </member>
+        <member name="T:Waher.Script.Graphs.Functions.Canvas.Canvas">
+            <summary>
+            Creates a 2D Canvas for custom drawing.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Canvas.Canvas.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a 2D Canvas for custom drawing.
+            </summary>
+            <param name="Width">Width of canvas</param>
+            <param name="Height">Height of canvas</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Canvas.Canvas.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a 2D Canvas for custom drawing.
+            </summary>
+            <param name="Width">Width of canvas</param>
+            <param name="Height">Height of canvas</param>
+            <param name="Color">Default color of graph.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Canvas.Canvas.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a 2D Canvas for custom drawing.
+            </summary>
+            <param name="Width">Width of canvas</param>
+            <param name="Height">Height of canvas</param>
+            <param name="Color">Default color of graph.</param>
+            <param name="BgColor">Background color.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Canvas.Canvas.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Graphs.Functions.Canvas.Canvas.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.Canvas.Canvas.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
         </member>
         <member name="T:Waher.Script.Graphs.Functions.Colors.Alpha">
             <summary>

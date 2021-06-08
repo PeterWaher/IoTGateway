@@ -3640,15 +3640,15 @@ namespace Waher.Script.Graphs3D
 											switch (E3.LocalName)
 											{
 												case "World":
-													P.World = ToVector3DoubleArray((IMatrix)this.Parse(E.InnerText, Variables));
+													P.World = ToVector3DoubleArray((IMatrix)Parse(E.InnerText, Variables));
 													break;
 
 												case "Screen":
-													P.Screen = ToVector3DoubleArray((IMatrix)this.Parse(E.InnerText, Variables));
+													P.Screen = ToVector3DoubleArray((IMatrix)Parse(E.InnerText, Variables));
 													break;
 
 												case "Normals":
-													P.Normals = ToVector3DoubleArray((IMatrix)this.Parse(E.InnerText, Variables));
+													P.Normals = ToVector3DoubleArray((IMatrix)Parse(E.InnerText, Variables));
 													break;
 											}
 										}

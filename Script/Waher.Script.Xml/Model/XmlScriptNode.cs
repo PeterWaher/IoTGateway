@@ -33,7 +33,7 @@ namespace Waher.Script.Xml.Model
 		}
 
 		/// <summary>
-		/// Builds an XML Document objcet
+		/// Builds an XML Document object
 		/// </summary>
 		/// <param name="Document">Document being built.</param>
 		/// <param name="Parent">Parent element.</param>

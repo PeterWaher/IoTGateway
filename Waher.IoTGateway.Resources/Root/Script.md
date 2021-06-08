@@ -2703,6 +2703,23 @@ the `Waher.Script` library:
 
 **Note**: Since `IN` is a keyword, the unit *in* has to be written `inch`.
 
+Furthermore, the following length units used in web applications are also recocnized:
+
+| Unit | Meaning |
+|:----:|:--------|
+| px   | Pixels |
+| pt   | Points |
+| pc   | Picas  |
+| em   | Relative to the font-size of the element |
+| ex   | Relative to the x-height of the current font |
+| ch   | Relative to the width of the "0" (zero) |
+| rem  | Relative to font-size of the root element |
+| vw   | Relative to 1% of the width of the viewport |
+| vh   | Relative to 1% of the height of the viewport |
+| vmin | Relative to 1% of viewport's smaller dimension |
+| vmax | Relative to 1% of viewport's larger dimension |
+[Length (Web)]
+
 | Unit | Meaning |
 |:----:|:--------|
 | g    | Gram |

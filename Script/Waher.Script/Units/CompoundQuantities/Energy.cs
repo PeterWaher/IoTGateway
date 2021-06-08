@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Waher.Script.Objects;
 
 namespace Waher.Script.Units.CompoundQuantities
 {

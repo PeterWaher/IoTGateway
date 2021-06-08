@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Exceptions;
 
 namespace Waher.Script.Units

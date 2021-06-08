@@ -70,12 +70,12 @@ namespace Waher.Layout.Layout2D.Model
 		Vh,
 
 		/// <summary>
-		/// Relative to 1% of viewport's* smaller dimension
+		/// Relative to 1% of viewport's smaller dimension
 		/// </summary>
 		Vmin,
 
 		/// <summary>
-		/// Relative to 1% of viewport's* larger dimension
+		/// Relative to 1% of viewport's larger dimension
 		/// </summary>
 		Vmax,
 

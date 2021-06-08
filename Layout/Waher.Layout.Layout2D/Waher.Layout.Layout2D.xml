@@ -396,6 +396,14 @@
             <param name="Value">Parsed value, if successful.</param>
             <returns>If the value could be parsed.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.TryConvert(System.Object,`0@)">
+            <summary>
+            Tries to convert script result to a value of type <typeparamref name="T"/>.
+            </summary>
+            <param name="Result">Script result.</param>
+            <param name="Value">Converted value.</param>
+            <returns>If conversion was possible.</returns>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.ToString(`0)">
             <summary>
             Converts a value to a string.
@@ -655,6 +663,14 @@
             <param name="AttributeName">Attribute name.</param>
             <param name="Expression">Expression.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.TryConvert(System.Object,System.Single@)">
+            <summary>
+            Tries to convert script result to a value of type <see cref="T:System.Single"/>.
+            </summary>
+            <param name="Result">Script result.</param>
+            <param name="Value">Converted value.</param>
+            <returns>If conversion was possible.</returns>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute.TryParse(System.String,System.Single@)">
             <summary>
             Tries to parse a string value
@@ -702,6 +718,14 @@
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.TryConvert(System.Object,Waher.Layout.Layout2D.Model.Length@)">
+            <summary>
+            Tries to convert script result to a value of type <see cref="T:System.Single"/>.
+            </summary>
+            <param name="Result">Script result.</param>
+            <param name="Value">Converted value.</param>
+            <returns>If conversion was possible.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.LengthAttribute.TryParse(System.String,Waher.Layout.Layout2D.Model.Length@)">
             <summary>
@@ -751,6 +775,14 @@
             <param name="AttributeName">Attribute name.</param>
             <param name="Expression">Expression.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.TryConvert(System.Object,System.Int32@)">
+            <summary>
+            Tries to convert script result to a value of type <see cref="T:System.Single"/>.
+            </summary>
+            <param name="Result">Script result.</param>
+            <param name="Value">Converted value.</param>
+            <returns>If conversion was possible.</returns>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute.TryParse(System.String,System.Int32@)">
             <summary>
             Tries to parse a string value
@@ -798,6 +830,14 @@
             </summary>
             <param name="AttributeName">Attribute name.</param>
             <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.TryConvert(System.Object,System.String@)">
+            <summary>
+            Tries to convert script result to a value of type <see cref="T:System.Single"/>.
+            </summary>
+            <param name="Result">Script result.</param>
+            <param name="Value">Converted value.</param>
+            <returns>If conversion was possible.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.StringAttribute.TryParse(System.String,System.String@)">
             <summary>
@@ -7509,12 +7549,12 @@
         </member>
         <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.Vmin">
             <summary>
-            Relative to 1% of viewport's* smaller dimension
+            Relative to 1% of viewport's smaller dimension
             </summary>
         </member>
         <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.Vmax">
             <summary>
-            Relative to 1% of viewport's* larger dimension
+            Relative to 1% of viewport's larger dimension
             </summary>
         </member>
         <member name="F:Waher.Layout.Layout2D.Model.LengthUnit.Percent">

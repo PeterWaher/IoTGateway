@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Text;
 using System.Xml;
 using Waher.Content;
 using Waher.Layout.Layout2D.Exceptions;
 using Waher.Script;
+using Waher.Script.Objects;
+using Waher.Script.Units;
 
 namespace Waher.Layout.Layout2D.Model.Attributes
 {
@@ -41,6 +42,98 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 			: base(AttributeName, Expression)
 		{
 		}
+
+		/// <summary>
+		/// Tries to convert script result to a value of type <see cref="float"/>.
+		/// </summary>
+		/// <param name="Result">Script result.</param>
+		/// <param name="Value">Converted value.</param>
+		/// <returns>If conversion was possible.</returns>
+		public override bool TryConvert(object Result, out Length Value)
+		{
+			if (Result is double d)
+			{
+				Value = new Length((float)(d * 100), LengthUnit.Percent);
+				return true;
+			}
+			else if (Result is PhysicalQuantity Q)
+			{
+				switch (Q.Unit.ToString().ToLower())
+				{
+					case "px":
+						Value = new Length((float)Q.Magnitude, LengthUnit.Px);
+						return true;
+
+					case "pt":
+						Value = new Length((float)Q.Magnitude, LengthUnit.Pt);
+						return true;
+
+					case "pc":
+						Value = new Length((float)Q.Magnitude, LengthUnit.Pc);
+						return true;
+
+					case "cm":
+						Value = new Length((float)Q.Magnitude, LengthUnit.Cm);
+						return true;
+
+					case "in":
+						Value = new Length((float)Q.Magnitude, LengthUnit.In);
+						return true;
+
+					case "mm":
+						Value = new Length((float)Q.Magnitude, LengthUnit.Mm);
+						return true;
+
+					case "em":
+						Value = new Length((float)Q.Magnitude, LengthUnit.Em);
+						return true;
+
+					case "ex":
+						Value = new Length((float)Q.Magnitude, LengthUnit.Ex);
+						return true;
+
+					case "ch":
+						Value = new Length((float)Q.Magnitude, LengthUnit.Ch);
+						return true;
+
+					case "rem":
+						Value = new Length((float)Q.Magnitude, LengthUnit.Rem);
+						return true;
+
+					case "vw":
+						Value = new Length((float)Q.Magnitude, LengthUnit.Vw);
+						return true;
+
+					case "vh":
+						Value = new Length((float)Q.Magnitude, LengthUnit.Vh);
+						return true;
+
+					case "vmin":
+						Value = new Length((float)Q.Magnitude, LengthUnit.Vmin);
+						return true;
+
+					case "vmax":
+						Value = new Length((float)Q.Magnitude, LengthUnit.Vmax);
+						return true;
+
+					default:
+						if (Unit.TryConvert(Q.Magnitude, Q.Unit, pixels, out double Pixels))
+						{
+							Value = new Length((float)Pixels, LengthUnit.Px);
+							return true;
+						}
+						else
+						{
+							Value = null;
+							return false;
+						}
+				}
+			}
+			else
+				return base.TryConvert(Result, out Value);
+		}
+
+		private static readonly Unit pixels = new Unit("px");
 
 		/// <summary>
 		/// Tries to parse a string value

@@ -50,6 +50,7 @@
     <None Remove="Xml\Test_39_Stack.xml" />
     <None Remove="Xml\Test_40_HorizontalBars.xml" />
     <None Remove="Xml\Test_41_FlexibleLegend.xml" />
+    <None Remove="Xml\Test_42_Pie.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,6 +65,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Xml\Test_34_Flexible_DTLR.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Xml\Test_42_Pie.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Xml\Test_41_FlexibleLegend.xml">

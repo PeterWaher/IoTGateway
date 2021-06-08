@@ -40,6 +40,18 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		}
 
 		/// <summary>
+		/// Tries to convert script result to a value of type <see cref="float"/>.
+		/// </summary>
+		/// <param name="Result">Script result.</param>
+		/// <param name="Value">Converted value.</param>
+		/// <returns>If conversion was possible.</returns>
+		public override bool TryConvert(object Result, out string Value)
+		{
+			Value = Result?.ToString() ?? string.Empty;
+			return true;
+		}
+
+		/// <summary>
 		/// Tries to parse a string value
 		/// </summary>
 		/// <param name="StringValue">String value for attribute.</param>

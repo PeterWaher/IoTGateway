@@ -281,5 +281,11 @@ namespace Waher.Layout.Layout2D.Test
 		{
 			this.Test("Test_41_FlexibleLegend");
 		}
+
+		[TestMethod]
+		public void Test_42_Pie()
+		{
+			this.Test("Test_42_Pie");
+		}
 	}
 }

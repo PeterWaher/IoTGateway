@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+          background="WhiteBackground" pen="BlackPen"
+          font="Text" textColor="Black">
+	<SolidPen id="BlackPen" color="Black" width="1px"/>
+	<SolidPen id="LightGrayPen" color="LightGray" width="1px"/>
+	<SolidPen id="GreenPen" color="Green" width="2mm"/>
+	<SolidPen id="RedPen" color="Red" width="2mm"/>
+	<SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+	<SolidBackground id="GreenBackground" color="{Alpha('Green',128)}"/>
+	<SolidBackground id="RedBackground" color="{Alpha('Red',128)}"/>
+	<Font id="Text" name="Arial" size="36pt" color="White"/>
+	<Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
+	<ForEach variable="k" expression="(10..90|10)+'%'">
+		<Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
+		<Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
+	</ForEach>
+	<CircleArc x="45%" y="50%" radius="30%" startDegrees="{Ok:=20;Total:=24;DegGreen:=360*Ok/Total;DegRed:=360-DegGreen;DegRed/2}" endDegrees="{360-DegRed/2}" clockwise="true" center="true" pen="GreenPen" fill="GreenBackground"/>
+	<CircleArc x="55%" y="50%" radius="30%" startDegrees="{360-DegRed/2}" endDegrees="{DegRed/2}" clockwise="true" center="true" pen="RedPen" fill="RedBackground"/>
+	<Label x="30%" y="50%" font="Text" halign="Center" valign="Center" text="{Ok}"/>
+	<Label x="70%" y="50%" font="Text" halign="Center" valign="Center" text="{Total-Ok}"/>
+</Layout2D>

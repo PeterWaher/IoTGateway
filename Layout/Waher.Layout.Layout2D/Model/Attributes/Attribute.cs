@@ -135,6 +135,23 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		public abstract bool TryParse(string StringValue, out T Value);
 
 		/// <summary>
+		/// Tries to convert script result to a value of type <typeparamref name="T"/>.
+		/// </summary>
+		/// <param name="Result">Script result.</param>
+		/// <param name="Value">Converted value.</param>
+		/// <returns>If conversion was possible.</returns>
+		public virtual bool TryConvert(object Result, out T Value)
+		{
+			if (Result is string s && this.TryParse(s, out Value))
+				return true;
+			else
+			{
+				Value = default;
+				return false;
+			}
+		}
+
+		/// <summary>
 		/// Converts a value to a string.
 		/// </summary>
 		/// <param name="Value">Value</param>
@@ -181,8 +198,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 				try
 				{
 					object Value = this.expression.Evaluate(Session);
-					if (Value is T Eval ||
-						(Value is string s && this.TryParse(s, out Eval)))
+					if (Value is T Eval || this.TryConvert(Value, out Eval))
 					{
 						Result = this.evaluatedValue = Eval;
 						this.hasEvaluated = true;

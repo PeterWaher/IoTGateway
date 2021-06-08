@@ -11,6 +11,7 @@ namespace Waher.Script.Xml.Model
 	/// </summary>
 	public class XmlScriptElement : XmlScriptNode
 	{
+		private XmlScriptAttribute xmlns;
 		private readonly XmlScriptAttribute[] attributes;
 		private LinkedList<XmlScriptNode> children = null;
 		private readonly string name;
@@ -19,14 +20,17 @@ namespace Waher.Script.Xml.Model
 		/// XML Script element node.
 		/// </summary>
 		/// <param name="Name">Element name.</param>
+		/// <param name="Xmlns">XML Namespace attribute.</param>
 		/// <param name="Attributes">Attributes</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public XmlScriptElement(string Name, XmlScriptAttribute[] Attributes, int Start, int Length, Expression Expression)
+		public XmlScriptElement(string Name, XmlScriptAttribute Xmlns, XmlScriptAttribute[] Attributes, 
+			int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
 			this.name = Name;
+			this.xmlns = Xmlns;
 			this.attributes = Attributes;
 		}
 
@@ -57,6 +61,9 @@ namespace Waher.Script.Xml.Model
 
 			if (DepthFirst)
 			{
+				if (!(this.xmlns?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					return false;
+
 				for (i = 0; i < c; i++)
 				{
 					if (!this.attributes[i].ForAllChildNodes(Callback, State, DepthFirst))
@@ -70,6 +77,22 @@ namespace Waher.Script.Xml.Model
 						return false;
 
 					Loop = Loop.Next;
+				}
+			}
+
+			if (!(this.xmlns is null))
+			{
+				Node = this.xmlns;
+
+				if (!Callback(ref Node, State))
+					return false;
+
+				if (Node != this.xmlns)
+				{
+					if (Node is XmlScriptAttribute Attr)
+						this.xmlns = Attr;
+					else
+						throw new ScriptRuntimeException("Incompatible node change.", this);
 				}
 			}
 
@@ -110,6 +133,9 @@ namespace Waher.Script.Xml.Model
 
 			if (!DepthFirst)
 			{
+				if (!(this.xmlns?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					return false;
+
 				for (i = 0; i < c; i++)
 				{
 					if (!this.attributes[i].ForAllChildNodes(Callback, State, DepthFirst))
@@ -130,14 +156,20 @@ namespace Waher.Script.Xml.Model
 		}
 
 		/// <summary>
-		/// Builds an XML Document objcet
+		/// Builds an XML Document object
 		/// </summary>
 		/// <param name="Document">Document being built.</param>
 		/// <param name="Parent">Parent element.</param>
 		/// <param name="Variables">Current set of variables.</param>
 		internal override void Build(XmlDocument Document, XmlElement Parent, Variables Variables)
 		{
-			XmlElement E = Document.CreateElement(this.name);
+			string ns = this.xmlns?.GetValue(Variables) ?? null;
+			XmlElement E;
+
+			if (string.IsNullOrEmpty(ns))
+				E = Document.CreateElement(this.name);
+			else
+				E = Document.CreateElement(this.name, ns);
 
 			if (Parent is null)
 				Document.AppendChild(E);

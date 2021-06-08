@@ -26,5 +26,11 @@ namespace Waher.Script.Xml.Model
 		/// Attribute name.
 		/// </summary>
 		public string Name => this.name;
+
+		/// <summary>
+		/// Gets the attribute value.
+		/// </summary>
+		/// <param name="Variables">Current set of variables.</param>
+		internal abstract string GetValue(Variables Variables);
 	}
 }

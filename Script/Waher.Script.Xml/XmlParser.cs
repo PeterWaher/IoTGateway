@@ -98,7 +98,9 @@ namespace Waher.Script.Xml
 				throw Parser.SyntaxError("< expected.");
 
 			List<XmlScriptAttribute> Attributes = null;
+			XmlScriptAttribute Xmlns = null;
 			IElement ElementValue;
+			XmlScriptAttribute Attribute;
 			int ElementStart = Parser.Position;
 			string ElementName = ParseName(Parser);
 			string Value;
@@ -112,7 +114,7 @@ namespace Waher.Script.Xml
 				{
 					Parser.NextChar();
 
-					XmlScriptElement Element = new XmlScriptElement(ElementName, Attributes?.ToArray() ?? new XmlScriptAttribute[0],
+					XmlScriptElement Element = new XmlScriptElement(ElementName, Xmlns, Attributes?.ToArray() ?? new XmlScriptAttribute[0],
 						ElementStart, Parser.Position - ElementStart, Parser.Expression);
 
 					while (true)
@@ -224,7 +226,7 @@ namespace Waher.Script.Xml
 					if (Parser.NextChar() != '>')
 						throw Parser.SyntaxError("> expected.");
 
-					return new XmlScriptElement(ElementName, Attributes?.ToArray() ?? new XmlScriptAttribute[0],
+					return new XmlScriptElement(ElementName, Xmlns, Attributes?.ToArray() ?? new XmlScriptAttribute[0],
 						ElementStart, Parser.Position - ElementStart, Parser.Expression);
 				}
 				else if (char.IsLetter(ch) || ch == '_' || ch == ':')
@@ -241,9 +243,6 @@ namespace Waher.Script.Xml
 					ScriptNode Node = Parser.ParsePowers();
 					Parser.CanSkipWhitespace = Bak;
 
-					if (Attributes is null)
-						Attributes = new List<XmlScriptAttribute>();
-
 					if (Node is ConstantElement Constant)
 					{
 						ElementValue = Constant.Constant;
@@ -253,13 +252,23 @@ namespace Waher.Script.Xml
 						else
 							Value = Expression.ToString(ElementValue.AssociatedObjectValue);
 
-						Attributes.Add(new XmlScriptAttributeString(AttributeName, Value,
-							AttributeStart, Parser.Position - AttributeStart, Parser.Expression));
+						Attribute = new XmlScriptAttributeString(AttributeName, Value,
+							AttributeStart, Parser.Position - AttributeStart, Parser.Expression);
 					}
 					else
 					{
-						Attributes.Add(new XmlScriptAttributeScript(AttributeName, Node,
-							AttributeStart, Parser.Position - AttributeStart, Parser.Expression));
+						Attribute = new XmlScriptAttributeScript(AttributeName, Node,
+							AttributeStart, Parser.Position - AttributeStart, Parser.Expression);
+					}
+
+					if (AttributeName == "xmlns")
+						Xmlns = Attribute;
+					else
+					{
+						if (Attributes is null)
+							Attributes = new List<XmlScriptAttribute>();
+
+						Attributes.Add(Attribute);
 					}
 				}
 				else if (char.IsWhiteSpace(ch))

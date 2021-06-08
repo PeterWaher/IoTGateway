@@ -53,7 +53,7 @@ namespace Waher.Script.Xml.Model
 		}
 
 		/// <summary>
-		/// Builds an XML Document objcet
+		/// Builds an XML Document object
 		/// </summary>
 		/// <param name="Document">Document being built.</param>
 		/// <param name="Parent">Parent element.</param>
@@ -63,6 +63,15 @@ namespace Waher.Script.Xml.Model
 			string s = EvaluateString(this.node, Variables);
 			if (!(s is null))
 				Parent.SetAttribute(this.Name, s);
+		}
+
+		/// <summary>
+		/// Gets the attribute value.
+		/// </summary>
+		/// <param name="Variables">Current set of variables.</param>
+		internal override string GetValue(Variables Variables)
+		{
+			return EvaluateString(this.node, Variables);
 		}
 	}
 }

@@ -18,10 +18,14 @@ namespace Waher.Script.Test
 		{
 			Variables v = new Variables();
 			Expression Exp = new Expression(Script);
-			XmlDocument Result = Exp.Evaluate(v) as XmlDocument;
+			object Result = Exp.Evaluate(v);
 
-			Assert.IsNotNull(Result, "XmlDocument expected.");
-			Assert.AreEqual(ExpectedOutput ?? Script, Result.OuterXml);
+			if (Result is XmlDocument Xml)
+				Assert.AreEqual(ExpectedOutput ?? Script, Xml.OuterXml);
+			else if (Result is string s)
+				Assert.AreEqual(ExpectedOutput ?? Script, s);
+			else
+				Assert.Fail("XmlDocument or string expected.");
 		}
 
 		[TestMethod]
@@ -82,6 +86,12 @@ namespace Waher.Script.Test
 		public void XML_Test_10_ProcessingInstruction()
 		{
 			this.Test("<?xml version=\"1.0\" encoding=\"UTF-8\"?><?xml-stylesheet type=\"text/xsl\" href=\"style.xsl\"?><a>Hello</a>", null);
+		}
+
+		[TestMethod]
+		public void XML_Test_11_DefaultNamespace()
+		{
+			this.Test("x:=<a xmlns=\"test\"><b /></a>;x.DocumentElement.NamespaceURI", "test");
 		}
 
 	}

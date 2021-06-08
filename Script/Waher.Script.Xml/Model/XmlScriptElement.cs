@@ -25,7 +25,7 @@ namespace Waher.Script.Xml.Model
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public XmlScriptElement(string Name, XmlScriptAttribute Xmlns, XmlScriptAttribute[] Attributes, 
+		public XmlScriptElement(string Name, XmlScriptAttribute Xmlns, XmlScriptAttribute[] Attributes,
 			int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
@@ -166,8 +166,13 @@ namespace Waher.Script.Xml.Model
 			string ns = this.xmlns?.GetValue(Variables) ?? null;
 			XmlElement E;
 
-			if (string.IsNullOrEmpty(ns))
-				E = Document.CreateElement(this.name);
+			if (ns is null)
+			{
+				if (Parent is null || string.IsNullOrEmpty(ns = Parent.NamespaceURI))
+					E = Document.CreateElement(this.name);
+				else
+					E = Document.CreateElement(this.name, ns);
+			}
 			else
 				E = Document.CreateElement(this.name, ns);
 

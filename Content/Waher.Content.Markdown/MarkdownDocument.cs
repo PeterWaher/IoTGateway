@@ -6420,11 +6420,18 @@ namespace Waher.Content.Markdown
 		/// <returns>Transformed object (possibly the same if no XML Visualizer found).</returns>
 		public static object TransformXml(XmlDocument Xml)
 		{
-			IXmlVisualizer Visualizer = CodeBlock.GetXmlVisualizerHandler(Xml);
-			if (Visualizer is null)
-				return Xml;
+			try
+			{
+				IXmlVisualizer Visualizer = CodeBlock.GetXmlVisualizerHandler(Xml);
+				if (Visualizer is null)
+					return Xml;
 
-			return Visualizer.TransformXml(Xml) ?? Xml;
+				return Visualizer.TransformXml(Xml) ?? Xml;
+			}
+			catch (Exception ex)
+			{
+				return ex;
+			}
 		}
 
 		// TODO: Footnotes in included markdown files.

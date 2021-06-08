@@ -145,10 +145,17 @@ namespace Waher.IoTGateway.CodeContent
 		{
 			Script.OnPreview += async (sender, e) =>
 			{
-				StringBuilder Html2 = new StringBuilder();
-				InlineScript.GenerateHTML(e.Preview.AssociatedObjectValue, Html2, true, Variables);
+				try
+				{
+					StringBuilder Html2 = new StringBuilder();
+					InlineScript.GenerateHTML(e.Preview.AssociatedObjectValue, Html2, true, Variables);
 
-				await ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html2.ToString()), true);
+					await ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html2.ToString()), true);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
 			};
 
 			object Result = this.Evaluate(Script, Variables);

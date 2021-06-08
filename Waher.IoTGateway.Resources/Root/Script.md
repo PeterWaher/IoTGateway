@@ -1280,14 +1280,16 @@ The following graph functions are available in the `Waher.Script.Graphs3D` libra
 To use the 3D graph functions, or the 3D graphic drawing primitives, you may also need to
 use the following helper functions.
 
-| Function                                  | Description                                           | Example                                   |
-|-------------------------------------------|-------------------------------------------------------|-------------------------------------------|
-| `Columns(Values)`                         | Creates a square matrix whose columns have elements of the same value, each defined by the corresponding element in the input vector. | [Example][ColumnsExample] |
-| `Matrix4x4(m11,m12,m13,m14,m21,...,m44)`  | Creates a Matrix4x4 object (from the `System.Numerics` namespace).                                                                    | [Example][Matrix4x4Example] |
-| `Rows(Values)`                            | Creates a square matrix whose rows have elements of the same value, each defined by the corresponding element in the input vector.    | [Example][RowsExample] |
-| `Vector3(X,Y,Z)`                          | Creates a `Vector3` object (from the `System.Numerics` namespace).                                                                    | [Example][Vector3Example] |
-| `Vector4(X,Y,Z,W)`                        | Creates a `Vector4` object (from the `System.Numerics` namespace).                                                                    | [Example][Vector4Example] |
+| Function                                              | Description                                           | Example                                   |
+|-------------------------------------------------------|-------------------------------------------------------|-------------------------------------------|
+| `Canvas3D(Width,Height,Oversampling,BackgroundColor)` | Creates a 3D canvas for custom drawing.                                                                                               | [Example](Canvas3DExample) |
+| `Columns(Values)`                                     | Creates a square matrix whose columns have elements of the same value, each defined by the corresponding element in the input vector. | [Example][ColumnsExample] |
+| `Matrix4x4(m11,m12,m13,m14,m21,...,m44)`              | Creates a Matrix4x4 object (from the `System.Numerics` namespace).                                                                    | [Example][Matrix4x4Example] |
+| `Rows(Values)`                                        | Creates a square matrix whose rows have elements of the same value, each defined by the corresponding element in the input vector.    | [Example][RowsExample] |
+| `Vector3(X,Y,Z)`                                      | Creates a `Vector3` object (from the `System.Numerics` namespace).                                                                    | [Example][Vector3Example] |
+| `Vector4(X,Y,Z,W)`                                    | Creates a `Vector4` object (from the `System.Numerics` namespace).                                                                    | [Example][Vector4Example] |
 
+[Canvas3DExample]: Prompt.md?Expression=Canvas3D%28500,500,2,"White"%29
 [ColumnsExample]: Prompt.md?Expression=X%3A%3DColumns%280..10%29
 [Matrix4x4Example]: Prompt.md?Expression=Matrix4x4%281%2C0%2C0%2C0%2C0%2C1%2C0%2C0%2C0%2C0%2C1%2C0%2C0%2C0%2C0%2C1%29
 [RowsExample]: Prompt.md?Expression=Z%3A%3DRows%280..10%29
@@ -1925,12 +1927,10 @@ The following functions are available in the `Waher.Service.NeuroLedger` library
 
 The following functions are available in the `Waher.Service.IoTBroker` library, which is part of the Neuron^TM.
 
-| Function                                                        | Description                                                                                                                                                                | Example |
-|-----------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-| `Consolidate(RoomId,Domain,Command[Preview[,N]])                | Sends a command `Command` to a MUC room identified by `RoomId` and `Domain`, and consolidates responses into one. `Preview` is a Boolean value, specifying if intermediate results should be previewed or not. If `N` is provided, it defines the number of expected responses, before consolidation is returned. Otherwise the function returns when all online occupants have responded. | `Consolidate("Room","example.com","select Type, Count(*) Nr from PersistedEvent where Timestamp>Now.AddDays(-1) group by Type")` |
-| `Consolidate(RoomId,Domain,Command[Preview[,Sources]])          | Sends a command `Command` to a MUC room identified by `RoomId` and `Domain`, and consolidates responses into one. `Preview` is a Boolean value, specifying if intermediate results should be previewed or not. If `Sources` is provided, it is an array of sources, expected to return responses. Otherwise the function returns when all online occupants have responded. | `Consolidate("Room","example.com","select Type, Count(*) Nr from PersistedEvent where Timestamp>Now.AddDays(-1) group by Type")` |
-| `Consolidate(RoomId,Domain,Command[Preview[,DefaultResponses]]) | Sends a command `Command` to a MUC room identified by `RoomId` and `Domain`, and consolidates responses into one. `Preview` is a Boolean value, specifying if intermediate results should be previewed or not. `DefaultResponses` is an object ex-nihilo defining default responses from sources, unless they respond. If not provided, the function returns when all online occupants have responded. | `Consolidate("Room","example.com","select Type, Count(*) Nr from PersistedEvent where Timestamp>Now.AddDays(-1) group by Type")` |
-| `Occupants(RoomId,Domain)`                                      | Returns an array of nick-names corresponding to occupants in a Multi-User Chat Room. | `Occupants("Room","example.com"` |
+| Function                                                         | Description                                                                                                                                                                | Example |
+|------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+| `Consolidate(RoomId,Domain,Command[Preview[,Config[,Variable]]]) | Sends a command `Command` to a MUC room identified by `RoomId` and `Domain`, and consolidates responses into one. `Preview` is a Boolean value, specifying if intermediate results should be previewed or not. `Config` can be one of three things: If a positive integer, it defines the number of expected responses, before consolidation is returned. If an array of strings, represents the nick-names of the sources that are expected to return responses. If an object ex-nihilo, it defining default responses from the expected sources. These default responses will be displayed until proper responses are returned. If no `Config` is provided, the function returns when all online occupants of the room have responded. `Variable` may contain a string containing the name of an optional variable that will contain the consolidator of the operation. It can be used to derive further information about the consolidated result after the function completes.  | `Consolidate("Room","example.com","select Type, Count(*) Nr from PersistedEvent where Timestamp>Now.AddDays(-1) group by Type")` |
+| `Occupants(RoomId,Domain)`                                       | Returns an array of nick-names corresponding to occupants in a Multi-User Chat Room. | `Occupants("Room","example.com"` |
 
 The following predefined constants are also available:
 

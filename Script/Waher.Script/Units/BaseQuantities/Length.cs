@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Script.Units.BaseQuantities
 {
@@ -55,7 +53,18 @@ namespace Waher.Script.Units.BaseQuantities
 					"yd",
 					"yard",
 					"SM",
-					"NM"
+					"NM",
+					"px",
+					"pt",
+					"pc",
+					"em",
+					"ex",
+					"ch",
+					"rem",
+					"vw",
+					"vh",
+					"vmin",
+					"vmax"
 				};
 			}
 		}
@@ -99,6 +108,18 @@ namespace Waher.Script.Units.BaseQuantities
 
 				case "NM":
 					Magnitude *= Math.Pow(1852, Exponent);
+					return true;
+
+				case "px":
+					Magnitude *= Math.Pow(0.0254 / 96, Exponent);
+					return true;
+
+				case "pt":
+					Magnitude *= Math.Pow(0.0254 / 72, Exponent);
+					return true;
+
+				case "pc":
+					Magnitude *= Math.Pow(0.0254 / 6, Exponent);
 					return true;
 
 				default:

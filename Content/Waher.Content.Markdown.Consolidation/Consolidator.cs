@@ -662,19 +662,26 @@ namespace Waher.Content.Markdown.Consolidation
 				Markdown.AppendLine("`");
 				Markdown.AppendLine();
 
-				bool First = true;
+				DocumentInformation[] Info = P.Value.Documents;
 
-				foreach (DocumentInformation Doc in P.Value.Documents)
+				if (Info.Length == 0)
+					Markdown.AppendLine(":\t");
+				else
 				{
-					if (First)
-						First = false;
-					else
-						Markdown.AppendLine(":\t");
+					bool First = true;
 
-					foreach (string Row in Doc.Rows)
+					foreach (DocumentInformation Doc in P.Value.Documents)
 					{
-						Markdown.Append(":\t");
-						Markdown.AppendLine(Row);
+						if (First)
+							First = false;
+						else
+							Markdown.AppendLine(":\t");
+
+						foreach (string Row in Doc.Rows)
+						{
+							Markdown.Append(":\t");
+							Markdown.AppendLine(Row);
+						}
 					}
 				}
 

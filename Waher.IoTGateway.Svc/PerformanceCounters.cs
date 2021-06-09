@@ -150,6 +150,18 @@ namespace Waher.IoTGateway.Svc
 		}
 
 		/// <summary>
+		/// Gets a performance counter, given its category, instance and counter names.
+		/// </summary>
+		/// <param name="CategoryName">Category name</param>
+		/// <param name="CounterName">Counter name</param>
+		/// <returns>Performance counter value, if found, null otherwise.</returns>
+		public static double? GetCounterValue(string CategoryName, string CounterName)
+		{
+			PerformanceCounter C = GetCounter(CategoryName, CounterName);
+			return C?.NextValue();
+		}
+
+		/// <summary>
 		/// Gets available instance name, given a performance category name.
 		/// </summary>
 		/// <param name="CategoryName">Category name</param>
@@ -267,6 +279,19 @@ namespace Waher.IoTGateway.Svc
 				return Result;
 			else
 				return null;
+		}
+
+		/// <summary>
+		/// Gets a performance counter, given its category, instance and counter names.
+		/// </summary>
+		/// <param name="CategoryName">Category name</param>
+		/// <param name="InstanceName">Instance name</param>
+		/// <param name="CounterName">Counter name</param>
+		/// <returns>Performance counter value, if found, null otherwise.</returns>
+		public static double? GetCounterValue(string CategoryName, string InstanceName, string CounterName)
+		{
+			PerformanceCounter C = GetCounter(CategoryName, InstanceName, CounterName);
+			return C?.NextValue();
 		}
 
 	}

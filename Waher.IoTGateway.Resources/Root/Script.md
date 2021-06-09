@@ -1925,9 +1925,10 @@ The following functions are available in the `Waher.Service.NeuroLedger` library
 | `ToBinary(Object)`                 | Alias for `Serialize`.                                                                                                                                                                               | `Base64Encode(ToBinary(Obj))` |
 | `ToBinary(Vector)`                 | Alias for `Serialize`.                                                                                                                                                                               | `Base64Encode(ToBinary([Obj1,Obj2,Obj3]))` |
 
-#### Neuron Extensions (Waher.Service.IoTBroker)
+#### Multi-User Chat Extensions (available in Waher.Service.LittleSister, Waher.Service.IoTBroker)
 
-The following functions are available in the `Waher.Service.IoTBroker` library, which is part of the Neuron^TM.
+The following functions are available in applications using Multi-User Chat, such as the `Waher.Service.LittleSister` library,
+part of Lil'Sis'^TM, and the `Waher.Service.IoTBroker` library, part of the Neuron^TM.
 
 | Function                                                         | Description                                                                                                                                                                | Example |
 |------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|

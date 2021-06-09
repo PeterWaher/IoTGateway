@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
 
 namespace Waher.Script.Objects
 {
@@ -55,11 +52,8 @@ namespace Waher.Script.Objects
 		/// <returns>Result</returns>
 		public int Compare(IElement x, IElement y)
 		{
-			ObjectValue o1 = (ObjectValue)x;
-			ObjectValue o2 = (ObjectValue)y;
-
-			IComparable c1 = o1.Value as IComparable;
-			IComparable c2 = o2.Value as IComparable;
+			IComparable c1 = x.AssociatedObjectValue as IComparable;
+			IComparable c2 = y.AssociatedObjectValue as IComparable;
 
 			if (c1 is null || c2 is null)
 			{

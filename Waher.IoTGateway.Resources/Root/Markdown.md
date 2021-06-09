@@ -1929,6 +1929,60 @@ foreach x in 1..60 do
 );
 ```
 
+**Note**: If the script returns XML, and there is an XML Visualizer available in the code (i.e.a class that has implemented
+`Waher.Content.Markdown.Model.XmlVisualizer`), the XML is first transformed before being visualized. For example, script may compute
+a 2D Layout XML document, that is then used to generate a visual image, as shown in the following example:
+
+    ```async:Online Status
+    <Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+              background="WhiteBackground" pen="BlackPen"
+              font="Text" textColor="Black">
+	    <SolidPen id="BlackPen" color="Black" width="1px"/>
+	    <SolidPen id="LightGrayPen" color="LightGray" width="1px"/>
+	    <SolidPen id="GreenPen" color="Green" width="2mm"/>
+	    <SolidPen id="RedPen" color="Red" width="2mm"/>
+	    <SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+	    <SolidBackground id="GreenBackground" color="{Alpha('Green',128)}"/>
+	    <SolidBackground id="RedBackground" color="{Alpha('Red',128)}"/>
+	    <Font id="Text" name="Arial" size="36pt" color="White"/>
+	    <Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
+	    <ForEach variable="k" expression="(10..90|10)+'%'">
+		    <Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
+		    <Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
+	    </ForEach>
+	    <CircleArc x="45%" y="50%" radius="30%" startDegrees="{Ok:=20;Total:=24;DegGreen:=360*Ok/Total;DegRed:=360-DegGreen;DegRed/2}" endDegrees="{360-DegRed/2}" clockwise="true" center="true" pen="GreenPen" fill="GreenBackground"/>
+	    <CircleArc x="55%" y="50%" radius="30%" startDegrees="{360-DegRed/2}" endDegrees="{DegRed/2}" clockwise="true" center="true" pen="RedPen" fill="RedBackground"/>
+	    <Label x="30%" y="50%" font="Text" halign="Center" valign="Center" text="{Ok}"/>
+	    <Label x="70%" y="50%" font="Text" halign="Center" valign="Center" text="{Total-Ok}"/>
+    </Layout2D>
+    ```
+
+Is shown as
+
+```async:Online Status
+<Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+          background="WhiteBackground" pen="BlackPen"
+          font="Text" textColor="Black">
+	<SolidPen id="BlackPen" color="Black" width="1px"/>
+	<SolidPen id="LightGrayPen" color="LightGray" width="1px"/>
+	<SolidPen id="GreenPen" color="Green" width="2mm"/>
+	<SolidPen id="RedPen" color="Red" width="2mm"/>
+	<SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+	<SolidBackground id="GreenBackground" color="{Alpha('Green',128)}"/>
+	<SolidBackground id="RedBackground" color="{Alpha('Red',128)}"/>
+	<Font id="Text" name="Arial" size="36pt" color="White"/>
+	<Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
+	<ForEach variable="k" expression="(10..90|10)+'%'">
+		<Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
+		<Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
+	</ForEach>
+	<CircleArc x="45%" y="50%" radius="30%" startDegrees="{Ok:=20;Total:=24;DegGreen:=360*Ok/Total;DegRed:=360-DegGreen;DegRed/2}" endDegrees="{360-DegRed/2}" clockwise="true" center="true" pen="GreenPen" fill="GreenBackground"/>
+	<CircleArc x="55%" y="50%" radius="30%" startDegrees="{360-DegRed/2}" endDegrees="{DegRed/2}" clockwise="true" center="true" pen="RedPen" fill="RedBackground"/>
+	<Label x="30%" y="50%" font="Text" halign="Center" valign="Center" text="{Ok}"/>
+	<Label x="70%" y="50%" font="Text" halign="Center" valign="Center" text="{Total-Ok}"/>
+</Layout2D>
+```
+
 ### Sessions and variables
 
 When a user connects to the server, it will receive a session. This session will maintain all variables that is created in script.
@@ -2109,7 +2163,7 @@ Link to an image for the page.
 ### Init
 
 Links to server-side script files that should be executed before processing the page. The script is only executed once, regardless of how
-many times the mrkdown page is processed. It can be used to initialize the backend appropriately. To execute the script again, a newer
+many times the markdown page is processed. It can be used to initialize the backend appropriately. To execute the script again, a newer
 version must be available. The file time stamps are used to determine if a file is newer than a previous version or not. For script that 
 is to be executed every time the page is processed, see the [Script](#script) tag.
 

@@ -614,6 +614,8 @@ namespace Waher.Script.Graphs
 				return Color;
 			else if (Object is string s && Functions.Colors.Color.TryParse(s, out Color))
 				return Color;
+			else if (Object is null)
+				return Graph.DefaultColor;
 
 			throw new ScriptException("Expected a color.");
 		}

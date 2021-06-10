@@ -57,7 +57,7 @@ namespace Waher.IoTGateway.CodeContent
 
 		private bool Contains(KeyValuePair<string, bool>[] Values, string Value)
 		{
-			foreach (KeyValuePair<string,bool> P in Values)
+			foreach (KeyValuePair<string, bool> P in Values)
 			{
 				if (string.Compare(P.Key, Value, true) == 0)
 					return true;
@@ -143,35 +143,36 @@ namespace Waher.IoTGateway.CodeContent
 
 		private Task Evaluate(Expression Script, Variables Variables, string Id)
 		{
+			Script.OnPreview += async (sender, e) =>
+			{
+				try
+				{
+					StringBuilder Html2 = new StringBuilder();
+					InlineScript.GenerateHTML(e.Preview.AssociatedObjectValue, Html2, true, Variables);
+
+					await ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html2.ToString()), true);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			};
+
+			StringBuilder Html = new StringBuilder();
+
 			try
 			{
-				Script.OnPreview += async (sender, e) =>
-				{
-					try
-					{
-						StringBuilder Html2 = new StringBuilder();
-						InlineScript.GenerateHTML(e.Preview.AssociatedObjectValue, Html2, true, Variables);
-
-						await ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html2.ToString()), true);
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
-				};
-
 				object Result = this.Evaluate(Script, Variables);
 
-				StringBuilder Html = new StringBuilder();
 				InlineScript.GenerateHTML(Result, Html, true, Variables);
-
-				return ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html.ToString()), false);
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
-				return Task.CompletedTask;
+				Html.Clear();
+				InlineScript.GenerateHTML(ex, Html, true, Variables);
 			}
+
+			return ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html.ToString()), false);
 		}
 
 		/// <summary>

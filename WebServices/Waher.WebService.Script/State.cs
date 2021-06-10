@@ -417,10 +417,10 @@ namespace Waher.WebService.Script
 					s = "<figure><img border=\"2\" width=\"" + Settings.Width.ToString() + "\" height=\"" + Settings.Height.ToString() +
 						"\" src=\"data:image/png;base64," + s + "\" onclick=\"GraphClicked(this,event,'" + Tag + "');\" /></figure>";
 
-					if (!(this.variables["Graphs"] is Dictionary<string, KeyValuePair<Graph, object[]>> Graphs))
+					if (!(this.request.Session["Graphs"] is Dictionary<string, KeyValuePair<Graph, object[]>> Graphs))
 					{
 						Graphs = new Dictionary<string, KeyValuePair<Graph, object[]>>();
-						this.variables["Graphs"] = Graphs;
+						this.request.Session["Graphs"] = Graphs;
 					}
 
 					lock (Graphs)

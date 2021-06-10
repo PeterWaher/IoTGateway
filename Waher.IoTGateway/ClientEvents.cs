@@ -524,9 +524,12 @@ namespace Waher.IoTGateway
 				{
 					HttpResponse Response = e.Value.Response;
 
-					Response.ContentType = "text/plain";
-					await Response.Write("Request took too long to complete.");
-					await Response.SendResponse();
+					if (!(Response is null))
+					{
+						Response.ContentType = "text/plain";
+						await Response.Write("Request took too long to complete.");
+						await Response.SendResponse();
+					}
 				}
 				catch (Exception)
 				{

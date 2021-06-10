@@ -120,6 +120,11 @@ namespace Waher.WebService.Script
 			Task.Run(() => this.SendResult(Result, false));
 		}
 
+		private void SendNewPreview(IElement Result)
+		{
+			Task.Run(() => this.SendResult(Result, true));
+		}
+
 		private void Expression_OnPreview(object Sender, PreviewEventArgs e)
 		{
 			lock (this.synchObj)
@@ -131,6 +136,7 @@ namespace Waher.WebService.Script
 		internal void SetRequestResponse(HttpRequest Request, HttpResponse Response, IUser User)
 		{
 			IElement Result;
+			bool Preview;
 
 			lock (this.synchObj)
 			{
@@ -138,19 +144,32 @@ namespace Waher.WebService.Script
 				this.response = Response;
 				this.user = User;
 
-				if (this.queued is null)
+				if (!(this.queued is null))
+				{
+					Result = this.queued;
+					this.queued = null;
+					this.sent = true;
+					Preview = false;
+				}
+				else if (!(this.preview is null))
+				{
+					Result = this.preview;
+					this.preview = null;
+					this.previewing = true;
+					this.sent = true;
+					Preview = true;
+				}
+				else
 				{
 					this.sent = false;
 					return;
 				}
-
-				Result = this.queued;
-
-				this.queued = null;
-				this.sent = true;
 			}
 
-			this.SendNewResult(Result);
+			if (Preview)
+				this.SendNewPreview(Result);
+			else
+				this.SendNewResult(Result);
 		}
 
 		/// <summary>
@@ -341,171 +360,178 @@ namespace Waher.WebService.Script
 
 		private async Task SendResult(IElement Result, bool More)
 		{
-			if (!More)
-				this.request.Session["Ans"] = Result;
-
-			byte[] Bin;
-			object Obj;
-			string s;
-
-			if (Result is Graph G)
+			try
 			{
-				GraphSettings Settings = new GraphSettings();
-				Tuple<int, int> Size;
-				double d;
+				if (!More)
+					this.request.Session["Ans"] = Result;
 
-				if ((Size = G.RecommendedBitmapSize) != null)
+				byte[] Bin;
+				object Obj;
+				string s;
+
+				if (Result is Graph G)
 				{
-					Settings.Width = Size.Item1;
-					Settings.Height = Size.Item2;
+					GraphSettings Settings = new GraphSettings();
+					Tuple<int, int> Size;
+					double d;
 
-					Settings.MarginLeft = (int)Math.Round(15.0 * Settings.Width / 640);
-					Settings.MarginRight = Settings.MarginLeft;
-
-					Settings.MarginTop = (int)Math.Round(15.0 * Settings.Height / 480);
-					Settings.MarginBottom = Settings.MarginTop;
-					Settings.LabelFontSize = 12.0 * Settings.Height / 480;
-				}
-				else
-				{
-					if (this.variables.TryGetVariable("GraphWidth", out Variable v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
+					if ((Size = G.RecommendedBitmapSize) != null)
 					{
-						Settings.Width = (int)Math.Round(d);
-						Settings.MarginLeft = (int)Math.Round(15 * d / 640);
+						Settings.Width = Size.Item1;
+						Settings.Height = Size.Item2;
+
+						Settings.MarginLeft = (int)Math.Round(15.0 * Settings.Width / 640);
 						Settings.MarginRight = Settings.MarginLeft;
-					}
-					else if (!this.variables.ContainsVariable("GraphWidth"))
-						this.variables["GraphWidth"] = (double)Settings.Width;
 
-					if (this.variables.TryGetVariable("GraphHeight", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
-					{
-						Settings.Height = (int)Math.Round(d);
-						Settings.MarginTop = (int)Math.Round(15 * d / 480);
+						Settings.MarginTop = (int)Math.Round(15.0 * Settings.Height / 480);
 						Settings.MarginBottom = Settings.MarginTop;
-						Settings.LabelFontSize = 12 * d / 480;
+						Settings.LabelFontSize = 12.0 * Settings.Height / 480;
 					}
-					else if (!this.variables.ContainsVariable("GraphHeight"))
-						this.variables["GraphHeight"] = (double)Settings.Height;
-				}
-
-				PixelInformation Pixels = G.CreatePixels(Settings, out object[] States);
-				string Tag = Guid.NewGuid().ToString();
-				Bin = Pixels.EncodeAsPng();
-
-				s = Convert.ToBase64String(Bin, 0, Bin.Length);
-				s = "<figure><img border=\"2\" width=\"" + Settings.Width.ToString() + "\" height=\"" + Settings.Height.ToString() +
-					"\" src=\"data:image/png;base64," + s + "\" onclick=\"GraphClicked(this,event,'" + Tag + "');\" /></figure>";
-
-				if (!(this.variables["Graphs"] is Dictionary<string, KeyValuePair<Graph, object[]>> Graphs))
-				{
-					Graphs = new Dictionary<string, KeyValuePair<Graph, object[]>>();
-					this.variables["Graphs"] = Graphs;
-				}
-
-				lock (Graphs)
-				{
-					Graphs[Tag] = new KeyValuePair<Graph, object[]>(G, States);
-				}
-			}
-			else if (Result.AssociatedObjectValue is SKImage Img)
-			{
-				SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100);
-				Bin = Data.ToArray();
-
-				s = Convert.ToBase64String(Bin, 0, Bin.Length);
-				s = "<figure><img border=\"2\" width=\"" + Img.Width.ToString() + "\" height=\"" + Img.Height.ToString() +
-					"\" src=\"data:image/png;base64," + s + "\" /></figure>";
-
-				Data.Dispose();
-			}
-			else if (Result.AssociatedObjectValue is Exception ex)
-			{
-				ex = Log.UnnestException(ex);
-
-				if (ex is AggregateException ex2)
-				{
-					StringBuilder sb2 = new StringBuilder();
-
-					foreach (Exception ex3 in ex2.InnerExceptions)
+					else
 					{
-						sb2.Append("<p><font style=\"color:red;font-weight:bold\"><code>");
-						sb2.Append(this.FormatText(XML.HtmlValueEncode(ex3.Message)));
-						sb2.Append("</code></font></p>");
-					}
-
-					s = sb2.ToString();
-				}
-				else
-					s = "<p><font style=\"color:red;font-weight:bold\"><code>" + this.FormatText(XML.HtmlValueEncode(ex.Message)) + "</code></font></p>";
-			}
-			else if (Result is ObjectMatrix M && M.ColumnNames != null)
-			{
-				StringBuilder Html = new StringBuilder();
-
-				s = Result.ToString();
-
-				Html.Append("<div class='clickable' onclick='SetScript(this);'><code style='display:none'>");
-				Html.Append(XML.Encode(s));
-				Html.Append("</code><table><thead><tr>");
-
-				foreach (string Name in M.ColumnNames)
-				{
-					Html.Append("<th>");
-					Html.Append(this.FormatText(XML.HtmlValueEncode(Name)));
-					Html.Append("</th>");
-				}
-
-				Html.Append("</tr></thead><tbody>");
-
-				int x, y;
-
-				for (y = 0; y < M.Rows; y++)
-				{
-					Html.Append("<tr>");
-
-					for (x = 0; x < M.Columns; x++)
-					{
-						Html.Append("<td>");
-
-						object Item = M.GetElement(x, y).AssociatedObjectValue;
-						if (!(Item is null))
+						if (this.variables.TryGetVariable("GraphWidth", out Variable v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
 						{
-							if (Item is string s3)
-								Html.Append(this.FormatText(XML.HtmlValueEncode(s3)));
-							else if (Item is MarkdownElement Element)
-								Element.GenerateHTML(Html);
-							else
-								Html.Append(this.FormatText(XML.HtmlValueEncode(Expression.ToString(Item))));
+							Settings.Width = (int)Math.Round(d);
+							Settings.MarginLeft = (int)Math.Round(15 * d / 640);
+							Settings.MarginRight = Settings.MarginLeft;
+						}
+						else if (!this.variables.ContainsVariable("GraphWidth"))
+							this.variables["GraphWidth"] = (double)Settings.Width;
+
+						if (this.variables.TryGetVariable("GraphHeight", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
+						{
+							Settings.Height = (int)Math.Round(d);
+							Settings.MarginTop = (int)Math.Round(15 * d / 480);
+							Settings.MarginBottom = Settings.MarginTop;
+							Settings.LabelFontSize = 12 * d / 480;
+						}
+						else if (!this.variables.ContainsVariable("GraphHeight"))
+							this.variables["GraphHeight"] = (double)Settings.Height;
+					}
+
+					PixelInformation Pixels = G.CreatePixels(Settings, out object[] States);
+					string Tag = Guid.NewGuid().ToString();
+					Bin = Pixels.EncodeAsPng();
+
+					s = Convert.ToBase64String(Bin, 0, Bin.Length);
+					s = "<figure><img border=\"2\" width=\"" + Settings.Width.ToString() + "\" height=\"" + Settings.Height.ToString() +
+						"\" src=\"data:image/png;base64," + s + "\" onclick=\"GraphClicked(this,event,'" + Tag + "');\" /></figure>";
+
+					if (!(this.variables["Graphs"] is Dictionary<string, KeyValuePair<Graph, object[]>> Graphs))
+					{
+						Graphs = new Dictionary<string, KeyValuePair<Graph, object[]>>();
+						this.variables["Graphs"] = Graphs;
+					}
+
+					lock (Graphs)
+					{
+						Graphs[Tag] = new KeyValuePair<Graph, object[]>(G, States);
+					}
+				}
+				else if (Result.AssociatedObjectValue is SKImage Img)
+				{
+					SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100);
+					Bin = Data.ToArray();
+
+					s = Convert.ToBase64String(Bin, 0, Bin.Length);
+					s = "<figure><img border=\"2\" width=\"" + Img.Width.ToString() + "\" height=\"" + Img.Height.ToString() +
+						"\" src=\"data:image/png;base64," + s + "\" /></figure>";
+
+					Data.Dispose();
+				}
+				else if (Result.AssociatedObjectValue is Exception ex)
+				{
+					ex = Log.UnnestException(ex);
+
+					if (ex is AggregateException ex2)
+					{
+						StringBuilder sb2 = new StringBuilder();
+
+						foreach (Exception ex3 in ex2.InnerExceptions)
+						{
+							sb2.Append("<p><font style=\"color:red;font-weight:bold\"><code>");
+							sb2.Append(this.FormatText(XML.HtmlValueEncode(ex3.Message)));
+							sb2.Append("</code></font></p>");
 						}
 
-						Html.Append("</td>");
+						s = sb2.ToString();
+					}
+					else
+						s = "<p><font style=\"color:red;font-weight:bold\"><code>" + this.FormatText(XML.HtmlValueEncode(ex.Message)) + "</code></font></p>";
+				}
+				else if (Result is ObjectMatrix M && M.ColumnNames != null)
+				{
+					StringBuilder Html = new StringBuilder();
+
+					s = Result.ToString();
+
+					Html.Append("<div class='clickable' onclick='SetScript(this);'><code style='display:none'>");
+					Html.Append(XML.Encode(s));
+					Html.Append("</code><table><thead><tr>");
+
+					foreach (string Name in M.ColumnNames)
+					{
+						Html.Append("<th>");
+						Html.Append(this.FormatText(XML.HtmlValueEncode(Name)));
+						Html.Append("</th>");
 					}
 
-					Html.Append("</tr>");
+					Html.Append("</tr></thead><tbody>");
+
+					int x, y;
+
+					for (y = 0; y < M.Rows; y++)
+					{
+						Html.Append("<tr>");
+
+						for (x = 0; x < M.Columns; x++)
+						{
+							Html.Append("<td>");
+
+							object Item = M.GetElement(x, y).AssociatedObjectValue;
+							if (!(Item is null))
+							{
+								if (Item is string s3)
+									Html.Append(this.FormatText(XML.HtmlValueEncode(s3)));
+								else if (Item is MarkdownElement Element)
+									Element.GenerateHTML(Html);
+								else
+									Html.Append(this.FormatText(XML.HtmlValueEncode(Expression.ToString(Item))));
+							}
+
+							Html.Append("</td>");
+						}
+
+						Html.Append("</tr>");
+					}
+
+					Html.Append("</tbody></table></div>");
+					s = Html.ToString();
+				}
+				else
+				{
+					s = Result.ToString();
+					s = "<div class='clickable' onclick='SetScript(this);'><code style='display:none'>" + XML.Encode(s) +
+						"</code><p><font style=\"color:red\"><code>" + this.FormatText(XML.HtmlValueEncode(s)) + "</code></font></p></div>";
 				}
 
-				Html.Append("</tbody></table></div>");
-				s = Html.ToString();
+				string s2 = this.printOutput.ToString();
+				if (!string.IsNullOrEmpty(s2))
+					s = "<p><font style=\"color:blue\"><code>" + this.FormatText(XML.HtmlValueEncode(s2)) + "</code></font></p>" + s;
+
+				Bin = Encoding.UTF8.GetBytes(s);
+
+				this.response.ContentType = "text/html; charset=utf-8";
+				this.response.ContentLength = Bin.Length;   // To avoid chunked transfer.
+				this.response.SetHeader("X-More", More ? "1" : "0");
+				await this.response.Write(Bin);
+				await this.response.SendResponse();
+				this.response.Dispose();
 			}
-			else
+			catch (Exception ex)
 			{
-				s = Result.ToString();
-				s = "<div class='clickable' onclick='SetScript(this);'><code style='display:none'>" + XML.Encode(s) +
-					"</code><p><font style=\"color:red\"><code>" + this.FormatText(XML.HtmlValueEncode(s)) + "</code></font></p></div>";
+				Log.Critical(ex);
 			}
-
-			string s2 = this.printOutput.ToString();
-			if (!string.IsNullOrEmpty(s2))
-				s = "<p><font style=\"color:blue\"><code>" + this.FormatText(XML.HtmlValueEncode(s2)) + "</code></font></p>" + s;
-
-			Bin = Encoding.UTF8.GetBytes(s);
-
-			this.response.ContentType = "text/html; charset=utf-8";
-			this.response.ContentLength = Bin.Length;   // To avoid chunked transfer.
-			this.response.SetHeader("X-More", More ? "1" : "0");
-			await this.response.Write(Bin);
-			await this.response.SendResponse();
-			this.response.Dispose();
 		}
 
 		private string FormatText(string s)

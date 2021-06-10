@@ -61,6 +61,11 @@ namespace Waher.Script.Operators.Membership
 		public override IElement Evaluate(Variables Variables)
 		{
 			IElement E = this.op.Evaluate(Variables);
+			return this.Evaluate(E, Variables);
+		}
+
+		private IElement Evaluate(IElement E, Variables Variables)
+		{ 
 			object Object = E.AssociatedObjectValue;
 			Type T, PT;
 			IElement[] Arguments = null;
@@ -235,7 +240,17 @@ namespace Waher.Script.Operators.Membership
 					}
 
 					if (this.method is null)
-						throw new ScriptRuntimeException("Invalid number or type of parameters.", this);
+					{
+						if (E.IsScalar)
+							throw new ScriptRuntimeException("Invalid number or type of parameters.", this);
+
+						LinkedList<IElement> Elements = new LinkedList<IElement>();
+
+						foreach (IElement Item in E.ChildElements)
+							Elements.AddLast(this.Evaluate(Item, Variables));
+
+						return E.Encapsulate(Elements, this);
+					}
 				}
 			}
 

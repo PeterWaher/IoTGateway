@@ -268,7 +268,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				if (AloneInParagraph)
 					Output.Append("<p>");
 
-				Output.Append(XML.HtmlValueEncode(Result.ToString()));
+				Output.Append(XML.HtmlValueEncode(Result?.ToString() ?? string.Empty));
 
 				if (AloneInParagraph)
 					Output.Append("</p>");

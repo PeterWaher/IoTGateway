@@ -438,10 +438,13 @@ namespace Waher.Content.Markdown.Consolidation
 							{
 								foreach (DocumentInformation Doc in P.Value.Documents)
 								{
-									if (Table is null)
-										Table = new ConsolidatedTable(P.Key, Doc.Table);
-									else
-										Table.Add(P.Key, Doc.Table);
+									if (!(Doc?.Table is null))
+									{
+										if (Table is null)
+											Table = new ConsolidatedTable(P.Key, Doc.Table);
+										else
+											Table.Add(P.Key, Doc.Table);
+									}
 								}
 							}
 
@@ -471,14 +474,17 @@ namespace Waher.Content.Markdown.Consolidation
 							{
 								foreach (DocumentInformation Doc in P.Value.Documents)
 								{
-									i = this.legend.Count % this.maxPaletteSize;
-									if (Doc.Graph.TrySetDefaultColor(this.palette[i]))
-										this.legend[P.Key] = new KeyValuePair<SKColor, int>(this.palette[i], i);
+									if (!(Doc?.Graph is null))
+									{
+										i = this.legend.Count % this.maxPaletteSize;
+										if (Doc.Graph.TrySetDefaultColor(this.palette[i]))
+											this.legend[P.Key] = new KeyValuePair<SKColor, int>(this.palette[i], i);
 
-									if (G is null)
-										G = Doc.Graph;
-									else
-										G = (Graph)G.AddRightElementWise(Doc.Graph);
+										if (G is null)
+											G = Doc.Graph;
+										else
+											G = (Graph)G.AddRightElementWise(Doc.Graph);
+									}
 								}
 							}
 
@@ -677,10 +683,13 @@ namespace Waher.Content.Markdown.Consolidation
 						else
 							Markdown.AppendLine(":\t");
 
-						foreach (string Row in Doc.Rows)
+						if (!(Doc?.Rows is null))
 						{
-							Markdown.Append(":\t");
-							Markdown.AppendLine(Row);
+							foreach (string Row in Doc.Rows)
+							{
+								Markdown.Append(":\t");
+								Markdown.AppendLine(Row);
+							}
 						}
 					}
 				}

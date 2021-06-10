@@ -104,8 +104,7 @@ namespace Waher.Script.Graphs3D.Functions.Plots
 			IElement TwoSided = Arguments.Length <= 4 ? null : Arguments[4];
 
 			return new Graph3D(X, Y, Z, null, new PolygonMesh3DPainter(), false, false, false, this,
-				Shader is null ? Graph.DefaultColor : Shader.AssociatedObjectValue,
-				TwoSided is null ? true : TwoSided.AssociatedObjectValue);
+				Shader?.AssociatedObjectValue ?? Graph.DefaultColor, TwoSided?.AssociatedObjectValue ?? true);
 		}
 	}
 }

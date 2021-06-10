@@ -96,7 +96,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 			IElement AreaColor = Arguments.Length <= 2 ? null : Arguments[2];
 
 			return new Graph2D(X, Y, new Plot2DCurveAreaPainter(), false, true, this,
-				AreaColor is null ? new SKColor(Graph.DefaultColor.Red, Graph.DefaultColor.Green, Graph.DefaultColor.Blue, 192) : AreaColor.AssociatedObjectValue);
+				AreaColor?.AssociatedObjectValue ?? new SKColor(Graph.DefaultColor.Red, Graph.DefaultColor.Green, Graph.DefaultColor.Blue, 192));
 		}
 	}
 }

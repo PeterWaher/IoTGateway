@@ -83,7 +83,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 			IElement Color = Arguments.Length <= 2 ? null : Arguments[2];
 
 			return new Graph2D(X, Y, new Polygon2DPainter(), false, false, this, 
-				Color is null ? Graph.DefaultColor : Color.AssociatedObjectValue);
+				Color?.AssociatedObjectValue ?? Graph.DefaultColor);
 		}
 	}
 }

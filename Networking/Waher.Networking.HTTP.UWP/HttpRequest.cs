@@ -152,6 +152,14 @@ namespace Waher.Networking.HTTP
 		{
 			get { return this.clientConnection?.Client?.RemoteCertificateValid ?? false; }
 		}
+
+		/// <summary>
+		/// If the connection is encrypted or not.
+		/// </summary>
+		public bool Encrypted
+		{
+			get { return this.clientConnection?.Encrypted ?? false; }
+		}
 #endif
 
 		/// <summary>

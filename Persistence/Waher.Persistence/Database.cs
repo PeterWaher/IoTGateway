@@ -298,7 +298,7 @@ namespace Waher.Persistence
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public static Task<IEnumerable<T>> Find<T>(string Collection, params string[] SortOrder)
+		public static Task<IEnumerable<T>> Find<T>(string Collection, string[] SortOrder)	// Note: No params, to avoid confusion with Find<T>(params SortOrder)
 			where T : class
 		{
 			return Provider.Find<T>(Collection, 0, int.MaxValue, null, SortOrder);

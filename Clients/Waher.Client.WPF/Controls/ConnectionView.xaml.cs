@@ -74,6 +74,8 @@ namespace Waher.Client.WPF.Controls
 				while (GridView.Columns.Count > 2)
 					GridView.Columns.RemoveAt(2);
 			}
+			else
+				GridView = null;
 
 			this.selectedNode = this.ConnectionTree.SelectedItem as TreeNode;
 			if (this.selectedNode != null)

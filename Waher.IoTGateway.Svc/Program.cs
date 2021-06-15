@@ -38,6 +38,7 @@ namespace Waher.IoTGateway.Svc
 	/// -localservice        Installed service will run using the Local Service account (default).
 	/// -networkservice      Installed service will run using the Network Service account.
 	/// -instance INSTANCE   Name of instance. Default is the empty string. Parallel instances of the IoT Gateway can execute, provided they are given separate instance names.
+	/// -interactive         If the service interacts with the user. Default is that services do not interact with users.
 	/// </summary>
 	public class Program
 	{
@@ -137,6 +138,7 @@ namespace Waher.IoTGateway.Svc
 				bool Uninstall = false;
 				bool Immediate = false;
 				bool AsConsole = false;
+				bool Interactive = false;
 				bool Error = false;
 				bool Help = false;
 				int i, c = args.Length;
@@ -171,6 +173,11 @@ namespace Waher.IoTGateway.Svc
 
 						case "-console":
 							AsConsole = true;
+							break;
+
+						case "-interactive":
+							Credentials = Win32ServiceCredentials.LocalSystem;
+							Interactive = true;
 							break;
 
 						case "-displayname":
@@ -267,6 +274,8 @@ namespace Waher.IoTGateway.Svc
 					Console.Out.WriteLine("-instance INSTANCE   Name of instance. Default is the empty string. Parallel");
 					Console.Out.WriteLine("                     instances of the IoT Gateway can execute, provided they");
 					Console.Out.WriteLine("                     are given separate instance names.");
+					Console.Out.WriteLine("-interactive         If the service interacts with the user. Default is that");
+					Console.Out.WriteLine("                     services do not interact with users.");
 
 					return -1;
 				}
@@ -282,7 +291,7 @@ namespace Waher.IoTGateway.Svc
 				{
 					Log.Informational("Installing service.");
 
-					InstallService(ServiceName, DisplayName, Description, StartType, Immediate,
+					InstallService(ServiceName, DisplayName, Description, StartType, Immediate, Interactive,
 						new ServiceFailureActions(TimeSpan.FromDays(1), null, null, new ScAction[]
 						{
 							new ScAction() { Type = ScActionType.ScActionRestart, Delay = TimeSpan.FromMinutes(1) },
@@ -441,13 +450,13 @@ namespace Waher.IoTGateway.Svc
 			}
 		}
 
-		private static void InstallService(string ServiceName, string DisplayName, string Description, ServiceStartType StartType, bool Immediate,
-			ServiceFailureActions FailureActions, Win32ServiceCredentials Credentials)
+		private static void InstallService(string ServiceName, string DisplayName, string Description, ServiceStartType StartType, 
+			bool Immediate, bool Interactive, ServiceFailureActions FailureActions, Win32ServiceCredentials Credentials)
 		{
 			ServiceInstaller host = new ServiceInstaller(ServiceName);
 			int i;
 
-			switch (i = host.Install(DisplayName, Description, StartType, Immediate, FailureActions, Credentials))
+			switch (i = host.Install(DisplayName, Description, StartType, Immediate, Interactive, FailureActions, Credentials))
 			{
 				case 0:
 					Console.Out.WriteLine("Service successfully installed. Service start is pending.");

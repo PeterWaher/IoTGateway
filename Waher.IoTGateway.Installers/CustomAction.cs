@@ -106,6 +106,10 @@ namespace Waher.IoTGateway.Installers
                 string DisplayName = Session["SERVICEDISPLAYNAME"];
                 string Description = Session["SERVICEDESCRIPTION"];
                 string InstallDir = Session["INSTALLDIR"];
+                string NoInteractiveServicesStr = Session["NOINTERACTIVESERVICES"];
+
+                if (!CommonTypes.TryParse(NoInteractiveServicesStr, out bool NoInteractiveServices))
+                    NoInteractiveServices = true;
 
                 if (!InstallDir.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
                     InstallDir += Path.DirectorySeparatorChar;
@@ -113,11 +117,23 @@ namespace Waher.IoTGateway.Installers
                 Session.Log("Service Display Name: " + DisplayName);
                 Session.Log("Service Description: " + Description);
                 Session.Log("Working folder: " + InstallDir);
+                Session.Log("No Interactive Services: " + NoInteractiveServices.ToString() + " (" + NoInteractiveServicesStr + ")");
+
+                StringBuilder sb = new StringBuilder();
+
+                sb.Append("-install -displayname \"");
+                sb.Append(DisplayName);
+                sb.Append("\" -description \"");
+                sb.Append(Description);
+                sb.Append("\" -start AutoStart -immediate");
+
+                if (!NoInteractiveServices)
+                    sb.Append(" -interactive");
 
                 ProcessStartInfo ProcessInformation = new ProcessStartInfo()
                 {
                     FileName = InstallDir + "Waher.IotGateway.Svc.exe",
-                    Arguments = "-install -displayname \"" + DisplayName + "\" -description \"" + Description + "\" -start AutoStart -immediate",
+                    Arguments = sb.ToString(),
                     UseShellExecute = false,
                     RedirectStandardError = true,
                     RedirectStandardOutput = true,

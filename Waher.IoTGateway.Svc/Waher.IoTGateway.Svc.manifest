@@ -234,6 +234,7 @@
 	<Assembly fileName='mscorrc.debug.dll'/>
 	<Assembly fileName='mscorrc.dll'/>
 	<Assembly fileName='netstandard.dll'/>
+	<Assembly fileName='SOS_README.md'/>
 	<Assembly fileName='ucrtbase.dll'/>
 	<Assembly fileName='WindowsBase.dll'/>
 	<Assembly fileName='DnsClient.dll'/>

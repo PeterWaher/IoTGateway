@@ -3,8 +3,8 @@
 		 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
 		 xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
 		 xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
-	<Bundle Name="IoT Gateway Setup" 
-          Version="1.0" 
+	<Bundle Name="IoT Gateway Setup"
+          Version="1.0"
           Manufacturer="Waher Data AB"
           UpgradeCode="01a50176-5f9c-4eba-888c-7812302375c1"
           DisableModify="yes"
@@ -14,13 +14,14 @@
 		</BootstrapperApplicationRef>
 		<Chain>
 			<PackageGroupRef Id="NetFx462Web"/>
-      <!--<MsiPackage SourceFile="C:\Downloads\graphviz-2.38.msi" DisplayName="GraphViz 2.38" Description="Renders diagrams." DisplayInternalUI="yes"/>-->
-      <MsiPackage SourceFile="..\..\..\Waher.IoTGateway.Win32\bin\$(var.Configuration)\en-us\Waher.IoTGateway.Win32.msi"
-									DisplayInternalUI="yes">
-        <MsiProperty Name="SERVICEDISPLAYNAME" Value="IoT Gateway Service"/>
-        <MsiProperty Name="SERVICEDESCRIPTION" Value="Windows Service hosting the Waher IoT Gateway."/>
-        <MsiProperty Name="OPENBROWSER" Value="yes"/>
-      </MsiPackage>
+			<!--<MsiPackage SourceFile="C:\Downloads\graphviz-2.38.msi" DisplayName="GraphViz 2.38" Description="Renders diagrams." DisplayInternalUI="yes"/>-->
+			<MsiPackage SourceFile="..\..\..\Waher.IoTGateway.Win32\bin\$(var.Configuration)\en-us\Waher.IoTGateway.Win32.msi"
+										  DisplayInternalUI="yes">
+				<MsiProperty Name="SERVICEDISPLAYNAME" Value="IoT Gateway Service"/>
+				<MsiProperty Name="SERVICEDESCRIPTION" Value="Windows Service hosting the Waher IoT Gateway."/>
+				<MsiProperty Name="OPENBROWSER" Value="yes"/>
+				<MsiProperty Name="NOINTERACTIVESERVICES" Value="1"/>
+			</MsiPackage>
 		</Chain>
 	</Bundle>
 </Wix>

@@ -19,6 +19,7 @@
 		<Property Id="OPENBROWSER" Value="unset"/>
 		<Property Id="SERVICEDISPLAYNAME" Value="IoT Gateway Service"/>
 		<Property Id="SERVICEDESCRIPTION" Value="Windows Service hosting the Waher IoT Gateway."/>
+		<Property Id="NOINTERACTIVESERVICES" Value="1"/>
 		<Property Id="DiskPrompt" Value="IoT Gateway 1.0 Installation [1]"/>
 		<Property Id="ButtonText_No">!(loc.ButtonText_No)</Property>
 		<Property Id="ButtonText_Yes">!(loc.ButtonText_Yes)</Property>
@@ -486,6 +487,7 @@
 							<File Id='mscorrc.debug.dll' Name='mscorrc.debug.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscorrc.debug.dll' Vital='yes' />
 							<File Id='mscorrc.dll' Name='mscorrc.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscorrc.dll' Vital='yes' />
 							<File Id='netstandard.dll' Name='netstandard.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\netstandard.dll' Vital='yes' />
+							<File Id='SOS_README.md' Name='SOS_README.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\SOS_README.md' Vital='yes'/>
 							<File Id='ucrtbase.dll' Name='ucrtbase.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\ucrtbase.dll' Vital='yes' />
 							<File Id='WindowsBase.dll' Name='WindowsBase.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\WindowsBase.dll' Vital='yes' />
 							<RemoveFile Id='Removeclrcompression.dll' Name='clrcompression.dll' On='uninstall'/>
@@ -511,6 +513,7 @@
 							<RemoveFile Id='Removemscorrc.debug.dll' Name='mscorrc.debug.dll' On='uninstall'/>
 							<RemoveFile Id='Removemscorrc.dll' Name='mscorrc.dll' On='uninstall'/>
 							<RemoveFile Id='Removenetstandard.dll' Name='netstandard.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveSOS_README.md' Name='SOS_README.md' On='uninstall'/>
 							<RemoveFile Id='Removeucrtbase.dll' Name='ucrtbase.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWindowsBase.dll' Name='WindowsBase.dll' On='uninstall'/>
 						</Component>
@@ -543,7 +546,7 @@
 								<RegistryValue Type='string' Name='InstallDir' Value='[INSTALLDIR]' Action='write'/>
 							</RegistryKey>
 							<RegistryKey Root='HKLM' Key='SYSTEM\CurrentControlSet\Control\Windows'>
-								<RegistryValue Type='integer' Name='NoInteractiveServices' Value='0' Action='write'/>
+								<RegistryValue Type='integer' Name='NoInteractiveServices' Value='[NOINTERACTIVESERVICES]' Action='write'/>
 							</RegistryKey>
 							<File Id='Waher.Content.dll' Name='Waher.Content.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.dll' Vital='yes'/>
 							<File Id='Waher.Content.Asn1.dll' Name='Waher.Content.Asn1.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Asn1.dll' Vital='yes'/>

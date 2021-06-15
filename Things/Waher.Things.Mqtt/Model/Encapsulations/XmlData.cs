@@ -78,7 +78,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 				{
 					s = ChildElement.LocalName;
 
-					if (Repetitions == null)
+					if (Repetitions is null)
 						Repetitions = new Dictionary<string, int>();
 
 					if (Repetitions.TryGetValue(s, out int i))

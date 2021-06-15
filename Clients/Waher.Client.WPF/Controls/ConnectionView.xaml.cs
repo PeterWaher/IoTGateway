@@ -69,9 +69,7 @@ namespace Waher.Client.WPF.Controls
 		{
 			this.ConnectionListView.Items.Clear();
 
-			GridView GridView;
-
-			if ((GridView = this.ConnectionListView.View as GridView) != null)
+			if (this.ConnectionListView.View is GridView GridView)
 			{
 				while (GridView.Columns.Count > 2)
 					GridView.Columns.RemoveAt(2);

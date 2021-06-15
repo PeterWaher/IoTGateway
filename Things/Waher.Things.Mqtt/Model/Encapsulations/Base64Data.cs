@@ -68,7 +68,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 
 		public override void SnifferOutput(ISniffable Output)
 		{
-			if (this.value == null)
+			if (this.value is null)
 				this.Information(Output, "NULL");
 			else if (this.value.Length == 1)
 				this.Information(Output, "1 byte.");

@@ -46,7 +46,7 @@ namespace Waher.Things.Mqtt.Model
 
 		private MqttTopic[] GetChildNodes()
 		{
-			if (this.topics == null)
+			if (this.topics is null)
 				return new MqttTopic[0];
 			else
 			{
@@ -72,7 +72,7 @@ namespace Waher.Things.Mqtt.Model
 					Topic = null;
 			}
 
-			if (Topic == null)
+			if (Topic is null)
 			{
 				if (System.Guid.TryParse(Parts[Index].Replace('_', '-'), out Guid _))
 					return null;
@@ -91,7 +91,7 @@ namespace Waher.Things.Mqtt.Model
 
 				MqttTopicNode Node = null;
 
-				if (Topic == null)
+				if (Topic is null)
 				{
 					if (!CreateNew)
 						return null;
@@ -155,7 +155,7 @@ namespace Waher.Things.Mqtt.Model
 
 			try
 			{
-				if (this.data == null)
+				if (this.data is null)
 					this.data = this.FindDataType(Content);
 				else
 					this.data.DataReported(Content);
@@ -412,7 +412,7 @@ namespace Waher.Things.Mqtt.Model
 
 				if (this.ex != null)
 					Request.ReportErrors(Last, new ThingError(ThingReference, this.exTP, this.ex.Message));
-				else if (this.data == null)
+				else if (this.data is null)
 				{
 					if (Last)
 						Request.ReportFields(true);
@@ -431,7 +431,7 @@ namespace Waher.Things.Mqtt.Model
 
 		public ControlParameter[] GetControlParameters()
 		{
-			if (this.data == null || !this.data.IsControllable)
+			if (this.data is null || !this.data.IsControllable)
 				return new ControlParameter[0];
 			else
 				return this.data.GetControlParameters();

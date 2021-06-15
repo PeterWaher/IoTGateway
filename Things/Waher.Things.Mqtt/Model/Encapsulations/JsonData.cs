@@ -94,7 +94,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 
 		private void Add(ThingReference ThingReference, List<Field> Fields, string Name, object Value, ISensorReadout Request)
 		{
-			if (Value == null)
+			if (Value is null)
 				this.Add(Fields, new StringField(ThingReference, this.timestamp, Name, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout), Request);
 			else if (Value is string s)
 			{

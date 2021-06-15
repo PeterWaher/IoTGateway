@@ -183,7 +183,7 @@ namespace Waher.Things.Mqtt.Model
 
 					lock (this.queue)
 					{
-						if (this.queue.First == null)
+						if (this.queue.First is null)
 						{
 							this.processing = false;
 							break;
@@ -232,7 +232,7 @@ namespace Waher.Things.Mqtt.Model
 					Topic = null;
 			}
 
-			if (Topic == null)
+			if (Topic is null)
 			{
 				if (System.Guid.TryParse(Parts[0].Replace('_', '-'), out Guid _))
 					return null;
@@ -251,7 +251,7 @@ namespace Waher.Things.Mqtt.Model
 
 				MqttTopicNode Node = null;
 
-				if (Topic == null)
+				if (Topic is null)
 				{
 					if (!CreateNew)
 						return null;

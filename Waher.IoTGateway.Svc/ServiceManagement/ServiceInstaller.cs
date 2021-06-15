@@ -46,66 +46,64 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 
 			try
 			{
-				using (ServiceControlManager mgr = ServiceControlManager.Connect(null, null, ServiceControlManagerAccessRights.All))
+				using ServiceControlManager mgr = ServiceControlManager.Connect(null, null, ServiceControlManagerAccessRights.All);
+				
+				if (mgr.TryOpenService(this.serviceName, ServiceControlAccessRights.All, out ServiceHandle existingService,
+					out Win32Exception errorException))
 				{
-					if (mgr.TryOpenService(this.serviceName, ServiceControlAccessRights.All, out ServiceHandle existingService,
-						out Win32Exception errorException))
+					using (existingService)
 					{
-						using (existingService)
+						existingService.ChangeConfig(DisplayName, Path, ServiceType.Win32OwnProcess | ServiceType.InteractiveProcess,
+							StartType, ErrorSeverity.Normal, Credentials);
+
+						if (!string.IsNullOrEmpty(Description))
+							existingService.SetDescription(Description);
+
+						if (!(FailureActions is null))
 						{
-							existingService.ChangeConfig(DisplayName, Path, ServiceType.Win32OwnProcess,
-								StartType, ErrorSeverity.Normal, Credentials);
-
-							if (!string.IsNullOrEmpty(Description))
-								existingService.SetDescription(Description);
-
-							if (!(FailureActions is null))
-							{
-								existingService.SetFailureActions(FailureActions);
-								existingService.SetFailureActionFlag(true);
-							}
-							else
-								existingService.SetFailureActionFlag(false);
-
-							if (StartImmediately)
-							{
-								existingService.Start(throwIfAlreadyRunning: false);
-								return 3;
-							}
-							else
-								return 2;
-						}
-					}
-					else
-					{
-						if (errorException.NativeErrorCode == Win32.ERROR_SERVICE_DOES_NOT_EXIST)
-						{
-							using (ServiceHandle svc = mgr.CreateService(this.serviceName, DisplayName, Path, ServiceType.Win32OwnProcess,
-								StartType, ErrorSeverity.Normal, Credentials))
-							{
-								if (!string.IsNullOrEmpty(Description))
-									svc.SetDescription(Description);
-
-								if (!(FailureActions is null))
-								{
-									svc.SetFailureActions(FailureActions);
-									svc.SetFailureActionFlag(true);
-								}
-								else
-									svc.SetFailureActionFlag(false);
-
-								if (StartImmediately)
-								{
-									svc.Start();
-									return 1;
-								}
-								else
-									return 0;
-							}
+							existingService.SetFailureActions(FailureActions);
+							existingService.SetFailureActionFlag(true);
 						}
 						else
-							throw errorException;
+							existingService.SetFailureActionFlag(false);
+
+						if (StartImmediately)
+						{
+							existingService.Start(throwIfAlreadyRunning: false);
+							return 3;
+						}
+						else
+							return 2;
 					}
+				}
+				else
+				{
+					if (errorException.NativeErrorCode == Win32.ERROR_SERVICE_DOES_NOT_EXIST)
+					{
+						using ServiceHandle svc = mgr.CreateService(this.serviceName, DisplayName, Path, 
+							ServiceType.Win32OwnProcess | ServiceType.InteractiveProcess, StartType, ErrorSeverity.Normal, Credentials);
+
+						if (!string.IsNullOrEmpty(Description))
+							svc.SetDescription(Description);
+
+						if (!(FailureActions is null))
+						{
+							svc.SetFailureActions(FailureActions);
+							svc.SetFailureActionFlag(true);
+						}
+						else
+							svc.SetFailureActionFlag(false);
+
+						if (StartImmediately)
+						{
+							svc.Start();
+							return 1;
+						}
+						else
+							return 0;
+					}
+					else
+						throw errorException;
 				}
 			}
 			catch (DllNotFoundException dllException)
@@ -123,24 +121,23 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 		{
 			try
 			{
-				using (ServiceControlManager mgr = ServiceControlManager.Connect(null, null, ServiceControlManagerAccessRights.All))
+				using ServiceControlManager mgr = ServiceControlManager.Connect(null, null, ServiceControlManagerAccessRights.All);
+				
+				if (mgr.TryOpenService(this.serviceName, ServiceControlAccessRights.All, out ServiceHandle existingService,
+					out Win32Exception errorException))
 				{
-					if (mgr.TryOpenService(this.serviceName, ServiceControlAccessRights.All, out ServiceHandle existingService,
-						out Win32Exception errorException))
+					using (existingService)
 					{
-						using (existingService)
-						{
-							existingService.Delete();
-							return true;
-						}
+						existingService.Delete();
+						return true;
 					}
+				}
+				else
+				{
+					if (errorException.NativeErrorCode == Win32.ERROR_SERVICE_DOES_NOT_EXIST)
+						return false;
 					else
-					{
-						if (errorException.NativeErrorCode == Win32.ERROR_SERVICE_DOES_NOT_EXIST)
-							return false;
-						else
-							throw errorException;
-					}
+						throw errorException;
 				}
 			}
 			catch (DllNotFoundException dllException)

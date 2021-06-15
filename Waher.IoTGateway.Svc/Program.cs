@@ -54,42 +54,40 @@ namespace Waher.IoTGateway.Svc
 					string FileName = Path.Combine(Gateway.AppDataFolder, "UnhandledException.txt");
 					Networking.Sniffers.XmlFileSniffer.MakeUnique(ref FileName);
 
-					using (StreamWriter w = File.CreateText(FileName))
+					using StreamWriter w = File.CreateText(FileName);
+					w.Write("Type: ");
+
+					if (e.ExceptionObject != null)
+						w.WriteLine(e.ExceptionObject.GetType().FullName);
+					else
+						w.WriteLine("null");
+
+					w.Write("Time: ");
+					w.WriteLine(DateTime.Now.ToString());
+
+					w.WriteLine();
+					if (e.ExceptionObject is Exception ex)
 					{
-						w.Write("Type: ");
+						while (!(ex is null))
+						{
+							w.WriteLine(ex.Message);
+							w.WriteLine();
+							w.WriteLine(Log.CleanStackTrace(ex.StackTrace));
+							w.WriteLine();
 
+							ex = ex.InnerException;
+						}
+					}
+					else
+					{
 						if (e.ExceptionObject != null)
-							w.WriteLine(e.ExceptionObject.GetType().FullName);
-						else
-							w.WriteLine("null");
-
-						w.Write("Time: ");
-						w.WriteLine(DateTime.Now.ToString());
+							w.WriteLine(e.ExceptionObject.ToString());
 
 						w.WriteLine();
-						if (e.ExceptionObject is Exception ex)
-						{
-							while (!(ex is null))
-							{
-								w.WriteLine(ex.Message);
-								w.WriteLine();
-								w.WriteLine(Log.CleanStackTrace(ex.StackTrace));
-								w.WriteLine();
-
-								ex = ex.InnerException;
-							}
-						}
-						else
-						{
-							if (e.ExceptionObject != null)
-								w.WriteLine(e.ExceptionObject.ToString());
-
-							w.WriteLine();
-							w.WriteLine(Log.CleanStackTrace(Environment.StackTrace));
-						}
-
-						w.Flush();
+						w.WriteLine(Log.CleanStackTrace(Environment.StackTrace));
 					}
+
+					w.Flush();
 				}
 
 				if (e.ExceptionObject is Exception ex2)
@@ -331,10 +329,8 @@ namespace Waher.IoTGateway.Svc
 			{
 				Log.Informational("Starting service.");
 
-				using (GatewayService Service = new GatewayService(ServiceName))
-				{
-					ServiceBase.Run(Service);
-				}
+				using GatewayService Service = new GatewayService(ServiceName);
+				ServiceBase.Run(Service);
 			}
 			catch (Exception ex)
 			{

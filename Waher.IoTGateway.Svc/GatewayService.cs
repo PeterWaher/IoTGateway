@@ -229,12 +229,11 @@ namespace Waher.IoTGateway.Svc
 			Log.Notice("Service is being stopped.");
 			try
 			{
-				using (PendingTimer Timer = new PendingTimer(this))
-				{
-					this.Flush();
-					Gateway.Stop().Wait();
-					Log.Terminate();
-				}
+				using PendingTimer Timer = new PendingTimer(this);
+				
+				this.Flush();
+				Gateway.Stop().Wait();
+				Log.Terminate();
 			}
 			catch (Exception ex)
 			{

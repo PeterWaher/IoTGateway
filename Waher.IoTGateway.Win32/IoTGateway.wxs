@@ -542,6 +542,9 @@
 							<RegistryKey Root='HKLM' Key='Software\[Manufacturer]\[ProductName]'>
 								<RegistryValue Type='string' Name='InstallDir' Value='[INSTALLDIR]' Action='write'/>
 							</RegistryKey>
+							<RegistryKey Root='HKLM' Key='SYSTEM\CurrentControlSet\Control\Windows'>
+								<RegistryValue Type='integer' Name='NoInteractiveServices' Value='0' Action='write'/>
+							</RegistryKey>
 							<File Id='Waher.Content.dll' Name='Waher.Content.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.dll' Vital='yes'/>
 							<File Id='Waher.Content.Asn1.dll' Name='Waher.Content.Asn1.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Asn1.dll' Vital='yes'/>
 							<File Id='Waher.Content.Dsn.dll' Name='Waher.Content.Dsn.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Dsn.dll' Vital='yes'/>

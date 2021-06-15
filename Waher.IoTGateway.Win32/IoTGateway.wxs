@@ -141,6 +141,7 @@
 							<File Id='System.Console.dll' Name='System.Console.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Console.dll' Vital='yes'/>
 							<File Id='System.Core.dll' Name='System.Core.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Core.dll' Vital='yes'/>
 							<File Id='System.Data.Common.dll' Name='System.Data.Common.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Data.Common.dll' Vital='yes'/>
+							<File Id='System.Data.DataSetExtensions.dll' Name='System.Data.DataSetExtensions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Data.DataSetExtensions.dll' Vital='yes'/>
 							<File Id='System.Data.dll' Name='System.Data.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Data.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.Contracts.dll' Name='System.Diagnostics.Contracts.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.Contracts.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.Debug.dll' Name='System.Diagnostics.Debug.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.Debug.dll' Vital='yes'/>
@@ -156,8 +157,10 @@
 							<File Id='System.Diagnostics.Tracing.dll' Name='System.Diagnostics.Tracing.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.Tracing.dll' Vital='yes'/>
 							<File Id='System.dll' Name='System.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.dll' Vital='yes'/>
 							<File Id='System.Drawing.dll' Name='System.Drawing.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Drawing.dll' Vital='yes'/>
+							<File Id='System.Drawing.Common.dll' Name='System.Drawing.Common.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Drawing.Common.dll' Vital='yes'/>
 							<File Id='System.Drawing.Primitives.dll' Name='System.Drawing.Primitives.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Drawing.Primitives.dll' Vital='yes'/>
 							<File Id='System.Dynamic.Runtime.dll' Name='System.Dynamic.Runtime.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Dynamic.Runtime.dll' Vital='yes'/>
+							<File Id='System.Formats.Asn1.dll' Name='System.Formats.Asn1.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Formats.Asn1.dll' Vital='yes'/>
 							<File Id='System.Globalization.Calendars.dll' Name='System.Globalization.Calendars.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Globalization.Calendars.dll' Vital='yes'/>
 							<File Id='System.Globalization.dll' Name='System.Globalization.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Globalization.dll' Vital='yes'/>
 							<File Id='System.Globalization.Extensions.dll' Name='System.Globalization.Extensions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Globalization.Extensions.dll' Vital='yes'/>
@@ -227,12 +230,15 @@
 							<File Id='System.Runtime.InteropServices.RuntimeInformation.dll' Name='System.Runtime.InteropServices.RuntimeInformation.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.InteropServices.RuntimeInformation.dll' Vital='yes'/>
 							<File Id='System.Runtime.InteropServices.WindowsRuntime.dll' Name='System.Runtime.InteropServices.WindowsRuntime.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.InteropServices.WindowsRuntime.dll' Vital='yes'/>
 							<File Id='System.Runtime.Loader.dll' Name='System.Runtime.Loader.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.Loader.dll' Vital='yes'/>
+							<File Id='System.Runtime.Intrinsics.dll' Name='System.Runtime.Intrinsics.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.Intrinsics.dll' Vital='yes'/>
 							<File Id='System.Runtime.Numerics.dll' Name='System.Runtime.Numerics.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.Numerics.dll' Vital='yes'/>
 							<File Id='System.Runtime.Serialization.dll' Name='System.Runtime.Serialization.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.Serialization.dll' Vital='yes'/>
 							<File Id='System.Runtime.Serialization.Formatters.dll' Name='System.Runtime.Serialization.Formatters.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.Serialization.Formatters.dll' Vital='yes'/>
 							<File Id='System.Runtime.Serialization.Json.dll' Name='System.Runtime.Serialization.Json.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.Serialization.Json.dll' Vital='yes'/>
 							<File Id='System.Runtime.Serialization.Primitives.dll' Name='System.Runtime.Serialization.Primitives.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.Serialization.Primitives.dll' Vital='yes'/>
 							<File Id='System.Runtime.Serialization.Xml.dll' Name='System.Runtime.Serialization.Xml.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.Serialization.Xml.dll' Vital='yes'/>
+							<File Id='System.Runtime.WindowsRuntime.dll' Name='System.Runtime.WindowsRuntime.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.WindowsRuntime.dll' Vital='yes'/>
+							<File Id='System.Runtime.WindowsRuntime.UI.Xaml.dll' Name='System.Runtime.WindowsRuntime.UI.Xaml.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Runtime.WindowsRuntime.UI.Xaml.dll' Vital='yes'/>
 							<File Id='System.Security.AccessControl.dll' Name='System.Security.AccessControl.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.AccessControl.dll' Vital='yes'/>
 							<File Id='System.Security.Claims.dll' Name='System.Security.Claims.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Claims.dll' Vital='yes'/>
 							<File Id='System.Security.Cryptography.Algorithms.dll' Name='System.Security.Cryptography.Algorithms.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Security.Cryptography.Algorithms.dll' Vital='yes'/>
@@ -256,8 +262,11 @@
 							<File Id='System.Text.Encoding.CodePages.dll' Name='System.Text.Encoding.CodePages.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Text.Encoding.CodePages.dll' Vital='yes'/>
 							<File Id='System.Text.Encoding.dll' Name='System.Text.Encoding.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Text.Encoding.dll' Vital='yes'/>
 							<File Id='System.Text.Encoding.Extensions.dll' Name='System.Text.Encoding.Extensions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Text.Encoding.Extensions.dll' Vital='yes'/>
+							<File Id='System.Text.Encodings.Web.dll' Name='System.Text.Encodings.Web.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Text.Encodings.Web.dll' Vital='yes'/>
+							<File Id='System.Text.Json.dll' Name='System.Text.Json.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Text.Json.dll' Vital='yes'/>
 							<File Id='System.Text.RegularExpressions.dll' Name='System.Text.RegularExpressions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Text.RegularExpressions.dll' Vital='yes'/>
 							<File Id='System.Threading.dll' Name='System.Threading.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Threading.dll' Vital='yes'/>
+							<File Id='System.Threading.Channels.dll' Name='System.Threading.Channels.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Threading.Channels.dll' Vital='yes'/>
 							<File Id='System.Threading.Overlapped.dll' Name='System.Threading.Overlapped.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Threading.Overlapped.dll' Vital='yes'/>
 							<File Id='System.Threading.Tasks.Dataflow.dll' Name='System.Threading.Tasks.Dataflow.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Threading.Tasks.Dataflow.dll' Vital='yes'/>
 							<File Id='System.Threading.Tasks.dll' Name='System.Threading.Tasks.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Threading.Tasks.dll' Vital='yes'/>
@@ -272,6 +281,7 @@
 							<File Id='System.Web.dll' Name='System.Web.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Web.dll' Vital='yes'/>
 							<File Id='System.Web.HttpUtility.dll' Name='System.Web.HttpUtility.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Web.HttpUtility.dll' Vital='yes'/>
 							<File Id='System.Windows.dll' Name='System.Windows.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Windows.dll' Vital='yes'/>
+							<File Id='System.Windows.Extensions.dll' Name='System.Windows.Extensions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Windows.Extensions.dll' Vital='yes'/>
 							<File Id='System.Xml.dll' Name='System.Xml.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Xml.dll' Vital='yes'/>
 							<File Id='System.Xml.Linq.dll' Name='System.Xml.Linq.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Xml.Linq.dll' Vital='yes'/>
 							<File Id='System.Xml.ReaderWriter.dll' Name='System.Xml.ReaderWriter.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Xml.ReaderWriter.dll' Vital='yes'/>
@@ -300,6 +310,7 @@
 							<RemoveFile Id='RemoveSystem.Console.dll' Name='System.Console.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Core.dll' Name='System.Core.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Data.Common.dll' Name='System.Data.Common.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Data.DataSetExtensions.dll' Name='System.Data.DataSetExtensions.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Data.dll' Name='System.Data.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Diagnostics.Contracts.dll' Name='System.Diagnostics.Contracts.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Diagnostics.Debug.dll' Name='System.Diagnostics.Debug.dll' On='uninstall' />
@@ -315,8 +326,10 @@
 							<RemoveFile Id='RemoveSystem.Diagnostics.Tracing.dll' Name='System.Diagnostics.Tracing.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.dll' Name='System.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Drawing.dll' Name='System.Drawing.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Drawing.Common.dll' Name='System.Drawing.Common.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Drawing.Primitives.dll' Name='System.Drawing.Primitives.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Dynamic.Runtime.dll' Name='System.Dynamic.Runtime.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Formats.Asn1.dll' Name='System.Formats.Asn1.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Globalization.Calendars.dll' Name='System.Globalization.Calendars.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Globalization.dll' Name='System.Globalization.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Globalization.Extensions.dll' Name='System.Globalization.Extensions.dll' On='uninstall' />
@@ -386,12 +399,15 @@
 							<RemoveFile Id='RemoveSystem.Runtime.InteropServices.RuntimeInformation.dll' Name='System.Runtime.InteropServices.RuntimeInformation.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Runtime.InteropServices.WindowsRuntime.dll' Name='System.Runtime.InteropServices.WindowsRuntime.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Runtime.Loader.dll' Name='System.Runtime.Loader.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.Intrinsics.dll' Name='System.Runtime.Intrinsics.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Runtime.Numerics.dll' Name='System.Runtime.Numerics.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Runtime.Serialization.dll' Name='System.Runtime.Serialization.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Runtime.Serialization.Formatters.dll' Name='System.Runtime.Serialization.Formatters.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Runtime.Serialization.Json.dll' Name='System.Runtime.Serialization.Json.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Runtime.Serialization.Primitives.dll' Name='System.Runtime.Serialization.Primitives.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Runtime.Serialization.Xml.dll' Name='System.Runtime.Serialization.Xml.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.WindowsRuntime.dll' Name='System.Runtime.WindowsRuntime.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Runtime.WindowsRuntime.UI.Xaml.dll' Name='System.Runtime.WindowsRuntime.UI.Xaml.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.AccessControl.dll' Name='System.Security.AccessControl.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Claims.dll' Name='System.Security.Claims.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Security.Cryptography.Algorithms.dll' Name='System.Security.Cryptography.Algorithms.dll' On='uninstall' />
@@ -415,8 +431,11 @@
 							<RemoveFile Id='RemoveSystem.Text.Encoding.CodePages.dll' Name='System.Text.Encoding.CodePages.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Text.Encoding.dll' Name='System.Text.Encoding.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Text.Encoding.Extensions.dll' Name='System.Text.Encoding.Extensions.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Text.Encodings.Web.dll' Name='System.Text.Encodings.Web.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Text.Json.dll' Name='System.Text.Json.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Text.RegularExpressions.dll' Name='System.Text.RegularExpressions.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Threading.dll' Name='System.Threading.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Threading.Channels.dll' Name='System.Threading.Channels.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Threading.Overlapped.dll' Name='System.Threading.Overlapped.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Threading.Tasks.Dataflow.dll' Name='System.Threading.Tasks.Dataflow.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Threading.Tasks.dll' Name='System.Threading.Tasks.dll' On='uninstall' />
@@ -431,6 +450,7 @@
 							<RemoveFile Id='RemoveSystem.Web.dll' Name='System.Web.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Web.HttpUtility.dll' Name='System.Web.HttpUtility.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Windows.dll' Name='System.Windows.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Windows.Extensions.dll' Name='System.Windows.Extensions.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Xml.dll' Name='System.Xml.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Xml.Linq.dll' Name='System.Xml.Linq.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Xml.ReaderWriter.dll' Name='System.Xml.ReaderWriter.dll' On='uninstall' />
@@ -454,19 +474,18 @@
 							<File Id='Microsoft.CodeAnalysis.dll' Name='Microsoft.CodeAnalysis.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.CodeAnalysis.dll' Vital='yes' />
 							<File Id='Microsoft.CSharp.dll' Name='Microsoft.CSharp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.CSharp.dll' Vital='yes' />
 							<File Id='Microsoft.DiaSymReader.Native.x86.dll' Name='Microsoft.DiaSymReader.Native.x86.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.DiaSymReader.Native.x86.dll' Vital='yes' />
+							<File Id='Microsoft.VisualBasic.Core.dll' Name='Microsoft.VisualBasic.Core.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.VisualBasic.Core.dll' Vital='yes' />
 							<File Id='Microsoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.Win32.Primitives.dll' Vital='yes' />
 							<File Id='Microsoft.Win32.Registry.dll' Name='Microsoft.Win32.Registry.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.Win32.Registry.dll' Vital='yes' />
+							<File Id='Microsoft.Win32.SystemEvents.dll' Name='Microsoft.Win32.SystemEvents.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.Win32.SystemEvents.dll' Vital='yes' />
 							<File Id='Microsoft.VisualBasic.dll' Name='Microsoft.VisualBasic.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Microsoft.VisualBasic.dll' Vital='yes' />
 							<File Id='mscordaccore.dll' Name='mscordaccore.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordaccore.dll' Vital='yes' />
-							<File Id='mscordaccore_x86_x86_4.6.28207.03.dll' Name='mscordaccore_x86_x86_4.6.28207.03.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordaccore_x86_x86_4.6.28207.03.dll' Vital='yes' />
+							<File Id='mscordaccore_x86_x86_4.700.19.56402.dll' Name='mscordaccore_x86_x86_4.700.19.56402.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordaccore_x86_x86_4.700.19.56402.dll' Vital='yes' />
 							<File Id='mscordbi.dll' Name='mscordbi.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscordbi.dll' Vital='yes' />
 							<File Id='mscorlib.dll' Name='mscorlib.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscorlib.dll' Vital='yes' />
 							<File Id='mscorrc.debug.dll' Name='mscorrc.debug.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscorrc.debug.dll' Vital='yes' />
 							<File Id='mscorrc.dll' Name='mscorrc.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mscorrc.dll' Vital='yes' />
 							<File Id='netstandard.dll' Name='netstandard.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\netstandard.dll' Vital='yes' />
-							<File Id='sos.dll' Name='sos.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\sos.dll' Vital='yes' />
-							<File Id='SOS.NETCore.dll' Name='SOS.NETCore.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\SOS.NETCore.dll' Vital='yes' />
-							<File Id='sos_x86_x86_4.6.28207.03.dll' Name='sos_x86_x86_4.6.28207.03.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\sos_x86_x86_4.6.28207.03.dll' Vital='yes' />
 							<File Id='ucrtbase.dll' Name='ucrtbase.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\ucrtbase.dll' Vital='yes' />
 							<File Id='WindowsBase.dll' Name='WindowsBase.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\WindowsBase.dll' Vital='yes' />
 							<RemoveFile Id='Removeclrcompression.dll' Name='clrcompression.dll' On='uninstall'/>
@@ -480,19 +499,18 @@
 							<RemoveFile Id='RemoveMicrosoft.CodeAnalysis.dll' Name='Microsoft.CodeAnalysis.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMicrosoft.CSharp.dll' Name='Microsoft.CSharp.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMicrosoft.DiaSymReader.Native.x86.dll' Name='Microsoft.DiaSymReader.Native.x86.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveMicrosoft.VisualBasic.Core.dll' Name='Microsoft.VisualBasic.Core.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMicrosoft.Win32.Primitives.dll' Name='Microsoft.Win32.Primitives.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMicrosoft.Win32.Registry.dll' Name='Microsoft.Win32.Registry.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveMicrosoft.Win32.SystemEvents.dll' Name='Microsoft.Win32.SystemEvents.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMicrosoft.VisualBasic.dll' Name='Microsoft.VisualBasic.dll' On='uninstall'/>
 							<RemoveFile Id='Removemscordaccore.dll' Name='mscordaccore.dll' On='uninstall'/>
-							<RemoveFile Id='Removemscordaccore_x86_x86_4.6.28207.03.dll' Name='mscordaccore_x86_x86_4.6.28207.03.dll' On='uninstall'/>
+							<RemoveFile Id='Removemscordaccore_x86_x86_4.700.19.56402.dll' Name='mscordaccore_x86_x86_4.700.19.56402.dll' On='uninstall'/>
 							<RemoveFile Id='Removemscordbi.dll' Name='mscordbi.dll' On='uninstall'/>
 							<RemoveFile Id='Removemscorlib.dll' Name='mscorlib.dll' On='uninstall'/>
 							<RemoveFile Id='Removemscorrc.debug.dll' Name='mscorrc.debug.dll' On='uninstall'/>
 							<RemoveFile Id='Removemscorrc.dll' Name='mscorrc.dll' On='uninstall'/>
 							<RemoveFile Id='Removenetstandard.dll' Name='netstandard.dll' On='uninstall'/>
-							<RemoveFile Id='Removesos.dll' Name='sos.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveSOS.NETCore.dll' Name='SOS.NETCore.dll' On='uninstall'/>
-							<RemoveFile Id='Removesos_x86_x86_4.6.28207.03.dll' Name='sos_x86_x86_4.6.28207.03.dll' On='uninstall'/>
 							<RemoveFile Id='Removeucrtbase.dll' Name='ucrtbase.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWindowsBase.dll' Name='WindowsBase.dll' On='uninstall'/>
 						</Component>

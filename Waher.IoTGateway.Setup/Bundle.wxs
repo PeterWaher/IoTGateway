@@ -10,9 +10,7 @@
           DisableModify="yes"
           DisableRepair="yes">
 		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
-			<bal:WixStandardBootstrapperApplication LicenseFile="License.rtf"
-																							SuppressOptionsUI="yes" 
-                                              SuppressRepair="yes"/>
+			<bal:WixStandardBootstrapperApplication LicenseFile="License.rtf" SuppressOptionsUI="yes" SuppressRepair="yes"/>
 		</BootstrapperApplicationRef>
 		<Chain>
 			<PackageGroupRef Id="NetFx462Web"/>

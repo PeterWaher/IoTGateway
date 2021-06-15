@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <StartupObject>Waher.Utility.DeleteDB.Program</StartupObject>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
@@ -19,7 +19,7 @@
     <FileVersion>1.0.0</FileVersion>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
-    <RuntimeFrameworkVersion>2.2.8</RuntimeFrameworkVersion>
+    <RuntimeFrameworkVersion>3.1.0</RuntimeFrameworkVersion>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
   </PropertyGroup>

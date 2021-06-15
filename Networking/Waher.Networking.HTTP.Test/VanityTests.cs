@@ -1,20 +1,5 @@
 ﻿using System;
-using System.Reflection;
-using System.IO;
-using System.Collections.Generic;
-using System.Text;
-using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SkiaSharp;
-using Waher.Content;
-using Waher.Events;
-using Waher.Events.Console;
-using Waher.Networking.Sniffers;
-using Waher.Networking.HTTP;
-using Waher.Networking.HTTP.Authentication;
-using Waher.Security;
 
 namespace Waher.Networking.HTTP.Test
 {

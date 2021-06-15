@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using SkiaSharp;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Script.Graphs;
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence;
 using Waher.Persistence.Files;
@@ -9,7 +8,6 @@ using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects.Matrices;
-using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Xml;
 
 namespace Waher.Script.Test

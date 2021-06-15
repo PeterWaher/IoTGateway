@@ -19,7 +19,7 @@ namespace Waher.Security.DTLS.Test
 		private TextWriterSniffer sniffer;
 
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(typeof(ICipher).Assembly);
 			Log.Register(new ConsoleEventSink());

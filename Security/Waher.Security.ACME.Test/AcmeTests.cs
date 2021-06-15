@@ -38,10 +38,8 @@ namespace Waher.Security.ACME.Test
 					RSA.Clear();
 				}*/
 
-				using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
-				{
-					Parameters = RSA.ExportParameters(true);
-				}
+				using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams);
+				Parameters = RSA.ExportParameters(true);
 			}
 			catch (CryptographicException ex)
 			{
@@ -125,10 +123,8 @@ namespace Waher.Security.ACME.Test
 				KeyContainerName = directory
 			};
 
-			using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
-			{
-				RSA.ImportParameters(this.client.ExportAccountKey(true));
-			}
+			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams);
+			RSA.ImportParameters(this.client.ExportAccountKey(true));
 		}
 
 		[TestMethod]
@@ -327,25 +323,23 @@ namespace Waher.Security.ACME.Test
 		[TestMethod]
 		public async Task ACME_Test_15_FinalizeOrder()
 		{
-			using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096))
+			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096);
+			AcmeOrder Order = await this.OrderCertificate("example.com", "www.example.com");
+			await Order.FinalizeOrder(new CertificateRequest(new RsaSha256(RSA))
 			{
-				AcmeOrder Order = await this.OrderCertificate("example.com", "www.example.com");
-				await Order.FinalizeOrder(new CertificateRequest(new RsaSha256(RSA))
-				{
-					//Country = "SE",
-					//StateOrProvince = "Stockholm",
-					//Locality = "Locality",
-					//Organization = "Example Ltd",
-					//OrganizationalUnit = "Development",
-					CommonName = "example.com",
-					SubjectAlternativeNames = new string[] { "example.com", "www.example.com" },
-					EMailAddress = "ex@example.com",
-					//Surname = "Smith",
-					//Description = "Domain certificate",
-					//Name = "Mr Smith",
-					//GivenName = "Mr"
-				});
-			}
+				//Country = "SE",
+				//StateOrProvince = "Stockholm",
+				//Locality = "Locality",
+				//Organization = "Example Ltd",
+				//OrganizationalUnit = "Development",
+				CommonName = "example.com",
+				SubjectAlternativeNames = new string[] { "example.com", "www.example.com" },
+				EMailAddress = "ex@example.com",
+				//Surname = "Smith",
+				//Description = "Domain certificate",
+				//Name = "Mr Smith",
+				//GivenName = "Mr"
+			});
 		}
 
 		[TestMethod]

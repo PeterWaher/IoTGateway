@@ -380,385 +380,371 @@ namespace Waher.Security.PKCS.Test
 		[TestMethod]
 		public void DER_Test_21_CSR_2_Generate_1024_SHA1()
 		{
-			using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(1024))
-			{
-				RSAParameters Parameters = RSA.ExportParameters(false);
+			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(1024);
+			RSAParameters Parameters = RSA.ExportParameters(false);
 
-				// Example taken from: https://www.sslshopper.com/what-is-a-csr-certificate-signing-request.html
+			// Example taken from: https://www.sslshopper.com/what-is-a-csr-certificate-signing-request.html
 
-				this.derOutput.StartSEQUENCE();     // CertificationRequestInfo 
-				this.derOutput.INTEGER(0);          // Version
+			this.derOutput.StartSEQUENCE();     // CertificationRequestInfo 
+			this.derOutput.INTEGER(0);          // Version
 
-				this.derOutput.StartSEQUENCE();     // subject
-				this.derOutput.StartSET();
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.OBJECT_IDENTIFIER("2.5.4.6");    // Country Name
-				this.derOutput.PRINTABLE_STRING("US");
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndSET();
+			this.derOutput.StartSEQUENCE();     // subject
+			this.derOutput.StartSET();
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.OBJECT_IDENTIFIER("2.5.4.6");    // Country Name
+			this.derOutput.PRINTABLE_STRING("US");
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndSET();
 
-				this.derOutput.StartSET();
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.OBJECT_IDENTIFIER("2.5.4.8");    // State or Province Name
-				this.derOutput.PRINTABLE_STRING("California");
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndSET();
+			this.derOutput.StartSET();
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.OBJECT_IDENTIFIER("2.5.4.8");    // State or Province Name
+			this.derOutput.PRINTABLE_STRING("California");
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndSET();
 
-				this.derOutput.StartSET();
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.OBJECT_IDENTIFIER("2.5.4.7");    // Locality Name
-				this.derOutput.PRINTABLE_STRING("Mountain View");
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndSET();
+			this.derOutput.StartSET();
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.OBJECT_IDENTIFIER("2.5.4.7");    // Locality Name
+			this.derOutput.PRINTABLE_STRING("Mountain View");
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndSET();
 
-				this.derOutput.StartSET();
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.OBJECT_IDENTIFIER("2.5.4.10");    // Organization Name
-				this.derOutput.PRINTABLE_STRING("Google Inc");
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndSET();
+			this.derOutput.StartSET();
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.OBJECT_IDENTIFIER("2.5.4.10");    // Organization Name
+			this.derOutput.PRINTABLE_STRING("Google Inc");
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndSET();
 
-				this.derOutput.StartSET();
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.OBJECT_IDENTIFIER("2.5.4.11");    // Organizational Unit Name
-				this.derOutput.PRINTABLE_STRING("Information Technology");
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndSET();
+			this.derOutput.StartSET();
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.OBJECT_IDENTIFIER("2.5.4.11");    // Organizational Unit Name
+			this.derOutput.PRINTABLE_STRING("Information Technology");
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndSET();
 
-				this.derOutput.StartSET();
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.OBJECT_IDENTIFIER("2.5.4.3");    // Common Name
-				this.derOutput.PRINTABLE_STRING("www.google.com");
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndSET();
-				this.derOutput.EndSEQUENCE();       // end of subject
+			this.derOutput.StartSET();
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.OBJECT_IDENTIFIER("2.5.4.3");    // Common Name
+			this.derOutput.PRINTABLE_STRING("www.google.com");
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndSET();
+			this.derOutput.EndSEQUENCE();       // end of subject
 
-				this.derOutput.StartSEQUENCE();     // subjectPKInfo
-				this.derOutput.StartSEQUENCE();     // algorithm
-				this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.1");   // RSA Encryption
-				this.derOutput.NULL();  // No parameters
-				this.derOutput.EndSEQUENCE();       // end of algorithm
-				this.derOutput.StartBITSTRING();    // subjectPublicKey
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.INTEGER(Parameters.Modulus, false);
-				this.derOutput.INTEGER(Parameters.Exponent, false);
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndBITSTRING();      // end of subjectPublicKey
-				this.derOutput.EndSEQUENCE();       // end of subjectPKInfo
+			this.derOutput.StartSEQUENCE();     // subjectPKInfo
+			this.derOutput.StartSEQUENCE();     // algorithm
+			this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.1");   // RSA Encryption
+			this.derOutput.NULL();  // No parameters
+			this.derOutput.EndSEQUENCE();       // end of algorithm
+			this.derOutput.StartBITSTRING();    // subjectPublicKey
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.INTEGER(Parameters.Modulus, false);
+			this.derOutput.INTEGER(Parameters.Exponent, false);
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndBITSTRING();      // end of subjectPublicKey
+			this.derOutput.EndSEQUENCE();       // end of subjectPKInfo
 
-				this.derOutput.Content(Asn1TypeClass.ContextSpecific);     // attributes
-				this.derOutput.EndSEQUENCE();       // end of CertificationRequestInfo
+			this.derOutput.Content(Asn1TypeClass.ContextSpecific);     // attributes
+			this.derOutput.EndSEQUENCE();       // end of CertificationRequestInfo
 
 
-				byte[] CertificationRequestInfo = this.derOutput.ToArray();
+			byte[] CertificationRequestInfo = this.derOutput.ToArray();
 
-				this.derOutput.Clear();
-				this.derOutput.StartSEQUENCE();     // CertificationRequest
-				this.derOutput.Raw(CertificationRequestInfo);
+			this.derOutput.Clear();
+			this.derOutput.StartSEQUENCE();     // CertificationRequest
+			this.derOutput.Raw(CertificationRequestInfo);
 
-				this.derOutput.StartSEQUENCE();     // signatureAlgorithm
-				this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.5");   // algorithm (SHA-1 with RSA Encryption)
-				this.derOutput.NULL();              // parameters
-				this.derOutput.EndSEQUENCE();       // End of signatureAlgorithm
+			this.derOutput.StartSEQUENCE();     // signatureAlgorithm
+			this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.5");   // algorithm (SHA-1 with RSA Encryption)
+			this.derOutput.NULL();              // parameters
+			this.derOutput.EndSEQUENCE();       // End of signatureAlgorithm
 
-				this.derOutput.BITSTRING(RSA.SignData(CertificationRequestInfo, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1));
+			this.derOutput.BITSTRING(RSA.SignData(CertificationRequestInfo, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1));
 
-				this.derOutput.EndSEQUENCE();       // end of CertificationRequest
+			this.derOutput.EndSEQUENCE();       // end of CertificationRequest
 
-				byte[] CSR = this.derOutput.ToArray();
+			byte[] CSR = this.derOutput.ToArray();
 
-				this.PrintCSR(CSR);
-			}
+			this.PrintCSR(CSR);
 		}
 
 		[TestMethod]
 		public void DER_Test_22_CSR_3_Generate_2048_SHA1()
 		{
-			using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(2048))
-			{
-				RSAParameters Parameters = RSA.ExportParameters(false);
+			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(2048);
+			RSAParameters Parameters = RSA.ExportParameters(false);
 
-				// Example taken from: https://www.sslshopper.com/what-is-a-csr-certificate-signing-request.html
+			// Example taken from: https://www.sslshopper.com/what-is-a-csr-certificate-signing-request.html
 
-				this.derOutput.StartSEQUENCE();     // CertificationRequestInfo 
-				this.derOutput.INTEGER(0);          // Version
+			this.derOutput.StartSEQUENCE();     // CertificationRequestInfo 
+			this.derOutput.INTEGER(0);          // Version
 
-				this.derOutput.StartSEQUENCE();     // subject
-				this.derOutput.StartSET();
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.OBJECT_IDENTIFIER("2.5.4.6");    // Country Name
-				this.derOutput.PRINTABLE_STRING("US");
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndSET();
+			this.derOutput.StartSEQUENCE();     // subject
+			this.derOutput.StartSET();
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.OBJECT_IDENTIFIER("2.5.4.6");    // Country Name
+			this.derOutput.PRINTABLE_STRING("US");
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndSET();
 
-				this.derOutput.StartSET();
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.OBJECT_IDENTIFIER("2.5.4.8");    // State or Province Name
-				this.derOutput.PRINTABLE_STRING("California");
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndSET();
+			this.derOutput.StartSET();
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.OBJECT_IDENTIFIER("2.5.4.8");    // State or Province Name
+			this.derOutput.PRINTABLE_STRING("California");
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndSET();
 
-				this.derOutput.StartSET();
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.OBJECT_IDENTIFIER("2.5.4.7");    // Locality Name
-				this.derOutput.PRINTABLE_STRING("Mountain View");
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndSET();
+			this.derOutput.StartSET();
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.OBJECT_IDENTIFIER("2.5.4.7");    // Locality Name
+			this.derOutput.PRINTABLE_STRING("Mountain View");
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndSET();
 
-				this.derOutput.StartSET();
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.OBJECT_IDENTIFIER("2.5.4.10");    // Organization Name
-				this.derOutput.PRINTABLE_STRING("Google Inc");
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndSET();
+			this.derOutput.StartSET();
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.OBJECT_IDENTIFIER("2.5.4.10");    // Organization Name
+			this.derOutput.PRINTABLE_STRING("Google Inc");
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndSET();
 
-				this.derOutput.StartSET();
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.OBJECT_IDENTIFIER("2.5.4.11");    // Organizational Unit Name
-				this.derOutput.PRINTABLE_STRING("Information Technology");
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndSET();
+			this.derOutput.StartSET();
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.OBJECT_IDENTIFIER("2.5.4.11");    // Organizational Unit Name
+			this.derOutput.PRINTABLE_STRING("Information Technology");
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndSET();
 
-				this.derOutput.StartSET();
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.OBJECT_IDENTIFIER("2.5.4.3");    // Common Name
-				this.derOutput.PRINTABLE_STRING("www.google.com");
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndSET();
-				this.derOutput.EndSEQUENCE();       // end of subject
+			this.derOutput.StartSET();
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.OBJECT_IDENTIFIER("2.5.4.3");    // Common Name
+			this.derOutput.PRINTABLE_STRING("www.google.com");
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndSET();
+			this.derOutput.EndSEQUENCE();       // end of subject
 
-				this.derOutput.StartSEQUENCE();     // subjectPKInfo
-				this.derOutput.StartSEQUENCE();     // algorithm
-				this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.1");   // RSA Encryption
-				this.derOutput.NULL();  // No parameters
-				this.derOutput.EndSEQUENCE();       // end of algorithm
-				this.derOutput.StartBITSTRING();    // subjectPublicKey
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.INTEGER(Parameters.Modulus, false);
-				this.derOutput.INTEGER(Parameters.Exponent, false);
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndBITSTRING();      // end of subjectPublicKey
-				this.derOutput.EndSEQUENCE();       // end of subjectPKInfo
+			this.derOutput.StartSEQUENCE();     // subjectPKInfo
+			this.derOutput.StartSEQUENCE();     // algorithm
+			this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.1");   // RSA Encryption
+			this.derOutput.NULL();  // No parameters
+			this.derOutput.EndSEQUENCE();       // end of algorithm
+			this.derOutput.StartBITSTRING();    // subjectPublicKey
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.INTEGER(Parameters.Modulus, false);
+			this.derOutput.INTEGER(Parameters.Exponent, false);
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndBITSTRING();      // end of subjectPublicKey
+			this.derOutput.EndSEQUENCE();       // end of subjectPKInfo
 
-				this.derOutput.Content(Asn1TypeClass.ContextSpecific);     // attributes
-				this.derOutput.EndSEQUENCE();       // end of CertificationRequestInfo
+			this.derOutput.Content(Asn1TypeClass.ContextSpecific);     // attributes
+			this.derOutput.EndSEQUENCE();       // end of CertificationRequestInfo
 
 
-				byte[] CertificationRequestInfo = this.derOutput.ToArray();
+			byte[] CertificationRequestInfo = this.derOutput.ToArray();
 
-				this.derOutput.Clear();
-				this.derOutput.StartSEQUENCE();     // CertificationRequest
-				this.derOutput.Raw(CertificationRequestInfo);
+			this.derOutput.Clear();
+			this.derOutput.StartSEQUENCE();     // CertificationRequest
+			this.derOutput.Raw(CertificationRequestInfo);
 
-				this.derOutput.StartSEQUENCE();     // signatureAlgorithm
-				this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.5");   // algorithm (SHA-1 with RSA Encryption)
-				this.derOutput.NULL();              // parameters
-				this.derOutput.EndSEQUENCE();       // End of signatureAlgorithm
+			this.derOutput.StartSEQUENCE();     // signatureAlgorithm
+			this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.5");   // algorithm (SHA-1 with RSA Encryption)
+			this.derOutput.NULL();              // parameters
+			this.derOutput.EndSEQUENCE();       // End of signatureAlgorithm
 
-				this.derOutput.BITSTRING(RSA.SignData(CertificationRequestInfo, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1));
+			this.derOutput.BITSTRING(RSA.SignData(CertificationRequestInfo, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1));
 
-				this.derOutput.EndSEQUENCE();       // end of CertificationRequest
+			this.derOutput.EndSEQUENCE();       // end of CertificationRequest
 
-				byte[] CSR = this.derOutput.ToArray();
+			byte[] CSR = this.derOutput.ToArray();
 
-				this.PrintCSR(CSR);
-			}
+			this.PrintCSR(CSR);
 		}
 
 		[TestMethod]
 		public void DER_Test_23_CSR_4_Generate_Simple_SHA1()
 		{
-			using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(2048))
-			{
-				RSAParameters Parameters = RSA.ExportParameters(false);
+			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(2048);
+			RSAParameters Parameters = RSA.ExportParameters(false);
 
-				// Example taken from: https://www.sslshopper.com/what-is-a-csr-certificate-signing-request.html
+			// Example taken from: https://www.sslshopper.com/what-is-a-csr-certificate-signing-request.html
 
-				this.derOutput.StartSEQUENCE();     // CertificationRequestInfo 
-				this.derOutput.INTEGER(0);          // Version
+			this.derOutput.StartSEQUENCE();     // CertificationRequestInfo 
+			this.derOutput.INTEGER(0);          // Version
 
-				this.derOutput.StartSEQUENCE();     // subject
-				this.derOutput.StartSET();
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.OBJECT_IDENTIFIER("2.5.4.3");    // Common Name
-				this.derOutput.PRINTABLE_STRING("www.example.com");
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndSET();
-				this.derOutput.EndSEQUENCE();       // end of subject
+			this.derOutput.StartSEQUENCE();     // subject
+			this.derOutput.StartSET();
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.OBJECT_IDENTIFIER("2.5.4.3");    // Common Name
+			this.derOutput.PRINTABLE_STRING("www.example.com");
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndSET();
+			this.derOutput.EndSEQUENCE();       // end of subject
 
-				this.derOutput.StartSEQUENCE();     // subjectPKInfo
-				this.derOutput.StartSEQUENCE();     // algorithm
-				this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.1");   // RSA Encryption
-				this.derOutput.NULL();  // No parameters
-				this.derOutput.EndSEQUENCE();       // end of algorithm
-				this.derOutput.StartBITSTRING();    // subjectPublicKey
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.INTEGER(Parameters.Modulus, false);
-				this.derOutput.INTEGER(Parameters.Exponent, false);
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndBITSTRING();      // end of subjectPublicKey
-				this.derOutput.EndSEQUENCE();       // end of subjectPKInfo
+			this.derOutput.StartSEQUENCE();     // subjectPKInfo
+			this.derOutput.StartSEQUENCE();     // algorithm
+			this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.1");   // RSA Encryption
+			this.derOutput.NULL();  // No parameters
+			this.derOutput.EndSEQUENCE();       // end of algorithm
+			this.derOutput.StartBITSTRING();    // subjectPublicKey
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.INTEGER(Parameters.Modulus, false);
+			this.derOutput.INTEGER(Parameters.Exponent, false);
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndBITSTRING();      // end of subjectPublicKey
+			this.derOutput.EndSEQUENCE();       // end of subjectPKInfo
 
-				this.derOutput.Content(Asn1TypeClass.ContextSpecific);     // attributes
-				this.derOutput.EndSEQUENCE();       // end of CertificationRequestInfo
+			this.derOutput.Content(Asn1TypeClass.ContextSpecific);     // attributes
+			this.derOutput.EndSEQUENCE();       // end of CertificationRequestInfo
 
 
-				byte[] CertificationRequestInfo = this.derOutput.ToArray();
+			byte[] CertificationRequestInfo = this.derOutput.ToArray();
 
-				this.derOutput.Clear();
-				this.derOutput.StartSEQUENCE();     // CertificationRequest
-				this.derOutput.Raw(CertificationRequestInfo);
+			this.derOutput.Clear();
+			this.derOutput.StartSEQUENCE();     // CertificationRequest
+			this.derOutput.Raw(CertificationRequestInfo);
 
-				this.derOutput.StartSEQUENCE();     // signatureAlgorithm
-				this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.5");   // algorithm (SHA-1 with RSA Encryption)
-				this.derOutput.NULL();              // parameters
-				this.derOutput.EndSEQUENCE();       // End of signatureAlgorithm
+			this.derOutput.StartSEQUENCE();     // signatureAlgorithm
+			this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.5");   // algorithm (SHA-1 with RSA Encryption)
+			this.derOutput.NULL();              // parameters
+			this.derOutput.EndSEQUENCE();       // End of signatureAlgorithm
 
-				this.derOutput.BITSTRING(RSA.SignData(CertificationRequestInfo, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1));
+			this.derOutput.BITSTRING(RSA.SignData(CertificationRequestInfo, HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1));
 
-				this.derOutput.EndSEQUENCE();       // end of CertificationRequest
+			this.derOutput.EndSEQUENCE();       // end of CertificationRequest
 
-				byte[] CSR = this.derOutput.ToArray();
+			byte[] CSR = this.derOutput.ToArray();
 
-				this.PrintCSR(CSR);
-			}
+			this.PrintCSR(CSR);
 		}
 
 		[TestMethod]
 		public void DER_Test_23_CSR_5_Generate_Simple_SHA256()
 		{
-			using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(2048))
-			{
-				RSAParameters Parameters = RSA.ExportParameters(false);
+			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(2048);
+			RSAParameters Parameters = RSA.ExportParameters(false);
 
-				// Example taken from: https://www.sslshopper.com/what-is-a-csr-certificate-signing-request.html
+			// Example taken from: https://www.sslshopper.com/what-is-a-csr-certificate-signing-request.html
 
-				this.derOutput.StartSEQUENCE();     // CertificationRequestInfo 
-				this.derOutput.INTEGER(0);          // Version
+			this.derOutput.StartSEQUENCE();     // CertificationRequestInfo 
+			this.derOutput.INTEGER(0);          // Version
 
-				this.derOutput.StartSEQUENCE();     // subject
-				this.derOutput.StartSET();
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.OBJECT_IDENTIFIER("2.5.4.3");    // Common Name
-				this.derOutput.PRINTABLE_STRING("www.example.com");
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndSET();
-				this.derOutput.EndSEQUENCE();       // end of subject
+			this.derOutput.StartSEQUENCE();     // subject
+			this.derOutput.StartSET();
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.OBJECT_IDENTIFIER("2.5.4.3");    // Common Name
+			this.derOutput.PRINTABLE_STRING("www.example.com");
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndSET();
+			this.derOutput.EndSEQUENCE();       // end of subject
 
-				this.derOutput.StartSEQUENCE();     // subjectPKInfo
-				this.derOutput.StartSEQUENCE();     // algorithm
-				this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.1");   // RSA Encryption
-				this.derOutput.NULL();  // No parameters
-				this.derOutput.EndSEQUENCE();       // end of algorithm
-				this.derOutput.StartBITSTRING();    // subjectPublicKey
-				this.derOutput.StartSEQUENCE();
-				this.derOutput.INTEGER(Parameters.Modulus, false);
-				this.derOutput.INTEGER(Parameters.Exponent, false);
-				this.derOutput.EndSEQUENCE();
-				this.derOutput.EndBITSTRING();      // end of subjectPublicKey
-				this.derOutput.EndSEQUENCE();       // end of subjectPKInfo
+			this.derOutput.StartSEQUENCE();     // subjectPKInfo
+			this.derOutput.StartSEQUENCE();     // algorithm
+			this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.1");   // RSA Encryption
+			this.derOutput.NULL();  // No parameters
+			this.derOutput.EndSEQUENCE();       // end of algorithm
+			this.derOutput.StartBITSTRING();    // subjectPublicKey
+			this.derOutput.StartSEQUENCE();
+			this.derOutput.INTEGER(Parameters.Modulus, false);
+			this.derOutput.INTEGER(Parameters.Exponent, false);
+			this.derOutput.EndSEQUENCE();
+			this.derOutput.EndBITSTRING();      // end of subjectPublicKey
+			this.derOutput.EndSEQUENCE();       // end of subjectPKInfo
 
-				this.derOutput.Content(Asn1TypeClass.ContextSpecific);     // attributes
-				this.derOutput.EndSEQUENCE();       // end of CertificationRequestInfo
+			this.derOutput.Content(Asn1TypeClass.ContextSpecific);     // attributes
+			this.derOutput.EndSEQUENCE();       // end of CertificationRequestInfo
 
 
-				byte[] CertificationRequestInfo = this.derOutput.ToArray();
+			byte[] CertificationRequestInfo = this.derOutput.ToArray();
 
-				this.derOutput.Clear();
-				this.derOutput.StartSEQUENCE();     // CertificationRequest
-				this.derOutput.Raw(CertificationRequestInfo);
+			this.derOutput.Clear();
+			this.derOutput.StartSEQUENCE();     // CertificationRequest
+			this.derOutput.Raw(CertificationRequestInfo);
 
-				this.derOutput.StartSEQUENCE();     // signatureAlgorithm
-				this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.11");   // algorithm (SHA-256 with RSA Encryption)
-				this.derOutput.NULL();              // parameters
-				this.derOutput.EndSEQUENCE();       // End of signatureAlgorithm
+			this.derOutput.StartSEQUENCE();     // signatureAlgorithm
+			this.derOutput.OBJECT_IDENTIFIER("1.2.840.113549.1.1.11");   // algorithm (SHA-256 with RSA Encryption)
+			this.derOutput.NULL();              // parameters
+			this.derOutput.EndSEQUENCE();       // End of signatureAlgorithm
 
-				this.derOutput.BITSTRING(RSA.SignData(CertificationRequestInfo, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1));
+			this.derOutput.BITSTRING(RSA.SignData(CertificationRequestInfo, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1));
 
-				this.derOutput.EndSEQUENCE();       // end of CertificationRequest
+			this.derOutput.EndSEQUENCE();       // end of CertificationRequest
 
-				byte[] CSR = this.derOutput.ToArray();
+			byte[] CSR = this.derOutput.ToArray();
 
-				this.PrintCSR(CSR);
-			}
+			this.PrintCSR(CSR);
 		}
 
 		[TestMethod]
 		public void DER_Test_24_CSR_6_Generic_SHA256()
 		{
-			using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(2048))
+			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(2048);
+			CertificateRequest CertificateRequest = new CertificateRequest(new RsaSha256(RSA))
 			{
-				CertificateRequest CertificateRequest = new CertificateRequest(new RsaSha256(RSA))
-				{
-					Country = "SE",
-					StateOrProvince = "Stockholm",
-					Locality = "Locality",
-					Organization = "Example Ltd",
-					OrganizationalUnit = "Development",
-					CommonName = "www.example.com",
-					SubjectAlternativeNames = new string[] { "example.com" },
-					Surname = "Smith",
-					Description = "Domain certificate",
-					Name = "Mr Smith",
-					GivenName = "Mr"
-				};
+				Country = "SE",
+				StateOrProvince = "Stockholm",
+				Locality = "Locality",
+				Organization = "Example Ltd",
+				OrganizationalUnit = "Development",
+				CommonName = "www.example.com",
+				SubjectAlternativeNames = new string[] { "example.com" },
+				Surname = "Smith",
+				Description = "Domain certificate",
+				Name = "Mr Smith",
+				GivenName = "Mr"
+			};
 
-				byte[] CSR = CertificateRequest.BuildCSR();
+			byte[] CSR = CertificateRequest.BuildCSR();
 
-				this.PrintCSR(CSR);
-			}
+			this.PrintCSR(CSR);
 		}
 
 		[TestMethod]
 		public void DER_Test_24_CSR_7_Generic_SHA384()
 		{
-			using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096))
+			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096);
+			CertificateRequest CertificateRequest = new CertificateRequest(new RsaSha384(RSA))
 			{
-				CertificateRequest CertificateRequest = new CertificateRequest(new RsaSha384(RSA))
-				{
-					Country = "SE",
-					StateOrProvince = "Stockholm",
-					Locality = "Locality",
-					Organization = "Example Ltd",
-					OrganizationalUnit = "Development",
-					CommonName = "www.example.com",
-					SubjectAlternativeNames = new string[] { "example.com" },
-					Surname = "Smith",
-					Description = "Domain certificate",
-					Name = "Mr Smith",
-					GivenName = "Mr"
-				};
+				Country = "SE",
+				StateOrProvince = "Stockholm",
+				Locality = "Locality",
+				Organization = "Example Ltd",
+				OrganizationalUnit = "Development",
+				CommonName = "www.example.com",
+				SubjectAlternativeNames = new string[] { "example.com" },
+				Surname = "Smith",
+				Description = "Domain certificate",
+				Name = "Mr Smith",
+				GivenName = "Mr"
+			};
 
-				byte[] CSR = CertificateRequest.BuildCSR();
+			byte[] CSR = CertificateRequest.BuildCSR();
 
-				this.PrintCSR(CSR);
-			}
+			this.PrintCSR(CSR);
 		}
 
 		[TestMethod]
 		public void DER_Test_24_CSR_8_Generic_SHA512()
 		{
-			using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096))
+			using RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096);
+			CertificateRequest CertificateRequest = new CertificateRequest(new RsaSha512(RSA))
 			{
-				CertificateRequest CertificateRequest = new CertificateRequest(new RsaSha512(RSA))
-				{
-					Country = "SE",
-					StateOrProvince = "Stockholm",
-					Locality = "Locality",
-					Organization = "Example Ltd",
-					OrganizationalUnit = "Development",
-					CommonName = "www.example.com",
-					SubjectAlternativeNames = new string[] { "example.com" },
-					Surname = "Smith",
-					Description = "Domain certificate",
-					Name = "Mr Smith",
-					GivenName = "Mr"
-				};
+				Country = "SE",
+				StateOrProvince = "Stockholm",
+				Locality = "Locality",
+				Organization = "Example Ltd",
+				OrganizationalUnit = "Development",
+				CommonName = "www.example.com",
+				SubjectAlternativeNames = new string[] { "example.com" },
+				Surname = "Smith",
+				Description = "Domain certificate",
+				Name = "Mr Smith",
+				GivenName = "Mr"
+			};
 
-				byte[] CSR = CertificateRequest.BuildCSR();
+			byte[] CSR = CertificateRequest.BuildCSR();
 
-				this.PrintCSR(CSR);
-			}
+			this.PrintCSR(CSR);
 		}
 
 		private void PrintCSR(byte[] CSR)

@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using System.Xml;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Script.Abstraction.Elements;
-using Waher.Script.Objects;
-using Waher.Script.Objects.Matrices;
-using Waher.Script.Objects.Sets;
-using Waher.Script.Units;
 
 namespace Waher.Script.Test
 {

@@ -28,7 +28,7 @@ namespace Waher.Networking.CoAP.Test
 		private CoapEndpoint client;
 
 		[AssemblyInitialize]
-		public static async Task AssemblyInitialize(TestContext Context)
+		public static async Task AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(
 				typeof(IContentDecoder).Assembly,
@@ -203,27 +203,29 @@ namespace Waher.Networking.CoAP.Test
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 30000));
 		}
 
-		private async Task Delete(string Uri, params CoapOption[] Options)
-		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
-
-			await this.client.DELETE(Uri, true, null, (sender, e) =>
-			{
-				if (e.Ok)
-				{
-					object Result = e.Message.Decode();
-					if (Result != null)
-						Console.Out.WriteLine(Result.ToString());
-
-					Done.Set();
-				}
-				else
-					Error.Set();
-			}, null, Options);
-
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 30000));
-		}
+		// TODO: Test DELETE.
+		//
+		//private async Task Delete(string Uri, params CoapOption[] Options)
+		//{
+		//	ManualResetEvent Done = new ManualResetEvent(false);
+		//	ManualResetEvent Error = new ManualResetEvent(false);
+		//
+		//	await this.client.DELETE(Uri, true, null, (sender, e) =>
+		//	{
+		//		if (e.Ok)
+		//		{
+		//			object Result = e.Message.Decode();
+		//			if (Result != null)
+		//				Console.Out.WriteLine(Result.ToString());
+		//
+		//			Done.Set();
+		//		}
+		//		else
+		//			Error.Set();
+		//	}, null, Options);
+		//
+		//	Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 30000));
+		//}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_01_GET()
@@ -372,7 +374,7 @@ namespace Waher.Networking.CoAP.Test
 			string s = "0123456789";
 			s = s + s + s + s + s + s + s + s + s + s;
 			s = s + s + s + s + s + s + s + s + s + s;
-			s = s + s;
+			s += s;
 
 			await this.Post("coap://californium.eclipse.org/large-create", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
 		}
@@ -385,7 +387,7 @@ namespace Waher.Networking.CoAP.Test
 			string s = "0123456789";
 			s = s + s + s + s + s + s + s + s + s + s;
 			s = s + s + s + s + s + s + s + s + s + s;
-			s = s + s;
+			s += s;
 
 			await this.Post("coap://californium.eclipse.org/large-post", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
 		}
@@ -405,7 +407,7 @@ namespace Waher.Networking.CoAP.Test
 			string s = "0123456789";
 			s = s + s + s + s + s + s + s + s + s + s;
 			s = s + s + s + s + s + s + s + s + s + s;
-			s = s + s;
+			s += s;
 
 			await this.Put("coap://californium.eclipse.org/large-update", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
 		}

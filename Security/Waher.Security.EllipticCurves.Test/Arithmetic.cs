@@ -294,7 +294,7 @@ namespace Waher.Security.EllipticCurves.Test
             MontgomeryCurve C = new Curve25519();
             BigInteger N = 9;
             BigInteger U = 9;
-            BigInteger NU;
+            BigInteger NU = BigInteger.Zero;
 
             while (i-- > 0)
             {
@@ -427,7 +427,7 @@ namespace Waher.Security.EllipticCurves.Test
             MontgomeryCurve C = new Curve448();
             BigInteger N = 5;
             BigInteger U = 5;
-            BigInteger NU;
+            BigInteger NU = BigInteger.Zero;
 
             while (i-- > 0)
             {

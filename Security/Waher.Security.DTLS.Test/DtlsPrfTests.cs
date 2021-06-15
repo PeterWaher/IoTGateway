@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Net.Sockets;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Runtime.Inventory;
 
 namespace Waher.Security.DTLS.Test
 {

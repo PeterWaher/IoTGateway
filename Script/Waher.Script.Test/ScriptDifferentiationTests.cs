@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using SkiaSharp;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Script.Graphs;
 

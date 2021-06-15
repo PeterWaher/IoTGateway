@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
 using System.Xml;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Waher.Content;
 using Waher.Networking.Sniffers;
-using Waher.Networking.CoAP.ContentFormats;
 using Waher.Networking.CoAP.CoRE;
 using Waher.Networking.CoAP.Options;
-using Waher.Runtime.Inventory;
 using Waher.Security;
 using Waher.Security.DTLS;
 
@@ -184,7 +179,7 @@ namespace Waher.Networking.CoAP.Test
 			string s = "0123456789";
 			s = s + s + s + s + s + s + s + s + s + s;
 			s = s + s + s + s + s + s + s + s + s + s;
-			s = s + s;
+			s += s;
 
 			await this.Post("coaps://127.0.0.1/large-create", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
 		}
@@ -197,7 +192,7 @@ namespace Waher.Networking.CoAP.Test
 			string s = "0123456789";
 			s = s + s + s + s + s + s + s + s + s + s;
 			s = s + s + s + s + s + s + s + s + s + s;
-			s = s + s;
+			s += s;
 
 			await this.Post("coaps://127.0.0.1/large-post", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
 		}
@@ -217,7 +212,7 @@ namespace Waher.Networking.CoAP.Test
 			string s = "0123456789";
 			s = s + s + s + s + s + s + s + s + s + s;
 			s = s + s + s + s + s + s + s + s + s + s;
-			s = s + s;
+			s += s;
 
 			await this.Put("coaps://127.0.0.1/large-update", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
 		}

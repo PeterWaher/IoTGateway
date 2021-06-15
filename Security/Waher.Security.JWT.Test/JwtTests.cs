@@ -73,10 +73,8 @@ namespace Waher.Security.JWT.Test
 			Assert.AreEqual(true, Token.TryGetClaim("admin", out object Admin));
 			Assert.AreEqual(true, Admin);
 
-			using (JwtFactory Factory = new JwtFactory(Encoding.ASCII.GetBytes("secret")))
-			{
-				Assert.AreEqual(true, Factory.IsValid(Token));
-			}
+			using JwtFactory Factory = new JwtFactory(Encoding.ASCII.GetBytes("secret"));
+			Assert.AreEqual(true, Factory.IsValid(Token));
 		}
 
 		[TestMethod]
@@ -97,34 +95,30 @@ namespace Waher.Security.JWT.Test
 			Assert.AreEqual(true, Token.TryGetClaim("admin", out object Admin));
 			Assert.AreEqual(true, Admin);
 
-			using (JwtFactory Factory = new JwtFactory(Encoding.ASCII.GetBytes("wrong secret")))
-			{
-				Assert.AreEqual(false, Factory.IsValid(Token));
-			}
+			using JwtFactory Factory = new JwtFactory(Encoding.ASCII.GetBytes("wrong secret"));
+			Assert.AreEqual(false, Factory.IsValid(Token));
 		}
 
 		[TestMethod]
 		public void JWT_Test_05_CreateToken()
 		{
-			using (JwtFactory Factory = new JwtFactory(Encoding.ASCII.GetBytes("secret")))
-			{
-				DateTime Expires = DateTime.Today.ToUniversalTime().AddDays(2);
-				string TokenStr = Factory.Create(
-					new KeyValuePair<string, object>(JwtClaims.Subject, "test user"),
-					new KeyValuePair<string, object>(JwtClaims.ExpirationTime, Expires));
-				JwtToken Token = new JwtToken(TokenStr);
+			using JwtFactory Factory = new JwtFactory(Encoding.ASCII.GetBytes("secret"));
+			DateTime Expires = DateTime.Today.ToUniversalTime().AddDays(2);
+			string TokenStr = Factory.Create(
+				new KeyValuePair<string, object>(JwtClaims.Subject, "test user"),
+				new KeyValuePair<string, object>(JwtClaims.ExpirationTime, Expires));
+			JwtToken Token = new JwtToken(TokenStr);
 
-				Assert.AreEqual("JWT", Token.Type);
-				Assert.IsTrue(Token.Algorithm is HmacSha256);
+			Assert.AreEqual("JWT", Token.Type);
+			Assert.IsTrue(Token.Algorithm is HmacSha256);
 
-				Assert.AreEqual(true, Token.TryGetClaim(JwtClaims.Subject, out object Subject));
-				Assert.AreEqual("test user", Subject);
-				Assert.AreEqual("test user", Token.Subject);
+			Assert.AreEqual(true, Token.TryGetClaim(JwtClaims.Subject, out object Subject));
+			Assert.AreEqual("test user", Subject);
+			Assert.AreEqual("test user", Token.Subject);
 
-				Assert.AreEqual(Expires, Token.Expiration);
+			Assert.AreEqual(Expires, Token.Expiration);
 
-				Assert.AreEqual(true, Factory.IsValid(Token));
-			}
+			Assert.AreEqual(true, Factory.IsValid(Token));
 		}
 	}
 }

@@ -15,7 +15,7 @@ namespace Waher.Content.Html.Test
 	public class HtmlParsingTests
 	{
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Types.Initialize(typeof(InternetContent).Assembly,
 				typeof(HtmlDocument).Assembly);
@@ -23,77 +23,74 @@ namespace Waher.Content.Html.Test
 
 		private async Task LoadAndParse(string Url)
 		{
-			using (HttpClient Client = new HttpClient())
+			using HttpClient Client = new HttpClient();
+			Client.Timeout = TimeSpan.FromMilliseconds(30000);
+			Client.DefaultRequestHeaders.ExpectContinue = false;
+
+			HttpResponseMessage Response = await Client.GetAsync(Url);
+			Response.EnsureSuccessStatusCode();
+
+			byte[] Data = await Response.Content.ReadAsByteArrayAsync();
+			string ContentType = Response.Content.Headers.ContentType.ToString();
+
+			HtmlDocument Doc = InternetContent.Decode(ContentType, Data, new Uri(Url)) as HtmlDocument;
+			Assert.IsNotNull(Doc);
+
+			Assert.IsNotNull(Doc.Root);
+			Assert.IsNotNull(Doc.Html);
+			Assert.IsNotNull(Doc.Head);
+			Assert.IsNotNull(Doc.Body);
+			Assert.IsNotNull(Doc.Title);
+
+			List<HtmlNode> Todo = new List<HtmlNode>()
 			{
-				Client.Timeout = TimeSpan.FromMilliseconds(30000);
-				Client.DefaultRequestHeaders.ExpectContinue = false;
+				Doc.Root
+			};
 
-				HttpResponseMessage Response = await Client.GetAsync(Url);
-				Response.EnsureSuccessStatusCode();
+			string s;
+			HtmlNode N;
+			int i = 0;
+			int Last = -1;
 
-				byte[] Data = await Response.Content.ReadAsByteArrayAsync();
-				string ContentType = Response.Content.Headers.ContentType.ToString();
+			while (i < Todo.Count)
+			{
+				N = Todo[i++];
 
-				HtmlDocument Doc = InternetContent.Decode(ContentType, Data, new Uri(Url)) as HtmlDocument;
-				Assert.IsNotNull(Doc);
+				if (Last >= 0)
+					s = "\r\n\r\n" + Doc.HtmlText[(Last + 1)..];
+				else
+					s = string.Empty;
 
-				Assert.IsNotNull(Doc.Root);
-				Assert.IsNotNull(Doc.Html);
-				Assert.IsNotNull(Doc.Head);
-				Assert.IsNotNull(Doc.Body);
-				Assert.IsNotNull(Doc.Title);
+				Assert.IsTrue(N.StartPosition > Last, "Start position not set properly. Start=" + N.StartPosition.ToString() + ", Last=" + Last.ToString() + s);
+				Assert.IsTrue(N.EndPosition >= N.StartPosition, "End position not set.\r\n\r\n" + Doc.HtmlText[N.StartPosition..]);
+				Assert.IsTrue(!string.IsNullOrEmpty(N.OuterHtml), "OuterHTML not set properly.\r\n\r\n" + Doc.HtmlText[N.StartPosition..]);
 
-				List<HtmlNode> Todo = new List<HtmlNode>()
+				if (N is HtmlElement E)
 				{
-					Doc.Root
-				};
+					Last = E.EndPositionOfStartTag;
 
-				string s;
-				HtmlNode N;
-				int i = 0;
-				int Last = -1;
+					if (E.HasChildren)
+						Todo.InsertRange(i, E.Children);
 
-				while (i < Todo.Count)
-				{
-					N = Todo[i++];
-
-					if (Last >= 0)
-						s = "\r\n\r\n" + Doc.HtmlText.Substring(Last + 1);
-					else
-						s = string.Empty;
-
-					Assert.IsTrue(N.StartPosition > Last, "Start position not set properly. Start=" + N.StartPosition.ToString() + ", Last=" + Last.ToString() + s);
-					Assert.IsTrue(N.EndPosition >= N.StartPosition, "End position not set.\r\n\r\n" + Doc.HtmlText.Substring(N.StartPosition));
-					Assert.IsTrue(!string.IsNullOrEmpty(N.OuterHtml), "OuterHTML not set properly.\r\n\r\n" + Doc.HtmlText.Substring(N.StartPosition));
-
-					if (N is HtmlElement E)
-					{
-						Last = E.EndPositionOfStartTag;
-
-						if (E.HasChildren)
-							Todo.InsertRange(i, E.Children);
-
-						Assert.IsTrue(E.InnerHtml != null, "InnerHTML not set properly.\r\n\r\n" + Doc.HtmlText.Substring(N.StartPosition));
-					}
-					else
-						Last = N.EndPosition;
+					Assert.IsTrue(E.InnerHtml != null, "InnerHTML not set properly.\r\n\r\n" + Doc.HtmlText[N.StartPosition..]);
 				}
-
-				PageMetaData MetaData = Doc.GetMetaData();
-
-				if (Doc.Meta != null)
-				{
-					foreach (Meta Meta in Doc.Meta)
-						Console.Out.WriteLine(Meta.OuterHtml);
-				}
-
-				XmlWriterSettings Settings = XML.WriterSettings(true, true);
-				using (XmlWriter Output = XmlWriter.Create(Console.Out, Settings))
-				{
-					Doc.Export(Output);
-					Output.Flush();
-				}
+				else
+					Last = N.EndPosition;
 			}
+
+			PageMetaData MetaData = Doc.GetMetaData();
+
+			if (Doc.Meta != null)
+			{
+				foreach (Meta Meta in Doc.Meta)
+					Console.Out.WriteLine(Meta.OuterHtml);
+			}
+
+			XmlWriterSettings Settings = XML.WriterSettings(true, true);
+			using XmlWriter Output = XmlWriter.Create(Console.Out, Settings);
+			
+			Doc.Export(Output);
+			Output.Flush();
 		}
 
 		[TestMethod]

@@ -97,10 +97,8 @@ namespace Waher.Networking.HTTP.Test
 				}
 			};
 
-			using (ClientWebSocket Client = new ClientWebSocket())
-			{
-				await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
-			}
+			using ClientWebSocket Client = new ClientWebSocket();
+			await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
 		}
 
 		[TestMethod]
@@ -124,13 +122,11 @@ namespace Waher.Networking.HTTP.Test
 					Assert.Fail("Socket not set.");
 			};
 
-			using (ClientWebSocket Client = new ClientWebSocket())
-			{
-				Client.Options.SetRequestHeader("Origin", "UnitTest");
-				await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
+			using ClientWebSocket Client = new ClientWebSocket();
+			Client.Options.SetRequestHeader("Origin", "UnitTest");
+			await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
 
-				Assert.AreEqual(WebSocketState.Open, Client.State);
-			}
+			Assert.AreEqual(WebSocketState.Open, Client.State);
 		}
 
 		[TestMethod]
@@ -149,19 +145,17 @@ namespace Waher.Networking.HTTP.Test
 				};
 			};
 
-			using (ClientWebSocket Client = new ClientWebSocket())
-			{
-				await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
+			using ClientWebSocket Client = new ClientWebSocket();
+			await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
 
-				await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes("Hello World")),
-					WebSocketMessageType.Text, true, CancellationToken.None);
+			await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes("Hello World")),
+				WebSocketMessageType.Text, true, CancellationToken.None);
 
-				if (!Result.Task.Wait(5000))
-					Assert.Fail("No text delivered.");
+			if (!Result.Task.Wait(5000))
+				Assert.Fail("No text delivered.");
 
-				if (!Result.Task.Result)
-					Assert.Fail("Wrong text delivered.");
-			}
+			if (!Result.Task.Result)
+				Assert.Fail("Wrong text delivered.");
 		}
 
 		[TestMethod]
@@ -186,19 +180,17 @@ namespace Waher.Networking.HTTP.Test
 				};
 			};
 
-			using (ClientWebSocket Client = new ClientWebSocket())
-			{
-				await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
+			using ClientWebSocket Client = new ClientWebSocket();
+			await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
 
-				await Client.SendAsync(new ArraySegment<byte>(new byte[] { 1, 2, 3, 4 }),
-					WebSocketMessageType.Binary, true, CancellationToken.None);
+			await Client.SendAsync(new ArraySegment<byte>(new byte[] { 1, 2, 3, 4 }),
+				WebSocketMessageType.Binary, true, CancellationToken.None);
 
-				if (!Result.Task.Wait(5000))
-					Assert.Fail("No binary data delivered.");
+			if (!Result.Task.Wait(5000))
+				Assert.Fail("No binary data delivered.");
 
-				if (!Result.Task.Result)
-					Assert.Fail("Wrong binary data delivered.");
-			}
+			if (!Result.Task.Result)
+				Assert.Fail("Wrong binary data delivered.");
 		}
 
 		[TestMethod]
@@ -217,22 +209,20 @@ namespace Waher.Networking.HTTP.Test
 				};
 			};
 
-			using (ClientWebSocket Client = new ClientWebSocket())
-			{
-				await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
+			using ClientWebSocket Client = new ClientWebSocket();
+			await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
 
-				await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes("Hello ")),
-					WebSocketMessageType.Text, false, CancellationToken.None);
+			await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes("Hello ")),
+				WebSocketMessageType.Text, false, CancellationToken.None);
 
-				await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes("World")),
-					WebSocketMessageType.Text, true, CancellationToken.None);
+			await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes("World")),
+				WebSocketMessageType.Text, true, CancellationToken.None);
 
-				if (!Result.Task.Wait(5000))
-					Assert.Fail("No text delivered.");
+			if (!Result.Task.Wait(5000))
+				Assert.Fail("No text delivered.");
 
-				if (!Result.Task.Result)
-					Assert.Fail("Wrong text delivered.");
-			}
+			if (!Result.Task.Result)
+				Assert.Fail("Wrong text delivered.");
 		}
 
 		[TestMethod]
@@ -257,22 +247,20 @@ namespace Waher.Networking.HTTP.Test
 				};
 			};
 
-			using (ClientWebSocket Client = new ClientWebSocket())
-			{
-				await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
+			using ClientWebSocket Client = new ClientWebSocket();
+			await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
 
-				await Client.SendAsync(new ArraySegment<byte>(new byte[] { 1, 2 }),
-					WebSocketMessageType.Binary, false, CancellationToken.None);
+			await Client.SendAsync(new ArraySegment<byte>(new byte[] { 1, 2 }),
+				WebSocketMessageType.Binary, false, CancellationToken.None);
 
-				await Client.SendAsync(new ArraySegment<byte>(new byte[] { 3, 4 }),
-					WebSocketMessageType.Binary, true, CancellationToken.None);
+			await Client.SendAsync(new ArraySegment<byte>(new byte[] { 3, 4 }),
+				WebSocketMessageType.Binary, true, CancellationToken.None);
 
-				if (!Result.Task.Wait(5000))
-					Assert.Fail("No binary data delivered.");
+			if (!Result.Task.Wait(5000))
+				Assert.Fail("No binary data delivered.");
 
-				if (!Result.Task.Result)
-					Assert.Fail("Wrong binary data delivered.");
-			}
+			if (!Result.Task.Result)
+				Assert.Fail("Wrong binary data delivered.");
 		}
 
 		[TestMethod]
@@ -291,19 +279,17 @@ namespace Waher.Networking.HTTP.Test
 				};
 			};
 
-			using (ClientWebSocket Client = new ClientWebSocket())
-			{
-				await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
+			using ClientWebSocket Client = new ClientWebSocket();
+			await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
 
-				await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(new string('A', 100000))),
-					WebSocketMessageType.Text, true, CancellationToken.None);
+			await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(new string('A', 100000))),
+				WebSocketMessageType.Text, true, CancellationToken.None);
 
-				if (!Result.Task.Wait(5000))
-					Assert.Fail("No text delivered.");
+			if (!Result.Task.Wait(5000))
+				Assert.Fail("No text delivered.");
 
-				if (!Result.Task.Result)
-					Assert.Fail("Wrong text delivered.");
-			}
+			if (!Result.Task.Result)
+				Assert.Fail("Wrong text delivered.");
 		}
 
 		[TestMethod]
@@ -320,16 +306,14 @@ namespace Waher.Networking.HTTP.Test
 				};
 			};
 
-			using (ClientWebSocket Client = new ClientWebSocket())
-			{
-				await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
+			using ClientWebSocket Client = new ClientWebSocket();
+			await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
 
-				await Client.SendAsync(new ArraySegment<byte>(new byte[MaxBinarySize * 2]),
-					WebSocketMessageType.Binary, true, CancellationToken.None);
+			await Client.SendAsync(new ArraySegment<byte>(new byte[MaxBinarySize * 2]),
+				WebSocketMessageType.Binary, true, CancellationToken.None);
 
-				if (Result.Task.Wait(5000) && Result.Task.Result)
-					Assert.Fail("Data delivered.");
-			}
+			if (Result.Task.Wait(5000) && Result.Task.Result)
+				Assert.Fail("Data delivered.");
 		}
 
 		[TestMethod]
@@ -340,20 +324,18 @@ namespace Waher.Networking.HTTP.Test
 				e.Socket.Send("Hello World");
 			};
 
-			using (ClientWebSocket Client = new ClientWebSocket())
-			{
-				await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
+			using ClientWebSocket Client = new ClientWebSocket();
+			await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
 
-				ArraySegment<byte> Buffer = new ArraySegment<byte>(new byte[1024]);
-				WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
+			ArraySegment<byte> Buffer = new ArraySegment<byte>(new byte[1024]);
+			WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
 
-				Assert.AreEqual(WebSocketMessageType.Text, Result.MessageType);
-				Assert.AreEqual(true, Result.EndOfMessage);
+			Assert.AreEqual(WebSocketMessageType.Text, Result.MessageType);
+			Assert.AreEqual(true, Result.EndOfMessage);
 
-				string s = Encoding.UTF8.GetString(Buffer.Array, 0, Result.Count);
+			string s = Encoding.UTF8.GetString(Buffer.Array, 0, Result.Count);
 
-				Assert.AreEqual("Hello World", s);
-			}
+			Assert.AreEqual("Hello World", s);
 		}
 
 		[TestMethod]
@@ -364,24 +346,22 @@ namespace Waher.Networking.HTTP.Test
 				e.Socket.Send(new byte[] { 1, 2, 3, 4 });
 			};
 
-			using (ClientWebSocket Client = new ClientWebSocket())
-			{
-				await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
+			using ClientWebSocket Client = new ClientWebSocket();
+			await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
 
-				ArraySegment<byte> Buffer = new ArraySegment<byte>(new byte[1024]);
-				WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
+			ArraySegment<byte> Buffer = new ArraySegment<byte>(new byte[1024]);
+			WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
 
-				Assert.AreEqual(WebSocketMessageType.Binary, Result.MessageType);
-				Assert.AreEqual(true, Result.EndOfMessage);
+			Assert.AreEqual(WebSocketMessageType.Binary, Result.MessageType);
+			Assert.AreEqual(true, Result.EndOfMessage);
 
-				byte[] Bin = Buffer.Array;
-				int i;
+			byte[] Bin = Buffer.Array;
+			int i;
 
-				Assert.AreEqual(4, Result.Count);
+			Assert.AreEqual(4, Result.Count);
 
-				for (i = 0; i < 4; i++)
-					Assert.AreEqual(i + 1, Bin[i]);
-			}
+			for (i = 0; i < 4; i++)
+				Assert.AreEqual(i + 1, Bin[i]);
 		}
 
 		[TestMethod]
@@ -393,29 +373,27 @@ namespace Waher.Networking.HTTP.Test
 				e.Socket.Send("World", false);
 			};
 
-			using (ClientWebSocket Client = new ClientWebSocket())
-			{
-				await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
+			using ClientWebSocket Client = new ClientWebSocket();
+			await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
 
-				ArraySegment<byte> Buffer = new ArraySegment<byte>(new byte[1024]);
-				WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
+			ArraySegment<byte> Buffer = new ArraySegment<byte>(new byte[1024]);
+			WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
 
-				Assert.AreEqual(WebSocketMessageType.Text, Result.MessageType);
-				Assert.AreEqual(false, Result.EndOfMessage);
+			Assert.AreEqual(WebSocketMessageType.Text, Result.MessageType);
+			Assert.AreEqual(false, Result.EndOfMessage);
 
-				string s = Encoding.UTF8.GetString(Buffer.Array, 0, Result.Count);
+			string s = Encoding.UTF8.GetString(Buffer.Array, 0, Result.Count);
 
-				Assert.AreEqual("Hello ", s);
+			Assert.AreEqual("Hello ", s);
 
-				Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
+			Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
 
-				Assert.AreEqual(WebSocketMessageType.Text, Result.MessageType);
-				Assert.AreEqual(true, Result.EndOfMessage);
+			Assert.AreEqual(WebSocketMessageType.Text, Result.MessageType);
+			Assert.AreEqual(true, Result.EndOfMessage);
 
-				s = Encoding.UTF8.GetString(Buffer.Array, 0, Result.Count);
+			s = Encoding.UTF8.GetString(Buffer.Array, 0, Result.Count);
 
-				Assert.AreEqual("World", s);
-			}
+			Assert.AreEqual("World", s);
 		}
 
 		[TestMethod]
@@ -427,33 +405,31 @@ namespace Waher.Networking.HTTP.Test
 				e.Socket.Send(new byte[] { 3, 4 }, false);
 			};
 
-			using (ClientWebSocket Client = new ClientWebSocket())
-			{
-				await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
+			using ClientWebSocket Client = new ClientWebSocket();
+			await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
 
-				ArraySegment<byte> Buffer = new ArraySegment<byte>(new byte[1024]);
-				WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
+			ArraySegment<byte> Buffer = new ArraySegment<byte>(new byte[1024]);
+			WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
 
-				Assert.AreEqual(WebSocketMessageType.Binary, Result.MessageType);
-				Assert.AreEqual(false, Result.EndOfMessage);
+			Assert.AreEqual(WebSocketMessageType.Binary, Result.MessageType);
+			Assert.AreEqual(false, Result.EndOfMessage);
 
-				byte[] Bin = Buffer.Array;
+			byte[] Bin = Buffer.Array;
 
-				Assert.AreEqual(2, Result.Count);
-				Assert.AreEqual(1, Bin[0]);
-				Assert.AreEqual(2, Bin[1]);
+			Assert.AreEqual(2, Result.Count);
+			Assert.AreEqual(1, Bin[0]);
+			Assert.AreEqual(2, Bin[1]);
 
-				Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
+			Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
 
-				Assert.AreEqual(WebSocketMessageType.Binary, Result.MessageType);
-				Assert.AreEqual(true, Result.EndOfMessage);
+			Assert.AreEqual(WebSocketMessageType.Binary, Result.MessageType);
+			Assert.AreEqual(true, Result.EndOfMessage);
 
-				Bin = Buffer.Array;
+			Bin = Buffer.Array;
 
-				Assert.AreEqual(2, Result.Count);
-				Assert.AreEqual(3, Bin[0]);
-				Assert.AreEqual(4, Bin[1]);
-			}
+			Assert.AreEqual(2, Result.Count);
+			Assert.AreEqual(3, Bin[0]);
+			Assert.AreEqual(4, Bin[1]);
 		}
 
 		[TestMethod]
@@ -467,27 +443,25 @@ namespace Waher.Networking.HTTP.Test
 				};
 			};
 
-			using (ClientWebSocket Client = new ClientWebSocket())
+			using ClientWebSocket Client = new ClientWebSocket();
+			await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
+
+			int i;
+
+			for (i = 0; i < 10000; i++)
 			{
-				await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
+				await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(i.ToString())),
+					WebSocketMessageType.Text, true, CancellationToken.None);
 
-				int i;
+				ArraySegment<byte> Buffer = new ArraySegment<byte>(new byte[16]);
+				WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
 
-				for (i = 0; i < 10000; i++)
-				{
-					await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(i.ToString())),
-						WebSocketMessageType.Text, true, CancellationToken.None);
+				Assert.AreEqual(WebSocketMessageType.Text, Result.MessageType);
+				Assert.AreEqual(true, Result.EndOfMessage);
 
-					ArraySegment<byte> Buffer = new ArraySegment<byte>(new byte[16]);
-					WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
+				string s = Encoding.UTF8.GetString(Buffer.Array, 0, Result.Count);
 
-					Assert.AreEqual(WebSocketMessageType.Text, Result.MessageType);
-					Assert.AreEqual(true, Result.EndOfMessage);
-
-					string s = Encoding.UTF8.GetString(Buffer.Array, 0, Result.Count);
-
-					Assert.AreEqual(i, int.Parse(s));
-				}
+				Assert.AreEqual(i, int.Parse(s));
 			}
 		}
 
@@ -502,29 +476,27 @@ namespace Waher.Networking.HTTP.Test
 				};
 			};
 
-			using (ClientWebSocket Client = new ClientWebSocket())
+			using ClientWebSocket Client = new ClientWebSocket();
+			await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
+
+			int i;
+
+			for (i = 0; i < 3; i++)
 			{
-				await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
+				await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(i.ToString())),
+					WebSocketMessageType.Text, true, CancellationToken.None);
 
-				int i;
+				ArraySegment<byte> Buffer = new ArraySegment<byte>(new byte[16]);
+				WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
 
-				for (i = 0; i < 3; i++)
-				{
-					await Client.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(i.ToString())),
-						WebSocketMessageType.Text, true, CancellationToken.None);
+				Assert.AreEqual(WebSocketMessageType.Text, Result.MessageType);
+				Assert.AreEqual(true, Result.EndOfMessage);
 
-					ArraySegment<byte> Buffer = new ArraySegment<byte>(new byte[16]);
-					WebSocketReceiveResult Result = await Client.ReceiveAsync(Buffer, CancellationToken.None);
+				string s = Encoding.UTF8.GetString(Buffer.Array, 0, Result.Count);
 
-					Assert.AreEqual(WebSocketMessageType.Text, Result.MessageType);
-					Assert.AreEqual(true, Result.EndOfMessage);
+				Assert.AreEqual(i, int.Parse(s));
 
-					string s = Encoding.UTF8.GetString(Buffer.Array, 0, Result.Count);
-
-					Assert.AreEqual(i, int.Parse(s));
-
-					Thread.Sleep(60000);    // ClientWebSocket sends unsolicited pong messages to keep the connection alive.
-				}
+				Thread.Sleep(60000);    // ClientWebSocket sends unsolicited pong messages to keep the connection alive.
 			}
 		}
 
@@ -542,17 +514,15 @@ namespace Waher.Networking.HTTP.Test
 				};
 			};
 
-			using (ClientWebSocket Client = new ClientWebSocket())
-			{
-				await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
-				await Client.CloseAsync(System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, "Manual", CancellationToken.None);
+			using ClientWebSocket Client = new ClientWebSocket();
+			await Client.ConnectAsync(new Uri("ws://localhost:8080/ws"), CancellationToken.None);
+			await Client.CloseAsync(System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, "Manual", CancellationToken.None);
 
-				if (!Result.Task.Wait(5000))
-					Assert.Fail("Close event not received.");
+			if (!Result.Task.Wait(5000))
+				Assert.Fail("Close event not received.");
 
-				if (!Result.Task.Result)
-					Assert.Fail("Close data not delivered correctly.");
-			}
+			if (!Result.Task.Result)
+				Assert.Fail("Close data not delivered correctly.");
 		}
 
 	}

@@ -74,12 +74,10 @@ namespace Waher.Networking.HTTP.Test
 		{
 			server.Register("/test01.txt", (req, resp) => resp.Return("hej på dej"));
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				byte[] Data = Client.DownloadData("http://localhost:8080/test01.txt");
-				string s = Encoding.UTF8.GetString(Data);
-				Assert.AreEqual("hej på dej", s);
-			}
+			using CookieWebClient Client = new CookieWebClient();
+			byte[] Data = Client.DownloadData("http://localhost:8080/test01.txt");
+			string s = Encoding.UTF8.GetString(Data);
+			Assert.AreEqual("hej på dej", s);
 		}
 
 		[TestMethod]
@@ -94,13 +92,11 @@ namespace Waher.Networking.HTTP.Test
 					await resp.Write(new string('a', 100));
 			});
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				byte[] Data = Client.DownloadData("http://localhost:8080/test02.txt");
-				string s = Encoding.UTF8.GetString(Data);
-				Assert.AreEqual(100000, s.Length);
-				Assert.AreEqual(new string('a', 100000), s);
-			}
+			using CookieWebClient Client = new CookieWebClient();
+			byte[] Data = Client.DownloadData("http://localhost:8080/test02.txt");
+			string s = Encoding.UTF8.GetString(Data);
+			Assert.AreEqual(100000, s.Length);
+			Assert.AreEqual(new string('a', 100000), s);
 		}
 
 		[TestMethod]
@@ -111,13 +107,11 @@ namespace Waher.Networking.HTTP.Test
 				await resp.Return(new SKBitmap(320, 200));
 			});
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				byte[] Data = Client.DownloadData("http://localhost:8080/test03.png");
-				SKBitmap Bmp = SKBitmap.Decode(Data);
-				Assert.AreEqual(320, Bmp.Width);
-				Assert.AreEqual(200, Bmp.Height);
-			}
+			using CookieWebClient Client = new CookieWebClient();
+			byte[] Data = Client.DownloadData("http://localhost:8080/test03.png");
+			SKBitmap Bmp = SKBitmap.Decode(Data);
+			Assert.AreEqual(320, Bmp.Width);
+			Assert.AreEqual(200, Bmp.Height);
 		}
 
 		[TestMethod]
@@ -125,12 +119,10 @@ namespace Waher.Networking.HTTP.Test
 		{
 			server.Register("/test04.txt", (req, resp) => resp.Return("hej på dej"));
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				byte[] Data = Client.DownloadData("https://localhost:8088/test04.txt");
-				string s = Encoding.UTF8.GetString(Data);
-				Assert.AreEqual("hej på dej", s);
-			}
+			using CookieWebClient Client = new CookieWebClient();
+			byte[] Data = Client.DownloadData("https://localhost:8088/test04.txt");
+			string s = Encoding.UTF8.GetString(Data);
+			Assert.AreEqual("hej på dej", s);
 		}
 
 		[TestMethod]
@@ -138,13 +130,11 @@ namespace Waher.Networking.HTTP.Test
 		{
 			server.Register("/test05.txt", (req, resp) => resp.Return("hej på dej"), new BasicAuthentication("Test05", this));
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				Client.Credentials = new NetworkCredential("User", "Password");
-				byte[] Data = Client.DownloadData("http://localhost:8080/test05.txt");
-				string s = Encoding.UTF8.GetString(Data);
-				Assert.AreEqual("hej på dej", s);
-			}
+			using CookieWebClient Client = new CookieWebClient();
+			Client.Credentials = new NetworkCredential("User", "Password");
+			byte[] Data = Client.DownloadData("http://localhost:8080/test05.txt");
+			string s = Encoding.UTF8.GetString(Data);
+			Assert.AreEqual("hej på dej", s);
 		}
 
 		[TestMethod]
@@ -152,13 +142,11 @@ namespace Waher.Networking.HTTP.Test
 		{
 			server.Register("/test06.txt", (req, resp) => resp.Return("hej på dej"), new DigestAuthentication("Test06", this));
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				Client.Credentials = new NetworkCredential("User", "Password");
-				byte[] Data = Client.DownloadData("http://localhost:8080/test06.txt");
-				string s = Encoding.UTF8.GetString(Data);
-				Assert.AreEqual("hej på dej", s);
-			}
+			using CookieWebClient Client = new CookieWebClient();
+			Client.Credentials = new NetworkCredential("User", "Password");
+			byte[] Data = Client.DownloadData("http://localhost:8080/test06.txt");
+			string s = Encoding.UTF8.GetString(Data);
+			Assert.AreEqual("hej på dej", s);
 		}
 
 		[TestMethod]
@@ -166,13 +154,11 @@ namespace Waher.Networking.HTTP.Test
 		{
 			server.Register(new HttpEmbeddedResource("/test07.png", "Waher.Networking.HTTP.Test.Data.Frog-300px.png", typeof(HttpServerTests).Assembly));
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				byte[] Data = Client.DownloadData("http://localhost:8080/test07.png");
-				SKBitmap Bmp = SKBitmap.Decode(Data);
-				Assert.AreEqual(300, Bmp.Width);
-				Assert.AreEqual(184, Bmp.Height);
-			}
+			using CookieWebClient Client = new CookieWebClient();
+			byte[] Data = Client.DownloadData("http://localhost:8080/test07.png");
+			SKBitmap Bmp = SKBitmap.Decode(Data);
+			Assert.AreEqual(300, Bmp.Width);
+			Assert.AreEqual(184, Bmp.Height);
 		}
 
 		[TestMethod]
@@ -180,13 +166,11 @@ namespace Waher.Networking.HTTP.Test
 		{
 			server.Register(new HttpFolderResource("/Test08", "Data", false, false, true, false));
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				byte[] Data = Client.DownloadData("http://localhost:8080/Test08/BarnSwallowIsolated-300px.png");
-				SKBitmap Bmp = SKBitmap.Decode(Data);
-				Assert.AreEqual(300, Bmp.Width);
-				Assert.AreEqual(264, Bmp.Height);
-			}
+			using CookieWebClient Client = new CookieWebClient();
+			byte[] Data = Client.DownloadData("http://localhost:8080/Test08/BarnSwallowIsolated-300px.png");
+			SKBitmap Bmp = SKBitmap.Decode(Data);
+			Assert.AreEqual(300, Bmp.Width);
+			Assert.AreEqual(264, Bmp.Height);
 		}
 
 		[TestMethod]
@@ -194,17 +178,15 @@ namespace Waher.Networking.HTTP.Test
 		{
 			server.Register(new HttpFolderResource("/Test09", "Data", true, false, true, false));
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				Encoding Utf8 = new UTF8Encoding(true);
-				string s1 = new string('Ω', 100000);
-				Client.UploadData("http://localhost:8080/Test09/string.txt", "PUT", Utf8.GetBytes(s1));
+			using CookieWebClient Client = new CookieWebClient();
+			Encoding Utf8 = new UTF8Encoding(true);
+			string s1 = new string('Ω', 100000);
+			Client.UploadData("http://localhost:8080/Test09/string.txt", "PUT", Utf8.GetBytes(s1));
 
-				byte[] Data = Client.DownloadData("http://localhost:8080/Test09/string.txt");
-				string s2 = Utf8.GetString(Data);
+			byte[] Data = Client.DownloadData("http://localhost:8080/Test09/string.txt");
+			string s2 = Utf8.GetString(Data);
 
-				Assert.AreEqual(s1, s2);
-			}
+			Assert.AreEqual(s1, s2);
 		}
 
 		[TestMethod]
@@ -213,11 +195,9 @@ namespace Waher.Networking.HTTP.Test
 		{
 			server.Register(new HttpFolderResource("/Test10", "Data", false, false, true, false));
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				Encoding Utf8 = new UTF8Encoding(true);
-				byte[] Data = Client.UploadData("http://localhost:8080/Test10/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
-			}
+			using CookieWebClient Client = new CookieWebClient();
+			Encoding Utf8 = new UTF8Encoding(true);
+			byte[] Data = Client.UploadData("http://localhost:8080/Test10/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
 		}
 
 		[TestMethod]
@@ -225,13 +205,11 @@ namespace Waher.Networking.HTTP.Test
 		{
 			server.Register(new HttpFolderResource("/Test11", "Data", true, true, true, false));
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				Encoding Utf8 = new UTF8Encoding(true);
-				Client.UploadData("http://localhost:8080/Test11/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
+			using CookieWebClient Client = new CookieWebClient();
+			Encoding Utf8 = new UTF8Encoding(true);
+			Client.UploadData("http://localhost:8080/Test11/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
 
-				Client.UploadData("http://localhost:8080/Test11/string.txt", "DELETE", new byte[0]);
-			}
+			Client.UploadData("http://localhost:8080/Test11/string.txt", "DELETE", new byte[0]);
 		}
 
 		[TestMethod]
@@ -240,13 +218,11 @@ namespace Waher.Networking.HTTP.Test
 		{
 			server.Register(new HttpFolderResource("/Test12", "Data", true, false, true, false));
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				Encoding Utf8 = new UTF8Encoding(true);
-				Client.UploadData("http://localhost:8080/Test12/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
+			using CookieWebClient Client = new CookieWebClient();
+			Encoding Utf8 = new UTF8Encoding(true);
+			Client.UploadData("http://localhost:8080/Test12/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
 
-				Client.UploadData("http://localhost:8080/Test12/string.txt", "DELETE", new byte[0]);
-			}
+			Client.UploadData("http://localhost:8080/Test12/string.txt", "DELETE", new byte[0]);
 		}
 
 		[TestMethod]
@@ -254,17 +230,15 @@ namespace Waher.Networking.HTTP.Test
 		{
 			server.Register(new HttpFolderResource("/Test13", "Data", true, false, true, false));
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				Encoding Utf8 = new UTF8Encoding(true);
-				string s1 = new string('Ω', 100000);
-				Client.UploadData("http://localhost:8080/Test13/Folder/string.txt", "PUT", Utf8.GetBytes(s1));
+			using CookieWebClient Client = new CookieWebClient();
+			Encoding Utf8 = new UTF8Encoding(true);
+			string s1 = new string('Ω', 100000);
+			Client.UploadData("http://localhost:8080/Test13/Folder/string.txt", "PUT", Utf8.GetBytes(s1));
 
-				byte[] Data = Client.DownloadData("http://localhost:8080/Test13/Folder/string.txt");
-				string s2 = Utf8.GetString(Data);
+			byte[] Data = Client.DownloadData("http://localhost:8080/Test13/Folder/string.txt");
+			string s2 = Utf8.GetString(Data);
 
-				Assert.AreEqual(s1, s2);
-			}
+			Assert.AreEqual(s1, s2);
 		}
 
 		[TestMethod]
@@ -272,13 +246,11 @@ namespace Waher.Networking.HTTP.Test
 		{
 			server.Register(new HttpFolderResource("/Test14", "Data", true, true, true, false));
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				Encoding Utf8 = new UTF8Encoding(true);
-				Client.UploadData("http://localhost:8080/Test14/Folder/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
+			using CookieWebClient Client = new CookieWebClient();
+			Encoding Utf8 = new UTF8Encoding(true);
+			Client.UploadData("http://localhost:8080/Test14/Folder/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
 
-				Client.UploadData("http://localhost:8080/Test14/Folder", "DELETE", new byte[0]);
-			}
+			Client.UploadData("http://localhost:8080/Test14/Folder", "DELETE", new byte[0]);
 		}
 
 		[TestMethod]
@@ -289,17 +261,13 @@ namespace Waher.Networking.HTTP.Test
 			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test15/Text.txt");
 			Request.AddRange(100, 119);
 
-			using (WebResponse Response = Request.GetResponse())
-			{
-				byte[] Data = new byte[Response.ContentLength];
+			using WebResponse Response = Request.GetResponse();
+			byte[] Data = new byte[Response.ContentLength];
 
-				using (Stream f = Response.GetResponseStream())
-				{
-					Assert.AreEqual(20, f.Read(Data, 0, (int)Response.ContentLength));
-					string s = Encoding.UTF8.GetString(Data);
-					Assert.AreEqual("89012345678901234567", s);
-				}
-			}
+			using Stream f = Response.GetResponseStream();
+			Assert.AreEqual(20, f.Read(Data, 0, (int)Response.ContentLength));
+			string s = Encoding.UTF8.GetString(Data);
+			Assert.AreEqual("89012345678901234567", s);
 		}
 
 		[TestMethod]
@@ -310,17 +278,13 @@ namespace Waher.Networking.HTTP.Test
 			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test16/Text.txt");
 			Request.AddRange(980);
 
-			using (WebResponse Response = Request.GetResponse())
-			{
-				byte[] Data = new byte[Response.ContentLength];
+			using WebResponse Response = Request.GetResponse();
+			byte[] Data = new byte[Response.ContentLength];
 
-				using (Stream f = Response.GetResponseStream())
-				{
-					Assert.AreEqual(23, f.Read(Data, 0, (int)Response.ContentLength));
-					string s = Encoding.UTF8.GetString(Data);
-					Assert.AreEqual("89012345678901234567890", s);
-				}
-			}
+			using Stream f = Response.GetResponseStream();
+			Assert.AreEqual(23, f.Read(Data, 0, (int)Response.ContentLength));
+			string s = Encoding.UTF8.GetString(Data);
+			Assert.AreEqual("89012345678901234567890", s);
 		}
 
 		[TestMethod]
@@ -331,17 +295,13 @@ namespace Waher.Networking.HTTP.Test
 			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test17/Text.txt");
 			Request.AddRange(-20);
 
-			using (WebResponse Response = Request.GetResponse())
-			{
-				byte[] Data = new byte[Response.ContentLength];
+			using WebResponse Response = Request.GetResponse();
+			byte[] Data = new byte[Response.ContentLength];
 
-				using (Stream f = Response.GetResponseStream())
-				{
-					Assert.AreEqual(20, f.Read(Data, 0, (int)Response.ContentLength));
-					string s = Encoding.UTF8.GetString(Data);
-					Assert.AreEqual("12345678901234567890", s);
-				}
-			}
+			using Stream f = Response.GetResponseStream();
+			Assert.AreEqual(20, f.Read(Data, 0, (int)Response.ContentLength));
+			string s = Encoding.UTF8.GetString(Data);
+			Assert.AreEqual("12345678901234567890", s);
 		}
 
 		[TestMethod]
@@ -353,23 +313,19 @@ namespace Waher.Networking.HTTP.Test
 			Request.AddRange(100, 199);
 			Request.AddRange(-100);
 
-			using (WebResponse Response = Request.GetResponse())
-			{
-				byte[] Data = new byte[500];
+			using WebResponse Response = Request.GetResponse();
+			byte[] Data = new byte[500];
 
-				using (Stream f = Response.GetResponseStream())
-				{
-					int NrRead = f.Read(Data, 0, 500);
-					string s = Encoding.UTF8.GetString(Data, 0, NrRead);
-					string s2 = File.ReadAllText("Data/MultiRangeResponse.txt");
+			using Stream f = Response.GetResponseStream();
+			int NrRead = f.Read(Data, 0, 500);
+			string s = Encoding.UTF8.GetString(Data, 0, NrRead);
+			string s2 = File.ReadAllText("Data/MultiRangeResponse.txt");
 
-					int i = s.IndexOf("--");
-					int j = s.IndexOf("\r\n", i);
-					string Boundary = s.Substring(i + 2, j - i - 2);
+			int i = s.IndexOf("--");
+			int j = s.IndexOf("\r\n", i);
+			string Boundary = s.Substring(i + 2, j - i - 2);
 
-					Assert.AreEqual(s2, s.Replace(Boundary, "463d71b7a34048709e1bb217940feea6"));
-				}
-			}
+			Assert.AreEqual(s2, s.Replace(Boundary, "463d71b7a34048709e1bb217940feea6"));
 		}
 
 		[TestMethod]
@@ -405,13 +361,11 @@ namespace Waher.Networking.HTTP.Test
 			Response = Request.GetResponse();
 			Response.Close();
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				Data = Client.DownloadData("http://localhost:8080/Test19/String2.txt");
-				string s = Encoding.ASCII.GetString(Data);
+			using CookieWebClient Client = new CookieWebClient();
+			Data = Client.DownloadData("http://localhost:8080/Test19/String2.txt");
+			string s = Encoding.ASCII.GetString(Data);
 
-				Assert.AreEqual("2222222222222222222211111111111111111111", s);
-			}
+			Assert.AreEqual("2222222222222222222211111111111111111111", s);
 		}
 
 		[TestMethod]
@@ -451,16 +405,14 @@ namespace Waher.Networking.HTTP.Test
 				await resp.Return(req.Header.Cookie["word1"] + " " + req.Header.Cookie["word2"] + " " + req.Header.Cookie["word3"]);
 			});
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				byte[] Data = Client.DownloadData("http://localhost:8080/test21_1.txt");
-				string s = Encoding.UTF8.GetString(Data);
-				Assert.AreEqual("hejsan", s);
+			using CookieWebClient Client = new CookieWebClient();
+			byte[] Data = Client.DownloadData("http://localhost:8080/test21_1.txt");
+			string s = Encoding.UTF8.GetString(Data);
+			Assert.AreEqual("hejsan", s);
 
-				Data = Client.DownloadData("http://localhost:8080/test21_2.txt");
-				s = Encoding.UTF8.GetString(Data);
-				Assert.AreEqual("hej på dej", s);
-			}
+			Data = Client.DownloadData("http://localhost:8080/test21_2.txt");
+			s = Encoding.UTF8.GetString(Data);
+			Assert.AreEqual("hej på dej", s);
 		}
 
 		[TestMethod]
@@ -471,11 +423,9 @@ namespace Waher.Networking.HTTP.Test
 
 			server.Register(new HttpFolderResource("/Test22", "Data", false, false, true, false));
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				Client.IfModifiedSince = LastModified.AddMinutes(1);
-				byte[] Data = Client.DownloadData("http://localhost:8080/Test22/BarnSwallowIsolated-300px.png");
-			}
+			using CookieWebClient Client = new CookieWebClient();
+			Client.IfModifiedSince = LastModified.AddMinutes(1);
+			byte[] Data = Client.DownloadData("http://localhost:8080/Test22/BarnSwallowIsolated-300px.png");
 		}
 
 		[TestMethod]
@@ -485,14 +435,12 @@ namespace Waher.Networking.HTTP.Test
 
 			server.Register(new HttpFolderResource("/Test23", "Data", false, false, true, false));
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				Client.IfModifiedSince = LastModified.AddMinutes(-1);
-				byte[] Data = Client.DownloadData("http://localhost:8080/Test23/BarnSwallowIsolated-300px.png");
-				SKBitmap Bmp = SKBitmap.Decode(Data);
-				Assert.AreEqual(300, Bmp.Width);
-				Assert.AreEqual(264, Bmp.Height);
-			}
+			using CookieWebClient Client = new CookieWebClient();
+			Client.IfModifiedSince = LastModified.AddMinutes(-1);
+			byte[] Data = Client.DownloadData("http://localhost:8080/Test23/BarnSwallowIsolated-300px.png");
+			SKBitmap Bmp = SKBitmap.Decode(Data);
+			Assert.AreEqual(300, Bmp.Width);
+			Assert.AreEqual(264, Bmp.Height);
 		}
 
 		[TestMethod]
@@ -503,13 +451,11 @@ namespace Waher.Networking.HTTP.Test
 
 			server.Register(new HttpFolderResource("/Test24", "Data", true, false, true, false));
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				Encoding Utf8 = new UTF8Encoding(true);
-				string s1 = new string('Ω', 100000);
-				Client.IfUnmodifiedSince = LastModified.AddMinutes(-1);
-				Client.UploadData("http://localhost:8080/Test24/Temp.txt", "PUT", Utf8.GetBytes(s1));
-			}
+			using CookieWebClient Client = new CookieWebClient();
+			Encoding Utf8 = new UTF8Encoding(true);
+			string s1 = new string('Ω', 100000);
+			Client.IfUnmodifiedSince = LastModified.AddMinutes(-1);
+			Client.UploadData("http://localhost:8080/Test24/Temp.txt", "PUT", Utf8.GetBytes(s1));
 		}
 
 		[TestMethod]
@@ -519,13 +465,11 @@ namespace Waher.Networking.HTTP.Test
 
 			server.Register(new HttpFolderResource("/Test25", "Data", true, false, true, false));
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				Encoding Utf8 = new UTF8Encoding(true);
-				string s1 = new string('Ω', 100000);
-				Client.IfUnmodifiedSince = LastModified.AddMinutes(1);
-				Client.UploadData("http://localhost:8080/Test25/Temp.txt", "PUT", Utf8.GetBytes(s1));
-			}
+			using CookieWebClient Client = new CookieWebClient();
+			Encoding Utf8 = new UTF8Encoding(true);
+			string s1 = new string('Ω', 100000);
+			Client.IfUnmodifiedSince = LastModified.AddMinutes(1);
+			Client.UploadData("http://localhost:8080/Test25/Temp.txt", "PUT", Utf8.GetBytes(s1));
 		}
 
 		[TestMethod]
@@ -534,11 +478,9 @@ namespace Waher.Networking.HTTP.Test
 		{
 			server.Register(new HttpFolderResource("/Test26", "Data", false, false, true, false));
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				Client.Accept = "text/x-test4";
-				byte[] Data = Client.DownloadData("http://localhost:8080/Test26/Text.txt");
-			}
+			using CookieWebClient Client = new CookieWebClient();
+			Client.Accept = "text/x-test4";
+			byte[] Data = Client.DownloadData("http://localhost:8080/Test26/Text.txt");
 		}
 
 		[TestMethod]
@@ -549,15 +491,13 @@ namespace Waher.Networking.HTTP.Test
 
 			server.Register(Resource);
 
-			using (CookieWebClient Client = new CookieWebClient())
-			{
-				Client.Accept = "text/x-test3";
-				byte[] Data = Client.DownloadData("http://localhost:8080/Test27/Text.txt");
-				MemoryStream ms = new MemoryStream(Data);
-				StreamReader r = new StreamReader(ms);
-				string s = r.ReadToEnd();
-				Assert.AreEqual("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890\r\nConverter 1 was here.\r\nConverter 2 was here.\r\nConverter 3 was here.", s);
-			}
+			using CookieWebClient Client = new CookieWebClient();
+			Client.Accept = "text/x-test3";
+			byte[] Data = Client.DownloadData("http://localhost:8080/Test27/Text.txt");
+			MemoryStream ms = new MemoryStream(Data);
+			StreamReader r = new StreamReader(ms);
+			string s = r.ReadToEnd();
+			Assert.AreEqual("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890\r\nConverter 1 was here.\r\nConverter 2 was here.\r\nConverter 3 was here.", s);
 		}
 
 	}

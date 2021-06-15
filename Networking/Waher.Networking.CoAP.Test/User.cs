@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Waher.Security;
 
 namespace Waher.Networking.CoAP.Test
 {
 	internal class User : IUser
 	{
-		private string[] privileges;
-		private string userName;
-		private string passwordHash;
-		private string passwordHashType;
+		private readonly string[] privileges;
+		private readonly string userName;
+		private readonly string passwordHash;
+		private readonly string passwordHashType;
 
 		public User(string UserName, string PasswordHash, string PasswordHashType,
 			params string[] Privileges)

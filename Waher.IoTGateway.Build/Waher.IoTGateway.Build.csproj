@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <Configuration>Release</Configuration>
-    <RuntimeFrameworkVersion>netcoreapp2.2</RuntimeFrameworkVersion>
+    <RuntimeFrameworkVersion>netcoreapp3.1</RuntimeFrameworkVersion>
     <RuntimeIdentifiers>win-x86</RuntimeIdentifiers>
     <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
   </PropertyGroup>

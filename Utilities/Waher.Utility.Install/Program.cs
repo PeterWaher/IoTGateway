@@ -49,6 +49,9 @@ namespace Waher.Utility.Install
 	///                      operation. If the gateway does not stop within this period of
 	///                      time, the operation fails. (Default=60000)
 	/// -?                   Help.
+	/// 
+	/// Note: Alternating -p and -k attributes can be used to process multiple packages in
+	///       one operation.
 	/// </summary>
 	/// <example>
 	/// Packs assembly and content files defined in a manifest file into an encrypted package file:
@@ -66,6 +69,7 @@ namespace Waher.Utility.Install
 		{
 			try
 			{
+				LinkedList<KeyValuePair<string, string>> Packages = new LinkedList<KeyValuePair<string, string>>();
 				List<string> ManifestFiles = new List<string>();
 				string ProgramDataFolder = null;
 				string ServerApplication = null;
@@ -118,10 +122,13 @@ namespace Waher.Utility.Install
 							if (i >= c)
 								throw new Exception("Missing package file name.");
 
-							if (string.IsNullOrEmpty(PackageFile))
-								PackageFile = args[i++];
-							else
-								throw new Exception("Only one package file name allowed.");
+							if (!string.IsNullOrEmpty(PackageFile))
+							{
+								Packages.AddLast(new KeyValuePair<string, string>(PackageFile, Key));
+								Key = string.Empty;
+							}
+
+							PackageFile = args[i++];
 							break;
 
 						case "-k":
@@ -129,9 +136,17 @@ namespace Waher.Utility.Install
 								throw new Exception("Missing key.");
 
 							if (string.IsNullOrEmpty(Key))
+							{
 								Key = args[i++];
+								if (!string.IsNullOrEmpty(PackageFile))
+								{
+									Packages.AddLast(new KeyValuePair<string, string>(PackageFile, Key));
+									PackageFile = null;
+									Key = string.Empty;
+								}
+							}
 							else
-								throw new Exception("Only one key allowed.");
+								throw new Exception("Only one key per package allowed.");
 							break;
 
 						case "-n":
@@ -181,6 +196,9 @@ namespace Waher.Utility.Install
 					}
 				}
 
+				if (!string.IsNullOrEmpty(PackageFile))
+					Packages.AddLast(new KeyValuePair<string, string>(PackageFile, Key));
+
 				if (Help || c == 0)
 				{
 					Console.Out.WriteLine("-m MANIFEST_FILE     Points to a manifest file describing the files in the module.");
@@ -211,6 +229,9 @@ namespace Waher.Utility.Install
 					Console.Out.WriteLine("                     operation. If the gateway does not stop within this period of");
 					Console.Out.WriteLine("                     time, the operation fails. (Default=60000)");
 					Console.Out.WriteLine("-?                   Help.");
+					Console.Out.WriteLine();
+					Console.Out.WriteLine("Note: Alternating -p and -k attributes can be used to process multiple packages in");
+					Console.Out.WriteLine("      one operation.");
 					return 0;
 				}
 
@@ -245,17 +266,19 @@ namespace Waher.Utility.Install
 							Console.Out.WriteLine("Server is closed. Proceeding...");
 					}
 
-					if (!string.IsNullOrEmpty(PackageFile))
+					if (!(Packages.First is null))
 					{
 						if (ManifestFiles.Count == 0)
 						{
 							if (UninstallService)
-								UninstallPackage(PackageFile, Key, ServerApplication, ProgramDataFolder, RemoveFiles);
+								UninstallPackage(Packages, ServerApplication, ProgramDataFolder, RemoveFiles);
 							else
-								InstallPackage(PackageFile, Key, ServerApplication, ProgramDataFolder);
+								InstallPackage(Packages, ServerApplication, ProgramDataFolder);
 						}
+						else if (Packages.Count == 1)
+							GeneratePackage(ManifestFiles.ToArray(), Packages.First.Value.Key, Packages.First.Value.Value);
 						else
-							GeneratePackage(ManifestFiles.ToArray(), PackageFile, Key);
+							throw new Exception("Only one package file name can be referenced, when generating a package.");
 					}
 					else
 					{
@@ -978,6 +1001,12 @@ namespace Waher.Utility.Install
 			throw new FileNotFoundException("File not found: " + AbsFileName);
 		}
 
+		private static void InstallPackage(LinkedList<KeyValuePair<string, string>> Packages, string ServerApplication, string ProgramDataFolder)
+		{
+			foreach (KeyValuePair<string, string> Package in Packages)
+				InstallPackage(Package.Key, Package.Value, ServerApplication, ProgramDataFolder);
+		}
+
 		private static void InstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
@@ -1293,6 +1322,12 @@ namespace Waher.Utility.Install
 
 				Bytes -= (uint)d;
 			}
+		}
+
+		private static void UninstallPackage(LinkedList<KeyValuePair<string, string>> Packages, string ServerApplication, string ProgramDataFolder, bool Remove)
+		{
+			foreach (KeyValuePair<string, string> Package in Packages)
+				UninstallPackage(Package.Key, Package.Value, ServerApplication, ProgramDataFolder, Remove);
 		}
 
 		private static void UninstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder, bool Remove)

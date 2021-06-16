@@ -19,7 +19,6 @@
 		<Property Id="OPENBROWSER" Value="unset"/>
 		<Property Id="SERVICEDISPLAYNAME" Value="IoT Gateway Service"/>
 		<Property Id="SERVICEDESCRIPTION" Value="Windows Service hosting the Waher IoT Gateway."/>
-		<Property Id="NOINTERACTIVESERVICES" Value="1"/>
 		<Property Id="DiskPrompt" Value="IoT Gateway 1.0 Installation [1]"/>
 		<Property Id="ButtonText_No">!(loc.ButtonText_No)</Property>
 		<Property Id="ButtonText_Yes">!(loc.ButtonText_Yes)</Property>
@@ -544,9 +543,6 @@
 						<Component Id='MainExecutable' Guid='4A7EDBB4-9F37-4115-93B6-1BCBECD06486'>
 							<RegistryKey Root='HKLM' Key='Software\[Manufacturer]\[ProductName]'>
 								<RegistryValue Type='string' Name='InstallDir' Value='[INSTALLDIR]' Action='write'/>
-							</RegistryKey>
-							<RegistryKey Root='HKLM' Key='SYSTEM\CurrentControlSet\Control\Windows'>
-								<RegistryValue Type='integer' Name='NoInteractiveServices' Value='[NOINTERACTIVESERVICES]' Action='write'/>
 							</RegistryKey>
 							<File Id='Waher.Content.dll' Name='Waher.Content.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.dll' Vital='yes'/>
 							<File Id='Waher.Content.Asn1.dll' Name='Waher.Content.Asn1.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Content.Asn1.dll' Vital='yes'/>

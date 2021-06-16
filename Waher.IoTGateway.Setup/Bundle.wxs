@@ -20,7 +20,6 @@
 				<MsiProperty Name="SERVICEDISPLAYNAME" Value="IoT Gateway Service"/>
 				<MsiProperty Name="SERVICEDESCRIPTION" Value="Windows Service hosting the Waher IoT Gateway."/>
 				<MsiProperty Name="OPENBROWSER" Value="yes"/>
-				<MsiProperty Name="NOINTERACTIVESERVICES" Value="1"/>
 			</MsiPackage>
 		</Chain>
 	</Bundle>

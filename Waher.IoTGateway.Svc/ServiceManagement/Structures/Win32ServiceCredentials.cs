@@ -16,7 +16,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Structures
             Password = password;
         }
 
-        public static Win32ServiceCredentials LocalSystem = new Win32ServiceCredentials(userName: null, password: null);
+        public static Win32ServiceCredentials LocalSystem = new Win32ServiceCredentials(@".\LocalSystem", password: null);
 
         public static Win32ServiceCredentials LocalService = new Win32ServiceCredentials(@"NT AUTHORITY\LocalService", password: null);
 

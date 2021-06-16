@@ -346,6 +346,23 @@ namespace Waher.Networking.XMPP.P2P
 		}
 
 		/// <summary>
+		/// Gets a peer XMPP connection.
+		/// </summary>
+		/// <param name="FullJID">Bare JID of peer to connect to.</param>
+		/// <returns>Peer Connection event arguments containing peer-to-peer client, and corresponding JIDs, if they exist.</returns>
+		public Task<PeerConnectionEventArgs> GetPeerConnectionAsync(string FullJID)
+		{
+			TaskCompletionSource<PeerConnectionEventArgs> Result = new TaskCompletionSource<PeerConnectionEventArgs>();
+
+			this.GetPeerConnection(FullJID, (Sender, e) =>
+			{
+				Result.TrySetResult(e);
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
 		/// Event raised when the peer-to-peer connection parameters need to be updated for a given remote JID.
 		/// </summary>
 		public event ResynchEventHandler OnResynch = null;

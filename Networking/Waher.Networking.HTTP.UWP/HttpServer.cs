@@ -23,8 +23,9 @@ using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Networking.HTTP.Vanity;
 using Waher.Runtime.Cache;
 using Waher.Script;
-using Waher.Security;
 using Waher.Script.Functions.ComplexNumbers;
+using Waher.Security;
+using Waher.Security.LoginMonitor;
 
 namespace Waher.Networking.HTTP
 {
@@ -1020,6 +1021,22 @@ namespace Waher.Networking.HTTP
 				{
 					this.connections[Connection.Id] = Connection;
 				}
+			}
+			catch (AuthenticationException ex)
+			{
+				Exception ex2 = Log.UnnestException(ex);
+				EndPoint EP = Client.Client.Client.RemoteEndPoint;
+				string RemoteEndpoint;
+
+				if (EP is IPEndPoint IpEP)
+					RemoteEndpoint = IpEP.Address.ToString();
+				else
+					RemoteEndpoint = EP.ToString();
+
+				Security.LoginMonitor.LoginAuditor.Fail("TLS handshake failed: " + ex2.Message, string.Empty, RemoteEndpoint,
+					"HTTPS", await Security.LoginMonitor.LoginAuditor.Annotate(RemoteEndpoint));
+
+				Client.Dispose();
 			}
 			catch (SocketException)
 			{

@@ -459,23 +459,25 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Images.Test",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Utility.GetEmojiCatalog", "Utilities\Waher.Utility.GetEmojiCatalog\Waher.Utility.GetEmojiCatalog.csproj", "{08AA3B4C-5619-4EC8-A51F-FECE953BB691}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Html.Test", "Content\Waher.Content.Html.Test\Waher.Content.Html.Test.csproj", "{79808CD2-3922-47B2-9124-5B940D121EF4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Html.Test", "Content\Waher.Content.Html.Test\Waher.Content.Html.Test.csproj", "{79808CD2-3922-47B2-9124-5B940D121EF4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.CoAP.Test", "Networking\Waher.Networking.CoAP.Test\Waher.Networking.CoAP.Test.csproj", "{BDB0EB78-E172-45C6-ACD0-3EA80ABB07E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.CoAP.Test", "Networking\Waher.Networking.CoAP.Test\Waher.Networking.CoAP.Test.csproj", "{BDB0EB78-E172-45C6-ACD0-3EA80ABB07E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.HTTP.Test", "Networking\Waher.Networking.HTTP.Test\Waher.Networking.HTTP.Test.csproj", "{FC04ED4A-BF3F-4368-86A1-8894005D6554}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.HTTP.Test", "Networking\Waher.Networking.HTTP.Test\Waher.Networking.HTTP.Test.csproj", "{FC04ED4A-BF3F-4368-86A1-8894005D6554}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.MQTT.Test", "Networking\Waher.Networking.MQTT.Test\Waher.Networking.MQTT.Test.csproj", "{457B48E0-5F1D-4156-84A1-B7CA53C643C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.MQTT.Test", "Networking\Waher.Networking.MQTT.Test\Waher.Networking.MQTT.Test.csproj", "{457B48E0-5F1D-4156-84A1-B7CA53C643C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.Test", "Script\Waher.Script.Test\Waher.Script.Test.csproj", "{BB91C706-AE82-417A-BC83-E336B489FD7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Test", "Script\Waher.Script.Test\Waher.Script.Test.csproj", "{BB91C706-AE82-417A-BC83-E336B489FD7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.ACME.Test", "Security\Waher.Security.ACME.Test\Waher.Security.ACME.Test.csproj", "{EB719EB5-01EE-4B61-B4C3-B5058E034536}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.ACME.Test", "Security\Waher.Security.ACME.Test\Waher.Security.ACME.Test.csproj", "{EB719EB5-01EE-4B61-B4C3-B5058E034536}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.DTLS.Test", "Security\Waher.Security.DTLS.Test\Waher.Security.DTLS.Test.csproj", "{34628105-5C7B-449D-BE73-7134D1B404E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.DTLS.Test", "Security\Waher.Security.DTLS.Test\Waher.Security.DTLS.Test.csproj", "{34628105-5C7B-449D-BE73-7134D1B404E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.JWT.Test", "Security\Waher.Security.JWT.Test\Waher.Security.JWT.Test.csproj", "{FDDEEBE7-8033-4DC5-9A59-AC01F8C4D8FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.JWT.Test", "Security\Waher.Security.JWT.Test\Waher.Security.JWT.Test.csproj", "{FDDEEBE7-8033-4DC5-9A59-AC01F8C4D8FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.PKCS.Test", "Security\Waher.Security.PKCS.Test\Waher.Security.PKCS.Test.csproj", "{ABF52AA4-C027-4D62-948D-47CF7681D7A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.PKCS.Test", "Security\Waher.Security.PKCS.Test\Waher.Security.PKCS.Test.csproj", "{ABF52AA4-C027-4D62-948D-47CF7681D7A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.RDP", "Networking\Waher.Networking.XMPP.RDP\Waher.Networking.XMPP.RDP.csproj", "{CC09FDC7-BCBC-4285-AD1B-731D442BC693}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -5366,6 +5368,30 @@ Global
 		{ABF52AA4-C027-4D62-948D-47CF7681D7A3}.Release|x64.Build.0 = Release|Any CPU
 		{ABF52AA4-C027-4D62-948D-47CF7681D7A3}.Release|x86.ActiveCfg = Release|Any CPU
 		{ABF52AA4-C027-4D62-948D-47CF7681D7A3}.Release|x86.Build.0 = Release|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Debug|ARM.Build.0 = Debug|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Debug|x64.Build.0 = Debug|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Debug|x86.Build.0 = Debug|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Release|ARM.ActiveCfg = Release|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Release|ARM.Build.0 = Release|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Release|ARM64.Build.0 = Release|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Release|x64.ActiveCfg = Release|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Release|x64.Build.0 = Release|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Release|x86.ActiveCfg = Release|Any CPU
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -5566,6 +5592,7 @@ Global
 		{34628105-5C7B-449D-BE73-7134D1B404E8} = {D9FE4585-4E25-44EC-8DBA-DA90B012DC67}
 		{FDDEEBE7-8033-4DC5-9A59-AC01F8C4D8FA} = {D9FE4585-4E25-44EC-8DBA-DA90B012DC67}
 		{ABF52AA4-C027-4D62-948D-47CF7681D7A3} = {D9FE4585-4E25-44EC-8DBA-DA90B012DC67}
+		{CC09FDC7-BCBC-4285-AD1B-731D442BC693} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

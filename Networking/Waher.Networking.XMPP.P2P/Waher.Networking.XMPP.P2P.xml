@@ -3176,6 +3176,13 @@
             <param name="Callback">Method to call when connection is established.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.GetPeerConnectionAsync(System.String)">
+            <summary>
+            Gets a peer XMPP connection.
+            </summary>
+            <param name="FullJID">Bare JID of peer to connect to.</param>
+            <returns>Peer Connection event arguments containing peer-to-peer client, and corresponding JIDs, if they exist.</returns>
+        </member>
         <member name="E:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.OnResynch">
             <summary>
             Event raised when the peer-to-peer connection parameters need to be updated for a given remote JID.

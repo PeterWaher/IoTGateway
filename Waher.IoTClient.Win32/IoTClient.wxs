@@ -275,6 +275,7 @@
 							<File Id='Waher.Networking.XMPP.PEP.dll' Name='Waher.Networking.XMPP.PEP.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.PEP.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Provisioning.dll' Name='Waher.Networking.XMPP.Provisioning.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Provisioning.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.PubSub.dll' Name='Waher.Networking.XMPP.PubSub.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.PubSub.dll' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.RDP.dll' Name='Waher.Networking.XMPP.RDP.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.RDP.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Sensor.dll' Name='Waher.Networking.XMPP.Sensor.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Sensor.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Synchronization.dll' Name='Waher.Networking.XMPP.Synchronization.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Synchronization.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.WebSocket.dll' Name='Waher.Networking.XMPP.WebSocket.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.WebSocket.dll' Vital='yes'/>
@@ -343,6 +344,7 @@
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.PEP.dll' Name='Waher.Networking.XMPP.PEP.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Provisioning.dll' Name='Waher.Networking.XMPP.Provisioning.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.PubSub.dll' Name='Waher.Networking.XMPP.PubSub.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.RDP.dll' Name='Waher.Networking.XMPP.RDP.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Sensor.dll' Name='Waher.Networking.XMPP.Sensor.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Synchronization.dll' Name='Waher.Networking.XMPP.Synchronization.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.WebSocket.dll' Name='Waher.Networking.XMPP.WebSocket.dll' On='uninstall'/>

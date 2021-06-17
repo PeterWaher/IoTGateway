@@ -50,19 +50,18 @@
 	<Assembly fileName='hostpolicy.dll'/>
 	<Assembly fileName='Microsoft.CSharp.dll'/>
 	<Assembly fileName='Microsoft.DiaSymReader.Native.x86.dll'/>
+	<Assembly fileName='Microsoft.VisualBasic.Core.dll'/>
 	<Assembly fileName='Microsoft.VisualBasic.dll'/>
 	<Assembly fileName='Microsoft.Win32.Primitives.dll'/>
 	<Assembly fileName='Microsoft.Win32.Registry.dll'/>
 	<Assembly fileName='mscordaccore.dll'/>
-	<Assembly fileName='mscordaccore_x86_x86_4.6.28207.03.dll'/>
+	<Assembly fileName='mscordaccore_x86_x86_4.700.19.56402.dll'/>
 	<Assembly fileName='mscordbi.dll'/>
 	<Assembly fileName='mscorlib.dll'/>
 	<Assembly fileName='mscorrc.debug.dll'/>
 	<Assembly fileName='mscorrc.dll'/>
 	<Assembly fileName='netstandard.dll'/>
-	<Assembly fileName='sos.dll'/>
-	<Assembly fileName='SOS.NETCore.dll'/>
-	<Assembly fileName='sos_x86_x86_4.6.28207.03.dll'/>
+	<Assembly fileName='SOS_README.md'/>
 	<Assembly fileName='System.AppContext.dll'/>
 	<Assembly fileName='System.Buffers.dll'/>
 	<Assembly fileName='System.Collections.Concurrent.dll'/>
@@ -80,6 +79,7 @@
 	<Assembly fileName='System.Console.dll'/>
 	<Assembly fileName='System.Core.dll'/>
 	<Assembly fileName='System.Data.Common.dll'/>
+	<Assembly fileName='System.Data.DataSetExtensions.dll'/>
 	<Assembly fileName='System.Data.dll'/>
 	<Assembly fileName='System.Diagnostics.Contracts.dll'/>
 	<Assembly fileName='System.Diagnostics.Debug.dll'/>
@@ -155,6 +155,7 @@
 	<Assembly fileName='System.Resources.Reader.dll'/>
 	<Assembly fileName='System.Resources.ResourceManager.dll'/>
 	<Assembly fileName='System.Resources.Writer.dll'/>
+	<Assembly fileName='System.Runtime.CompilerServices.Unsafe.dll'/>
 	<Assembly fileName='System.Runtime.CompilerServices.VisualC.dll'/>
 	<Assembly fileName='System.Runtime.dll'/>
 	<Assembly fileName='System.Runtime.Extensions.dll'/>
@@ -162,6 +163,7 @@
 	<Assembly fileName='System.Runtime.InteropServices.dll'/>
 	<Assembly fileName='System.Runtime.InteropServices.RuntimeInformation.dll'/>
 	<Assembly fileName='System.Runtime.InteropServices.WindowsRuntime.dll'/>
+	<Assembly fileName='System.Runtime.Intrinsics.dll'/>
 	<Assembly fileName='System.Runtime.Loader.dll'/>
 	<Assembly fileName='System.Runtime.Numerics.dll'/>
 	<Assembly fileName='System.Runtime.Serialization.dll'/>
@@ -169,6 +171,8 @@
 	<Assembly fileName='System.Runtime.Serialization.Json.dll'/>
 	<Assembly fileName='System.Runtime.Serialization.Primitives.dll'/>
 	<Assembly fileName='System.Runtime.Serialization.Xml.dll'/>
+	<Assembly fileName='System.Runtime.WindowsRuntime.dll'/>
+	<Assembly fileName='System.Runtime.WindowsRuntime.UI.Xaml.dll'/>
 	<Assembly fileName='System.Security.AccessControl.dll'/>
 	<Assembly fileName='System.Security.Claims.dll'/>
 	<Assembly fileName='System.Security.Cryptography.Algorithms.dll'/>
@@ -184,9 +188,13 @@
 	<Assembly fileName='System.Security.SecureString.dll'/>
 	<Assembly fileName='System.ServiceModel.Web.dll'/>
 	<Assembly fileName='System.ServiceProcess.dll'/>
+	<Assembly fileName='System.Text.Encoding.CodePages.dll'/>
 	<Assembly fileName='System.Text.Encoding.dll'/>
 	<Assembly fileName='System.Text.Encoding.Extensions.dll'/>
+	<Assembly fileName='System.Text.Encodings.Web.dll'/>
+	<Assembly fileName='System.Text.Json.dll'/>
 	<Assembly fileName='System.Text.RegularExpressions.dll'/>
+	<Assembly fileName='System.Threading.Channels.dll'/>
 	<Assembly fileName='System.Threading.dll'/>
 	<Assembly fileName='System.Threading.Overlapped.dll'/>
 	<Assembly fileName='System.Threading.Tasks.Dataflow.dll'/>
@@ -211,9 +219,7 @@
 	<Assembly fileName='System.Xml.XmlSerializer.dll'/>
 	<Assembly fileName='System.Xml.XPath.dll'/>
 	<Assembly fileName='System.Xml.XPath.XDocument.dll'/>
-	<Assembly fileName='System.Xml.XPath.XmlDocument.dll'/>
 	<Assembly fileName='ucrtbase.dll'/>
-	<Assembly fileName='WindowsBase.dll'/>
 	<Assembly fileName='Waher.Content.dll'/>
 	<Assembly fileName='Waher.Content.pdb'/>
 	<Assembly fileName='Waher.Content.Xml.dll'/>
@@ -235,6 +241,8 @@
 	<Assembly fileName='Waher.Utility.Install.deps.json'/>
 	<Assembly fileName='Waher.Utility.Install.dll'/>
 	<Assembly fileName='Waher.Utility.Install.exe'/>
+	<Assembly fileName='Waher.Utility.Install.manifest'/>
 	<Assembly fileName='Waher.Utility.Install.pdb'/>
 	<Assembly fileName='Waher.Utility.Install.runtimeconfig.json'/>
+	<Assembly fileName='WindowsBase.dll'/>
 </Module>

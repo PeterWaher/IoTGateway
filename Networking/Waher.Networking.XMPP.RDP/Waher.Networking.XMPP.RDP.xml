@@ -1,0 +1,199 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Networking.XMPP.RDP</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Networking.XMPP.RDP.RemoteDesktopClient">
+            <summary>
+            Remote Desktop Client
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.RDP.RemoteDesktopClient.RemoteDesktopNamespace">
+            <summary>
+            http://waher.se/rdp/1.0
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopClient.#ctor(Waher.Networking.XMPP.XmppClient)">
+            <summary>
+            Remote Desktop Client
+            </summary>
+            <param name="Client">XMPP Client.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopClient.Dispose">
+            <summary>
+            Disposes of the extension.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.RemoteDesktopClient.Extensions">
+            <summary>
+            Implemented extensions.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopClient.StartSessionAsync(System.String)">
+            <summary>
+            Starts a Remote Desktop session.
+            </summary>
+            <param name="To">Full JID of remote client.</param>
+            <returns>Remote Desktop Session object.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopClient.StopSessionAsync(System.String,System.String)">
+            <summary>
+            Stops a Remote Desktop session.
+            </summary>
+            <param name="To">Full JID of remote client.</param>
+            <param name="SessionId">Session ID</param>
+            <returns>Remote Desktop Session object.</returns>
+        </member>
+        <member name="T:Waher.Networking.XMPP.RDP.RemoteDesktopSession">
+            <summary>
+            Maintains the client-side state of a Remote Desktop Session.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopSession.#ctor(System.String,System.String,Waher.Networking.XMPP.RDP.RemoteDesktopClient)">
+            <summary>
+            Maintains the client-side state of a Remote Desktop Session.
+            </summary>
+            <param name="SessionId">Session ID</param>
+            <param name="RemoteJid">Remote JID</param>
+            <param name="Client">Remote Desktop Client</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.RemoteDesktopSession.SessionId">
+            <summary>
+            Session ID
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.RemoteDesktopSession.RemoteJid">
+            <summary>
+            Remote JID
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.RemoteDesktopSession.Client">
+            <summary>
+            Remote Desktop Client
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.RemoteDesktopSession.State">
+            <summary>
+            Session state changed.
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.RDP.RemoteDesktopSession.StateChanged">
+            <summary>
+            Event raised when state has been changed.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.RemoteDesktopSession.Screens">
+            <summary>
+            Available remote screens.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.RemoteDesktopSession.BitsPerPixel">
+            <summary>
+            Bits per pixel.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.RemoteDesktopSession.Left">
+            <summary>
+            Left coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.RemoteDesktopSession.Top">
+            <summary>
+            Top coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.RemoteDesktopSession.Width">
+            <summary>
+            Width of screen
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.RemoteDesktopSession.Height">
+            <summary>
+            Height of screen
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.RemoteDesktopSession.DeviceName">
+            <summary>
+            Name of device
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.RDP.RemoteDesktopSessionState">
+            <summary>
+            State of a Remote Desktop Session
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.RDP.RemoteDesktopSessionState.Starting">
+            <summary>
+            Session is starting.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.RDP.RemoteDesktopSessionState.Started">
+            <summary>
+            Session has been started.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.RDP.RemoteDesktopSessionState.Stopping">
+            <summary>
+            Session is stopping.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.RDP.RemoteDesktopSessionState.Stopped">
+            <summary>
+            Session has been stopped.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.RDP.ScreenInfo">
+            <summary>
+            Information about a remote screen.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.RDP.ScreenInfo.#ctor(System.Boolean,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.String)">
+            <summary>
+            Information about a remote screen.
+            </summary>
+            <param name="Primary">If the screen is the primary screen.</param>
+            <param name="BitsPerPixel">Bits per pixel.</param>
+            <param name="Left">Left coordinate</param>
+            <param name="Top">Top coordinate</param>
+            <param name="Width">Width of screen</param>
+            <param name="Height">Height of screen</param>
+            <param name="DeviceName">Name of device</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.ScreenInfo.Primary">
+            <summary>
+            If the screen is the primary screen.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.ScreenInfo.BitsPerPixel">
+            <summary>
+            Bits per pixel.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.ScreenInfo.Left">
+            <summary>
+            Left coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.ScreenInfo.Top">
+            <summary>
+            Top coordinate
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.ScreenInfo.Width">
+            <summary>
+            Width of screen
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.ScreenInfo.Height">
+            <summary>
+            Height of screen
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.ScreenInfo.DeviceName">
+            <summary>
+            Name of device
+            </summary>
+        </member>
+    </members>
+</doc>

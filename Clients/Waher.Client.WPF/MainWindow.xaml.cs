@@ -1006,16 +1006,7 @@ namespace Waher.Client.WPF
 			if (Node is null || !Node.CanConfigure)
 				return;
 
-			Mouse.OverrideCursor = Cursors.Wait;
-			Node.GetConfigurationForm((Sender, e2) =>
-			{
-				if (e2.Ok && e2.Form != null)
-					UpdateGui(this.ShowForm, e2.Form);
-				else
-					UpdateGui(this.ShowError, e2);
-
-				return Task.CompletedTask;
-			}, null);
+			Node.Configure();
 		}
 
 		public void ShowDataForm(DataForm Form)
@@ -1023,7 +1014,7 @@ namespace Waher.Client.WPF
 			UpdateGui(this.ShowForm, Form);
 		}
 
-		private void ShowForm(object P)
+		internal void ShowForm(object P)
 		{
 			Mouse.OverrideCursor = null;
 
@@ -1045,7 +1036,7 @@ namespace Waher.Client.WPF
 			Dialog.ShowDialog();
 		}
 
-		private void ShowError(object P)
+		internal void ShowError(object P)
 		{
 			Mouse.OverrideCursor = null;
 

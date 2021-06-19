@@ -14,8 +14,8 @@ namespace Waher.Client.WPF.Model.Things
 	{
 		private readonly bool suportsEvents;
 
-		public XmppSensor(TreeNode Parent, XmppClient Client, string BareJid, bool SupportsEventSubscripton)
-			: base(Parent, Client, BareJid)
+		public XmppSensor(TreeNode Parent, XmppClient Client, string BareJid, bool SupportsEventSubscripton, bool SupportsRdp)
+			: base(Parent, Client, BareJid, SupportsRdp)
 		{
 			this.suportsEvents = SupportsEventSubscripton;
 		}

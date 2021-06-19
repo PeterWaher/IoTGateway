@@ -23,6 +23,7 @@ using Waher.Networking.XMPP.MUC;
 using Waher.Networking.XMPP.PEP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.PubSub;
+using Waher.Networking.XMPP.RDP;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Networking.XMPP.Synchronization;
@@ -55,6 +56,7 @@ namespace Waher.Client.WPF.Model
 		private const string ActuatorGroupName = "Actuators";
 		private const string ConcentratorGroupName = "Concentrators";
 		private const string OtherGroupName = "Others";
+		private const string RemoteDesktopGroupName = "RDP";
 
 		private readonly LinkedList<KeyValuePair<DateTime, MessageEventArgs>> unhandledMessages = new LinkedList<KeyValuePair<DateTime, MessageEventArgs>>();
 		private readonly LinkedList<XmppComponent> components = new LinkedList<XmppComponent>();
@@ -586,15 +588,15 @@ namespace Waher.Client.WPF.Model
 					else
 					{
 						if (Item.IsInGroup(ConcentratorGroupName))
-							Contact = new XmppConcentrator(this, this.client, Item.BareJid, Item.IsInGroup(EventsGroupName));
+							Contact = new XmppConcentrator(this, this.client, Item.BareJid, Item.IsInGroup(EventsGroupName), Item.IsInGroup(RemoteDesktopGroupName));
 						else if (Item.IsInGroup(ActuatorGroupName))
-							Contact = new XmppActuator(this, this.client, Item.BareJid, Item.IsInGroup(SensorGroupName), Item.IsInGroup(EventsGroupName));
+							Contact = new XmppActuator(this, this.client, Item.BareJid, Item.IsInGroup(SensorGroupName), Item.IsInGroup(EventsGroupName), Item.IsInGroup(RemoteDesktopGroupName));
 						else if (Item.IsInGroup(SensorGroupName))
-							Contact = new XmppSensor(this, this.client, Item.BareJid, Item.IsInGroup(EventsGroupName));
+							Contact = new XmppSensor(this, this.client, Item.BareJid, Item.IsInGroup(EventsGroupName), Item.IsInGroup(RemoteDesktopGroupName));
 						else if (Item.IsInGroup(OtherGroupName))
-							Contact = new XmppOther(this, this.client, Item.BareJid);
+							Contact = new XmppOther(this, this.client, Item.BareJid, Item.IsInGroup(RemoteDesktopGroupName));
 						else
-							Contact = new XmppContact(this, this.client, Item.BareJid);
+							Contact = new XmppContact(this, this.client, Item.BareJid, Item.IsInGroup(RemoteDesktopGroupName));
 
 						Contacts[Item.BareJid] = Contact;
 
@@ -696,7 +698,7 @@ namespace Waher.Client.WPF.Model
 					}
 					else
 					{
-						Contact = new XmppContact(this, this.client, Item.BareJid);
+						Contact = new XmppContact(this, this.client, Item.BareJid, Item.IsInGroup(RemoteDesktopGroupName));
 						this.children[Item.BareJid] = Contact;
 						Added = true;
 					}
@@ -831,27 +833,37 @@ namespace Waher.Client.WPF.Model
 				if (e.HasFeature(ConcentratorServer.NamespaceConcentrator))
 				{
 					bool SupportsEvents = e.HasFeature(SensorClient.NamespaceSensorEvents);
+					bool SupportsRdp = e.HasFeature(RemoteDesktopClient.RemoteDesktopNamespace);
 
 					OldTag = Node.Tag;
-					Node = new XmppConcentrator(Node.Parent, this.client, Node.BareJID, SupportsEvents)
+					Node = new XmppConcentrator(Node.Parent, this.client, Node.BareJID, SupportsEvents, SupportsRdp)
 					{
 						Tag = OldTag
 					};
 
 					this.children[Node.Key] = Node;
 
+					List<string> Groups = new List<string>()
+					{
+						ConcentratorGroupName
+					};
+
 					if (SupportsEvents)
-						this.AddGroups(Node, ConcentratorGroupName, EventsGroupName);
-					else
-						this.AddGroups(Node, ConcentratorGroupName);
+						Groups.Add(EventsGroupName);
+
+					if (SupportsRdp)
+						Groups.Add(RemoteDesktopGroupName);
+
+					this.AddGroups(Node, Groups.ToArray());
 				}
 				else if (e.HasFeature(ControlClient.NamespaceControl))
 				{
 					bool IsSensor = e.HasFeature(SensorClient.NamespaceSensorData);
 					bool SupportsEvents = e.HasFeature(SensorClient.NamespaceSensorEvents);
+					bool SupportsRdp = e.HasFeature(RemoteDesktopClient.RemoteDesktopNamespace);
 
 					OldTag = Node.Tag;
-					Node = new XmppActuator(Node.Parent, this.client, Node.BareJID, IsSensor, SupportsEvents)
+					Node = new XmppActuator(Node.Parent, this.client, Node.BareJID, IsSensor, SupportsEvents, SupportsRdp)
 					{
 						Tag = OldTag
 					};
@@ -869,14 +881,18 @@ namespace Waher.Client.WPF.Model
 					if (SupportsEvents)
 						Groups.Add(EventsGroupName);
 
+					if (SupportsRdp)
+						Groups.Add(RemoteDesktopGroupName);
+
 					this.AddGroups(Node, Groups.ToArray());
 				}
 				else if (e.HasFeature(SensorClient.NamespaceSensorData))
 				{
 					bool SupportsEvents = e.HasFeature(SensorClient.NamespaceSensorEvents);
+					bool SupportsRdp = e.HasFeature(RemoteDesktopClient.RemoteDesktopNamespace);
 
 					OldTag = Node.Tag;
-					Node = new XmppSensor(Node.Parent, this.client, Node.BareJID, SupportsEvents)
+					Node = new XmppSensor(Node.Parent, this.client, Node.BareJID, SupportsEvents, SupportsRdp)
 					{
 						Tag = OldTag
 					};
@@ -891,19 +907,32 @@ namespace Waher.Client.WPF.Model
 					if (SupportsEvents)
 						Groups.Add(EventsGroupName);
 
+					if (SupportsRdp)
+						Groups.Add(RemoteDesktopGroupName);
+
 					this.AddGroups(Node, Groups.ToArray());
 				}
 				else
 				{
+					bool SupportsRdp = e.HasFeature(RemoteDesktopClient.RemoteDesktopNamespace);
+
 					OldTag = Node.Tag;
-					Node = new XmppOther(Node.Parent, this.client, Node.BareJID)
+					Node = new XmppOther(Node.Parent, this.client, Node.BareJID, SupportsRdp)
 					{
 						Tag = OldTag
 					};
 
 					this.children[Node.Key] = Node;
 
-					this.AddGroups(Node, OtherGroupName);
+					List<string> Groups = new List<string>()
+					{
+						OtherGroupName
+					};
+
+					if (SupportsRdp)
+						Groups.Add(RemoteDesktopGroupName);
+
+					this.AddGroups(Node, Groups.ToArray());
 				}
 
 				this.OnUpdated();

@@ -178,6 +178,9 @@
     <Compile Include="Controls\LogView.xaml.cs">
       <DependentUpon>LogView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\RemoteDesktopView.xaml.cs">
+      <DependentUpon>RemoteDesktopView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SnifferView.xaml.cs">
       <DependentUpon>SnifferView.xaml</DependentUpon>
     </Compile>
@@ -254,6 +257,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\LogView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\RemoteDesktopView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

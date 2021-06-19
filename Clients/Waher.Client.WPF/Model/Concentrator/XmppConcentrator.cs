@@ -16,8 +16,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 		private readonly Dictionary<string, DataSource> dataSources = new Dictionary<string, DataSource>();
 		private readonly bool suportsEvents;
 
-		public XmppConcentrator(TreeNode Parent, XmppClient Client, string BareJid, bool SupportsEventSubscripton)
-			: base(Parent, Client, BareJid)
+		public XmppConcentrator(TreeNode Parent, XmppClient Client, string BareJid, bool SupportsEventSubscripton, bool SupportsRdp)
+			: base(Parent, Client, BareJid, SupportsRdp)
 		{
 			this.suportsEvents = SupportsEventSubscripton;
 			this.children = new SortedDictionary<string, TreeNode>()

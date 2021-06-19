@@ -2,13 +2,16 @@
 using System.Text;
 using System.Xml;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using Waher.Client.WPF.Controls;
 using Waher.Content.Html;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
+using Waher.Networking.XMPP.RDP;
 
 namespace Waher.Client.WPF.Model
 {
@@ -18,13 +21,17 @@ namespace Waher.Client.WPF.Model
 	public class XmppContact : TreeNode
 	{
 		private readonly XmppClient client;
+		private readonly RemoteDesktopClient rdpClient;
 		private readonly string bareJid;
 
-		public XmppContact(TreeNode Parent, XmppClient Client, string BareJid)
+		public XmppContact(TreeNode Parent, XmppClient Client, string BareJid, bool SupportsRdp)
 			: base(Parent)
 		{
 			this.client = Client;
 			this.bareJid = BareJid;
+
+			this.rdpClient = SupportsRdp ? new RemoteDesktopClient(this.client) : null;
+
 		}
 
 		public override string Header
@@ -373,6 +380,60 @@ namespace Waher.Client.WPF.Model
 		private void Unsubscribe_Click(object sender, RoutedEventArgs e)
 		{
 			this.XmppAccountNode?.Client?.RequestPresenceUnsubscription(this.bareJid);
+		}
+
+		public override bool CanConfigure => !string.IsNullOrEmpty(this.LastOnlineFullJid);
+
+		private string LastOnlineFullJid
+		{
+			get
+			{
+				try
+				{
+					if (this.rdpClient is null)
+						return null;
+
+					RosterItem Item = this.client[this.bareJid];
+					if (Item is null)
+						return null;
+
+					PresenceEventArgs e = Item.LastPresence;
+					if (e?.IsOnline ?? false)
+						return e.From;
+					else
+						return null;
+				}
+				catch (Exception)
+				{
+					return null;
+				}
+			}
+		}
+
+		public override async void Configure()
+		{
+			try
+			{
+				string FullJid = this.LastOnlineFullJid;
+				if (string.IsNullOrEmpty(FullJid))
+					return;
+
+				Mouse.OverrideCursor = Cursors.Wait;
+				RemoteDesktopSession Session = await this.rdpClient.StartSessionAsync(FullJid);
+				Mouse.OverrideCursor = null;
+
+				TabItem TabItem = MainWindow.NewTab(this.bareJid);
+				MainWindow.currentInstance.Tabs.Items.Add(TabItem);
+
+				RemoteDesktopView View = new RemoteDesktopView(this, this.client, this.rdpClient, Session);
+				TabItem.Content = View;
+
+				MainWindow.currentInstance.Tabs.SelectedItem = TabItem;
+			}
+			catch (Exception ex)
+			{
+				MainWindow.ErrorBox(ex.Message);
+			}
 		}
 	}
 }

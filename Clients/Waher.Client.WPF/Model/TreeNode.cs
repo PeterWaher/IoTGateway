@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Waher.Content.Markdown;
-using Waher.Events;
 using Waher.Networking.Sniffers;
-using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Things.DisplayableParameters;
@@ -560,6 +559,23 @@ namespace Waher.Client.WPF.Model
 		public virtual bool CanConfigure
 		{
 			get { return false; }
+		}
+
+		/// <summary>
+		/// Starts configuration of the node.
+		/// </summary>
+		public virtual void Configure()
+		{
+			Mouse.OverrideCursor = Cursors.Wait;
+			this.GetConfigurationForm((Sender, e2) =>
+			{
+				if (e2.Ok && e2.Form != null)
+					MainWindow.UpdateGui(MainWindow.currentInstance.ShowForm, e2.Form);
+				else
+					MainWindow.UpdateGui(MainWindow.currentInstance.ShowError, e2);
+
+				return Task.CompletedTask;
+			}, null);
 		}
 
 		/// <summary>

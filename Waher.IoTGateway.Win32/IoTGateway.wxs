@@ -1564,7 +1564,7 @@
 							</Component>
 						</Directory>
 						<Directory Id='Controls' Name='Controls'>
-							<Component Id='ControlFiles' Guid='9c6c1624-b970-4770-9245-798252976610'>
+							<Component Id='ControlFiles' Guid='9C6C1624-B970-4770-9245-798252976610'>
 								<CreateFolder>
 									<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
 								</CreateFolder>

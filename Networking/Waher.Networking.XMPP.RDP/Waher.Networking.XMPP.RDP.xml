@@ -113,9 +113,19 @@
             Height of screen
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.RDP.RemoteDesktopSession.TileSize">
+            <summary>
+            Tile size
+            </summary>
+        </member>
         <member name="P:Waher.Networking.XMPP.RDP.RemoteDesktopSession.DeviceName">
             <summary>
             Name of device
+            </summary>
+        </member>
+        <member name="E:Waher.Networking.XMPP.RDP.RemoteDesktopSession.TileUpdated">
+            <summary>
+            Event raised when a tile on the remote desktop has been updated.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.RDP.RemoteDesktopSessionState">
@@ -193,6 +203,40 @@
         <member name="P:Waher.Networking.XMPP.RDP.ScreenInfo.DeviceName">
             <summary>
             Name of device
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.RDP.TileEventArgs">
+            <summary>
+            Event arguments for tile events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.RDP.TileEventArgs.#ctor(Waher.Networking.XMPP.RDP.RemoteDesktopSession,System.Int32,System.Int32,System.String)">
+            <summary>
+            Event arguments for tile events.
+            </summary>
+            <param name="Session">Remote Desktop session.</param>
+            <param name="X">Tile X-coordinate of remote desktop screen.</param>
+            <param name="Y">Tile Y-coordinate of remote desktop screen.</param>
+            <param name="TileBase64">PNG of tile being updated, base64-encoded.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.TileEventArgs.Session">
+            <summary>
+            Remote Desktop session.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.TileEventArgs.TileBase64">
+            <summary>
+            PNG of tile being updated, base64-encoded.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.TileEventArgs.X">
+            <summary>
+            Tile X-coordinate of remote desktop screen.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.TileEventArgs.Y">
+            <summary>
+            Tile Y-coordinate of remote desktop screen.
             </summary>
         </member>
     </members>

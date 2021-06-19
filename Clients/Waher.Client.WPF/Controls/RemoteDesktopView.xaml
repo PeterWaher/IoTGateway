@@ -6,6 +6,5 @@
              xmlns:local="clr-namespace:Waher.Client.WPF.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="700" SizeChanged="UserControl_SizeChanged">
-    <DockPanel>
-    </DockPanel>
+    <Image Name="DesktopImage"/>
 </UserControl>

@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Events;
 using Waher.Runtime.Cache;
 
 namespace Waher.Networking.XMPP.RDP
@@ -32,6 +33,7 @@ namespace Waher.Networking.XMPP.RDP
 
 			Client.RegisterMessageHandler("started", RemoteDesktopNamespace, this.StartedMessageHandler, true);
 			Client.RegisterMessageHandler("stopped", RemoteDesktopNamespace, this.StoppedMessageHandler, false);
+			Client.RegisterMessageHandler("tile", RemoteDesktopNamespace, this.TileMessageHandler, false);
 		}
 
 		/// <summary>
@@ -41,6 +43,7 @@ namespace Waher.Networking.XMPP.RDP
 		{
 			this.client.UnregisterMessageHandler("started", RemoteDesktopNamespace, this.StartedMessageHandler, true);
 			this.client.UnregisterMessageHandler("stopped", RemoteDesktopNamespace, this.StoppedMessageHandler, false);
+			this.client.UnregisterMessageHandler("tile", RemoteDesktopNamespace, this.TileMessageHandler, false);
 
 			this.sessions.Dispose();
 			base.Dispose();
@@ -139,6 +142,7 @@ namespace Waher.Networking.XMPP.RDP
 			Session.Top = XML.Attribute(e.Content, "top", 0);
 			Session.Width = XML.Attribute(e.Content, "width", 0);
 			Session.Height = XML.Attribute(e.Content, "height", 0);
+			Session.TileSize = XML.Attribute(e.Content, "tileSize", 0);
 
 			foreach (XmlNode N in e.Content.ChildNodes)
 			{
@@ -175,5 +179,45 @@ namespace Waher.Networking.XMPP.RDP
 			return Task.CompletedTask;
 		}
 
+		private Task TileMessageHandler(object State, MessageEventArgs e)
+		{
+			RemoteDesktopSession Session = null;
+			string TileBase64 = null;
+			int X = 0;
+			int Y = 0;
+
+			foreach (XmlAttribute Attr in e.Content.Attributes)
+			{
+				switch (Attr.Name)
+				{
+					case "sessionId":
+						if (!this.sessions.TryGetValue(Attr.Value, out Session))
+							return Task.CompletedTask;
+						break;
+
+					case "x":
+						if (!int.TryParse(Attr.Value, out X))
+							return Task.CompletedTask;
+						break;
+
+					case "y":
+						if (!int.TryParse(Attr.Value, out Y))
+							return Task.CompletedTask;
+						break;
+
+					case "tile":
+						TileBase64 = Attr.InnerText;
+						break;
+
+				}
+			}
+
+			if (Session is null || TileBase64 is null)
+				return Task.CompletedTask;
+
+			Session.UpdateTile(X, Y, TileBase64);
+		
+			return Task.CompletedTask;
+		}
 	}
 }

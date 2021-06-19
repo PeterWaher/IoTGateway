@@ -19,6 +19,7 @@ namespace Waher.Networking.XMPP.RDP
 		private int top = 0;
 		private int width = 0;
 		private int height = 0;
+		private int tileSize = 0;
 
 		/// <summary>
 		/// Maintains the client-side state of a Remote Desktop Session.
@@ -58,6 +59,8 @@ namespace Waher.Networking.XMPP.RDP
 			{
 				if (this.state != value)
 				{
+					this.state = value;
+
 					try
 					{
 						this.StateChanged?.Invoke(this, new EventArgs());
@@ -130,6 +133,15 @@ namespace Waher.Networking.XMPP.RDP
 		}
 
 		/// <summary>
+		/// Tile size
+		/// </summary>
+		public int TileSize
+		{
+			get => this.tileSize;
+			internal set => this.tileSize = value;
+		}
+
+		/// <summary>
 		/// Name of device
 		/// </summary>
 		public string DeviceName
@@ -137,5 +149,22 @@ namespace Waher.Networking.XMPP.RDP
 			get => this.deviceName;
 			internal set => this.deviceName = value;
 		}
+
+		internal void UpdateTile(int X, int Y, string TileBase64)
+		{
+			try
+			{
+				this.TileUpdated?.Invoke(this, new TileEventArgs(this, X, Y, TileBase64));
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
+		/// Event raised when a tile on the remote desktop has been updated.
+		/// </summary>
+		public event EventHandler<TileEventArgs> TileUpdated;
 	}
 }

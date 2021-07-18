@@ -159,5 +159,34 @@ namespace Waher.Networking.WHOIS
 			}
 		}
 
+		/// <summary>
+		/// Gets the RDAP URI for an IP Address. It points to a JSON object containing WHOIS information about the IP Address.
+		/// </summary>
+		/// <param name="Address">IP Address</param>
+		/// <returns>RDAP URI, if available, null if not.</returns>
+		public static Uri RdapUri(IPAddress Address)
+		{
+			switch (Address.AddressFamily)
+			{
+				case AddressFamily.InterNetwork:
+					byte[] Bytes = Address.GetAddressBytes();
+					byte b = Bytes[0];
+
+					if (b >= ipv4ToWhoIsService.Length)
+						return null;
+
+					WhoIsIpv4ServiceEnum Service = ipv4ToWhoIsService[b];
+					string RdapService = rdapServices[(int)Service];
+
+					if (string.IsNullOrEmpty(RdapService))
+						return null;
+
+					return new Uri(RdapService + "ip/" + Address.ToString());
+
+				default:
+					return null;
+			}
+		}
+
 	}
 }

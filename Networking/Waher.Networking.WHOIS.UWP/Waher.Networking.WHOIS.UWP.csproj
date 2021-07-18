@@ -123,6 +123,7 @@
   <ItemGroup>
     <Compile Include="Ipv4ToWhoIsService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RdapServices.cs" />
     <Compile Include="WhoIsClient.cs" />
     <Compile Include="WhoIsIpv4ServiceEnum.cs" />
     <Compile Include="WhoIsIpv4Services.cs" />

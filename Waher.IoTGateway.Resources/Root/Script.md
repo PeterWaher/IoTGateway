@@ -1926,6 +1926,15 @@ The following functions are available in the `Waher.Service.NeuroLedger` library
 | `ToBinary(Object)`                 | Alias for `Serialize`.                                                                                                                                                                               | `Base64Encode(ToBinary(Obj))` |
 | `ToBinary(Vector)`                 | Alias for `Serialize`.                                                                                                                                                                               | `Base64Encode(ToBinary([Obj1,Obj2,Obj3]))` |
 
+#### IP Localization Extensions (available in Waher.Service.IoTBroker)
+
+The following functions are available in applications running on the IoT Broker (hosting the `Waher.Service.IoTBroker` library) 
+or the Neuron^TM.
+
+| Function        | Description                                      | Example               |
+|-----------------|--------------------------------------------------|-----------------------|
+| `IpLocale(IP)`  | Looks up locale information about an IP address. | `IpLocale("1.2.3.4")` |
+
 #### Multi-User Chat Extensions (available in Waher.Service.LittleSister, Waher.Service.IoTBroker)
 
 The following functions are available in applications using Multi-User Chat, such as the `Waher.Service.LittleSister` library,

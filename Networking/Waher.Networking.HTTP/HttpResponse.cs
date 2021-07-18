@@ -703,7 +703,7 @@ namespace Waher.Networking.HTTP
 							Output.Append(this.encoding.WebName);
 							this.txText = true;
 						}
-						else if (this.clientConnection.HasSniffers)
+						else if (this.clientConnection?.HasSniffers ?? false)
 							this.txText = HttpClientConnection.IsSniffableTextType(this.contentType);
 						else
 							this.txText = false;

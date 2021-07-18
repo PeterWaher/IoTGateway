@@ -65,6 +65,11 @@ namespace Waher.Content.Text
 				Grade = Grade.Excellent;
 				return true;
 			}
+			else if (ContentType.StartsWith("application/") && ContentType.EndsWith("+json"))
+			{
+				Grade = Grade.Ok;
+				return true;
+			}
 			else
 			{
 				Grade = Grade.NotAtAll;
@@ -117,15 +122,22 @@ namespace Waher.Content.Text
 		/// <returns>If the Content-Type was recognized.</returns>
 		public bool TryGetFileExtension(string ContentType, out string FileExtension)
 		{
-			switch (ContentType.ToLower())
-			{
-				case "application/json":
-					FileExtension = "json";
-					return true;
+			ContentType = ContentType.ToLower();
 
-				default:
-					FileExtension = string.Empty;
-					return false;
+			if (Array.IndexOf<string>(ContentTypes, ContentType) >= 0)
+			{
+				FileExtension = "json";
+				return true;
+			}
+			else if (ContentType.StartsWith("application/") && ContentType.EndsWith("+json"))
+			{
+				FileExtension = ContentType.Substring(12, ContentType.Length - 5 - 12);
+				return true;
+			}
+			else
+			{
+				FileExtension = string.Empty;
+				return false;
 			}
 		}
 
@@ -157,7 +169,7 @@ namespace Waher.Content.Text
 					Object is long ||
 					Object is short ||
 					Object is byte ||
-					Object is uint||
+					Object is uint ||
 					Object is ulong ||
 					Object is ushort ||
 					Object is sbyte ||

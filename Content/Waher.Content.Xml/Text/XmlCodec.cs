@@ -66,6 +66,11 @@ namespace Waher.Content.Xml.Text
 				Grade = Grade.Excellent;
 				return true;
 			}
+			else if (ContentType.StartsWith("application/") && ContentType.EndsWith("+xml"))
+			{
+				Grade = Grade.Ok;
+				return true;
+			}
 			else
 			{
 				Grade = Grade.NotAtAll;
@@ -138,6 +143,8 @@ namespace Waher.Content.Xml.Text
 		/// <returns>If the Content-Type was recognized.</returns>
 		public bool TryGetFileExtension(string ContentType, out string FileExtension)
 		{
+			ContentType = ContentType.ToLower();
+
 			switch (ContentType.ToLower())
 			{
 				case "text/xml":
@@ -149,8 +156,16 @@ namespace Waher.Content.Xml.Text
 					return true;
 
 				default:
-					FileExtension = string.Empty;
-					return false;
+					if (ContentType.StartsWith("application/") && ContentType.EndsWith("+xml"))
+					{
+						FileExtension = ContentType.Substring(12, ContentType.Length - 4 - 12);
+						return true;
+					}
+					else
+					{
+						FileExtension = string.Empty;
+						return false;
+					}
 			}
 		}
 

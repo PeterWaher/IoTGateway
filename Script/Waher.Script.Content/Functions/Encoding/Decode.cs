@@ -49,12 +49,17 @@ namespace Waher.Script.Content.Functions.Encoding
 
 			string ContentType = Argument2 is StringValue S2 ? S2.Value : Expression.ToString(Argument2.AssociatedObjectValue);
 
-			return this.DoDecode(Bin, ContentType, System.Text.Encoding.UTF8);
+			return this.DoDecode(Bin, ContentType, null);
 		}
 
 		private IElement DoDecode(byte[] Data, string ContentType, System.Text.Encoding Encoding)
 		{
-			object Decoded = InternetContent.Decode(ContentType, Data, Encoding, new KeyValuePair<string, string>[0], null);
+			object Decoded;
+
+			if (Encoding is null)
+				Decoded = InternetContent.Decode(ContentType, Data, null);
+			else
+				Decoded = InternetContent.Decode(ContentType, Data, Encoding, new KeyValuePair<string, string>[0], null);
 
 			if (Decoded is string[][] Records)
 			{

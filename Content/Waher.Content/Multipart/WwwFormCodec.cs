@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
-using Waher.Content;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Multipart
@@ -10,7 +8,7 @@ namespace Waher.Content.Multipart
 	/// <summary>
 	/// Decoder of URL encoded web forms.
 	/// </summary>
-	public class WwwFormDecoder : IContentDecoder
+	public class WwwFormCodec : IContentDecoder, IContentEncoder
 	{
 		/// <summary>
 		/// application/x-www-form-urlencoded
@@ -20,7 +18,7 @@ namespace Waher.Content.Multipart
 		/// <summary>
 		/// Decoder of URL encoded web forms.
 		/// </summary>
-		public WwwFormDecoder()
+		public WwwFormCodec()
 		{
 		}
 
@@ -60,7 +58,7 @@ namespace Waher.Content.Multipart
 		/// <returns>If the decoder can decode an object with the given type.</returns>
 		public bool Decodes(string ContentType, out Grade Grade)
 		{
-			if (ContentType == WwwFormDecoder.ContentType)
+			if (ContentType == WwwFormCodec.ContentType)
 			{
 				Grade = Grade.Excellent;
 				return true;
@@ -115,7 +113,7 @@ namespace Waher.Content.Multipart
 		{
 			if (FileExtension.ToLower() == "webform")
 			{
-				ContentType = WwwFormDecoder.ContentType;
+				ContentType = WwwFormCodec.ContentType;
 				return true;
 			}
 			else
@@ -135,7 +133,7 @@ namespace Waher.Content.Multipart
 		{
 			switch (ContentType.ToLower())
 			{
-				case WwwFormDecoder.ContentType:
+				case WwwFormCodec.ContentType:
 					FileExtension = "webform";
 					return true;
 
@@ -143,6 +141,72 @@ namespace Waher.Content.Multipart
 					FileExtension = string.Empty;
 					return false;
 			}
+		}
+
+		/// <summary>
+		/// If the encoder encodes a given object.
+		/// </summary>
+		/// <param name="Object">Object to encode.</param>
+		/// <param name="Grade">How well the encoder encodes the object.</param>
+		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+		/// <returns>If the encoder can encode the given object.</returns>
+		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
+		{
+			if (Object is Dictionary<string, string> &&
+				InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
+			{
+				Grade = Grade.Ok;
+				return true;
+			}
+			else
+			{
+				Grade = Grade.NotAtAll;
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Encodes an object.
+		/// </summary>
+		/// <param name="Object">Object to encode.</param>
+		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+		/// <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
+		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+		/// <returns>Encoded object.</returns>
+		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
+		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
+		{
+			if (Object is Dictionary<string, string> Form &&
+				InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
+			{
+				StringBuilder sb = new StringBuilder();
+				bool First = true;
+
+				foreach (KeyValuePair<string, string> Pair in Form)
+				{
+					if (First)
+						First = false;
+					else
+						sb.Append('&');
+
+					sb.Append(Uri.EscapeDataString(Pair.Key));
+					sb.Append('=');
+					sb.Append(Uri.EscapeDataString(Pair.Value));
+				}
+
+				if (Encoding is null)
+				{
+					ContentType = WwwFormCodec.ContentType + "; charset=utf-8";
+					return Encoding.UTF8.GetBytes(sb.ToString());
+				}
+				else
+				{
+					ContentType = WwwFormCodec.ContentType + "; charset=" + Encoding.WebName;
+					return Encoding.GetBytes(sb.ToString());
+				}
+			}
+			else
+				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
 		}
 
 	}

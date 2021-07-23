@@ -118,6 +118,49 @@
             <param name="Object">Object</param>
             <returns>Generaized object.</returns>
         </member>
+        <member name="T:Waher.Script.Persistence.Functions.GetSetting">
+            <summary>
+            Gets a runtime setting with name `Name`. If one is not found, the `DefaultValue` value is returned.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.GetSetting.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Gets a runtime setting with name `Name`. If one is not found, the `DefaultValue` value is returned.
+            </summary>
+            <param name="Name">Name of runtime setting parameter.</param>
+            <param name="DefaultValue">Default value, if setting not found.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.GetSetting.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.GetSetting.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.GetSetting.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.GetSetting.EvaluateScalar(System.String,System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.Functions.Pivot">
             <summary>
             Pivots a result matrix so columns become rows, and vice versa. It is similar to the matrix transpose operator, except it takes
@@ -181,6 +224,49 @@
             Evaluates the function on a scalar argument.
             </summary>
             <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Persistence.Functions.SetSetting">
+            <summary>
+            Sets a runtime setting with name `Name` to the value `Value`.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.SetSetting.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Sets a runtime setting with name `Name` to the value `Value`.
+            </summary>
+            <param name="Name">Name of runtime setting parameter.</param>
+            <param name="Value">Default value, if setting not found.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.SetSetting.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Persistence.Functions.SetSetting.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.SetSetting.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.SetSetting.EvaluateScalar(System.String,System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>

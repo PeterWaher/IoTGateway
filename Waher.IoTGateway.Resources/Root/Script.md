@@ -1586,15 +1586,17 @@ The following functions are available in the `Waher.Script.Networking` library.
 
 The following functions are available in the `Waher.Script.Persistence` library.
 
-| Function | Description | Example |
-|----------|-------------|---------|
-| `DeleteObject(Obj)`  | Deletes an object from the underlying persistence layer. | `Delete(Obj)` |
+| Function                                                 | Description | Example |
+|----------------------------------------------------------|-------------|---------|
+| `DeleteObject(Obj)`                                      | Deletes an object from the underlying persistence layer. | `Delete(Obj)` |
 | `FindObjects(Type, Offset, MaxCount, Filter, SortOrder)` | Finds objects of a given `Type`. `Offset` and `MaxCount` provide a means to paginate the result set. `Filter` can be null, if none is used, or a string containing an expression to limit the result set. `SortOrder` sorts the result. It also determines the index to use. | `FindObjects(Namespace.CustomType, 0, 10, "StringProperty='StringValue'", ["Property1","Property2"])` |
-| `Generalize(Object)` | Creates a generalized representation of the data in the object `Object`. This generalized representation can be more easily serialized, to JSON for instance. | `generalize(Obj)` |
-| `Pivot(Result)`      | Pivots a result matrix so columns become rows, and vice versa. It is similar to the matrix transpose operator, except it takes column headers into account also. | `pivot(select Type, count(*) Nr from PersistedEvent group by Type)` |
-| `SaveNewObject(Obj)` | Saves a new object to the underlying persistence layer. | `SaveNewObject(Obj)` |
-| `UpdateObject(Obj)`  | Updates an object in the underlying persistence layer. | `UpdateObject(Obj)` |
-| `XPath(Expression)`  | Specifies an XPath-expression. | `XPath("Element/@Attr")` |
+| `Generalize(Object)`                                     | Creates a generalized representation of the data in the object `Object`. This generalized representation can be more easily serialized, to JSON for instance. | `generalize(Obj)` |
+| `GetSetting(Name,DefaultValue)`                          | Gets a runtime setting with name `Name`. If one is not found, the `DefaultValue` value is returned. | `GetSetting("Name","Kilroy")` |
+| `Pivot(Result)`                                          | Pivots a result matrix so columns become rows, and vice versa. It is similar to the matrix transpose operator, except it takes column headers into account also. | `pivot(select Type, count(*) Nr from PersistedEvent group by Type)` |
+| `SaveNewObject(Obj)`                                     | Saves a new object to the underlying persistence layer. | `SaveNewObject(Obj)` |
+| `SetSetting(Name,Value) `                                | Sets a runtime setting with name `Name`. | `SetSetting("Name","Kilroy")` |
+| `UpdateObject(Obj)`                                      | Updates an object in the underlying persistence layer. | `UpdateObject(Obj)` |
+| `XPath(Expression)`                                      | Specifies an XPath-expression. | `XPath("Element/@Attr")` |
 
 #### Statistics-related functions (Waher.Script.Statistics)
 
@@ -1832,16 +1834,16 @@ The following functions return HTTP server error responses back to he client:
 
 | Function                               | Code | Description |
 |----------------------------------------|-----:|-------------|
-| BadGateway(Content)                    |  502 | Returns the Bad Gateway server error message back to the client.                   |
-| GatewayTimeout(Content)                |  504 | Returns the Gateway Timeout server error message back to the client.                   |
-| InsufficientStorage(Content)           |  507 | Returns the Insufficient Storage server error message back to the client.                   |
-| InternalServerError(Content)           |  500 | Returns the Internal Server Error server error message back to the client.                   |
+| BadGateway(Content)                    |  502 | Returns the Bad Gateway server error message back to the client.                     |
+| GatewayTimeout(Content)                |  504 | Returns the Gateway Timeout server error message back to the client.                 |
+| InsufficientStorage(Content)           |  507 | Returns the Insufficient Storage server error message back to the client.            |
+| InternalServerError(Content)           |  500 | Returns the Internal Server Error server error message back to the client.           |
 | LoopDetected(Content)                  |  508 | Returns the Loop Detected server error message back to the client.                   |
-| NetworkAuthenticationRequired(Content) |  511 | Returns the Network Authentication Required server error message back to the client.                   |
-| NotExtended(Content)                   |  510 | Returns the Not Extended server error message back to the client.                   |
-| NotImplemented(Content)                |  501 | Returns the Not Implemented server error message back to the client.                   |
-| ServiceUnavailable(Content)            |  503 | Returns the Service Unavailable server error message back to the client.                   |
-| VariantAlsoNegotiates(Content)         |  506 | Returns the Variant Also Negotiates server error message back to the client.                   |
+| NetworkAuthenticationRequired(Content) |  511 | Returns the Network Authentication Required server error message back to the client. |
+| NotExtended(Content)                   |  510 | Returns the Not Extended server error message back to the client.                    |
+| NotImplemented(Content)                |  501 | Returns the Not Implemented server error message back to the client.                 |
+| ServiceUnavailable(Content)            |  503 | Returns the Service Unavailable server error message back to the client.             |
+| VariantAlsoNegotiates(Content)         |  506 | Returns the Variant Also Negotiates server error message back to the client.         |
 
 The following predefined variables are available in such web content files:
 

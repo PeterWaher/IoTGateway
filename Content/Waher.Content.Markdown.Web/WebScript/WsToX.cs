@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using SkiaSharp;
-using Waher.Content;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Inventory;
 using Waher.Script;

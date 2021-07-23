@@ -72,9 +72,21 @@
             Web Script encoder/decoder.
             </summary>
         </member>
+        <member name="M:Waher.Content.Markdown.Web.WebScript.WsCodec.AllowRawEncoding(System.Boolean,System.Boolean)">
+            <summary>
+            If raw encoding of web script should be allowed.
+            </summary>
+            <param name="Allow">If Raw encoding should be allowed.</param>
+            <param name="Lock">If settings should be locked.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.Web.WebScript.WsCodec.#ctor">
             <summary>
             Web Script encoder/decoder.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.Web.WebScript.WsCodec.ContentType">
+            <summary>
+            Markdown content type.
             </summary>
         </member>
         <member name="F:Waher.Content.Markdown.Web.WebScript.WsCodec.WsContentTypes">

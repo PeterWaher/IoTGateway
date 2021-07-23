@@ -11,6 +11,23 @@ namespace Waher.Content.Markdown.Web.WebScript
 	/// </summary>
 	public class WsCodec : IContentDecoder, IContentEncoder
 	{
+		private static bool allowEncoding = true;
+		private static bool locked = false;
+
+		/// <summary>
+		/// If raw encoding of web script should be allowed.
+		/// </summary>
+		/// <param name="Allow">If Raw encoding should be allowed.</param>
+		/// <param name="Lock">If settings should be locked.</param>
+		public static void AllowRawEncoding(bool Allow, bool Lock)
+		{
+			if (locked)
+				throw new InvalidOperationException("Setting has been locked.");
+
+			allowEncoding = Allow;
+			locked = Lock;
+		}
+
 		/// <summary>
 		/// Web Script encoder/decoder.
 		/// </summary>
@@ -19,11 +36,16 @@ namespace Waher.Content.Markdown.Web.WebScript
 		}
 
 		/// <summary>
+		/// Markdown content type.
+		/// </summary>
+		public const string ContentType = "application/x-webscript";
+
+		/// <summary>
 		/// Plain text content types.
 		/// </summary>
 		public static readonly string[] WsContentTypes = new string[] 
 		{
- 			"application/x-webscript"
+ 			ContentType
 		};
 
 		/// <summary>
@@ -31,7 +53,7 @@ namespace Waher.Content.Markdown.Web.WebScript
 		/// </summary>
 		public static readonly string[] WsFileExtensions = new string[] 
 		{ 
-			"ws"
+			"ws", "script"
 		};
 
 		/// <summary>
@@ -97,6 +119,7 @@ namespace Waher.Content.Markdown.Web.WebScript
 			switch (FileExtension.ToLower())
 			{
 				case "ws":
+				case "script":
 					ContentType = "application/x-webscript";
 					return true;
 
@@ -135,7 +158,7 @@ namespace Waher.Content.Markdown.Web.WebScript
 		/// <returns>If the encoder can encode the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if (Object is Expression)
+			if (allowEncoding && Object is Expression)
 			{
 				if (InternetContent.IsAccepted(WsContentTypes, AcceptedContentTypes))
 				{
@@ -159,7 +182,7 @@ namespace Waher.Content.Markdown.Web.WebScript
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
 		{
-			if (InternetContent.IsAccepted(WsContentTypes, out ContentType, AcceptedContentTypes))
+			if (allowEncoding && InternetContent.IsAccepted(WsContentTypes, out ContentType, AcceptedContentTypes))
 			{
 				string s = null;
 
@@ -184,7 +207,6 @@ namespace Waher.Content.Markdown.Web.WebScript
 			}
 
 			throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
-
 		}
 	}
 }

@@ -23,6 +23,7 @@ using Waher.Content.Markdown.GraphViz;
 using Waher.Content.Markdown.Layout2D;
 using Waher.Content.Markdown.PlantUml;
 using Waher.Content.Markdown.Web;
+using Waher.Content.Markdown.Web.WebScript;
 using Waher.Content.SystemFiles;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
@@ -512,6 +513,14 @@ namespace Waher.IoTGateway
 					new LoginInterval(2, TimeSpan.FromDays(7)),     // Maximum 2x2x5 failed login attempts in a week
 					new LoginInterval(2, TimeSpan.MaxValue));       // Maximum 2x2x2x5 failed login attempts in total, then blocked.
 				Log.Register(loginAuditor);
+
+				// Protecting Markdown resources:
+				MarkdownCodec.AllowRawEncoding(false, true);
+				HttpFolderResource.ProtectContentType(MarkdownCodec.ContentType);
+
+				// Protecting web-script resources:
+				WsCodec.AllowRawEncoding(false, true);
+				HttpFolderResource.ProtectContentType(WsCodec.ContentType);
 
 				Dictionary<string, Type> SystemConfigurationTypes = new Dictionary<string, Type>();
 				Dictionary<string, SystemConfiguration> SystemConfigurations = new Dictionary<string, SystemConfiguration>();

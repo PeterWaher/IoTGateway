@@ -41,6 +41,7 @@ namespace Waher.Networking.HTTP
 	{
 		private const int BufferSize = 32768;
 
+		private readonly static Dictionary<string, bool> protectedContentTypes = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
 		private readonly Dictionary<string, CacheRec> cacheInfo = new Dictionary<string, CacheRec>();
 		private readonly Dictionary<string, bool> definedDomains = new Dictionary<string, bool>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly Dictionary<string, string> folders = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
@@ -119,6 +120,18 @@ namespace Waher.Networking.HTTP
 
 			this.FolderPath = FolderPath;
 
+		}
+
+		/// <summary>
+		/// Protects a content type, so that it cannot be retrieved in raw format by external parties through any folder resources.
+		/// </summary>
+		/// <param name="ContentType">Content type to protect.</param>
+		public static void ProtectContentType(string ContentType)
+		{
+			lock (protectedContentTypes)
+			{
+				protectedContentTypes[ContentType] = true;
+			}
 		}
 
 		/// <summary>
@@ -552,7 +565,7 @@ namespace Waher.Networking.HTTP
 
 			Dynamic = false;
 
-			if (Header.Accept != null)
+			if (!(Header.Accept is null))
 			{
 				bool Acceptable = Header.Accept.IsAcceptable(ContentType, out double Quality, out AcceptanceLevel TypeAcceptance, null);
 
@@ -625,7 +638,7 @@ namespace Waher.Networking.HTTP
 						}
 					}
 
-					if (Acceptable && Converter != null)
+					if (Acceptable && !(Converter is null))
 					{
 						Stream f2 = null;
 						Stream f = File.Open(FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -690,6 +703,12 @@ namespace Waher.Networking.HTTP
 
 				if (!Acceptable)
 					throw new NotAcceptableException();
+			}
+
+			lock (protectedContentTypes)
+			{
+				if (protectedContentTypes.TryGetValue(ContentType, out bool Protected) && Protected)
+					throw new ForbiddenException("Resource is protected.");
 			}
 
 			return null;

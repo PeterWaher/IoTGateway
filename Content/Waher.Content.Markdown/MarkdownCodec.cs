@@ -10,6 +10,23 @@ namespace Waher.Content.Markdown
 	/// </summary>
 	public class MarkdownCodec : IContentDecoder, IContentEncoder
 	{
+		private static bool allowEncoding = true;
+		private static bool locked = false;
+
+		/// <summary>
+		/// If raw encoding of web script should be allowed.
+		/// </summary>
+		/// <param name="Allow">If Raw encoding should be allowed.</param>
+		/// <param name="Lock">If settings should be locked.</param>
+		public static void AllowRawEncoding(bool Allow, bool Lock)
+		{
+			if (locked)
+				throw new InvalidOperationException("Setting has been locked.");
+
+			allowEncoding = Allow;
+			locked = Lock;
+		}
+
 		/// <summary>
 		/// Markdown encoder/decoder.
 		/// </summary>
@@ -94,7 +111,7 @@ namespace Waher.Content.Markdown
 		/// <returns>If the encoder can encode the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if (Object is MarkdownDocument && InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
+			if (allowEncoding && Object is MarkdownDocument && InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Excellent;
 				return true;
@@ -117,20 +134,21 @@ namespace Waher.Content.Markdown
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
 		{
-			MarkdownDocument MarkdownDocument = Object as MarkdownDocument;
-			if (MarkdownDocument is null)
-				throw new ArgumentException("Object not a markdown document.", nameof(Object));
+			if (allowEncoding && Object is MarkdownDocument MarkdownDocument)
+			{
+				if (Encoding is null)
+				{
+					ContentType = "text/markdown; charset=utf-8";
+					return Encoding.UTF8.GetBytes(MarkdownDocument.MarkdownText);
+				}
+				else
+				{
+					ContentType = "text/markdown; charset=" + Encoding.WebName;
+					return Encoding.GetBytes(MarkdownDocument.MarkdownText);
+				}
+			}
 
-			if (Encoding is null)
-			{
-				ContentType = "text/markdown; charset=utf-8";
-				return System.Text.Encoding.UTF8.GetBytes(Object.ToString());
-			}
-			else
-			{
-				ContentType = "text/markdown; charset=" + Encoding.WebName;
-				return Encoding.GetBytes(Object.ToString());
-			}
+			throw new ArgumentException("Object not a markdown document.", nameof(Object));
 		}
 
 		/// <summary>

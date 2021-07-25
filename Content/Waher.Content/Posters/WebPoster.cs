@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
+using Waher.Content.Getters;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Posters
@@ -70,17 +70,35 @@ namespace Waher.Content.Posters
 				})
 				{
 					Request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(ContentType);
-					Getters.WebGetter.PrepareHeaders(Request, Headers);
+					WebGetter.PrepareHeaders(Request, Headers);
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
-					Response.EnsureSuccessStatusCode();
-					
-					byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
-					string ContentType2 = Response.Content.Headers.ContentType.ToString();
 
-					return new KeyValuePair<byte[], string>(Bin, ContentType2);
+					return await ProcessResponse(Response, Uri);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Decodes a response from the web. If the response is a success, the decoded response is returned.
+		/// If the response is not a success, a <see cref="WebException"/> is thrown.
+		/// </summary>
+		/// <param name="Response">Web response.</param>
+		/// <param name="Uri">Original URI of request.</param>
+		/// <returns>Decoded response, if success.</returns>
+		/// <exception cref="WebException">If response does not indicate a success.</exception>
+		public static async Task<KeyValuePair<byte[], string>> ProcessResponse(HttpResponseMessage Response, Uri Uri)
+		{
+			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
+			string ContentType = Response.Content.Headers.ContentType.ToString();
+
+			if (!Response.IsSuccessStatusCode)
+			{
+				object Decoded = InternetContent.Decode(ContentType, Bin, Uri);
+				throw new WebException(Decoded as string ?? Decoded.ToString(), Response.StatusCode, ContentType, Bin, Decoded);
+			}
+
+			return new KeyValuePair<byte[], string>(Bin, ContentType);
 		}
 
 	}

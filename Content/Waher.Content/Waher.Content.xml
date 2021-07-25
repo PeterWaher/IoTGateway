@@ -690,6 +690,41 @@
             <param name="Seconds">Number of seconds.</param>
             <returns><see cref="T:Waher.Content.Duration"/> object.</returns>
         </member>
+        <member name="T:Waher.Content.Getters.WebException">
+            <summary>
+            Exception class for web exceptions.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Getters.WebException.#ctor(System.String,System.Net.HttpStatusCode,System.String,System.Byte[],System.Object)">
+            <summary>
+            Exception class for web exceptions.
+            </summary>
+            <param name="Message">Exception message.</param>
+            <param name="StatusCode">HTTP Status Code returned.</param>
+            <param name="ContentType">Content-Type of response.</param>
+            <param name="RawContent">Raw undecoded content, in binary form.</param>
+            <param name="Content">Decoded content.</param>
+        </member>
+        <member name="P:Waher.Content.Getters.WebException.StatusCode">
+            <summary>
+            HTTP Status Code of content.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Getters.WebException.ContentType">
+            <summary>
+            Content-Type of response.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Getters.WebException.RawContent">
+            <summary>
+            Raw undecoded content, in binary form.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Getters.WebException.Content">
+            <summary>
+            Decoded content.
+            </summary>
+        </member>
         <member name="T:Waher.Content.Getters.WebGetter">
             <summary>
             Gets resources from the Web (i.e. using HTTP or HTTPS).
@@ -729,6 +764,16 @@
             <param name="TimeoutMs">Timeout, in milliseconds.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded object.</returns>
+        </member>
+        <member name="M:Waher.Content.Getters.WebGetter.ProcessResponse(System.Net.Http.HttpResponseMessage,System.Uri)">
+            <summary>
+            Decodes a response from the web. If the response is a success, the decoded response is returned.
+            If the response is not a success, a <see cref="T:Waher.Content.Getters.WebException"/> is thrown.
+            </summary>
+            <param name="Response">Web response.</param>
+            <param name="Uri">Original URI of request.</param>
+            <returns>Decoded response, if success.</returns>
+            <exception cref="T:Waher.Content.Getters.WebException">If response does not indicate a success.</exception>
         </member>
         <member name="M:Waher.Content.Getters.WebGetter.GetTempStreamAsync(System.Uri,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
@@ -2030,6 +2075,16 @@
             <param name="TimeoutMs">Timeout, in milliseconds.</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.Posters.WebPoster.ProcessResponse(System.Net.Http.HttpResponseMessage,System.Uri)">
+            <summary>
+            Decodes a response from the web. If the response is a success, the decoded response is returned.
+            If the response is not a success, a <see cref="T:Waher.Content.Getters.WebException"/> is thrown.
+            </summary>
+            <param name="Response">Web response.</param>
+            <param name="Uri">Original URI of request.</param>
+            <returns>Decoded response, if success.</returns>
+            <exception cref="T:Waher.Content.Getters.WebException">If response does not indicate a success.</exception>
         </member>
         <member name="T:Waher.Content.Resources">
             <summary>

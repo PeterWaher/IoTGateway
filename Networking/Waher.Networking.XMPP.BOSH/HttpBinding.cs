@@ -279,7 +279,9 @@ namespace Waher.Networking.XMPP.BOSH
 				this.bindingInterface.NextPing = DateTime.Now.AddMinutes(1);
 
 				HttpResponseMessage Response = await this.httpClients[0].PostAsync(this.url, Content);
-				Response.EnsureSuccessStatusCode();
+
+				if (!Response.IsSuccessStatusCode)
+					await Waher.Content.Getters.WebGetter.ProcessResponse(Response, this.url);
 
 				Stream Stream = await Response.Content.ReadAsStreamAsync(); // Regardless of status code, we check for XML content.
 				XmlElement Body;
@@ -651,7 +653,9 @@ namespace Waher.Networking.XMPP.BOSH
 					this.bindingInterface.NextPing = DateTime.Now.AddSeconds(this.waitSeconds + 5);
 
 					HttpResponseMessage Response = await this.httpClients[ClientIndex].PostAsync(this.url, Content);
-					Response.EnsureSuccessStatusCode();
+
+					if (!Response.IsSuccessStatusCode)
+						await Waher.Content.Getters.WebGetter.ProcessResponse(Response, this.url);
 
 					lock (this.httpClients)
 					{

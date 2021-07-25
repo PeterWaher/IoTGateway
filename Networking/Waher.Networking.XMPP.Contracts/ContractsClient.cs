@@ -5031,7 +5031,8 @@ namespace Waher.Networking.XMPP.Contracts
 						}
 					}
 
-					Response.EnsureSuccessStatusCode();
+					if (!Response.IsSuccessStatusCode)
+						await Content.Getters.WebGetter.ProcessResponse(Response, Request.RequestUri);
 
 					string ContentType = Response.Content.Headers.ContentType.ToString();
 					TemporaryFile File = new TemporaryFile();

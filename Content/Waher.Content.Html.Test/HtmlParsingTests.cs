@@ -28,7 +28,8 @@ namespace Waher.Content.Html.Test
 			Client.DefaultRequestHeaders.ExpectContinue = false;
 
 			HttpResponseMessage Response = await Client.GetAsync(Url);
-			Response.EnsureSuccessStatusCode();
+			if (!Response.IsSuccessStatusCode)
+				await Getters.WebGetter.ProcessResponse(Response, new Uri(Url));
 
 			byte[] Data = await Response.Content.ReadAsByteArrayAsync();
 			string ContentType = Response.Content.Headers.ContentType.ToString();

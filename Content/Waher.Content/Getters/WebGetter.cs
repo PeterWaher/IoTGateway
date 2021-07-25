@@ -80,15 +80,30 @@ namespace Waher.Content.Getters
 					PrepareHeaders(Request, Headers);
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
-					Response.EnsureSuccessStatusCode();
 
-					byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
-					string ContentType = Response.Content.Headers.ContentType.ToString();
-					object Decoded = InternetContent.Decode(ContentType, Bin, Uri);
-
-					return Decoded;
+					return await ProcessResponse(Response, Uri);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Decodes a response from the web. If the response is a success, the decoded response is returned.
+		/// If the response is not a success, a <see cref="WebException"/> is thrown.
+		/// </summary>
+		/// <param name="Response">Web response.</param>
+		/// <param name="Uri">Original URI of request.</param>
+		/// <returns>Decoded response, if success.</returns>
+		/// <exception cref="WebException">If response does not indicate a success.</exception>
+		public static async Task<object> ProcessResponse(HttpResponseMessage Response, Uri Uri)
+		{
+			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
+			string ContentType = Response.Content.Headers.ContentType.ToString();
+			object Decoded = InternetContent.Decode(ContentType, Bin, Uri);
+
+			if (!Response.IsSuccessStatusCode)
+				throw new WebException(Decoded as string ?? Decoded.ToString(), Response.StatusCode, ContentType, Bin, Decoded);
+
+			return Decoded;
 		}
 
 		internal static void PrepareHeaders(HttpRequestMessage Request, KeyValuePair<string, string>[] Headers)
@@ -146,7 +161,9 @@ namespace Waher.Content.Getters
 					PrepareHeaders(Request, Headers);
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
-					Response.EnsureSuccessStatusCode();
+
+					if (!Response.IsSuccessStatusCode)
+						await ProcessResponse(Response, Uri);
 
 					string ContentType = Response.Content.Headers.ContentType.ToString();
 					TemporaryStream File = new TemporaryStream();

@@ -52,6 +52,7 @@
     <Compile Include=".bak\Waher.Content\Audio\AudioDecoder.cs" />
     <Compile Include=".bak\Waher.Content\Base64Url.cs" />
     <Compile Include=".bak\Waher.Content\Binary\BinaryDecoder.cs" />
+    <Compile Include=".bak\Waher.Content\Getters\WebException.cs" />
     <Compile Include=".bak\Waher.Content\Getters\WebGetter.cs" />
     <Compile Include=".bak\Waher.Content\IContentGetter.cs" />
     <Compile Include=".bak\Waher.Content\IContentPoster.cs" />
@@ -65,11 +66,13 @@
     <Compile Include=".bak\Waher.Content\Multipart\MultipartContent.cs" />
     <Compile Include=".bak\Waher.Content\Multipart\RelatedCodec.cs" />
     <Compile Include=".bak\Waher.Content\Multipart\RelatedContent.cs" />
+    <Compile Include=".bak\Waher.Content\Multipart\WwwFormCodec.cs" />
     <Compile Include=".bak\Waher.Content\Multipart\WwwFormDecoder.cs" />
     <Compile Include=".bak\Waher.Content\Posters\PosterBase.cs" />
     <Compile Include=".bak\Waher.Content\Posters\WebPoster.cs" />
     <Compile Include=".bak\Waher.Content\Text\CsvCodec.cs" />
     <Compile Include=".bak\Waher.Content\Text\JsonCodec.cs" />
+    <Compile Include=".bak\Waher.Content\Text\JsonOutput.cs" />
     <Compile Include=".bak\Waher.Content\Text\PlainTextCodec.cs" />
     <Compile Include=".bak\Waher.Content\Video\VideoDecoder.cs" />
     <Compile Include=".bak\Waher.Events\DebugEventSink.cs" />

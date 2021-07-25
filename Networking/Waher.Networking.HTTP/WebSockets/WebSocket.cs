@@ -175,7 +175,7 @@ namespace Waher.Networking.HTTP.WebSockets
 			{
 				try
 				{
-					h(this, new EventArgs());
+					h(this, EventArgs.Empty);
 				}
 				catch (Exception ex)
 				{
@@ -572,7 +572,7 @@ namespace Waher.Networking.HTTP.WebSockets
 					{
 						try
 						{
-							Callback(this, new EventArgs());
+							Callback(this, EventArgs.Empty);
 						}
 						catch (Exception ex)
 						{

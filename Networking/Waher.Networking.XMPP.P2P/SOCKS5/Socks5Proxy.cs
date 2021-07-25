@@ -204,7 +204,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				{
 					try
 					{
-						this.Callback(this.Proxy, new EventArgs());
+						this.Callback(this.Proxy, EventArgs.Empty);
 					}
 					catch (Exception ex)
 					{

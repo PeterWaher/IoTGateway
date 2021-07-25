@@ -99,7 +99,7 @@ namespace Waher.Events
 				}
 			}
 
-			Terminating?.Invoke(null, new EventArgs());
+			Terminating?.Invoke(null, EventArgs.Empty);
 		}
 
 		/// <summary>

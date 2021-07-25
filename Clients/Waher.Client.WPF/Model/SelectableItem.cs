@@ -29,7 +29,7 @@ namespace Waher.Client.WPF.Model
 			{
 				try
 				{
-					h(this, new EventArgs());
+					h(this, EventArgs.Empty);
 				}
 				catch (Exception ex)
 				{

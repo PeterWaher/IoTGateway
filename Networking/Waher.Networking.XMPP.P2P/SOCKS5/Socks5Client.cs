@@ -202,7 +202,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				{
 					try
 					{
-						await h(this, new EventArgs());
+						await h(this, EventArgs.Empty);
 					}
 					catch (Exception ex)
 					{

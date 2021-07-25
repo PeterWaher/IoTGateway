@@ -376,7 +376,7 @@ namespace Waher.Client.WPF.Model
 		public virtual void Delete(TreeNode Parent, EventHandler OnDeleted)
 		{
 			Parent?.RemoveChild(this);
-			OnDeleted?.Invoke(this, new EventArgs());
+			OnDeleted?.Invoke(this, EventArgs.Empty);
 		}
 
 		/// <summary>

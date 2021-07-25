@@ -300,7 +300,7 @@ namespace Waher.Runtime.Inventory
 			{
 				try
 				{
-					h(typeof(Types), new EventArgs());
+					h(typeof(Types), EventArgs.Empty);
 				}
 				catch (Exception ex)
 				{

@@ -379,7 +379,7 @@ namespace Waher.Networking.PeerToPeer
 				{
 					try
 					{
-						this.resynchCallback(this, new EventArgs());
+						this.resynchCallback(this, EventArgs.Empty);
 
 						this.closed = true;
 						this.Dispose();
@@ -402,7 +402,7 @@ namespace Waher.Networking.PeerToPeer
 			{
 				try
 				{
-					h(this, new EventArgs());
+					h(this, EventArgs.Empty);
 				}
 				catch (Exception ex)
 				{

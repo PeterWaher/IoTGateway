@@ -708,7 +708,7 @@ namespace Waher.Content.Markdown.Consolidation
 			{
 				try
 				{
-					h(this, new EventArgs());
+					h(this, EventArgs.Empty);
 				}
 				catch (Exception ex)
 				{

@@ -91,7 +91,7 @@ namespace Waher.Networking.LWM2M
 
 					try
 					{
-						this.OnStateChanged?.Invoke(this, new EventArgs());
+						this.OnStateChanged?.Invoke(this, EventArgs.Empty);
 					}
 					catch (Exception ex)
 					{
@@ -364,7 +364,7 @@ namespace Waher.Networking.LWM2M
 
 			try
 			{
-				this.OnBootstrapCompleted?.Invoke(this, new EventArgs());
+				this.OnBootstrapCompleted?.Invoke(this, EventArgs.Empty);
 			}
 			catch (Exception ex)
 			{
@@ -378,7 +378,7 @@ namespace Waher.Networking.LWM2M
 		{
 			try
 			{
-				this.OnBootstrapFailed?.Invoke(this, new EventArgs());
+				this.OnBootstrapFailed?.Invoke(this, EventArgs.Empty);
 			}
 			catch (Exception ex)
 			{
@@ -696,7 +696,7 @@ namespace Waher.Networking.LWM2M
 		{
 			try
 			{
-				this.OnRebootRequest?.Invoke(this, new EventArgs());
+				this.OnRebootRequest?.Invoke(this, EventArgs.Empty);
 			}
 			catch (Exception ex)
 			{

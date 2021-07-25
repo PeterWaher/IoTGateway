@@ -268,7 +268,7 @@ namespace Waher.Networking.HTTP
 				foreach (KeyValuePair<TcpListener, bool> P in Listeners)
 					P.Key.Stop();
 #endif
-				this.OnNetworkChanged?.Invoke(this, new EventArgs());
+				this.OnNetworkChanged?.Invoke(this, EventArgs.Empty);
 			}
 			catch (Exception ex)
 			{
@@ -706,7 +706,7 @@ namespace Waher.Networking.HTTP
 
 					try
 					{
-						this.ETagSaltChanged?.Invoke(this, new EventArgs());
+						this.ETagSaltChanged?.Invoke(this, EventArgs.Empty);
 					}
 					catch (Exception ex)
 					{

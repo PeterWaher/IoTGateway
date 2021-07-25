@@ -262,7 +262,7 @@ namespace Waher.Networking.LWM2M
 		{
 			try
 			{
-				this.OnAfterRegister?.Invoke(this, new EventArgs());
+				this.OnAfterRegister?.Invoke(this, EventArgs.Empty);
 			}
 			catch (Exception ex)
 			{
@@ -422,7 +422,7 @@ namespace Waher.Networking.LWM2M
 		{
 			try
 			{
-				this.OnSet?.Invoke(this, new EventArgs());
+				this.OnSet?.Invoke(this, EventArgs.Empty);
 			}
 			catch (Exception ex)
 			{

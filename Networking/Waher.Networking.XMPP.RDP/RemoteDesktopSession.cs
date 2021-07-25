@@ -63,7 +63,7 @@ namespace Waher.Networking.XMPP.RDP
 
 					try
 					{
-						this.StateChanged?.Invoke(this, new EventArgs());
+						this.StateChanged?.Invoke(this, EventArgs.Empty);
 					}
 					catch (Exception ex)
 					{

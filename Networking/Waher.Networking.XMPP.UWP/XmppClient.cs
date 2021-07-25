@@ -1166,11 +1166,11 @@ namespace Waher.Networking.XMPP
 				}
 				catch (Exception)
 				{
-					this.CleanUp(this, new EventArgs());
+					this.CleanUp(this, EventArgs.Empty);
 				}
 			}
 			else
-				this.CleanUp(this, new EventArgs());
+				this.CleanUp(this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -1243,7 +1243,7 @@ namespace Waher.Networking.XMPP
 
 					try
 					{
-						h(this, new EventArgs());
+						h(this, EventArgs.Empty);
 					}
 					catch (Exception ex)
 					{
@@ -1321,7 +1321,7 @@ namespace Waher.Networking.XMPP
 				{
 					try
 					{
-						Callback(this, new EventArgs());
+						Callback(this, EventArgs.Empty);
 					}
 					catch (Exception ex)
 					{
@@ -4432,7 +4432,7 @@ namespace Waher.Networking.XMPP
 				{
 					try
 					{
-						h(this, new EventArgs());
+						h(this, EventArgs.Empty);
 					}
 					catch (Exception ex)
 					{
@@ -4589,7 +4589,7 @@ namespace Waher.Networking.XMPP
 
 					try
 					{
-						await h(this, new EventArgs());
+						await h(this, EventArgs.Empty);
 					}
 					catch (Exception ex)
 					{

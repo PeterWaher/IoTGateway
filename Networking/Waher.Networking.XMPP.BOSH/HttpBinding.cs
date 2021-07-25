@@ -607,7 +607,7 @@ namespace Waher.Networking.XMPP.BOSH
 							{
 								try
 								{
-									P.Value(this, new EventArgs());
+									P.Value(this, EventArgs.Empty);
 								}
 								catch (Exception ex)
 								{
@@ -626,7 +626,7 @@ namespace Waher.Networking.XMPP.BOSH
 						{
 							try
 							{
-								DeliveryCallback(this.xmppClient, new EventArgs());
+								DeliveryCallback(this.xmppClient, EventArgs.Empty);
 							}
 							catch (Exception ex)
 							{

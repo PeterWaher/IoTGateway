@@ -304,7 +304,7 @@ namespace Waher.Networking.XMPP
 			if (this.state == XmppState.Connected || this.state == XmppState.FetchingRoster || this.state == XmppState.SettingPresence)
 				this.BeginWrite(this.streamFooter, this.CleanUp);
 			else
-				this.CleanUp(this, new EventArgs());
+				this.CleanUp(this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -315,7 +315,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public void HardOffline()
 		{
-			this.CleanUp(this, new EventArgs());
+			this.CleanUp(this, EventArgs.Empty);
 		}
 
 		private void CleanUp(object Sender, EventArgs e)
@@ -374,7 +374,7 @@ namespace Waher.Networking.XMPP
 				{
 					try
 					{
-						Callback(this, new EventArgs());
+						Callback(this, EventArgs.Empty);
 					}
 					catch (Exception ex)
 					{

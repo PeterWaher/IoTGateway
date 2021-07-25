@@ -515,7 +515,7 @@ namespace Waher.Networking.XMPP.WebSocket
 					{
 						try
 						{
-							DeliveryCallback(this.xmppClient, new EventArgs());
+							DeliveryCallback(this.xmppClient, EventArgs.Empty);
 						}
 						catch (Exception ex)
 						{

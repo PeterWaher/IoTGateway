@@ -243,7 +243,7 @@ namespace Waher.Runtime.Queue
 
 			try
 			{
-				this.Disposed?.Invoke(this, new EventArgs());
+				this.Disposed?.Invoke(this, EventArgs.Empty);
 			}
 			catch (Exception ex)
 			{

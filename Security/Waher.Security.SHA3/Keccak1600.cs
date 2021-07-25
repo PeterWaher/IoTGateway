@@ -213,7 +213,7 @@ namespace Waher.Security.SHA3
             this.InitState(S);
 
             if (this.reportStates)
-                this.NewState?.Invoke(this, new EventArgs());
+                this.NewState?.Invoke(this, EventArgs.Empty);
 
             for (ir = 0; ir < 24; ir++)
             {
@@ -262,7 +262,7 @@ namespace Waher.Security.SHA3
                 A_24 ^= v;
 
                 if (this.reportStates)
-                    this.NewState?.Invoke(this, new EventArgs());
+                    this.NewState?.Invoke(this, EventArgs.Empty);
 
                 // ρ function, as defined in section 3.2.2 of NIST FIPS 202.
 
@@ -292,7 +292,7 @@ namespace Waher.Security.SHA3
                 A_6 = ((v = A_6) << 44) | (v >> 20);
 
                 if (this.reportStates)
-                    this.NewState?.Invoke(this, new EventArgs());
+                    this.NewState?.Invoke(this, EventArgs.Empty);
 
                 // π function, as defined in section 3.2.3 of NIST FIPS 202.
 
@@ -329,7 +329,7 @@ namespace Waher.Security.SHA3
                 if (this.reportStates)
                 {
                     this.inA2 = true;
-                    this.NewState?.Invoke(this, new EventArgs());
+                    this.NewState?.Invoke(this, EventArgs.Empty);
                 }
 
                 // χ function, as defined in section 3.2.4 of NIST FIPS 202.
@@ -367,7 +367,7 @@ namespace Waher.Security.SHA3
                 if (this.reportStates)
                 {
                     this.inA2 = false;
-                    this.NewState?.Invoke(this, new EventArgs());
+                    this.NewState?.Invoke(this, EventArgs.Empty);
                 }
 
                 // ι function, as defined in section 3.2.5 of NIST FIPS 202.
@@ -375,7 +375,7 @@ namespace Waher.Security.SHA3
                 A_0 ^= RC_ir[ir];
 
                 if (this.reportStates)
-                    this.NewState?.Invoke(this, new EventArgs());
+                    this.NewState?.Invoke(this, EventArgs.Empty);
             }
 
             return this.GetState();

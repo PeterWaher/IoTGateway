@@ -634,7 +634,7 @@ namespace Waher.Networking.MQTT
 						{
 							try
 							{
-								await h(this, new EventArgs());
+								await h(this, EventArgs.Empty);
 							}
 							catch (Exception ex)
 							{
@@ -835,7 +835,7 @@ namespace Waher.Networking.MQTT
 			{
 				try
 				{
-					await h(this, new EventArgs());
+					await h(this, EventArgs.Empty);
 				}
 				catch (Exception ex)
 				{

@@ -608,7 +608,7 @@ namespace Waher.Networking.XMPP.Synchronization
 
 									try
 									{
-										this.OnUpdated?.Invoke(this, new EventArgs());
+										this.OnUpdated?.Invoke(this, EventArgs.Empty);
 									}
 									catch (Exception ex)
 									{

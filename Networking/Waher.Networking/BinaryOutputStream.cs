@@ -87,7 +87,7 @@ namespace Waher.Networking
 			{
 				try
 				{
-					Callback(this, new EventArgs());
+					Callback(this, EventArgs.Empty);
 				}
 				catch (Exception ex)
 				{

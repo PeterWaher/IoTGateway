@@ -787,7 +787,7 @@ namespace Waher.Service.GPIO
 			{
 				try
 				{
-					h(this, new EventArgs());
+					h(this, EventArgs.Empty);
 				}
 				catch (Exception ex)
 				{

@@ -88,7 +88,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 				EventHandlerAsync h = this.OnCancel;
 				if (!(h is null))
-					await h(this, new EventArgs());
+					await h(this, EventArgs.Empty);
 			}
 			catch (Exception ex)
 			{

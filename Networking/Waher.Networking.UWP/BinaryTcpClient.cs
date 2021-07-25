@@ -592,7 +592,7 @@ namespace Waher.Networking
 				{
 					try
 					{
-						await h(this, new EventArgs());
+						await h(this, EventArgs.Empty);
 					}
 					catch (Exception ex)
 					{
@@ -614,7 +614,7 @@ namespace Waher.Networking
 		{
 			try
 			{
-				this.OnDisconnected?.Invoke(this, new EventArgs());
+				this.OnDisconnected?.Invoke(this, EventArgs.Empty);
 			}
 			catch (Exception ex)
 			{
@@ -754,7 +754,7 @@ namespace Waher.Networking
 				{
 					try
 					{
-						Callback(this, new EventArgs());
+						Callback(this, EventArgs.Empty);
 					}
 					catch (Exception ex)
 					{
@@ -879,7 +879,7 @@ namespace Waher.Networking
 					{
 						try
 						{
-							Callback(this, new EventArgs());
+							Callback(this, EventArgs.Empty);
 						}
 						catch (Exception ex)
 						{
@@ -906,7 +906,7 @@ namespace Waher.Networking
 					{
 						try
 						{
-							h(this, new EventArgs());
+							h(this, EventArgs.Empty);
 						}
 						catch (Exception ex)
 						{

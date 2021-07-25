@@ -1965,7 +1965,7 @@ namespace Waher.IoTGateway
 
 			try
 			{
-				h(instance, new EventArgs());
+				h(instance, EventArgs.Empty);
 			}
 			catch (Exception ex)
 			{
@@ -2082,7 +2082,7 @@ namespace Waher.IoTGateway
 					{
 						try
 						{
-							h(null, new EventArgs());
+							h(null, EventArgs.Empty);
 						}
 						catch (Exception ex)
 						{
@@ -2630,7 +2630,7 @@ namespace Waher.IoTGateway
 			{
 				try
 				{
-					h(null, new EventArgs());
+					h(null, EventArgs.Empty);
 				}
 				catch (Exception ex)
 				{
@@ -2975,7 +2975,7 @@ namespace Waher.IoTGateway
 			if (ExportFolder != KeyFolder)
 				DeleteOldFiles(KeyFolder, KeepDays, KeepMonths, KeepYears, Now);
 
-			OnAfterBackup?.Invoke(typeof(Gateway), new EventArgs());
+			OnAfterBackup?.Invoke(typeof(Gateway), EventArgs.Empty);
 		}
 
 		private static DateTime? lastBackupTimeCheck = null;

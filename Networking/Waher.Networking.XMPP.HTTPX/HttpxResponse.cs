@@ -160,7 +160,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (e.Ok)
 				await this.socks5Output.Opened(e.Stream);
 			else
-				this.OnAbort(null, new EventArgs());
+				this.OnAbort(null, EventArgs.Empty);
 		}
 
 		private void OnAbort(object sender, EventArgs e)

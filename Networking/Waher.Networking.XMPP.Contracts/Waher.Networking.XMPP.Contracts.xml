@@ -476,6 +476,20 @@
             Generates new keys for the contracts clients.
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ImportKeys(System.Collections.Generic.KeyValuePair{System.String,System.Byte[]}[])">
+            <summary>
+            Imports keys
+            </summary>
+            <param name="PrivateKeys">Private keys</param>
+            <returns>If keys could be loaded into the client.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SetKeySettingsInstance(System.String,System.Boolean)">
+            <summary>
+            Sets the key settings instance name.
+            </summary>
+            <param name="InstanceName">Instance name.</param>
+            <param name="Locked">If the key settings instance name should be locked.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SetAllowedSources(System.Object[])">
             <summary>
             If access to sensitive methods is only accessible from a set of approved sources.

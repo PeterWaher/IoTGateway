@@ -1329,6 +1329,8 @@ namespace Waher.IoTGateway
 			if (!string.IsNullOrEmpty(XmppConfiguration.Instance.LegalIdentities))
 			{
 				contractsClient = new ContractsClient(xmppClient, XmppConfiguration.Instance.LegalIdentities);
+				contractsClient.SetKeySettingsInstance(string.Empty, true);
+				
 				await contractsClient.LoadKeys(true);
 			}
 			else

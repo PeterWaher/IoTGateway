@@ -59,6 +59,8 @@ namespace Waher.Networking.XMPP.Contracts
 		private DateTime keysTimestamp = DateTime.MinValue;
 		private object[] approvedSources = null;
 		private readonly string componentAddress;
+		private string keySettingsPrefix;
+		private bool keySettingsPrefixLocked = false;
 		private RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 		private Aes aes;
 
@@ -119,6 +121,8 @@ namespace Waher.Networking.XMPP.Contracts
 			this.aes.KeySize = 256;
 			this.aes.Mode = CipherMode.CBC;
 			this.aes.Padding = PaddingMode.None;
+
+			this.keySettingsPrefix = KeySettings;
 		}
 
 		/// <summary>
@@ -196,7 +200,7 @@ namespace Waher.Networking.XMPP.Contracts
 				Thread?.NewState("Search");
 
 				List<IE2eEndpoint> Keys = new List<IE2eEndpoint>();
-				Dictionary<string, object> Settings = await RuntimeSettings.GetWhereKeyLikeAsync(KeySettings + "*", "*");
+				Dictionary<string, object> Settings = await RuntimeSettings.GetWhereKeyLikeAsync(this.keySettingsPrefix + "*", "*");
 
 				Thread?.NewState("Endpoints");
 
@@ -209,7 +213,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 				foreach (KeyValuePair<string, object> Setting in Settings)
 				{
-					string LocalName = Setting.Key.Substring(KeySettings.Length);
+					string LocalName = Setting.Key.Substring(this.keySettingsPrefix.Length);
 
 					if (Setting.Value is string d)
 					{
@@ -250,12 +254,12 @@ namespace Waher.Networking.XMPP.Contracts
 					foreach (EllipticCurveEndpoint Curve in AvailableEndpoints)
 					{
 						Key = this.GetKey(Curve.Curve);
-						await RuntimeSettings.SetAsync(KeySettings + Curve.LocalName, Convert.ToBase64String(Key));
+						await RuntimeSettings.SetAsync(this.keySettingsPrefix + Curve.LocalName, Convert.ToBase64String(Key));
 						Keys.Add(Curve);
 					}
 
 					Timestamp = DateTime.Now;
-					await RuntimeSettings.SetAsync(KeySettings + "Timestamp", Timestamp.Value);
+					await RuntimeSettings.SetAsync(this.keySettingsPrefix + "Timestamp", Timestamp.Value);
 
 					Log.Notice("Private keys for contracts client created.");
 				}
@@ -264,7 +268,7 @@ namespace Waher.Networking.XMPP.Contracts
 					Thread?.NewState("Time");
 
 					Timestamp = DateTime.Now;
-					await RuntimeSettings.SetAsync(KeySettings + "Timestamp", Timestamp.Value);
+					await RuntimeSettings.SetAsync(this.keySettingsPrefix + "Timestamp", Timestamp.Value);
 				}
 
 				Thread?.NewState("Sec");
@@ -305,7 +309,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public async Task GenerateNewKeys()
 		{
-			await RuntimeSettings.DeleteWhereKeyLikeAsync(KeySettings + "*", "*");
+			await RuntimeSettings.DeleteWhereKeyLikeAsync(this.keySettingsPrefix + "*", "*");
 			await this.LoadKeys(true);
 
 			foreach (LegalIdentityState State in await Database.Find<LegalIdentityState>(
@@ -331,6 +335,40 @@ namespace Waher.Networking.XMPP.Contracts
 						break;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Imports keys
+		/// </summary>
+		/// <param name="PrivateKeys">Private keys</param>
+		/// <returns>If keys could be loaded into the client.</returns>
+		public async Task<bool> ImportKeys(params KeyValuePair<string, byte[]>[] PrivateKeys)
+		{
+			foreach (KeyValuePair<string,byte[]> Key in PrivateKeys)
+				await RuntimeSettings.SetAsync(this.keySettingsPrefix + Key.Key, Convert.ToBase64String(Key.Value));
+
+			this.keysTimestamp = DateTime.Now;
+			await RuntimeSettings.SetAsync(this.keySettingsPrefix + "Timestamp", this.keysTimestamp);
+
+			return await this.LoadKeys(false);
+		}
+
+		/// <summary>
+		/// Sets the key settings instance name.
+		/// </summary>
+		/// <param name="InstanceName">Instance name.</param>
+		/// <param name="Locked">If the key settings instance name should be locked.</param>
+		public void SetKeySettingsInstance(string InstanceName, bool Locked)
+		{
+			if (this.keySettingsPrefixLocked)
+				throw new InvalidOperationException("Key settings instance is locked.");
+
+			if (string.IsNullOrEmpty(InstanceName))
+				this.keySettingsPrefix = KeySettings;
+			else
+				this.keySettingsPrefix = InstanceName + "." + KeySettings;
+
+			this.keySettingsPrefixLocked = Locked;
 		}
 
 		#endregion

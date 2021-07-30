@@ -28,6 +28,8 @@ namespace Waher.Client.WPF.Model.Legal
 			LegalService Result = new LegalService(Parent, JID, Name, Node, Features);
 
 			Result.contractsClient = new ContractsClient(Result.Account.Client, JID);
+			Result.contractsClient.SetKeySettingsInstance(string.Empty, true);
+
 			await Result.contractsClient.LoadKeys(true);
 
 			Result.contractsClient.IdentityUpdated += Result.ContractsClient_IdentityUpdated;

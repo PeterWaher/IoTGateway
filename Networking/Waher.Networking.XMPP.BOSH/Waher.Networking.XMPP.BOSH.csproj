@@ -20,9 +20,9 @@ XEP-0206: XMPP Over BOSH
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp bosh http</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.1.3</AssemblyVersion>
-    <FileVersion>1.1.3</FileVersion>
-    <Version>1.1.3</Version>
+    <AssemblyVersion>1.1.4</AssemblyVersion>
+    <FileVersion>1.1.4</FileVersion>
+    <Version>1.1.4</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>

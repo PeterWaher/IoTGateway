@@ -13,7 +13,7 @@ namespace Waher.Runtime.Inventory
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
 	public class SingletonAttribute : Attribute
 	{
-		private static readonly Dictionary<SingletonKey, KeyValuePair<bool, object>> instances = new Dictionary<SingletonKey, KeyValuePair<bool, object>>();
+		private static readonly Dictionary<SingletonKey, SingletonRecord> instances = new Dictionary<SingletonKey, SingletonRecord>();
 
 		/// <summary>
 		/// Defines a class or struct as singleton. This means that when instantiated, using <see cref="Types.Instantiate(Type, object[])"/>,
@@ -26,18 +26,18 @@ namespace Waher.Runtime.Inventory
 
 		internal static void Clear()
 		{
-			KeyValuePair<bool, object>[] Objects;
+			SingletonRecord[] Objects;
 
 			lock (instances)
 			{
-				Objects = new KeyValuePair<bool, object>[instances.Count];
+				Objects = new SingletonRecord[instances.Count];
 				instances.Values.CopyTo(Objects, 0);
 				instances.Clear();
 			}
 
-			foreach (KeyValuePair<bool, object> P in Objects)
+			foreach (SingletonRecord Rec in Objects)
 			{
-				if (P.Key && P.Value is IDisposable Disposable)
+				if (Rec.Instantiated && Rec.Instance is IDisposable Disposable)
 				{
 					try
 					{
@@ -64,8 +64,8 @@ namespace Waher.Runtime.Inventory
 
 			lock (instances)
 			{
-				if (instances.TryGetValue(Key, out KeyValuePair<bool, object> P))
-					return P.Value;
+				if (instances.TryGetValue(Key, out SingletonRecord Rec))
+					return Rec.Instance;
 			}
 
 			object Object = Types.Create(ReturnNullIfFail, Type, Arguments);
@@ -74,15 +74,15 @@ namespace Waher.Runtime.Inventory
 
 			lock (instances)
 			{
-				if (instances.TryGetValue(Key, out KeyValuePair<bool, object> P))
+				if (instances.TryGetValue(Key, out SingletonRecord Rec))
 				{
 					if (Object is IDisposable Disposable)
 						Disposable.Dispose();
 
-					return P.Value;
+					return Rec.Instance;
 				}
 
-				instances[Key] = new KeyValuePair<bool, object>(true, Object);
+				instances[Key] = new SingletonRecord(Key, true, Object);
 			}
 
 			return Object;
@@ -102,7 +102,7 @@ namespace Waher.Runtime.Inventory
 				if (instances.ContainsKey(Key))
 					throw new InvalidOperationException("Singleton already registered.");
 
-				instances[Key] = new KeyValuePair<bool, object>(false, Object);
+				instances[Key] = new SingletonRecord(Key, false, Object);
 			}
 		}
 
@@ -138,73 +138,17 @@ namespace Waher.Runtime.Inventory
 			}
 		}
 
-		private class SingletonKey
+		/// <summary>
+		/// Gets available singleton instances.
+		/// </summary>
+		/// <returns>Singleton instances.</returns>
+		public static SingletonRecord[] GetInstances()
 		{
-			public readonly Type type;
-			public readonly object[] arguments;
-
-			public SingletonKey(Type Type, object[] Arguments)
+			lock (instances)
 			{
-				this.type = Type;
-				this.arguments = Arguments;
-			}
-
-			public override bool Equals(object obj)
-			{
-				int i, c;
-
-				if (!(obj is SingletonKey Key) ||
-					this.type != Key.type ||
-					(this.arguments is null) ^ (Key.arguments is null) ||
-					(c = this.arguments?.Length ?? 0) != (Key.arguments?.Length ?? 0))
-				{
-					return false;
-				}
-
-				for (i = 0; i < c; i++)
-				{
-					if (!this.arguments[i].Equals(Key.arguments[i]))
-						return false;
-				}
-
-				return true;
-			}
-
-			public override int GetHashCode()
-			{
-				int Result = this.type.GetHashCode();
-
-				if (!(this.arguments is null))
-				{
-					foreach (object Obj in this.arguments)
-						Result ^= Result << 5 ^ (Obj?.GetHashCode() ?? 0);
-				}
-
+				SingletonRecord[] Result = new SingletonRecord[instances.Count];
+				instances.Values.CopyTo(Result, 0);
 				return Result;
-			}
-
-			public override string ToString()
-			{
-				StringBuilder sb = new StringBuilder();
-				int i, c;
-
-				sb.Append(this.type.FullName);
-				sb.Append('(');
-
-				for (i = 0, c = this.arguments?.Length ?? 0; i < c; i++)
-				{
-					if (i > 0)
-						sb.Append(", ");
-
-					if (this.arguments[i] is null)
-						sb.Append("null");
-					else
-						sb.Append(this.arguments[i].GetType().FullName);
-				}
-
-				sb.Append(')');
-
-				return sb.ToString();
 			}
 		}
 	}

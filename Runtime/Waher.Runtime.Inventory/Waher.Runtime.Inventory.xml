@@ -148,6 +148,71 @@
             <param name="Arguments">Any constructor arguments associated with the type.</param>
             <returns>If such a singleton type is registered.</returns>
         </member>
+        <member name="M:Waher.Runtime.Inventory.SingletonAttribute.GetInstances">
+            <summary>
+            Gets available singleton instances.
+            </summary>
+            <returns>Singleton instances.</returns>
+        </member>
+        <member name="T:Waher.Runtime.Inventory.SingletonKey">
+            <summary>
+            Represents a type and a set of arguments, for which an object instance is the single instantiation.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.SingletonKey.#ctor(System.Type,System.Object[])">
+            <summary>
+            Represents a type and a set of arguments, for which an object instance is the single instantiation.
+            </summary>
+            <param name="Type">Singleton type.</param>
+            <param name="Arguments">Arguments, for which the instance is unique.</param>
+        </member>
+        <member name="P:Waher.Runtime.Inventory.SingletonKey.Type">
+            <summary>
+            Singleton type.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Inventory.SingletonKey.Arguments">
+            <summary>
+            Arguments, for which the instance is unique.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.SingletonKey.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.SingletonKey.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.SingletonKey.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Runtime.Inventory.SingletonRecord">
+            <summary>
+            A record of a singleton instance in memory.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.SingletonRecord.#ctor(Waher.Runtime.Inventory.SingletonKey,System.Boolean,System.Object)">
+            <summary>
+            A record of a singleton instance in memory.
+            </summary>
+            <param name="Key">Singleton key.</param>
+            <param name="Instantiated">If the instance was instantiated by the library (true) or externally (by caller).</param>
+            <param name="Instance">Object instance.</param>
+        </member>
+        <member name="P:Waher.Runtime.Inventory.SingletonRecord.Key">
+            <summary>
+            Singleton key.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Inventory.SingletonRecord.Instantiated">
+            <summary>
+            If the instance was instantiated by the library (true) or externally (by caller).
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Inventory.SingletonRecord.Instance">
+            <summary>
+            Object instance.
+            </summary>
+        </member>
         <member name="T:Waher.Runtime.Inventory.Types">
             <summary>
             Static class that dynamically manages types and interfaces available in the runtime environment.
@@ -573,6 +638,12 @@
             <param name="Type">Singleton type</param>
             <param name="Arguments">Any constructor arguments associated with the type.</param>
             <returns>If such a singleton type is registered.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.GetSingletonInstances">
+            <summary>
+            Gets available singleton instances.
+            </summary>
+            <returns>Singleton instances.</returns>
         </member>
         <member name="M:Waher.Runtime.Inventory.Types.RegisterDefaultImplementation(System.Type,System.Type)">
             <summary>

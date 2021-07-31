@@ -1367,6 +1367,15 @@ namespace Waher.Runtime.Inventory
 		}
 
 		/// <summary>
+		/// Gets available singleton instances.
+		/// </summary>
+		/// <returns>Singleton instances.</returns>
+		public static SingletonRecord[] GetSingletonInstances()
+		{
+			return SingletonAttribute.GetInstances();
+		}
+
+		/// <summary>
 		/// Registers a default implementation for an interface. Such a registration takes presedence of any default implementations
 		/// provided by the <see cref="DefaultImplementationAttribute"/> associated with the interface definition.
 		/// </summary>
@@ -1407,6 +1416,5 @@ namespace Waher.Runtime.Inventory
 		{
 			DefaultImplementationAttribute.UnregisterDefaultImplementation(From, To);
 		}
-
 	}
 }

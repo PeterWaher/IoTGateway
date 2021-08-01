@@ -1,8 +1,31 @@
 ﻿using System;
+using System.Text;
+using Waher.Content.Xml;
 using Waher.Events;
 
 namespace Waher.Networking.XMPP.RDP
 {
+	/// <summary>
+	/// Enumeration identifying mouse button being used.
+	/// </summary>
+	public enum MouseButton
+	{
+		/// <summary>
+		/// Left mouse button
+		/// </summary>
+		Left,
+
+		/// <summary>
+		/// Middle mouse button
+		/// </summary>
+		Middle,
+
+		/// <summary>
+		/// Right mouse button
+		/// </summary>
+		Right
+	}
+
 	/// <summary>
 	/// Maintains the client-side state of a Remote Desktop Session.
 	/// </summary>
@@ -166,5 +189,106 @@ namespace Waher.Networking.XMPP.RDP
 		/// Event raised when a tile on the remote desktop has been updated.
 		/// </summary>
 		public event EventHandler<TileEventArgs> TileUpdated;
+
+		/// <summary>
+		/// Reports the mouse having moved to a given position.
+		/// </summary>
+		/// <param name="X">X-coodrinate.</param>
+		/// <param name="Y">Y-coordinate.</param>
+		public void MouseMoved(int X, int Y)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<mouseMoved xmlns='");
+			Xml.Append(RemoteDesktopClient.RemoteDesktopNamespace);
+			Xml.Append("' sid='");
+			Xml.Append(XML.Encode(this.sessionId));
+			Xml.Append("' x='");
+			Xml.Append(X.ToString());
+			Xml.Append("' y='");
+			Xml.Append(Y.ToString());
+			Xml.Append("'/>");
+
+			this.client.Client.SendMessage(MessageType.Normal, this.remoteJid, Xml.ToString(), 
+				string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Reports the mouse having been pressed down.
+		/// </summary>
+		/// <param name="X">X-coodrinate.</param>
+		/// <param name="Y">Y-coordinate.</param>
+		/// <param name="Button">Mouse button being pressed.</param>
+		public void MouseDown(int X, int Y, MouseButton Button)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<mouseDown xmlns='");
+			Xml.Append(RemoteDesktopClient.RemoteDesktopNamespace);
+			Xml.Append("' sid='");
+			Xml.Append(XML.Encode(this.sessionId));
+			Xml.Append("' x='");
+			Xml.Append(X.ToString());
+			Xml.Append("' y='");
+			Xml.Append(Y.ToString());
+			Xml.Append("' b='");
+			Xml.Append(Button.ToString());
+			Xml.Append("'/>");
+
+			this.client.Client.SendMessage(MessageType.Normal, this.remoteJid, Xml.ToString(),
+				string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Reports the mouse having been released up.
+		/// </summary>
+		/// <param name="X">X-coodrinate.</param>
+		/// <param name="Y">Y-coordinate.</param>
+		/// <param name="Button">Mouse button being released.</param>
+		public void MouseUp(int X, int Y, MouseButton Button)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<mouseUp xmlns='");
+			Xml.Append(RemoteDesktopClient.RemoteDesktopNamespace);
+			Xml.Append("' sid='");
+			Xml.Append(XML.Encode(this.sessionId));
+			Xml.Append("' x='");
+			Xml.Append(X.ToString());
+			Xml.Append("' y='");
+			Xml.Append(Y.ToString());
+			Xml.Append("' b='");
+			Xml.Append(Button.ToString());
+			Xml.Append("'/>");
+
+			this.client.Client.SendMessage(MessageType.Normal, this.remoteJid, Xml.ToString(),
+				string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Reports the mouse wheel having been turned.
+		/// </summary>
+		/// <param name="X">X-coodrinate.</param>
+		/// <param name="Y">Y-coordinate.</param>
+		/// <param name="Delta">Wheel delta</param>
+		public void MouseWheel(int X, int Y, int Delta)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<mouseWheel xmlns='");
+			Xml.Append(RemoteDesktopClient.RemoteDesktopNamespace);
+			Xml.Append("' sid='");
+			Xml.Append(XML.Encode(this.sessionId));
+			Xml.Append("' x='");
+			Xml.Append(X.ToString());
+			Xml.Append("' y='");
+			Xml.Append(Y.ToString());
+			Xml.Append("' d='");
+			Xml.Append(Delta.ToString());
+			Xml.Append("'/>");
+
+			this.client.Client.SendMessage(MessageType.Normal, this.remoteJid, Xml.ToString(),
+				string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
 	}
 }

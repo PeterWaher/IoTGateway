@@ -6,6 +6,7 @@ using System.IO;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Waher.Client.WPF.Model;
@@ -183,6 +184,74 @@ namespace Waher.Client.WPF.Controls
 		public RemoteDesktopClient RdpClient => this.rdpClient;
 		public RemoteDesktopSession Session => this.session;
 
+		private void UserControl_MouseMove(object sender, MouseEventArgs e)
+		{
+			System.Windows.Point P = e.GetPosition(this.DesktopImage);
+			this.session.MouseMoved((int)(P.X + 0.5), (int)(P.Y + 0.5));
+			e.Handled = true;
+		}
+
+		private void UserControl_MouseDown(object sender, MouseButtonEventArgs e)
+		{
+			System.Windows.Point P = e.GetPosition(this.DesktopImage);
+
+			switch (e.ChangedButton)
+			{
+				case System.Windows.Input.MouseButton.Left:
+					this.session.MouseDown((int)(P.X + 0.5), (int)(P.Y + 0.5), Networking.XMPP.RDP.MouseButton.Left);
+					e.Handled = true;
+					break;
+
+				case System.Windows.Input.MouseButton.Middle:
+					this.session.MouseDown((int)(P.X + 0.5), (int)(P.Y + 0.5), Networking.XMPP.RDP.MouseButton.Middle);
+					e.Handled = true;
+					break;
+
+				case System.Windows.Input.MouseButton.Right:
+					this.session.MouseDown((int)(P.X + 0.5), (int)(P.Y + 0.5), Networking.XMPP.RDP.MouseButton.Right);
+					e.Handled = true;
+					break;
+
+				default:
+					e.Handled = false;
+					break;
+			}
+		}
+
+		private void UserControl_MouseUp(object sender, MouseButtonEventArgs e)
+		{
+			System.Windows.Point P = e.GetPosition(this.DesktopImage);
+
+			switch (e.ChangedButton)
+			{
+				case System.Windows.Input.MouseButton.Left:
+					this.session.MouseUp((int)(P.X + 0.5), (int)(P.Y + 0.5), Networking.XMPP.RDP.MouseButton.Left);
+					e.Handled = true;
+					break;
+
+				case System.Windows.Input.MouseButton.Middle:
+					this.session.MouseUp((int)(P.X + 0.5), (int)(P.Y + 0.5), Networking.XMPP.RDP.MouseButton.Middle);
+					e.Handled = true;
+					break;
+
+				case System.Windows.Input.MouseButton.Right:
+					this.session.MouseUp((int)(P.X + 0.5), (int)(P.Y + 0.5), Networking.XMPP.RDP.MouseButton.Right);
+					e.Handled = true;
+					break;
+
+				default:
+					e.Handled = false;
+					break;
+			}
+		}
+
+		private void UserControl_MouseWheel(object sender, MouseWheelEventArgs e)
+		{
+			System.Windows.Point P = e.GetPosition(this.DesktopImage);
+			this.session.MouseWheel((int)(P.X + 0.5), (int)(P.Y + 0.5), e.Delta);
+			e.Handled = true;
+		}
+
 		public void NewButton_Click(object sender, RoutedEventArgs e)
 		{
 			// TODO: Refresh screen?
@@ -207,6 +276,5 @@ namespace Waher.Client.WPF.Controls
 		{
 			// TODO: ?
 		}
-
 	}
 }

@@ -45,6 +45,26 @@
             <param name="SessionId">Session ID</param>
             <returns>Remote Desktop Session object.</returns>
         </member>
+        <member name="T:Waher.Networking.XMPP.RDP.MouseButton">
+            <summary>
+            Enumeration identifying mouse button being used.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.RDP.MouseButton.Left">
+            <summary>
+            Left mouse button
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.RDP.MouseButton.Middle">
+            <summary>
+            Middle mouse button
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.RDP.MouseButton.Right">
+            <summary>
+            Right mouse button
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.RDP.RemoteDesktopSession">
             <summary>
             Maintains the client-side state of a Remote Desktop Session.
@@ -127,6 +147,37 @@
             <summary>
             Event raised when a tile on the remote desktop has been updated.
             </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopSession.MouseMoved(System.Int32,System.Int32)">
+            <summary>
+            Reports the mouse having moved to a given position.
+            </summary>
+            <param name="X">X-coodrinate.</param>
+            <param name="Y">Y-coordinate.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopSession.MouseDown(System.Int32,System.Int32,Waher.Networking.XMPP.RDP.MouseButton)">
+            <summary>
+            Reports the mouse having been pressed down.
+            </summary>
+            <param name="X">X-coodrinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Button">Mouse button being pressed.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopSession.MouseUp(System.Int32,System.Int32,Waher.Networking.XMPP.RDP.MouseButton)">
+            <summary>
+            Reports the mouse having been released up.
+            </summary>
+            <param name="X">X-coodrinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Button">Mouse button being released.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopSession.MouseWheel(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Reports the mouse wheel having been turned.
+            </summary>
+            <param name="X">X-coodrinate.</param>
+            <param name="Y">Y-coordinate.</param>
+            <param name="Delta">Wheel delta</param>
         </member>
         <member name="T:Waher.Networking.XMPP.RDP.RemoteDesktopSessionState">
             <summary>

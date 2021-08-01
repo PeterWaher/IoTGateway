@@ -366,8 +366,6 @@ namespace Waher.Runtime.Inventory
 					moduleParameters.Clear();
 				}
 			}
-
-			SingletonAttribute.Clear();
 		}
 
 		/// <summary>

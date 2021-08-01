@@ -69,6 +69,7 @@ namespace Waher.Client.WPF.Model
 		private ConcentratorClient concentratorClient;
 		private SynchronizationClient synchronizationClient;
 		private MultiUserChatClient mucClient;
+		private RemoteDesktopClient rdpClient;
 		private Timer connectionTimer;
 		private Exception lastError = null;
 		private TransportMethod transport = TransportMethod.TraditionalSocket;
@@ -204,6 +205,7 @@ namespace Waher.Client.WPF.Model
 			this.controlClient = new ControlClient(this.client);
 			this.concentratorClient = new ConcentratorClient(this.client);
 			this.synchronizationClient = new SynchronizationClient(this.client);
+			this.rdpClient = new RemoteDesktopClient(this.client);
 
 			this.AddPepClient(string.Empty);
 
@@ -378,6 +380,9 @@ namespace Waher.Client.WPF.Model
 
 			this.connectionTimer?.Dispose();
 			this.connectionTimer = null;
+
+			this.rdpClient?.Dispose();
+			this.rdpClient = null;
 
 			this.pepClient?.Dispose();
 			this.pepClient = null;
@@ -1140,6 +1145,11 @@ namespace Waher.Client.WPF.Model
 		public SynchronizationClient SynchronizationClient
 		{
 			get { return this.synchronizationClient; }
+		}
+
+		public RemoteDesktopClient RdpClient
+		{
+			get { return this.rdpClient; }
 		}
 
 		public void SearchComponents()

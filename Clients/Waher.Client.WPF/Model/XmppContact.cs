@@ -21,16 +21,15 @@ namespace Waher.Client.WPF.Model
 	public class XmppContact : TreeNode
 	{
 		private readonly XmppClient client;
-		private readonly RemoteDesktopClient rdpClient;
 		private readonly string bareJid;
+		private readonly bool supportsRdp;
 
 		public XmppContact(TreeNode Parent, XmppClient Client, string BareJid, bool SupportsRdp)
 			: base(Parent)
 		{
 			this.client = Client;
 			this.bareJid = BareJid;
-
-			this.rdpClient = SupportsRdp ? new RemoteDesktopClient(this.client) : null;
+			this.supportsRdp = SupportsRdp;
 
 		}
 
@@ -382,7 +381,7 @@ namespace Waher.Client.WPF.Model
 			this.XmppAccountNode?.Client?.RequestPresenceUnsubscription(this.bareJid);
 		}
 
-		public override bool CanConfigure => !string.IsNullOrEmpty(this.LastOnlineFullJid);
+		public override bool CanConfigure => this.supportsRdp && !string.IsNullOrEmpty(this.LastOnlineFullJid);
 
 		private string LastOnlineFullJid
 		{
@@ -390,7 +389,7 @@ namespace Waher.Client.WPF.Model
 			{
 				try
 				{
-					if (this.rdpClient is null)
+					if (this.client is null)
 						return null;
 
 					RosterItem Item = this.client[this.bareJid];
@@ -418,14 +417,18 @@ namespace Waher.Client.WPF.Model
 				if (string.IsNullOrEmpty(FullJid))
 					return;
 
+				RemoteDesktopClient RdpClient = this.XmppAccountNode.RdpClient;
+				if (RdpClient is null)
+					return;
+
 				Mouse.OverrideCursor = Cursors.Wait;
-				RemoteDesktopSession Session = await this.rdpClient.StartSessionAsync(FullJid);
+				RemoteDesktopSession Session = await RdpClient.StartSessionAsync(FullJid);
 				Mouse.OverrideCursor = null;
 
 				TabItem TabItem = MainWindow.NewTab(this.bareJid);
 				MainWindow.currentInstance.Tabs.Items.Add(TabItem);
 
-				RemoteDesktopView View = new RemoteDesktopView(this, this.client, this.rdpClient, Session);
+				RemoteDesktopView View = new RemoteDesktopView(this, this.client, RdpClient, Session);
 				TabItem.Content = View;
 
 				MainWindow.currentInstance.Tabs.SelectedItem = TabItem;

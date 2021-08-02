@@ -163,18 +163,28 @@ namespace Waher.Networking.XMPP.RDP
 			Session.Screens = Screens.ToArray();
 			Session.State = RemoteDesktopSessionState.Started;
 
+			Log.Informational("Remote desktop session started.",
+				new KeyValuePair<string, object>("RemoteJid", Session.RemoteJid),
+				new KeyValuePair<string, object>("SessionId", Session.SessionId));
+
 			return Task.CompletedTask;
 		}
 
 		private Task StoppedMessageHandler(object State, MessageEventArgs e)
 		{
 			string SessionId = XML.Attribute(e.Content, "sessionId");
+			string Reason = XML.Attribute(e.Content, "reason");
 
 			if (!this.sessions.TryGetValue(SessionId, out RemoteDesktopSession Session))
 				return Task.CompletedTask;
 
 			Session.State = RemoteDesktopSessionState.Stopped;
 			this.sessions.Remove(SessionId);
+
+			Log.Informational("Remote desktop session stopped.",
+				new KeyValuePair<string, object>("RemoteJid", Session.RemoteJid),
+				new KeyValuePair<string, object>("SessionId", Session.SessionId),
+				new KeyValuePair<string, object>("Reason", Reason));
 
 			return Task.CompletedTask;
 		}

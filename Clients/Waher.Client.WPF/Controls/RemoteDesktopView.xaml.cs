@@ -260,6 +260,20 @@ namespace Waher.Client.WPF.Controls
 			e.Handled = true;
 		}
 
+		private void UserControl_KeyDown(object sender, KeyEventArgs e)
+		{
+			int KeyCode = KeyInterop.VirtualKeyFromKey(e.Key);
+			this.session.KeyDown(KeyCode);
+			e.Handled = true;
+		}
+
+		private void UserControl_KeyUp(object sender, KeyEventArgs e)
+		{
+			int KeyCode = KeyInterop.VirtualKeyFromKey(e.Key);
+			this.session.KeyUp(KeyCode);
+			e.Handled = true;
+		}
+
 		public void NewButton_Click(object sender, RoutedEventArgs e)
 		{
 			// TODO: Refresh screen?

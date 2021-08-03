@@ -290,5 +290,45 @@ namespace Waher.Networking.XMPP.RDP
 			this.client.Client.SendMessage(MessageType.Normal, this.remoteJid, Xml.ToString(),
 				string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
 		}
+
+		/// <summary>
+		/// Reports a key having been pressed.
+		/// </summary>
+		/// <param name="KeyCode">Key Code.</param>
+		public void KeyDown(int KeyCode)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<keyDown xmlns='");
+			Xml.Append(RemoteDesktopClient.RemoteDesktopNamespace);
+			Xml.Append("' sid='");
+			Xml.Append(XML.Encode(this.sessionId));
+			Xml.Append("' key='");
+			Xml.Append(KeyCode.ToString());
+			Xml.Append("'/>");
+
+			this.client.Client.SendMessage(MessageType.Normal, this.remoteJid, Xml.ToString(),
+				string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Reports a key having been released.
+		/// </summary>
+		/// <param name="KeyCode">Key Code.</param>
+		public void KeyUp(int KeyCode)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<keyUp xmlns='");
+			Xml.Append(RemoteDesktopClient.RemoteDesktopNamespace);
+			Xml.Append("' sid='");
+			Xml.Append(XML.Encode(this.sessionId));
+			Xml.Append("' key='");
+			Xml.Append(KeyCode.ToString());
+			Xml.Append("'/>");
+
+			this.client.Client.SendMessage(MessageType.Normal, this.remoteJid, Xml.ToString(),
+				string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
 	}
 }

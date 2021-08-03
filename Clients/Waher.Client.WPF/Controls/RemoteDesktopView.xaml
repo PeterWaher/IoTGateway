@@ -7,6 +7,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="700" SizeChanged="UserControl_SizeChanged" 
              MouseMove="UserControl_MouseMove" MouseDown="UserControl_MouseDown"
-             MouseUp="UserControl_MouseUp" MouseWheel="UserControl_MouseWheel">
+             MouseUp="UserControl_MouseUp" MouseWheel="UserControl_MouseWheel" 
+             KeyDown="UserControl_KeyDown" KeyUp="UserControl_KeyUp">
     <Image Name="DesktopImage"/>
 </UserControl>

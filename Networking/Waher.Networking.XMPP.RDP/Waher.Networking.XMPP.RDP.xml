@@ -179,6 +179,18 @@
             <param name="Y">Y-coordinate.</param>
             <param name="Delta">Wheel delta</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopSession.KeyDown(System.Int32)">
+            <summary>
+            Reports a key having been pressed.
+            </summary>
+            <param name="KeyCode">Key Code.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopSession.KeyUp(System.Int32)">
+            <summary>
+            Reports a key having been released.
+            </summary>
+            <param name="KeyCode">Key Code.</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.RDP.RemoteDesktopSessionState">
             <summary>
             State of a Remote Desktop Session

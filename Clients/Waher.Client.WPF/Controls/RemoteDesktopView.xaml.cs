@@ -186,29 +186,37 @@ namespace Waher.Client.WPF.Controls
 
 		private void UserControl_MouseMove(object sender, MouseEventArgs e)
 		{
-			System.Windows.Point P = e.GetPosition(this.DesktopImage);
-			this.session.MouseMoved((int)(P.X + 0.5), (int)(P.Y + 0.5));
+			this.GetPosition(e, out int X, out int Y);
+			this.session.MouseMoved(X, Y);
 			e.Handled = true;
+		}
+
+		private void GetPosition(MouseEventArgs e, out int X, out int Y)
+		{
+			System.Windows.Point P = e.GetPosition(this.DesktopImage);
+
+			X = (int)(this.session.Width * P.X / this.DesktopImage.ActualWidth + 0.5);
+			Y = (int)(this.session.Height * P.Y / this.DesktopImage.ActualHeight + 0.5);
 		}
 
 		private void UserControl_MouseDown(object sender, MouseButtonEventArgs e)
 		{
-			System.Windows.Point P = e.GetPosition(this.DesktopImage);
+			this.GetPosition(e, out int X, out int Y);
 
 			switch (e.ChangedButton)
 			{
 				case System.Windows.Input.MouseButton.Left:
-					this.session.MouseDown((int)(P.X + 0.5), (int)(P.Y + 0.5), Networking.XMPP.RDP.MouseButton.Left);
+					this.session.MouseDown(X, Y, Networking.XMPP.RDP.MouseButton.Left);
 					e.Handled = true;
 					break;
 
 				case System.Windows.Input.MouseButton.Middle:
-					this.session.MouseDown((int)(P.X + 0.5), (int)(P.Y + 0.5), Networking.XMPP.RDP.MouseButton.Middle);
+					this.session.MouseDown(X, Y, Networking.XMPP.RDP.MouseButton.Middle);
 					e.Handled = true;
 					break;
 
 				case System.Windows.Input.MouseButton.Right:
-					this.session.MouseDown((int)(P.X + 0.5), (int)(P.Y + 0.5), Networking.XMPP.RDP.MouseButton.Right);
+					this.session.MouseDown(X, Y, Networking.XMPP.RDP.MouseButton.Right);
 					e.Handled = true;
 					break;
 
@@ -220,22 +228,22 @@ namespace Waher.Client.WPF.Controls
 
 		private void UserControl_MouseUp(object sender, MouseButtonEventArgs e)
 		{
-			System.Windows.Point P = e.GetPosition(this.DesktopImage);
+			this.GetPosition(e, out int X, out int Y);
 
 			switch (e.ChangedButton)
 			{
 				case System.Windows.Input.MouseButton.Left:
-					this.session.MouseUp((int)(P.X + 0.5), (int)(P.Y + 0.5), Networking.XMPP.RDP.MouseButton.Left);
+					this.session.MouseUp(X, Y, Networking.XMPP.RDP.MouseButton.Left);
 					e.Handled = true;
 					break;
 
 				case System.Windows.Input.MouseButton.Middle:
-					this.session.MouseUp((int)(P.X + 0.5), (int)(P.Y + 0.5), Networking.XMPP.RDP.MouseButton.Middle);
+					this.session.MouseUp(X, Y, Networking.XMPP.RDP.MouseButton.Middle);
 					e.Handled = true;
 					break;
 
 				case System.Windows.Input.MouseButton.Right:
-					this.session.MouseUp((int)(P.X + 0.5), (int)(P.Y + 0.5), Networking.XMPP.RDP.MouseButton.Right);
+					this.session.MouseUp(X, Y, Networking.XMPP.RDP.MouseButton.Right);
 					e.Handled = true;
 					break;
 
@@ -247,8 +255,8 @@ namespace Waher.Client.WPF.Controls
 
 		private void UserControl_MouseWheel(object sender, MouseWheelEventArgs e)
 		{
-			System.Windows.Point P = e.GetPosition(this.DesktopImage);
-			this.session.MouseWheel((int)(P.X + 0.5), (int)(P.Y + 0.5), e.Delta);
+			this.GetPosition(e, out int X, out int Y);
+			this.session.MouseWheel(X, Y, e.Delta);
 			e.Handled = true;
 		}
 

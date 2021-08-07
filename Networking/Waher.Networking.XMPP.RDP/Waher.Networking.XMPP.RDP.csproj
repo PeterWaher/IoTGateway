@@ -37,6 +37,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
+    <ProjectReference Include="..\Waher.Networking.XMPP.P2P\Waher.Networking.XMPP.P2P.csproj" />
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
   </ItemGroup>
 

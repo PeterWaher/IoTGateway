@@ -20,6 +20,7 @@ using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
 using Waher.Networking.XMPP.MUC;
+using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.PEP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.PubSub;
@@ -62,6 +63,7 @@ namespace Waher.Client.WPF.Model
 		private readonly LinkedList<XmppComponent> components = new LinkedList<XmppComponent>();
 		private readonly Dictionary<string, List<RosterItemEventHandlerAsync>> rosterSubscriptions = new Dictionary<string, List<RosterItemEventHandlerAsync>>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly Connections connections;
+		private EndpointSecurity e2eEncryption;
 		private XmppClient client;
 		private PepClient pepClient;
 		private SensorClient sensorClient;
@@ -70,6 +72,7 @@ namespace Waher.Client.WPF.Model
 		private SynchronizationClient synchronizationClient;
 		private MultiUserChatClient mucClient;
 		private RemoteDesktopClient rdpClient;
+		private XmppServerlessMessaging p2pNetwork;
 		private Timer connectionTimer;
 		private Exception lastError = null;
 		private TransportMethod transport = TransportMethod.TraditionalSocket;
@@ -205,11 +208,19 @@ namespace Waher.Client.WPF.Model
 			this.controlClient = new ControlClient(this.client);
 			this.concentratorClient = new ConcentratorClient(this.client);
 			this.synchronizationClient = new SynchronizationClient(this.client);
-			this.rdpClient = new RemoteDesktopClient(this.client);
 
 			this.AddPepClient(string.Empty);
 
 			this.concentratorClient.OnEvent += ConcentratorClient_OnEvent;
+
+			this.p2pNetwork = new XmppServerlessMessaging("RDP " + this.BareJID, this.client.BareJID);
+			this.p2pNetwork.OnNewXmppClient += ServerlessMessaging_OnNewXmppClient;
+			this.p2pNetwork.OnResynch += ServerlessMessaging_OnResynch;
+
+			this.e2eEncryption = new EndpointSecurity(this.client, this.p2pNetwork, 128);
+			this.client.SetTag("E2E", this.e2eEncryption);
+
+			this.rdpClient = new RemoteDesktopClient(this.client, this.e2eEncryption);
 
 			this.client.Connect();
 		}
@@ -338,6 +349,8 @@ namespace Waher.Client.WPF.Model
 
 					this.CheckRoster();
 					this.SearchComponents();
+
+					this.p2pNetwork.FullJid = this.client.FullJID;
 					break;
 
 				case XmppState.Offline:
@@ -402,8 +415,13 @@ namespace Waher.Client.WPF.Model
 			this.synchronizationClient?.Dispose();
 			this.synchronizationClient = null;
 
-			if (this.client != null)
+			this.e2eEncryption?.Dispose();
+			this.e2eEncryption = null;
+
+			if (!(this.client is null))
 			{
+				this.client.RemoveTag("E2E");
+
 				XmppClient Client = this.client;
 				this.client = null;
 				Client.Dispose();
@@ -1049,13 +1067,18 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		public override string Key
-		{
-			get
-			{
-				return this.BareJID;
-			}
-		}
+		public override string Key => this.BareJID;
+		public override bool IsSniffable => !(this.client is null);
+		public XmppClient Client => this.client;
+		public XmppServerlessMessaging P2P => this.p2pNetwork;
+		public EndpointSecurity E2E => this.e2eEncryption;
+		public PepClient PepClient => this.pepClient;
+		public MultiUserChatClient MucClient => this.mucClient;
+		public SensorClient SensorClient => this.sensorClient;
+		public ControlClient ControlClient => this.controlClient;
+		public ConcentratorClient ConcentratorClient => this.concentratorClient;
+		public SynchronizationClient SynchronizationClient => this.synchronizationClient;
+		public RemoteDesktopClient RdpClient => this.rdpClient;
 
 		public override bool RemoveChild(TreeNode Node)
 		{
@@ -1079,14 +1102,6 @@ namespace Waher.Client.WPF.Model
 				return false;
 		}
 
-		public override bool IsSniffable
-		{
-			get
-			{
-				return this.client != null;
-			}
-		}
-
 		public override void AddSniffer(Networking.Sniffers.ISniffer Sniffer)
 		{
 			this.client.Add(Sniffer);
@@ -1100,11 +1115,6 @@ namespace Waher.Client.WPF.Model
 				return this.client.Remove(Sniffer);
 		}
 
-		public XmppClient Client
-		{
-			get { return this.client; }
-		}
-
 		public override void Added(MainWindow Window)
 		{
 			this.client.OnChatMessage += Window.OnChatMessage;
@@ -1115,41 +1125,6 @@ namespace Waher.Client.WPF.Model
 		{
 			this.client.OnChatMessage -= Window.OnChatMessage;
 			this.client.OnStateChanged -= Window.OnStateChange;
-		}
-
-		public PepClient PepClient
-		{
-			get { return this.pepClient; }
-		}
-
-		public MultiUserChatClient MucClient
-		{
-			get { return this.mucClient; }
-		}
-
-		public SensorClient SensorClient
-		{
-			get { return this.sensorClient; }
-		}
-
-		public ControlClient ControlClient
-		{
-			get { return this.controlClient; }
-		}
-
-		public ConcentratorClient ConcentratorClient
-		{
-			get { return this.concentratorClient; }
-		}
-
-		public SynchronizationClient SynchronizationClient
-		{
-			get { return this.synchronizationClient; }
-		}
-
-		public RemoteDesktopClient RdpClient
-		{
-			get { return this.rdpClient; }
 		}
 
 		public void SearchComponents()
@@ -1328,7 +1303,7 @@ namespace Waher.Client.WPF.Model
 				return Task.CompletedTask;
 
 			}, null);
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -1677,6 +1652,22 @@ namespace Waher.Client.WPF.Model
 		{
 			// TODO: Avatars
 			return Task.CompletedTask;
+		}
+
+		private void ServerlessMessaging_OnNewXmppClient(object Sender, PeerConnectionEventArgs e)
+		{
+			XmppClient Client = e.Client;
+
+			this.e2eEncryption.RegisterHandlers(Client);
+		}
+
+		private void ServerlessMessaging_OnResynch(object Sender, ResynchEventArgs e)
+		{
+			this.e2eEncryption?.SynchronizeE2e(e.RemoteFullJid, (Sender2, e2) =>
+			{
+				e.Done(e2.Ok);
+				return Task.CompletedTask;
+			});
 		}
 
 	}

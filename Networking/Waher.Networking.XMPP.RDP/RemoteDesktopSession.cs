@@ -209,8 +209,13 @@ namespace Waher.Networking.XMPP.RDP
 			Xml.Append(Y.ToString());
 			Xml.Append("'/>");
 
-			this.client.Client.SendMessage(MessageType.Normal, this.remoteJid, Xml.ToString(), 
-				string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+			this.SendMessage(Xml.ToString());
+		}
+
+		private void SendMessage(string Xml)
+		{
+			this.client.E2E.SendMessage(this.client.Client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged, MessageType.Normal,
+				string.Empty, this.remoteJid, Xml, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
 		}
 
 		/// <summary>
@@ -235,8 +240,7 @@ namespace Waher.Networking.XMPP.RDP
 			Xml.Append(Button.ToString());
 			Xml.Append("'/>");
 
-			this.client.Client.SendMessage(MessageType.Normal, this.remoteJid, Xml.ToString(),
-				string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+			this.SendMessage(Xml.ToString());
 		}
 
 		/// <summary>
@@ -261,8 +265,7 @@ namespace Waher.Networking.XMPP.RDP
 			Xml.Append(Button.ToString());
 			Xml.Append("'/>");
 
-			this.client.Client.SendMessage(MessageType.Normal, this.remoteJid, Xml.ToString(),
-				string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+			this.SendMessage(Xml.ToString());
 		}
 
 		/// <summary>
@@ -287,8 +290,7 @@ namespace Waher.Networking.XMPP.RDP
 			Xml.Append(Delta.ToString());
 			Xml.Append("'/>");
 
-			this.client.Client.SendMessage(MessageType.Normal, this.remoteJid, Xml.ToString(),
-				string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+			this.SendMessage(Xml.ToString());
 		}
 
 		/// <summary>
@@ -307,8 +309,7 @@ namespace Waher.Networking.XMPP.RDP
 			Xml.Append(KeyCode.ToString());
 			Xml.Append("'/>");
 
-			this.client.Client.SendMessage(MessageType.Normal, this.remoteJid, Xml.ToString(),
-				string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+			this.SendMessage(Xml.ToString());
 		}
 
 		/// <summary>
@@ -327,8 +328,7 @@ namespace Waher.Networking.XMPP.RDP
 			Xml.Append(KeyCode.ToString());
 			Xml.Append("'/>");
 
-			this.client.Client.SendMessage(MessageType.Normal, this.remoteJid, Xml.ToString(),
-				string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+			this.SendMessage(Xml.ToString());
 		}
 	}
 }

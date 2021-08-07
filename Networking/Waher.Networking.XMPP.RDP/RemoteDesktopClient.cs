@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking.XMPP.P2P;
 using Waher.Runtime.Cache;
 
 namespace Waher.Networking.XMPP.RDP
@@ -15,6 +16,7 @@ namespace Waher.Networking.XMPP.RDP
 	public class RemoteDesktopClient : XmppExtension
 	{
 		private readonly Cache<string, RemoteDesktopSession> sessions;
+		private readonly EndpointSecurity e2e;
 
 		/// <summary>
 		/// http://waher.se/rdp/1.0
@@ -25,9 +27,12 @@ namespace Waher.Networking.XMPP.RDP
 		/// Remote Desktop Client
 		/// </summary>
 		/// <param name="Client">XMPP Client.</param>
-		public RemoteDesktopClient(XmppClient Client)
+		/// <param name="E2e">End-to-end encryption</param>
+		public RemoteDesktopClient(XmppClient Client, EndpointSecurity E2e)
 			: base(Client)
 		{
+			this.e2e = E2e;
+
 			this.sessions = new Cache<string, RemoteDesktopSession>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromMinutes(15));
 			this.sessions.Removed += Sessions_Removed;
 
@@ -55,6 +60,11 @@ namespace Waher.Networking.XMPP.RDP
 		public override string[] Extensions => new string[0];
 
 		/// <summary>
+		/// End-to-end encryption
+		/// </summary>
+		public EndpointSecurity E2E => this.e2e;
+
+		/// <summary>
 		/// Starts a Remote Desktop session.
 		/// </summary>
 		/// <param name="To">Full JID of remote client.</param>
@@ -72,7 +82,7 @@ namespace Waher.Networking.XMPP.RDP
 
 			TaskCompletionSource<RemoteDesktopSession> Result = new TaskCompletionSource<RemoteDesktopSession>();
 
-			this.client.SendIqSet(To, sb.ToString(), (sender, e) =>
+			this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, To, sb.ToString(), (sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -115,7 +125,7 @@ namespace Waher.Networking.XMPP.RDP
 
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			this.client.SendIqSet(To, sb.ToString(), (sender, e) =>
+			this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, To, sb.ToString(), (sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);
@@ -226,7 +236,7 @@ namespace Waher.Networking.XMPP.RDP
 				return Task.CompletedTask;
 
 			Session.UpdateTile(X, Y, TileBase64);
-		
+
 			return Task.CompletedTask;
 		}
 	}

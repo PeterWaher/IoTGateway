@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using Waher.Client.WPF.Model;
 using Waher.Events;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.RDP;
 
 namespace Waher.Client.WPF.Controls
@@ -33,12 +34,15 @@ namespace Waher.Client.WPF.Controls
 		private int columns;
 		private int rows;
 		private bool drawing = false;
+		private bool disposeRdpClient;
 
-		public RemoteDesktopView(TreeNode Node, XmppClient Client, RemoteDesktopClient RdpClient, RemoteDesktopSession Session)
+		public RemoteDesktopView(TreeNode Node, XmppClient Client, RemoteDesktopClient RdpClient, bool DisposeRdpClient,
+			RemoteDesktopSession Session)
 		{
 			this.node = Node;
 			this.client = Client;
 			this.rdpClient = RdpClient;
+			this.disposeRdpClient = DisposeRdpClient;
 			this.session = Session;
 
 			this.session.StateChanged += Session_StateChanged;
@@ -173,6 +177,12 @@ namespace Waher.Client.WPF.Controls
 
 				if (this.session.State != RemoteDesktopSessionState.Stopped && this.session.State != RemoteDesktopSessionState.Stopping)
 					await this.rdpClient.StopSessionAsync(this.session.RemoteJid, this.session.SessionId);
+
+				if (this.disposeRdpClient)
+				{
+					this.rdpClient.Dispose();
+					this.disposeRdpClient = false;
+				}
 			}
 			catch (Exception ex)
 			{
@@ -283,11 +293,6 @@ namespace Waher.Client.WPF.Controls
 				Keyboard.Focus(this);
 		}
 
-		public void NewButton_Click(object sender, RoutedEventArgs e)
-		{
-			// TODO: Refresh screen?
-		}
-
 		public void SaveButton_Click(object sender, RoutedEventArgs e)
 		{
 			// TODO: screen capture?
@@ -296,6 +301,11 @@ namespace Waher.Client.WPF.Controls
 		public void SaveAsButton_Click(object sender, RoutedEventArgs e)
 		{
 			// TODO: screen capture?
+		}
+
+		public void NewButton_Click(object sender, RoutedEventArgs e)
+		{
+			// TODO: Refresh screen?
 		}
 
 		public void OpenButton_Click(object sender, RoutedEventArgs e)

@@ -11,6 +11,7 @@ using Waher.Content.Html;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.RDP;
 
 namespace Waher.Client.WPF.Model
@@ -30,7 +31,6 @@ namespace Waher.Client.WPF.Model
 			this.client = Client;
 			this.bareJid = BareJid;
 			this.supportsRdp = SupportsRdp;
-
 		}
 
 		public override string Header
@@ -411,30 +411,45 @@ namespace Waher.Client.WPF.Model
 
 		public override async void Configure()
 		{
+			string FullJid = this.LastOnlineFullJid;
+			if (string.IsNullOrEmpty(FullJid))
+				return;
+
+			RemoteDesktopClient RdpClient = this.XmppAccountNode.RdpClient;
+			if (RdpClient is null)
+				return;
+
+			XmppClient Client = this.client;
+			bool DisposeRdpClient = false;
+
 			try
 			{
-				string FullJid = this.LastOnlineFullJid;
-				if (string.IsNullOrEmpty(FullJid))
-					return;
-
-				RemoteDesktopClient RdpClient = this.XmppAccountNode.RdpClient;
-				if (RdpClient is null)
-					return;
-
 				Mouse.OverrideCursor = Cursors.Wait;
+
+				PeerConnectionEventArgs e = await this.XmppAccountNode.P2P.GetPeerConnectionAsync(FullJid);
+				if (!(e.Client is null))
+				{
+					Client = e.Client;
+					RdpClient = new RemoteDesktopClient(Client, this.XmppAccountNode.E2E);
+					DisposeRdpClient = true;
+				}
+
 				RemoteDesktopSession Session = await RdpClient.StartSessionAsync(FullJid);
 				Mouse.OverrideCursor = null;
 
 				TabItem TabItem = MainWindow.NewTab(this.bareJid);
 				MainWindow.currentInstance.Tabs.Items.Add(TabItem);
 
-				RemoteDesktopView View = new RemoteDesktopView(this, this.client, RdpClient, Session);
+				RemoteDesktopView View = new RemoteDesktopView(this, Client, RdpClient, DisposeRdpClient, Session);
 				TabItem.Content = View;
 
 				MainWindow.currentInstance.Tabs.SelectedItem = TabItem;
 			}
 			catch (Exception ex)
 			{
+				if (DisposeRdpClient)
+					RdpClient.Dispose();
+
 				MainWindow.ErrorBox(ex.Message);
 			}
 		}

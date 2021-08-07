@@ -45,6 +45,9 @@ namespace Waher.Client.WPF.Controls
 			this.session.TileUpdated += Session_TileUpdated;
 
 			InitializeComponent();
+
+			this.Focusable = true;
+			Keyboard.Focus(this);
 		}
 
 		private void Session_StateChanged(object sender, EventArgs e)
@@ -274,6 +277,12 @@ namespace Waher.Client.WPF.Controls
 			e.Handled = true;
 		}
 
+		private void UserControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+		{
+			if (this.IsVisible)
+				Keyboard.Focus(this);
+		}
+
 		public void NewButton_Click(object sender, RoutedEventArgs e)
 		{
 			// TODO: Refresh screen?
@@ -290,11 +299,6 @@ namespace Waher.Client.WPF.Controls
 		}
 
 		public void OpenButton_Click(object sender, RoutedEventArgs e)
-		{
-			// TODO: ?
-		}
-
-		private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
 			// TODO: ?
 		}

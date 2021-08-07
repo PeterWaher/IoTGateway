@@ -3098,7 +3098,7 @@
             Class managing peer-to-peer serveless XMPP communication.
             </summary>
             <param name="ApplicationName">Name of application, as it will be registered in Internet Gateways.</param>
-            <param name="FullJid">Bare JID of local end-point.</param>
+            <param name="FullJid">Full JID of local end-point.</param>
             <param name="Sniffers">Sniffers</param>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.#ctor(System.String,System.String,System.UInt16,System.UInt16,Waher.Networking.Sniffers.ISniffer[])">
@@ -3106,7 +3106,7 @@
             Class managing peer-to-peer serveless XMPP communication.
             </summary>
             <param name="ApplicationName">Name of application, as it will be registered in Internet Gateways.</param>
-            <param name="FullJid">Bare JID of local end-point.</param>
+            <param name="FullJid">Full JID of local end-point.</param>
             <param name="LocalPort">Desired local port number. If 0, a dynamic port number will be assigned.</param>
             <param name="ExternalPort">Desired external port number. If 0, a dynamic port number will be assigned.</param>
             <param name="Sniffers">Sniffers</param>
@@ -3116,7 +3116,7 @@
             Class managing peer-to-peer serveless XMPP communication.
             </summary>
             <param name="ApplicationName">Name of application, as it will be registered in Internet Gateways.</param>
-            <param name="FullJid">Bare JID of local end-point.</param>
+            <param name="FullJid">Full JID of local end-point.</param>
             <param name="LocalPort">Desired local port number. If 0, a dynamic port number will be assigned.</param>
             <param name="ExternalPort">Desired external port number. If 0, a dynamic port number will be assigned.</param>
             <param name="Backlog">Connection backlog.</param>
@@ -3172,7 +3172,7 @@
             <summary>
             Gets a peer XMPP connection.
             </summary>
-            <param name="FullJID">Bare JID of peer to connect to.</param>
+            <param name="FullJID">Full JID of peer to connect to.</param>
             <param name="Callback">Method to call when connection is established.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
@@ -3180,7 +3180,7 @@
             <summary>
             Gets a peer XMPP connection.
             </summary>
-            <param name="FullJID">Bare JID of peer to connect to.</param>
+            <param name="FullJID">Full JID of peer to connect to.</param>
             <returns>Peer Connection event arguments containing peer-to-peer client, and corresponding JIDs, if they exist.</returns>
         </member>
         <member name="E:Waher.Networking.XMPP.P2P.XmppServerlessMessaging.OnResynch">

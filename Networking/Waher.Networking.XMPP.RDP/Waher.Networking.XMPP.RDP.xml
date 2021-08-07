@@ -14,11 +14,12 @@
             http://waher.se/rdp/1.0
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopClient.#ctor(Waher.Networking.XMPP.XmppClient)">
+        <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopClient.#ctor(Waher.Networking.XMPP.XmppClient,Waher.Networking.XMPP.P2P.EndpointSecurity)">
             <summary>
             Remote Desktop Client
             </summary>
             <param name="Client">XMPP Client.</param>
+            <param name="E2e">End-to-end encryption</param>
         </member>
         <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopClient.Dispose">
             <summary>
@@ -28,6 +29,11 @@
         <member name="P:Waher.Networking.XMPP.RDP.RemoteDesktopClient.Extensions">
             <summary>
             Implemented extensions.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.RDP.RemoteDesktopClient.E2E">
+            <summary>
+            End-to-end encryption
             </summary>
         </member>
         <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopClient.StartSessionAsync(System.String)">

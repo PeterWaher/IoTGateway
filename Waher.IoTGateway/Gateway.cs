@@ -47,6 +47,7 @@ using Waher.Networking.XMPP.Contracts;
 using Waher.Networking.XMPP.HTTPX;
 using Waher.Networking.XMPP.Mail;
 using Waher.Networking.XMPP.MUC;
+using Waher.Networking.XMPP.P2P.SOCKS5;
 using Waher.Networking.XMPP.PEP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.PubSub;
@@ -2589,6 +2590,14 @@ namespace Waher.IoTGateway
 		public static HttpxProxy HttpxProxy
 		{
 			get { return httpxProxy; }
+		}
+
+		/// <summary>
+		/// SOCKS5 Proxy
+		/// </summary>
+		public static Socks5Proxy Socks5Proxy
+		{
+			get { return socksProxy; }
 		}
 
 		/// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,6 +13,7 @@ using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.P2P;
+using Waher.Networking.XMPP.P2P.SOCKS5;
 using Waher.Networking.XMPP.RDP;
 
 namespace Waher.Client.WPF.Model
@@ -24,6 +26,7 @@ namespace Waher.Client.WPF.Model
 		private readonly XmppClient client;
 		private readonly string bareJid;
 		private readonly bool supportsRdp;
+		private Socks5Proxy proxy = null;
 
 		public XmppContact(TreeNode Parent, XmppClient Client, string BareJid, bool SupportsRdp)
 			: base(Parent)
@@ -419,6 +422,7 @@ namespace Waher.Client.WPF.Model
 			if (RdpClient is null)
 				return;
 
+			RemoteDesktopSession Session = null;
 			XmppClient Client = this.client;
 			bool DisposeRdpClient = false;
 
@@ -427,14 +431,34 @@ namespace Waher.Client.WPF.Model
 				Mouse.OverrideCursor = Cursors.Wait;
 
 				PeerConnectionEventArgs e = await this.XmppAccountNode.P2P.GetPeerConnectionAsync(FullJid);
-				if (!(e.Client is null))
+				if (e.Client is null)
+				{
+					if (this.proxy is null)
+					{
+						TaskCompletionSource<bool> Socks5Search = new TaskCompletionSource<bool>();
+
+						this.proxy = new Socks5Proxy(this.client, this.XmppAccountNode.E2E);
+						this.proxy.StartSearch((sender, e2) => Socks5Search.TrySetResult(true));
+
+						await Socks5Search.Task;
+					}
+
+					if (this.proxy?.HasProxy ?? false)
+					{
+						TaskCompletionSource<Socks5Client> SessionInitiated = new TaskCompletionSource<Socks5Client>();
+						Session = await RdpClient.StartSessionAsync(FullJid, this.proxy.JID, this.proxy.Host, this.proxy.Port, Socks5SessionId);
+					}
+				}
+				else
 				{
 					Client = e.Client;
 					RdpClient = new RemoteDesktopClient(Client, this.XmppAccountNode.E2E);
 					DisposeRdpClient = true;
 				}
 
-				RemoteDesktopSession Session = await RdpClient.StartSessionAsync(FullJid);
+				if (Session is null)
+					Session = await RdpClient.StartSessionAsync(FullJid);
+
 				Mouse.OverrideCursor = null;
 
 				TabItem TabItem = MainWindow.NewTab(this.bareJid);

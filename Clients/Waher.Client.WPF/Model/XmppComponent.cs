@@ -175,6 +175,9 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-
+		public bool HasFeature(string Feature)
+		{
+			return this.features?.ContainsKey(Feature) ?? false;
+		}
 	}
 }

@@ -73,14 +73,38 @@ namespace Waher.Networking.XMPP.RDP
 		/// <returns>Remote Desktop Session object.</returns>
 		public Task<RemoteDesktopSession> StartSessionAsync(string To)
 		{
+			return this.StartSessionAsync(To, null, null, 0);
+		}
+
+		/// <summary>
+		/// Starts a Remote Desktop session.
+		/// </summary>
+		/// <param name="To">Full JID of remote client.</param>
+		/// <param name="Socks5Jid">Optional SOCKS5 component JID.</param>
+		/// <param name="Socks5Host">Optional SOCKS5 host name.</param>
+		/// <param name="Socks5Port">Optional SOCKS5 port number.</param>
+		/// <returns>Remote Desktop Session object.</returns>
+		public Task<RemoteDesktopSession> StartSessionAsync(string To, string Socks5Jid, string Socks5Host, int Socks5Port)
+		{
 			StringBuilder sb = new StringBuilder();
 			string SessionId = Guid.NewGuid().ToString();
 
 			sb.Append("<start xmlns='");
 			sb.Append(RemoteDesktopNamespace);
-			sb.Append("'>");
+			sb.Append("' sessionId='");
 			sb.Append(SessionId);
-			sb.Append("</start>");
+
+			if (!string.IsNullOrEmpty(Socks5Jid))
+			{
+				sb.Append("' s5Jid='");
+				sb.Append(XML.Encode(Socks5Jid));
+				sb.Append("' s5Host='");
+				sb.Append(XML.Encode(Socks5Host));
+				sb.Append("' s5Port='");
+				sb.Append(Socks5Port.ToString());
+			}
+
+			sb.Append("'/>");
 
 			TaskCompletionSource<RemoteDesktopSession> Result = new TaskCompletionSource<RemoteDesktopSession>();
 

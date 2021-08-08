@@ -39,6 +39,7 @@ namespace Waher.Networking.XMPP.RDP
 			Client.RegisterMessageHandler("started", RemoteDesktopNamespace, this.StartedMessageHandler, true);
 			Client.RegisterMessageHandler("stopped", RemoteDesktopNamespace, this.StoppedMessageHandler, false);
 			Client.RegisterMessageHandler("tile", RemoteDesktopNamespace, this.TileMessageHandler, false);
+			Client.RegisterMessageHandler("tiles", RemoteDesktopNamespace, this.TilesMessageHandler, false);
 		}
 
 		/// <summary>
@@ -49,6 +50,7 @@ namespace Waher.Networking.XMPP.RDP
 			this.client.UnregisterMessageHandler("started", RemoteDesktopNamespace, this.StartedMessageHandler, true);
 			this.client.UnregisterMessageHandler("stopped", RemoteDesktopNamespace, this.StoppedMessageHandler, false);
 			this.client.UnregisterMessageHandler("tile", RemoteDesktopNamespace, this.TileMessageHandler, false);
+			this.client.UnregisterMessageHandler("tiles", RemoteDesktopNamespace, this.TilesMessageHandler, false);
 
 			this.sessions.Dispose();
 			base.Dispose();
@@ -202,7 +204,7 @@ namespace Waher.Networking.XMPP.RDP
 		private Task TileMessageHandler(object State, MessageEventArgs e)
 		{
 			RemoteDesktopSession Session = null;
-			string TileBase64 = null;
+			string TileBase64 = e.Content.InnerText;
 			int X = 0;
 			int Y = 0;
 
@@ -224,11 +226,6 @@ namespace Waher.Networking.XMPP.RDP
 						if (!int.TryParse(Attr.Value, out Y))
 							return Task.CompletedTask;
 						break;
-
-					case "tile":
-						TileBase64 = Attr.InnerText;
-						break;
-
 				}
 			}
 
@@ -236,6 +233,43 @@ namespace Waher.Networking.XMPP.RDP
 				return Task.CompletedTask;
 
 			Session.UpdateTile(X, Y, TileBase64);
+
+			return Task.CompletedTask;
+		}
+
+		private Task TilesMessageHandler(object State, MessageEventArgs e)
+		{
+			string SessionId = XML.Attribute(e.Content, "sessionId");
+			if (!this.sessions.TryGetValue(SessionId, out RemoteDesktopSession Session))
+				return Task.CompletedTask;
+
+			foreach (XmlNode N in e.Content.ChildNodes)
+			{
+				if (N is XmlElement E && E.LocalName == "tile" && E.NamespaceURI == e.Content.NamespaceURI)
+				{
+					string TileBase64 = E.InnerText;
+					int X = 0;
+					int Y = 0;
+
+					foreach (XmlAttribute Attr in E.Attributes)
+					{
+						switch (Attr.Name)
+						{
+							case "x":
+								if (!int.TryParse(Attr.Value, out X))
+									continue;
+								break;
+
+							case "y":
+								if (!int.TryParse(Attr.Value, out Y))
+									continue;
+								break;
+						}
+					}
+
+					Session.UpdateTile(X, Y, TileBase64);
+				}
+			}
 
 			return Task.CompletedTask;
 		}

@@ -96,6 +96,7 @@ namespace Waher.IoTGateway.WebResources
 				}
 
 				KeyValuePair<string, IExportFormat> Exporter = GetExporter(TypeOfFile, OnlySelectedCollections, SelectedCollections);
+				Task T;
 
 				lock (synchObject)
 				{
@@ -104,11 +105,19 @@ namespace Waher.IoTGateway.WebResources
 						Response.StatusCode = 409;
 						Response.StatusMessage = "Conflict";
 						Response.ContentType = "text/plain";
-						Response.Write("Export is underway.");
-						return;
+						T = Response.Write("Export is underway.");
 					}
 					else
+					{
 						exporting = true;
+						T = null;
+					}
+				}
+
+				if (!(T is null))
+				{
+					await T;
+					return;
 				}
 
 				if (!ExportOnly)

@@ -53,7 +53,7 @@ namespace Waher.IoTGateway.WebResources
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public Task POST(HttpRequest Request, HttpResponse Response)
+		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request, "Admin.Data.Backup");
 
@@ -83,11 +83,9 @@ namespace Waher.IoTGateway.WebResources
 
 			Response.StatusCode = 200;
 			Response.ContentType = "text/plain";
-			Response.Write("1");
+			await Response.Write("1");
 
 			ExportFormat.UpdateClientsFileDeleted(FileName);
-
-			return Task.CompletedTask;
 		}
 
 	}

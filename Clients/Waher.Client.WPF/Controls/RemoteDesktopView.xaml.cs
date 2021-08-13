@@ -23,19 +23,35 @@ namespace Waher.Client.WPF.Controls
 	/// </summary>
 	public partial class RemoteDesktopView : UserControl, ITabView
 	{
-		private readonly LinkedList<(string, int, int)> queue = new LinkedList<(string, int, int)>();
+		private readonly LinkedList<(Pending, int, int)> queue = new LinkedList<(Pending, int, int)>();
 		private readonly XmppContact node;
 		private readonly XmppClient client;
 		private readonly RemoteDesktopClient rdpClient;
 		private readonly RemoteDesktopSession session;
 		private readonly object synchObj = new object();
-		private string[,] pendingTiles = null;
+		private Pending[,] pendingTiles = null;
 		private WriteableBitmap desktop = null;
 		private Timer timer;
 		private int columns;
 		private int rows;
 		private bool drawing = false;
 		private bool disposeRdpClient;
+
+		private class Pending
+		{
+			public string Base64;
+			public byte[] Bin;
+
+			public Pending(string Base64)
+			{
+				this.Base64 = Base64;
+			}
+
+			public Pending(byte[] Bin)
+			{
+				this.Bin = Bin;
+			}
+		}
 
 		public RemoteDesktopView(XmppContact Node, XmppClient Client, RemoteDesktopClient RdpClient, bool DisposeRdpClient,
 			RemoteDesktopSession Session)
@@ -66,10 +82,10 @@ namespace Waher.Client.WPF.Controls
 
 				lock (this.synchObj)
 				{
-					this.pendingTiles = new string[this.rows, this.columns];
+					this.pendingTiles = new Pending[this.rows, this.columns];
 
-					foreach ((string TileBase64, int X, int Y) in this.queue)
-						this.pendingTiles[Y, X] = TileBase64;
+					foreach ((Pending Tile, int X, int Y) in this.queue)
+						this.pendingTiles[Y, X] = Tile;
 
 					this.queue.Clear();
 				}
@@ -83,15 +99,125 @@ namespace Waher.Client.WPF.Controls
 			lock (this.synchObj)
 			{
 				if (this.pendingTiles is null)
-					this.queue.AddLast((e.TileBase64, e.X, e.Y));
+					this.queue.AddLast((new Pending(e.TileBase64), e.X, e.Y));
 				else
-					this.pendingTiles[e.Y, e.X] = e.TileBase64;
+					this.pendingTiles[e.Y, e.X] = new Pending(e.TileBase64);
 			}
 		}
 
+		private byte[] buffer;
+		private int state = 0;
+		private byte command = 0;
+		private int len = 0;
+		private int left = 0;
+		private int pos = 0;
+		private int x = 0;
+		private int y = 0;
+
 		internal Task Socks5DataReceived(object Sender, DataReceivedEventArgs e)
 		{
-			return Task.CompletedTask;	// TODO
+			byte[] Data = e.Buffer;
+			int i = e.Offset;
+			int c = e.Count;
+			int j;
+			byte b;
+
+			while (c > 0)
+			{
+				b = Data[i++];
+				c--;
+
+				switch (this.state)
+				{
+					case 0:
+						this.command = b;
+						this.state++;
+						break;
+
+					case 1:
+						this.command = b;
+						this.state++;
+						break;
+
+					case 2:
+						this.len = b;
+						this.state++;
+						break;
+
+					case 3:
+						this.len |= b << 8;
+						this.state++;
+						break;
+
+					case 4:
+						this.len |= b << 16;
+						this.left = len;
+						this.buffer = new byte[len];
+						this.pos = 0;
+						this.state++;
+						break;
+
+					case 5:
+						this.x = b;
+						this.state++;
+						break;
+
+					case 6:
+						this.x |= b << 8;
+						this.state++;
+						break;
+
+					case 7:
+						this.y = b;
+						this.state++;
+						break;
+
+					case 8:
+						this.y |= b << 8;
+						if (this.left > 0)
+							this.state++;
+						else
+						{
+							this.ProcessCommand();
+							this.state = 0;
+						}
+						break;
+
+					case 9:
+						j = Math.Min(this.left, c + 1);
+						Array.Copy(Data, i - 1, this.buffer, this.pos, j);
+						this.pos += j;
+						this.left -= j;
+						j--;
+						i += j;
+						c -= j;
+						this.ProcessCommand();
+						this.state = 0;
+						break;
+
+					default:
+						c = 0;
+						break;
+				}
+			}
+
+			return Task.CompletedTask;  // TODO
+		}
+
+		private void ProcessCommand()
+		{
+			switch (this.command)
+			{
+				case 0:
+					lock (this.synchObj)
+					{
+						if (this.pendingTiles is null)
+							this.queue.AddLast((new Pending(this.buffer), this.x, this.y));
+						else
+							this.pendingTiles[this.y, this.x] = new Pending(this.buffer);
+					}
+					break;
+			}
 		}
 
 		internal Task Socks5StreamClosed(object Sender, StreamEventArgs e)
@@ -109,9 +235,9 @@ namespace Waher.Client.WPF.Controls
 			MemoryStream ms = null;
 			Bitmap Tile = null;
 			BitmapData Data = null;
+			Pending PendingTile;
 			bool Locked = false;
 			int Size = this.session.TileSize;
-			string s;
 			int x, y;
 
 			try
@@ -127,8 +253,8 @@ namespace Waher.Client.WPF.Controls
 					{
 						lock (this.synchObj)
 						{
-							s = this.pendingTiles[y, x];
-							if (s is null)
+							PendingTile = this.pendingTiles[y, x];
+							if (PendingTile is null)
 								continue;
 
 							this.pendingTiles[y, x] = null;
@@ -142,7 +268,7 @@ namespace Waher.Client.WPF.Controls
 
 						ms?.Dispose();
 						ms = null;
-						ms = new MemoryStream(Convert.FromBase64String(s));
+						ms = new MemoryStream(PendingTile.Bin ?? Convert.FromBase64String(PendingTile.Base64));
 
 						Tile = (Bitmap)Bitmap.FromStream(ms);
 						Data = Tile.LockBits(new Rectangle(0, 0, Tile.Width, Tile.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);

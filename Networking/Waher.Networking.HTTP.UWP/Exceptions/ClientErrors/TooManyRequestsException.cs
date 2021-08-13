@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Networking.HTTP
 {
@@ -9,14 +7,21 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class TooManyRequestsException : HttpException
 	{
-		private const int Code = 429;
-		private const string Msg = "Too Many Requests";
+		/// <summary>
+		/// 429
+		/// </summary>
+		public const int Code = 429;
+
+		/// <summary>
+		/// Too Many Requests
+		/// </summary>
+		public const string StatusMessage = "Too Many Requests";
 
 		/// <summary>
 		/// The user has sent too many requests in a given amount of time. Intended for use with rate limiting schemes.
 		/// </summary>
 		public TooManyRequestsException()
-			: base(Code, Msg)
+			: base(Code, StatusMessage)
 		{
 		}
 
@@ -25,7 +30,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
 		public TooManyRequestsException(object ContentObject)
-			: base(Code, Msg, ContentObject)
+			: base(Code, StatusMessage, ContentObject)
 		{
 		}
 
@@ -35,7 +40,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Content">Any encoded content to return.</param>
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
 		public TooManyRequestsException(byte[] Content, string ContentType)
-			: base(Code, Msg, Content, ContentType)
+			: base(Code, StatusMessage, Content, ContentType)
 		{
 		}
 	}

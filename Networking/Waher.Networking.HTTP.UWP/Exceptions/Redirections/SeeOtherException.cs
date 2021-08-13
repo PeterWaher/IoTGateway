@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Networking.HTTP
 {
@@ -12,8 +11,15 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class SeeOtherException : HttpException
 	{
-		private const int Code = 303;
-		private const string Msg = "See Other";
+		/// <summary>
+		/// 303
+		/// </summary>
+		public const int Code = 303;
+
+		/// <summary>
+		/// See Other
+		/// </summary>
+		public const string StatusMessage = "See Other";
 
 		/// <summary>
 		/// The response to the request can be found under a different URI and SHOULD be retrieved using a GET method on that resource. This method exists 
@@ -23,7 +29,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="Location">Location.</param>
 		public SeeOtherException(string Location)
-			: base(Code, Msg, new KeyValuePair<string, string>("Location", Location))
+			: base(Code, StatusMessage, new KeyValuePair<string, string>("Location", Location))
 		{
 		}
 
@@ -36,7 +42,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Location">Location.</param>
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
 		public SeeOtherException(string Location, object ContentObject)
-			: base(Code, Msg, ContentObject, new KeyValuePair<string, string>("Location", Location))
+			: base(Code, StatusMessage, ContentObject, new KeyValuePair<string, string>("Location", Location))
 		{
 		}
 
@@ -50,7 +56,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Content">Any encoded content to return.</param>
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
 		public SeeOtherException(string Location, byte[] Content, string ContentType)
-			: base(Code, Msg, Content, ContentType, new KeyValuePair<string, string>("Location", Location))
+			: base(Code, StatusMessage, Content, ContentType, new KeyValuePair<string, string>("Location", Location))
 		{
 		}
 	}

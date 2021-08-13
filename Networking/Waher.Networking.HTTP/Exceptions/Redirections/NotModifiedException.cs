@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Networking.HTTP
 {
@@ -13,8 +11,15 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class NotModifiedException : HttpException
 	{
-		private const int Code = 304;
-		private const string Msg = "Not Modified";
+		/// <summary>
+		/// 304
+		/// </summary>
+		public const int Code = 304;
+
+		/// <summary>
+		/// Not Modified
+		/// </summary>
+		public const string StatusMessage = "Not Modified";
 
 		/// <summary>
 		/// If the client has performed a conditional GET request and access is allowed, but the document has not been modified, the server SHOULD respond 
@@ -24,7 +29,7 @@ namespace Waher.Networking.HTTP
 		/// Note: 304 does not allow content in response.
 		/// </summary>
 		public NotModifiedException()
-			: base(Code, Msg)
+			: base(Code, StatusMessage)
 		{
 		}
 	}

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Networking.HTTP
 {
@@ -12,8 +10,15 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class ConflictException : HttpException
 	{
-		private const int Code = 409;
-		private const string Msg = "Conflict";
+		/// <summary>
+		/// 409
+		/// </summary>
+		public const int Code = 409;
+
+		/// <summary>
+		/// Conflict
+		/// </summary>
+		public const string StatusMessage = "Conflict";
 
 		/// <summary>
 		/// The request could not be completed due to a conflict with the current state of the resource. This code is only allowed in situations where 
@@ -22,7 +27,7 @@ namespace Waher.Networking.HTTP
 		/// or user agent to fix the problem; however, that might not be possible and is not required. 
 		/// </summary>
 		public ConflictException()
-			: base(Code, Msg)
+			: base(Code, StatusMessage)
 		{
 		}
 
@@ -34,7 +39,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
 		public ConflictException(object ContentObject)
-			: base(Code, Msg, ContentObject)
+			: base(Code, StatusMessage, ContentObject)
 		{
 		}
 
@@ -47,7 +52,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Content">Any encoded content to return.</param>
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
 		public ConflictException(byte[] Content, string ContentType)
-			: base(Code, Msg, Content, ContentType)
+			: base(Code, StatusMessage, Content, ContentType)
 		{
 		}
 	}

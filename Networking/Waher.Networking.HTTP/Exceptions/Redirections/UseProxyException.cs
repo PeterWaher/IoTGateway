@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Networking.HTTP
 {
@@ -10,8 +9,15 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class UseProxyException : HttpException
 	{
-		private const int Code = 305;
-		private const string Msg = "Use Proxy";
+		/// <summary>
+		/// 305
+		/// </summary>
+		public const int Code = 305;
+
+		/// <summary>
+		/// Use Proxy
+		/// </summary>
+		public const string StatusMessage = "Use Proxy";
 
 		/// <summary>
 		/// The requested resource MUST be accessed through the proxy given by the Location field. The Location field gives the URI of the proxy. 
@@ -19,7 +25,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="Location">Location.</param>
 		public UseProxyException(string Location)
-			: base(Code, Msg, new KeyValuePair<string, string>("Location", Location))
+			: base(Code, StatusMessage, new KeyValuePair<string, string>("Location", Location))
 		{
 		}
 
@@ -30,7 +36,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Location">Location.</param>
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
 		public UseProxyException(string Location, object ContentObject)
-			: base(Code, Msg, ContentObject, new KeyValuePair<string, string>("Location", Location))
+			: base(Code, StatusMessage, ContentObject, new KeyValuePair<string, string>("Location", Location))
 		{
 		}
 
@@ -42,7 +48,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Content">Any encoded content to return.</param>
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
 		public UseProxyException(string Location, byte[] Content, string ContentType)
-			: base(Code, Msg, Content, ContentType, new KeyValuePair<string, string>("Location", Location))
+			: base(Code, StatusMessage, Content, ContentType, new KeyValuePair<string, string>("Location", Location))
 		{
 		}
 	}

@@ -333,7 +333,8 @@ namespace Waher.Networking.HTTP
 					}
 					else
 					{
-						await this.SendResponse(null, null, new HttpException(501, "Not Implemented", "Transfer encoding not implemented."), false);
+						await this.SendResponse(null, null, new HttpException(NotImplementedException.Code, NotImplementedException.StatusMessage,
+							"Transfer encoding not implemented."), false);
 						return true;
 					}
 				}
@@ -345,7 +346,8 @@ namespace Waher.Networking.HTTP
 						long l = ContentLength.ContentLength;
 						if (l < 0)
 						{
-							await this.SendResponse(null, null, new HttpException(400, "Bad Request", "Negative content lengths invalid."), false);
+							await this.SendResponse(null, null, new HttpException(BadRequestException.Code, BadRequestException.StatusMessage, 
+								"Negative content lengths invalid."), false);
 							return true;
 						}
 
@@ -394,12 +396,14 @@ namespace Waher.Networking.HTTP
 			{
 				if (this.transferEncoding.InvalidEncoding)
 				{
-					await this.SendResponse(null, null, new HttpException(400, "Bad Request", "Invalid transfer encoding."), false);
+					await this.SendResponse(null, null, new HttpException(BadRequestException.Code, BadRequestException.StatusMessage, 
+						"Invalid transfer encoding."), false);
 					return true;
 				}
 				else if (this.transferEncoding.TransferError)
 				{
-					await this.SendResponse(null, null, new HttpException(500, "Internal Server Error", "Unable to transfer content to resource."), false);
+					await this.SendResponse(null, null, new HttpException(InternalServerErrorException.Code, InternalServerErrorException.StatusMessage,
+						"Unable to transfer content to resource."), false);
 					return true;
 				}
 				else
@@ -650,7 +654,10 @@ namespace Waher.Networking.HTTP
 
 				int Win32ErrorCode = ex.HResult & 0xFFFF;
 				if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
-					await this.SendResponse(Request, null, new HttpException(507, "Insufficient Storage", "Insufficient space."), true);
+				{
+					await this.SendResponse(Request, null, new HttpException(InsufficientStorageException.Code, 
+						InsufficientStorageException.StatusMessage, "Insufficient space."), true);
+				}
 				else
 					await this.SendResponse(Request, null, new InternalServerErrorException(ex.Message), true);
 
@@ -732,7 +739,7 @@ namespace Waher.Networking.HTTP
 						Location.Append(Header.Fragment);
 					}
 
-					await this.SendResponse(Request, Response, new HttpException(307, "Moved Temporarily",
+					await this.SendResponse(Request, Response, new HttpException(TemporaryRedirectException.Code, TemporaryRedirectException.StatusMessage,
 						new KeyValuePair<string, string>("Location", Location.ToString()),
 						new KeyValuePair<string, string>("Vary", "Upgrade-Insecure-Requests")), false);
 				}

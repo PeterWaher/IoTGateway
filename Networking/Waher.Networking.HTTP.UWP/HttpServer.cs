@@ -23,9 +23,7 @@ using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Networking.HTTP.Vanity;
 using Waher.Runtime.Cache;
 using Waher.Script;
-using Waher.Script.Functions.ComplexNumbers;
 using Waher.Security;
-using Waher.Security.LoginMonitor;
 
 namespace Waher.Networking.HTTP
 {
@@ -1908,7 +1906,7 @@ namespace Waher.Networking.HTTP
 				}
 			}
 			else
-				return new Tuple<int, string, byte[]>(NotFoundException.Code, NotFoundException.Msg, null);
+				return new Tuple<int, string, byte[]>(NotFoundException.Code, NotFoundException.StatusMessage, null);
 		}
 
 		#endregion

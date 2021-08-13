@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Networking.HTTP
 {
@@ -12,8 +10,15 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class RangeNotSatisfiableException : HttpException
 	{
-		private const int Code = 416;
-		private const string Msg = "Range Not Satisfiable";
+		/// <summary>
+		/// 416
+		/// </summary>
+		public const int Code = 416;
+
+		/// <summary>
+		/// Range Not Satisfiable
+		/// </summary>
+		public const string StatusMessage = "Range Not Satisfiable";
 
 		/// <summary>
 		/// A server SHOULD return a response with this status code if a request included a Range request-header field (section 14.35), and none of the 
@@ -22,7 +27,7 @@ namespace Waher.Networking.HTTP
 		/// current length of the selected resource.) 
 		/// </summary>
 		public RangeNotSatisfiableException()
-			: base(Code, Msg)
+			: base(Code, StatusMessage)
 		{
 		}
 
@@ -34,7 +39,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
 		public RangeNotSatisfiableException(object ContentObject)
-			: base(Code, Msg, ContentObject)
+			: base(Code, StatusMessage, ContentObject)
 		{
 		}
 
@@ -47,7 +52,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Content">Any encoded content to return.</param>
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
 		public RangeNotSatisfiableException(byte[] Content, string ContentType)
-			: base(Code, Msg, Content, ContentType)
+			: base(Code, StatusMessage, Content, ContentType)
 		{
 		}
 	}

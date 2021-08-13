@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Networking.HTTP
 {
@@ -9,14 +7,21 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class LockedException : HttpException
 	{
-		private const int Code = 423;
-		private const string Msg = "Locked";
+		/// <summary>
+		/// 423
+		/// </summary>
+		public const int Code = 423;
+
+		/// <summary>
+		/// Locked
+		/// </summary>
+		public const string StatusMessage = "Locked";
 
 		/// <summary>
 		/// The resource that is being accessed is locked.
 		/// </summary>
 		public LockedException()
-			: base(Code, Msg)
+			: base(Code, StatusMessage)
 		{
 		}
 
@@ -25,7 +30,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
 		public LockedException(object ContentObject)
-			: base(Code, Msg, ContentObject)
+			: base(Code, StatusMessage, ContentObject)
 		{
 		}
 
@@ -35,7 +40,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Content">Any encoded content to return.</param>
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
 		public LockedException(byte[] Content, string ContentType)
-			: base(Code, Msg, Content, ContentType)
+			: base(Code, StatusMessage, Content, ContentType)
 		{
 		}
 	}

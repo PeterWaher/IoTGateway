@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Networking.HTTP
 {
@@ -9,14 +7,21 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class VariantAlsoNegotiatesException : HttpException
 	{
-		private const int Code = 506;
-		private const string Msg = "Variant Also Negotiates";
+		/// <summary>
+		/// 506
+		/// </summary>
+		public const int Code = 506;
+
+		/// <summary>
+		/// Variant Also Negotiates
+		/// </summary>
+		public const string StatusMessage = "Variant Also Negotiates";
 
 		/// <summary>
 		/// Transparent content negotiation for the request results in a circular reference.
 		/// </summary>
 		public VariantAlsoNegotiatesException()
-			: base(Code, Msg)
+			: base(Code, StatusMessage)
 		{
 		}
 
@@ -25,7 +30,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
 		public VariantAlsoNegotiatesException(object ContentObject)
-			: base(Code, Msg, ContentObject)
+			: base(Code, StatusMessage, ContentObject)
 		{
 		}
 
@@ -35,7 +40,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Content">Any encoded content to return.</param>
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
 		public VariantAlsoNegotiatesException(byte[] Content, string ContentType)
-			: base(Code, Msg, Content, ContentType)
+			: base(Code, StatusMessage, Content, ContentType)
 		{
 		}
 	}

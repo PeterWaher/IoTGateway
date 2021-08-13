@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Networking.HTTP
 {
@@ -9,14 +7,21 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class UnprocessableEntityException : HttpException
 	{
-		private const int Code = 422;
-		private const string Msg = "Unprocessable Entity";
+		/// <summary>
+		/// 422
+		/// </summary>
+		public const int Code = 422;
+
+		/// <summary>
+		/// Unprocessable Entity
+		/// </summary>
+		public const string StatusMessage = "Unprocessable Entity";
 
 		/// <summary>
 		/// The request was well-formed but was unable to be followed due to semantic errors.
 		/// </summary>
 		public UnprocessableEntityException()
-			: base(Code, Msg)
+			: base(Code, StatusMessage)
 		{
 		}
 
@@ -25,7 +30,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ContentObject">Any content object to return. The object will be encoded before being sent.</param>
 		public UnprocessableEntityException(object ContentObject)
-			: base(Code, Msg, ContentObject)
+			: base(Code, StatusMessage, ContentObject)
 		{
 		}
 
@@ -35,7 +40,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Content">Any encoded content to return.</param>
 		/// <param name="ContentType">The content type of <paramref name="Content"/>, if provided.</param>
 		public UnprocessableEntityException(byte[] Content, string ContentType)
-			: base(Code, Msg, Content, ContentType)
+			: base(Code, StatusMessage, Content, ContentType)
 		{
 		}
 	}

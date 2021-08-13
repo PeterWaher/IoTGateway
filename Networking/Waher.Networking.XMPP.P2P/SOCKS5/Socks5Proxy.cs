@@ -194,7 +194,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				}
 				else
 					this.Advance();
-			
+
 				return Task.CompletedTask;
 			}
 
@@ -237,7 +237,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="State">State object to pass on to callback method.</param>
 		public Task InitiateSession(string DestinationJid, StreamEventHandler Callback, object State)
 		{
-			return this.InitiateSession(DestinationJid, null, Callback, State);
+			return this.InitiateSession(DestinationJid, null, true, Callback, State);
 		}
 
 		/// <summary>
@@ -247,7 +247,22 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="StreamId">Stream ID to use.</param>
 		/// <param name="Callback">Method to call when initiation attempt completes.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public async Task InitiateSession(string DestinationJid, string StreamId, StreamEventHandler Callback, object State)
+		public Task InitiateSession(string DestinationJid, string StreamId, StreamEventHandler Callback, object State)
+		{
+			return this.InitiateSession(DestinationJid, StreamId, true, Callback, State);
+		}
+
+		/// <summary>
+		/// Initiates a mediated SOCKS5 session with another.
+		/// </summary>
+		/// <param name="DestinationJid">JID of destination.</param>
+		/// <param name="StreamId">Stream ID to use.</param>
+		/// <param name="InstantiateSocks5Client">If a SOCKS5 client should be instantiated when activated (true, default), or
+		/// if the caller instantiates the SOCKS5 client (false).</param>
+		/// <param name="Callback">Method to call when initiation attempt completes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public async Task InitiateSession(string DestinationJid, string StreamId, bool InstantiateSocks5Client,
+			StreamEventHandler Callback, object State)
 		{
 			if (!this.hasProxy)
 			{
@@ -298,7 +313,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				streamId = StreamId,
 				callback = Callback,
 				state = State,
-				proxy = this
+				proxy = this,
+				instantiateSocks5Client = InstantiateSocks5Client
 			};
 
 			if (!(this.e2e is null))
@@ -312,6 +328,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			public string destinationJid;
 			public string streamId;
 			public object state;
+			public bool instantiateSocks5Client;
 			public StreamEventHandler callback;
 			public Socks5Client stream = null;
 			public Socks5Proxy proxy;
@@ -379,13 +396,18 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 					if (!string.IsNullOrEmpty(StreamHostUsed) && StreamHostUsed == this.host)
 					{
-                        Rec.stream = new Socks5Client(this.host, this.port, this.jid);
-                        Rec.stream.OnStateChange += Rec.StateChanged;
-
-						lock (this.streams)
+						if (Rec.instantiateSocks5Client)
 						{
-							this.streams[Rec.streamId] = Rec.stream;
+							Rec.stream = new Socks5Client(this.host, this.port, this.jid);
+							Rec.stream.OnStateChange += Rec.StateChanged;
+
+							lock (this.streams)
+							{
+								this.streams[Rec.streamId] = Rec.stream;
+							}
 						}
+						else
+							await this.Callback(Rec.callback, Rec.state, true, null, Rec.streamId);
 					}
 					else
 						await this.Callback(Rec.callback, Rec.state, false, null, Rec.streamId);
@@ -491,9 +513,9 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					throw new ConflictException("Stream already exists.", e.IQ);
 
 				Client = new Socks5Client(Host, Port, JID)
-                {
-				    CallbackState = e2.State
-                };
+				{
+					CallbackState = e2.State
+				};
 
 				this.streams[StreamId] = Client;
 			}

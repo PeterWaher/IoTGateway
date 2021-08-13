@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -12,7 +13,7 @@ using System.Windows.Media.Imaging;
 using Waher.Client.WPF.Model;
 using Waher.Events;
 using Waher.Networking.XMPP;
-using Waher.Networking.XMPP.P2P;
+using Waher.Networking.XMPP.P2P.SOCKS5;
 using Waher.Networking.XMPP.RDP;
 
 namespace Waher.Client.WPF.Controls
@@ -23,7 +24,7 @@ namespace Waher.Client.WPF.Controls
 	public partial class RemoteDesktopView : UserControl, ITabView
 	{
 		private readonly LinkedList<(string, int, int)> queue = new LinkedList<(string, int, int)>();
-		private readonly TreeNode node;
+		private readonly XmppContact node;
 		private readonly XmppClient client;
 		private readonly RemoteDesktopClient rdpClient;
 		private readonly RemoteDesktopSession session;
@@ -36,7 +37,7 @@ namespace Waher.Client.WPF.Controls
 		private bool drawing = false;
 		private bool disposeRdpClient;
 
-		public RemoteDesktopView(TreeNode Node, XmppClient Client, RemoteDesktopClient RdpClient, bool DisposeRdpClient,
+		public RemoteDesktopView(XmppContact Node, XmppClient Client, RemoteDesktopClient RdpClient, bool DisposeRdpClient,
 			RemoteDesktopSession Session)
 		{
 			this.node = Node;
@@ -86,6 +87,16 @@ namespace Waher.Client.WPF.Controls
 				else
 					this.pendingTiles[e.Y, e.X] = e.TileBase64;
 			}
+		}
+
+		internal Task Socks5DataReceived(object Sender, DataReceivedEventArgs e)
+		{
+			return Task.CompletedTask;	// TODO
+		}
+
+		internal Task Socks5StreamClosed(object Sender, StreamEventArgs e)
+		{
+			return Task.CompletedTask;  // TODO
 		}
 
 		private void UpdateScreen(object _)
@@ -172,6 +183,8 @@ namespace Waher.Client.WPF.Controls
 		{
 			try
 			{
+				this.node?.UnregisterView(this);
+
 				this.timer?.Dispose();
 				this.timer = null;
 
@@ -189,10 +202,10 @@ namespace Waher.Client.WPF.Controls
 				Log.Critical(ex);
 			}
 
-			this.Node?.ViewClosed();
+			this.node?.ViewClosed();
 		}
 
-		public TreeNode Node => this.node;
+		public XmppContact Node => this.node;
 		public XmppClient Client => this.client;
 		public RemoteDesktopClient RdpClient => this.rdpClient;
 		public RemoteDesktopSession Session => this.session;

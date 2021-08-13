@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -23,6 +24,7 @@ namespace Waher.Client.WPF.Model
 	/// </summary>
 	public class XmppContact : TreeNode
 	{
+		private readonly Dictionary<string, RemoteDesktopView> activeViews = new Dictionary<string, RemoteDesktopView>();
 		private readonly XmppClient client;
 		private readonly string bareJid;
 		private readonly bool supportsRdp;
@@ -422,7 +424,7 @@ namespace Waher.Client.WPF.Model
 			if (RdpClient is null)
 				return;
 
-			RemoteDesktopSession Session = null;
+			RemoteDesktopSession Session;
 			XmppClient Client = this.client;
 			bool DisposeRdpClient = false;
 
@@ -435,18 +437,8 @@ namespace Waher.Client.WPF.Model
 				{
 					if (this.proxy is null)
 					{
-						TaskCompletionSource<bool> Socks5Search = new TaskCompletionSource<bool>();
-
 						this.proxy = new Socks5Proxy(this.client, this.XmppAccountNode.E2E);
-						this.proxy.StartSearch((sender, e2) => Socks5Search.TrySetResult(true));
-
-						await Socks5Search.Task;
-					}
-
-					if (this.proxy?.HasProxy ?? false)
-					{
-						TaskCompletionSource<Socks5Client> SessionInitiated = new TaskCompletionSource<Socks5Client>();
-						Session = await RdpClient.StartSessionAsync(FullJid, this.proxy.JID, this.proxy.Host, this.proxy.Port, Socks5SessionId);
+						this.proxy.OnOpen += Proxy_OnOpen;
 					}
 				}
 				else
@@ -456,8 +448,7 @@ namespace Waher.Client.WPF.Model
 					DisposeRdpClient = true;
 				}
 
-				if (Session is null)
-					Session = await RdpClient.StartSessionAsync(FullJid);
+				Session = await RdpClient.StartSessionAsync(FullJid);
 
 				Mouse.OverrideCursor = null;
 
@@ -466,6 +457,11 @@ namespace Waher.Client.WPF.Model
 
 				RemoteDesktopView View = new RemoteDesktopView(this, Client, RdpClient, DisposeRdpClient, Session);
 				TabItem.Content = View;
+
+				lock (this.activeViews)
+				{
+					this.activeViews[Session.SessionId] = View;
+				}
 
 				MainWindow.currentInstance.Tabs.SelectedItem = TabItem;
 			}
@@ -476,6 +472,29 @@ namespace Waher.Client.WPF.Model
 
 				MainWindow.ErrorBox(ex.Message);
 			}
+		}
+
+		internal void UnregisterView(RemoteDesktopView View)
+		{
+			lock (this.activeViews)
+			{
+				this.activeViews.Remove(View.Session.SessionId);
+			}
+		}
+
+		private Task Proxy_OnOpen(object Sender, ValidateStreamEventArgs e)
+		{
+			RemoteDesktopView View;
+
+			lock (this.activeViews)
+			{
+				if (!this.activeViews.TryGetValue(e.StreamId, out View))
+					return Task.CompletedTask;
+			}
+
+			e.AcceptStream(View.Socks5DataReceived, View.Socks5StreamClosed, null);
+
+			return Task.CompletedTask;
 		}
 	}
 }

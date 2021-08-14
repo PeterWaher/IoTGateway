@@ -27,8 +27,8 @@ namespace Waher.Client.WPF.Controls
 		private readonly XmppContact node;
 		private readonly XmppClient client;
 		private readonly RemoteDesktopClient rdpClient;
-		private readonly RemoteDesktopSession session;
 		private readonly object synchObj = new object();
+		private RemoteDesktopSession session;
 		private Pending[,] pendingTiles = null;
 		private WriteableBitmap desktop = null;
 		private Timer timer;
@@ -53,22 +53,35 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		public RemoteDesktopView(XmppContact Node, XmppClient Client, RemoteDesktopClient RdpClient, bool DisposeRdpClient,
-			RemoteDesktopSession Session)
+		public RemoteDesktopView(XmppContact Node, XmppClient Client, RemoteDesktopClient RdpClient, bool DisposeRdpClient)
 		{
 			this.node = Node;
 			this.client = Client;
 			this.rdpClient = RdpClient;
 			this.disposeRdpClient = DisposeRdpClient;
-			this.session = Session;
-
-			this.session.StateChanged += Session_StateChanged;
-			this.session.TileUpdated += Session_TileUpdated;
 
 			InitializeComponent();
 
 			this.Focusable = true;
 			Keyboard.Focus(this);
+		}
+
+		public RemoteDesktopSession Session
+		{
+			get => this.session;
+			internal set
+			{
+				if (!(this.session is null))
+				{
+					this.session.StateChanged -= Session_StateChanged;
+					this.session.TileUpdated -= Session_TileUpdated;
+				}
+
+				this.session = value;
+
+				this.session.StateChanged += Session_StateChanged;
+				this.session.TileUpdated += Session_TileUpdated;
+			}
 		}
 
 		private void Session_StateChanged(object sender, EventArgs e)
@@ -201,7 +214,7 @@ namespace Waher.Client.WPF.Controls
 				}
 			}
 
-			return Task.CompletedTask;  // TODO
+			return Task.CompletedTask;
 		}
 
 		private void ProcessCommand()
@@ -314,8 +327,12 @@ namespace Waher.Client.WPF.Controls
 				this.timer?.Dispose();
 				this.timer = null;
 
-				if (this.session.State != RemoteDesktopSessionState.Stopped && this.session.State != RemoteDesktopSessionState.Stopping)
+				if (!(this.session is null) &&
+					this.session.State != RemoteDesktopSessionState.Stopped &&
+					this.session.State != RemoteDesktopSessionState.Stopping)
+				{
 					await this.rdpClient.StopSessionAsync(this.session.RemoteJid, this.session.SessionId);
+				}
 
 				if (this.disposeRdpClient)
 				{
@@ -334,13 +351,15 @@ namespace Waher.Client.WPF.Controls
 		public XmppContact Node => this.node;
 		public XmppClient Client => this.client;
 		public RemoteDesktopClient RdpClient => this.rdpClient;
-		public RemoteDesktopSession Session => this.session;
 
 		private void UserControl_MouseMove(object sender, MouseEventArgs e)
 		{
-			this.GetPosition(e, out int X, out int Y);
-			this.session.MouseMoved(X, Y);
-			e.Handled = true;
+			if (!(this.session is null))
+			{
+				this.GetPosition(e, out int X, out int Y);
+				this.session.MouseMoved(X, Y);
+				e.Handled = true;
+			}
 		}
 
 		private void GetPosition(MouseEventArgs e, out int X, out int Y)
@@ -353,77 +372,92 @@ namespace Waher.Client.WPF.Controls
 
 		private void UserControl_MouseDown(object sender, MouseButtonEventArgs e)
 		{
-			this.GetPosition(e, out int X, out int Y);
-
-			switch (e.ChangedButton)
+			if (!(this.session is null))
 			{
-				case System.Windows.Input.MouseButton.Left:
-					this.session.MouseDown(X, Y, Networking.XMPP.RDP.MouseButton.Left);
-					e.Handled = true;
-					break;
+				this.GetPosition(e, out int X, out int Y);
 
-				case System.Windows.Input.MouseButton.Middle:
-					this.session.MouseDown(X, Y, Networking.XMPP.RDP.MouseButton.Middle);
-					e.Handled = true;
-					break;
+				switch (e.ChangedButton)
+				{
+					case System.Windows.Input.MouseButton.Left:
+						this.session.MouseDown(X, Y, Networking.XMPP.RDP.MouseButton.Left);
+						e.Handled = true;
+						break;
 
-				case System.Windows.Input.MouseButton.Right:
-					this.session.MouseDown(X, Y, Networking.XMPP.RDP.MouseButton.Right);
-					e.Handled = true;
-					break;
+					case System.Windows.Input.MouseButton.Middle:
+						this.session.MouseDown(X, Y, Networking.XMPP.RDP.MouseButton.Middle);
+						e.Handled = true;
+						break;
 
-				default:
-					e.Handled = false;
-					break;
+					case System.Windows.Input.MouseButton.Right:
+						this.session.MouseDown(X, Y, Networking.XMPP.RDP.MouseButton.Right);
+						e.Handled = true;
+						break;
+
+					default:
+						e.Handled = false;
+						break;
+				}
 			}
 		}
 
 		private void UserControl_MouseUp(object sender, MouseButtonEventArgs e)
 		{
-			this.GetPosition(e, out int X, out int Y);
-
-			switch (e.ChangedButton)
+			if (!(this.session is null))
 			{
-				case System.Windows.Input.MouseButton.Left:
-					this.session.MouseUp(X, Y, Networking.XMPP.RDP.MouseButton.Left);
-					e.Handled = true;
-					break;
+				this.GetPosition(e, out int X, out int Y);
 
-				case System.Windows.Input.MouseButton.Middle:
-					this.session.MouseUp(X, Y, Networking.XMPP.RDP.MouseButton.Middle);
-					e.Handled = true;
-					break;
+				switch (e.ChangedButton)
+				{
+					case System.Windows.Input.MouseButton.Left:
+						this.session.MouseUp(X, Y, Networking.XMPP.RDP.MouseButton.Left);
+						e.Handled = true;
+						break;
 
-				case System.Windows.Input.MouseButton.Right:
-					this.session.MouseUp(X, Y, Networking.XMPP.RDP.MouseButton.Right);
-					e.Handled = true;
-					break;
+					case System.Windows.Input.MouseButton.Middle:
+						this.session.MouseUp(X, Y, Networking.XMPP.RDP.MouseButton.Middle);
+						e.Handled = true;
+						break;
 
-				default:
-					e.Handled = false;
-					break;
+					case System.Windows.Input.MouseButton.Right:
+						this.session.MouseUp(X, Y, Networking.XMPP.RDP.MouseButton.Right);
+						e.Handled = true;
+						break;
+
+					default:
+						e.Handled = false;
+						break;
+				}
 			}
 		}
 
 		private void UserControl_MouseWheel(object sender, MouseWheelEventArgs e)
 		{
-			this.GetPosition(e, out int X, out int Y);
-			this.session.MouseWheel(X, Y, e.Delta);
-			e.Handled = true;
+			if (!(this.session is null))
+			{
+				this.GetPosition(e, out int X, out int Y);
+				this.session.MouseWheel(X, Y, e.Delta);
+				e.Handled = true;
+			}
 		}
 
 		private void UserControl_KeyDown(object sender, KeyEventArgs e)
 		{
-			int KeyCode = KeyInterop.VirtualKeyFromKey(e.Key);
-			this.session.KeyDown(KeyCode);
-			e.Handled = true;
+			if (!(this.session is null))
+			{
+				int KeyCode = KeyInterop.VirtualKeyFromKey(e.Key);
+				this.session.KeyDown(KeyCode);
+				e.Handled = true;
+			}
 		}
 
 		private void UserControl_KeyUp(object sender, KeyEventArgs e)
 		{
-			int KeyCode = KeyInterop.VirtualKeyFromKey(e.Key);
-			this.session.KeyUp(KeyCode);
-			e.Handled = true;
+			if (!(this.session is null))
+			{
+				int KeyCode = KeyInterop.VirtualKeyFromKey(e.Key);
+				this.session.KeyUp(KeyCode);
+				e.Handled = true;
+			}
 		}
 
 		private void UserControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)

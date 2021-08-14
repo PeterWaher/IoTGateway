@@ -43,6 +43,14 @@
             <param name="To">Full JID of remote client.</param>
             <returns>Remote Desktop Session object.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopClient.StartSessionAsync(System.String,System.Guid)">
+            <summary>
+            Starts a Remote Desktop session.
+            </summary>
+            <param name="To">Full JID of remote client.</param>
+            <param name="SessionGuid">Session ID to use.</param>
+            <returns>Remote Desktop Session object.</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopClient.StopSessionAsync(System.String,System.String)">
             <summary>
             Stops a Remote Desktop session.

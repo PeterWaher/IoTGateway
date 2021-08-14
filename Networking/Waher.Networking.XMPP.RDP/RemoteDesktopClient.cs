@@ -73,8 +73,19 @@ namespace Waher.Networking.XMPP.RDP
 		/// <returns>Remote Desktop Session object.</returns>
 		public Task<RemoteDesktopSession> StartSessionAsync(string To)
 		{
+			return this.StartSessionAsync(To, Guid.NewGuid());
+		}
+
+		/// <summary>
+		/// Starts a Remote Desktop session.
+		/// </summary>
+		/// <param name="To">Full JID of remote client.</param>
+		/// <param name="SessionGuid">Session ID to use.</param>
+		/// <returns>Remote Desktop Session object.</returns>
+		public Task<RemoteDesktopSession> StartSessionAsync(string To, Guid SessionGuid)
+		{
 			StringBuilder sb = new StringBuilder();
-			string SessionId = Guid.NewGuid().ToString();
+			string SessionId = SessionGuid.ToString();
 
 			sb.Append("<start xmlns='");
 			sb.Append(RemoteDesktopNamespace);

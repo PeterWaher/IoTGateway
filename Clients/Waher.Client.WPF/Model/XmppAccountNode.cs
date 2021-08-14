@@ -72,7 +72,7 @@ namespace Waher.Client.WPF.Model
 		private SynchronizationClient synchronizationClient;
 		private MultiUserChatClient mucClient;
 		private RemoteDesktopClient rdpClient;
-		private XmppServerlessMessaging p2pNetwork;
+		//private XmppServerlessMessaging p2pNetwork;
 		private Timer connectionTimer;
 		private Exception lastError = null;
 		private TransportMethod transport = TransportMethod.TraditionalSocket;
@@ -213,11 +213,11 @@ namespace Waher.Client.WPF.Model
 
 			this.concentratorClient.OnEvent += ConcentratorClient_OnEvent;
 
-			this.p2pNetwork = new XmppServerlessMessaging("RDP " + this.BareJID, this.client.BareJID);
-			this.p2pNetwork.OnNewXmppClient += ServerlessMessaging_OnNewXmppClient;
-			this.p2pNetwork.OnResynch += ServerlessMessaging_OnResynch;
+			//this.p2pNetwork = new XmppServerlessMessaging("RDP " + this.BareJID, this.client.BareJID);
+			//this.p2pNetwork.OnNewXmppClient += ServerlessMessaging_OnNewXmppClient;
+			//this.p2pNetwork.OnResynch += ServerlessMessaging_OnResynch;
 
-			this.e2eEncryption = new EndpointSecurity(this.client, this.p2pNetwork, 128);
+			this.e2eEncryption = new EndpointSecurity(this.client, /*this.p2pNetwork,*/ 128);
 			this.client.SetTag("E2E", this.e2eEncryption);
 
 			this.rdpClient = new RemoteDesktopClient(this.client, this.e2eEncryption);
@@ -350,7 +350,7 @@ namespace Waher.Client.WPF.Model
 					this.CheckRoster();
 					this.SearchComponents();
 
-					this.p2pNetwork.FullJid = this.client.FullJID;
+					//this.p2pNetwork.FullJid = this.client.FullJID;
 					break;
 
 				case XmppState.Offline:
@@ -1070,7 +1070,7 @@ namespace Waher.Client.WPF.Model
 		public override string Key => this.BareJID;
 		public override bool IsSniffable => !(this.client is null);
 		public XmppClient Client => this.client;
-		public XmppServerlessMessaging P2P => this.p2pNetwork;
+		//public XmppServerlessMessaging P2P => this.p2pNetwork;
 		public EndpointSecurity E2E => this.e2eEncryption;
 		public PepClient PepClient => this.pepClient;
 		public MultiUserChatClient MucClient => this.mucClient;
@@ -1657,7 +1657,7 @@ namespace Waher.Client.WPF.Model
 		private void ServerlessMessaging_OnNewXmppClient(object Sender, PeerConnectionEventArgs e)
 		{
 			XmppClient Client = e.Client;
-
+			
 			this.e2eEncryption.RegisterHandlers(Client);
 		}
 

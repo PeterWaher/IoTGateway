@@ -2572,6 +2572,17 @@
             <param name="Callback">Method to call when initiation attempt completes.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.InitiateSession(System.String,System.String,System.Boolean,Waher.Networking.XMPP.P2P.SOCKS5.StreamEventHandler,System.Object)">
+            <summary>
+            Initiates a mediated SOCKS5 session with another.
+            </summary>
+            <param name="DestinationJid">JID of destination.</param>
+            <param name="StreamId">Stream ID to use.</param>
+            <param name="InstantiateSocks5Client">If a SOCKS5 client should be instantiated when activated (true, default), or
+            if the caller instantiates the SOCKS5 client (false).</param>
+            <param name="Callback">Method to call when initiation attempt completes.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
         <member name="E:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.OnOpen">
             <summary>
             Event raised when a remote entity tries to open a SOCKS5 bytestream for transmission of data to/from the client.

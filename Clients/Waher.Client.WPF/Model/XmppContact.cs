@@ -13,7 +13,6 @@ using Waher.Content.Html;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP;
-using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.SOCKS5;
 using Waher.Networking.XMPP.RDP;
 
@@ -432,35 +431,42 @@ namespace Waher.Client.WPF.Model
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 
-				PeerConnectionEventArgs e = await this.XmppAccountNode.P2P.GetPeerConnectionAsync(FullJid);
-				if (e.Client is null)
+				//PeerConnectionEventArgs e = await this.XmppAccountNode.P2P.GetPeerConnectionAsync(FullJid);
+				//if (e.Client is null)
+				//{
+				if (this.proxy is null)
 				{
-					if (this.proxy is null)
-					{
-						this.proxy = new Socks5Proxy(this.client, this.XmppAccountNode.E2E);
-						this.proxy.OnOpen += Proxy_OnOpen;
-					}
+					this.proxy = new Socks5Proxy(this.client);  //, this.XmppAccountNode.E2E);
+					this.proxy.OnOpen += Proxy_OnOpen;
 				}
-				else
+				//}
+				//else
+				//{
+				//	Client = e.Client;
+				//	RdpClient = new RemoteDesktopClient(Client, this.XmppAccountNode.E2E);
+				//	DisposeRdpClient = true;
+				//}
+
+				Guid SessionGuid = Guid.NewGuid();
+				RemoteDesktopView View = new RemoteDesktopView(this, Client, RdpClient, DisposeRdpClient);
+
+				lock (this.activeViews)
 				{
-					Client = e.Client;
-					RdpClient = new RemoteDesktopClient(Client, this.XmppAccountNode.E2E);
-					DisposeRdpClient = true;
+					this.activeViews[SessionGuid.ToString()] = View;
 				}
 
-				Session = await RdpClient.StartSessionAsync(FullJid);
+				View.Session = await RdpClient.StartSessionAsync(FullJid, SessionGuid);
 
 				Mouse.OverrideCursor = null;
 
 				TabItem TabItem = MainWindow.NewTab(this.bareJid);
 				MainWindow.currentInstance.Tabs.Items.Add(TabItem);
 
-				RemoteDesktopView View = new RemoteDesktopView(this, Client, RdpClient, DisposeRdpClient, Session);
 				TabItem.Content = View;
 
 				lock (this.activeViews)
 				{
-					this.activeViews[Session.SessionId] = View;
+					this.activeViews[View.Session.SessionId] = View;
 				}
 
 				MainWindow.currentInstance.Tabs.SelectedItem = TabItem;

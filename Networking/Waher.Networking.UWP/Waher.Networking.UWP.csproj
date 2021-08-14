@@ -106,7 +106,9 @@
     <Compile Include="ClientCertificates.cs" />
     <Compile Include="IBinaryTransmission.cs" />
     <Compile Include="RowTcpClient.cs" />
+    <Compile Include="Sniffers\DebugSniffer.cs" />
     <Compile Include="Sniffers\SnifferBase.cs" />
+    <Compile Include="Sniffers\TextSnifferBase.cs" />
     <Compile Include="TextTcpClient.cs" />
     <Compile Include="BinaryTcpClient.cs" />
     <Compile Include="IBinaryTransportLayer.cs" />

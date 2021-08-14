@@ -268,6 +268,16 @@
             <param name="Allow">If Raw encoding should be allowed.</param>
             <param name="Lock">If settings should be locked.</param>
         </member>
+        <member name="P:Waher.Content.Markdown.MarkdownCodec.IsRawEncodingAllowed">
+            <summary>
+            If Raw encoding is allowed. Can be changed calling <see cref="M:Waher.Content.Markdown.MarkdownCodec.AllowRawEncoding(System.Boolean,System.Boolean)"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownCodec.IsRawEncodingAllowedLocked">
+            <summary>
+            If the <see cref="P:Waher.Content.Markdown.MarkdownCodec.IsRawEncodingAllowed"/> setting is locked.
+            </summary>
+        </member>
         <member name="M:Waher.Content.Markdown.MarkdownCodec.#ctor">
             <summary>
             Markdown encoder/decoder.

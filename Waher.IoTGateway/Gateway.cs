@@ -516,7 +516,8 @@ namespace Waher.IoTGateway
 				Log.Register(loginAuditor);
 
 				// Protecting Markdown resources:
-				MarkdownCodec.AllowRawEncoding(false, true);
+				if (!MarkdownCodec.IsRawEncodingAllowedLocked)
+					MarkdownCodec.AllowRawEncoding(false, true);
 				HttpFolderResource.ProtectContentType(MarkdownCodec.ContentType);
 
 				// Protecting web-script resources:

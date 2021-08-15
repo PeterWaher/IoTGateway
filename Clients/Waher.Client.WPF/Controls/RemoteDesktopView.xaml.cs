@@ -322,7 +322,7 @@ namespace Waher.Client.WPF.Controls
 		{
 			try
 			{
-				this.node?.UnregisterView(this);
+				this.node?.XmppAccountNode?.UnregisterView(this);
 
 				this.timer?.Dispose();
 				this.timer = null;

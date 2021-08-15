@@ -21,6 +21,7 @@ using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
 using Waher.Networking.XMPP.MUC;
 using Waher.Networking.XMPP.P2P;
+using Waher.Networking.XMPP.P2P.SOCKS5;
 using Waher.Networking.XMPP.PEP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.PubSub;
@@ -30,6 +31,7 @@ using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Networking.XMPP.Synchronization;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
+using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Model.Concentrator;
 using Waher.Client.WPF.Model.Legal;
@@ -59,6 +61,7 @@ namespace Waher.Client.WPF.Model
 		private const string OtherGroupName = "Others";
 		private const string RemoteDesktopGroupName = "RDP";
 
+		private readonly Dictionary<string, RemoteDesktopView> activeViews = new Dictionary<string, RemoteDesktopView>();
 		private readonly LinkedList<KeyValuePair<DateTime, MessageEventArgs>> unhandledMessages = new LinkedList<KeyValuePair<DateTime, MessageEventArgs>>();
 		private readonly LinkedList<XmppComponent> components = new LinkedList<XmppComponent>();
 		private readonly Dictionary<string, List<RosterItemEventHandlerAsync>> rosterSubscriptions = new Dictionary<string, List<RosterItemEventHandlerAsync>>(StringComparer.CurrentCultureIgnoreCase);
@@ -72,6 +75,7 @@ namespace Waher.Client.WPF.Model
 		private SynchronizationClient synchronizationClient;
 		private MultiUserChatClient mucClient;
 		private RemoteDesktopClient rdpClient;
+		private Socks5Proxy socks5Proxy = null;
 		//private XmppServerlessMessaging p2pNetwork;
 		private Timer connectionTimer;
 		private Exception lastError = null;
@@ -219,6 +223,9 @@ namespace Waher.Client.WPF.Model
 
 			this.e2eEncryption = new EndpointSecurity(this.client, /*this.p2pNetwork,*/ 128);
 			this.client.SetTag("E2E", this.e2eEncryption);
+
+			this.socks5Proxy = new Socks5Proxy(this.client);  //, this.XmppAccountNode.E2E);		TODO
+			this.socks5Proxy.OnOpen += Proxy_OnOpen;
 
 			this.rdpClient = new RemoteDesktopClient(this.client, this.e2eEncryption);
 
@@ -1668,6 +1675,37 @@ namespace Waher.Client.WPF.Model
 				e.Done(e2.Ok);
 				return Task.CompletedTask;
 			});
+		}
+
+		internal void ReregisterView(string SessionId, RemoteDesktopView View)
+		{
+			lock (this.activeViews)
+			{
+				this.activeViews[SessionId] = View;
+			}
+		}
+
+		internal void UnregisterView(RemoteDesktopView View)
+		{
+			lock (this.activeViews)
+			{
+				this.activeViews.Remove(View.Session.SessionId);
+			}
+		}
+
+		private Task Proxy_OnOpen(object Sender, ValidateStreamEventArgs e)
+		{
+			RemoteDesktopView View;
+
+			lock (this.activeViews)
+			{
+				if (!this.activeViews.TryGetValue(e.StreamId, out View))
+					return Task.CompletedTask;
+			}
+
+			e.AcceptStream(View.Socks5DataReceived, View.Socks5StreamClosed, null);
+
+			return Task.CompletedTask;
 		}
 
 	}

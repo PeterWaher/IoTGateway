@@ -97,8 +97,19 @@ namespace Waher.Content.Getters
 		public static async Task<object> ProcessResponse(HttpResponseMessage Response, Uri Uri)
 		{
 			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
-			string ContentType = Response.Content.Headers.ContentType.ToString();
-			object Decoded = InternetContent.Decode(ContentType, Bin, Uri);
+			string ContentType;
+			object Decoded;
+
+			if (Bin.Length == 0 || Response.Content.Headers.ContentType is null)
+			{
+				Decoded = Bin;
+				ContentType = string.Empty;
+			}
+			else
+			{
+				ContentType = Response.Content.Headers.ContentType.ToString();
+				Decoded = InternetContent.Decode(ContentType, Bin, Uri);
+			}
 
 			if (!Response.IsSuccessStatusCode)
 				throw new WebException(Decoded as string ?? Decoded.ToString(), Response.StatusCode, ContentType, Bin, Decoded);

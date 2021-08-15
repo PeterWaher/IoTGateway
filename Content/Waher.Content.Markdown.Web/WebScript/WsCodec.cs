@@ -29,6 +29,16 @@ namespace Waher.Content.Markdown.Web.WebScript
 		}
 
 		/// <summary>
+		/// If Raw encoding is allowed. Can be changed calling <see cref="AllowRawEncoding(bool, bool)"/>.
+		/// </summary>
+		public static bool IsRawEncodingAllowed => allowEncoding;
+
+		/// <summary>
+		/// If the <see cref="IsRawEncodingAllowed"/> setting is locked.
+		/// </summary>
+		public static bool IsRawEncodingAllowedLocked => locked;
+
+		/// <summary>
 		/// Web Script encoder/decoder.
 		/// </summary>
 		public WsCodec()

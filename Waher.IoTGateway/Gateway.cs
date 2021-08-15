@@ -521,7 +521,8 @@ namespace Waher.IoTGateway
 				HttpFolderResource.ProtectContentType(MarkdownCodec.ContentType);
 
 				// Protecting web-script resources:
-				WsCodec.AllowRawEncoding(false, true);
+				if (!WsCodec.IsRawEncodingAllowedLocked)
+					WsCodec.AllowRawEncoding(false, true);
 				HttpFolderResource.ProtectContentType(WsCodec.ContentType);
 
 				Dictionary<string, Type> SystemConfigurationTypes = new Dictionary<string, Type>();

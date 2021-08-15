@@ -79,6 +79,16 @@
             <param name="Allow">If Raw encoding should be allowed.</param>
             <param name="Lock">If settings should be locked.</param>
         </member>
+        <member name="P:Waher.Content.Markdown.Web.WebScript.WsCodec.IsRawEncodingAllowed">
+            <summary>
+            If Raw encoding is allowed. Can be changed calling <see cref="M:Waher.Content.Markdown.Web.WebScript.WsCodec.AllowRawEncoding(System.Boolean,System.Boolean)"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.WebScript.WsCodec.IsRawEncodingAllowedLocked">
+            <summary>
+            If the <see cref="P:Waher.Content.Markdown.Web.WebScript.WsCodec.IsRawEncodingAllowed"/> setting is locked.
+            </summary>
+        </member>
         <member name="M:Waher.Content.Markdown.Web.WebScript.WsCodec.#ctor">
             <summary>
             Web Script encoder/decoder.

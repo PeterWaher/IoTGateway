@@ -119,6 +119,11 @@ namespace Waher.Client.WPF.Controls
 		}
 
 		private byte[] buffer;
+		private byte[] block;
+		private int blockState = 0;
+		private int blockLen = 0;
+		private int blockLeft = 0;
+		private int blockPos = 0;
 		private int state = 0;
 		private byte command = 0;
 		private int len = 0;
@@ -132,61 +137,107 @@ namespace Waher.Client.WPF.Controls
 			byte[] Data = e.Buffer;
 			int i = e.Offset;
 			int c = e.Count;
-			int j;
-			byte b;
 
 			while (c > 0)
 			{
-				b = Data[i++];
-				c--;
+				switch (this.blockState)
+				{
+					case 0:
+						this.blockLen = Data[i++];
+						this.blockState++;
+						c--;
+						break;
 
+					case 1:
+						this.blockLen <<= 8;
+						this.blockLen |= Data[i++];
+						this.blockLeft = this.blockLen;
+						if ((this.block?.Length ?? 0) != this.blockLen)
+							this.block = new byte[this.blockLen];
+						this.blockPos = 0;
+						this.blockState++;
+						c--;
+						break;
+
+					case 2:
+						int j = Math.Min(this.blockLeft, c);
+						Array.Copy(Data, i, this.block, this.blockPos, j);
+						this.blockPos += j;
+						this.blockLeft -= j;
+						i += j;
+						c -= j;
+
+						if (this.blockLeft == 0)
+						{
+							this.BlockReceived(this.block);
+							this.blockState = 0;
+						}
+						break;
+				}
+			}
+
+			return Task.CompletedTask;
+		}
+
+		private void BlockReceived(byte[] Data)
+		{
+			int i = 0;
+			int c = Data.Length;
+			int j;
+
+			while (c > 0)
+			{
 				switch (this.state)
 				{
 					case 0:
-						this.command = b;
+						this.command = Data[i++];
+						c--;
 						this.state++;
 						break;
 
 					case 1:
-						this.command = b;
+						this.len = Data[i++];
+						c--;
 						this.state++;
 						break;
 
 					case 2:
-						this.len = b;
+						this.len |= Data[i++] << 8;
+						c--;
 						this.state++;
 						break;
 
 					case 3:
-						this.len |= b << 8;
-						this.state++;
-						break;
-
-					case 4:
-						this.len |= b << 16;
+						this.len |= Data[i++] << 16;
+						c--;
 						this.left = len;
 						this.buffer = new byte[len];
 						this.pos = 0;
 						this.state++;
 						break;
 
+					case 4:
+						this.x = Data[i++];
+						c--;
+						this.state++;
+						break;
+
 					case 5:
-						this.x = b;
+						this.x |= Data[i++] << 8;
+						c--;
 						this.state++;
 						break;
 
 					case 6:
-						this.x |= b << 8;
+						this.y = Data[i++];
+						c--;
 						this.state++;
 						break;
 
 					case 7:
-						this.y = b;
-						this.state++;
-						break;
+						this.y |= Data[i++] << 8;
+						c--;
 
-					case 8:
-						this.y |= b << 8;
 						if (this.left > 0)
 							this.state++;
 						else
@@ -196,16 +247,19 @@ namespace Waher.Client.WPF.Controls
 						}
 						break;
 
-					case 9:
-						j = Math.Min(this.left, c + 1);
-						Array.Copy(Data, i - 1, this.buffer, this.pos, j);
+					case 8:
+						j = Math.Min(this.left, c);
+						Array.Copy(Data, i, this.buffer, this.pos, j);
 						this.pos += j;
 						this.left -= j;
-						j--;
 						i += j;
 						c -= j;
-						this.ProcessCommand();
-						this.state = 0;
+
+						if (this.left == 0)
+						{
+							this.ProcessCommand();
+							this.state = 0;
+						}
 						break;
 
 					default:
@@ -213,8 +267,6 @@ namespace Waher.Client.WPF.Controls
 						break;
 				}
 			}
-
-			return Task.CompletedTask;
 		}
 
 		private void ProcessCommand()

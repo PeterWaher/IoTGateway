@@ -1505,7 +1505,7 @@ namespace Waher.Networking.XMPP.P2P
 			switch (E2ETransmission)
 			{
 				case E2ETransmission.AssertE2E:
-					throw new InvalidOperationException("End-to-End Encryption not available.");
+					throw new InvalidOperationException("End-to-End Encryption not available between " + Client.FullJID + " and " + To + ".");
 
 				case E2ETransmission.NormalIfNotE2E:
 					return Client.SendIq(Id, To, Xml, Type, Callback, State, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout);

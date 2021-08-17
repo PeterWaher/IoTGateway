@@ -212,16 +212,13 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		private async void WriteQueueEmpty(object Sender, EventArgs e)
 		{
-			if (this.tempStream is null)
+			if (this.tempStream is null || this.aborted)
 				return;
-
-			if (!await (this.syncObject?.TryBeginWrite(10000) ?? Task.FromResult<bool>(false)))
-				throw new TimeoutException();
 
 			try
 			{
-				if (this.aborted)
-					return;
+				if (!(this.syncObject is null) && !await this.syncObject.TryBeginWrite(10000))
+					throw new TimeoutException();
 
 				long NrLeft = this.tempStream.Length - this.pos;
 
@@ -235,9 +232,14 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 						await this.SendClose();
 				}
 			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 			finally
 			{
-				await (this.syncObject?.EndWrite() ?? Task.CompletedTask);
+				if (!(this.syncObject is null))
+					await this.syncObject.EndWrite();
 			}
 		}
 

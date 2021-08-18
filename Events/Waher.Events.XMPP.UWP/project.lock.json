@@ -22816,7 +22816,7 @@
       ]
     },
     "runtime.win7.System.Private.Uri/4.0.4": {
-      "sha512": "Pd49+p3SqIZlehM4vjleHQHE/55dVIj5HsNDRQ7qvtdh0xTyI8/CrIHz4PcDPVFU3lSbYnHSOIQ7KPRIZ6xdKw==",
+      "sha512": "k2xVGa4NJL0GnzyB+nT3QOCspTAuW2SM2BaTsNSFMAyM2fn2qSDtd6TE8a2Y6Cu/uiwUbupjXlyYNbpN0Wofpg==",
       "type": "package",
       "path": "runtime.win7.system.private.uri/4.0.4",
       "files": [

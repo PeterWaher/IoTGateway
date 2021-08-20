@@ -40,6 +40,7 @@ namespace Waher.Networking.XMPP.RDP
 			Client.RegisterMessageHandler("stopped", RemoteDesktopNamespace, this.StoppedMessageHandler, false);
 			Client.RegisterMessageHandler("tile", RemoteDesktopNamespace, this.TileMessageHandler, false);
 			Client.RegisterMessageHandler("tiles", RemoteDesktopNamespace, this.TilesMessageHandler, false);
+			Client.RegisterMessageHandler("scanComplete", RemoteDesktopNamespace, this.ScanCompleteHandler, false);
 		}
 
 		/// <summary>
@@ -51,6 +52,7 @@ namespace Waher.Networking.XMPP.RDP
 			this.client.UnregisterMessageHandler("stopped", RemoteDesktopNamespace, this.StoppedMessageHandler, false);
 			this.client.UnregisterMessageHandler("tile", RemoteDesktopNamespace, this.TileMessageHandler, false);
 			this.client.UnregisterMessageHandler("tiles", RemoteDesktopNamespace, this.TilesMessageHandler, false);
+			this.client.UnregisterMessageHandler("scanComplete", RemoteDesktopNamespace, this.ScanCompleteHandler, false);
 
 			this.sessions.Dispose();
 			base.Dispose();
@@ -281,6 +283,18 @@ namespace Waher.Networking.XMPP.RDP
 					Session.UpdateTile(X, Y, TileBase64);
 				}
 			}
+
+			return Task.CompletedTask;
+		}
+
+		private Task ScanCompleteHandler(object State, MessageEventArgs e)
+		{
+			RemoteDesktopSession Session = null;
+			string SessionId = XML.Attribute(e.Content, "sessionId");
+			if (!this.sessions.TryGetValue(SessionId, out Session))
+				return Task.CompletedTask;
+
+			Session.ScanCompleted();
 
 			return Task.CompletedTask;
 		}

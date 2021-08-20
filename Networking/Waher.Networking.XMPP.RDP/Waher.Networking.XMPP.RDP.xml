@@ -162,6 +162,11 @@
             Event raised when a tile on the remote desktop has been updated.
             </summary>
         </member>
+        <member name="E:Waher.Networking.XMPP.RDP.RemoteDesktopSession.ScanComplete">
+            <summary>
+            Event raised when the screen has been successfully scanned and transferred.
+            </summary>
+        </member>
         <member name="M:Waher.Networking.XMPP.RDP.RemoteDesktopSession.MouseMoved(System.Int32,System.Int32)">
             <summary>
             Reports the mouse having moved to a given position.

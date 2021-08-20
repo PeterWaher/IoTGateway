@@ -31,7 +31,7 @@ namespace Waher.Client.WPF.Controls
 		private RemoteDesktopSession session;
 		private Pending[,] pendingTiles = null;
 		private WriteableBitmap desktop = null;
-		private Timer timer;
+		private Timer updateScreenTimer;
 		private int columns;
 		private int rows;
 		private bool drawing = false;
@@ -75,12 +75,14 @@ namespace Waher.Client.WPF.Controls
 				{
 					this.session.StateChanged -= Session_StateChanged;
 					this.session.TileUpdated -= Session_TileUpdated;
+					this.session.ScanComplete -= Session_ScanComplete;
 				}
 
 				this.session = value;
 
 				this.session.StateChanged += Session_StateChanged;
 				this.session.TileUpdated += Session_TileUpdated;
+				this.session.ScanComplete += Session_ScanComplete;
 			}
 		}
 
@@ -102,8 +104,6 @@ namespace Waher.Client.WPF.Controls
 
 					this.queue.Clear();
 				}
-
-				this.timer = new Timer(this.UpdateScreen, null, 250, 250);
 			}
 		}
 
@@ -115,7 +115,15 @@ namespace Waher.Client.WPF.Controls
 					this.queue.AddLast((new Pending(e.TileBase64), e.X, e.Y));
 				else
 					this.pendingTiles[e.Y, e.X] = new Pending(e.TileBase64);
+
+				if (this.updateScreenTimer is null)
+					this.updateScreenTimer = new Timer(this.UpdateScreen, null, 250, Timeout.Infinite);
 			}
+		}
+
+		private void Session_ScanComplete(object sender, EventArgs e)
+		{
+			this.UpdateScreen(null);
 		}
 
 		private byte[] buffer;
@@ -280,7 +288,14 @@ namespace Waher.Client.WPF.Controls
 							this.queue.AddLast((new Pending(this.buffer), this.x, this.y));
 						else
 							this.pendingTiles[this.y, this.x] = new Pending(this.buffer);
+
+						if (this.updateScreenTimer is null)
+							this.updateScreenTimer = new Timer(this.UpdateScreen, null, 250, Timeout.Infinite);
 					}
+					break;
+
+				case 1:
+					this.UpdateScreen(null);
 					break;
 			}
 		}
@@ -311,6 +326,12 @@ namespace Waher.Client.WPF.Controls
 					return;
 
 				this.drawing = true;
+
+				lock (this.synchObj)
+				{
+					this.updateScreenTimer?.Dispose();
+					this.updateScreenTimer = null;
+				}
 
 				for (y = 0; y < this.rows; y++)
 				{
@@ -376,8 +397,8 @@ namespace Waher.Client.WPF.Controls
 			{
 				this.node?.XmppAccountNode?.UnregisterView(this);
 
-				this.timer?.Dispose();
-				this.timer = null;
+				this.updateScreenTimer?.Dispose();
+				this.updateScreenTimer = null;
 
 				if (!(this.session is null) &&
 					this.session.State != RemoteDesktopSessionState.Stopped &&

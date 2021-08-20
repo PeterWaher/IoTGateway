@@ -190,6 +190,23 @@ namespace Waher.Networking.XMPP.RDP
 		/// </summary>
 		public event EventHandler<TileEventArgs> TileUpdated;
 
+		internal void ScanCompleted()
+		{
+			try
+			{
+				this.ScanComplete?.Invoke(this, EventArgs.Empty);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
+		/// Event raised when the screen has been successfully scanned and transferred.
+		/// </summary>
+		public event EventHandler ScanComplete;
+
 		/// <summary>
 		/// Reports the mouse having moved to a given position.
 		/// </summary>

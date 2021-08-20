@@ -2235,6 +2235,11 @@
             <param name="Offset">Offset into array where writing is to start.</param>
             <param name="Count">Number of bytes to start.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.Flush">
+            <summary>
+            Flushes any outgoing data.
+            </summary>
+        </member>
         <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.OutgoingStream.Opened(Waher.Networking.XMPP.P2P.SOCKS5.Socks5Client)">
             <summary>
             Opens the output.

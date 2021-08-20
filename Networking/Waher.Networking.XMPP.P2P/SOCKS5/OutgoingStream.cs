@@ -26,6 +26,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private bool isWriting;
 		private volatile bool done;
 		private volatile bool aborted = false;
+		private volatile bool flush = false;
 
 		/// <summary>
 		/// Class managing the transmission of a SOCKS5 bytestream.
@@ -149,6 +150,32 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			}
 		}
 
+		/// <summary>
+		/// Flushes any outgoing data.
+		/// </summary>
+		public async Task Flush()
+		{
+			if (this.tempStream is null || this.aborted || this.done)
+				throw new IOException("Stream not open");
+
+			if (!await (this.syncObject?.TryBeginWrite(10000) ?? Task.FromResult<bool>(false)))
+				throw new TimeoutException();
+
+			try
+			{
+				this.tempStream.Position = this.tempStream.Length;
+
+				if (!(this.client is null) && !this.isWriting && this.tempStream.Length - this.pos > 0)
+					await this.WriteBlockLocked();
+				else
+					this.flush = true;
+			}
+			finally
+			{
+				await (this.syncObject?.EndWrite() ?? Task.CompletedTask);
+			}
+		}
+
 		private async Task WriteBlockLocked()
 		{
 			int BlockSize = (int)Math.Min(this.tempStream.Length - this.pos, this.blockSize);
@@ -208,6 +235,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				this.isWriting = true;
 				await this.client.Send(Block);
 			}
+
+			this.flush = false;
 		}
 
 		private async void WriteQueueEmpty(object Sender, EventArgs e)
@@ -222,7 +251,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 				long NrLeft = this.tempStream.Length - this.pos;
 
-				if (NrLeft >= this.blockSize || (this.done && NrLeft > 0))
+				if (NrLeft >= this.blockSize || ((this.done || this.flush) && NrLeft > 0))
 					await this.WriteBlockLocked();
 				else
 				{

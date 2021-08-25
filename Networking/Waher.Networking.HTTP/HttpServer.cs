@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -1022,19 +1023,11 @@ namespace Waher.Networking.HTTP
 			}
 			catch (AuthenticationException ex)
 			{
-				Exception ex2 = Log.UnnestException(ex);
-				EndPoint EP = Client.Client.Client.RemoteEndPoint;
-				string RemoteEndpoint;
-
-				if (EP is IPEndPoint IpEP)
-					RemoteEndpoint = IpEP.Address.ToString();
-				else
-					RemoteEndpoint = EP.ToString();
-
-				Security.LoginMonitor.LoginAuditor.Fail("TLS handshake failed: " + ex2.Message, string.Empty, RemoteEndpoint,
-					"HTTPS", await Security.LoginMonitor.LoginAuditor.Annotate(RemoteEndpoint));
-
-				Client.Dispose();
+				await this.LoginFailure(ex, Client);
+			}
+			catch (Win32Exception ex)
+			{
+				await this.LoginFailure(ex, Client);
 			}
 			catch (SocketException)
 			{
@@ -1049,6 +1042,23 @@ namespace Waher.Networking.HTTP
 				Client.Dispose();
 				Log.Critical(ex);
 			}
+		}
+
+		private async Task LoginFailure(Exception ex, BinaryTcpClient Client)
+		{
+			Exception ex2 = Log.UnnestException(ex);
+			EndPoint EP = Client.Client.Client.RemoteEndPoint;
+			string RemoteEndpoint;
+
+			if (EP is IPEndPoint IpEP)
+				RemoteEndpoint = IpEP.Address.ToString();
+			else
+				RemoteEndpoint = EP.ToString();
+
+			Security.LoginMonitor.LoginAuditor.Fail("TLS handshake failed: " + ex2.Message, string.Empty, RemoteEndpoint,
+				"HTTPS", await Security.LoginMonitor.LoginAuditor.Annotate(RemoteEndpoint));
+
+			Client.Dispose();
 		}
 #endif
 

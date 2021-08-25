@@ -52,8 +52,19 @@ existing data with the contents of the backup file. If not checked, the backup f
 
 <p style="display:none">
 <input type="checkbox" name="OnlySelectedCollections" id="OnlySelectedCollections" onclick="ToggleSelectedCollections()"/>
-<label for="OnlySelectedCollections" title="If only selected collections are to be restored.">Only restore selected collections.</label>
+<label for="OnlySelectedCollections" title="If only selected collections are to be restored.">Only restore selected parts.</label>
 </p>
+
+<fieldset id="SelectedParts" style="display:none">
+<legend>Parts</legend>
+<div id='Parts'>
+{{foreach PartName in ["Database","Ledger","Files"] do ]]
+<p>
+<input type="checkbox" name="Part_((PartName))" data-part="((PartName))" id="Part_((PartName))"/>
+<label for="Part_((PartName))" title="If checked, the ((PartName)) part of the backup file will be restored.">((PartName))</label>
+</p>[[}}
+</div>
+</fieldset>
 
 <fieldset id="SelectedCollections" style="display:none">
 <legend>Collections</legend>

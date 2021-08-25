@@ -37,6 +37,9 @@ function ToggleSelectedCollections()
 
     var Element = document.getElementById("SelectedCollections");
     Element.style.display = OnlySelectedCollections ? "block" : "none";
+
+    Element = document.getElementById("SelectedParts");
+    Element.style.display = OnlySelectedCollections ? "block" : "none";
 }
 
 function Restore()
@@ -131,7 +134,9 @@ function Restore()
                 };
 
                 var SelectedCollections = [];
+                var SelectedParts = [];
                 var Collections = document.getElementById("Collections");
+                var Parts = document.getElementById("Parts");
                 var Loop = Collections.firstElementChild;
                 var Next;
 
@@ -149,10 +154,28 @@ function Restore()
                     Loop = Next;
                 }
 
+                Loop = Parts.firstElementChild;
+                var Next;
+
+                while (Loop)
+                {
+                    Next = Loop.nextElementSibling;
+
+                    if (Loop.tagName === "P")
+                    {
+                        Loop = Loop.firstElementChild;
+                        if (Loop.tagName === "INPUT" && Loop.checked)
+                            SelectedParts.push(Loop.getAttribute("data-part"));
+                    }
+
+                    Loop = Next;
+                }
+
                 var Req = {
                     "overwrite": document.getElementById("OverwriteExisting").checked,
                     "onlySelectedCollections": document.getElementById("OnlySelectedCollections").checked,
-                    "selectedCollections": SelectedCollections
+                    "selectedCollections": SelectedCollections,
+                    "selectedParts": SelectedParts
                 };
 
                 xhttp.open("POST", "/Settings/Restore", true);

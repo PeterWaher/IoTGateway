@@ -97,7 +97,7 @@ namespace Waher.Networking.Sniffers
 
 							case BinaryPresentationMethod.Base64:
 
-								string s = System.Convert.ToBase64String(Data);
+								string s = Convert.ToBase64String(Data);
 
 								while (!string.IsNullOrEmpty(s))
 								{

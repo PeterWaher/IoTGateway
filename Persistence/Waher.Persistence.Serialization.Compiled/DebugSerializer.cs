@@ -220,7 +220,7 @@ namespace Waher.Persistence.Serialization
 		public void WriteRaw(byte[] Data)
 		{
 			this.serializer.WriteRaw(Data);
-			this.output.WriteLine("Raw: " + System.Convert.ToBase64String(Data));
+			this.output.WriteLine("Raw: " + Convert.ToBase64String(Data));
 		}
 
 		/// <summary>

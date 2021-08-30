@@ -242,8 +242,8 @@ namespace Waher.IoTGateway.WebResources
 					{
 						XmlOutput.WriteStartDocument();
 						XmlOutput.WriteStartElement("KeyAes256", Export.ExportNamepace);
-						XmlOutput.WriteAttributeString("key", System.Convert.ToBase64String(Key));
-						XmlOutput.WriteAttributeString("iv", System.Convert.ToBase64String(IV));
+						XmlOutput.WriteAttributeString("key", Convert.ToBase64String(Key));
+						XmlOutput.WriteAttributeString("iv", Convert.ToBase64String(IV));
 						XmlOutput.WriteEndElement();
 						XmlOutput.WriteEndDocument();
 					}

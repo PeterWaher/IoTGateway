@@ -15,13 +15,13 @@ namespace Waher.Persistence.FilesLW.Test
 			if (Left != null && Right != null && Left.GetType() != Right.GetType())
 			{
 				if (Left is long)
-					Right = System.Convert.ToInt64(Right);
+					Right = Convert.ToInt64(Right);
 				else if (Right is long)
-					Left = System.Convert.ToInt64(Left);
+					Left = Convert.ToInt64(Left);
 				else if (Left is int)
-					Right = System.Convert.ToInt32(Right);
+					Right = Convert.ToInt32(Right);
 				else if (Right is int)
-					Left = System.Convert.ToInt32(Left);
+					Left = Convert.ToInt32(Left);
 			}
 		}
 

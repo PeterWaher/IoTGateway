@@ -226,7 +226,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			IBuffer Buffer = Certificate.GetCertificateBlob();
 			
 			CryptographicBuffer.CopyToByteArray(Buffer, out byte[] Bin);
-			string Base64 = System.Convert.ToBase64String(Bin);
+			string Base64 = Convert.ToBase64String(Bin);
 #else
 			byte[] Bin = Certificate.Export(X509ContentType.Cert);
 			string Base64 = Convert.ToBase64String(Bin);
@@ -257,7 +257,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				IBuffer Buffer = CryptographicBuffer.CreateFromByteArray(Bin);
 				Buffer = CryptographicEngine.Decrypt(Key, Buffer, null);
 				CryptographicBuffer.CopyToByteArray(Buffer, out Bin);
-				string Response = System.Convert.ToBase64String(Bin);
+				string Response = Convert.ToBase64String(Bin);
 #else
 				Bin = Certificate.GetRSAPrivateKey().Decrypt(Bin, RSAEncryptionPadding.OaepSHA1);
 				string Response = Convert.ToBase64String(Bin);
@@ -359,7 +359,7 @@ namespace Waher.Networking.XMPP.Provisioning
 
 			if (Use.LocalCertificate != null)
 			{
-				byte[] Bin = System.Convert.FromBase64String(Challenge);
+				byte[] Bin = Convert.FromBase64String(Challenge);
 
 #if WINDOWS_UWP
 				CryptographicKey Key = PersistedKeyProvider.OpenPublicKeyFromCertificate(Use.LocalCertificate,
@@ -367,7 +367,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				IBuffer Buffer = CryptographicBuffer.CreateFromByteArray(Bin);
 				Buffer = CryptographicEngine.Decrypt(Key, Buffer, null);
 				CryptographicBuffer.CopyToByteArray(Buffer, out Bin);
-				string Response = System.Convert.ToBase64String(Bin);
+				string Response = Convert.ToBase64String(Bin);
 #else
 				Bin = Use.LocalCertificate.GetRSAPrivateKey().Decrypt(Bin, RSAEncryptionPadding.OaepSHA1);
 				string Response = Convert.ToBase64String(Bin);

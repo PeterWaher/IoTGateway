@@ -176,7 +176,7 @@ namespace Waher.Networking.UPnP
 					else if (Value is decimal)
 						d = (double)((decimal)Value);
 					else
-						d = System.Convert.ToDouble(Value);
+						d = Convert.ToDouble(Value);
 
 					return d.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
 
@@ -189,7 +189,7 @@ namespace Waher.Networking.UPnP
 					else if (Value is decimal)
 						d = (double)((decimal)Value);
 					else
-						d = System.Convert.ToDouble(Value);
+						d = Convert.ToDouble(Value);
 
 					return d.ToString("F4").Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
 
@@ -199,7 +199,7 @@ namespace Waher.Networking.UPnP
 					if (Value is DateTime)
 						DT = (DateTime)Value;
 					else
-						DT = System.Convert.ToDateTime(Value);
+						DT = Convert.ToDateTime(Value);
 
 					return DT.ToString("yyyyMMdd");
 
@@ -207,7 +207,7 @@ namespace Waher.Networking.UPnP
 					if (Value is DateTime)
 						DT = (DateTime)Value;
 					else
-						DT = System.Convert.ToDateTime(Value);
+						DT = Convert.ToDateTime(Value);
 
 					return DT.ToString("yyyyMMddTHHmmss");
 
@@ -237,7 +237,7 @@ namespace Waher.Networking.UPnP
 						if (Value is DateTime)
 							DT = (DateTime)Value;
 						else
-							DT = System.Convert.ToDateTime(Value);
+							DT = Convert.ToDateTime(Value);
 
 						return DT.ToString("yyyyMMddTHHmmss");
 					}
@@ -259,7 +259,7 @@ namespace Waher.Networking.UPnP
 						return TS.Hours.ToString("D2") + ":" + TS.Minutes.ToString("D2") + ":" + TS.Seconds.ToString("D2");
 					else
 					{
-						DT = System.Convert.ToDateTime(Value);
+						DT = Convert.ToDateTime(Value);
 						return DT.ToString("HH:mm:ss");
 					}
 
@@ -295,7 +295,7 @@ namespace Waher.Networking.UPnP
 						return TS.Hours.ToString("D2") + ":" + TS.Minutes.ToString("D2") + ":" + TS.Seconds.ToString("D2");
 					else
 					{
-						DT = System.Convert.ToDateTime(Value);
+						DT = Convert.ToDateTime(Value);
 						return DT.ToString("HH:mm:ss");
 					}
 
@@ -305,7 +305,7 @@ namespace Waher.Networking.UPnP
 					if (Value is bool)
 						b = (bool)Value;
 					else
-						b = System.Convert.ToBoolean(Value);
+						b = Convert.ToBoolean(Value);
 
 					return b ? "1" : "0";
 
@@ -316,7 +316,7 @@ namespace Waher.Networking.UPnP
 					if (Bin is null)
 						Bin = SerializeToBinary(Value);
 
-					return System.Convert.ToBase64String(Bin);
+					return Convert.ToBase64String(Bin);
 
 				case "bin.hex":
 					Bin = Value as byte[];
@@ -401,7 +401,7 @@ namespace Waher.Networking.UPnP
 					return (Value == "1" || Value == "true" || Value == "yes");
 
 				case "bin.base64":
-					return System.Convert.FromBase64String(Value);
+					return Convert.FromBase64String(Value);
 
 				case "bin.hex":
 					int i, c = Value.Length;

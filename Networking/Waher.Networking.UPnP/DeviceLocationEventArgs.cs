@@ -17,9 +17,9 @@ namespace Waher.Networking.UPnP
 	/// </summary>
 	public class DeviceLocationEventArgs
 	{
-		private DeviceLocation location;
-		private IPEndPoint localEndPoint;
-		private IPEndPoint remoteEndPoint;
+		private readonly DeviceLocation location;
+		private readonly IPEndPoint localEndPoint;
+		private readonly IPEndPoint remoteEndPoint;
 
 		internal DeviceLocationEventArgs(DeviceLocation Location, IPEndPoint LocalEndPoint, IPEndPoint RemoteEndPoint)
 		{

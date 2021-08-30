@@ -17,10 +17,10 @@ namespace Waher.Networking.UPnP
 	/// </summary>
 	public class NotificationEventArgs
 	{
-		private UPnPClient client;
-		private UPnPHeaders headers;
-		private IPEndPoint localEndPoint;
-		private IPEndPoint remoteEndPoint;
+		private readonly UPnPClient client;
+		private readonly UPnPHeaders headers;
+		private readonly IPEndPoint localEndPoint;
+		private readonly IPEndPoint remoteEndPoint;
 
 		/// <summary>
 		/// Contains information about the location of a device on the network.

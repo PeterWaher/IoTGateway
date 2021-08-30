@@ -10,12 +10,12 @@ namespace Waher.Networking.UPnP
 	/// </summary>
 	public class DeviceDescriptionDocument
 	{
-		private XmlDocument xml;
-		private UPnPDevice device;
-		private int majorVersion;
-		private int minorVersion;
-		private string baseUrl;
-		private Uri baseUri;
+		private readonly XmlDocument xml;
+		private readonly UPnPDevice device;
+		private readonly int majorVersion;
+		private readonly int minorVersion;
+		private readonly string baseUrl;
+		private readonly Uri baseUri;
 
 		internal DeviceDescriptionDocument(XmlDocument Xml, UPnPClient Client, string BaseUrl)
 		{

@@ -10,13 +10,13 @@ namespace Waher.Networking.UPnP
 	/// </summary>
 	public class UPnPIcon
 	{
-		private XmlElement xml;
-		private Uri uri;
-		private string mimetype;
-		private string url;
-		private int width;
-		private int height;
-		private int depth;
+		private readonly XmlElement xml;
+		private readonly Uri uri;
+		private readonly string mimetype;
+		private readonly string url;
+		private readonly int width;
+		private readonly int height;
+		private readonly int depth;
 
 		internal UPnPIcon(XmlElement Xml, Uri BaseUri)
 		{

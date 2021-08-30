@@ -10,14 +10,14 @@ namespace Waher.Networking.UPnP
 	/// </summary>
 	public class ServiceDescriptionDocument
 	{
-		private Dictionary<string, UPnPAction> actionsByName = new Dictionary<string, UPnPAction>();
-		private Dictionary<string, UPnPStateVariable> variablesByName = new Dictionary<string, UPnPStateVariable>();
-		private UPnPAction[] actions;
-		private UPnPStateVariable[] variables;
-		private UPnPService service;
-		private XmlDocument xml;
-		private int majorVersion;
-		private int minorVersion;
+		private readonly Dictionary<string, UPnPAction> actionsByName = new Dictionary<string, UPnPAction>();
+		private readonly Dictionary<string, UPnPStateVariable> variablesByName = new Dictionary<string, UPnPStateVariable>();
+		private readonly UPnPAction[] actions;
+		private readonly UPnPStateVariable[] variables;
+		private readonly UPnPService service;
+		private readonly XmlDocument xml;
+		private readonly int majorVersion;
+		private readonly int minorVersion;
 
 		internal ServiceDescriptionDocument(XmlDocument Xml, UPnPClient Client, UPnPService Service)
 		{

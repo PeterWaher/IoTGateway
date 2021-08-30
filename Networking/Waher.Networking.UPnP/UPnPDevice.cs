@@ -10,25 +10,25 @@ namespace Waher.Networking.UPnP
 	/// </summary>
 	public class UPnPDevice
 	{
-		private XmlElement xml;
-		private string deviceType;
-		private string friendlyName;
-		private string manufacturer;
-		private string manufacturerURL;
-		private string modelDescription;
-		private string modelName;
-		private string modelNumber;
-		private string modelURL;
-		private string serialNumber;
-		private string udn;
-		private string upc;
-		private UPnPIcon[] icons;
-		private UPnPService[] services;
-		private UPnPDevice[] devices;
-		private string presentationURL;
-		private Uri manufacturerURI;
-		private Uri modelURI;
-		private Uri presentationURI;
+		private readonly XmlElement xml;
+		private readonly string deviceType;
+		private readonly string friendlyName;
+		private readonly string manufacturer;
+		private readonly string manufacturerURL;
+		private readonly string modelDescription;
+		private readonly string modelName;
+		private readonly string modelNumber;
+		private readonly string modelURL;
+		private readonly string serialNumber;
+		private readonly string udn;
+		private readonly string upc;
+		private readonly UPnPIcon[] icons;
+		private readonly UPnPService[] services;
+		private readonly UPnPDevice[] devices;
+		private readonly string presentationURL;
+		private readonly Uri manufacturerURI;
+		private readonly Uri modelURI;
+		private readonly Uri presentationURI;
 
 		internal UPnPDevice(XmlElement Xml, Uri BaseUri, UPnPClient Client)
 		{
@@ -261,7 +261,7 @@ namespace Waher.Networking.UPnP
 		/// <returns>Service object, if found, null otherwise.</returns>
 		public UPnPService GetService(string ServiceType)
 		{
-			UPnPService Result = null;
+			UPnPService Result;
 
 			foreach (UPnPService Service in this.services)
 			{
@@ -286,9 +286,11 @@ namespace Waher.Networking.UPnP
 		{
 			get
 			{
-				List<UPnPDevice> Result = new List<UPnPDevice>();
+				List<UPnPDevice> Result = new List<UPnPDevice>()
+				{
+					this 
+				};
 
-				Result.Add(this);
 				foreach (UPnPDevice Device in this.devices)
 					Result.AddRange(Device.DevicesRecursive);
 

@@ -9,10 +9,10 @@ namespace Waher.Networking.UPnP
 	/// </summary>
 	public class UPnPException : Exception
 	{
-		private string faultCode;
-		private string faultString;
-		private string upnpErrorCode;
-		private string upnpErrorDescription;
+		private readonly string faultCode;
+		private readonly string faultString;
+		private readonly string upnpErrorCode;
+		private readonly string upnpErrorDescription;
 
 		internal UPnPException(string FaultCode, string FaultString, string UPnPErrorCode, string UPnPErrorDescription)
 			: base(string.IsNullOrEmpty(UPnPErrorDescription) ? FaultString : UPnPErrorDescription)

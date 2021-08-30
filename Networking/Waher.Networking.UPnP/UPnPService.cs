@@ -10,16 +10,16 @@ namespace Waher.Networking.UPnP
 	/// </summary>
 	public class UPnPService
 	{
-		private UPnPClient client;
-		private XmlElement xml;
-		private string serviceType;
-		private string serviceId;
-		private string scpdURL;
-		private string controlURL;
-		private string eventSubURL;
-		private Uri scpdURI;
-		private Uri controlURI;
-		private Uri eventSubURI;
+		private readonly UPnPClient client;
+		private readonly XmlElement xml;
+		private readonly string serviceType;
+		private readonly string serviceId;
+		private readonly string scpdURL;
+		private readonly string controlURL;
+		private readonly string eventSubURL;
+		private readonly Uri scpdURI;
+		private readonly Uri controlURI;
+		private readonly Uri eventSubURI;
 
 		/// <summary>
 		/// Contains information about a service.

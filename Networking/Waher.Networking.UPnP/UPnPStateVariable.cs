@@ -11,17 +11,17 @@ namespace Waher.Networking.UPnP
 	/// </summary>
 	public class UPnPStateVariable
 	{
-		private XmlElement xml;
-		private string[] allowedValues;
-		private string name;
-		private string dataType;
-		private string defaultValue;
-		private string minimum;
-		private string maximum;
-		private string step;
-		private bool sendsEvents;
-		private bool hasAllowedValues = false;
-		private bool hasAllowedValueRange = false;
+		private readonly XmlElement xml;
+		private readonly string[] allowedValues;
+		private readonly string name;
+		private readonly string dataType;
+		private readonly string defaultValue;
+		private readonly string minimum;
+		private readonly string maximum;
+		private readonly string step;
+		private readonly bool sendsEvents;
+		private readonly bool hasAllowedValues = false;
+		private readonly bool hasAllowedValueRange = false;
 
 		internal UPnPStateVariable(XmlElement Xml)
 		{
@@ -167,57 +167,46 @@ namespace Waher.Networking.UPnP
 				case "r8":
 				case "number":
 				case "float":
-					double d;
-
-					if (Value is double)
-						d = (double)Value;
-					else if (Value is float)
-						d = (float)Value;
-					else if (Value is decimal)
-						d = (double)((decimal)Value);
-					else
-						d = Convert.ToDouble(Value);
+					if (!(Value is double d))
+					{
+						if (Value is float f)
+							d = f;
+						else if (Value is decimal dec)
+							d = (double)dec;
+						else
+							d = Convert.ToDouble(Value);
+					}
 
 					return d.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
 
 				case "fixed.14.4":
 
-					if (Value is double)
-						d = (double)Value;
-					else if (Value is float)
-						d = (float)Value;
-					else if (Value is decimal)
-						d = (double)((decimal)Value);
+					if (Value is double d2)
+						d = d2;
+					else if (Value is float f2)
+						d = f2;
+					else if (Value is decimal dec2)
+						d = (double)dec2;
 					else
 						d = Convert.ToDouble(Value);
 
 					return d.ToString("F4").Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
 
 				case "date":
-					DateTime DT;
-
-					if (Value is DateTime)
-						DT = (DateTime)Value;
-					else
+					if (!(Value is DateTime DT))
 						DT = Convert.ToDateTime(Value);
 
 					return DT.ToString("yyyyMMdd");
 
 				case "dateTime":
-					if (Value is DateTime)
-						DT = (DateTime)Value;
-					else
-						DT = Convert.ToDateTime(Value);
+					if (!(Value is DateTime DT2))
+						DT2 = Convert.ToDateTime(Value);
 
-					return DT.ToString("yyyyMMddTHHmmss");
+					return DT2.ToString("yyyyMMddTHHmmss");
 
 				case "dateTime.tz":
-					DateTimeOffset DTO;
-
-					if (Value is DateTimeOffset)
+					if (Value is DateTimeOffset DTO)
 					{
-						DTO = (DateTimeOffset)Value;
-
 						string s = DTO.ToString("yyyyMMddTHHmmss");
 						TimeSpan Zone = DTO.Offset;
 
@@ -234,27 +223,17 @@ namespace Waher.Networking.UPnP
 					}
 					else
 					{
-						if (Value is DateTime)
-							DT = (DateTime)Value;
-						else
-							DT = Convert.ToDateTime(Value);
+						if (!(Value is DateTime DT3))
+							DT3 = Convert.ToDateTime(Value);
 
-						return DT.ToString("yyyyMMddTHHmmss");
+						return DT3.ToString("yyyyMMddTHHmmss");
 					}
 
 				case "time":
-					TimeSpan TS;
-
-					if (Value is TimeSpan)
-					{
-						TS = (TimeSpan)Value;
+					if (Value is TimeSpan TS)
 						return TS.Hours.ToString("D2") + ":" + TS.Minutes.ToString("D2") + ":" + TS.Seconds.ToString("D2");
-					}
-					else if (Value is DateTime)
-					{
-						DT = (DateTime)Value;
-						return DT.ToString("HH:mm:ss");
-					}
+					else if (Value is DateTime DT4)
+						return DT4.ToString("HH:mm:ss");
 					else if (TimeSpan.TryParse(Value.ToString(), out TS))
 						return TS.Hours.ToString("D2") + ":" + TS.Minutes.ToString("D2") + ":" + TS.Seconds.ToString("D2");
 					else
@@ -264,21 +243,14 @@ namespace Waher.Networking.UPnP
 					}
 
 				case "time.tz":
-					if (Value is TimeSpan)
+					if (Value is TimeSpan TS2)
+						return TS2.Hours.ToString("D2") + ":" + TS2.Minutes.ToString("D2") + ":" + TS2.Seconds.ToString("D2");
+					else if (Value is DateTime DT5)
+						return DT5.ToString("HH:mm:ss");
+					else if (Value is DateTimeOffset DTO2)
 					{
-						TS = (TimeSpan)Value;
-						return TS.Hours.ToString("D2") + ":" + TS.Minutes.ToString("D2") + ":" + TS.Seconds.ToString("D2");
-					}
-					else if (Value is DateTime)
-					{
-						DT = (DateTime)Value;
-						return DT.ToString("HH:mm:ss");
-					}
-					else if (Value is DateTimeOffset)
-					{
-						DTO = (DateTimeOffset)Value;
-						string s = DTO.ToString("HH:mm:ss");
-						TimeSpan Zone = DTO.Offset;
+						string s = DTO2.ToString("HH:mm:ss");
+						TimeSpan Zone = DTO2.Offset;
 
 						if (Zone < TimeSpan.Zero)
 						{
@@ -300,32 +272,24 @@ namespace Waher.Networking.UPnP
 					}
 
 				case "boolean":
-					bool b;
-
-					if (Value is bool)
-						b = (bool)Value;
-					else
+					if (!(Value is bool b))
 						b = Convert.ToBoolean(Value);
 
 					return b ? "1" : "0";
 
 				case "bin.base64":
-					byte[] Bin;
-
-					Bin = Value as byte[];
-					if (Bin is null)
+					if (!(Value is byte[] Bin))
 						Bin = SerializeToBinary(Value);
 
 					return Convert.ToBase64String(Bin);
 
 				case "bin.hex":
-					Bin = Value as byte[];
-					if (Bin is null)
-						Bin = SerializeToBinary(Value);
+					if (!(Value is byte[] Bin2))
+						Bin2 = SerializeToBinary(Value);
 
 					StringBuilder sb = new StringBuilder();
 
-					foreach (byte b2 in Bin)
+					foreach (byte b2 in Bin2)
 						sb.Append(b2.ToString("X2"));
 
 					return sb.ToString();
@@ -458,7 +422,7 @@ namespace Waher.Networking.UPnP
 			if (Value is byte[] Bin)
 				return Bin;
 			else
-				return InternetContent.Encode(Value, Encoding.UTF8, out string ContentType);
+				return InternetContent.Encode(Value, Encoding.UTF8, out string _);
 		}
 	}
 }

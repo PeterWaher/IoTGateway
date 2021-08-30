@@ -26,11 +26,11 @@ namespace Waher.Networking.UPnP
 	/// </summary>
 	public class UPnPArgument
 	{
-		private XmlElement xml;
-		private string name;
-		private ArgumentDirection direction;
-		private bool returnValue;
-		private string relatedStateVariable;
+		private readonly XmlElement xml;
+		private readonly string name;
+		private readonly ArgumentDirection direction;
+		private readonly bool returnValue;
+		private readonly string relatedStateVariable;
 
 		internal UPnPArgument(XmlElement Xml)
 		{

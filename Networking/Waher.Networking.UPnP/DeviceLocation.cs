@@ -9,12 +9,12 @@ namespace Waher.Networking.UPnP
 	/// </summary>
 	public class DeviceLocation
 	{
-		private UPnPClient client;
-		private UPnPHeaders headers;
-		private string searchTarget;
-		private string server;
-		private string location;
-		private string uniqueServiceName;
+		private readonly UPnPClient client;
+		private readonly UPnPHeaders headers;
+		private readonly string searchTarget;
+		private readonly string server;
+		private readonly string location;
+		private readonly string uniqueServiceName;
 
 		/// <summary>
 		/// Contains information about the location of a device on the network.
@@ -65,6 +65,14 @@ namespace Waher.Networking.UPnP
 		public string UniqueServiceName
 		{
 			get { return this.uniqueServiceName; }
+		}
+
+		/// <summary>
+		/// UPnP Headers
+		/// </summary>
+		public UPnPHeaders Headers
+		{
+			get { return this.headers; }
 		}
 
 		/// <summary>

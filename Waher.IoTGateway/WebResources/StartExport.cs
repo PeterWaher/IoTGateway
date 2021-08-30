@@ -95,7 +95,7 @@ namespace Waher.IoTGateway.WebResources
 					throw new BadRequestException();
 				}
 
-				KeyValuePair<string, IExportFormat> Exporter = GetExporter(TypeOfFile, OnlySelectedCollections, SelectedCollections);
+				ExportInfo ExportInfo = GetExporter(TypeOfFile, OnlySelectedCollections, SelectedCollections);
 				Task T;
 
 				lock (synchObject)
@@ -142,11 +142,11 @@ namespace Waher.IoTGateway.WebResources
 					}
 				}
 
-				Task _ = DoExport(Exporter.Value, Database, Ledger, WebContent, Folders.ToArray());
+				Task _ = DoExport(ExportInfo.Exporter, Database, Ledger, WebContent, Folders.ToArray());
 
 				Response.StatusCode = 200;
 				Response.ContentType = "text/plain";
-				await Response.Write(Exporter.Key);
+				await Response.Write(ExportInfo.LocalBackupFileName);
 			}
 			catch (Exception ex)
 			{
@@ -157,9 +157,18 @@ namespace Waher.IoTGateway.WebResources
 		private static bool exporting = false;
 		private static readonly object synchObject = new object();
 
-		internal static KeyValuePair<string, IExportFormat> GetExporter(string TypeOfFile, bool OnlySelectedCollections, Array SelectedCollections)
+		internal class ExportInfo
 		{
-			IExportFormat Output;
+			public string LocalBackupFileName;
+			public string LocalKeyFileName;
+			public string FullBackupFileName;
+			public string FullKeyFileName;
+			public IExportFormat Exporter;
+		}
+
+		internal static ExportInfo GetExporter(string TypeOfFile, bool OnlySelectedCollections, Array SelectedCollections)
+		{
+			ExportInfo Result = new ExportInfo();
 			string BasePath = Export.FullExportFolder;
 
 			if (!Directory.Exists(BasePath))
@@ -167,43 +176,43 @@ namespace Waher.IoTGateway.WebResources
 
 			BasePath += Path.DirectorySeparatorChar;
 
-			string FullFileName = BasePath + DateTime.Now.ToString("yyyy-MM-dd HH_mm_ss");
+			Result.FullBackupFileName = BasePath + DateTime.Now.ToString("yyyy-MM-dd HH_mm_ss");
 
 			switch (TypeOfFile)
 			{
 				case "XML":
-					FullFileName = GetUniqueFileName(FullFileName, ".xml");
-					FileStream fs = new FileStream(FullFileName, FileMode.Create, FileAccess.Write);
-					DateTime Created = File.GetCreationTime(FullFileName);
+					Result.FullBackupFileName = GetUniqueFileName(Result.FullBackupFileName, ".xml");
+					FileStream fs = new FileStream(Result.FullBackupFileName, FileMode.Create, FileAccess.Write);
+					DateTime Created = File.GetCreationTime(Result.FullBackupFileName);
 					XmlWriterSettings Settings = XML.WriterSettings(true, false);
 					Settings.Async = true;
 					XmlWriter XmlOutput = XmlWriter.Create(fs, Settings);
-					string FileName = FullFileName.Substring(BasePath.Length);
-					Output = new XmlExportFormat(FileName, Created, XmlOutput, fs, OnlySelectedCollections, SelectedCollections);
+					Result.LocalBackupFileName = Result.FullBackupFileName.Substring(BasePath.Length);
+					Result.Exporter = new XmlExportFormat(Result.LocalBackupFileName, Created, XmlOutput, fs, OnlySelectedCollections, SelectedCollections);
 					break;
 
 				case "Binary":
-					FullFileName = GetUniqueFileName(FullFileName, ".bin");
-					fs = new FileStream(FullFileName, FileMode.Create, FileAccess.Write);
-					Created = File.GetCreationTime(FullFileName);
-					FileName = FullFileName.Substring(BasePath.Length);
-					Output = new BinaryExportFormat(FileName, Created, fs, fs, OnlySelectedCollections, SelectedCollections);
+					Result.FullBackupFileName = GetUniqueFileName(Result.FullBackupFileName, ".bin");
+					fs = new FileStream(Result.FullBackupFileName, FileMode.Create, FileAccess.Write);
+					Created = File.GetCreationTime(Result.FullBackupFileName);
+					Result.LocalBackupFileName = Result.FullBackupFileName.Substring(BasePath.Length);
+					Result.Exporter = new BinaryExportFormat(Result.LocalBackupFileName, Created, fs, fs, OnlySelectedCollections, SelectedCollections);
 					break;
 
 				case "Compressed":
-					FullFileName = GetUniqueFileName(FullFileName, ".gz");
-					fs = new FileStream(FullFileName, FileMode.Create, FileAccess.Write);
-					Created = File.GetCreationTime(FullFileName);
-					FileName = FullFileName.Substring(BasePath.Length);
+					Result.FullBackupFileName = GetUniqueFileName(Result.FullBackupFileName, ".gz");
+					fs = new FileStream(Result.FullBackupFileName, FileMode.Create, FileAccess.Write);
+					Created = File.GetCreationTime(Result.FullBackupFileName);
+					Result.LocalBackupFileName = Result.FullBackupFileName.Substring(BasePath.Length);
 					GZipStream gz = new GZipStream(fs, CompressionLevel.Optimal, false);
-					Output = new BinaryExportFormat(FileName, Created, gz, fs, OnlySelectedCollections, SelectedCollections);
+					Result.Exporter = new BinaryExportFormat(Result.LocalBackupFileName, Created, gz, fs, OnlySelectedCollections, SelectedCollections);
 					break;
 
 				case "Encrypted":
-					FullFileName = GetUniqueFileName(FullFileName, ".bak");
-					fs = new FileStream(FullFileName, FileMode.Create, FileAccess.Write);
-					Created = File.GetCreationTime(FullFileName);
-					FileName = FullFileName.Substring(BasePath.Length);
+					Result.FullBackupFileName = GetUniqueFileName(Result.FullBackupFileName, ".bak");
+					fs = new FileStream(Result.FullBackupFileName, FileMode.Create, FileAccess.Write);
+					Created = File.GetCreationTime(Result.FullBackupFileName);
+					Result.LocalBackupFileName = Result.FullBackupFileName.Substring(BasePath.Length);
 
 					byte[] Key = new byte[32];
 					byte[] IV = new byte[16];
@@ -218,7 +227,7 @@ namespace Waher.IoTGateway.WebResources
 					CryptoStream cs = new CryptoStream(fs, AesTransform, CryptoStreamMode.Write);
 
 					gz = new GZipStream(cs, CompressionLevel.Optimal, false);
-					Output = new BinaryExportFormat(FileName, Created, gz, fs, cs, 32, OnlySelectedCollections, SelectedCollections);
+					Result.Exporter = new BinaryExportFormat(Result.LocalBackupFileName, Created, gz, fs, cs, 32, OnlySelectedCollections, SelectedCollections);
 
 					string BasePath2 = Export.FullKeyExportFolder;
 
@@ -226,9 +235,10 @@ namespace Waher.IoTGateway.WebResources
 						Directory.CreateDirectory(BasePath2);
 
 					BasePath2 += Path.DirectorySeparatorChar;
-					string FullFileName2 = BasePath2 + FullFileName.Substring(BasePath.Length).Replace(".bak", ".key");
+					Result.LocalKeyFileName = Result.LocalBackupFileName.Replace(".bak", ".key");
+					Result.FullKeyFileName = BasePath2 + Result.LocalKeyFileName;
 
-					using (XmlOutput = XmlWriter.Create(FullFileName2, XML.WriterSettings(true, false)))
+					using (XmlOutput = XmlWriter.Create(Result.FullKeyFileName, XML.WriterSettings(true, false)))
 					{
 						XmlOutput.WriteStartDocument();
 						XmlOutput.WriteStartElement("KeyAes256", Export.ExportNamepace);
@@ -242,7 +252,7 @@ namespace Waher.IoTGateway.WebResources
 
 					try
 					{
-						using (fs = File.OpenRead(FullFileName2))
+						using (fs = File.OpenRead(Result.FullKeyFileName))
 						{
 							Size = fs.Length;
 						}
@@ -253,19 +263,16 @@ namespace Waher.IoTGateway.WebResources
 						Size = 0;
 					}
 
-					Created = File.GetCreationTime(FullFileName2);
+					Created = File.GetCreationTime(Result.FullKeyFileName);
 
-					ExportFormat.UpdateClientsFileUpdated(FullFileName2.Substring(BasePath2.Length), Size, Created);
+					ExportFormat.UpdateClientsFileUpdated(Result.LocalKeyFileName, Size, Created);
 					break;
 
 				default:
 					throw new NotSupportedException("Unsupported file type.");
 			}
 
-			if (FullFileName.StartsWith(BasePath))
-				FullFileName = FullFileName.Substring(BasePath.Length);
-
-			return new KeyValuePair<string, IExportFormat>(FullFileName, Output);
+			return Result;
 		}
 
 		/// <summary>

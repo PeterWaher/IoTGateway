@@ -60,7 +60,7 @@ If you enable automatic backups, the system will automaticly backup your data ev
 
 <form action="UpdateBackupFolderSettings" method="post" enctype="multipart/form-data">
 <fieldset>
-<legend>Backup Folder</legend>
+<legend>Backup Folders</legend>
 
 You can redirect any exported files to another folder if you want, on the local machine, or in the network. 
 Currently, backup files are stored in this folder:
@@ -74,6 +74,13 @@ Keys are stored in this folder:
 ```
 {{Export.FullKeyExportFolder}}
 ```
+
+**Note**: Backup files generated in these folders, can also be uploaded to contacts in your [roster](/Settings/Roster.md), if they:
+
+1.	Support HTTP File Upload. (Public TAG Neurons do.)
+2.	You are subscribed to their presence.
+3.	Are members of the group `BACKUP` or `KEY`, or both. Backup files are sent to roster items in group `BACKUP`. Key files are sent to
+	roster items in group `KEY`.
 
 You can update these folders if you want below. By leaving the fields blank, the default backup folder is used. 
 

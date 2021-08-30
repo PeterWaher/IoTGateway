@@ -2966,17 +2966,16 @@ namespace Waher.IoTGateway
 
 			await Export.SetLastBackupAsync(Now);
 
-			KeyValuePair<string, IExportFormat> Exporter = StartExport.GetExporter("Encrypted", false, new string[0]);
-			string FileName = Exporter.Key;
+			StartExport.ExportInfo ExportInfo = StartExport.GetExporter("Encrypted", false, new string[0]);
 
-			ExportFormat.UpdateClientsFileUpdated(FileName, -1, Now);
+			ExportFormat.UpdateClientsFileUpdated(ExportInfo.LocalBackupFileName, -1, Now);
 
 			List<string> Folders = new List<string>();
 
 			foreach (Export.FolderCategory FolderCategory in Export.GetRegisteredFolders())
 				Folders.AddRange(FolderCategory.Folders);
 
-			await StartExport.DoExport(Exporter.Value, true, false, true, Folders.ToArray());
+			await StartExport.DoExport(ExportInfo.Exporter, true, false, true, Folders.ToArray());
 
 			long KeepDays = await Export.GetKeepDaysAsync();
 			long KeepMonths = await Export.GetKeepMonthsAsync();
@@ -2988,7 +2987,14 @@ namespace Waher.IoTGateway
 			if (ExportFolder != KeyFolder)
 				DeleteOldFiles(KeyFolder, KeepDays, KeepMonths, KeepYears, Now);
 
-			OnAfterBackup?.Invoke(typeof(Gateway), EventArgs.Empty);
+			try
+			{
+				OnAfterBackup?.Invoke(typeof(Gateway), EventArgs.Empty);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 		}
 
 		private static DateTime? lastBackupTimeCheck = null;
@@ -3003,7 +3009,7 @@ namespace Waher.IoTGateway
 		{
 			try
 			{
-				string[] Files = Directory.GetFiles(Path, "*.*", SearchOption.TopDirectoryOnly);
+				string[] Files = Directory.GetFiles(Path, "*.*", SearchOption.AllDirectories);
 				DateTime CreationTime;
 
 				foreach (string FileName in Files)

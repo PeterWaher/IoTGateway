@@ -1022,7 +1022,7 @@ namespace Waher.IoTGateway
 			{
 				int c1 = this.ModuleCategory(x);
 				int c2 = this.ModuleCategory(y);
-				
+
 				int i = c1 - c2;
 				if (i != 0)
 					return i;
@@ -1333,7 +1333,7 @@ namespace Waher.IoTGateway
 			{
 				contractsClient = new ContractsClient(xmppClient, XmppConfiguration.Instance.LegalIdentities);
 				contractsClient.SetKeySettingsInstance(string.Empty, true);
-				
+
 				await contractsClient.LoadKeys(true);
 			}
 			else
@@ -2975,7 +2975,7 @@ namespace Waher.IoTGateway
 			foreach (Export.FolderCategory FolderCategory in Export.GetRegisteredFolders())
 				Folders.AddRange(FolderCategory.Folders);
 
-			await StartExport.DoExport(ExportInfo.Exporter, true, false, true, Folders.ToArray());
+			await StartExport.DoExport(ExportInfo, true, false, true, Folders.ToArray());
 
 			long KeepDays = await Export.GetKeepDaysAsync();
 			long KeepMonths = await Export.GetKeepMonthsAsync();

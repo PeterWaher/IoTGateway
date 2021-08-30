@@ -519,8 +519,20 @@ namespace Waher.IoTGateway.WebResources
 						{
 							using (FileStream fs = File.OpenRead(BackupInfo.FullFileName))
 							{
+								StringBuilder Xml = new StringBuilder();
+								long FileSize = fs.Length;
+
+								Xml.Append("<prepare xmlns='http://waher.se/Schema/Backups.xsd' filename='");
+								Xml.Append(XML.Encode(BackupInfo.LocalFileName));
+								Xml.Append("' size='");
+								Xml.Append(FileSize.ToString());
+								Xml.Append("' content-type='application/octet-stream'/>");
+
+								await HttpFileUploadClient.Client.IqSetAsync(HttpFileUploadClient.FileUploadJid, Xml.ToString());	
+								// Empty response expected. Errors cause an exception to be raised.
+
 								HttpFileUploadEventArgs e2 = await HttpFileUploadClient.RequestUploadSlotAsync(BackupInfo.LocalFileName,
-									"application/octet-stream", fs.Length);
+									"application/octet-stream", FileSize);
 
 								if (!e2.Ok)
 									throw (e2.StanzaError ?? new XmppException("Unable to get HTTP upload slot for backup file."));

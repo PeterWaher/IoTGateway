@@ -75,12 +75,9 @@ Keys are stored in this folder:
 {{Export.FullKeyExportFolder}}
 ```
 
-**Note**: Backup files generated in these folders, can also be uploaded to contacts in your [roster](/Settings/Roster.md), if they:
-
-1.	Support HTTP File Upload. (Public TAG Neurons do.)
-2.	You are subscribed to their presence.
-3.	Are members of the group `BACKUP` or `KEY`, or both. Backup files are sent to roster items in group `BACKUP`. Key files are sent to
-	roster items in group `KEY`.
+**Note**: Backup files generated in these folders, can also be uploaded to TAG Neurons^TM that are contacts in your 
+[roster](/Settings/Roster.md). Backup files are sent to roster items in group `BACKUP`. Key files are sent to
+roster items in group `KEY`.
 
 You can update these folders if you want below. By leaving the fields blank, the default backup folder is used. 
 

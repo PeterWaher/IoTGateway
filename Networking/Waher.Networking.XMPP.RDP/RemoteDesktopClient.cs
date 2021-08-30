@@ -289,9 +289,8 @@ namespace Waher.Networking.XMPP.RDP
 
 		private Task ScanCompleteHandler(object State, MessageEventArgs e)
 		{
-			RemoteDesktopSession Session = null;
 			string SessionId = XML.Attribute(e.Content, "sessionId");
-			if (!this.sessions.TryGetValue(SessionId, out Session))
+			if (!this.sessions.TryGetValue(SessionId, out RemoteDesktopSession Session))
 				return Task.CompletedTask;
 
 			Session.ScanCompleted();

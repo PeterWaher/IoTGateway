@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.IoTGateway.WebResources.ExportFormats;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.HttpFileUpload;
-using Waher.IoTGateway.WebResources.ExportFormats;
+using Waher.Runtime.Profiling;
 
 namespace Waher.IoTGateway.WebResources
 {
@@ -48,24 +49,12 @@ namespace Waher.IoTGateway.WebResources
 		/// <summary>
 		/// If the resource handles sub-paths.
 		/// </summary>
-		public override bool HandlesSubPaths
-		{
-			get
-			{
-				return false;
-			}
-		}
+		public override bool HandlesSubPaths => false;
 
 		/// <summary>
 		/// If the resource uses user sessions.
 		/// </summary>
-		public override bool UserSessions
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public override bool UserSessions => true;
 
 		/// <summary>
 		/// If the POST method is allowed.
@@ -84,18 +73,29 @@ namespace Waher.IoTGateway.WebResources
 			{
 				Gateway.AssertUserAuthenticated(Request, "Admin.Data.Backup");
 
-				if (!Request.HasData ||
-					!(Request.DecodeData() is Dictionary<string, object> RequestObj) ||
-					!RequestObj.TryGetValue("TypeOfFile", out object Obj) || !(Obj is string TypeOfFile) ||
-					!RequestObj.TryGetValue("Database", out Obj) || !(Obj is bool Database) ||
-					!RequestObj.TryGetValue("Ledger", out Obj) || !(Obj is bool Ledger) ||
-					!RequestObj.TryGetValue("WebContent", out Obj) || !(Obj is bool WebContent) ||
-					!RequestObj.TryGetValue("OnlySelectedCollections", out Obj) || !(Obj is bool OnlySelectedCollections) ||
-					!RequestObj.TryGetValue("selectedCollections", out Obj) || !(Obj is Array SelectedCollections) ||
-					!RequestObj.TryGetValue("exportOnly", out Obj) || !(Obj is bool ExportOnly))
-				{
-					throw new BadRequestException();
-				}
+				if (!Request.HasData || !(Request.DecodeData() is Dictionary<string, object> RequestObj))
+					throw new BadRequestException("Invalid request.");
+
+				if (!RequestObj.TryGetValue("TypeOfFile", out object Obj) || !(Obj is string TypeOfFile))
+					throw new BadRequestException("Missing: TypeOfFile");
+
+				if (!RequestObj.TryGetValue("Database", out Obj) || !(Obj is bool Database))
+					throw new BadRequestException("Missing: Database");
+
+				if (!RequestObj.TryGetValue("Ledger", out Obj) || !(Obj is bool Ledger))
+					Ledger = false;
+
+				if (!RequestObj.TryGetValue("WebContent", out Obj) || !(Obj is bool WebContent))
+					throw new BadRequestException("Missing: WebContent");
+
+				if (!RequestObj.TryGetValue("OnlySelectedCollections", out Obj) || !(Obj is bool OnlySelectedCollections))
+					throw new BadRequestException("Missing: OnlySelectedCollections");
+
+				if (!RequestObj.TryGetValue("selectedCollections", out Obj) || !(Obj is Array SelectedCollections))
+					throw new BadRequestException("Missing: selectedCollections");
+
+				if (!RequestObj.TryGetValue("exportOnly", out Obj) || !(Obj is bool ExportOnly))
+					throw new BadRequestException("Missing: exportOnly");
 
 				ExportInfo ExportInfo = GetExporter(TypeOfFile, OnlySelectedCollections, SelectedCollections);
 				Task T;
@@ -310,6 +310,10 @@ namespace Waher.IoTGateway.WebResources
 		/// <param name="Folders">Root subfolders to export.</param>
 		internal static async Task DoExport(ExportInfo ExportInfo, bool Database, bool Ledger, bool WebContent, string[] Folders)
 		{
+			Profiler Profiler = new Profiler("Export", ProfilerThreadType.Sequential);
+			Profiler.Start();
+			Profiler.NewState("Start");
+
 			try
 			{
 				List<KeyValuePair<string, object>> Tags = new List<KeyValuePair<string, object>>()
@@ -327,21 +331,30 @@ namespace Waher.IoTGateway.WebResources
 
 				if (Database)
 				{
+					Profiler.NewState("Database");
+
 					StringBuilder Temp = new StringBuilder();
 					using (XmlWriter w = XmlWriter.Create(Temp, XML.WriterSettings(false, true)))
 					{
 						await Persistence.Database.Analyze(w, Path.Combine(Gateway.AppDataFolder, "Transforms", "DbStatXmlToHtml.xslt"),
-							Path.Combine(Gateway.RootFolder, "Data"), false, true);
+							Path.Combine(Gateway.RootFolder, "Data"), false, true, Profiler.CreateThread("Analyze",ProfilerThreadType.Sequential));
 					}
 
-					await Persistence.Database.Export(ExportInfo.Exporter, ExportInfo.Exporter.CollectionNames);
+					await Persistence.Database.Export(ExportInfo.Exporter, ExportInfo.Exporter.CollectionNames,
+						Profiler.CreateThread("Database", ProfilerThreadType.Sequential));
 				}
 
 				if (Ledger && Persistence.Ledger.HasProvider)
-					await Persistence.Ledger.Export(ExportInfo.Exporter, ExportInfo.Exporter.CollectionNames);
+				{
+					Profiler.NewState("Ledger");
+					await Persistence.Ledger.Export(ExportInfo.Exporter, ExportInfo.Exporter.CollectionNames,
+						Profiler.CreateThread("Ledger", ProfilerThreadType.Sequential));
+				}
 
 				if (WebContent || Folders.Length > 0)
 				{
+					Profiler.NewState("Files");
+
 					await ExportInfo.Exporter.StartFiles();
 					try
 					{
@@ -409,6 +422,8 @@ namespace Waher.IoTGateway.WebResources
 			}
 			catch (Exception ex)
 			{
+				Profiler.Exception(ex);
+
 				Log.Critical(ex);
 
 				string[] Tabs = ClientEvents.GetTabIDsForLocation("/Settings/Backup.md");
@@ -417,6 +432,8 @@ namespace Waher.IoTGateway.WebResources
 			}
 			finally
 			{
+				Profiler.NewState("End");
+
 				try
 				{
 					await ExportInfo.Exporter.End();
@@ -424,6 +441,7 @@ namespace Waher.IoTGateway.WebResources
 				}
 				catch (Exception ex)
 				{
+					Profiler.Exception(ex);
 					Log.Critical(ex);
 				}
 
@@ -432,9 +450,28 @@ namespace Waher.IoTGateway.WebResources
 					exporting = false;
 				}
 
-				await UploadBackupFile(ExportInfo.LocalBackupFileName, ExportInfo.FullBackupFileName, "BACKUP");
+				Profiler.NewState("Upload");
+
+				ProfilerThread Thread = Profiler.CreateThread("Upload", ProfilerThreadType.StateMachine);
+
+				await UploadBackupFile(ExportInfo.LocalBackupFileName, ExportInfo.FullBackupFileName, false, Thread);
 				if (!string.IsNullOrEmpty(ExportInfo.FullKeyFileName))
-					await UploadBackupFile(ExportInfo.LocalKeyFileName, ExportInfo.FullKeyFileName, "KEY");
+					await UploadBackupFile(ExportInfo.LocalKeyFileName, ExportInfo.FullKeyFileName, true, Thread);
+
+				Profiler.Stop();
+				
+				string Uml = Profiler.ExportPlantUml(TimeUnit.DynamicPerProfiling);
+				string UmlFileName = Path.ChangeExtension(ExportInfo.FullBackupFileName, "uml");
+				long UmlFileSize;
+				
+				File.WriteAllText(UmlFileName, Uml);
+
+				using (FileStream fs = File.OpenRead(UmlFileName))
+				{
+					UmlFileSize = fs.Length;
+				}
+
+				ExportFormat.UpdateClientsFileUpdated(Path.ChangeExtension(ExportInfo.LocalBackupFileName, "uml"), UmlFileSize, DateTime.Now);
 			}
 		}
 
@@ -451,13 +488,14 @@ namespace Waher.IoTGateway.WebResources
 			await Output.UpdateClient(false);
 		}
 
-		private static Task UploadBackupFile(string LocalFileName, string FullFileName, string GroupName)
+		private static Task UploadBackupFile(string LocalFileName, string FullFileName, bool IsKey, ProfilerThread Thread)
 		{
 			return UploadBackupFile(new BackupInfo()
 			{
 				LocalFileName = LocalFileName,
 				FullFileName = FullFileName,
-				GroupName = GroupName
+				IsKey = IsKey,
+				Thread = Thread
 			});
 		}
 
@@ -465,87 +503,113 @@ namespace Waher.IoTGateway.WebResources
 		{
 			public string LocalFileName;
 			public string FullFileName;
-			public string GroupName;
+			public bool IsKey;
 			public Dictionary<string, bool> Recipients = null;
+			public ProfilerThread Thread;
 		}
 
 		private static async Task UploadBackupFile(object State)
 		{
+			BackupInfo BackupInfo = (BackupInfo)State;
 			bool Reschedule = false;
 
 			try
 			{
-				BackupInfo BackupInfo = (BackupInfo)State;
-
-				if (Gateway.XmppClient.State != XmppState.Connected ||
-					!Gateway.XmppClient.TryGetExtension(typeof(HttpFileUploadClient), out IXmppExtension Extension) ||
-					!(Extension is HttpFileUploadClient HttpFileUploadClient))
-				{
+				if (Gateway.XmppClient.State != XmppState.Connected)
 					Reschedule = true;
-				}
 				else
 				{
 					if (BackupInfo.Recipients is null)
 					{
 						BackupInfo.Recipients = new Dictionary<string, bool>();
 
-						foreach (RosterItem Item in Gateway.XmppClient.Roster)
+						if (BackupInfo.IsKey && !(Export.KeyHosts is null))
 						{
-							if (Item.IsInGroup(BackupInfo.GroupName, true))
-								BackupInfo.Recipients[Item.BareJid] = false;
+							foreach (string Host in Export.KeyHosts)
+								BackupInfo.Recipients[Host] = false;
+						}
+
+						if (!BackupInfo.IsKey && !(Export.BackupHosts is null))
+						{
+							foreach (string Host in Export.BackupHosts)
+								BackupInfo.Recipients[Host] = false;
 						}
 					}
 
-					LinkedList<RosterItem> Recipients = new LinkedList<RosterItem>();
-					RosterItem Recipient;
+					LinkedList<string> Recipients = new LinkedList<string>();
+					string Recipient;
 
 					foreach (KeyValuePair<string, bool> P in BackupInfo.Recipients)
 					{
-						if (!P.Value && !((Recipient = Gateway.XmppClient[P.Key]) is null))
-							Recipients.AddLast(Recipient);
+						if (!P.Value)
+							Recipients.AddLast(P.Key);
 					}
 
 					while (!((Recipient = Recipients.First?.Value) is null))
 					{
 						Recipients.RemoveFirst();
 
-						if (!Recipient.HasLastPresence || !Recipient.LastPresence.IsOnline)
+						if (Recipient.IndexOf('@') >= 0)
 						{
-							Reschedule = true;
-							continue;
+							RosterItem Item = Gateway.XmppClient[Recipient];
+							if (Item is null)
+								continue;
+
+							if (!Item.HasLastPresence || !Item.LastPresence.IsOnline)
+							{
+								Reschedule = true;
+								continue;
+							}
 						}
 
 						try
 						{
-							using (FileStream fs = File.OpenRead(BackupInfo.FullFileName))
+							BackupInfo.Thread?.NewState("Discover_" + Recipient);
+
+							using (HttpFileUploadClient UploadClient = new HttpFileUploadClient(Gateway.XmppClient, Recipient, null))
 							{
-								StringBuilder Xml = new StringBuilder();
-								long FileSize = fs.Length;
+								await UploadClient.DiscoverAsync(Recipient);
 
-								Xml.Append("<prepare xmlns='http://waher.se/Schema/Backups.xsd' filename='");
-								Xml.Append(XML.Encode(BackupInfo.LocalFileName));
-								Xml.Append("' size='");
-								Xml.Append(FileSize.ToString());
-								Xml.Append("' content-type='application/octet-stream'/>");
+								if (UploadClient.HasSupport)
+								{
+									using (FileStream fs = File.OpenRead(BackupInfo.FullFileName))
+									{
+										BackupInfo.Thread?.NewState("Prepare_" + Recipient);
 
-								await HttpFileUploadClient.Client.IqSetAsync(HttpFileUploadClient.FileUploadJid, Xml.ToString());	
-								// Empty response expected. Errors cause an exception to be raised.
+										StringBuilder Xml = new StringBuilder();
+										long FileSize = fs.Length;
 
-								HttpFileUploadEventArgs e2 = await HttpFileUploadClient.RequestUploadSlotAsync(BackupInfo.LocalFileName,
-									"application/octet-stream", FileSize);
+										Xml.Append("<prepare xmlns='http://waher.se/Schema/Backups.xsd' filename='");
+										Xml.Append(XML.Encode(BackupInfo.LocalFileName));
+										Xml.Append("' size='");
+										Xml.Append(FileSize.ToString());
+										Xml.Append("' content-type='application/octet-stream'/>");
 
-								if (!e2.Ok)
-									throw (e2.StanzaError ?? new XmppException("Unable to get HTTP upload slot for backup file."));
+										BackupInfo.Thread?.NewState("Get_Slot_" + Recipient);
 
-								Log.Informational("Uploading backup file to " + Recipient.BareJid + ".", BackupInfo.LocalFileName);
+										await UploadClient.Client.IqSetAsync(UploadClient.FileUploadJid, Xml.ToString());
+										// Empty response expected. Errors cause an exception to be raised.
 
-								await e2.PUT(fs, "application/octet-stream", 60 * 60 * 1000);   // 1h timeout
-								
-								Log.Informational("Backup file uploaded to " + Recipient.BareJid + ".", BackupInfo.LocalFileName);
+										HttpFileUploadEventArgs e2 = await UploadClient.RequestUploadSlotAsync(BackupInfo.LocalFileName,
+											"application/octet-stream", FileSize, false);
+
+										if (!e2.Ok)
+											throw (e2.StanzaError ?? new XmppException("Unable to get HTTP upload slot for backup file."));
+
+										BackupInfo.Thread?.NewState("Upload_" + Recipient);
+
+										Log.Informational("Uploading backup file to " + Recipient + ".", BackupInfo.LocalFileName);
+
+										await e2.PUT(fs, "application/octet-stream", 60 * 60 * 1000);   // 1h timeout
+
+										Log.Informational("Backup file uploaded to " + Recipient + ".", BackupInfo.LocalFileName);
+									}
+								}
 							}
 						}
 						catch (Exception ex)
 						{
+							BackupInfo.Thread?.Exception(ex);
 							Log.Critical(ex);
 							Reschedule = true;
 						}
@@ -554,12 +618,20 @@ namespace Waher.IoTGateway.WebResources
 			}
 			catch (Exception ex)
 			{
+				BackupInfo.Thread?.Exception(ex);
 				Log.Critical(ex);
 				Reschedule = true;
 			}
+			finally
+			{
+				if (Reschedule)
+				{
+					BackupInfo.Thread?.NewState("Reschedule");
+					Gateway.ScheduleEvent(UploadBackupFile, DateTime.Now.AddMinutes(15), State);
+				}
 
-			if (Reschedule)
-				Gateway.ScheduleEvent(UploadBackupFile, DateTime.Now.AddMinutes(15), State);
+				BackupInfo.Thread = null;
+			}
 		}
 
 	}

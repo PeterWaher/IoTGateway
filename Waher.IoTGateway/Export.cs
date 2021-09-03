@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Events;
-using Waher.IoTGateway;
 using Waher.Runtime.Settings;
 using Waher.IoTGateway.Setup;
 using Waher.IoTGateway.WebResources.ExportFormats;
@@ -171,11 +172,25 @@ namespace Waher.IoTGateway
 					RuntimeSettings.Set("ExportFolder", exportFolderValue);
 
 					BackupConfiguration.Instance?.UpdateExportFolder(FullExportFolder);
+
+					try
+					{
+						OnExportFolderUpdated?.Invoke(BackupConfiguration.Instance, EventArgs.Empty);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
 			}
 		}
 
 		private static string exportFolderValue = null;
+
+		/// <summary>
+		/// Event raised when the export folder has been updated.
+		/// </summary>
+		public static event EventHandler OnExportFolderUpdated;
 
 		/// <summary>
 		/// Key folder
@@ -198,11 +213,25 @@ namespace Waher.IoTGateway
 					RuntimeSettings.Set("ExportKeyFolder", exportKeyFolderValue);
 
 					BackupConfiguration.Instance?.UpdateExportKeyFolder(FullKeyExportFolder);
+
+					try
+					{
+						OnExportKeyFolderUpdated?.Invoke(BackupConfiguration.Instance, EventArgs.Empty);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
 			}
 		}
 
 		private static string exportKeyFolderValue = null;
+
+		/// <summary>
+		/// Event raised when the export key folder has been updated.
+		/// </summary>
+		public static event EventHandler OnExportKeyFolderUpdated;
 
 		/// <summary>
 		/// If the database should be exported.
@@ -618,5 +647,77 @@ namespace Waher.IoTGateway
 
 		private static readonly Dictionary<string, FolderCategory> folders = new Dictionary<string, FolderCategory>();
 
+		/// <summary>
+		/// Secondary backup hosts.
+		/// </summary>
+		public static string[] BackupHosts
+		{
+			get
+			{
+				if (backupHosts is null)
+					backupHosts = StringToArray(RuntimeSettings.Get("BackupHosts", string.Empty));
+
+				return backupHosts;
+			}
+
+			set
+			{
+				if (backupHosts != value)
+				{
+					backupHosts = value;
+					RuntimeSettings.Set("BackupHosts", ArrayToString(backupHosts));
+				}
+			}
+		}
+
+		private static string[] backupHosts = null;
+
+		/// <summary>
+		/// Secondary key hosts.
+		/// </summary>
+		public static string[] KeyHosts
+		{
+			get
+			{
+				if (keyHosts is null)
+					keyHosts = StringToArray(RuntimeSettings.Get("KeyHosts", string.Empty));
+
+				return keyHosts;
+			}
+
+			set
+			{
+				if (keyHosts != value)
+				{
+					keyHosts = value;
+					RuntimeSettings.Set("KeyHosts", ArrayToString(keyHosts));
+				}
+			}
+		}
+
+		private static string[] keyHosts = null;
+
+		private static string[] StringToArray(string s)
+		{
+			return s.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
+		}
+
+		private static string ArrayToString(string[] Items)
+		{
+			StringBuilder Result = new StringBuilder();
+			bool First = true;
+
+			foreach (string Item in Items)
+			{
+				if (First)
+					First = false;
+				else
+					Result.AppendLine();
+
+				Result.Append(Item);
+			}
+
+			return Result.ToString();
+		}
 	}
 }

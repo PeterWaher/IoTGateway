@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.HTTP;
@@ -21,24 +22,12 @@ namespace Waher.IoTGateway.WebResources
 		/// <summary>
 		/// If the resource handles sub-paths.
 		/// </summary>
-		public override bool HandlesSubPaths
-		{
-			get
-			{
-				return false;
-			}
-		}
+		public override bool HandlesSubPaths => false;
 
 		/// <summary>
 		/// If the resource uses user sessions.
 		/// </summary>
-		public override bool UserSessions
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public override bool UserSessions => true;
 
 		/// <summary>
 		/// If the POST method is allowed.
@@ -59,19 +48,21 @@ namespace Waher.IoTGateway.WebResources
 				throw new BadRequestException();
 
 			object Obj = Request.DecodeData();
-			string[] P;
 
-			if (!(Obj is string s))
+			if (!(Obj is Dictionary<string, object> Form))
 				throw new BadRequestException();
 
-			P = s.Split('\n');
-			if (P.Length != 5)
-				throw new BadRequestException();
+			if (!Form.TryGetValue("AutomaticBackups", out Obj) || !CommonTypes.TryParse(Obj.ToString().Trim(), out bool AutomaticBackups))
+			{
+				Response.StatusCode = 400;
+				Response.StatusMessage = "Bad Request";
+				Response.ContentType = "text/plain";
+				await Response.Write("Automatic backups value invalid.");
+				await Response.SendResponse();
+				return;
+			}
 
-			if (!CommonTypes.TryParse(P[0].Trim(), out bool AutomaticBackups))
-				throw new BadRequestException();
-
-			if (!TimeSpan.TryParse(P[1].Trim(), out TimeSpan BackupTime))
+			if (!Form.TryGetValue("BackupTime", out Obj) || !TimeSpan.TryParse(Obj.ToString().Trim(), out TimeSpan BackupTime))
 			{
 				Response.StatusCode = 400;
 				Response.StatusMessage = "Bad Request";
@@ -81,7 +72,7 @@ namespace Waher.IoTGateway.WebResources
 				return;
 			}
 
-			if (!int.TryParse(P[2].Trim(), out int KeepDays) || KeepDays < 0)
+			if (!Form.TryGetValue("KeepDays", out Obj) || !int.TryParse(Obj.ToString().Trim(), out int KeepDays) || KeepDays < 0)
 			{
 				Response.StatusCode = 400;
 				Response.StatusMessage = "Bad Request";
@@ -91,7 +82,7 @@ namespace Waher.IoTGateway.WebResources
 				return;
 			}
 
-			if (!int.TryParse(P[3].Trim(), out int KeepMonths) || KeepMonths < 0)
+			if (!Form.TryGetValue("KeepMonths", out Obj) || !int.TryParse(Obj.ToString().Trim(), out int KeepMonths) || KeepMonths < 0)
 			{
 				Response.StatusCode = 400;
 				Response.StatusMessage = "Bad Request";
@@ -101,7 +92,7 @@ namespace Waher.IoTGateway.WebResources
 				return;
 			}
 
-			if (!int.TryParse(P[4].Trim(), out int KeepYears) || KeepYears < 0)
+			if (!Form.TryGetValue("KeepYears", out Obj) || !int.TryParse(Obj.ToString().Trim(), out int KeepYears) || KeepYears < 0)
 			{
 				Response.StatusCode = 400;
 				Response.StatusMessage = "Bad Request";

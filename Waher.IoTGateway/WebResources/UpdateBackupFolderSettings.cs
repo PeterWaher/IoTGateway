@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP;
@@ -21,24 +22,12 @@ namespace Waher.IoTGateway.WebResources
 		/// <summary>
 		/// If the resource handles sub-paths.
 		/// </summary>
-		public override bool HandlesSubPaths
-		{
-			get
-			{
-				return false;
-			}
-		}
+		public override bool HandlesSubPaths => false;
 
 		/// <summary>
 		/// If the resource uses user sessions.
 		/// </summary>
-		public override bool UserSessions
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public override bool UserSessions => true;
 
 		/// <summary>
 		/// If the POST method is allowed.
@@ -59,18 +48,26 @@ namespace Waher.IoTGateway.WebResources
 				throw new BadRequestException();
 
 			object Obj = Request.DecodeData();
-			string[] P;
 
-			if (!(Obj is string s))
+			if (!(Obj is Dictionary<string, object> Form) ||
+				!Form.TryGetValue("ExportFolder", out Obj) || !(Obj is string ExportFolder) ||
+				!Form.TryGetValue("KeyFolder", out Obj) || !(Obj is string KeyFolder) ||
+				!Form.TryGetValue("BackupHosts", out Obj) || !(Obj is string BackupHostsStr) ||
+				!Form.TryGetValue("KeyHosts", out Obj) || !(Obj is string KeyHostsStr))
+			{
 				throw new BadRequestException();
+			}
 
-			P = s.Split('\n');
-			if (P.Length != 2)
-				throw new BadRequestException();
 
-			string ExportFolder = P[0].Trim();
-			string KeyFolder = P[1].Trim();
+			ExportFolder = ExportFolder.Trim();
+			KeyFolder = KeyFolder.Trim();
+
+			string[] BackupHosts = BackupHostsStr.Split(',');
+			string[] KeyHosts = KeyHostsStr.Split(',');
 			int Len;
+
+			Trim(BackupHosts);
+			Trim(KeyHosts);
 
 			Len = ExportFolder.Length;
 			if (Len > 0 && (ExportFolder[Len - 1] == '/' || ExportFolder[Len - 1] == '\\'))
@@ -104,7 +101,7 @@ namespace Waher.IoTGateway.WebResources
 
 				try
 				{
-					s = ExportFolder + Path.DirectorySeparatorChar + "test.txt";
+					string s = ExportFolder + Path.DirectorySeparatorChar + "test.txt";
 					File.WriteAllText(s, "test");
 					File.Delete(s);
 				}
@@ -143,7 +140,7 @@ namespace Waher.IoTGateway.WebResources
 
 				try
 				{
-					s = KeyFolder + Path.DirectorySeparatorChar + "test.txt";
+					string s = KeyFolder + Path.DirectorySeparatorChar + "test.txt";
 					File.WriteAllText(s, "test");
 					File.Delete(s);
 				}
@@ -160,10 +157,20 @@ namespace Waher.IoTGateway.WebResources
 
 			Export.ExportFolder = ExportFolder;
 			Export.ExportKeyFolder = KeyFolder;
+			Export.BackupHosts = BackupHosts;
+			Export.KeyHosts = KeyHosts;
 
 			Response.StatusCode = 200;
 			Response.StatusMessage = "OK";
 			await Response.SendResponse();
+		}
+
+		private static void Trim(string[] Array)
+		{
+			int i, c = Array.Length;
+
+			for (i = 0; i < c; i++)
+				Array[i] = Array[i].Trim();
 		}
 	}
 }

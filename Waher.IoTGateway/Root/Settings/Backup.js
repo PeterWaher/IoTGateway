@@ -263,12 +263,15 @@ function UpdateBackupSettings()
 	};
 
 	xhttp.open("POST", "/UpdateBackupSettings", true);
-	xhttp.setRequestHeader("Content-Type", "text/plain");
-	xhttp.send(document.getElementById("AutomaticBackups").checked + '\n' +
-		document.getElementById("BackupTime").value + '\n' +
-		document.getElementById("KeepDays").value + '\n' +
-		document.getElementById("KeepMonths").value + '\n' +
-		document.getElementById("KeepYears").value);
+	xhttp.setRequestHeader("Content-Type", "application/json");
+	xhttp.send(JSON.stringify(
+		{
+			"AutomaticBackups": document.getElementById("AutomaticBackups").checked,
+			"BackupTime": document.getElementById("BackupTime").value,
+			"KeepDays": document.getElementById("KeepDays").value,
+			"KeepMonths": document.getElementById("KeepMonths").value,
+			"KeepYears": document.getElementById("KeepYears").value
+		}));
 }
 
 function UpdateBackupFolderSettings()
@@ -286,9 +289,14 @@ function UpdateBackupFolderSettings()
 	};
 
 	xhttp.open("POST", "/UpdateBackupFolderSettings", true);
-	xhttp.setRequestHeader("Content-Type", "text/plain");
-	xhttp.send(document.getElementById("ExportFolder").value + '\n' +
-		document.getElementById("KeyFolder").value);
+	xhttp.setRequestHeader("Content-Type", "application/json");
+	xhttp.send(JSON.stringify(
+		{
+			"ExportFolder": document.getElementById("ExportFolder").value,
+			"KeyFolder": document.getElementById("KeyFolder").value,
+			"BackupHosts": document.getElementById("BackupHosts").value,
+			"KeyHosts": document.getElementById("KeyHosts").value
+		}));
 }
 
 function FileDeleted(Data)

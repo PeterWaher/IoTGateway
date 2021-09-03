@@ -454,13 +454,14 @@
             <param name="TimeUnit">Time unit to use.</param>
             <returns>Corresponding time.</returns>
         </member>
-        <member name="M:Waher.Runtime.Profiling.Profiler.ToTimeStr(System.Int64,Waher.Runtime.Profiling.ProfilerThread,Waher.Runtime.Profiling.TimeUnit)">
+        <member name="M:Waher.Runtime.Profiling.Profiler.ToTimeStr(System.Int64,Waher.Runtime.Profiling.ProfilerThread,Waher.Runtime.Profiling.TimeUnit,System.Int32)">
             <summary>
             String representation of time, corresponding to a measured number of high-frequency clock ticks.
             </summary>
             <param name="Ticks">Ticks</param>
             <param name="Thread">Thread associated with event.</param>
             <param name="TimeUnit">Time unit to use.</param>
+            <param name="NrDecimals">Number of decimals.</param>
             <returns>Corresponding time as a string.</returns>
         </member>
         <member name="M:Waher.Runtime.Profiling.Profiler.ExportXml(Waher.Runtime.Profiling.TimeUnit)">

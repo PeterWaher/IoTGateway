@@ -272,7 +272,7 @@ namespace Waher.Runtime.Profiling
 			{
 				StringBuilder Output = States.Summary;
 				long Ticks = this.stoppedAt.Value - this.startedAt.Value;
-				string ElapsedStr = this.profiler.ToTimeStr(Ticks, this, States.TimeUnit);
+				string ElapsedStr = this.profiler.ToTimeStr(Ticks, this, States.TimeUnit, 3);
 				KeyValuePair<double, string> Time;
 
 				Output.Append(this.Key);
@@ -310,7 +310,7 @@ namespace Waher.Runtime.Profiling
 		/// <returns>Corresponding time as a string.</returns>
 		public string ToTimeStr(long Ticks, TimeUnit TimeUnit)
 		{
-			return this.profiler.ToTimeStr(Ticks, this, TimeUnit);
+			return this.profiler.ToTimeStr(Ticks, this, TimeUnit, 7);
 		}
 
 	}

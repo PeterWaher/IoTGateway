@@ -299,11 +299,12 @@ namespace Waher.Runtime.Profiling
 		/// <param name="Ticks">Ticks</param>
 		/// <param name="Thread">Thread associated with event.</param>
 		/// <param name="TimeUnit">Time unit to use.</param>
+		/// <param name="NrDecimals">Number of decimals.</param>
 		/// <returns>Corresponding time as a string.</returns>
-		public string ToTimeStr(long Ticks, ProfilerThread Thread, TimeUnit TimeUnit)
+		public string ToTimeStr(long Ticks, ProfilerThread Thread, TimeUnit TimeUnit, int NrDecimals)
 		{
 			KeyValuePair<double, string> Time = this.ToTime(Ticks, Thread, TimeUnit);
-			return Time.Key.ToString("F3") + " " + Time.Value;
+			return Time.Key.ToString("F" + NrDecimals.ToString()) + " " + Time.Value;
 		}
 
 		/// <summary>
@@ -341,7 +342,7 @@ namespace Waher.Runtime.Profiling
 		{
 			Output.WriteStartElement("Profiler", "http://waher.se/schema/Profiler.xsd");
 			Output.WriteAttributeString("ticksPerSecond", Stopwatch.Frequency.ToString());
-			Output.WriteAttributeString("timePerTick", this.ToTimeStr(1, this.mainThread, TimeUnit.DynamicPerEvent));
+			Output.WriteAttributeString("timePerTick", this.ToTimeStr(1, this.mainThread, TimeUnit.DynamicPerEvent, 7));
 
 			foreach (ProfilerThread Thread in this.threads)
 			{
@@ -471,7 +472,7 @@ namespace Waher.Runtime.Profiling
 			{
 				KeyValuePair<double, string> Time = this.ToTime(P.Key, null, TimeUnit);
 				Output.Append('@');
-				Output.AppendLine(Time.Key.ToString("F3").Replace(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator, "."));
+				Output.AppendLine(Time.Key.ToString("F7").Replace(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator, "."));
 				Output.Append(P.Value.ToString());
 			}
 

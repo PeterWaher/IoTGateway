@@ -89,14 +89,11 @@ namespace Waher.Content.Posters
 		/// <exception cref="WebException">If response does not indicate a success.</exception>
 		public static async Task<KeyValuePair<byte[], string>> ProcessResponse(HttpResponseMessage Response, Uri Uri)
 		{
+			if (!Response.IsSuccessStatusCode)
+				await WebGetter.ProcessResponse(Response, Uri);
+
 			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
 			string ContentType = Response.Content.Headers.ContentType.ToString();
-
-			if (!Response.IsSuccessStatusCode)
-			{
-				object Decoded = InternetContent.Decode(ContentType, Bin, Uri);
-				throw new WebException(Decoded as string ?? Decoded.ToString(), Response.StatusCode, ContentType, Bin, Decoded);
-			}
 
 			return new KeyValuePair<byte[], string>(Bin, ContentType);
 		}

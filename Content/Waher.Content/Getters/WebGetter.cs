@@ -112,7 +112,17 @@ namespace Waher.Content.Getters
 			}
 
 			if (!Response.IsSuccessStatusCode)
-				throw new WebException(Decoded as string ?? Decoded.ToString(), Response.StatusCode, ContentType, Bin, Decoded);
+			{
+				if (!(Decoded is string Message))
+				{
+					if (Decoded is null || (Decoded is byte[] Bin2 && Bin2.Length == 0))
+						Message = Response.ReasonPhrase;
+					else
+						Message = Decoded.ToString();
+				}
+
+				throw new WebException(Message, Response.StatusCode, ContentType, Bin, Decoded);
+			}
 
 			return Decoded;
 		}

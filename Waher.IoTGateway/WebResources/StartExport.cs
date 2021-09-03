@@ -598,11 +598,17 @@ namespace Waher.IoTGateway.WebResources
 
 										BackupInfo.Thread?.NewState("Upload_" + Recipient);
 
-										Log.Informational("Uploading backup file to " + Recipient + ".", BackupInfo.LocalFileName);
+										if (BackupInfo.IsKey)
+											Log.Informational("Uploading key file to " + Recipient + ".", BackupInfo.LocalFileName);
+										else
+											Log.Informational("Uploading backup file to " + Recipient + ".", BackupInfo.LocalFileName);
 
 										await e2.PUT(fs, "application/octet-stream", 60 * 60 * 1000);   // 1h timeout
 
-										Log.Informational("Backup file uploaded to " + Recipient + ".", BackupInfo.LocalFileName);
+										if (BackupInfo.IsKey)
+											Log.Informational("Key file uploaded to " + Recipient + ".", BackupInfo.LocalFileName);
+										else
+											Log.Informational("Backup file uploaded to " + Recipient + ".", BackupInfo.LocalFileName);
 									}
 								}
 							}

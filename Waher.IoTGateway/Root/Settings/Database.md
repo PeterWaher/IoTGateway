@@ -25,13 +25,13 @@ best suits your needs.
 <legend>Database Settings</legend>
 
 {{Config:=Waher.IoTGateway.Setup.DatabaseConfiguration.Instance;
-i:=0;
+k:=0;
 foreach PluginType in Waher.Runtime.Inventory.Types.GetTypesImplementingInterface(Waher.IoTGateway.Setup.Databases.IDatabasePlugin) do
 (
 	Plugin:=Create(PluginType);
 	Title:=Plugin.Name(Language);
 	]]<p>
-<input name="Plugin" id="Plugin((i))" type="radio" value="((FN:=String(PluginType) ))" onclick="SelectDatabase(this);"((Config.DatabasePluginName=FN ? " checked" : ""))/>
+<input name="Plugin" id="Plugin((k))" type="radio" value="((FN:=String(PluginType) ))" onclick="SelectDatabase(this);"((Config.DatabasePluginName=FN ? " checked" : ""))/>
 <label for="Plugin((i++))">((MarkdownEncode(Title) ))</label>
 </p>
 [[;

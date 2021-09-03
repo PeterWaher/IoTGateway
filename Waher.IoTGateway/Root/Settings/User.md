@@ -45,12 +45,12 @@ if exists(Posted) then
 		MetaData:=Create(System.Collections.Generic.List,Waher.Security.Users.UserMetaData);
 		foreach Row in Posted.MetaData.Split(Waher.Content.CommonTypes.CRLF,System.StringSplitOptions.RemoveEmptyEntries) do
 		(
-			i:=Row.IndexOf('=');
-			if i>0 then 
+			k:=Row.IndexOf('=');
+			if k>0 then 
 			(
 				Data:=Create(Waher.Security.Users.UserMetaData);
-				Data.Name:=Row.Substring(0,i);
-				Data.Value:=Row.Substring(i+1);
+				Data.Name:=Row.Substring(0,k);
+				Data.Value:=Row.Substring(k+1);
 				MetaData.Add(Data)
 			)
 		);

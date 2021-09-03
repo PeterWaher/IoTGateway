@@ -274,7 +274,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
             sb.Append("\", \"created\": \"");
 			sb.Append(CommonTypes.JsonStringEncode(Created.ToString()));
 			sb.Append("\", \"button\": \"");
-			sb.Append(CommonTypes.JsonStringEncode("<button class=\"posButtonSm\" onclick=\"DeleteExport('" + FileName + "');\">Delete</button>"));
+			sb.Append(CommonTypes.JsonStringEncode("<button class=\"negButtonSm\" onclick=\"DeleteExport('" + FileName + "');\">Delete</button>"));
 			sb.Append("\", \"isKey\": ");
 			sb.Append(FileName.EndsWith(".key", StringComparison.CurrentCultureIgnoreCase) ? "true" : "false");
 			sb.Append("}");

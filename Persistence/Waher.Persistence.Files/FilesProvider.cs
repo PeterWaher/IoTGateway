@@ -427,6 +427,7 @@ namespace Waher.Persistence.Files
 				await Result.LoadConfiguration();
 			}
 
+			Thread?.Idle();
 			Thread?.Stop();
 			return Result;
 		}
@@ -2696,10 +2697,24 @@ namespace Waher.Persistence.Files
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
 		/// <returns>Task object for synchronization purposes.</returns>
-		public async Task Export(IDatabaseExport Output, string[] CollectionNames)
+		public Task Export(IDatabaseExport Output, string[] CollectionNames)
+		{
+			return this.Export(Output, CollectionNames, null);
+		}
+
+
+		/// <summary>
+		/// Performs an export of the entire database.
+		/// </summary>
+		/// <param name="Output">Database will be output to this interface.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public async Task Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread)
 		{
 			ObjectBTreeFile[] Files = this.Files;
 
+			Thread?.Start();
 			await Output.StartDatabase();
 			try
 			{
@@ -2708,6 +2723,7 @@ namespace Waher.Persistence.Files
 					if (!(CollectionNames is null) && Array.IndexOf<string>(CollectionNames, File.CollectionName) < 0)
 						continue;
 
+					Thread?.NewState(File.CollectionName);
 					await Output.StartCollection(File.CollectionName);
 					try
 					{
@@ -2778,11 +2794,14 @@ namespace Waher.Persistence.Files
 			}
 			catch (Exception ex)
 			{
+				Thread?.Exception(ex);
 				this.ReportException(ex, Output);
 			}
 			finally
 			{
 				await Output.EndDatabase();
+				Thread?.Idle();
+				Thread?.Stop();
 			}
 		}
 
@@ -2824,7 +2843,21 @@ namespace Waher.Persistence.Files
 		/// <returns>Collections with errors.</returns>
 		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
-			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, false, null);
+			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, false, null, null);
+		}
+
+		/// <summary>
+		/// Analyzes the database and exports findings to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Collections with errors.</returns>
+		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, ProfilerThread Thread)
+		{
+			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, false, null, Thread);
 		}
 
 		/// <summary>
@@ -2837,7 +2870,21 @@ namespace Waher.Persistence.Files
 		/// <returns>Collections with errors.</returns>
 		public Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
-			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, true, null);
+			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, true, null, null);
+		}
+
+		/// <summary>
+		/// Analyzes the database and repairs it if necessary. Results are exported to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Collections with errors.</returns>
+		public Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, ProfilerThread Thread)
+		{
+			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, true, null, Thread);
 		}
 
 		/// <summary>
@@ -2851,7 +2898,23 @@ namespace Waher.Persistence.Files
 		/// <returns>Collections with errors.</returns>
 		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
 		{
-			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, Repair, null);
+			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, Repair, null, null);
+		}
+
+		/// <summary>
+		/// Analyzes the database and exports findings to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Collections with errors.</returns>
+		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair, 
+			ProfilerThread Thread)
+		{
+			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, Repair, null, Thread);
 		}
 
 		/// <summary>
@@ -2863,12 +2926,14 @@ namespace Waher.Persistence.Files
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
 		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
 		/// <param name="CollectionNames">If provided, lists collections to be repaired.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
 		/// <returns>Collections with errors.</returns>
 		private async Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair,
-			string[] CollectionNames)
+			string[] CollectionNames, ProfilerThread Thread)
 		{
 			SortedDictionary<string, bool> CollectionsWithErrors = new SortedDictionary<string, bool>();
 
+			Thread?.Start();
 			Output.WriteStartDocument();
 
 			if (!string.IsNullOrEmpty(XsltPath))
@@ -2884,6 +2949,7 @@ namespace Waher.Persistence.Files
 				if (!(CollectionNames is null) && Array.IndexOf<string>(CollectionNames, File.CollectionName) < 0)
 					continue;
 
+				Thread?.NewState(File.CollectionName);
 				await File.BeginWrite();
 				try
 				{
@@ -2895,19 +2961,27 @@ namespace Waher.Persistence.Files
 					FileStatistics IndexStat;
 
 					if (FileStat.IsCorrupt)
+					{
 						CollectionsWithErrors[File.CollectionName] = true;
+						Thread?.Event("Corruption");
+					}
 
 					if (Repair && FileStat.IsCorrupt)
 					{
+						ProfilerThread RepairThread = Thread?.CreateSubThread("Repair " + File.CollectionName, ProfilerThreadType.Sequential);
 						LinkedList<Exception> Exceptions = null;
 						string TempFileName = Path.GetTempFileName();
 						string TempBtreeFileName = TempFileName + ".btree";
 						string TempBlobFileName = TempFileName + ".blob";
 
+						RepairThread?.Start();
+
 						using (ObjectBTreeFile TempFile = await ObjectBTreeFile.Create(TempBtreeFileName, File.CollectionName, TempBlobFileName,
 							File.BlockSize, File.BlobBlockSize, this, File.Encoding, File.TimeoutMilliseconds, File.Encrypted))
 						{
 							int c = 0;
+
+							RepairThread?.NewState("Scan Blocks");
 
 							ObjectIds = new Dictionary<Guid, bool>();
 
@@ -2945,8 +3019,9 @@ namespace Waher.Persistence.Files
 													Reader2.Position = 0;
 													Pos2 = Reader2.Data.Length;
 												}
-												catch (Exception)
+												catch (Exception ex)
 												{
+													RepairThread?.Exception(ex);
 													Reader2 = null;
 												}
 
@@ -2999,6 +3074,8 @@ namespace Waher.Persistence.Files
 														}
 														catch (Exception ex)
 														{
+															RepairThread?.Exception(ex);
+
 															if (Exceptions is null)
 																Exceptions = new LinkedList<Exception>();
 
@@ -3030,6 +3107,8 @@ namespace Waher.Persistence.Files
 
 								await this.StartBulk();
 								c = 0;
+
+								RepairThread?.NewState("Regenerate");
 
 								await TempFile.BeginRead();
 								try
@@ -3125,6 +3204,9 @@ namespace Waher.Persistence.Files
 								// Ignore
 							}
 						}
+
+						RepairThread?.Idle();
+						RepairThread?.Stop();
 					}
 					else
 						ObjectIds = P.Value;
@@ -3148,6 +3230,7 @@ namespace Waher.Persistence.Files
 					}
 					catch (Exception ex)
 					{
+						Thread?.Exception(ex);
 						Log.Alert(ex);
 					}
 
@@ -3173,6 +3256,7 @@ namespace Waher.Persistence.Files
 						}
 						catch (Exception ex)
 						{
+							Thread?.Exception(ex);
 							Log.Alert(ex);
 						}
 
@@ -3201,6 +3285,7 @@ namespace Waher.Persistence.Files
 				}
 				catch (Exception ex)
 				{
+					Thread?.Exception(ex);
 					Log.Alert(ex);
 				}
 				finally
@@ -3215,6 +3300,9 @@ namespace Waher.Persistence.Files
 
 			string[] Result = new string[CollectionsWithErrors.Count];
 			CollectionsWithErrors.Keys.CopyTo(Result, 0);
+
+			Thread?.Idle();
+			Thread?.Stop();
 
 			return Result;
 		}
@@ -3387,6 +3475,18 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Repairs a set of collections.
 		/// </summary>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <param name="CollectionNames">Set of collections to repair.</param>
+		/// <returns>Collections repaired.</returns>
+		public Task<string[]> Repair(ProfilerThread Thread, params string[] CollectionNames)
+		{
+			string ReportFileName = this.GetReportFileName();
+			return this.Repair(Thread, ReportFileName, xsltPath, CollectionNames);
+		}
+
+		/// <summary>
+		/// Repairs a set of collections.
+		/// </summary>
 		/// <param name="XsltPath">Path to XSLT transform formatting the report.</param>
 		/// <param name="CollectionNames">Set of collections to repair.</param>
 		/// <returns>Collections repaired.</returns>
@@ -3403,7 +3503,20 @@ namespace Waher.Persistence.Files
 		/// <param name="XsltPath">Path to XSLT transform formatting the report.</param>
 		/// <param name="CollectionNames">Set of collections to repair.</param>
 		/// <returns>Collections repaired.</returns>
-		public async Task<string[]> Repair(string ReportFileName, string XsltPath, params string[] CollectionNames)
+		public Task<string[]> Repair(string ReportFileName, string XsltPath, params string[] CollectionNames)
+		{
+			return this.Repair(null, ReportFileName, XsltPath, CollectionNames);
+		}
+
+		/// <summary>
+		/// Repairs a set of collections.
+		/// </summary>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <param name="ReportFileName">Filename of repair report.</param>
+		/// <param name="XsltPath">Path to XSLT transform formatting the report.</param>
+		/// <param name="CollectionNames">Set of collections to repair.</param>
+		/// <returns>Collections repaired.</returns>
+		public async Task<string[]> Repair(ProfilerThread Thread, string ReportFileName, string XsltPath, params string[] CollectionNames)
 		{
 			XmlWriterSettings Settings = new XmlWriterSettings()
 			{
@@ -3422,7 +3535,7 @@ namespace Waher.Persistence.Files
 			{
 				using (XmlWriter w = XmlWriter.Create(fs, Settings))
 				{
-					return await this.Analyze(w, XsltPath, this.folder, false, true, CollectionNames);
+					return await this.Analyze(w, XsltPath, this.folder, false, true, CollectionNames, Thread);
 				}
 			}
 		}

@@ -499,6 +499,16 @@
             <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
             <param name="ExportData">If data in database is to be exported in output.</param>
         </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Analyze(System.Xml.XmlWriter,System.String,System.String,System.Boolean,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Analyzes the database and exports findings to XML.
+            </summary>
+            <param name="Output">XML Output.</param>
+            <param name="XsltPath">Optional XSLT to use to view the output.</param>
+            <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+            <param name="ExportData">If data in database is to be exported in output.</param>
+            <param name="Thread">Optional Profiler thread.</param>
+        </member>
         <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Repair(System.Xml.XmlWriter,System.String,System.String,System.Boolean)">
             <summary>
             Analyzes the database and repairs it if necessary. Results are exported to XML.
@@ -507,6 +517,16 @@
             <param name="XsltPath">Optional XSLT to use to view the output.</param>
             <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
             <param name="ExportData">If data in database is to be exported in output.</param>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Repair(System.Xml.XmlWriter,System.String,System.String,System.Boolean,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Analyzes the database and repairs it if necessary. Results are exported to XML.
+            </summary>
+            <param name="Output">XML Output.</param>
+            <param name="XsltPath">Optional XSLT to use to view the output.</param>
+            <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+            <param name="ExportData">If data in database is to be exported in output.</param>
+            <param name="Thread">Optional Profiler thread.</param>
         </member>
         <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Analyze(System.Xml.XmlWriter,System.String,System.String,System.Boolean,System.Boolean)">
             <summary>
@@ -518,10 +538,29 @@
             <param name="ExportData">If data in database is to be exported in output.</param>
             <param name="Repair">If files should be repaired if corruptions are detected.</param>
         </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Analyze(System.Xml.XmlWriter,System.String,System.String,System.Boolean,System.Boolean,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Analyzes the database and exports findings to XML.
+            </summary>
+            <param name="Output">XML Output.</param>
+            <param name="XsltPath">Optional XSLT to use to view the output.</param>
+            <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+            <param name="ExportData">If data in database is to be exported in output.</param>
+            <param name="Repair">If files should be repaired if corruptions are detected.</param>
+            <param name="Thread">Optional Profiler thread.</param>
+        </member>
         <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Repair(System.String[])">
             <summary>
             Repairs a set of collections.
             </summary>
+            <param name="CollectionNames">Set of collections to repair.</param>
+            <returns>Collections repaired.</returns>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Repair(Waher.Runtime.Profiling.ProfilerThread,System.String[])">
+            <summary>
+            Repairs a set of collections.
+            </summary>
+            <param name="Thread">Optional Profiler thread.</param>
             <param name="CollectionNames">Set of collections to repair.</param>
             <returns>Collections repaired.</returns>
         </member>
@@ -531,6 +570,15 @@
             </summary>
             <param name="Output">Database will be output to this interface.</param>
             <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+            <returns>Task object for synchronization purposes.</returns>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.Export(Waher.Persistence.Serialization.IDatabaseExport,System.String[],Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Performs an export of the entire database.
+            </summary>
+            <param name="Output">Database will be output to this interface.</param>
+            <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+            <param name="Thread">Optional Profiler thread.</param>
             <returns>Task object for synchronization purposes.</returns>
         </member>
         <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.StartBulk">

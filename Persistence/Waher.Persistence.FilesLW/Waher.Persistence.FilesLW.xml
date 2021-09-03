@@ -998,6 +998,15 @@
             <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
             <returns>Task object for synchronization purposes.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.Export(Waher.Persistence.Serialization.IDatabaseExport,System.String[],Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Performs an export of the entire database.
+            </summary>
+            <param name="Output">Database will be output to this interface.</param>
+            <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+            <param name="Thread">Optional Profiler thread.</param>
+            <returns>Task object for synchronization purposes.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.Clear(System.String)">
             <summary>
             Clears a collection of all objects.
@@ -1015,6 +1024,17 @@
             <param name="ExportData">If data in database is to be exported in output.</param>
             <returns>Collections with errors.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.Analyze(System.Xml.XmlWriter,System.String,System.String,System.Boolean,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Analyzes the database and exports findings to XML.
+            </summary>
+            <param name="Output">XML Output.</param>
+            <param name="XsltPath">Optional XSLT to use to view the output.</param>
+            <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+            <param name="ExportData">If data in database is to be exported in output.</param>
+            <param name="Thread">Optional Profiler thread.</param>
+            <returns>Collections with errors.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.Repair(System.Xml.XmlWriter,System.String,System.String,System.Boolean)">
             <summary>
             Analyzes the database and repairs it if necessary. Results are exported to XML.
@@ -1023,6 +1043,17 @@
             <param name="XsltPath">Optional XSLT to use to view the output.</param>
             <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
             <param name="ExportData">If data in database is to be exported in output.</param>
+            <returns>Collections with errors.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.Repair(System.Xml.XmlWriter,System.String,System.String,System.Boolean,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Analyzes the database and repairs it if necessary. Results are exported to XML.
+            </summary>
+            <param name="Output">XML Output.</param>
+            <param name="XsltPath">Optional XSLT to use to view the output.</param>
+            <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+            <param name="ExportData">If data in database is to be exported in output.</param>
+            <param name="Thread">Optional Profiler thread.</param>
             <returns>Collections with errors.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.Analyze(System.Xml.XmlWriter,System.String,System.String,System.Boolean,System.Boolean)">
@@ -1036,7 +1067,19 @@
             <param name="Repair">If files should be repaired if corruptions are detected.</param>
             <returns>Collections with errors.</returns>
         </member>
-        <member name="M:Waher.Persistence.Files.FilesProvider.Analyze(System.Xml.XmlWriter,System.String,System.String,System.Boolean,System.Boolean,System.String[])">
+        <member name="M:Waher.Persistence.Files.FilesProvider.Analyze(System.Xml.XmlWriter,System.String,System.String,System.Boolean,System.Boolean,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Analyzes the database and exports findings to XML.
+            </summary>
+            <param name="Output">XML Output.</param>
+            <param name="XsltPath">Optional XSLT to use to view the output.</param>
+            <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+            <param name="ExportData">If data in database is to be exported in output.</param>
+            <param name="Repair">If files should be repaired if corruptions are detected.</param>
+            <param name="Thread">Optional Profiler thread.</param>
+            <returns>Collections with errors.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.Analyze(System.Xml.XmlWriter,System.String,System.String,System.Boolean,System.Boolean,System.String[],Waher.Runtime.Profiling.ProfilerThread)">
             <summary>
             Analyzes the database and exports findings to XML.
             </summary>
@@ -1046,6 +1089,7 @@
             <param name="ExportData">If data in database is to be exported in output.</param>
             <param name="Repair">If files should be repaired if corruptions are detected.</param>
             <param name="CollectionNames">If provided, lists collections to be repaired.</param>
+            <param name="Thread">Optional Profiler thread.</param>
             <returns>Collections with errors.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.RepairIfInproperShutdown(System.String)">
@@ -1063,6 +1107,14 @@
             <param name="CollectionNames">Set of collections to repair.</param>
             <returns>Collections repaired.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.Repair(Waher.Runtime.Profiling.ProfilerThread,System.String[])">
+            <summary>
+            Repairs a set of collections.
+            </summary>
+            <param name="Thread">Optional Profiler thread.</param>
+            <param name="CollectionNames">Set of collections to repair.</param>
+            <returns>Collections repaired.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.Repair(System.String,System.String[])">
             <summary>
             Repairs a set of collections.
@@ -1075,6 +1127,16 @@
             <summary>
             Repairs a set of collections.
             </summary>
+            <param name="ReportFileName">Filename of repair report.</param>
+            <param name="XsltPath">Path to XSLT transform formatting the report.</param>
+            <param name="CollectionNames">Set of collections to repair.</param>
+            <returns>Collections repaired.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.Repair(Waher.Runtime.Profiling.ProfilerThread,System.String,System.String,System.String[])">
+            <summary>
+            Repairs a set of collections.
+            </summary>
+            <param name="Thread">Optional Profiler thread.</param>
             <param name="ReportFileName">Filename of repair report.</param>
             <param name="XsltPath">Path to XSLT transform formatting the report.</param>
             <param name="CollectionNames">Set of collections to repair.</param>

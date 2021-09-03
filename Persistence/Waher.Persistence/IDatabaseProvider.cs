@@ -4,6 +4,7 @@ using System.Xml;
 using System.Threading.Tasks;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Profiling;
 
 namespace Waher.Persistence
 {
@@ -335,6 +336,15 @@ namespace Waher.Persistence
 		Task Export(IDatabaseExport Output, string[] CollectionNames);
 
 		/// <summary>
+		/// Performs an export of the entire database.
+		/// </summary>
+		/// <param name="Output">Database will be output to this interface.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		Task Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread);
+
+		/// <summary>
 		/// Clears a collection of all objects.
 		/// </summary>
 		/// <param name="CollectionName">Name of collection to clear.</param>
@@ -352,6 +362,17 @@ namespace Waher.Persistence
 		Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData);
 
 		/// <summary>
+		/// Analyzes the database and exports findings to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Collections with errors found.</returns>
+		Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, ProfilerThread Thread);
+
+		/// <summary>
 		/// Analyzes the database and repairs it if necessary. Results are exported to XML.
 		/// </summary>
 		/// <param name="Output">XML Output.</param>
@@ -360,6 +381,17 @@ namespace Waher.Persistence
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
 		/// <returns>Collections with errors found and repaired.</returns>
 		Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData);
+
+		/// <summary>
+		/// Analyzes the database and repairs it if necessary. Results are exported to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Collections with errors found and repaired.</returns>
+		Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, ProfilerThread Thread);
 
 		/// <summary>
 		/// Analyzes the database and exports findings to XML.
@@ -373,11 +405,31 @@ namespace Waher.Persistence
 		Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair);
 
 		/// <summary>
+		/// Analyzes the database and exports findings to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Collections with errors found, and repaired if <paramref name="Repair"/>=true.</returns>
+		Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair, ProfilerThread Thread);
+
+		/// <summary>
 		/// Repairs a set of collections.
 		/// </summary>
 		/// <param name="CollectionNames">Set of collections to repair.</param>
 		/// <returns>Collections repaired.</returns>
 		Task<string[]> Repair(params string[] CollectionNames);
+
+		/// <summary>
+		/// Repairs a set of collections.
+		/// </summary>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <param name="CollectionNames">Set of collections to repair.</param>
+		/// <returns>Collections repaired.</returns>
+		Task<string[]> Repair(ProfilerThread Thread, params string[] CollectionNames);
 
 		/// <summary>
 		/// Adds an index to a collection, if one does not already exist.

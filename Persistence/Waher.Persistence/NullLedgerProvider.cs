@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Profiling;
 
 namespace Waher.Persistence
 {
@@ -76,5 +77,14 @@ namespace Waher.Persistence
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
 		/// <returns>Task object for synchronization purposes.</returns>
 		public Task Export(ILedgerExport Output, string[] CollectionNames) => Task.CompletedTask;
+
+		/// <summary>
+		/// Performs an export of the entire ledger.
+		/// </summary>
+		/// <param name="Output">Ledger will be output to this interface.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public Task Export(ILedgerExport Output, string[] CollectionNames, ProfilerThread Thread) => Task.CompletedTask;
 	}
 }

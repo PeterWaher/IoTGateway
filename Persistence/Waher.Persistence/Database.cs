@@ -7,6 +7,7 @@ using Waher.Events;
 using Waher.Persistence.Exceptions;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Profiling;
 
 namespace Waher.Persistence
 {
@@ -980,6 +981,18 @@ namespace Waher.Persistence
 		}
 
 		/// <summary>
+		/// Performs an export of the entire database.
+		/// </summary>
+		/// <param name="Output">Database will be output to this interface.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null (default), all collections will be exported.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public static Task Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread)
+		{
+			return Provider.Export(Output, CollectionNames, Thread);
+		}
+
+		/// <summary>
 		/// Clears a collection of all objects.
 		/// </summary>
 		/// <param name="CollectionName">Name of collection to clear.</param>
@@ -1021,6 +1034,21 @@ namespace Waher.Persistence
 		}
 
 		/// <summary>
+		/// Analyzes the database and exports findings to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Collections with errors found.</returns>
+		public static Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData,
+			ProfilerThread Thread)
+		{
+			return Provider.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, Thread);
+		}
+
+		/// <summary>
 		/// Analyzes the database and repairs it if necessary. Results are exported to XML.
 		/// </summary>
 		/// <param name="Output">XML Output.</param>
@@ -1028,11 +1056,26 @@ namespace Waher.Persistence
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
 		/// <returns>Collections with errors found and repaired.</returns>
-		public async static Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
+		public static Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
+		{
+			return Repair(Output, XsltPath, ProgramDataFolder, ExportData, null);
+		}
+
+		/// <summary>
+		/// Analyzes the database and repairs it if necessary. Results are exported to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Collections with errors found and repaired.</returns>
+		public async static Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData,
+			ProfilerThread Thread)
 		{
 			KeyValuePair<string, Dictionary<string, FlagSource>>[] Flagged = GetFlaggedCollections();
 
-			string[] Result = await Provider.Repair(Output, XsltPath, ProgramDataFolder, ExportData);
+			string[] Result = await Provider.Repair(Output, XsltPath, ProgramDataFolder, ExportData, Thread);
 
 			if (Result.Length > 0)
 				RaiseRepaired(Result, Flagged);
@@ -1090,11 +1133,28 @@ namespace Waher.Persistence
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
 		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
 		/// <returns>Collections with errors found, and repaired if <paramref name="Repair"/>=true.</returns>
-		public async static Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
+		public static Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData,
+			bool Repair)
+		{
+			return Analyze(Output, XsltPath, ProgramDataFolder, ExportData, Repair, null);
+		}
+
+		/// <summary>
+		/// Analyzes the database and exports findings to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Collections with errors found, and repaired if <paramref name="Repair"/>=true.</returns>
+		public async static Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, 
+			bool Repair, ProfilerThread Thread)
 		{
 			KeyValuePair<string, Dictionary<string, FlagSource>>[] Flagged = GetFlaggedCollections();
 
-			string[] Result = await Provider.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, Repair);
+			string[] Result = await Provider.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, Repair, Thread);
 
 			if (Repair && Result.Length > 0)
 				RaiseRepaired(Result, Flagged);

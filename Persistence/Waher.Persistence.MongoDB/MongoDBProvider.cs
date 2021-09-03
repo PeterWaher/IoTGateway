@@ -16,6 +16,7 @@ using Waher.Persistence.MongoDB.Serialization;
 using Waher.Persistence.MongoDB.Serialization.ReferenceTypes;
 using Waher.Persistence.MongoDB.Serialization.ValueTypes;
 using Waher.Runtime.Cache;
+using Waher.Runtime.Profiling;
 
 namespace Waher.Persistence.MongoDB
 {
@@ -1487,6 +1488,19 @@ namespace Waher.Persistence.MongoDB
 		}
 
 		/// <summary>
+		/// Analyzes the database and exports findings to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, ProfilerThread Thread)
+		{
+			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, false, Thread);
+		}
+
+		/// <summary>
 		/// Analyzes the database and repairs it if necessary. Results are exported to XML.
 		/// </summary>
 		/// <param name="Output">XML Output.</param>
@@ -1499,6 +1513,19 @@ namespace Waher.Persistence.MongoDB
 		}
 
 		/// <summary>
+		/// Analyzes the database and repairs it if necessary. Results are exported to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		public Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, ProfilerThread Thread)
+		{
+			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, true, Thread);
+		}
+
+		/// <summary>
 		/// Analyzes the database and exports findings to XML.
 		/// </summary>
 		/// <param name="Output">XML Output.</param>
@@ -1506,8 +1533,24 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
 		/// <param name="ExportData">If data in database is to be exported in output.</param>
 		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
-		public async Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
+		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
 		{
+			return this.Analyze(null, XsltPath, ProgramDataFolder, ExportData, Repair, null);
+		}
+
+		/// <summary>
+		/// Analyzes the database and exports findings to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="XsltPath">Optional XSLT to use to view the output.</param>
+		/// <param name="ProgramDataFolder">Program data folder. Can be removed from filenames used, when referencing them in the report.</param>
+		/// <param name="ExportData">If data in database is to be exported in output.</param>
+		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		public async Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair,
+			ProfilerThread Thread)
+		{
+			Thread?.Start();
 			Output.WriteStartDocument();
 
 			if (!string.IsNullOrEmpty(XsltPath))
@@ -1517,6 +1560,8 @@ namespace Waher.Persistence.MongoDB
 
 			foreach (string CollectionName in (await this.database.ListCollectionNamesAsync()).ToEnumerable())
 			{
+				Thread?.NewState(CollectionName);
+
 				IMongoCollection<BsonDocument> Collection = this.database.GetCollection<BsonDocument>(CollectionName);
 
 				Output.WriteStartElement("File");
@@ -1568,6 +1613,9 @@ namespace Waher.Persistence.MongoDB
 			Output.WriteEndElement();
 			Output.WriteEndDocument();
 
+			Thread?.Idle();
+			Thread?.Stop();
+
 			return new string[0];
 		}
 
@@ -1577,6 +1625,17 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="CollectionNames">Set of collections to repair.</param>
 		/// <returns>Collections repaired.</returns>
 		public Task<string[]> Repair(params string[] CollectionNames)
+		{
+			return Task.FromResult<string[]>(new string[0]);
+		}
+
+		/// <summary>
+		/// Repairs a set of collections.
+		/// </summary>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <param name="CollectionNames">Set of collections to repair.</param>
+		/// <returns>Collections repaired.</returns>
+		public Task<string[]> Repair(ProfilerThread Thread, params string[] CollectionNames)
 		{
 			return Task.FromResult<string[]>(new string[0]);
 		}
@@ -1597,8 +1656,21 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
 		/// <returns>Task object for synchronization purposes.</returns>
-		public async Task Export(IDatabaseExport Output, string[] CollectionNames)
+		public Task Export(IDatabaseExport Output, string[] CollectionNames)
 		{
+			return this.Export(Output, CollectionNames, null);
+		}
+
+		/// <summary>
+		/// Performs an export of the entire database.
+		/// </summary>
+		/// <param name="Output">Database will be output to this interface.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public async Task Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread)
+		{
+			Thread?.Start();
 			await Output.StartDatabase();
 			try
 			{
@@ -1612,6 +1684,8 @@ namespace Waher.Persistence.MongoDB
 				{
 					if (!(CollectionNames is null) && Array.IndexOf<string>(CollectionNames, CollectionName) < 0)
 						continue;
+
+					Thread?.NewState(CollectionName);
 
 					IMongoCollection<BsonDocument> Collection = this.database.GetCollection<BsonDocument>(CollectionName);
 
@@ -1658,6 +1732,7 @@ namespace Waher.Persistence.MongoDB
 								}
 								catch (Exception ex)
 								{
+									Thread?.Exception(ex);
 									this.ReportException(ex, Output);
 								}
 								finally
@@ -1671,6 +1746,7 @@ namespace Waher.Persistence.MongoDB
 					}
 					catch (Exception ex)
 					{
+						Thread?.Exception(ex);
 						this.ReportException(ex, Output);
 					}
 					finally
@@ -1681,17 +1757,20 @@ namespace Waher.Persistence.MongoDB
 			}
 			catch (Exception ex)
 			{
+				Thread?.Exception(ex);
 				this.ReportException(ex, Output);
 			}
 			finally
 			{
 				await Output.EndDatabase();
+				Thread?.Idle();
+				Thread?.Stop();
 			}
 		}
 
 		private void ReportException(Exception ex, IDatabaseExport Output)
 		{
-			ex = Waher.Events.Log.UnnestException(ex);
+			ex = Events.Log.UnnestException(ex);
 
 			if (ex is AggregateException ex2)
 			{

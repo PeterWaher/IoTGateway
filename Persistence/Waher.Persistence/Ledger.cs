@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
-using Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Profiling;
 
 namespace Waher.Persistence
 {
@@ -159,6 +156,18 @@ namespace Waher.Persistence
 		public static Task Export(ILedgerExport Output, string[] CollectionNames)
 		{
 			return Provider.Export(Output, CollectionNames);
+		}
+
+		/// <summary>
+		/// Performs an export of the entire ledger.
+		/// </summary>
+		/// <param name="Output">Ledger will be output to this interface.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public static Task Export(ILedgerExport Output, string[] CollectionNames, ProfilerThread Thread)
+		{
+			return Provider.Export(Output, CollectionNames, Thread);
 		}
 
 	}

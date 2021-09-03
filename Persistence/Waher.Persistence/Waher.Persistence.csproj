@@ -29,6 +29,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Profiling\Waher.Runtime.Profiling.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">

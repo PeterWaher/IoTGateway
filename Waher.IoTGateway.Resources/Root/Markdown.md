@@ -777,7 +777,7 @@ Example of a **layout** diagram (some parts have been removed for splicity; full
       <Overlays>
         <Grid columns="13">
           <Cell colSpan="2"/>
-          <Cell colSpan="3">
+          <Cell colSpan="2">
             <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
               <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="ThirdParty">
                 <Margins left="0.5em" right="0.5em">
@@ -786,11 +786,11 @@ Example of a **layout** diagram (some parts have been removed for splicity; full
               </RoundedRectangle>
             </Margins>
           </Cell>
-          <Cell colSpan="3">
+          <Cell colSpan="2">
             <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
               <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="ThirdParty">
                 <Margins left="0.5em" right="0.5em">
-                  <Label text="crosdomin.io" x="50%" y="50%" halign="Center" valign="Center"/>
+                  <Label text="abc4.io" x="50%" y="50%" halign="Center" valign="Center"/>
                 </Margins>
               </RoundedRectangle>
             </Margins>
@@ -831,7 +831,7 @@ Example of a **layout** diagram (some parts have been removed for splicity; full
     <Overlays>
     <Grid columns="13">
         <Cell colSpan="2"/>
-        <Cell colSpan="3">
+        <Cell colSpan="2">
         <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
             <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="ThirdParty">
             <Margins left="0.5em" right="0.5em">
@@ -840,25 +840,34 @@ Example of a **layout** diagram (some parts have been removed for splicity; full
             </RoundedRectangle>
         </Margins>
         </Cell>
-        <Cell colSpan="3">
+        <Cell colSpan="2">
         <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
             <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="ThirdParty">
             <Margins left="0.5em" right="0.5em">
-                <Label text="crosdomin.io" x="50%" y="50%" halign="Center" valign="Center"/>
-            </Margins>
-            </RoundedRectangle>
-        </Margins>
-        </Cell>
-        <Cell colSpan="3">
-        <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-            <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="ThirdParty">
-            <Margins left="0.5em" right="0.5em">
-                <Label text="PIX" x="50%" y="50%" halign="Center" valign="Center"/>
+                <Label text="abc4.io" x="50%" y="50%" halign="Center" valign="Center"/>
             </Margins>
             </RoundedRectangle>
         </Margins>
         </Cell>
         <Cell colSpan="2">
+        <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+            <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="ThirdParty">
+            <Margins left="0.5em" right="0.5em">
+                <Label text="lils.is" x="50%" y="50%" halign="Center" valign="Center"/>
+            </Margins>
+            </RoundedRectangle>
+        </Margins>
+        </Cell>
+        <Cell colSpan="2">
+        <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+            <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="ThirdParty">
+            <Margins left="0.5em" right="0.5em">
+                <Label text="TPN" x="50%" y="50%" halign="Center" valign="Center"/>
+            </Margins>
+            </RoundedRectangle>
+        </Margins>
+        </Cell>
+        <Cell colSpan="3">
         <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
             <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="App">
             <Margins left="0.5em" right="0.5em">
@@ -984,7 +993,7 @@ Example of a **layout** diagram (some parts have been removed for splicity; full
         <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
             <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="App">
             <Margins left="0.5em" right="0.5em">
-                <Label text="XamarinApp" x="50%" y="50%" halign="Center" valign="Center"/>
+                <Label text="Tag ID" x="50%" y="50%" halign="Center" valign="Center"/>
             </Margins>
             </RoundedRectangle>
         </Margins>
@@ -1128,7 +1137,7 @@ Example of a **layout** diagram (some parts have been removed for splicity; full
 
         <Cell>
         <Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
-            <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="NeuroLedger">
+            <RoundedRectangle radiusX="5mm" radiusY="5mm" height="2cm" fill="Neuron">
             <Margins left="0.5em" right="0.5em">
                 <Label text="NuGets" x="50%" y="50%" halign="Center" valign="Center"/>
             </Margins>

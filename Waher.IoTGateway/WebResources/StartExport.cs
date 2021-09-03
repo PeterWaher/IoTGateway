@@ -460,18 +460,18 @@ namespace Waher.IoTGateway.WebResources
 
 				Profiler.Stop();
 				
-				string Uml = Profiler.ExportPlantUml(TimeUnit.DynamicPerProfiling);
-				string UmlFileName = Path.ChangeExtension(ExportInfo.FullBackupFileName, "uml");
-				long UmlFileSize;
-				
-				File.WriteAllText(UmlFileName, Uml);
-
-				using (FileStream fs = File.OpenRead(UmlFileName))
-				{
-					UmlFileSize = fs.Length;
-				}
-
-				ExportFormat.UpdateClientsFileUpdated(Path.ChangeExtension(ExportInfo.LocalBackupFileName, "uml"), UmlFileSize, DateTime.Now);
+				//string Uml = Profiler.ExportPlantUml(TimeUnit.DynamicPerProfiling);
+				//string UmlFileName = Path.ChangeExtension(ExportInfo.FullBackupFileName, "uml");
+				//long UmlFileSize;
+				//
+				//File.WriteAllText(UmlFileName, Uml);
+				//
+				//using (FileStream fs = File.OpenRead(UmlFileName))
+				//{
+				//	UmlFileSize = fs.Length;
+				//}
+				//
+				//ExportFormat.UpdateClientsFileUpdated(Path.ChangeExtension(ExportInfo.LocalBackupFileName, "uml"), UmlFileSize, DateTime.Now);
 			}
 		}
 

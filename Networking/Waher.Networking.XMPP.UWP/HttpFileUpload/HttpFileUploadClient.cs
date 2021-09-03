@@ -58,41 +58,103 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		/// <param name="Callback">Callback method to call when discovery procedure is complete.</param>
 		public void Discover(EventHandler Callback)
 		{
-			this.client.SendServiceItemsDiscoveryRequest(this.client.Domain, (sender, e) =>
+			this.Discover(this.client.Domain, Callback);
+		}
+
+		/// <summary>
+		/// Searches for HTTP File Upload support on the current broker.
+		/// </summary>
+		/// <param name="Domain">Domain name of host.</param>
+		/// <param name="Callback">Callback method to call when discovery procedure is complete.</param>
+		public void Discover(string Domain, EventHandler Callback)
+		{
+			Dictionary<string, bool> Jids = new Dictionary<string, bool>();
+
+			this.client.SendServiceItemsDiscoveryRequest(Domain, (sender, e) =>
 			{
-				foreach (Item Item in e.Items)
+				if (e.Ok)
 				{
-					this.client.SendServiceDiscoveryRequest(Item.JID, (sender2, e2) =>
+					foreach (Item Item in e.Items)
 					{
-						if (e2.HasFeature(Namespace))
+						lock (Jids)
 						{
-							Item Item2 = (Item)e2.State;
-							this.fileUploadJid = Item2.JID;
-							this.maxFileSize = FindMaxFileSize(this.client, e2);
-							this.hasSupport = this.maxFileSize.HasValue;
-
-							if (!(Callback is null))
-							{
-								EventHandler h = Callback;
-								Callback = null;
-
-								try
-								{
-									h(this, EventArgs.Empty);
-								}
-								catch (Exception ex)
-								{
-									Log.Critical(ex);
-								}
-							}
+							Jids[Item.JID] = true;
 						}
 
-						return Task.CompletedTask;
-					}, Item);
+						this.client.SendServiceDiscoveryRequest(Item.JID, (sender2, e2) =>
+						{
+							Item Item2 = (Item)e2.State;
+							bool Last;
+
+							lock (Jids)
+							{
+								Jids.Remove(Item2.JID);
+								Last = Jids.Count == 0;
+							}
+
+							if (e2.Ok && e2.HasFeature(Namespace))
+							{
+								this.fileUploadJid = Item2.JID;
+								this.maxFileSize = FindMaxFileSize(this.client, e2);
+								this.hasSupport = this.maxFileSize.HasValue;
+
+								this.RaiseEvent(ref Callback);
+							}
+							else if (Last)
+								this.RaiseEvent(ref Callback);
+
+							return Task.CompletedTask;
+						}, Item);
+					}
 				}
+				else
+					this.RaiseEvent(ref Callback);
 
 				return Task.CompletedTask;
 			}, null);
+		}
+
+		/// <summary>
+		/// Searches for HTTP File Upload support on the current broker.
+		/// </summary>
+		public Task DiscoverAsync()
+		{
+			return this.DiscoverAsync(this.client.Domain);
+		}
+
+		/// <summary>
+		/// Searches for HTTP File Upload support on the current broker.
+		/// </summary>
+		/// <param name="Domain">Domain name of host.</param>
+		public Task DiscoverAsync(string Domain)
+		{
+			TaskCompletionSource<bool> Wait = new TaskCompletionSource<bool>();
+
+			this.Discover(Domain, (Sender, e) =>
+			{
+				Wait.TrySetResult(true);
+			});
+
+			return Wait.Task;
+		}
+
+		private void RaiseEvent(ref EventHandler Callback)
+		{
+			EventHandler h = Callback;
+
+			if (!(h is null))
+			{
+				Callback = null;
+
+				try
+				{
+					h(this, EventArgs.Empty);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
 		}
 
 		/// <summary>
@@ -126,26 +188,17 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		/// <summary>
 		/// If support has been found.
 		/// </summary>
-		public bool HasSupport
-		{
-			get { return this.hasSupport; }
-		}
+		public bool HasSupport => this.hasSupport;
 
 		/// <summary>
 		/// JID of HTTP File Upload component.
 		/// </summary>
-		public string FileUploadJid
-		{
-			get { return this.fileUploadJid; }
-		}
+		public string FileUploadJid => this.fileUploadJid;
 
 		/// <summary>
 		/// Maximum file size.
 		/// </summary>
-		public long? MaxFileSize
-		{
-			get { return this.maxFileSize; }
-		}
+		public long? MaxFileSize => this.maxFileSize;
 
 		/// <summary>
 		/// Uploads a file to the upload component.
@@ -158,10 +211,25 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		public void RequestUploadSlot(string FileName, string ContentType, long ContentSize,
 			HttpFileUploadEventHandler Callback, object State)
 		{
+			this.RequestUploadSlot(FileName, ContentType, ContentSize, true, Callback, State);
+		}
+
+		/// <summary>
+		/// Uploads a file to the upload component.
+		/// </summary>
+		/// <param name="FileName">Name of file.</param>
+		/// <param name="ContentType">Internet content type.</param>
+		/// <param name="ContentSize">Size of content.</param>
+		/// <param name="CheckFileSize">If the size of the file should be checked before the slot is requested.</param>
+		/// <param name="Callback">Callback method to call after process completes or fails.</param>
+		/// <param name="State">State object to pass to callback method.</param>
+		public void RequestUploadSlot(string FileName, string ContentType, long ContentSize, bool CheckFileSize,
+			HttpFileUploadEventHandler Callback, object State)
+		{
 			if (!this.hasSupport)
 				throw new Exception("HTTP File Upload not supported.");
 
-			if (this.maxFileSize.HasValue && ContentSize > this.maxFileSize.Value)
+			if (CheckFileSize && this.maxFileSize.HasValue && ContentSize > this.maxFileSize.Value)
 				throw new Exception("File too large.");
 
 			StringBuilder Xml = new StringBuilder();
@@ -257,11 +325,24 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		/// <param name="FileName">Name of file.</param>
 		/// <param name="ContentType">Internet content type.</param>
 		/// <param name="ContentSize">Size of content.</param>
-		public async Task<HttpFileUploadEventArgs> RequestUploadSlotAsync(string FileName, string ContentType, long ContentSize)
+		public Task<HttpFileUploadEventArgs> RequestUploadSlotAsync(string FileName, string ContentType, long ContentSize)
+		{
+			return RequestUploadSlotAsync(FileName, ContentType, ContentSize, true);
+		}
+
+		/// <summary>
+		/// Uploads a file to the upload component.
+		/// </summary>
+		/// <param name="FileName">Name of file.</param>
+		/// <param name="ContentType">Internet content type.</param>
+		/// <param name="ContentSize">Size of content.</param>
+		/// <param name="CheckFileSize">If the size of the file should be checked before the slot is requested.</param>
+		public async Task<HttpFileUploadEventArgs> RequestUploadSlotAsync(string FileName, string ContentType, long ContentSize, 
+			bool CheckFileSize)
 		{
 			TaskCompletionSource<HttpFileUploadEventArgs> Result = new TaskCompletionSource<HttpFileUploadEventArgs>();
 
-			this.RequestUploadSlot(FileName, ContentType, ContentSize, (sender, e) =>
+			this.RequestUploadSlot(FileName, ContentType, ContentSize, CheckFileSize, (sender, e) =>
 			{
 				Result.TrySetResult(e);
 				return Task.CompletedTask;

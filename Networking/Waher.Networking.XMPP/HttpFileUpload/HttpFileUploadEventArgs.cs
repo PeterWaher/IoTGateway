@@ -100,10 +100,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 
 				HttpResponseMessage Response = await HttpClient.PutAsync(this.putUrl, Content);
 				if (!Response.IsSuccessStatusCode)
-				{
-					string Msg = await Response.Content.ReadAsStringAsync();
-					throw new IOException("Unable to PUT content: " + Msg);
-				}
+					await Waher.Content.Getters.WebGetter.ProcessResponse(Response, new Uri(this.PutUrl));
 
 				if (Response.StatusCode != System.Net.HttpStatusCode.Created)
 					throw new IOException("Unexpected response.");

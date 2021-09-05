@@ -67,7 +67,7 @@ namespace Waher.Script.Statistics.Functions
 				throw new ScriptRuntimeException("Min must be smaller than Max.", this);
 
 			double[] Result = new double[N];
-			double Scale = N / (Max - Min);
+			double Diff = Max - Min;
 			double x;
 			int i, j, c;
 
@@ -82,7 +82,7 @@ namespace Waher.Script.Statistics.Functions
 
 					if (x >= Min && x <= Max)
 					{
-						i = (int)((x - Min) * Scale);
+						i = (int)(((x - Min) * N) / Diff);
 						if (i == N)
 							i--;
 
@@ -110,7 +110,7 @@ namespace Waher.Script.Statistics.Functions
 
 					if (x >= Min && x <= Max)
 					{
-						i = (int)((x - Min) * Scale);
+						i = (int)(((x - Min) * N) / Diff);
 						if (i == N)
 							i--;
 
@@ -119,21 +119,30 @@ namespace Waher.Script.Statistics.Functions
 				}
 			}
 
-			string[] Labels = new string[N];
+			return new ObjectVector(new IElement[]
+			{
+				new ObjectVector(GetLabels(N, Min, Diff)),
+				new DoubleVector(Result)
+			});
+		}
 
-			Scale = (Max - Min) / N;
+		internal static string[] GetLabels(int N, double Min, double Diff)
+		{
+			string[] Labels = new string[N];
+			string CurrentLabel;
+			double Next = Min;
+			string NextLabel = TrimLabel(Expression.ToString(Next));
+			int i;
 
 			for (i = 0; i < N; i++)
 			{
-				Labels[i] = TrimLabel(Expression.ToString(Min + i * Scale)) + "-" +
-					TrimLabel(Expression.ToString(Min + (i + 1) * Scale));
+				CurrentLabel = NextLabel;
+				Next = ((i + 1) * Diff) / N + Min;
+				NextLabel = TrimLabel(Expression.ToString(Next));
+				Labels[i] = CurrentLabel + "-" + NextLabel;
 			}
 
-			return new ObjectVector(new IElement[]
-			{
-				new ObjectVector(Labels),
-				new DoubleVector(Result)
-			});
+			return Labels;
 		}
 
 		/// <summary>
@@ -147,7 +156,8 @@ namespace Waher.Script.Statistics.Functions
 			if (i < 0)
 				return Label;
 
-			if (Label.EndsWith("00001"))
+			int j = Label.LastIndexOf("00000");
+			if (j > i)
 			{
 				i = Label.Length - 5;
 				while (Label[i] == '0')
@@ -156,13 +166,15 @@ namespace Waher.Script.Statistics.Functions
 				if (Label[i] == '.')
 					i--;
 
-				Label = Label.Substring(0, i + 1);
+				return Label.Substring(0, i + 1);
 			}
-			else if (Label.EndsWith("99999"))
+
+			j = Label.LastIndexOf("99999");
+			if (j > i)
 			{
 				bool DecimalSection = true;
-			
-				i = Label.Length - 5;
+
+				i = j;
 				while (Label[i] == '9')
 					i--;
 

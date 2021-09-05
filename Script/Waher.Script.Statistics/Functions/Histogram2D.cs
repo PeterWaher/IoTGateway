@@ -89,8 +89,8 @@ namespace Waher.Script.Statistics.Functions
 				throw new ScriptRuntimeException("MinY must be smaller than MaxY.", this);
 
 			double[,] Result = new double[NX, NY];
-			double ScaleX = NX / (MaxX - MinX);
-			double ScaleY = NY / (MaxY - MinY);
+			double DiffX = MaxX - MinX;
+			double DiffY = MaxY - MinY;
 			double x, y;
 			int ix, iy, j, c;
 
@@ -109,11 +109,11 @@ namespace Waher.Script.Statistics.Functions
 
 						if (x >= MinX && x <= MaxX && y >= MinY && y <= MaxY)
 						{
-							ix = (int)((x - MinX) * ScaleX);
+							ix = (int)(((x - MinX) * NX) / DiffX);
 							if (ix == NX)
 								ix--;
 
-							iy = (int)((y - MinY) * ScaleY);
+							iy = (int)(((y - MinY) * NY) / DiffY);
 							if (iy == NY)
 								iy--;
 
@@ -132,11 +132,11 @@ namespace Waher.Script.Statistics.Functions
 
 						if (x >= MinX && x <= MaxX && y >= MinY && y <= MaxY)
 						{
-							ix = (int)((x - MinX) * ScaleX);
+							ix = (int)(((x - MinX) * NX) / DiffX);
 							if (ix == NX)
 								ix--;
 
-							iy = (int)((y - MinY) * ScaleY);
+							iy = (int)(((y - MinY) * NY) / DiffY);
 							if (iy == NY)
 								iy--;
 
@@ -191,11 +191,11 @@ namespace Waher.Script.Statistics.Functions
 
 						if (x >= MinX && x <= MaxX && y >= MinY && y <= MaxY)
 						{
-							ix = (int)((x - MinX) * ScaleX);
+							ix = (int)(((x - MinX) * NX) / DiffX);
 							if (ix == NX)
 								ix--;
 
-							iy = (int)((y - MinY) * ScaleY);
+							iy = (int)(((y - MinY) * NY) / DiffY);
 							if (iy == NY)
 								iy--;
 
@@ -243,11 +243,11 @@ namespace Waher.Script.Statistics.Functions
 
 						if (x >= MinX && x <= MaxX && y >= MinY && y <= MaxY)
 						{
-							ix = (int)((x - MinX) * ScaleX);
+							ix = (int)(((x - MinX) * NX) / DiffX);
 							if (ix == NX)
 								ix--;
 
-							iy = (int)((y - MinY) * ScaleY);
+							iy = (int)(((y - MinY) * NY) / DiffY);
 							if (iy == NY)
 								iy--;
 
@@ -259,28 +259,10 @@ namespace Waher.Script.Statistics.Functions
 					throw new ScriptRuntimeException("Matrix must have either 2 columns or 2 rows.", this);
 			}
 
-			string[] LabelsX = new string[NX];
-			string[] LabelsY = new string[NY];
-
-			ScaleX = (MaxX - MinX) / NX;
-			ScaleY = (MaxY - MinY) / NY;
-
-			for (ix = 0; ix < NX; ix++)
-			{
-				LabelsX[ix] = Histogram.TrimLabel(Expression.ToString(MinX + ix * ScaleX)) + "-" +
-					Histogram.TrimLabel(Expression.ToString(MinX + (ix + 1) * ScaleX));
-			}
-
-			for (iy = 0; iy < NY; iy++)
-			{
-				LabelsY[iy] = Histogram.TrimLabel(Expression.ToString(MinY + iy * ScaleY)) + 
-					"-" + Histogram.TrimLabel(Expression.ToString(MinY + (iy + 1) * ScaleY));
-			}
-
 			return new ObjectVector(new IElement[]
 			{
-				new ObjectVector(LabelsX),
-				new ObjectVector(LabelsY),
+				new ObjectVector(Histogram.GetLabels(NX, MinX, DiffX)),
+				new ObjectVector(Histogram.GetLabels(NY, MinY, DiffY)),
 				new DoubleMatrix(Result)
 			});
 		}

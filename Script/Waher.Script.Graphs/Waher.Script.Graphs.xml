@@ -2367,6 +2367,18 @@
             <param name="ApproxNrLabels">Number of labels.</param>
             <returns>Recommended step size.</returns>
         </member>
+        <member name="M:Waher.Script.Graphs.Graph.GetStepFraction(System.Double,System.Double,System.Int32,System.Int32@,System.Int32@,System.Int32@)">
+            <summary>
+            Gets a human readable step size for an interval, given its limits and desired number of steps.
+            The step size is given as a fraction and an exponent of power 10.
+            </summary>
+            <param name="Min">Smallest value.</param>
+            <param name="Max">Largest value.</param>
+            <param name="ApproxNrLabels">Number of labels.</param>
+            <param name="Numerator">Numerator of fraction.</param>
+            <param name="Denominator">Denominator of fraction.</param>
+            <param name="Exponent">Power of 10 exponent.</param>
+        </member>
         <member name="M:Waher.Script.Graphs.Graph.GetLabels(System.DateTime,System.DateTime,System.Int32,Waher.Script.Graphs.LabelType@)">
             <summary>
             Gets label values for a series vector.

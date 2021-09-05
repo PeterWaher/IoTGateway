@@ -317,7 +317,7 @@ namespace Waher.Script.Graphs
 		/// <returns>Sequence of points.</returns>
 		public static SKPoint[] Scale(IVector VectorX, IVector VectorY, IElement MinX, IElement MaxX,
 			IElement MinY, IElement MaxY, double OffsetX, double OffsetY, double Width, double Height,
-			Dictionary<string,double> XLabelPositions, Dictionary<string, double> YLabelPositions)
+			Dictionary<string, double> XLabelPositions, Dictionary<string, double> YLabelPositions)
 		{
 			if (VectorX.Dimension != VectorY.Dimension)
 				throw new ScriptException("Dimension mismatch.");
@@ -343,8 +343,8 @@ namespace Waher.Script.Graphs
 		/// <param name="Size">Size of area.</param>
 		/// <param name="LabelPositions">Optional fixed label positions.</param>
 		/// <returns>Vector distributed in the available area.</returns>
-		public static double[] Scale(IVector Vector, IElement Min, IElement Max, double Offset, 
-			double Size, Dictionary<string,double> LabelPositions)
+		public static double[] Scale(IVector Vector, IElement Min, IElement Max, double Offset,
+			double Size, Dictionary<string, double> LabelPositions)
 		{
 			if (Vector is DoubleVector DV)
 			{
@@ -489,7 +489,7 @@ namespace Waher.Script.Graphs
 		/// <param name="Size">Size of area.</param>
 		/// <param name="LabelPositions">Optional fixed label positions.</param>
 		/// <returns>Vector distributed in the available area.</returns>
-		public static double[] Scale(IElement[] Vector, double Offset, double Size, 
+		public static double[] Scale(IElement[] Vector, double Offset, double Size,
 			Dictionary<string, double> LabelPositions)
 		{
 			int i, c = Vector.Length;
@@ -767,15 +767,27 @@ namespace Waher.Script.Graphs
 			if (double.IsInfinity(Max))
 				throw new ArgumentException("Infinite interval.", nameof(Max));
 
-			double StepSize = GetStepSize(Min, Max, ApproxNrLabels);
+			// Calculate steps, without introducing growing round-off errors.
+
+			GetStepFraction(Min, Max, ApproxNrLabels, out int Numerator, out int Denominator, out int Exponent);
+			double Num = Numerator;
+			double Den = Denominator;
+
+			if (Exponent > 0)
+				Num *= Math.Pow(10, Exponent);
+			else if (Exponent < 0)
+				Den *= Math.Pow(10, -Exponent);
+
+			double StepSize = Num / Den;
 			List<double> Steps = new List<double>();
 			int i = (int)Math.Ceiling(Min / StepSize);
-			double d = i * StepSize;
+			double d = (i * Num) / Den;
 
 			while (d <= Max)
 			{
 				Steps.Add(d);
-				d = ++i * StepSize;
+				i++;
+				d = (i * Num) / Den;
 			}
 
 			return Steps.ToArray();
@@ -790,13 +802,36 @@ namespace Waher.Script.Graphs
 		/// <returns>Recommended step size.</returns>
 		public static double GetStepSize(double Min, double Max, int ApproxNrLabels)
 		{
+			GetStepFraction(Min, Max, ApproxNrLabels, out int Numerator, out int Denominator, out int Exponent);
+			return (Math.Pow(10, Exponent) * Numerator) / Denominator;
+		}
+
+		/// <summary>
+		/// Gets a human readable step size for an interval, given its limits and desired number of steps.
+		/// The step size is given as a fraction and an exponent of power 10.
+		/// </summary>
+		/// <param name="Min">Smallest value.</param>
+		/// <param name="Max">Largest value.</param>
+		/// <param name="ApproxNrLabels">Number of labels.</param>
+		/// <param name="Numerator">Numerator of fraction.</param>
+		/// <param name="Denominator">Denominator of fraction.</param>
+		/// <param name="Exponent">Power of 10 exponent.</param>
+		public static void GetStepFraction(double Min, double Max, int ApproxNrLabels, out int Numerator, out int Denominator, out int Exponent)
+		{
+			Numerator = 1;
+			Denominator = 1;
+
 			double Delta = Max - Min;
 			if (Delta == 0)
-				return 1;
+			{
+				Exponent = 0;
+				return;
+			}
 
-			double StepSize0 = Math.Pow(10, Math.Round(Math.Log10(Delta / ApproxNrLabels)));
+			Exponent = (int)Math.Round(Math.Log10(Delta / ApproxNrLabels));
+
+			double StepSize0 = Math.Pow(10, Exponent);
 			double StepSize = StepSize0;
-			double BestStepSize = StepSize0;
 			int NrSteps = (int)Math.Floor(Max / StepSize) - (int)Math.Ceiling(Min / StepSize) + 1;
 			int BestDiff = Math.Abs(NrSteps - ApproxNrLabels);
 			int Diff;
@@ -809,7 +844,7 @@ namespace Waher.Script.Graphs
 				if (Diff < BestDiff)
 				{
 					BestDiff = Diff;
-					BestStepSize = StepSize;
+					Numerator = 2;
 
 					StepSize = StepSize0 * 2.5;
 					NrSteps = (int)Math.Floor(Max / StepSize) - (int)Math.Ceiling(Min / StepSize) + 1;
@@ -817,13 +852,14 @@ namespace Waher.Script.Graphs
 					if (Diff < BestDiff)
 					{
 						BestDiff = Diff;
-						BestStepSize = StepSize;
+						Numerator = 5;
+						Denominator = 2;
 
 						StepSize = StepSize0 * 5;
 						NrSteps = (int)Math.Floor(Max / StepSize) - (int)Math.Ceiling(Min / StepSize) + 1;
 						Diff = Math.Abs(NrSteps - ApproxNrLabels);
 						if (Diff < BestDiff)
-							BestStepSize = StepSize;
+							Denominator = 1;
 					}
 				}
 			}
@@ -835,7 +871,7 @@ namespace Waher.Script.Graphs
 				if (Diff < BestDiff)
 				{
 					BestDiff = Diff;
-					BestStepSize = StepSize;
+					Denominator = 2;
 
 					StepSize = StepSize0 / 4;
 					NrSteps = (int)Math.Floor(Max / StepSize) - (int)Math.Ceiling(Min / StepSize) + 1;
@@ -843,18 +879,16 @@ namespace Waher.Script.Graphs
 					if (Diff < BestDiff)
 					{
 						BestDiff = Diff;
-						BestStepSize = StepSize;
+						Denominator = 4;
 
 						StepSize = StepSize0 / 5;
 						NrSteps = (int)Math.Floor(Max / StepSize) - (int)Math.Ceiling(Min / StepSize) + 1;
 						Diff = Math.Abs(NrSteps - ApproxNrLabels);
 						if (Diff < BestDiff)
-							BestStepSize = StepSize;
+							Denominator = 5;
 					}
 				}
 			}
-
-			return BestStepSize;
 		}
 
 		/// <summary>

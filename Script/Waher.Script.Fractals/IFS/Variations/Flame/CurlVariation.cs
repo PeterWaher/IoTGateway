@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -8,8 +6,8 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
 	public class CurlVariation : FlameVariationMultipleParameters
 	{
-		private double c1;
-		private double c2;
+		private readonly double c1;
+		private readonly double c2;
 
 		public CurlVariation(ScriptNode c1, ScriptNode c2, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { c1, c2 }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar },

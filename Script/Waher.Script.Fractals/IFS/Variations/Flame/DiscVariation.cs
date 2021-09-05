@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using Waher.Script.Abstraction.Elements;
-using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
@@ -15,10 +11,10 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         public override void Operate(ref double x, ref double y)
         {
-            double r = System.Math.Sqrt(x * x + y * y);
-            double a = System.Math.Atan2(x, y);
-            x = a * System.Math.Sin(r * System.Math.PI) / System.Math.PI;
-            y = a * System.Math.Cos(r * System.Math.PI) / System.Math.PI;
+            double r = Math.Sqrt(x * x + y * y);
+            double a = Math.Atan2(x, y);
+            x = a * Math.Sin(r * Math.PI) / Math.PI;
+            y = a * Math.Cos(r * Math.PI) / Math.PI;
         }
 
         public override string FunctionName

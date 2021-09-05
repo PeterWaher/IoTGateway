@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;

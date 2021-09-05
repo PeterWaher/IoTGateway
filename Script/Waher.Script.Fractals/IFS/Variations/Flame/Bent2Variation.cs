@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -8,8 +6,8 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
 	public class Bent2Variation : FlameVariationMultipleParameters
 	{
-		private double x;
-		private double y;
+		private readonly double x;
+		private readonly double y;
 
 		public Bent2Variation(ScriptNode x, ScriptNode y, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { x, y }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar },

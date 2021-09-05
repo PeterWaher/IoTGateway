@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using Waher.Script.Abstraction.Elements;
-using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
 {
-    public class zLnVariation : FlameVariationZeroParameters
+    public class ZLnVariation : FlameVariationZeroParameters
     {
-        public zLnVariation(int Start, int Length, Expression Expression)
+        public ZLnVariation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }
@@ -16,8 +12,8 @@ namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
         public override void Operate(ref double x, ref double y)
         {
             // ln(x+iy)
-            x = System.Math.Sqrt(x * x + y * y);
-            y = System.Math.Atan2(y, x);
+            x = Math.Sqrt(x * x + y * y);
+            y = Math.Atan2(y, x);
         }
 
         public override string FunctionName

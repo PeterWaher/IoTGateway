@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using SkiaSharp;
-using Waher.Script;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
 

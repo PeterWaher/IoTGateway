@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -8,10 +6,10 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
     public class NGonVariation : FlameVariationMultipleParameters
     {
-        private double power;
-        private double sides;
-        private double corners;
-        private double circle;
+        private readonly double power;
+        private readonly double sides;
+        private readonly double corners;
+        private readonly double circle;
 
         public NGonVariation(ScriptNode high, ScriptNode low, ScriptNode corners, ScriptNode circle,
 			int Start, int Length, Expression Expression)
@@ -60,15 +58,15 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         public override void Operate(ref double x, ref double y)
         {
-            double p2 = System.Math.PI * 2 / this.sides;
-            double a = System.Math.Atan2(y, x);
-            double t3 = a - p2 * System.Math.Floor(a / p2);
+            double p2 = Math.PI * 2 / this.sides;
+            double a = Math.Atan2(y, x);
+            double t3 = a - p2 * Math.Floor(a / p2);
 
             if (t3 <= p2 * 0.5)
                 t3 -= p2;
 
-            double r = System.Math.Sqrt(x * x + y * y);
-            double k = (this.corners * (1 / (System.Math.Cos(t3) + 1e-6) - 1) + this.circle) / System.Math.Pow(r, this.power);
+            double r = Math.Sqrt(x * x + y * y);
+            double k = (this.corners * (1 / (Math.Cos(t3) + 1e-6) - 1) + this.circle) / Math.Pow(r, this.power);
             x *= k;
             y *= k;
         }

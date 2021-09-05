@@ -84,12 +84,10 @@ namespace Waher.Script.Fractals.ComplexFractals
             int c = Arguments.Length;
             int i = 0;
             object Obj;
-            Complex z;
 
             Obj = Arguments[i++].AssociatedObjectValue;
-			if (Obj is Complex)
+			if (Obj is Complex z)
 			{
-				z = (Complex)Obj;
 				rc = z.Real;
                 ic = z.Imaginary;
             }
@@ -183,7 +181,6 @@ namespace Waher.Script.Fractals.ComplexFractals
         private string FractalZoomScript(double r, double i, double Size, object State)
         {
             object[] Parameters = (object[])State;
-            SKColor[] Palette = (SKColor[])Parameters[0];
             int DimX = (int)Parameters[1];
             int DimY = (int)Parameters[2];
             Complex R = (Complex)Parameters[3];

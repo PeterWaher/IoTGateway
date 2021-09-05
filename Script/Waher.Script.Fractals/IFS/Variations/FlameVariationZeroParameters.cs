@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Waher.Script.Abstraction;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators;
 

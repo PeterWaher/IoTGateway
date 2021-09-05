@@ -208,8 +208,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			if (!(f is null))
 			{
-				return CalcHalley(rc, ic, dr, R, f, fDef, Variables, Palette, dimx, dimy,
-				   this, this.FractalZoomScript,
+				return CalcHalley(rc, ic, dr, R, f, Variables, Palette, dimx, dimy, this, this.FractalZoomScript,
 				   new object[] { Palette, dimx, dimy, R, fDef, ColorExpression });
 			}
 			else if (!(CoefficientsZ is null))
@@ -576,7 +575,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 		}
 
 		public static FractalGraph CalcHalley(double rCenter, double iCenter, double rDelta, Complex R,
-			ILambdaExpression f, ScriptNode fDef, Variables Variables, SKColor[] Palette, int Width, int Height,
+			ILambdaExpression f, Variables Variables, SKColor[] Palette, int Width, int Height,
 			ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
 		{
 			double RRe = R.Real;

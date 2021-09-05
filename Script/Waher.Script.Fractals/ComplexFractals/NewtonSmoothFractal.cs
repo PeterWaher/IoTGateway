@@ -107,12 +107,10 @@ namespace Waher.Script.Fractals.ComplexFractals
 			int c = Arguments.Length;
 			int i = 0;
 			object Obj;
-			Complex z;
 
 			Obj = Arguments[i++].AssociatedObjectValue;
-			if (Obj is Complex)
+			if (Obj is Complex z)
 			{
-				z = (Complex)Obj;
 				rc = z.Real;
 				ic = z.Imaginary;
 			}
@@ -210,8 +208,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			if (!(f is null))
 			{
-				return CalcNewtonSmooth(rc, ic, dr, R, f, fDef, Variables, Palette, dimx, dimy,
-					this, this.FractalZoomScript,
+				return CalcNewtonSmooth(rc, ic, dr, R, f, Variables, Palette, dimx, dimy, this, this.FractalZoomScript,
 					new object[] { Palette, dimx, dimy, R, fDef, ColorExpression });
 			}
 			else if (!(CoefficientsZ is null))
@@ -231,12 +228,10 @@ namespace Waher.Script.Fractals.ComplexFractals
 		private string FractalZoomScript(double r, double i, double Size, object State)
 		{
 			object[] Parameters = (object[])State;
-			SKColor[] Palette = (SKColor[])Parameters[0];
 			int DimX = (int)Parameters[1];
 			int DimY = (int)Parameters[2];
 			Complex R = (Complex)Parameters[3];
 			double[] Coefficients = Parameters[4] as double[];
-			Complex[] CoefficientsZ = Parameters[4] as Complex[];
 			string ColorExpression = (string)Parameters[5];
 
 			StringBuilder sb = new StringBuilder();
@@ -253,7 +248,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			if (Parameters[4] is ScriptNode fDef)
 				sb.Append(fDef.SubExpression);
-			else if (!(CoefficientsZ is null))
+			else if (Parameters[4] is Complex[] CoefficientsZ)
 				sb.Append(Expression.ToString(CoefficientsZ));
 			else
 				sb.Append(Expression.ToString(Coefficients));
@@ -528,7 +523,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 		}
 
 		public static FractalGraph CalcNewtonSmooth(double rCenter, double iCenter, double rDelta, Complex R,
-			ILambdaExpression f, ScriptNode fDef, Variables Variables, SKColor[] Palette, int Width, int Height,
+			ILambdaExpression f, Variables Variables, SKColor[] Palette, int Width, int Height,
 			ScriptNode Node, FractalZoomScript FractalZoomScript, object State)
 		{
 			double RRe = R.Real;

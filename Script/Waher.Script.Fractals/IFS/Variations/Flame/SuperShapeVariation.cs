@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -8,12 +6,12 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
     public class SuperShapeVariation : FlameVariationMultipleParameters
     {
-        private double m;
-        private double n1;
-        private double n2;
-        private double n3;
-        private double holes;
-        private double rnd;
+        private readonly double m;
+        private readonly double n1;
+        private readonly double n2;
+        private readonly double n3;
+        private readonly double holes;
+        private readonly double rnd;
 
 		public SuperShapeVariation(ScriptNode m, ScriptNode n1, ScriptNode n2, ScriptNode n3,
 			ScriptNode holes, ScriptNode rnd, int Start, int Length, Expression Expression)
@@ -78,16 +76,16 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             }
 
             double pneg1_n1 = -1.0 / this.n1;
-            double theta = (this.m * System.Math.Atan2(y, x) + System.Math.PI) / 4.0;
-            double t1 = System.Math.Pow(System.Math.Abs(System.Math.Sin(theta)), this.n2);
-            double t2 = System.Math.Pow(System.Math.Abs(System.Math.Cos(theta)), this.n3);
-            double r = System.Math.Sqrt(x * x + y * y) + 1e-6;
-            r = ((this.rnd * r1 + (1.0 - this.rnd) * r - this.holes) * System.Math.Pow(t1 + t2, pneg1_n1)) / r;
+            double theta = (this.m * Math.Atan2(y, x) + Math.PI) / 4.0;
+            double t1 = Math.Pow(Math.Abs(Math.Sin(theta)), this.n2);
+            double t2 = Math.Pow(Math.Abs(Math.Cos(theta)), this.n3);
+            double r = Math.Sqrt(x * x + y * y) + 1e-6;
+            r = ((this.rnd * r1 + (1.0 - this.rnd) * r - this.holes) * Math.Pow(t1 + t2, pneg1_n1)) / r;
             x *= r;
             y *= r;
         }
 
-        private Random gen = new Random();
+        private readonly Random gen = new Random();
 
         public override string FunctionName
         {

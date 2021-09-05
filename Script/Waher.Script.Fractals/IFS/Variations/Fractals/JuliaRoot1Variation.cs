@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
@@ -52,12 +51,12 @@ namespace Waher.Script.Fractals.IFS.Variations.Fractals
             double re = x - this.re;
             double im = y - this.im;
 
-            double argz = System.Math.Atan2(im, re);
-            double amp = System.Math.Pow(re * re + im * im, 0.25);
+            double argz = Math.Atan2(im, re);
+            double amp = Math.Pow(re * re + im * im, 0.25);
             double phi = 0.5 * argz;
 
-            x = amp * System.Math.Cos(phi);
-            y = amp * System.Math.Sin(phi);
+            x = amp * Math.Cos(phi);
+            y = amp * Math.Sin(phi);
         }
 
         public override string FunctionName

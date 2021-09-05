@@ -5,7 +5,6 @@ using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Exceptions;
-using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Fractals.ComplexFractals
@@ -70,16 +69,13 @@ namespace Waher.Script.Fractals.ComplexFractals
             int dimx, dimy;
             int i, c;
             object Obj;
-            Complex z;
-            ILambdaExpression f;
             ScriptNode fDef = null;
             c = Arguments.Length;
             i = 0;
 
             Obj = Arguments[i++].AssociatedObjectValue;
-			if (Obj is Complex)
+			if (Obj is Complex z)
 			{
-				z = (Complex)Obj;
 				rc = z.Real;
                 ic = z.Imaginary;
             }
@@ -93,9 +89,8 @@ namespace Waher.Script.Fractals.ComplexFractals
                 throw new ScriptRuntimeException("Insufficient parameters in call to MandelbrotTopographyFractal().", this);
 
             Obj = Arguments[i].AssociatedObjectValue;
-            if (Obj is ILambdaExpression)
+            if (Obj is ILambdaExpression f)
             {
-                f = (ILambdaExpression)Obj;
                 fDef = this.Arguments[i++];
 
                 if (f.NrArguments != 2)
@@ -160,7 +155,6 @@ namespace Waher.Script.Fractals.ComplexFractals
         private string FractalZoomScript(double r, double i, double Size, object State)
         {
             object[] Parameters = (object[])State;
-            SKColor[] Palette = (SKColor[])Parameters[0];
             int DimX = (int)Parameters[1];
             int DimY = (int)Parameters[2];
             string ColorExpression = (string)Parameters[3];

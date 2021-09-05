@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -8,8 +6,8 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
     public class FlowerVariation : FlameVariationMultipleParameters
     {
-        private double holes;
-        private double petals;
+        private readonly double holes;
+        private readonly double petals;
 
         public FlowerVariation(ScriptNode holes, ScriptNode petals, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { holes, petals }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar },
@@ -52,13 +50,13 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
                 r1 = this.gen.NextDouble();
             }
 
-            double a = System.Math.Atan2(y, x);
-            double r = (r1 - this.holes) * System.Math.Cos(this.petals * a);
-            x = r * System.Math.Cos(a);
-            y = r * System.Math.Sin(a);
+            double a = Math.Atan2(y, x);
+            double r = (r1 - this.holes) * Math.Cos(this.petals * a);
+            x = r * Math.Cos(a);
+            y = r * Math.Sin(a);
         }
 
-        private Random gen = new Random();
+        private readonly Random gen = new Random();
 
         public override string FunctionName
         {

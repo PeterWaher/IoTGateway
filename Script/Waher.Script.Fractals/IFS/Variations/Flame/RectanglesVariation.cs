@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -8,8 +6,8 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
     public class RectanglesVariation : FlameVariationMultipleParameters
     {
-        private double x;
-        private double y;
+        private readonly double x;
+        private readonly double y;
 
 		public RectanglesVariation(ScriptNode x, ScriptNode y, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { x, y }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar },
@@ -46,8 +44,8 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         public override void Operate(ref double x, ref double y)
         {
-            x = (2 * System.Math.Floor(x / this.x) + 1) * this.x - x;
-            y = (2 * System.Math.Floor(y / this.y) + 1) * this.y - y;
+            x = (2 * Math.Floor(x / this.x) + 1) * this.x - x;
+            y = (2 * Math.Floor(y / this.y) + 1) * this.y - y;
         }
 
         public override string FunctionName

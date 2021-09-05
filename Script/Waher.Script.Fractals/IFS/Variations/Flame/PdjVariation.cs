@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -8,10 +6,10 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
     public class PdjVariation : FlameVariationMultipleParameters
     {
-        private double a;
-        private double b;
-        private double c;
-        private double d;
+        private readonly double a;
+        private readonly double b;
+        private readonly double c;
+        private readonly double d;
 
 		public PdjVariation(ScriptNode a, ScriptNode b, ScriptNode c, ScriptNode d,
 			int Start, int Length, Expression Expression)
@@ -60,8 +58,8 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         public override void Operate(ref double x, ref double y)
         {
-            x = System.Math.Sin(this.a * y) - System.Math.Cos(this.b * x);
-            y = System.Math.Sin(this.c * x) - System.Math.Cos(this.d * y);
+            x = Math.Sin(this.a * y) - Math.Cos(this.b * x);
+            y = Math.Sin(this.c * x) - Math.Cos(this.d * y);
         }
 
         public override string FunctionName

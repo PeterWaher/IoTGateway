@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -8,8 +6,8 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
     public class ParabolaVariation : FlameVariationMultipleParameters
     {
-        private double width;
-        private double height;
+        private readonly double width;
+        private readonly double height;
 
 		public ParabolaVariation(ScriptNode width, ScriptNode height, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { width, height }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar },
@@ -52,14 +50,14 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
                 r1 = this.gen.NextDouble();
             }
 
-            double r = System.Math.Sqrt(x * x + y * y);
-            double s = System.Math.Sin(r);
-            double c = System.Math.Cos(r);
+            double r = Math.Sqrt(x * x + y * y);
+            double s = Math.Sin(r);
+            double c = Math.Cos(r);
             x = this.height * s * s * r1;
             y = this.width * c * r1;
         }
 
-        private Random gen = new Random();
+        private readonly Random gen = new Random();
 
         public override string FunctionName
         {

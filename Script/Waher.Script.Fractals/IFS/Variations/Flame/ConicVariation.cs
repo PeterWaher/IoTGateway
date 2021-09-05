@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -8,8 +6,8 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
 	public class ConicVariation : FlameVariationMultipleParameters
 	{
-		private double holes;
-		private double eccentricity;
+		private readonly double holes;
+		private readonly double eccentricity;
 
 		public ConicVariation(ScriptNode holes, ScriptNode eccentricity, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { holes, eccentricity }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar },
@@ -54,13 +52,13 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 				r1 = this.gen.NextDouble();
 			}
 
-			double a = System.Math.Atan2(y, x);
-			double r = (r1 - this.holes) * this.eccentricity / (1 + this.eccentricity + System.Math.Cos(a));
-			x = r * System.Math.Cos(a);
-			y = r * System.Math.Sin(a);
+			double a = Math.Atan2(y, x);
+			double r = (r1 - this.holes) * this.eccentricity / (1 + this.eccentricity + Math.Cos(a));
+			x = r * Math.Cos(a);
+			y = r * Math.Sin(a);
 		}
 
-		private Random gen = new Random();
+		private readonly Random gen = new Random();
 
 		public override string FunctionName
 		{

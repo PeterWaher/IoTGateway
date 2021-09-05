@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -8,7 +6,7 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
     public class JuliaVariation : FlameVariationOneParameter
     {
-        private double omega;
+        private readonly double omega;
 
         public JuliaVariation(ScriptNode Parameter, int Start, int Length, Expression Expression)
             : base(Parameter, Start, Length, Expression)
@@ -29,10 +27,10 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         public override void Operate(ref double x, ref double y)
         {
-            double r = System.Math.Pow(x * x + y * y, 0.25);
-            double a = System.Math.Atan2(x, y) / 2;
-            x = System.Math.Cos(a + this.omega) * r;
-            y = System.Math.Sin(a + this.omega) * r;
+            double r = Math.Pow(x * x + y * y, 0.25);
+            double a = Math.Atan2(x, y) / 2;
+            x = Math.Cos(a + this.omega) * r;
+            y = Math.Sin(a + this.omega) * r;
         }
 
         public override string FunctionName

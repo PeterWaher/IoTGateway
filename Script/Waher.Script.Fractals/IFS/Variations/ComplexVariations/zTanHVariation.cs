@@ -1,27 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using Waher.Script.Abstraction.Elements;
-using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
 {
-    public class zTanHVariation : FlameVariationZeroParameters
+    public class ZTanHVariation : FlameVariationZeroParameters
     {
-        public zTanHVariation(int Start, int Length, Expression Expression)
+        public ZTanHVariation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }
 
         public override void Operate(ref double x, ref double y)
         {
-            double Mod = System.Math.Exp(x);
-            double zr = Mod * (System.Math.Cos(y));
-            double zi = Mod * (System.Math.Sin(y));
+            double Mod = Math.Exp(x);
+            double zr = Mod * (Math.Cos(y));
+            double zi = Mod * (Math.Sin(y));
 
-            Mod = System.Math.Exp(-x);
-            double zr2 = Mod * System.Math.Cos(-y);
-            double zi2 = Mod * System.Math.Sin(-y);
+            Mod = Math.Exp(-x);
+            double zr2 = Mod * Math.Cos(-y);
+            double zi2 = Mod * Math.Sin(-y);
 
             double sinr = zr - zr2;
             double sini = zi - zi2;

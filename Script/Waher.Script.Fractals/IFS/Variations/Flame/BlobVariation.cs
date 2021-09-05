@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -8,9 +6,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
 	public class BlobVariation : FlameVariationMultipleParameters
 	{
-		private double high;
-		private double low;
-		private double waves;
+		private readonly double high;
+		private readonly double low;
+		private readonly double waves;
 
 		public BlobVariation(ScriptNode high, ScriptNode low, ScriptNode waves, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { high, low, waves }, new ArgumentType[] { ArgumentType.Scalar,
@@ -51,11 +49,11 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
 		public override void Operate(ref double x, ref double y)
 		{
-			double r = System.Math.Sqrt(x * x + y * y);
-			double a = System.Math.Atan2(x, y);
-			r *= this.low + (this.high - this.low) * 0.5 * (System.Math.Sin(this.waves * a) + 1);
-			x = r * System.Math.Cos(a);
-			y = r * System.Math.Sin(a);
+			double r = Math.Sqrt(x * x + y * y);
+			double a = Math.Atan2(x, y);
+			r *= this.low + (this.high - this.low) * 0.5 * (Math.Sin(this.waves * a) + 1);
+			x = r * Math.Cos(a);
+			y = r * Math.Sin(a);
 		}
 
 		public override string FunctionName

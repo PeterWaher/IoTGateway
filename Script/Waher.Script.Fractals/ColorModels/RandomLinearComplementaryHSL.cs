@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using SkiaSharp;
 using Waher.Script.Exceptions;
-using Waher.Script.Functions;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Abstraction.Elements;
 
@@ -182,7 +178,7 @@ namespace Waher.Script.Fractals.ColorModels
             return Result;
         }
 
-        private static Random gen = new Random();
+        private static readonly Random gen = new Random();
 
         public override string FunctionName
         {

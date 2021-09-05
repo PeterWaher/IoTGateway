@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -8,8 +6,8 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
     public class Disc2Variation : FlameVariationMultipleParameters
     {
-        private double rotation;
-        private double twist;
+        private readonly double rotation;
+        private readonly double twist;
 
         public Disc2Variation(ScriptNode rotation, ScriptNode twist, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { rotation, twist }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar },
@@ -46,9 +44,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         public override void Operate(ref double x, ref double y)
         {
-            double d2rtp = this.rotation * System.Math.PI;
-            double s0 = System.Math.Sin(this.twist);
-            double c0 = System.Math.Cos(this.twist);
+            double d2rtp = this.rotation * Math.PI;
+            double s0 = Math.Sin(this.twist);
+            double c0 = Math.Cos(this.twist);
 
             if (this.twist > pi2)
             {
@@ -65,15 +63,15 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
             }
 
-            double t = this.rotation * System.Math.PI * (x + y);
-            double sinr = System.Math.Sin(t);
-            double cosr = System.Math.Cos(t);
-            double r = System.Math.Atan2(x, y) / System.Math.PI;
+            double t = d2rtp * (x + y);
+            double sinr = Math.Sin(t);
+            double cosr = Math.Cos(t);
+            double r = Math.Atan2(x, y) / Math.PI;
             x = (sinr + c0) * r;
             y = (cosr + s0) * r;
         }
 
-        private const double pi2 = 2 * System.Math.PI;
+        private const double pi2 = 2 * Math.PI;
 
         public override string FunctionName
         {

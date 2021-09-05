@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -8,7 +6,7 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
     public class RadialBlurVariation : FlameVariationOneParameter
     {
-        private double angle;
+        private readonly double angle;
 
 		public RadialBlurVariation(ScriptNode Parameter, int Start, int Length, Expression Expression)
             : base(Parameter, Start, Length, Expression)
@@ -28,7 +26,7 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         public override void Operate(ref double x, ref double y)
         {
-            double p1 = this.angle * System.Math.PI / 2;
+            double p1 = this.angle * Math.PI / 2;
             double r1, r2, r3, r4;
 
             lock (this.gen)
@@ -40,14 +38,14 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             }
 
             double t1 = (r1 + r2 + r3 + r4 - 2) / this.variationWeight;
-            double t2 = System.Math.Atan2(y, x) + t1 * System.Math.Sin(p1);
-            double t3 = t1 * System.Math.Cos(p1) - 1;
-            double r = System.Math.Sqrt(x * x + y * y);
-            x = (System.Math.Cos(t2) * r + t3 * x) / this.variationWeight;
-            y = (System.Math.Sin(t2) * r + t3 * y) / this.variationWeight;
+            double t2 = Math.Atan2(y, x) + t1 * Math.Sin(p1);
+            double t3 = t1 * Math.Cos(p1) - 1;
+            double r = Math.Sqrt(x * x + y * y);
+            x = (Math.Cos(t2) * r + t3 * x) / this.variationWeight;
+            y = (Math.Sin(t2) * r + t3 * y) / this.variationWeight;
         }
 
-        private Random gen = new Random();
+        private readonly Random gen = new Random();
 
         public override string FunctionName
         {

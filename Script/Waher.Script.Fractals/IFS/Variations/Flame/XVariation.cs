@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Numerics;
-using Waher.Script.Abstraction.Elements;
-using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
@@ -16,10 +11,10 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         public override void Operate(ref double x, ref double y)
         {
-            double r = System.Math.Sqrt(x * x + y * y);
-            double a = System.Math.Atan2(x, y);
-            double p0 = System.Math.Sin(a + r);
-            double p1 = System.Math.Cos(a - r);
+            double r = Math.Sqrt(x * x + y * y);
+            double a = Math.Atan2(x, y);
+            double p0 = Math.Sin(a + r);
+            double p1 = Math.Cos(a - r);
             p0 = p0 * p0 * p0;
             p1 = p1 * p1 * p1;
             x = r * (p0 + p1);

@@ -5,7 +5,6 @@ using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Exceptions;
-using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Fractals.ComplexFractals
@@ -157,7 +156,6 @@ namespace Waher.Script.Fractals.ComplexFractals
         private string FractalZoomScript(double r, double i, double Size, object State)
         {
             object[] Parameters = (object[])State;
-            SKColor[] Palette = (SKColor[])Parameters[0];
             int DimX = (int)Parameters[1];
             int DimY = (int)Parameters[2];
             double Rr = (double)Parameters[3];
@@ -264,24 +262,24 @@ namespace Waher.Script.Fractals.ComplexFractals
                         // = exp(pr*ln|z|-pi*arg(z)+i*(pi*ln|z|+pr*arg(z)))-1 =
                         // = exp(pr*ln|z|-pi*arg(z))*(cos(pi*ln|z|+pr*arg(z))+i*sin(pi*ln|z|+pr*arg(z)))-1
 
-                        lnz = System.Math.Log(Math.Sqrt(zr * zr + zi * zi));
-                        argz = System.Math.Atan2(zi, zr);
-                        amp = System.Math.Exp(pr * lnz - pi * argz);
+                        lnz = Math.Log(Math.Sqrt(zr * zr + zi * zi));
+                        argz = Math.Atan2(zi, zr);
+                        amp = Math.Exp(pr * lnz - pi * argz);
                         phi = pi * lnz + pr * argz;
 
-                        zr2 = amp * System.Math.Cos(phi) - 1;
-                        zi2 = amp * System.Math.Sin(phi);
+                        zr2 = amp * Math.Cos(phi) - 1;
+                        zi2 = amp * Math.Sin(phi);
 
                         // f': z->p*z^(p-1) = p*exp((p-1)*ln(z)) =
                         // = (pr+i*pi)*exp((pr-1+i*pi)*(ln|z|+i*arg(z))) =
                         // = (pr+i*pi)*exp((pr-1)*ln|z|-pi*arg(z)+i*(pi*ln|z|+(pr-1)*arg(z))) =
                         // = (pr+i*pi)*exp((pr-1)*ln|z|-pi*arg(z))(sin(pi*ln|z|+(pr-1)*arg(z))+i*cos(pi*ln|z|+(pr-1)*arg(z))) =
 
-                        amp = System.Math.Exp((pr - 1) * lnz - pi * argz);
+                        amp = Math.Exp((pr - 1) * lnz - pi * argz);
                         phi = pi * lnz + (pr - 1) * argz;
 
-                        zr3 = amp * System.Math.Cos(phi);
-                        zi3 = amp * System.Math.Sin(phi);
+                        zr3 = amp * Math.Cos(phi);
+                        zi3 = amp * Math.Sin(phi);
 
                         Temp = pr * zr3 - pi * zi3;
                         zi3 = pr * zi3 + pi * zr3;

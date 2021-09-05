@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using Waher.Script.Abstraction.Elements;
-using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
 {
-    public class zATanVariation : FlameVariationZeroParameters
+    public class ZATanVariation : FlameVariationZeroParameters
     {
-        public zATanVariation(int Start, int Length, Expression Expression)
+        public ZATanVariation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }

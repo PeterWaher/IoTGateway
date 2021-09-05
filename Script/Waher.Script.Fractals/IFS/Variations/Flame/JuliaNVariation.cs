@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -8,8 +6,8 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
     public class JuliaNVariation : FlameVariationMultipleParameters
     {
-        private double dist;
-        private int power;
+        private readonly double dist;
+        private readonly int power;
 
         public JuliaNVariation(ScriptNode power, ScriptNode dist, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { power, dist }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar },
@@ -49,18 +47,18 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
             lock (this.gen)
             {
-                p3 = this.gen.Next(System.Math.Abs(this.power));
+                p3 = this.gen.Next(Math.Abs(this.power));
             }
 
-            double a = System.Math.Atan2(y, x);
-            double t = (a + 2 * System.Math.PI * p3) / this.power;
-            double r = System.Math.Pow(System.Math.Sqrt(x * x + y * y), this.dist / this.power);
+            double a = Math.Atan2(y, x);
+            double t = (a + 2 * Math.PI * p3) / this.power;
+            double r = Math.Pow(Math.Sqrt(x * x + y * y), this.dist / this.power);
             
-            x = r * System.Math.Cos(t);
-            y = r * System.Math.Sin(t);
+            x = r * Math.Cos(t);
+            y = r * Math.Sin(t);
         }
 
-        private Random gen = new Random();
+        private readonly Random gen = new Random();
 
         public override string FunctionName
         {

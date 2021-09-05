@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -8,9 +6,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
     public class PieVariation : FlameVariationMultipleParameters
     {
-        private double slices;
-        private double rotation;
-        private double thickness;
+        private readonly double slices;
+        private readonly double rotation;
+        private readonly double thickness;
 
 		public PieVariation(ScriptNode slices, ScriptNode rotation, ScriptNode thickness, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { slices, rotation, thickness }, new ArgumentType[] { ArgumentType.Scalar,
@@ -62,13 +60,13 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
                 rnd3 = this.gen.NextDouble();
             }
 
-            double t1 = System.Math.Round(this.slices * rnd1);
-            double t2 = this.rotation + 2 * System.Math.PI / this.slices * (t1 + rnd2 * this.thickness);
-            x = rnd3 * System.Math.Cos(t2);
-            y = rnd3 * System.Math.Sin(t2);
+            double t1 = Math.Round(this.slices * rnd1);
+            double t2 = this.rotation + 2 * Math.PI / this.slices * (t1 + rnd2 * this.thickness);
+            x = rnd3 * Math.Cos(t2);
+            y = rnd3 * Math.Sin(t2);
         }
 
-        private Random gen = new Random();
+        private readonly Random gen = new Random();
 
         public override string FunctionName
         {

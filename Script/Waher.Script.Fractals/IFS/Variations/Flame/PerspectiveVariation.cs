@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -8,8 +6,8 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
     public class PerspectiveVariation : FlameVariationMultipleParameters
     {
-        private double angle;
-        private double distance;
+        private readonly double angle;
+        private readonly double distance;
 
 		public PerspectiveVariation(ScriptNode angle, ScriptNode distance, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { angle, distance }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar },
@@ -45,9 +43,9 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         public override void Operate(ref double x, ref double y)
         {
-            double d = this.distance / (this.distance - y * System.Math.Sin(this.angle));
+            double d = this.distance / (this.distance - y * Math.Sin(this.angle));
             x *= d;
-            y *= d * System.Math.Cos(this.angle);
+            y *= d * Math.Cos(this.angle);
         }
 
         public override string FunctionName

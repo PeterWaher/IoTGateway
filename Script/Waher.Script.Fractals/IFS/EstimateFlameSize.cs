@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Threading;
 using System.Collections.Generic;
-using System.Text;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects.VectorSpaces;
 
@@ -77,21 +74,18 @@ namespace Waher.Script.Fractals.IFS
                 throw new ScriptRuntimeException("N in calls to EstimateFlameSize() must be a positive integer.", this);
 
             object Obj = Arguments[i].AssociatedObjectValue;
-            string FunctionsExpression = this.Arguments[i++].SubExpression;
 
 			if (!(Obj is Array FlameArray))
 				throw new ScriptRuntimeException("the second parameter to EstimateFlameSize must be an array, containing flame definitions.", this);
 
 			List<FlameFunction> FlameFunctions = new List<FlameFunction>();
-            DoubleMatrix M;
             double Weight;
             FlameFunction CurrentFunction = null;
 
             foreach (object FlameItem in FlameArray)
             {
-                if (FlameItem is DoubleMatrix)
+                if (FlameItem is DoubleMatrix M)
                 {
-                    M = (DoubleMatrix)FlameItem;
                     CurrentFunction = new FlameFunction(M, this);
                     FlameFunctions.Add(CurrentFunction);
                 }
@@ -109,7 +103,7 @@ namespace Waher.Script.Fractals.IFS
                     
                     CurrentFunction.SetColorHsl(H, S, L);
                 }
-                else if (FlameItem is IFlameVariation)
+                else if (FlameItem is IFlameVariation Var)
                 {
                     if (CurrentFunction is null)
                     {
@@ -118,9 +112,9 @@ namespace Waher.Script.Fractals.IFS
                         FlameFunctions.Add(CurrentFunction);
                     }
 
-                    CurrentFunction.Add((IFlameVariation)FlameItem);
+                    CurrentFunction.Add(Var);
                 }
-                else if (FlameItem is ILambdaExpression)
+                else if (FlameItem is ILambdaExpression Lambda)
                 {
                     if (CurrentFunction is null)
                     {
@@ -129,7 +123,7 @@ namespace Waher.Script.Fractals.IFS
                         FlameFunctions.Add(CurrentFunction);
                     }
 
-                    CurrentFunction.Add((ILambdaExpression)FlameItem);
+                    CurrentFunction.Add(Lambda);
                 }
                 else
                 {
@@ -191,7 +185,7 @@ namespace Waher.Script.Fractals.IFS
 			return new DoubleVector(xc, yc, dr);
         }
 
-		private static Random gen = new Random();
+		private static readonly Random gen = new Random();
 
 	}
 }

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using Waher.Script.Abstraction.Elements;
-using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.Flame
 {
@@ -23,12 +19,12 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
                 r2 = this.gen.NextDouble();
             }
 
-            r2 *= System.Math.PI * 2;
-            x *= r1 * System.Math.Cos(r2);
-            y *= r1 * System.Math.Sin(r2);
+            r2 *= Math.PI * 2;
+            x *= r1 * Math.Cos(r2);
+            y *= r1 * Math.Sin(r2);
         }
 
-        private Random gen = new Random();
+        private readonly Random gen = new Random();
 
         public override string FunctionName
         {

@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using Waher.Script.Abstraction.Elements;
-using Waher.Script.Model;
 
 namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
 {
-    public class zCubeVariation : FlameVariationZeroParameters
+    public class ZCubeVariation : FlameVariationZeroParameters
     {
-        public zCubeVariation(int Start, int Length, Expression Expression)
+        public ZCubeVariation(int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
         }

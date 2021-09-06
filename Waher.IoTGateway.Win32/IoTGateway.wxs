@@ -648,6 +648,7 @@
 							<File Id='Waher.Security.Users.dll' Name='Waher.Security.Users.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.Users.dll' Vital='yes'/>
 							<File Id='Waher.Theme.CactusRose.dll' Name='Waher.Theme.CactusRose.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.CactusRose.dll'/>
 							<File Id='Waher.Theme.GothicPeacock.dll' Name='Waher.Theme.GothicPeacock.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.GothicPeacock.dll'/>
+							<File Id='Waher.Theme.SpaceGravel.dll' Name='Waher.Theme.SpaceGravel.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.SpaceGravel.dll'/>
 							<File Id='Waher.Theme.WinterDawn.dll' Name='Waher.Theme.WinterDawn.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.WinterDawn.dll'/>
 							<File Id='Waher.Things.dll' Name='Waher.Things.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.dll' Vital='yes'/>
 							<File Id='Waher.Things.IP.dll' Name='Waher.Things.IP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.IP.dll' Vital='yes'/>
@@ -755,6 +756,7 @@
 							<RemoveFile Id='RemoveWaher.Security.Users.dll' Name='Waher.Security.Users.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Theme.CactusRose.dll' Name='Waher.Theme.CactusRose.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Theme.GothicPeacock.dll' Name='Waher.Theme.GothicPeacock.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Theme.SpaceGravel.dll' Name='Waher.Theme.SpaceGravel.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Theme.WinterDawn.dll' Name='Waher.Theme.WinterDawn.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.dll' Name='Waher.Things.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.IP.dll' Name='Waher.Things.IP.dll' On='uninstall'/>
@@ -1890,6 +1892,24 @@
 									<RemoveFile Id='RemoveGothicPeacock1600x1600Dimmed.png' Name='GothicPeacock1600x1600Dimmed.png' On='uninstall'/>
 								</Component>
 							</Directory>
+							<Directory Id='SpaceGravel' Name='SpaceGravel'>
+								<Component Id='SpaceGravelFiles' Guid='1BBE23EC-09F7-44CE-BB4D-31C91403E8E4'>
+									<CreateFolder>
+										<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+									</CreateFolder>
+									<RemoveFolder Id='RemoveSpaceGravel' On='uninstall' />
+									<File Id='SpaceGravel.cssx' Name='SpaceGravel.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\SpaceGravel\SpaceGravel.cssx'/>
+									<File Id='SpaceGravel.xml' Name='SpaceGravel.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\SpaceGravel\SpaceGravel.xml'/>
+									<File Id='SpaceGravel.png' Name='SpaceGravel.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\SpaceGravel\SpaceGravel.png'/>
+									<File Id='SpaceGravel800x800.png' Name='SpaceGravel800x800.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\SpaceGravel\SpaceGravel800x800.png'/>
+									<File Id='SpaceGravel1600x1600.png' Name='SpaceGravel1600x1600.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\SpaceGravel\SpaceGravel1600x1600.png'/>
+									<RemoveFile Id='RemoveSpaceGravel.cssx' Name='SpaceGravel.cssx' On='uninstall'/>
+									<RemoveFile Id='RemoveSpaceGravel.xml' Name='SpaceGravel.xml' On='uninstall'/>
+									<RemoveFile Id='RemoveSpaceGravel.png' Name='SpaceGravel.png' On='uninstall'/>
+									<RemoveFile Id='RemoveSpaceGravel800x800.png' Name='SpaceGravel800x800.png' On='uninstall'/>
+									<RemoveFile Id='RemoveSpaceGravel1600x1600.png' Name='SpaceGravel1600x1600.png' On='uninstall'/>
+								</Component>
+							</Directory>
 							<Directory Id='WinterDawn' Name='WinterDawn'>
 								<Component Id='WinterDawnFiles' Guid='84D79AA3-B199-43EF-8772-5C38DDF72F2D'>
 									<CreateFolder>
@@ -2026,6 +2046,7 @@
 				<ComponentRef Id='TemplateFiles' />
 				<ComponentRef Id='CactusRoseFiles'/>
 				<ComponentRef Id='GothicPeacockFiles'/>
+				<ComponentRef Id='SpaceGravelFiles'/>
 				<ComponentRef Id='WinterDawnFiles'/>
 				<ComponentRef Id='VideoFiles' />
 				<ComponentRef Id='TransformFiles' />

@@ -1,0 +1,71 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Product>Waher.IoTGateway</Product>
+    <Description>Contains theme files for the Space Gravel theme.</Description>
+    <Copyright>Copyright © Waher Data AB 2021. All rights reserved.</Copyright>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Themes/Waher.Theme.SpaceGravel</PackageProjectUrl>
+    <PackageIcon>Icon_64x64.png</PackageIcon>
+    <PackageIconUrl />
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>IoT Gateway Theme</PackageTags>
+    <NeutralLanguage>English</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Root\Themes\SpaceGravel\SpaceGravel.cssx" />
+    <None Remove="Root\Themes\SpaceGravel\SpaceGravel.png" />
+    <None Remove="Root\Themes\SpaceGravel\SpaceGravel.xml" />
+    <None Remove="Root\Themes\SpaceGravel\SpaceGravel00x800.png" />
+    <None Remove="Root\Themes\SpaceGravel\SpaceGravel1600x1600.png" />
+    <None Remove="Root\Themes\SpaceGravel\SpaceGravel600x1600.png" />
+    <None Remove="Root\Themes\SpaceGravel\SpaceGravel800x800.png" />
+    <None Remove="Waher.Theme.SpaceGravel.manifest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Root\Themes\SpaceGravel\SpaceGravel.cssx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\SpaceGravel\SpaceGravel.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\SpaceGravel\SpaceGravel.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\SpaceGravel\SpaceGravel00x800.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Themes\SpaceGravel\SpaceGravel600x1600.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Waher.Theme.SpaceGravel.manifest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Images\Icon_64x64.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy &quot;$(OutDir)Root\*.*&quot; &quot;C:\ProgramData\IoT Gateway Dev\Root&quot; /S /Y" />
+  </Target>
+
+</Project>

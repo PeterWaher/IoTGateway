@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Theme id="SpaceGravel" xmlns="http://waher.se/Schema/Theme.xsd">
+	<Presentation>
+		<Title>Space Gravel</Title>
+		<Thumbnail width="480" height="270">SpaceGravel.png</Thumbnail>
+	</Presentation>
+	<BasicProperties>
+		<CSSX>SpaceGravel.cssx</CSSX>
+		<TextColor>#F8F8F8</TextColor>
+		<BackgroundColor>#000000C0</BackgroundColor>
+		<HeaderColor>#c5bb86</HeaderColor>
+		<HeaderTextColor>#F8F8F8</HeaderTextColor>
+		<ButtonColor>#5e583d</ButtonColor>
+		<ButtonTextColor>#F8F8F8</ButtonTextColor>
+		<MenuTextColor>#F8F8F8</MenuTextColor>
+		<InsertColor>#00A00040</InsertColor>
+		<DeleteColor>#A0000040</DeleteColor>
+		<LinkColorUnvisited>#c5bb86</LinkColorUnvisited>
+		<LinkColorVisited>#c5bb86</LinkColorVisited>
+		<LinkColorHot>#ede1a1</LinkColorHot>
+		<FontFamily>"Segoe UI", "Segoe UI Web Regular", "Segoe UI Symbol", "Helvetica Neue", "BBAlpha Sans", "S60 Sans", Arial, sans-serif</FontFamily>
+	</BasicProperties>
+	<CustomProperties>
+		<Property name="PosColor" value="#399356"/>
+		<Property name="PosSelectedColor" value="#B5E3C4"/>
+		<Property name="NegColor" value="#D83134"/>
+		<Property name="TagColor" value="#4C83AE"/>
+		<Property name="DropDownColor" value="#E4F0FE"/>
+		<Property name="RestrictionColor" value="#EB9500"/>
+		<Property name="PublishColor" value="#4CAF50"/>
+		<Property name="EditorColor" value="#68217A"/>
+	</CustomProperties>
+	<BackgroundImages>
+		<BackgroundImage width="1600" height="1600">SpaceGravel600x1600.png</BackgroundImage>
+		<BackgroundImage width="800" height="800">SpaceGravel00x800.png</BackgroundImage>
+	</BackgroundImages>
+	<BannerImages>
+	</BannerImages>
+</Theme>

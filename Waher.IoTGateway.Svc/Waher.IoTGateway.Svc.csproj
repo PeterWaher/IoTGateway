@@ -135,6 +135,7 @@
     <ProjectReference Include="..\Security\Waher.Security\Waher.Security.csproj" />
     <ProjectReference Include="..\Themes\Waher.Theme.CactusRose\Waher.Theme.CactusRose.csproj" />
     <ProjectReference Include="..\Themes\Waher.Theme.GothicPeacock\Waher.Theme.GothicPeacock.csproj" />
+    <ProjectReference Include="..\Themes\Waher.Theme.SpaceGravel\Waher.Theme.SpaceGravel.csproj" />
     <ProjectReference Include="..\Themes\Waher.Theme.WinterDawn\Waher.Theme.WinterDawn.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Ip\Waher.Things.Ip.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj" />

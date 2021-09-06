@@ -1,0 +1,16 @@
+CreateBackground([Width],[Height],[N],[Seed]):=
+(
+	Palette:=RandomLinearAnalogousHSL(256, 16, Seed);
+	Canvas:=Canvas(Width,Height);
+	Canvas.Color("Black");
+	Canvas.Clear();
+	foreach x in 1..N do
+	(
+		Canvas.Color(Palette[floor(Uniform(0,256))]);
+		Canvas.Plot(Uniform(0,Width),Uniform(0,Height))
+	);
+	SmoothImage(Canvas)
+);
+
+SpaceGravel800x800:=CreateBackground(800,800,1000,213450666);
+SpaceGravel800x800Dimmed:=Blend(SpaceGravel800x800,"White",0.65);

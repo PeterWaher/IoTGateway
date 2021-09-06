@@ -1,0 +1,13 @@
+﻿<Module xmlns="http://waher.se/Schema/ModuleManifest.xsd">
+  <Folder name="Root">
+		<Folder name="Themes">
+			<Folder name="SpaceGravel">
+				<Content fileName="SpaceGravel.xml"/>
+				<Content fileName="SpaceGravel.cssx"/>
+				<Content fileName="SpaceGravel.png"/>
+				<Content fileName="SpaceGravel800x800.png"/>
+				<Content fileName="SpaceGravel1600x1600.png"/>
+			</Folder>
+		</Folder>
+  </Folder>
+</Module>

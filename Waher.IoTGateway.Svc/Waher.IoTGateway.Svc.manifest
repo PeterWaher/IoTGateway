@@ -348,6 +348,7 @@
 	<Assembly fileName='Waher.Security.Users.dll'/>
 	<Assembly fileName='Waher.Theme.CactusRose.dll'/>
 	<Assembly fileName='Waher.Theme.GothicPeacock.dll'/>
+	<Assembly fileName='Waher.Theme.SpaceGravel.dll'/>
 	<Assembly fileName='Waher.Theme.WinterDawn.dll'/>
 	<Assembly fileName='Waher.Things.dll'/>
 	<Assembly fileName='Waher.Things.IP.dll'/>
@@ -712,6 +713,13 @@
 				<Content fileName='GothicPeacock800x800Dimmed.png'/>
 				<Content fileName='GothicPeacock1600x1600.png'/>
 				<Content fileName='GothicPeacock1600x1600Dimmed.png'/>
+			</Folder>
+			<Folder name='SpaceGravel'>
+				<Content fileName='SpaceGravel.cssx'/>
+				<Content fileName='SpaceGravel.xml'/>
+				<Content fileName='SpaceGravel.png'/>
+				<Content fileName='SpaceGravel800x800.png'/>
+				<Content fileName='SpaceGravel1600x1600.png'/>
 			</Folder>
 			<Folder name='WinterDawn'>
 				<Content fileName='WinterDawn.cssx'/>

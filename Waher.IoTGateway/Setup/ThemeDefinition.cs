@@ -346,6 +346,9 @@ namespace Waher.IoTGateway.Setup
 				}
 			}
 
+			if (Best is null)
+				throw new InvalidOperationException("No such images defined in theme.");
+
 			return Best;
 		}
 

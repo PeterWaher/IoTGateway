@@ -80,12 +80,12 @@
 									<xs:documentation>Backgound color for inserted text.</xs:documentation>
 								</xs:annotation>
 							</xs:element>
-              <xs:element name="DeleteColor" type="Color">
-                <xs:annotation>
-                  <xs:documentation>Backgound color for deleted text.</xs:documentation>
-                </xs:annotation>
-              </xs:element>
-              <xs:element name="LinkColorUnvisited" type="Color">
+							<xs:element name="DeleteColor" type="Color">
+								<xs:annotation>
+									<xs:documentation>Backgound color for deleted text.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="LinkColorUnvisited" type="Color">
 								<xs:annotation>
 									<xs:documentation>Color of unvisited links.</xs:documentation>
 								</xs:annotation>
@@ -132,7 +132,7 @@
 					</xs:annotation>
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="BackgroundImage" minOccurs="1" maxOccurs="unbounded">
+							<xs:element name="BackgroundImage" minOccurs="0" maxOccurs="unbounded">
 								<xs:annotation>
 									<xs:documentation>One background image.</xs:documentation>
 								</xs:annotation>
@@ -146,7 +146,7 @@
 					</xs:annotation>
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="BannerImage" minOccurs="1" maxOccurs="unbounded">
+							<xs:element name="BannerImage" minOccurs="0" maxOccurs="unbounded">
 								<xs:annotation>
 									<xs:documentation>One banner image.</xs:documentation>
 								</xs:annotation>

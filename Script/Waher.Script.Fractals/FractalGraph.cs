@@ -1,10 +1,7 @@
 ﻿using System;
-using System.IO;
 using SkiaSharp;
-using Waher.Script;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Fractals
@@ -135,8 +132,8 @@ namespace Waher.Script.Fractals
 			int DynamicPixels = Size;
 			double Sum = Size;
 			bool DoPreview = Node.Expression.HandlesPreview;
-			System.DateTime LastPreview = System.DateTime.Now;
-			System.DateTime TP;
+			DateTime LastPreview = DateTime.Now;
+			DateTime TP;
 
 			for (Index = 0; Index < Size; Index++)
 			{
@@ -144,10 +141,10 @@ namespace Waher.Script.Fractals
 					DynamicPixels--;
 			}
 
-			System.DateTime Start = System.DateTime.Now;
-			System.TimeSpan Limit = new System.TimeSpan(1, 0, 0);
+			DateTime Start = DateTime.Now;
+			TimeSpan Limit = new TimeSpan(1, 0, 0);
 
-			while (100 * Sum / DynamicPixels > LimitPercentChange && Iterations < 50000 && (System.DateTime.Now - Start) < Limit)
+			while (100 * Sum / DynamicPixels > LimitPercentChange && Iterations < 50000 && (DateTime.Now - Start) < Limit)
 			{
 				Sum = 0;
 
@@ -184,7 +181,7 @@ namespace Waher.Script.Fractals
 
 				Iterations++;
 
-				TP = System.DateTime.Now;
+				TP = DateTime.Now;
 				if ((TP - LastPreview).TotalSeconds > 5)
 				{
 					if (!(Node is null))
@@ -192,8 +189,161 @@ namespace Waher.Script.Fractals
 						LastPreview = TP;
 
 						if (DoPreview)
-							Node.Expression.Preview(new GraphBitmap(
-								FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
+							Node.Expression.Preview(new GraphBitmap(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
+
+						Node.Expression.Status("Smoothing. Change: " + (100 * Sum / DynamicPixels).ToString("F3") + "%, Limit: " + LimitPercentChange.ToString("F3") + "%, Iterations: " + Iterations.ToString());
+					}
+				}
+			}
+
+			Variables.ConsoleOut.Write("Iterations: " + Iterations.ToString());
+			Node.Expression.Status(string.Empty);
+		}
+
+		public static void Smooth(double[] R, double[] G, double[] B, double[] A, 
+			double[] BoundaryR, double[] BoundaryG, double[] BoundaryB, double[] BoundaryA, 
+			int Width, int Height, ScriptNode Node, Variables Variables)
+		{
+			// Passing color components through the heat equation of 2 spatial dimensions, 
+			// maintaining the boundary values fixed in each step.
+			//
+			// du       ( d2u   d2u )
+			// -- = a * | --- + --- |
+			// dt       ( dx2   dy2 )
+			//
+			// the following difference equations will be used to estimate the derivatives:
+			//
+			//         f(x+h)-2f(x)+f(x-h)
+			// f"(x) = ------------------- + O(h^2)
+			//                 h^2
+			//
+			// at the edges, we let f"(x)=0.
+
+			int Size = Width * Height;
+			double[] DeltaR = new double[Size];
+			double[] DeltaG = new double[Size];
+			double[] DeltaB = new double[Size];
+			double[] DeltaA = new double[Size];
+			double uxx, uyy;
+			double d;
+			int Iterations = 0;
+			int Index;
+			int x, y;
+			int DynamicPixels = Size;
+			double Sum = Size;
+			bool DoPreview = Node.Expression.HandlesPreview;
+			DateTime LastPreview = DateTime.Now;
+			DateTime TP;
+
+			for (Index = 0; Index < Size; Index++)
+			{
+				if (BoundaryR[Index] >= 0)
+					DynamicPixels--;
+			}
+
+			DateTime Start = DateTime.Now;
+			TimeSpan Limit = new TimeSpan(1, 0, 0);
+
+			while (100 * Sum / DynamicPixels > LimitPercentChange && Iterations < 50000 && (DateTime.Now - Start) < Limit)
+			{
+				Sum = 0;
+
+				for (y = Index = 0; y < Height; y++)
+				{
+					for (x = 0; x < Width; x++)
+					{
+						if (BoundaryR[Index] >= 0 || BoundaryG[Index] >= 0 || BoundaryB[Index] >= 0 || BoundaryA[Index] >= 0)
+						{
+							DeltaR[Index] = 0;
+							DeltaG[Index] = 0;
+							DeltaB[Index] = 0;
+							DeltaA[Index++] = 0;
+							continue;
+						}
+
+						d = 2 * R[Index];
+						if (x == 0 || x == Width - 1)
+							uxx = 0;
+						else
+							uxx = R[Index - 1] - d + R[Index + 1];
+
+						if (y == 0 || y == Height - 1)
+							uyy = 0;
+						else
+							uyy = R[Index - Width] - d + R[Index + Width];
+
+						d = 0.2 * (uxx + uyy);
+						DeltaR[Index] = d;
+						Sum += Math.Abs(d);
+
+						d = 2 * G[Index];
+						if (x == 0 || x == Width - 1)
+							uxx = 0;
+						else
+							uxx = G[Index - 1] - d + G[Index + 1];
+
+						if (y == 0 || y == Height - 1)
+							uyy = 0;
+						else
+							uyy = G[Index - Width] - d + G[Index + Width];
+
+						d = 0.2 * (uxx + uyy);
+						DeltaG[Index] = d;
+						Sum += Math.Abs(d);
+
+						d = 2 * B[Index];
+						if (x == 0 || x == Width - 1)
+							uxx = 0;
+						else
+							uxx = B[Index - 1] - d + B[Index + 1];
+
+						if (y == 0 || y == Height - 1)
+							uyy = 0;
+						else
+							uyy = B[Index - Width] - d + B[Index + Width];
+
+						d = 0.2 * (uxx + uyy);
+						DeltaB[Index] = d;
+						Sum += Math.Abs(d);
+
+						d = 2 * A[Index];
+						if (x == 0 || x == Width - 1)
+							uxx = 0;
+						else
+							uxx = A[Index - 1] - d + A[Index + 1];
+
+						if (y == 0 || y == Height - 1)
+							uyy = 0;
+						else
+							uyy = A[Index - Width] - d + A[Index + Width];
+
+						d = 0.2 * (uxx + uyy);
+						DeltaA[Index] = d;
+						Sum += Math.Abs(d);
+
+						Index++;
+					}
+				}
+
+				for (Index = 0; Index < Size; Index++)
+				{
+					R[Index] += DeltaR[Index];
+					G[Index] += DeltaG[Index];
+					B[Index] += DeltaB[Index];
+					A[Index] += DeltaA[Index];
+				}
+
+				Iterations++;
+
+				TP = DateTime.Now;
+				if ((TP - LastPreview).TotalSeconds > 5)
+				{
+					if (!(Node is null))
+					{
+						LastPreview = TP;
+
+						if (DoPreview)
+							Node.Expression.Preview(new GraphBitmap(FractalGraph.ToPixels(R, G, B, A, Width, Height)));
 
 						Node.Expression.Status("Smoothing. Change: " + (100 * Sum / DynamicPixels).ToString("F3") + "%, Limit: " + LimitPercentChange.ToString("F3") + "%, Iterations: " + Iterations.ToString());
 					}
@@ -254,7 +404,7 @@ namespace Waher.Script.Fractals
 				{
 					d2 = ColorIndex[Index + Width];
 					if (d <= d2 && d > d2 - 2)
-						Boundary[0] = -1;
+						Boundary[Index] = -1;
 				}
 			}
 
@@ -272,7 +422,7 @@ namespace Waher.Script.Fractals
 					{
 						d2 = ColorIndex[Index + Width];
 						if (d <= d2 && d > d2 - 2)
-							Boundary[0] = -1;
+							Boundary[Index] = -1;
 					}
 				}
 
@@ -311,7 +461,7 @@ namespace Waher.Script.Fractals
 					{
 						d2 = ColorIndex[Index + Width];
 						if (d <= d2 && d > d2 - 2)
-							Boundary[0] = -1;
+							Boundary[Index] = -1;
 					}
 				}
 
@@ -325,7 +475,7 @@ namespace Waher.Script.Fractals
 			{
 				d2 = ColorIndex[Index - Width];
 				if (d <= d2 && d > d2 - 2)
-					Boundary[0] = -1;
+					Boundary[Index] = -1;
 			}
 
 			Index++;
@@ -356,7 +506,7 @@ namespace Waher.Script.Fractals
 			{
 				d2 = ColorIndex[Index - Width];
 				if (d <= d2 && d > d2 - 2)
-					Boundary[0] = -1;
+					Boundary[Index] = -1;
 			}
 
 			return Boundary;
@@ -412,7 +562,7 @@ namespace Waher.Script.Fractals
 				{
 					d2 = ColorIndex[Index + Width];
 					if (d <= d2 && d > d2 - 2)
-						Boundary[0] = -1;
+						Boundary[Index] = -1;
 				}
 			}
 
@@ -430,7 +580,7 @@ namespace Waher.Script.Fractals
 					{
 						d2 = ColorIndex[Index + Width];
 						if (d <= d2 && d > d2 - 2)
-							Boundary[0] = -1;
+							Boundary[Index] = -1;
 					}
 				}
 
@@ -469,7 +619,7 @@ namespace Waher.Script.Fractals
 					{
 						d2 = ColorIndex[Index + Width];
 						if (d <= d2 && d > d2 - 2)
-							Boundary[0] = -1;
+							Boundary[Index] = -1;
 					}
 				}
 
@@ -483,7 +633,7 @@ namespace Waher.Script.Fractals
 			{
 				d2 = ColorIndex[Index - Width];
 				if (d <= d2 && d > d2 - 2)
-					Boundary[0] = -1;
+					Boundary[Index] = -1;
 			}
 
 			Index++;
@@ -518,6 +668,428 @@ namespace Waher.Script.Fractals
 			}
 
 			return Boundary;
+		}
+
+		public static (double[], double[], double[], double[]) FindBoundaries(double[] R, double[] G, double[] B, double[] A, int Width, int Height)
+		{
+			// Finding boundary values:
+
+			double[] BoundaryR = (double[])R.Clone();
+			double[] BoundaryG = (double[])G.Clone();
+			double[] BoundaryB = (double[])B.Clone();
+			double[] BoundaryA = (double[])A.Clone();
+			double dR, dR2;
+			double dG, dG2;
+			double dB, dB2;
+			double dA, dA2;
+			int Index;
+			int x, y;
+
+			Index = 0;
+
+			dR = R[0];
+			dG = G[0];
+			dB = B[0];
+			dA = A[0];
+
+			dR2 = R[1];
+			dG2 = G[1];
+			dB2 = B[1];
+			dA2 = A[1];
+
+			if (dR <= dR2 && dR > dR2 - 2 &&
+				dG <= dG2 && dG > dG2 - 2 &&
+				dB <= dB2 && dB > dB2 - 2 &&
+				dA <= dA2 && dA > dA2 - 2)
+			{
+				dR2 = R[Width];
+				dG2 = G[Width];
+				dB2 = B[Width];
+				dA2 = A[Width];
+
+				if (dR <= dR2 && dR > dR2 - 2 &&
+					dG <= dG2 && dG > dG2 - 2 &&
+					dB <= dB2 && dB > dB2 - 2 &&
+					dA <= dA2 && dA > dA2 - 2)
+				{
+					BoundaryR[0] = -1;
+					BoundaryG[0] = -1;
+					BoundaryB[0] = -1;
+					BoundaryA[0] = -1;
+				}
+			}
+
+			Index++;
+
+			for (x = 2; x < Width; x++, Index++)
+			{
+				dR = R[Index];
+				dG = G[Index];
+				dB = B[Index];
+				dA = A[Index];
+
+				dR2 = R[Index + 1];
+				dG2 = G[Index + 1];
+				dB2 = B[Index + 1];
+				dA2 = A[Index + 1];
+
+				if (dR > dR2 || dR <= dR2 - 2 &&
+					dG > dG2 || dG <= dG2 - 2 &&
+					dB > dB2 || dB <= dB2 - 2 &&
+					dA > dA2 || dA <= dA2 - 2)
+				{
+					continue;
+				}
+
+				dR2 = R[Index - 1];
+				dG2 = G[Index - 1];
+				dB2 = B[Index - 1];
+				dA2 = A[Index - 1];
+
+				if (dR > dR2 || dR <= dR2 - 2 &&
+					dG > dG2 || dG <= dG2 - 2 &&
+					dB > dB2 || dB <= dB2 - 2 &&
+					dA > dA2 || dA <= dA2 - 2)
+				{
+					continue;
+				}
+
+				dR2 = R[Index + Width];
+				dG2 = G[Index + Width];
+				dB2 = B[Index + Width];
+				dA2 = A[Index + Width];
+
+				if (dR > dR2 || dR <= dR2 - 2 &&
+					dG > dG2 || dG <= dG2 - 2 &&
+					dB > dB2 || dB <= dB2 - 2 &&
+					dA > dA2 || dA <= dA2 - 2)
+				{
+					continue;
+				}
+
+				BoundaryR[Index] = -1;
+				BoundaryG[Index] = -1;
+				BoundaryB[Index] = -1;
+				BoundaryA[Index] = -1;
+			}
+
+			dR2 = R[Index];
+			dG2 = G[Index];
+			dB2 = B[Index];
+			dA2 = A[Index];
+
+			if (dR <= dR2 && dR > dR2 - 2 &&
+				dG <= dG2 && dG > dG2 - 2 &&
+				dB <= dB2 && dB > dB2 - 2 &&
+				dA <= dA2 && dA > dA2 - 2)
+			{
+				dR2 = R[Index - 1];
+				dG2 = G[Index - 1];
+				dB2 = B[Index - 1];
+				dA2 = A[Index - 1];
+
+				if (dR <= dR2 && dR > dR2 - 2 &&
+					dG <= dG2 && dG > dG2 - 2 &&
+					dB <= dB2 && dB > dB2 - 2 &&
+					dA <= dA2 && dA > dA2 - 2)
+				{
+					dR2 = R[Index + Width];
+					dG2 = G[Index + Width];
+					dB2 = B[Index + Width];
+					dA2 = A[Index + Width];
+
+					if (dR <= dR2 && dR > dR2 - 2 &&
+						dG <= dG2 && dG > dG2 - 2 &&
+						dB <= dB2 && dB > dB2 - 2 &&
+						dA <= dA2 && dA > dA2 - 2)
+					{
+						BoundaryR[Index] = -1;
+						BoundaryG[Index] = -1;
+						BoundaryB[Index] = -1;
+						BoundaryA[Index] = -1;
+					}
+				}
+			}
+
+			Index++;
+
+			for (y = 2; y < Height; y++)
+			{
+				dR = R[Index];
+				dG = G[Index];
+				dB = B[Index];
+				dA = A[Index];
+
+				dR2 = R[Index + 1];
+				dG2 = G[Index + 1];
+				dB2 = B[Index + 1];
+				dA2 = A[Index + 1];
+
+				if (dR <= dR2 && dR > dR2 - 2 &&
+					dG <= dG2 && dG > dG2 - 2 &&
+					dB <= dB2 && dB > dB2 - 2 &&
+					dA <= dA2 && dA > dA2 - 2)
+				{
+					dR2 = R[Index - Width];
+					dG2 = G[Index - Width];
+					dB2 = B[Index - Width];
+					dA2 = A[Index - Width];
+
+					if (dR <= dR2 && dR > dR2 - 2 &&
+						dG <= dG2 && dG > dG2 - 2 &&
+						dB <= dB2 && dB > dB2 - 2 &&
+						dA <= dA2 && dA > dA2 - 2)
+					{
+						dR2 = R[Index + Width];
+						dG2 = G[Index + Width];
+						dB2 = B[Index + Width];
+						dA2 = A[Index + Width];
+
+						if (dR <= dR2 && dR > dR2 - 2 &&
+							dG <= dG2 && dG > dG2 - 2 &&
+							dB <= dB2 && dB > dB2 - 2 &&
+							dA <= dA2 && dA > dA2 - 2)
+						{
+							BoundaryR[Index] = -1;
+							BoundaryG[Index] = -1;
+							BoundaryB[Index] = -1;
+							BoundaryA[Index] = -1;
+						}
+					}
+				}
+
+				Index++;
+
+				for (x = 2; x < Width; x++, Index++)
+				{
+					dR = R[Index];
+					dG = G[Index];
+					dB = B[Index];
+					dA = A[Index];
+
+					dR2 = R[Index + 1];
+					dG2 = G[Index + 1];
+					dB2 = B[Index + 1];
+					dA2 = A[Index + 1];
+
+					if (dR > dR2 || dR <= dR2 - 2 &&
+						dG > dG2 || dG <= dG2 - 2 &&
+						dB > dB2 || dB <= dB2 - 2 &&
+						dA > dA2 || dA <= dA2 - 2)
+					{
+						continue;
+					}
+
+					dR2 = R[Index - 1];
+					dG2 = G[Index - 1];
+					dB2 = B[Index - 1];
+					dA2 = A[Index - 1];
+
+					if (dR > dR2 || dR <= dR2 - 2 &&
+						dG > dG2 || dG <= dG2 - 2 &&
+						dB > dB2 || dB <= dB2 - 2 &&
+						dA > dA2 || dA <= dA2 - 2)
+					{
+						continue;
+					}
+
+					dR2 = R[Index + Width];
+					dG2 = G[Index + Width];
+					dB2 = B[Index + Width];
+					dA2 = A[Index + Width];
+
+					if (dR > dR2 || dR <= dR2 - 2 &&
+						dG > dG2 || dG <= dG2 - 2 &&
+						dB > dB2 || dB <= dB2 - 2 &&
+						dA > dA2 || dA <= dA2 - 2)
+					{
+						continue;
+					}
+
+					dR2 = R[Index - Width];
+					dG2 = G[Index - Width];
+					dB2 = B[Index - Width];
+					dA2 = A[Index - Width];
+
+					if (dR > dR2 || dR <= dR2 - 2 &&
+						dG > dG2 || dG <= dG2 - 2 &&
+						dB > dB2 || dB <= dB2 - 2 &&
+						dA > dA2 || dA <= dA2 - 2)
+					{
+						continue;
+					}
+
+					BoundaryR[Index] = -1;
+					BoundaryG[Index] = -1;
+					BoundaryB[Index] = -1;
+					BoundaryA[Index] = -1;
+				}
+
+				dR = R[Index];
+				dG = G[Index];
+				dB = B[Index];
+				dA = A[Index];
+
+				dR2 = R[Index - 1];
+				dG2 = G[Index - 1];
+				dB2 = B[Index - 1];
+				dA2 = A[Index - 1];
+
+				if (dR <= dR2 && dR > dR2 - 2 &&
+					dG <= dG2 && dG > dG2 - 2 &&
+					dB <= dB2 && dB > dB2 - 2 &&
+					dA <= dA2 && dA > dA2 - 2)
+				{
+					dR2 = R[Index - Width];
+					dG2 = G[Index - Width];
+					dB2 = B[Index - Width];
+					dA2 = A[Index - Width];
+
+					if (dR <= dR2 && dR > dR2 - 2 &&
+						dG <= dG2 && dG > dG2 - 2 &&
+						dB <= dB2 && dB > dB2 - 2 &&
+						dA <= dA2 && dA > dA2 - 2)
+					{
+						dR2 = R[Index + Width];
+						dG2 = G[Index + Width];
+						dB2 = B[Index + Width];
+						dA2 = A[Index + Width];
+
+						if (dR <= dR2 && dR > dR2 - 2 &&
+							dG <= dG2 && dG > dG2 - 2 &&
+							dB <= dB2 && dB > dB2 - 2 &&
+							dA <= dA2 && dA > dA2 - 2)
+						{
+							BoundaryR[Index] = -1;
+							BoundaryG[Index] = -1;
+							BoundaryB[Index] = -1;
+							BoundaryA[Index] = -1;
+						}
+					}
+				}
+
+				Index++;
+			}
+
+			dR = R[Index];
+			dG = G[Index];
+			dB = B[Index];
+			dA = A[Index];
+
+			dR2 = R[Index + 1];
+			dG2 = G[Index + 1];
+			dB2 = B[Index + 1];
+			dA2 = A[Index + 1];
+
+			if (dR <= dR2 && dR > dR2 - 2 &&
+				dG <= dG2 && dG > dG2 - 2 &&
+				dB <= dB2 && dB > dB2 - 2 &&
+				dA <= dA2 && dA > dA2 - 2)
+			{
+				dR2 = R[Index - Width];
+				dG2 = G[Index - Width];
+				dB2 = B[Index - Width];
+				dA2 = A[Index - Width];
+
+				if (dR <= dR2 && dR > dR2 - 2 &&
+					dG <= dG2 && dG > dG2 - 2 &&
+					dB <= dB2 && dB > dB2 - 2 &&
+					dA <= dA2 && dA > dA2 - 2)
+				{
+					BoundaryR[Index] = -1;
+					BoundaryG[Index] = -1;
+					BoundaryB[Index] = -1;
+					BoundaryA[Index] = -1;
+				}
+			}
+
+			Index++;
+
+			for (x = 2; x < Width; x++, Index++)
+			{
+				dR = R[Index];
+				dG = G[Index];
+				dB = B[Index];
+				dA = A[Index];
+
+				dR2 = R[Index + 1];
+				dG2 = G[Index + 1];
+				dB2 = B[Index + 1];
+				dA2 = A[Index + 1];
+
+				if (dR > dR2 || dR <= dR2 - 2 &&
+					dG > dG2 || dG <= dG2 - 2 &&
+					dB > dB2 || dB <= dB2 - 2 &&
+					dA > dA2 || dA <= dA2 - 2)
+				{
+					continue;
+				}
+
+				dR2 = R[Index - 1];
+				dG2 = G[Index - 1];
+				dB2 = B[Index - 1];
+				dA2 = A[Index - 1];
+
+				if (dR > dR2 || dR <= dR2 - 2 &&
+					dG > dG2 || dG <= dG2 - 2 &&
+					dB > dB2 || dB <= dB2 - 2 &&
+					dA > dA2 || dA <= dA2 - 2)
+				{
+					continue;
+				}
+
+				dR2 = R[Index - Width];
+				dG2 = G[Index - Width];
+				dB2 = B[Index - Width];
+				dA2 = A[Index - Width];
+
+				if (dR > dR2 || dR <= dR2 - 2 &&
+					dG > dG2 || dG <= dG2 - 2 &&
+					dB > dB2 || dB <= dB2 - 2 &&
+					dA > dA2 || dA <= dA2 - 2)
+				{
+					continue;
+				}
+
+				BoundaryR[Index] = -1;
+				BoundaryG[Index] = -1;
+				BoundaryB[Index] = -1;
+				BoundaryA[Index] = -1;
+			}
+
+			dR = R[Index];
+			dG = G[Index];
+			dB = B[Index];
+			dA = A[Index];
+
+			dR2 = R[Index - 1];
+			dG2 = G[Index - 1];
+			dB2 = B[Index - 1];
+			dA2 = A[Index - 1];
+
+			if (dR <= dR2 && dR > dR2 - 2 &&
+				dG <= dG2 && dG > dG2 - 2 &&
+				dB <= dB2 && dB > dB2 - 2 &&
+				dA <= dA2 && dA > dA2 - 2)
+			{
+				dR2 = R[Index - Width];
+				dG2 = G[Index - Width];
+				dB2 = B[Index - Width];
+				dA2 = A[Index - Width];
+
+				if (dR <= dR2 && dR > dR2 - 2 &&
+					dG <= dG2 && dG > dG2 - 2 &&
+					dB <= dB2 && dB > dB2 - 2 &&
+					dA <= dA2 && dA > dA2 - 2)
+				{
+					BoundaryR[Index] = -1;
+					BoundaryG[Index] = -1;
+					BoundaryB[Index] = -1;
+					BoundaryA[Index] = -1;
+				}
+			}
+
+			return (BoundaryR, BoundaryG, BoundaryB, BoundaryA);
 		}
 
 		public static PixelInformation ToPixels(double[] ColorIndex, int Width, int Height, SKColor[] Palette)
@@ -638,6 +1210,33 @@ namespace Waher.Script.Fractals
 					rgb[Index2++] = reds[d];
 					rgb[Index2++] = 255;
 				}
+			}
+
+			return PixelInformation.FromRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
+		}
+
+		public static PixelInformation ToPixels(double[] R, double[] G, double[] B, double[] A, int Width, int Height)
+		{
+			int Size = Width * Height;
+			int Size4 = Size * 4;
+			byte[] rgb = new byte[Size4];
+			int Index2;
+			int ci;
+			int Index;
+
+			for (Index = Index2 = 0; Index < Size; Index++)
+			{
+				ci = (int)(B[Index] + 0.5);
+				rgb[Index2++] = (byte)(ci < 0 ? 0 : ci > 255 ? 255 : ci);
+
+				ci = (int)(G[Index] + 0.5);
+				rgb[Index2++] = (byte)(ci < 0 ? 0 : ci > 255 ? 255 : ci);
+
+				ci = (int)(R[Index] + 0.5);
+				rgb[Index2++] = (byte)(ci < 0 ? 0 : ci > 255 ? 255 : ci);
+
+				ci = (int)(A[Index] + 0.5);
+				rgb[Index2++] = (byte)(ci < 0 ? 0 : ci > 255 ? 255 : ci);
 			}
 
 			return PixelInformation.FromRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);

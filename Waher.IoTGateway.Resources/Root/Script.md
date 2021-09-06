@@ -1497,6 +1497,7 @@ The following functions can be used to create fractal images based on iterations
 | `NovaMandelbrotFractal(r,i,dr,R,p[,Palette[,DimX[,DimY]]])` | Calculates a Nova-Mandelbrot fractal. | `NovaMandelbrotFractal(0,0,0.1,0,3,0.5,5.2,randomlinearrgb(1024,16),640,480)` |
 | `NovaMandelbrotSmoothFractal(r,i,dr,R,p[,Palette[,DimX[,DimY]]])` | As `NovaMandelbrotFractal`, except the image is smoothed out using the *Heat Equation*. Pixels where colors change are used as fixed boundary conditions. | `NovaMandelbrotSmoothFractal(0,0,0.1,0,3,0.5,5.2,randomlinearrgb(1024,16),640,480)` |
 | `NovaMandelbrotTopographyFractal(r,i,dr,R,p[,Palette[,DimX[,DimY]]])` | As `NovaMandelbrotFractal`, except only pixels where the color changes are returned, creating a topographical map of the image. | `NovaMandelbrotTopographyFractal(0,0,0.1,0,3,0.5,5.2,randomlinearrgb(1024,16),640,480)` |
+| `SmoothImage(Image)` | Creates a smooth version of an image provided in `Image`. | `x:=-10..10;SmoothImage(plot2dcurve(x,sin(x)))` |
 
 #### Iterated Function System (IFS) Fractal functions (Waher.Script.Fractals)
 

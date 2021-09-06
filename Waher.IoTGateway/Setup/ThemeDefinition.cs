@@ -21,20 +21,20 @@ namespace Waher.IoTGateway.Setup
 		private readonly string title;
 		private readonly string cssx;
 		private readonly string fontFamily;
-		private SKColor textColor;
-		private SKColor backgroundColor;
-		private SKColor headerColor;
-		private SKColor headerTextColor;
-		private SKColor buttonColor;
-		private SKColor buttonTextColor;
-		private SKColor menuTextColor;
-		private SKColor insertColor;
-		private SKColor deleteColor;
-		private SKColor linkColorUnvisited;
-		private SKColor linkColorVisited;
-		private SKColor linkColorHot;
-		private SKColor graphBgColor;
-		private SKColor graphFgColor;
+		private readonly SKColor textColor;
+		private readonly SKColor backgroundColor;
+		private readonly SKColor headerColor;
+		private readonly SKColor headerTextColor;
+		private readonly SKColor buttonColor;
+		private readonly SKColor buttonTextColor;
+		private readonly SKColor menuTextColor;
+		private readonly SKColor insertColor;
+		private readonly SKColor deleteColor;
+		private readonly SKColor linkColorUnvisited;
+		private readonly SKColor linkColorVisited;
+		private readonly SKColor linkColorHot;
+		private readonly SKColor graphBgColor;
+		private readonly SKColor graphFgColor;
 
 		/// <summary>
 		/// Contains properties for a theme.

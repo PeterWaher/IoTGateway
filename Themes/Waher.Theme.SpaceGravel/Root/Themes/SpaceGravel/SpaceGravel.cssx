@@ -794,7 +794,8 @@ input
     border: 2px solid ¤ButtonColor¤;
     border-radius: 4px;
     box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
-    background-color: white;
+    background-color: ¤GraphBgColor¤;
+    color:¤TextColor¤;
 }
 
 input:focus
@@ -811,12 +812,25 @@ select
     border: 2px solid ¤ButtonColor¤;
     border-radius: 4px;
     box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
-    background-color: white;
+    background-color: ¤GraphBgColor¤;
+    color:¤TextColor¤;
 }
 
 select:focus
 {
     border: 3px solid ¤ButtonColor¤;
+}
+
+option
+{
+    color:¤TextColor¤;
+    background-color:¤BackgroundColor¤;
+}
+
+option[selected]
+{
+    color:¤ButtonTextColor¤ !important;
+    background-color:¤ButtonColor¤ !important;
 }
 
 textarea 
@@ -834,7 +848,8 @@ textarea
 	-o-tab-size : 3;
 	tab-size : 3;
     box-shadow: 0.3em 0.3em 0.3em rgba(0,0,0,0.5);
-    background-color: white;
+    background-color: ¤GraphBgColor¤;
+    color:¤TextColor¤;
 }
 
 textarea:focus
@@ -903,7 +918,8 @@ input[type="checkbox"] + label:before
     box-sizing: border-box;
     border: 2px solid ¤ButtonColor¤;
     box-shadow: 0.1em 0.1em 0.1em rgba(0,0,0,0.75);
-    background-color: white;
+    background-color: ¤GraphBgColor¤;
+    color:¤TextColor¤;
 }
 
 input[type="checkbox"] + label:before:focus
@@ -915,7 +931,7 @@ input[type="checkbox"]:checked + label:before
 {
     content: "\2713";
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
-    color: ¤ButtonColor¤;
+    color: ¤TextColor¤;
     text-align: center;
     line-height: 0.75em;
 }
@@ -996,11 +1012,11 @@ fieldset
 
 fieldset > legend
 {
-    color:¤HeaderTextColor¤;
+    color:¤ButtonTextColor¤;
     font-size: 1.25em;
 	padding: 0.25em 1em 0.25em 1em;
 	border-radius:0.7em;
-	background-color:¤HeaderColor¤;
+	background-color:¤ButtonColor¤;
 }
 
 .posButton 

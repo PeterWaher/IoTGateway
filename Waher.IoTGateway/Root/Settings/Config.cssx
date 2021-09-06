@@ -21,7 +21,8 @@
 
 .theme
 {
-    background-color: white;
+    background-color: ¤GraphBgColor¤;
+    color:¤TextColor¤;
     box-shadow: 0.5em 0.5em 0.5em #999;
     margin:2em;
     display:inline-block;
@@ -30,7 +31,8 @@
 
 .themeSelected
 {
-    background-color: white;
+    background-color: ¤GraphBgColor¤;
+    color:¤TextColor¤;
     box-shadow: 0.1em 0.1em 0.1em #999;
     margin:2em;
     display:inline-block;

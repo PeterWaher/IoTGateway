@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		LICENSE.md = LICENSE.md
 		LICENSE.txt = LICENSE.txt
 		README.md = README.md
+		Waher.IoTGateway.Resources\Root\Script.md = Waher.IoTGateway.Resources\Root\Script.md
 		TODO.txt = TODO.txt
 	EndProjectSection
 EndProject
@@ -477,7 +478,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.JWT.Test", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.PKCS.Test", "Security\Waher.Security.PKCS.Test\Waher.Security.PKCS.Test.csproj", "{ABF52AA4-C027-4D62-948D-47CF7681D7A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.RDP", "Networking\Waher.Networking.XMPP.RDP\Waher.Networking.XMPP.RDP.csproj", "{CC09FDC7-BCBC-4285-AD1B-731D442BC693}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.XMPP.RDP", "Networking\Waher.Networking.XMPP.RDP\Waher.Networking.XMPP.RDP.csproj", "{CC09FDC7-BCBC-4285-AD1B-731D442BC693}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

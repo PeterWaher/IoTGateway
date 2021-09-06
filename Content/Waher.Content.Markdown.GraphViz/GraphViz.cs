@@ -25,6 +25,8 @@ namespace Waher.Content.Markdown.GraphViz
 		private static string installationFolder = null;
 		private static string graphVizFolder = null;
 		private static string contentRootFolder = null;
+		private static string defaultBgColor = null;
+		private static string defaultFgColor = null;
 		private static bool supportsDot = false;
 		private static bool supportsNeato = false;
 		private static bool supportsFdp = false;
@@ -119,12 +121,20 @@ namespace Waher.Content.Markdown.GraphViz
 
 		private static void DeleteOldFiles(object P)
 		{
-			DateTime Old = DateTime.Now.AddDays(-7);
+			DeleteOldFiles(DateTime.Now.AddDays(-7));
+		}
+
+		/// <summary>
+		/// Deletes generated files older than <paramref name="Limit"/>.
+		/// </summary>
+		/// <param name="Limit">Age limit.</param>
+		public static void DeleteOldFiles(DateTime Limit)
+		{ 
 			int Count = 0;
 
 			foreach (string FileName in Directory.GetFiles(graphVizFolder, "*.*"))
 			{
-				if (File.GetLastAccessTime(FileName) < Old)
+				if (File.GetLastAccessTime(FileName) < Limit)
 				{
 					try
 					{
@@ -432,10 +442,51 @@ namespace Waher.Content.Markdown.GraphViz
 				string TxtFileName = FileName + ".txt";
 				File.WriteAllText(TxtFileName, Graph, Encoding.Default);
 
+				StringBuilder Arguments = new StringBuilder();
+
+				Arguments.Append("-Tcmapx -o\"");
+				Arguments.Append(MapFileName);
+				Arguments.Append("\" -T");
+				Arguments.Append(Type.ToString().ToLower());
+
+				if (!string.IsNullOrEmpty(defaultBgColor))
+				{
+					Arguments.Append(" -Gbgcolor=\"");
+					Arguments.Append(defaultBgColor);
+					Arguments.Append('"');
+				}
+
+				if (!string.IsNullOrEmpty(defaultFgColor))
+				{
+					Arguments.Append(" -Gcolor=\"");
+					Arguments.Append(defaultFgColor);
+					//Arguments.Append("\" -Nfillcolor=\"");
+					//Arguments.Append(defaultFgColor);
+					Arguments.Append("\" -Nfontcolor=\"");
+					Arguments.Append(defaultFgColor);
+					Arguments.Append("\" -Nlabelfontcolor=\"");
+					Arguments.Append(defaultFgColor);
+					Arguments.Append("\" -Npencolor=\"");
+					Arguments.Append(defaultFgColor);
+					Arguments.Append("\" -Efontcolor=\"");
+					Arguments.Append(defaultFgColor);
+					Arguments.Append("\" -Elabelfontcolor=\"");
+					Arguments.Append(defaultFgColor);
+					Arguments.Append("\" -Epencolor=\"");
+					Arguments.Append(defaultFgColor);
+					Arguments.Append("\"");
+				}
+
+				Arguments.Append(" -q -o\"");
+				Arguments.Append(ResultFileName);
+				Arguments.Append("\" \"");
+				Arguments.Append(TxtFileName + "\"");
+
+
 				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
 				{
 					FileName = Path.Combine(installationFolder, "bin", Language.ToLower() + ".exe"),
-					Arguments = "-Tcmapx -o\"" + MapFileName + "\" -T" + Type.ToString().ToLower() + " -q -o\"" + ResultFileName + "\" \"" + TxtFileName + "\"",
+					Arguments = Arguments.ToString(),
 					UseShellExecute = false,
 					RedirectStandardError = true,
 					RedirectStandardOutput = true,
@@ -566,6 +617,24 @@ namespace Waher.Content.Markdown.GraphViz
 			{
 				return new PixelInformationPng(Data, Bitmap.Width, Bitmap.Height);
 			}
+		}
+
+		/// <summary>
+		/// Default Background color
+		/// </summary>
+		public static string DefaultBgColor
+		{
+			get => defaultBgColor;
+			set => defaultBgColor = value;
+		}
+
+		/// <summary>
+		/// Default Foreground color
+		/// </summary>
+		public static string DefaultFgColor
+		{
+			get => defaultFgColor;
+			set => defaultFgColor = value;
 		}
 	}
 }

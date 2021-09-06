@@ -21,6 +21,12 @@
             <param name="ContentRootFolder">Content root folder. If hosting markdown under a web server, this would correspond
             to the roof folder for the web content.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.DeleteOldFiles(System.DateTime)">
+            <summary>
+            Deletes generated files older than <paramref name="Limit"/>.
+            </summary>
+            <param name="Limit">Age limit.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.Supports(System.String)">
             <summary>
             Checks how well the handler supports multimedia content of a given type.

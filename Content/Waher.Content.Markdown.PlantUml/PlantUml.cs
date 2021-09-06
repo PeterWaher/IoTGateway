@@ -27,6 +27,8 @@ namespace Waher.Content.Markdown.PlantUml
 		private static string javaPath = null;
 		private static string plantUmlFolder = null;
 		private static string contentRootFolder = null;
+		private static string defaultBgColor = null;
+		private static string defaultFgColor = null;
 
 		/// <summary>
 		/// Class managing PlantUML integration into Markdown documents.
@@ -107,12 +109,20 @@ namespace Waher.Content.Markdown.PlantUml
 
 		private static void DeleteOldFiles(object P)
 		{
-			DateTime Old = DateTime.Now.AddDays(-7);
+			DeleteOldFiles(DateTime.Now.AddDays(-7));
+		}
+
+		/// <summary>
+		/// Deletes generated files older than <paramref name="Limit"/>.
+		/// </summary>
+		/// <param name="Limit">Age limit.</param>
+		public static void DeleteOldFiles(DateTime Limit)
+		{
 			int Count = 0;
 
 			foreach (string FileName in Directory.GetFiles(plantUmlFolder, "*.*"))
 			{
-				if (File.GetLastAccessTime(FileName) < Old)
+				if (File.GetLastAccessTime(FileName) < Limit)
 				{
 					try
 					{
@@ -295,10 +305,46 @@ namespace Waher.Content.Markdown.PlantUml
 				string TxtFileName = FileName + ".txt";
 				File.WriteAllText(TxtFileName, Graph, Encoding.UTF8);
 
+				StringBuilder Arguments = new StringBuilder();
+				Arguments.Append("-jar \"");
+				Arguments.Append(jarPath);
+				Arguments.Append("\" -charset UTF-8 -t");
+				Arguments.Append(Type.ToString().ToLower());
+
+				//if (!string.IsNullOrEmpty(defaultBgColor))
+				//{
+				//	Arguments.Append(" -SbackgroundColor=");
+				//	Arguments.Append(defaultBgColor);
+				//}
+				//
+				//if (!string.IsNullOrEmpty(defaultFgColor))
+				//{
+				//	Arguments.Append(" -SborderColor=");
+				//	Arguments.Append(defaultFgColor);
+				//	Arguments.Append(" -SarrowColor=");
+				//	Arguments.Append(defaultFgColor);
+				//	Arguments.Append(" -SarrowFontColor=");
+				//	Arguments.Append(defaultFgColor);
+				//	Arguments.Append(" -SlabelFontColor=");
+				//	Arguments.Append(defaultFgColor);
+				//	Arguments.Append(" -SlegendFontColor=");
+				//	Arguments.Append(defaultFgColor);
+				//	Arguments.Append(" -StitleFontColor=");
+				//	Arguments.Append(defaultFgColor);
+				//	Arguments.Append(" -StimingFontColor=");
+				//	Arguments.Append(defaultFgColor);
+				//}
+
+				Arguments.Append(" -quiet \"");
+				Arguments.Append(TxtFileName);
+				Arguments.Append("\" \"");
+				Arguments.Append(ResultFileName);
+				Arguments.Append("\"");
+
 				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
 				{
 					FileName = javaPath,
-					Arguments = "-jar \"" + jarPath + "\" -charset UTF-8 -t" + Type.ToString().ToLower() + " -quiet \"" + TxtFileName + "\" \"" + ResultFileName + "\"",
+					Arguments = Arguments.ToString(),
 					UseShellExecute = false,
 					RedirectStandardError = true,
 					RedirectStandardOutput = true,
@@ -421,6 +467,24 @@ namespace Waher.Content.Markdown.PlantUml
 			{
 				return new PixelInformationPng(Data, Bitmap.Width, Bitmap.Height);
 			}
+		}
+
+		/// <summary>
+		/// Default Background color
+		/// </summary>
+		public static string DefaultBgColor
+		{
+			get => defaultBgColor;
+			set => defaultBgColor = value;
+		}
+
+		/// <summary>
+		/// Default Foreground color
+		/// </summary>
+		public static string DefaultFgColor
+		{
+			get => defaultFgColor;
+			set => defaultFgColor = value;
 		}
 	}
 }

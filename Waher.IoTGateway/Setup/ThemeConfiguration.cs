@@ -258,6 +258,5 @@ namespace Waher.IoTGateway.Setup
 			return Result;
 		}
 
-
 	}
 }

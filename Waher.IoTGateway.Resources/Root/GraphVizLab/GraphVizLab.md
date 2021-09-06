@@ -13,7 +13,7 @@ Login: /Login.md
 <div id="Lab">
 <section id="DotSection">
 <div id="DotDiv">
-Plant UML: ([documentation](https:/graphviz.org/))
+GraphViz: ([documentation](https:/graphviz.org/))
 <textarea id="Dot" autofocus="autofocus" wrap="hard" onkeydown="return DotKeyDown(this,event);"></textarea>
 
 {{

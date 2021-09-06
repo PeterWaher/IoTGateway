@@ -29,6 +29,12 @@
             <exception cref="T:System.Exception">If trying to set the installation folder to a different folder than the one set previously.
             The folder can only be set once, for security reasons.</exception>
         </member>
+        <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.DeleteOldFiles(System.DateTime)">
+            <summary>
+            Deletes generated files older than <paramref name="Limit"/>.
+            </summary>
+            <param name="Limit">Age limit.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.SearchForInstallationFolder">
             <summary>
             Searches for the installation folder on the local machine.
@@ -117,6 +123,16 @@
             <param name="Language">Language used.</param>
             <param name="Document">Markdown document containing element.</param>
             <returns>Image, if successful, null otherwise.</returns>
+        </member>
+        <member name="P:Waher.Content.Markdown.GraphViz.GraphViz.DefaultBgColor">
+            <summary>
+            Default Background color
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.GraphViz.GraphViz.DefaultFgColor">
+            <summary>
+            Default Foreground color
+            </summary>
         </member>
     </members>
 </doc>

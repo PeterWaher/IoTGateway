@@ -66,12 +66,20 @@ namespace Waher.Content.Markdown.Layout2D
 
 		private static void DeleteOldFiles(object P)
 		{
-			DateTime Old = DateTime.Now.AddDays(-7);
+			DeleteOldFiles(DateTime.Now.AddDays(-7));
+		}
+
+		/// <summary>
+		/// Deletes generated files older than <paramref name="Limit"/>.
+		/// </summary>
+		/// <param name="Limit">Age limit.</param>
+		public static void DeleteOldFiles(DateTime Limit)
+		{
 			int Count = 0;
 
 			foreach (string FileName in Directory.GetFiles(layoutFolder, "*.*"))
 			{
-				if (File.GetLastAccessTime(FileName) < Old)
+				if (File.GetLastAccessTime(FileName) < Limit)
 				{
 					try
 					{

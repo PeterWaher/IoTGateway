@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Text;
+using SkiaSharp;
+using Waher.Content.Markdown.GraphViz;
+using Waher.Content.Markdown.Layout2D;
+using Waher.Content.Markdown.PlantUml;
 using Waher.IoTGateway.Setup;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
@@ -10,8 +15,8 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 	/// <summary>
 	/// Theme constant.
 	/// </summary>
-    public class Theme : IConstant
-    {
+	public class Theme : IConstant
+	{
 		private static ThemeDefinition currentDefinition = null;
 
 		/// <summary>
@@ -48,14 +53,44 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 
 			return new ObjectValue(currentDefinition);
 		}
-		
+
 		/// <summary>
 		/// Current theme.
 		/// </summary>
 		public static ThemeDefinition CurrerntTheme
 		{
 			get => currentDefinition;
-			internal set => currentDefinition = value;
+			internal set
+			{
+				currentDefinition = value;
+
+				string Color = ColorToString(currentDefinition.GraphBgColor);
+				GraphViz.DefaultBgColor = Color;
+				PlantUml.DefaultBgColor = Color;
+
+				Color = ColorToString(currentDefinition.GraphFgColor);
+				GraphViz.DefaultFgColor = Color;
+				PlantUml.DefaultFgColor = Color;
+
+				GraphViz.DeleteOldFiles(DateTime.Now);
+				PlantUml.DeleteOldFiles(DateTime.Now);
+				XmlLayout.DeleteOldFiles(DateTime.Now);
+			}
+		}
+
+		private static string ColorToString(SKColor Color)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("#");
+			sb.Append(Color.Red.ToString("X2"));
+			sb.Append(Color.Green.ToString("X2"));
+			sb.Append(Color.Blue.ToString("X2"));
+
+			if (Color.Alpha != 255)
+				sb.Append(Color.Alpha.ToString("X2"));
+
+			return sb.ToString();
 		}
 
 	}

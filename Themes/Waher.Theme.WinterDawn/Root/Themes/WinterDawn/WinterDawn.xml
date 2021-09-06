@@ -19,6 +19,8 @@
 		<LinkColorVisited>#399356</LinkColorVisited>
 		<LinkColorHot>#47B86B</LinkColorHot>
 		<FontFamily>"Segoe UI", "Segoe UI Web Regular", "Segoe UI Symbol", "Helvetica Neue", "BBAlpha Sans", "S60 Sans", Arial, sans-serif</FontFamily>
+		<GraphBgColor>#FFFFFF</GraphBgColor>
+		<GraphFgColor>#000000</GraphFgColor>
 	</BasicProperties>
 	<CustomProperties>
 		<Property name="PosColor" value="#399356"/>

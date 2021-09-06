@@ -19,10 +19,12 @@
 		<LinkColorVisited>#c5bb86</LinkColorVisited>
 		<LinkColorHot>#ede1a1</LinkColorHot>
 		<FontFamily>"Segoe UI", "Segoe UI Web Regular", "Segoe UI Symbol", "Helvetica Neue", "BBAlpha Sans", "S60 Sans", Arial, sans-serif</FontFamily>
+		<GraphBgColor>#202020</GraphBgColor>
+		<GraphFgColor>#F8F8F8</GraphFgColor>
 	</BasicProperties>
 	<CustomProperties>
-		<Property name="PosColor" value="#399356"/>
-		<Property name="PosSelectedColor" value="#B5E3C4"/>
+		<Property name="PosColor" value="#5e583d"/>
+		<Property name="PosSelectedColor" value="#262318"/>
 		<Property name="NegColor" value="#D83134"/>
 		<Property name="TagColor" value="#4C83AE"/>
 		<Property name="DropDownColor" value="#E4F0FE"/>

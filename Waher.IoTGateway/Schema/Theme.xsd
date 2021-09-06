@@ -105,6 +105,16 @@
 									<xs:documentation>CSS font-family value.</xs:documentation>
 								</xs:annotation>
 							</xs:element>
+							<xs:element name="GraphBgColor" type="Color">
+								<xs:annotation>
+									<xs:documentation>Background Color of graphs.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="GraphFgColor" type="Color">
+								<xs:annotation>
+									<xs:documentation>Foreground Color of graphs.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>

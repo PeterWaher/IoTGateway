@@ -2434,6 +2434,14 @@
             <param name="Size">Optional size.</param>
             <returns>Pen object.</returns>
         </member>
+        <member name="M:Waher.Script.Graphs.Graph.TryConvertToColor(System.Object,SkiaSharp.SKColor@)">
+            <summary>
+            Tries to convert an object to a color.
+            </summary>
+            <param name="Object">Object to convert.</param>
+            <param name="Color">Resulting color, if possible to convert.</param>
+            <returns>Of <paramref name="Object"/> could be converted to a color.</returns>
+        </member>
         <member name="M:Waher.Script.Graphs.Graph.ToColor(System.Object)">
             <summary>
             Converts an object to a color.

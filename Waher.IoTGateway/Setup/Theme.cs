@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
@@ -44,6 +42,9 @@ namespace Waher.IoTGateway.Setup
 		/// <param name="Variables">Current set of variables.</param>
 		public IElement GetValueElement(Variables Variables)
 		{
+			Variables["GraphBgColor"] = currentDefinition.GraphBgColor;
+			Variables["GraphFgColor"] = currentDefinition.GraphFgColor;
+
 			return new ObjectValue(currentDefinition);
 		}
 		

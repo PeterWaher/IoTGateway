@@ -33,6 +33,8 @@ namespace Waher.IoTGateway.Setup
 		private SKColor linkColorUnvisited;
 		private SKColor linkColorVisited;
 		private SKColor linkColorHot;
+		private SKColor graphBgColor;
+		private SKColor graphFgColor;
 
 		/// <summary>
 		/// Contains properties for a theme.
@@ -140,6 +142,16 @@ namespace Waher.IoTGateway.Setup
 
 										case "FontFamily":
 											this.fontFamily = E2.InnerText;
+											break;
+
+										case "GraphBgColor":
+											if (Color.TryParse(E2.InnerText, out cl))
+												this.graphBgColor = cl;
+											break;
+
+										case "GraphFgColor":
+											if (Color.TryParse(E2.InnerText, out cl))
+												this.graphFgColor = cl;
 											break;
 									}
 								}
@@ -294,6 +306,16 @@ namespace Waher.IoTGateway.Setup
 		public string FontFamily => this.fontFamily;
 
 		/// <summary>
+		/// Graph background color.
+		/// </summary>
+		public SKColor GraphBgColor => this.graphBgColor;
+
+		/// <summary>
+		/// Graph foreground color.
+		/// </summary>
+		public SKColor GraphFgColor => this.graphFgColor;
+
+		/// <summary>
 		/// Background images.
 		/// </summary>
 		public ThemeImage[] BackgroundImages => this.backgroundImages;
@@ -366,8 +388,6 @@ namespace Waher.IoTGateway.Setup
 
 			return Result;
 		}
-
-
 
 	}
 }

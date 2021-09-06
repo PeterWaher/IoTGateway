@@ -185,43 +185,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 
 					if (Result is Graph G)
 					{
-						GraphSettings Settings = new GraphSettings();
-						Tuple<int, int> Size;
-
-						if ((Size = G.RecommendedBitmapSize) != null)
-						{
-							Settings.Width = Size.Item1;
-							Settings.Height = Size.Item2;
-
-							Settings.MarginLeft = (int)Math.Round(15.0 * Settings.Width / 640);
-							Settings.MarginRight = Settings.MarginLeft;
-
-							Settings.MarginTop = (int)Math.Round(15.0 * Settings.Height / 480);
-							Settings.MarginBottom = Settings.MarginTop;
-							Settings.LabelFontSize = 12.0 * Settings.Height / 480;
-						}
-						else
-						{
-							if (State.Session.TryGetVariable("GraphWidth", out Variable v) && v.ValueObject is double w && w >= 1)
-							{
-								Settings.Width = (int)Math.Round(w);
-								Settings.MarginLeft = (int)Math.Round(15 * w / 640);
-								Settings.MarginRight = Settings.MarginLeft;
-							}
-							else if (!State.Session.ContainsVariable("GraphWidth"))
-								State.Session["GraphWidth"] = (double)Settings.Width;
-
-							if (State.Session.TryGetVariable("GraphHeight", out v) && v.ValueObject is double h && h >= 1)
-							{
-								Settings.Height = (int)Math.Round(h);
-								Settings.MarginTop = (int)Math.Round(15 * h / 480);
-								Settings.MarginBottom = Settings.MarginTop;
-								Settings.LabelFontSize = 12 * h / 480;
-							}
-							else if (!State.Session.ContainsVariable("GraphHeight"))
-								State.Session["GraphHeight"] = (double)Settings.Height;
-						}
-
+						GraphSettings Settings = G.GetSettings(State.Session);
 						PixelInformation Pixels = G.CreatePixels(Settings);
 						this.cid = this.Document.AddContent(Pixels);
 						this.evaluated = new ImageInternal(this.Document, this)

@@ -172,6 +172,7 @@ namespace Waher.Script.Graphs
 		{
 			GraphSettings Settings = new GraphSettings();
 			Tuple<int, int> Size;
+			Variable v;
 
 			if (DefaultWidth.HasValue)
 				Settings.Width = DefaultWidth.Value;
@@ -193,7 +194,7 @@ namespace Waher.Script.Graphs
 			}
 			else
 			{
-				if (Variables.TryGetVariable("GraphWidth", out Variable v) && v.ValueObject is double d && d >= 1)
+				if (Variables.TryGetVariable("GraphWidth", out v) && v.ValueObject is double d && d >= 1)
 				{
 					Settings.Width = (int)Math.Round(d);
 					Settings.MarginLeft = (int)Math.Round(15 * d / 640);
@@ -212,6 +213,23 @@ namespace Waher.Script.Graphs
 				else if (!Variables.ContainsVariable("GraphHeight"))
 					Variables["GraphHeight"] = (double)Settings.Height;
 			}
+
+			int i = 0;
+
+			if (Variables.TryGetVariable("GraphBgColor", out v) && TryConvertToColor(v.ValueObject, out SKColor Color))
+			{
+				Settings.BackgroundColor = Color;
+				i++;
+			}
+
+			if (Variables.TryGetVariable("GraphFgColor", out v) && TryConvertToColor(v.ValueObject, out Color))
+			{
+				Settings.AxisColor = Color;
+				i++;
+			}
+
+			if (i == 2)
+				Settings.GridColor = Functions.Colors.Blend.BlendColors(Settings.BackgroundColor, Settings.AxisColor, 0.4);
 
 			return Settings;
 		}
@@ -604,20 +622,39 @@ namespace Waher.Script.Graphs
 		}
 
 		/// <summary>
+		/// Tries to convert an object to a color.
+		/// </summary>
+		/// <param name="Object">Object to convert.</param>
+		/// <param name="Color">Resulting color, if possible to convert.</param>
+		/// <returns>Of <paramref name="Object"/> could be converted to a color.</returns>
+		public static bool TryConvertToColor(object Object, out SKColor Color)
+		{
+			if (Object is SKColor Color2)
+			{
+				Color = Color2;
+				return true;
+			}
+			else if (Object is string s && Functions.Colors.Color.TryParse(s, out Color))
+				return true;
+			else 
+			{
+				Color = Graph.DefaultColor;
+				return (Object is null);
+			}
+		}
+
+
+		/// <summary>
 		/// Converts an object to a color.
 		/// </summary>
 		/// <param name="Object">Object.</param>
 		/// <returns>Color value.</returns>
 		public static SKColor ToColor(object Object)
 		{
-			if (Object is SKColor Color)
-				return Color;
-			else if (Object is string s && Functions.Colors.Color.TryParse(s, out Color))
-				return Color;
-			else if (Object is null)
-				return Graph.DefaultColor;
+			if (!TryConvertToColor(Object, out SKColor Color))
+				throw new ScriptException("Expected a color.");
 
-			throw new ScriptException("Expected a color.");
+			return Color;
 		}
 
 		/// <summary>

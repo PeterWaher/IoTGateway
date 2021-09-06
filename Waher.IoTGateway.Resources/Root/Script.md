@@ -1123,18 +1123,12 @@ will return a vector corresponding to the point under the mouse.
 
 The following table lists variables that control graph output:
 
-| Varaible    | Description                 | Current value              |
-|-------------|-----------------------------|----------------------------|
-| GraphWidth  | Width of graph, in pixels.  | {try GraphWidth catch ""}  |
-| GraphHeight | Height of graph, in pixels. | {try GraphHeight catch ""} |
-
-The following table lists properties on 2D-graph object that can be used to control how the graph is rendered:
-
-| Property  | Type    | Description                      | Default value |
-|-----------|---------|----------------------------------|---------------|
-| ShowXAxis | Boolean | If the x-axis is to be displayed | `true`        |
-| ShowYAxis | Boolean | If the y-axis is to be displayed | `true`        |
-| ShowGrid  | Boolean | If the grid is to be displayed   | `true`        |
+| Varaible     | Type    | Description                      | Current value              |
+|--------------|---------|----------------------------------|----------------------------|
+| GraphWidth   | Double  | Width of graph, in pixels.       | {try GraphWidth catch ""}  |
+| GraphHeight  | Double  | Height of graph, in pixels.      | {try GraphHeight catch ""} |
+| GraphBgColor | Color   | Background color.                | {try BgColor catch ""}     |
+| GraphFgColor | Color   | Foreground color.                | {try BgColor catch ""}     |
 
 You can combine graphs using the `+` operator, as long as graph axes are compatible:
 

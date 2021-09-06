@@ -13,12 +13,14 @@
 		<ButtonColor>#663300</ButtonColor>
 		<ButtonTextColor>#FFFFFF</ButtonTextColor>
 		<MenuTextColor>#FFFFFF</MenuTextColor>
-    <InsertColor>#00A00040</InsertColor>
-    <DeleteColor>#A0000040</DeleteColor>
+		<InsertColor>#00A00040</InsertColor>
+		<DeleteColor>#A0000040</DeleteColor>
 		<LinkColorUnvisited>#993300</LinkColorUnvisited>
 		<LinkColorVisited>#732600</LinkColorVisited>
 		<LinkColorHot>#663300</LinkColorHot>
 		<FontFamily>"Segoe UI", "Segoe UI Web Regular", "Segoe UI Symbol", "Helvetica Neue", "BBAlpha Sans", "S60 Sans", Arial, sans-serif</FontFamily>
+		<GraphBgColor>#FFFFFF</GraphBgColor>
+		<GraphFgColor>#000000</GraphFgColor>
 	</BasicProperties>
 	<CustomProperties>
 		<Property name="PosColor" value="#663300"/>

@@ -369,6 +369,47 @@ namespace Waher.Script.Graphs.Canvas2D
 			this.operations.AddLast(new FillRectangle((float)x1, (float)y1, (float)x2, (float)y2));
 		}
 
+		/// <summary>
+		/// Plots a pixel at a given coordinate.
+		/// </summary>
+		/// <param name="x">X-coordinate.</param>
+		/// <param name="y">Y-coordinate.</param>
+		public void Plot(double x, double y)
+		{
+			this.operations.AddLast(new Plot((float)x, (float)y));
+		}
+
+		/// <summary>
+		/// Draws a ellipse defined by two opposing corner points.
+		/// </summary>
+		/// <param name="x1">X-coordinate of first point.</param>
+		/// <param name="y1">Y-coordinate of first point.</param>
+		/// <param name="x2">X-coordinate of second point.</param>
+		/// <param name="y2">Y-coordinate of second point.</param>
+		public void Ellipse(double x1, double y1, double x2, double y2)
+		{
+			this.operations.AddLast(new Ellipse((float)x1, (float)y1, (float)x2, (float)y2));
+		}
+
+		/// <summary>
+		/// Fills a ellipse defined by two opposing corner points.
+		/// </summary>
+		/// <param name="x1">X-coordinate of first point.</param>
+		/// <param name="y1">Y-coordinate of first point.</param>
+		/// <param name="x2">X-coordinate of second point.</param>
+		/// <param name="y2">Y-coordinate of second point.</param>
+		public void FillEllipse(double x1, double y1, double x2, double y2)
+		{
+			this.operations.AddLast(new FillEllipse((float)x1, (float)y1, (float)x2, (float)y2));
+		}
+
+		/// <summary>
+		/// Clears the canvas with the current brush.
+		/// </summary>
+		public void Clear()
+		{
+			this.operations.AddLast(new Clear());
+		}
 
 	}
 }

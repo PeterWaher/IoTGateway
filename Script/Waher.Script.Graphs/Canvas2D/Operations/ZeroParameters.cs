@@ -19,7 +19,7 @@ namespace Waher.Script.Graphs.Canvas2D.Operations
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
-			return (obj is ZeroParameters Obj);
+			return (obj is ZeroParameters);
 		}
 
 		/// <inheritdoc/>

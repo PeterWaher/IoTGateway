@@ -278,6 +278,13 @@
             Clears registered elements with IDs.
             </summary>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.GetRenderSettings(Waher.Script.Variables)">
+            <summary>
+            Creates a render settings object.
+            </summary>
+            <param name="Session">Session variables.</param>
+            <returns>Render settings.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Map">
             <summary>
             Contains information about an actionable area in a generated image.
@@ -978,6 +985,11 @@
         <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.TextColorAttribute">
             <summary>
             Text Color
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.BackgroundColorAttribute">
+            <summary>
+            Background Color
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Backgrounds.Layout2D.FromXml(System.Xml.XmlElement)">

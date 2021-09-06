@@ -149,7 +149,7 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = GetFileName(Language, Rows, out string Title);
+			string FileName = GetFileName(Language, Rows, out string Title, Document.Settings.Variables);
 			if (FileName is null)
 				return false;
 
@@ -190,8 +190,9 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <param name="Language">Language</param>
 		/// <param name="Rows">Code Block rows</param>
 		/// <param name="Title">Title</param>
+		/// <param name="Session">Session variables.</param>
 		/// <returns>File name</returns>
-		public static string GetFileName(string Language, string[] Rows, out string Title)
+		public static string GetFileName(string Language, string[] Rows, out string Title, Variables Session)
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -225,10 +226,7 @@ namespace Waher.Content.Markdown.Layout2D
 					Doc.LoadXml(Xml);
 
 					Layout2DDocument LayoutDoc = new Layout2DDocument(Doc);
-					RenderSettings Settings = new RenderSettings()
-					{
-						ImageSize = RenderedImageSize.ResizeImage   // TODO: Theme colors, font, etc.
-					};
+					RenderSettings Settings = LayoutDoc.GetRenderSettings(Session);
 
 					using (SKImage Img = LayoutDoc.Render(Settings, out Map[] _))   // TODO: Maps
 					{
@@ -261,7 +259,7 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GetFileName(Language, Rows, out string Title);
+			GetFileName(Language, Rows, out string Title, Document.Settings.Variables);
 			Output.AppendLine(Title);
 
 			return true;
@@ -279,7 +277,7 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = GetFileName(Language, Rows, out string Title);
+			string FileName = GetFileName(Language, Rows, out string Title, Document.Settings.Variables);
 			if (FileName is null)
 				return false;
 
@@ -307,7 +305,7 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
 		public bool GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = GetFileName(Language, Rows, out string _);
+			string FileName = GetFileName(Language, Rows, out string _, Document.Settings.Variables);
 			if (FileName is null)
 				return false;
 
@@ -327,7 +325,7 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>Image, if successful, null otherwise.</returns>
 		public PixelInformation GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
 		{
-			string FileName = GetFileName(Language, Rows, out string _);
+			string FileName = GetFileName(Language, Rows, out string _, Document.Settings.Variables);
 			if (FileName is null)
 				return null;
 
@@ -354,15 +352,12 @@ namespace Waher.Content.Markdown.Layout2D
 		/// Transforms the XML document before visualizing it.
 		/// </summary>
 		/// <param name="Xml">XML Document.</param>
-		/// <param name="Variables">Current variables.</param>
+		/// <param name="Session">Current variables.</param>
 		/// <returns>Transformed object.</returns>
-		public object TransformXml(XmlDocument Xml, Variables Variables)
+		public object TransformXml(XmlDocument Xml, Variables Session)
 		{
-			Layout2DDocument LayoutDoc = new Layout2DDocument(Xml, Variables);
-			RenderSettings Settings = new RenderSettings()
-			{
-				ImageSize = RenderedImageSize.ResizeImage   // TODO: Theme colors, font, etc.
-			};
+			Layout2DDocument LayoutDoc = new Layout2DDocument(Xml, Session);
+			RenderSettings Settings = LayoutDoc.GetRenderSettings(Session);
 
 			using (SKImage Img = LayoutDoc.Render(Settings, out Map[] _))   // TODO: Maps
 			{

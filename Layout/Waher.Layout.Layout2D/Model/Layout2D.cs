@@ -69,6 +69,15 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		}
 
 		/// <summary>
+		/// Background Color
+		/// </summary>
+		public StringAttribute BackgroundColorAttribute
+		{
+			get => this.background;
+			set => this.background = value;
+		}
+
+		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
@@ -125,6 +134,8 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		}
 
 		private Font fontDef = null;
+		private Pen penDef = null;
+		private Background backgroundDef = null;
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
@@ -135,6 +146,8 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		{
 			SKFont FontBak = null;
 			SKPaint TextBak = null;
+			SKPaint PenBak = null;
+			SKPaint BackgroundBak = null;
 			bool Relative = false;
 
 			if (!(this.font is null) &&
@@ -159,7 +172,9 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 				this.Document.TryGetElement(PenId, out Element) &&
 				Element is Pen Pen)
 			{
-				// TODO
+				penDef = Pen;
+				PenBak = State.ShapePen;
+				State.ShapePen = Pen.Paint;
 			}
 
 			if (!(this.background is null) &&
@@ -167,7 +182,9 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 				this.Document.TryGetElement(BackgroundId, out Element) &&
 				Element is Background Background)
 			{
-				// TODO
+				backgroundDef = Background;
+				BackgroundBak = State.ShapeFill;
+				State.ShapeFill = Background.Paint;
 			}
 
 			if (base.DoMeasureDimensions(State))
@@ -178,6 +195,12 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 
 			if (!(TextBak is null))
 				State.Text = TextBak;
+
+			if (!(PenBak is null))
+				State.ShapePen = PenBak;
+
+			if (!(BackgroundBak is null))
+				State.ShapeFill = BackgroundBak;
 
 			return Relative;
 		}
@@ -190,6 +213,8 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		{
 			SKFont FontBak = null;
 			SKPaint TextBak = null;
+			SKPaint PenBak = null;
+			SKPaint BackgroundBak = null;
 
 			if (!(this.fontDef is null))
 			{
@@ -200,6 +225,18 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 				State.Text = this.fontDef.Text;
 			}
 
+			if (!(this.penDef is null))
+			{
+				PenBak = State.ShapePen;
+				State.ShapePen = this.penDef.Paint;
+			}
+
+			if (!(this.backgroundDef is null))
+			{
+				BackgroundBak = State.ShapeFill;
+				State.ShapeFill = this.backgroundDef.Paint;
+			}
+
 			base.MeasurePositions(State);
 
 			if (!(FontBak is null))
@@ -207,6 +244,12 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 
 			if (!(TextBak is null))
 				State.Text = TextBak;
+
+			if (!(PenBak is null))
+				State.ShapePen = PenBak;
+
+			if (!(BackgroundBak is null))
+				State.ShapeFill = BackgroundBak;
 		}
 
 		/// <summary>
@@ -217,6 +260,8 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		{
 			SKFont FontBak = null;
 			SKPaint TextBak = null;
+			SKPaint PenBak = null;
+			SKPaint BackgroundBak = null;
 
 			if (!(this.fontDef is null))
 			{
@@ -227,6 +272,21 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 				State.Text = this.fontDef.Text;
 			}
 
+			if (!(this.penDef is null))
+			{
+				PenBak = State.ShapePen;
+				State.ShapePen = this.penDef.Paint;
+			}
+
+			if (!(this.backgroundDef is null))
+			{
+				BackgroundBak = State.ShapeFill;
+				State.ShapeFill = this.backgroundDef.Paint;
+
+				if (!(this.backgroundDef is SolidBackground))
+					State.Canvas.DrawRect(0, 0, State.AreaWidth, State.AreaHeight, State.ShapeFill);
+			}
+
 			base.Draw(State);
 
 			if (!(FontBak is null))
@@ -234,6 +294,12 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 
 			if (!(TextBak is null))
 				State.Text = TextBak;
+
+			if (!(PenBak is null))
+				State.ShapePen = PenBak;
+
+			if (!(BackgroundBak is null))
+				State.ShapeFill = BackgroundBak;
 		}
 	}
 }

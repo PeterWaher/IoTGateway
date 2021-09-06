@@ -1,10 +1,11 @@
 ﻿using System;
+using Waher.IoTGateway.Setup;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.IoTGateway.Setup
+namespace Waher.IoTGateway.ScriptExtensions.Constants
 {
 	/// <summary>
 	/// Theme constant.

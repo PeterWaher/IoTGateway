@@ -763,10 +763,8 @@ Example of a **layout** diagram (some parts have been removed for splicity; full
 
 	```layout: Neuron architecture
     <Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
-              background="WhiteBackground" pen="BlackPen"
-              font="Text" textColor="Black">
-      <SolidPen id="BlackPen" color="Black" width="1px"/>
-      <SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+              background="ThemeBackground" font="Text" textColor="Black">
+      <SolidBackground id="ThemeBackground" color="{Theme.BackgroundColor}"/>
       <SolidBackground id="Core" color="{Alpha('Red',128)}"/>
       <SolidBackground id="IoTGateway" color="{Alpha('Orange',128)}"/>
       <SolidBackground id="NeuroLedger" color="{Alpha('Blue',128)}"/>
@@ -817,10 +815,8 @@ Example of a **layout** diagram (some parts have been removed for splicity; full
 
 ```layout: Neuron architecture
 <Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
-            background="WhiteBackground" pen="BlackPen"
-            font="Text" textColor="Black">
-    <SolidPen id="BlackPen" color="Black" width="1px"/>
-    <SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+          background="ThemeBackground" font="Text" textColor="Black">
+    <SolidBackground id="ThemeBackground" color="{Theme.BackgroundColor}"/>
     <SolidBackground id="Core" color="{Alpha('Red',128)}"/>
     <SolidBackground id="IoTGateway" color="{Alpha('Orange',128)}"/>
     <SolidBackground id="NeuroLedger" color="{Alpha('Blue',128)}"/>
@@ -1944,17 +1940,17 @@ a 2D Layout XML document, that is then used to generate a visual image, as shown
 
     ```async:Online Status
     <Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
-              background="WhiteBackground" pen="BlackPen"
+              background="ThemeBackground" pen="BlackPen"
               font="Text" textColor="Black">
 	    <SolidPen id="BlackPen" color="Black" width="1px"/>
 	    <SolidPen id="LightGrayPen" color="LightGray" width="1px"/>
 	    <SolidPen id="GreenPen" color="Green" width="2mm"/>
 	    <SolidPen id="RedPen" color="Red" width="2mm"/>
-	    <SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+	    <SolidBackground id="ThemeBackground" color="{Theme.BackgroundColor}"/>
 	    <SolidBackground id="GreenBackground" color="{Alpha('Green',128)}"/>
 	    <SolidBackground id="RedBackground" color="{Alpha('Red',128)}"/>
 	    <Font id="Text" name="Arial" size="36pt" color="White"/>
-	    <Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
+	    <Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="ThemeBackground"/>
 	    <ForEach variable="k" expression="(10..90|10)+'%'">
 		    <Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
 		    <Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>
@@ -1970,17 +1966,17 @@ Is shown as
 
 ```async:Online Status
 <Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
-          background="WhiteBackground" pen="BlackPen"
+          background="ThemeBackground" pen="BlackPen"
           font="Text" textColor="Black">
 	<SolidPen id="BlackPen" color="Black" width="1px"/>
 	<SolidPen id="LightGrayPen" color="LightGray" width="1px"/>
 	<SolidPen id="GreenPen" color="Green" width="2mm"/>
 	<SolidPen id="RedPen" color="Red" width="2mm"/>
-	<SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+	<SolidBackground id="ThemeBackground" color="{Theme.BackgroundColor}"/>
 	<SolidBackground id="GreenBackground" color="{Alpha('Green',128)}"/>
 	<SolidBackground id="RedBackground" color="{Alpha('Red',128)}"/>
 	<Font id="Text" name="Arial" size="36pt" color="White"/>
-	<Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="WhiteBackground"/>
+	<Rectangle x="0%" y="0%" x2="100%" y2="100%" pen="BlackPen" fill="ThemeBackground"/>
 	<ForEach variable="k" expression="(10..90|10)+'%'">
 		<Line x="{k}" y="0%" x2="{k}" y2="100%" pen="LightGrayPen"/>
 		<Line x="0%" y="{k}" x2="100%" y2="{k}" pen="LightGrayPen"/>

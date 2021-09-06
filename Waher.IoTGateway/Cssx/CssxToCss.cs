@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using SkiaSharp;
 using Waher.Content;
+using Waher.IoTGateway.ScriptExtensions.Constants;
 using Waher.IoTGateway.Setup;
 using Waher.Runtime.Inventory;
 using Waher.Script;

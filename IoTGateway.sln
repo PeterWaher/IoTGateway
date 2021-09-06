@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		LICENSE.md = LICENSE.md
 		LICENSE.txt = LICENSE.txt
+		Waher.IoTGateway.Resources\Root\Markdown.md = Waher.IoTGateway.Resources\Root\Markdown.md
 		README.md = README.md
 		Waher.IoTGateway.Resources\Root\Script.md = Waher.IoTGateway.Resources\Root\Script.md
 		TODO.txt = TODO.txt

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xsl;
 using Waher.Events;
+using Waher.IoTGateway.ScriptExtensions.Constants;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
@@ -63,7 +64,7 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		/// <param name="Language">Current language.</param>
 		/// <returns>Title string</returns>
-		public override Task<string> Title(Language Language)
+		public override Task<string> Title(Runtime.Language.Language Language)
 		{
 			return Language.GetStringAsync(typeof(Gateway), 5, "Theme");
 		}

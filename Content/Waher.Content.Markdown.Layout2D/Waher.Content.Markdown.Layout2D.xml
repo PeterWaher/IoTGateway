@@ -60,13 +60,14 @@
             <param name="Document">Markdown document containing element.</param>
             <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
         </member>
-        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GetFileName(System.String,System.String[],System.String@)">
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GetFileName(System.String,System.String[],System.String@,Waher.Script.Variables)">
             <summary>
             Generates an image, saves it, and returns the file name of the image file.
             </summary>
             <param name="Language">Language</param>
             <param name="Rows">Code Block rows</param>
             <param name="Title">Title</param>
+            <param name="Session">Session variables.</param>
             <returns>File name</returns>
         </member>
         <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GeneratePlainText(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
@@ -125,7 +126,7 @@
             Transforms the XML document before visualizing it.
             </summary>
             <param name="Xml">XML Document.</param>
-            <param name="Variables">Current variables.</param>
+            <param name="Session">Current variables.</param>
             <returns>Transformed object.</returns>
         </member>
     </members>

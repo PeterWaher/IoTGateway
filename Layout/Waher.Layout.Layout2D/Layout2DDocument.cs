@@ -12,6 +12,7 @@ using Waher.Runtime.Inventory;
 using Waher.Layout.Layout2D.Events;
 using Waher.Layout.Layout2D.Exceptions;
 using Waher.Layout.Layout2D.Model;
+using Waher.Layout.Layout2D.Model.Backgrounds;
 
 namespace Waher.Layout.Layout2D
 {
@@ -556,6 +557,33 @@ namespace Waher.Layout.Layout2D
 		public void ClearElementIds()
 		{
 			this.elementsById.Clear();
+		}
+
+		/// <summary>
+		/// Creates a render settings object.
+		/// </summary>
+		/// <param name="Session">Session variables.</param>
+		/// <returns>Render settings.</returns>
+		public RenderSettings GetRenderSettings(Variables Session)
+		{
+			RenderSettings Result = new RenderSettings()
+			{
+				ImageSize = RenderedImageSize.ResizeImage   // TODO: Theme colors, font, etc.
+			};
+
+			if (this.root is Model.Backgrounds.Layout2D Layout2D)
+			{
+				if (!(Layout2D.BackgroundColorAttribute is null) &&
+					Layout2D.BackgroundColorAttribute.TryEvaluate(Session, out string BackgroundId) &&
+					this.TryGetElement(BackgroundId, out ILayoutElement Element) &&
+					Element is SolidBackground SolidBackground &&
+					SolidBackground.ColorAttribute.TryEvaluate(Session, out SKColor Color))
+				{
+					Result.BackgroundColor = Color;
+				}
+			}
+
+			return Result;
 		}
 
 	}

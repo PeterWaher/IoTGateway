@@ -17,17 +17,16 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT Gateway Theme</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0</FileVersion>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1</FileVersion>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Root\Themes\SpaceGravel\SpaceGravel.cssx" />
     <None Remove="Root\Themes\SpaceGravel\SpaceGravel.png" />
     <None Remove="Root\Themes\SpaceGravel\SpaceGravel.xml" />
-    <None Remove="Root\Themes\SpaceGravel\SpaceGravel00x800.png" />
     <None Remove="Root\Themes\SpaceGravel\SpaceGravel1600x1600.png" />
-    <None Remove="Root\Themes\SpaceGravel\SpaceGravel600x1600.png" />
     <None Remove="Root\Themes\SpaceGravel\SpaceGravel800x800.png" />
     <None Remove="Waher.Theme.SpaceGravel.manifest" />
   </ItemGroup>
@@ -42,10 +41,10 @@
     <Content Include="Root\Themes\SpaceGravel\SpaceGravel.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Themes\SpaceGravel\SpaceGravel00x800.png">
+    <Content Include="Root\Themes\SpaceGravel\SpaceGravel800x800.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Root\Themes\SpaceGravel\SpaceGravel600x1600.png">
+    <Content Include="Root\Themes\SpaceGravel\SpaceGravel1600x1600.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Waher.Theme.SpaceGravel.manifest">

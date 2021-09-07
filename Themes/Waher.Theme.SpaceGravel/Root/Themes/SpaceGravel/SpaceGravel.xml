@@ -33,8 +33,8 @@
 		<Property name="EditorColor" value="#68217A"/>
 	</CustomProperties>
 	<BackgroundImages>
-		<BackgroundImage width="1600" height="1600">SpaceGravel600x1600.png</BackgroundImage>
-		<BackgroundImage width="800" height="800">SpaceGravel00x800.png</BackgroundImage>
+		<BackgroundImage width="1600" height="1600">SpaceGravel1600x1600.png</BackgroundImage>
+		<BackgroundImage width="800" height="800">SpaceGravel800x800.png</BackgroundImage>
 	</BackgroundImages>
 	<BannerImages>
 	</BannerImages>

@@ -37,11 +37,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		public override void Dispose()
 		{
-			if (this.timer != null)
-			{
-				this.timer.Dispose();
-				this.timer = null;
-			}
+			this.timer?.Dispose();
+			this.timer = null;
 
 			base.Dispose();
 		}

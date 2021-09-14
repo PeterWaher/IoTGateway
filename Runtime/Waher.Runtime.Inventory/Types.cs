@@ -386,6 +386,49 @@ namespace Waher.Runtime.Inventory
 		}
 
 		/// <summary>
+		/// Gets an array of loaded modules.
+		/// </summary>
+		/// <returns>Array of loaded modules.</returns>
+		public static IModule[] GetLoadedModules()
+		{
+			return GetLoadedModules(null);
+		}
+
+		/// <summary>
+		/// Gets an array of loaded modules.
+		/// </summary>
+		/// <param name="Order">Optional sort order of modules.</param>
+		/// <returns>Array of loaded modules.</returns>
+		public static IModule[] GetLoadedModules(IComparer<IModule> Order)
+		{
+			List<IModule> Modules = new List<IModule>();
+			IModule Module;
+			TypeInfo TI;
+
+			foreach (Type T in GetTypesImplementingInterface(typeof(IModule)))
+			{
+				TI = T.GetTypeInfo();
+				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+					continue;
+
+				try
+				{
+					Module = (IModule)Activator.CreateInstance(T);
+					Modules.Add(Module);
+				}
+				catch (Exception ex)
+				{
+					Log.Error("Unable to start module: " + ex.Message, T.FullName);
+				}
+			}
+
+			if (!(Order is null))
+				Modules.Sort(Order);
+
+			return Modules.ToArray();
+		}
+
+		/// <summary>
 		/// Starts all loaded modules.
 		/// </summary>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
@@ -407,30 +450,8 @@ namespace Waher.Runtime.Inventory
 		{
 			if (modules is null || modules.Length == 0)
 			{
+				IModule[] Modules = GetLoadedModules(Order);
 				List<Task> Tasks = new List<Task>();
-				List<IModule> Modules = new List<IModule>();
-				IModule Module;
-				TypeInfo TI;
-
-				foreach (Type T in GetTypesImplementingInterface(typeof(IModule)))
-				{
-					TI = T.GetTypeInfo();
-					if (TI.IsAbstract || TI.IsGenericTypeDefinition)
-						continue;
-
-					try
-					{
-						Module = (IModule)Activator.CreateInstance(T);
-						Modules.Add(Module);
-					}
-					catch (Exception ex)
-					{
-						Log.Error("Unable to start module: " + ex.Message, T.FullName);
-					}
-				}
-
-				if (!(Order is null))
-					Modules.Sort(Order);
 
 				foreach (IModule Module2 in Modules)
 				{
@@ -444,7 +465,7 @@ namespace Waher.Runtime.Inventory
 					}
 				}
 
-				modules = Modules.ToArray();
+				modules = Modules;
 
 				if (Tasks.Count > 0)
 				{

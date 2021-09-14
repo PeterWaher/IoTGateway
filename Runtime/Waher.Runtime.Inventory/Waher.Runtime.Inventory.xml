@@ -326,6 +326,19 @@
             Loaded modules.
             </summary>
         </member>
+        <member name="M:Waher.Runtime.Inventory.Types.GetLoadedModules">
+            <summary>
+            Gets an array of loaded modules.
+            </summary>
+            <returns>Array of loaded modules.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.GetLoadedModules(System.Collections.Generic.IComparer{Waher.Runtime.Inventory.IModule})">
+            <summary>
+            Gets an array of loaded modules.
+            </summary>
+            <param name="Order">Optional sort order of modules.</param>
+            <returns>Array of loaded modules.</returns>
+        </member>
         <member name="M:Waher.Runtime.Inventory.Types.StartAllModules(System.Int32)">
             <summary>
             Starts all loaded modules.

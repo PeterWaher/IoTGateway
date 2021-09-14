@@ -120,7 +120,7 @@ namespace Waher.IoTGateway
 		private static XmppClient xmppClient = null;
 		private static Networking.XMPP.Avatar.AvatarClient avatarClient = null;
 		private static Networking.XMPP.InBandBytestreams.IbbClient ibbClient = null;
-		private static Networking.XMPP.P2P.SOCKS5.Socks5Proxy socksProxy = null;
+		private static Socks5Proxy socksProxy = null;
 		private static ConcentratorServer concentratorServer = null;
 		private static SynchronizationClient synchronizationClient = null;
 		private static PepClient pepClient = null;
@@ -888,6 +888,9 @@ namespace Waher.IoTGateway
 						Sources = new IDataSource[0];
 					}
 				}
+
+				Types.GetLoadedModules();	// Makes sure all modules are instantiated, allowing static constructors to add
+											// appropriate data sources, if necessary.
 
 				if (!(GetDataSources is null))
 					Sources = await GetDataSources(Sources);

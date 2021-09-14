@@ -474,8 +474,35 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Domain">Domain of service hosting the room.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetRoomConfiguration(string RoomId, string Domain,
-			DataFormEventHandler Callback, object State)
+		[Obsolete("Use the DataFormResultEventHandler override instead.")]
+		public void GetRoomConfiguration(string RoomId, string Domain, DataFormEventHandler Callback, object State)
+		{
+			this.GetRoomConfiguration(RoomId, Domain, new FormResultToFormCallback(Callback).Callback, State);
+		}
+
+		/// <summary>
+		/// Gets the configuration form for a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		[Obsolete("Use the DataFormResultEventHandler override instead.")]
+		public void GetRoomConfiguration(string RoomId, string Domain, DataFormEventHandler Callback,
+			IqResultEventHandlerAsync SubmissionCallback, object State)
+		{
+			this.GetRoomConfiguration(RoomId, Domain, new FormResultToFormCallback(Callback).Callback, SubmissionCallback, State);
+		}
+
+		/// <summary>
+		/// Gets the configuration form for a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetRoomConfiguration(string RoomId, string Domain, DataFormResultEventHandler Callback, object State)
 		{
 			this.GetRoomConfiguration(RoomId, Domain, Callback, null, State);
 		}
@@ -488,8 +515,8 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void GetRoomConfiguration(string RoomId, string Domain,
-			DataFormEventHandler Callback, IqResultEventHandlerAsync SubmissionCallback, object State)
+		public void GetRoomConfiguration(string RoomId, string Domain, DataFormResultEventHandler Callback, 
+			IqResultEventHandlerAsync SubmissionCallback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -524,7 +551,7 @@ namespace Waher.Networking.XMPP.MUC
 					}
 				}
 
-				return Callback?.Invoke(this, Form) ?? Task.CompletedTask;
+				return Callback?.Invoke(this, new DataFormEventArgs(Form, e)) ?? Task.CompletedTask;
 			}, State);
 		}
 
@@ -651,9 +678,12 @@ namespace Waher.Networking.XMPP.MUC
 		{
 			TaskCompletionSource<DataForm> Result = new TaskCompletionSource<DataForm>();
 
-			this.GetRoomConfiguration(RoomId, Domain, (sender, Form) =>
+			this.GetRoomConfiguration(RoomId, Domain, (sender, e) =>
 			{
-				Result.TrySetResult(Form);
+				if (!e.Ok)
+					throw e.StanzaError ?? new XmppException("Unable to get room configuration.");
+
+				Result.TrySetResult(e.Form);
 				return Task.CompletedTask;
 			}, SubmissionCallback, State);
 

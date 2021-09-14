@@ -172,6 +172,7 @@
     <Compile Include="DataForms\FieldTypes\TextMultiField.cs" />
     <Compile Include="DataForms\FieldTypes\TextPrivateField.cs" />
     <Compile Include="DataForms\FieldTypes\TextSingleField.cs" />
+    <Compile Include="DataForms\FormResultToFormCallback.cs" />
     <Compile Include="DataForms\IPropertyFormAnnotation.cs" />
     <Compile Include="DataForms\Layout\FieldReference.cs" />
     <Compile Include="DataForms\Layout\LayoutElement.cs" />

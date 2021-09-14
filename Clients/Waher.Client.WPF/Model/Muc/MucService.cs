@@ -220,20 +220,26 @@ namespace Waher.Client.WPF.Model.Muc
 					{
 						if (e.HasStatus(MucStatus.Created))
 						{
-							this.mucClient.GetRoomConfiguration(RoomId, Domain, (sender2, ConfigurationForm) =>
+							this.mucClient.GetRoomConfiguration(RoomId, Domain, (sender2, e2) =>
 							{
-								Form = ConfigurationForm;
-
-								if (!string.IsNullOrEmpty(Password))
+								if (e2.Ok)
 								{
-									Field PasswordProtectionField = Form["muc#roomconfig_passwordprotectedroom"];
-									PasswordProtectionField?.SetValue("true");
+									Form = e2.Form;
 
-									Field PasswordField = Form["muc#roomconfig_roomsecret"];
-									PasswordField?.SetValue(Password);
+									if (!string.IsNullOrEmpty(Password))
+									{
+										Field PasswordProtectionField = Form["muc#roomconfig_passwordprotectedroom"];
+										PasswordProtectionField?.SetValue("true");
+
+										Field PasswordField = Form["muc#roomconfig_roomsecret"];
+										PasswordField?.SetValue(Password);
+									}
+
+									MainWindow.currentInstance.ShowDataForm(e2.Form);
 								}
+								else
+									MainWindow.ErrorBox(e2.ErrorText);
 
-								MainWindow.currentInstance.ShowDataForm(ConfigurationForm);
 								return Task.CompletedTask;
 							}, async (sender2, e2) =>
 							{

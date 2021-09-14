@@ -1115,12 +1115,57 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
 		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
+		[Obsolete("Use the DataFormResultEventHandler override instead.")]
 		public void GetParametersForNewNode(string To, IThingReference Node, string NodeType, string Language,
 			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback,
 			NodeInformationEventHandler NodeCallback, object State)
 		{
-			this.GetParametersForNewNode(To, Node.NodeId, Node.SourceId, Node.Partition, NodeType, Language, ServiceToken, DeviceToken, UserToken,
-				FormCallback, NodeCallback, State);
+			this.GetParametersForNewNode(To, Node, NodeType, Language, ServiceToken, DeviceToken, UserToken,
+				new FormResultToFormCallback(FormCallback).Callback, NodeCallback, State);
+		}
+
+		/// <summary>
+		/// Gets a set of parameters for the creation of a new node.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="NodeType">Type of node to create.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
+		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		[Obsolete("Use the DataFormResultEventHandler override instead.")]
+		public void GetParametersForNewNode(string To, string NodeID, string SourceID, string Partition, string NodeType, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeInformationEventHandler NodeCallback, object State)
+		{
+			this.GetParametersForNewNode(To, NodeID, SourceID, Partition, NodeType, Language, ServiceToken, DeviceToken, UserToken,
+				new FormResultToFormCallback(FormCallback).Callback, NodeCallback, State);
+		}
+
+		/// <summary>
+		/// Gets a set of parameters for the creation of a new node.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="NodeType">Type of node to create.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
+		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		public void GetParametersForNewNode(string To, IThingReference Node, string NodeType, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback,
+			NodeInformationEventHandler NodeCallback, object State)
+		{
+			this.GetParametersForNewNode(To, Node.NodeId, Node.SourceId, Node.Partition, NodeType, Language, 
+				ServiceToken, DeviceToken, UserToken, FormCallback, NodeCallback, State);
 		}
 
 		/// <summary>
@@ -1139,7 +1184,8 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
 		public void GetParametersForNewNode(string To, string NodeID, string SourceID, string Partition, string NodeType, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeInformationEventHandler NodeCallback, object State)
+			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback, 
+			NodeInformationEventHandler NodeCallback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1168,11 +1214,11 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (FormCallback != null && Form != null)
+				if (FormCallback != null)
 				{
 					try
 					{
-						await FormCallback(this, Form);
+						await FormCallback(this, new DataFormEventArgs(Form, e));
 					}
 					catch (Exception ex)
 					{
@@ -1326,8 +1372,51 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
 		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
+		[Obsolete("Use the DataFormResultEventHandler override instead.")]
 		public void GetNodeParametersForEdit(string To, IThingReference Node, string Language,
 			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback,
+			NodeInformationEventHandler NodeCallback, object State)
+		{
+			this.GetNodeParametersForEdit(To, Node, Language, ServiceToken, DeviceToken, UserToken,
+				new FormResultToFormCallback(FormCallback).Callback, NodeCallback, State);
+		}
+
+		/// <summary>
+		/// Gets the set of parameters for the purpose of editing a node.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
+		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		[Obsolete("Use the DataFormResultEventHandler override instead.")]
+		public void GetNodeParametersForEdit(string To, string NodeID, string SourceID, string Partition, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeInformationEventHandler NodeCallback, object State)
+		{
+			this.GetNodeParametersForEdit(To, NodeID, SourceID, Partition, Language, ServiceToken, DeviceToken, UserToken,
+				new FormResultToFormCallback(FormCallback).Callback, NodeCallback, State);
+		}
+
+		/// <summary>
+		/// Gets the set of parameters for the purpose of editing a node.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
+		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		public void GetNodeParametersForEdit(string To, IThingReference Node, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback,
 			NodeInformationEventHandler NodeCallback, object State)
 		{
 			this.GetNodeParametersForEdit(To, Node.NodeId, Node.SourceId, Node.Partition, Language, ServiceToken, DeviceToken, UserToken,
@@ -1349,7 +1438,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="NodeCallback">Method to call when node creation response is returned.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
 		public void GetNodeParametersForEdit(string To, string NodeID, string SourceID, string Partition, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeInformationEventHandler NodeCallback, object State)
+			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback, NodeInformationEventHandler NodeCallback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -1376,11 +1465,11 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (FormCallback != null && Form != null)
+				if (FormCallback != null)
 				{
 					try
 					{
-						await FormCallback(this, Form);
+						await FormCallback(this, new DataFormEventArgs(Form, e));
 					}
 					catch (Exception ex)
 					{
@@ -1804,8 +1893,53 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
 		/// <param name="CommandCallback">Method to call after executing command.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
+		[Obsolete("Use the DataFormResultEventHandler override instead.")]
 		public void GetCommandParameters(string To, IThingReference Node, string Command, string Language,
 			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback,
+			NodeCommandResponseEventHandler CommandCallback, object State)
+		{
+			this.GetCommandParameters(To, Node, Command, Language, ServiceToken, DeviceToken, UserToken,
+				new FormResultToFormCallback(FormCallback).Callback, CommandCallback, State);
+		}
+
+		/// <summary>
+		/// Gets the set of parameters for a parametrized command.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
+		/// <param name="CommandCallback">Method to call after executing command.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		[Obsolete("Use the DataFormResultEventHandler override instead.")]
+		public void GetCommandParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeCommandResponseEventHandler CommandCallback, object State)
+		{
+			this.GetCommandParameters(To, NodeID, SourceID, Partition, Command, Language, ServiceToken, DeviceToken, UserToken,
+				new FormResultToFormCallback(FormCallback).Callback, CommandCallback, State);
+		}
+
+		/// <summary>
+		/// Gets the set of parameters for a parametrized command.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
+		/// <param name="CommandCallback">Method to call after executing command.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		public void GetCommandParameters(string To, IThingReference Node, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback,
 			NodeCommandResponseEventHandler CommandCallback, object State)
 		{
 			this.GetCommandParameters(To, Node.NodeId, Node.SourceId, Node.Partition, Command, Language, ServiceToken, DeviceToken, UserToken,
@@ -1828,7 +1962,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="CommandCallback">Method to call after executing command.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
 		public void GetCommandParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeCommandResponseEventHandler CommandCallback, object State)
+			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback, NodeCommandResponseEventHandler CommandCallback, object State)
 		{
 			this.GetCommandParameters(To, NodeID, SourceID, Partition, Command, Language, ServiceToken, DeviceToken, UserToken, FormCallback, CommandCallback, null, State);
 		}
@@ -1846,8 +1980,53 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
 		/// <param name="QueryCallback">Method to call when query execution has begun.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
+		[Obsolete("Use the DataFormResultEventHandler override instead.")]
 		public void GetQueryParameters(string To, IThingReference Node, string Command, string Language,
 			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback,
+			NodeQueryResponseEventHandler QueryCallback, object State)
+		{
+			this.GetQueryParameters(To, Node, Command, Language, ServiceToken, DeviceToken, UserToken,
+				new FormResultToFormCallback(FormCallback).Callback, QueryCallback, State);
+		}
+
+		/// <summary>
+		/// Gets the set of parameters for a parametrized query.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="NodeID">Node ID</param>
+		/// <param name="SourceID">Optional Source ID</param>
+		/// <param name="Partition">Optional Partition</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
+		/// <param name="QueryCallback">Method to call when query execution has begun.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		[Obsolete("Use the DataFormResultEventHandler override instead.")]
+		public void GetQueryParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeQueryResponseEventHandler QueryCallback, object State)
+		{
+			this.GetQueryParameters(To, NodeID, SourceID, Partition, Command, Language, ServiceToken, DeviceToken, UserToken,
+				new FormResultToFormCallback(FormCallback).Callback, QueryCallback, State);
+		}
+
+		/// <summary>
+		/// Gets the set of parameters for a parametrized query.
+		/// </summary>
+		/// <param name="To">Address of concentrator server.</param>
+		/// <param name="Node">Node reference.</param>
+		/// <param name="Command">Command for which to get parameters.</param>
+		/// <param name="Language">Code of desired language.</param>
+		/// <param name="ServiceToken">Optional Service token.</param>
+		/// <param name="DeviceToken">Optional Device token.</param>
+		/// <param name="UserToken">Optional User token.</param>
+		/// <param name="FormCallback">Method to call when parameter form is returned.</param>
+		/// <param name="QueryCallback">Method to call when query execution has begun.</param>
+		/// <param name="State">State object to pass on to the node callback method.</param>
+		public void GetQueryParameters(string To, IThingReference Node, string Command, string Language,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback,
 			NodeQueryResponseEventHandler QueryCallback, object State)
 		{
 			this.GetCommandParameters(To, Node.NodeId, Node.SourceId, Node.Partition, Command, Language, ServiceToken, DeviceToken, UserToken,
@@ -1870,13 +2049,13 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <param name="QueryCallback">Method to call when query execution has begun.</param>
 		/// <param name="State">State object to pass on to the node callback method.</param>
 		public void GetQueryParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeQueryResponseEventHandler QueryCallback, object State)
+			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback, NodeQueryResponseEventHandler QueryCallback, object State)
 		{
 			this.GetCommandParameters(To, NodeID, SourceID, Partition, Command, Language, ServiceToken, DeviceToken, UserToken, FormCallback, null, QueryCallback, State);
 		}
 
 		private void GetCommandParameters(string To, string NodeID, string SourceID, string Partition, string Command, string Language,
-			string ServiceToken, string DeviceToken, string UserToken, DataFormEventHandler FormCallback, NodeCommandResponseEventHandler CommandCallback,
+			string ServiceToken, string DeviceToken, string UserToken, DataFormResultEventHandler FormCallback, NodeCommandResponseEventHandler CommandCallback,
 			NodeQueryResponseEventHandler QueryCallback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -1906,11 +2085,11 @@ namespace Waher.Networking.XMPP.Concentrator
 				else
 					e.Ok = false;
 
-				if (FormCallback != null && Form != null)
+				if (FormCallback != null)
 				{
 					try
 					{
-						await FormCallback(this, Form);
+						await FormCallback(this, new DataFormEventArgs(Form, e));
 					}
 					catch (Exception ex)
 					{
@@ -1942,7 +2121,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				this.ExecuteCommand(To, NodeID, SourceID, Partition, Command, Form, Language, ServiceToken, DeviceToken, UserToken, CommandCallback, State);
 			else
 				this.ExecuteQuery(To, NodeID, SourceID, Partition, Command, Form, Language, ServiceToken, DeviceToken, UserToken, QueryCallback, State);
-		
+
 			return Task.CompletedTask;
 		}
 

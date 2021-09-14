@@ -948,6 +948,25 @@
             <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetRoomConfiguration(System.String,System.String,Waher.Networking.XMPP.DataForms.DataFormResultEventHandler,System.Object)">
+            <summary>
+            Gets the configuration form for a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetRoomConfiguration(System.String,System.String,Waher.Networking.XMPP.DataForms.DataFormResultEventHandler,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Gets the configuration form for a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="SubmissionCallback">Method to call when configuration has been submitted.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SubmitConfigurationForm(Waher.Networking.XMPP.DataForms.DataForm)">
             <summary>
             Submits a room configuration form.

@@ -373,15 +373,20 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 
-				ConcentratorClient.GetParametersForNewNode(FullJid, this.nodeInfo, Type, "en", string.Empty, string.Empty, string.Empty, (sender, Form) =>
+				ConcentratorClient.GetParametersForNewNode(FullJid, this.nodeInfo, Type, "en", string.Empty, string.Empty, string.Empty, (sender, e) =>
 				{
 					MainWindow.MouseDefault();
 
-					MainWindow.UpdateGui(() =>
+					if (e.Ok)
 					{
-						ParameterDialog Dialog = new ParameterDialog(Form);
-						Dialog.ShowDialog();
-					});
+						MainWindow.UpdateGui(() =>
+						{
+							ParameterDialog Dialog = new ParameterDialog(e.Form);
+							Dialog.ShowDialog();
+						});
+					}
+					else
+						MainWindow.ErrorBox(e.ErrorText);
 
 					return Task.CompletedTask;
 
@@ -457,15 +462,20 @@ namespace Waher.Client.WPF.Model.Concentrator
 			{
 				Mouse.OverrideCursor = Cursors.Wait;
 
-				ConcentratorClient.GetNodeParametersForEdit(FullJid, this.nodeInfo, "en", string.Empty, string.Empty, string.Empty, (sender, Form) =>
+				ConcentratorClient.GetNodeParametersForEdit(FullJid, this.nodeInfo, "en", string.Empty, string.Empty, string.Empty, (sender, e) =>
 				{
 					MainWindow.MouseDefault();
 
-					MainWindow.UpdateGui(() =>
+					if (e.Ok)
 					{
-						ParameterDialog Dialog = new ParameterDialog(Form);
-						Dialog.ShowDialog();
-					});
+						MainWindow.UpdateGui(() =>
+						{
+							ParameterDialog Dialog = new ParameterDialog(e.Form);
+							Dialog.ShowDialog();
+						});
+					}
+					else
+						MainWindow.ErrorBox(e.ErrorText);
 
 					return Task.CompletedTask;
 
@@ -631,15 +641,20 @@ namespace Waher.Client.WPF.Model.Concentrator
 						Mouse.OverrideCursor = Cursors.Wait;
 
 						ConcentratorClient.GetCommandParameters(FullJid, this.NodeId, this.SourceId, this.Partition, Command.Command,
-							ConcentratorClient.Client.Language, string.Empty, string.Empty, string.Empty, (sender2, Form) =>
+							ConcentratorClient.Client.Language, string.Empty, string.Empty, string.Empty, (sender2, e2) =>
 							{
 								MainWindow.MouseDefault();
 
-								MainWindow.UpdateGui(() =>
+								if (e2.Ok)
 								{
-									ParameterDialog Dialog = new ParameterDialog(Form);
-									Dialog.ShowDialog();
-								});
+									MainWindow.UpdateGui(() =>
+									{
+										ParameterDialog Dialog = new ParameterDialog(e2.Form);
+										Dialog.ShowDialog();
+									});
+								}
+								else
+									MainWindow.ErrorBox(e2.ErrorText);
 
 								return Task.CompletedTask;
 							},
@@ -654,15 +669,20 @@ namespace Waher.Client.WPF.Model.Concentrator
 						Mouse.OverrideCursor = Cursors.Wait;
 
 						ConcentratorClient.GetQueryParameters(FullJid, this.NodeId, this.SourceId, this.Partition, Command.Command,
-							ConcentratorClient.Client.Language, string.Empty, string.Empty, string.Empty, (sender2, Form) =>
+							ConcentratorClient.Client.Language, string.Empty, string.Empty, string.Empty, (sender2, e2) =>
 							{
 								MainWindow.MouseDefault();
 
-								MainWindow.UpdateGui(() =>
+								if (e2.Ok)
 								{
-									ParameterDialog Dialog = new ParameterDialog(Form);
-									Dialog.ShowDialog();
-								});
+									MainWindow.UpdateGui(() =>
+									{
+										ParameterDialog Dialog = new ParameterDialog(e2.Form);
+										Dialog.ShowDialog();
+									});
+								}
+								else
+									MainWindow.ErrorBox(e2.ErrorText);
 
 								return Task.CompletedTask;
 							},

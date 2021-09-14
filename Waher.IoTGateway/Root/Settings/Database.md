@@ -32,7 +32,7 @@ foreach PluginType in Waher.Runtime.Inventory.Types.GetTypesImplementingInterfac
 	Title:=Plugin.Name(Language);
 	]]<p>
 <input name="Plugin" id="Plugin((k))" type="radio" value="((FN:=String(PluginType) ))" onclick="SelectDatabase(this);"((Config.DatabasePluginName=FN ? " checked" : ""))/>
-<label for="Plugin((i++))">((MarkdownEncode(Title) ))</label>
+<label for="Plugin((k++))">((MarkdownEncode(Title) ))</label>
 </p>
 [[;
 )}}

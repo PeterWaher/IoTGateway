@@ -132,6 +132,7 @@
     <Compile Include="Events\SnifferRegistrationEventArgs..cs" />
     <Compile Include="Events\SourceEventMessageEventArgs.cs" />
     <Compile Include="Events\StringsResponseEventArgs..cs" />
+    <Compile Include="IEditableObject.cs" />
     <Compile Include="NodeCommand.cs" />
     <Compile Include="NodeInformation.cs" />
     <Compile Include="Parameters.cs" />

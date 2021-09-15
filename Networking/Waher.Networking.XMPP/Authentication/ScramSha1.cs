@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Waher.Security;
 
 namespace Waher.Networking.XMPP.Authentication

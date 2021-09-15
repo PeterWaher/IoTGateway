@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.Layout;
 
 namespace Waher.Networking.XMPP.DataForms

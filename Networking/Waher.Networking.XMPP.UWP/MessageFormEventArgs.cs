@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Xml;
-using Waher.Content.Xml;
 using Waher.Networking.XMPP.DataForms;
 
 namespace Waher.Networking.XMPP

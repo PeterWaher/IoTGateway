@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 

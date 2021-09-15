@@ -1241,7 +1241,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			string ServiceToken = (string)P[6];
 			string DeviceToken = (string)P[7];
 			string UserToken = (string)P[8];
-			DataFormEventHandler FormCallback = (DataFormEventHandler)P[9];
+			DataFormResultEventHandler FormCallback = (DataFormResultEventHandler)P[9];
 			NodeInformationEventHandler NodeCallback = (NodeInformationEventHandler)P[10];
 			object State = P[11];
 
@@ -1278,7 +1278,8 @@ namespace Waher.Networking.XMPP.Concentrator
 					{
 						try
 						{
-							await FormCallback(this, Form);
+							e.Ok = true;
+							await FormCallback(this, new DataFormEventArgs(Form, e));
 						}
 						catch (Exception ex)
 						{
@@ -1491,7 +1492,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			string ServiceToken = (string)P[5];
 			string DeviceToken = (string)P[6];
 			string UserToken = (string)P[7];
-			DataFormEventHandler FormCallback = (DataFormEventHandler)P[8];
+			DataFormResultEventHandler FormCallback = (DataFormResultEventHandler)P[8];
 			NodeInformationEventHandler NodeCallback = (NodeInformationEventHandler)P[9];
 			object State = P[10];
 
@@ -1526,7 +1527,8 @@ namespace Waher.Networking.XMPP.Concentrator
 					{
 						try
 						{
-							FormCallback(this, Form);
+							e.Ok = true;
+							FormCallback(this, new DataFormEventArgs(Form, e));
 						}
 						catch (Exception ex)
 						{
@@ -2112,7 +2114,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			string ServiceToken = (string)P[6];
 			string DeviceToken = (string)P[7];
 			string UserToken = (string)P[8];
-			DataFormEventHandler FormCallback = (DataFormEventHandler)P[9];
+			DataFormResultEventHandler FormCallback = (DataFormResultEventHandler)P[9];
 			NodeCommandResponseEventHandler CommandCallback = (NodeCommandResponseEventHandler)P[10];
 			NodeQueryResponseEventHandler QueryCallback = (NodeQueryResponseEventHandler)P[11];
 			object State = P[12];

@@ -751,6 +751,8 @@ There are multiple ways to execute conditional loops. These statements have the 
 **Note 2**: The use of the `STEP` keyword together with the step size is optional. If omitted, a default step size of `1` or `-1` will be used, depending
 if the loop is ascending or descending.
 
+**Note 3**: Exceptions caught using the `CATCH` statement are accessible within the `CATCH` statement by referencing the variable `Exception`.
+
 ### Lists
 
 Lists of statements are created by writing a list of statements or arguments, each separated by a comma `,` character. Example:

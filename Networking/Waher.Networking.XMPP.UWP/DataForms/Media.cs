@@ -22,6 +22,42 @@ namespace Waher.Networking.XMPP.DataForms
 		private byte[] bin = null;
 		private string url = null;
 
+		/// <summary>
+		/// Class containing information about media content in a data form.
+		/// 
+		/// Specified in XEP-0221:
+		///
+		/// XEP-0221: Data Forms Media Element
+		/// http://xmpp.org/extensions/xep-0221.html
+		/// </summary>
+		/// <param name="Url">Media URL</param>
+		/// <param name="ContentType">Content-Type</param>
+		public Media(string Url, string ContentType)
+			: this(Url, ContentType, null, null)
+		{
+		}
+
+		/// <summary>
+		/// Class containing information about media content in a data form.
+		/// 
+		/// Specified in XEP-0221:
+		///
+		/// XEP-0221: Data Forms Media Element
+		/// http://xmpp.org/extensions/xep-0221.html
+		/// </summary>
+		/// <param name="Url">Media URL</param>
+		/// <param name="ContentType">Content-Type</param>
+		/// <param name="Width">Width</param>
+		/// <param name="Height">Height</param>
+		public Media(string Url, string ContentType, int? Width, int? Height)
+		{
+			this.uris = new KeyValuePair<string, Uri>[] { new KeyValuePair<string, Uri>(ContentType, new Uri(Url)) };
+			this.width = Width;
+			this.height = Height;
+			this.contentType = ContentType;
+			this.url = Url;
+		}
+
 		internal Media(XmlElement E)
 		{
 			if (E.HasAttribute("width"))

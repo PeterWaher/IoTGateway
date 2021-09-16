@@ -182,18 +182,27 @@ namespace Waher.Networking.XMPP.DataForms
 		/// Validates field input. The <see cref="Field.Error"/> property will reflect any errors found.
 		/// </summary>
 		/// <param name="Value">Field Value(s)</param>
-		public virtual void Validate(params string[] Value)
+		/// <returns>Parsed value(s).</returns>
+		public virtual object[] Validate(params string[] Value)
 		{
+			object[] Result = null;
+
 			this.error = string.Empty;
 
-			if ((Value is null || Value.Length == 0 || (Value.Length == 1 && string.IsNullOrEmpty(Value[0]))) && !(this.validationMethod is ListRangeValidation))
+			if ((Value is null || 
+				Value.Length == 0 || 
+				(Value.Length == 1 && string.IsNullOrEmpty(Value[0]))) && !(this.validationMethod is ListRangeValidation))
 			{
 				if (this.required)
 					this.error = "Required field.";
+
+				Result = new object[0];
 			}
 			else if (!(Value is null))
 			{
-				if (!(this.dataType is null))
+				if (this.dataType is null)
+					Result = Value;
+				else
 				{
 					List<object> Parsed = new List<object>();
 
@@ -206,10 +215,14 @@ namespace Waher.Networking.XMPP.DataForms
 							Parsed.Add(Obj);
 					}
 
+					Result = Parsed.ToArray();
+
 					if (!(this.validationMethod is null))
-						this.validationMethod.Validate(this, this.dataType, Parsed.ToArray(), Value);
+						this.validationMethod.Validate(this, this.dataType, Result, Value);
 				}
 			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -218,9 +231,10 @@ namespace Waher.Networking.XMPP.DataForms
 		/// The values are validated.
 		/// </summary>
 		/// <param name="Value">Value(s).</param>
-		public void SetValue(params string[] Value)
+		/// <returns>Parsed value(s).</returns>
+		public object[] SetValue(params string[] Value)
 		{
-			this.Validate(Value);
+			object[] Result = this.Validate(Value);
 
 			this.edited = true;
 			this.valueStrings = Value;
@@ -238,6 +252,8 @@ namespace Waher.Networking.XMPP.DataForms
 
 				this.form.Client.SendIqSet(this.form.From, Xml.ToString(), this.FormUpdated, null);
 			}
+
+			return Result;
 		}
 
 		private Task FormUpdated(object Sender, IqResultEventArgs e)

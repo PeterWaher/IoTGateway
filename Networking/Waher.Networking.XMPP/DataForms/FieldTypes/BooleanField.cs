@@ -68,7 +68,8 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		/// Validates field input. The <see cref="Field.Error"/> property will reflect any errors found.
 		/// </summary>
 		/// <param name="Value">Field Value(s)</param>
-		public override void Validate(params string[] Value)
+		/// <returns>Parsed value(s).</returns>
+		public override object[] Validate(params string[] Value)
 		{
 			base.Validate(Value);
 
@@ -80,14 +81,16 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 				{
 					foreach (string s in Value)
 					{
-						if (!CommonTypes.TryParse(s, out bool _))
-						{
-							this.Error = "Invalid boolean value.";
-							break;
-						}
+						if (CommonTypes.TryParse(s, out bool b))
+							return new object[] { b };
+
+						this.Error = "Invalid boolean value.";
+						break;
 					}
 				}
 			}
+
+			return null;
 		}
 
 	}

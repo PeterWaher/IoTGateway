@@ -67,12 +67,15 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		/// Validates field input. The <see cref="Field.Error"/> property will reflect any errors found.
 		/// </summary>
 		/// <param name="Value">Field Value(s)</param>
-		public override void Validate(params string[] Value)
+		/// <returns>Parsed value(s).</returns>
+		public override object[] Validate(params string[] Value)
 		{
-			base.Validate(Value);
+			object[] Result = base.Validate(Value);
 
 			if (!this.HasError && Value != null && Value.Length > 1)
 				this.Error = "Only one value allowed.";
+
+			return Result;
 		}
 
 	}

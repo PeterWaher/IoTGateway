@@ -798,11 +798,11 @@ namespace Waher.Script.Graphs
 		/// <returns>Vector of labels.</returns>
 		public static double[] GetLabels(double Min, double Max, int ApproxNrLabels)
 		{
-			if (double.IsInfinity(Min))
-				throw new ArgumentException("Infinite interval.", nameof(Min));
+			if (double.IsInfinity(Min) || double.IsNaN(Min))
+				throw new ArgumentException("Undefined or infinite interval.", nameof(Min));
 
-			if (double.IsInfinity(Max))
-				throw new ArgumentException("Infinite interval.", nameof(Max));
+			if (double.IsInfinity(Max) || double.IsNaN(Max))
+				throw new ArgumentException("Undefined or infinite interval.", nameof(Max));
 
 			// Calculate steps, without introducing growing round-off errors.
 

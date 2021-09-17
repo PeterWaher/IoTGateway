@@ -38,7 +38,7 @@ namespace Waher.Script.Operators.Arithmetics
             while (Operand > 0)
             {
                 Result *= Operand;
-                if (double.IsInfinity(Result))
+                if (double.IsInfinity(Result) || double.IsNaN(Result))
                     throw new ScriptRuntimeException("Overflow.", this);
 
                 Operand--;

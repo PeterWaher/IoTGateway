@@ -159,7 +159,6 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public void Differentiation_Test_22_ArcSecH()
 		{
-			this.Test("DrawTangent([2,5],arcsech,1,10)");
 			this.Test("DrawTangent([0.25,0.75],arcsech,0.1,0.9)");
 		}
 

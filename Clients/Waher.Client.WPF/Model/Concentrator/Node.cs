@@ -185,6 +185,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 								this.OnUpdated();
 								this.DataSource?.NodesAdded(Children.Values, this);
 							}
+							else
+								MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get child nodes." : e.ErrorText);
 
 							return Task.CompletedTask;
 
@@ -357,6 +359,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 								break;
 						}
 					}
+					else
+						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to add nodes." : e.ErrorText);
 
 					return Task.CompletedTask;
 
@@ -394,6 +398,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 				{
 					if (e.Ok)
 						this.Add(new Node(this, e.NodeInformation));
+					else
+						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to set parameters." : e.ErrorText);
 
 					return Task.CompletedTask;
 
@@ -445,6 +451,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 							Log.Critical(ex);
 						}
 					}
+					else
+						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to destroy node." : e.ErrorText);
 
 					return Task.CompletedTask;
 
@@ -492,6 +500,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 						if (NewKey != OldKey && Parent != null)
 							Parent.RenameChild(OldKey, NewKey, this);
 					}
+					else
+						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to set properties." : e.ErrorText);
 
 					return Task.CompletedTask;
 
@@ -568,6 +578,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 					{
 						if (e.Ok)
 							this.commands = e.Result;
+						else
+							MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to get commands." : e.ErrorText);
 
 						return Task.CompletedTask;
 

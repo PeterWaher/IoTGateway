@@ -29,6 +29,7 @@ namespace Waher.Script.Persistence.SQL
 		private ScriptNode where;
 		private ScriptNode having;
 		private ScriptNode offset;
+		private bool selectOneObject;
 
 		/// <summary>
 		/// Executes a SELECT statement against the object database.
@@ -77,6 +78,18 @@ namespace Waher.Script.Persistence.SQL
 
 			if (!(this.columns is null) && this.columns.Length != this.columnNames.Length)
 				throw new ArgumentException("GroupBy and GroupByNames must be of equal length.", nameof(GroupByNames));
+
+			this.CalcSelectOneObject();
+		}
+
+		private void CalcSelectOneObject()
+		{
+			this.selectOneObject =
+				this.columns is null &&
+				!(this.top is null) &&
+				this.top is ConstantElement TopConstant &&
+				TopConstant.Constant is DoubleNumber D &&
+				D.Value == 1;
 		}
 
 		/// <summary>
@@ -255,6 +268,14 @@ namespace Waher.Script.Persistence.SQL
 			{
 				Items.AddLast(e2.CurrentRecord);
 				NrRecords++;
+			}
+
+			if (this.selectOneObject)
+			{
+				if (Items.First is null)
+					return ObjectValue.Null;
+				else if (NrRecords == 1 && Items.First.Value.Length == 1)
+					return Items.First.Value[0];
 			}
 
 			IElement[] Elements = new IElement[Columns2 is null ? NrRecords : NrRecords * c];

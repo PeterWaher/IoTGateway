@@ -18,7 +18,7 @@ Parameter: Add
 
 {{
 Item:=select top 1 * from Waher.Security.Users.User where UserName=UserId;
-if count(Item)=0 then 
+if !exists(Item) then 
 (
 	if Add then
 		Item:=Create(Waher.Security.Users.User)

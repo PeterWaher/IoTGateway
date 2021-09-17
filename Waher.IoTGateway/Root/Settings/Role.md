@@ -19,7 +19,7 @@ Parameter: Add
 
 {{
 Role:=select top 1 * from Waher.Security.Users.Role where Id=RoleId;
-if count(Role)=0 then 
+if !exists(Role) then 
 (
 	if Add then
 		Role:=Create(Waher.Security.Users.Role)

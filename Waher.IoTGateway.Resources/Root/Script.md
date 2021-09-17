@@ -129,14 +129,15 @@ corresponding libraries.
 
 There are also a set of predefined variables:
 
-| Variable               | Description                                              |
-|:----------------------:|----------------------------------------------------------|
-| `Now`                  | Current date and time, local time coordinates.           |
-| `NowUtc`               | Current date and time, UTC coordinates.                  |
-| `Time`                 | Current time, local time coordinates.                    |
-| `TimeUtc`              | Current time, UTC coordinates.                           |
-| `Today`                | Current date, local time coordinates.                    |
-| `TodayUtc`             | Current date, UTC coordinates.                           |
+| Variable               | Description                                                 |
+|:----------------------:|-------------------------------------------------------------|
+| `Exception`            | Access to current exception object, in a `CATCH` statement. |
+| `Now`                  | Current date and time, local time coordinates.              |
+| `NowUtc`               | Current date and time, UTC coordinates.                     |
+| `Time`                 | Current time, local time coordinates.                       |
+| `TimeUtc`              | Current time, UTC coordinates.                              |
+| `Today`                | Current date, local time coordinates.                       |
+| `TodayUtc`             | Current date, UTC coordinates.                              |
 
 **Note**: Names are case sensitive. `r` and `R` point to different objects.
 
@@ -1753,7 +1754,8 @@ The following functions are available in the `Waher.Content.Markdown` library.
 | `PreprocessMarkdown(MD)` | Preprocesses a markdown string `MD`, and returns it as a string. | [Example][PreprocessMarkdownExample] |
 | `ToMarkdown(Obj)`        | Converts the object to a string containing the Markdown Representation of the object. | [Example][ToMarkdownExample] |
 
-The following predefined context-specific constants (read-only variables) are available in inline script:
+The following 
+context-specific constants (read-only variables) are available in inline script:
 
 | Variable        | Description                                                           |
 |:---------------:|-----------------------------------------------------------------------|
@@ -2095,6 +2097,11 @@ Example:
 v:=[{a:1,b:2},{a:2,b:1}];
 select a, b from v
 ```
+
+##### Selecting a single object
+
+If you select a single object, using a statement like `SELECT TOP 1 * ...` (here `TOP 1 *` identifies such a selection), either `null` 
+or an object will be returned, instead of an empty array or an array of one or multiple objects.
 
 ##### SELECT FROM XML
 

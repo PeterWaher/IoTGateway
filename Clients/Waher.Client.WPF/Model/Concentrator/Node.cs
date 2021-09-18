@@ -637,7 +637,6 @@ namespace Waher.Client.WPF.Model.Concentrator
 					case CommandType.Simple:
 						Mouse.OverrideCursor = Cursors.Wait;
 
-						this.commands = null;
 						ConcentratorClient.ExecuteCommand(FullJid, this.NodeId, this.SourceId, this.Partition, Command.Command,
 							ConcentratorClient.Client.Language, string.Empty, string.Empty, string.Empty, (sender2, e2) =>
 							{
@@ -673,7 +672,6 @@ namespace Waher.Client.WPF.Model.Concentrator
 							},
 							(sender2, e2) =>
 							{
-								this.commands = null;
 								this.ShowCommandResult(e2, Command);
 								return Task.CompletedTask;
 							}, null);
@@ -702,8 +700,6 @@ namespace Waher.Client.WPF.Model.Concentrator
 							},
 							(sender2, e2) =>
 							{
-								this.commands = null;
-
 								if (e2.Ok)
 								{
 									MainWindow.UpdateGui(() =>
@@ -728,6 +724,12 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		private void ShowCommandResult(IqResultEventArgs e, NodeCommand Command)
 		{
+			if (!(this.commands is null))
+			{
+				this.commands = null;
+				this.SelectionChanged();
+			}
+
 			if (e.Ok)
 			{
 				if (!string.IsNullOrEmpty(Command.SuccessString))

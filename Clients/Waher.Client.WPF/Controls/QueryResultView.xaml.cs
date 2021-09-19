@@ -44,6 +44,8 @@ namespace Waher.Client.WPF.Controls
 			this.query.TableCompleted += Query_TableCompleted;
 			this.query.TableUpdated += Query_TableUpdated;
 			this.query.ObjectAdded += Query_ObjectAdded;
+			
+			this.query.Resume();
 
 			InitializeComponent();
 
@@ -310,11 +312,8 @@ namespace Waher.Client.WPF.Controls
 
 		public void Dispose()
 		{
-			if (this.query != null)
-			{
-				this.query.Dispose();
-				this.query = null;
-			}
+			this.query?.Dispose();
+			this.query = null;
 		}
 
 		public void NewButton_Click(object sender, RoutedEventArgs e)

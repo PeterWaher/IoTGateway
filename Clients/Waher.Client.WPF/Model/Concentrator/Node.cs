@@ -709,6 +709,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 										QueryResultView ResultView = new QueryResultView(this, e2.Query, HeaderLabel);
 										TabItem.Content = ResultView;
+
+										TabItem.Focus();
 									});
 								}
 

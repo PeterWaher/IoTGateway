@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media.Imaging;
 using Waher.Events;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Concentrator.Queries;
 using Waher.Things.Queries;
 using Waher.Client.WPF.Model.Concentrator;
+using SkiaSharp;
+using Waher.Script.Graphs;
+using System.IO;
 
 namespace Waher.Client.WPF.Controls
 {
@@ -44,7 +48,7 @@ namespace Waher.Client.WPF.Controls
 			this.query.TableCompleted += Query_TableCompleted;
 			this.query.TableUpdated += Query_TableUpdated;
 			this.query.ObjectAdded += Query_ObjectAdded;
-			
+
 			this.query.Resume();
 
 			InitializeComponent();
@@ -298,13 +302,37 @@ namespace Waher.Client.WPF.Controls
 				if (Obj is null)
 					return;
 
-				// TODO: Images
-
-				this.currentPanel.Children.Add(new TextBlock()
+				if (Obj is SKImage Image)
 				{
-					Text = Obj.ToString(),
-					Margin = new Thickness(0, 0, 0, 6)
-				});
+					PixelInformation Pixels = PixelInformation.FromImage(Image);
+
+					BitmapImage BitmapImage;
+					byte[] Bin = Pixels.EncodeAsPng();
+
+					using (MemoryStream ms = new MemoryStream(Bin))
+					{
+						BitmapImage = new BitmapImage();
+						BitmapImage.BeginInit();
+						BitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+						BitmapImage.StreamSource = ms;
+						BitmapImage.EndInit();
+					}
+
+					this.currentPanel.Children.Add(new Image()
+					{
+						Source = BitmapImage,
+						Width = Pixels.Width,
+						Height = Pixels.Height
+					});
+				}
+				else
+				{
+					this.currentPanel.Children.Add(new TextBlock()
+					{
+						Text = Obj.ToString(),
+						Margin = new Thickness(0, 0, 0, 6)
+					});
+				}
 			}));
 
 			return Task.CompletedTask;

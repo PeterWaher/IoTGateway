@@ -93,6 +93,8 @@
     <Compile Include=".bak\Waher.Runtime.Inventory\IModule.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\IProcessingSupport.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\SingletonAttribute.cs" />
+    <Compile Include=".bak\Waher.Runtime.Inventory\SingletonKey.cs" />
+    <Compile Include=".bak\Waher.Runtime.Inventory\SingletonRecord.cs" />
     <Compile Include=".bak\Waher.Runtime.Inventory\Types.cs" />
     <Compile Include=".bak\Waher.Runtime.Temporary\TemporaryFile.cs" />
     <Compile Include=".bak\Waher.Runtime.Temporary\TemporaryStream.cs" />

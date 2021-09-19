@@ -1,5 +1,10 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Xml;
+using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Things.Queries;
 
@@ -10,6 +15,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 	/// </summary>
 	public class NodeQuery : IDisposable
 	{
+		private readonly object synchObj = new object();
 		private readonly string queryId;
 		private readonly string to;
 		private readonly string nodeID;
@@ -22,6 +28,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		private readonly string userToken;
 		private readonly ConcentratorClient client;
 		private bool isDone = false;
+		private bool paused = true;
 		private int seqNr = 0;
 		private string title = string.Empty;
 		private readonly List<QueryItem> result = new List<QueryItem>();
@@ -118,6 +125,319 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		/// If the query has been completed.
 		/// </summary>
 		public bool IsDone => this.isDone;
+
+		/// <summary>
+		/// If query reception is paused. It can be resumed, by calling <see cref="Resume"/>. The object is paused by default,
+		/// and resumed when event handlers have been properly assigned.
+		/// </summary>
+		public bool Paused
+		{
+			get
+			{
+				lock (this.synchObj)
+				{
+					return this.paused;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Resumes a paused query reception.
+		/// </summary>
+		public void Resume()
+		{
+			lock (this.synchObj)
+			{
+				if (this.paused)
+				{
+					MessageEventArgs e;
+
+					while (!((e = this.queuedMessages?.First?.Value.Value) is null))
+					{
+						if (this.Process(e, false))
+							this.queuedMessages.RemoveFirst();
+						else
+							break;
+					}
+
+					this.paused = false;
+				}
+			}
+		}
+
+		internal bool Process(MessageEventArgs e, bool CanQueue)
+		{
+			int SequenceNr = XML.Attribute(e.Content, "seqNr", 0);
+
+			int ExpectedSeqNr = this.SequenceNr + 1;
+			if (SequenceNr < ExpectedSeqNr)
+				return true;
+
+			if (SequenceNr == ExpectedSeqNr && !this.paused)
+			{
+				this.NextSequenceNr();
+				this.ProcessQueryProgress(e);
+
+				if (this.HasQueued)
+				{
+					ExpectedSeqNr++;
+
+					e = this.PopQueued(ExpectedSeqNr);
+					while (!(e is null))
+					{
+						this.ProcessQueryProgress(e);
+						ExpectedSeqNr++;
+						e = this.PopQueued(ExpectedSeqNr);
+					}
+				}
+
+				return true;
+			}
+			else
+			{
+				if (CanQueue)
+					this.Queue(SequenceNr, e);
+
+				return false;
+			}
+		}
+
+		private void ProcessQueryProgress(MessageEventArgs e)
+		{
+			string s, s2;
+
+			foreach (XmlNode N in e.Content.ChildNodes)
+			{
+				if (N is XmlElement E)
+				{
+					try
+					{
+						switch (E.LocalName)
+						{
+							case "title":
+								s = XML.Attribute(E, "name");
+								this.SetTitle(s, e);
+								break;
+
+							case "tableDone":
+								s = XML.Attribute(E, "tableId");
+								this.TableDone(s, e);
+								break;
+
+							case "status":
+								s = XML.Attribute(E, "message");
+								this.StatusMessage(s, e);
+								break;
+
+							case "queryStarted":
+								this.ReportStarted(e);
+								break;
+
+							case "newTable":
+								s = XML.Attribute(E, "tableId");
+								s2 = XML.Attribute(E, "tableName");
+
+								List<Column> Columns = new List<Column>();
+
+								foreach (XmlNode N2 in E.ChildNodes)
+								{
+									if (N2 is XmlElement E2 && E2.LocalName == "column")
+									{
+										string ColumnId = XML.Attribute(E2, "columnId");
+										string Header = XML.Attribute(E2, "header");
+										string SourceID = XML.Attribute(E2, "src");
+										string Partition2 = XML.Attribute(E2, "pt");
+										SKColor? FgColor = null;
+										SKColor? BgColor = null;
+										ColumnAlignment? ColumnAlignment = null;
+										byte? NrDecimals = null;
+
+										if (E2.HasAttribute("fgColor") && ConcentratorClient.TryParse(E2.GetAttribute("fgColor"), out SKColor Color))
+											FgColor = Color;
+
+										if (E2.HasAttribute("bgColor") && ConcentratorClient.TryParse(E2.GetAttribute("bgColor"), out Color))
+											BgColor = Color;
+
+										if (E2.HasAttribute("alignment") && Enum.TryParse<ColumnAlignment>(E2.GetAttribute("alignment"), out ColumnAlignment ColumnAlignment2))
+											ColumnAlignment = ColumnAlignment2;
+
+										if (E2.HasAttribute("nrDecimals") && byte.TryParse(E2.GetAttribute("nrDecimals"), out byte b))
+											NrDecimals = b;
+
+										Columns.Add(new Column(ColumnId, Header, SourceID, Partition2, FgColor, BgColor, ColumnAlignment, NrDecimals));
+									}
+								}
+
+								this.NewTable(new Table(s, s2, Columns.ToArray()), e);
+								break;
+
+							case "newRecords":
+								s = XML.Attribute(E, "tableId");
+
+								List<Record> Records = new List<Record>();
+								List<object> Record = null;
+
+								foreach (XmlNode N2 in E.ChildNodes)
+								{
+									if (N2 is XmlElement E2 && E2.LocalName == "record")
+									{
+										if (Record is null)
+											Record = new List<object>();
+										else
+											Record.Clear();
+
+										foreach (XmlNode N3 in E2.ChildNodes)
+										{
+											if (N3 is XmlElement E3)
+											{
+												switch (E3.LocalName)
+												{
+													case "void":
+														Record.Add(null);
+														break;
+
+													case "boolean":
+														if (CommonTypes.TryParse(E3.InnerText, out bool b))
+															Record.Add(b);
+														else
+															Record.Add(null);
+														break;
+
+													case "color":
+														if (ConcentratorClient.TryParse(E3.InnerText, out SKColor Color))
+															Record.Add(Color);
+														else
+															Record.Add(null);
+														break;
+
+													case "date":
+													case "dateTime":
+														if (XML.TryParse(E3.InnerText, out DateTime TP))
+															Record.Add(TP);
+														else
+															Record.Add(null);
+														break;
+
+													case "double":
+														if (CommonTypes.TryParse(E3.InnerText, out double d))
+															Record.Add(d);
+														else
+															Record.Add(null);
+														break;
+
+													case "duration":
+														if (Duration.TryParse(E3.InnerText, out Duration d2))
+															Record.Add(d2);
+														else
+															Record.Add(null);
+														break;
+
+													case "int":
+														if (int.TryParse(E3.InnerText, out int i))
+															Record.Add(i);
+														else
+															Record.Add(null);
+														break;
+
+													case "long":
+														if (long.TryParse(E3.InnerText, out long l))
+															Record.Add(l);
+														else
+															Record.Add(null);
+														break;
+
+													case "string":
+														Record.Add(E3.InnerText);
+														break;
+
+													case "time":
+														if (TimeSpan.TryParse(E3.InnerText, out TimeSpan TS))
+															Record.Add(TS);
+														else
+															Record.Add(null);
+														break;
+
+													case "base64":
+														try
+														{
+															string ContentType = XML.Attribute(E3, "contentType");
+															byte[] Bin = Convert.FromBase64String(E3.InnerText);
+															object Decoded = InternetContent.Decode(ContentType, Bin, null);
+
+															Record.Add(Decoded);
+														}
+														catch (Exception ex)
+														{
+															this.QueryMessage(QueryEventType.Exception, QueryEventLevel.Major, ex.Message, e);
+															Record.Add(null);
+														}
+														break;
+
+													default:
+														Record.Add(null);
+														break;
+												}
+											}
+										}
+
+										Records.Add(new Record(Record.ToArray()));
+									}
+								}
+
+								this.NewRecords(s, Records.ToArray(), e);
+								break;
+
+							case "newObject":
+								try
+								{
+									string ContentType = XML.Attribute(E, "contentType");
+									byte[] Bin = Convert.FromBase64String(E.InnerText);
+									object Decoded = InternetContent.Decode(ContentType, Bin, null);
+
+									this.NewObject(Decoded, e);
+								}
+								catch (Exception ex)
+								{
+									this.QueryMessage(QueryEventType.Exception, QueryEventLevel.Major, ex.Message, e);
+								}
+								break;
+
+							case "queryMessage":
+								QueryEventType Type = (QueryEventType)XML.Attribute(E, "type", QueryEventType.Information);
+								QueryEventLevel Level = (QueryEventLevel)XML.Attribute(E, "level", QueryEventLevel.Minor);
+
+								this.QueryMessage(Type, Level, E.InnerText, e);
+								break;
+
+							case "endSection":
+								this.EndSection(e);
+								break;
+
+							case "queryDone":
+								this.ReportDone(e);
+								break;
+
+							case "beginSection":
+								s = XML.Attribute(E, "header");
+								this.BeginSection(s, e);
+								break;
+
+							case "queryAborted":
+								this.ReportAborted(e);
+								break;
+
+							default:
+								this.QueryMessage(QueryEventType.Exception, QueryEventLevel.Major, "Unrecognized sniffer event received: " + E.OuterXml, e);
+								break;
+						}
+					}
+					catch (Exception ex)
+					{
+						this.QueryMessage(QueryEventType.Exception, QueryEventLevel.Major, ex.Message, e);
+					}
+				}
+			}
+		}
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -458,36 +778,45 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 
 		internal void Queue(int SequenceNr, MessageEventArgs e)
 		{
-			if (this.queuedMessages is null)
+			lock (this.synchObj)
 			{
-				this.queuedMessages = new LinkedList<KeyValuePair<int, MessageEventArgs>>();
-				this.queuedMessages.AddLast(new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
-			}
-			else
-			{
-				LinkedListNode<KeyValuePair<int, MessageEventArgs>> Loop = this.queuedMessages.First;
-
-				while (!(Loop is null))
+				if (this.queuedMessages is null)
 				{
-					if (SequenceNr < Loop.Value.Key)
+					this.queuedMessages = new LinkedList<KeyValuePair<int, MessageEventArgs>>();
+					this.queuedMessages.AddLast(new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
+				}
+				else
+				{
+					LinkedListNode<KeyValuePair<int, MessageEventArgs>> Loop = this.queuedMessages.First;
+
+					while (!(Loop is null))
 					{
-						this.queuedMessages.AddBefore(Loop, new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
-						Loop = null;
+						if (SequenceNr < Loop.Value.Key)
+						{
+							this.queuedMessages.AddBefore(Loop, new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
+							Loop = null;
+						}
+						else if (Loop.Next is null)
+						{
+							this.queuedMessages.AddAfter(Loop, new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
+							Loop = null;
+						}
+						else
+							Loop = Loop.Next;
 					}
-					else if (Loop.Next is null)
-					{
-						this.queuedMessages.AddAfter(Loop, new KeyValuePair<int, MessageEventArgs>(SequenceNr, e));
-						Loop = null;
-					}
-					else
-						Loop = Loop.Next;
 				}
 			}
 		}
 
 		internal bool HasQueued
 		{
-			get { return this.queuedMessages != null; }
+			get 
+			{
+				lock (this.synchObj)
+				{
+					return this.queuedMessages != null;
+				}
+			}
 		}
 
 		internal int SequenceNr
@@ -502,19 +831,22 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 
 		internal MessageEventArgs PopQueued(int ExpectedSequenceNr)
 		{
-			KeyValuePair<int, MessageEventArgs> P;
-
-			if (this.queuedMessages != null && this.queuedMessages.First != null && (P = this.queuedMessages.First.Value).Key == ExpectedSequenceNr)
+			lock (this.synchObj)
 			{
-				this.queuedMessages.RemoveFirst();
+				KeyValuePair<int, MessageEventArgs> P;
 
-				if (this.queuedMessages.First is null)
-					this.queuedMessages = null;
+				if (this.queuedMessages != null && this.queuedMessages.First != null && (P = this.queuedMessages.First.Value).Key == ExpectedSequenceNr)
+				{
+					this.queuedMessages.RemoveFirst();
 
-				return P.Value;
+					if (this.queuedMessages.First is null)
+						this.queuedMessages = null;
+
+					return P.Value;
+				}
+				else
+					return null;
 			}
-			else
-				return null;
 		}
 
 	}

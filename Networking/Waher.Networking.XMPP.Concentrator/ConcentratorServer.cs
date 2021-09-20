@@ -2778,6 +2778,8 @@ namespace Waher.Networking.XMPP.Concentrator
 							this.queries.Remove(QueryId);
 						}
 
+						ex = Log.UnnestException(ex);
+
 						await Query.LogMessage(QueryEventType.Exception, QueryEventLevel.Major, ex.Message);
 						await Query.Abort();
 

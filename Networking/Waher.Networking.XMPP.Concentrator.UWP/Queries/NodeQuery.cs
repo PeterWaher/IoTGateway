@@ -150,6 +150,8 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 			{
 				if (this.paused)
 				{
+					this.paused = false;
+				
 					MessageEventArgs e;
 
 					while (!((e = this.queuedMessages?.First?.Value.Value) is null))
@@ -159,8 +161,6 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 						else
 							break;
 					}
-
-					this.paused = false;
 				}
 			}
 		}

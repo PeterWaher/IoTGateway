@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using Waher.Script.Abstraction.Elements;
+using System.Threading.Tasks;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 
 namespace Waher.Script.Persistence.SQL
 {
@@ -41,6 +39,27 @@ namespace Waher.Script.Persistence.SQL
 				}
 			}
 		
+			return false;
+		}
+
+		/// <summary>
+		/// Advances the enumerator to the next element of the collection.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the next element; false if
+		/// the enumerator has passed the end of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		public override async Task<bool> MoveNextAsync()
+		{
+			while (await base.MoveNextAsync())
+			{
+				Record Rec = new Record(this.CurrentRecord);
+				if (!this.reported.ContainsKey(Rec))
+				{
+					this.reported[Rec] = true;
+					return true;
+				}
+			}
+
 			return false;
 		}
 

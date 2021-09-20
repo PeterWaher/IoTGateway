@@ -57,7 +57,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>true if the enumerator was successfully advanced to the next element; false if
 		/// the enumerator has passed the end of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		public async Task<bool> MoveNextAsync()
+		public virtual async Task<bool> MoveNextAsync()
 		{
 			if (!await this.e.MoveNextAsync())
 				return false;

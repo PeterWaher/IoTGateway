@@ -611,6 +611,14 @@
             <see cref="M:System.Collections.IEnumerator.MoveNext"/>
             </summary>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.DistinctEnumerator.MoveNextAsync">
+            <summary>
+            Advances the enumerator to the next element of the collection.
+            </summary>
+            <returns>true if the enumerator was successfully advanced to the next element; false if
+            the enumerator has passed the end of the collection.</returns>
+            <exception cref="T:System.InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.DistinctEnumerator.Reset">
             <summary>
             <see cref="M:System.Collections.IEnumerator.Reset"/>

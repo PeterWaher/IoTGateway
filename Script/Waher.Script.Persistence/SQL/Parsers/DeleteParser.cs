@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 
 namespace Waher.Script.Persistence.SQL.Parsers
 {

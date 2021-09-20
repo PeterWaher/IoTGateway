@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Text;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
-using Waher.Script.Model;
 using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Persistence.SQL.Sources

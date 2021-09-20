@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using Waher.Script.Model;
 using Waher.Script.Operators;
-using Waher.Script.Operators.Assignments;
-using Waher.Script.Operators.Comparisons;
 
 namespace Waher.Script.Persistence.SQL.Parsers
 {

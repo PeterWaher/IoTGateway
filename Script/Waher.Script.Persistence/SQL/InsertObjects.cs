@@ -5,7 +5,6 @@ using Waher.Persistence;
 using Waher.Persistence.Serialization;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;

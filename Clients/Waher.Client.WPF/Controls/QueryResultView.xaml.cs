@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using SkiaSharp;
+using Waher.Client.WPF.Model.Concentrator;
 using Waher.Events;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Concentrator.Queries;
-using Waher.Things.Queries;
-using Waher.Client.WPF.Model.Concentrator;
-using SkiaSharp;
 using Waher.Script.Graphs;
-using System.IO;
+using Waher.Things.Queries;
 
 namespace Waher.Client.WPF.Controls
 {
@@ -133,7 +134,17 @@ namespace Waher.Client.WPF.Controls
 
 		private Task Query_EventMessageReceived(object Sender, NodeQueryEventMessageEventArgs e)
 		{
-			this.StatusMessage(e.EventMessage);
+			this.UpdateGui(new ThreadStart(() =>
+			{
+				this.currentPanel.Children.Add(new TextBlock()
+				{
+					Text = e.EventMessage,
+					Margin = new Thickness(0, 0, 0, 6),
+					Foreground = Brushes.Red,
+					FontFamily = new FontFamily("Courier New")
+				});
+			}));
+
 			return Task.CompletedTask;
 		}
 
@@ -296,12 +307,18 @@ namespace Waher.Client.WPF.Controls
 
 		private Task Query_ObjectAdded(object Sender, NodeQueryObjectEventArgs e)
 		{
+			this.ObjectAdded(e.Object.Object);
+
+			return Task.CompletedTask;
+		}
+
+		private void ObjectAdded(object Obj)
+		{
+			if (Obj is null)
+				return;
+
 			this.UpdateGui(new ThreadStart(() =>
 			{
-				object Obj = e.Object.Object;
-				if (Obj is null)
-					return;
-
 				if (Obj is SKImage Image)
 				{
 					PixelInformation Pixels = PixelInformation.FromImage(Image);
@@ -334,8 +351,6 @@ namespace Waher.Client.WPF.Controls
 					});
 				}
 			}));
-
-			return Task.CompletedTask;
 		}
 
 		public void Dispose()

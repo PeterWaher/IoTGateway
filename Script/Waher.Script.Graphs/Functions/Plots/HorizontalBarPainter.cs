@@ -54,6 +54,9 @@ namespace Waher.Script.Graphs.Functions.Plots
 					}
 				}
 
+				int MinY = DrawingArea.OffsetY;
+				int MaxY = DrawingArea.OffsetY + DrawingArea.Height;
+
 				i = 0;
 				foreach (SKPoint Point in Points)
 				{
@@ -61,6 +64,12 @@ namespace Waher.Script.Graphs.Functions.Plots
 					x0 = Point.X;
 					y1 = Point.Y + HalfBarHeight - 1;
 					x1 = !(PrevPoints is null) ? PrevPoints[i++].X : DrawingArea.OrigoX;
+
+					if (y0 < MaxY)
+						y0 = MaxY;
+
+					if (y1 > MinY)
+						y1 = MinY;
 
 					Canvas.DrawRect(new SKRect(x0, y0, x1, y1), Brush);
 				}

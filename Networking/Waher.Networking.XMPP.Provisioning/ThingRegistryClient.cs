@@ -1078,11 +1078,11 @@ namespace Waher.Networking.XMPP.Provisioning
 					ContainsR = true;
 			}
 
-			if (!First)
-				Result.Append(';');
-
 			if (!ContainsR)
 			{
+				if (!First)
+					Result.Append(';');
+
 				Result.Append("R=");
 				Result.Append(Uri.EscapeDataString(this.thingRegistryAddress));
 			}

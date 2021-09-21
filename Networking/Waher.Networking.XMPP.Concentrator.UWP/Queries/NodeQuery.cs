@@ -394,7 +394,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 									byte[] Bin = Convert.FromBase64String(E.InnerText);
 									object Decoded = InternetContent.Decode(ContentType, Bin, null);
 
-									this.NewObject(Decoded, e);
+									this.NewObject(Decoded, Bin, ContentType, e);
 								}
 								catch (Exception ex)
 								{
@@ -617,7 +617,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		/// </summary>
 		public event NodeQueryTableEventHandler TableCompleted = null;
 
-		internal void NewObject(object Object, MessageEventArgs e)
+		internal void NewObject(object Object, byte[] Binary, string ContentType, MessageEventArgs e)
 		{
 			QueryObject Obj;
 
@@ -625,13 +625,13 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 			{
 				if (!(this.currentSection is null))
 				{
-					Obj = new QueryObject(this.currentSection, Object);
+					Obj = new QueryObject(this.currentSection, Object, Binary, ContentType);
 
 					this.currentSection.Add(Obj);
 				}
 				else
 				{
-					Obj = new QueryObject(null, Object);
+					Obj = new QueryObject(null, Object, Binary, ContentType);
 
 					this.result.Add(Obj);
 					this.resultFixed = null;

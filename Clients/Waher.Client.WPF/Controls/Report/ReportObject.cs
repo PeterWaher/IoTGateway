@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Xml;
-using Waher.Things.Queries;
+using Waher.Content;
+using Waher.Content.Xml;
 
 namespace Waher.Client.WPF.Controls.Report
 {
@@ -24,6 +25,17 @@ namespace Waher.Client.WPF.Controls.Report
 			this.@object = Object;
 			this.binary = Binary;
 			this.contentType = ContentType;
+		}
+
+		/// <summary>
+		/// Contains information about a report object.
+		/// </summary>
+		/// <param name="Xml">XML Definition.</param>
+		public ReportObject(XmlElement Xml)
+		{
+			this.binary = Convert.FromBase64String(Xml.InnerText);
+			this.contentType = XML.Attribute(Xml, "contentType");
+			this.@object = InternetContent.Decode(this.contentType, this.binary, null);
 		}
 
 		/// <summary>

@@ -46,25 +46,31 @@ namespace Waher.Client.WPF.Controls
 			this.query = Query;
 			this.headerLabel = HeaderLabel;
 
-			this.query.Aborted += Query_Aborted;
-			this.query.EventMessageReceived += Query_EventMessageReceived;
-			this.query.NewTitle += Query_NewTitle;
-			this.query.SectionAdded += Query_SectionAdded;
-			this.query.SectionCompleted += Query_SectionCompleted;
-			this.query.Started += Query_Started;
-			this.query.Done += Query_Done;
-			this.query.StatusMessageReceived += Query_StatusMessageReceived;
-			this.query.TableAdded += Query_TableAdded;
-			this.query.TableCompleted += Query_TableCompleted;
-			this.query.TableUpdated += Query_TableUpdated;
-			this.query.ObjectAdded += Query_ObjectAdded;
+			if (!(this.query is null))
+			{
+				this.query.Aborted += Query_Aborted;
+				this.query.EventMessageReceived += Query_EventMessageReceived;
+				this.query.NewTitle += Query_NewTitle;
+				this.query.SectionAdded += Query_SectionAdded;
+				this.query.SectionCompleted += Query_SectionCompleted;
+				this.query.Started += Query_Started;
+				this.query.Done += Query_Done;
+				this.query.StatusMessageReceived += Query_StatusMessageReceived;
+				this.query.TableAdded += Query_TableAdded;
+				this.query.TableCompleted += Query_TableCompleted;
+				this.query.TableUpdated += Query_TableUpdated;
+				this.query.ObjectAdded += Query_ObjectAdded;
 
-			this.query.Resume();
+				this.query.Resume();
+			}
 
 			InitializeComponent();
 
 			this.currentPanel = this.ReportPanel;
 		}
+
+		public Node Node => this.node;
+		public NodeQuery Query => this.query;
 
 		private void UpdateGui(ThreadStart P)
 		{
@@ -143,51 +149,56 @@ namespace Waher.Client.WPF.Controls
 
 		private Task Query_EventMessageReceived(object Sender, NodeQueryEventMessageEventArgs e)
 		{
-			lock (this.elements)
-			{
-				this.elements.AddLast(new ReportEvent(e.EventType, e.EventLevel, e.EventMessage));
-			}
-
 			this.UpdateGui(new ThreadStart(() =>
 			{
-				Brush FgColor;
-				Brush BgColor;
-
-				switch (e.EventType)
-				{
-					case QueryEventType.Information:
-					default:
-						FgColor = Brushes.Black;
-						BgColor = Brushes.White;
-						break;
-
-					case QueryEventType.Warning:
-						FgColor = Brushes.Black;
-						BgColor = Brushes.Yellow;
-						break;
-
-					case QueryEventType.Error:
-						FgColor = Brushes.Yellow;
-						BgColor = Brushes.Red;
-						break;
-
-					case QueryEventType.Exception:
-						FgColor = Brushes.Yellow;
-						BgColor = Brushes.DarkRed;
-						break;
-				}
-
-				this.currentPanel.Children.Add(new TextBlock()
-				{
-					Text = e.EventMessage,
-					Margin = new Thickness(0, 0, 0, 6),
-					Foreground = FgColor,
-					Background = BgColor,
-					FontFamily = new FontFamily("Courier New")
-				});
+				this.Add(new ReportEvent(e.EventType, e.EventLevel, e.EventMessage));
 			}));
 
 			return Task.CompletedTask;
+		}
+
+		private void Add(ReportEvent Event)
+		{
+			lock (this.elements)
+			{
+				this.elements.AddLast(Event);
+			}
+
+			Brush FgColor;
+			Brush BgColor;
+
+			switch (Event.EventType)
+			{
+				case QueryEventType.Information:
+				default:
+					FgColor = Brushes.Black;
+					BgColor = Brushes.White;
+					break;
+
+				case QueryEventType.Warning:
+					FgColor = Brushes.Black;
+					BgColor = Brushes.Yellow;
+					break;
+
+				case QueryEventType.Error:
+					FgColor = Brushes.Yellow;
+					BgColor = Brushes.Red;
+					break;
+
+				case QueryEventType.Exception:
+					FgColor = Brushes.Yellow;
+					BgColor = Brushes.DarkRed;
+					break;
+			}
+
+			this.currentPanel.Children.Add(new TextBlock()
+			{
+				Text = Event.EventMessage,
+				Margin = new Thickness(0, 0, 0, 6),
+				Foreground = FgColor,
+				Background = BgColor,
+				FontFamily = new FontFamily("Courier New")
+			});
 		}
 
 		private Task Query_NewTitle(object Sender, NodeQueryEventArgs e)
@@ -202,99 +213,113 @@ namespace Waher.Client.WPF.Controls
 
 		private Task Query_SectionAdded(object Sender, NodeQuerySectionEventArgs e)
 		{
-			lock (this.elements)
-			{
-				this.elements.AddLast(new ReportSectionCreated(e.Section.Header));
-			}
-
 			this.UpdateGui(new ThreadStart(() =>
 			{
-				StackPanel Section = new StackPanel()
-				{
-					Margin = new Thickness(16, 8, 16, 8)
-				};
-
-				this.currentPanel.Children.Add(Section);
-				this.currentPanel = Section;
-
-				Section.Children.Add(new TextBlock()
-				{
-					Text = e.Section.Header,
-					FontSize = 20,
-					FontWeight = FontWeights.Bold,
-					Margin = new Thickness(0, 0, 0, 12)
-				});
+				this.Add(new ReportSectionCreated(e.Section.Header));
 			}));
 
 			return Task.CompletedTask;
+		}
+
+		private void Add(ReportSectionCreated Event)
+		{
+			lock (this.elements)
+			{
+				this.elements.AddLast(Event);
+			}
+
+			StackPanel Section = new StackPanel()
+			{
+				Margin = new Thickness(16, 8, 16, 8)
+			};
+
+			this.currentPanel.Children.Add(Section);
+			this.currentPanel = Section;
+
+			Section.Children.Add(new TextBlock()
+			{
+				Text = Event.Header,
+				FontSize = 20,
+				FontWeight = FontWeights.Bold,
+				Margin = new Thickness(0, 0, 0, 12)
+			});
 		}
 
 		private Task Query_SectionCompleted(object Sender, NodeQuerySectionEventArgs e)
 		{
-			lock (this.elements)
-			{
-				this.elements.AddLast(new ReportSectionCompleted());
-			}
-
 			this.UpdateGui(new ThreadStart(() =>
 			{
-				this.currentPanel = this.currentPanel.Parent as StackPanel;
-				if (this.currentPanel is null)
-					this.currentPanel = this.ReportPanel;
+				this.Add(new ReportSectionCompleted());
 			}));
 
 			return Task.CompletedTask;
 		}
 
-		private Task Query_TableAdded(object Sender, NodeQueryTableEventArgs e)
+		private void Add(ReportSectionCompleted Event)
 		{
 			lock (this.elements)
 			{
-				Table Table = e.Table.TableDefinition;
-
-				this.elements.AddLast(new ReportTableCreated(Table.TableId, Table.Name, Table.Columns));
+				this.elements.AddLast(Event);
 			}
 
+			this.currentPanel = this.currentPanel.Parent as StackPanel;
+			if (this.currentPanel is null)
+				this.currentPanel = this.ReportPanel;
+		}
+
+		private Task Query_TableAdded(object Sender, NodeQueryTableEventArgs e)
+		{
 			this.UpdateGui(new ThreadStart(() =>
 			{
-				try
-				{
-					if (!this.tables.ContainsKey(e.Table.TableDefinition.TableId))
-					{
-						DataTable Table = new DataTable(e.Table.TableDefinition.Name);
-						GridView GridView = new GridView();
-
-						foreach (Column Column in e.Table.TableDefinition.Columns)
-						{
-							Table.Columns.Add(Column.ColumnId);
-
-							// TODO: Alignment 
-
-							GridView.Columns.Add(new GridViewColumn()
-							{
-								Header = Column.Header,
-								DisplayMemberBinding = new Binding(Column.ColumnId)
-							});
-						}
-
-						ListView TableView = new ListView()
-						{
-							ItemsSource = Table.DefaultView,
-							View = GridView
-						};
-
-						this.tables[e.Table.TableDefinition.TableId] = (Table, e.Table.TableDefinition.Columns, TableView);
-
-						this.currentPanel.Children.Add(TableView);
-					}
-				}
-				catch (Exception ex)
-				{
-					this.StatusMessage(ex.Message);
-				}
+				Table Table = e.Table.TableDefinition;
+				this.Add(new ReportTableCreated(Table.TableId, Table.Name, Table.Columns));
 			}));
 
 			return Task.CompletedTask;
+		}
+
+		private void Add(ReportTableCreated Event)
+		{
+			lock (this.elements)
+			{
+				this.elements.AddLast(Event);
+			}
+
+			try
+			{
+				if (!this.tables.ContainsKey(Event.TableId))
+				{
+					DataTable Table = new DataTable(Event.Name);
+					GridView GridView = new GridView();
+
+					foreach (Column Column in Event.Columns)
+					{
+						Table.Columns.Add(Column.ColumnId);
+
+						// TODO: Alignment 
+
+						GridView.Columns.Add(new GridViewColumn()
+						{
+							Header = Column.Header,
+							DisplayMemberBinding = new Binding(Column.ColumnId)
+						});
+					}
+
+					ListView TableView = new ListView()
+					{
+						ItemsSource = Table.DefaultView,
+						View = GridView
+					};
+
+					this.tables[Event.TableId] = (Table, Event.Columns, TableView);
+
+					this.currentPanel.Children.Add(TableView);
+				}
+			}
+			catch (Exception ex)
+			{
+				this.StatusMessage(ex.Message);
+			}
 		}
 
 		private Task Query_TableUpdated(object Sender, NodeQueryTableUpdatedEventArgs e)
@@ -302,75 +327,107 @@ namespace Waher.Client.WPF.Controls
 			this.UpdateGui(new ThreadStart(() =>
 			{
 				if (this.tables.TryGetValue(e.Table.TableDefinition.TableId, out (DataTable, Column[], ListView) P))
-				{
-					lock (this.elements)
-					{
-						this.elements.AddLast(new ReportTableRecords(e.Table.TableDefinition.TableId, e.NewRecords, P.Item2));
-					}
-
-					DataTable Table = P.Item1;
-					Column[] Columns = P.Item2;
-					ListView TableView = P.Item3;
-					Column Column;
-					object Obj;
-					int i, c = Columns.Length;
-					int d;
-
-					foreach (Record Record in e.NewRecords)
-					{
-						DataRow Row = Table.NewRow();
-
-						d = Math.Min(c, Record.Elements.Length);
-						for (i = 0; i < d; i++)
-						{
-							Obj = Record.Elements[i];
-							if (Obj is null)
-								continue;
-
-							Column = Columns[i];
-
-							if (Obj is bool b)
-								Row[Column.ColumnId] = b ? "✓" : string.Empty;
-							/*else if (Obj is SKColor)	TODO
-							{
-							}*/
-							else if (Obj is double dbl)
-							{
-								if (Column.NrDecimals.HasValue)
-									Row[Column.ColumnId] = dbl.ToString("F" + Column.NrDecimals.Value.ToString());
-								else
-									Row[Column.ColumnId] = dbl.ToString();
-							}
-							/*else if (Obj is Image)	TODO
-							{
-							}*/
-							else
-								Row[Column.ColumnId] = Obj.ToString();
-						}
-
-						Table.Rows.Add(Row);
-					}
-
-					//Table.AcceptChanges();
-				}
+					this.Add(new ReportTableRecords(e.Table.TableDefinition.TableId, e.NewRecords, P.Item2));
 			}));
 
 			return Task.CompletedTask;
 		}
 
-		private Task Query_TableCompleted(object Sender, NodeQueryTableEventArgs e)
+		private void Add(ReportTableRecords Event)
 		{
-			lock (this.elements)
+			if (this.tables.TryGetValue(Event.TableId, out (DataTable, Column[], ListView) P))
 			{
-				this.elements.AddLast(new ReportTableCompleted(e.Table.TableDefinition.TableId));
+				lock (this.elements)
+				{
+					this.elements.AddLast(Event);
+				}
+
+				DataTable Table = P.Item1;
+				Column[] Columns = P.Item2;
+				ListView TableView = P.Item3;
+				Column Column;
+				object Obj;
+				int i, c = Columns.Length;
+				int d;
+
+				foreach (Record Record in Event.Records)
+				{
+					DataRow Row = Table.NewRow();
+
+					d = Math.Min(c, Record.Elements.Length);
+					for (i = 0; i < d; i++)
+					{
+						Obj = Record.Elements[i];
+						if (Obj is null)
+							continue;
+
+						Column = Columns[i];
+
+						if (Obj is bool b)
+							Row[Column.ColumnId] = b ? "✓" : string.Empty;
+						/*else if (Obj is SKColor)	TODO
+						{
+						}*/
+						else if (Obj is double dbl)
+						{
+							if (Column.NrDecimals.HasValue)
+								Row[Column.ColumnId] = dbl.ToString("F" + Column.NrDecimals.Value.ToString());
+							else
+								Row[Column.ColumnId] = dbl.ToString();
+						}
+						else if (Obj is decimal dec)
+						{
+							if (Column.NrDecimals.HasValue)
+								Row[Column.ColumnId] = dec.ToString("F" + Column.NrDecimals.Value.ToString());
+							else
+								Row[Column.ColumnId] = dec.ToString();
+						}
+						else if (Obj is float f)
+						{
+							if (Column.NrDecimals.HasValue)
+								Row[Column.ColumnId] = f.ToString("F" + Column.NrDecimals.Value.ToString());
+							else
+								Row[Column.ColumnId] = f.ToString();
+						}
+						else if (Obj is DateTime DT)
+						{
+							if (DT.TimeOfDay == TimeSpan.Zero)
+								Row[Column.ColumnId] = DT.ToShortDateString();
+							else
+								Row[Column.ColumnId] = DT.ToShortDateString() + ", " + DT.ToLongTimeString();
+						}
+						/*else if (Obj is Image)	TODO
+						{
+						}*/
+						else
+							Row[Column.ColumnId] = Obj.ToString();
+					}
+
+					Table.Rows.Add(Row);
+				}
 			}
 
+			//Table.AcceptChanges();
+		}
+
+		private Task Query_TableCompleted(object Sender, NodeQueryTableEventArgs e)
+		{
 			this.UpdateGui(new ThreadStart(() =>
 			{
-				this.tables.Remove(e.Table.TableDefinition.TableId);
+				this.Add(new ReportTableCompleted(e.Table.TableDefinition.TableId));
 			}));
 
 			return Task.CompletedTask;
+		}
+
+		private void Add(ReportTableCompleted Event)
+		{
+			lock (this.elements)
+			{
+				this.elements.AddLast(Event);
+			}
+
+			this.tables.Remove(Event.TableId);
 		}
 
 		private Task Query_ObjectAdded(object Sender, NodeQueryObjectEventArgs e)
@@ -379,47 +436,52 @@ namespace Waher.Client.WPF.Controls
 			if (Obj is null)
 				return Task.CompletedTask;
 
-			lock (this.elements)
-			{
-				this.elements.AddLast(new ReportObject(Obj, e.Object.Binary, e.Object.ContentType));
-			}
-
 			this.UpdateGui(new ThreadStart(() =>
 			{
-				if (Obj is SKImage Image)
-				{
-					PixelInformation Pixels = PixelInformation.FromImage(Image);
-
-					BitmapImage BitmapImage;
-					byte[] Bin = Pixels.EncodeAsPng();
-
-					using (MemoryStream ms = new MemoryStream(Bin))
-					{
-						BitmapImage = new BitmapImage();
-						BitmapImage.BeginInit();
-						BitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-						BitmapImage.StreamSource = ms;
-						BitmapImage.EndInit();
-					}
-
-					this.currentPanel.Children.Add(new Image()
-					{
-						Source = BitmapImage,
-						Width = Pixels.Width,
-						Height = Pixels.Height
-					});
-				}
-				else
-				{
-					this.currentPanel.Children.Add(new TextBlock()
-					{
-						Text = Obj.ToString(),
-						Margin = new Thickness(0, 0, 0, 6)
-					});
-				}
+				this.Add(new ReportObject(Obj, e.Object.Binary, e.Object.ContentType));
 			}));
 
 			return Task.CompletedTask;
+		}
+
+		private void Add(ReportObject Event)
+		{
+			lock (this.elements)
+			{
+				this.elements.AddLast(Event);
+			}
+
+			if (Event.Object is SKImage Image)
+			{
+				PixelInformation Pixels = PixelInformation.FromImage(Image);
+
+				BitmapImage BitmapImage;
+				byte[] Bin = Pixels.EncodeAsPng();
+
+				using (MemoryStream ms = new MemoryStream(Bin))
+				{
+					BitmapImage = new BitmapImage();
+					BitmapImage.BeginInit();
+					BitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+					BitmapImage.StreamSource = ms;
+					BitmapImage.EndInit();
+				}
+
+				this.currentPanel.Children.Add(new Image()
+				{
+					Source = BitmapImage,
+					Width = Pixels.Width,
+					Height = Pixels.Height
+				});
+			}
+			else
+			{
+				this.currentPanel.Children.Add(new TextBlock()
+				{
+					Text = Event.Object.ToString(),
+					Margin = new Thickness(0, 0, 0, 6)
+				});
+			}
 		}
 
 		public void Dispose()
@@ -438,6 +500,7 @@ namespace Waher.Client.WPF.Controls
 			this.currentPanel = null;
 
 			this.ReportPanel.Children.Clear();
+			this.currentPanel = this.ReportPanel;
 		}
 
 		public void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -512,10 +575,89 @@ namespace Waher.Client.WPF.Controls
 
 		public void OpenButton_Click(object sender, RoutedEventArgs e)
 		{
-			// TODO
+			try
+			{
+				OpenFileDialog Dialog = new OpenFileDialog()
+				{
+					AddExtension = true,
+					CheckFileExists = true,
+					CheckPathExists = true,
+					DefaultExt = "xml",
+					Filter = "XML Files (*.xml)|*.xml|All Files (*.*)|*.*",
+					Multiselect = false,
+					ShowReadOnly = true,
+					Title = "Open report file"
+				};
+
+				bool? Result = Dialog.ShowDialog(MainWindow.FindWindow(this));
+
+				if (Result.HasValue && Result.Value)
+				{
+					XmlDocument Xml = new XmlDocument()
+					{
+						PreserveWhitespace = true
+					};
+					Xml.Load(Dialog.FileName);
+
+					this.Load(Xml, Dialog.FileName);
+				}
+			}
+			catch (Exception ex)
+			{
+				ex = Log.UnnestException(ex);
+				MessageBox.Show(ex.Message, "Unable to load file.", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		public Node Node => this.node;
-		public NodeQuery Query => this.query;
+		public void Load(XmlDocument Xml, string FileName)
+		{
+			XSL.Validate(FileName, Xml, reportRoot, reportNamespace, schema);
+
+			this.NewButton_Click(null, null);
+			this.headerLabel.Text = XML.Attribute(Xml.DocumentElement, "title");
+
+			Dictionary<string, Column[]> ColumnsByTableId = new Dictionary<string, Column[]>();
+
+			foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
+			{
+				if (!(N is XmlElement E))
+					continue;
+
+				switch (E.LocalName)
+				{
+					case "Event":
+						this.Add(new ReportEvent(E));
+						break;
+
+					case "Object":
+						this.Add(new ReportObject(E));
+						break;
+
+					case "SectionStart":
+						this.Add(new ReportSectionCreated(E));
+						break;
+
+					case "SectionEnd":
+						this.Add(new ReportSectionCompleted());
+						break;
+
+					case "TableStart":
+						ReportTableCreated Table = new ReportTableCreated(E);
+						ColumnsByTableId[Table.TableId] = Table.Columns;
+
+						this.Add(Table);
+						break;
+
+					case "TableEnd":
+						this.Add(new ReportTableCompleted(E));
+						break;
+
+					case "Records":
+						this.Add(new ReportTableRecords(E, ColumnsByTableId));
+						break;
+				}
+			}
+		}
+
 	}
 }

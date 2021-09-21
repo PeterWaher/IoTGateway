@@ -20,6 +20,15 @@ namespace Waher.Client.WPF.Controls.Report
 		}
 
 		/// <summary>
+		/// Creation of a section.
+		/// </summary>
+		/// <param name="Xml">XML Definition</param>
+		public ReportSectionCreated(XmlElement Xml)
+		{
+			this.header = Xml.InnerText;
+		}
+
+		/// <summary>
 		/// Section header
 		/// </summary>
 		public string Header

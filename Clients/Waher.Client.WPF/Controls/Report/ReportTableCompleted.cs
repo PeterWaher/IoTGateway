@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Xml;
+using Waher.Content.Xml;
 
 namespace Waher.Client.WPF.Controls.Report
 {
@@ -17,6 +18,15 @@ namespace Waher.Client.WPF.Controls.Report
 		public ReportTableCompleted(string TableId)
 		{
 			this.tableId = TableId;
+		}
+
+		/// <summary>
+		/// Completion of a table.
+		/// </summary>
+		/// <param name="Xml">XML Definition.</param>
+		public ReportTableCompleted(XmlElement Xml)
+		{
+			this.tableId = XML.Attribute(Xml, "tableId");
 		}
 
 		/// <summary>

@@ -1,5 +1,9 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
+using System.Collections.Generic;
 using System.Xml;
+using Waher.Content.Xml;
+using Waher.Script.Graphs;
 using Waher.Things.Queries;
 
 namespace Waher.Client.WPF.Controls.Report
@@ -24,6 +28,37 @@ namespace Waher.Client.WPF.Controls.Report
 			this.tableId = TableId;
 			this.name = Name;
 			this.columns = Columns;
+		}
+
+		/// <summary>
+		/// Creation of a table.
+		/// </summary>
+		/// <param name="Xml">XML Definition.</param>
+		public ReportTableCreated(XmlElement Xml)
+		{
+			this.tableId = XML.Attribute(Xml, "tableId");
+			this.name = XML.Attribute(Xml, "name");
+
+			List<Column> Columns = new List<Column>();
+
+			foreach (XmlNode N in Xml.ChildNodes)
+			{
+				if (N is XmlElement E && E.LocalName == "Column")
+				{
+					string ColumnId = XML.Attribute(E, "columnId");
+					string Header = XML.Attribute(E, "header");
+					string DataSourceId = E.HasAttribute("dataSourceId") ? XML.Attribute(E, "dataSourceId") : null;
+					string Partition = E.HasAttribute("partition") ? XML.Attribute(E, "partition") : null;
+					SKColor? FgColor = E.HasAttribute("fgColor") ? Graph.ToColor(XML.Attribute(E, "fgColor")) : (SKColor?)null;
+					SKColor? BgColor = E.HasAttribute("bgColor") ? Graph.ToColor(XML.Attribute(E, "bgColor")) : (SKColor?)null;
+					ColumnAlignment? Alignment = E.HasAttribute("alignment") ? (ColumnAlignment)XML.Attribute(E, "alignment", ColumnAlignment.Left) : (ColumnAlignment?)null;
+					byte? NrDecimals = E.HasAttribute("nrDecimals") ? (byte)XML.Attribute(E, "nrDecimals", 0) : (byte?)null;
+
+					Columns.Add(new Column(ColumnId, Header, DataSourceId, Partition, FgColor, BgColor, Alignment, NrDecimals));
+				}
+			}
+
+			this.columns = Columns.ToArray();
 		}
 
 		/// <summary>

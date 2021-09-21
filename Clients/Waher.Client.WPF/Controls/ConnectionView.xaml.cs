@@ -286,6 +286,18 @@ namespace Waher.Client.WPF.Controls
 						LogView.Load(Xml, FileName);
 						break;
 
+					case "Report":
+						TabItem = MainWindow.NewTab(Path.GetFileName(FileName), out TextBlock HeaderLabel);
+						this.MainWindow.Tabs.Items.Add(TabItem);
+
+						QueryResultView ReportView = new QueryResultView(null, null, HeaderLabel);
+						TabItem.Content = ReportView;
+
+						this.MainWindow.Tabs.SelectedItem = TabItem;
+
+						ReportView.Load(Xml, FileName);
+						break;
+
 					default:
 						throw new Exception("Unrecognized file format.");
 				}

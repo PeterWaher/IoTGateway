@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Xml;
+using Waher.Content.Xml;
 using Waher.Things.Queries;
 
 namespace Waher.Client.WPF.Controls.Report
@@ -24,6 +25,17 @@ namespace Waher.Client.WPF.Controls.Report
 			this.type = Type;
 			this.level = Level;
 			this.eventMessage = EventMessage;
+		}
+
+		/// <summary>
+		/// Contains information about a report event.
+		/// </summary>
+		/// <param name="Xml">XML Definition</param>
+		public ReportEvent(XmlElement Xml)
+		{
+			this.type = (QueryEventType)XML.Attribute(Xml, "type", QueryEventType.Information);
+			this.level = (QueryEventLevel)XML.Attribute(Xml, "level", QueryEventLevel.Minor);
+			this.eventMessage = Xml.InnerText;
 		}
 
 		/// <summary>

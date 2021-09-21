@@ -907,7 +907,10 @@ namespace Waher.IoTGateway
 				Types.SetModuleParameter("Scheduler", scheduler);
 
 				if (FirstStart)
+				{
 					MeteringTopology.OnNewMomentaryValues += NewMomentaryValues;
+					ProvisionedMeteringNode.QrCodeUrlRequested += ProvisionedMeteringNode_QrCodeUrlRequested;
+				}
 
 				DeleteOldDataSourceEvents(null);
 
@@ -1009,6 +1012,22 @@ namespace Waher.IoTGateway
 			}
 
 			return true;
+		}
+
+		private static void ProvisionedMeteringNode_QrCodeUrlRequested(object sender, GetQrCodeUrlEventArgs e)
+		{
+			StringBuilder Link = new StringBuilder();
+			Link.Append("https://");
+
+			if (string.IsNullOrEmpty(Gateway.Domain))
+				Link.Append(Gateway.XmppClient.Domain);
+			else
+				Link.Append(Gateway.Domain);
+
+			Link.Append("/QR/");
+			Link.Append(e.Text);
+
+			e.Url = Link.ToString();
 		}
 
 		private static Task GoToDefaultPage(HttpRequest Request, HttpResponse Response)

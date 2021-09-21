@@ -174,6 +174,27 @@
             <param name="Query">Query data receptor.</param>
             <param name="Language">Language to use.</param>
         </member>
+        <member name="T:Waher.Things.Metering.GetQrCodeUrlEventArgs">
+            <summary>
+            Event arguments for events that request an URL to a QR code.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.Metering.GetQrCodeUrlEventArgs.#ctor(System.String)">
+            <summary>
+            Event arguments for events that request an URL to a QR code.
+            </summary>
+            <param name="Text">Text to encode.</param>
+        </member>
+        <member name="P:Waher.Things.Metering.GetQrCodeUrlEventArgs.Text">
+            <summary>
+            Text to encode.
+            </summary>
+        </member>
+        <member name="P:Waher.Things.Metering.GetQrCodeUrlEventArgs.Url">
+            <summary>
+            QR Code URL.
+            </summary>
+        </member>
         <member name="T:Waher.Things.Metering.MetaMeteringNode">
             <summary>
             Base class for metering nodes with interoperable meta-information.
@@ -1015,6 +1036,11 @@
             Annotates the property form.
             </summary>
             <param name="Form">Form being built.</param>
+        </member>
+        <member name="E:Waher.Things.Metering.ProvisionedMeteringNode.QrCodeUrlRequested">
+            <summary>
+            Event raised when a QR code URL is requested.
+            </summary>
         </member>
     </members>
 </doc>

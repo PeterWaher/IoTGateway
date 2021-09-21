@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Events;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
-using Waher.Persistence;
 using Waher.Persistence.Attributes;
-using Waher.Persistence.Filters;
-using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Runtime.Settings;
 using Waher.Things.Attributes;
@@ -200,10 +195,31 @@ namespace Waher.Things.Metering
 
 					if (Form.PageByLabel.TryGetValue(await Namespace.GetStringAsync(18, "Provisioning"), out Page Page))
 						Page.Add(new FieldReference(Form.Form, Field.Var));
+
+					GetQrCodeUrlEventArgs e = new GetQrCodeUrlEventArgs(Uri);
+
+					QrCodeUrlRequested?.Invoke(this, e);
+
+					if (!string.IsNullOrEmpty(e.Url))
+					{
+						MediaField MediaField = new MediaField("QrCode", new Media(e.Url, "image/png", 400, 400))
+						{
+							Priority = HeaderAttribute.DefaultPriority,
+							Ordinal = Form.FieldOrdinal++
+						};
+
+						Form.Fields.Add(MediaField);
+
+						if (!(Page is null))
+							Page.Add(new FieldReference(Form.Form, MediaField.Var));
+					}
 				}
 			}
 		}
 
-
+		/// <summary>
+		/// Event raised when a QR code URL is requested.
+		/// </summary>
+		public static event EventHandler<GetQrCodeUrlEventArgs> QrCodeUrlRequested;
 	}
 }

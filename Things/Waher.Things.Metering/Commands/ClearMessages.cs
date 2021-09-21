@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Language;
 using Waher.Things.Queries;
-using Waher.Things.SourceEvents;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 
@@ -15,7 +12,7 @@ namespace Waher.Things.Metering.Commands
 	/// </summary>
 	public class ClearMessages : ICommand
 	{
-		private MeteringNode node;
+		private readonly MeteringNode node;
 
 		/// <summary>
 		/// Clears all messages for a node.

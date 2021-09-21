@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Events;
-using Waher.Persistence;
 using Waher.Persistence.Attributes;
-using Waher.Persistence.Filters;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;

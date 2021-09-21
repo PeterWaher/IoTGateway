@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers;
@@ -8,7 +7,6 @@ using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Language;
 using Waher.Runtime.Settings;
-using Waher.Things.DisplayableParameters;
 using Waher.Things.Metering.NodeTypes;
 using Waher.Things.SensorData;
 using Waher.Things.SourceEvents;

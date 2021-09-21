@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Queries;
-using Waher.Things.SourceEvents;
-using Waher.Persistence;
-using Waher.Persistence.Filters;
 
 namespace Waher.Things.Metering.Commands
 {
@@ -17,7 +12,7 @@ namespace Waher.Things.Metering.Commands
 	/// </summary>
 	public class LogMessage : ICommand
 	{
-		private MeteringNode node;
+		private readonly MeteringNode node;
 		private MessageType messageType = MessageType.Information;
 		private string messaageBody = string.Empty;
 

@@ -398,7 +398,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 				{
 					if (e.Ok)
 						this.Add(new Node(this, e.NodeInformation));
-					else
+					else if (!string.IsNullOrEmpty(e.From))
 						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to set parameters." : e.ErrorText);
 
 					return Task.CompletedTask;
@@ -500,7 +500,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 						if (NewKey != OldKey && Parent != null)
 							Parent.RenameChild(OldKey, NewKey, this);
 					}
-					else
+					else if (!string.IsNullOrEmpty(e.From))
 						MainWindow.ErrorBox(string.IsNullOrEmpty(e.ErrorText) ? "Unable to set properties." : e.ErrorText);
 
 					return Task.CompletedTask;

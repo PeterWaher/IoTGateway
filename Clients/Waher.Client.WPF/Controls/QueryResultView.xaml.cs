@@ -35,8 +35,8 @@ namespace Waher.Client.WPF.Controls
 		private readonly Dictionary<string, (DataTable, Column[], ListView)> tables = new Dictionary<string, (DataTable, Column[], ListView)>();
 		private readonly LinkedList<ThreadStart> guiQueue = new LinkedList<ThreadStart>();
 		private readonly LinkedList<ReportElement> elements = new LinkedList<ReportElement>();
+		private readonly TextBlock headerLabel;
 		private Node node;
-		private TextBlock headerLabel;
 		private NodeQuery query;
 		private StackPanel currentPanel;
 
@@ -344,7 +344,6 @@ namespace Waher.Client.WPF.Controls
 
 				DataTable Table = P.Item1;
 				Column[] Columns = P.Item2;
-				ListView TableView = P.Item3;
 				Column Column;
 				object Obj;
 				int i, c = Columns.Length;

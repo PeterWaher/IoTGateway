@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
 
@@ -137,5 +138,38 @@ namespace Waher.Networking.XMPP.DataForms
 			get { return this.url; }
 			internal set { this.url = value; }
 		}
+
+		internal void AnnotateField(StringBuilder Output, bool ValuesOnly, bool IncludeLabels)
+		{
+			Output.Append("<media xmlns='urn:xmpp:media-element'");
+
+			if (this.height.HasValue)
+			{
+				Output.Append(" height='");
+				Output.Append(this.height.Value.ToString());
+				Output.Append('\'');
+			}
+
+			if (this.width.HasValue)
+			{
+				Output.Append(" width='");
+				Output.Append(this.width.Value.ToString());
+				Output.Append('\'');
+			}
+
+			Output.Append('>');
+
+			foreach (KeyValuePair<string, Uri> Uri in this.uris)
+			{
+				Output.Append("<uri type='");
+				Output.Append(XML.Encode(Uri.Key));
+				Output.Append("'>");
+				Output.Append(XML.Encode(Uri.Value.ToString()));
+				Output.Append("</uri>");
+			}
+
+			Output.Append("</media>");
+		}
+
 	}
 }

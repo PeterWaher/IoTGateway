@@ -189,8 +189,8 @@ namespace Waher.Networking.XMPP.DataForms
 
 			this.error = string.Empty;
 
-			if ((Value is null || 
-				Value.Length == 0 || 
+			if ((Value is null ||
+				Value.Length == 0 ||
 				(Value.Length == 1 && string.IsNullOrEmpty(Value[0]))) && !(this.validationMethod is ListRangeValidation))
 			{
 				if (this.required)
@@ -280,94 +280,110 @@ namespace Waher.Networking.XMPP.DataForms
 
 			string TypeName = this.TypeName;
 
-			if (TypeName != "fixed")
+			if (TypeName == "fixed" && ValuesOnly)
+				return true;
+
+			Output.Append("<field");
+
+			if (!string.IsNullOrEmpty(this.var))
 			{
-				Output.Append("<field var='");
+				Output.Append(" var='");
 				Output.Append(XML.Encode(this.var));
-
-				if (IncludeLabels && !string.IsNullOrEmpty(this.label))
-				{
-					Output.Append("' label='");
-					Output.Append(XML.Encode(this.label));
-				}
-
-				if (!ValuesOnly)
-				{
-					Output.Append("' type='");
-					Output.Append(this.TypeName);
-				}
-
-				Output.Append("'>");
-
-				if (!ValuesOnly)
-				{
-					if (!string.IsNullOrEmpty(this.description))
-					{
-						Output.Append("<desc>");
-						Output.Append(XML.Encode(this.description));
-						Output.Append("</desc>");
-					}
-
-					if (this.required)
-						Output.Append("<required/>");
-
-					if (!(this.dataType is null))
-					{
-						Output.Append("<xdv:validate datatype='");
-						Output.Append(XML.Encode(this.dataType.TypeName));
-						Output.Append("'>");
-
-						if (!(this.validationMethod is null))
-							this.validationMethod.Serialize(Output);
-
-						Output.Append("</xdv:validate>");
-					}
-
-					if (this.notSame)
-						Output.Append("<xdd:notSame/>");
-
-					if (this.readOnly)
-						Output.Append("<xdd:readOnly/>");
-
-					if (!string.IsNullOrEmpty(this.error))
-					{
-						Output.Append("<xdd:error>");
-						Output.Append(XML.Encode(this.error));
-						Output.Append("</xdd:error>");
-					}
-				}
-
-				if (!(this.valueStrings is null))
-				{
-					foreach (string Value in this.valueStrings)
-					{
-						Output.Append("<value>");
-						Output.Append(XML.Encode(Value));
-						Output.Append("</value>");
-					}
-				}
-				else if (ValuesOnly)
-					Output.Append("<value/>");
-
-				if (!ValuesOnly)
-				{
-					if (!(this.options is null))
-					{
-						foreach (KeyValuePair<string, string> P in this.options)
-						{
-							Output.Append("<option label='");
-							Output.Append(XML.Encode(P.Key));
-							Output.Append("'><value>");
-							Output.Append(XML.Encode(P.Value));
-							Output.Append("</value></option>");
-						}
-					}
-				}
-
-				Output.Append("</field>");
+				Output.Append('\'');
 			}
 
+			if (IncludeLabels && !string.IsNullOrEmpty(this.label))
+			{
+				Output.Append(" label='");
+				Output.Append(XML.Encode(this.label));
+				Output.Append('\'');
+			}
+
+			if (!ValuesOnly)
+			{
+				Output.Append(" type='");
+				Output.Append(this.TypeName);
+				Output.Append('\'');
+			}
+
+			Output.Append('>');
+
+			if (!ValuesOnly)
+			{
+				if (!string.IsNullOrEmpty(this.description))
+				{
+					Output.Append("<desc>");
+					Output.Append(XML.Encode(this.description));
+					Output.Append("</desc>");
+				}
+
+				if (this.required)
+					Output.Append("<required/>");
+
+				if (!(this.dataType is null))
+				{
+					Output.Append("<xdv:validate datatype='");
+					Output.Append(XML.Encode(this.dataType.TypeName));
+					Output.Append("'>");
+
+					if (!(this.validationMethod is null))
+						this.validationMethod.Serialize(Output);
+
+					Output.Append("</xdv:validate>");
+				}
+
+				if (this.notSame)
+					Output.Append("<xdd:notSame/>");
+
+				if (this.readOnly)
+					Output.Append("<xdd:readOnly/>");
+
+				if (!string.IsNullOrEmpty(this.error))
+				{
+					Output.Append("<xdd:error>");
+					Output.Append(XML.Encode(this.error));
+					Output.Append("</xdd:error>");
+				}
+
+
+			}
+
+			if (!(this.valueStrings is null))
+			{
+				foreach (string Value in this.valueStrings)
+				{
+					Output.Append("<value>");
+					Output.Append(XML.Encode(Value));
+					Output.Append("</value>");
+				}
+			}
+			else if (ValuesOnly)
+				Output.Append("<value/>");
+
+			if (!ValuesOnly)
+			{
+				if (!(this.options is null))
+				{
+					foreach (KeyValuePair<string, string> P in this.options)
+					{
+						Output.Append("<option label='");
+						Output.Append(XML.Encode(P.Key));
+						Output.Append("'><value>");
+						Output.Append(XML.Encode(P.Value));
+						Output.Append("</value></option>");
+					}
+				}
+			}
+
+			this.AnnotateField(Output, ValuesOnly, IncludeLabels);
+
+			Output.Append("</field>");
+
 			return true;
+		}
+
+		internal virtual void AnnotateField(StringBuilder Output, bool ValuesOnly, bool IncludeLabels)
+		{
 		}
 
 		/// <summary>

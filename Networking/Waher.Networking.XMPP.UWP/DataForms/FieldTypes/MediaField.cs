@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
 
@@ -75,5 +76,11 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 			get { return this.media; }
 		}
 
+		internal override void AnnotateField(StringBuilder Output, bool ValuesOnly, bool IncludeLabels)
+		{
+			base.AnnotateField(Output, ValuesOnly, IncludeLabels);
+
+			this.media?.AnnotateField(Output, ValuesOnly, IncludeLabels);
+		}
 	}
 }

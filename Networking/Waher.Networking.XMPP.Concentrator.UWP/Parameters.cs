@@ -851,37 +851,40 @@ namespace Waher.Networking.XMPP.Concentrator
 						Tags = new List<KeyValuePair<string, object>>()
 					};
 
-					foreach (Tuple<PropertyInfo, FieldInfo, object> P in ToSet)
+					if (!(ToSet is null))
 					{
-						try
+						foreach (Tuple<PropertyInfo, FieldInfo, object> P in ToSet)
 						{
-							if (OnlySetChanged)
+							try
 							{
-								object Current = P.Item1?.GetValue(EditableObject) ?? P.Item2?.GetValue(EditableObject);
-
-								if (Current is null)
+								if (OnlySetChanged)
 								{
-									if (P.Item3 is null)
+									object Current = P.Item1?.GetValue(EditableObject) ?? P.Item2?.GetValue(EditableObject);
+
+									if (Current is null)
+									{
+										if (P.Item3 is null)
+											continue;
+									}
+									else if (P.Item3 != null && Current.Equals(P.Item3))
 										continue;
 								}
-								else if (P.Item3 != null && Current.Equals(P.Item3))
-									continue;
-							}
 
-							if (P.Item1 != null)
-							{
-								P.Item1.SetValue(EditableObject, P.Item3);
-								Result.Tags.Add(new KeyValuePair<string, object>(P.Item1.Name, P.Item3));
+								if (P.Item1 != null)
+								{
+									P.Item1.SetValue(EditableObject, P.Item3);
+									Result.Tags.Add(new KeyValuePair<string, object>(P.Item1.Name, P.Item3));
+								}
+								else
+								{
+									P.Item2.SetValue(EditableObject, P.Item3);
+									Result.Tags.Add(new KeyValuePair<string, object>(P.Item2.Name, P.Item3));
+								}
 							}
-							else
+							catch (Exception ex)
 							{
-								P.Item2.SetValue(EditableObject, P.Item3);
-								Result.Tags.Add(new KeyValuePair<string, object>(P.Item2.Name, P.Item3));
+								AddError(ref Errors, P.Item1?.Name ?? P.Item2.Name, ex.Message);
 							}
-						}
-						catch (Exception ex)
-						{
-							AddError(ref Errors, P.Item1?.Name ?? P.Item2.Name, ex.Message);
 						}
 					}
 

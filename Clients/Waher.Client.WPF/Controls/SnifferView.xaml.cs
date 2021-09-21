@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
@@ -101,7 +100,7 @@ namespace Waher.Client.WPF.Controls
 
 						string Html = XSL.Transform(Xml.ToString(), sniffToHtml);
 
-						File.WriteAllText(Dialog.FileName, Html, System.Text.Encoding.UTF8);
+						File.WriteAllText(Dialog.FileName, Html, Encoding.UTF8);
 					}
 					else
 					{

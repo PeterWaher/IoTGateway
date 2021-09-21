@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -9,8 +10,15 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Xsl;
+using Microsoft.Win32;
 using SkiaSharp;
+using Waher.Client.WPF.Controls.Report;
 using Waher.Client.WPF.Model.Concentrator;
+using Waher.Content.Xml;
+using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Concentrator.Queries;
@@ -26,8 +34,9 @@ namespace Waher.Client.WPF.Controls
 	{
 		private readonly Dictionary<string, (DataTable, Column[], ListView)> tables = new Dictionary<string, (DataTable, Column[], ListView)>();
 		private readonly LinkedList<ThreadStart> guiQueue = new LinkedList<ThreadStart>();
-		private readonly Node node;
-		private readonly TextBlock headerLabel;
+		private readonly LinkedList<ReportElement> elements = new LinkedList<ReportElement>();
+		private Node node;
+		private TextBlock headerLabel;
 		private NodeQuery query;
 		private StackPanel currentPanel;
 
@@ -134,13 +143,46 @@ namespace Waher.Client.WPF.Controls
 
 		private Task Query_EventMessageReceived(object Sender, NodeQueryEventMessageEventArgs e)
 		{
+			lock (this.elements)
+			{
+				this.elements.AddLast(new ReportEvent(e.EventType, e.EventLevel, e.EventMessage));
+			}
+
 			this.UpdateGui(new ThreadStart(() =>
 			{
+				Brush FgColor;
+				Brush BgColor;
+
+				switch (e.EventType)
+				{
+					case QueryEventType.Information:
+					default:
+						FgColor = Brushes.Black;
+						BgColor = Brushes.White;
+						break;
+
+					case QueryEventType.Warning:
+						FgColor = Brushes.Black;
+						BgColor = Brushes.Yellow;
+						break;
+
+					case QueryEventType.Error:
+						FgColor = Brushes.Yellow;
+						BgColor = Brushes.Red;
+						break;
+
+					case QueryEventType.Exception:
+						FgColor = Brushes.Yellow;
+						BgColor = Brushes.DarkRed;
+						break;
+				}
+
 				this.currentPanel.Children.Add(new TextBlock()
 				{
 					Text = e.EventMessage,
 					Margin = new Thickness(0, 0, 0, 6),
-					Foreground = Brushes.Red,
+					Foreground = FgColor,
+					Background = BgColor,
 					FontFamily = new FontFamily("Courier New")
 				});
 			}));
@@ -160,6 +202,11 @@ namespace Waher.Client.WPF.Controls
 
 		private Task Query_SectionAdded(object Sender, NodeQuerySectionEventArgs e)
 		{
+			lock (this.elements)
+			{
+				this.elements.AddLast(new ReportSectionCreated(e.Section.Header));
+			}
+
 			this.UpdateGui(new ThreadStart(() =>
 			{
 				StackPanel Section = new StackPanel()
@@ -184,6 +231,11 @@ namespace Waher.Client.WPF.Controls
 
 		private Task Query_SectionCompleted(object Sender, NodeQuerySectionEventArgs e)
 		{
+			lock (this.elements)
+			{
+				this.elements.AddLast(new ReportSectionCompleted());
+			}
+
 			this.UpdateGui(new ThreadStart(() =>
 			{
 				this.currentPanel = this.currentPanel.Parent as StackPanel;
@@ -196,6 +248,13 @@ namespace Waher.Client.WPF.Controls
 
 		private Task Query_TableAdded(object Sender, NodeQueryTableEventArgs e)
 		{
+			lock (this.elements)
+			{
+				Table Table = e.Table.TableDefinition;
+
+				this.elements.AddLast(new ReportTableCreated(Table.TableId, Table.Name, Table.Columns));
+			}
+
 			this.UpdateGui(new ThreadStart(() =>
 			{
 				try
@@ -240,6 +299,11 @@ namespace Waher.Client.WPF.Controls
 
 		private Task Query_TableUpdated(object Sender, NodeQueryTableUpdatedEventArgs e)
 		{
+			lock (this.elements)
+			{
+				this.elements.AddLast(new ReportTableRecords(e.Table.TableDefinition.TableId, e.NewRecords));
+			}
+
 			this.UpdateGui(new ThreadStart(() =>
 			{
 				if (this.tables.TryGetValue(e.Table.TableDefinition.TableId, out (DataTable, Column[], ListView) P))
@@ -297,6 +361,11 @@ namespace Waher.Client.WPF.Controls
 
 		private Task Query_TableCompleted(object Sender, NodeQueryTableEventArgs e)
 		{
+			lock (this.elements)
+			{
+				this.elements.AddLast(new ReportTableCompleted(e.Table.TableDefinition.TableId));
+			}
+
 			this.UpdateGui(new ThreadStart(() =>
 			{
 				this.tables.Remove(e.Table.TableDefinition.TableId);
@@ -307,15 +376,14 @@ namespace Waher.Client.WPF.Controls
 
 		private Task Query_ObjectAdded(object Sender, NodeQueryObjectEventArgs e)
 		{
-			this.ObjectAdded(e.Object.Object);
-
-			return Task.CompletedTask;
-		}
-
-		private void ObjectAdded(object Obj)
-		{
+			object Obj = e.Object.Object;
 			if (Obj is null)
-				return;
+				return Task.CompletedTask;
+
+			lock (this.elements)
+			{
+				this.elements.AddLast(new ReportObject(Obj, e.Object.Binary, e.Object.ContentType));
+			}
 
 			this.UpdateGui(new ThreadStart(() =>
 			{
@@ -351,6 +419,8 @@ namespace Waher.Client.WPF.Controls
 					});
 				}
 			}));
+
+			return Task.CompletedTask;
 		}
 
 		public void Dispose()
@@ -361,17 +431,84 @@ namespace Waher.Client.WPF.Controls
 
 		public void NewButton_Click(object sender, RoutedEventArgs e)
 		{
-			// TODO
+			this.tables.Clear();
+			this.guiQueue.Clear();
+			this.elements.Clear();
+			this.node = null;
+			this.headerLabel = null;
+			this.query = null;
+			this.currentPanel = null;
+
+			this.ReportPanel.Children.Clear();
 		}
 
 		public void SaveButton_Click(object sender, RoutedEventArgs e)
 		{
-			// TODO
+			this.SaveAsButton_Click(sender, e);
 		}
 
 		public void SaveAsButton_Click(object sender, RoutedEventArgs e)
 		{
-			// TODO
+			SaveFileDialog Dialog = new SaveFileDialog()
+			{
+				AddExtension = true,
+				CheckPathExists = true,
+				CreatePrompt = false,
+				DefaultExt = "xml",
+				Filter = "XML Files (*.xml)|*.xml|HTML Files (*.html,*.htm)|*.html,*.htm|All Files (*.*)|*.*",
+				Title = "Save report file"
+			};
+
+			bool? Result = Dialog.ShowDialog(MainWindow.FindWindow(this));
+
+			if (Result.HasValue && Result.Value)
+			{
+				try
+				{
+					if (Dialog.FilterIndex == 2)
+					{
+						StringBuilder Xml = new StringBuilder();
+						using (XmlWriter w = XmlWriter.Create(Xml, XML.WriterSettings(true, true)))
+						{
+							this.SaveAsXml(w);
+						}
+
+						string Html = XSL.Transform(Xml.ToString(), reportToHtml);
+
+						File.WriteAllText(Dialog.FileName, Html, Encoding.UTF8);
+					}
+					else
+					{
+						using (FileStream f = File.Create(Dialog.FileName))
+						{
+							using (XmlWriter w = XmlWriter.Create(f, XML.WriterSettings(true, false)))
+							{
+								this.SaveAsXml(w);
+							}
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show(MainWindow.FindWindow(this), ex.Message, "Unable to save file.", MessageBoxButton.OK, MessageBoxImage.Error);
+				}
+			}
+		}
+
+		private static readonly XslCompiledTransform reportToHtml = XSL.LoadTransform("Waher.Client.WPF.Transforms.ReportToHTML.xslt");
+		private static readonly XmlSchema schema = XSL.LoadSchema("Waher.Client.WPF.Schema.Report.xsd");
+		private const string reportNamespace = "http://waher.se/Schema/Report.xsd";
+		private const string reportRoot = "Report";
+
+		private void SaveAsXml(XmlWriter w)
+		{
+			w.WriteStartElement(reportRoot, reportNamespace);
+
+			foreach (ReportElement Item in this.elements)
+				Item.ExportXml(w);
+
+			w.WriteEndElement();
+			w.Flush();
 		}
 
 		public void OpenButton_Click(object sender, RoutedEventArgs e)
@@ -379,15 +516,7 @@ namespace Waher.Client.WPF.Controls
 			// TODO
 		}
 
-		public Node Node
-		{
-			get { return this.node; }
-		}
-
-		public NodeQuery Query
-		{
-			get { return this.query; }
-		}
-
+		public Node Node => this.node;
+		public NodeQuery Query => this.query;
 	}
 }

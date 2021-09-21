@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="Report"
+		   targetNamespace="http://waher.se/Schema/Report.xsd"
+		   elementFormDefault="qualified"
+		   xmlns="http://waher.se/Schema/Report.xsd"
+		   xmlns:mstns="http://waher.se/Schema/Report.xsd"
+		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="Report">
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="Event" type="Event"/>
+				<xs:element name="Object" type="Object"/>
+				<xs:element name="SectionStart" type="xs:string"/>
+				<xs:element name="SectionEnd" type="Empty"/>
+				<xs:element name="TableStart" type="TableStart"/>
+				<xs:element name="TableEnd" type="TableId"/>
+				<xs:element name="Records" type="Records"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="Event">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="type" type="EventType" use="required"/>
+				<xs:attribute name="level" type="EventLevel" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:simpleType name="EventType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Information"/>
+			<xs:enumeration value="Warning"/>
+			<xs:enumeration value="Error"/>
+			<xs:enumeration value="Exception"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="EventLevel">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Major"/>
+			<xs:enumeration value="Medium"/>
+			<xs:enumeration value="Minor"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="Object">
+		<xs:simpleContent>
+			<xs:extension base="xs:base64Binary">
+				<xs:attribute name="contentType" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="Empty"/>
+
+	<xs:complexType name="TableId">
+		<xs:attribute name="tableId" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="TableStart">
+		<xs:complexContent>
+			<xs:extension base="TableId">
+				<xs:sequence>
+					<xs:element name="Column" type="Column" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="name" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Column">
+		<xs:attribute name="columnId" type="xs:string" use="required"/>
+		<xs:attribute name="header" type="xs:string" use="required"/>
+		<xs:attribute name="dataSourceId" type="xs:string" use="optional"/>
+		<xs:attribute name="partition" type="xs:string" use="optional"/>
+		<xs:attribute name="fgColor" type="xs:string" use="optional"/>
+		<xs:attribute name="bgColor" type="xs:string" use="optional"/>
+		<xs:attribute name="alignment" type="Alignment" use="optional"/>
+		<xs:attribute name="nrDecimals" type="xs:positiveInteger" use="optional"/>
+	</xs:complexType>
+
+	<xs:simpleType name="Alignment">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Left"/>
+			<xs:enumeration value="Center"/>
+			<xs:enumeration value="Right"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="Records">
+		<xs:complexContent>
+			<xs:extension base="TableId">
+				<xs:sequence>
+					<xs:element name="Record" minOccurs="0" maxOccurs="unbounded">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="Item" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+</xs:schema>

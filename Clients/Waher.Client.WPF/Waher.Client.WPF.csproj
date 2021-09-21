@@ -160,6 +160,14 @@
     <Compile Include="Controls\Questions\CanReadQuestion.cs" />
     <Compile Include="Controls\Questions\IsFriendQuestion.cs" />
     <Compile Include="Controls\Questions\Question.cs" />
+    <Compile Include="Controls\Report\ReportObject.cs" />
+    <Compile Include="Controls\Report\ReportTableCompleted.cs" />
+    <Compile Include="Controls\Report\ReportSectionCompleted.cs" />
+    <Compile Include="Controls\Report\ReportTableRecords.cs" />
+    <Compile Include="Controls\Report\ReportTableCreated.cs" />
+    <Compile Include="Controls\Report\ReportSectionCreated.cs" />
+    <Compile Include="Controls\Report\ReportEvent.cs" />
+    <Compile Include="Controls\Report\ReportElement.cs" />
     <Compile Include="Controls\Script\PrintOutput.cs" />
     <Compile Include="Controls\SearchResultView.xaml.cs">
       <DependentUpon>SearchResultView.xaml</DependentUpon>
@@ -425,6 +433,9 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Schema\EventOutput.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Schema\Report.xsd">
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="Waher.Client.WPF_TemporaryKey.pfx" />
@@ -827,6 +838,9 @@
   <ItemGroup>
     <Resource Include="Graphics\folder-blue-icon.png" />
     <Resource Include="Graphics\folder-blue-open-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Transforms\ReportToHTML.xslt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\SkiaSharp.2.80.2\build\net462\SkiaSharp.targets" Condition="Exists('..\..\packages\SkiaSharp.2.80.2\build\net462\SkiaSharp.targets')" />

@@ -17,6 +17,7 @@
 				<xs:element name="TableEnd" type="TableId"/>
 				<xs:element name="Records" type="Records"/>
 			</xs:choice>
+			<xs:attribute name="title" type="xs:string" use="required"/>
 		</xs:complexType>
 	</xs:element>
 
@@ -79,7 +80,7 @@
 		<xs:attribute name="fgColor" type="xs:string" use="optional"/>
 		<xs:attribute name="bgColor" type="xs:string" use="optional"/>
 		<xs:attribute name="alignment" type="Alignment" use="optional"/>
-		<xs:attribute name="nrDecimals" type="xs:positiveInteger" use="optional"/>
+		<xs:attribute name="nrDecimals" type="UI8" use="optional"/>
 	</xs:complexType>
 
 	<xs:simpleType name="Alignment">
@@ -96,14 +97,86 @@
 				<xs:sequence>
 					<xs:element name="Record" minOccurs="0" maxOccurs="unbounded">
 						<xs:complexType>
-							<xs:sequence>
-								<xs:element name="Item" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-							</xs:sequence>
+							<xs:choice minOccurs="0" maxOccurs="unbounded">
+								<xs:element name="String" type="xs:string"/>
+								<xs:element name="Double" type="xs:double"/>
+								<xs:element name="Decimal" type="xs:decimal"/>
+								<xs:element name="Single" type="xs:float"/>
+								<xs:element name="Boolean" type="xs:boolean"/>
+								<xs:element name="Date" type="xs:date"/>
+								<xs:element name="DateTime" type="xs:dateTime"/>
+								<xs:element name="TimeSpan" type="xs:string"/>
+								<xs:element name="UI8" type="UI8"/>
+								<xs:element name="UI16" type="UI16"/>
+								<xs:element name="UI32" type="UI32"/>
+								<xs:element name="UI64" type="UI64"/>
+								<xs:element name="I8" type="I8"/>
+								<xs:element name="I16" type="I16"/>
+								<xs:element name="I32" type="I32"/>
+								<xs:element name="I64" type="I64"/>
+								<xs:element name="Null" type="Empty"/>
+							</xs:choice>
 						</xs:complexType>
 					</xs:element>
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
+
+	<xs:simpleType name="UI8">
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="0"/>
+			<xs:maxExclusive value="256"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="UI16">
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="0"/>
+			<xs:maxExclusive value="65536"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="UI32">
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="0"/>
+			<xs:maxExclusive value="4294967296"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="UI64">
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="0"/>
+			<xs:maxExclusive value="18446744073709551616"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="I8">
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="-128"/>
+			<xs:maxExclusive value="128"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="I16">
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="-32768"/>
+			<xs:maxExclusive value="32768"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="I32">
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="-2147483648"/>
+			<xs:maxExclusive value="2147483648"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="I64">
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="-9223372036854775808"/>
+			<xs:maxExclusive value="9223372036854775808"/>
+		</xs:restriction>
+	</xs:simpleType>
 
 </xs:schema>

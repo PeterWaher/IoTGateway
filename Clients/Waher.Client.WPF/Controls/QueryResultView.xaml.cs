@@ -299,15 +299,15 @@ namespace Waher.Client.WPF.Controls
 
 		private Task Query_TableUpdated(object Sender, NodeQueryTableUpdatedEventArgs e)
 		{
-			lock (this.elements)
-			{
-				this.elements.AddLast(new ReportTableRecords(e.Table.TableDefinition.TableId, e.NewRecords));
-			}
-
 			this.UpdateGui(new ThreadStart(() =>
 			{
 				if (this.tables.TryGetValue(e.Table.TableDefinition.TableId, out (DataTable, Column[], ListView) P))
 				{
+					lock (this.elements)
+					{
+						this.elements.AddLast(new ReportTableRecords(e.Table.TableDefinition.TableId, e.NewRecords, P.Item2));
+					}
+
 					DataTable Table = P.Item1;
 					Column[] Columns = P.Item2;
 					ListView TableView = P.Item3;
@@ -340,7 +340,6 @@ namespace Waher.Client.WPF.Controls
 									Row[Column.ColumnId] = dbl.ToString("F" + Column.NrDecimals.Value.ToString());
 								else
 									Row[Column.ColumnId] = dbl.ToString();
-
 							}
 							/*else if (Obj is Image)	TODO
 							{
@@ -435,7 +434,6 @@ namespace Waher.Client.WPF.Controls
 			this.guiQueue.Clear();
 			this.elements.Clear();
 			this.node = null;
-			this.headerLabel = null;
 			this.query = null;
 			this.currentPanel = null;
 
@@ -503,6 +501,7 @@ namespace Waher.Client.WPF.Controls
 		private void SaveAsXml(XmlWriter w)
 		{
 			w.WriteStartElement(reportRoot, reportNamespace);
+			w.WriteAttributeString("title", this.headerLabel.Text);
 
 			foreach (ReportElement Item in this.elements)
 				Item.ExportXml(w);

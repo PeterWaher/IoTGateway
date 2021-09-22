@@ -24,7 +24,11 @@ namespace Waher.Persistence.Files.Searching
 
 			if (xType == yType)
             {
-				if (x is DateTime TPx && y is DateTime TPy && TPx.Kind != TPy.Kind)
+				if (x is DateTime TPx && 
+					y is DateTime TPy && 
+					TPx.Kind != TPy.Kind && 
+					TPx.Kind != DateTimeKind.Unspecified &&
+					TPy.Kind != DateTimeKind.Unspecified)
 				{
 					x = TPx.ToLocalTime();
 					y = TPy.ToLocalTime();

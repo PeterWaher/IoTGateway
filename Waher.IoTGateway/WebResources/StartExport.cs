@@ -334,10 +334,21 @@ namespace Waher.IoTGateway.WebResources
 					Profiler.NewState("Database");
 
 					StringBuilder Temp = new StringBuilder();
-					using (XmlWriter w = XmlWriter.Create(Temp, XML.WriterSettings(false, true)))
+					string[] RepairedCollections;
+
+					using (XmlWriter w = XmlWriter.Create(Temp, XML.WriterSettings(true, true)))
 					{
-						await Persistence.Database.Analyze(w, Path.Combine(Gateway.AppDataFolder, "Transforms", "DbStatXmlToHtml.xslt"),
-							Path.Combine(Gateway.RootFolder, "Data"), false, true, Profiler.CreateThread("Analyze",ProfilerThreadType.Sequential));
+						RepairedCollections = await Persistence.Database.Analyze(w, Path.Combine(Gateway.AppDataFolder, 
+							"Transforms", "DbStatXmlToHtml.xslt"), Path.Combine(Gateway.RootFolder, "Data"), false, true, 
+							Profiler.CreateThread("Analyze",ProfilerThreadType.Sequential));
+					}
+
+					if (RepairedCollections.Length > 0)
+					{
+						string Xml = Temp.ToString();
+						string ReportFileName = Path.Combine(Path.GetDirectoryName(ExportInfo.FullBackupFileName),
+							"AutoRepair " + DateTime.Now.ToString("yyyy-MM-ddTHH.mm.ss.ffffff") + ".xml");
+						File.WriteAllText(ReportFileName, Xml);
 					}
 
 					await Persistence.Database.Export(ExportInfo.Exporter, ExportInfo.Exporter.CollectionNames,

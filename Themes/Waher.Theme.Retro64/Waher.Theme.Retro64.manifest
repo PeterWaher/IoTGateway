@@ -1,0 +1,11 @@
+﻿<Module xmlns="http://waher.se/Schema/ModuleManifest.xsd">
+  <Folder name="Root">
+		<Folder name="Themes">
+			<Folder name="Retro64">
+				<Content fileName="Retro64.xml"/>
+				<Content fileName="Retro64.cssx"/>
+				<Content fileName="Retro64.png"/>
+			</Folder>
+		</Folder>
+  </Folder>
+</Module>

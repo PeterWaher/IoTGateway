@@ -430,6 +430,7 @@ The [Themes](Themes) folder contains libraries that contain content files for di
 |-------------------------------|--------------|--------------------------------------------------------------------|---------------------|
 | **Waher.Theme.CactusRose**    | .NET Std 1.0 | [NuGet](https://www.nuget.org/packages/Waher.Theme.CactusRose/)    | The [Waher.Theme.CactusRose](Themes/Waher.Theme.CactusRose) project contains content files for the Cactus Rose theme.          |
 | **Waher.Theme.GothicPeacock** | .NET Std 1.0 | [NuGet](https://www.nuget.org/packages/Waher.Theme.GothicPeacock/) | The [Waher.Theme.GothicPeacock](Themes/Waher.Theme.GothicPeacock) project contains content files for the Gothic Peacock theme. |
+| **Waher.Theme.Retro64**       | .NET Std 1.0 | [NuGet](https://www.nuget.org/packages/Waher.Theme.Retro64/)       | The [Waher.Theme.Retro64](Themes/Waher.Theme.Retro64) project contains content files for the Retro-64 theme.                   |
 | **Waher.Theme.SpaceGravel**   | .NET Std 1.0 | [NuGet](https://www.nuget.org/packages/Waher.Theme.SpaceGravel/)   | The [Waher.Theme.SpaceGravel](Themes/Waher.Theme.SpaceGravel) project contains content files for the Space Gravel theme.       |
 | **Waher.Theme.WinterDawn**    | .NET Std 1.0 | [NuGet](https://www.nuget.org/packages/Waher.Theme.WinterDawn/)    | The [Waher.Theme.WinterDawn](Themes/Waher.Theme.WinterDawn) project contains content files for the Winter Dawn theme.          |
 

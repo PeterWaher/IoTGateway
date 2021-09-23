@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Theme id="Retro64" xmlns="http://waher.se/Schema/Theme.xsd">
+	<Presentation>
+		<Title>Retro 64</Title>
+		<Thumbnail width="480" height="270">Retro64.png</Thumbnail>
+	</Presentation>
+	<BasicProperties>
+		<CSSX>Retro64.cssx</CSSX>
+		<TextColor>#FFFFFF</TextColor>
+		<BackgroundColor>#4040E0</BackgroundColor>
+		<HeaderColor>#C0C0C0</HeaderColor>
+		<HeaderTextColor>#FFFFFF</HeaderTextColor>
+		<ButtonColor>#C0C0C0</ButtonColor>
+		<ButtonTextColor>#000000</ButtonTextColor>
+		<MenuTextColor>#FFFFFF</MenuTextColor>
+		<InsertColor>#40A040</InsertColor>
+		<DeleteColor>#A04040</DeleteColor>
+		<LinkColorUnvisited>#C0C0C0</LinkColorUnvisited>
+		<LinkColorVisited>#FFFFFF</LinkColorVisited>
+		<LinkColorHot>#FFA0A0</LinkColorHot>
+		<FontFamily>Consolas,monaco,monospace</FontFamily>
+		<GraphBgColor>#A0A0FF</GraphBgColor>
+		<GraphFgColor>#000000</GraphFgColor>
+	</BasicProperties>
+	<CustomProperties>
+		<Property name="PosColor" value="#C0C0C0"/>
+		<Property name="PosSelectedColor" value="#888888"/>
+		<Property name="NegColor" value="#FFA0A0"/>
+		<Property name="TagColor" value="#4C83AE"/>
+		<Property name="DropDownColor" value="#E4F0FE"/>
+		<Property name="RestrictionColor" value="#EB9500"/>
+		<Property name="PublishColor" value="#4CAF50"/>
+		<Property name="EditorColor" value="#68217A"/>
+	</CustomProperties>
+	<BackgroundImages/>
+	<BannerImages/>
+</Theme>

@@ -348,6 +348,7 @@
 	<Assembly fileName='Waher.Security.Users.dll'/>
 	<Assembly fileName='Waher.Theme.CactusRose.dll'/>
 	<Assembly fileName='Waher.Theme.GothicPeacock.dll'/>
+	<Assembly fileName='Waher.Theme.Retro64.dll'/>
 	<Assembly fileName='Waher.Theme.SpaceGravel.dll'/>
 	<Assembly fileName='Waher.Theme.WinterDawn.dll'/>
 	<Assembly fileName='Waher.Things.dll'/>

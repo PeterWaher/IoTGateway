@@ -648,6 +648,7 @@
 							<File Id='Waher.Security.Users.dll' Name='Waher.Security.Users.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.Users.dll' Vital='yes'/>
 							<File Id='Waher.Theme.CactusRose.dll' Name='Waher.Theme.CactusRose.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.CactusRose.dll'/>
 							<File Id='Waher.Theme.GothicPeacock.dll' Name='Waher.Theme.GothicPeacock.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.GothicPeacock.dll'/>
+							<File Id='Waher.Theme.Retro64.dll' Name='Waher.Theme.Retro64.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.Retro64.dll'/>
 							<File Id='Waher.Theme.SpaceGravel.dll' Name='Waher.Theme.SpaceGravel.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.SpaceGravel.dll'/>
 							<File Id='Waher.Theme.WinterDawn.dll' Name='Waher.Theme.WinterDawn.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Theme.WinterDawn.dll'/>
 							<File Id='Waher.Things.dll' Name='Waher.Things.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Things.dll' Vital='yes'/>
@@ -756,6 +757,7 @@
 							<RemoveFile Id='RemoveWaher.Security.Users.dll' Name='Waher.Security.Users.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Theme.CactusRose.dll' Name='Waher.Theme.CactusRose.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Theme.GothicPeacock.dll' Name='Waher.Theme.GothicPeacock.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Theme.Retro64.dll' Name='Waher.Theme.Retro64.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Theme.SpaceGravel.dll' Name='Waher.Theme.SpaceGravel.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Theme.WinterDawn.dll' Name='Waher.Theme.WinterDawn.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.dll' Name='Waher.Things.dll' On='uninstall'/>
@@ -1892,6 +1894,20 @@
 									<RemoveFile Id='RemoveGothicPeacock1600x1600Dimmed.png' Name='GothicPeacock1600x1600Dimmed.png' On='uninstall'/>
 								</Component>
 							</Directory>
+							<Directory Id='Retro64' Name='Retro64'>
+								<Component Id='Retro64Files' Guid='F380999F-3FEB-4B07-8846-32B1B0811C97'>
+									<CreateFolder>
+										<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
+									</CreateFolder>
+									<RemoveFolder Id='RemoveRetro64' On='uninstall' />
+									<File Id='Retro64.cssx' Name='Retro64.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\Retro64\Retro64.cssx'/>
+									<File Id='Retro64.xml' Name='Retro64.xml' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\Retro64\Retro64.xml'/>
+									<File Id='Retro64.png' Name='Retro64.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Themes\Retro64\Retro64.png'/>
+									<RemoveFile Id='RemoveRetro64.cssx' Name='Retro64.cssx' On='uninstall'/>
+									<RemoveFile Id='RemoveRetro64.xml' Name='Retro64.xml' On='uninstall'/>
+									<RemoveFile Id='RemoveRetro64.png' Name='Retro64.png' On='uninstall'/>
+								</Component>
+							</Directory>
 							<Directory Id='SpaceGravel' Name='SpaceGravel'>
 								<Component Id='SpaceGravelFiles' Guid='1BBE23EC-09F7-44CE-BB4D-31C91403E8E4'>
 									<CreateFolder>
@@ -2046,6 +2062,7 @@
 				<ComponentRef Id='TemplateFiles' />
 				<ComponentRef Id='CactusRoseFiles'/>
 				<ComponentRef Id='GothicPeacockFiles'/>
+				<ComponentRef Id='Retro64Files'/>
 				<ComponentRef Id='SpaceGravelFiles'/>
 				<ComponentRef Id='WinterDawnFiles'/>
 				<ComponentRef Id='VideoFiles' />

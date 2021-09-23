@@ -225,7 +225,6 @@ namespace Waher.IoTGateway.Setup
 		{
 			get
 			{
-				Assert.CallFromSource(approvedSources);
 				return this.protectWithPassword;
 			}
 
@@ -249,7 +248,9 @@ namespace Waher.IoTGateway.Setup
 		{
 			get
 			{
-				Assert.CallFromSource(approvedSources);
+				if (!(this.passwordHashes is null))
+					Assert.CallFromSource(approvedSources);
+
 				return this.passwordHashes;
 			}
 

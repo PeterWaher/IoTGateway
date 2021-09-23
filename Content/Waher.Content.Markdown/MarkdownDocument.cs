@@ -414,7 +414,7 @@ namespace Waher.Content.Markdown
 						{
 							CheckException(ex3, TransparentExceptionTypes);
 
-							Log.Critical(ex3);
+							Log.Critical(ex3, FileName);
 
 							sb.Append("<p><font style=\"color:red\">");
 							sb.Append(XML.HtmlValueEncode(ex3.Message));
@@ -427,7 +427,7 @@ namespace Waher.Content.Markdown
 					{
 						CheckException(ex, TransparentExceptionTypes);
 
-						Log.Critical(ex);
+						Log.Critical(ex, FileName);
 
 						Result = "<font style=\"color:red\">" + XML.HtmlValueEncode(ex.Message) + "</font>";
 					}
@@ -2222,7 +2222,7 @@ namespace Waher.Content.Markdown
 								{
 									this.CheckException(ex3);
 
-									Log.Critical(ex3);
+									Log.Critical(ex3, this.fileName);
 
 									sb.Append("<p><font style=\"color:red\">");
 									sb.Append(XML.HtmlValueEncode(ex3.Message));
@@ -2236,7 +2236,7 @@ namespace Waher.Content.Markdown
 							{
 								this.CheckException(ex);
 
-								Log.Critical(ex);
+								Log.Critical(ex, this.fileName);
 
 								string[] Rows = ex.Message.Replace("\r\n", "\n").Split(CommonTypes.CRLF);
 								Elements.AddLast(new CodeBlock(this, Rows, 0, Rows.Length - 1, 0));

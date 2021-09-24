@@ -1064,7 +1064,7 @@ fieldset > legend
 
 .error 
 {
-	color:red;
+	color:¤Theme.NegColor¤;
 	font-weight:bold;
 	padding:1em;
     border:0.1em solid ¤HeaderColor¤;

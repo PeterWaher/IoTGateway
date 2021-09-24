@@ -39,6 +39,7 @@
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security.LoginMonitor\Waher.Security.LoginMonitor.csproj" />
     <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj" />
+    <ProjectReference Include="..\..\Waher.IoTGateway\Waher.IoTGateway.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">

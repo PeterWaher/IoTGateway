@@ -75,7 +75,7 @@ namespace Waher.IoTGateway.Setup
 		public override Task ConfigureSystem()
 		{
 			if (!string.IsNullOrEmpty(this.themeId) && themeDefinitions.TryGetValue(this.themeId, out ThemeDefinition Def))
-				Theme.CurrerntTheme = Def;
+				Theme.CurrentTheme = Def;
 
 			return Task.CompletedTask;
 		}
@@ -160,14 +160,14 @@ namespace Waher.IoTGateway.Setup
 			}
 
 			if (!string.IsNullOrEmpty(this.themeId) && themeDefinitions.TryGetValue(this.themeId, out Def))
-				Theme.CurrerntTheme = Def;
+				Theme.CurrentTheme = Def;
 			else if (themeDefinitions.TryGetValue("CactusRose", out Def))
-				Theme.CurrerntTheme = Def;
+				Theme.CurrentTheme = Def;
 			else
 			{
 				foreach (ThemeDefinition Def2 in themeDefinitions.Values)
 				{
-					Theme.CurrerntTheme = Def2;
+					Theme.CurrentTheme = Def2;
 					break;
 				}
 			}
@@ -207,7 +207,7 @@ namespace Waher.IoTGateway.Setup
 				throw new BadRequestException();
 
 			if (themeDefinitions.TryGetValue(ThemeId, out ThemeDefinition Def))
-				Theme.CurrerntTheme = Def;
+				Theme.CurrentTheme = Def;
 			else
 				throw new NotFoundException("Theme not found: " + ThemeId);
 

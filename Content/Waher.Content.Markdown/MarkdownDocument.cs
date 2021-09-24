@@ -416,7 +416,7 @@ namespace Waher.Content.Markdown
 
 							Log.Critical(ex3, FileName);
 
-							sb.Append("<p><font style=\"color:red\">");
+							sb.Append("<p><font class=\"error\">");
 							sb.Append(XML.HtmlValueEncode(ex3.Message));
 							sb.Append("</font></p>");
 						}
@@ -429,7 +429,7 @@ namespace Waher.Content.Markdown
 
 						Log.Critical(ex, FileName);
 
-						Result = "<font style=\"color:red\">" + XML.HtmlValueEncode(ex.Message) + "</font>";
+						Result = "<font class=\"error\">" + XML.HtmlValueEncode(ex.Message) + "</font>";
 					}
 				}
 
@@ -2224,7 +2224,7 @@ namespace Waher.Content.Markdown
 
 									Log.Critical(ex3, this.fileName);
 
-									sb.Append("<p><font style=\"color:red\">");
+									sb.Append("<p><font class=\"error\">");
 									sb.Append(XML.HtmlValueEncode(ex3.Message));
 									sb.Append("</font></p>");
 								}

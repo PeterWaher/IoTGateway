@@ -192,8 +192,8 @@ Example: `#hashtag` becomes #hashtag.
 ### Inline HTML
 
 Inline HTML elements can be inserted anywhere in markdown text, by just writing it. It can be freely combined with 
-other inline markdown constructs. Example: `This text is <span style='color:red'>red and **bold**</span>`. This is 
-transformed into: This text is <span style='color:red'>red and **bold**</span>. You can also use [HTML entities](Entities.md) 
+other inline markdown constructs. Example: `This text is <span style='color:{{Theme.NegColor}}'>colored and **bold**</span>`. This is 
+transformed into: This text is <span style='color:{{Theme.NegColor}}'>colored and **bold**</span>. You can also use [HTML entities](Entities.md) 
 directly in markdown. For example `&copy;` is transformed into &copy;.
 
 **Note**: Care has to be taken so that the end result is HTML compliant. While HTML can be inserted anywhere, it's only 

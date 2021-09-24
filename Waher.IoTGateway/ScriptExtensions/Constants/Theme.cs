@@ -57,7 +57,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 		/// <summary>
 		/// Current theme.
 		/// </summary>
-		public static ThemeDefinition CurrerntTheme
+		public static ThemeDefinition CurrentTheme
 		{
 			get => currentDefinition;
 			internal set

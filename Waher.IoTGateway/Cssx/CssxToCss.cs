@@ -88,7 +88,7 @@ namespace Waher.IoTGateway.Cssx
 				Session.Push();
 				Pushed = true;
 
-				ThemeDefinition Def = Theme.CurrerntTheme;
+				ThemeDefinition Def = Theme.CurrentTheme;
 				if (!(Def is null))
 				{
 					Session["TextColor"] = Def.TextColor;

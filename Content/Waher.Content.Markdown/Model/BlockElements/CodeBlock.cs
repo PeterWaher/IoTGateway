@@ -268,14 +268,14 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					{
 						foreach (Exception ex3 in ex2.InnerExceptions)
 						{
-							Output.Append("<p><font style=\"color:red\">");
+							Output.Append("<p><font class=\"error\">");
 							Output.Append(XML.HtmlValueEncode(ex3.Message));
 							Output.AppendLine("</font></p>");
 						}
 					}
 					else
 					{
-						Output.Append("<p><font style=\"color:red\">");
+						Output.Append("<p><font class=\"error\">");
 						Output.Append(XML.HtmlValueEncode(ex.Message));
 						Output.Append("</font></p>");
 					}

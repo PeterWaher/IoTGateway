@@ -10,6 +10,7 @@ using SkiaSharp;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.IoTGateway.ScriptExtensions.Constants;
 using Waher.Networking.HTTP;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
@@ -405,21 +406,30 @@ namespace Waher.WebService.Script
 				{
 					ex = Log.UnnestException(ex);
 
+					StringBuilder sb2 = new StringBuilder();
+					string NegColor = Theme.CurrentTheme["Theme.NegColor"];
+
 					if (ex is AggregateException ex2)
 					{
-						StringBuilder sb2 = new StringBuilder();
-
 						foreach (Exception ex3 in ex2.InnerExceptions)
 						{
-							sb2.Append("<p><font style=\"color:red;font-weight:bold\"><code>");
+							sb2.Append("<p><font style=\"color:");
+							sb2.Append(NegColor);
+							sb2.Append(";font-weight:bold\"><code>");
 							sb2.Append(this.FormatText(XML.HtmlValueEncode(ex3.Message)));
 							sb2.Append("</code></font></p>");
 						}
-
-						s = sb2.ToString();
 					}
 					else
-						s = "<p><font style=\"color:red;font-weight:bold\"><code>" + this.FormatText(XML.HtmlValueEncode(ex.Message)) + "</code></font></p>";
+					{
+						sb2.Append("<p><font style=\"color:");
+						sb2.Append(NegColor);
+						sb2.Append(";font-weight:bold\"><code>");
+						sb2.Append(this.FormatText(XML.HtmlValueEncode(ex.Message)));
+						sb2.Append("</code></font></p>");
+					}
+
+					s = sb2.ToString();
 				}
 				else if (Result is ObjectMatrix M && M.ColumnNames != null)
 				{
@@ -473,13 +483,34 @@ namespace Waher.WebService.Script
 				else
 				{
 					s = Result.ToString();
-					s = "<div class='clickable' onclick='SetScript(this);'><code style='display:none'>" + XML.Encode(s) +
-						"</code><p><font style=\"color:red\"><code>" + this.FormatText(XML.HtmlValueEncode(s)) + "</code></font></p></div>";
+
+					StringBuilder sb2 = new StringBuilder();
+
+					sb2.Append("<div class='clickable' onclick='SetScript(this);'><code style='display:none'>");
+					sb2.Append(XML.Encode(s));
+					sb2.Append("</code><p><font style=\"");
+					sb2.Append(Theme.CurrentTheme["Theme.NegColor"]);
+					sb2.Append("\"><code>");
+					sb2.Append(this.FormatText(XML.HtmlValueEncode(s)));
+					sb2.Append("</code></font></p></div>");
+
+					s = sb2.ToString();
 				}
 
 				string s2 = this.printOutput.ToString();
 				if (!string.IsNullOrEmpty(s2))
-					s = "<p><font style=\"color:blue\"><code>" + this.FormatText(XML.HtmlValueEncode(s2)) + "</code></font></p>" + s;
+				{
+					StringBuilder sb2 = new StringBuilder();
+
+					sb2.Append("<p><font style=\"");
+					sb2.Append(Theme.CurrentTheme.LinkColorUnvisited.ToString());
+					sb2.Append("\"><code>");
+					sb2.Append(this.FormatText(XML.HtmlValueEncode(s2)));
+					sb2.Append("</code></font></p>");
+					sb2.Append(s);
+
+					s = sb2.ToString();
+				}
 
 				Bin = Encoding.UTF8.GetBytes(s);
 

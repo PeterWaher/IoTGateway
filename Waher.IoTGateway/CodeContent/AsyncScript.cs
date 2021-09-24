@@ -18,6 +18,8 @@ namespace Waher.IoTGateway.CodeContent
 	/// </summary>
 	public class AsyncScript : ICodeContent
 	{
+		private MarkdownDocument document;
+
 		/// <summary>
 		/// Class managing 2D XML Layout integration into Markdown documents.
 		/// </summary>
@@ -48,6 +50,8 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="Document">Document containing the instance.</param>
 		public void Register(MarkdownDocument Document)
 		{
+			this.document = Document;
+
 			if (!Document.TryGetMetaData("JAVASCRIPT", out KeyValuePair<string, bool>[] Values) ||
 				!this.Contains(Values, "/Events.js"))
 			{
@@ -126,7 +130,7 @@ namespace Waher.IoTGateway.CodeContent
 			foreach (string Row in Rows)
 				sb.AppendLine(Row);
 
-			return new Expression(sb.ToString());
+			return new Expression(sb.ToString(), this.document?.FileName);
 		}
 
 		private object Evaluate(Expression Script, Variables Variables)

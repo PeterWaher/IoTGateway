@@ -15,8 +15,8 @@ using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Script;
-using Waher.Runtime.Inventory;
 using Waher.Runtime.Text;
+using Waher.Content.Markdown.Functions;
 
 namespace Waher.Content.Markdown
 {
@@ -34,7 +34,6 @@ namespace Waher.Content.Markdown
 	/// </summary>
 	public class MarkdownDocument : IFileNameResource, IEnumerable<MarkdownElement>
 	{
-		private static readonly Dictionary<string, DateTime> lastExecuted = new Dictionary<string, DateTime>();
 		internal static readonly Regex endOfHeader = new Regex(@"\n\s*\n", RegexOptions.Multiline | RegexOptions.Compiled);
 		internal static readonly Regex scriptHeader = new Regex(@"^(?'Tag'(([Ss][Cc][Rr][Ii][Pp][Tt])|([Ii][Nn][Ii][Tt]))):\s*(?'ScriptFile'[^\r\n]*)", RegexOptions.Multiline | RegexOptions.Compiled);
 
@@ -285,56 +284,8 @@ namespace Waher.Content.Markdown
 
 							FileName2 = Settings.GetFileName(FileName, FileName2);
 
-							if (Tag == "INIT")
-							{
-								DateTime Timestamp = File.GetLastWriteTime(FileName2);
-								DateTime? LastExecuted;
-								Type RuntimeSettings = null;
-								MethodInfo Get;
-								MethodInfo Set;
-
-								lock (lastExecuted)
-								{
-									if (lastExecuted.TryGetValue(FileName, out DateTime TP))
-										LastExecuted = TP;
-									else
-										LastExecuted = null;
-								}
-
-								if (LastExecuted.HasValue && LastExecuted.Value >= Timestamp)
-									continue;
-
-								if (!LastExecuted.HasValue &&
-									!((RuntimeSettings = Types.GetType("Waher.Runtime.Settings.RuntimeSettings")) is null) &&
-									!((Get = RuntimeSettings.GetRuntimeMethod("Get", new Type[] { typeof(string), typeof(DateTime) })) is null))
-								{
-									LastExecuted = (DateTime)Get.Invoke(null, new object[] { FileName, DateTime.MinValue });
-
-									if (LastExecuted.HasValue && LastExecuted.Value >= Timestamp)
-									{
-										lock (lastExecuted)
-										{
-											lastExecuted[FileName] = LastExecuted.Value;
-										}
-
-										continue;
-									}
-								}
-
-								lock (lastExecuted)
-								{
-									lastExecuted[FileName] = Timestamp;
-								}
-
-								if (RuntimeSettings is null)
-									RuntimeSettings = Types.GetType("Waher.Runtime.Settings.RuntimeSettings");
-
-								if (!(RuntimeSettings is null) &&
-									!((Set = RuntimeSettings.GetRuntimeMethod("Set", new Type[] { typeof(string), typeof(DateTime) })) is null))
-								{
-									Set.Invoke(null, new object[] { FileName, Timestamp });
-								}
-							}
+							if (Tag == "INIT" && !InitScriptFile.NeedsExecution(FileName2))
+								continue;
 
 							Script = File.ReadAllText(FileName2);
 
@@ -346,7 +297,7 @@ namespace Waher.Content.Markdown
 
 							try
 							{
-								Exp = new Expression(Script);
+								Exp = new Expression(Script, FileName2);
 								Exp.Evaluate(Variables);
 							}
 							catch (Exception ex)
@@ -371,7 +322,7 @@ namespace Waher.Content.Markdown
 
 				try
 				{
-					Exp = new Expression(Script);
+					Exp = new Expression(Script, FileName);
 
 					if (!IsDynamic)
 					{
@@ -2203,7 +2154,7 @@ namespace Waher.Content.Markdown
 
 						try
 						{
-							Expression Exp = new Expression(Text.ToString());
+							Expression Exp = new Expression(Text.ToString(), this.fileName);
 							State.DiscardBackup();
 							Elements.AddLast(new InlineScript(this, Exp, this.settings.Variables,
 								Elements.First is null && State.PeekNextChar() == 0, StartPosition, EndPosition));

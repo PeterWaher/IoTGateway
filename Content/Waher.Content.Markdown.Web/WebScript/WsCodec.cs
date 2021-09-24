@@ -115,7 +115,7 @@ namespace Waher.Content.Markdown.Web.WebScript
 		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string s = CommonTypes.GetString(Data, Encoding);
-			return new Expression(s);
+			return new Expression(s, BaseUri?.ToString());
 		}
 
 		/// <summary>

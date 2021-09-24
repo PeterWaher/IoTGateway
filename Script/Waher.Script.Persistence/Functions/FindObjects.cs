@@ -113,7 +113,7 @@ namespace Waher.Script.Persistence.Functions
 
 			if (Filter is null && !(FilterObj is null))
 			{
-				Expression Exp = new Expression(FilterObj.ToString());
+				Expression Exp = new Expression(FilterObj.ToString(), this.Expression.Source);
 				Filter = this.Convert(Exp.Root, Variables);
 			}
 

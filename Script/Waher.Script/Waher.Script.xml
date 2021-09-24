@@ -2367,6 +2367,13 @@
             Class managing a script expression.
             </summary>
         </member>
+        <member name="M:Waher.Script.Expression.#ctor(System.String,System.String)">
+            <summary>
+            Class managing a script expression.
+            </summary>
+            <param name="Script">Script expression.</param>
+            <param name="Source">Source of script.</param>
+        </member>
         <member name="M:Waher.Script.Expression.#ctor(System.String)">
             <summary>
             Class managing a script expression.
@@ -2376,6 +2383,11 @@
         <member name="P:Waher.Script.Expression.Script">
             <summary>
             Original script string.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Expression.Source">
+            <summary>
+            Source of script, or null if not defined.
             </summary>
         </member>
         <member name="M:Waher.Script.Expression.TryGetConstant(System.String,Waher.Script.Variables,Waher.Script.Abstraction.Elements.IElement@)">
@@ -2422,6 +2434,17 @@
             <param name="StartDelimiter">Start delimiter.</param>
             <param name="StopDelimiter">Stop delimiter.</param>
             <param name="Variables">Collection of variables.</param>
+            <returns>Transformed string.</returns>
+        </member>
+        <member name="M:Waher.Script.Expression.Transform(System.String,System.String,System.String,Waher.Script.Variables,System.String)">
+            <summary>
+            Transforms a string by executing embedded script.
+            </summary>
+            <param name="s">String to transform.</param>
+            <param name="StartDelimiter">Start delimiter.</param>
+            <param name="StopDelimiter">Stop delimiter.</param>
+            <param name="Variables">Collection of variables.</param>
+            <param name="Source">Optional source of <paramref name="s"/>.</param>
             <returns>Transformed string.</returns>
         </member>
         <member name="M:Waher.Script.Expression.ToString(System.Double)">

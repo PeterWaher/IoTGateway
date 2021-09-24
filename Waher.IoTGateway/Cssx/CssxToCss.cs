@@ -64,7 +64,7 @@ namespace Waher.IoTGateway.Cssx
 				Cssx = rd.ReadToEnd();
 			}
 
-			string Css = Convert(Cssx, Session);
+			string Css = Convert(Cssx, Session, FromFileName);
 
 			byte[] Data = Utf8WithBOM.GetBytes(Css);
 			To.Write(Data, 0, Data.Length);
@@ -77,8 +77,9 @@ namespace Waher.IoTGateway.Cssx
 		/// </summary>
 		/// <param name="Cssx">CSSX</param>
 		/// <param name="Session">Current session</param>
+		/// <param name="FileName">Source file name.</param>
 		/// <returns>CSS</returns>
-		public static string Convert(string Cssx, Variables Session)
+		public static string Convert(string Cssx, Variables Session, string FileName)
 		{
 			bool Pushed = false;
 
@@ -132,7 +133,7 @@ namespace Waher.IoTGateway.Cssx
 						break;
 
 					Script = Cssx.Substring(j + 1, k - j - 1);
-					Exp = new Expression(Script);
+					Exp = new Expression(Script, FileName);
 					Value = Exp.Evaluate(Session);
 
 					if (Value is SKColor Color)

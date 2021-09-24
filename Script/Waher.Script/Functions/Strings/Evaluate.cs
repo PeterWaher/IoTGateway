@@ -47,7 +47,7 @@ namespace Waher.Script.Functions.Strings
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(string Argument, Variables Variables)
         {
-            Expression Exp = new Expression(Argument);
+            Expression Exp = new Expression(Argument, this.Expression.Source);
 
             try
             {

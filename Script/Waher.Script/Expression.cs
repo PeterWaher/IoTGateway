@@ -46,11 +46,23 @@ namespace Waher.Script
 
 		private ScriptNode root;
 		private readonly string script;
+		private readonly string source;
 		private object tag;
 		private int pos;
 		private readonly int len;
 		private bool containsImplicitPrint = false;
 		private bool canSkipWhitespace = true;
+
+		/// <summary>
+		/// Class managing a script expression.
+		/// </summary>
+		/// <param name="Script">Script expression.</param>
+		/// <param name="Source">Source of script.</param>
+		public Expression(string Script, string Source)
+			: this(Script)
+		{
+			this.source = Source;
+		}
 
 		/// <summary>
 		/// Class managing a script expression.
@@ -163,6 +175,14 @@ namespace Waher.Script
 		public string Script
 		{
 			get { return this.script; }
+		}
+
+		/// <summary>
+		/// Source of script, or null if not defined.
+		/// </summary>
+		public string Source
+		{
+			get { return this.source; }
 		}
 
 		internal char NextChar()
@@ -4185,6 +4205,20 @@ namespace Waher.Script
 		/// <returns>Transformed string.</returns>
 		public static string Transform(string s, string StartDelimiter, string StopDelimiter, Variables Variables)
 		{
+			return Transform(s, StartDelimiter, StopDelimiter, Variables, null);
+		}
+
+		/// <summary>
+		/// Transforms a string by executing embedded script.
+		/// </summary>
+		/// <param name="s">String to transform.</param>
+		/// <param name="StartDelimiter">Start delimiter.</param>
+		/// <param name="StopDelimiter">Stop delimiter.</param>
+		/// <param name="Variables">Collection of variables.</param>
+		/// <param name="Source">Optional source of <paramref name="s"/>.</param>
+		/// <returns>Transformed string.</returns>
+		public static string Transform(string s, string StartDelimiter, string StopDelimiter, Variables Variables, string Source)
+		{
 			Expression Exp;
 			string Script, s2;
 			object Result;
@@ -4202,7 +4236,7 @@ namespace Waher.Script
 				Script = s.Substring(i + StartLen, j - i - StartLen);
 				s = s.Remove(i, j - i + StopLen);
 
-				Exp = new Expression(Script);
+				Exp = new Expression(Script, Source);
 				Result = Exp.Evaluate(Variables);
 
 				if (!(Result is null))
@@ -4802,13 +4836,13 @@ namespace Waher.Script
 		/// <param name="Node">Script node making the request.</param>
 		/// <returns>Converted value.</returns>
 		public static object ConvertTo(object Obj, Type DesiredType, ScriptNode Node)
-		{ 
+		{
 			if (Obj is null)
 				return null;
 
 			if (TryConvert(Obj, DesiredType, out object Result))
 				return Result;
-				
+
 			Type T = Obj.GetType();
 			if (T == DesiredType)
 				return Obj;
@@ -4837,7 +4871,7 @@ namespace Waher.Script
 
 				return Dest;
 			}
-			
+
 			return Convert.ChangeType(Obj, DesiredType);
 		}
 
@@ -4994,7 +5028,7 @@ namespace Waher.Script
 				return true;
 			}
 
-			if (TryGetTypeConverter(T,DesiredType,out ITypeConverter Converter))
+			if (TryGetTypeConverter(T, DesiredType, out ITypeConverter Converter))
 			{
 				Result = Converter.Convert(Value);
 				return true;

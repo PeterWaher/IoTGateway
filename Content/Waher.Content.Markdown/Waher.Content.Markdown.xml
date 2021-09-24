@@ -46,6 +46,47 @@
             <param name="Element">Markdown element.</param>
             <returns>Script element.</returns>
         </member>
+        <member name="T:Waher.Content.Markdown.Functions.InitScriptFile">
+            <summary>
+            Executes script from a file, if not executed before, or if file timestamp has changed.
+            Corresponds to the INIT meta-data tag in Markdown.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.InitScriptFile.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Executes script from a file, if not executed before, or if file timestamp has changed.
+            Corresponds to the INIT meta-data tag in Markdown.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Functions.InitScriptFile.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Functions.InitScriptFile.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.InitScriptFile.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.InitScriptFile.NeedsExecution(System.String)">
+            <summary>
+            Checks if an init-file needs to be executed.
+            </summary>
+            <param name="FileName">File name</param>
+            <returns>If script file needs to be executed.</returns>
+        </member>
         <member name="T:Waher.Content.Markdown.Functions.LoadMarkdown">
             <summary>
             LoadMarkdown(FileName)
@@ -162,6 +203,40 @@
             </summary>
         </member>
         <member name="M:Waher.Content.Markdown.Functions.PreprocessMarkdown.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Functions.ScriptFile">
+            <summary>
+            Executes script from a file.
+            Corresponds to the SCRIPT meta-data tag in Markdown.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.ScriptFile.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Executes script from a file, if not executed before, or if file timestamp has changed.
+            Corresponds to the INIT meta-data tag in Markdown.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Functions.ScriptFile.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Functions.ScriptFile.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.ScriptFile.EvaluateScalar(System.String,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>

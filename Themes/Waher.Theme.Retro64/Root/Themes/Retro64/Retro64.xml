@@ -28,6 +28,7 @@
 		<Property name="NegColor" value="#FFA0A0"/>
 		<Property name="TagColor" value="#4C83AE"/>
 		<Property name="DropDownColor" value="#E4F0FE"/>
+		<Property name="DropDownTextColor" value="#000000"/>
 		<Property name="RestrictionColor" value="#EB9500"/>
 		<Property name="PublishColor" value="#4CAF50"/>
 		<Property name="EditorColor" value="#68217A"/>

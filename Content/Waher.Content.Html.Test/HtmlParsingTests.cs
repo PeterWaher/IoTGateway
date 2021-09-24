@@ -111,5 +111,11 @@ namespace Waher.Content.Html.Test
 		{
 			await this.LoadAndParse("https://www.theguardian.com/technology/2018/mar/04/has-dopamine-got-us-hooked-on-tech-facebook-apps-addiction");
 		}
+
+		[TestMethod]
+		public async Task HtmlParseTest_04_Cnbc()
+		{
+			await this.LoadAndParse("https://www.cnbc.com/2021/09/10/epic-games-v-apple-judge-reaches-decision-.html");
+		}
 	}
 }

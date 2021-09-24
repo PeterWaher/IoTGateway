@@ -407,7 +407,7 @@ namespace Waher.WebService.Script
 					ex = Log.UnnestException(ex);
 
 					StringBuilder sb2 = new StringBuilder();
-					string NegColor = Theme.CurrentTheme["Theme.NegColor"];
+					string NegColor = Theme.CurrentTheme["NegColor"];
 
 					if (ex is AggregateException ex2)
 					{
@@ -488,8 +488,8 @@ namespace Waher.WebService.Script
 
 					sb2.Append("<div class='clickable' onclick='SetScript(this);'><code style='display:none'>");
 					sb2.Append(XML.Encode(s));
-					sb2.Append("</code><p><font style=\"");
-					sb2.Append(Theme.CurrentTheme["Theme.NegColor"]);
+					sb2.Append("</code><p><font style=\"color:");
+					sb2.Append(Theme.CurrentTheme["NegColor"]);
 					sb2.Append("\"><code>");
 					sb2.Append(this.FormatText(XML.HtmlValueEncode(s)));
 					sb2.Append("</code></font></p></div>");
@@ -502,7 +502,7 @@ namespace Waher.WebService.Script
 				{
 					StringBuilder sb2 = new StringBuilder();
 
-					sb2.Append("<p><font style=\"");
+					sb2.Append("<p><font style=\"color:");
 					sb2.Append(Theme.CurrentTheme.LinkColorUnvisited.ToString());
 					sb2.Append("\"><code>");
 					sb2.Append(this.FormatText(XML.HtmlValueEncode(s2)));

@@ -2968,6 +2968,7 @@ namespace Waher.Persistence.Files
 
 					if (Repair && FileStat.IsCorrupt)
 					{
+						string[] Comments = FileStat.Comments;
 						ProfilerThread RepairThread = Thread?.CreateSubThread("Repair " + File.CollectionName, ProfilerThreadType.Sequential);
 						LinkedList<Exception> Exceptions = null;
 						string TempFileName = Path.GetTempFileName();
@@ -3183,7 +3184,10 @@ namespace Waher.Persistence.Files
 						FileStat = P.Key;
 						ObjectIds = P.Value;
 
-						FileStat.LogComment("File was regenerated due to errors found.");
+						FileStat.LogComment("File was regenerated due to errors found:");
+
+						foreach (string Comment in Comments)
+							FileStat.LogComment(Comment);
 
 						if (!(Exceptions is null))
 						{

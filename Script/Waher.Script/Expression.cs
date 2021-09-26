@@ -5212,6 +5212,28 @@ namespace Waher.Script
 			return Converters;
 		}
 
+		/// <summary>
+		/// Evaluates script, in string format.
+		/// </summary>
+		/// <param name="Script">Script to parse and evaluate.</param>
+		/// <returns>Result</returns>
+		public static object Eval(string Script)
+		{
+			return Eval(Script, new Variables());
+		}
+
+		/// <summary>
+		/// Evaluates script, in string format.
+		/// </summary>
+		/// <param name="Script">Script to parse and evaluate.</param>
+		/// <param name="Variables">Variables</param>
+		/// <returns>Result</returns>
+		public static object Eval(string Script, Variables Variables)
+		{
+			Expression Exp = new Expression(Script);
+			return Exp.Evaluate(Variables);
+		}
+
 		// TODO: Optimize constants
 		// TODO: Integers (0d, 0x, 0o, 0b), Big Integers (0D, 0X, 0O, 0B)
 		// TODO: Matrix*Vector = Vector

@@ -2700,6 +2700,21 @@
             <param name="Converter">Type Converter found, or null if not found.</param>
             <returns>If a type converter could be found, or constructed from existing converters.</returns>
         </member>
+        <member name="M:Waher.Script.Expression.Eval(System.String)">
+            <summary>
+            Evaluates script, in string format.
+            </summary>
+            <param name="Script">Script to parse and evaluate.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Expression.Eval(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates script, in string format.
+            </summary>
+            <param name="Script">Script to parse and evaluate.</param>
+            <param name="Variables">Variables</param>
+            <returns>Result</returns>
+        </member>
         <member name="T:Waher.Script.Functions.Analytic.ArcCos">
             <summary>
             ArcCos(x)

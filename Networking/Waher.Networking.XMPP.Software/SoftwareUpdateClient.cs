@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
-using Waher.Script.Operators.Membership;
 
 namespace Waher.Networking.XMPP.Software
 {
@@ -419,19 +418,25 @@ namespace Waher.Networking.XMPP.Software
 			{
 				string FileName = await this.DownloadPackageAsync(PackageInfo);
 				PackageFileEventArgs e3 = new PackageFileEventArgs(PackageInfo, FileName, e);
+				PackageFileEventHandler h = this.OnSoftwareValidation;
 
-				try
+				if (!(h is null))
 				{
-					this.OnSoftwareValidation?.Invoke(this, e3);
-				}
-				catch (Exception ex)
-				{
-					File.Delete(FileName);
-					Log.Warning("Package with invalid signature downloaded and deleted.\r\n\r\n" + ex.Message, FileName);
-					return;
+					try
+					{
+						await h(this, e3);
+					}
+					catch (Exception ex)
+					{
+						File.Delete(FileName);
+						Log.Warning("Package with invalid signature downloaded and deleted.\r\n\r\n" + ex.Message, FileName);
+						return;
+					}
 				}
 
-				this.OnSoftwareDownloaded?.Invoke(this, e3);
+				h = this.OnSoftwareDownloaded;
+				if (!(h is null))
+					await h(this, e3);
 			}
 			catch (Exception ex)
 			{

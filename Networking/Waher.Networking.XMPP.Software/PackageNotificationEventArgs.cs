@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Xml;
-using Waher.Networking.XMPP;
 
 namespace Waher.Networking.XMPP.Software
 {

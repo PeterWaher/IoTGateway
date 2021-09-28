@@ -4330,7 +4330,18 @@ namespace Waher.Persistence.Files
 			if (NrObjects != Header.SizeSubtree)
 			{
 				if (Header.SizeSubtree != uint.MaxValue)
-					Statistics.LogError("Size of subtree rooted at block " + BlockIndex.ToString() + " is wrong. Stated count: " + Header.SizeSubtree.ToString() + ", Actual count: " + NrObjects.ToString());
+				{
+					if (this.fileAccess.IsWriting)
+					{
+						Array.Copy(BitConverter.GetBytes(NrObjects), 0, Block, 2, 4);
+						this.QueueSaveBlockLocked(BlockIndex, Block);
+						
+						Statistics.LogComment("Size of subtree rooted at block " + BlockIndex.ToString() + " updated. Incorrect count: " + Header.SizeSubtree.ToString() + ", Actual count: " + NrObjects.ToString());
+						// TODO: Find out why this happens.
+					}
+					else
+						Statistics.LogError("Size of subtree rooted at block " + BlockIndex.ToString() + " is wrong. Stated count: " + Header.SizeSubtree.ToString() + ", Actual count: " + NrObjects.ToString());
+				}
 				else
 					Statistics.LogComment("Size field of block " + BlockIndex.ToString() + " cannot hold actual subtree size: " + NrObjects.ToString());
 			}

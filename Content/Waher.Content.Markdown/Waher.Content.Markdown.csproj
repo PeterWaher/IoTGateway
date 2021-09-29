@@ -17,10 +17,10 @@ https://waher.se/Markdown.md</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>Markdown Parser Text HTML XAML WPF Xamarin Forms XML Difference History</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.2.4</AssemblyVersion>
-    <FileVersion>1.2.4</FileVersion>
+    <AssemblyVersion>1.2.5</AssemblyVersion>
+    <FileVersion>1.2.5</FileVersion>
     <PackageIconUrl></PackageIconUrl>
-    <Version>1.2.4</Version>
+    <Version>1.2.5</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content.Markdown\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

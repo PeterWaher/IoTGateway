@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Xml;
+using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -52,6 +54,14 @@ namespace Waher.Script.Xml.Model
 
 			if (Element is StringValue S)
 				return S.Value;
+			else if (Element is BooleanValue B)
+				return CommonTypes.Encode(B.Value);
+			else if (Element is DoubleNumber D)
+				return CommonTypes.Encode(D.Value);
+			else if (Element is DateTimeValue DT)
+				return XML.Encode(DT.Value, DT.Value.TimeOfDay == TimeSpan.Zero);
+			else if (Element is Integer I)
+				return I.Value.ToString();
 			else
 			{
 				object Value = Element.AssociatedObjectValue;

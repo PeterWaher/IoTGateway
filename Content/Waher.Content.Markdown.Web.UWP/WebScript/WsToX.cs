@@ -72,7 +72,7 @@ namespace Waher.Content.Markdown.Web.WebScript
 					Script = rd.ReadToEnd();
 				}
 
-				Exp = new Expression(Script);
+				Exp = new Expression(Script, FromFileName);
 
 				lock (parsed)
 				{

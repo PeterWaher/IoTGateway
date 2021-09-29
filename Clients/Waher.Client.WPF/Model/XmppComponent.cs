@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml;
@@ -10,10 +7,12 @@ using Waher.Networking.XMPP;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Controls;
 using System.Threading.Tasks;
+using System.Windows;
+using Waher.Client.WPF.Dialogs.Xmpp;
 
 namespace Waher.Client.WPF.Model
 {
-	public class XmppComponent : TreeNode
+	public class XmppComponent : XmppNode
 	{
 		private readonly Dictionary<string, bool> features;
 		private readonly string jid;
@@ -43,6 +42,7 @@ namespace Waher.Client.WPF.Model
 		public string Name => this.name;
 		public string Node => this.node;
 
+		public override string FullJID => this.jid;
 		public override string Key => this.jid;
 		public override ImageSource ImageResource => XmppAccountNode.component;
 		public override string TypeName => "XMPP Server component";
@@ -76,11 +76,6 @@ namespace Waher.Client.WPF.Model
 		public override void Write(XmlWriter Output)
 		{
 			// Don't output.
-		}
-
-		public XmppAccountNode Account
-		{
-			get { return this.Parent as XmppAccountNode; }
 		}
 
 		public override bool CanSearch => this.canSearch;
@@ -179,5 +174,6 @@ namespace Waher.Client.WPF.Model
 		{
 			return this.features?.ContainsKey(Feature) ?? false;
 		}
+
 	}
 }

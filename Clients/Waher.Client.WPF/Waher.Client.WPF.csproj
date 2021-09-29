@@ -340,6 +340,18 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialogs\Xmpp\IqResultFrom.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\Xmpp\IqFrom.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\Xmpp\MessageForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -349,6 +361,15 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Controls\ITabView.cs" />
+    <Compile Include="Dialogs\Xmpp\IqResultFrom.xaml.cs">
+      <DependentUpon>IqResultFrom.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Xmpp\IqFrom.xaml.cs">
+      <DependentUpon>IqFrom.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Xmpp\MessageForm.xaml.cs">
+      <DependentUpon>MessageForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Model\ColorableItem.cs" />
     <Compile Include="Dialogs\ConnectToForm.xaml.cs">
       <DependentUpon>ConnectToForm.xaml</DependentUpon>
@@ -372,6 +393,7 @@
     <Compile Include="Model\PubSub\PubSubItem.cs" />
     <Compile Include="Model\PubSub\PubSubNode.cs" />
     <Compile Include="Model\PubSub\PubSubService.cs" />
+    <Compile Include="Model\XmppNode.cs" />
     <Compile Include="Model\XmppComponent.cs" />
     <Compile Include="Model\Connections.cs" />
     <Compile Include="Model\Loading.cs" />

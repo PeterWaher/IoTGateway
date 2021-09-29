@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,7 +11,6 @@ using Waher.Content.Html;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP;
-using Waher.Networking.XMPP.P2P.SOCKS5;
 using Waher.Networking.XMPP.RDP;
 
 namespace Waher.Client.WPF.Model
@@ -21,7 +18,7 @@ namespace Waher.Client.WPF.Model
 	/// <summary>
 	/// Represents an XMPP contact whose capabilities have not been measured.
 	/// </summary>
-	public class XmppContact : TreeNode
+	public class XmppContact : XmppNode
 	{
 		private readonly XmppClient client;
 		private readonly string bareJid;
@@ -48,6 +45,18 @@ namespace Waher.Client.WPF.Model
 		public string BareJID
 		{
 			get { return this.bareJid; }
+		}
+
+		public override string FullJID
+		{
+			get
+			{
+				RosterItem Item = this.client[this.bareJid];
+				if (Item is null || !Item.HasLastPresence)
+					return this.bareJid;
+				else
+					return Item.LastPresenceFullJid;
+			}
 		}
 
 		public RosterItem RosterItem

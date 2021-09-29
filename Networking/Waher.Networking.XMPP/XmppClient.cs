@@ -2213,8 +2213,11 @@ namespace Waher.Networking.XMPP
 
 				lock (this.synchObject)
 				{
-					foreach (XmlElement E in e.Message.ChildNodes)
+					foreach (XmlNode N in e.Message.ChildNodes)
 					{
+						if (!(N is XmlElement E))
+							continue;
+
 						if (FormHandler is null && E.LocalName == "x" && E.NamespaceURI == NamespaceData)
 						{
 							Form = new DataForm(this, E, this.MessageFormSubmitted, this.MessageFormCancelled, e.From, e.To)
@@ -2483,8 +2486,11 @@ namespace Waher.Networking.XMPP
 				{
 					lock (this.synchObject)
 					{
-						foreach (XmlElement E in e.Presence.ChildNodes)
+						foreach (XmlNode N in e.Presence.ChildNodes)
 						{
+							if (!(N is XmlElement E))
+								continue;
+
 							Key = E.LocalName + " " + E.NamespaceURI;
 							if (this.presenceHandlers.TryGetValue(Key, out Callback))
 							{
@@ -2610,8 +2616,11 @@ namespace Waher.Networking.XMPP
 
 				lock (this.synchObject)
 				{
-					foreach (XmlElement E in e.IQ.ChildNodes)
+					foreach (XmlNode N in e.IQ.ChildNodes)
 					{
+						if (!(N is XmlElement E))
+							continue;
+
 						Key = E.LocalName + " " + E.NamespaceURI;
 						if (Handlers.TryGetValue(Key, out h))
 						{
@@ -5421,9 +5430,9 @@ namespace Waher.Networking.XMPP
 
 			RosterItem Item = null;
 
-			foreach (XmlElement E in e.Query.ChildNodes)
+			foreach (XmlNode N in e.Query.ChildNodes)
 			{
-				if (E.LocalName == "item" && E.NamespaceURI == NamespaceRoster)
+				if (N is XmlElement E && E.LocalName == "item" && E.NamespaceURI == NamespaceRoster)
 				{
 					lock (this.roster)
 					{

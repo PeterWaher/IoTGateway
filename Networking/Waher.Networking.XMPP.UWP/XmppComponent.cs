@@ -1055,8 +1055,11 @@ namespace Waher.Networking.XMPP
 
 				lock (this.synchObject)
 				{
-					foreach (XmlElement E in e.Message.ChildNodes)
+					foreach (XmlNode N in e.Message.ChildNodes)
 					{
+						if (!(N is XmlElement E))
+							continue;
+
 						Key = E.LocalName + " " + E.NamespaceURI;
 						if (this.messageHandlers.TryGetValue(Key, out h))
 						{
@@ -1244,8 +1247,11 @@ namespace Waher.Networking.XMPP
 
 				lock (this.synchObject)
 				{
-					foreach (XmlElement E in e.IQ.ChildNodes)
+					foreach (XmlNode N in e.IQ.ChildNodes)
 					{
+						if (!(N is XmlElement E))
+							continue;
+
 						Key = E.LocalName + " " + E.NamespaceURI;
 						if (Handlers.TryGetValue(Key, out h))
 						{

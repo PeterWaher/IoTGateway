@@ -56,14 +56,6 @@ namespace Waher.Client.WPF.Model
 			});
 
 			Item.Click += this.SendXmppIqSet_Click;
-
-			Menu.Items.Add(Item = new MenuItem()
-			{
-				Header = "Send XMPP Presence...",
-				IsEnabled = true
-			});
-
-			Item.Click += this.SendXmppPresence_Click;
 		}
 
 		private void SendXmppMessage_Click(object sender, RoutedEventArgs e)
@@ -183,10 +175,5 @@ namespace Waher.Client.WPF.Model
 				MainWindow.ErrorBox(ex.Message);
 			}
 		}
-
-		private void SendXmppPresence_Click(object sender, RoutedEventArgs e)
-		{
-		}
-
 	}
 }

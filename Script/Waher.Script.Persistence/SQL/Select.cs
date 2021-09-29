@@ -293,9 +293,7 @@ namespace Waher.Script.Persistence.SQL
 				}
 			}
 
-			if (Elements.Length == 1)
-				return Elements[0];
-			else if (Columns2 is null || c == 1)
+			if (Columns2 is null || c == 1)
 				return Operators.Vectors.VectorDefinition.Encapsulate(Elements, false, this);
 
 			ObjectMatrix Result = new ObjectMatrix(NrRecords, c, Elements);

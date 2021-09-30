@@ -7,8 +7,9 @@ using Waher.Networking.XMPP;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Controls;
 using System.Threading.Tasks;
-using System.Windows;
-using Waher.Client.WPF.Dialogs.Xmpp;
+using Waher.Networking.XMPP.Sensor;
+using Waher.Networking.XMPP.ServiceDiscovery;
+using Waher.Things.SensorData;
 
 namespace Waher.Client.WPF.Model
 {
@@ -173,6 +174,65 @@ namespace Waher.Client.WPF.Model
 		public bool HasFeature(string Feature)
 		{
 			return this.features?.ContainsKey(Feature) ?? false;
+		}
+
+		public override bool CanReadSensorData => this.Account.IsOnline;
+
+		public override SensorDataClientRequest StartSensorDataFullReadout()
+		{
+			return this.DoReadout(FieldType.All);
+		}
+
+		public override SensorDataClientRequest StartSensorDataMomentaryReadout()
+		{
+			return this.DoReadout(FieldType.Momentary);
+		}
+
+		private SensorDataClientRequest DoReadout(FieldType Types)
+		{
+			string Id = Guid.NewGuid().ToString();
+
+			CustomSensorDataClientRequest Request = new CustomSensorDataClientRequest(Id, string.Empty, string.Empty, null,
+				Types, null, DateTime.MinValue, DateTime.MaxValue, DateTime.Now, string.Empty, string.Empty, string.Empty);
+
+			Request.Accept(false);
+			Request.Started();
+
+			this.Account.Client.SendServiceDiscoveryRequest(this.jid, (sender, e) =>
+			{
+				if (e.Ok)
+				{
+					List<Field> Fields = new List<Field>();
+					DateTime Now = DateTime.Now;
+
+					foreach (KeyValuePair<string, bool> Feature in e.Features)
+					{
+						Fields.Add(new BooleanField(Waher.Things.ThingReference.Empty, Now,
+							Feature.Key, Feature.Value, FieldType.Momentary, FieldQoS.AutomaticReadout));
+					}
+
+					if ((Types & FieldType.Identity) != 0)
+					{
+						foreach (Identity Identity in e.Identities)
+						{
+							Fields.Add(new StringField(Waher.Things.ThingReference.Empty, Now,
+								Identity.Type, Identity.Category + (string.IsNullOrEmpty(Identity.Name) ? string.Empty : " (" + Identity.Name + ")"),
+								FieldType.Identity,
+								FieldQoS.AutomaticReadout));
+						}
+					}
+
+					Request.LogFields(Fields);
+					Request.Done();
+				}
+				else
+					Request.Fail("Unable to perform a service discovery.");
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return Request;
 		}
 
 	}

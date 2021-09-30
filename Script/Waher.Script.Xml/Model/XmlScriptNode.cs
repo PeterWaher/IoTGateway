@@ -48,10 +48,18 @@ namespace Waher.Script.Xml.Model
 		/// <param name="Node">Node to evaluate.</param>
 		/// <param name="Variables">Variables.</param>
 		/// <returns>String result.</returns>
-		protected static string EvaluateString(ScriptNode Node, Variables Variables)
+		public static string EvaluateString(ScriptNode Node, Variables Variables)
 		{
-			IElement Element = Node.Evaluate(Variables);
+			return EvaluateString(Node.Evaluate(Variables));
+		}
 
+		/// <summary>
+		/// Evaluates a script element to a string.
+		/// </summary>
+		/// <param name="Element">Element to convert to a string.</param>
+		/// <returns>String result.</returns>
+		public static string EvaluateString(IElement Element)
+		{ 
 			if (Element is StringValue S)
 				return S.Value;
 			else if (Element is BooleanValue B)

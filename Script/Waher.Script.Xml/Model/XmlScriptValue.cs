@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.Numerics;
 using System.Xml;
+using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -72,6 +75,14 @@ namespace Waher.Script.Xml.Model
 
 			if (Value is string s)
 				Parent.AppendChild(Document.CreateTextNode(s));
+			else if (Value is bool b)
+				Parent.AppendChild(Document.CreateTextNode(CommonTypes.Encode(b)));
+			else if (Value is double d)
+				Parent.AppendChild(Document.CreateTextNode(CommonTypes.Encode(d)));
+			else if (Value is DateTime TP)
+				Parent.AppendChild(Document.CreateTextNode(XML.Encode(TP, TP.TimeOfDay == TimeSpan.Zero)));
+			else if (Value is BigInteger I)
+				Parent.AppendChild(Document.CreateTextNode(I.ToString()));
 			else if (Value is XmlDocument Doc)
 				Parent.AppendChild(Document.ImportNode(Doc.DocumentElement, true));
 			else if (Value is XmlElement E)

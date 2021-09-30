@@ -246,11 +246,7 @@ namespace Waher.Script.Xml
 					if (Node is ConstantElement Constant)
 					{
 						ElementValue = Constant.Constant;
-
-						if (ElementValue is StringValue S)
-							Value = S.Value;
-						else
-							Value = Expression.ToString(ElementValue.AssociatedObjectValue);
+						Value = XmlScriptNode.EvaluateString(ElementValue);
 
 						Attribute = new XmlScriptAttributeString(AttributeName, Value,
 							AttributeStart, Parser.Position - AttributeStart, Parser.Expression);

@@ -294,7 +294,12 @@ namespace Waher.Script.Persistence.SQL
 			}
 
 			if (Columns2 is null || c == 1)
+			{
+				if (Elements.Length == 1 && !(this.columns is null) && this.columns[0] is Functions.XPath)
+					return Elements[0];
+
 				return Operators.Vectors.VectorDefinition.Encapsulate(Elements, false, this);
+			}
 
 			ObjectMatrix Result = new ObjectMatrix(NrRecords, c, Elements);
 			string[] Names = new string[c];

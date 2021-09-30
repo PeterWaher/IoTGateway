@@ -384,6 +384,124 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Cryptography.Functions.Encryption.Aes256Decrypt">
+            <summary>
+            AES Decryption
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Encryption.Aes256Decrypt.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            AES Decryption
+            </summary>
+            <param name="Content">Content to be decrypted.</param>
+            <param name="Key">Key to use for decryption.</param>
+            <param name="IV">Initiation Vector to use for decryption.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Encryption.Aes256Decrypt.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            AES Decryption
+            </summary>
+            <param name="Content">Content to be decrypted.</param>
+            <param name="Key">Key to use for decryption.</param>
+            <param name="IV">Initiation Vector to use for decryption.</param>
+            <param name="CipherMode">Cipher Mode</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Encryption.Aes256Decrypt.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            AES Decryption
+            </summary>
+            <param name="Content">Content to be decrypted.</param>
+            <param name="Key">Key to use for decryption.</param>
+            <param name="IV">Initiation Vector to use for decryption.</param>
+            <param name="CipherMode">Cipher Mode</param>
+            <param name="PaddingMode">Padding mode</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Encryption.Aes256Decrypt.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Encryption.Aes256Decrypt.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Encryption.Aes256Decrypt.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Cryptography.Functions.Encryption.Aes256Encrypt">
+            <summary>
+            AES Encryption
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Encryption.Aes256Encrypt.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            AES Encryption
+            </summary>
+            <param name="Content">Content to be encrypted.</param>
+            <param name="Key">Key to use for encryption.</param>
+            <param name="IV">Initiation Vector to use for encryption.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Encryption.Aes256Encrypt.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            AES Encryption
+            </summary>
+            <param name="Content">Content to be encrypted.</param>
+            <param name="Key">Key to use for encryption.</param>
+            <param name="IV">Initiation Vector to use for encryption.</param>
+            <param name="CipherMode">Cipher Mode</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Encryption.Aes256Encrypt.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            AES Encryption
+            </summary>
+            <param name="Content">Content to be encrypted.</param>
+            <param name="Key">Key to use for encryption.</param>
+            <param name="IV">Initiation Vector to use for encryption.</param>
+            <param name="CipherMode">Cipher Mode</param>
+            <param name="PaddingMode">Padding mode</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Encryption.Aes256Encrypt.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Cryptography.Functions.Encryption.Aes256Encrypt.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Cryptography.Functions.Encryption.Aes256Encrypt.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Cryptography.Functions.HashFunctions.Md5">
             <summary>
             Md5(Data)

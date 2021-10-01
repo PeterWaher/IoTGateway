@@ -407,6 +407,11 @@
             urn:ieee:iot:leg:sc:1.0
             </summary>
         </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractsClient.NamespaceOnboarding">
+            <summary>
+            http://waher.se/schema/Onboarding/v1.xsd
+            </summary>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.#ctor(Waher.Networking.XMPP.XmppClient,System.String)">
             <summary>
             Adds support for legal identities, smart contracts and signatures to an XMPP client.
@@ -476,11 +481,37 @@
             Generates new keys for the contracts clients.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ImportKeys(System.Collections.Generic.KeyValuePair{System.String,System.Byte[]}[])">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ExportKeys">
+            <summary>
+            Exports Keys to XML.
+            </summary>
+            <returns>XML string.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ExportKeys(System.Xml.XmlWriter)">
+            <summary>
+            Exports Keys to XML.
+            </summary>
+            <param name="Output">XML output.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ImportKeys(System.String)">
             <summary>
             Imports keys
             </summary>
-            <param name="PrivateKeys">Private keys</param>
+            <param name="Xml">XML Definition of keys.</param>
+            <returns>If keys could be loaded into the client.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ImportKeys(System.Xml.XmlDocument)">
+            <summary>
+            Imports keys
+            </summary>
+            <param name="Xml">XML Definition of keys.</param>
+            <returns>If keys could be loaded into the client.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ImportKeys(System.Xml.XmlElement)">
+            <summary>
+            Imports keys
+            </summary>
+            <param name="Xml">XML Definition of keys.</param>
             <returns>If keys could be loaded into the client.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SetKeySettingsInstance(System.String,System.Boolean)">

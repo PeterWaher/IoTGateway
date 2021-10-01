@@ -50,6 +50,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public const string NamespaceSmartContracts = "urn:ieee:iot:leg:sc:1.0";
 
+		/// <summary>
+		/// http://waher.se/schema/Onboarding/v1.xsd
+		/// </summary>
+		public const string NamespaceOnboarding = "http://waher.se/schema/Onboarding/v1.xsd";
+
 		private static readonly string KeySettings = typeof(ContractsClient).FullName + ".";
 
 		private readonly Dictionary<string, KeyEventArgs> publicKeys = new Dictionary<string, KeyEventArgs>();
@@ -338,17 +343,169 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
+		/// Exports Keys to XML.
+		/// </summary>
+		/// <returns>XML string.</returns>
+		public async Task<string> ExportKeys()
+		{
+			StringBuilder Xml = new StringBuilder();
+			XmlWriterSettings Settings = XML.WriterSettings(false, true);
+
+			using (XmlWriter Output = XmlWriter.Create(Xml, Settings))
+			{
+				await this.ExportKeys(Output);
+			}
+
+			return Xml.ToString();
+		}
+
+		/// <summary>
+		/// Exports Keys to XML.
+		/// </summary>
+		/// <param name="Output">XML output.</param>
+		public async Task ExportKeys(XmlWriter Output)
+		{
+			Output.WriteStartElement("LegalId", NamespaceOnboarding);
+
+			Dictionary<string, object> Settings = await RuntimeSettings.GetWhereKeyLikeAsync(this.keySettingsPrefix + "*", "*");
+
+			foreach (KeyValuePair<string, object> Setting in Settings)
+			{
+				string Name = Setting.Key.Substring(this.keySettingsPrefix.Length);
+
+				if (Setting.Value is string s)
+				{
+					Output.WriteStartElement("S");
+					Output.WriteAttributeString("n", Name);
+					Output.WriteAttributeString("v", s);
+					Output.WriteEndElement();
+				}
+				else if (Setting.Value is DateTime TP)
+				{
+					Output.WriteStartElement("DT");
+					Output.WriteAttributeString("n", Name);
+					Output.WriteAttributeString("v", XML.Encode(TP));
+					Output.WriteEndElement();
+				}
+			}
+
+			foreach (LegalIdentityState State in await Database.Find<LegalIdentityState>(new FilterAnd(
+				new FilterFieldEqualTo("BareJid", this.client.BareJID),
+				new FilterFieldEqualTo("State", IdentityState.Approved))))
+			{
+				Output.WriteStartElement("State");
+				Output.WriteAttributeString("legalId", State.LegalId);
+				Output.WriteAttributeString("publicKey", Convert.ToBase64String(State.PublicKey));
+				Output.WriteAttributeString("timestamp", XML.Encode(State.Timestamp));
+				Output.WriteEndElement();
+			}
+
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
 		/// Imports keys
 		/// </summary>
-		/// <param name="PrivateKeys">Private keys</param>
+		/// <param name="Xml">XML Definition of keys.</param>
 		/// <returns>If keys could be loaded into the client.</returns>
-		public async Task<bool> ImportKeys(params KeyValuePair<string, byte[]>[] PrivateKeys)
+		public Task<bool> ImportKeys(string Xml)
 		{
-			foreach (KeyValuePair<string,byte[]> Key in PrivateKeys)
-				await RuntimeSettings.SetAsync(this.keySettingsPrefix + Key.Key, Convert.ToBase64String(Key.Value));
+			XmlDocument Doc = new XmlDocument();
+			Doc.LoadXml(Xml);
 
-			this.keysTimestamp = DateTime.Now;
-			await RuntimeSettings.SetAsync(this.keySettingsPrefix + "Timestamp", this.keysTimestamp);
+			return this.ImportKeys(Doc);
+		}
+
+		/// <summary>
+		/// Imports keys
+		/// </summary>
+		/// <param name="Xml">XML Definition of keys.</param>
+		/// <returns>If keys could be loaded into the client.</returns>
+		public Task<bool> ImportKeys(XmlDocument Xml)
+		{
+			return this.ImportKeys(Xml.DocumentElement);
+		}
+
+		/// <summary>
+		/// Imports keys
+		/// </summary>
+		/// <param name="Xml">XML Definition of keys.</param>
+		/// <returns>If keys could be loaded into the client.</returns>
+		public async Task<bool> ImportKeys(XmlElement Xml)
+		{
+			if (Xml is null || Xml.LocalName != "LegalId" || Xml.NamespaceURI != NamespaceOnboarding)
+				return false;
+
+			foreach (XmlNode N in Xml.ChildNodes)
+			{
+				if (!(N is XmlElement E))
+					continue;
+
+				if (E.NamespaceURI != NamespaceOnboarding)
+					return false;
+
+				switch (E.LocalName)
+				{
+					case "S":
+						string Name = XML.Attribute(E, "n");
+						string StringValue = XML.Attribute(E, "v");
+
+						await RuntimeSettings.SetAsync(this.keySettingsPrefix + Name, StringValue);
+						break;
+
+					case "DT":
+						Name = XML.Attribute(E, "n");
+						DateTime DateTimeValue = XML.Attribute(E, "v", DateTime.MinValue);
+
+						await RuntimeSettings.SetAsync(this.keySettingsPrefix + Name, DateTimeValue);
+						break;
+
+					case "State":
+						string LegalId = XML.Attribute(E, "legalId");
+						string PublicKeyStr = XML.Attribute(E, "publicKey");
+						byte[] PublicKey;
+						DateTimeValue = XML.Attribute(E, "timestamp", DateTime.MinValue);
+
+						try
+						{
+							PublicKey = Convert.FromBase64String(PublicKeyStr);
+						}
+						catch (Exception)
+						{
+							return false;
+						}
+
+						LegalIdentityState IdState = await Database.FindFirstDeleteRest<LegalIdentityState>(new FilterAnd(
+							new FilterFieldEqualTo("BareJid", this.client.BareJID),
+							new FilterFieldEqualTo("LegalId", LegalId)));
+
+						if (IdState is null)
+						{
+							IdState = new LegalIdentityState()
+							{
+								BareJid = this.client.BareJID,
+								LegalId = LegalId,
+								State = IdentityState.Approved,
+								Timestamp = DateTimeValue,
+								PublicKey = PublicKey
+							};
+
+							await Database.Insert(IdState);
+						}
+						else
+						{
+							IdState.State = IdentityState.Approved;
+							IdState.Timestamp = DateTimeValue;
+							IdState.PublicKey = PublicKey;
+
+							await Database.Update(IdState);
+						}
+						break;
+
+					default:
+						return false;
+				}
+			}
 
 			return await this.LoadKeys(false);
 		}

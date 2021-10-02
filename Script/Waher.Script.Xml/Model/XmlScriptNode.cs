@@ -2,6 +2,7 @@
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Persistence;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -75,6 +76,8 @@ namespace Waher.Script.Xml.Model
 				object Value = Element.AssociatedObjectValue;
 				if (Value is null)
 					return null;
+				else if (Value is CaseInsensitiveString cis)
+					return cis.Value;
 				else
 					return Expression.ToString(Value);
 			}

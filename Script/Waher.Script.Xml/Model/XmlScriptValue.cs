@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Persistence;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -81,6 +82,8 @@ namespace Waher.Script.Xml.Model
 				Parent.AppendChild(Document.CreateTextNode(CommonTypes.Encode(d)));
 			else if (Value is DateTime TP)
 				Parent.AppendChild(Document.CreateTextNode(XML.Encode(TP, TP.TimeOfDay == TimeSpan.Zero)));
+			else if (Value is CaseInsensitiveString cis)
+				Parent.AppendChild(Document.CreateTextNode(cis.Value));
 			else if (Value is BigInteger I)
 				Parent.AppendChild(Document.CreateTextNode(I.ToString()));
 			else if (Value is XmlDocument Doc)

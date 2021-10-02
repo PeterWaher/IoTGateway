@@ -26,6 +26,7 @@ namespace Waher.Content.Html.Test
 			using HttpClient Client = new HttpClient();
 			Client.Timeout = TimeSpan.FromMilliseconds(30000);
 			Client.DefaultRequestHeaders.ExpectContinue = false;
+			Client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36 Edg/94.0.992.31");
 
 			HttpResponseMessage Response = await Client.GetAsync(Url);
 			if (!Response.IsSuccessStatusCode)
@@ -116,6 +117,12 @@ namespace Waher.Content.Html.Test
 		public async Task HtmlParseTest_04_Cnbc()
 		{
 			await this.LoadAndParse("https://www.cnbc.com/2021/09/10/epic-games-v-apple-judge-reaches-decision-.html");
+		}
+
+		[TestMethod]
+		public async Task HtmlParseTest_05_Amgreatness()
+		{
+			await this.LoadAndParse("https://amgreatness.com/2021/09/24/over-3000-doctors-and-scientists-sign-declaration-accusing-covid-policy-makers-of-crimes-against-humanity/");
 		}
 	}
 }

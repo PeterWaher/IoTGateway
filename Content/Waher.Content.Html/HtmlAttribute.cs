@@ -148,14 +148,21 @@ namespace Waher.Content.Html
 		/// <param name="Output">XML Output</param>
 		public override void Export(XmlWriter Output)
 		{
-			Output.WriteAttributeString(this.name, this.value);
+			int i = this.name.IndexOf(':');
+			if (i < 0)
+				Output.WriteAttributeString(this.name, this.value);
+			else
+			{
+				Output.WriteAttributeString(this.name.Substring(0, i),
+					this.name.Substring(i + 1), string.Empty, this.value);
+			}
 		}
 
-        /// <summary>
-        /// Exports the HTML document to XML.
-        /// </summary>
-        /// <param name="Output">XML Output</param>
-        public override void Export(StringBuilder Output)
+		/// <summary>
+		/// Exports the HTML document to XML.
+		/// </summary>
+		/// <param name="Output">XML Output</param>
+		public override void Export(StringBuilder Output)
         {
             Output.Append(' ');
             Output.Append(this.name);

@@ -13,6 +13,7 @@ namespace Waher.Content.Html
 		private LinkedList<HtmlAttribute> attributes = null;
 		private LinkedList<HtmlNode> children = null;
 		private readonly string name;
+		private string @namespace;
 
 		/// <summary>
 		/// Base class for all HTML elements.
@@ -25,6 +26,7 @@ namespace Waher.Content.Html
 			: base(Document, Parent, StartPosition)
 		{
 			this.name = Name;
+			this.@namespace = null;
 		}
 
 		/// <summary>
@@ -33,6 +35,14 @@ namespace Waher.Content.Html
 		public string Name
 		{
 			get { return this.name; }
+		}
+
+		/// <summary>
+		/// Namespace, if provided, null if not.
+		/// </summary>
+		public string Namespace
+		{
+			get { return this.@namespace; }
 		}
 
 		internal void Add(HtmlNode Node)
@@ -45,10 +55,15 @@ namespace Waher.Content.Html
 
 		internal void AddAttribute(HtmlAttribute Attribute)
 		{
-			if (this.attributes is null)
-				this.attributes = new LinkedList<HtmlAttribute>();
+			if (Attribute.Name == "xmlns")
+				this.@namespace = Attribute.Value;
+			else
+			{
+				if (this.attributes is null)
+					this.attributes = new LinkedList<HtmlAttribute>();
 
-			this.attributes.AddLast(Attribute);
+				this.attributes.AddLast(Attribute);
+			}
 		}
 
 		/// <summary>
@@ -187,7 +202,10 @@ namespace Waher.Content.Html
 		/// <param name="Output">XML Output</param>
 		public override void Export(XmlWriter Output)
 		{
-			Output.WriteStartElement(this.name);
+			if (this.@namespace is null)
+				Output.WriteStartElement(this.name);
+			else
+				Output.WriteStartElement(this.name, this.@namespace);
 
 			if (!(this.attributes is null))
 			{
@@ -219,6 +237,13 @@ namespace Waher.Content.Html
                     Attr.Export(Output);
             }
 
+			if (!(this.@namespace is null))
+			{
+				Output.Append(" xmlns=\"");
+				Output.Append(Xml.XML.Encode(this.@namespace));
+				Output.Append('"');
+			}
+
             if (this.children is null)
                 Output.Append("/>");
             else
@@ -249,6 +274,9 @@ namespace Waher.Content.Html
 		/// <returns>If such an attribute exists.</returns>
 		public bool HasAttribute(string Name)
 		{
+			if (Name == "xmlns")
+				return !(this.@namespace is null);
+
 			if (this.attributes is null)
 				return false;
 
@@ -268,6 +296,9 @@ namespace Waher.Content.Html
 		/// <returns>Attribute value.</returns>
 		public string GetAttribute(string Name)
 		{
+			if (Name == "xmlns")
+				return this.@namespace;
+
 			if (this.attributes is null)
 				return string.Empty;
 

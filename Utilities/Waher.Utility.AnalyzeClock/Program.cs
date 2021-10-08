@@ -328,137 +328,151 @@ namespace Waher.Utility.AnalyzeClock
 
 					ManualResetEvent Done2 = new ManualResetEvent(false);
 
-					using (StreamWriter f = File.CreateText(OutputFileName))
+					using StreamWriter f = File.CreateText(OutputFileName);
+					XmlWriterSettings Settings = new XmlWriterSettings()
 					{
-						XmlWriterSettings Settings = new XmlWriterSettings()
+						Encoding = Encoding,
+						Indent = true,
+						IndentChars = "\t",
+						NewLineChars = Console.Out.NewLine,
+						OmitXmlDeclaration = false,
+						WriteEndDocumentOnClose = true
+					};
+
+					XmlWriter w = XmlWriter.Create(f, Settings);
+
+					w.WriteStartDocument();
+
+					if (!string.IsNullOrEmpty(XsltPath))
+					{
+						if (File.Exists(XsltPath))
 						{
-							Encoding = Encoding,
-							Indent = true,
-							IndentChars = "\t",
-							NewLineChars = Console.Out.NewLine,
-							OmitXmlDeclaration = false,
-							WriteEndDocumentOnClose = true
+							try
+							{
+								byte[] XsltBin = File.ReadAllBytes(XsltPath);
+
+								w.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"data:text/xsl;base64," +
+									Convert.ToBase64String(XsltBin) + "\"");
+							}
+							catch (Exception)
+							{
+								w.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + XML.Encode(XsltPath) + "\"");
+							}
+						}
+						else
+							w.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + XML.Encode(XsltPath) + "\"");
+					}
+
+					w.WriteStartElement("ClockStatistics", "http://waher.se/Schema/Networking/ClockStatistics.xsd");
+
+					w.WriteStartElement("Parameters");
+					w.WriteAttributeString("clientJid", Client.BareJID);
+					w.WriteAttributeString("sourceJid", Jid);
+					w.WriteAttributeString("records", Records.ToString());
+					w.WriteAttributeString("interval", Interval.ToString());
+					w.WriteAttributeString("history", History.ToString());
+					w.WriteAttributeString("window", Window.ToString());
+					w.WriteAttributeString("spikePos", SpikePos.ToString());
+					w.WriteAttributeString("spikeWidth", SpikeWidth.ToString());
+					w.WriteAttributeString("hfFreq", System.Diagnostics.Stopwatch.Frequency.ToString());
+					w.WriteEndElement();
+
+					w.WriteStartElement("Samples");
+
+					using (SynchronizationClient SynchClient = new SynchronizationClient(Client))
+					{
+						SynchClient.OnUpdated += (sender, e) =>
+						{
+							DateTime TP = DateTime.Now;
+							double? StdDev;
+
+							w.WriteStartElement("Sample");
+							w.WriteAttributeString("timestamp", XML.Encode(TP));
+
+							if (SynchClient.RawLatency100Ns.HasValue)
+								w.WriteAttributeString("rawLatencyMs", CommonTypes.Encode(SynchClient.RawLatency100Ns.Value * 1e-4));
+
+							if (SynchClient.LatencySpikeRemoved.HasValue)
+								w.WriteAttributeString("spikeLatencyRemoved", CommonTypes.Encode(SynchClient.LatencySpikeRemoved.Value));
+
+							if (SynchClient.RawClockDifference100Ns.HasValue)
+								w.WriteAttributeString("rawDifferenceMs", CommonTypes.Encode(SynchClient.RawClockDifference100Ns.Value * 1e-4));
+
+							if (SynchClient.ClockDifferenceSpikeRemoved.HasValue)
+								w.WriteAttributeString("spikeDifferenceRemoved", CommonTypes.Encode(SynchClient.ClockDifferenceSpikeRemoved.Value));
+
+							if (SynchClient.FilteredLatency100Ns.HasValue)
+								w.WriteAttributeString("filteredLatencyMs", CommonTypes.Encode(SynchClient.FilteredLatency100Ns.Value * 1e-4));
+
+							if (SynchClient.FilteredClockDifference100Ns.HasValue)
+								w.WriteAttributeString("filteredDifferenceMs", CommonTypes.Encode(SynchClient.FilteredClockDifference100Ns.Value * 1e-4));
+
+							if (SynchClient.AvgLatency100Ns.HasValue)
+								w.WriteAttributeString("avgLatencyMs", CommonTypes.Encode(SynchClient.AvgLatency100Ns.Value * 1e-4));
+
+							if (SynchClient.AvgClockDifference100Ns.HasValue)
+								w.WriteAttributeString("avgDifferenceMs", CommonTypes.Encode(SynchClient.AvgClockDifference100Ns.Value * 1e-4));
+
+							StdDev = SynchClient.CalcStdDevLatency100Ns();
+							if (StdDev.HasValue)
+								w.WriteAttributeString("stdDevLatencyMs", CommonTypes.Encode(StdDev.Value * 1e-4));
+
+							StdDev = SynchClient.CalcStdDevClockDifference100Ns();
+							if (StdDev.HasValue)
+								w.WriteAttributeString("stdDevDifferenceMs", CommonTypes.Encode(StdDev.Value * 1e-4));
+
+							if (SynchClient.RawLatencyHf.HasValue)
+								w.WriteAttributeString("rawLatencyHf", SynchClient.RawLatencyHf.Value.ToString());
+
+							if (SynchClient.LatencyHfSpikeRemoved.HasValue)
+								w.WriteAttributeString("spikeLatencyHfRemoved", CommonTypes.Encode(SynchClient.LatencyHfSpikeRemoved.Value));
+
+							if (SynchClient.RawClockDifferenceHf.HasValue)
+								w.WriteAttributeString("rawDifferenceHf", SynchClient.RawClockDifferenceHf.Value.ToString());
+
+							if (SynchClient.ClockDifferenceHfSpikeRemoved.HasValue)
+								w.WriteAttributeString("spikeDifferenceHfRemoved", CommonTypes.Encode(SynchClient.ClockDifferenceHfSpikeRemoved.Value));
+
+							if (SynchClient.FilteredLatencyHf.HasValue)
+								w.WriteAttributeString("filteredLatencyHf", SynchClient.FilteredLatencyHf.ToString());
+
+							if (SynchClient.FilteredClockDifferenceHf.HasValue)
+								w.WriteAttributeString("filteredDifferenceHf", SynchClient.FilteredClockDifferenceHf.ToString());
+
+							if (SynchClient.AvgLatencyHf.HasValue)
+								w.WriteAttributeString("avgLatencyHf", SynchClient.AvgLatencyHf.ToString());
+
+							if (SynchClient.AvgClockDifferenceHf.HasValue)
+								w.WriteAttributeString("avgDifferenceHf", SynchClient.AvgClockDifferenceHf.ToString());
+
+							StdDev = SynchClient.CalcStdDevLatencyHf();
+							if (StdDev.HasValue)
+								w.WriteAttributeString("stdDevLatencyHf", CommonTypes.Encode(StdDev.Value));
+
+							StdDev = SynchClient.CalcStdDevClockDifferenceHf();
+							if (StdDev.HasValue)
+								w.WriteAttributeString("stdDevDifferenceHf", CommonTypes.Encode(StdDev.Value));
+
+							w.WriteEndElement();
+
+							Console.Out.Write(".");
+
+							if (--Records <= 0)
+								Done2.Set();
 						};
 
-						using (XmlWriter w = XmlWriter.Create(f, Settings))
-						{
-							w.WriteStartDocument();
+						SynchClient.MonitorClockDifference(Jid, Interval, History, Window, SpikePos, SpikeWidth, true);
 
-							if (!string.IsNullOrEmpty(XsltPath))
-								w.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + XML.Encode(XsltPath) + "\"");
-
-							w.WriteStartElement("ClockStatistics", "http://waher.se/Schema/Networking/ClockStatistics.xsd");
-
-							w.WriteStartElement("Parameters");
-							w.WriteAttributeString("clientJid", Client.BareJID);
-							w.WriteAttributeString("sourceJid", Jid);
-							w.WriteAttributeString("records", Records.ToString());
-							w.WriteAttributeString("interval", Interval.ToString());
-							w.WriteAttributeString("history", History.ToString());
-							w.WriteAttributeString("window", Window.ToString());
-							w.WriteAttributeString("spikePos", SpikePos.ToString());
-							w.WriteAttributeString("spikeWidth", SpikeWidth.ToString());
-							w.WriteAttributeString("hfFreq", System.Diagnostics.Stopwatch.Frequency.ToString());
-							w.WriteEndElement();
-
-							w.WriteStartElement("Samples");
-
-							using (SynchronizationClient SynchClient = new SynchronizationClient(Client))
-							{
-								SynchClient.OnUpdated += (sender, e) =>
-								{
-									DateTime TP = DateTime.Now;
-									double? StdDev;
-
-									w.WriteStartElement("Sample");
-									w.WriteAttributeString("timestamp", XML.Encode(TP));
-
-									if (SynchClient.RawLatency100Ns.HasValue)
-										w.WriteAttributeString("rawLatencyMs", CommonTypes.Encode(SynchClient.RawLatency100Ns.Value * 1e-4));
-
-									if (SynchClient.LatencySpikeRemoved.HasValue)
-										w.WriteAttributeString("spikeLatencyRemoved", CommonTypes.Encode(SynchClient.LatencySpikeRemoved.Value));
-
-									if (SynchClient.RawClockDifference100Ns.HasValue)
-										w.WriteAttributeString("rawDifferenceMs", CommonTypes.Encode(SynchClient.RawClockDifference100Ns.Value * 1e-4));
-
-									if (SynchClient.ClockDifferenceSpikeRemoved.HasValue)
-										w.WriteAttributeString("spikeDifferenceRemoved", CommonTypes.Encode(SynchClient.ClockDifferenceSpikeRemoved.Value));
-
-									if (SynchClient.FilteredLatency100Ns.HasValue)
-										w.WriteAttributeString("filteredLatencyMs", CommonTypes.Encode(SynchClient.FilteredLatency100Ns.Value * 1e-4));
-
-									if (SynchClient.FilteredClockDifference100Ns.HasValue)
-										w.WriteAttributeString("filteredDifferenceMs", CommonTypes.Encode(SynchClient.FilteredClockDifference100Ns.Value * 1e-4));
-
-									if (SynchClient.AvgLatency100Ns.HasValue)
-										w.WriteAttributeString("avgLatencyMs", CommonTypes.Encode(SynchClient.AvgLatency100Ns.Value * 1e-4));
-
-									if (SynchClient.AvgClockDifference100Ns.HasValue)
-										w.WriteAttributeString("avgDifferenceMs", CommonTypes.Encode(SynchClient.AvgClockDifference100Ns.Value * 1e-4));
-
-									StdDev = SynchClient.CalcStdDevLatency100Ns();
-									if (StdDev.HasValue)
-										w.WriteAttributeString("stdDevLatencyMs", CommonTypes.Encode(StdDev.Value * 1e-4));
-
-									StdDev = SynchClient.CalcStdDevClockDifference100Ns();
-									if (StdDev.HasValue)
-										w.WriteAttributeString("stdDevDifferenceMs", CommonTypes.Encode(StdDev.Value * 1e-4));
-
-									if (SynchClient.RawLatencyHf.HasValue)
-										w.WriteAttributeString("rawLatencyHf", SynchClient.RawLatencyHf.Value.ToString());
-
-									if (SynchClient.LatencyHfSpikeRemoved.HasValue)
-										w.WriteAttributeString("spikeLatencyHfRemoved", CommonTypes.Encode(SynchClient.LatencyHfSpikeRemoved.Value));
-
-									if (SynchClient.RawClockDifferenceHf.HasValue)
-										w.WriteAttributeString("rawDifferenceHf", SynchClient.RawClockDifferenceHf.Value.ToString());
-
-									if (SynchClient.ClockDifferenceHfSpikeRemoved.HasValue)
-										w.WriteAttributeString("spikeDifferenceHfRemoved", CommonTypes.Encode(SynchClient.ClockDifferenceHfSpikeRemoved.Value));
-
-									if (SynchClient.FilteredLatencyHf.HasValue)
-										w.WriteAttributeString("filteredLatencyHf", SynchClient.FilteredLatencyHf.ToString());
-
-									if (SynchClient.FilteredClockDifferenceHf.HasValue)
-										w.WriteAttributeString("filteredDifferenceHf", SynchClient.FilteredClockDifferenceHf.ToString());
-
-									if (SynchClient.AvgLatencyHf.HasValue)
-										w.WriteAttributeString("avgLatencyHf", SynchClient.AvgLatencyHf.ToString());
-
-									if (SynchClient.AvgClockDifferenceHf.HasValue)
-										w.WriteAttributeString("avgDifferenceHf", SynchClient.AvgClockDifferenceHf.ToString());
-
-									StdDev = SynchClient.CalcStdDevLatencyHf();
-									if (StdDev.HasValue)
-										w.WriteAttributeString("stdDevLatencyHf", CommonTypes.Encode(StdDev.Value));
-
-									StdDev = SynchClient.CalcStdDevClockDifferenceHf();
-									if (StdDev.HasValue)
-										w.WriteAttributeString("stdDevDifferenceHf", CommonTypes.Encode(StdDev.Value));
-
-									w.WriteEndElement();
-
-									Console.Out.Write(".");
-
-									if (--Records <= 0)
-										Done2.Set();
-								};
-
-								SynchClient.MonitorClockDifference(Jid, Interval, History, Window, SpikePos, SpikeWidth, true);
-
-								Done2.WaitOne();
-							}
-
-							w.WriteEndElement();
-							w.WriteEndElement();
-							w.WriteEndDocument();
-
-							w.Flush();
-
-							Console.Out.WriteLine();
-						}
+						Done2.WaitOne();
 					}
+
+					w.WriteEndElement();
+					w.WriteEndElement();
+					w.WriteEndDocument();
+
+					w.Flush();
+
+					Console.Out.WriteLine();
 				}
 
 				return 0;

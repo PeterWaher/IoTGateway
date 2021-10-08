@@ -2938,7 +2938,23 @@ namespace Waher.Persistence.Files
 
 			if (!string.IsNullOrEmpty(XsltPath))
 			{
-				Output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + Encode(XsltPath) + "\"");
+				if (File.Exists(XsltPath))
+				{
+					try
+					{
+						byte[] XsltBin = File.ReadAllBytes(XsltPath);
+
+						Output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"data:text/xsl;base64," +
+							Convert.ToBase64String(XsltBin) + "\"");
+					}
+					catch (Exception)
+					{
+						Output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + Encode(XsltPath) + "\"");
+					}
+				}
+				else
+					Output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + Encode(XsltPath) + "\"");
+
 				xsltPath = XsltPath;
 			}
 

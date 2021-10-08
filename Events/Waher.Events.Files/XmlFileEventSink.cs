@@ -211,7 +211,24 @@ namespace Waher.Events.Files
 			this.output.WriteStartDocument();
 
 			if (!string.IsNullOrEmpty(this.transform))
-				this.output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + this.transform + "\"");
+			{
+				if (File.Exists(this.transform))
+				{
+					try
+					{
+						byte[] XsltBin = File.ReadAllBytes(this.transform);
+
+						this.output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"data:text/xsl;base64," +
+							Convert.ToBase64String(XsltBin) + "\"");
+					}
+					catch (Exception)
+					{
+						this.output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + this.transform + "\"");
+					}
+				}
+				else
+					this.output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + this.transform + "\"");
+			}
 
 			this.output.WriteStartElement("EventOutput", "http://waher.se/Schema/EventOutput.xsd");
 			this.output.Flush();

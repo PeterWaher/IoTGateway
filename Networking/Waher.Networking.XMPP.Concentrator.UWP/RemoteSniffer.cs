@@ -28,7 +28,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			this.id = Guid.NewGuid().ToString().Replace("-", string.Empty);
 			this.fullJID = FullJID;
-			this.expires = Expires;
+			this.expires = Expires.ToUniversalTime();
 			this.node = Node;
 			this.concentratorServer = ConcentratorServer;
 		}
@@ -65,7 +65,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <returns></returns>
 		private bool HasExpired(DateTime Now)
 		{
-			if (Now >= this.expires)
+			if (Now.ToUniversalTime() >= this.expires)
 			{
 				this.node.Remove(this);
 

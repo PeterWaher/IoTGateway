@@ -1607,7 +1607,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.AppendTokenAttributes(Xml, ServiceToken, DeviceToken, UserToken);
 			this.AppendNodeInfoAttributes(Xml, false, false, this.client.Language);
 			Xml.Append("' expires='");
-			Xml.Append(XML.Encode(Expires));
+			Xml.Append(XML.Encode(Expires.ToUniversalTime()));
 			Xml.Append("'/>");
 
 			this.client.SendIqSet(To, Xml.ToString(), async (sender, e) =>

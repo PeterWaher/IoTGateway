@@ -4082,9 +4082,9 @@ namespace Waher.Networking.XMPP.Concentrator
 				e.IqError(new StanzaErrors.NotAcceptableException(await GetErrorMessage(Language, 21, "Node is not sniffable."), e.IQ));
 			else
 			{
-				DateTime Expires = XML.Attribute(e.Query, "expires", DateTime.Now.AddHours(1));
+				DateTime Expires = XML.Attribute(e.Query, "expires", DateTime.Now.AddHours(1)).ToUniversalTime();
 				RemoteSniffer Sniffer = new RemoteSniffer(e.From, Expires, Sniffable, this);
-				DateTime MaxExpires = DateTime.Now.AddDays(1);
+				DateTime MaxExpires = DateTime.UtcNow.AddDays(1);
 
 				if (Expires > MaxExpires)
 					Expires = MaxExpires;
@@ -4098,7 +4098,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Xml.Append("' snifferId='");
 				Xml.Append(Sniffer.Id);
 				Xml.Append("' expires='");
-				Xml.Append(XML.Encode(Expires));
+				Xml.Append(XML.Encode(Expires.ToUniversalTime()));
 				Xml.Append("'/>");
 
 				e.IqResult(Xml.ToString());

@@ -1942,7 +1942,7 @@ namespace Waher.Networking.XMPP
 									IqResultEventHandlerAsync Callback;
 									object State;
 									PendingRequest Rec;
-									
+
 									Ok = (Type == "result");
 
 									if (uint.TryParse(Id, out SeqNr))
@@ -2100,7 +2100,7 @@ namespace Waher.Networking.XMPP
 										this.passwordHashMethod = string.Empty;
 									}
 
-									throw GetSaslExceptionObject(E);
+									throw GetExceptionObject(E);
 								}
 							}
 							else
@@ -2108,7 +2108,7 @@ namespace Waher.Networking.XMPP
 								if (E.FirstChild is null)
 									throw new XmppException("Unable to start TLS negotiation.", E);
 								else
-									throw GetStreamExceptionObject(E);
+									throw GetExceptionObject(E);
 							}
 
 						case "challenge":
@@ -2122,7 +2122,7 @@ namespace Waher.Networking.XMPP
 							break;
 
 						case "error":
-							XmppException StreamException = GetStreamExceptionObject(E);
+							XmppException StreamException = GetExceptionObject(E);
 							if (StreamException is SeeOtherHostException SeeOtherHostException)
 							{
 								this.host = SeeOtherHostException.NewHost;
@@ -3393,118 +3393,100 @@ namespace Waher.Networking.XMPP
 			return string.Empty;
 		}
 
-		internal static XmppException GetStreamExceptionObject(XmlElement E)
+		/// <summary>
+		/// Gets an XMPP Exception object corresponding to its XML definition.
+		/// </summary>
+		/// <param name="StanzaElement">XMPP Stanza.</param>
+		/// <returns>Exception object.</returns>
+		public static XmppException GetExceptionObject(XmlElement StanzaElement)
 		{
-			string Msg = GetErrorText(E);
+			string Msg = GetErrorText(StanzaElement);
 
-			foreach (XmlNode N2 in E.ChildNodes)
+			foreach (XmlNode N2 in StanzaElement.ChildNodes)
 			{
-				if (N2.NamespaceURI == NamespaceXmppStreams)
+				switch (N2.NamespaceURI)
 				{
-					switch (N2.LocalName)
-					{
-						// Stream Exceptions:
-						case "bad-format": return new BadFormatException(Msg, E);
-						case "bad-namespace-prefix": return new BadNamespacePrefixException(Msg, E);
-						case "conflict": return new StreamErrors.ConflictException(Msg, E);
-						case "connection-timeout": return new ConnectionTimeoutException(Msg, E);
-						case "host-gone": return new HostGoneException(Msg, E);
-						case "host-unknown": return new HostUnknownException(Msg, E);
-						case "improper-addressing": return new ImproperAddressingException(Msg, E);
-						case "internal-server-error": return new StreamErrors.InternalServerErrorException(Msg, E);
-						case "invalid-from": return new InvalidFromException(Msg, E);
-						case "invalid-namespace": return new InvalidNamespaceException(Msg, E);
-						case "invalid-xml": return new InvalidXmlException(Msg, E);
-						case "not-authorized": return new StreamErrors.NotAuthorizedException(Msg, E);
-						case "not-well-formed": return new NotWellFormedException(Msg, E);
-						case "policy-violation": return new StreamErrors.PolicyViolationException(Msg, E);
-						case "remote-connection-failed": return new RemoteConnectionFailedException(Msg, E);
-						case "reset": return new ResetException(Msg, E);
-						case "resource-constraint": return new StreamErrors.ResourceConstraintException(Msg, E);
-						case "restricted-xml": return new RestrictedXmlException(Msg, E);
-						case "see-other-host": return new SeeOtherHostException(Msg, E, N2.InnerText);
-						case "system-shutdown": return new SystemShutdownException(Msg, E);
-						case "undefined-condition": return new StreamErrors.UndefinedConditionException(Msg, E);
-						case "unsupported-encoding": return new UnsupportedEncodingException(Msg, E);
-						case "unsupported-feature": return new UnsupportedFeatureException(Msg, E);
-						case "unsupported-stanza-type": return new UnsupportedStanzaTypeException(Msg, E);
-						case "unsupported-version": return new UnsupportedVersionException(Msg, E);
-						case "xml-not-well-formed": return new NotWellFormedException(Msg, E);
-						default: return new XmppException(string.IsNullOrEmpty(Msg) ? "Unrecognized stream error returned." : Msg, E);
-					}
+					case NamespaceXmppStreams:
+						switch (N2.LocalName)
+						{
+							// Stream Exceptions:
+							case "bad-format": return new BadFormatException(Msg, StanzaElement);
+							case "bad-namespace-prefix": return new BadNamespacePrefixException(Msg, StanzaElement);
+							case "conflict": return new StreamErrors.ConflictException(Msg, StanzaElement);
+							case "connection-timeout": return new ConnectionTimeoutException(Msg, StanzaElement);
+							case "host-gone": return new HostGoneException(Msg, StanzaElement);
+							case "host-unknown": return new HostUnknownException(Msg, StanzaElement);
+							case "improper-addressing": return new ImproperAddressingException(Msg, StanzaElement);
+							case "internal-server-error": return new StreamErrors.InternalServerErrorException(Msg, StanzaElement);
+							case "invalid-from": return new InvalidFromException(Msg, StanzaElement);
+							case "invalid-namespace": return new InvalidNamespaceException(Msg, StanzaElement);
+							case "invalid-xml": return new InvalidXmlException(Msg, StanzaElement);
+							case "not-authorized": return new StreamErrors.NotAuthorizedException(Msg, StanzaElement);
+							case "not-well-formed": return new NotWellFormedException(Msg, StanzaElement);
+							case "policy-violation": return new StreamErrors.PolicyViolationException(Msg, StanzaElement);
+							case "remote-connection-failed": return new RemoteConnectionFailedException(Msg, StanzaElement);
+							case "reset": return new ResetException(Msg, StanzaElement);
+							case "resource-constraint": return new StreamErrors.ResourceConstraintException(Msg, StanzaElement);
+							case "restricted-xml": return new RestrictedXmlException(Msg, StanzaElement);
+							case "see-other-host": return new SeeOtherHostException(Msg, StanzaElement, N2.InnerText);
+							case "system-shutdown": return new SystemShutdownException(Msg, StanzaElement);
+							case "undefined-condition": return new StreamErrors.UndefinedConditionException(Msg, StanzaElement);
+							case "unsupported-encoding": return new UnsupportedEncodingException(Msg, StanzaElement);
+							case "unsupported-feature": return new UnsupportedFeatureException(Msg, StanzaElement);
+							case "unsupported-stanza-type": return new UnsupportedStanzaTypeException(Msg, StanzaElement);
+							case "unsupported-version": return new UnsupportedVersionException(Msg, StanzaElement);
+							case "xml-not-well-formed": return new NotWellFormedException(Msg, StanzaElement);
+							default: return new XmppException(string.IsNullOrEmpty(Msg) ? "Unrecognized stream error returned." : Msg, StanzaElement);
+						}
+
+					case NamespaceXmppStanzas:
+						switch (N2.LocalName)
+						{
+							case "bad-request": return new BadRequestException(Msg, StanzaElement);
+							case "conflict": return new StanzaErrors.ConflictException(Msg, StanzaElement);
+							case "feature-not-implemented": return new FeatureNotImplementedException(Msg, StanzaElement);
+							case "forbidden": return new ForbiddenException(Msg, StanzaElement);
+							case "gone": return new GoneException(Msg, StanzaElement);
+							case "internal-server-error": return new StanzaErrors.InternalServerErrorException(Msg, StanzaElement);
+							case "item-not-found": return new ItemNotFoundException(Msg, StanzaElement);
+							case "jid-malformed": return new JidMalformedException(Msg, StanzaElement);
+							case "not-acceptable": return new NotAcceptableException(Msg, StanzaElement);
+							case "not-allowed": return new NotAllowedException(Msg, StanzaElement);
+							case "not-authorized": return new StanzaErrors.NotAuthorizedException(Msg, StanzaElement);
+							case "policy-violation": return new StanzaErrors.PolicyViolationException(Msg, StanzaElement);
+							case "recipient-unavailable": return new RecipientUnavailableException(Msg, StanzaElement);
+							case "redirect": return new RedirectException(Msg, StanzaElement);
+							case "registration-required": return new RegistrationRequiredException(Msg, StanzaElement);
+							case "remote-server-not-found": return new RemoteServerNotFoundException(Msg, StanzaElement);
+							case "remote-server-timeout": return new RemoteServerTimeoutException(Msg, StanzaElement);
+							case "resource-constraint": return new StanzaErrors.ResourceConstraintException(Msg, StanzaElement);
+							case "service-unavailable": return new ServiceUnavailableException(Msg, StanzaElement);
+							case "subscription-required": return new SubscriptionRequiredException(Msg, StanzaElement);
+							case "undefined-condition": return new StanzaErrors.UndefinedConditionException(Msg, StanzaElement);
+							case "unexpected-request": return new UnexpectedRequestException(Msg, StanzaElement);
+							default: return new XmppException(string.IsNullOrEmpty(Msg) ? "Unrecognized stanza error returned." : Msg, StanzaElement);
+						}
+
+					case NamespaceXmppSasl:
+						switch (N2.LocalName)
+						{
+							case "account-disabled": return new AccountDisabledException(Msg, StanzaElement);
+							case "credentials-expired": return new CredentialsExpiredException(Msg, StanzaElement);
+							case "encryption-required": return new EncryptionRequiredException(Msg, StanzaElement);
+							case "incorrect-encoding": return new IncorrectEncodingException(Msg, StanzaElement);
+							case "invalid-authzid": return new InvalidAuthzidException(Msg, StanzaElement);
+							case "invalid-mechanism": return new InvalidMechanismException(Msg, StanzaElement);
+							case "malformed-request": return new MalformedRequestException(Msg, StanzaElement);
+							case "mechanism-too-weak": return new MechanismTooWeakException(Msg, StanzaElement);
+							case "bad-auth":    // SASL error returned from some XMPP servers. Not listed in RFC6120.
+							case "not-authorized": return new AuthenticationErrors.NotAuthorizedException(Msg, StanzaElement);
+							case "temporary-auth-failure": return new TemporaryAuthFailureException(Msg, StanzaElement);
+							default: return new XmppException(string.IsNullOrEmpty(Msg) ? "Unrecognized SASL error returned." : Msg, StanzaElement);
+						}
 				}
 			}
 
-			return new XmppException(string.IsNullOrEmpty(Msg) ? "Unspecified error returned." : Msg, E);
-		}
-
-		internal static XmppException GetStanzaExceptionObject(XmlElement E)
-		{
-			string Msg = GetErrorText(E);
-
-			foreach (XmlNode N2 in E.ChildNodes)
-			{
-				if (N2.NamespaceURI == NamespaceXmppStanzas)
-				{
-					switch (N2.LocalName)
-					{
-						case "bad-request": return new BadRequestException(Msg, E);
-						case "conflict": return new StanzaErrors.ConflictException(Msg, E);
-						case "feature-not-implemented": return new FeatureNotImplementedException(Msg, E);
-						case "forbidden": return new ForbiddenException(Msg, E);
-						case "gone": return new GoneException(Msg, E);
-						case "internal-server-error": return new StanzaErrors.InternalServerErrorException(Msg, E);
-						case "item-not-found": return new ItemNotFoundException(Msg, E);
-						case "jid-malformed": return new JidMalformedException(Msg, E);
-						case "not-acceptable": return new NotAcceptableException(Msg, E);
-						case "not-allowed": return new NotAllowedException(Msg, E);
-						case "not-authorized": return new StanzaErrors.NotAuthorizedException(Msg, E);
-						case "policy-violation": return new StanzaErrors.PolicyViolationException(Msg, E);
-						case "recipient-unavailable": return new RecipientUnavailableException(Msg, E);
-						case "redirect": return new RedirectException(Msg, E);
-						case "registration-required": return new RegistrationRequiredException(Msg, E);
-						case "remote-server-not-found": return new RemoteServerNotFoundException(Msg, E);
-						case "remote-server-timeout": return new RemoteServerTimeoutException(Msg, E);
-						case "resource-constraint": return new StanzaErrors.ResourceConstraintException(Msg, E);
-						case "service-unavailable": return new ServiceUnavailableException(Msg, E);
-						case "subscription-required": return new SubscriptionRequiredException(Msg, E);
-						case "undefined-condition": return new StanzaErrors.UndefinedConditionException(Msg, E);
-						case "unexpected-request": return new UnexpectedRequestException(Msg, E);
-						default: return new XmppException(string.IsNullOrEmpty(Msg) ? "Unrecognized stanza error returned." : string.Empty, E);
-					}
-				}
-			}
-
-			return new XmppException(string.IsNullOrEmpty(Msg) ? "Unspecified error returned." : string.Empty, E);
-		}
-
-		internal static XmppException GetSaslExceptionObject(XmlElement E)
-		{
-			string Msg = GetErrorText(E);
-
-			foreach (XmlNode N2 in E.ChildNodes)
-			{
-				if (N2.NamespaceURI == NamespaceXmppSasl)
-				{
-					switch (N2.LocalName)
-					{
-						case "account-disabled": return new AccountDisabledException(Msg, E);
-						case "credentials-expired": return new CredentialsExpiredException(Msg, E);
-						case "encryption-required": return new EncryptionRequiredException(Msg, E);
-						case "incorrect-encoding": return new IncorrectEncodingException(Msg, E);
-						case "invalid-authzid": return new InvalidAuthzidException(Msg, E);
-						case "invalid-mechanism": return new InvalidMechanismException(Msg, E);
-						case "malformed-request": return new MalformedRequestException(Msg, E);
-						case "mechanism-too-weak": return new MechanismTooWeakException(Msg, E);
-						case "bad-auth":    // SASL error returned from some XMPP servers. Not listed in RFC6120.
-						case "not-authorized": return new AuthenticationErrors.NotAuthorizedException(Msg, E);
-						case "temporary-auth-failure": return new TemporaryAuthFailureException(Msg, E);
-						default: return new XmppException(string.IsNullOrEmpty(Msg) ? "Unrecognized SASL error returned." : Msg, E);
-					}
-				}
-			}
-
-			return new XmppException(string.IsNullOrEmpty(Msg) ? "Unspecified error returned." : Msg, E);
+			return new XmppException(string.IsNullOrEmpty(Msg) ? "Unspecified error returned." : Msg, StanzaElement);
 		}
 
 		private async Task Client_OnPaused(object sender, EventArgs e)
@@ -7381,7 +7363,7 @@ namespace Waher.Networking.XMPP
 					{
 						lock (this.synchObject)
 						{
-							if (!this.pendingRequestsByTimeout.Remove(Request.Timeout))	
+							if (!this.pendingRequestsByTimeout.Remove(Request.Timeout))
 							{
 								this.pendingRequestsBySeqNr.Remove(Request.SeqNr);
 								continue;   // Already processed

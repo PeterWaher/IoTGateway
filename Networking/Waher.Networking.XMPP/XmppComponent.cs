@@ -1012,7 +1012,7 @@ namespace Waher.Networking.XMPP
 							break;
 
 						case "error":
-							XmppException StreamException = XmppClient.GetStreamExceptionObject(E);
+							XmppException StreamException = XmppClient.GetExceptionObject(E);
 							if (StreamException is SeeOtherHostException SeeOther)
 							{
 								this.host = SeeOther.NewHost;

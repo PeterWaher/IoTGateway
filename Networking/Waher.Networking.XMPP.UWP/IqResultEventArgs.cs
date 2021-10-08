@@ -170,7 +170,7 @@ namespace Waher.Networking.XMPP
 								break;
 						}
 
-						this.stanzaError = XmppClient.GetStanzaExceptionObject(E);
+						this.stanzaError = XmppClient.GetExceptionObject(E);
 						this.errorText = this.stanzaError.Message;
 					}
 				}

@@ -148,10 +148,26 @@ namespace Waher.Networking.WHOIS
 
 					WhoIsIpv4ServiceEnum Service = ipv4ToWhoIsService[b];
 					string InternetRegistry = ipv4WhoIsServices[(int)Service];
+					string Command;
+
+					switch (Service)
+					{
+						case WhoIsIpv4ServiceEnum.whois_apnic_net:
+						case WhoIsIpv4ServiceEnum.whois_arin_net:
+						case WhoIsIpv4ServiceEnum.whois_lacnic_net:
+							Command = "n ";
+							break;
+
+						case WhoIsIpv4ServiceEnum.whois_ripe_net:
+						case WhoIsIpv4ServiceEnum.whois_afrinic_net:
+						default:
+							Command = string.Empty;
+							break;
+					}
 
 					using (WhoIsClient Client = new WhoIsClient())
 					{
-						return await Client.DoQuery(InternetRegistry, Address.ToString());
+						return await Client.DoQuery(InternetRegistry, Command + Address.ToString());
 					}
 
 				default:

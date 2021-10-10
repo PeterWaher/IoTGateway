@@ -24,7 +24,7 @@ XEP-0118: User Tune</description>
       <dependency id="Waher.Content" version="1.1.4"/>
       <dependency id="Waher.Content.Xml" version="1.1.1"/>
       <dependency id="Waher.Events" version="1.0.15"/>
-      <dependency id="Waher.Networking.UWP" version="1.1.2"/>
+      <dependency id="Waher.Networking.UWP" version="1.1.3"/>
 			<dependency id="Waher.Networking.XMPP.UWP" version="1.1.20"/>
 			<dependency id="Waher.Networking.XMPP.PubSub.UWP" version="1.1.2"/>
 			<dependency id="Waher.Security" version="1.0.8"/>

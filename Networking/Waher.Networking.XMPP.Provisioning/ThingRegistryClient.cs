@@ -1693,19 +1693,28 @@ namespace Waher.Networking.XMPP.Provisioning
 		public static bool IsIoTDiscoClaimURI(IEnumerable<SearchOperator> Operators)
 		{
 			bool HasKey = false;
+			bool HasRegistry = false;
 
 			foreach (SearchOperator Op in Operators)
 			{
 				if (Op is StringTagEqualTo S)
 				{
-					if (!HasKey && S.Name.ToUpper() == "KEY")
-						HasKey = true;
+					switch (S.Name.ToUpper())
+					{
+						case "KEY":
+							HasKey = true;
+							break;
+
+						case "R":
+							HasRegistry = true;
+							break;
+					}
 				}
 				else if (!(Op is NumericTagEqualTo))
 					return false;
 			}
 
-			return HasKey;
+			return HasKey && HasRegistry;
 		}
 
 		/// <summary>
@@ -1718,7 +1727,87 @@ namespace Waher.Networking.XMPP.Provisioning
 			if (!TryDecodeIoTDiscoURI(DiscoUri, out IEnumerable<SearchOperator> Operators))
 				return false;
 			else
-				return !IsIoTDiscoClaimURI(Operators);
+				return IsIoTDiscoSearchURI(Operators);
+		}
+
+		/// <summary>
+		/// Checks if a URI is a search URI.
+		/// </summary>
+		/// <param name="Operators">Tag operators in URI</param>
+		/// <returns>If <paramref name="Operators"/> is a search URI.</returns>
+		public static bool IsIoTDiscoSearchURI(IEnumerable<SearchOperator> Operators)
+		{
+			bool HasRegistry = false;
+
+			foreach (SearchOperator Op in Operators)
+			{
+				if (Op is StringTagEqualTo S)
+				{
+					switch (S.Name.ToUpper())
+					{
+						case "KEY":
+						case "JID":
+						case "NID":
+						case "SID":
+						case "PT":
+							return false;
+
+						case "R":
+							HasRegistry = true;
+							break;
+					}
+				}
+			}
+
+			return HasRegistry;
+		}
+
+		/// <summary>
+		/// Checks if a URI is a direct reference URI.
+		/// </summary>
+		/// <param name="DiscoUri">IoTDisco URI</param>
+		/// <returns>If <paramref name="DiscoUri"/> is a search URI.</returns>
+		public static bool IsIoTDiscoDirectURI(string DiscoUri)
+		{
+			if (!TryDecodeIoTDiscoURI(DiscoUri, out IEnumerable<SearchOperator> Operators))
+				return false;
+			else
+				return IsIoTDiscoDirectURI(Operators);
+		}
+
+		/// <summary>
+		/// Checks if a URI is a direct reference URI.
+		/// </summary>
+		/// <param name="Operators">Tag operators in URI</param>
+		/// <returns>If <paramref name="Operators"/> is a direct reference URI.</returns>
+		public static bool IsIoTDiscoDirectURI(IEnumerable<SearchOperator> Operators)
+		{
+			bool HasJid = false;
+
+			foreach (SearchOperator Op in Operators)
+			{
+				if (Op is StringTagEqualTo S)
+				{
+					switch (S.Name.ToUpper())
+					{
+						case "JID":
+							HasJid = true;
+							break;
+
+						case "NID":
+						case "SID":
+						case "PT":
+							break;
+
+						default:
+							return false;
+					}
+				}
+				else
+					return false;
+			}
+
+			return HasJid;
 		}
 
 		#region Finding Thing Registry

@@ -1797,13 +1797,11 @@ namespace Waher.Networking.XMPP.Provisioning
 						case "NID":
 						case "SID":
 						case "PT":
-							break;
-
 						default:
-							return false;
+							break;
 					}
 				}
-				else
+				else if (!(Op is NumericTagEqualTo))
 					return false;
 			}
 

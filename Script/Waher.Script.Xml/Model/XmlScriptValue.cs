@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Xml;
 using Waher.Content;
@@ -7,6 +8,7 @@ using Waher.Content.Xml;
 using Waher.Persistence;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Xml.Model
 {
@@ -99,6 +101,27 @@ namespace Waher.Script.Xml.Model
 			}
 			else
 				Parent.AppendChild(Document.CreateTextNode(Expression.ToString(Value)));
+		}
+
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(XmlNode CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			if (CheckAgainst is XmlText ||
+				CheckAgainst is XmlWhitespace ||
+				CheckAgainst is XmlSignificantWhitespace ||
+				CheckAgainst is XmlCDataSection)
+			{
+				return this.node.PatternMatch(new StringValue(CheckAgainst.InnerText), AlreadyFound);
+			}
+			else if (CheckAgainst is null)
+				return this.node.PatternMatch(ObjectValue.Null, AlreadyFound);
+			else
+				return PatternMatchResult.NoMatch;
 		}
 
 	}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -80,7 +81,7 @@ namespace Waher.Script.Xml.Model
 
 			if (!Callback(ref Node, State))
 				return false;
-			
+
 			if (Node != this.root)
 			{
 				if (Node is XmlScriptElement Root)
@@ -116,7 +117,7 @@ namespace Waher.Script.Xml.Model
 				PreserveWhitespace = true
 			};
 
-			this.Build(Doc, null, Variables);	
+			this.Build(Doc, null, Variables);
 
 			return new ObjectValue(Doc);
 		}
@@ -134,5 +135,77 @@ namespace Waher.Script.Xml.Model
 
 			this.root?.Build(Document, Parent, Variables);
 		}
+
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			if (!(CheckAgainst?.AssociatedObjectValue is XmlDocument Doc))
+				return PatternMatchResult.NoMatch;
+
+			return this.PatternMatch(Doc, AlreadyFound);
+		}
+
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(XmlNode CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			if (!(CheckAgainst is XmlDocument Doc))
+				return PatternMatchResult.NoMatch;
+
+			int PiIndex = 0;
+			bool RootMatched = false;
+			PatternMatchResult Result;
+
+			foreach (XmlNode N in Doc.ChildNodes)
+			{
+				if (N is XmlElement)
+				{
+					if (RootMatched || this.root is null)
+						return PatternMatchResult.NoMatch;
+
+					if ((Result = this.root.PatternMatch(N, AlreadyFound)) != PatternMatchResult.Match)
+						return Result;
+
+					RootMatched = true;
+				}
+				else if (N is XmlDeclaration)
+				{
+					if (PiIndex < this.processingInstructions.Length &&
+						(Result = this.processingInstructions[PiIndex++].PatternMatch(N, AlreadyFound)) != PatternMatchResult.Match)
+					{
+						return Result;
+					}
+				}
+				else if (N is XmlProcessingInstruction)
+				{
+					if (PiIndex >= this.processingInstructions.Length)
+						return PatternMatchResult.NoMatch;
+					else if ((Result = this.processingInstructions[PiIndex++].PatternMatch(N, AlreadyFound)) != PatternMatchResult.Match)
+						return Result;
+				}
+				else if (N is XmlComment || N is XmlSignificantWhitespace || N is XmlWhitespace)
+					continue;
+				else
+					return PatternMatchResult.NoMatch;
+			}
+
+			if (!RootMatched && !(this.root is null))
+				return PatternMatchResult.NoMatch;
+
+			if (PiIndex < this.processingInstructions.Length)
+				return PatternMatchResult.NoMatch;
+
+			return PatternMatchResult.Match;
+		}
+
 	}
 }

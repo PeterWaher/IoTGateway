@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Xml.Model
 {
@@ -191,5 +193,61 @@ namespace Waher.Script.Xml.Model
 			}
 		}
 
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(XmlNode CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			if (!(CheckAgainst is XmlElement E))
+				return PatternMatchResult.NoMatch;
+
+			if (E.LocalName != this.name)
+				return PatternMatchResult.NoMatch;
+
+			PatternMatchResult Result;
+
+			if (!(this.xmlns is null))
+			{
+				Result = this.xmlns.PatternMatch(CheckAgainst, AlreadyFound);
+				if (Result != PatternMatchResult.Match)
+					return Result;
+			}
+
+			foreach (XmlScriptAttribute Attr in this.attributes)
+			{
+				XmlAttribute Attr2 = E.Attributes[Attr.Name];
+
+				Result = Attr.PatternMatch(Attr2, AlreadyFound);
+				if (Result != PatternMatchResult.Match)
+					return Result;
+			}
+
+			if (this.children is null)
+			{
+				if (!(E.FirstChild is null))
+					return PatternMatchResult.NoMatch;
+			}
+			else
+			{
+				XmlNode N = E.FirstChild;
+
+				foreach (XmlScriptNode N2 in this.children)
+				{
+					Result = N2.PatternMatch(N, AlreadyFound);
+					if (Result != PatternMatchResult.Match)
+						return Result;
+
+					N = N?.NextSibling;
+				}
+
+				if (!(N is null))
+					return PatternMatchResult.NoMatch;
+			}
+
+			return PatternMatchResult.Match;
+		}
 	}
 }

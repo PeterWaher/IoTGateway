@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Xml;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Model;
 
 namespace Waher.Script.Xml.Model
 {
@@ -59,6 +62,45 @@ namespace Waher.Script.Xml.Model
 		}
 
 		private static readonly Regex xmlDeclaration = new Regex("\\s*xml\\s*(((version=['\"](?'Version'[^'\"]*)['\"])|(encoding=['\"](?'Encoding'[^'\"]*)['\"])|(standalone=['\"](?'Standalone'[^'\"]*)['\"]))\\s*)*", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase);
+
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(XmlNode CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			int i = this.text.IndexOf(' ');
+
+			if (i < 0)
+			{
+				return CheckAgainst is XmlProcessingInstruction PI && PI.Target == this.text && string.IsNullOrEmpty(PI.Data) ?
+					PatternMatchResult.Match : PatternMatchResult.NoMatch;
+			}
+			else
+			{
+				Match M = xmlDeclaration.Match(this.text);
+
+				if (M.Success && M.Index == 0 && M.Length == this.text.Length)
+				{
+					string Version = M.Groups["Version"].Value;
+					string Encoding = M.Groups["Encoding"].Value;
+					string Standalone = M.Groups["Standalone"].Value;
+
+					return CheckAgainst is XmlDeclaration D && D.Version == Version && D.Encoding == Encoding &&
+						D.Standalone == Standalone ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
+				}
+				else
+				{
+					string Target = this.text.Substring(0, i);
+					string Data = this.text.Substring(i + 1).Trim();
+
+					return CheckAgainst is XmlProcessingInstruction PI && PI.Target == Target && PI.Data == Data ?
+						PatternMatchResult.Match : PatternMatchResult.NoMatch;
+				}
+			}
+		}
 
 	}
 }

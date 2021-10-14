@@ -103,10 +103,12 @@ namespace Waher.Script.Functions.Scalar
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			if (!(CheckAgainst is StringValue S))
-				return PatternMatchResult.NoMatch;
-
-			return this.Argument.PatternMatch(S, AlreadyFound);
+			if (CheckAgainst is StringValue)
+				return this.Argument.PatternMatch(CheckAgainst, AlreadyFound);
+			else if (CheckAgainst.AssociatedObjectValue is null)
+				return this.Argument.PatternMatch(new StringValue(null), AlreadyFound);
+			else
+				return this.Argument.PatternMatch(new StringValue(Expression.ToString(CheckAgainst.AssociatedObjectValue)), AlreadyFound);
 		}
 	}
 }

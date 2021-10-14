@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Xml;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Model;
 
 namespace Waher.Script.Xml.Model
 {
@@ -32,6 +35,20 @@ namespace Waher.Script.Xml.Model
 		internal override void Build(XmlDocument Document, XmlElement Parent, Variables Variables)
 		{
 			Parent.AppendChild(Document.CreateComment(this.text));
+		}
+
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(XmlNode CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			if (CheckAgainst is XmlComment Comment)
+				return Comment.InnerText == this.text ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
+			else
+				return PatternMatchResult.NoMatch;
 		}
 	}
 }

@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Xml;
+using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Xml.Model
 {
@@ -72,6 +75,22 @@ namespace Waher.Script.Xml.Model
 		internal override string GetValue(Variables Variables)
 		{
 			return EvaluateString(this.node, Variables);
+		}
+
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(XmlNode CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			if (CheckAgainst is XmlAttribute Attr)
+				return this.node.PatternMatch(new StringValue(Attr.Value), AlreadyFound);
+			else if (CheckAgainst is null)
+				return this.node.PatternMatch(ObjectValue.Null, AlreadyFound);
+			else
+				return PatternMatchResult.NoMatch;
 		}
 	}
 }

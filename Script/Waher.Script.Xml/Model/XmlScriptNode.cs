@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
@@ -60,7 +61,7 @@ namespace Waher.Script.Xml.Model
 		/// <param name="Element">Element to convert to a string.</param>
 		/// <returns>String result.</returns>
 		public static string EvaluateString(IElement Element)
-		{ 
+		{
 			if (Element is StringValue S)
 				return S.Value;
 			else if (Element is BooleanValue B)
@@ -82,5 +83,13 @@ namespace Waher.Script.Xml.Model
 					return Expression.ToString(Value);
 			}
 		}
+
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public abstract PatternMatchResult PatternMatch(XmlNode CheckAgainst, Dictionary<string, IElement> AlreadyFound);
 	}
 }

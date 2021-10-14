@@ -96,14 +96,21 @@ namespace Waher.Script.Functions.Scalar
         /// <returns>Pattern match result</returns>
         public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
         {
-            if (!(CheckAgainst is DoubleNumber N))
-                return PatternMatchResult.NoMatch;
+            if (!(CheckAgainst is Objects.Integer))
+            {
+                if (CheckAgainst is DoubleNumber N)
+                {
+                    double d = N.Value;
+                    if (Math.Truncate(d) != d)
+                        return PatternMatchResult.NoMatch;
+                }
+                else if (CheckAgainst is StringValue S && BigInteger.TryParse(S.Value, out BigInteger I))
+                    return this.Argument.PatternMatch(new Objects.Integer(I), AlreadyFound);
+                else
+                    return PatternMatchResult.NoMatch;
+            }
 
-            double d = N.Value;
-            if (Math.Truncate(d) != d)
-                return PatternMatchResult.NoMatch;
-
-            return this.Argument.PatternMatch(N, AlreadyFound);
+            return this.Argument.PatternMatch(CheckAgainst, AlreadyFound);
         }
     }
 }

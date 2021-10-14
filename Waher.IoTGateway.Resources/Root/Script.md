@@ -874,37 +874,37 @@ The following table lists available scalar functions:
 
 | Function     | Description                               | In Pattern Matching                                     | Example           |
 |--------------|-------------------------------------------|---------------------------------------------------------|-------------------|
-| `Abs(z)`     | Absolute value (or magnitude of) `z`      | Asserts `z` is non-negative.                            | `Abs(-1)`                |
-| `Bool(x)`    | Alias for `Boolean`.                      | Asserts `z` is a Boolean.                               | `Bool('true')`    |
-| `Boolean(x)` | Converts `x` to a boolean value.          | Asserts `z` is a Boolean.                               | `Boolean('true')` |
+| `Abs(z)`     | Absolute value (or magnitude of) `z`      | Asserts `z` is non-negative.                            | `Abs(-1)`         |
+| `Bool(x)`    | Alias for `Boolean`.                      | Asserts `x` is a Boolean.                               | `Bool('true')`    |
+| `Boolean(x)` | Converts `x` to a boolean value.          | Asserts `x` is a Boolean.                               | `Boolean('true')` |
 | `Ceiling(z)` | Round `z` up to closest integer.          | Asserts `z` is an Integer.                              | `Ceiling(pi)`     |
 | `Ceil(z)`    | Alias for `Ceiling(z)`.                   | Asserts `z` is an Integer.                              | `Ceil(-1)`        |
-| `Dbl(x)`     | Alias for `Double(x)`                     | Asserts `z` is a double.precision floating-point value. | `Dbl("3.14")`     |
-| `Double(x)`  | Converts `x` to a double value.           | Asserts `z` is a double.precision floating-point value. | `Double(pi)`      |
+| `Dbl(x)`     | Alias for `Double(x)`                     | Asserts `x` is a double-precision floating-point value. | `Dbl("3.14")`     |
+| `Double(x)`  | Converts `x` to a double value.           | Asserts `x` is a double-precision floating-point value. | `Double(pi)`      |
 | `Floor(z)`   | Round `z` down to closest integer.        | Asserts `z` is an Integer.                              | `Floor(pi)`       |
-| `Int(x)`     | Alias for `Integer(x)`                    | Asserts `z` is an Integer.                              | `Int(pi)`         |
-| `Integer(x)` | Round `x` down to closest integer.        | Asserts `z` is an Integer.                              | `Integer(pi)`     |
+| `Int(x)`     | Alias for `Integer(x)`                    | Asserts `x` is an Integer.                              | `Int(pi)`         |
+| `Integer(x)` | Round `x` down to closest integer.        | Asserts `x` is an Integer.                              | `Integer(pi)`     |
 | `Max(x,y)`   | Largest of `x` and `y`.                   |                                                         | `Max(10,a)`       |
 | `Min(x,y)`   | Smallest of `x` and `y`.                  |                                                         | `Min(10,a)`       |
-| `Num(x)`     | Alias for `Number(x)`.                    | Asserts `z` is a number.                                | `Num('100')`      |
-| `Number(x)`  | Converts `x` to a number.                 | Asserts `z` is a number.                                | `Number('100')`   |
+| `Num(x)`     | Alias for `Number(x)`.                    | Asserts `x` is a number.                                | `Num('100')`      |
+| `Number(x)`  | Converts `x` to a number.                 | Asserts `x` is a number.                                | `Number('100')`   |
 | `Round(z)`   | Round `z` up or down to closest integer.  | Asserts `z` is an Integer.                              | `Round(pi)`       |
 | `Sign(z)`    | Sign of `z` (-1/0/1 + -i/0/+i).           | Asserts `z` is -1, 0 or 1.                              | `Sign(pi)`        |
-| `Str(x)`     | Alias for `String(x)`.                    | Asserts `z` is a string.                                | `Str(100)`        |
-| `String(x)`  | Converts `x` to a string.                 | Asserts `z` is a string.                                | `String(100)`     |
+| `Str(x)`     | Alias for `String(x)`.                    | Asserts `x` is a string.                                | `Str(100)`        |
+| `String(x)`  | Converts `x` to a string.                 | Asserts `x` is a string.                                | `String(100)`     |
 
 ### Complex Functions
 
 The following table lists available scalar functions:
 
-| Function | Description | Example |
-|----------|-------------|---------|
-| `Arg(z)` | Argument (or phase) of `z`. | `Arg(2+i)` |
-| `Conj(z)` | Alias for `Conjugate(z)`. | `Conj(2+i)` |
-| `Conjugate(z)` | Conjugate of `z`. | `Conjugate(2+i)` |
-| `Im(z)` | Imaginary part of `z`. | `Im(2+i)` |
-| `Polar(n,φ)` | Complex number given in polar coordinates `n` and `φ`. | `Polar(1,pi/2)` |
-| `Re(z)` | Real part of `z`. | `Re(2+i)` |
+| Function       | Description                                            | Example          |
+|----------------|--------------------------------------------------------|------------------|
+| `Arg(z)`       | Argument (or phase) of `z`.                            | `Arg(2+i)`       |
+| `Conj(z)`      | Alias for `Conjugate(z)`.                              | `Conj(2+i)`      |
+| `Conjugate(z)` | Conjugate of `z`.                                      | `Conjugate(2+i)` |
+| `Im(z)`        | Imaginary part of `z`.                                 | `Im(2+i)`        |
+| `Polar(n,φ)`   | Complex number given in polar coordinates `n` and `φ`. | `Polar(1,pi/2)`  |
+| `Re(z)`        | Real part of `z`.                                      | `Re(2+i)`        |
 
 ### String Functions
 
@@ -2401,7 +2401,7 @@ Attribute values are always considered to be script. You can provide constant st
 but also provide script to dynamically populate your XML document with contents and calculations
 based on current variable values. In element values, you can also embed script between the special 
 `<[` and `]>` operators, or the corresponding `<(` and `)>` operators. Element names and attribute 
-names are always interpreted literally. If you need to create dynamic XML, you can build
+names are always interpreted literally. If you need to create dynamic XML, you can also build
 a string, and use the `Xml()` function to convert it to an XML document.
 
 #### XML Document

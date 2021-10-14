@@ -68,20 +68,7 @@ namespace Waher.Script.Functions.Runtime
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-            if (CheckAgainst is ObjectValue V && V.AssociatedObjectValue is null)
-            {
-                this.Argument.ForAllChildNodes((ref ScriptNode Node, object State) =>
-                {
-                    if (Node is VariableReference Ref && !AlreadyFound.ContainsKey(Ref.VariableName))
-                        AlreadyFound[Ref.VariableName] = ObjectValue.Null;
-
-                    return true;
-                }, null, true);
-
-                return PatternMatchResult.Match;
-            }
-            else
-                return this.Argument.PatternMatch(CheckAgainst, AlreadyFound);
+            return this.Argument.PatternMatch(CheckAgainst, AlreadyFound);
 		}
 	}
 }

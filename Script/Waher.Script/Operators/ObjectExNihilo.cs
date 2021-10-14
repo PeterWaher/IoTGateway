@@ -179,7 +179,7 @@ namespace Waher.Script.Operators
 
 			PatternMatchResult Result;
 
-			if (Obj.AssociatedObjectValue is Dictionary<string, IElement> Object)
+			if (Obj.AssociatedObjectValue is IDictionary<string, IElement> Object)
 			{
 				foreach (KeyValuePair<string, IElement> P in Object)
 				{
@@ -198,7 +198,7 @@ namespace Waher.Script.Operators
 						return Result;
 				}
 			}
-			else if (Obj.AssociatedObjectValue is Dictionary<string, object> Object2)
+			else if (Obj.AssociatedObjectValue is IDictionary<string, object> Object2)
 			{
 				foreach (KeyValuePair<string, object> P in Object2)
 				{

@@ -56,6 +56,24 @@ namespace Waher.Script.Test
 		{
 			ScriptEvaluationTests.Test("<test><a><[A]></a><b x=Double(B) y=Required(Double(C)) z=Optional(D)/></test>:=<test><a><[s]></a><b y=c x=b/></test>;[A,B,C,D]",
 				new object[] { ScriptEvaluationTests.s, ScriptEvaluationTests.b, ScriptEvaluationTests.c, null });
+
+			string s =
+				"Posted:=<Connect>\r\n" +
+				"    <ApplicationName>Postman</ApplicationName>\r\n" +
+				"    <Purpose>Testing API</Purpose>\r\n" +
+				"    <ClientSideToken>Testing</ClientSideToken>\r\n" +
+				"</Connect>;\r\n";
+
+			s +=
+				"									<Connect>\r\n" +
+				"										<ApplicationName><[Required(Str(ApplicationName))]></ApplicationName>\r\n" +
+				"										<Purpose><[Required(Str(Purpose))]></Purpose>\r\n" +
+				"										<ClientSideToken><[Optional(Str(ClientSideToken))]></ClientSideToken>\r\n" +
+				"									</Connect>:=Posted;";
+
+			s += "[ApplicationName,Purpose,ClientSideToken]";
+
+			ScriptEvaluationTests.Test(s, new object[] { "Postman", "Testing API", "Testing" });
 		}
 
 	}

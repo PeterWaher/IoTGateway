@@ -46,9 +46,9 @@ namespace Waher.Script.Xml.Model
 		public override PatternMatchResult PatternMatch(XmlNode CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
 			if (CheckAgainst is XmlText Text)
-				return Text.InnerText == this.text ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
+				return Text.InnerText.Trim() == this.text.Trim() ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
 			else if(CheckAgainst is XmlCDataSection CData)
-				return CData.InnerText == this.text ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
+				return CData.InnerText.Trim() == this.text.Trim() ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
 			else 
 				return PatternMatchResult.NoMatch;
 		}

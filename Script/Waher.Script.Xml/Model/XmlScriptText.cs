@@ -45,11 +45,14 @@ namespace Waher.Script.Xml.Model
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(XmlNode CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			if (CheckAgainst is XmlText Text)
-				return Text.InnerText.Trim() == this.text.Trim() ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
-			else if(CheckAgainst is XmlCDataSection CData)
-				return CData.InnerText.Trim() == this.text.Trim() ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
-			else 
+			if (CheckAgainst is XmlText ||
+				CheckAgainst is XmlCDataSection ||
+				CheckAgainst is XmlWhitespace ||
+				CheckAgainst is XmlSignificantWhitespace)
+			{
+				return CheckAgainst.InnerText.Trim() == this.text.Trim() ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
+			}
+			else
 				return PatternMatchResult.NoMatch;
 		}
 

@@ -101,5 +101,32 @@ namespace Waher.Networking.HTTP.ScriptExtensions
 			return PageVariables;
 		}
 
+		/// <summary>
+		/// Clears the current set of page variables.
+		/// </summary>
+		/// <param name="Session">Current session.</param>
+		public static void Clear(Variables Session)
+		{
+			Session.Remove(Page.VariableName);
+			Session.Remove(Page.LastPageVariableName);
+		}
+
+		/// <summary>
+		/// Removes a page variable from the session.
+		/// </summary>
+		/// <param name="Session">Current session.</param>
+		/// <param name="PageVariableName">Page variable name to remove.</param>
+		/// <returns>If such a page variable was found and removed.</returns>
+		public static bool Remove(Variables Session, string PageVariableName)
+		{
+			if (Session.TryGetVariable(Page.VariableName, out Variable v) &&
+				v.ValueObject is Variables PageVariables)
+			{
+				return PageVariables.Remove(PageVariableName);
+			}
+			else
+				return false;
+		}
+
 	}
 }

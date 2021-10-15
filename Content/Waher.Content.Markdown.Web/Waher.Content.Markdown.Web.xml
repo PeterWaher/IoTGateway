@@ -269,5 +269,19 @@
             <param name="Resource">Resource part of the URL of the page.</param>
             <returns>Page variables.</returns>
         </member>
+        <member name="M:Waher.Networking.HTTP.ScriptExtensions.Page.Clear(Waher.Script.Variables)">
+            <summary>
+            Clears the current set of page variables.
+            </summary>
+            <param name="Session">Current session.</param>
+        </member>
+        <member name="M:Waher.Networking.HTTP.ScriptExtensions.Page.Remove(Waher.Script.Variables,System.String)">
+            <summary>
+            Removes a page variable from the session.
+            </summary>
+            <param name="Session">Current session.</param>
+            <param name="PageVariableName">Page variable name to remove.</param>
+            <returns>If such a page variable was found and removed.</returns>
+        </member>
     </members>
 </doc>

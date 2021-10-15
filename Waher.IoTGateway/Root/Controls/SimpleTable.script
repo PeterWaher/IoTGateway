@@ -1,6 +1,6 @@
 ﻿PrepareTable(GetScript):=
 (
-	if !exists(Page.Table) then 
+	if !exists(Page.Table) or !exists(Posted) then 
 		Page.Table:=GetScript is System.String ? eval(GetScript) : GetScript();
 
 	if exists(Posted) then

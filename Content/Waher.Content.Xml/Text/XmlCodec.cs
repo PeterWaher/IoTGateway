@@ -178,13 +178,11 @@ namespace Waher.Content.Xml.Text
 		/// <returns>If the encoder can encode the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if (Object is XmlDocument || Object is XmlElement)
+			if ((Object is XmlDocument || Object is XmlElement) &&
+				InternetContent.IsAccepted(XmlContentTypes, AcceptedContentTypes))
 			{
-				if (InternetContent.IsAccepted(XmlContentTypes, AcceptedContentTypes))
-				{
-					Grade = Grade.Ok;
-					return true;
-				}
+				Grade = Grade.Ok;
+				return true;
 			}
 
 			Grade = Grade.NotAtAll;
@@ -202,7 +200,8 @@ namespace Waher.Content.Xml.Text
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
 		{
-			if (this.Encodes(Object, out Grade _, AcceptedContentTypes))
+			if ((Object is XmlDocument || Object is XmlElement) &&
+				InternetContent.IsAccepted(XmlContentTypes, out ContentType, AcceptedContentTypes))
 			{
 				if (!(Object is XmlDocument Doc))
 				{
@@ -225,12 +224,12 @@ namespace Waher.Content.Xml.Text
 					if (Encoding is null)
 					{
 						Settings.Encoding = Encoding.UTF8;
-						ContentType = "text/xml; charset=utf-8";
+						ContentType += "; charset=utf-8";
 					}
 					else
 					{
 						Settings.Encoding = Encoding;
-						ContentType = "text/xml; charset=" + Encoding.WebName;
+						ContentType += "; charset=" + Encoding.WebName;
 					}
 
 					w = XmlWriter.Create(ms, Settings);

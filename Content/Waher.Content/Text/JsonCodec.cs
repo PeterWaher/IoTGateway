@@ -195,13 +195,23 @@ namespace Waher.Content.Text
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
 		{
-			string Json = JSON.Encode(Object, false);
-			ContentType = "application/json";
+			if (InternetContent.IsAccepted(JsonContentTypes, out ContentType, AcceptedContentTypes))
+			{
+				string Json = JSON.Encode(Object, false);
+				ContentType = "application/json";
 
-			if (Encoding is null)
-				Encoding = Encoding.UTF8;
+				if (Encoding is null)
+				{
+					Encoding = Encoding.UTF8;
+					ContentType += "; charset=utf-8";
+				}
+				else
+					ContentType += "; charset=" + Encoding.WebName;
 
-			return Encoding.GetBytes(Json);
+				return Encoding.GetBytes(Json);
+			}
+			else
+				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
 		}
 	}
 }

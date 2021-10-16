@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -26,7 +27,7 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		/// <param name="Variables">Current set of variables.</param>
 		/// <returns>Data Source</returns>
-		public abstract IDataSource GetSource(Variables Variables);
+		public abstract Task<IDataSource> GetSource(Variables Variables);
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.

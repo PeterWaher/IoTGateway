@@ -9,7 +9,7 @@ namespace Waher.Script.Persistence.SQL
 	/// <summary>
 	/// Executes an CREATE INDEX ... ON ... (...) statement against the object database.
 	/// </summary>
-	public class CreateIndex : ScriptNode
+	public class CreateIndex : ScriptNode, IEvaluateAsync
 	{
 		private ScriptNode name;
 		private SourceDefinition source;
@@ -59,7 +59,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public async Task<IElement> EvaluateAsync(Variables Variables)
 		{
-			IDataSource Source = this.source.GetSource(Variables);
+			IDataSource Source = await this.source.GetSource(Variables);
 			string Name = InsertValues.GetName(this.name, Variables);
 			string[] Fields = new string[this.nrColumns];
 			int i;

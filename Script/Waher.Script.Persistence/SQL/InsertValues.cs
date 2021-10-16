@@ -12,7 +12,7 @@ namespace Waher.Script.Persistence.SQL
 	/// <summary>
 	/// Executes an INSERT ... VALUES ... statement against the object database.
 	/// </summary>
-	public class InsertValues : ScriptNode
+	public class InsertValues : ScriptNode, IEvaluateAsync
 	{
 		private SourceDefinition source;
 		private ElementList columns;
@@ -60,7 +60,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public async Task<IElement> EvaluateAsync(Variables Variables)
 		{
-			IDataSource Source = this.source.GetSource(Variables);
+			IDataSource Source = await this .source.GetSource(Variables);
 			GenericObject Obj = new GenericObject(Source.CollectionName, Source.TypeName, Guid.Empty);
 			ScriptNode Node;
 			IElement E;

@@ -10,7 +10,7 @@ namespace Waher.Script.Persistence.SQL
 	/// <summary>
 	/// Executes a DELETE statement against the object database.
 	/// </summary>
-	public class Delete : ScriptNode
+	public class Delete : ScriptNode, IEvaluateAsync
 	{
 		private SourceDefinition source;
 		private ScriptNode where;
@@ -51,7 +51,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public async Task<IElement> EvaluateAsync(Variables Variables)
 		{
-			IDataSource Source = this.source.GetSource(Variables);
+			IDataSource Source = await this.source.GetSource(Variables);
 			int? Count = await Source.FindDelete(this.lazy, 0, int.MaxValue, this.where, Variables, new	KeyValuePair<VariableReference, bool>[0], this);
 
 			if (Count.HasValue)

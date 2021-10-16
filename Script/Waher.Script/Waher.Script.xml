@@ -9376,6 +9376,19 @@
             Default variable name, if any, null otherwise.
             </summary>
         </member>
+        <member name="T:Waher.Script.Model.IEvaluateAsync">
+            <summary>
+            Interface for script nodes with asynchronous evaluation
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Model.IEvaluateAsync.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node asynchronously, using the variables provided in 
+            the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Model.ArgumentType">
             <summary>
             Type of parameter used in a function definition or a lambda definition.

@@ -38,9 +38,13 @@ namespace Waher.Script.Persistence.SQL
 		public ObjectProperties(object Object, Variables Variables, bool ReadOnly)
 			: base()
 		{
-			this.obj = Object;
-			this.dictionary = Object as IDictionary<string, object>;
-			this.type = Object.GetType();
+			if (Object is IElement E)
+				this.obj = E.AssociatedObjectValue;
+			else
+				this.obj = Object;
+
+			this.dictionary = this.obj as IDictionary<string, object>;
+			this.type = this.obj.GetType();
 			this.variables2 = Variables;
 			this.readOnly = ReadOnly;
 		}

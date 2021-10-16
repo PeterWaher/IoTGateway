@@ -2445,6 +2445,14 @@
             Drops the collection from the source.
             </summary>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.Sources.VectorSource.ToGenericObjectVector(Waher.Script.Objects.Matrices.ObjectMatrix)">
+            <summary>
+            Converts an object matrix, with named columns, to a vector of
+            objects ex nihilo.
+            </summary>
+            <param name="ResultSet">Result set</param>
+            <returns>Object vector.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.Sources.XmlSource">
             <summary>
             Data Source defined by XML.

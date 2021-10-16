@@ -15,7 +15,7 @@ namespace Waher.Script.Persistence.SQL
 	/// <summary>
 	/// Executes a SELECT statement against the object database.
 	/// </summary>
-	public class Select : ScriptNode
+	public class Select : ScriptNode, IEvaluateAsync
 	{
 		private readonly ScriptNode[] columns;
 		private readonly ScriptNode[] columnNames;
@@ -135,7 +135,7 @@ namespace Waher.Script.Persistence.SQL
 			else
 				Offset = 0;
 
-			IDataSource Source = this.source.GetSource(Variables);
+			IDataSource Source = await this.source.GetSource(Variables);
 
 			List<KeyValuePair<VariableReference, bool>> OrderBy = new List<KeyValuePair<VariableReference, bool>>();
 			bool CalculatedOrder = false;

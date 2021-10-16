@@ -15,7 +15,7 @@ namespace Waher.Script.Persistence.SQL
 	/// <summary>
 	/// Executes an INSERT ... OBJECT[S] ... statement against the object database.
 	/// </summary>
-	public class InsertObjects : ScriptNode
+	public class InsertObjects : ScriptNode, IEvaluateAsync
 	{
 		private SourceDefinition source;
 		private ElementList objects;
@@ -56,7 +56,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public async Task<IElement> EvaluateAsync(Variables Variables)
 		{
-			IDataSource Source = this.source.GetSource(Variables);
+			IDataSource Source = await this .source.GetSource(Variables);
 			List<IElement> Result = new List<IElement>();
 			IEnumerable<IElement> Objects;
 			IElement E;

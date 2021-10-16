@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Persistence.SQL.Sources;
 
 namespace Waher.Script.Persistence.SQL.SourceDefinitions
@@ -26,10 +27,11 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 		/// </summary>
 		/// <param name="Variables">Current set of variables.</param>
 		/// <returns>Data Source</returns>
-		public override IDataSource GetSource(Variables Variables)
+		public override async Task<IDataSource> GetSource(Variables Variables)
 		{
-			return new InnerJoinedSource(this.Left.GetSource(Variables), 
-				this.Right.GetSource(Variables), null);
+			return new InnerJoinedSource(
+				await this.Left.GetSource(Variables), 
+				await this.Right.GetSource(Variables), null);
 		}
 
 	}

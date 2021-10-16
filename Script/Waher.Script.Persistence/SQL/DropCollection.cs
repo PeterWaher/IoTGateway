@@ -9,7 +9,7 @@ namespace Waher.Script.Persistence.SQL
 	/// <summary>
 	/// Executes an DROP INDEX ... ON ... statement against the object database.
 	/// </summary>
-	public class DropCollection : ScriptNode
+	public class DropCollection : ScriptNode, IEvaluateAsync
 	{
 		private SourceDefinition source;
 
@@ -44,7 +44,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public async Task<IElement> EvaluateAsync(Variables Variables)
 		{
-			IDataSource Source = this.source.GetSource(Variables);
+			IDataSource Source = await this .source.GetSource(Variables);
 			await Source.DropCollection();
 			return ObjectValue.Null;
 		}

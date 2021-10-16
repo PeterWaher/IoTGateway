@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Objects.Matrices;
 using Waher.Script.Persistence.SQL.Sources;
 
 namespace Waher.Script.Persistence.SQL.SourceDefinitions
@@ -49,7 +51,7 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 		/// </summary>
 		/// <param name="Variables">Current set of variables.</param>
 		/// <returns>Data Source</returns>
-		public override IDataSource GetSource(Variables Variables)
+		public override async Task<IDataSource> GetSource(Variables Variables)
 		{
 			string Alias;
 
@@ -63,7 +65,12 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 			if (this.source is VariableReference Ref2)
 				return GetDataSource(Ref2, Alias, Variables);
 			else
-				return GetDataSource(string.Empty, Alias, this.source.Evaluate(Variables), this.source);
+			{
+				if (this.source is IEvaluateAsync AsyncSource)
+					return GetDataSource(string.Empty, Alias, await AsyncSource.EvaluateAsync(Variables), this.source);
+				else
+					return GetDataSource(string.Empty, Alias, this.source.Evaluate(Variables), this.source);
+			}
 		}
 
 		private static IDataSource GetDataSource(string Name, string Alias, IElement E, ScriptNode Source)
@@ -72,6 +79,8 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 				return new TypeSource(T, Alias);
 			else if (E is StringValue S)
 				return new CollectionSource(S.Value, Alias);
+			else if (E is ObjectMatrix OM && OM.HasColumnNames)
+				return new VectorSource(Name, Alias, VectorSource.ToGenericObjectVector(OM), Source);
 			else if (E is IVector V)
 				return new VectorSource(Name, Alias, V, Source);
 			else if (E is ObjectValue Value)

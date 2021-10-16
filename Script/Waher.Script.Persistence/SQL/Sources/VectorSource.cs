@@ -6,6 +6,9 @@ using Waher.Persistence.Serialization;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
+using Waher.Script.Objects.Matrices;
+using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Order;
 using Waher.Script.Persistence.Functions;
 
@@ -134,7 +137,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <param name="Objects">Objects to update</param>
 		public Task Update(bool Lazy, IEnumerable<object> Objects)
 		{
-			return Task.CompletedTask;	// Do nothing.
+			return Task.CompletedTask;  // Do nothing.
 		}
 
 		private Exception InvalidOperation()
@@ -200,7 +203,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <returns>If the name refers to the source.</returns>
 		public bool IsSource(string Name)
 		{
-			return 
+			return
 				string.Compare(this.name, Name, true) == 0 ||
 				string.Compare(this.alias, Name, true) == 0;
 		}
@@ -261,6 +264,36 @@ namespace Waher.Script.Persistence.SQL.Sources
 		public Task DropCollection()
 		{
 			throw InvalidOperation();
+		}
+
+		/// <summary>
+		/// Converts an object matrix, with named columns, to a vector of
+		/// objects ex nihilo.
+		/// </summary>
+		/// <param name="ResultSet">Result set</param>
+		/// <returns>Object vector.</returns>
+		public static ObjectVector ToGenericObjectVector(ObjectMatrix ResultSet)
+		{
+			if (!ResultSet.HasColumnNames)
+				throw new ArgumentException("Result Set lacks named columns.", nameof(ResultSet));
+
+			int Rows = ResultSet.Rows;
+			int Columns = ResultSet.Columns;
+			string[] Names = ResultSet.ColumnNames;
+			IElement[] Objects = new IElement[Rows];
+			Dictionary<string, object> Object;
+			int x, y;
+
+			for (y = 0; y < Rows; y++)
+			{
+				Object = new Dictionary<string, object>();
+				Objects[y] = new ObjectValue(Object);
+
+				for (x = 0; x < Columns; x++)
+					Object[Names[x]] = ResultSet.GetElement(x, y).AssociatedObjectValue;
+			}
+
+			return new ObjectVector(Objects);
 		}
 
 	}

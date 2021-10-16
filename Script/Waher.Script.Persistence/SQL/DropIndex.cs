@@ -10,7 +10,7 @@ namespace Waher.Script.Persistence.SQL
 	/// <summary>
 	/// Executes an DROP INDEX ... ON ... statement against the object database.
 	/// </summary>
-	public class DropIndex : ScriptNode
+	public class DropIndex : ScriptNode, IEvaluateAsync
 	{
 		private ScriptNode name;
 		private SourceDefinition source;
@@ -48,7 +48,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public async Task<IElement> EvaluateAsync(Variables Variables)
 		{
-			IDataSource Source = this.source.GetSource(Variables);
+			IDataSource Source = await this .source.GetSource(Variables);
 			string Name = InsertValues.GetName(this.name, Variables);
 
 			if (!await Source.DropIndex(Name))

@@ -57,10 +57,14 @@ namespace Waher.Script.Persistence.SQL
 			get => this.obj;
 			set
 			{
-				this.obj = value;
-				this.dictionary = value as IDictionary<string, object>;
+				if (value is IElement E)
+					this.obj = E.AssociatedObjectValue;
+				else
+					this.obj = value;
+
+				this.dictionary = this.obj as IDictionary<string, object>;
 				
-				Type T = value.GetType();
+				Type T = this.obj.GetType();
 
 				if (this.type != T)
 				{

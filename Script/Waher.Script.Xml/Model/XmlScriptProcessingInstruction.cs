@@ -102,5 +102,15 @@ namespace Waher.Script.Xml.Model
 			}
 		}
 
+		/// <summary>
+		/// If the node is applicable in pattern matching against <paramref name="CheckAgainst"/>.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <returns>If the node is applicable for pattern matching.</returns>
+		public override bool IsApplicable(XmlNode CheckAgainst)
+		{
+			return (CheckAgainst is XmlProcessingInstruction || CheckAgainst is XmlDeclaration);
+		}
+
 	}
 }

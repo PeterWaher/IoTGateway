@@ -27,6 +27,11 @@ namespace Waher.Script.Xml.Model
 		}
 
 		/// <summary>
+		/// Text represented by node.
+		/// </summary>
+		public string Text => this.text;
+
+		/// <summary>
 		/// Builds an XML Document object
 		/// </summary>
 		/// <param name="Document">Document being built.</param>
@@ -52,8 +57,23 @@ namespace Waher.Script.Xml.Model
 			{
 				return CheckAgainst.InnerText.Trim() == this.text.Trim() ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
 			}
+			else if (CheckAgainst is null)
+				return string.IsNullOrWhiteSpace(this.text) ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
 			else
 				return PatternMatchResult.NoMatch;
+		}
+
+		/// <summary>
+		/// If the node is applicable in pattern matching against <paramref name="CheckAgainst"/>.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <returns>If the node is applicable for pattern matching.</returns>
+		public override bool IsApplicable(XmlNode CheckAgainst)
+		{
+			return (CheckAgainst is XmlText ||
+				CheckAgainst is XmlCDataSection ||
+				CheckAgainst is XmlWhitespace ||
+				CheckAgainst is XmlSignificantWhitespace);
 		}
 
 	}

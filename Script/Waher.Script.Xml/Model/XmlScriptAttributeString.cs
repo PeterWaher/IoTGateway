@@ -67,8 +67,8 @@ namespace Waher.Script.Xml.Model
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(XmlNode CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			if (CheckAgainst is XmlAttribute Attr)
-				return Attr.Value == this.value ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
+			if (CheckAgainst is XmlAttribute)
+				return CheckAgainst.Value == this.value ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
 			else
 				return PatternMatchResult.NoMatch;
 		}

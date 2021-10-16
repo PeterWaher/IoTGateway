@@ -91,5 +91,12 @@ namespace Waher.Script.Xml.Model
 		/// <param name="AlreadyFound">Variables already identified.</param>
 		/// <returns>Pattern match result</returns>
 		public abstract PatternMatchResult PatternMatch(XmlNode CheckAgainst, Dictionary<string, IElement> AlreadyFound);
+
+		/// <summary>
+		/// If the node is applicable in pattern matching against <paramref name="CheckAgainst"/>.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <returns>If the node is applicable for pattern matching.</returns>
+		public abstract bool IsApplicable(XmlNode CheckAgainst);
 	}
 }

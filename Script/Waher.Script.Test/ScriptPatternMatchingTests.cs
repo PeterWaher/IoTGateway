@@ -52,11 +52,15 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void Test_05_XML()
+		public void Test_05_XML_1()
 		{
 			ScriptEvaluationTests.Test("<test><a><[A]></a><b x=Double(B) y=Required(Double(C)) z=Optional(D)/></test>:=<test><a><[s]></a><b y=c x=b/></test>;[A,B,C,D]",
 				new object[] { ScriptEvaluationTests.s, ScriptEvaluationTests.b, ScriptEvaluationTests.c, null });
+		}
 
+		[TestMethod]
+		public void Test_06_XML_2()
+		{
 			string s =
 				"Posted:=<Connect>\r\n" +
 				"    <ApplicationName>Postman</ApplicationName>\r\n" +
@@ -69,11 +73,69 @@ namespace Waher.Script.Test
 				"										<ApplicationName><[Required(Str(ApplicationName))]></ApplicationName>\r\n" +
 				"										<Purpose><[Required(Str(Purpose))]></Purpose>\r\n" +
 				"										<ClientSideToken><[Optional(Str(ClientSideToken))]></ClientSideToken>\r\n" +
-				"									</Connect>:=Posted;";
+				"									</Connect>:=Posted;\r\n";
 
 			s += "[ApplicationName,Purpose,ClientSideToken]";
 
 			ScriptEvaluationTests.Test(s, new object[] { "Postman", "Testing API", "Testing" });
+		}
+
+		[TestMethod]
+		public void Test_07_XML_3()
+		{
+			string s =
+				"Posted:=<Refresh>\r\n" +
+				"    <Purpose>Testing API again</Purpose>\r\n" +
+				"</Refresh>;\r\n";
+
+			s +=
+				"<Refresh>\r\n" +
+				"	<ApplicationName><[Optional(Str(ApplicationName))]></ApplicationName>\r\n" +
+				"	<Purpose><[Optional(Str(Purpose))]></Purpose>\r\n" +
+				"	<ClientSideToken><[Optional(Str(ClientSideToken))]></ClientSideToken>\r\n" +
+				"</Refresh>:=Posted;\r\n";
+
+			s += "[ApplicationName,Purpose,ClientSideToken]";
+
+			ScriptEvaluationTests.Test(s, new object[] { null, "Testing API again", null });
+		}
+
+		[TestMethod]
+		public void Test_08_XML_4()
+		{
+			string s =
+				"Posted:=<Refresh><Purpose>Testing API again</Purpose></Refresh>;\r\n";
+
+			s +=
+				"<Refresh>\r\n" +
+				"	<ApplicationName><[Optional(Str(ApplicationName))]></ApplicationName>\r\n" +
+				"	<Purpose><[Optional(Str(Purpose))]></Purpose>\r\n" +
+				"	<ClientSideToken><[Optional(Str(ClientSideToken))]></ClientSideToken>\r\n" +
+				"</Refresh>:=Posted;\r\n";
+
+			s += "[ApplicationName,Purpose,ClientSideToken]";
+
+			ScriptEvaluationTests.Test(s, new object[] { null, "Testing API again", null });
+		}
+
+		[TestMethod]
+		public void Test_09_XML_5()
+		{
+			string s =
+				"Posted:=<Refresh>\r\n" +
+				"    <Purpose>Testing API again</Purpose>\r\n" +
+				"</Refresh>;\r\n";
+
+			s +=
+				"<Refresh>" +
+				"<ApplicationName><[Optional(Str(ApplicationName))]></ApplicationName>" +
+				"<Purpose><[Optional(Str(Purpose))]></Purpose>" +
+				"<ClientSideToken><[Optional(Str(ClientSideToken))]></ClientSideToken>" +
+				"</Refresh>:=Posted;";
+
+			s += "[ApplicationName,Purpose,ClientSideToken]";
+
+			ScriptEvaluationTests.Test(s, new object[] { null, "Testing API again", null });
 		}
 
 	}

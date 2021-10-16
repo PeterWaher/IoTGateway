@@ -201,53 +201,134 @@ namespace Waher.Script.Xml.Model
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(XmlNode CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			if (!(CheckAgainst is XmlElement E))
-				return PatternMatchResult.NoMatch;
-
-			if (E.LocalName != this.name)
-				return PatternMatchResult.NoMatch;
-
 			PatternMatchResult Result;
 
-			if (!(this.xmlns is null))
+			if (CheckAgainst is null)
 			{
-				Result = this.xmlns.PatternMatch(CheckAgainst, AlreadyFound);
-				if (Result != PatternMatchResult.Match)
-					return Result;
-			}
+				if (!(this.xmlns is null))
+				{
+					Result = this.xmlns.PatternMatch(null, AlreadyFound);
+					if (Result != PatternMatchResult.Match)
+						return Result;
+				}
 
-			foreach (XmlScriptAttribute Attr in this.attributes)
-			{
-				XmlAttribute Attr2 = E.Attributes[Attr.Name];
+				foreach (XmlScriptAttribute Attr in this.attributes)
+				{
+					Result = Attr.PatternMatch(null, AlreadyFound);
+					if (Result != PatternMatchResult.Match)
+						return Result;
+				}
 
-				Result = Attr.PatternMatch(Attr2, AlreadyFound);
-				if (Result != PatternMatchResult.Match)
-					return Result;
-			}
-
-			if (this.children is null)
-			{
-				if (!(E.FirstChild is null))
-					return PatternMatchResult.NoMatch;
+				if (!(this.children is null))
+				{
+					foreach (XmlScriptNode N2 in this.children)
+					{
+						Result = N2.PatternMatch(null, AlreadyFound);
+						if (Result != PatternMatchResult.Match)
+							return Result;
+					}
+				}
 			}
 			else
 			{
-				XmlNode N = E.FirstChild;
+				if (!(CheckAgainst is XmlElement E))
+					return PatternMatchResult.NoMatch;
 
-				foreach (XmlScriptNode N2 in this.children)
+				if (E.LocalName != this.name)
+					return PatternMatchResult.NoMatch;
+
+				if (!(this.xmlns is null))
 				{
-					Result = N2.PatternMatch(N, AlreadyFound);
+					XmlAttribute XmlNs = CheckAgainst.OwnerDocument.CreateAttribute("xmlns", CheckAgainst.NamespaceURI);
+
+					Result = this.xmlns.PatternMatch(XmlNs, AlreadyFound);
 					if (Result != PatternMatchResult.Match)
 						return Result;
-
-					N = N?.NextSibling;
 				}
 
-				if (!(N is null))
-					return PatternMatchResult.NoMatch;
-			}
+				foreach (XmlScriptAttribute Attr in this.attributes)
+				{
+					XmlAttribute Attr2 = E.Attributes[Attr.Name];
 
+					Result = Attr.PatternMatch(Attr2, AlreadyFound);
+					if (Result != PatternMatchResult.Match)
+						return Result;
+				}
+
+				XmlNode N = E.FirstChild;
+				bool Again;
+
+				if (!(this.children is null))
+				{
+					foreach (XmlScriptNode N2 in this.children)
+					{
+						do
+						{
+							Again = false;
+
+							if (!(N is null))
+							{
+								if (N2.IsApplicable(N))
+								{
+									Result = N2.PatternMatch(N, AlreadyFound);
+									N = N.NextSibling;
+								}
+								else if ((N2 is XmlScriptText Text && string.IsNullOrWhiteSpace(Text.Text)) ||
+									N2 is XmlScriptComment)
+								{
+									Result = PatternMatchResult.Match;
+								}
+								else if ((N is XmlText && string.IsNullOrWhiteSpace(N.InnerText)) ||
+									N is XmlComment)
+								{
+									N = N.NextSibling;
+									Again = true;
+									continue;
+								}
+								else
+									Result = N2.PatternMatch(null, AlreadyFound);
+							}
+							else
+								Result = N2.PatternMatch(null, AlreadyFound);
+
+							if (Result != PatternMatchResult.Match)
+								return Result;
+						}
+						while (Again);
+					}
+				}
+
+				while (!(N is null))
+				{
+					if (N is XmlWhitespace || N is XmlSignificantWhitespace || N is XmlComment ||
+						((N is XmlText || N is XmlCDataSection) && string.IsNullOrWhiteSpace(N.InnerXml)))
+					{
+						N = N.NextSibling;
+					}
+					else
+						return PatternMatchResult.NoMatch;
+				}
+			}
+		
 			return PatternMatchResult.Match;
+		}
+
+		/// <summary>
+		/// If the node is applicable in pattern matching against <paramref name="CheckAgainst"/>.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <returns>If the node is applicable for pattern matching.</returns>
+		public override bool IsApplicable(XmlNode CheckAgainst)
+		{
+			if (!(CheckAgainst is XmlElement E) || this.name != E.LocalName)
+				return false;
+
+			if (this.xmlns is null)
+				return true;
+
+			XmlAttribute XmlNs = CheckAgainst.OwnerDocument.CreateAttribute("xmlns", CheckAgainst.NamespaceURI);
+
+			return this.xmlns.IsApplicable(XmlNs);
 		}
 	}
 }

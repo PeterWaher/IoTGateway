@@ -45,10 +45,20 @@ namespace Waher.Script.Xml.Model
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(XmlNode CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			if (CheckAgainst is XmlComment Comment)
-				return Comment.InnerText == this.text ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
+			if (CheckAgainst is XmlComment)
+				return CheckAgainst.InnerText == this.text ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
 			else
 				return PatternMatchResult.NoMatch;
+		}
+
+		/// <summary>
+		/// If the node is applicable in pattern matching against <paramref name="CheckAgainst"/>.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <returns>If the node is applicable for pattern matching.</returns>
+		public override bool IsApplicable(XmlNode CheckAgainst)
+		{
+			return (CheckAgainst is XmlComment);
 		}
 	}
 }

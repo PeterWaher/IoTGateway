@@ -47,6 +47,7 @@ namespace Waher.Script.Persistence.SQL
 			this.type = this.obj.GetType();
 			this.variables2 = Variables;
 			this.readOnly = ReadOnly;
+			this.ConsoleOut = Variables.ConsoleOut;
 		}
 
 		/// <summary>

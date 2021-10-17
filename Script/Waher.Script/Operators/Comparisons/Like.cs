@@ -113,7 +113,7 @@ namespace Waher.Script.Operators.Comparisons
 
 					foreach (string s in this.regex.GetGroupNames())
 					{
-						if (!int.TryParse(s, out int i))
+						if (!int.TryParse(s, out int _))
 						{
 							if (Names is null)
 								Names = new List<string>();

@@ -2423,14 +2423,14 @@
           }
         }
       },
-      "Waher.Content/1.1.4": {
+      "Waher.Content/1.1.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.27",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "1.1.5"
+          "Waher.Script": "1.1.6"
         }
       },
       "Waher.Events/1.0.15": {
@@ -2504,7 +2504,7 @@
           "Waher.Events": "1.0.15"
         }
       },
-      "Waher.Script/1.1.5": {
+      "Waher.Script/1.1.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -4977,14 +4977,14 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.1.4": {
+      "Waher.Content/1.1.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.27",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "1.1.5"
+          "Waher.Script": "1.1.6"
         }
       },
       "Waher.Events/1.0.15": {
@@ -5058,7 +5058,7 @@
           "Waher.Events": "1.0.15"
         }
       },
-      "Waher.Script/1.1.5": {
+      "Waher.Script/1.1.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7567,14 +7567,14 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.1.4": {
+      "Waher.Content/1.1.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.27",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "1.1.5"
+          "Waher.Script": "1.1.6"
         }
       },
       "Waher.Events/1.0.15": {
@@ -7648,7 +7648,7 @@
           "Waher.Events": "1.0.15"
         }
       },
-      "Waher.Script/1.1.5": {
+      "Waher.Script/1.1.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10130,14 +10130,14 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.1.4": {
+      "Waher.Content/1.1.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.27",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "1.1.5"
+          "Waher.Script": "1.1.6"
         }
       },
       "Waher.Events/1.0.15": {
@@ -10211,7 +10211,7 @@
           "Waher.Events": "1.0.15"
         }
       },
-      "Waher.Script/1.1.5": {
+      "Waher.Script/1.1.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12729,14 +12729,14 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.1.4": {
+      "Waher.Content/1.1.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.27",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "1.1.5"
+          "Waher.Script": "1.1.6"
         }
       },
       "Waher.Events/1.0.15": {
@@ -12810,7 +12810,7 @@
           "Waher.Events": "1.0.15"
         }
       },
-      "Waher.Script/1.1.5": {
+      "Waher.Script/1.1.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15292,14 +15292,14 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.1.4": {
+      "Waher.Content/1.1.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.27",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "1.1.5"
+          "Waher.Script": "1.1.6"
         }
       },
       "Waher.Events/1.0.15": {
@@ -15373,7 +15373,7 @@
           "Waher.Events": "1.0.15"
         }
       },
-      "Waher.Script/1.1.5": {
+      "Waher.Script/1.1.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -17891,14 +17891,14 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/1.1.4": {
+      "Waher.Content/1.1.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.27",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "1.1.5"
+          "Waher.Script": "1.1.6"
         }
       },
       "Waher.Events/1.0.15": {
@@ -17972,7 +17972,7 @@
           "Waher.Events": "1.0.15"
         }
       },
-      "Waher.Script/1.1.5": {
+      "Waher.Script/1.1.6": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -27864,7 +27864,7 @@
         "system.xml.xmlserializer.nuspec"
       ]
     },
-    "Waher.Content/1.1.4": {
+    "Waher.Content/1.1.5": {
       "type": "project",
       "path": "../../Content/Waher.Content/Waher.Content.csproj",
       "msbuildProject": "../../Content/Waher.Content/Waher.Content.csproj"
@@ -27914,7 +27914,7 @@
       "path": "../../Runtime/Waher.Runtime.Temporary/Waher.Runtime.Temporary.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Temporary/Waher.Runtime.Temporary.csproj"
     },
-    "Waher.Script/1.1.5": {
+    "Waher.Script/1.1.6": {
       "type": "project",
       "path": "../../Script/Waher.Script/Waher.Script.csproj",
       "msbuildProject": "../../Script/Waher.Script/Waher.Script.csproj"

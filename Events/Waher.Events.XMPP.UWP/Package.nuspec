@@ -15,8 +15,8 @@
     <copyright>Copyright © Waher Data AB 2015-2021. All rights reserved.</copyright>
     <tags>logger logging logs events eventlogging eventlogs xmpp xep-0337 uwp</tags>
     <dependencies>
-      <dependency id="Waher.Content" version="1.1.4"/>
-      <dependency id="Waher.Content.Xml" version="1.1.1"/>
+      <dependency id="Waher.Content" version="1.1.5"/>
+      <dependency id="Waher.Content.Xml" version="1.1.2"/>
       <dependency id="Waher.Events" version="1.0.15"/>
       <dependency id="Waher.Networking.UWP" version="1.1.3"/>
       <dependency id="Waher.Networking.XMPP.UWP" version="1.1.20"/>

@@ -18,11 +18,11 @@ https://waher.se/Script.md#xmlRelatedFunctionsWaherScriptXml</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution xml</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.9</AssemblyVersion>
-    <FileVersion>1.0.9</FileVersion>
+    <AssemblyVersion>1.0.10</AssemblyVersion>
+    <FileVersion>1.0.10</FileVersion>
     <PackageIcon>Icon_64x64.png</PackageIcon>
     <PackageIconUrl />
-    <Version>1.0.9</Version>
+    <Version>1.0.10</Version>
   </PropertyGroup>
 
   <ItemGroup>

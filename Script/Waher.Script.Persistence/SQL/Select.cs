@@ -295,8 +295,13 @@ namespace Waher.Script.Persistence.SQL
 
 			if (Columns2 is null || c == 1)
 			{
-				if (Elements.Length == 1 && !(this.columns is null) && this.columns[0] is Functions.XPath)
-					return Elements[0];
+				c = Elements.Length;
+				if (c <= 1 && !(this.columns is null) && (
+					this.columns[0] is Functions.XPath ||
+					(!(this.groupBy is null) && this.groupBy.Length == 0)))
+				{
+					return c == 0 ? ObjectValue.Null : Elements[0];
+				}
 
 				return Operators.Vectors.VectorDefinition.Encapsulate(Elements, false, this);
 			}

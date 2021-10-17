@@ -75,12 +75,12 @@ namespace Waher.Networking.XMPP.Contracts
 
 					object Result = this.parsed.Evaluate(Variables);
 
-					if (!(Result is bool b) || !b)
+					if (Result is bool b && !b)
 						return false;
 				}
 				catch (Exception)
 				{
-					return false;
+					// Ignore. Leniant expression handling: Servers handle implementation-specific expression syntaxes.
 				}
 			}
 

@@ -46,6 +46,11 @@ namespace Waher.Networking.XMPP.Contracts
 		HumanReadableNotWellDefined,
 
 		/// <summary>
+		/// Parameter Values not valid
+		/// </summary>
+		ParameterValuesNotValid,
+
+		/// <summary>
 		/// Machine-readable section not properly defined.
 		/// </summary>
 		MachineReadableNotWellDefined,

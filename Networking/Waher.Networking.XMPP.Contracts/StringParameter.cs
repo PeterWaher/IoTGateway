@@ -226,7 +226,7 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 				catch (Exception)
 				{
-					return false;
+					// Ignore. Leniant expression handling: Servers handle implementation-specific expression syntaxes.
 				}
 			}
 

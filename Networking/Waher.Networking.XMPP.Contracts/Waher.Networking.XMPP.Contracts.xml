@@ -298,21 +298,23 @@
             If the contract can act as a template for other contracts.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.Contract.Parse(System.Xml.XmlDocument,System.Boolean@)">
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.Parse(System.Xml.XmlDocument,System.Boolean@,System.Boolean@)">
             <summary>
             Validates a contract XML Document, and returns the contract definition in it.
             </summary>
             <param name="Xml">XML representation</param>
             <param name="HasStatus">If a status element was found.</param>
+            <param name="ParametersValid">If parameter values are valid.</param>
             <returns>Parsed contract, or null if it contains errors.</returns>
             <exception cref="T:System.Exception">If XML is invalid.</exception>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.Contract.Parse(System.Xml.XmlElement,System.Boolean@)">
+        <member name="M:Waher.Networking.XMPP.Contracts.Contract.Parse(System.Xml.XmlElement,System.Boolean@,System.Boolean@)">
             <summary>
             Parses a contract from is XML representation.
             </summary>
             <param name="Xml">XML representation</param>
             <param name="HasStatus">If a status element was found.</param>
+            <param name="ParametersValid">If parameter values are valid.</param>
             <returns>Parsed contract, or null if it contains errors.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.Contract.NormalizeXml(System.Xml.XmlElement,System.Text.StringBuilder,System.String)">
@@ -2401,6 +2403,11 @@
         <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.HumanReadableNotWellDefined">
             <summary>
             Human-readable section not properly defined.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.ParameterValuesNotValid">
+            <summary>
+            Parameter Values not valid
             </summary>
         </member>
         <member name="F:Waher.Networking.XMPP.Contracts.ContractStatus.MachineReadableNotWellDefined">

@@ -7,6 +7,7 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
+using Waher.Script;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -333,14 +334,15 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Xml">XML representation</param>
 		/// <param name="HasStatus">If a status element was found.</param>
+		/// <param name="ParametersValid">If parameter values are valid.</param>
 		/// <returns>Parsed contract, or null if it contains errors.</returns>
 		/// <exception cref="Exception">If XML is invalid.</exception>
-		public static Contract Parse(XmlDocument Xml, out bool HasStatus)
+		public static Contract Parse(XmlDocument Xml, out bool HasStatus, out bool ParametersValid)
 		{
 			XSL.Validate(string.Empty, Xml, "contract", ContractsClient.NamespaceSmartContracts, 
 				contractSchema, identitiesSchema, e2eSchema, p2pSchema, xmlSchema);
 
-			return Parse(Xml.DocumentElement, out HasStatus);
+			return Parse(Xml.DocumentElement, out HasStatus, out ParametersValid);
 		}
 
 		private static readonly XmlSchema identitiesSchema = XSL.LoadSchema(typeof(Contract).Namespace + ".Schema.LegalIdentities.xsd");
@@ -354,13 +356,15 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Xml">XML representation</param>
 		/// <param name="HasStatus">If a status element was found.</param>
+		/// <param name="ParametersValid">If parameter values are valid.</param>
 		/// <returns>Parsed contract, or null if it contains errors.</returns>
-		public static Contract Parse(XmlElement Xml, out bool HasStatus)
+		public static Contract Parse(XmlElement Xml, out bool HasStatus, out bool ParametersValid)
 		{
 			Contract Result = new Contract();
 			bool HasVisibility = false;
 
 			HasStatus = false;
+			ParametersValid = true;
 
 			foreach (XmlAttribute Attr in Xml.Attributes)
 			{
@@ -928,6 +932,20 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (Content is null || ForHumans.Count == 0 || !PartsDefined)
 				return null;
+
+			Variables Variables = new Variables();
+
+			foreach (Parameter Parameter in Parameters)
+				Parameter.Populate(Variables);
+
+			foreach (Parameter Parameter in Parameters)
+			{
+				if (!Parameter.IsParameterValid(Variables))
+				{
+					ParametersValid = false;
+					break;
+				}
+			}
 
 			Result.roles = Roles.ToArray();
 			Result.parameters = Parameters.ToArray();

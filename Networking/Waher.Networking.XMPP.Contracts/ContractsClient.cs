@@ -25,6 +25,7 @@ using Waher.Runtime.Inventory;
 using Waher.Runtime.Profiling;
 using Waher.Runtime.Settings;
 using Waher.Runtime.Temporary;
+using Waher.Script;
 using Waher.Security;
 using Waher.Security.CallStack;
 using Waher.Security.EllipticCurves;
@@ -2202,7 +2203,7 @@ namespace Waher.Networking.XMPP.Contracts
 				E.LocalName == "contract" &&
 				E.NamespaceURI == NamespaceSmartContracts)
 			{
-				Contract = Contract.Parse(E, out bool _);
+				Contract = Contract.Parse(E, out bool _, out bool _);
 			}
 			else
 				e.Ok = false;
@@ -3146,6 +3147,31 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				await this.ReturnStatus(ContractStatus.HumanReadableNotWellDefined, Callback, State);
 				return;
+			}
+
+			if ((Contract.Parameters?.Length ?? 0) > 0)
+			{
+				try
+				{
+					Variables Variables = new Variables();
+
+					foreach (Parameter Parameter in Contract.Parameters)
+						Parameter.Populate(Variables);
+
+					foreach (Parameter Parameter in Contract.Parameters)
+					{
+						if (!Parameter.IsParameterValid(Variables))
+						{
+							await this.ReturnStatus(ContractStatus.ParameterValuesNotValid, Callback, State);
+							return;
+						}
+					}
+				}
+				catch (Exception)
+				{
+					await this.ReturnStatus(ContractStatus.ParameterValuesNotValid, Callback, State);
+					return;
+				}
 			}
 
 			if (string.IsNullOrEmpty(Contract.ForMachinesLocalName) ||
@@ -4972,7 +4998,7 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					if (N is XmlElement E && E.LocalName == "contract" && E.NamespaceURI == NamespaceSmartContracts)
 					{
-						Contract = Contract.Parse(E, out bool _);
+						Contract = Contract.Parse(E, out bool _, out bool _);
 						break;
 					}
 				}
@@ -5094,7 +5120,7 @@ namespace Waher.Networking.XMPP.Contracts
 				XmlElement E;
 
 				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "contract" && E.NamespaceURI == NamespaceSmartContracts)
-					Contract = Contract.Parse(E, out bool _);
+					Contract = Contract.Parse(E, out bool _, out bool _);
 				else
 					e.Ok = false;
 
@@ -5328,7 +5354,7 @@ namespace Waher.Networking.XMPP.Contracts
 				XmlElement E;
 
 				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "contract" && E.NamespaceURI == NamespaceSmartContracts)
-					Contract = Contract.Parse(E, out bool _);
+					Contract = Contract.Parse(E, out bool _, out bool _);
 				else
 					e.Ok = false;
 

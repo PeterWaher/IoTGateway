@@ -72,9 +72,12 @@ namespace Waher.IoTGateway.WebResources
 
 				if (Posted is XmlDocument Doc)
 				{
-					Contract Contract = Contract.Parse(Doc, out bool HasStatus);
+					Contract Contract = Contract.Parse(Doc, out bool HasStatus, out bool ParametersValid);
 					if (HasStatus)
 						throw new ForbiddenException("Contract must not have a status section.");
+
+					if (!ParametersValid)
+						throw new BadRequestException("Contract parameter values not valid.");
 
 					PageVariables["Contract"] = Contract;
 				}

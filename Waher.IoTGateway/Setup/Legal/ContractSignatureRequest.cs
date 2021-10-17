@@ -58,7 +58,7 @@ namespace Waher.IoTGateway.Setup.Legal
 						PreserveWhitespace = true
 					};
 					Doc.LoadXml(this.contractXml);
-					this.contract = Contract.Parse(Doc.DocumentElement, out bool _);
+					this.contract = Contract.Parse(Doc.DocumentElement, out bool _, out bool _);
 				}
 
 				return this.contract;

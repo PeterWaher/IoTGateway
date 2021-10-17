@@ -3,6 +3,7 @@ using System.Text;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
+using Waher.Script;
 
 namespace Waher.Networking.XMPP.Contracts
 {
@@ -50,5 +51,25 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append("</booleanParameter>");
 			}
 		}
+
+		/// <summary>
+		/// Checks if the parameter value is valid.
+		/// </summary>
+		/// <param name="Variables">Collection of parameter values.</param>
+		/// <returns>If parameter value is valid.</returns>
+		public override bool IsParameterValid(Variables Variables)
+		{
+			return base.IsParameterValid(Variables);
+		}
+
+		/// <summary>
+		/// Populates a variable collection with the value of the parameter.
+		/// </summary>
+		/// <param name="Variables">Variable collection.</param>
+		public override void Populate(Variables Variables)
+		{
+			Variables[this.Name] = this.value;
+		}
+
 	}
 }

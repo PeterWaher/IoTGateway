@@ -686,6 +686,15 @@ namespace Waher.Networking.XMPP.Contracts
 										{
 											Name = Name,
 											Value = XML.Attribute(E2, "value"),
+											Guide = XML.Attribute(E2, "guide"),
+											Expression = XML.Attribute(E2, "exp"),
+											RegEx = XML.Attribute(E2, "regEx"),
+											Min = E2.HasAttribute("min") ? XML.Attribute(E2, "min") : null,
+											MinIncluded = XML.Attribute(E2, "minIncluded", true),
+											Max = E2.HasAttribute("max") ? XML.Attribute(E2, "max") : null,
+											MaxIncluded = XML.Attribute(E2, "maxIncluded", true),
+											MinLength = E2.HasAttribute("minLength") ? XML.Attribute(E2, "minLength", 0) : (int?)null,
+											MaxLength = E2.HasAttribute("maxLength") ? XML.Attribute(E2, "maxLength", 0) : (int?)null,
 											Descriptions = Descriptions.ToArray()
 										});
 										break;
@@ -695,6 +704,12 @@ namespace Waher.Networking.XMPP.Contracts
 										{
 											Name = Name,
 											Value = XML.Attribute(E2, "value", 0.0),
+											Guide = XML.Attribute(E2, "guide"),
+											Expression = XML.Attribute(E2, "exp"),
+											Min = E2.HasAttribute("min") ? XML.Attribute(E2, "min", 0.0) : (double?)null,
+											MinIncluded = XML.Attribute(E2, "minIncluded", true),
+											Max = E2.HasAttribute("max") ? XML.Attribute(E2, "max", 0.0) : (double?)null,
+											MaxIncluded = XML.Attribute(E2, "maxIncluded", true),
 											Descriptions = Descriptions.ToArray()
 										});
 										break;
@@ -704,6 +719,8 @@ namespace Waher.Networking.XMPP.Contracts
 										{
 											Name = Name,
 											Value = XML.Attribute(E2, "value", false),
+											Guide = XML.Attribute(E2, "guide"),
+											Expression = XML.Attribute(E2, "exp"),
 											Descriptions = Descriptions.ToArray()
 										});
 										break;

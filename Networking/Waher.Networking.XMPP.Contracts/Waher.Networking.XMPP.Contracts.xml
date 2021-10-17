@@ -71,6 +71,19 @@
             </summary>
             <param name="Xml">XML Output</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.BooleanParameter.IsParameterValid(Waher.Script.Variables)">
+            <summary>
+            Checks if the parameter value is valid.
+            </summary>
+            <param name="Variables">Collection of parameter values.</param>
+            <returns>If parameter value is valid.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.BooleanParameter.Populate(Waher.Script.Variables)">
+            <summary>
+            Populates a variable collection with the value of the parameter.
+            </summary>
+            <param name="Variables">Variable collection.</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ClientSignature">
             <summary>
             Represents a digital signature on a contract.
@@ -3922,6 +3935,26 @@
             Parameter value
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.NumericalParameter.Min">
+            <summary>
+            Optional minimum value.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.NumericalParameter.Max">
+            <summary>
+            Optional maximum value.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.NumericalParameter.MinIncluded">
+            <summary>
+            If the optional minimum value is included in the allowed range.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.NumericalParameter.MaxIncluded">
+            <summary>
+            If the optional maximum value is included in the allowed range.
+            </summary>
+        </member>
         <member name="P:Waher.Networking.XMPP.Contracts.NumericalParameter.ObjectValue">
             <summary>
             Parameter value.
@@ -3933,6 +3966,19 @@
             </summary>
             <param name="Xml">XML Output</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.NumericalParameter.IsParameterValid(Waher.Script.Variables)">
+            <summary>
+            Checks if the parameter value is valid.
+            </summary>
+            <param name="Variables">Collection of parameter values.</param>
+            <returns>If parameter value is valid.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.NumericalParameter.Populate(Waher.Script.Variables)">
+            <summary>
+            Populates a variable collection with the value of the parameter.
+            </summary>
+            <param name="Variables">Variable collection.</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.Parameter">
             <summary>
             Abstract base class for contractual parameters
@@ -3941,6 +3987,16 @@
         <member name="P:Waher.Networking.XMPP.Contracts.Parameter.Name">
             <summary>
             Parameter name
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Parameter.Guide">
+            <summary>
+            Parameter guide text
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Parameter.Expression">
+            <summary>
+            Parameter validation script expression.
             </summary>
         </member>
         <member name="P:Waher.Networking.XMPP.Contracts.Parameter.ObjectValue">
@@ -3953,6 +4009,19 @@
             Serializes the parameter, in normalized form.
             </summary>
             <param name="Xml">XML Output</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Parameter.IsParameterValid(Waher.Script.Variables)">
+            <summary>
+            Checks if the parameter value is valid.
+            </summary>
+            <param name="Variables">Collection of parameter values.</param>
+            <returns>If parameter value is valid.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Parameter.Populate(Waher.Script.Variables)">
+            <summary>
+            Populates a variable collection with the value of the parameter.
+            </summary>
+            <param name="Variables">Variable collection.</param>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractParts">
             <summary>
@@ -5073,6 +5142,41 @@
             Parameter value
             </summary>
         </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.StringParameter.RegEx">
+            <summary>
+            Optional regular expression to validate the value of the string parameter.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.StringParameter.Min">
+            <summary>
+            Optional minimum value.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.StringParameter.Max">
+            <summary>
+            Optional maximum value.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.StringParameter.MinIncluded">
+            <summary>
+            If the optional minimum value is included in the allowed range.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.StringParameter.MaxIncluded">
+            <summary>
+            If the optional maximum value is included in the allowed range.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.StringParameter.MinLength">
+            <summary>
+            Optional minimum length of value.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.StringParameter.MaxLength">
+            <summary>
+            Optional maximum length of value.
+            </summary>
+        </member>
         <member name="P:Waher.Networking.XMPP.Contracts.StringParameter.ObjectValue">
             <summary>
             Parameter value.
@@ -5083,6 +5187,19 @@
             Serializes the parameter, in normalized form.
             </summary>
             <param name="Xml">XML Output</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.StringParameter.IsParameterValid(Waher.Script.Variables)">
+            <summary>
+            Checks if the parameter value is valid.
+            </summary>
+            <param name="Variables">Collection of parameter values.</param>
+            <returns>If parameter value is valid.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.StringParameter.Populate(Waher.Script.Variables)">
+            <summary>
+            Populates a variable collection with the value of the parameter.
+            </summary>
+            <param name="Variables">Variable collection.</param>
         </member>
     </members>
 </doc>

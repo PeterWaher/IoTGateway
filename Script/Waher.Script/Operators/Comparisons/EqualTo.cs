@@ -66,6 +66,18 @@ namespace Waher.Script.Operators.Comparisons
 				if (i == 0)
 					return this.left.PatternMatch(CheckAgainst, AlreadyFound);
 			}
+			else if (this.left is VariableReference LeftReference && AlreadyFound.TryGetValue(LeftReference.VariableName, out IElement LeftValue))
+			{
+				i = S.Compare(LeftValue, CheckAgainst);
+				if (i == 0)
+					return this.right.PatternMatch(CheckAgainst, AlreadyFound);
+			}
+			else if (this.right is VariableReference RightReference && AlreadyFound.TryGetValue(RightReference.VariableName, out IElement RightValue))
+			{
+				i = S.Compare(CheckAgainst, RightValue);
+				if (i == 0)
+					return this.left.PatternMatch(CheckAgainst, AlreadyFound);
+			}
 
 			return PatternMatchResult.NoMatch;
 		}

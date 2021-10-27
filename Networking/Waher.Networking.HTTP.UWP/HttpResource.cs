@@ -62,25 +62,25 @@ namespace Waher.Networking.HTTP
 
 			List<string> Methods = new List<string>();
 
-			if ((this.get != null && this.get.AllowsGET) || (this.getRanges != null && this.getRanges.AllowsGET))
+			if ((!(this.get is null) && this.get.AllowsGET) || (this.getRanges != null && this.getRanges.AllowsGET))
 			{
 				Methods.Add("GET");
 				Methods.Add("HEAD");
 			}
 
-			if ((this.post != null && this.post.AllowsPOST) || (this.postRanges != null && this.postRanges.AllowsPOST))
+			if ((!(this.post is null) && this.post.AllowsPOST) || (this.postRanges != null && this.postRanges.AllowsPOST))
 				Methods.Add("POST");
 
-			if ((this.put != null && this.put.AllowsPUT) || (this.putRanges != null && this.putRanges.AllowsPUT))
+			if ((!(this.put is null) && this.put.AllowsPUT) || (this.putRanges != null && this.putRanges.AllowsPUT))
 				Methods.Add("PUT");
 
-			if (this.delete != null && this.delete.AllowsDELETE)
+			if (!(this.delete is null) && this.delete.AllowsDELETE)
 				Methods.Add("DELETE");
 
-			if (this.options != null && this.options.AllowsOPTIONS)
+			if (!(this.options is null) && this.options.AllowsOPTIONS)
 				Methods.Add("OPTIONS");
 
-			if (this.trace != null && this.trace.AllowsTRACE)
+			if (!(this.trace is null) && this.trace.AllowsTRACE)
 				Methods.Add("TRACE");
 
 			this.allowedMethods = Methods.ToArray();
@@ -266,7 +266,7 @@ namespace Waher.Networking.HTTP
 					{
 						Response.SetHeader("Accept-Ranges", "bytes");
 
-						if (Header.Range != null)
+						if (!(Header.Range is null))
 						{
 							ByteRangeInterval FirstInterval = Header.Range.FirstInterval;
 							if (FirstInterval is null)
@@ -302,7 +302,7 @@ namespace Waher.Networking.HTTP
 				case "POST":
 					if (!(this.postRanges is null))
 					{
-						if (Header.ContentRange != null)
+						if (!(Header.ContentRange is null))
 						{
 							ContentByteRangeInterval Interval = Header.ContentRange.Interval;
 							if (Interval is null)
@@ -338,7 +338,7 @@ namespace Waher.Networking.HTTP
 				case "PUT":
 					if (!(this.putRanges is null))
 					{
-						if (Header.ContentRange != null)
+						if (!(Header.ContentRange is null))
 						{
 							ContentByteRangeInterval Interval = Header.ContentRange.Interval;
 							if (Interval is null)

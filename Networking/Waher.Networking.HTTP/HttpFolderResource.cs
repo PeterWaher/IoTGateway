@@ -209,7 +209,7 @@ namespace Waher.Networking.HTTP
 			HttpRequestHeader Header = Request.Header;
 			DateTimeOffset? Limit;
 
-			if (Header.IfMatch is null && Header.IfUnmodifiedSince != null && (Limit = Header.IfUnmodifiedSince.Timestamp).HasValue)
+			if (Header.IfMatch is null && !(Header.IfUnmodifiedSince is null) && (Limit = Header.IfUnmodifiedSince.Timestamp).HasValue)
 			{
 				string FullPath = this.GetFullPath(Request);
 				if (File.Exists(FullPath))
@@ -468,12 +468,12 @@ namespace Waher.Networking.HTTP
 
 			if (!Rec.IsDynamic)
 			{
-				if (Header.IfNoneMatch != null)
+				if (!(Header.IfNoneMatch is null))
 				{
 					if (Header.IfNoneMatch.Value == Rec.ETag)
 						throw new NotModifiedException();
 				}
-				else if (Header.IfModifiedSince != null)
+				else if (!(Header.IfModifiedSince is null))
 				{
 					if ((Limit = Header.IfModifiedSince.Timestamp).HasValue &&
 						LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
@@ -629,7 +629,7 @@ namespace Waher.Networking.HTTP
 								}
 							}
 
-							if (Best != null && (!Acceptable || BestQuality >= Quality))
+							if (!(Best is null) && (!Acceptable || BestQuality >= Quality))
 							{
 								Acceptable = true;
 								Converter = Best;
@@ -648,7 +648,7 @@ namespace Waher.Networking.HTTP
 						{
 							f2 = f.Length < HttpClientConnection.MaxInmemoryMessageSize ? (Stream)new MemoryStream() : new TemporaryFile();
 
-							if (Request.Session != null)
+							if (!(Request.Session is null))
 							{
 								Request.Session["Request"] = Request;
 								Request.Session["Response"] = Response;
@@ -850,7 +850,7 @@ namespace Waher.Networking.HTTP
 				DateTimeOffset? Limit;
 				CacheRec Rec;
 
-				if (Header.IfRange != null && (Limit = Header.IfRange.Timestamp).HasValue &&
+				if (!(Header.IfRange is null) && (Limit = Header.IfRange.Timestamp).HasValue &&
 					!LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
 				{
 					Response.StatusCode = 200;
@@ -933,7 +933,7 @@ namespace Waher.Networking.HTTP
 				}
 				else
 				{
-					if (FirstInterval.Next != null)
+					if (!(FirstInterval.Next is null))
 					{
 						await Response.WriteLine();
 						await Response.WriteLine("--" + Progress.Boundary);

@@ -75,7 +75,7 @@ namespace Waher.Networking.HTTP.Authentication
 		public override async Task<IUser> IsAuthenticated(HttpRequest Request)
 		{
 			HttpFieldAuthorization Authorization = Request.Header.Authorization;
-			if (Authorization != null && Authorization.Value.StartsWith("Basic ", StringComparison.CurrentCultureIgnoreCase))
+			if (!(Authorization is null) && Authorization.Value.StartsWith("Basic ", StringComparison.CurrentCultureIgnoreCase))
 			{
 				byte[] Data = Convert.FromBase64String(Authorization.Value.Substring(6).Trim());
 				string s = InternetContent.ISO_8859_1.GetString(Data);

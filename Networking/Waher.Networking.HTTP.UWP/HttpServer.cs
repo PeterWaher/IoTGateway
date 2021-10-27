@@ -753,7 +753,7 @@ namespace Waher.Networking.HTTP
 					if ((Listener.Value && Https) || ((!Listener.Value) && Http))
 					{
 						IPEndPoint = Listener.Key.LocalEndpoint as IPEndPoint;
-						if (IPEndPoint != null && !this.failedPorts.ContainsKey(IPEndPoint.Port))
+						if (!(IPEndPoint is null) && !this.failedPorts.ContainsKey(IPEndPoint.Port))
 							Open[IPEndPoint.Port] = true;
 					}
 				}
@@ -789,7 +789,7 @@ namespace Waher.Networking.HTTP
 						if (Listener.Value)
 						{
 							IPEndPoint = Listener.Key.LocalEndpoint as IPEndPoint;
-							if (IPEndPoint != null && !this.failedPorts.ContainsKey(Port = IPEndPoint.Port))
+							if (!(IPEndPoint is null) && !this.failedPorts.ContainsKey(Port = IPEndPoint.Port))
 							{
 								if (Port == DefaultHttpsPort || !Result.HasValue)
 									Result = Port;
@@ -1723,10 +1723,10 @@ namespace Waher.Networking.HTTP
 				this.IncLocked(Request.Header.Method, this.callsPerMethod);
 				this.IncLocked(Resource.ResourceName, this.callsPerResource);
 
-				if ((UserAgent = Request.Header.UserAgent) != null)
+				if (!((UserAgent = Request.Header.UserAgent) is null))
 					this.IncLocked(UserAgent.Value, this.callsPerUserAgent);
 
-				if ((From = Request.Header.From) != null)
+				if (!((From = Request.Header.From) is null))
 					this.IncLocked(From.Value, this.callsPerFrom);
 				else
 				{

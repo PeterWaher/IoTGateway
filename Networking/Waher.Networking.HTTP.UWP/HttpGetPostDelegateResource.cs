@@ -36,7 +36,7 @@ namespace Waher.Networking.HTTP
 		{
 			get
 			{
-				return this.post != null;
+				return !(this.post is null);
 			}
 		}
 

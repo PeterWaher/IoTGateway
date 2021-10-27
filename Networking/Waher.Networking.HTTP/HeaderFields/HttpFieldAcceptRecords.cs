@@ -189,7 +189,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 				{
 					CurrentAcceptance = AcceptanceLevel.TopAndSubType;
 
-					if (Record.Parameters != null && Parameters != null)
+					if (!(Record.Parameters is null) && !(Parameters is null))
 					{
 						Found = null;
 

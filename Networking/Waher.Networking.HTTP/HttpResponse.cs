@@ -68,7 +68,7 @@ namespace Waher.Networking.HTTP
 			this.httpServer = HttpServer;
 			this.httpRequest = Request;
 
-			if (Request != null && Request.Header.TryGetHeaderField("Connection", out HttpField Field) && Field.Value == "close")
+			if (!(Request is null) && Request.Header.TryGetHeaderField("Connection", out HttpField Field) && Field.Value == "close")
 			{
 				this.closeAfterResponse = true;
 				this.SetHeader("Connection", "close");
@@ -472,7 +472,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public bool HeaderSent
 		{
-			get { return this.transferEncoding != null; }
+			get { return !(this.transferEncoding is null); }
 		}
 
 		/// <summary>
@@ -824,7 +824,7 @@ namespace Waher.Networking.HTTP
 			if (Accept is null)
 			{
 				Data = InternetContent.Encode(Object, this.encoding, out ContentType);
-				return Data != null;
+				return !(Data is null);
 			}
 			else
 			{
@@ -891,7 +891,7 @@ namespace Waher.Networking.HTTP
 
 			await this.transferEncoding.EncodeAsync(Data, 0, Data.Length);
 
-			if (this.httpServer != null && ((TP = DateTime.Now) - this.lastPing).TotalSeconds >= 1)
+			if (!(this.httpServer is null) && ((TP = DateTime.Now) - this.lastPing).TotalSeconds >= 1)
 			{
 				this.lastPing = TP;
 				this.httpServer.PingRequest(this.httpRequest);
@@ -930,7 +930,7 @@ namespace Waher.Networking.HTTP
 
 			await this.transferEncoding.EncodeAsync(Data, Offset, Count);
 
-			if (this.httpServer != null && ((TP = DateTime.Now) - this.lastPing).TotalSeconds >= 1)
+			if (!(this.httpServer is null) && ((TP = DateTime.Now) - this.lastPing).TotalSeconds >= 1)
 			{
 				this.lastPing = TP;
 				this.httpServer.PingRequest(this.httpRequest);

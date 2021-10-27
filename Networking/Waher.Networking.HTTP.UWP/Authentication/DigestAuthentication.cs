@@ -47,7 +47,6 @@ namespace Waher.Networking.HTTP.Authentication
 		private readonly string realm;
 		private readonly DigestAlgorithm algorithm;
 		private readonly int digestBytes;
-		private readonly HashFunctionString h;
 
 		/// <summary>
 		/// Digest authentication mechanism, as defined in RFC 2617:
@@ -97,13 +96,11 @@ namespace Waher.Networking.HTTP.Authentication
 			{
 				case DigestAlgorithm.MD5:
 					this.digestBytes = 16;
-					this.h = H_MD5;
 					break;
 
 				case DigestAlgorithm.SHA256:
 				default:
 					this.digestBytes = 32;
-					this.h = H_SHA256;
 					break;
 			}
 
@@ -188,7 +185,7 @@ namespace Waher.Networking.HTTP.Authentication
 		public override async Task<IUser> IsAuthenticated(HttpRequest Request)
 		{
 			HttpFieldAuthorization Authorization = Request.Header.Authorization;
-			if (Authorization != null && Authorization.Value.StartsWith("Digest ", StringComparison.CurrentCultureIgnoreCase))
+			if (!(Authorization is null) && Authorization.Value.StartsWith("Digest ", StringComparison.CurrentCultureIgnoreCase))
 			{
 				HashFunctionString H = H_MD5;
 				DigestAlgorithm Algorithm = DigestAlgorithm.MD5;

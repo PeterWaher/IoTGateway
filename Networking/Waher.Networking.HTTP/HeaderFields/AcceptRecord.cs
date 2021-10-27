@@ -95,7 +95,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 
 				CurrentAcceptance = AcceptanceLevel.TopAndSubType;
 
-				if (this.parameters != null && Parameters != null)
+				if (!(this.parameters is null) && !(Parameters is null))
 				{
 					Found = null;
 

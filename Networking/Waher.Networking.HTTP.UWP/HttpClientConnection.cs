@@ -214,7 +214,7 @@ namespace Waher.Networking.HTTP
 					return false;
 				}
 
-				if (this.header.ContentLength != null && (this.header.ContentLength.ContentLength > MaxEntitySize))
+				if (!(this.header.ContentLength is null) && (this.header.ContentLength.ContentLength > MaxEntitySize))
 				{
 					await this.SendResponse(null, null, new HttpException(413, "Request Entity Too Large", "Maximum Entity Size: " + MaxEntitySize.ToString()), true);
 					return false;
@@ -446,7 +446,7 @@ namespace Waher.Networking.HTTP
 
 			if (Queued.HasValue)
 			{
-				if (!Queued.Value && this.dataStream != null)
+				if (!Queued.Value && !(this.dataStream is null))
 					this.dataStream.Dispose();
 
 				this.header = null;
@@ -478,7 +478,7 @@ namespace Waher.Networking.HTTP
 #endif
 
 					AuthenticationSchemes = Resource.GetAuthenticationSchemes(Request);
-					if (AuthenticationSchemes != null && AuthenticationSchemes.Length > 0)
+					if (!(AuthenticationSchemes is null) && AuthenticationSchemes.Length > 0)
 					{
 						ILoginAuditor Auditor = this.server.LoginAuditor;
 
@@ -608,7 +608,7 @@ namespace Waher.Networking.HTTP
 
 					Resource.Validate(Request);
 
-					if (Request.Header.Expect != null)
+					if (!(Request.Header.Expect is null))
 					{
 						if (Request.Header.Expect.Continue100)
 						{
@@ -702,7 +702,7 @@ namespace Waher.Networking.HTTP
 
 				if (!this.encrypted &&
 					(Header.UpgradeInsecureRequests?.Upgrade ?? false) &&
-					Header.Host != null &&
+					!(Header.Host is null) &&
 					string.Compare(Header.Host.Value, "localhost", true) != 0 &&
 					((UpgradePort = this.server.UpgradePort).HasValue))
 				{

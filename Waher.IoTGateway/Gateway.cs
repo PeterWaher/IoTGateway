@@ -2317,7 +2317,7 @@ namespace Waher.IoTGateway
 			if (Address.Equals(ipv4Local) || Address.Equals(ipv6Local))
 				return true;
 
-			string s = Request.Header.Host.Value;
+			string s = Request.Header.Host?.Value ?? string.Empty;
 			int i = s.IndexOf(':');
 			if (i > 0)
 				s = s.Substring(0, i);
@@ -2327,7 +2327,7 @@ namespace Waher.IoTGateway
 				if (!IPAddress.TryParse(s, out IPAddress IP) || !Address.Equals(IP))
 				{
 					if (DoLog)
-						Log.Debug("Host not localhost or IP Address: " + Request.Header.Host.Value);
+						Log.Debug("Host is not localhost or an IP Address: " + (Request.Header.Host?.Value ?? string.Empty));
 
 					return false;
 				}

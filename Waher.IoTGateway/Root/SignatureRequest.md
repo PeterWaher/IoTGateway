@@ -21,7 +21,7 @@ A contract has been received for signature
 | `{{
 if (try Page.Request.ObjectId!=RequestId catch true) then
 (
-	Page.Request:=select * from ContractSignatureRequest where ObjectId=RequestId;
+	Page.Request:=select top 1 * from ContractSignatureRequest where ObjectId=RequestId;
 	if !exists(Page.Request) then NotFound("Signature Request not found.");
 );
 Contract:=Page.Request.Contract;

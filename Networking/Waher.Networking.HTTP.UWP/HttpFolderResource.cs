@@ -211,8 +211,8 @@ namespace Waher.Networking.HTTP
 
 			if (Header.IfMatch is null && !(Header.IfUnmodifiedSince is null) && (Limit = Header.IfUnmodifiedSince.Timestamp).HasValue)
 			{
-				string FullPath = this.GetFullPath(Request);
-				if (File.Exists(FullPath))
+				string FullPath = this.GetFullPath(Request, out bool Exists);
+				if (Exists)
 				{
 					DateTime LastModified = File.GetLastWriteTime(FullPath);
 					LastModified = LastModified.ToUniversalTime();
@@ -237,58 +237,63 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private string GetFullPath(HttpRequest Request)
+		private string GetFullPath(HttpRequest Request, out bool Exists)
 		{
 			string s = WebUtility.UrlDecode(Request.SubPath).Replace('/', Path.DirectorySeparatorChar);
 
 			if (s.Contains("..") || s.Contains(doubleBackslash) || s.Contains(":"))
 				throw new ForbiddenException("Path control characters not permitted.");
 
-			if (this.domainOptions == HostDomainOptions.SameForAllDomains)
-				return this.folderPath + s;
-
-			string Host = Request.Header.Host?.Value ?? string.Empty;
-			string Folder;
-			int i = Host.IndexOf(':');
-
-			if (i > 0)
-				Host = Host.Substring(0, i);
-
-			if (this.domainOptions == HostDomainOptions.OnlySpecifiedDomains)
+			if (this.domainOptions != HostDomainOptions.SameForAllDomains)
 			{
-				lock (this.definedDomains)
-				{
-					if (!this.definedDomains.ContainsKey(Host))
-						throw new ForbiddenException("Access to this folder is not permitted on this domain.");
-				}
+				string Host = Request.Header.Host?.Value ?? string.Empty;
+				string Folder;
+				int i = Host.IndexOf(':');
 
-				Folder = this.folderPath;
-			}
-			else
-			{
-				lock (this.folders)
+				if (i > 0)
+					Host = Host.Substring(0, i);
+
+				if (this.domainOptions == HostDomainOptions.OnlySpecifiedDomains)
 				{
-					if (!this.folders.TryGetValue(Host, out Folder))
+					lock (this.definedDomains)
 					{
-						Folder = this.folderPath + Path.DirectorySeparatorChar + Host;
-						if (!Directory.Exists(Folder))
+						if (!this.definedDomains.ContainsKey(Host))
+							throw new ForbiddenException("Access to this folder is not permitted on this domain.");
+					}
+
+					Folder = this.folderPath;
+				}
+				else
+				{
+					lock (this.folders)
+					{
+						if (!this.folders.TryGetValue(Host, out Folder))
 						{
-							if (Host.StartsWith("www.", StringComparison.CurrentCultureIgnoreCase))
+							Folder = this.folderPath + Path.DirectorySeparatorChar + Host;
+							if (!Directory.Exists(Folder))
 							{
-								Folder = this.folderPath + Path.DirectorySeparatorChar + Host.Substring(4);
-								if (!Directory.Exists(Folder))
+								if (Host.StartsWith("www.", StringComparison.CurrentCultureIgnoreCase))
+								{
+									Folder = this.folderPath + Path.DirectorySeparatorChar + Host.Substring(4);
+									if (!Directory.Exists(Folder))
+										Folder = this.folderPath;
+								}
+								else
 									Folder = this.folderPath;
 							}
-							else
-								Folder = this.folderPath;
-						}
 
-						this.folders[Host] = Folder;
+							this.folders[Host] = Folder;
+						}
 					}
 				}
+
+				if (Exists = File.Exists(Folder + s))
+					return Folder + s;
 			}
 
-			return Folder + s;
+			s = this.folderPath + s;
+			Exists = File.Exists(s);
+			return this.folderPath + s;
 		}
 
 		private readonly static string doubleBackslash = new string(Path.DirectorySeparatorChar, 2);
@@ -308,8 +313,8 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
-			string FullPath = this.GetFullPath(Request);
-			if (File.Exists(FullPath))
+			string FullPath = this.GetFullPath(Request, out bool Exists);
+			if (Exists)
 			{
 				DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
 				CacheRec Rec;
@@ -842,8 +847,8 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response, ByteRangeInterval FirstInterval)
 		{
-			string FullPath = this.GetFullPath(Request);
-			if (File.Exists(FullPath))
+			string FullPath = this.GetFullPath(Request, out bool Exists);
+			if (Exists)
 			{
 				HttpRequestHeader Header = Request.Header;
 				DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
@@ -957,7 +962,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task PUT(HttpRequest Request, HttpResponse Response)
 		{
-			string FullPath = this.GetFullPath(Request);
+			string FullPath = this.GetFullPath(Request, out bool _);
 
 			if (!Request.HasData)
 				throw new BadRequestException("No data in PUT request.");
@@ -985,16 +990,19 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task PUT(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
 		{
-			string FullPath = this.GetFullPath(Request);
+			string FullPath = this.GetFullPath(Request, out bool Exists);
 
 			if (!Request.HasData)
 				throw new BadRequestException("No data in PUT request.");
 
-			string Folder = Path.GetDirectoryName(FullPath);
-			if (!Directory.Exists(Folder))
-				Directory.CreateDirectory(Folder);
+			if (!Exists)
+			{
+				string Folder = Path.GetDirectoryName(FullPath);
+				if (!Directory.Exists(Folder))
+					Directory.CreateDirectory(Folder);
+			}
 
-			using (FileStream f = File.Exists(FullPath) ? File.OpenWrite(FullPath) : File.Create(FullPath))
+			using (FileStream f = Exists ? File.OpenWrite(FullPath) : File.Create(FullPath))
 			{
 				long l;
 
@@ -1032,9 +1040,9 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task DELETE(HttpRequest Request, HttpResponse Response)
 		{
-			string FullPath = this.GetFullPath(Request);
+			string FullPath = this.GetFullPath(Request, out bool Exists);
 
-			if (File.Exists(FullPath))
+			if (Exists)
 				File.Delete(FullPath);
 			else if (Directory.Exists(FullPath))
 				Directory.Delete(FullPath, true);

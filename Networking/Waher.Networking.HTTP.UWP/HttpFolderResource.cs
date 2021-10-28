@@ -240,6 +240,7 @@ namespace Waher.Networking.HTTP
 		private string GetFullPath(HttpRequest Request, out bool Exists)
 		{
 			string s = WebUtility.UrlDecode(Request.SubPath).Replace('/', Path.DirectorySeparatorChar);
+			string s2;
 
 			if (s.Contains("..") || s.Contains(doubleBackslash) || s.Contains(":"))
 				throw new ForbiddenException("Path control characters not permitted.");
@@ -287,13 +288,12 @@ namespace Waher.Networking.HTTP
 					}
 				}
 
-				if (Exists = File.Exists(Folder + s))
-					return Folder + s;
+				if (Exists = File.Exists(s2 = Folder + s))
+					return s2;
 			}
 
-			s = this.folderPath + s;
-			Exists = File.Exists(s);
-			return this.folderPath + s;
+			Exists = File.Exists(s2 = this.folderPath + s);
+			return s2;
 		}
 
 		private readonly static string doubleBackslash = new string(Path.DirectorySeparatorChar, 2);

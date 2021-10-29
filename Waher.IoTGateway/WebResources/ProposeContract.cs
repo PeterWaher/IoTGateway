@@ -6,6 +6,7 @@ using Waher.Networking.HTTP;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Script;
 using Waher.Networking.HTTP.ScriptExtensions;
+using System.Text;
 
 namespace Waher.IoTGateway.WebResources
 {
@@ -78,6 +79,15 @@ namespace Waher.IoTGateway.WebResources
 
 					if (!ParametersValid && Contract.PartsMode != ContractParts.TemplateOnly)
 						throw new BadRequestException("Contract parameter values not valid.");
+
+					StringBuilder sb = new StringBuilder();
+					
+					Networking.XMPP.Contracts.Contract.NormalizeXml(Contract.ForMachines, sb, ContractsClient.NamespaceSmartContracts);
+
+					Doc = new XmlDocument();
+					Doc.LoadXml(sb.ToString());
+
+					Contract.ForMachines = Doc.DocumentElement;
 
 					PageVariables["Contract"] = Contract;
 				}

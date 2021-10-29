@@ -1385,7 +1385,7 @@ namespace Waher.Networking.XMPP.Contracts
 					}
 				}
 
-				return string.Empty;
+				return null;
 			}
 		}
 

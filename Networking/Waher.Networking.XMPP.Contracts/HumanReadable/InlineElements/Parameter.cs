@@ -48,10 +48,28 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 			object Value = Contract[this.name];
 			string s;
 
-			if (Value is bool BooleanValue)
+			if (Value is null)
+			{
+				string Guide = null;
+
+				foreach (Contracts.Parameter P in Contract.Parameters)
+				{
+					if (P.Name == this.name)
+					{
+						Guide = P.Guide;
+						break;
+					}
+				}
+
+				if (string.IsNullOrEmpty(Guide))
+					Guide = this.name;
+
+				s = "*" + Guide + "*";
+			}
+			else if (Value is bool BooleanValue)
 				s = BooleanValue ? "[X]" : "[ ]";
 			else
-				s = Value?.ToString() ?? string.Empty;
+				s = Value.ToString();
 
 			Markdown.Append(MarkdownDocument.Encode(s));
 		}

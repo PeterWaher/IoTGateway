@@ -20,7 +20,7 @@ namespace Waher.Script.Xml.Functions
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Xml(ScriptNode Argument, int Start, int Length, Expression Expression)
+		public PrettyXml(ScriptNode Argument, int Start, int Length, Expression Expression)
 			: base(Argument, Start, Length, Expression)
 		{
 		}

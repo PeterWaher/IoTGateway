@@ -46,7 +46,6 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, Contract Contract)
 		{
 			object Value = Contract[this.name];
-			string s;
 
 			if (Value is null)
 			{
@@ -64,14 +63,21 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 				if (string.IsNullOrEmpty(Guide))
 					Guide = this.name;
 
-				s = "`" + Guide + "`";
+				Markdown.Append('`');
+				Markdown.Append(Guide);
+				Markdown.Append('`');
 			}
-			else if (Value is bool BooleanValue)
-				s = BooleanValue ? "[X]" : "[ ]";
 			else
-				s = Value.ToString();
+			{
+				string s;
+			
+				if (Value is bool BooleanValue)
+					s = BooleanValue ? "[X]" : "[ ]";
+				else
+					s = Value.ToString();
 
-			Markdown.Append(MarkdownDocument.Encode(s));
+				Markdown.Append(MarkdownDocument.Encode(s));
+			}
 		}
 	}
 }

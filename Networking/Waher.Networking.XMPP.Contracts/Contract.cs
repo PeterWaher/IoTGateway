@@ -689,7 +689,7 @@ namespace Waher.Networking.XMPP.Contracts
 										Parameters.Add(new StringParameter()
 										{
 											Name = Name,
-											Value = XML.Attribute(E2, "value"),
+											Value = E2.HasAttribute("value") ? XML.Attribute(E2, "value") : null,
 											Guide = XML.Attribute(E2, "guide"),
 											Expression = XML.Attribute(E2, "exp"),
 											RegEx = XML.Attribute(E2, "regEx"),
@@ -707,7 +707,7 @@ namespace Waher.Networking.XMPP.Contracts
 										Parameters.Add(new NumericalParameter()
 										{
 											Name = Name,
-											Value = XML.Attribute(E2, "value", 0.0),
+											Value = E2.HasAttribute("value") ? XML.Attribute(E2, "value", 0.0) : (double?)null,
 											Guide = XML.Attribute(E2, "guide"),
 											Expression = XML.Attribute(E2, "exp"),
 											Min = E2.HasAttribute("min") ? XML.Attribute(E2, "min", 0.0) : (double?)null,
@@ -722,7 +722,7 @@ namespace Waher.Networking.XMPP.Contracts
 										Parameters.Add(new BooleanParameter()
 										{
 											Name = Name,
-											Value = XML.Attribute(E2, "value", false),
+											Value = E2.HasAttribute("value") ? XML.Attribute(E2, "value", false) : (bool?)null,
 											Guide = XML.Attribute(E2, "guide"),
 											Expression = XML.Attribute(E2, "exp"),
 											Descriptions = Descriptions.ToArray()
@@ -1361,17 +1361,17 @@ namespace Waher.Networking.XMPP.Contracts
 			if (!(this.parameters is null))
 			{
 				foreach (Parameter P in this.parameters)
-					Response.Add(new KeyValuePair<string, object>(P.Name, P.ObjectValue));
+					Response.Add(new KeyValuePair<string, object>(P.Name, P.ObjectValue ?? string.Empty));
 			}
 
 			return Response.ToArray();
 		}
 
 		/// <summary>
-		/// Access to contract paameters.
+		/// Access to contract parameters.
 		/// </summary>
 		/// <param name="Key"></param>
-		/// <returns></returns>
+		/// <returns>Parameter value.</returns>
 		public object this[string Key]
 		{
 			get

@@ -379,9 +379,10 @@ purposes.
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base='Parameter'>
-				<xs:attribute name='value' type='xs:string' use='required'>
+				<xs:attribute name='value' type='xs:string' use='optional'>
 					<xs:annotation>
 						<xs:documentation>The value of the parameter.</xs:documentation>
+						<xs:documentation>The value attribute is required for contracts, but optional for templates.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
 				<xs:attribute name='regEx' type='xs:string' use='optional'>
@@ -429,9 +430,10 @@ purposes.
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base='Parameter'>
-				<xs:attribute name='value' type='xs:double' use='required'>
+				<xs:attribute name='value' type='xs:double' use='optional'>
 					<xs:annotation>
 						<xs:documentation>The value of the parameter.</xs:documentation>
+						<xs:documentation>The value attribute is required for contracts, but optional for templates.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
 				<xs:attribute name='min' type='xs:double' use='optional'>
@@ -464,9 +466,10 @@ purposes.
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base='Parameter'>
-				<xs:attribute name='value' type='xs:boolean' use='required'>
+				<xs:attribute name='value' type='xs:boolean' use='optional'>
 					<xs:annotation>
 						<xs:documentation>The value of the parameter.</xs:documentation>
+						<xs:documentation>The value attribute is required for contracts, but optional for templates.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
 			</xs:extension>

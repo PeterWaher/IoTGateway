@@ -118,8 +118,12 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			Xml.Append("<stringParameter name=\"");
 			Xml.Append(XML.Encode(this.Name));
-			Xml.Append("\" value=\"");
-			Xml.Append(XML.Encode(this.value));
+
+			if (!(this.value is null))
+			{
+				Xml.Append("\" value=\"");
+				Xml.Append(XML.Encode(this.value));
+			}
 
 			if (!string.IsNullOrEmpty(this.Guide))
 			{
@@ -189,6 +193,9 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			int i;
 
+			if (this.value is null)
+				return false;
+
 			if (!(this.min is null))
 			{
 				i = string.Compare(this.value, this.min);
@@ -241,7 +248,7 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			Variables[this.Name] = this.value;
 
-			if (!string.IsNullOrEmpty(this.regEx))
+			if (!string.IsNullOrEmpty(this.regEx) && !(this.value is null))
 			{
 				try
 				{

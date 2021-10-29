@@ -12,12 +12,12 @@ namespace Waher.Networking.XMPP.Contracts
 	/// </summary>
 	public class BooleanParameter : Parameter
 	{
-		private bool value;
+		private bool? value;
 
 		/// <summary>
 		/// Parameter value
 		/// </summary>
-		public bool Value
+		public bool? Value
 		{
 			get => this.value;
 			set => this.value = value;
@@ -36,8 +36,12 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			Xml.Append("<booleanParameter name=\"");
 			Xml.Append(XML.Encode(this.Name));
-			Xml.Append("\" value=\"");
-			Xml.Append(CommonTypes.Encode(this.value));
+
+			if (this.value.HasValue)
+			{
+				Xml.Append("\" value=\"");
+				Xml.Append(CommonTypes.Encode(this.value.Value));
+			}
 
 			if (this.Descriptions is null || this.Descriptions.Length == 0)
 				Xml.Append("\"/>");
@@ -59,6 +63,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>If parameter value is valid.</returns>
 		public override bool IsParameterValid(Variables Variables)
 		{
+			if (!(this.value.HasValue))
+				return false;
+
 			return base.IsParameterValid(Variables);
 		}
 

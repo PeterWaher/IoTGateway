@@ -353,10 +353,10 @@
         </member>
         <member name="P:Waher.Networking.XMPP.Contracts.Contract.Item(System.String)">
             <summary>
-            Access to contract paameters.
+            Access to contract parameters.
             </summary>
             <param name="Key"></param>
-            <returns></returns>
+            <returns>Parameter value.</returns>
         </member>
         <member name="P:Waher.Networking.XMPP.Contracts.Contract.DefaultLanguage">
             <summary>

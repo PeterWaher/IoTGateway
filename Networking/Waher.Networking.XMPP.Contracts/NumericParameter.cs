@@ -12,7 +12,7 @@ namespace Waher.Networking.XMPP.Contracts
 	/// </summary>
 	public class NumericalParameter : Parameter
 	{
-		private double value;
+		private double? value;
 		private double? min = null;
 		private double? max = null;
 		private bool minIncluded = true;
@@ -21,7 +21,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Parameter value
 		/// </summary>
-		public double Value
+		public double? Value
 		{
 			get => this.value;
 			set => this.value = value;
@@ -76,8 +76,12 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			Xml.Append("<numericalParameter name=\"");
 			Xml.Append(XML.Encode(this.Name));
-			Xml.Append("\" value=\"");
-			Xml.Append(CommonTypes.Encode(this.value));
+
+			if (this.value.HasValue)
+			{
+				Xml.Append("\" value=\"");
+				Xml.Append(CommonTypes.Encode(this.value.Value));
+			}
 
 			if (!string.IsNullOrEmpty(this.Guide))
 			{
@@ -129,9 +133,12 @@ namespace Waher.Networking.XMPP.Contracts
 		{
 			double Diff;
 
+			if (!(this.value.HasValue))
+				return false;
+
 			if (this.min.HasValue)
 			{
-				Diff = this.value - this.min.Value;
+				Diff = this.value.Value - this.min.Value;
 
 				if (Diff < 0 || (Diff == 0 && !this.minIncluded))
 					return false;
@@ -139,7 +146,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			if (this.max.HasValue)
 			{
-				Diff = this.value - this.max.Value;
+				Diff = this.value.Value - this.max.Value;
 
 				if (Diff > 0 || (Diff == 0 && !this.maxIncluded))
 					return false;

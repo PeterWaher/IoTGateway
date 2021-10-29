@@ -64,7 +64,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 				if (string.IsNullOrEmpty(Guide))
 					Guide = this.name;
 
-				s = "*" + Guide + "*";
+				s = "`" + Guide + "`";
 			}
 			else if (Value is bool BooleanValue)
 				s = BooleanValue ? "[X]" : "[ ]";

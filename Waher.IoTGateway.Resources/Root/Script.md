@@ -1731,7 +1731,8 @@ The following functions are available in the `Waher.Script.Xml` library.
 
 | Function                        | Description | Example |
 |---------------------------------|-------------|---------|
-| `Xml(s)`                        | Converts the string `s` to an XML Document. | `Xml("<a>Hello</a>")` |
+| `PrettyXml(Xml)`                | Makes XML defined in `Xml` pretty, for display. | `PrettyXml("<a><b>Hello</b></a>")` |
+| `Xml(s)`                        | Converts the string `s` to an XML Document.     | `Xml("<a>Hello</a>")`              |
 
 #### XMLDSIG-related functions (Waher.Script.XmlDSig)
 

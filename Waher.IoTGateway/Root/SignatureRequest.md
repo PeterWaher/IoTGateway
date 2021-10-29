@@ -109,7 +109,7 @@ Machine-Readable Information
 
 ```xml
 
-((Contract.ForMachines?.OuterXml))
+((PrettyXml(Contract.ForMachines) ))
 
 ```
 

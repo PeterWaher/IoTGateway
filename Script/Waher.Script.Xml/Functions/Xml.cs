@@ -48,5 +48,25 @@ namespace Waher.Script.Xml.Functions
 
 			return new ObjectValue(Doc);
         }
-    }
+
+        /// <summary>
+        /// Evaluates the function on a scalar argument.
+        /// </summary>
+        /// <param name="Argument">Function argument.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
+		{
+            object Obj = Argument.AssociatedObjectValue;
+
+            if (Obj is string s)
+                return this.EvaluateScalar(s, Variables);
+            else if (Obj is XmlDocument)
+                return Argument;
+            else if (Obj is XmlNode N)
+                return this.EvaluateScalar(N.OuterXml, Variables);
+            else
+			    return base.EvaluateScalar(Argument, Variables);
+		}
+	}
 }

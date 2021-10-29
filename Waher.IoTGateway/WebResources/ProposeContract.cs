@@ -76,7 +76,7 @@ namespace Waher.IoTGateway.WebResources
 					if (HasStatus)
 						throw new ForbiddenException("Contract must not have a status section.");
 
-					if (!ParametersValid)
+					if (!ParametersValid && Contract.PartsMode != ContractParts.TemplateOnly)
 						throw new BadRequestException("Contract parameter values not valid.");
 
 					PageVariables["Contract"] = Contract;

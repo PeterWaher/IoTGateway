@@ -1387,6 +1387,23 @@ namespace Waher.Networking.XMPP.Contracts
 
 				return null;
 			}
+
+			set
+			{
+				if (!(this.parameters is null))
+				{
+					foreach (Parameter P in this.parameters)
+					{
+						if (P.Name == Key)
+						{
+							P.SetValue(value);
+							return;
+						}
+					}
+				}
+
+				throw new IndexOutOfRangeException("A parameter named " + Key + " not found.");
+			}
 		}
 
 		/// <summary>

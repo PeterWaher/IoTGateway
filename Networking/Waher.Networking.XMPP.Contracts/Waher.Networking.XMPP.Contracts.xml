@@ -84,6 +84,13 @@
             </summary>
             <param name="Variables">Variable collection.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.BooleanParameter.SetValue(System.Object)">
+            <summary>
+            Sets the parameter value.
+            </summary>
+            <param name="Value">Value</param>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ClientSignature">
             <summary>
             Represents a digital signature on a contract.
@@ -3986,6 +3993,13 @@
             </summary>
             <param name="Variables">Variable collection.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.NumericalParameter.SetValue(System.Object)">
+            <summary>
+            Sets the parameter value.
+            </summary>
+            <param name="Value">Value</param>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.Parameter">
             <summary>
             Abstract base class for contractual parameters
@@ -4029,6 +4043,13 @@
             Populates a variable collection with the value of the parameter.
             </summary>
             <param name="Variables">Variable collection.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Parameter.SetValue(System.Object)">
+            <summary>
+            Sets the parameter value.
+            </summary>
+            <param name="Value">Value</param>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractParts">
             <summary>
@@ -5207,6 +5228,13 @@
             Populates a variable collection with the value of the parameter.
             </summary>
             <param name="Variables">Variable collection.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.StringParameter.SetValue(System.Object)">
+            <summary>
+            Sets the parameter value.
+            </summary>
+            <param name="Value">Value</param>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
         </member>
     </members>
 </doc>

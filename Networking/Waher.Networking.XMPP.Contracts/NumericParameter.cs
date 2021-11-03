@@ -164,5 +164,40 @@ namespace Waher.Networking.XMPP.Contracts
 			Variables[this.Name] = this.value;
 		}
 
+		/// <summary>
+		/// Sets the parameter value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
+		public override void SetValue(object Value)
+		{
+			if (Value is double d)
+				this.value = d;
+			else if (Value is float f)
+				this.value = f;
+			else if (Value is decimal dec)
+				this.value = (double)dec;
+			else if (Value is int i)
+				this.value = i;
+			else if (Value is long l)
+				this.value = l;
+			else if (Value is short s)
+				this.value = s;
+			else if (Value is sbyte sb)
+				this.value = sb;
+			else if (Value is uint ui)
+				this.value = ui;
+			else if (Value is ulong ul)
+				this.value = ul;
+			else if (Value is ushort us)
+				this.value = us;
+			else if (Value is byte ub)
+				this.value = ub;
+			else if (Value is string str && CommonTypes.TryParse(str, out d))
+				this.value = d;
+			else
+				throw new ArgumentException("Invalid parameter type.", nameof(Value));
+		}
+
 	}
 }

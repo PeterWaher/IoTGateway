@@ -289,5 +289,15 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 		}
 
+		/// <summary>
+		/// Sets the parameter value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
+		public override void SetValue(object Value)
+		{
+			this.value = Value.ToString();
+		}
+
 	}
 }

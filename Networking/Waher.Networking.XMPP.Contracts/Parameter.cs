@@ -92,5 +92,12 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Variables">Variable collection.</param>
 		public abstract void Populate(Variables Variables);
+
+		/// <summary>
+		/// Sets the parameter value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
+		public abstract void SetValue(object Value);
 	}
 }

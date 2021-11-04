@@ -25,6 +25,15 @@ namespace Waher.Runtime.Transactions
 		}
 
 		/// <summary>
+		/// Caller can use this property to tag the transaction with information.
+		/// </summary>
+		object Tag
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
 		/// Event raised when the transaction state has changed.
 		/// </summary>
 		event TransactionEventHandler StateChanged;

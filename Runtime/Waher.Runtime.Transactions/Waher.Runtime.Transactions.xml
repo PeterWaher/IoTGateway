@@ -9,10 +9,11 @@
             A transaction built up of a set of sub-transactions.
             </summary>
         </member>
-        <member name="M:Waher.Runtime.Transactions.CompositeTransaction.#ctor(System.Boolean,Waher.Runtime.Transactions.ITransaction[])">
+        <member name="M:Waher.Runtime.Transactions.CompositeTransaction.#ctor(System.Guid,System.Boolean,Waher.Runtime.Transactions.ITransaction[])">
             <summary>
             A transaction built up of a set of sub-transactions.
             </summary>
+            <param name="Id">ID of transaction.</param>
             <param name="Parallel">If sub-transactions can be run in parallel (true), or in sequence (false).</param>
             <param name="Transactions">Subtransactions</param>
         </member>
@@ -49,6 +50,11 @@
         <member name="P:Waher.Runtime.Transactions.ITransaction.State">
             <summary>
             Transaction state.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Transactions.ITransaction.Tag">
+            <summary>
+            Caller can use this property to tag the transaction with information.
             </summary>
         </member>
         <member name="E:Waher.Runtime.Transactions.ITransaction.StateChanged">
@@ -119,6 +125,7 @@
             <summary>
             Abstract base class for transactions.
             </summary>
+            <param name="Id">ID of transaction.</param>
         </member>
         <member name="P:Waher.Runtime.Transactions.Transaction.Id">
             <summary>
@@ -128,6 +135,11 @@
         <member name="P:Waher.Runtime.Transactions.Transaction.State">
             <summary>
             Transaction state.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Transactions.Transaction.Tag">
+            <summary>
+            Caller can use this property to tag the transaction with information.
             </summary>
         </member>
         <member name="M:Waher.Runtime.Transactions.Transaction.Dispose">

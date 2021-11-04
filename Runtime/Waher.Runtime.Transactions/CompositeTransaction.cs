@@ -14,10 +14,11 @@ namespace Waher.Runtime.Transactions
 		/// <summary>
 		/// A transaction built up of a set of sub-transactions.
 		/// </summary>
+		/// <param name="Id">ID of transaction.</param>
 		/// <param name="Parallel">If sub-transactions can be run in parallel (true), or in sequence (false).</param>
 		/// <param name="Transactions">Subtransactions</param>
-		public CompositeTransaction(bool Parallel, params ITransaction[] Transactions)
-			: base()
+		public CompositeTransaction(Guid Id, bool Parallel, params ITransaction[] Transactions)
+			: base(Id)
 		{
 			if (Transactions is null)
 				throw new ArgumentNullException("Array of transactions cannot be null.");

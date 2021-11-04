@@ -116,6 +116,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.client.RegisterMessageHandler("petitionSignatureResponseMsg", NamespaceLegalIdentities, this.PetitionSignatureResponseMessageHandler, false);
 
 			this.client.RegisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
+			this.client.RegisterMessageHandler("contractCreated", NamespaceSmartContracts, this.ContractCreatedMessageHandler, false);
 			this.client.RegisterMessageHandler("contractUpdated", NamespaceSmartContracts, this.ContractUpdatedMessageHandler, false);
 			this.client.RegisterMessageHandler("contractDeleted", NamespaceSmartContracts, this.ContractDeletedMessageHandler, false);
 			this.client.RegisterMessageHandler("petitionContractMsg", NamespaceSmartContracts, this.PetitionContractMessageHandler, false);
@@ -143,6 +144,7 @@ namespace Waher.Networking.XMPP.Contracts
 			this.client.UnregisterMessageHandler("petitionSignatureResponseMsg", NamespaceLegalIdentities, this.PetitionSignatureResponseMessageHandler, false);
 
 			this.client.UnregisterMessageHandler("contractSigned", NamespaceSmartContracts, this.ContractSignedMessageHandler, true);
+			this.client.UnregisterMessageHandler("contractCreated", NamespaceSmartContracts, this.ContractCreatedMessageHandler, false);
 			this.client.UnregisterMessageHandler("contractUpdated", NamespaceSmartContracts, this.ContractUpdatedMessageHandler, false);
 			this.client.UnregisterMessageHandler("contractDeleted", NamespaceSmartContracts, this.ContractDeletedMessageHandler, false);
 			this.client.UnregisterMessageHandler("petitionContractMsg", NamespaceSmartContracts, this.PetitionContractMessageHandler, false);
@@ -2945,6 +2947,30 @@ namespace Waher.Networking.XMPP.Contracts
 
 			return Result.Task;
 		}
+
+		#endregion
+
+		#region Contract Created event
+
+		private async Task ContractCreatedMessageHandler(object Sender, MessageEventArgs e)
+		{
+			ContractReferenceEventHandler h = this.ContractCreated;
+
+			if (!(h is null))
+			{
+				string ContractId = XML.Attribute(e.Content, "contractId");
+
+				if (!this.IsFromTrustProvider(ContractId, e.From))
+					return;
+
+				await h(this, new ContractReferenceEventArgs(ContractId));
+			}
+		}
+
+		/// <summary>
+		/// Event raised whenever a contract has been created.
+		/// </summary>
+		public event ContractReferenceEventHandler ContractCreated = null;
 
 		#endregion
 

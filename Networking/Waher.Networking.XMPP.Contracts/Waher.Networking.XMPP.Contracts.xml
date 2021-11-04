@@ -1367,6 +1367,11 @@
             <param name="ContractId">ID of contract to delete.</param>
             <returns>Contract</returns>
         </member>
+        <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.ContractCreated">
+            <summary>
+            Event raised whenever a contract has been created.
+            </summary>
+        </member>
         <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.ContractUpdated">
             <summary>
             Event raised whenever a contract has been updated.

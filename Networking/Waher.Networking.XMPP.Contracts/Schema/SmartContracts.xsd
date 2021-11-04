@@ -997,6 +997,21 @@ purposes.
 		</xs:complexType>
 	</xs:element>
 
+	<xs:element name='contractCreated'>
+		<xs:annotation>
+			<xs:documentation>This element is sent in message stanza, to inform the receiving end that a contract has been created.</xs:documentation>
+			<xs:documentation>It is sent to the creator and parts of a contract.</xs:documentation>
+			<xs:documentation>Note: Only the contract identity is sent, not the contract itself. It is up to each recipient if they are interested in retrieving the contract or not.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='contractId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The identity of the contract that has been created.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
 	<xs:element name='contractUpdated'>
 		<xs:annotation>
 			<xs:documentation>This element is sent in message stanza, to inform the receiving end that a contract has been updated or changed.</xs:documentation>

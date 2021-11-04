@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Waher.Events.Statistics
@@ -18,7 +17,7 @@ namespace Waher.Events.Statistics
 		private Dictionary<string, Statistic> perType = new Dictionary<string, Statistic>();
 		private Dictionary<string, Statistic> perStackTrace = new Dictionary<string, Statistic>();
 		private DateTime lastStat = DateTime.MinValue;
-		private object synchObj = new object();
+		private readonly object synchObj = new object();
 
 		/// <summary>
 		/// Calculates statistics on incoming events.

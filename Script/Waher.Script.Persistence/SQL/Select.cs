@@ -85,7 +85,7 @@ namespace Waher.Script.Persistence.SQL
 		private void CalcSelectOneObject()
 		{
 			this.selectOneObject =
-				this.columns is null &&
+				(this.columns is null || this.columns.Length == 1) &&
 				!(this.top is null) &&
 				this.top is ConstantElement TopConstant &&
 				TopConstant.Constant is DoubleNumber D &&

@@ -104,8 +104,15 @@ namespace Waher.Script.Functions.Scalar
                     if (Math.Truncate(d) != d)
                         return PatternMatchResult.NoMatch;
                 }
-                else if (CheckAgainst is StringValue S && BigInteger.TryParse(S.Value, out BigInteger I))
-                    return this.Argument.PatternMatch(new Objects.Integer(I), AlreadyFound);
+                else if (CheckAgainst is StringValue S)
+                {
+                    if (int.TryParse(S.Value,out int i))
+                        return this.Argument.PatternMatch(new DoubleNumber(i), AlreadyFound);
+                    else if (long.TryParse(S.Value, out long l) && ((long)((double)l)) == l)
+                        return this.Argument.PatternMatch(new DoubleNumber(l), AlreadyFound);
+                    else if (BigInteger.TryParse(S.Value, out BigInteger I))
+                        return this.Argument.PatternMatch(new Objects.Integer(I), AlreadyFound);
+                }
                 else
                     return PatternMatchResult.NoMatch;
             }

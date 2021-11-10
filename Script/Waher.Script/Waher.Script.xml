@@ -19065,6 +19065,38 @@
             Current status of execution.
             </summary>
         </member>
+        <member name="T:Waher.Script.TypeConversion.BigIntegerToDouble">
+            <summary>
+            Converts a <see cref="T:System.Numerics.BigInteger"/> to a double number, if possible.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.BigIntegerToDouble.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.BigIntegerToDouble.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.BigIntegerToDouble.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.BigIntegerToDouble.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.BigIntegerToDouble.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.BigIntegerToDouble.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.BigIntegerToDouble.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.BigIntegerToDouble.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.BigIntegerToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.BigIntegerToDouble.From"/>.</exception>
+        </member>
         <member name="T:Waher.Script.TypeConversion.BooleanToDouble">
             <summary>
             Converts a Boolean value to a double number.
@@ -19128,7 +19160,7 @@
             Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.ConversionSequence.To"/>.
             </summary>
             <param name="Value">Object to be converted.</param>
-            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.ConversionSequence.To"/>.</returns>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.ConversionSequence.To"/>. If conversion not possible, null is returned.</returns>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.ConversionSequence.From"/>.</exception>
         </member>
         <member name="M:Waher.Script.TypeConversion.ConversionSequence.ConvertToElement(System.Object)">
@@ -19137,8 +19169,41 @@
             <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
             </summary>
             <param name="Value">Object to be converted.</param>
-            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.ConversionSequence.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.ConversionSequence.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            If conversion not possible, null is returned.</returns>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.ConversionSequence.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Script.TypeConversion.DoubleToBigInteger">
+            <summary>
+            Converts a double number to a <see cref="T:System.Numerics.BigInteger"/>, if possible.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.DoubleToBigInteger.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.DoubleToBigInteger.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.DoubleToBigInteger.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.DoubleToBigInteger.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.DoubleToBigInteger.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.DoubleToBigInteger.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.DoubleToBigInteger.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.DoubleToBigInteger.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.DoubleToBigInteger.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.DoubleToBigInteger.From"/>.</exception>
         </member>
         <member name="T:Waher.Script.TypeConversion.DoubleToComplex">
             <summary>
@@ -19192,7 +19257,7 @@
             Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.ITypeConverter.To"/>.
             </summary>
             <param name="Value">Object to be converted.</param>
-            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.ITypeConverter.To"/>.</returns>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.ITypeConverter.To"/>. If conversion not possible, null is returned.</returns>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.ITypeConverter.From"/>.</exception>
         </member>
         <member name="M:Waher.Script.TypeConversion.ITypeConverter.ConvertToElement(System.Object)">
@@ -19201,7 +19266,8 @@
             <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
             </summary>
             <param name="Value">Object to be converted.</param>
-            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.ITypeConverter.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.ITypeConverter.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            If conversion not possible, null is returned.</returns>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.ITypeConverter.From"/>.</exception>
         </member>
         <member name="T:Waher.Script.TypeConversion.PhysicalQuantityToDouble">

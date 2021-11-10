@@ -5031,7 +5031,7 @@ namespace Waher.Script
 			if (TryGetTypeConverter(T, DesiredType, out ITypeConverter Converter))
 			{
 				Result = Converter.Convert(Value);
-				return true;
+				return !(Result is null) || (Value is null);
 			}
 			else
 			{
@@ -5062,7 +5062,7 @@ namespace Waher.Script
 			if (TryGetTypeConverter(T, DesiredType, out ITypeConverter Converter))
 			{
 				Result = Converter.ConvertToElement(Obj);
-				return true;
+				return !(Result is null);
 			}
 			else
 			{

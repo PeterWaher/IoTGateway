@@ -145,6 +145,7 @@ namespace Waher.IoTGateway
 		private static Emoji1LocalFiles emoji1_24x24 = null;
 		private static StreamWriter exceptionFile = null;
 		private static CaseInsensitiveString domain = null;
+		private static CaseInsensitiveString[] alternativeDomains = null;
 		private static CaseInsensitiveString ownerJid = null;
 		private static Dictionary<string, string> defaultPageByHostName = null;
 		private static string instance;
@@ -1383,7 +1384,13 @@ namespace Waher.IoTGateway
 
 		internal static async Task ConfigureDomain(DomainConfiguration Configuration)
 		{
+			int i, c = Configuration.AlternativeDomains?.Length ?? 0;
+
 			domain = Configuration.Domain;
+			alternativeDomains = new CaseInsensitiveString[c];
+
+			for (i = 0; i < c; i++)
+				alternativeDomains[i] = Configuration.AlternativeDomains[i];
 
 			if (Configuration.UseDomainName)
 			{
@@ -1869,6 +1876,14 @@ namespace Waher.IoTGateway
 		public static CaseInsensitiveString Domain
 		{
 			get { return domain; }
+		}
+
+		/// <summary>
+		/// Alternative domain names
+		/// </summary>
+		public static CaseInsensitiveString[] AlternativeDomains
+		{
+			get { return alternativeDomains; }
 		}
 
 		/// <summary>

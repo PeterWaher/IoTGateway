@@ -19,6 +19,14 @@ Markdown: ([documentation](/Markdown.md))
 </section>
 
 <section id="HtmlSection">
+
+<button class="posButtonPressed" data-suffix="Html" onclick="FormatButtonClicked(this)">HTML</button>
+<button class="posButton" data-suffix="SmartContract" onclick="FormatButtonClicked(this)">Contract</button>
+<button class="posButton" data-suffix="Text" onclick="FormatButtonClicked(this)">Text</button>
+<button class="posButton" data-suffix="XamarinForms" onclick="FormatButtonClicked(this)">Xamarin</button>
+<button class="posButton" data-suffix="Xaml" onclick="FormatButtonClicked(this)">XAML</button>
+<button class="posButton" data-suffix="Xml" onclick="FormatButtonClicked(this)">XML</button>
+
 <div id="HtmlDiv">
 </div>
 </section>

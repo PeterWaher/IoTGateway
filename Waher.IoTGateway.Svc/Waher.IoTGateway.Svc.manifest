@@ -603,6 +603,11 @@
 			<Content fileName="MarkdownLab.js"/>
 			<Content fileName="MarkdownLab.md"/>
 			<Content fileName="MarkdownLabHtml.md"/>
+			<Content fileName="MarkdownLabSmartContract.md"/>
+			<Content fileName="MarkdownLabText.md"/>
+			<Content fileName="MarkdownLabXamarinForms.md"/>
+			<Content fileName="MarkdownLabXaml.md"/>
+			<Content fileName="MarkdownLabXml.md"/>
 			<Content fileName="MarkdownLab.css"/>
 		</Folder>
 		<Folder name="PlantUmlLab">

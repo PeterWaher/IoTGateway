@@ -1,5 +1,5 @@
 Title: Markdown Laboratory HTML
-Description: This page converts Markdown text to HTML that can be displayed.
+Description: This page converts Markdown text to HTML that can be displayed in browsers.
 Author: Peter Waher
 Date: 2021-05-29
 UserVariable: User

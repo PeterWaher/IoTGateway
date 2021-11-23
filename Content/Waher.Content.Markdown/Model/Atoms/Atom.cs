@@ -93,6 +93,17 @@ namespace Waher.Content.Markdown.Model.Atoms
 			MustBeReassembled();
 		}
 
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="Level">Current section level.</param>
+		public override void GenerateSmartContractXml(XmlWriter Output, ref int Level)
+		{
+			MustBeReassembled();
+		}
+
 		private static void MustBeReassembled()
 		{
 			throw new NotSupportedException("Atomic elements must be reassembled before being exported or used for output.");

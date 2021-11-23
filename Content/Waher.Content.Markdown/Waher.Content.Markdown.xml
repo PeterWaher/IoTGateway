@@ -635,6 +635,51 @@
             <param name="Output">Widows XamarinForms will be output here.</param>
             <param name="Inclusion">If the XamarinForms is to be included in another document (true), or if it is a standalone document (false).</param>
         </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateSmartContractXml">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <returns>Smart Contract XML</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateSmartContractXml(System.Xml.XmlWriterSettings)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="XmlSettings">XML settings.</param>
+            <returns>Smart Contract XML</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateSmartContractXml(System.Text.StringBuilder)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateSmartContractXml(System.Text.StringBuilder,System.Xml.XmlWriterSettings)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="XmlSettings">XML settings.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateSmartContractXml(System.Xml.XmlWriter)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateSmartContractXml(System.Xml.XmlWriter,System.String)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="LocalName">Local Name of container element. If no container element, LocalName is null.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.MarkdownDocument.ExportXml">
             <summary>
             Exports the parsed document to XML.
@@ -1132,6 +1177,14 @@
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.Atoms.Atom.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.Atoms.Atom.Equals(System.Object)">
             <summary>
             Determines whether the specified object is equal to the current object.
@@ -1346,6 +1399,14 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.BulletList.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.BulletList.InlineSpanElement">
             <summary>
@@ -2007,6 +2068,14 @@
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Header.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.Header.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -2456,6 +2525,14 @@
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.NumberedItem.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.NumberedItem.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -2555,6 +2632,14 @@
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.NumberedList.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.NumberedList.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -2618,6 +2703,14 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Paragraph.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.Paragraph.InlineSpanElement">
             <summary>
@@ -3164,6 +3257,14 @@
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.UnnumberedItem.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.UnnumberedItem.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -3578,6 +3679,14 @@
             <param name="Output">Xamarin.Forms XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.MarkdownElement.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.MarkdownElement.OutsideParagraph">
             <summary>
             If element, parsed as a span element, can stand outside of a paragraph if alone in it.
@@ -3740,6 +3849,14 @@
             </summary>
             <param name="Output">Plain text will be output here.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.MarkdownElementChildren.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.MarkdownElementChildren.JoinOverParagraphs">
             <summary>
             If elements of this type should be joined over paragraphs.
@@ -3810,6 +3927,14 @@
             Generates plain text for the markdown element.
             </summary>
             <param name="Output">Plain text will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.MarkdownElementSingleChild.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Model.MarkdownElementSingleChild.ForEach(Waher.Content.Markdown.MarkdownElementHandler,System.Object)">
             <summary>
@@ -4873,6 +4998,14 @@
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Emphasize.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.Emphasize.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -5594,6 +5727,14 @@
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineText.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.InlineText.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -6005,6 +6146,14 @@
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.MetaReference.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.MetaReference.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -6267,6 +6416,14 @@
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.StrikeThrough.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.StrikeThrough.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -6324,6 +6481,14 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Strong.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.Strong.InlineSpanElement">
             <summary>
@@ -6389,6 +6554,14 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.SubScript.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.SubScript.GeneratePlainText(System.Text.StringBuilder)">
             <summary>
@@ -6461,6 +6634,14 @@
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.SuperScript.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.SuperScript.GeneratePlainText(System.Text.StringBuilder)">
             <summary>
             Generates plain text for the markdown element.
@@ -6524,6 +6705,14 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="TextAlignment">Alignment of text in element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Underline.GenerateSmartContractXml(System.Xml.XmlWriter,System.Int32@)">
+            <summary>
+            Generates Human-Readable XML for Smart Contracts from the markdown text.
+            Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+            </summary>
+            <param name="Output">Smart Contract XML will be output here.</param>
+            <param name="Level">Current section level.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.Underline.InlineSpanElement">
             <summary>

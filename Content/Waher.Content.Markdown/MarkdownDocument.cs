@@ -5310,6 +5310,123 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <returns>Smart Contract XML</returns>
+		public string GenerateSmartContractXml()
+		{
+			return this.GenerateSmartContractXml(XML.WriterSettings(false, true));
+		}
+
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="XmlSettings">XML settings.</param>
+		/// <returns>Smart Contract XML</returns>
+		public string GenerateSmartContractXml(XmlWriterSettings XmlSettings)
+		{
+			StringBuilder Output = new StringBuilder();
+			this.GenerateSmartContractXml(Output, XmlSettings);
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		public void GenerateSmartContractXml(StringBuilder Output)
+		{
+			this.GenerateSmartContractXml(Output, XML.WriterSettings(false, true));
+		}
+
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="XmlSettings">XML settings.</param>
+		public void GenerateSmartContractXml(StringBuilder Output, XmlWriterSettings XmlSettings)
+		{
+			XmlSettings.ConformanceLevel = ConformanceLevel.Fragment;
+
+			using (XmlWriter w = XmlWriter.Create(Output, XmlSettings))
+			{
+				this.GenerateSmartContractXml(w, null);
+			}
+		}
+
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		public void GenerateSmartContractXml(XmlWriter Output)
+		{
+			this.GenerateSmartContractXml(Output, null);
+		}
+
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="LocalName">Local Name of container element. If no container element, LocalName is null.</param>
+		internal void GenerateSmartContractXml(XmlWriter Output, string LocalName)
+		{
+			if (this.settings.XamlSettings is null)
+				this.settings.XamlSettings = new XamlSettings();
+
+			if (!string.IsNullOrEmpty(LocalName))
+				Output.WriteStartElement(LocalName);
+
+			int Level = 0;
+
+			foreach (MarkdownElement E in this.elements)
+				E.GenerateSmartContractXml(Output, ref Level);
+
+			while (Level > 0)
+			{
+				Output.WriteEndElement();
+				Output.WriteEndElement();
+				Level--;
+			}
+
+			if (this.footnoteOrder != null && this.footnoteOrder.Count > 0)
+			{
+				Output.WriteStartElement("numberedItems");
+
+				foreach (string Key in this.footnoteOrder)
+				{
+					if (this.footnotes.TryGetValue(Key, out Footnote Footnote))
+					{
+						Output.WriteStartElement("item");
+						Footnote.GenerateSmartContractXml(Output, ref Level);
+
+						while (Level > 0)
+						{
+							Output.WriteEndElement();
+							Output.WriteEndElement();
+							Level--;
+						}
+
+						Output.WriteEndElement();
+					}
+				}
+
+				Output.WriteEndElement();
+			}
+
+			if (!string.IsNullOrEmpty(LocalName))
+			{
+				Output.WriteEndElement();
+				Output.Flush();
+			}
+		}
+
+		/// <summary>
 		/// Exports the parsed document to XML.
 		/// </summary>
 		/// <returns>XML String.</returns>

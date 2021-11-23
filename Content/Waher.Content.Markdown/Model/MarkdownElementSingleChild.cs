@@ -49,8 +49,18 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Output">Plain text will be output here.</param>
 		public override void GeneratePlainText(StringBuilder Output)
 		{
-			if (!(this.child is null))
-				this.child.GeneratePlainText(Output);
+			this.child?.GeneratePlainText(Output);
+		}
+
+		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="Level">Current section level.</param>
+		public override void GenerateSmartContractXml(XmlWriter Output, ref int Level)
+		{
+			this.child?.GenerateSmartContractXml(Output, ref Level);
 		}
 
 		/// <summary>

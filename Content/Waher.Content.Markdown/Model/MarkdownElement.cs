@@ -100,6 +100,17 @@ namespace Waher.Content.Markdown.Model
 		public abstract void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment);
 
 		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="Level">Current section level.</param>
+		public virtual void GenerateSmartContractXml(XmlWriter Output, ref int Level)
+		{
+			// Do nothing by default
+		}
+
+		/// <summary>
 		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
 		/// </summary>
 		internal virtual bool OutsideParagraph

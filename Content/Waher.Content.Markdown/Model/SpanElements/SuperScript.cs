@@ -82,6 +82,22 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
+		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
+		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
+		/// </summary>
+		/// <param name="Output">Smart Contract XML will be output here.</param>
+		/// <param name="Level">Current section level.</param>
+		public override void GenerateSmartContractXml(XmlWriter Output, ref int Level)
+		{
+			Output.WriteStartElement("super");
+
+			foreach (MarkdownElement E in this.Children)
+				E.GenerateSmartContractXml(Output, ref Level);
+
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>

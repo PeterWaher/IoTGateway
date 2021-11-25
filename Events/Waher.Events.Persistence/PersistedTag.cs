@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Waher.Persistence.Attributes;
 
 namespace Waher.Events.Persistence
@@ -21,7 +20,7 @@ namespace Waher.Events.Persistence
 		}
 
 		/// <summary>
-		/// Free-text event message.
+		/// Tag name.
 		/// </summary>
 		[DefaultValueStringEmpty]
 		public string Name
@@ -31,7 +30,7 @@ namespace Waher.Events.Persistence
 		}
 
 		/// <summary>
-		/// Object related to the event.
+		/// Tag value.
 		/// </summary>
 		[DefaultValueNull]
 		public object Value
@@ -40,9 +39,7 @@ namespace Waher.Events.Persistence
 			set { this.value = value; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.name + "=" + this.value?.ToString();

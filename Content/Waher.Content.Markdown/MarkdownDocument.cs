@@ -5396,27 +5396,16 @@ namespace Waher.Content.Markdown
 
 			if (this.footnoteOrder != null && this.footnoteOrder.Count > 0)
 			{
-				Output.WriteStartElement("numberedItems");
-
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnotes.TryGetValue(Key, out Footnote Footnote))
+					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) && this.footnotes.TryGetValue(Key, out Footnote Footnote))
 					{
-						Output.WriteStartElement("item");
+						Output.WriteStartElement("paragraph");
+						Output.WriteElementString("text", "[" + Nr.ToString() + "] ");
 						Footnote.GenerateSmartContractXml(Output, ref Level);
-
-						while (Level > 0)
-						{
-							Output.WriteEndElement();
-							Output.WriteEndElement();
-							Level--;
-						}
-
 						Output.WriteEndElement();
 					}
 				}
-
-				Output.WriteEndElement();
 			}
 
 			if (!string.IsNullOrEmpty(LocalName))

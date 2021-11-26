@@ -47,6 +47,7 @@ namespace Waher.IoTGateway.Setup
 		private static readonly object[] approvedContractClientSources = new object[]
 		{
 			"Waher.Service.IoTBroker.Legal.MFA.QuickLogin",
+			"Waher.Service.IoTBroker.Marketplace.MarketplaceProcessor",
 			"Waher.Service.Abc4Io.Model.Actions.Contract.SignContract",
 			typeof(LegalIdentityConfiguration),
 			GetAttachment
@@ -402,6 +403,44 @@ namespace Waher.IoTGateway.Setup
 				Assert.CallFromSource(approvedSources);
 				return approvedIdentities;
 			}
+		}
+
+		/// <summary>
+		/// Checks if a Legal Identity refers to the gateway.
+		/// </summary>
+		/// <param name="LegalId">Legal ID</param>
+		/// <returns>If Legal ID is referring to the gateway.</returns>
+		public static bool IsMe(CaseInsensitiveString LegalId)
+		{
+			if (allIdentities is null)
+				return false;
+
+			foreach (LegalIdentity ID in allIdentities)
+			{
+				if (LegalId == ID.Id)
+					return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Checks if a Legal Identity refers to an approved ID of the gateway.
+		/// </summary>
+		/// <param name="LegalId">Legal ID</param>
+		/// <returns>If Legal ID is referring to an approved ID of the gateway.</returns>
+		public static bool IsMeApproved(CaseInsensitiveString LegalId)
+		{
+			if (approvedIdentities is null)
+				return false;
+
+			foreach (LegalIdentity ID in approvedIdentities)
+			{
+				if (LegalId == ID.Id)
+					return true;
+			}
+
+			return false;
 		}
 
 		private Task ContractsClient_IdentityUpdated(object Sender, LegalIdentityEventArgs e)

@@ -1008,23 +1008,33 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 			}
 
-			bool HasElements = false;
+			bool HasContent = false;
 
 			foreach (XmlNode N in Xml.ChildNodes)
 			{
 				if (N is XmlElement E)
 				{
-					if (!HasElements)
+					if (!HasContent)
 					{
-						HasElements = true;
+						HasContent = true;
 						Output.Append('>');
 					}
 
 					NormalizeXml(E, Output, CurrentNamespace);
 				}
+				else if (N is XmlText || N is XmlCDataSection || N is XmlSignificantWhitespace)
+				{
+					if (!HasContent)
+					{
+						HasContent = true;
+						Output.Append('>');
+					}
+
+					Output.Append(XML.Encode(N.InnerText));
+				}
 			}
 
-			if (HasElements)
+			if (HasContent)
 			{
 				Output.Append("</");
 				Output.Append(TagName);

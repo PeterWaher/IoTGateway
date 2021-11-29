@@ -970,10 +970,10 @@ namespace Waher.Networking.XMPP.Contracts
 			Output.Append('<');
 
 			SortedDictionary<string, string> Attributes = null;
-			string TagName = Xml.LocalName;
+			string TagName = Xml.LocalName.Normalize(NormalizationForm.FormC);
 
 			if (!string.IsNullOrEmpty(Xml.Prefix))
-				TagName = Xml.Prefix + ":" + TagName;
+				TagName = Xml.Prefix.Normalize(NormalizationForm.FormC) + ":" + TagName;
 
 			Output.Append(TagName);
 
@@ -982,7 +982,7 @@ namespace Waher.Networking.XMPP.Contracts
 				if (Attributes is null)
 					Attributes = new SortedDictionary<string, string>();
 
-				Attributes[Attr.Name] = Attr.Value;
+				Attributes[Attr.Name.Normalize(NormalizationForm.FormC)] = Attr.Value.Normalize(NormalizationForm.FormC);
 			}
 
 			if (Xml.NamespaceURI != CurrentNamespace && string.IsNullOrEmpty(Xml.Prefix))
@@ -1030,7 +1030,7 @@ namespace Waher.Networking.XMPP.Contracts
 						Output.Append('>');
 					}
 
-					Output.Append(XML.Encode(N.InnerText));
+					Output.Append(XML.Encode(N.InnerText.Normalize(NormalizationForm.FormC)));
 				}
 			}
 

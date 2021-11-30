@@ -3633,6 +3633,17 @@ namespace Waher.IoTGateway
 		public static ContractsClient ContractsClient
 		{
 			get { return contractsClient; }
+			set
+			{
+				if (contractsClient is null ||
+					contractsClient == value ||
+					(value is null && LegalIdentityConfiguration.Instance is null))
+				{
+					contractsClient = value;
+				}
+				else
+					throw new InvalidOperationException("Not allowed to set a new Contracts Client class.");
+			}
 		}
 
 		/// <summary>

@@ -609,7 +609,9 @@ namespace Waher.Runtime.Settings
 				{
 					if (!(Setting is ObjectSetting))
 					{
-						await Database.Delete(Setting);
+						if (!(Setting is null))
+							await Database.Delete(Setting);
+
 						Setting = null;
 					}
 				}
@@ -619,7 +621,9 @@ namespace Waher.Runtime.Settings
 					{
 						if (!(Setting is StringSetting StringSetting))
 						{
-							await Database.Delete(Setting);
+							if (!(Setting is null))
+								await Database.Delete(Setting);
+
 							StringSetting = null;
 						}
 
@@ -629,7 +633,9 @@ namespace Waher.Runtime.Settings
 					{
 						if (!(Setting is Int64Setting Int64Setting))
 						{
-							await Database.Delete(Setting);
+							if (!(Setting is null))
+								await Database.Delete(Setting);
+							
 							Int64Setting = null;
 						}
 
@@ -639,7 +645,9 @@ namespace Waher.Runtime.Settings
 					{
 						if (!(Setting is DoubleSetting DoubleSetting))
 						{
-							await Database.Delete(Setting);
+							if (!(Setting is null))
+								await Database.Delete(Setting);
+							
 							DoubleSetting = null;
 						}
 
@@ -649,7 +657,9 @@ namespace Waher.Runtime.Settings
 					{
 						if (!(Setting is BooleanSetting BooleanSetting))
 						{
-							await Database.Delete(Setting);
+							if (!(Setting is null))
+								await Database.Delete(Setting);
+							
 							BooleanSetting = null;
 						}
 
@@ -659,7 +669,9 @@ namespace Waher.Runtime.Settings
 					{
 						if (!(Setting is DateTimeSetting DateTimeSetting))
 						{
-							await Database.Delete(Setting);
+							if (!(Setting is null))
+								await Database.Delete(Setting);
+							
 							DateTimeSetting = null;
 						}
 
@@ -669,7 +681,9 @@ namespace Waher.Runtime.Settings
 					{
 						if (!(Setting is TimeSpanSetting TimeSpanSetting))
 						{
-							await Database.Delete(Setting);
+							if (!(Setting is null))
+								await Database.Delete(Setting);
+							
 							TimeSpanSetting = null;
 						}
 
@@ -679,7 +693,9 @@ namespace Waher.Runtime.Settings
 					{
 						if (!(Setting is EnumSetting EnumSetting))
 						{
-							await Database.Delete(Setting);
+							if (!(Setting is null))
+								await Database.Delete(Setting);
+							
 							EnumSetting = null;
 						}
 

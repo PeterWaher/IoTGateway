@@ -736,7 +736,7 @@ namespace Waher.Networking.XMPP.Contracts
 			get
 			{
 				if (this.localKeys is null)
-					throw new InvalidOperationException("Local keys not loaded to generated.");
+					throw new InvalidOperationException("Local keys not loaded or generated.");
 
 				return this.localKeys;
 			}

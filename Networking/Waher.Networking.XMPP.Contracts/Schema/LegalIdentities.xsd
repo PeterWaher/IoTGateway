@@ -156,19 +156,19 @@ purposes.
 						<xs:documentation>Note: Legal identities are updated by the client regularly. Check with the server to get the most recent legal identity, if needed.</xs:documentation>
 					</xs:annotation>
 					<xs:complexType>
-            <xs:attribute name="s" type="xs:base64Binary" use="optional">
-              <xs:annotation>
-                <xs:documentation>Digital signature created using the corresponding client public-key algorithm.</xs:documentation>
-              </xs:annotation>
-            </xs:attribute>
+						<xs:attribute name="s" type="xs:base64Binary" use="optional">
+							<xs:annotation>
+								<xs:documentation>Digital signature created using the corresponding client public-key algorithm.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
 					</xs:complexType>
 				</xs:element>
-        <xs:element ref='attachment' minOccurs='0' maxOccurs='unbounded'>
-          <xs:annotation>
-            <xs:documentation>Any attached items associated with the identity.</xs:documentation>
-          </xs:annotation>
-        </xs:element>
-        <xs:element name='status' minOccurs='0' maxOccurs='1'>
+				<xs:element ref='attachment' minOccurs='0' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>Any attached items associated with the identity.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name='status' minOccurs='0' maxOccurs='1'>
 					<xs:annotation>
 						<xs:documentation>The status object is created and managed by the Trust Provider.</xs:documentation>
 						<xs:documentation>Anyone can get the latest version of the legal identity by requesting it from the trust provider, given the id of the legal identity.</xs:documentation>
@@ -218,21 +218,21 @@ purposes.
 						<xs:documentation>Note: Server keys may change over time. If a signature does not validate, make sure to get the most recent public key from the server and check signature again.</xs:documentation>
 					</xs:annotation>
 					<xs:complexType>
-            <xs:attribute name="s" type="xs:base64Binary" use="optional">
-              <xs:annotation>
-                <xs:documentation>Digital signature created using the corresponding server public-key algorithm.</xs:documentation>
-              </xs:annotation>
-            </xs:attribute>
-          </xs:complexType>
+						<xs:attribute name="s" type="xs:base64Binary" use="optional">
+							<xs:annotation>
+								<xs:documentation>Digital signature created using the corresponding server public-key algorithm.</xs:documentation>
+							</xs:annotation>
+						</xs:attribute>
+					</xs:complexType>
 				</xs:element>
-        <xs:element ref='attachmentRef' minOccurs='0' maxOccurs='unbounded'>
-          <xs:annotation>
-            <xs:documentation>Any downloadable references to attachments assigned to the legal identity.</xs:documentation>
-            <xs:documentation>As references might change over time, they are not included in signatures.</xs:documentation>
-            <xs:documentation>All meta-data necessary to assert the validity and integrity of attachments are provided using attachment elements above.</xs:documentation>
-          </xs:annotation>
-        </xs:element>
-      </xs:sequence>
+				<xs:element ref='attachmentRef' minOccurs='0' maxOccurs='unbounded'>
+					<xs:annotation>
+						<xs:documentation>Any downloadable references to attachments assigned to the legal identity.</xs:documentation>
+						<xs:documentation>As references might change over time, they are not included in signatures.</xs:documentation>
+						<xs:documentation>All meta-data necessary to assert the validity and integrity of attachments are provided using attachment elements above.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
 			<xs:attribute name='id' type='xs:string' use='optional'>
 				<xs:annotation>
 					<xs:documentation>An identifier assigned to the legal identity.</xs:documentation>
@@ -324,7 +324,7 @@ purposes.
 			<xs:documentation>If valid, the information about the corresponding legal identity is returned.</xs:documentation>
 			<xs:documentation>If signature is not valid, a forbidden error will be returned.</xs:documentation>
 			<xs:documentation>Expected response element: identity</xs:documentation>
-      <xs:documentation>Note: If neither id or bareJid are provided, current approved legal identities for the sender will be used to verify the signature.</xs:documentation>
+			<xs:documentation>Note: If neither id or bareJid are provided, current approved legal identities for the sender will be used to verify the signature.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:attribute name='id' type='xs:string' use='optional'>
@@ -332,23 +332,28 @@ purposes.
 					<xs:documentation>Identifier of the legal identity to retrieve.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
-      <xs:attribute name='bareJid' type='xs:string' use='optional'>
-        <xs:annotation>
-          <xs:documentation>Bare JID of account on the Trust Provider.</xs:documentation>
-          <xs:documentation>Current approved legal identities for this account will be used to verify the signature.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='data' type='xs:base64Binary' use='required'>
+			<xs:attribute name='bareJid' type='xs:string' use='optional'>
+				<xs:annotation>
+					<xs:documentation>Bare JID of account on the Trust Provider.</xs:documentation>
+					<xs:documentation>Current approved legal identities for this account will be used to verify the signature.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='data' type='xs:base64Binary' use='required'>
 				<xs:annotation>
 					<xs:documentation>Binary data claimed to be signed.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
-      <xs:attribute name="s" type="xs:base64Binary" use="optional">
-        <xs:annotation>
-          <xs:documentation>Digital signature to validate.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
+			<xs:attribute name="s" type="xs:base64Binary" use="optional">
+				<xs:annotation>
+					<xs:documentation>Digital signature to validate.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='for' type='xs:string' use='optional'>
+				<xs:annotation>
+					<xs:documentation>May contain a Bare JID of entity for which the signature was presented.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
 	</xs:element>
 
 	<xs:element name='obsoleteLegalIdentity'>
@@ -370,8 +375,8 @@ purposes.
 	<xs:element name='compromisedLegalIdentity'>
 		<xs:annotation>
 			<xs:documentation>Sent by a client in an iq set to a Trust Provider, to report one of its legal identities as compromised.</xs:documentation>
-      <xs:documentation>Expected response element: identity</xs:documentation>
-    </xs:annotation>
+			<xs:documentation>Expected response element: identity</xs:documentation>
+		</xs:annotation>
 		<xs:complexType>
 			<xs:attribute name='id' type='xs:string' use='required'>
 				<xs:annotation>
@@ -383,228 +388,228 @@ purposes.
 		</xs:complexType>
 	</xs:element>
 
-  <xs:element name='petitionIdentity'>
-    <xs:annotation>
-      <xs:documentation>Sent by a client in an iq set to a Trust Provider to petition for the information related to a legal identity managed by the Trust Provider.</xs:documentation>
-      <xs:documentation>The request must be signed using an approved and valid legal identity of the caller. Invalid requests must be rejected.</xs:documentation>
-      <xs:documentation>The Trust Provider will forward the petition to the corresponding client(s) using a normal message containing a petitionIdentityMsg element.</xs:documentation>
-      <xs:documentation>Expect an empty response on success.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name='id' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>Identifier of the legal identity hosted by the Trust Provider, to which the caller requests access.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='pid' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='purpose' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>A string containing the purpose of the request. This string can be shown to the owner of the identity.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='nonce' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>A nonce value, generated by a cryptographic pseudo random number generator.</xs:documentation>
-          <xs:documentation>Used to introduce sufficient entropy in the request.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='s' type='xs:base64Binary' use='required'>
-        <xs:annotation>
-          <xs:documentation>Digital signature of the request using the legal identity (or one of the approved legal identities) of the caller.</xs:documentation>
-          <xs:documentation>The signature is calculated on the following data: UTF8Encode(pid + ":" + id + ":" + purpose + ":" + nonce + ":" + fromBareJid), where fromBareJid is the Bare JID of the sender.</xs:documentation>
-          <xs:documentation>Note: If a sender has multiple approved legal identities associated with it, the Trust Provider uses the signature to identify which identity has been used to form the signature. It is this identity that is later forwarded to the owner of the requested identity.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
+	<xs:element name='petitionIdentity'>
+		<xs:annotation>
+			<xs:documentation>Sent by a client in an iq set to a Trust Provider to petition for the information related to a legal identity managed by the Trust Provider.</xs:documentation>
+			<xs:documentation>The request must be signed using an approved and valid legal identity of the caller. Invalid requests must be rejected.</xs:documentation>
+			<xs:documentation>The Trust Provider will forward the petition to the corresponding client(s) using a normal message containing a petitionIdentityMsg element.</xs:documentation>
+			<xs:documentation>Expect an empty response on success.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the legal identity hosted by the Trust Provider, to which the caller requests access.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='pid' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='purpose' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>A string containing the purpose of the request. This string can be shown to the owner of the identity.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='nonce' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>A nonce value, generated by a cryptographic pseudo random number generator.</xs:documentation>
+					<xs:documentation>Used to introduce sufficient entropy in the request.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='s' type='xs:base64Binary' use='required'>
+				<xs:annotation>
+					<xs:documentation>Digital signature of the request using the legal identity (or one of the approved legal identities) of the caller.</xs:documentation>
+					<xs:documentation>The signature is calculated on the following data: UTF8Encode(pid + ":" + id + ":" + purpose + ":" + nonce + ":" + fromBareJid), where fromBareJid is the Bare JID of the sender.</xs:documentation>
+					<xs:documentation>Note: If a sender has multiple approved legal identities associated with it, the Trust Provider uses the signature to identify which identity has been used to form the signature. It is this identity that is later forwarded to the owner of the requested identity.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
 
-  <xs:element name='petitionIdentityMsg'>
-    <xs:annotation>
-      <xs:documentation>Sent in a normal message stanza from a Trust Provider to a client, when the Trust Provider has received a petition for a legal identity owned by the recipient of this message.</xs:documentation>
-      <xs:documentation>The recipient can choose to ignore the message, and respond in its own time, sending an petitionIdentityResponse element with the response in an IQ set stanza back to the Trust Provider.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref='identity' minOccurs='1' maxOccurs='1'>
-          <xs:annotation>
-            <xs:documentation>The legal identity of the entity making the petition.</xs:documentation>
-            <xs:documentation>This information can be used by the recipient of the message to make an informed decision on wether to accept, deny or ignore the request.</xs:documentation>
-          </xs:annotation>
-        </xs:element>
-      </xs:sequence>
-      <xs:attribute name='pid' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='from' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>The Bare JID of the entity requesting the information.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='purpose' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>A string containing the purpose of the request. This string can be shown to the owner of the identity.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-  
-  <xs:element name='petitionIdentityResponse'>
-    <xs:annotation>
-      <xs:documentation>Sent by a client in an iq set to a Trust Provider as an active response to a previous petition for information related to a legal identity owned by the client.</xs:documentation>
-      <xs:documentation>Expect an empty response on success.</xs:documentation>
-      <xs:documentation>A successfull request will forward the response, and the referenced legal identity if approved, to the entity making the request, by sending a petitionIdentityResponseMsg element in a normal message stanza.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name='id' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>Identifier of the legal identity referred to by the petition.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='pid' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='jid' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>Bare JID of the entity making the petition.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='response' type='xs:boolean' use='optional' default='false'>
-        <xs:annotation>
-          <xs:documentation>If the Trust Provider can share the legal identity information with the entity making the petition.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-  
-  <xs:element name='petitionIdentityResponseMsg'>
-    <xs:annotation>
-      <xs:documentation>Sent in a normal message stanza from a Trust Provider to a client, when the Trust Provider has received a response on a petition made by the client for a legal identity.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref='identity' minOccurs='0' maxOccurs='1'>
-          <xs:annotation>
-            <xs:documentation>The legal identity requested, if available, and the owner of the identity consented in sharing the information.</xs:documentation>
-            <xs:documentation>This information must only be used for the purposes described in the original petition.</xs:documentation>
-          </xs:annotation>
-        </xs:element>
-      </xs:sequence>
-      <xs:attribute name='pid' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='response' type='xs:boolean' use='required'>
-        <xs:annotation>
-          <xs:documentation>If the Trust Provider can share the legal identity information with the entity making the petition.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
+	<xs:element name='petitionIdentityMsg'>
+		<xs:annotation>
+			<xs:documentation>Sent in a normal message stanza from a Trust Provider to a client, when the Trust Provider has received a petition for a legal identity owned by the recipient of this message.</xs:documentation>
+			<xs:documentation>The recipient can choose to ignore the message, and respond in its own time, sending an petitionIdentityResponse element with the response in an IQ set stanza back to the Trust Provider.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='identity' minOccurs='1' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>The legal identity of the entity making the petition.</xs:documentation>
+						<xs:documentation>This information can be used by the recipient of the message to make an informed decision on wether to accept, deny or ignore the request.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name='pid' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='from' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The Bare JID of the entity requesting the information.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='purpose' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>A string containing the purpose of the request. This string can be shown to the owner of the identity.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
 
-  <xs:element name='addAttachment'>
-    <xs:annotation>
-      <xs:documentation>Sent in an iq set stanza from a client to a Trust Provider, to add an attachment to a legal identity that is yet to be approved.</xs:documentation>
-      <xs:documentation>Attachments can be photos, documents, or other types of objects that have a well-defined Internet Content Type.</xs:documentation>
-      <xs:documentation>The contents of the attachment may have been uploaded to the Trust Provider using HTTP File Upload (XEP-0363) before this command is sent.</xs:documentation>
-      <xs:documentation>After the file has been registered as an attachment, it must be removed, after first giving time for lost messages and retries, from the temporary storage of the HTTP File Upload service by the Trust Provider, for privacy reasons.</xs:documentation>
-      <xs:documentation>Access privileges to legal identities or smart contracts, automatically infer access privileges to any attachments associated with them.</xs:documentation>
-      <xs:documentation>Expected response element: identity</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name='id' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>Legal identity to which the attachment is to be assigned.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='getUrl' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>The URL of the content. It may previously have been uploaded using HTTP File Upload (XEP-0363).</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='s' type='xs:base64Binary' use='required'>
-        <xs:annotation>
-          <xs:documentation>Signature of the content assigned to the legal identity.</xs:documentation>
-          <xs:documentation>The signature must be made by the private key of the legal identity to which the attachment is to be assigned.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
+	<xs:element name='petitionIdentityResponse'>
+		<xs:annotation>
+			<xs:documentation>Sent by a client in an iq set to a Trust Provider as an active response to a previous petition for information related to a legal identity owned by the client.</xs:documentation>
+			<xs:documentation>Expect an empty response on success.</xs:documentation>
+			<xs:documentation>A successfull request will forward the response, and the referenced legal identity if approved, to the entity making the request, by sending a petitionIdentityResponseMsg element in a normal message stanza.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identifier of the legal identity referred to by the petition.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='pid' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='jid' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Bare JID of the entity making the petition.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='response' type='xs:boolean' use='optional' default='false'>
+				<xs:annotation>
+					<xs:documentation>If the Trust Provider can share the legal identity information with the entity making the petition.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
 
-  <xs:element name='removeAttachment'>
-    <xs:annotation>
-      <xs:documentation>Sent in an iq set stanza from a client to a Trust Provider, to remove an attachment from a legal identity that is yet to be approved.</xs:documentation>
-      <xs:documentation>A client can only remove attachments from its own identities.</xs:documentation>
-      <xs:documentation>Expected response element: identity</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name='attachmentId' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>Identity of attachment to remove.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
+	<xs:element name='petitionIdentityResponseMsg'>
+		<xs:annotation>
+			<xs:documentation>Sent in a normal message stanza from a Trust Provider to a client, when the Trust Provider has received a response on a petition made by the client for a legal identity.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref='identity' minOccurs='0' maxOccurs='1'>
+					<xs:annotation>
+						<xs:documentation>The legal identity requested, if available, and the owner of the identity consented in sharing the information.</xs:documentation>
+						<xs:documentation>This information must only be used for the purposes described in the original petition.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name='pid' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>A petition ID. This identity will follow the petition.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='response' type='xs:boolean' use='required'>
+				<xs:annotation>
+					<xs:documentation>If the Trust Provider can share the legal identity information with the entity making the petition.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
 
-  <xs:element name='attachment'>
-    <xs:annotation>
-      <xs:documentation>Represents an attachment.</xs:documentation>
-      <xs:documentation>An attachment can	be assigned to legal identities.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name='id' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>The identity of the attachment.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='contentType' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>Internet Content-Type of attachment.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='fileName' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>Filename of attachment.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='s' type='xs:base64Binary' use='required'>
-        <xs:annotation>
-          <xs:documentation>Signature of attachment, made by the uploader.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='timestamp' type='xs:dateTime' use='required'>
-        <xs:annotation>
-          <xs:documentation>Timestamp of attachment upload.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
+	<xs:element name='addAttachment'>
+		<xs:annotation>
+			<xs:documentation>Sent in an iq set stanza from a client to a Trust Provider, to add an attachment to a legal identity that is yet to be approved.</xs:documentation>
+			<xs:documentation>Attachments can be photos, documents, or other types of objects that have a well-defined Internet Content Type.</xs:documentation>
+			<xs:documentation>The contents of the attachment may have been uploaded to the Trust Provider using HTTP File Upload (XEP-0363) before this command is sent.</xs:documentation>
+			<xs:documentation>After the file has been registered as an attachment, it must be removed, after first giving time for lost messages and retries, from the temporary storage of the HTTP File Upload service by the Trust Provider, for privacy reasons.</xs:documentation>
+			<xs:documentation>Access privileges to legal identities or smart contracts, automatically infer access privileges to any attachments associated with them.</xs:documentation>
+			<xs:documentation>Expected response element: identity</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Legal identity to which the attachment is to be assigned.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='getUrl' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The URL of the content. It may previously have been uploaded using HTTP File Upload (XEP-0363).</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='s' type='xs:base64Binary' use='required'>
+				<xs:annotation>
+					<xs:documentation>Signature of the content assigned to the legal identity.</xs:documentation>
+					<xs:documentation>The signature must be made by the private key of the legal identity to which the attachment is to be assigned.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
 
-  <xs:element name='attachmentRef'>
-    <xs:annotation>
-      <xs:documentation>Includes information on how to download an attachment.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name='attachmentId' type='xs:string' use='required'>
-        <xs:annotation>
-          <xs:documentation>The ID of the attachment referenced to.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name='url' type='xs:anyURI' use='required'>
-        <xs:annotation>
-          <xs:documentation>An URL to download the attachment.</xs:documentation>
-          <xs:documentation>Attachments must be protected using the IEEE1451.99.Sign WWW-authentication mechanism to make sure only authorized clients can access the attachment.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
+	<xs:element name='removeAttachment'>
+		<xs:annotation>
+			<xs:documentation>Sent in an iq set stanza from a client to a Trust Provider, to remove an attachment from a legal identity that is yet to be approved.</xs:documentation>
+			<xs:documentation>A client can only remove attachments from its own identities.</xs:documentation>
+			<xs:documentation>Expected response element: identity</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='attachmentId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Identity of attachment to remove.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='attachment'>
+		<xs:annotation>
+			<xs:documentation>Represents an attachment.</xs:documentation>
+			<xs:documentation>An attachment can	be assigned to legal identities.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='id' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The identity of the attachment.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='contentType' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Internet Content-Type of attachment.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='fileName' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>Filename of attachment.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='s' type='xs:base64Binary' use='required'>
+				<xs:annotation>
+					<xs:documentation>Signature of attachment, made by the uploader.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='timestamp' type='xs:dateTime' use='required'>
+				<xs:annotation>
+					<xs:documentation>Timestamp of attachment upload.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name='attachmentRef'>
+		<xs:annotation>
+			<xs:documentation>Includes information on how to download an attachment.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name='attachmentId' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The ID of the attachment referenced to.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name='url' type='xs:anyURI' use='required'>
+				<xs:annotation>
+					<xs:documentation>An URL to download the attachment.</xs:documentation>
+					<xs:documentation>Attachments must be protected using the IEEE1451.99.Sign WWW-authentication mechanism to make sure only authorized clients can access the attachment.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
 
 </xs:schema>

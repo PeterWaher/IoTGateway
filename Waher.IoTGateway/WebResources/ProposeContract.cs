@@ -84,7 +84,10 @@ namespace Waher.IoTGateway.WebResources
 					
 					Networking.XMPP.Contracts.Contract.NormalizeXml(Contract.ForMachines, sb, ContractsClient.NamespaceSmartContracts);
 
-					Doc = new XmlDocument();
+					Doc = new XmlDocument()
+					{
+						PreserveWhitespace = true
+					};
 					Doc.LoadXml(sb.ToString());
 
 					Contract.ForMachines = Doc.DocumentElement;

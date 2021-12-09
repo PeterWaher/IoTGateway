@@ -297,6 +297,7 @@ namespace Waher.Networking.XMPP.Contracts
 		public override void SetValue(object Value)
 		{
 			this.value = Value.ToString();
+			this.match = null;
 		}
 
 	}

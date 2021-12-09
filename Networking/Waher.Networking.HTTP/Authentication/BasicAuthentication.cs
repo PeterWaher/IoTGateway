@@ -4,6 +4,7 @@ using Waher.Content;
 using Waher.Security;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Security.LoginMonitor;
+using System.Collections.Generic;
 
 namespace Waher.Networking.HTTP.Authentication
 {
@@ -88,7 +89,8 @@ namespace Waher.Networking.HTTP.Authentication
 					IUser User = await this.users.TryGetUser(UserName);
 					if (User is null)
 					{
-						LoginAuditor.Fail("Login attempt using invalid user name.", UserName, Request.RemoteEndPoint, "HTTP");
+						LoginAuditor.Fail("Login attempt using invalid user name.", UserName, Request.RemoteEndPoint, "HTTP",
+							new KeyValuePair<string, object>("UserName", UserName));
 						return null;
 					}
 

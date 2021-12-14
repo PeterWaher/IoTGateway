@@ -2090,6 +2090,9 @@ This is then transformed to:
 The title of this document is "[%Title]". It describes [%Description]
 It was written [%Date] by [%Author].
 
+Note: If a metadata record does not exist for a given key, but a variable exists with the given name, the corresponding variable value will be
+inserted instead.
+
 The following subsections list the different metadata keys that have special meaning to the **IoT Gateway** Markdown parser. You're not limited to these
 metadata keys, and can freely add your own.
 

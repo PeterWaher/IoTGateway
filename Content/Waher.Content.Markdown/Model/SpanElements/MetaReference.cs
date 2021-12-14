@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Script;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -51,7 +52,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			bool FirstOnRow = true;
 
-			if (this.Document.TryGetMetaData(this.key, out KeyValuePair<string, bool>[] Values))
+			if (this.TryGetMetaData(out KeyValuePair<string, bool>[] Values))
 			{
 				foreach (KeyValuePair<string, bool> P in Values)
 				{
@@ -70,6 +71,21 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			}
 		}
 
+		private bool TryGetMetaData(out KeyValuePair<string, bool>[] Values)
+		{
+			if (this.Document.TryGetMetaData(this.key, out Values))
+				return true;
+
+			if (this.Document.Settings.Variables.TryGetVariable(this.key, out Variable Variable))
+			{
+				Values = new KeyValuePair<string, bool>[] { new KeyValuePair<string, bool>(Variable.ValueObject?.ToString() ?? string.Empty, false) };
+				return true;
+			}
+
+			Values = null;
+			return false;
+		}
+
 		/// <summary>
 		/// Generates plain text for the markdown element.
 		/// </summary>
@@ -78,7 +94,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			bool FirstOnRow = true;
 
-			if (this.Document.TryGetMetaData(this.key, out KeyValuePair<string, bool>[] Values))
+			if (this.TryGetMetaData(out KeyValuePair<string, bool>[] Values))
 			{
 				foreach (KeyValuePair<string, bool> P in Values)
 				{
@@ -114,7 +130,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			bool FirstOnRow = true;
 
-			if (this.Document.TryGetMetaData(this.key, out KeyValuePair<string, bool>[] Values))
+			if (this.TryGetMetaData(out KeyValuePair<string, bool>[] Values))
 			{
 				foreach (KeyValuePair<string, bool> P in Values)
 				{

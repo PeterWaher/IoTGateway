@@ -1,6 +1,7 @@
 ﻿#if !WINDOWS_UWP
 
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Security;
@@ -74,7 +75,8 @@ namespace Waher.Networking.HTTP.Authentication
 			IUser User = await this.users.TryGetUser(UserName);
 			if (User is null)
 			{
-				LoginAuditor.Fail("Login attempt using invalid user name.", Certificate.Subject, Request.RemoteEndPoint, "HTTP");
+				LoginAuditor.Fail("Login attempt using invalid user name.", Certificate.Subject, Request.RemoteEndPoint, "HTTP",
+					new KeyValuePair<string, object>("UserName", UserName));
 				return null;
 			}
 			else

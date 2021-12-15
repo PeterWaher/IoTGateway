@@ -119,9 +119,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Level">Current section level.</param>
 		public override void GenerateSmartContractXml(XmlWriter Output, ref int Level)
 		{
-			Output.WriteStartElement("item");
-			this.Child.GenerateSmartContractXml(Output, ref Level);
-			Output.WriteEndElement();
+			NumberedItem.GenerateSmartContractXmlItem(this.Child, Output, ref Level);
 		}
 
 		/// <summary>

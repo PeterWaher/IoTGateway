@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Numerics;
 using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.P2P;
 using Waher.Networking.XMPP.P2P.E2E;
-using Waher.Security;
-using Waher.Security.EllipticCurves;
 
 namespace Waher.Networking.XMPP.Contracts
 {

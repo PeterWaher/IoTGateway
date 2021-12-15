@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Networking.XMPP.Contracts.HumanReadable;
 
 namespace Waher.Networking.XMPP.Contracts
 {

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 {

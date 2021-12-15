@@ -1,6 +1,4 @@
-﻿
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Text;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements

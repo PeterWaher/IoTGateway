@@ -18,7 +18,12 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		public static BlockElement[] Parse(XmlElement Xml)
 		{
 			List<BlockElement> Result = new List<BlockElement>();
+			Parse(Xml, Result);
+			return Result.ToArray();
+		}
 
+		private static void Parse(XmlElement Xml, List<BlockElement> Result)
+		{
 			foreach (XmlNode N in Xml.ChildNodes)
 			{
 				if (N is XmlElement E)
@@ -96,12 +101,15 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 							break;
 
 						default:
-							return null;
+							foreach (XmlNode N2 in E.ChildNodes)
+							{
+								if (N2 is XmlElement E2)
+									Parse(E2, Result);
+							}
+							break;
 					}
 				}
 			}
-
-			return Result.ToArray();
 		}
 	}
 }

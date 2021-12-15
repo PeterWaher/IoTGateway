@@ -26,6 +26,9 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		{
 			get
 			{
+				if (this.body is null)
+					return false;
+
 				foreach (BlockElement E in this.body)
 				{
 					if (E is null || !E.IsWellDefined)
@@ -44,8 +47,11 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
 		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, Contract Contract)
 		{
-			foreach (HumanReadableElement E in this.Body)
-				E.GenerateMarkdown(Markdown, SectionLevel, Contract);
+			if (!(this.body is null))
+			{
+				foreach (HumanReadableElement E in this.body)
+					E.GenerateMarkdown(Markdown, SectionLevel, Contract);
+			}
 		}
 	}
 }

@@ -18,7 +18,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 			get => this.elements;
 			set => this.elements = value;
 		}
-	
+
 		/// <summary>
 		/// Checks if the element is well-defined.
 		/// </summary>
@@ -26,6 +26,9 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		{
 			get
 			{
+				if (this.elements is null)
+					return false;
+
 				foreach (InlineElement E in this.elements)
 				{
 					if (E is null || !E.IsWellDefined)

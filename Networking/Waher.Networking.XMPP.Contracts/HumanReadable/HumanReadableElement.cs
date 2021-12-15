@@ -47,15 +47,18 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 			Xml.Append('<');
 			Xml.Append(EncapsulatingElementName);
 
-			foreach (HumanReadableElement E in Elements)
+			if (!(Elements is null))
 			{
-				if (First)
+				foreach (HumanReadableElement E in Elements)
 				{
-					First = false;
-					Xml.Append('>');
-				}
+					if (First)
+					{
+						First = false;
+						Xml.Append('>');
+					}
 
-				E.Serialize(Xml);
+					E.Serialize(Xml);
+				}
 			}
 
 			if (First)

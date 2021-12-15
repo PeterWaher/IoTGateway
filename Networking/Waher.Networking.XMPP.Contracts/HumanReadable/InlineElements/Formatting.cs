@@ -25,6 +25,9 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		{
 			get
 			{
+				if (this.elements is null)
+					return false;
+
 				foreach (InlineElement E in this.elements)
 				{
 					if (E is null || !E.IsWellDefined)

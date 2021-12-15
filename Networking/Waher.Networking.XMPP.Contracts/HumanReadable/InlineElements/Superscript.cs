@@ -27,8 +27,11 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		{
 			Markdown.Append("^[");
 
-			foreach (InlineElement E in this.Elements)
-				E.GenerateMarkdown(Markdown, SectionLevel, Contract);
+			if (!(this.Elements is null))
+			{
+				foreach (InlineElement E in this.Elements)
+					E.GenerateMarkdown(Markdown, SectionLevel, Contract);
+			}
 
 			Markdown.Append(']');
 		}

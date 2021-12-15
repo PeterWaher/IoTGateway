@@ -25,6 +25,9 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		{
 			get
 			{
+				if (this.items is null)
+					return false;
+
 				foreach (Item E in this.items)
 				{
 					if (E is null || !E.IsWellDefined)

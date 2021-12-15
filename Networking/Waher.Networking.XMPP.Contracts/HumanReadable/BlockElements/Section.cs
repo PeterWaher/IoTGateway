@@ -27,6 +27,9 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		{
 			get
 			{
+				if (this.header is null)
+					return false;
+
 				foreach (InlineElement E in this.header)
 				{
 					if (E is null || !E.IsWellDefined)
@@ -68,8 +71,11 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 			else
 				Markdown2 = new StringBuilder();
 
-			foreach (InlineElement E in this.header)
-				E.GenerateMarkdown(Markdown2, SectionLevel, Contract);
+			if (!(this.header is null))
+			{
+				foreach (InlineElement E in this.header)
+					E.GenerateMarkdown(Markdown2, SectionLevel, Contract);
+			}
 
 			if (SectionLevel < 3)
 			{

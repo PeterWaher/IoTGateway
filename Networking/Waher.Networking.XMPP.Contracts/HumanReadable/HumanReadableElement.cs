@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Content;
+using Waher.Content.Markdown;
 
 namespace Waher.Networking.XMPP.Contracts.HumanReadable
 {
@@ -76,7 +78,32 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// </summary>
 		/// <param name="Markdown">Markdown output.</param>
 		/// <param name="SectionLevel">Current section level.</param>
-		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
-		public abstract void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, Contract Contract);
+		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
+		public abstract void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, MarkdownSettings Settings);
+
+		/// <summary>
+		/// Encodes text to Markdown.
+		/// </summary>
+		/// <param name="s">Text to encode.</param>
+		/// <param name="SimpleEscape">If simplified escape procedures are to be used.</param>
+		/// <returns>Encoded text.</returns>
+		protected static string MarkdownEncode(string s, bool SimpleEscape)
+		{
+			if (SimpleEscape)
+				return CommonTypes.Escape(s, specialCharactersSimplified, specialCharactersSimplifiedEncoded);
+			else
+				return MarkdownDocument.Encode(s);
+		}
+
+		private static readonly char[] specialCharactersSimplified = new char[]
+		{
+			'*', '_', '~', '\\', '`', '{', '}', '[', ']', '<', '>', '&', '#', '^'
+		};
+
+		private static readonly string[] specialCharactersSimplifiedEncoded = new string[]
+		{
+			"\\*", "\\_", "\\~", "\\\\", "\\`", "\\{", "\\}", "\\[", "\\]", "\\<", "\\>", "\\&", "\\#", "\\^"
+		};
+
 	}
 }

@@ -42,10 +42,10 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		/// </summary>
 		/// <param name="Markdown">Markdown output.</param>
 		/// <param name="SectionLevel">Current section level.</param>
-		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
-		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, Contract Contract)
+		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
+		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, MarkdownSettings Settings)
 		{
-			Markdown.Append(MarkdownDocument.Encode(this.value));
+			Markdown.Append(MarkdownEncode(this.value, Settings.SimpleEscape));
 		}
 	}
 }

@@ -24,10 +24,11 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Language">Desired language</param>
 		/// <param name="Contract">Contract hosting the object.</param>
+		/// <param name="Type">Type of Markdown being generated.</param>
 		/// <returns>Markdown</returns>
-		public string ToMarkdown(string Language, Contract Contract)
+		public string ToMarkdown(string Language, Contract Contract, MarkdownType Type)
 		{
-			return Contract.ToMarkdown(this.descriptions, Language);
+			return Contract.ToMarkdown(this.descriptions, Language, Type);
 		}
 
 		/// <summary>

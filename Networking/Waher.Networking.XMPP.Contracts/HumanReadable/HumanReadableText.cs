@@ -94,8 +94,29 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 		/// <returns>Markdown</returns>
 		public string GenerateMarkdown(Contract Contract)
 		{
+			return this.GenerateMarkdown(Contract, MarkdownType.ForRendering);
+		}
+
+		/// <summary>
+		/// Generates markdown for the human-readable text.
+		/// </summary>
+		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
+		/// <param name="Type">Type of Markdown to generate</param>
+		/// <returns>Markdown</returns>
+		public string GenerateMarkdown(Contract Contract, MarkdownType Type)
+		{
+			return this.GenerateMarkdown(new MarkdownSettings(Contract, Type));
+		}
+
+		/// <summary>
+		/// Generates markdown for the human-readable text.
+		/// </summary>
+		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
+		/// <returns>Markdown</returns>
+		public string GenerateMarkdown(MarkdownSettings Settings)
+		{
 			StringBuilder Markdown = new StringBuilder();
-			this.GenerateMarkdown(Markdown, 1, Contract);
+			this.GenerateMarkdown(Markdown, 1, Settings);
 			return Markdown.ToString();
 		}
 

@@ -1480,7 +1480,18 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Markdown</returns>
 		public string ToMarkdown(string Language)
 		{
-			return this.ToMarkdown(this.forHumans, Language);
+			return this.ToMarkdown(Language, MarkdownType.ForRendering);
+		}
+
+		/// <summary>
+		/// Creates a human-readable Markdown document for the contract.
+		/// </summary>
+		/// <param name="Language">Desired language</param>
+		/// <param name="Type">Type of Markdown being generated.</param>
+		/// <returns>Markdown</returns>
+		public string ToMarkdown(string Language, MarkdownType Type)
+		{
+			return this.ToMarkdown(this.forHumans, Language, Type);
 		}
 
 		/// <summary>
@@ -1523,9 +1534,9 @@ namespace Waher.Networking.XMPP.Contracts
 			return this.ToXamarinForms(this.forHumans, Language);
 		}
 
-		internal string ToMarkdown(HumanReadableText[] Text, string Language)
+		internal string ToMarkdown(HumanReadableText[] Text, string Language, MarkdownType Type)
 		{
-			return Select(Text, Language)?.GenerateMarkdown(this);
+			return Select(Text, Language)?.GenerateMarkdown(this, Type);
 		}
 
 		internal string ToPlainText(HumanReadableText[] Text, string Language)

@@ -57,8 +57,8 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		/// </summary>
 		/// <param name="Markdown">Markdown output.</param>
 		/// <param name="SectionLevel">Current section level.</param>
-		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
-		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, Contract Contract)
+		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
+		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, MarkdownSettings Settings)
 		{
 			StringBuilder Markdown2;
 
@@ -74,7 +74,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 			if (!(this.header is null))
 			{
 				foreach (InlineElement E in this.header)
-					E.GenerateMarkdown(Markdown2, SectionLevel, Contract);
+					E.GenerateMarkdown(Markdown2, SectionLevel, Settings);
 			}
 
 			if (SectionLevel < 3)
@@ -87,7 +87,7 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 			Markdown.AppendLine();
 			Markdown.AppendLine();
 
-			base.GenerateMarkdown(Markdown, SectionLevel + 1, Contract);
+			base.GenerateMarkdown(Markdown, SectionLevel + 1, Settings);
 		}
 
 	}

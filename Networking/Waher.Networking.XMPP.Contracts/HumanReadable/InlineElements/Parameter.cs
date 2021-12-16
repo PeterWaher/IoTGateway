@@ -42,41 +42,52 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.InlineElements
 		/// </summary>
 		/// <param name="Markdown">Markdown output.</param>
 		/// <param name="SectionLevel">Current section level.</param>
-		/// <param name="Contract">Contract, of which the human-readable text is part.</param>
-		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, Contract Contract)
+		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
+		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, MarkdownSettings Settings)
 		{
-			object Value = Contract[this.name];
-
-			if (Value is null)
+			switch (Settings.Type)
 			{
-				string Guide = null;
+				case MarkdownType.ForEditing:
+					Markdown.Append("[%");
+					Markdown.Append(this.name);
+					Markdown.Append(']');
+					break;
 
-				foreach (Contracts.Parameter P in Contract.Parameters)
-				{
-					if (P.Name == this.name)
+				case MarkdownType.ForRendering:
+					object Value = Settings.Contract[this.name];
+
+					if (Value is null)
 					{
-						Guide = P.Guide;
-						break;
+						string Guide = null;
+
+						foreach (Contracts.Parameter P in Settings.Contract.Parameters)
+						{
+							if (P.Name == this.name)
+							{
+								Guide = P.Guide;
+								break;
+							}
+						}
+
+						if (string.IsNullOrEmpty(Guide))
+							Guide = this.name;
+
+						Markdown.Append('`');
+						Markdown.Append(Guide);
+						Markdown.Append('`');
 					}
-				}
+					else
+					{
+						string s;
 
-				if (string.IsNullOrEmpty(Guide))
-					Guide = this.name;
+						if (Value is bool BooleanValue)
+							s = BooleanValue ? "[X]" : "[ ]";
+						else
+							s = Value.ToString();
 
-				Markdown.Append('`');
-				Markdown.Append(Guide);
-				Markdown.Append('`');
-			}
-			else
-			{
-				string s;
-			
-				if (Value is bool BooleanValue)
-					s = BooleanValue ? "[X]" : "[ ]";
-				else
-					s = Value.ToString();
-
-				Markdown.Append(MarkdownDocument.Encode(s));
+						Markdown.Append(MarkdownEncode(s, Settings.SimpleEscape));
+					}
+					break;
 			}
 		}
 	}

@@ -97,12 +97,12 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable
 
 		private static readonly char[] specialCharactersSimplified = new char[]
 		{
-			'*', '_', '~', '\\', '`', '{', '}', '[', ']', '<', '>', '&', '#', '^'
+			'*', '_', '~', '\\', '`', '{', '}', '[', ']', '(', ')', '<', '>', '&', '#', '^'
 		};
 
 		private static readonly string[] specialCharactersSimplifiedEncoded = new string[]
 		{
-			"\\*", "\\_", "\\~", "\\\\", "\\`", "\\{", "\\}", "\\[", "\\]", "\\<", "\\>", "\\&", "\\#", "\\^"
+			"\\*", "\\_", "\\~", "\\\\", "\\`", "\\{", "\\}", "\\[", "\\]", "\\(", "\\)", "\\<", "\\>", "\\&", "\\#", "\\^"
 		};
 
 	}

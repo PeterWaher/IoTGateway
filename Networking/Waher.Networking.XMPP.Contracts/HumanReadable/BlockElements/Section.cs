@@ -60,28 +60,13 @@ namespace Waher.Networking.XMPP.Contracts.HumanReadable.BlockElements
 		/// <param name="Settings">Settings used for Markdown generation of human-readable text.</param>
 		public override void GenerateMarkdown(StringBuilder Markdown, int SectionLevel, MarkdownSettings Settings)
 		{
-			StringBuilder Markdown2;
-
-			if (SectionLevel >= 3)
-			{
-				Markdown2 = Markdown;
-				Markdown.Append(new string('#', SectionLevel));
-				Markdown.Append(' ');
-			}
-			else
-				Markdown2 = new StringBuilder();
+			Markdown.Append(new string('#', SectionLevel));
+			Markdown.Append(' ');
 
 			if (!(this.header is null))
 			{
 				foreach (InlineElement E in this.header)
-					E.GenerateMarkdown(Markdown2, SectionLevel, Settings);
-			}
-
-			if (SectionLevel < 3)
-			{
-				string s = Markdown2.ToString();
-				Markdown.AppendLine(s);
-				Markdown.Append(new string(SectionLevel == 1 ? '=' : '-', s.Length + 3));
+					E.GenerateMarkdown(Markdown, SectionLevel, Settings);
 			}
 
 			Markdown.AppendLine();

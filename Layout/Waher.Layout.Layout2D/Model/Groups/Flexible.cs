@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
 
@@ -128,15 +128,15 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.order = new EnumAttribute<FlexibleOrder>(Input, "order");
 			this.horizontalDirection = new EnumAttribute<HorizontalDirection>(Input, "horizontalDirection");
 			this.verticalDirection = new EnumAttribute<VerticalDirection>(Input, "verticalDirection");
 			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign");
 			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -188,45 +188,28 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>Cell layout object.</returns>
-		public override ICellLayout GetCellLayout(DrawingState State)
+		public override async Task<ICellLayout> GetCellLayout(DrawingState State)
 		{
-			if (this.order is null || !this.order.TryEvaluate(State.Session, out FlexibleOrder Order))
-				Order = FlexibleOrder.HorizontalVertical;
-
-			if (this.horizontalDirection is null || !this.horizontalDirection.TryEvaluate(State.Session, out HorizontalDirection HorizontalDirection))
-				HorizontalDirection = HorizontalDirection.LeftRight;
-
-			if (this.verticalDirection is null || !this.verticalDirection.TryEvaluate(State.Session, out VerticalDirection VerticalDirection))
-				VerticalDirection = VerticalDirection.TopDown;
+			FlexibleOrder Order = await this.order.Evaluate(State.Session, FlexibleOrder.HorizontalVertical);
+			HorizontalDirection HorizontalDirection = await this.horizontalDirection.Evaluate(State.Session, HorizontalDirection.LeftRight);
+			VerticalDirection VerticalDirection = await this.verticalDirection.Evaluate(State.Session, VerticalDirection.TopDown);
 
 			switch (Order)
 			{
 				case FlexibleOrder.HorizontalVertical:
 				default:
 					float Size = this.ExplicitWidth ?? this.Parent?.InnerWidth ?? State.AreaWidth;
-					if (this.halign is null || !this.halign.TryEvaluate(State.Session, out HorizontalAlignment HorizontalAlignment))
-					{
-						if (HorizontalDirection == HorizontalDirection.LeftRight)
-							HorizontalAlignment = HorizontalAlignment.Left;
-						else
-							HorizontalAlignment = HorizontalAlignment.Right;
-					}
+					HorizontalAlignment HAlignment = await this.halign.Evaluate<HorizontalAlignment>(State.Session,
+						HorizontalDirection == HorizontalDirection.LeftRight ? HorizontalAlignment.Left : HorizontalAlignment.Right);
 
-					return new FlexibleHorizontalCells(State.Session, Size,
-						HorizontalDirection, VerticalDirection, HorizontalAlignment);
+					return new FlexibleHorizontalCells(State.Session, Size, HorizontalDirection, VerticalDirection, HAlignment);
 
 				case FlexibleOrder.VerticalHorizontal:
 					Size = this.ExplicitHeight ?? this.Parent?.InnerHeight ?? State.AreaHeight;
-					if (this.valign is null || !this.valign.TryEvaluate(State.Session, out VerticalAlignment VerticalAlignment))
-					{
-						if (VerticalDirection == VerticalDirection.TopDown)
-							VerticalAlignment = VerticalAlignment.Top;
-						else
-							VerticalAlignment = VerticalAlignment.Bottom;
-					}
+					VerticalAlignment VAlignment = await this.valign.Evaluate<VerticalAlignment>(State.Session,
+						VerticalDirection == VerticalDirection.TopDown ? VerticalAlignment.Top : VerticalAlignment.Bottom);
 
-					return new FlexibleVerticalCells(State.Session, Size,
-						HorizontalDirection, VerticalDirection, VerticalAlignment);
+					return new FlexibleVerticalCells(State.Session, Size, HorizontalDirection, VerticalDirection, VAlignment);
 			}
 		}
 

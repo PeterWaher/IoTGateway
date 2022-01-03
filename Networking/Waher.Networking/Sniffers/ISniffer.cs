@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.Sniffers
 {
@@ -12,117 +13,117 @@ namespace Waher.Networking.Sniffers
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Data">Binary Data.</param>
-		void ReceiveBinary(byte[] Data);
+		Task ReceiveBinary(byte[] Data);
 
 		/// <summary>
 		/// Called when binary data has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		void ReceiveBinary(DateTime Timestamp, byte[] Data);
+		Task ReceiveBinary(DateTime Timestamp, byte[] Data);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Data">Binary Data.</param>
-		void TransmitBinary(byte[] Data);
+		Task TransmitBinary(byte[] Data);
 
 		/// <summary>
 		/// Called when binary data has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		void TransmitBinary(DateTime Timestamp, byte[] Data);
+		Task TransmitBinary(DateTime Timestamp, byte[] Data);
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		void ReceiveText(string Text);
+		Task ReceiveText(string Text);
 
 		/// <summary>
 		/// Called when text has been received.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		void ReceiveText(DateTime Timestamp, string Text);
+		Task ReceiveText(DateTime Timestamp, string Text);
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Text">Text</param>
-		void TransmitText(string Text);
+		Task TransmitText(string Text);
 
 		/// <summary>
 		/// Called when text has been transmitted.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		void TransmitText(DateTime Timestamp, string Text);
+		Task TransmitText(DateTime Timestamp, string Text);
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Comment">Comment.</param>
-		void Information(string Comment);
+		Task Information(string Comment);
 
 		/// <summary>
 		/// Called to inform the viewer of something.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Comment">Comment.</param>
-		void Information(DateTime Timestamp, string Comment);
+		Task Information(DateTime Timestamp, string Comment);
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Warning">Warning.</param>
-		void Warning(string Warning);
+		Task Warning(string Warning);
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Warning">Warning.</param>
-		void Warning(DateTime Timestamp, string Warning);
+		Task Warning(DateTime Timestamp, string Warning);
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Error">Error.</param>
-		void Error(string Error);
+		Task Error(string Error);
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Error">Error.</param>
-		void Error(DateTime Timestamp, string Error);
+		Task Error(DateTime Timestamp, string Error);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Exception">Exception.</param>
-		void Exception(string Exception);
-
-		/// <summary>
-		/// Called to inform the viewer of an exception state.
-		/// </summary>
-		/// <param name="Timestamp">Timestamp of event.</param>
-		/// <param name="Exception">Exception.</param>
-		void Exception(DateTime Timestamp, string Exception);
-
-		/// <summary>
-		/// Called to inform the viewer of an exception state.
-		/// </summary>
-		/// <param name="Exception">Exception.</param>
-		void Exception(Exception Exception);
+		Task Exception(string Exception);
 
 		/// <summary>
 		/// Called to inform the viewer of an exception state.
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		void Exception(DateTime Timestamp, Exception Exception);
+		Task Exception(DateTime Timestamp, string Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
+		Task Exception(Exception Exception);
+
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of event.</param>
+		/// <param name="Exception">Exception.</param>
+		Task Exception(DateTime Timestamp, Exception Exception);
 	}
 }

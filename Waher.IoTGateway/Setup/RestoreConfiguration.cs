@@ -223,7 +223,7 @@ namespace Waher.IoTGateway.Setup
 			ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", Message, false);
 		}
 
-		private Task Restore(HttpRequest Request, HttpResponse Response)
+		private async Task Restore(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
@@ -242,7 +242,7 @@ namespace Waher.IoTGateway.Setup
 				throw new BadRequestException();
 			}
 
-			object Obj = Request.DecodeData();
+			object Obj = await Request.DecodeDataAsync();
 			if (!(Obj is Dictionary<string, object> Parameters))
 				throw new BadRequestException();
 
@@ -261,8 +261,6 @@ namespace Waher.IoTGateway.Setup
 				Overwrite, OnlySelectedCollections, SelectedCollections, SelectedParts);
 
 			Response.StatusCode = 200;
-
-			return Task.CompletedTask;
 		}
 
 		private static TemporaryFile GetAndRemoveFile(string SessionID, Dictionary<string, TemporaryFile> Files)
@@ -1431,7 +1429,7 @@ namespace Waher.IoTGateway.Setup
 			DateTime LastReport = DateTime.Now;
 			byte Command;
 			bool ImportCollection = !OnlySelectedCollections;
-			bool ImportPart = !OnlySelectedCollections;
+			bool ImportPart;
 
 			using (BinaryReader r = new BinaryReader(BackupFile, Encoding.UTF8, true))
 			{
@@ -1943,11 +1941,11 @@ namespace Waher.IoTGateway.Setup
 
 			XslCompiledTransform Xslt = XSL.LoadTransform(typeof(Gateway).Namespace + ".Transforms.DbStatXmlToHtml.xslt");
 
-			string s = File.ReadAllText(XmlPath);
+			string s = await Resources.ReadAllTextAsync(XmlPath);
 			s = XSL.Transform(s, Xslt);
 			byte[] Bin = WebResources.StartAnalyze.utf8Bom.GetBytes(s);
 
-			File.WriteAllBytes(HtmlPath, Bin);
+			await Resources.WriteAllBytesAsync(HtmlPath, Bin);
 
 			ShowStatus(TabID, "Database analysis successfully completed.");
 

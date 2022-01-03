@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Resources;
-using System.Xml;
+using System.Threading.Tasks;
 using SkiaSharp;
-using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Groups
 {
@@ -32,18 +29,18 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>Cell layout object.</returns>
-		public abstract ICellLayout GetCellLayout(DrawingState State);
+		public abstract Task<ICellLayout> GetCellLayout(DrawingState State);
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
-			this.cellLayout = this.GetCellLayout(State);
+			this.cellLayout = await this.GetCellLayout(State);
 
 			if (this.HasChildren)
 			{
@@ -55,26 +52,23 @@ namespace Waher.Layout.Layout2D.Model.Groups
 					if (Child is IDynamicChildren DynamicChildren)
 					{
 						foreach (ILayoutElement Child2 in DynamicChildren.DynamicChildren)
-							this.cellLayout.Add(Child2);
+							await this.cellLayout.Add(Child2);
 					}
 					else
-						this.cellLayout.Add(Child);
+						await this.cellLayout.Add(Child);
 				}
 
 				this.cellLayout.Flush();
 			}
-
-			return Relative;
 		}
 
 		/// <summary>
 		/// Called when dimensions have been measured.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		/// <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
-		public override void AfterMeasureDimensions(DrawingState State, ref bool Relative)
+		public override async Task AfterMeasureDimensions(DrawingState State)
 		{
-			base.AfterMeasureDimensions(State, ref Relative);
+			await base.AfterMeasureDimensions(State);
 
 			this.cellLayout?.Distribute(false);
 
@@ -110,7 +104,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			SKCanvas Canvas = State.Canvas;
 			SKMatrix M = Canvas.TotalMatrix;
@@ -118,7 +112,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			foreach (Padding P in this.measured)
 			{
 				Canvas.Translate(P.OffsetX, P.OffsetY);
-				P.Element.Draw(State);
+				await P.Element.Draw(State);
 				Canvas.SetMatrix(M);
 			}
 		}

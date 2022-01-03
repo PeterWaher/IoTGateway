@@ -54,9 +54,7 @@ namespace Waher.Networking.XMPP.Software
 			Client.RegisterMessageHandler("packageDeleted", NamespaceSoftwareUpdates, this.PackageDeletedNotificationHandler, false);
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			base.Dispose();

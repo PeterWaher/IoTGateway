@@ -10,6 +10,7 @@ namespace Waher.Content.Html
 	/// </summary>
 	public class HtmlElement : HtmlNode
 	{
+		private Dictionary<string, HtmlAttribute> attributesByName = null;
 		private LinkedList<HtmlAttribute> attributes = null;
 		private LinkedList<HtmlNode> children = null;
 		private readonly string name;
@@ -32,18 +33,12 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// Tag name.
 		/// </summary>
-		public string Name
-		{
-			get { return this.name; }
-		}
+		public string Name => this.name;
 
 		/// <summary>
 		/// Namespace, if provided, null if not.
 		/// </summary>
-		public string Namespace
-		{
-			get { return this.@namespace; }
-		}
+		public string Namespace => this.@namespace;
 
 		internal void Add(HtmlNode Node)
 		{
@@ -56,46 +51,61 @@ namespace Waher.Content.Html
 		internal void AddAttribute(HtmlAttribute Attribute)
 		{
 			if (Attribute.Name == "xmlns")
-				this.@namespace = Attribute.Value;
+			{
+				if (string.IsNullOrEmpty(@namespace))
+					this.@namespace = Attribute.Value;
+			}
 			else
 			{
 				if (this.attributes is null)
+				{
 					this.attributes = new LinkedList<HtmlAttribute>();
+					this.attributesByName = new Dictionary<string, HtmlAttribute>(StringComparer.OrdinalIgnoreCase);
+				}
 
-				this.attributes.AddLast(Attribute);
+				if (!this.attributesByName.ContainsKey(Attribute.Name))
+				{
+					this.attributes.AddLast(Attribute);
+					this.attributesByName[Attribute.Name] = Attribute;
+				}
 			}
 		}
 
 		/// <summary>
 		/// If the element has children.
 		/// </summary>
-		public bool HasChildren
-		{
-			get { return this.children != null; }
-		}
+		public bool HasChildren => this.children != null;
 
 		/// <summary>
 		/// If the element has attributes.
 		/// </summary>
-		public bool HasAttributes
-		{
-			get { return this.attributes != null; }
-		}
+		public bool HasAttributes => this.attributes != null;
 
 		/// <summary>
 		/// Child nodes, or null if none.
 		/// </summary>
-		public IEnumerable<HtmlNode> Children
-		{
-			get { return this.children; }
-		}
+		public IEnumerable<HtmlNode> Children => this.children;
 
 		/// <summary>
 		/// Attributes, or null if none.
 		/// </summary>
-		public IEnumerable<HtmlAttribute> Attributes
+		public IEnumerable<HtmlAttribute> Attributes => this.attributes;
+
+		/// <summary>
+		/// Tries to get an attribute from the element, by its name.
+		/// </summary>
+		/// <param name="Name">Attribute name.</param>
+		/// <param name="Attribute">Attribute object, if found, null otherwise.</param>
+		/// <returns>If attribute was found.</returns>
+		public bool TryGetAttribute(string Name, out HtmlAttribute Attribute)
 		{
-			get { return this.attributes; }
+			if (this.attributesByName is null)
+			{
+				Attribute = null;
+				return false;
+			}
+			else
+				return this.attributesByName.TryGetValue(Name, out Attribute);
 		}
 
 		/// <summary>
@@ -188,9 +198,7 @@ namespace Waher.Content.Html
 			}
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.StartTag;
@@ -262,10 +270,7 @@ namespace Waher.Content.Html
         /// <summary>
         /// If the element is an empty element.
         /// </summary>
-        public virtual bool IsEmptyElement
-		{
-			get { return false; }
-		}
+        public virtual bool IsEmptyElement => false;
 
 		/// <summary>
 		/// If the element has an attribute with a given (case-insensitive) name.

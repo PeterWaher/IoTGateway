@@ -58,9 +58,7 @@ namespace Waher.Content.Asn1.Model.Macro
 			}
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.identifier;

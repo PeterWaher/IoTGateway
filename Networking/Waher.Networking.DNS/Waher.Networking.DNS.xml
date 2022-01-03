@@ -339,9 +339,7 @@
             </summary>
         </member>
         <member name="M:Waher.Networking.DNS.Communication.DnsResponse.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.DNS.Communication.DnsUdpClient">
             <summary>
@@ -362,9 +360,7 @@
             is assumed.</param>
         </member>
         <member name="M:Waher.Networking.DNS.Communication.DnsUdpClient.Dispose">
-            <summary>
-            <see cref="M:System.IDisposable.Dispose"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.DNS.Communication.Question">
             <summary>
@@ -395,9 +391,7 @@
             </summary>
         </member>
         <member name="M:Waher.Networking.DNS.Communication.Question.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.DNS.DnsResolver">
             <summary>
@@ -1118,9 +1112,7 @@
             </summary>
         </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.HINFO.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.MB">
             <summary>
@@ -1237,9 +1229,7 @@
             </summary>
         </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.MINFO.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.MR">
             <summary>
@@ -1293,9 +1283,7 @@
             </summary>
         </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.MX.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.NS">
             <summary>
@@ -1399,9 +1387,7 @@
             </summary>
         </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.ResourceAddressRecord.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.ResourceNameRecord">
             <summary>
@@ -1429,9 +1415,7 @@
             </summary>
         </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.ResourceNameRecord.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.ResourceRecord">
             <summary>
@@ -1480,9 +1464,7 @@
             <returns>Resource Record.</returns>
         </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.ResourceRecord.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.SOA">
             <summary>
@@ -1541,9 +1523,7 @@
             </summary>
         </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.SOA.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.SRV">
             <summary>
@@ -1596,9 +1576,7 @@
             </summary>
         </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.SRV.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.TXT">
             <summary>
@@ -1627,9 +1605,7 @@
             </summary>
         </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.TXT.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.DNS.ResourceRecords.WKS">
             <summary>
@@ -1668,9 +1644,7 @@
             </summary>
         </member>
         <member name="M:Waher.Networking.DNS.ResourceRecords.WKS.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
     </members>
 </doc>

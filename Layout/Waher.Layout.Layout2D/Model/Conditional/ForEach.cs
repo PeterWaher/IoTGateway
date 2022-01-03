@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
 
@@ -57,12 +58,12 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.expression = new ExpressionAttribute(Input, "expression");
 			this.variable = new StringAttribute(Input, "variable");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -108,35 +109,38 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
 			if (this.measured is null)
 			{
 				List<ILayoutElement> Measured = new List<ILayoutElement>();
-				object Result = this.expression.Evaluate(State.Session);
+				object Result = await this.expression.EvaluateAsync(State.Session);
 
-				if (Result is IEnumerable Set &&
-					this.HasChildren &&
-					!(this.variable is null) &&
-					this.variable.TryEvaluate(State.Session, out string VariableName))
+				if (Result is IEnumerable Set && this.HasChildren)
 				{
-					IEnumerator e = Set.GetEnumerator();
-
-					while (e.MoveNext())
+					EvaluationResult<string> Variable = await this.variable.TryEvaluate(State.Session);
+					if (Variable.Ok)
 					{
-						State.Session[VariableName] = e.Current;
+						IEnumerator e = Set.GetEnumerator();
 
-						foreach (ILayoutElement Child in this.Children)
+						while (e.MoveNext())
 						{
-							ILayoutElement Copy = Child.Copy(this);
-							Measured.Add(Copy);
+							State.Session[Variable.Result] = e.Current;
 
-							if (Copy.MeasureDimensions(State))
-								Relative = true;
+							if (this.HasChildren)
+							{
+								foreach (ILayoutElement Child in this.Children)
+								{
+									ILayoutElement Copy = Child.Copy(this);
+									Measured.Add(Copy);
 
-							this.IncludeElement(Copy);
+									await Copy.MeasureDimensions(State);
+
+									this.IncludeElement(Copy);
+								}
+							}
 						}
 					}
 				}
@@ -147,14 +151,10 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 			{
 				foreach (ILayoutElement E in this.measured)
 				{
-					if (E.MeasureDimensions(State))
-						Relative = true;
-
+					await E.MeasureDimensions(State);
 					this.IncludeElement(E);
 				}
 			}
-
-			return Relative;
 		}
 
 		/// <summary>

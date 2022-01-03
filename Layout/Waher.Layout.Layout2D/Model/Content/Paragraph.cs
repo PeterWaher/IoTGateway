@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Exceptions;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -57,9 +58,9 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override async Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
+			await base.FromXml(Input);
 
 			this.font = new StringAttribute(Input, "font");
 
@@ -69,7 +70,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 			{
 				if (Node is XmlElement E)
 				{
-					ILayoutElement Child = this.Document.CreateElement(E, this);
+					ILayoutElement Child = await this.Document.CreateElement(E, this);
 
 					if (Child is IFlowingText Text)
 						Children.Add(Text);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -63,12 +64,12 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public bool GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public async Task<bool> GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			try
 			{
-				Graph G = GetGraph(Rows);
-				SpanElements.InlineScript.GenerateHTML(G, Output, true, Document.Settings.Variables ?? new Variables());
+				Graph G = await GetGraph(Rows);
+				await SpanElements.InlineScript.GenerateHTML(G, Output, true, Document.Settings.Variables ?? new Variables());
 				return true;
 			}
 			catch (Exception ex)
@@ -83,7 +84,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		/// </summary>
 		/// <param name="Rows">Rows</param>
 		/// <returns>Graph object</returns>
-		public static Graph GetGraph(string[] Rows)
+		public static async Task<Graph> GetGraph(string[] Rows)
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -113,7 +114,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 			{
 				if (N is XmlElement E)
 				{
-					G.ImportGraph(E);
+					await G.ImportGraphAsync(E);
 					break;
 				}
 			}
@@ -130,12 +131,12 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public bool GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public async Task<bool> GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			try
 			{
-				Graph G = GetGraph(Rows);
-				SpanElements.InlineScript.GeneratePlainText(G, Output, true);
+				Graph G = await GetGraph(Rows);
+				await SpanElements.InlineScript.GeneratePlainText(G, Output, true);
 				return true;
 			}
 			catch (Exception ex)
@@ -155,13 +156,13 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public bool GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent,
+		public async Task<bool> GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent,
 			MarkdownDocument Document)
 		{
 			try
 			{
-				Graph G = GetGraph(Rows);
-				SpanElements.InlineScript.GenerateXAML(G, Output, TextAlignment, true, Document.Settings.Variables ?? new Variables(), 
+				Graph G = await GetGraph(Rows);
+				await SpanElements.InlineScript.GenerateXAML(G, Output, TextAlignment, true, Document.Settings.Variables ?? new Variables(), 
 					Document.Settings.XamlSettings);
 				return true;
 			}
@@ -182,13 +183,13 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public bool GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent,
+		public async Task<bool> GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent,
 			MarkdownDocument Document)
 		{
 			try
 			{
-				Graph G = GetGraph(Rows);
-				SpanElements.InlineScript.GenerateXamarinForms(G, Output, TextAlignment, true, 
+				Graph G = await GetGraph(Rows);
+				await SpanElements.InlineScript.GenerateXamarinForms(G, Output, TextAlignment, true, 
 					Document.Settings.Variables ?? new Variables(), Document.Settings.XamlSettings);
 				return true;
 			}
@@ -206,9 +207,9 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		/// <param name="Language">Language used.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>Image, if successful, null otherwise.</returns>
-		public PixelInformation GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
+		public async Task<PixelInformation> GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
 		{
-			Graph G = GetGraph(Rows);
+			Graph G = await GetGraph(Rows);
 			return G.CreatePixels(Document.Settings.Variables ?? new Variables());
 		}
 

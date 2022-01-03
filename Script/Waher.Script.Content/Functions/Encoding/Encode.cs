@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Script.Abstraction.Elements;
@@ -44,15 +45,18 @@ namespace Waher.Script.Content.Functions.Encoding
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "encode"; }
-		}
+		public override string FunctionName => "encode";
 
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
 		public override string[] DefaultArgumentNames => new string[] { "Object" };
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
 
 		/// <summary>
 		/// Evaluates the function.
@@ -61,6 +65,17 @@ namespace Waher.Script.Content.Functions.Encoding
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
+		{
+			return this.EvaluateAsync(Arguments, Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Arguments">Function arguments.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
 			string ContentType;
 			byte[] Bin;
@@ -76,10 +91,16 @@ namespace Waher.Script.Content.Functions.Encoding
 				for (i = 0; i < c; i++)
 					AcceptedTypes[i] = A.GetValue(i)?.ToString();
 
-				Bin = InternetContent.Encode(Arguments[0].AssociatedObjectValue, System.Text.Encoding.UTF8, out ContentType, AcceptedTypes);
+				KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Arguments[0].AssociatedObjectValue, System.Text.Encoding.UTF8, AcceptedTypes);
+				Bin = P.Key;
+				ContentType = P.Value;
 			}
 			else
-				Bin = InternetContent.Encode(Arguments[0].AssociatedObjectValue, System.Text.Encoding.UTF8, out ContentType);
+			{
+				KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Arguments[0].AssociatedObjectValue, System.Text.Encoding.UTF8);
+				Bin = P.Key;
+				ContentType = P.Value;
+			}
 
 			return new ObjectVector(new ObjectValue(Bin), new StringValue(ContentType));
 		}

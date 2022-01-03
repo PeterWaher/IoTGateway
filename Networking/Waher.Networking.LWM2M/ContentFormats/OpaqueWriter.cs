@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Waher.Networking.CoAP;
-using Waher.Security.DTLS;
 
 namespace Waher.Networking.LWM2M.ContentFormats
 {
@@ -12,7 +9,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 	/// </summary>
 	public class OpaqueWriter : TlvWriter
 	{
-		private MemoryStream ms;
+		private readonly MemoryStream ms;
 
 		/// <summary>
 		/// Content format of generated payload.

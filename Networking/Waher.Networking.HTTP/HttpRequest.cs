@@ -3,6 +3,7 @@ using System.IO;
 #if !WINDOWS_UWP
 using System.Security.Cryptography.X509Certificates;
 #endif
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Script;
@@ -44,16 +45,23 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// If the request has data.
 		/// </summary>
-		public bool HasData
+		public bool HasData => !(this.dataStream is null);
+
+		/// <summary>
+		/// Decodes data sent in request.
+		/// </summary>
+		/// <returns>Decoded data.</returns>
+		[Obsolete("Use DecodeDataAsync() instead, for better performance processing asynchronous elements in parallel environments.")]
+		public object DecodeData()
 		{
-			get { return !(this.dataStream is null); }
+			return this.DecodeDataAsync().Result;
 		}
 
 		/// <summary>
 		/// Decodes data sent in request.
 		/// </summary>
 		/// <returns>Decoded data.</returns>
-		public object DecodeData()
+		public async Task<object> DecodeDataAsync()
 		{
 			if (this.dataStream is null)
 				return null;
@@ -71,7 +79,7 @@ namespace Waher.Networking.HTTP
 			if (ContentType is null)
 				return Data;
 
-			return InternetContent.Decode(ContentType.Type, Data, ContentType.Encoding, ContentType.Fields,
+			return await InternetContent.DecodeAsync(ContentType.Type, Data, ContentType.Encoding, ContentType.Fields,
 				new Uri(this.header.GetURL(false, false)));
 		}
 

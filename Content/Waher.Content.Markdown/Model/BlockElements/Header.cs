@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 
@@ -64,24 +65,18 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <summary>
 		/// Header level.
 		/// </summary>
-		public int Level
-		{
-			get { return this.level; }
-		}
+		public int Level => this.level;
 
 		/// <summary>
 		/// ID of header.
 		/// </summary>
-		public string Id
-		{
-			get { return this.id; }
-		}
+		public string Id => this.id;
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
 			if (this.prefix)
 			{
@@ -89,7 +84,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				Output.Append(' ');
 			}
 
-			base.GenerateMarkdown(Output);
+			await base.GenerateMarkdown(Output);
 			Output.AppendLine();
 
 			if (!this.prefix)
@@ -102,7 +97,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override async Task GenerateHTML(StringBuilder Output)
 		{
 			Output.Append("<h");
 			Output.Append(this.level.ToString());
@@ -120,7 +115,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			Output.Append('>');
 
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateHTML(Output);
+				await E.GenerateHTML(Output);
 
 			Output.Append("</h");
 			Output.Append(this.level.ToString());
@@ -131,14 +126,14 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override async Task GeneratePlainText(StringBuilder Output)
 		{
 			if (this.level <= 2)
 			{
 				int Len = Output.Length;
 
 				foreach (MarkdownElement E in this.Children)
-					E.GeneratePlainText(Output);
+					await E.GeneratePlainText(Output);
 
 				Len = Output.Length - Len + 3;
 				Output.AppendLine();
@@ -151,7 +146,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				Output.Append(' ');
 
 				foreach (MarkdownElement E in this.Children)
-					E.GeneratePlainText(Output);
+					await E.GeneratePlainText(Output);
 
 				Output.AppendLine();
 				Output.AppendLine();
@@ -163,7 +158,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			XamlSettings Settings = this.Document.Settings.XamlSettings;
 
@@ -180,7 +175,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			}
 
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateXAML(Output, TextAlignment);
+				await E.GenerateXAML(Output, TextAlignment);
 
 			Output.WriteEndElement();
 		}
@@ -190,7 +185,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			XamlSettings Settings = this.Document.Settings.XamlSettings;
 			Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
@@ -209,7 +204,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			StringBuilder Html = new StringBuilder();
 
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateHTML(Html);
+				await E.GenerateHTML(Html);
 
 			Output.WriteCData(Html.ToString());
 
@@ -222,35 +217,32 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="Level">Current section level.</param>
-		public override void GenerateSmartContractXml(XmlWriter Output, ref int Level)
+		/// <param name="State">Current rendering state.</param>
+		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
 			while (Level >= this.level)
 			{
 				Output.WriteEndElement();
 				Output.WriteEndElement();
-				Level--;
+				State.Level--;
 			}
 
 			Output.WriteStartElement("section");
 			Output.WriteStartElement("header");
 
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateSmartContractXml(Output, ref Level);
+				await E.GenerateSmartContractXml(Output, State);
 
 			Output.WriteEndElement();
 			Output.WriteStartElement("body");
 
-			Level++;
+			State.Level++;
 		}
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get { return false; }
-		}
+		internal override bool InlineSpanElement => false;
 
 		/// <summary>
 		/// Exports the element to XML.

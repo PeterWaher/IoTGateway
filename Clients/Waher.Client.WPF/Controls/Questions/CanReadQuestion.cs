@@ -440,6 +440,8 @@ namespace Waher.Client.WPF.Controls.Questions
 							Tag = FieldName
 						});
 					}
+
+					return Task.CompletedTask;
 				});
 			}
 		}

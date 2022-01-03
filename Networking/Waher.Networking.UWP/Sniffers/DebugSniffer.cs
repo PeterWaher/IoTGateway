@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.Sniffers
 {
@@ -18,9 +19,10 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <inheritdoc/>
-		protected override void WriteLine(string s)
+		protected override Task WriteLine(string s)
 		{
 			Debug.WriteLine(s);
+			return Task.CompletedTask;
 		}
 	}
 }

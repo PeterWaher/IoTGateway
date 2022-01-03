@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Markdown.Model.SpanElements;
 
@@ -27,18 +28,15 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <summary>
 		/// Prefix, in plain text mode.
 		/// </summary>
-		public string Prefix
-		{
-			get { return this.prefix; }
-		}
+		public string Prefix => this.prefix;
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
-			PrefixedBlock(Output, this.Child, "*\t", "\t");
+			await PrefixedBlock(Output, this.Child, "*\t", "\t");
 			Output.AppendLine();
 		}
 
@@ -46,7 +44,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override async Task GenerateHTML(StringBuilder Output)
 		{
 			Output.Append("<li");
 
@@ -68,7 +66,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			}
 
 			Output.Append('>');
-			this.Child.GenerateHTML(Output);
+			await this.Child.GenerateHTML(Output);
 			Output.AppendLine("</li>");
 		}
 
@@ -76,12 +74,12 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override async Task GeneratePlainText(StringBuilder Output)
 		{
 			Output.Append(this.prefix);
 
 			StringBuilder sb = new StringBuilder();
-			this.Child.GeneratePlainText(sb);
+			await this.Child.GeneratePlainText(sb);
 
 			string s = sb.ToString();
 
@@ -96,9 +94,9 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			this.Child.GenerateXAML(Output, TextAlignment);
+			return this.Child.GenerateXAML(Output, TextAlignment);
 		}
 
 		/// <summary>
@@ -106,9 +104,9 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			this.Child.GenerateXamarinForms(Output, TextAlignment);
+			return this.Child.GenerateXamarinForms(Output, TextAlignment);
 		}
 
 		/// <summary>
@@ -116,22 +114,16 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="Level">Current section level.</param>
-		public override void GenerateSmartContractXml(XmlWriter Output, ref int Level)
+		/// <param name="State">Current rendering state.</param>
+		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
-			NumberedItem.GenerateSmartContractXmlItem(this.Child, Output, ref Level);
+			return NumberedItem.GenerateSmartContractXmlItem(this.Child, Output, State);
 		}
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get
-			{
-				return this.Child.InlineSpanElement;
-			}
-		}
+		internal override bool InlineSpanElement => this.Child.InlineSpanElement;
 
 		/// <summary>
 		/// Gets margins for content.

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -40,11 +41,10 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.factor = new FloatAttribute(Input, "factor");
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -85,13 +85,15 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// Called when dimensions have been measured.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		/// <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
-		public override void AfterMeasureDimensions(DrawingState State, ref bool Relative)
+		public override async Task AfterMeasureDimensions(DrawingState State)
 		{
-			base.AfterMeasureDimensions(State, ref Relative);
+			await base.AfterMeasureDimensions(State);
 
-			if (!(this.factor is null) && this.factor.TryEvaluate(State.Session, out this.sy))
+			EvaluationResult<float> Factor = await this.factor.TryEvaluate(State.Session);
+			if (Factor.Ok)
 			{
+				this.sy = Factor.Result;
+
 				SKMatrix M = SKMatrix.CreateTranslation(this.xCoordinate, this.yCoordinate);
 				M = M.PreConcat(SKMatrix.CreateSkew(0, this.sy));
 				M = M.PreConcat(SKMatrix.CreateTranslation(-this.xCoordinate, -this.yCoordinate));
@@ -108,14 +110,14 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			SKMatrix M = State.Canvas.TotalMatrix;
 			State.Canvas.Translate(this.xCoordinate, this.yCoordinate);
 			State.Canvas.Skew(0, this.sy);
 			State.Canvas.Translate(-this.xCoordinate, -this.yCoordinate);
 
-			base.Draw(State);
+			await base.Draw(State);
 
 			State.Canvas.SetMatrix(M);
 		}

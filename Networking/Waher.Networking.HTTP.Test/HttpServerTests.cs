@@ -305,7 +305,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[TestMethod]
-		public void Test_18_GET_MultipleRanges()
+		public async Task Test_18_GET_MultipleRanges()
 		{
 			server.Register(new HttpFolderResource("/Test18", "Data", false, false, true, false));
 
@@ -319,7 +319,7 @@ namespace Waher.Networking.HTTP.Test
 			using Stream f = Response.GetResponseStream();
 			int NrRead = f.Read(Data, 0, 500);
 			string s = Encoding.UTF8.GetString(Data, 0, NrRead);
-			string s2 = File.ReadAllText("Data/MultiRangeResponse.txt");
+			string s2 = await Resources.ReadAllTextAsync("Data/MultiRangeResponse.txt");
 
 			int i = s.IndexOf("--");
 			int j = s.IndexOf("\r\n", i);

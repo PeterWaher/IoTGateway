@@ -1,13 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Xml;
+using Waher.Content.Emoji;
 
 namespace Waher.Content.Markdown.Model
 {
 	/// <summary>
 	/// Multimedia item.
 	/// </summary>
-	public class MultimediaItem
+	public class MultimediaItem : IImageSource
 	{
 		private readonly MarkdownDocument doc;
 		private readonly string url;
@@ -37,42 +38,27 @@ namespace Waher.Content.Markdown.Model
 		/// <summary>
 		/// Markdown document
 		/// </summary>
-		public MarkdownDocument Document
-		{
-			get { return this.doc; }
-		}
+		public MarkdownDocument Document => this.doc;
 
 		/// <summary>
 		/// URL
 		/// </summary>
-		public string Url
-		{
-			get { return this.url; }
-		}
+		public string Url => this.url;
 
 		/// <summary>
 		/// Optional title.
 		/// </summary>
-		public string Title
-		{
-			get { return this.title; }
-		}
+		public string Title => this.title;
 
 		/// <summary>
 		/// Width of media item, if available.
 		/// </summary>
-		public int? Width
-		{
-			get { return this.width; }
-		}
+		public int? Width => this.width;
 
 		/// <summary>
 		/// Height of media item, if available.
 		/// </summary>
-		public int? Height
-		{
-			get { return this.height; }
-		}
+		public int? Height => this.height;
 
 		/// <summary>
 		/// Resource extension.

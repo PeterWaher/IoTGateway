@@ -71,9 +71,7 @@ namespace Waher.Things
 		/// </summary>
 		public string ErrorMessage { get { return this.errorMessage; } }
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder Output = new StringBuilder();

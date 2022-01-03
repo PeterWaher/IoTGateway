@@ -18,9 +18,7 @@ namespace Waher.Networking.XMPP.StanzaErrors
 		{
 		}
 
-		/// <summary>
-		/// <see cref="StanzaExceptionException.ErrorStanzaName"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ErrorStanzaName
 		{
 			get { return "conflict"; }

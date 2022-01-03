@@ -206,9 +206,7 @@ namespace Waher.Networking.XMPP.Chat
 			this.sessions.Removed += Sessions_Removed;
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			base.Dispose();
@@ -221,20 +219,20 @@ namespace Waher.Networking.XMPP.Chat
 		/// </summary>
 		public override string[] Extensions => new string[0];
 
-		private void SendChatMessage(string To, string OrgSubject, string OrgCommand, string Markdown, RemoteXmppSupport Support,
+		private async Task SendChatMessage(string To, string OrgSubject, string OrgCommand, string Markdown, RemoteXmppSupport Support,
 			bool Last, params Tuple<string, string, byte[]>[] EmbeddedContent)
 		{
 			if (Support.Mail && !string.IsNullOrEmpty(OrgCommand))
 				Markdown = ">\t" + OrgCommand + "\r\n\r\n" + Markdown;
 
-			MarkdownDocument Doc = new MarkdownDocument(Markdown, markdownSettings);
-			string PlainText = Doc.GeneratePlainText();
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, markdownSettings);
+			string PlainText = await Doc.GeneratePlainText();
 			StringBuilder Xml = new StringBuilder();
 
 			if (Support.Html)
 			{
 				Xml.Append("<html xmlns='http://jabber.org/protocol/xhtml-im'><body xmlns='http://www.w3.org/1999/xhtml'>");
-				HtmlDocument Doc2 = new HtmlDocument(Doc.GenerateHTML());
+				HtmlDocument Doc2 = new HtmlDocument(await Doc.GenerateHTML());
 				XmlEncode(Doc2.Body, Xml);
 				Xml.Append("</body></html>");
 			}
@@ -393,7 +391,7 @@ namespace Waher.Networking.XMPP.Chat
 				Menu = null;
 			}
 
-			if (this.concentratorServer != null)
+			if (!(this.concentratorServer is null))
 			{
 				if (!Variables.TryGetVariable(" Source ", out v) || (SelectedSource = v.ValueObject as IDataSource) is null)
 				{
@@ -512,9 +510,9 @@ namespace Waher.Networking.XMPP.Chat
 						Msg.Append(", ");
 				}
 
-				this.SendChatMessage(e.From, e.Subject, string.Empty, Msg.ToString(), Support, false);
+				await this.SendChatMessage(e.From, e.Subject, string.Empty, Msg.ToString(), Support, false);
 
-				if (this.provisioningClient != null)
+				if (!(this.provisioningClient is null))
 				{
 					if (Variables.TryGetVariable(" User ", out v) &&
 						v.ValueObject is User User &&
@@ -523,19 +521,17 @@ namespace Waher.Networking.XMPP.Chat
 						if (string.Compare(e.FromBareJID, this.provisioningClient.OwnerJid, true) == 0)
 						{
 							User.SetPrivilege(typeof(Expression).Namespace + ".Persistence", true);
-							this.SendChatMessage(e.From, e.Subject, string.Empty, "SQL interface enabled.", Support, false);
+							await this.SendChatMessage(e.From, e.Subject, string.Empty, "SQL interface enabled.", Support, false);
 						}
 						else
 						{
-							this.provisioningClient.CanRead(e.FromBareJID, FieldType.All, null, null, null, null, null, (sender3, e3) =>
+							this.provisioningClient.CanRead(e.FromBareJID, FieldType.All, null, null, null, null, null, async (sender3, e3) =>
 							{
 								if (e3.CanRead && e3.FieldTypes == FieldType.All)
 								{
 									User.SetPrivilege(typeof(Expression).Namespace + ".Persistence.SQL.Select", true);
-									this.SendChatMessage(e.From, e.Subject, string.Empty, "SQL SELECT interface enabled.", Support, false);
+									await this.SendChatMessage(e.From, e.Subject, string.Empty, "SQL SELECT interface enabled.", Support, false);
 								}
-
-								return Task.CompletedTask;
 							}, null);
 						}
 					}
@@ -585,15 +581,15 @@ namespace Waher.Networking.XMPP.Chat
 					case "hej":
 					case "hallo":
 					case "hola":
-						this.SendChatMessage(e.From, e.Subject, Row, "Hello. Type # to display the menu.", Support, Last);
+						await this.SendChatMessage(e.From, e.Subject, Row, "Hello. Type # to display the menu.", Support, Last);
 						break;
 
 					case "#":
-						this.ShowHelp(e.From, false, Support, e.Subject, Row, Last);
+						await this.ShowHelp(e.From, false, Support, e.Subject, Row, Last);
 						break;
 
 					case "##":
-						this.ShowHelp(e.From, true, Support, e.Subject, Row, Last);
+						await this.ShowHelp(e.From, true, Support, e.Subject, Row, Last);
 						break;
 
 					case "?":
@@ -601,11 +597,11 @@ namespace Waher.Networking.XMPP.Chat
 						IThingReference ThingRef;
 						bool Full = (s == "??");
 
-						if (this.concentratorServer != null)
+						if (!(this.concentratorServer is null))
 						{
 							if (SelectedNode is null)
 							{
-								this.Error(e.From, "No node selected.", Support, e.Subject, Row, Last);
+								await this.Error(e.From, "No node selected.", Support, e.Subject, Row, Last);
 								break;
 							}
 
@@ -620,13 +616,13 @@ namespace Waher.Networking.XMPP.Chat
 						InternalReadoutErrorsEventHandler ErrorsHandler = Full ? (InternalReadoutErrorsEventHandler)this.AllFieldsErrorsRead : this.MomentaryFieldsErrorsRead;
 
 						this.InitReadout(e.From);
-						this.SendChatMessage(e.From, e.Subject, Row, "Readout started...", Support, false);
+						await this.SendChatMessage(e.From, e.Subject, Row, "Readout started...", Support, false);
 
-						if (this.provisioningClient != null)
+						if (!(this.provisioningClient is null))
 						{
 							this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
 								FieldTypes, NodeReferences, null, new string[0], new string[0], new string[0],
-								(sender2, e2) =>
+								async (sender2, e2) =>
 								{
 									if (e2.Ok && e2.CanRead)
 									{
@@ -635,9 +631,7 @@ namespace Waher.Networking.XMPP.Chat
 											new object[] { e.From, true, null, Support, e.Subject, RowNr, NrRows });
 									}
 									else
-										this.Error(e.From, "Access denied.", Support, e.Subject, Row, Last);
-
-									return Task.CompletedTask;
+										await this.Error(e.From, "Access denied.", Support, e.Subject, Row, Last);
 								}, null);
 						}
 						else
@@ -660,7 +654,7 @@ namespace Waher.Networking.XMPP.Chat
 
 							if (Markdown.Length > 3000)
 							{
-								this.SendChatMessage(e.From, e.Subject, Row, Markdown.ToString(), Support, false);
+								await this.SendChatMessage(e.From, e.Subject, Row, Markdown.ToString(), Support, false);
 								Markdown.Clear();
 							}
 
@@ -678,21 +672,21 @@ namespace Waher.Networking.XMPP.Chat
 						}
 
 						if (Markdown.Length > 0)
-							this.SendChatMessage(e.From, e.Subject, Row, Markdown.ToString(), Support, Last);
+							await this.SendChatMessage(e.From, e.Subject, Row, Markdown.ToString(), Support, Last);
 						break;
 
 					case "/":
 						if (this.concentratorServer is null)
-							this.SendChatMessage(e.From, e.Subject, Row, "Device is not a concentrator.", Support, Last);
+							await this.SendChatMessage(e.From, e.Subject, Row, "Device is not a concentrator.", Support, Last);
 						else if (SelectedSource is null)
-							this.SendChatMessage(e.From, e.Subject, Row, "No source selected.", Support, Last);
+							await this.SendChatMessage(e.From, e.Subject, Row, "No source selected.", Support, Last);
 						else
 						{
 							IEnumerable<INode> Nodes = SelectedSource.RootNodes;
 							bool First = true;
 
 							SelectedNode = null;
-							if (Nodes != null)
+							if (!(Nodes is null))
 							{
 								foreach (INode Node in Nodes)
 								{
@@ -715,7 +709,7 @@ namespace Waher.Networking.XMPP.Chat
 
 					case "//":
 						if (this.concentratorServer is null)
-							this.SendChatMessage(e.From, e.Subject, Row, "Device is not a concentrator.", Support, Last);
+							await this.SendChatMessage(e.From, e.Subject, Row, "Device is not a concentrator.", Support, Last);
 						else
 						{
 							IEnumerable<IDataSource> Sources = this.concentratorServer.RootDataSources;
@@ -736,7 +730,7 @@ namespace Waher.Networking.XMPP.Chat
 								}
 							}
 
-							this.SelectSource(e, SelectedSource, Variables, Menu, Support, Row, Last);
+							await this.SelectSource(e, SelectedSource, Variables, Menu, Support, Row, Last);
 						}
 						break;
 
@@ -747,7 +741,7 @@ namespace Waher.Networking.XMPP.Chat
 						{
 							if (this.controlServer is null)
 							{
-								this.Error(e.From, "Device is not an actuator", Support, e.Subject, Row, Last);
+								await this.Error(e.From, "Device is not an actuator", Support, e.Subject, Row, Last);
 								break;
 							}
 							else
@@ -760,14 +754,14 @@ namespace Waher.Networking.XMPP.Chat
 						{
 							if (SelectedNode is null)
 							{
-								this.Error(e.From, "No node selected.", Support, e.Subject, Row, Last);
+								await this.Error(e.From, "No node selected.", Support, e.Subject, Row, Last);
 								break;
 							}
 							else if (SelectedNode is IActuator Actuator)
 								Parameters = await Actuator.GetControlParameters();
 							else
 							{
-								this.Error(e.From, "Selected node is not an actuator", Support, e.Subject, Row, Last);
+								await this.Error(e.From, "Selected node is not an actuator", Support, e.Subject, Row, Last);
 								break;
 							}
 						}
@@ -776,7 +770,7 @@ namespace Waher.Networking.XMPP.Chat
 						break;
 
 					default:
-						if (int.TryParse(s, out i) && i >= 0 && Menu != null && Menu.TryGetValue(i, out KeyValuePair<string, object> Item))
+						if (int.TryParse(s, out i) && i >= 0 && !(Menu is null) && Menu.TryGetValue(i, out KeyValuePair<string, object> Item))
 						{
 							if (string.IsNullOrEmpty(Item.Key))
 							{
@@ -784,9 +778,9 @@ namespace Waher.Networking.XMPP.Chat
 								{
 									Menu = PreviousMenu;
 									if (Menu is null)
-										this.Error(e.From, "There's no previous menu.", Support, e.Subject, Row, Last);
+										await this.Error(e.From, "There's no previous menu.", Support, e.Subject, Row, Last);
 									else
-										this.SendMenu(e.From, Menu, Variables, Support, e.Subject, Row, Last);
+										await this.SendMenu(e.From, Menu, Variables, Support, e.Subject, Row, Last);
 								}
 							}
 							else
@@ -816,12 +810,12 @@ namespace Waher.Networking.XMPP.Chat
 										{
 											if (RootSource.SourceID == s)
 											{
-												this.SelectSource(e, RootSource, Variables, Menu, Support, Row, Last);
+												await this.SelectSource(e, RootSource, Variables, Menu, Support, Row, Last);
 												break;
 											}
 										}
 									}
-									else if ((Source = Obj.Value as IDataSource) != null)
+									else if (!((Source = Obj.Value as IDataSource) is null))
 									{
 										if (Source.HasChildren)
 										{
@@ -829,7 +823,7 @@ namespace Waher.Networking.XMPP.Chat
 											{
 												if (ChildSource.SourceID == s)
 												{
-													this.SelectSource(e, ChildSource, Variables, Menu, Support, Row, Last);
+													await this.SelectSource(e, ChildSource, Variables, Menu, Support, Row, Last);
 													s = null;
 													break;
 												}
@@ -838,7 +832,7 @@ namespace Waher.Networking.XMPP.Chat
 
 										if (!string.IsNullOrEmpty(s))
 										{
-											if (Source.RootNodes != null)
+											if (!(Source.RootNodes is null))
 											{
 												foreach (INode RootNode in Source.RootNodes)
 												{
@@ -864,11 +858,11 @@ namespace Waher.Networking.XMPP.Chat
 							FieldsHandler = Full ? (InternalReadoutFieldsEventHandler)this.AllFieldsRead : this.MomentaryFieldsRead;
 							ErrorsHandler = Full ? (InternalReadoutErrorsEventHandler)this.AllFieldsErrorsRead : this.MomentaryFieldsErrorsRead;
 
-							if (this.concentratorServer != null)
+							if (!(this.concentratorServer is null))
 							{
 								if (SelectedSource is null)
 								{
-									this.Error(e.From, "No source selected.", Support, e.Subject, Row, Last);
+									await this.Error(e.From, "No source selected.", Support, e.Subject, Row, Last);
 									break;
 								}
 
@@ -882,11 +876,11 @@ namespace Waher.Networking.XMPP.Chat
 
 									if (Node is null)
 									{
-										this.Error(e.From, "Node not found.", Support, e.Subject, Row, Last);
+										await this.Error(e.From, "Node not found.", Support, e.Subject, Row, Last);
 										break;
 									}
 								}
-								else if ((Node = this.CheckMenuValue(Menu, Field) as INode) != null)
+								else if (!((Node = this.CheckMenuValue(Menu, Field) as INode) is null))
 									Field = string.Empty;
 								else
 								{
@@ -894,14 +888,14 @@ namespace Waher.Networking.XMPP.Chat
 
 									if (Node is null || !Node.IsReadable)
 									{
-										if (SelectedSource != null && await SelectedSource.GetNodeAsync(new ThingReference(Field, SelectedSource.SourceID, string.Empty)) is INode Node2)
+										if (!(SelectedSource is null) && await SelectedSource.GetNodeAsync(new ThingReference(Field, SelectedSource.SourceID, string.Empty)) is INode Node2)
 										{
 											Node = Node2;
 											Field = string.Empty;
 										}
 										else
 										{
-											this.Error(e.From, "No node selected.", Support, e.Subject, Row, Last);
+											await this.Error(e.From, "No node selected.", Support, e.Subject, Row, Last);
 											break;
 										}
 									}
@@ -909,17 +903,17 @@ namespace Waher.Networking.XMPP.Chat
 
 								ThingRef = Node;
 
-								this.SendChatMessage(e.From, e.Subject, Row, "Readout of " + Field + " on " + Node.NodeId + " started...", Support, false);
+								await this.SendChatMessage(e.From, e.Subject, Row, "Readout of " + Field + " on " + Node.NodeId + " started...", Support, false);
 
 								NodeReferences = new IThingReference[] { ThingRef ?? ThingReference.Empty };
 
 								if (string.IsNullOrEmpty(Field))
 								{
-									if (this.provisioningClient != null)
+									if (!(this.provisioningClient is null))
 									{
 										this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
 											FieldTypes, NodeReferences, null, new string[0], new string[0], new string[0],
-											(sender2, e2) =>
+											async (sender2, e2) =>
 											{
 												if (e2.Ok && e2.CanRead)
 												{
@@ -928,9 +922,7 @@ namespace Waher.Networking.XMPP.Chat
 														new object[] { e.From, true, Field, Support, e.Subject, RowNr, NrRows });
 												}
 												else
-													this.Error(e.From, "Access denied.", Support, e.Subject, Row, Last);
-
-												return Task.CompletedTask;
+													await this.Error(e.From, "Access denied.", Support, e.Subject, Row, Last);
 											}, null);
 									}
 									else
@@ -942,11 +934,11 @@ namespace Waher.Networking.XMPP.Chat
 								}
 								else
 								{
-									if (this.provisioningClient != null)
+									if (!(this.provisioningClient is null))
 									{
 										this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
 											FieldTypes, NodeReferences, new string[] { Field }, new string[0], new string[0], new string[0],
-											(sender2, e2) =>
+											async (sender2, e2) =>
 											{
 												if (e2.Ok && e2.CanRead)
 												{
@@ -955,9 +947,7 @@ namespace Waher.Networking.XMPP.Chat
 														new object[] { e.From, true, Field, Support, e.Subject, RowNr, NrRows });
 												}
 												else
-													this.Error(e.From, "Access denied.", Support, e.Subject, Row, Last);
-
-												return Task.CompletedTask;
+													await this.Error(e.From, "Access denied.", Support, e.Subject, Row, Last);
 											}, null);
 									}
 									else
@@ -970,13 +960,13 @@ namespace Waher.Networking.XMPP.Chat
 							}
 							else
 							{
-								this.SendChatMessage(e.From, e.Subject, Row, "Readout of " + Field + " started...", Support, false);
+								await this.SendChatMessage(e.From, e.Subject, Row, "Readout of " + Field + " started...", Support, false);
 
-								if (this.provisioningClient != null)
+								if (!(this.provisioningClient is null))
 								{
 									this.provisioningClient.CanRead(XmppClient.GetBareJID(e.From),
 										FieldTypes, null, null, new string[0], new string[0], new string[0],
-										(sender2, e2) =>
+										async (sender2, e2) =>
 										{
 											if (e2.Ok && e2.CanRead)
 											{
@@ -985,9 +975,7 @@ namespace Waher.Networking.XMPP.Chat
 													new object[] { e.From, true, Field, Support, e.Subject, RowNr, NrRows });
 											}
 											else
-												this.Error(e.From, "Access denied.", Support, e.Subject, Row, Last);
-
-											return Task.CompletedTask;
+												await this.Error(e.From, "Access denied.", Support, e.Subject, Row, Last);
 										}, null);
 								}
 								else
@@ -997,20 +985,20 @@ namespace Waher.Networking.XMPP.Chat
 								}
 							}
 						}
-						else if (SelectedSource != null && await SelectedSource.GetNodeAsync(new ThingReference(s, SelectedSource.SourceID, string.Empty)) is INode Node)
+						else if (!(SelectedSource is null) && await SelectedSource.GetNodeAsync(new ThingReference(s, SelectedSource.SourceID, string.Empty)) is INode Node)
 							await this.SelectNode(e, SelectedSource, Node, Variables, Menu, Support, Row, Last);
 						else
 						{
-							if (this.controlServer != null && (i = s.IndexOf(":=")) > 0)
+							if (!(this.controlServer is null) && (i = s.IndexOf(":=")) > 0)
 							{
 								string ParameterName = this.CheckMenuKey(Menu, s.Substring(0, i).Trim());
 								string ValueStr = s.Substring(i + 2).Trim();
 
-								if (this.concentratorServer != null)
+								if (!(this.concentratorServer is null))
 								{
 									if (SelectedSource is null)
 									{
-										this.Error(e.From, "No source selected.", Support, e.Subject, Row, Last);
+										await this.Error(e.From, "No source selected.", Support, e.Subject, Row, Last);
 										break;
 									}
 
@@ -1021,7 +1009,7 @@ namespace Waher.Networking.XMPP.Chat
 										ParameterName = this.CheckMenuKey(Menu, ParameterName.Substring(i + 1));
 
 										Node = this.CheckMenuValue(Menu, s) as INode;
-										if (Node is null && SelectedSource != null && await SelectedSource.GetNodeAsync(new ThingReference(s, SelectedSource.SourceID, string.Empty)) is INode Node3)
+										if (Node is null && !(SelectedSource is null) && await SelectedSource.GetNodeAsync(new ThingReference(s, SelectedSource.SourceID, string.Empty)) is INode Node3)
 											Node = Node3;
 									}
 									else
@@ -1030,7 +1018,7 @@ namespace Waher.Networking.XMPP.Chat
 										{
 											Node = this.CheckMenuValue(Menu, ParameterName) as INode;
 
-											if (Node != null)
+											if (!(Node is null))
 												ParameterName = string.Empty;
 											else
 												Node = SelectedNode;
@@ -1039,7 +1027,7 @@ namespace Waher.Networking.XMPP.Chat
 											Node = SelectedNode;
 									}
 
-									if (Node is null && Menu != null && Menu.TryGetValue(-2, out KeyValuePair<string, object> P) && P.Value is INode Node2)
+									if (Node is null && !(Menu is null) && Menu.TryGetValue(-2, out KeyValuePair<string, object> P) && P.Value is INode Node2)
 										Node = Node2;
 
 									ThingRef = Node;
@@ -1056,20 +1044,20 @@ namespace Waher.Networking.XMPP.Chat
 									}
 								}
 
-								if (ThingRef != null)
+								if (!(ThingRef is null))
 								{
 									try
 									{
 										if (string.IsNullOrEmpty(ValueStr))
 										{
-											if (this.concentratorServer != null && SelectedSource != null && (Node = await SelectedSource.GetNodeAsync(ThingRef)) != null)
+											if (!(this.concentratorServer is null) && !(SelectedSource is null) && !((Node = await SelectedSource.GetNodeAsync(ThingRef)) is null))
 											{
 												if (Node is IActuator Actuator)
 													Parameters = await Actuator.GetControlParameters();
 												else
 													throw new Exception("Node is not an actuator.");
 											}
-											else if (SelectedNode != null)
+											else if (!(SelectedNode is null))
 											{
 												if (SelectedNode is IActuator Actuator)
 												{
@@ -1079,9 +1067,9 @@ namespace Waher.Networking.XMPP.Chat
 												else
 													throw new Exception("Selected node is not an actuator.");
 											}
-											else if (this.concentratorServer != null)
+											else if (!(this.concentratorServer is null))
 												throw new Exception("No node selected.");
-											else if (this.controlServer != null)
+											else if (!(this.controlServer is null))
 											{
 												Node = null;
 												Parameters = await this.controlServer.GetControlParameters(ThingRef);
@@ -1119,8 +1107,8 @@ namespace Waher.Networking.XMPP.Chat
 											}
 
 											if (P0 is null)
-												this.Execute(s, e.From, Support, e.Subject, Row, Last);
-											else if (this.provisioningClient != null)
+												await this.Execute(s, e.From, Support, e.Subject, Row, Last);
+											else if (!(this.provisioningClient is null))
 											{
 												this.provisioningClient.CanControl(e.FromBareJID, new IThingReference[] { ThingRef ?? ThingReference.Empty },
 													new string[] { ParameterName }, new string[0], new string[0], new string[0], async (sender2, e2) =>
@@ -1128,12 +1116,12 @@ namespace Waher.Networking.XMPP.Chat
 														if (e2.Ok && e2.CanControl)
 														{
 															if (await P0.SetStringValue(ThingRef, ValueStr))
-																this.SendChatMessage(e.From, e.Subject, Row, "Control parameter set.", Support, Last);
+																await this.SendChatMessage(e.From, e.Subject, Row, "Control parameter set.", Support, Last);
 															else
-																this.Error(e.From, "Unable to set control parameter value.", Support, e.Subject, Row, Last);
+																await this.Error(e.From, "Unable to set control parameter value.", Support, e.Subject, Row, Last);
 														}
 														else
-															this.Error(e.From, "Access denied.", Support, e.Subject, Row, Last);
+															await this.Error(e.From, "Access denied.", Support, e.Subject, Row, Last);
 													}, null);
 											}
 											else
@@ -1141,20 +1129,20 @@ namespace Waher.Networking.XMPP.Chat
 												if (!await P0.SetStringValue(ThingRef, ValueStr))
 													throw new Exception("Unable to set control parameter value.");
 
-												this.SendChatMessage(e.From, e.Subject, Row, "Control parameter set.", Support, Last);
+												await this.SendChatMessage(e.From, e.Subject, Row, "Control parameter set.", Support, Last);
 											}
 											return;
 										}
 									}
 									catch (Exception ex)
 									{
-										this.Error(e.From, ex.Message, Support, e.Subject, Row, Last);
+										await this.Error(e.From, ex.Message, Support, e.Subject, Row, Last);
 										break;
 									}
 								}
 							}
 
-							this.Execute(s, e.From, Support, e.Subject, Row, Last);
+							await this.Execute(s, e.From, Support, e.Subject, Row, Last);
 						}
 						break;
 				}
@@ -1175,7 +1163,7 @@ namespace Waher.Networking.XMPP.Chat
 
 			int i = 0;
 
-			if (this.provisioningClient != null)
+			if (!(this.provisioningClient is null))
 			{
 				int j, c = Parameters.Length;
 				string[] ParameterNames = new string[c];
@@ -1202,10 +1190,10 @@ namespace Waher.Networking.XMPP.Chat
 
 							Menu[-3] = new KeyValuePair<string, object>(null, Parameters2.ToArray());
 
-							this.SendMenu(e.From, Menu, Variables, Support, e.Subject, OrgCommand, Last);
+							await this.SendMenu(e.From, Menu, Variables, Support, e.Subject, OrgCommand, Last);
 						}
 						else
-							this.Error(e.From, "Access denied.", Support, e.Subject, OrgCommand, Last);
+							await this.Error(e.From, "Access denied.", Support, e.Subject, OrgCommand, Last);
 					}, null);
 			}
 			else
@@ -1216,13 +1204,13 @@ namespace Waher.Networking.XMPP.Chat
 						await P.GetStringValue((IThingReference)SelectedNode ?? ThingReference.Empty) + ")");
 				}
 
-				this.SendMenu(e.From, Menu, Variables, Support, e.Subject, OrgCommand, Last);
+				await this.SendMenu(e.From, Menu, Variables, Support, e.Subject, OrgCommand, Last);
 			}
 		}
 
 		private string CheckMenuKey(SortedDictionary<int, KeyValuePair<string, object>> Menu, string s)
 		{
-			if (Menu != null &&
+			if (!(Menu is null) &&
 				int.TryParse(s, out int i) &&
 				i > 0 &&
 				Menu.TryGetValue(i, out KeyValuePair<string, object> Obj) &&
@@ -1236,7 +1224,7 @@ namespace Waher.Networking.XMPP.Chat
 
 		private object CheckMenuValue(SortedDictionary<int, KeyValuePair<string, object>> Menu, string s)
 		{
-			if (Menu != null &&
+			if (!(Menu is null) &&
 				int.TryParse(s, out int i) &&
 				i > 0 &&
 				Menu.TryGetValue(i, out KeyValuePair<string, object> Obj) &&
@@ -1265,9 +1253,9 @@ namespace Waher.Networking.XMPP.Chat
 			{
 				Menu[-1] = new KeyValuePair<string, object>(null, SelectedSource);
 
-				this.SendChatMessage(e.From, e.Subject, OrgCommand, "Root nodes of data source " + SelectedSource.SourceID + ":", Support, false);
+				await this.SendChatMessage(e.From, e.Subject, OrgCommand, "Root nodes of data source " + SelectedSource.SourceID + ":", Support, false);
 
-				if (SelectedSource.RootNodes != null)
+				if (!(SelectedSource.RootNodes is null))
 				{
 					foreach (INode Node in SelectedSource.RootNodes)
 						Menu[++i] = new KeyValuePair<string, object>(Node.NodeId, Node);
@@ -1275,11 +1263,11 @@ namespace Waher.Networking.XMPP.Chat
 			}
 			else
 			{
-				this.SendChatMessage(e.From, e.Subject, OrgCommand, "Selecting node " + SelectedNode.NodeId + " of " + SelectedSource.SourceID + ".", Support, false);
+				await this.SendChatMessage(e.From, e.Subject, OrgCommand, "Selecting node " + SelectedNode.NodeId + " of " + SelectedSource.SourceID + ".", Support, false);
 
 				if (SelectedNode.HasChildren)
 				{
-					this.SendChatMessage(e.From, e.Subject, OrgCommand, "Child nodes:", Support, false);
+					await this.SendChatMessage(e.From, e.Subject, OrgCommand, "Child nodes:", Support, false);
 
 					foreach (INode Node in await SelectedNode.ChildNodes)
 						Menu[++i] = new KeyValuePair<string, object>(Node.NodeId, Node);
@@ -1287,10 +1275,10 @@ namespace Waher.Networking.XMPP.Chat
 			}
 
 			if (i > 0)
-				this.SendMenu(e.From, Menu, Variables, Support, e.Subject, OrgCommand, Last);
+				await this.SendMenu(e.From, Menu, Variables, Support, e.Subject, OrgCommand, Last);
 		}
 
-		private void SelectSource(MessageEventArgs e, IDataSource SelectedSource, Variables Variables, SortedDictionary<int, KeyValuePair<string, object>> Menu,
+		private async Task SelectSource(MessageEventArgs e, IDataSource SelectedSource, Variables Variables, SortedDictionary<int, KeyValuePair<string, object>> Menu,
 			RemoteXmppSupport Support, string OrgCommand, bool Last)
 		{
 			Variables[" Source "] = SelectedSource;
@@ -1303,14 +1291,14 @@ namespace Waher.Networking.XMPP.Chat
 
 			if (SelectedSource is null)
 			{
-				this.SendChatMessage(e.From, e.Subject, OrgCommand, "Root data sources:", Support, Last);
+				await this.SendChatMessage(e.From, e.Subject, OrgCommand, "Root data sources:", Support, Last);
 
 				foreach (IDataSource Source in this.concentratorServer.RootDataSources)
 					Menu[++i] = new KeyValuePair<string, object>(Source.SourceID, Source);
 			}
 			else
 			{
-				this.SendChatMessage(e.From, e.Subject, OrgCommand, "Selecting data source " + SelectedSource.SourceID + ":", Support, Last);
+				await this.SendChatMessage(e.From, e.Subject, OrgCommand, "Selecting data source " + SelectedSource.SourceID + ":", Support, Last);
 
 				if (SelectedSource.HasChildren)
 				{
@@ -1318,7 +1306,7 @@ namespace Waher.Networking.XMPP.Chat
 						Menu[++i] = new KeyValuePair<string, object>(Source.SourceID, Source);
 				}
 
-				if (SelectedSource.RootNodes != null)
+				if (!(SelectedSource.RootNodes is null))
 				{
 					foreach (INode Node in SelectedSource.RootNodes)
 						Menu[++i] = new KeyValuePair<string, object>(Node.NodeId, Node);
@@ -1326,10 +1314,10 @@ namespace Waher.Networking.XMPP.Chat
 			}
 
 			if (i > 0)
-				this.SendMenu(e.From, Menu, Variables, Support, e.Subject, OrgCommand, Last);
+				await this.SendMenu(e.From, Menu, Variables, Support, e.Subject, OrgCommand, Last);
 		}
 
-		private void SendMenu(string To, SortedDictionary<int, KeyValuePair<string, object>> Menu, Variables Variables,
+		private Task SendMenu(string To, SortedDictionary<int, KeyValuePair<string, object>> Menu, Variables Variables,
 			RemoteXmppSupport Support, string OrgSubject, string OrgCommand, bool Last)
 		{
 			StringBuilder sb = new StringBuilder();
@@ -1342,13 +1330,13 @@ namespace Waher.Networking.XMPP.Chat
 				if (P.Key < 0)
 					continue;
 				else if (P.Key == 0)
-					HasBack = P.Value.Value != null;
+					HasBack = !(P.Value.Value is null);
 				else
 				{
 					sb.Append(P.Key);
 					sb.Append(". ");
 
-					if (P.Value.Value != null)
+					if (!(P.Value.Value is null))
 						sb.AppendLine(MarkdownDocument.Encode(P.Value.Value.ToString()));
 				}
 			}
@@ -1356,7 +1344,7 @@ namespace Waher.Networking.XMPP.Chat
 			if (HasBack)
 				sb.AppendLine("0. Back");
 
-			this.SendChatMessage(To, OrgSubject, OrgCommand, sb.ToString(), Support, Last);
+			return this.SendChatMessage(To, OrgSubject, OrgCommand, sb.ToString(), Support, Last);
 		}
 
 		private class RemoteXmppSupport
@@ -1371,7 +1359,7 @@ namespace Waher.Networking.XMPP.Chat
 			public bool Mail = false;
 		}
 
-		private void Execute(string s, string From, RemoteXmppSupport Support, string OrgSubject, string OrgCommand, bool Last)
+		private async Task Execute(string s, string From, RemoteXmppSupport Support, string OrgSubject, string OrgCommand, bool Last)
 		{
 			Expression Exp;
 
@@ -1381,7 +1369,7 @@ namespace Waher.Networking.XMPP.Chat
 			}
 			catch (Exception)
 			{
-				this.Que(From, Support, OrgSubject, OrgCommand, Last);
+				await this.Que(From, Support, OrgSubject, OrgCommand, Last);
 				return;
 			}
 
@@ -1389,7 +1377,7 @@ namespace Waher.Networking.XMPP.Chat
 			TextWriter Bak = Variables.ConsoleOut;
 			StringBuilder sb = new StringBuilder();
 
-			Variables.Lock();
+			await Variables.LockAsync();
 			Variables.ConsoleOut = new StringWriter(sb);
 			try
 			{
@@ -1404,7 +1392,7 @@ namespace Waher.Networking.XMPP.Chat
 
 				try
 				{
-					Result = Exp.Root.Evaluate(Variables);
+					Result = await Exp.Root.EvaluateAsync(Variables);
 				}
 				catch (ScriptReturnValueException ex)
 				{
@@ -1420,12 +1408,12 @@ namespace Waher.Networking.XMPP.Chat
 				if (Result is Graph G)
 				{
 					PixelInformation Pixels = G.CreatePixels(G.GetSettings(Variables, 600, 300));
-					ImageResult(From, Pixels, Support, Variables, true, OrgSubject, OrgCommand, Last);
+					await ImageResult(From, Pixels, Support, Variables, true, OrgSubject, OrgCommand, Last);
 					return;
 				}
 				else if (Result.AssociatedObjectValue is SKImage Img)
 				{
-					ImageResult(From, PixelInformation.FromImage(Img), Support, Variables, true, OrgSubject, OrgCommand, Last);
+					await ImageResult(From, PixelInformation.FromImage(Img), Support, Variables, true, OrgSubject, OrgCommand, Last);
 					return;
 				}
 				else if (Result.AssociatedObjectValue is Exception ex)
@@ -1435,12 +1423,12 @@ namespace Waher.Networking.XMPP.Chat
 					if (ex is AggregateException ex2)
 					{
 						foreach (Exception ex3 in ex2.InnerExceptions)
-							this.Error(From, ex3.Message, Support, OrgSubject, OrgCommand, false);
+							await this.Error(From, ex3.Message, Support, OrgSubject, OrgCommand, false);
 					}
 					else
-						this.Error(From, ex.Message, Support, OrgSubject, OrgCommand, false);
+						await this.Error(From, ex.Message, Support, OrgSubject, OrgCommand, false);
 				}
-				else if (Result.AssociatedObjectValue is ObjectMatrix M && M.ColumnNames != null)
+				else if (Result.AssociatedObjectValue is ObjectMatrix M && !(M.ColumnNames is null))
 				{
 					StringBuilder Markdown = new StringBuilder();
 
@@ -1466,7 +1454,7 @@ namespace Waher.Networking.XMPP.Chat
 							Markdown.Append("| ");
 
 							object Item = M.GetElement(x, y).AssociatedObjectValue;
-							if (Item != null)
+							if (!(Item is null))
 							{
 								if (!(Item is string s2))
 									s2 = Expression.ToString(Item);
@@ -1479,20 +1467,20 @@ namespace Waher.Networking.XMPP.Chat
 						Markdown.AppendLine(" |");
 					}
 
-					this.SendChatMessage(From, OrgSubject, OrgCommand, Markdown.ToString(), Support, Last);
+					await this.SendChatMessage(From, OrgSubject, OrgCommand, Markdown.ToString(), Support, Last);
 				}
 				else
 				{
 					s = Result.ToString();
-					this.SendChatMessage(From, OrgSubject, OrgCommand, MarkdownDocument.Encode(s), Support, Last);
+					await this.SendChatMessage(From, OrgSubject, OrgCommand, MarkdownDocument.Encode(s), Support, Last);
 				}
 			}
 			catch (Exception ex)
 			{
 				ex = Log.UnnestException(ex);
 
-				this.Error(From, ex.Message, Support, OrgSubject, OrgCommand, false);
-				this.Que(From, Support, OrgSubject, string.Empty, Last);
+				await this.Error(From, ex.Message, Support, OrgSubject, OrgCommand, false);
+				await this.Que(From, Support, OrgSubject, string.Empty, Last);
 			}
 			finally
 			{
@@ -1502,22 +1490,24 @@ namespace Waher.Networking.XMPP.Chat
 			}
 		}
 
-		private bool IsAuthorized(ref ScriptNode Node, object State)
+		private bool IsAuthorized(ScriptNode Node, out ScriptNode NewNode, object State)
 		{
+			NewNode = null;
+
 			if (State is IUser User)
 				return User.HasPrivilege("Script." + Node.GetType().FullName);
 			else
 				return false;
 		}
 
-		private void ImageResult(string To, PixelInformation Pixels, RemoteXmppSupport Support, Variables Variables, bool AllowHttpUpload,
+		private Task ImageResult(string To, PixelInformation Pixels, RemoteXmppSupport Support, Variables Variables, bool AllowHttpUpload,
 			string OrgSubject, string OrgCommand, bool Last)
 		{
 			byte[] Bin = Pixels.EncodeAsPng();
-			this.ImageResult(To, Bin, Support, Variables, AllowHttpUpload, OrgSubject, OrgCommand, Last);
+			return this.ImageResult(To, Bin, Support, Variables, AllowHttpUpload, OrgSubject, OrgCommand, Last);
 		}
 
-		private void ImageResult(string To, byte[] Bin, RemoteXmppSupport Support, Variables Variables, bool AllowHttpUpload,
+		private async Task ImageResult(string To, byte[] Bin, RemoteXmppSupport Support, Variables Variables, bool AllowHttpUpload,
 			string OrgSubject, string OrgCommand, bool Last)
 		{
 			string s;
@@ -1526,15 +1516,15 @@ namespace Waher.Networking.XMPP.Chat
 			{
 				string Cid = Guid.NewGuid().ToString();
 				s = "![Image result](cid:" + Cid + ")";
-				this.SendChatMessage(To, OrgSubject, OrgCommand, s, Support, Last, new Tuple<string, string, byte[]>(Cid, "image/png", Bin));
+				await this.SendChatMessage(To, OrgSubject, OrgCommand, s, Support, Last, new Tuple<string, string, byte[]>(Cid, "image/png", Bin));
 			}
 			else if (Support.Markdown)
 			{
 				s = Convert.ToBase64String(Bin, 0, Bin.Length);
 				s = "![Image result](data:image/png;base64," + s + ")";
-				this.SendChatMessage(To, OrgSubject, OrgCommand, s, Support, Last);
+				await this.SendChatMessage(To, OrgSubject, OrgCommand, s, Support, Last);
 			}
-			else if (AllowHttpUpload && this.httpUpload != null && this.httpUpload.HasSupport)
+			else if (AllowHttpUpload && !(this.httpUpload is null) && this.httpUpload.HasSupport)
 			{
 				string FileName = Guid.NewGuid().ToString().Replace("-", string.Empty) + ".png";
 				string ContentType = "image/png";
@@ -1552,7 +1542,7 @@ namespace Waher.Networking.XMPP.Chat
 
 								HttpContent Body = new ByteArrayContent(Bin);
 
-								if (e.PutHeaders != null)
+								if (!(e.PutHeaders is null))
 								{
 									foreach (KeyValuePair<string, string> P in e.PutHeaders)
 										Body.Headers.Add(P.Key, P.Value);
@@ -1562,26 +1552,26 @@ namespace Waher.Networking.XMPP.Chat
 
 								HttpResponseMessage Response = await HttpClient.PutAsync(e.PutUrl, Body);
 								if (!Response.IsSuccessStatusCode)
-									ImageResult(To, Bin, Support, Variables, false, OrgSubject, OrgCommand, Last);
+									await ImageResult(To, Bin, Support, Variables, false, OrgSubject, OrgCommand, Last);
 								else
-									this.SendChatMessage(To, OrgSubject, OrgCommand, "![Image result](" + e.GetUrl + ")", Support, Last);
+									await this.SendChatMessage(To, OrgSubject, OrgCommand, "![Image result](" + e.GetUrl + ")", Support, Last);
 							}
 						}
 						else
-							ImageResult(To, Bin, Support, Variables, false, OrgSubject, OrgCommand, Last);
+							await ImageResult(To, Bin, Support, Variables, false, OrgSubject, OrgCommand, Last);
 					}
 					catch (Exception)
 					{
-						ImageResult(To, Bin, Support, Variables, false, OrgSubject, OrgCommand, Last);
+						await ImageResult(To, Bin, Support, Variables, false, OrgSubject, OrgCommand, Last);
 					}
 
 				}, null);
 
 				return;
 			}
-			else if (Support.Html && this.bobClient != null && Support.BitsOfBinary)
+			else if (Support.Html && !(this.bobClient is null) && Support.BitsOfBinary)
 			{
-				s = this.bobClient.StoreData(Bin, "image/png");
+				s = await this.bobClient.StoreData(Bin, "image/png");
 
 				if (!Variables.TryGetVariable(" ContentIDs ", out Variable v) ||
 					!(v.ValueObject is Dictionary<string, bool> ContentIDs))
@@ -1595,13 +1585,13 @@ namespace Waher.Networking.XMPP.Chat
 					ContentIDs[s] = true;
 				}
 
-				this.SendChatMessage(To, OrgSubject, OrgCommand, "[Image result](cid:" + s + ")", Support, Last);
+				await this.SendChatMessage(To, OrgSubject, OrgCommand, "[Image result](cid:" + s + ")", Support, Last);
 			}
 			else
 			{
 				s = Convert.ToBase64String(Bin, 0, Bin.Length);
 				s = "![Image result](data:image/png;base64," + s + ")";
-				this.SendChatMessage(To, OrgSubject, OrgCommand, s, Support, Last);
+				await this.SendChatMessage(To, OrgSubject, OrgCommand, s, Support, Last);
 			}
 		}
 
@@ -1630,7 +1620,7 @@ namespace Waher.Networking.XMPP.Chat
 
 		private void Sessions_Removed(object Sender, CacheItemEventArgs<string, Variables> e)
 		{
-			if (this.bobClient != null &&
+			if (!(this.bobClient is null) &&
 				e.Value.TryGetVariable(" ContentIDs ", out Variable v) &&
 				v.ValueObject is Dictionary<string, bool> ContentIDs)
 			{
@@ -1639,7 +1629,7 @@ namespace Waher.Networking.XMPP.Chat
 			}
 		}
 
-		private KeyValuePair<string, string>[] UpdateReadoutVariables(string Address, InternalReadoutFieldsEventArgs e, string _, string Field)
+		private async Task<KeyValuePair<string, string>[]> UpdateReadoutVariables(string Address, InternalReadoutFieldsEventArgs e, string _, string Field)
 		{
 			Variables Variables = this.GetVariables(Address);
 			List<KeyValuePair<string, string>> Exp = null;
@@ -1685,7 +1675,7 @@ namespace Waher.Networking.XMPP.Chat
 
 							foreach (KeyValuePair<DateTime, Field> P2 in P.Value)
 							{
-								E = this.FieldElement(P2.Value);
+								E = await this.FieldElement(P2.Value);
 								Values.Add(new ObjectVector(new DateTimeValue(P2.Key),
 									Expression.Encapsulate(E),
 									new ObjectValue(P2.Value.Type), new ObjectValue(P2.Value.QoS)));
@@ -1738,7 +1728,7 @@ namespace Waher.Networking.XMPP.Chat
 						}
 					}
 
-					if (Series != null)
+					if (!(Series is null))
 					{
 						StringBuilder Expression = new StringBuilder();
 						string VariableName;
@@ -1864,7 +1854,7 @@ namespace Waher.Networking.XMPP.Chat
 			return true;
 		}
 
-		private IElement FieldElement(Field Field)
+		private async Task<IElement> FieldElement(Field Field)
 		{
 			if (Field is QuantityField Q)
 			{
@@ -1877,7 +1867,7 @@ namespace Waher.Networking.XMPP.Chat
 				try
 				{
 					Expression Exp = new Expression(Expression.ToString(Q.Value) + " " + Q.Unit);
-					object Result = Exp.Evaluate(null);
+					object Result = await Exp.EvaluateAsync(null);
 
 					if (Result is PhysicalQuantity Q2)
 						return Q2;
@@ -1946,7 +1936,7 @@ namespace Waher.Networking.XMPP.Chat
 			return Result.ToString();
 		}
 
-		private Task MomentaryFieldsRead(object _, InternalReadoutFieldsEventArgs e)
+		private async Task MomentaryFieldsRead(object _, InternalReadoutFieldsEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			string From = (string)P[0];
@@ -1959,7 +1949,7 @@ namespace Waher.Networking.XMPP.Chat
 			StringBuilder sb = new StringBuilder();
 			QuantityField QF;
 
-			KeyValuePair<string, string>[] Exp = this.UpdateReadoutVariables(From, e, From, Field);
+			KeyValuePair<string, string>[] Exp = await this.UpdateReadoutVariables(From, e, From, Field);
 
 			foreach (Field F in e.Fields)
 			{
@@ -1968,7 +1958,7 @@ namespace Waher.Networking.XMPP.Chat
 
 				if ((Support.Markdown || !Support.Html) && sb.Length > 3000)
 				{
-					this.SendChatMessage(From, OrgSubject, string.Empty, sb.ToString(), Support, false);
+					await this.SendChatMessage(From, OrgSubject, string.Empty, sb.ToString(), Support, false);
 					sb.Clear();
 				}
 
@@ -1976,7 +1966,7 @@ namespace Waher.Networking.XMPP.Chat
 
 				QF = F as QuantityField;
 
-				if (QF != null)
+				if (!(QF is null))
 				{
 					sb.Append('|');
 					sb.Append(MarkdownDocument.Encode(F.Name));
@@ -1996,32 +1986,30 @@ namespace Waher.Networking.XMPP.Chat
 				}
 			}
 
-			this.Send(From, sb, Support, OrgSubject, false);
-			this.SendExpressionResults(Exp, From, Support, OrgSubject, false);
+			await this.Send(From, sb, Support, OrgSubject, false);
+			await this.SendExpressionResults(Exp, From, Support, OrgSubject, false);
 
 			if (e.Done)
-				this.SendChatMessage(From, OrgSubject, string.Empty, "Readout complete.", Support, NrRows == 1);
+				await this.SendChatMessage(From, OrgSubject, string.Empty, "Readout complete.", Support, NrRows == 1);
 
 			// TODO: Localization
-
-			return Task.CompletedTask;
 		}
 
-		private void Send(string To, StringBuilder sb, RemoteXmppSupport Support, string OrgSubject, bool Last)
+		private async Task Send(string To, StringBuilder sb, RemoteXmppSupport Support, string OrgSubject, bool Last)
 		{
 			if (sb.Length > 0)
-				this.SendChatMessage(To, OrgSubject, string.Empty, sb.ToString(), Support, Last);
+				await this.SendChatMessage(To, OrgSubject, string.Empty, sb.ToString(), Support, Last);
 		}
 
-		private void SendExpressionResults(KeyValuePair<string, string>[] Exp, string From, RemoteXmppSupport Support,
+		private async Task SendExpressionResults(KeyValuePair<string, string>[] Exp, string From, RemoteXmppSupport Support,
 			string OrgSubject, bool Last)
 		{
-			if (Exp != null)
+			if (!(Exp is null))
 			{
 				foreach (KeyValuePair<string, string> Expression in Exp)
 				{
-					this.SendChatMessage(From, OrgSubject, string.Empty, "## " + MarkdownDocument.Encode(Expression.Key), Support, false);
-					this.Execute(Expression.Value, From, Support, OrgSubject, string.Empty, Last);
+					await this.SendChatMessage(From, OrgSubject, string.Empty, "## " + MarkdownDocument.Encode(Expression.Key), Support, false);
+					await this.Execute(Expression.Value, From, Support, OrgSubject, string.Empty, Last);
 				}
 			}
 		}
@@ -2037,7 +2025,7 @@ namespace Waher.Networking.XMPP.Chat
 			}
 		}
 
-		private Task MomentaryFieldsErrorsRead(object _, InternalReadoutErrorsEventArgs e)
+		private async Task MomentaryFieldsErrorsRead(object _, InternalReadoutErrorsEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			string From = (string)P[0];
@@ -2053,7 +2041,7 @@ namespace Waher.Networking.XMPP.Chat
 			{
 				if ((Support.Markdown || !Support.Html) && sb.Length > 3000)
 				{
-					this.SendChatMessage(From, OrgSubject, string.Empty, sb.ToString(), Support, false);
+					await this.SendChatMessage(From, OrgSubject, string.Empty, sb.ToString(), Support, false);
 					sb.Clear();
 				}
 
@@ -2064,15 +2052,13 @@ namespace Waher.Networking.XMPP.Chat
 				sb.AppendLine("|||");
 			}
 
-			this.Send(From, sb, Support, OrgSubject, false);
+			await this.Send(From, sb, Support, OrgSubject, false);
 
 			if (e.Done)
-				this.SendChatMessage(From, OrgSubject, string.Empty, "Readout complete.", Support, NrRows == 1);
-
-			return Task.CompletedTask;
+				await this.SendChatMessage(From, OrgSubject, string.Empty, "Readout complete.", Support, NrRows == 1);
 		}
 
-		private Task AllFieldsRead(object _, InternalReadoutFieldsEventArgs e)
+		private async Task AllFieldsRead(object _, InternalReadoutFieldsEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			string From = (string)P[0];
@@ -2087,7 +2073,7 @@ namespace Waher.Networking.XMPP.Chat
 			DateTime TP;
 			string s;
 
-			KeyValuePair<string, string>[] Exp = this.UpdateReadoutVariables(From, e, From, Field);
+			KeyValuePair<string, string>[] Exp = await this .UpdateReadoutVariables(From, e, From, Field);
 
 			foreach (Field F in e.Fields)
 			{
@@ -2099,7 +2085,7 @@ namespace Waher.Networking.XMPP.Chat
 
 				if ((Support.Markdown || !Support.Html) && sb.Length > 3000)
 				{
-					this.SendChatMessage(From, OrgSubject, string.Empty, sb.ToString(), Support, false);
+					await this.SendChatMessage(From, OrgSubject, string.Empty, sb.ToString(), Support, false);
 					sb.Clear();
 				}
 
@@ -2115,7 +2101,7 @@ namespace Waher.Networking.XMPP.Chat
 
 				QF = F as QuantityField;
 
-				if (QF != null)
+				if (!(QF is null))
 				{
 					sb.Append(CommonTypes.Encode(QF.Value, QF.NrDecimals));
 					sb.Append('|');
@@ -2146,15 +2132,13 @@ namespace Waher.Networking.XMPP.Chat
 				sb.AppendLine("|");
 			}
 
-			this.Send(From, sb, Support, OrgSubject, false);
-			this.SendExpressionResults(Exp, From, Support, OrgSubject, false);
+			await this.Send(From, sb, Support, OrgSubject, false);
+			await this.SendExpressionResults(Exp, From, Support, OrgSubject, false);
 
 			if (e.Done)
-				this.SendChatMessage(From, OrgSubject, string.Empty, "Readout complete.", Support, NrRows == 1);
+				await this.SendChatMessage(From, OrgSubject, string.Empty, "Readout complete.", Support, NrRows == 1);
 
 			// TODO: Localization
-
-			return Task.CompletedTask;
 		}
 
 		private void CheckAllFieldsHeader(object[] P, StringBuilder sb, RemoteXmppSupport _)
@@ -2168,7 +2152,7 @@ namespace Waher.Networking.XMPP.Chat
 			}
 		}
 
-		private Task AllFieldsErrorsRead(object _, InternalReadoutErrorsEventArgs e)
+		private async Task AllFieldsErrorsRead(object _, InternalReadoutErrorsEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			string From = (string)P[0];
@@ -2184,7 +2168,7 @@ namespace Waher.Networking.XMPP.Chat
 			{
 				if ((Support.Markdown || !Support.Html) && sb.Length > 3000)
 				{
-					this.SendChatMessage(From, OrgSubject, string.Empty, sb.ToString(), Support, false);
+					await this.SendChatMessage(From, OrgSubject, string.Empty, sb.ToString(), Support, false);
 					sb.Clear();
 				}
 
@@ -2195,26 +2179,24 @@ namespace Waher.Networking.XMPP.Chat
 				sb.AppendLine("|||||||");
 			}
 
-			this.Send(From, sb, Support, OrgSubject, false);
+			await this.Send(From, sb, Support, OrgSubject, false);
 
 			if (e.Done)
-				this.SendChatMessage(From, OrgSubject, string.Empty, "Readout complete.", Support, NrRows == 1);
-
-			return Task.CompletedTask;
+				await this.SendChatMessage(From, OrgSubject, string.Empty, "Readout complete.", Support, NrRows == 1);
 		}
 
-		private void Que(string To, RemoteXmppSupport Support, string OrgSubject, string OrgCommand, bool Last)
+		private Task Que(string To, RemoteXmppSupport Support, string OrgSubject, string OrgCommand, bool Last)
 		{
-			this.Error(To, "Sorry. Can't understand what you're trying to say. Type # to display the menu.", Support,
+			return this.Error(To, "Sorry. Can't understand what you're trying to say. Type # to display the menu.", Support,
 				OrgSubject, OrgCommand, Last);
 		}
 
-		private void Error(string To, string ErrorMessage, RemoteXmppSupport Support, string OrgSubject, string OrgCommand, bool Last)
+		private Task Error(string To, string ErrorMessage, RemoteXmppSupport Support, string OrgSubject, string OrgCommand, bool Last)
 		{
-			this.SendChatMessage(To, OrgSubject, OrgCommand, "**" + MarkdownDocument.Encode(ErrorMessage) + "**", Support, Last);
+			return this.SendChatMessage(To, OrgSubject, OrgCommand, "**" + MarkdownDocument.Encode(ErrorMessage) + "**", Support, Last);
 		}
 
-		private void ShowHelp(string To, bool Extended, RemoteXmppSupport Support, string OrgSubject, string OrgCommand, bool Last)
+		private async Task ShowHelp(string To, bool Extended, RemoteXmppSupport Support, string OrgSubject, string OrgCommand, bool Last)
 		{
 			StringBuilder Output = new StringBuilder();
 
@@ -2223,7 +2205,7 @@ namespace Waher.Networking.XMPP.Chat
 			Output.AppendLine("|#|Displays the short version of the menu.|");
 			Output.AppendLine("|##|Displays the extended version of the menu.|");
 
-			if (this.concentratorServer != null)
+			if (!(this.concentratorServer is null))
 			{
 				Output.AppendLine("|/|Selects the root node in the current data source.|");
 				Output.AppendLine("|//|Selects the root data source.|");
@@ -2231,9 +2213,9 @@ namespace Waher.Networking.XMPP.Chat
 				Output.AppendLine("|NR|The number NR corresponds to the item in the menu last shown. The menu number can be used as a replacement for the corresponding string in all constructs.|");
 			}
 
-			if (this.sensorServer != null)
+			if (!(this.sensorServer is null))
 			{
-				if (this.concentratorServer != null)
+				if (!(this.concentratorServer is null))
 				{
 					Output.AppendLine("|?|Reads non-historical values of the currently selected object.|");
 					Output.AppendLine("|??|Performs a full readout of the currently selected object.|");
@@ -2253,11 +2235,11 @@ namespace Waher.Networking.XMPP.Chat
 				}
 			}
 
-			if (this.controlServer != null)
+			if (!(this.controlServer is null))
 			{
 				Output.AppendLine("|:=|Lists available control parameters of the currently selected object.|");
 
-				if (this.concentratorServer != null)
+				if (!(this.concentratorServer is null))
 				{
 					Output.AppendLine("|NODE:=|Lists available control parameters of the node \"NODE\".|");
 					Output.AppendLine("|PARAMETER:=|Displays the current value of the control parameter \"PARAMETER\" of the currently selected object.|");
@@ -2271,7 +2253,7 @@ namespace Waher.Networking.XMPP.Chat
 			Output.AppendLine("|=|Displays available variables in the session.|");
 			Output.AppendLine("| |Anything else is assumed to be evaluated as a [mathematical expression](http://waher.se/Script.md)|");
 
-			this.SendChatMessage(To, OrgSubject, OrgCommand, Output.ToString(), Support, Last && !Extended);
+			await this.SendChatMessage(To, OrgSubject, OrgCommand, Output.ToString(), Support, Last && !Extended);
 
 			if (Extended)
 			{
@@ -2292,7 +2274,7 @@ namespace Waher.Networking.XMPP.Chat
 
 				Output.AppendLine("`GraphWidth` and `GraphHeight`.");
 
-				this.SendChatMessage(To, OrgSubject, string.Empty, Output.ToString(), Support, Last);
+				await this.SendChatMessage(To, OrgSubject, string.Empty, Output.ToString(), Support, Last);
 			}
 		}
 

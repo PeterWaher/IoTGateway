@@ -42,6 +42,17 @@ using Waher.Runtime.Settings;
 namespace Waher.Client.WPF
 {
 	/// <summary>
+	/// Delegate for GUI update methods with parameter.
+	/// </summary>
+	public delegate Task GuiDelegate();
+
+	/// <summary>
+	/// Delegate for GUI update methods with parameter.
+	/// </summary>
+	/// <param name="Parameter">Parameter</param>
+	public delegate Task GuiDelegateWithParameter(object Parameter);
+
+	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	public partial class MainWindow : Window
@@ -165,7 +176,7 @@ namespace Waher.Client.WPF
 		
 		internal static readonly string registryKey = Registry.CurrentUser + @"\Software\Waher Data AB\Waher.Client.WPF";
 
-		private void Window_Loaded(object sender, RoutedEventArgs e)
+		private async void Window_Loaded(object sender, RoutedEventArgs e)
 		{
 			object Value;
 
@@ -205,7 +216,7 @@ namespace Waher.Client.WPF
 				{
 					this.MainView.FileName = s2;
 					if (!string.IsNullOrEmpty(this.MainView.FileName))
-						this.MainView.Load(this.MainView.FileName);
+						await this.MainView.Load(this.MainView.FileName);
 				}
 			}
 			catch (Exception ex)
@@ -556,10 +567,11 @@ namespace Waher.Client.WPF
 			UpdateGui(this.FocusChatInput2, P);
 		}
 
-		private void FocusChatInput2(object P)
+		private Task FocusChatInput2(object P)
 		{
 			ChatView View = (ChatView)P;
 			View.Input.Focus();
+			return Task.CompletedTask;
 		}
 
 		public Task OnStateChange(object _, XmppState _2)
@@ -695,14 +707,14 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		private void ChatMessageReceived(object P)
+		private async Task ChatMessageReceived(object P)
 		{
 			MessageEventArgs e = (MessageEventArgs)P;
 			ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
-			this.ChatMessage(e.FromBareJID, XmppClient.GetBareJID(e.To), Message, e.ThreadID, IsMarkdown, Timestamp);
+			await this.ChatMessage(e.FromBareJID, XmppClient.GetBareJID(e.To), Message, e.ThreadID, IsMarkdown, Timestamp);
 		}
 
-		public void ChatMessage(string FromBareJid, string ToBareJid, string Message, string ThreadId, bool IsMarkdown, DateTime Timestamp)
+		public async Task ChatMessage(string FromBareJid, string ToBareJid, string Message, string ThreadId, bool IsMarkdown, DateTime Timestamp)
 		{
 			XmppAccountNode XmppAccountNode;
 
@@ -737,7 +749,7 @@ namespace Waher.Client.WPF
 				else
 					continue;
 
-				ChatView.ChatMessageReceived(Message, FromBareJid, ThreadId, IsMarkdown, Timestamp, this);
+				await ChatView.ChatMessageReceived(Message, FromBareJid, ThreadId, IsMarkdown, Timestamp, this);
 				return;
 			}
 
@@ -753,7 +765,7 @@ namespace Waher.Client.WPF
 						ChatView ChatView = new ChatView(ContactNode, false);
 						TabItem2.Content = ChatView;
 
-						ChatView.ChatMessageReceived(Message, FromBareJid, ThreadId, IsMarkdown, Timestamp, this);
+						await ChatView.ChatMessageReceived(Message, FromBareJid, ThreadId, IsMarkdown, Timestamp, this);
 						return;
 					}
 					else
@@ -779,7 +791,7 @@ namespace Waher.Client.WPF
 							ChatView ChatView = new ChatView(ContactNode, false);
 							TabItem2.Content = ChatView;
 
-							ChatView.ChatMessageReceived(Message, FromBareJid, ThreadId, IsMarkdown, Timestamp, this);
+							await ChatView.ChatMessageReceived(Message, FromBareJid, ThreadId, IsMarkdown, Timestamp, this);
 							return;
 						} 
 					}
@@ -813,7 +825,7 @@ namespace Waher.Client.WPF
 			return null;
 		}
 
-		public void MucGroupChatMessage(string FromFullJid, string ToBareJid, string Message, string ThreadId, bool IsMarkdown, 
+		public async Task MucGroupChatMessage(string FromFullJid, string ToBareJid, string Message, string ThreadId, bool IsMarkdown, 
 			DateTime Timestamp, ChatItemType Type, RoomNode Node, string Title)
 		{
 			ChatView ChatView = this.FindRoomView(FromFullJid, ToBareJid);
@@ -830,11 +842,11 @@ namespace Waher.Client.WPF
 			switch (Type)
 			{
 				case ChatItemType.Transmitted:
-					ChatView.ChatMessageTransmitted(Message, ThreadId, out MarkdownDocument _);
+					await ChatView.ChatMessageTransmitted(Message, ThreadId);
 					break;
 
 				case ChatItemType.Received:
-					ChatView.ChatMessageReceived(Message, FromFullJid, ThreadId, IsMarkdown, Timestamp, this);
+					await ChatView.ChatMessageReceived(Message, FromFullJid, ThreadId, IsMarkdown, Timestamp, this);
 					break;
 
 				case ChatItemType.Event:
@@ -843,7 +855,7 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		public void MucPrivateChatMessage(string FromFullJid, string ToBareJid, string Message, string ThreadId, bool IsMarkdown, DateTime Timestamp,
+		public async Task MucPrivateChatMessage(string FromFullJid, string ToBareJid, string Message, string ThreadId, bool IsMarkdown, DateTime Timestamp,
 			OccupantNode Node, string Title)
 		{
 			if (!string.IsNullOrEmpty(ThreadId))
@@ -851,7 +863,7 @@ namespace Waher.Client.WPF
 				ChatView ChatView = this.FindRoomView(FromFullJid, ToBareJid);
 				if (!(ChatView is null) && ChatView.ContainsThread(ThreadId))
 				{
-					ChatView.ChatMessageReceived(Message, FromFullJid, ThreadId, IsMarkdown, Timestamp, this);
+					await ChatView.ChatMessageReceived(Message, FromFullJid, ThreadId, IsMarkdown, Timestamp, this);
 					return;
 				}
 			}
@@ -869,7 +881,7 @@ namespace Waher.Client.WPF
 				else
 					continue;
 
-				ChatView.ChatMessageReceived(Message, FromFullJid, ThreadId, IsMarkdown, Timestamp, this);
+				await ChatView.ChatMessageReceived(Message, FromFullJid, ThreadId, IsMarkdown, Timestamp, this);
 				return;
 			}
 
@@ -879,7 +891,7 @@ namespace Waher.Client.WPF
 			ChatView ChatView2 = new ChatView(Node, true);
 			TabItem2.Content = ChatView2;
 
-			ChatView2.ChatMessageReceived(Message, FromFullJid, ThreadId, IsMarkdown, Timestamp, this);
+			await ChatView2.ChatMessageReceived(Message, FromFullJid, ThreadId, IsMarkdown, Timestamp, this);
 		}
 
 		public void MucChatSubject(string FromFullJid, string ToBareJid, RoomNode Node, string Title)
@@ -1014,7 +1026,7 @@ namespace Waher.Client.WPF
 			UpdateGui(this.ShowForm, Form);
 		}
 
-		internal void ShowForm(object P)
+		internal async Task ShowForm(object P)
 		{
 			Mouse.OverrideCursor = null;
 
@@ -1028,15 +1040,13 @@ namespace Waher.Client.WPF
 			Doc.LoadXml(Xml);
 			Form = new DataForm(Form.Client, Doc.DocumentElement, null, null, Form.From, Form.To);*/
 
-			ParameterDialog Dialog = new ParameterDialog(Form)
-			{
-				Owner = this
-			};
+			ParameterDialog Dialog = await ParameterDialog.CreateAsync(Form);
+			Dialog.Owner = this;
 
 			Dialog.ShowDialog();
 		}
 
-		internal void ShowError(object P)
+		internal Task ShowError(object P)
 		{
 			Mouse.OverrideCursor = null;
 
@@ -1044,6 +1054,8 @@ namespace Waher.Client.WPF
 				System.Windows.MessageBox.Show(this, e.ErrorText, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			else
 				System.Windows.MessageBox.Show(this, P.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+	
+			return Task.CompletedTask;
 		}
 
 		private void Search_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -1135,6 +1147,8 @@ namespace Waher.Client.WPF
 
 							foreach (Question Question2 in Questions)
 								QuestionView.NewQuestion(Question2);
+
+							return Task.CompletedTask;
 						});
 					}
 				}
@@ -1257,6 +1271,7 @@ namespace Waher.Client.WPF
 			UpdateGui(() =>
 			{
 				MainWindow.currentInstance.MainView.ShowStatus(Message);
+				return Task.CompletedTask;
 			});
 		}
 
@@ -1266,25 +1281,30 @@ namespace Waher.Client.WPF
 			{
 				Mouse.OverrideCursor = null;
 				System.Windows.MessageBox.Show(currentInstance, Text, Caption, Button, Icon);
+				return Task.CompletedTask;
 			});
 		}
 
 		public static void MouseDefault()
 		{
-			UpdateGui(() => Mouse.OverrideCursor = null);
+			UpdateGui(() =>
+			{
+				Mouse.OverrideCursor = null;
+				return Task.CompletedTask;
+			});
 		}
 
-		public static void UpdateGui(ThreadStart Method)
+		public static void UpdateGui(GuiDelegate Method)
 		{
-			UpdateGui((State) => ((ThreadStart)State)(), Method.Method.DeclaringType + "." + Method.Method.Name, Method);
+			UpdateGui((State) => ((GuiDelegate)State)(), Method.Method.DeclaringType + "." + Method.Method.Name, Method);
 		}
 
-		public static void UpdateGui(ParameterizedThreadStart Method, object State)
+		public static void UpdateGui(GuiDelegateWithParameter Method, object State)
 		{
 			UpdateGui(Method, Method.Method.DeclaringType + "." + Method.Method.Name, State);
 		}
 
-		private static void UpdateGui(ParameterizedThreadStart Method, string Name, object State)
+		private static void UpdateGui(GuiDelegateWithParameter Method, string Name, object State)
 		{
 			bool Start;
 			GuiUpdateTask Rec = new GuiUpdateTask()
@@ -1302,53 +1322,65 @@ namespace Waher.Client.WPF
 			}
 
 			if (Start)
-				currentInstance.Dispatcher.BeginInvoke(new ThreadStart(DoUpdates));
+				currentInstance.Dispatcher.BeginInvoke(new GuiDelegate(DoUpdates));
 		}
 
-		private static void DoUpdates()
+		private static async Task DoUpdates()
 		{
-			GuiUpdateTask Rec = null;
-			GuiUpdateTask Prev;
-
-			while (true)
+			try
 			{
+				GuiUpdateTask Rec = null;
+				GuiUpdateTask Prev;
+
+				while (true)
+				{
+					lock (guiUpdateQueue)
+					{
+						if (!(Rec is null))
+							guiUpdateQueue.RemoveFirst();
+
+						Prev = Rec;
+						Rec = guiUpdateQueue.First?.Value;
+						if (Rec is null)
+							return;
+					}
+
+					try
+					{
+						Rec.Started = DateTime.Now;
+						await Rec.Method(Rec.State);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+					finally
+					{
+						Rec.Ended = DateTime.Now;
+					}
+
+					TimeSpan TS;
+
+					if ((TS = (Rec.Ended - Rec.Started)).TotalSeconds >= 1)
+						Log.Notice("GUI update method is slow: " + TS.ToString(), Rec.Name, Prev?.Name);
+					else if ((TS = (Rec.Ended - Rec.Requested)).TotalSeconds >= 1)
+						Log.Notice("GUI update pipeline is slow: " + TS.ToString(), Rec.Name, Prev?.Name);
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+
 				lock (guiUpdateQueue)
 				{
-					if (!(Rec is null))
-						guiUpdateQueue.RemoveFirst();
-
-					Prev = Rec;
-					Rec = guiUpdateQueue.First?.Value;
-					if (Rec is null)
-						return;
+					guiUpdateQueue.Clear();
 				}
-
-				try
-				{
-					Rec.Started = DateTime.Now;
-					Rec.Method(Rec.State);
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-				finally
-				{
-					Rec.Ended = DateTime.Now;
-				}
-
-				TimeSpan TS;
-
-				if ((TS = (Rec.Ended - Rec.Started)).TotalSeconds >= 1)
-					Log.Notice("GUI update method is slow: " + TS.ToString(), Rec.Name, Prev?.Name);
-				else if ((TS = (Rec.Ended - Rec.Requested)).TotalSeconds >= 1)
-					Log.Notice("GUI update pipeline is slow: " + TS.ToString(), Rec.Name, Prev?.Name);
 			}
 		}
 
 		private class GuiUpdateTask
 		{
-			public ParameterizedThreadStart Method;
+			public GuiDelegateWithParameter Method;
 			public object State;
 			public string Name;
 			public DateTime Requested;

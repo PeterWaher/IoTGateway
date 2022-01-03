@@ -2205,7 +2205,8 @@ namespace Waher.Networking.XMPP.Contracts
 				E.LocalName == "contract" &&
 				E.NamespaceURI == NamespaceSmartContracts)
 			{
-				Contract = Contract.Parse(E, out bool _, out bool _);
+				ParsedContract Parsed = await Contract.Parse(E);
+				Contract = Parsed.Contract;
 			}
 			else
 				e.Ok = false;
@@ -3186,7 +3187,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 					foreach (Parameter Parameter in Contract.Parameters)
 					{
-						if (!Parameter.IsParameterValid(Variables))
+						if (!await Parameter.IsParameterValid(Variables))
 						{
 							await this.ReturnStatus(ContractStatus.ParameterValuesNotValid, Callback, State);
 							return;
@@ -5024,7 +5025,8 @@ namespace Waher.Networking.XMPP.Contracts
 				{
 					if (N is XmlElement E && E.LocalName == "contract" && E.NamespaceURI == NamespaceSmartContracts)
 					{
-						Contract = Contract.Parse(E, out bool _, out bool _);
+						ParsedContract Parsed = await Contract.Parse(E);
+						Contract = Parsed.Contract;
 						break;
 					}
 				}
@@ -5146,7 +5148,10 @@ namespace Waher.Networking.XMPP.Contracts
 				XmlElement E;
 
 				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "contract" && E.NamespaceURI == NamespaceSmartContracts)
-					Contract = Contract.Parse(E, out bool _, out bool _);
+				{
+					ParsedContract Parsed = await Contract.Parse(E);
+					Contract = Parsed.Contract;
+				}
 				else
 					e.Ok = false;
 
@@ -5380,7 +5385,10 @@ namespace Waher.Networking.XMPP.Contracts
 				XmlElement E;
 
 				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "contract" && E.NamespaceURI == NamespaceSmartContracts)
-					Contract = Contract.Parse(E, out bool _, out bool _);
+				{
+					ParsedContract Parsed = await Contract.Parse(E);
+					Contract = Parsed.Contract;
+				}
 				else
 					e.Ok = false;
 

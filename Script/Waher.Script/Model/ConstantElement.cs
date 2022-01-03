@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 
@@ -32,15 +33,33 @@ namespace Waher.Script.Model
             get { return this.constant; }
         }
 
-        /// <summary>
-        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-        /// </summary>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Result.</returns>
-        public override IElement Evaluate(Variables Variables)
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => false;
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// This method should be used for nodes whose <see cref="IsAsynchronous"/> is false.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override IElement Evaluate(Variables Variables)
         {
             return this.constant;
         }
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// This method should be used for nodes whose <see cref="IsAsynchronous"/> is true.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			return Task.FromResult<IElement>(this.constant);
+		}
 
 		/// <summary>
 		/// Performs a pattern match operation.
@@ -69,9 +88,7 @@ namespace Waher.Script.Model
 		/// </summary>
 		public string DefaultVariableName => null;
 
-		/// <summary>
-		/// <see cref="object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is ConstantElement O &&
@@ -79,9 +96,7 @@ namespace Waher.Script.Model
 				base.Equals(obj);
 		}
 
-		/// <summary>
-		/// <see cref="object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

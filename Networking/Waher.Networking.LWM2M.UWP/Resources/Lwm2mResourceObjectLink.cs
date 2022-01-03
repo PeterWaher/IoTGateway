@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Events;
 using Waher.Networking.LWM2M.ContentFormats;
-using Waher.Persistence;
 using Waher.Runtime.Settings;
 
 namespace Waher.Networking.LWM2M
@@ -13,8 +11,8 @@ namespace Waher.Networking.LWM2M
 	/// </summary>
 	public class Lwm2mResourceObjectLink : Lwm2mResource
 	{
-		private ushort? defaultRefId;
-		private ushort? defaultRefInstanceId;
+		private readonly ushort? defaultRefId;
+		private readonly ushort? defaultRefInstanceId;
 		private ushort? refId;
 		private ushort? refInstanceId;
 

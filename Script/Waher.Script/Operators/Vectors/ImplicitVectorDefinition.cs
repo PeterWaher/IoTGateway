@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects.Sets;
@@ -72,9 +71,7 @@ namespace Waher.Script.Operators.Vectors
 			return VectorDefinition.Encapsulate(Elements2, CanEncapsulateAsMatrix, this);
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is ImplicitVectorDefinition O &&
@@ -83,9 +80,7 @@ namespace Waher.Script.Operators.Vectors
 				base.Equals(obj);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -81,14 +82,14 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.font = new StringAttribute(Input, "font");
 			this.pen = new StringAttribute(Input, "pen");
 			this.background = new StringAttribute(Input, "background");
 			this.textColor = new ColorAttribute(Input, "textColor");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -142,23 +143,21 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
 			SKFont FontBak = null;
 			SKPaint TextBak = null;
 			SKPaint PenBak = null;
 			SKPaint BackgroundBak = null;
-			bool Relative = false;
 
-			if (!(this.font is null) &&
-				this.font.TryEvaluate(State.Session, out string FontId) &&
-				this.Document.TryGetElement(FontId, out ILayoutElement Element) &&
+			EvaluationResult<string> RefId = await this.font.TryEvaluate(State.Session);
+			if (RefId.Ok &&
+				this.Document.TryGetElement(RefId.Result, out ILayoutElement Element) &&
 				Element is Font Font)
 			{
 				this.fontDef = Font;
 
-				if (Font.MeasureDimensions(State))
-					Relative = true;
+				await Font.MeasureDimensions(State);
 
 				FontBak = State.Font;
 				State.Font = this.fontDef.FontDef;
@@ -167,9 +166,9 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 				State.Text = this.fontDef.Text;
 			}
 
-			if (!(this.pen is null) &&
-				this.pen.TryEvaluate(State.Session, out string PenId) &&
-				this.Document.TryGetElement(PenId, out Element) &&
+			RefId = await this.pen.TryEvaluate(State.Session);
+			if (RefId.Ok &&
+				this.Document.TryGetElement(RefId.Result, out Element) &&
 				Element is Pen Pen)
 			{
 				penDef = Pen;
@@ -177,9 +176,9 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 				State.ShapePen = Pen.Paint;
 			}
 
-			if (!(this.background is null) &&
-				this.background.TryEvaluate(State.Session, out string BackgroundId) &&
-				this.Document.TryGetElement(BackgroundId, out Element) &&
+			RefId = await this.background.TryEvaluate(State.Session);
+			if (RefId.Ok &&
+				this.Document.TryGetElement(RefId.Result, out Element) &&
 				Element is Background Background)
 			{
 				backgroundDef = Background;
@@ -187,8 +186,7 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 				State.ShapeFill = Background.Paint;
 			}
 
-			if (base.DoMeasureDimensions(State))
-				Relative = true;
+			await base.DoMeasureDimensions(State);
 
 			if (!(FontBak is null))
 				State.Font = FontBak;
@@ -201,8 +199,6 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 
 			if (!(BackgroundBak is null))
 				State.ShapeFill = BackgroundBak;
-
-			return Relative;
 		}
 
 		/// <summary>
@@ -256,7 +252,7 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			SKFont FontBak = null;
 			SKPaint TextBak = null;
@@ -287,7 +283,7 @@ namespace Waher.Layout.Layout2D.Model.Backgrounds
 					State.Canvas.DrawRect(0, 0, State.AreaWidth, State.AreaHeight, State.ShapeFill);
 			}
 
-			base.Draw(State);
+			await base.Draw(State);
 
 			if (!(FontBak is null))
 				State.Font = FontBak;

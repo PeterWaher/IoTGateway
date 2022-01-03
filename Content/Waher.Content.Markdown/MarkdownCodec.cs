@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Markdown
@@ -52,10 +53,7 @@ namespace Waher.Content.Markdown
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes
-		{
-			get { return new string[] { ContentType }; }
-		}
+		public string[] ContentTypes => new string[] { ContentType };
 
 		/// <summary>
 		/// Supported file extensions.
@@ -102,14 +100,14 @@ namespace Waher.Content.Markdown
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public async Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string s = CommonTypes.GetString(Data, Encoding ?? Encoding.UTF8);
 
 			if (BaseUri is null)
-				return new MarkdownDocument(s);
+				return await MarkdownDocument.CreateAsync(s);
 			else
-				return new MarkdownDocument(s, new MarkdownSettings(), string.Empty, string.Empty, BaseUri.ToString());
+				return await MarkdownDocument.CreateAsync(s, new MarkdownSettings(), string.Empty, string.Empty, BaseUri.ToString());
 		}
 
 		/// <summary>
@@ -138,24 +136,28 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
-		/// <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
-		/// <returns>Encoded object.</returns>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
+		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (allowEncoding && Object is MarkdownDocument MarkdownDocument)
 			{
+				string ContentType;
+				byte[] Bin;
+
 				if (Encoding is null)
 				{
 					ContentType = "text/markdown; charset=utf-8";
-					return Encoding.UTF8.GetBytes(MarkdownDocument.MarkdownText);
+					Bin = Encoding.UTF8.GetBytes(MarkdownDocument.MarkdownText);
 				}
 				else
 				{
 					ContentType = "text/markdown; charset=" + Encoding.WebName;
-					return Encoding.GetBytes(MarkdownDocument.MarkdownText);
+					Bin = Encoding.GetBytes(MarkdownDocument.MarkdownText);
 				}
+
+				return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Bin, ContentType));
 			}
 
 			throw new ArgumentException("Object not a markdown document.", nameof(Object));

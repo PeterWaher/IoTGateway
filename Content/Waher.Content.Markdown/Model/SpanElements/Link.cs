@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 
@@ -31,27 +32,21 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// URL
 		/// </summary>
-		public string Url
-		{
-			get { return this.url; }
-		}
+		public string Url => this.url;
 
 		/// <summary>
 		/// Optional Link title.
 		/// </summary>
-		public string Title
-		{
-			get { return this.title; }
-		}
+		public string Title => this.title;
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
 			Output.Append('[');
-			base.GenerateMarkdown(Output);
+			await base.GenerateMarkdown(Output);
 			Output.Append("](");
 			Output.Append(this.url);
 
@@ -69,9 +64,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override Task GenerateHTML(StringBuilder Output)
 		{
-			GenerateHTML(Output, this.url, this.title, this.Children, this.Document);
+			return GenerateHTML(Output, this.url, this.title, this.Children, this.Document);
 		}
 
 		/// <summary>
@@ -82,7 +77,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Title">Optional title.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="Document">Markdown document.</param>
-		public static void GenerateHTML(StringBuilder Output, string Url, string Title, IEnumerable<MarkdownElement> ChildNodes, 
+		public static async Task GenerateHTML(StringBuilder Output, string Url, string Title, IEnumerable<MarkdownElement> ChildNodes, 
 			MarkdownDocument Document)
 		{
 			bool IsRelative = Url.IndexOf(':') < 0;
@@ -102,14 +97,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			Output.Append("\">");
 
 			foreach (MarkdownElement E in ChildNodes)
-				E.GenerateHTML(Output);
+				await E.GenerateHTML(Output);
 
 			Output.Append("</a>");
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.url;
@@ -120,9 +113,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			GenerateXAML(Output, TextAlignment, this.url, this.title, this.Children, this.Document);
+			return GenerateXAML(Output, TextAlignment, this.url, this.title, this.Children, this.Document);
 		}
 
 		/// <summary>
@@ -134,7 +127,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Title">Optional title.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="Document">Markdown document.</param>
-		public static void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string Url, string Title, 
+		public static async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string Url, string Title, 
 			IEnumerable<MarkdownElement> ChildNodes, MarkdownDocument Document)
 		{
 			Output.WriteStartElement("Hyperlink");
@@ -144,7 +137,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.WriteAttributeString("ToolTip", Title);
 
 			foreach (MarkdownElement E in ChildNodes)
-				E.GenerateXAML(Output, TextAlignment);
+				await E.GenerateXAML(Output, TextAlignment);
 
 			Output.WriteEndElement();
 		}
@@ -154,18 +147,15 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			InlineText.GenerateInlineFormattedTextXamarinForms(Output, this);
+			return InlineText.GenerateInlineFormattedTextXamarinForms(Output, this);
 		}
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get { return true; }
-		}
+		internal override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Exports the element to XML.

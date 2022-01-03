@@ -9,11 +9,11 @@ namespace Waher.Content
 	/// </summary>
 	public class ColorReference
 	{
-		private byte red;
-		private byte green;
-		private byte blue;
-		private byte alpha;
-		private bool hasAlpha;
+		private readonly byte red;
+		private readonly byte green;
+		private readonly byte blue;
+		private readonly byte alpha;
+		private readonly bool hasAlpha;
 
 		/// <summary>
 		/// Color reference. Separate class to avoid reference to Windows Forms or WPF libraries.
@@ -71,9 +71,7 @@ namespace Waher.Content
 		/// </summary>
 		public bool HasAlpha { get { return this.hasAlpha; } }
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder Output = new StringBuilder();

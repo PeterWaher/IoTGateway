@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Waher.Networking.Sniffers.Model;
 
 namespace Waher.Networking.Sniffers
@@ -8,11 +10,12 @@ namespace Waher.Networking.Sniffers
 	/// <summary>
 	/// Sniffer that stores events in memory.
 	/// </summary>
-	public class InMemorySniffer : SnifferBase, IEnumerable<SnifferEvent>
+	public class InMemorySniffer : SnifferBase, IEnumerable<SnifferEvent>, IDisposable
 	{
 		private readonly LinkedList<SnifferEvent> events = new LinkedList<SnifferEvent>();
 		private readonly int maxCount;
 		private int count = 0;
+		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
 
 		/// <summary>
 		/// Sniffer that stores events in memory.
@@ -36,9 +39,9 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Error">Error.</param>
-		public override void Error(DateTime Timestamp, string Error)
+		public override Task Error(DateTime Timestamp, string Error)
 		{
-			this.Add(new SnifferError(Timestamp, Error));
+			return this.Add(new SnifferError(Timestamp, Error));
 		}
 
 		/// <summary>
@@ -46,9 +49,9 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public override void Exception(DateTime Timestamp, string Exception)
+		public override Task Exception(DateTime Timestamp, string Exception)
 		{
-			this.Add(new SnifferException(Timestamp, Exception));
+			return this.Add(new SnifferException(Timestamp, Exception));
 		}
 
 		/// <summary>
@@ -56,9 +59,9 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Comment">Comment.</param>
-		public override void Information(DateTime Timestamp, string Comment)
+		public override Task Information(DateTime Timestamp, string Comment)
 		{
-			this.Add(new SnifferInformation(Timestamp, Comment));
+			return this.Add(new SnifferInformation(Timestamp, Comment));
 		}
 
 		/// <summary>
@@ -66,9 +69,9 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public override void ReceiveBinary(DateTime Timestamp, byte[] Data)
+		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
-			this.Add(new SnifferRxBinary(Timestamp, Data));
+			return this.Add(new SnifferRxBinary(Timestamp, Data));
 		}
 
 		/// <summary>
@@ -76,9 +79,9 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public override void ReceiveText(DateTime Timestamp, string Text)
+		public override Task ReceiveText(DateTime Timestamp, string Text)
 		{
-			this.Add(new SnifferRxText(Timestamp, Text));
+			return this.Add(new SnifferRxText(Timestamp, Text));
 		}
 
 		/// <summary>
@@ -86,9 +89,9 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public override void TransmitBinary(DateTime Timestamp, byte[] Data)
+		public override Task TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
-			this.Add(new SnifferTxBinary(Timestamp, Data));
+			return this.Add(new SnifferTxBinary(Timestamp, Data));
 		}
 
 		/// <summary>
@@ -96,9 +99,9 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public override void TransmitText(DateTime Timestamp, string Text)
+		public override Task TransmitText(DateTime Timestamp, string Text)
 		{
-			this.Add(new SnifferTxText(Timestamp, Text));
+			return this.Add(new SnifferTxText(Timestamp, Text));
 		}
 
 		/// <summary>
@@ -106,20 +109,25 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Warning">Warning.</param>
-		public override void Warning(DateTime Timestamp, string Warning)
+		public override Task Warning(DateTime Timestamp, string Warning)
 		{
-			this.Add(new SnifferWarning(Timestamp, Warning));
+			return this.Add(new SnifferWarning(Timestamp, Warning));
 		}
 
-		private void Add(SnifferEvent Event)
+		private async Task Add(SnifferEvent Event)
 		{
-			lock (this.events)
+			await this.semaphore.WaitAsync();
+			try
 			{
 				this.events.AddLast(Event);
 				if (this.count >= this.maxCount)
 					this.events.RemoveFirst();
 				else
 					this.count++;
+			}
+			finally
+			{
+				this.semaphore.Release();
 			}
 		}
 
@@ -128,7 +136,7 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return this.ToArray().GetEnumerator();
+			return this.ToArrayAsync().Result.GetEnumerator();
 		}
 
 		/// <summary>
@@ -136,7 +144,7 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public IEnumerator<SnifferEvent> GetEnumerator()
 		{
-			SnifferEvent[] A = this.ToArray();
+			SnifferEvent[] A = this.ToArrayAsync().Result;
 			return ((IEnumerable<SnifferEvent>)A).GetEnumerator();
 		}
 
@@ -144,19 +152,39 @@ namespace Waher.Networking.Sniffers
 		/// Replays sniffer events.
 		/// </summary>
 		/// <param name="Sniffable">Receiver of sniffer events.</param>
+		[Obsolete("Use ReplayAsync instead, for better asynchronous performance.")]
 		public void Replay(Sniffable Sniffable)
 		{
-			if (Sniffable.HasSniffers)
-				this.Replay(Sniffable.Sniffers);
+			this.ReplayAsync(Sniffable).Wait();
 		}
 
 		/// <summary>
 		/// Replays sniffer events.
 		/// </summary>
 		/// <param name="Sniffers">Receiver of sniffer events.</param>
+		[Obsolete("Use ReplayAsync instead, for better asynchronous performance.")]
 		public void Replay(params ISniffer[] Sniffers)
 		{
-			foreach (SnifferEvent Event in this.ToArray())
+			this.ReplayAsync(Sniffers).Wait();
+		}
+
+		/// <summary>
+		/// Replays sniffer events.
+		/// </summary>
+		/// <param name="Sniffable">Receiver of sniffer events.</param>
+		public async Task ReplayAsync(Sniffable Sniffable)
+		{
+			if (Sniffable.HasSniffers)
+				await this.ReplayAsync(Sniffable.Sniffers);
+		}
+
+		/// <summary>
+		/// Replays sniffer events.
+		/// </summary>
+		/// <param name="Sniffers">Receiver of sniffer events.</param>
+		public async Task ReplayAsync(params ISniffer[] Sniffers)
+		{
+			foreach (SnifferEvent Event in await this.ToArrayAsync())
 			{
 				foreach (ISniffer Sniffer in Sniffers)
 					Event.Replay(Sniffer);
@@ -167,14 +195,37 @@ namespace Waher.Networking.Sniffers
 		/// Returns recorded events as an array.
 		/// </summary>
 		/// <returns>Recorded events.</returns>
+		[Obsolete("Use ToArrayAsync instead, for better asynchronous performance.")]
 		public SnifferEvent[] ToArray()
 		{
-			lock (this.events)
+			return this.ToArrayAsync().Result;
+		}
+
+		/// <summary>
+		/// Returns recorded events as an array.
+		/// </summary>
+		/// <returns>Recorded events.</returns>
+		public async Task<SnifferEvent[]> ToArrayAsync()
+		{
+			await this.semaphore.WaitAsync();
+			try
 			{
 				SnifferEvent[] Result = new SnifferEvent[this.count];
 				this.events.CopyTo(Result, 0);
 				return Result;
 			}
+			finally
+			{
+				this.semaphore.Release();
+			}
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public virtual void Dispose()
+		{
+			this.semaphore.Dispose();
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 
@@ -21,34 +22,22 @@ namespace Waher.Content.Text
 		/// <summary>
 		/// CSV content types.
 		/// </summary>
-		public static readonly string[] CsvContentTypes = new string[]
-		{
-			"text/csv"
-		};
+		public static readonly string[] CsvContentTypes = new string[] { "text/csv" };
 
 		/// <summary>
 		/// CSV content types.
 		/// </summary>
-		public static readonly string[] CsvFileExtensions = new string[]
-		{
-			"csv"
-		};
+		public static readonly string[] CsvFileExtensions = new string[] { "csv" };
 
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes
-		{
-			get { return CsvContentTypes; }
-		}
+		public string[] ContentTypes => CsvContentTypes;
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions
-		{
-			get { return CsvFileExtensions; }
-		}
+		public string[] FileExtensions => CsvFileExtensions;
 
 		/// <summary>
 		/// If the decoder decodes an object with a given content type.
@@ -80,10 +69,10 @@ namespace Waher.Content.Text
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string s = CommonTypes.GetString(Data, Encoding);
-			return CSV.Parse(s);
+			return Task.FromResult<object>(CSV.Parse(s));
 		}
 
 
@@ -154,11 +143,10 @@ namespace Waher.Content.Text
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
-		/// <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
-		/// <returns>Encoded object.</returns>
+		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
+		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			string Csv;
 
@@ -169,12 +157,10 @@ namespace Waher.Content.Text
 			else
 				throw new ArgumentException("Unable to encode as CSV.", nameof(Object));
 
-			ContentType = "text/csv";
-
 			if (Encoding is null)
 				Encoding = Encoding.UTF8;
 
-			return Encoding.GetBytes(Csv);
+			return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Encoding.GetBytes(Csv), "text/csv"));
 		}
 	}
 }

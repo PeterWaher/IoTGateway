@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Waher.Content.Markdown.Consolidation
 {
@@ -77,9 +78,9 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Markdown">Markdown document.</param>
 		/// <param name="Id">Optional ID of document.</param>
 		/// <returns>Consolidated document type.</returns>
-		public DocumentType Add(MarkdownDocument Markdown, string Id)
+		public async Task<DocumentType> Add(MarkdownDocument Markdown, string Id)
 		{
-			DocumentInformation Info = new DocumentInformation(Markdown, Id);
+			DocumentInformation Info = await DocumentInformation.CreateAsync(Markdown, Id);
 
 			lock (this.documents)
 			{
@@ -101,12 +102,12 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Markdown">Markdown document.</param>
 		/// <param name="Id">Optional ID of document.</param>
 		/// <returns>Consolidated document type.</returns>
-		public DocumentType Update(MarkdownDocument Markdown, string Id)
+		public async Task<DocumentType> Update(MarkdownDocument Markdown, string Id)
 		{
 			if (string.IsNullOrEmpty(Id))
-				return this.Add(Markdown, Id);
+				return await this.Add(Markdown, Id);
 
-			DocumentInformation Info = new DocumentInformation(Markdown, Id);
+			DocumentInformation Info = await DocumentInformation.CreateAsync(Markdown, Id);
 			DocumentInformation Info2;
 			int i, c;
 

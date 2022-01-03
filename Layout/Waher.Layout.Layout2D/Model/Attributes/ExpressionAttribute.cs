@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
+using Waher.Script.Model;
 using Waher.Script.Objects;
 
 namespace Waher.Layout.Layout2D.Model.Attributes
@@ -71,18 +73,18 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// or <see cref="Exception"/> object if expression throws an exception, 
 		/// or null if no expression is defined.
 		/// </returns>
-		public object Evaluate(Variables Session)
+		public Task<object> EvaluateAsync(Variables Session)
 		{
 			if (!this.HasPresetValue)
-				return null;
+				return Task.FromResult<object>(null);
 
 			try
 			{
-				return this.PresetValue?.Evaluate(Session);
+				return this.PresetValue?.EvaluateAsync(Session) ?? Task.FromResult<object>(null);
 			}
 			catch (Exception ex)
 			{
-				return ex;
+				return Task.FromResult<object>(ex);
 			}
 		}
 
@@ -95,7 +97,7 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		/// or <see cref="Exception"/> object if expression throws an exception, 
 		/// or null if no expression is defined.
 		/// </returns>
-		public IElement EvaluateElement(Variables Session)
+		public async Task<IElement> EvaluateElementAsync(Variables Session)
 		{
 			if (!this.HasPresetValue)
 				return null;
@@ -104,7 +106,11 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 
 			try
 			{
-				Result = this.PresetValue?.Root?.Evaluate(Session);
+				ScriptNode Node = this.PresetValue?.Root;
+				if (Node is null)
+					Result = ObjectValue.Null;
+				else
+					Result = await Node.EvaluateAsync(Session);
 			}
 			catch (ScriptReturnValueException ex)
 			{

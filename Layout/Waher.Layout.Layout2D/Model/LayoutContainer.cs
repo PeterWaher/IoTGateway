@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
 
@@ -56,9 +57,9 @@ namespace Waher.Layout.Layout2D.Model
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override async Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
+			await base.FromXml(Input);
 
 			List<ILayoutElement> Children = null;
 
@@ -69,7 +70,7 @@ namespace Waher.Layout.Layout2D.Model
 					if (Children is null)
 						Children = new List<ILayoutElement>();
 
-					Children.Add(this.Document.CreateElement(E, this));
+					Children.Add(await this.Document.CreateElement(E, this));
 				}
 			}
 
@@ -129,9 +130,9 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
 			if (this.HasChildren && this.MeasureChildrenDimensions)
 			{
@@ -139,23 +140,19 @@ namespace Waher.Layout.Layout2D.Model
 				{
 					E.BeforeMeasureDimensions(State);
 
-					if (E.DoMeasureDimensions(State))
-						Relative = true;
+					await E.DoMeasureDimensions(State);
 
-					E.AfterMeasureDimensions(State, ref Relative);
+					await E.AfterMeasureDimensions(State);
 					this.IncludeElement(E);
 				}
 			}
-
-			return Relative;
 		}
 
 		/// <summary>
 		/// Called when dimensions have been measured.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		/// <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
-		public override void AfterMeasureDimensions(DrawingState State, ref bool Relative)
+		public override Task AfterMeasureDimensions(DrawingState State)
 		{
 			float f;
 
@@ -205,6 +202,8 @@ namespace Waher.Layout.Layout2D.Model
 				this.Bottom = this.bottom0;
 				this.Top = this.top0;
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private float? left0;
@@ -318,17 +317,14 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="RefAttribute">Reference attribute</param>
 		/// <param name="X">Resulting X-coordinate.</param>
 		/// <param name="Y">Resulting Y-coordinate.</param>
-		/// <param name="Relative">If coordinate is relative, and should be recalculated if dimensions change.</param>
 		/// <returns>If point is well-defined.</returns>
-		protected bool IncludePoint(DrawingState State, LengthAttribute XAttribute,
-			LengthAttribute YAttribute, StringAttribute RefAttribute,
-			ref float X, ref float Y, ref bool Relative)
+		protected async Task<CalculatedPoint> IncludePoint(DrawingState State, LengthAttribute XAttribute,
+			LengthAttribute YAttribute, StringAttribute RefAttribute, float X, float Y)
 		{
-			bool Result = this.CalcPoint(State, XAttribute, YAttribute, RefAttribute, ref X, ref Y, ref Relative);
-
-			if (Result)
-				this.IncludePoint(X, Y);
-
+			CalculatedPoint Result = await this.CalcPoint(State, XAttribute, YAttribute, RefAttribute, X, Y);
+			if (Result.Ok)
+				this.IncludePoint(Result.X, Result.Y);
+			
 			return Result;
 		}
 
@@ -336,14 +332,14 @@ namespace Waher.Layout.Layout2D.Model
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			if (this.HasChildren)
 			{
 				foreach (ILayoutElement E in this.children)
 				{
 					if (E.IsVisible)
-						E.Draw(State);
+						await E.Draw(State);
 				}
 			}
 		}

@@ -49,9 +49,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 			set => this.name2 = value;
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return base.ToString() + "\t" + this.name2;

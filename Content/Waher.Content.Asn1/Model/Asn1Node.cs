@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Content.Asn1.Model
 {
@@ -42,7 +43,7 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Pass">Export pass</param>
-		public virtual void ExportCSharp(StringBuilder Output, CSharpExportState State,
+		public virtual Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)
@@ -50,6 +51,8 @@ namespace Waher.Content.Asn1.Model
 				throw new NotImplementedException("Support for exporting objects of type " +
 					this.GetType().FullName + " not implemented.");
 			}
+
+			return Task.CompletedTask;
 		}
 
 		internal static string Tabs(int Indent)

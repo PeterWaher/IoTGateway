@@ -200,9 +200,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			return await Rec.Source.GetNodeAsync(new ThingReference(NodeId, SourceId, Partition));
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			base.Dispose();
@@ -3043,7 +3041,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			return Task.CompletedTask;
 		}
 
-		private Task Query_OnNewRecords(object Sender, QueryNewRecordsEventArgs e)
+		private async Task Query_OnNewRecords(object Sender, QueryNewRecordsEventArgs e)
 		{
 			object[] P = (object[])e.Query.State;
 			XmppClient Client = (XmppClient)P[0];
@@ -3151,12 +3149,12 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					else
 					{
-						byte[] Bin = InternetContent.Encode(Element, Encoding.UTF8, out string ContentType);
+						KeyValuePair<byte[], string> Encoded = await InternetContent.EncodeAsync(Element, Encoding.UTF8);
 
 						Xml.Append("<base64 contentType='");
-						Xml.Append(XML.Encode(ContentType));
+						Xml.Append(XML.Encode(Encoded.Value));
 						Xml.Append("'>");
-						Xml.Append(Convert.ToBase64String(Bin));
+						Xml.Append(Convert.ToBase64String(Encoded.Key));
 						Xml.Append("</base64>");
 					}
 				}
@@ -3168,31 +3166,27 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
-		
-			return Task.CompletedTask;
 		}
 
-		private Task Query_OnNewObject(object Sender, QueryObjectEventArgs e)
+		private async Task Query_OnNewObject(object Sender, QueryObjectEventArgs e)
 		{
 			object[] P = (object[])e.Query.State;
 			XmppClient Client = (XmppClient)P[0];
 			IqEventArgs e0 = (IqEventArgs)P[1];
 			StringBuilder Xml = new StringBuilder();
-			byte[] Bin = InternetContent.Encode(e.Object, Encoding.UTF8, out string ContentType);
+			KeyValuePair<byte[], string> Encoded = await InternetContent.EncodeAsync(e.Object, Encoding.UTF8);
 
 			this.StartQueryProgress(Xml, e);
 
 			Xml.Append("<newObject contentType='");
-			Xml.Append(XML.Encode(ContentType));
+			Xml.Append(XML.Encode(Encoded.Value));
 			Xml.Append("'>");
-			Xml.Append(Convert.ToBase64String(Bin));
+			Xml.Append(Convert.ToBase64String(Encoded.Key));
 			Xml.Append("</newObject>");
 
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
-		
-			return Task.CompletedTask;
 		}
 
 		private Task Query_OnMessage(object Sender, QueryMessageEventArgs e)

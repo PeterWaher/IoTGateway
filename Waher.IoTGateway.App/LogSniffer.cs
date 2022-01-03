@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 
@@ -7,44 +8,52 @@ namespace Waher.IoTGateway.App
 {
 	public class LogSniffer : SnifferBase
 	{
-		public override void Error(DateTime _, string Error)
+		public override Task Error(DateTime _, string Error)
 		{
 			Log.Error(Error);
+			return Task.CompletedTask;
 		}
 
-		public override void Exception(DateTime _, string Exception)
+		public override Task Exception(DateTime _, string Exception)
 		{
 			Log.Critical(Exception);
+			return Task.CompletedTask;
 		}
 
-		public override void Information(DateTime _, string Comment)
+		public override Task Information(DateTime _, string Comment)
 		{
 			Log.Informational(Comment);
+			return Task.CompletedTask;
 		}
 
-		public override void ReceiveBinary(DateTime _, byte[] Data)
+		public override Task ReceiveBinary(DateTime _, byte[] Data)
 		{
 			Log.Informational("Rx: " + ToString(Data));
+			return Task.CompletedTask;
 		}
 
-		public override void ReceiveText(DateTime _, string Text)
+		public override Task ReceiveText(DateTime _, string Text)
 		{
 			Log.Informational("Rx: " + Text);
+			return Task.CompletedTask;
 		}
 
-		public override void TransmitBinary(DateTime _, byte[] Data)
+		public override Task TransmitBinary(DateTime _, byte[] Data)
 		{
 			Log.Informational("Tx: " + ToString(Data));
+			return Task.CompletedTask;
 		}
 
-		public override void TransmitText(DateTime _, string Text)
+		public override Task TransmitText(DateTime _, string Text)
 		{
 			Log.Informational("Tx: " + Text);
+			return Task.CompletedTask;
 		}
 
-		public override void Warning(DateTime _, string Warning)
+		public override Task Warning(DateTime _, string Warning)
 		{
 			Log.Warning(Warning);
+			return Task.CompletedTask;
 		}
 
 		private static string ToString(byte[] Data)

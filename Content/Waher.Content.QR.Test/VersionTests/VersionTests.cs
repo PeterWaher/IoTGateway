@@ -63,16 +63,10 @@ namespace Waher.Content.QR.Test.VersionTests
 			{
 				Marshal.Copy(RGBA, 0, Pixels, RGBA.Length);
 
-				using (SKData Data = SKData.Create(Pixels, RGBA.Length))
-				{
-					using (SKImage Result = SKImage.FromPixels(new SKImageInfo(ImgSize, ImgSize, SKColorType.Rgba8888), Data, ImgSize << 2))
-					{
-						using (SKData Data2 = Result.Encode(SKEncodedImageFormat.Png, 100))
-						{
-							File.WriteAllBytes(Path.Combine(Path.Combine(Folder, Version.ToString() + ".png")), Data2.ToArray());
-						}
-					}
-				}
+				using SKData Data = SKData.Create(Pixels, RGBA.Length);
+				using SKImage Result = SKImage.FromPixels(new SKImageInfo(ImgSize, ImgSize, SKColorType.Rgba8888), Data, ImgSize << 2);
+				using SKData Data2 = Result.Encode(SKEncodedImageFormat.Png, 100);
+				File.WriteAllBytes(Path.Combine(Path.Combine(Folder, Version.ToString() + ".png")), Data2.ToArray());
 			}
 			finally
 			{

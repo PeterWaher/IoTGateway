@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Content;
 using Waher.Layout.Layout2D.Model.Attributes;
-using Waher.Layout.Layout2D.Model.Figures;
-using Waher.Layout.Layout2D.Model.References;
 
 namespace Waher.Layout.Layout2D.Model.Images
 {
@@ -54,12 +53,11 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.url = new StringAttribute(Input, "url");
 			this.alt = new StringAttribute(Input, "alt");
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -106,10 +104,11 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>Loaded image, or null if not possible to load image, or
 		/// image loading is in process.</returns>
-		protected override SKImage LoadImage(DrawingState State)
+		protected override async Task<SKImage> LoadImage(DrawingState State)
 		{
-			if (!(this.url is null) && this.url.TryEvaluate(State.Session, out string URL))
-				this.StartLoad(URL);
+			EvaluationResult<string> URL = await this.url.TryEvaluate(State.Session);
+			if (URL.Ok && !string.IsNullOrEmpty(URL.Result))
+				this.StartLoad(URL.Result);
 
 			return null;
 		}
@@ -138,21 +137,16 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			if (!(this.alt is null) &&
-				this.alt.TryEvaluate(State.Session, out string RefId) &&
-				this.Document.TryGetElement(RefId, out ILayoutElement Element))
-			{
+			EvaluationResult<string> RefId = await this.alt.TryEvaluate(State.Session);
+			if (RefId.Ok && this.Document.TryGetElement(RefId.Result, out ILayoutElement Element))
 				this.alternative = Element;
-			}
-		
-			bool Relative = base.DoMeasureDimensions(State);
 
-			if (this.alternative?.MeasureDimensions(State) ?? false)
-				Relative = true;
+			await base.DoMeasureDimensions(State);
 
-			return Relative;
+			if (!(this.alternative is null))
+				await this.alternative.MeasureDimensions(State);
 		}
 
 		/// <summary>
@@ -171,12 +165,12 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			if (this.image is null && !(this.alternative is null))
-				this.alternative.DrawShape(State);
-		
-			base.Draw(State);
+				await this.alternative.DrawShape(State);
+
+			await base.Draw(State);
 		}
 	}
 }

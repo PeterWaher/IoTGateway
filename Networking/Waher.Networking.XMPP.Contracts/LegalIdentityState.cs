@@ -95,9 +95,7 @@ namespace Waher.Networking.XMPP.Contracts
 			set => this.timestamp = value;
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();

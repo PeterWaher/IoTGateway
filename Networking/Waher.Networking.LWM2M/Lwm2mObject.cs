@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +18,7 @@ namespace Waher.Networking.LWM2M
 	[Index("Id")]
 	public abstract class Lwm2mObject : CoapResource, ICoapGetMethod
 	{
-		private SortedDictionary<int, Lwm2mObjectInstance> instances = new SortedDictionary<int, Lwm2mObjectInstance>();
+		private readonly SortedDictionary<int, Lwm2mObjectInstance> instances = new SortedDictionary<int, Lwm2mObjectInstance>();
 		private Lwm2mClient client = null;
 		private string objectId = null;
 		private ushort id;
@@ -223,26 +222,26 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void GET(CoapMessage Request, CoapResponse Response)
+		public Task GET(CoapMessage Request, CoapResponse Response)
 		{
 			bool FromBootstrapServer = this.client.IsFromBootstrapServer(Request);
 
 			if (this.id == 0 && !FromBootstrapServer)
 			{
 				Response.RST(CoapCode.Unauthorized);
-				return;
+				return Task.CompletedTask;
 			}
 
 			if (!string.IsNullOrEmpty(Request.SubPath))
 			{
 				Response.RST(CoapCode.NotFound);
-				return;
+				return Task.CompletedTask;
 			}
 
 			if (!Request.IsAcceptable(CoreLinkFormat.ContentFormatCode))
 			{
 				Response.RST(CoapCode.NotAcceptable);
-				return;
+				return Task.CompletedTask;
 			}
 
 			StringBuilder Output = new StringBuilder();
@@ -250,11 +249,11 @@ namespace Waher.Networking.LWM2M
 
 			Response.Respond(CoapCode.Content, Encoding.UTF8.GetBytes(Output.ToString()), 64,
 				new CoapOptionContentFormat(CoreLinkFormat.ContentFormatCode));
+
+			return Task.CompletedTask;
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.Path + ": " + this.GetType().FullName;

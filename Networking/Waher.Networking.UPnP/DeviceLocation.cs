@@ -109,9 +109,7 @@ namespace Waher.Networking.UPnP
 			return this.client.GetDeviceAsync(this.location);
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.location;

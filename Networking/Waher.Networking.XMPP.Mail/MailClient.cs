@@ -29,9 +29,7 @@ namespace Waher.Networking.XMPP.Mail
 			Client.RegisterMessageHandler("mailInfo", NamespaceMail, this.MailHandler, true);
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			Client.UnregisterMessageHandler("mailInfo", NamespaceMail, this.MailHandler, true);

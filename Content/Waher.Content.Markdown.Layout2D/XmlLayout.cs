@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Content.Markdown.Model;
@@ -155,13 +157,13 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public bool GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public async Task<bool> GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = GetFileName(Language, Rows, out string Title, Document.Settings.Variables);
-			if (FileName is null)
+			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
+			if (Info.FileName is null)
 				return false;
 
-			FileName = FileName.Substring(contentRootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
+			string FileName = Info.FileName.Substring(contentRootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
 			if (!FileName.StartsWith("/"))
 				FileName = "/" + FileName;
 
@@ -169,21 +171,21 @@ namespace Waher.Content.Markdown.Layout2D
 			Output.Append("<img src=\"");
 			Output.Append(XML.HtmlAttributeEncode(FileName));
 
-			if (!string.IsNullOrEmpty(Title))
+			if (!string.IsNullOrEmpty(Info.Title))
 			{
 				Output.Append("\" alt=\"");
-				Output.Append(XML.HtmlAttributeEncode(Title));
+				Output.Append(XML.HtmlAttributeEncode(Info.Title));
 
 				Output.Append("\" title=\"");
-				Output.Append(XML.HtmlAttributeEncode(Title));
+				Output.Append(XML.HtmlAttributeEncode(Info.Title));
 			}
 
 			Output.Append("\" class=\"aloneUnsized\"/>");
 
-			if (!string.IsNullOrEmpty(Title))
+			if (!string.IsNullOrEmpty(Info.Title))
 			{
 				Output.Append("<figcaption>");
-				Output.Append(XML.HtmlValueEncode(Title));
+				Output.Append(XML.HtmlValueEncode(Info.Title));
 				Output.Append("</figcaption>");
 			}
 
@@ -192,17 +194,23 @@ namespace Waher.Content.Markdown.Layout2D
 			return true;
 		}
 
+		private class GraphInfo
+		{
+			public string FileName;
+			public string Title;
+		}
+
 		/// <summary>
 		/// Generates an image, saves it, and returns the file name of the image file.
 		/// </summary>
 		/// <param name="Language">Language</param>
 		/// <param name="Rows">Code Block rows</param>
-		/// <param name="Title">Title</param>
 		/// <param name="Session">Session variables.</param>
 		/// <returns>File name</returns>
-		public static string GetFileName(string Language, string[] Rows, out string Title, Variables Session)
+		private static async Task<GraphInfo> GetFileName(string Language, string[] Rows, Variables Session)
 		{
 			StringBuilder sb = new StringBuilder();
+			GraphInfo Result = new GraphInfo();
 
 			foreach (string Row in Rows)
 				sb.AppendLine(Row);
@@ -212,11 +220,11 @@ namespace Waher.Content.Markdown.Layout2D
 
 			if (i > 0)
 			{
-				Title = Language.Substring(i + 1).Trim();
+				Result.Title = Language.Substring(i + 1).Trim();
 				Language = Language.Substring(0, i).TrimEnd();
 			}
 			else
-				Title = string.Empty;
+				Result.Title = string.Empty;
 
 			sb.Append(Language);
 
@@ -224,26 +232,25 @@ namespace Waher.Content.Markdown.Layout2D
 
 			string LayoutFolder = Path.Combine(contentRootFolder, "Layout");
 			string FileName = Path.Combine(LayoutFolder, Hash);
-			string PngFileName = FileName + ".png";
+			Result.FileName = FileName + ".png";
 
-			if (!File.Exists(PngFileName))
+			if (!File.Exists(Result.FileName))
 			{
 				try
 				{
 					XmlDocument Doc = new XmlDocument();
 					Doc.LoadXml(Xml);
 
-					Layout2DDocument LayoutDoc = new Layout2DDocument(Doc);
-					RenderSettings Settings = LayoutDoc.GetRenderSettings(Session);
+					Layout2DDocument LayoutDoc = await Layout2DDocument.FromXml(Doc);
+					RenderSettings Settings = await LayoutDoc.GetRenderSettings(Session);
 
-					using (SKImage Img = LayoutDoc.Render(Settings, out Map[] _))   // TODO: Maps
+					KeyValuePair<SKImage, Map[]> P = await LayoutDoc.Render(Settings);
+					using (SKImage Img = P.Key)   // TODO: Maps
 					{
 						using (SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100))
 						{
-							using (FileStream fs = File.Create(PngFileName))
-							{
-								Data.SaveTo(fs);
-							}
+							byte[] Bin = Data.ToArray();
+							await Resources.WriteAllBytesAsync(Result.FileName, Bin);
 						}
 					}
 				}
@@ -253,7 +260,7 @@ namespace Waher.Content.Markdown.Layout2D
 				}
 			}
 
-			return PngFileName;
+			return Result;
 		}
 
 		/// <summary>
@@ -265,10 +272,10 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public bool GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public async Task<bool> GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			GetFileName(Language, Rows, out string Title, Document.Settings.Variables);
-			Output.AppendLine(Title);
+			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
+			Output.AppendLine(Info.Title);
 
 			return true;
 		}
@@ -283,18 +290,18 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public bool GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public async Task<bool> GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = GetFileName(Language, Rows, out string Title, Document.Settings.Variables);
-			if (FileName is null)
+			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
+			if (Info.FileName is null)
 				return false;
 
 			Output.WriteStartElement("Image");
-			Output.WriteAttributeString("Source", FileName);
+			Output.WriteAttributeString("Source", Info.FileName);
 			Output.WriteAttributeString("Stretch", "None");
 
-			if (!string.IsNullOrEmpty(Title))
-				Output.WriteAttributeString("ToolTip", Title);
+			if (!string.IsNullOrEmpty(Info.Title))
+				Output.WriteAttributeString("ToolTip", Info.Title);
 
 			Output.WriteEndElement();
 
@@ -311,14 +318,14 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public bool GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public async Task<bool> GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = GetFileName(Language, Rows, out string _, Document.Settings.Variables);
-			if (FileName is null)
+			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
+			if (Info.FileName is null)
 				return false;
 
 			Output.WriteStartElement("Image");
-			Output.WriteAttributeString("Source", FileName);
+			Output.WriteAttributeString("Source", Info.FileName);
 			Output.WriteEndElement();
 
 			return true;
@@ -331,13 +338,13 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <param name="Language">Language used.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>Image, if successful, null otherwise.</returns>
-		public PixelInformation GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
+		public async Task<PixelInformation> GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
 		{
-			string FileName = GetFileName(Language, Rows, out string _, Document.Settings.Variables);
-			if (FileName is null)
+			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
+			if (Info.FileName is null)
 				return null;
 
-			byte[] Data = File.ReadAllBytes(FileName);
+			byte[] Data = await Resources.ReadAllBytesAsync(Info.FileName);
 
 			using (SKBitmap Bitmap = SKBitmap.Decode(Data))
 			{
@@ -362,12 +369,13 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <param name="Xml">XML Document.</param>
 		/// <param name="Session">Current variables.</param>
 		/// <returns>Transformed object.</returns>
-		public object TransformXml(XmlDocument Xml, Variables Session)
+		public async Task<object> TransformXml(XmlDocument Xml, Variables Session)
 		{
-			Layout2DDocument LayoutDoc = new Layout2DDocument(Xml, Session);
-			RenderSettings Settings = LayoutDoc.GetRenderSettings(Session);
+			Layout2DDocument LayoutDoc = await Layout2DDocument.FromXml(Xml, Session);
+			RenderSettings Settings = await LayoutDoc.GetRenderSettings(Session);
 
-			using (SKImage Img = LayoutDoc.Render(Settings, out Map[] _))   // TODO: Maps
+			KeyValuePair<SKImage, Map[]> P = await LayoutDoc.Render(Settings);
+			using (SKImage Img = P.Key)   // TODO: Maps
 			{
 				return PixelInformation.FromImage(Img);
 			}

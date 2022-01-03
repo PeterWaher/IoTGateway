@@ -8,7 +8,7 @@ namespace Waher.Networking.CoAP.Options
 	/// </summary>
 	public abstract class CoapOptionOpaque : CoapOption
 	{
-		private byte[] value;
+		private readonly byte[] value;
 
 		/// <summary>
 		/// Base class for all opaque CoAP options.
@@ -36,9 +36,7 @@ namespace Waher.Networking.CoAP.Options
 			return this.value;
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return base.ToString() + " = " + Hashes.BinaryToString(this.value);

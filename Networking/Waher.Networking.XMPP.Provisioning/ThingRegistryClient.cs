@@ -87,9 +87,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			this.client.RegisterIqSetHandler("disowned", NamespaceDiscovery, this.DisownedHandler, false);
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			base.Dispose();

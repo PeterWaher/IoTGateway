@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -39,26 +37,17 @@ namespace Waher.Script.Functions.Runtime
         /// <summary>
         /// Default Argument names
         /// </summary>
-        public override string[] DefaultArgumentNames
-        {
-            get { return new string[] { "var" }; }
-        }
+        public override string[] DefaultArgumentNames => new string[] { "var" };
 
         /// <summary>
         /// Name of variable.
         /// </summary>
-        public string VariableName
-        {
-            get { return this.variableName; }
-        }
+        public string VariableName => this.variableName;
 
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "remove"; }
-        }
+        public override string FunctionName => "remove";
 
         /// <summary>
         /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -88,9 +77,7 @@ namespace Waher.Script.Functions.Runtime
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is Remove O &&
@@ -98,10 +85,8 @@ namespace Waher.Script.Functions.Runtime
 				base.Equals(obj);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
-		public override int GetHashCode()
+        /// <inheritdoc/>
+        public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();
 			Result ^= Result << 5 ^ this.variableName.GetHashCode();

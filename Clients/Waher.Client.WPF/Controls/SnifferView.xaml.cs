@@ -13,6 +13,7 @@ using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Client.WPF.Model;
 using Waher.Client.WPF.Controls.Sniffers;
+using System.Threading.Tasks;
 
 namespace Waher.Client.WPF.Controls
 {
@@ -56,10 +57,11 @@ namespace Waher.Client.WPF.Controls
 			MainWindow.UpdateGui(this.AddItem, Item);
 		}
 
-		private void AddItem(object P)
+		private Task AddItem(object P)
 		{
 			this.SnifferListView.Items.Add((SniffItem)P);
 			this.SnifferListView.ScrollIntoView(P);
+			return Task.CompletedTask;
 		}
 
 		public void NewButton_Click(object sender, RoutedEventArgs e)

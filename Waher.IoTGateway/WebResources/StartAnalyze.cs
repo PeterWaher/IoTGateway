@@ -67,7 +67,7 @@ namespace Waher.IoTGateway.WebResources
 			if (!Request.HasData)
 				throw new BadRequestException();
 
-			object Obj = Request.DecodeData();
+			object Obj = await Request.DecodeDataAsync();
 			if (!(Obj is Dictionary<string, object> Parameters))
 				throw new BadRequestException();
 
@@ -177,12 +177,12 @@ namespace Waher.IoTGateway.WebResources
 				if (xslt is null)
 					xslt = XSL.LoadTransform(typeof(Gateway).Namespace + ".Transforms.DbStatXmlToHtml.xslt");
 
-				string s = File.ReadAllText(FullPath);
+				string s = await Resources.ReadAllTextAsync(FullPath);
 				s = XSL.Transform(s, xslt);
 				byte[] Bin = utf8Bom.GetBytes(s);
 
 				string FullPath2 = FullPath.Substring(0, FullPath.Length - 4) + ".html";
-				File.WriteAllBytes(FullPath2, Bin);
+				await Resources.WriteAllBytesAsync(FullPath2, Bin);
 
 				ExportFormats.ExportFormat.UpdateClientsFileUpdated(FileName.Substring(0, FileName.Length - 4) + ".html", Bin.Length, Created);
 

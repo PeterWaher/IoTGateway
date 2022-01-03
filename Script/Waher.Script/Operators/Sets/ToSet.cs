@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
@@ -28,28 +27,29 @@ namespace Waher.Script.Operators.Sets
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
 		/// </summary>
+		/// <param name="Operand">Operand.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
+		public override IElement Evaluate(IElement Operand, Variables Variables)
 		{
-			return this.ConvertToSet(this.op.Evaluate(Variables));
+			return this.ConvertToSet(Operand);
 		}
 
-		private IElement ConvertToSet(IElement E)
+		private IElement ConvertToSet(IElement Operand)
 		{
-			if (this.nullCheck && E.AssociatedObjectValue is null)
-				return E;
+			if (this.nullCheck && Operand.AssociatedObjectValue is null)
+				return Operand;
 
-			if (E is ISet)
-				return E;
+			if (Operand is ISet)
+				return Operand;
 
-			if (E is IVector V)
+			if (Operand is IVector V)
 				return SetDefinition.Encapsulate(V.VectorElements, this);
 
-			if (this.nullCheck && E.AssociatedObjectValue is null)
-				return E;
+			if (this.nullCheck && Operand.AssociatedObjectValue is null)
+				return Operand;
 
-			return SetDefinition.Encapsulate(new IElement[] { E }, this);
+			return SetDefinition.Encapsulate(new IElement[] { Operand }, this);
 		}
 
 		/// <summary>

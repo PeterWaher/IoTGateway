@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Script.Abstraction.Elements;
@@ -79,14 +79,14 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.from = new ExpressionAttribute(Input, "from");
 			this.to = new ExpressionAttribute(Input, "to");
 			this.step = new ExpressionAttribute(Input, "step");
 			this.variable = new StringAttribute(Input, "variable");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -135,19 +135,19 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
 			if (this.measured is null)
 			{
 				List<ILayoutElement> Measured = new List<ILayoutElement>();
-				IElement FromValue = this.from.EvaluateElement(State.Session);
-				IElement ToValue = this.to.EvaluateElement(State.Session);
-				IElement Step = this.step.EvaluateElement(State.Session);
+				IElement FromValue = await this.from.EvaluateElementAsync(State.Session);
+				IElement ToValue = await this.to.EvaluateElementAsync(State.Session);
+				IElement Step = await this.step.EvaluateElementAsync(State.Session);
 
-				if (!(this.variable is null) &&
-					this.variable.TryEvaluate(State.Session, out string VariableName) &&
+				EvaluationResult<string> Variable = await this.variable.TryEvaluate(State.Session);
+				if (Variable.Ok &&
 					FromValue is ICommutativeRingWithIdentityElement From &&
 					ToValue is ICommutativeRingWithIdentityElement To &&
 					From.AssociatedSet is IOrderedSet S)
@@ -178,17 +178,19 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 
 					while (DoLoop)
 					{
-						State.Session[VariableName] = From;
+						State.Session[Variable.Result] = From;
 
-						foreach (ILayoutElement Child in this.Children)
+						if (this.HasChildren)
 						{
-							ILayoutElement Copy = Child.Copy(this);
-							Measured.Add(Copy);
+							foreach (ILayoutElement Child in this.Children)
+							{
+								ILayoutElement Copy = Child.Copy(this);
+								Measured.Add(Copy);
 
-							if (Copy.MeasureDimensions(State))
-								Relative = true;
-							
-							this.IncludeElement(Copy);
+								await Copy.MeasureDimensions(State);
+
+								this.IncludeElement(Copy);
+							}
 						}
 
 						if (Direction == 0)
@@ -213,14 +215,10 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 			{
 				foreach (ILayoutElement E in this.measured)
 				{
-					if (E.MeasureDimensions(State))
-						Relative = true;
-
+					await E.MeasureDimensions(State);
 					this.IncludeElement(E);
 				}
 			}
-
-			return Relative;
 		}
 
 		/// <summary>

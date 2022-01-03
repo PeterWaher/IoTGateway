@@ -359,9 +359,7 @@ namespace Waher.Content.Html
 			set { this.siteName = value; }
 		}
 
-		/// <summary>
-		/// <see cref="System.Object.ToString"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			PageMetaData Meta = obj as PageMetaData;
@@ -447,9 +445,7 @@ namespace Waher.Content.Html
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="System.Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = 0;

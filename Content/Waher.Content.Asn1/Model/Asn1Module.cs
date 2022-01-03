@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Content.Asn1.Model
 {
@@ -48,11 +49,11 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Pass">Export pass</param>
-		public override void ExportCSharp(StringBuilder Output, CSharpExportState State,
+		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
 			foreach (Asn1Node Item in this.items)
-				Item.ExportCSharp(Output, State, Indent, Pass);
+				await Item.ExportCSharp(Output, State, Indent, Pass);
 
 			State.ClosePending(Output);
 		}

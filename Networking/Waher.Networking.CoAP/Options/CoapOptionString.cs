@@ -46,9 +46,7 @@ namespace Waher.Networking.CoAP.Options
 			return Encoding.UTF8.GetBytes(this.value);
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return base.ToString() + " = " + this.value;

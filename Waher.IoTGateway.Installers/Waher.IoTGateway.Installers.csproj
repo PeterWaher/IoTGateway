@@ -52,6 +52,7 @@
     <Compile Include=".bak\Waher.Content\Audio\AudioDecoder.cs" />
     <Compile Include=".bak\Waher.Content\Base64Url.cs" />
     <Compile Include=".bak\Waher.Content\Binary\BinaryDecoder.cs" />
+    <Compile Include=".bak\Waher.Content\ConversionState.cs" />
     <Compile Include=".bak\Waher.Content\Getters\WebException.cs" />
     <Compile Include=".bak\Waher.Content\Getters\WebGetter.cs" />
     <Compile Include=".bak\Waher.Content\IContentGetter.cs" />
@@ -67,7 +68,6 @@
     <Compile Include=".bak\Waher.Content\Multipart\RelatedCodec.cs" />
     <Compile Include=".bak\Waher.Content\Multipart\RelatedContent.cs" />
     <Compile Include=".bak\Waher.Content\Multipart\WwwFormCodec.cs" />
-    <Compile Include=".bak\Waher.Content\Multipart\WwwFormDecoder.cs" />
     <Compile Include=".bak\Waher.Content\Posters\PosterBase.cs" />
     <Compile Include=".bak\Waher.Content\Posters\WebPoster.cs" />
     <Compile Include=".bak\Waher.Content\Text\CsvCodec.cs" />
@@ -141,6 +141,7 @@
     <Compile Include=".bak\Waher.Script\Model\FunctionOneMatrixVariable.cs" />
     <Compile Include=".bak\Waher.Script\Model\FunctionZeroVariables.cs" />
     <Compile Include=".bak\Waher.Script\Model\IDifferentiable.cs" />
+    <Compile Include=".bak\Waher.Script\Model\IEvaluateAsync.cs" />
     <Compile Include=".bak\Waher.Script\Model\IKeyWord.cs" />
     <Compile Include=".bak\Waher.Script\Model\NullCheckBinaryOperator.cs" />
     <Compile Include=".bak\Waher.Script\Model\NullCheckTernaryOperator.cs" />
@@ -197,8 +198,10 @@
     <Compile Include=".bak\Waher.Script\Output\ObjectExNihiloOutput.cs" />
     <Compile Include=".bak\Waher.Script\Output\StringOutput.cs" />
     <Compile Include=".bak\Waher.Script\Output\TimeSpanOutput.cs" />
+    <Compile Include=".bak\Waher.Script\TypeConversion\BigIntegerToDouble.cs" />
     <Compile Include=".bak\Waher.Script\TypeConversion\BooleanToDouble.cs" />
     <Compile Include=".bak\Waher.Script\TypeConversion\ConversionSequence.cs" />
+    <Compile Include=".bak\Waher.Script\TypeConversion\DoubleToBigInteger.cs" />
     <Compile Include=".bak\Waher.Script\TypeConversion\DoubleToComplex.cs" />
     <Compile Include=".bak\Waher.Script\TypeConversion\ITypeConverter.cs" />
     <Compile Include=".bak\Waher.Script\TypeConversion\PhysicalQuantityToDouble.cs" />

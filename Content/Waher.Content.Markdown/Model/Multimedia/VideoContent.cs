@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Runtime.Inventory;
@@ -49,7 +50,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
+		public override async Task GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
 			bool First = true;
@@ -97,7 +98,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				Output.AppendLine(">");
 
 			foreach (MarkdownElement E in ChildNodes)
-				E.GenerateHTML(Output);
+				await E.GenerateHTML(Output);
 
 			Output.Append("</video>");
 
@@ -114,7 +115,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
+		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
 			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
 			foreach (MultimediaItem Item in Items)
@@ -135,6 +136,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 				break;
 			}
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -146,7 +149,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
+		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
 			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
 			foreach (MultimediaItem Item in Items)
@@ -166,6 +169,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 				break;
 			}
+
+			return Task.CompletedTask;
 		}
 
 	}

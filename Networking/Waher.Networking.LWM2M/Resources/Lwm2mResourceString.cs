@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Events;
 using Waher.Networking.LWM2M.ContentFormats;
-using Waher.Persistence;
 using Waher.Runtime.Settings;
 
 namespace Waher.Networking.LWM2M
@@ -13,7 +10,7 @@ namespace Waher.Networking.LWM2M
 	/// </summary>
 	public class Lwm2mResourceString : Lwm2mResource
 	{
-		private string defaultValue;
+		private readonly string defaultValue;
 		private string value;
 
 		/// <summary>

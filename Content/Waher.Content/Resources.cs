@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Reflection;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Xml;
-using System.Xml.Schema;
 using System.Security.Cryptography.X509Certificates;
 using Waher.Runtime.Inventory;
+using System.Threading.Tasks;
+using System.Text;
 
 namespace Waher.Content
 {
@@ -139,6 +137,97 @@ namespace Waher.Content
 				return new X509Certificate2(Data);
 			else
 				return new X509Certificate2(Data, Password);
+		}
+
+		/// <summary>
+		/// Reads a binary file asynchronously.
+		/// </summary>
+		/// <param name="FileName">Filename.</param>
+		/// <returns>Binary content.</returns>
+		public static async Task<byte[]> ReadAllBytesAsync(string FileName)
+		{
+			using (FileStream fs = File.OpenRead(FileName))
+			{
+				long l = fs.Length;
+				if (l > int.MaxValue)
+					throw new NotSupportedException("File too large.");
+
+				int Len = (int)l;
+				byte[] Bin = new byte[Len];
+
+				await fs.ReadAsync(Bin, 0, Len);
+
+				return Bin;
+			}
+		}
+
+		/// <summary>
+		/// Reads a text file asynchronously.
+		/// </summary>
+		/// <param name="FileName">Filename.</param>
+		/// <returns>Decoded text.</returns>
+		public static async Task<string> ReadAllTextAsync(string FileName)
+		{
+			byte[] Bin = await ReadAllBytesAsync(FileName);
+			return CommonTypes.GetString(Bin, Encoding.UTF8);
+		}
+
+		/// <summary>
+		/// Creates a binary file asynchronously.
+		/// </summary>
+		/// <param name="FileName">Filename.</param>
+		/// <param name="Data">Binary data</param>
+		public static async Task WriteAllBytesAsync(string FileName, byte[] Data)
+		{
+			using (FileStream fs = File.Create(FileName))
+			{
+				await fs.WriteAsync(Data, 0, Data.Length);
+			}
+		}
+
+		/// <summary>
+		/// Creates a text file asynchronously.
+		/// </summary>
+		/// <param name="FileName">Filename.</param>
+		/// <param name="Text">Text</param>
+		public static Task WriteAllTextAsync(string FileName, string Text)
+		{
+			return WriteAllTextAsync(FileName, Text, Encoding.UTF8);
+		}
+
+		/// <summary>
+		/// Creates a text file asynchronously.
+		/// </summary>
+		/// <param name="FileName">Filename.</param>
+		/// <param name="Text">Text</param>
+		/// <param name="Encoding">Encoding to use</param>
+		public static async Task WriteAllTextAsync(string FileName, string Text, Encoding Encoding)
+		{
+			using (FileStream fs = File.Create(FileName))
+			{
+				byte[] Preamble = Encoding.GetPreamble();
+				byte[] Data = Encoding.GetBytes(Text);
+				int i, c = Preamble.Length;
+
+				if (c > 0)
+				{
+					if (c > Data.Length)
+						i = 0;
+					else
+					{
+						for (i = 0; i < c; i++)
+						{
+							if (Preamble[i] != Data[i])
+								break;
+						}
+					}
+
+					if (i < c)
+						await fs.WriteAsync(Preamble, 0, c);
+				}
+
+				await fs.WriteAsync(Data, 0, Data.Length);
+			}
 		}
 
 	}

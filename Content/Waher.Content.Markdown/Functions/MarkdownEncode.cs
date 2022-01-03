@@ -26,10 +26,7 @@ namespace Waher.Content.Markdown.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "MarkdownEncode"; }
-		}
+		public override string FunctionName => "MarkdownEncode";
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using SkiaSharp;
 
 namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
@@ -39,7 +40,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
-		public virtual void Measure(DrawingState State, PathState PathState)
+		public virtual Task Measure(DrawingState State, PathState PathState)
 		{
 			if (this.defined)
 			{
@@ -47,6 +48,8 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 				PathState.Set(this.xCoordinate2, this.yCoordinate2);
 				PathState.Set(this.xCoordinate3, this.yCoordinate3);
 			}
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -55,7 +58,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
 		/// <param name="Path">Path being generated.</param>
-		public virtual void Draw(DrawingState State, PathState PathState, SKPath Path)
+		public virtual Task Draw(DrawingState State, PathState PathState, SKPath Path)
 		{
 			if (this.defined)
 			{
@@ -69,6 +72,8 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 				PathState.Set(this.xCoordinate3, this.yCoordinate3);
 				Path.CubicTo(this.P1, this.P2, this.P3);
 			}
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

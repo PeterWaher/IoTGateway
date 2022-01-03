@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.Sniffers
 {
@@ -32,26 +33,26 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// Method is called before writing something to the text file.
 		/// </summary>
-		protected virtual void BeforeWrite()
+		protected virtual Task BeforeWrite()
 		{
-			// Do nothing by default.
+			return Task.CompletedTask;  // Do nothing by default.
 		}
 
 		/// <summary>
 		/// Method is called after writing something to the text file.
 		/// </summary>
-		protected virtual void AfterWrite()
+		protected virtual Task AfterWrite()
 		{
-			// Do nothing by default.
+			return Task.CompletedTask;  // Do nothing by default.
 		}
 
-		/// <summary>
-		/// <see cref="ISniffer.ReceiveBinary(DateTime, byte[])"/>
-		/// </summary>
-		public override void ReceiveBinary(DateTime Timestamp, byte[] Data)
+		/// <inheritdoc/>
+		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
 			if (Data.Length > 0)
-				this.HexOutput(Data, this.Prefix(Timestamp, "Rx"));
+				return this.HexOutput(Data, this.Prefix(Timestamp, "Rx"));
+			else
+				return Task.CompletedTask;
 		}
 
 		private string Prefix(DateTime Timestamp, string Type)
@@ -62,9 +63,9 @@ namespace Waher.Networking.Sniffers
 				return Type + ": ";
 		}
 
-		private void HexOutput(byte[] Data, string RowPrefix)
+		private async Task HexOutput(byte[] Data, string RowPrefix)
 		{
-			this.BeforeWrite();
+			await this.BeforeWrite();
 			try
 			{
 				switch (this.binaryPresentationMethod)
@@ -85,91 +86,79 @@ namespace Waher.Networking.Sniffers
 							i = (i + 1) & 31;
 							if (i == 0)
 							{
-								this.WriteLine(sb.ToString());
+								await this.WriteLine(sb.ToString());
 								sb.Clear();
 							}
 						}
 
 						if (i != 0)
-							this.WriteLine(sb.ToString());
+							await this.WriteLine(sb.ToString());
 						break;
 
 					case BinaryPresentationMethod.Base64:
-						this.WriteLine(RowPrefix + Convert.ToBase64String(Data));
+						await this.WriteLine(RowPrefix + Convert.ToBase64String(Data));
 						break;
 
 					case BinaryPresentationMethod.ByteCount:
-						this.WriteLine(RowPrefix + "<" + Data.Length.ToString() + " bytes>");
+						await this.WriteLine(RowPrefix + "<" + Data.Length.ToString() + " bytes>");
 						break;
 				}
 			}
 			finally
 			{
-				this.AfterWrite();
+				await this.AfterWrite();
 			}
 		}
 
-		/// <summary>
-		/// <see cref="ISniffer.TransmitBinary(DateTime, byte[])"/>
-		/// </summary>
-		public override void TransmitBinary(DateTime Timestamp, byte[] Data)
+		/// <inheritdoc/>
+		public override Task TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
 			if (Data.Length > 0)
-				this.HexOutput(Data, this.Prefix(Timestamp, "Tx"));
+				return this.HexOutput(Data, this.Prefix(Timestamp, "Tx"));
+			else
+				return Task.CompletedTask;
 		}
 
-		/// <summary>
-		/// <see cref="ISniffer.ReceiveText(DateTime, String)"/>
-		/// </summary>
-		public override void ReceiveText(DateTime Timestamp, string Text)
+		/// <inheritdoc/>
+		public override Task ReceiveText(DateTime Timestamp, string Text)
 		{
-			this.WriteLine(this.Prefix(Timestamp, "Rx") + Text);
+			return this.WriteLine(this.Prefix(Timestamp, "Rx") + Text);
 		}
 
 		/// <summary>
 		/// Writes a line of text.
 		/// </summary>
 		/// <param name="s">String to write.</param>
-		protected abstract void WriteLine(string s);
+		protected abstract Task WriteLine(string s);
 
-		/// <summary>
-		/// <see cref="ISniffer.TransmitText(DateTime, String)"/>
-		/// </summary>
-		public override void TransmitText(DateTime Timestamp, string Text)
+		/// <inheritdoc/>
+		public override Task TransmitText(DateTime Timestamp, string Text)
 		{
-			this.WriteLine(this.Prefix(Timestamp, "Tx") + Text);
+			return this.WriteLine(this.Prefix(Timestamp, "Tx") + Text);
 		}
 
-		/// <summary>
-		/// <see cref="ISniffer.Information(DateTime, String)"/>
-		/// </summary>
-		public override void Information(DateTime Timestamp, string Comment)
+		/// <inheritdoc/>
+		public override Task Information(DateTime Timestamp, string Comment)
 		{
-			this.WriteLine(this.Prefix(Timestamp, "Info") + Comment);
+			return this.WriteLine(this.Prefix(Timestamp, "Info") + Comment);
 		}
 
-		/// <summary>
-		/// <see cref="ISniffer.Warning(DateTime, String)"/>
-		/// </summary>
-		public override void Warning(DateTime Timestamp, string Warning)
+		/// <inheritdoc/>
+		public override Task Warning(DateTime Timestamp, string Warning)
 		{
-			this.WriteLine(this.Prefix(Timestamp, "Warning") + Warning);
+			return this.WriteLine(this.Prefix(Timestamp, "Warning") + Warning);
 		}
 
-		/// <summary>
-		/// <see cref="ISniffer.Error(DateTime, String)"/>
-		/// </summary>
-		public override void Error(DateTime Timestamp, string Error)
+		/// <inheritdoc/>
+		public override Task Error(DateTime Timestamp, string Error)
 		{
-			this.WriteLine(this.Prefix(Timestamp, "Error") + Error);
+			return this.WriteLine(this.Prefix(Timestamp, "Error") + Error);
 		}
 
-		/// <summary>
-		/// <see cref="ISniffer.Exception(DateTime, String)"/>
-		/// </summary>
-		public override void Exception(DateTime Timestamp, string Exception)
+		/// <inheritdoc/>
+		public override Task Exception(DateTime Timestamp, string Exception)
 		{
-			this.WriteLine(this.Prefix(Timestamp, "Exception") + Exception);
+			return this.WriteLine(this.Prefix(Timestamp, "Exception") + Exception);
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Values;
 
 namespace Waher.Content.Asn1.Model
@@ -95,7 +96,7 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Pass">Export pass</param>
-		public override void ExportCSharp(StringBuilder Output, CSharpExportState State,
+		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit && !(this.body is null))
@@ -113,7 +114,7 @@ namespace Waher.Content.Asn1.Model
 							ImportedDocument = State.Settings.GetDocument(Import.Module);
 						else
 						{
-							ImportedDocument = Import.LoadDocument();
+							ImportedDocument = await Import.LoadDocument();
 							string CSharp = ImportedDocument.ExportCSharp(State.Settings);
 							State.Settings.AddCode(Import.Module, CSharp, ImportedDocument);
 						}
@@ -155,20 +156,20 @@ namespace Waher.Content.Asn1.Model
 									!TypeDef.ConstructedType &&
 									Array.IndexOf<string>(Import.Identifiers, TypeDef.Name) >= 0)
 								{
-									TypeDef.ExportCSharp(Output, State, Indent, CSharpExportPass.Preprocess);
+									await TypeDef.ExportCSharp(Output, State, Indent, CSharpExportPass.Preprocess);
 								}
 							}
 						}
 					}
 				}
 
-				this.body.ExportCSharp(Output, State, Indent, CSharpExportPass.Preprocess);
+				await this.body.ExportCSharp(Output, State, Indent, CSharpExportPass.Preprocess);
 				State.ClosePending(Output);
 
-				this.body.ExportCSharp(Output, State, Indent, CSharpExportPass.Variables);
+				await this.body.ExportCSharp(Output, State, Indent, CSharpExportPass.Variables);
 				State.ClosePending(Output);
 
-				this.body.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
+				await this.body.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
 				State.ClosePending(Output);
 
 				Indent--;

@@ -34,6 +34,12 @@ namespace Waher.Script.Persistence.SQL
 		}
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
@@ -49,7 +55,7 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public async Task<IElement> EvaluateAsync(Variables Variables)
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
 			IDataSource Source = await this.source.GetSource(Variables);
 			int? Count = await Source.FindDelete(this.lazy, 0, int.MaxValue, this.where, Variables, new	KeyValuePair<VariableReference, bool>[0], this);
@@ -78,20 +84,28 @@ namespace Waher.Script.Persistence.SQL
 					return false;
 			}
 
-			ScriptNode Node = this.source;
-			if (!(Node is null) && !Callback(ref Node, State))
-				return false;
+			ScriptNode NewNode;
+			bool b;
 
-			if (Node != this.source)
+			if (!(this.source is null))
 			{
-				if (Node is SourceDefinition Source2)
+				b = !Callback(this.source, out NewNode, State);
+				if (!(NewNode is null) && NewNode is SourceDefinition Source2)
 					this.source = Source2;
-				else
+
+				if (b)
 					return false;
 			}
 
-			if (!(this.where is null) && !Callback(ref this.where, State))
-				return false;
+			if (!(this.where is null))
+			{
+				b = !Callback(this.where, out NewNode, State);
+				if (!(NewNode is null))
+					this.where = NewNode;
+
+				if (b)
+					return false;
+			}
 
 			if (!DepthFirst)
 			{
@@ -105,9 +119,7 @@ namespace Waher.Script.Persistence.SQL
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is Delete O &&
@@ -116,9 +128,7 @@ namespace Waher.Script.Persistence.SQL
 				base.Equals(obj);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

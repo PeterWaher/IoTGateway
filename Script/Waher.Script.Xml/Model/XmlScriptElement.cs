@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 
 namespace Waher.Script.Xml.Model
 {
@@ -17,6 +16,8 @@ namespace Waher.Script.Xml.Model
 		private readonly XmlScriptAttribute[] attributes;
 		private LinkedList<XmlScriptNode> children = null;
 		private readonly string name;
+		private readonly int nrAttributes;
+		private bool isAsync;
 
 		/// <summary>
 		/// XML Script element node.
@@ -34,7 +35,44 @@ namespace Waher.Script.Xml.Model
 			this.name = Name;
 			this.xmlns = Xmlns;
 			this.attributes = Attributes;
+			this.nrAttributes = Attributes.Length;
+
+			this.CalcIsAsync();
 		}
+
+		private void CalcIsAsync()
+		{
+			this.isAsync = this.xmlns?.IsAsynchronous ?? false;
+			if (this.isAsync)
+				return;
+
+			for (int i = 0; i < this.nrAttributes; i++)
+			{
+				if (this.attributes[i]?.IsAsynchronous ?? false)
+				{
+					this.isAsync = true;
+					break;
+				}
+			}
+
+			LinkedListNode<XmlScriptNode> Loop = this.children?.First;
+			while (!(Loop is null))
+			{
+				if (Loop.Value?.IsAsynchronous ?? false)
+				{
+					this.isAsync = true;
+					return;
+				}
+				else
+					Loop = Loop.Next;
+			}
+		}
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => this.isAsync;
 
 		/// <summary>
 		/// Adds a XML Script node to the element.
@@ -46,6 +84,7 @@ namespace Waher.Script.Xml.Model
 				this.children = new LinkedList<XmlScriptNode>();
 
 			this.children.AddLast(Node);
+			this.isAsync |= Node?.IsAsynchronous ?? false;
 		}
 
 		/// <summary>
@@ -57,16 +96,15 @@ namespace Waher.Script.Xml.Model
 		/// <returns>If the process was completed.</returns>
 		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
 		{
-			int i, c = this.attributes.Length;
 			LinkedListNode<XmlScriptNode> Loop;
-			ScriptNode Node;
+			int i;
 
 			if (DepthFirst)
 			{
 				if (!(this.xmlns?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
-				for (i = 0; i < c; i++)
+				for (i = 0; i < this.nrAttributes; i++)
 				{
 					if (!this.attributes[i].ForAllChildNodes(Callback, State, DepthFirst))
 						return false;
@@ -82,63 +120,76 @@ namespace Waher.Script.Xml.Model
 				}
 			}
 
+			ScriptNode NewNode;
+			bool RecalcIsAsync = false;
+			bool b;
+
 			if (!(this.xmlns is null))
 			{
-				Node = this.xmlns;
-
-				if (!Callback(ref Node, State))
-					return false;
-
-				if (Node != this.xmlns)
+				b = !Callback(this.xmlns, out NewNode, State);
+				if (!(NewNode is null) && NewNode is XmlScriptAttribute NewAttr)
 				{
-					if (Node is XmlScriptAttribute Attr)
-						this.xmlns = Attr;
-					else
-						throw new ScriptRuntimeException("Incompatible node change.", this);
+					this.xmlns = NewAttr;
+					RecalcIsAsync = true;
+				}
+
+				if (b)
+				{
+					if (RecalcIsAsync)
+						this.CalcIsAsync();
+
+					return false;
 				}
 			}
 
-			for (i = 0; i < c; i++)
+			for (i = 0; i < this.nrAttributes; i++)
 			{
-				Node = this.attributes[i];
-
-				if (!Callback(ref Node, State))
-					return false;
-
-				if (Node != this.attributes[i])
+				b = !Callback(this.attributes[i], out NewNode, State);
+				if (!(NewNode is null) && NewNode is XmlScriptAttribute Attr)
 				{
-					if (Node is XmlScriptAttribute Attr)
-						this.attributes[i] = Attr;
-					else
-						throw new ScriptRuntimeException("Incompatible node change.", this);
+					this.attributes[i] = Attr;
+					RecalcIsAsync = true;
+				}
+
+				if (b)
+				{
+					if (RecalcIsAsync)
+						this.CalcIsAsync();
+
+					return false;
 				}
 			}
 
 			Loop = this.children?.First;
 			while (!(Loop is null))
 			{
-				Node = Loop.Value;
-
-				if (!Callback(ref Node, State))
-					return false;
-
-				if (Node != Loop.Value)
+				b = !Callback(Loop.Value, out NewNode, State);
+				if (!(NewNode is null) && NewNode is XmlScriptNode Node2)
 				{
-					if (Node is XmlScriptNode Node2)
-						Loop.Value = Node2;
-					else
-						throw new ScriptRuntimeException("Incompatible node change.", this);
+					Loop.Value = Node2;
+					RecalcIsAsync = true;
+				}
+
+				if (b)
+				{
+					if (RecalcIsAsync)
+						this.CalcIsAsync();
+
+					return false;
 				}
 
 				Loop = Loop.Next;
 			}
+
+			if (RecalcIsAsync)
+				this.CalcIsAsync();
 
 			if (!DepthFirst)
 			{
 				if (!(this.xmlns?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
-				for (i = 0; i < c; i++)
+				for (i = 0; i < this.nrAttributes; i++)
 				{
 					if (!this.attributes[i].ForAllChildNodes(Callback, State, DepthFirst))
 						return false;
@@ -190,6 +241,53 @@ namespace Waher.Script.Xml.Model
 			{
 				foreach (XmlScriptNode Node in this.children)
 					Node.Build(Document, E, Variables);
+			}
+		}
+
+		/// <summary>
+		/// Builds an XML Document object
+		/// </summary>
+		/// <param name="Document">Document being built.</param>
+		/// <param name="Parent">Parent element.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		internal override async Task BuildAsync(XmlDocument Document, XmlElement Parent, Variables Variables)
+		{
+			if (!this.isAsync)
+			{
+				this.Build(Document, Parent, Variables);
+				return;
+			}
+
+			string ns;
+			XmlElement E;
+
+			if (this.xmlns is null)
+				ns = null;
+			else
+				ns = await this.xmlns.GetValueAsync(Variables);
+
+			if (ns is null)
+			{
+				if (Parent is null || string.IsNullOrEmpty(ns = Parent.NamespaceURI))
+					E = Document.CreateElement(this.name);
+				else
+					E = Document.CreateElement(this.name, ns);
+			}
+			else
+				E = Document.CreateElement(this.name, ns);
+
+			if (Parent is null)
+				Document.AppendChild(E);
+			else
+				Parent.AppendChild(E);
+
+			foreach (XmlScriptAttribute Attr in this.attributes)
+				await Attr.BuildAsync(Document, E, Variables);
+
+			if (!(this.children is null))
+			{
+				foreach (XmlScriptNode Node in this.children)
+					await Node.BuildAsync(Document, E, Variables);
 			}
 		}
 
@@ -309,7 +407,7 @@ namespace Waher.Script.Xml.Model
 						return PatternMatchResult.NoMatch;
 				}
 			}
-		
+
 			return PatternMatchResult.Match;
 		}
 

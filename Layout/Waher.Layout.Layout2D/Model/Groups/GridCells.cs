@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Groups
@@ -94,27 +95,26 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// Adds a cell to the layout.
 		/// </summary>
 		/// <param name="Element">Cell element</param>
-		public void Add(ILayoutElement Element)
+		public async Task Add(ILayoutElement Element)
 		{
-			int ColSpan;
-			int RowSpan;
+			CellSpan Span;
 
 			if (Element is Cell Cell)
-				Cell.CalcSpan(this.session, out ColSpan, out RowSpan);
+				Span = await Cell.CalcSpan(this.session);
 			else
-				ColSpan = RowSpan = 1;
+				Span.ColSpan = Span.RowSpan = 1;
 
 			while (!(this.GetElement(this.x, this.y) is null))
 				this.IncPos();
 
-			this.SetElement(this.x, this.y, ColSpan, RowSpan, Element);
+			this.SetElement(this.x, this.y, Span.ColSpan, Span.RowSpan, Element);
 
-			int X2 = this.x + ColSpan - 1;
+			int X2 = this.x + Span.ColSpan - 1;
 			if (X2 >= this.nrColumns)
 				X2 = this.nrColumns - 1;
 
 			float? f = Element.Width;
-			if (f.HasValue && ColSpan == 1 && f.Value > this.widths[this.x])
+			if (f.HasValue && Span.ColSpan == 1 && f.Value > this.widths[this.x])
 				this.widths[this.x] = f.Value;
 
 			float Right = this.GetRight(this.x - 1) + (f ?? 0);
@@ -133,7 +133,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				Diff = Right - Right2;
 			}
 
-			int Y2 = this.y + RowSpan - 1;
+			int Y2 = this.y + Span.RowSpan - 1;
 			
 			f = Element.Height;
 			
@@ -141,7 +141,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			float Bottom2 = this.GetBottom(Y2);
 			int c = this.bottoms.Count;
 
-			if (f.HasValue && RowSpan == 1 && f.Value > this.heights[this.y])
+			if (f.HasValue && Span.RowSpan == 1 && f.Value > this.heights[this.y])
 				this.heights[this.y] = f.Value;
 
 			Diff = Bottom - Bottom2;
@@ -158,7 +158,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				Diff = Bottom - Bottom2;
 			}
 
-			this.x += ColSpan;
+			this.x += Span.ColSpan;
 			if (this.x >= this.nrColumns)
 			{
 				this.x = 0;

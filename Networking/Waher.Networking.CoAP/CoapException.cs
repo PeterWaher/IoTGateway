@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Networking.CoAP
 {
@@ -9,7 +7,7 @@ namespace Waher.Networking.CoAP
 	/// </summary>
     public class CoapException : Exception
     {
-		private CoapCode errorCode;
+		private readonly CoapCode errorCode;
 
 		/// <summary>
 		/// CoAP Exception

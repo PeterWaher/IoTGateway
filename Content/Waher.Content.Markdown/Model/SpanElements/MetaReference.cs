@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Script;
@@ -28,27 +29,26 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// Meta-data key
 		/// </summary>
-		public string Key
-		{
-			get { return this.key; }
-		}
+		public string Key => this.key;
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override Task GenerateMarkdown(StringBuilder Output)
 		{
 			Output.Append("[%");
 			Output.Append(this.key);
 			Output.Append(']');
+	
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override Task GenerateHTML(StringBuilder Output)
 		{
 			bool FirstOnRow = true;
 
@@ -69,6 +69,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					}
 				}
 			}
+	
+			return Task.CompletedTask;
 		}
 
 		private bool TryGetMetaData(out KeyValuePair<string, bool>[] Values)
@@ -90,7 +92,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override Task GeneratePlainText(StringBuilder Output)
 		{
 			bool FirstOnRow = true;
 
@@ -111,11 +113,11 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					}
 				}
 			}
+
+			return Task.CompletedTask;
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.key;
@@ -126,7 +128,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			bool FirstOnRow = true;
 
@@ -147,6 +149,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					}
 				}
 			}
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -154,9 +158,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			InlineText.GenerateInlineFormattedTextXamarinForms(Output, this);
+			return InlineText.GenerateInlineFormattedTextXamarinForms(Output, this);
 		}
 
 		/// <summary>
@@ -164,21 +168,20 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="Level">Current section level.</param>
-		public override void GenerateSmartContractXml(XmlWriter Output, ref int Level)
+		/// <param name="State">Current rendering state.</param>
+		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
 			Output.WriteStartElement("parameter");
 			Output.WriteAttributeString("name", this.key);
 			Output.WriteEndElement();
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get { return true; }
-		}
+		internal override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Exports the element to XML.

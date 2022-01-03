@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Layout.Layout2D.Model;
 
 namespace Waher.Layout.Layout2D.Events

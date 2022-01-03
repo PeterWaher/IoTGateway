@@ -6606,24 +6606,58 @@
             <param name="Level">Level (number of colons used to define the emoji)</param>
             <param name="EmbedImage">If image should be embedded into the generated HTML, using the data URI scheme.</param>
         </member>
-        <member name="M:Waher.Content.Emoji.IEmojiSource.GetImageSource(Waher.Content.Emoji.EmojiInfo,System.String@,System.Int32@,System.Int32@)">
+        <member name="M:Waher.Content.Emoji.IEmojiSource.GetImageSource(Waher.Content.Emoji.EmojiInfo)">
             <summary>
             Gets the image source of an emoji.
             </summary>
             <param name="Emoji">Emoji</param>
-            <param name="Url">URL to emoji.</param>
-            <param name="Width">Width of emoji.</param>
-            <param name="Height">Height of emoji.</param>
         </member>
-        <member name="M:Waher.Content.Emoji.IEmojiSource.GetImageSource(Waher.Content.Emoji.EmojiInfo,System.Int32,System.String@,System.Int32@,System.Int32@)">
+        <member name="M:Waher.Content.Emoji.IEmojiSource.GetImageSource(Waher.Content.Emoji.EmojiInfo,System.Int32)">
             <summary>
             Gets the image source of an emoji.
             </summary>
             <param name="Emoji">Emoji</param>
             <param name="Level">Level (number of colons used to define the emoji)</param>
-            <param name="Url">URL to emoji.</param>
-            <param name="Width">Width of emoji.</param>
-            <param name="Height">Height of emoji.</param>
+        </member>
+        <member name="T:Waher.Content.Emoji.IImageSource">
+            <summary>
+            Contains information about an emoji image.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Emoji.IImageSource.Url">
+            <summary>
+            URL of image
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Emoji.IImageSource.Width">
+            <summary>
+            Width of image, if available.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Emoji.IImageSource.Height">
+            <summary>
+            Height of image, if available.
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Emoji.ImageSource">
+            <summary>
+            Contains information about an emoji image.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Emoji.ImageSource.Url">
+            <summary>
+            URL of image
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Emoji.ImageSource.Width">
+            <summary>
+            Width of image, if available.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Emoji.ImageSource.Height">
+            <summary>
+            Height of image, if available.
+            </summary>
         </member>
     </members>
 </doc>

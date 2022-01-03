@@ -105,9 +105,7 @@ namespace Waher.Networking.HTTP
 			this.httpOnly = HttpOnly;
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder Output = new StringBuilder();

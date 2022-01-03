@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Groups
@@ -27,7 +28,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// Adds a cell to the layout.
 		/// </summary>
 		/// <param name="Element">Cell element</param>
-		public void Add(ILayoutElement Element)
+		public Task Add(ILayoutElement Element)
 		{
 			this.measured.Add(new Padding(Element, 0, this.y));
 			this.y += Element.Height ?? 0;
@@ -35,6 +36,8 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			float Width = Element.Width ?? 0;
 			if (Width > this.maxWidth)
 				this.maxWidth = Width;
+	
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

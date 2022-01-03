@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
@@ -28,31 +27,32 @@ namespace Waher.Script.Operators.Matrices
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
 		/// </summary>
+		/// <param name="Operand">Operand.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
+		public override IElement Evaluate(IElement Operand, Variables Variables)
 		{
-			return this.ConvertToMatrix(this.op.Evaluate(Variables));
+			return this.ConvertToMatrix(Operand);
 		}
 
-		private IElement ConvertToMatrix(IElement E)
+		private IElement ConvertToMatrix(IElement Operand)
 		{ 
-			if (this.nullCheck && E.AssociatedObjectValue is null)
-				return E;
+			if (this.nullCheck && Operand.AssociatedObjectValue is null)
+				return Operand;
 
-			if (E is IMatrix)
-                return E;
+			if (Operand is IMatrix)
+                return Operand;
 
-            if (E is IVector V)
+            if (Operand is IVector V)
                 return MatrixDefinition.Encapsulate(V.VectorElements, 1, V.Dimension, this);
 
-            if (E is ISet S)
+            if (Operand is ISet S)
 			{
 				ICollection<IElement> Elements = S.ChildElements;
                 return MatrixDefinition.Encapsulate(Elements, 1, Elements.Count, this);
             }
 
-            return MatrixDefinition.Encapsulate(new IElement[] { E }, 1, 1, this);
+            return MatrixDefinition.Encapsulate(new IElement[] { Operand }, 1, 1, this);
         }
 
 		/// <summary>

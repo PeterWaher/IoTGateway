@@ -26,9 +26,7 @@ namespace Waher.Networking.Sniffers.Model
             Sniffer.Information(this.Timestamp, this.Text);
         }
 
-        /// <summary>
-        /// <see cref="Object.ToString()"/>
-        /// </summary>
+        /// <inheritdoc/>
         public override string ToString()
         {
             return "Information: " + this.Text;

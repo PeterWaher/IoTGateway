@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
+using Waher.Content.Emoji;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.Multimedia;
 using Waher.Content.Xml;
@@ -46,42 +48,30 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// Expression
 		/// </summary>
-		public Expression Expresion
-		{
-			get { return this.expression; }
-		}
+		public Expression Expresion => this.expression;
 
 		/// <summary>
 		/// If the element is alone in a paragraph.
 		/// </summary>
-		public bool AloneInParagraph
-		{
-			get { return this.aloneInParagraph; }
-		}
+		public bool AloneInParagraph => this.aloneInParagraph;
 
 		/// <summary>
 		/// Starting position of script in markdown document.
 		/// </summary>
-		public int StartPosition
-		{
-			get { return this.startPosition; }
-		}
+		public int StartPosition => this.startPosition;
 
 		/// <summary>
 		/// Ending position of script in markdown document.
 		/// </summary>
-		public int EndPosition
-		{
-			get { return this.endPosition; }
-		}
+		public int EndPosition => this.endPosition;
 
-		private object EvaluateExpression()
+		private async Task<object> EvaluateExpression()
 		{
 			IContextVariables Bak = this.variables.ContextVariables;
 			try
 			{
 				this.variables.ContextVariables = this;
-				return this.expression.Evaluate(this.variables);
+				return await this.expression.EvaluateAsync(this.variables);
 			}
 			catch (Exception ex)
 			{
@@ -100,24 +90,26 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override Task GenerateMarkdown(StringBuilder Output)
 		{
 			Output.Append("{");
 			Output.Append(this.expression.Script);
 			Output.Append("}");
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override async Task GenerateHTML(StringBuilder Output)
 		{
-			object Result = this.EvaluateExpression();
+			object Result = await this.EvaluateExpression();
 			if (Result is null)
 				return;
 
-			GenerateHTML(Result, Output, this.aloneInParagraph, this.variables);
+			await GenerateHTML(Result, Output, this.aloneInParagraph, this.variables);
 		}
 
 		/// <summary>
@@ -127,10 +119,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML output.</param>
 		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
 		/// <param name="Variables">Current variables.</param>
-		public static void GenerateHTML(object Result, StringBuilder Output, bool AloneInParagraph, Variables Variables)
+		public static async Task GenerateHTML(object Result, StringBuilder Output, bool AloneInParagraph, Variables Variables)
 		{
 			if (Result is XmlDocument Xml)
-				Result = MarkdownDocument.TransformXml(Xml, Variables);
+				Result = await MarkdownDocument.TransformXml(Xml, Variables);
 
 			if (Result is Graph G)
 			{
@@ -245,7 +237,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 							if (Item is string s2)
 								Output.Append(FormatText(XML.HtmlValueEncode(s2)));
 							else if (Item is MarkdownElement Element)
-								Element.GenerateHTML(Output);
+								await Element.GenerateHTML(Output);
 							else
 								Output.Append(FormatText(XML.HtmlValueEncode(Expression.ToString(Item))));
 						}
@@ -261,7 +253,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			else if (Result is Array A)
 			{
 				foreach (object Item in A)
-					GenerateHTML(Item, Output, false, Variables);
+					await GenerateHTML(Item, Output, false, Variables);
 			}
 			else
 			{
@@ -288,13 +280,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override async Task GeneratePlainText(StringBuilder Output)
 		{
-			object Result = this.EvaluateExpression();
+			object Result = await this.EvaluateExpression();
 			if (Result is null)
 				return;
 
-			GeneratePlainText(Result, Output, this.aloneInParagraph);
+			await GeneratePlainText(Result, Output, this.aloneInParagraph);
 		}
 
 		/// <summary>
@@ -303,7 +295,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Result">Script output.</param>
 		/// <param name="Output">HTML output.</param>
 		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
-		public static void GeneratePlainText(object Result, StringBuilder Output, bool AloneInParagraph)
+		public static Task GeneratePlainText(object Result, StringBuilder Output, bool AloneInParagraph)
 		{
 			Output.Append(Result.ToString());
 
@@ -312,6 +304,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.AppendLine();
 				Output.AppendLine();
 			}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -319,13 +313,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			object Result = this.EvaluateExpression();
+			object Result = await this.EvaluateExpression();
 			if (Result is null)
 				return;
 
-			GenerateXAML(Result, Output, TextAlignment, this.aloneInParagraph, this.variables, this.Document.Settings.XamlSettings);
+			await GenerateXAML(Result, Output, TextAlignment, this.aloneInParagraph, this.variables, this.Document.Settings.XamlSettings);
 		}
 
 		/// <summary>
@@ -337,7 +331,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
 		/// <param name="Variables">Current variables.</param>
 		/// <param name="XamlSettings">XAML Settings</param>
-		public static void GenerateXAML(object Result, XmlWriter Output, TextAlignment TextAlignment, bool AloneInParagraph,
+		public static async Task GenerateXAML(object Result, XmlWriter Output, TextAlignment TextAlignment, bool AloneInParagraph,
 			Variables Variables, XamlSettings XamlSettings)
 		{
 			string s;
@@ -349,7 +343,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 				s = "data:image/png;base64," + Convert.ToBase64String(Bin, 0, Bin.Length);
 
-				ImageContent.OutputWpf(Output, s, Pixels.Width, Pixels.Height, string.Empty);
+				await ImageContent.OutputWpf(Output, new ImageSource()
+				{
+					Url = s,
+					Width = Pixels.Width,
+					Height = Pixels.Height
+				}, string.Empty);
 			}
 			else if (Result is SKImage Img)
 			{
@@ -359,7 +358,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 					s = "data:image/png;base64," + Convert.ToBase64String(Bin, 0, Bin.Length);
 
-					ImageContent.OutputWpf(Output, s, Img.Width, Img.Height, string.Empty);
+					await ImageContent.OutputWpf(Output, new ImageSource()
+					{
+						Url = s,
+						Width = Img.Width,
+						Height = Img.Height
+					}, string.Empty);
 				}
 			}
 			else if (Result is Exception ex)
@@ -423,13 +427,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			object Result = this.EvaluateExpression();
+			object Result = await this.EvaluateExpression();
 			if (Result is null)
 				return;
 
-			GenerateXamarinForms(Result, Output, TextAlignment, this.aloneInParagraph, this.variables, this.Document.Settings.XamlSettings);
+			await GenerateXamarinForms(Result, Output, TextAlignment, this.aloneInParagraph, this.variables, this.Document.Settings.XamlSettings);
 		}
 
 		/// <summary>
@@ -441,7 +445,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
 		/// <param name="Variables">Current variables.</param>
 		/// <param name="XamlSettings">XAML Settings</param>
-		public static void GenerateXamarinForms(object Result, XmlWriter Output, TextAlignment TextAlignment, bool AloneInParagraph,
+		public static async Task GenerateXamarinForms(object Result, XmlWriter Output, TextAlignment TextAlignment, bool AloneInParagraph,
 			Variables Variables, XamlSettings XamlSettings)
 		{
 			string s;
@@ -453,7 +457,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 				s = "data:image/png;base64," + Convert.ToBase64String(Bin, 0, Bin.Length);
 
-				ImageContent.OutputXamarinForms(Output, s, Pixels.Width, Pixels.Height);
+				await ImageContent.OutputXamarinForms(Output, new ImageSource()
+				{
+					Url = s,
+					Width = Pixels.Width,
+					Height = Pixels.Height
+				});
 			}
 			else if (Result is SKImage Img)
 			{
@@ -463,7 +472,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 					s = "data:image/png;base64," + Convert.ToBase64String(Bin, 0, Bin.Length);
 
-					ImageContent.OutputXamarinForms(Output, s, Img.Width, Img.Height);
+					await ImageContent.OutputXamarinForms(Output, new ImageSource()
+					{
+						Url = s,
+						Width = Img.Width,
+						Height = Img.Height
+					});
 				}
 			}
 			else if (Result is Exception ex)
@@ -518,10 +532,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="Level">Current section level.</param>
-		public override void GenerateSmartContractXml(XmlWriter Output, ref int Level)
+		/// <param name="State">Current rendering state.</param>
+		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
-			object Result = this.EvaluateExpression();
+			object Result = await this.EvaluateExpression();
 			if (Result is null)
 				return;
 
@@ -537,32 +551,17 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get { return true; }
-		}
+		internal override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
 		/// </summary>
-		internal override bool OutsideParagraph
-		{
-			get
-			{
-				return true;
-			}
-		}
+		internal override bool OutsideParagraph => true;
 
 		/// <summary>
 		/// Baseline alignment
 		/// </summary>
-		internal override string BaselineAlignment
-		{
-			get
-			{
-				return "Baseline";
-			}
-		}
+		internal override string BaselineAlignment => "Baseline";
 
 		/// <summary>
 		/// Exports the element to XML.

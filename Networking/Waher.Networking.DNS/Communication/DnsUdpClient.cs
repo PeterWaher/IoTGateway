@@ -140,9 +140,7 @@ namespace Waher.Networking.DNS.Communication
 			return this.udp.SendAsync(Message, Message.Length, Destination ?? this.dnsEndpoint);
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			base.Dispose();

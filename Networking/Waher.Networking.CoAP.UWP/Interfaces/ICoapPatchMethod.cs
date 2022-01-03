@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.CoAP
 {
@@ -15,7 +14,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		void PATCH(CoapMessage Request, CoapResponse Response);
+		Task PATCH(CoapMessage Request, CoapResponse Response);
 
 		/// <summary>
 		/// If the PATCH method is allowed.

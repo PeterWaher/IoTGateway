@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Content.Markdown.Model.BlockElements
@@ -26,29 +27,35 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override Task GenerateMarkdown(StringBuilder Output)
 		{
 			Output.AppendLine(this.row);
 			Output.AppendLine();
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override Task GenerateHTML(StringBuilder Output)
 		{
 			Output.AppendLine("<hr/>");
+	
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override Task GeneratePlainText(StringBuilder Output)
 		{
 			Output.AppendLine(new string('-', 80));
 			Output.AppendLine();
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -56,9 +63,11 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			Output.WriteElementString("Separator", string.Empty);
+	
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -66,7 +75,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			Output.WriteStartElement("BoxView");
 			Output.WriteAttributeString("HeightRequest", "1");
@@ -74,15 +83,14 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			Output.WriteAttributeString("HorizontalOptions", "FillAndExpand");
 			Output.WriteAttributeString("Margin", this.Document.Settings.XamlSettings.ParagraphMargins);
 			Output.WriteEndElement();
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get { return false; }
-		}
+		internal override bool InlineSpanElement => false;
 
 		/// <summary>
 		/// Exports the element to XML.

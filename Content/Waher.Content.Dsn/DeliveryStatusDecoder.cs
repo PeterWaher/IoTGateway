@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Dsn
@@ -106,7 +107,7 @@ namespace Waher.Content.Dsn
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string Dsn = CommonTypes.GetString(Data, Encoding ?? Encoding.ASCII);
 			List<string[]> Sections = new List<string[]>();
@@ -155,7 +156,7 @@ namespace Waher.Content.Dsn
 					PerRecipients[i - 1] = new PerRecipientFields(Sections[i]);
 			}
 
-			return new DeliveryStatus(Dsn, PerMessage, PerRecipients);
+			return Task.FromResult<object>(new DeliveryStatus(Dsn, PerMessage, PerRecipients));
 		}
 	}
 }

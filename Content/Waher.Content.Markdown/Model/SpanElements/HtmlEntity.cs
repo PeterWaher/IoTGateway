@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Content.Markdown.Model.SpanElements
@@ -25,25 +26,22 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// HTML Entity
 		/// </summary>
-		public string Entity
-		{
-			get { return this.entity; }
-		}
+		public string Entity => this.entity;
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override Task GenerateMarkdown(StringBuilder Output)
 		{
-			this.GenerateHTML(Output);
+			return this.GenerateHTML(Output);
 		}
 
 		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override Task GenerateHTML(StringBuilder Output)
 		{
 			if (this.Document.Settings.HtmlSettings?.XmlEntitiesOnly ?? true)
 			{
@@ -81,24 +79,24 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.Append(this.entity);
 				Output.Append(';');
 			}
+	
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override async Task GeneratePlainText(StringBuilder Output)
 		{
 			string s = Html.HtmlEntity.EntityToCharacter(this.entity);
 			if (s is null)
-				this.GenerateHTML(Output);
+				await this.GenerateHTML(Output);
 			else
 				Output.Append(s);
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return "&" + this.entity + ";";
@@ -109,13 +107,15 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			string s = Html.HtmlEntity.EntityToCharacter(this.entity);
 			if (s is null)
 				Output.WriteRaw("&" + this.entity + ";");
 			else
 				Output.WriteValue(s);
+	
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -123,9 +123,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			InlineText.GenerateInlineFormattedTextXamarinForms(Output, this);
+			return InlineText.GenerateInlineFormattedTextXamarinForms(Output, this);
 		}
 
 		/// <summary>
@@ -133,21 +133,20 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="Level">Current section level.</param>
-		public override void GenerateSmartContractXml(XmlWriter Output, ref int Level)
+		/// <param name="State">Current rendering state.</param>
+		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
 			string s = Html.HtmlEntity.EntityToCharacter(this.entity);
 			if (!string.IsNullOrEmpty(s))
 				Output.WriteElementString("text", s);
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get { return true; }
-		}
+		internal override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Exports the element to XML.

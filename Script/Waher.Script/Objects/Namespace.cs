@@ -32,9 +32,7 @@ namespace Waher.Script.Objects
             get { return this.value; }
         }
 
-        /// <summary>
-        /// <see cref="Object.ToString()"/>
-        /// </summary>
+        /// <inheritdoc/>
         public override string ToString()
         {
             return this.value;
@@ -56,9 +54,7 @@ namespace Waher.Script.Objects
             get { return this; }
         }
 
-        /// <summary>
-        /// <see cref="Object.Equals(object)"/>
-        /// </summary>
+        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
 			if (!(obj is Namespace E))
@@ -67,9 +63,7 @@ namespace Waher.Script.Objects
 				return this.value == E.value;
 		}
 
-        /// <summary>
-        /// <see cref="Object.GetHashCode()"/>
-        /// </summary>
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             return this.value.GetHashCode();

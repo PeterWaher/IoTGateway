@@ -74,7 +74,7 @@ namespace Waher.WebService.Script
 				throw new ForbiddenException("Access denied.");
 			}
 
-			object Obj = Request.HasData ? Request.DecodeData() : null;
+			object Obj = Request.HasData ? await Request.DecodeDataAsync() : null;
 			string s = Obj as string;
 			string Tag = Request.Header["X-TAG"];
 
@@ -148,8 +148,10 @@ namespace Waher.WebService.Script
 			}
 		}
 
-		private bool IsAuthorized(ref ScriptNode Node, object State)
+		private bool IsAuthorized(ScriptNode Node, out ScriptNode NewNode, object State)
 		{
+			NewNode = null;
+
 			if (Node is null)
 				return true;
 			else if (State is IUser User)

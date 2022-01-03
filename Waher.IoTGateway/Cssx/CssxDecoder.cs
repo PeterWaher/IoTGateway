@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Runtime.Inventory;
 
@@ -21,34 +22,22 @@ namespace Waher.IoTGateway.Cssx
 		/// <summary>
 		/// Plain text content types.
 		/// </summary>
-		public static readonly string[] CssxContentTypes = new string[] 
-		{
- 			"text/x-cssx"
-		};
+		public static readonly string[] CssxContentTypes = new string[] { "text/x-cssx" };
 
 		/// <summary>
 		/// Plain text file extensions.
 		/// </summary>
-		public static readonly string[] CssxFileExtensions = new string[] 
-		{ 
-			"cssx"
-		};
+		public static readonly string[] CssxFileExtensions = new string[] { "cssx" };
 
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes
-		{
-			get { return CssxContentTypes; }
-		}
+		public string[] ContentTypes => CssxContentTypes;
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions
-		{
-			get { return CssxFileExtensions; }
-		}
+		public string[] FileExtensions => CssxFileExtensions;
 
 		/// <summary>
 		/// If the decoder decodes an object with a given content type.
@@ -80,9 +69,9 @@ namespace Waher.IoTGateway.Cssx
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			return CommonTypes.GetString(Data, Encoding);
+			return Task.FromResult<object>(CommonTypes.GetString(Data, Encoding));
 		}
 
 		/// <summary>

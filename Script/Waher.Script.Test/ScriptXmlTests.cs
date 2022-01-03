@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -7,11 +8,11 @@ namespace Waher.Script.Test
 	[TestClass]
 	public class ScriptXmlTests
 	{
-		private void Test(string Script, string ExpectedOutput)
+		private async Task Test(string Script, string ExpectedOutput)
 		{
 			Variables v = new Variables();
 			Expression Exp = new Expression(Script);
-			object Result = Exp.Evaluate(v);
+			object Result = await Exp.EvaluateAsync(v);
 
 			if (Result is XmlDocument Xml)
 				Assert.AreEqual(ExpectedOutput ?? Script, Xml.OuterXml);
@@ -22,69 +23,69 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public void XML_Test_01_Text()
+		public async Task XML_Test_01_Text()
 		{
-			this.Test("<a>Hello</a>", null);
+			await this.Test("<a>Hello</a>", null);
 		}
 
 		[TestMethod]
-		public void XML_Test_02_Expression()
+		public async Task XML_Test_02_Expression()
 		{
-			this.Test("<a><b>1</b><b><[1+2]></b></a>", "<a><b>1</b><b>3</b></a>");
+			await this.Test("<a><b>1</b><b><[1+2]></b></a>", "<a><b>1</b><b>3</b></a>");
 		}
 
 		[TestMethod]
-		public void XML_Test_03_Attributes()
+		public async Task XML_Test_03_Attributes()
 		{
-			this.Test("<a><b value=\"1\"/><b value=\"2\"/></a>", "<a><b value=\"1\" /><b value=\"2\" /></a>");
+			await this.Test("<a><b value=\"1\"/><b value=\"2\"/></a>", "<a><b value=\"1\" /><b value=\"2\" /></a>");
 		}
 
 		[TestMethod]
-		public void XML_Test_04_Attributes_Expression()
+		public async Task XML_Test_04_Attributes_Expression()
 		{
-			this.Test("x:=7;<a><b value=1/><b value=(2+x)/></a>", "<a><b value=\"1\" /><b value=\"9\" /></a>");
+			await this.Test("x:=7;<a><b value=1/><b value=(2+x)/></a>", "<a><b value=\"1\" /><b value=\"9\" /></a>");
 		}
 
 		[TestMethod]
-		public void XML_Test_05_CDATA()
+		public async Task XML_Test_05_CDATA()
 		{
-			this.Test("<a><![CDATA[Hello World.]]></a>", null);
+			await this.Test("<a><![CDATA[Hello World.]]></a>", null);
 		}
 
 		[TestMethod]
-		public void XML_Test_06_Comment()
+		public async Task XML_Test_06_Comment()
 		{
-			this.Test("<a><!--Hello World.--></a>", null);
+			await this.Test("<a><!--Hello World.--></a>", null);
 		}
 
 		[TestMethod]
-		public void XML_Test_07_Mixed_1()
+		public async Task XML_Test_07_Mixed_1()
 		{
-			this.Test("<a>2+3=<[2+3]>.</a>", "<a>2+3=5.</a>");
+			await this.Test("<a>2+3=<[2+3]>.</a>", "<a>2+3=5.</a>");
 		}
 
 		[TestMethod]
-		public void XML_Test_08_Mixed_2()
+		public async Task XML_Test_08_Mixed_2()
 		{
-			this.Test("<a>2+3=<(2+3)>.</a>", "<a>2+3=5.</a>");
+			await this.Test("<a>2+3=<(2+3)>.</a>", "<a>2+3=5.</a>");
 		}
 
 		[TestMethod]
-		public void XML_Test_09_XML_Declaration()
+		public async Task XML_Test_09_XML_Declaration()
 		{
-			this.Test("<?xml version=\"1.0\" encoding=\"UTF-8\"?><a>Hello</a>", null);
+			await this.Test("<?xml version=\"1.0\" encoding=\"UTF-8\"?><a>Hello</a>", null);
 		}
 
 		[TestMethod]
-		public void XML_Test_10_ProcessingInstruction()
+		public async Task XML_Test_10_ProcessingInstruction()
 		{
-			this.Test("<?xml version=\"1.0\" encoding=\"UTF-8\"?><?xml-stylesheet type=\"text/xsl\" href=\"style.xsl\"?><a>Hello</a>", null);
+			await this.Test("<?xml version=\"1.0\" encoding=\"UTF-8\"?><?xml-stylesheet type=\"text/xsl\" href=\"style.xsl\"?><a>Hello</a>", null);
 		}
 
 		[TestMethod]
-		public void XML_Test_11_DefaultNamespace()
+		public async Task XML_Test_11_DefaultNamespace()
 		{
-			this.Test("x:=<a xmlns=\"test\"><b /></a>;x.DocumentElement.NamespaceURI", "test");
+			await this.Test("x:=<a xmlns=\"test\"><b /></a>;x.DocumentElement.NamespaceURI", "test");
 		}
 
 	}

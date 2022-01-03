@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content
@@ -24,10 +26,9 @@ namespace Waher.Content
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
-		/// <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
-		/// <returns>Encoded object.</returns>
+		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes);
+		Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes);
 	}
 }

@@ -410,9 +410,7 @@ namespace Waher.Script.Objects.Sets
 			return null;
 		}
 
-		/// <summary>
-		/// <see cref="object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (!(obj is ImplicitSet S))
@@ -431,9 +429,7 @@ namespace Waher.Script.Objects.Sets
 				ScriptNode.AreEqual(this.setConditions, S.setConditions);
 		}
 
-		/// <summary>
-		/// <see cref="object.GetHashCode"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = this.pattern.GetHashCode();
@@ -448,9 +444,7 @@ namespace Waher.Script.Objects.Sets
 			return Result;
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			if (!(this.finiteSet is null))

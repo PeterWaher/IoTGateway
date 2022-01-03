@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Exceptions;
@@ -66,10 +67,10 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override async Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
+			await base.FromXml(Input);
+		
 			this.head = new StringAttribute(Input, "head");
 			this.tail = new StringAttribute(Input, "tail");
 			this.shapeFill = new StringAttribute(Input, "shapeFill");
@@ -81,17 +82,20 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			List<ISegment> Segments = null;
 
-			foreach (ILayoutElement Child in this.Children)
+			if (this.HasChildren)
 			{
-				if (Child is ISegment Segment)
+				foreach (ILayoutElement Child in this.Children)
 				{
-					if (Segments is null)
-						Segments = new List<ISegment>();
+					if (Child is ISegment Segment)
+					{
+						if (Segments is null)
+							Segments = new List<ISegment>();
 
-					Segments.Add(Segment);
+						Segments.Add(Segment);
+					}
+					else
+						throw new LayoutSyntaxException("Not a segment type: " + Child.Namespace + "#" + Child.LocalName);
 				}
-				else
-					throw new LayoutSyntaxException("Not a segment type: " + Child.Namespace + "#" + Child.LocalName);
 			}
 
 			return Segments?.ToArray();
@@ -144,31 +148,31 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
 			PathState PathState = new PathState(this, null, false, false);
 
-			if (!(this.head is null) &&
-				this.head.TryEvaluate(State.Session, out string RefId) &&
-				this.Document.TryGetElement(RefId, out ILayoutElement Element) &&
+			EvaluationResult<string> RefId = await this.head.TryEvaluate(State.Session);
+			if (RefId.Ok &&
+				this.Document.TryGetElement(RefId.Result, out ILayoutElement Element) &&
 				Element is Shape Shape)
 			{
 				this.headElement = Shape;
 			}
 
-			if (!(this.tail is null) &&
-				this.tail.TryEvaluate(State.Session, out RefId) &&
-				this.Document.TryGetElement(RefId, out Element) &&
+			RefId = await this.tail.TryEvaluate(State.Session);
+			if (RefId.Ok &&
+				this.Document.TryGetElement(RefId.Result, out Element) &&
 				Element is Shape Shape2)
 			{
 				this.tailElement = Shape2;
 			}
 
-			if (!(this.shapeFill is null) &&
-				this.shapeFill.TryEvaluate(State.Session, out RefId) &&
-				this.Document.TryGetElement(RefId, out Element) &&
+			RefId = await this.shapeFill.TryEvaluate(State.Session);
+			if (RefId.Ok &&
+				this.Document.TryGetElement(RefId.Result, out Element) &&
 				Element is Background Background)
 			{
 				this.shapeFiller = Background;
@@ -177,10 +181,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			if (!(this.segments is null))
 			{
 				foreach (ISegment Segment in this.segments)
-					Segment.Measure(State, PathState);
+					await Segment.Measure(State, PathState);
 			}
-
-			return Relative;
 		}
 
 		private Shape headElement;
@@ -191,13 +193,10 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
-			if (!this.TryGetFill(State, out SKPaint Fill))
-				Fill = null;
-
-			if (!this.TryGetPen(State, out SKPaint Pen))
-				Pen = null;
+			SKPaint Fill = await this.TryGetFill(State);
+			SKPaint Pen = await this.TryGetPen(State);
 
 			bool CalcStart = !(this.tailElement is null);
 			bool CalcEnd = !(this.headElement is null);
@@ -208,7 +207,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				{
 					PathState PathState = new PathState(this, Path, CalcStart, CalcEnd);
 
-					this.Draw(State, PathState, Path);
+					await this.Draw(State, PathState, Path);
 
 					PathState.FlushSpline();
 
@@ -229,7 +228,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				this.headElement?.DrawHead(State, this, Pen, Fill);
 			}
 
-			base.Draw(State);
+			await base.Draw(State);
 		}
 
 		/// <summary>
@@ -237,12 +236,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
-		public void Measure(DrawingState State, PathState PathState)
+		public async Task Measure(DrawingState State, PathState PathState)
 		{
 			if (!(this.segments is null))
 			{
 				foreach (ISegment Segment in this.segments)
-					Segment.Measure(State, PathState);
+					await Segment .Measure(State, PathState);
 			}
 
 			this.hasStart = false;
@@ -255,7 +254,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
 		/// <param name="Path">Path being generated.</param>
-		public void Draw(DrawingState State, PathState PathState, SKPath Path)
+		public async Task Draw(DrawingState State, PathState PathState, SKPath Path)
 		{
 			if (!(this.segments is null))
 			{
@@ -265,7 +264,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				{
 					if (Segment.IsVisible)
 					{
-						Segment.Draw(State, PathState, Path);
+						await Segment .Draw(State, PathState, Path);
 
 						if (CalcStart &&
 							Segment is IDirectedElement DirectedElement &&

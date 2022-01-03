@@ -39,9 +39,7 @@ namespace Waher.Content.Html.OpenGraph
 			set { this.height = value; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (obj is VideoInformation Video)
@@ -54,9 +52,7 @@ namespace Waher.Content.Html.OpenGraph
 				return false;
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

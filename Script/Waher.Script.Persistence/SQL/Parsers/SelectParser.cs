@@ -502,19 +502,18 @@ namespace Waher.Script.Persistence.SQL.Parsers
 
 		private bool ContainsVectorFunction(ScriptNode Node)
 		{
-			if (!this.SearchForVectorFunction(ref Node, null))
+			if (!this.SearchForVectorFunction(Node, out _, null))
 				return true;
 
 			return !(Node?.ForAllChildNodes(this.SearchForVectorFunction, null, false) ?? true);
 		}
 
-		private bool SearchForVectorFunction(ref ScriptNode Node, object State)
+		private bool SearchForVectorFunction(ScriptNode Node, out ScriptNode NewNode, object State)
 		{
+			NewNode = null;
+
 			if (Node is Function)
-			{
-				return !(Node is FunctionOneVectorVariable ||
-					Node is Count);
-			}
+				return !(Node is FunctionOneVectorVariable || Node is Count);
 
 			return true;
 		}

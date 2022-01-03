@@ -74,9 +74,7 @@
             <returns>Localized string.</returns>
         </member>
         <member name="M:Waher.Runtime.Language.Language.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Runtime.Language.LanguageString">
             <summary>
@@ -114,9 +112,7 @@
             </summary>
         </member>
         <member name="M:Waher.Runtime.Language.LanguageString.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Runtime.Language.Namespace">
             <summary>
@@ -180,9 +176,7 @@
             <param name="Id">String ID.</param>
         </member>
         <member name="M:Waher.Runtime.Language.Namespace.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Runtime.Language.Translator">
             <summary>

@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -32,10 +31,7 @@ namespace Waher.Script.Operators.Assignments
         /// <summary>
         /// Name of function
         /// </summary>
-        public string FunctionName
-        {
-            get { return this.functionName; }
-        }
+        public string FunctionName => this.functionName;
 
         /// <summary>
         /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -46,6 +42,17 @@ namespace Waher.Script.Operators.Assignments
         {
             Variables[this.functionName + " " + this.ArgumentNames.Length.ToString()] = this;
             return this;
+        }
+
+        /// <summary>
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+        /// </summary>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public override Task<IElement> EvaluateAsync(Variables Variables)
+        {
+            Variables[this.functionName + " " + this.ArgumentNames.Length.ToString()] = this;
+            return Task.FromResult<IElement>(this);
         }
 
     }

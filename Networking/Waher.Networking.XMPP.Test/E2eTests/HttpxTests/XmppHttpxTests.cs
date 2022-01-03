@@ -131,21 +131,19 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 					return Task.CompletedTask;
 				},
-				(sender, e) =>
+				async (sender, e) =>
 				{
 					ms?.Write(e.Data, 0, e.Data.Length);
 
 					if (e.Last)
 					{
-						object Decoded = InternetContent.Decode(ContentType, ms.ToArray(), null);
+						object Decoded = await InternetContent.DecodeAsync(ContentType, ms.ToArray(), null);
 
 						if (Decoded is string s && s == "World" && e.State.Equals(Nr))
 							Done2.Set();
 						else
 							Error2.Set();
 					}
-
-					return Task.CompletedTask;
 				}, Nr);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 5000), "Response not returned.");
@@ -164,12 +162,12 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 		}
 
 		[TestMethod]
-		public void HTTPX_Test_03_POST()
+		public async Task HTTPX_Test_03_POST()
 		{
-			this.DoPost(3);
+			await this.DoPost(3);
 		}
 
-		private void DoPost(int Nr)
+		private async Task DoPost(int Nr)
 		{
 			ManualResetEvent Done1 = new ManualResetEvent(false);
 			ManualResetEvent Error1 = new ManualResetEvent(false);
@@ -187,7 +185,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 			Message = Convert.ToBase64String(Bin);
 
-			this.httpxClient1.POST(this.client2.FullJID, "/Echo", Message,
+			await this.httpxClient1.POST(this.client2.FullJID, "/Echo", Message,
 				(sender, e) =>
 				{
 					if (e.Ok && e.HasData && e.State.Equals(Nr))
@@ -205,21 +203,19 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 
 					return Task.CompletedTask;
 				},
-				(sender, e) =>
+				async (sender, e) =>
 				{
 					ms?.Write(e.Data, 0, e.Data.Length);
 
 					if (e.Last)
 					{
-						object Decoded = InternetContent.Decode(ContentType, ms.ToArray(), null);
+						object Decoded = await InternetContent.DecodeAsync(ContentType, ms.ToArray(), null);
 
 						if (Decoded is string s && s == Message && e.State.Equals(Nr))
 							Done2.Set();
 						else
 							Error2.Set();
 					}
-
-					return Task.CompletedTask;
 				}, Nr);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 120000), "Response not returned.");
@@ -227,14 +223,14 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 		}
 
 		[TestMethod]
-		public void HTTPX_Test_04_POST_PostBack()
+		public async Task HTTPX_Test_04_POST_PostBack()
 		{
 			PostBack PostBack = new PostBack();
 
 			this.webServer.Register(PostBack);
 			this.httpxClient1.PostResource = PostBack;
 
-			this.DoPost(4);
+			await this.DoPost(4);
 		}
 
 	}

@@ -49,9 +49,7 @@ namespace Waher.Networking.XMPP.PEP
 			this.PubSubClient.ItemRetracted += PubSubClient_ItemRetracted;
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			if (!(this.pubSubClient is null))

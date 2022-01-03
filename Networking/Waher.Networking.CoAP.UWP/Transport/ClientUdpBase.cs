@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 using Waher.Events;
-using Waher.Security.DTLS;
 
 namespace Waher.Networking.CoAP.Transport
 {
@@ -38,7 +36,7 @@ namespace Waher.Networking.CoAP.Transport
 
 					try
 					{
-						this.Endpoint.Decode(this, Data.Buffer, Data.RemoteEndPoint);
+						await this.Endpoint.Decode(this, Data.Buffer, Data.RemoteEndPoint);
 					}
 					catch (Exception ex)
 					{

@@ -28,9 +28,7 @@ namespace Waher.Security.DTLS.Ciphers
 			this.aesCcm = new AesCcm(EncKeyLength * 8, TagLength, 12);
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			base.Dispose();

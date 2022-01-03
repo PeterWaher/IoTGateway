@@ -49,9 +49,7 @@ namespace Waher.Content.Html
 			}
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.text;

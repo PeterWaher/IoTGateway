@@ -94,7 +94,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 					if (!(e.Current is IElement E))
 						E = Expression.Encapsulate(e.Current);
 
-					Items.Add(Generic ? await Generalize.Evaluate(E) : E);
+					Items.Add(Generic ? await Generalize.EvaluateAsync(E) : E);
 				}
 
 				IComparer<IElement> Order2;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -54,12 +55,29 @@ namespace Waher.Script.Content.Functions.InputOutput
 		public override string[] DefaultArgumentNames => new string[] { "URL", "Data" };
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
 		/// </summary>
 		/// <param name="Arguments">Function arguments.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
+		{
+			return this.EvaluateAsync(Arguments, Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Arguments">Function arguments.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
 			Uri Url = new Uri(Arguments[0].AssociatedObjectValue?.ToString());
 			object Data = Arguments[1].AssociatedObjectValue;
@@ -68,7 +86,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 			if (Arguments.Length > 2)
 				HeaderList = Get.GetHeaders(Arguments[2].AssociatedObjectValue, this);
 
-			object Result = InternetContent.PostAsync(Url, Data, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]).Result;
+			object Result = await InternetContent.PostAsync(Url, Data, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
 
 			return Expression.Encapsulate(Result);
 		}

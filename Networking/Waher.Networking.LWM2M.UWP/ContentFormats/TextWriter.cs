@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using Waher.Networking.CoAP;
 using Waher.Security.DTLS;
@@ -12,7 +10,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 	/// </summary>
 	public class TextWriter : ILwm2mWriter
 	{
-		private StringBuilder sb;
+		private readonly StringBuilder sb;
 
 		/// <summary>
 		/// Content format of generated payload.

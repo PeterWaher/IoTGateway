@@ -1518,7 +1518,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 			Expression Exp = new Expression("select Byte, DateTime from Simple");
 			Variables v = new Variables();
-			ObjectMatrix Ans = Exp.Evaluate(v) as ObjectMatrix;
+			ObjectMatrix Ans = await Exp.EvaluateAsync(v) as ObjectMatrix;
 			StringBuilder sb = new StringBuilder();
 			int Rows = Ans.Rows;
 			int Row;

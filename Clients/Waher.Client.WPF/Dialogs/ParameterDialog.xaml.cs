@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -21,17 +22,23 @@ namespace Waher.Client.WPF.Dialogs
 		private readonly DataForm form;
 		private FrameworkElement makeVisible = null;
 
+		private ParameterDialog(DataForm Form)
+		{
+			this.form = Form;
+			InitializeComponent();
+		}
+
 		/// <summary>
 		/// Interaction logic for ParameterDialog.xaml
 		/// </summary>
-		public ParameterDialog(DataForm Form)
+		public static async Task<ParameterDialog> CreateAsync(DataForm Form)
 		{
-			InitializeComponent();
-			this.form = Form;
+			ParameterDialog Result = new ParameterDialog(Form)
+			{
+				Title = Form.Title
+			};
 
-			this.Title = Form.Title;
-
-			Panel Container = this.DialogPanel;
+			Panel Container = Result.DialogPanel;
 			TabControl TabControl = null;
 			TabItem TabItem;
 			StackPanel StackPanel;
@@ -42,7 +49,7 @@ namespace Waher.Client.WPF.Dialogs
 			if (Form.HasPages)
 			{
 				TabControl = new TabControl();
-				this.DialogPanel.Children.Add(TabControl);
+				Result.DialogPanel.Children.Add(TabControl);
 				DockPanel.SetDock(TabControl, Dock.Top);
 			}
 			else
@@ -52,7 +59,7 @@ namespace Waher.Client.WPF.Dialogs
 					VerticalScrollBarVisibility = ScrollBarVisibility.Auto
 				};
 
-				this.DialogPanel.Children.Add(ScrollViewer);
+				Result.DialogPanel.Children.Add(ScrollViewer);
 				DockPanel.SetDock(ScrollViewer, Dock.Top);
 
 				StackPanel = new StackPanel()
@@ -110,7 +117,7 @@ namespace Waher.Client.WPF.Dialogs
 
 				foreach (LayoutElement Element in Page.Elements)
 				{
-					Control = this.Layout(Container, Element, Form);
+					Control = await Result.Layout(Container, Element, Form);
 					if (First is null)
 						First = Control;
 				}
@@ -122,24 +129,26 @@ namespace Waher.Client.WPF.Dialogs
 			if (First != null)
 				First.Focus();
 
-			this.CheckOkButtonEnabled();
+			Result.CheckOkButtonEnabled();
+
+			return Result;
 		}
 
-		private Control Layout(Panel Container, LayoutElement Element, DataForm Form)
+		private async Task<Control> Layout(Panel Container, LayoutElement Element, DataForm Form)
 		{
 			if (Element is FieldReference FieldReference)
-				return this.Layout(Container, FieldReference, Form);
+				return await this.Layout(Container, FieldReference, Form);
 			else if (Element is Networking.XMPP.DataForms.Layout.TextElement TextElement)
 				this.Layout(Container, TextElement, Form);
 			else if (Element is Networking.XMPP.DataForms.Layout.Section Section)
-				return this.Layout(Container, Section, Form);
+				return await this.Layout(Container, Section, Form);
 			else if (Element is ReportedReference ReportedReference)
 				this.Layout(Container, ReportedReference, Form);
 
 			return null;
 		}
 
-		private Control Layout(Panel Container, Networking.XMPP.DataForms.Layout.Section Section, DataForm Form)
+		private async Task<Control> Layout(Panel Container, Networking.XMPP.DataForms.Layout.Section Section, DataForm Form)
 		{
 			GroupBox GroupBox = new GroupBox();
 			Container.Children.Add(GroupBox);
@@ -155,7 +164,7 @@ namespace Waher.Client.WPF.Dialogs
 
 			foreach (LayoutElement Element in Section.Elements)
 			{
-				Control = this.Layout(StackPanel, Element, Form);
+				Control = await this.Layout(StackPanel, Element, Form);
 				if (First is null)
 					First = Control;
 			}
@@ -175,7 +184,7 @@ namespace Waher.Client.WPF.Dialogs
 			Container.Children.Add(TextBlock);
 		}
 
-		private Control Layout(Panel Container, FieldReference FieldReference, DataForm Form)
+		private async Task<Control> Layout(Panel Container, FieldReference FieldReference, DataForm Form)
 		{
 			Field Field = Form[FieldReference.Var];
 			if (Field is null)
@@ -208,7 +217,7 @@ namespace Waher.Client.WPF.Dialogs
 			else if (Field is JidSingleField JidSingleField)
 				Result = this.Layout(Container, JidSingleField, Form);
 			else if (Field is MediaField MediaField)
-				this.Layout(Container, MediaField, Form);
+				await this.Layout(Container, MediaField, Form);
 
 			if (MakeVisible && this.makeVisible is null)
 				this.makeVisible = Result;
@@ -591,7 +600,7 @@ namespace Waher.Client.WPF.Dialogs
 			}
 		}
 
-		private void Layout(Panel Container, MediaField Field, DataForm _)
+		private async Task Layout(Panel Container, MediaField Field, DataForm _)
 		{
 			MediaElement MediaElement;
 			Uri Uri = null;
@@ -697,7 +706,7 @@ namespace Waher.Client.WPF.Dialogs
 				try
 				{
 					if (Field.Media.Binary != null)
-						BitmapImage.UriSource = new Uri(Waher.Content.Markdown.Model.Multimedia.ImageContent.GetTemporaryFile(Field.Media.Binary));
+						BitmapImage.UriSource = new Uri(await Waher.Content.Markdown.Model.Multimedia.ImageContent.GetTemporaryFile(Field.Media.Binary));
 					else if (Uri != null)
 						BitmapImage.UriSource = Uri;
 					else if (!string.IsNullOrEmpty(Field.Media.URL))

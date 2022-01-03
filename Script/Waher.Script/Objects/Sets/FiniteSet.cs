@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
-using Waher.Script.Model;
 
 namespace Waher.Script.Objects.Sets
 {
@@ -82,9 +81,7 @@ namespace Waher.Script.Objects.Sets
             }
         }
 
-        /// <summary>
-        /// <see cref="Object.ToString()"/>
-        /// </summary>
+        /// <inheritdoc/>
         public override string ToString()
         {
             StringBuilder sb = null;

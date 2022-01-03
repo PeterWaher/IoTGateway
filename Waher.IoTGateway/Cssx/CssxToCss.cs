@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Content;
 using Waher.IoTGateway.ScriptExtensions.Constants;
@@ -41,33 +42,21 @@ namespace Waher.IoTGateway.Cssx
 		/// <summary>
 		/// Performs the actual conversion.
 		/// </summary>
-		/// <param name="FromContentType">Content type of the content to convert from.</param>
-		/// <param name="From">Stream pointing to binary representation of content.</param>
-		/// <param name="FromFileName">If the content is coming from a file, this parameter contains the name of that file. 
-		/// Otherwise, the parameter is the empty string.</param>
-		/// <param name="LocalResourceName">Local resource name of file, if accessed from a web server.</param>
-		/// <param name="URL">URL of resource, if accessed from a web server.</param>
-		/// <param name="ToContentType">Content type of the content to convert to. This value might be changed, in case
-		/// the converter finds a better option.</param>
-		/// <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
-		/// <param name="Session">Session states.</param>
-		/// <param name="PossibleContentTypes">Possible content types the converter is allowed to convert to. 
-		/// Can be null if there are no alternatives.</param>
+		/// <param name="State">State of the current conversion.</param>
 		/// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
-		public bool Convert(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL, 
-			ref string ToContentType, Stream To, Variables Session, params string[] PossibleContentTypes)
+		public async Task<bool> ConvertAsync(ConversionState State)
 		{
 			string Cssx;
 
-			using (StreamReader rd = new StreamReader(From))
+			using (StreamReader rd = new StreamReader(State.From))
 			{
-				Cssx = rd.ReadToEnd();
+				Cssx = await rd.ReadToEndAsync();
 			}
 
-			string Css = Convert(Cssx, Session, FromFileName);
+			string Css = await Convert(Cssx, State.Session, State.FromFileName);
 
 			byte[] Data = Utf8WithBOM.GetBytes(Css);
-			To.Write(Data, 0, Data.Length);
+			await State .To.WriteAsync(Data, 0, Data.Length);
 
 			return false;
 		}
@@ -79,11 +68,11 @@ namespace Waher.IoTGateway.Cssx
 		/// <param name="Session">Current session</param>
 		/// <param name="FileName">Source file name.</param>
 		/// <returns>CSS</returns>
-		public static string Convert(string Cssx, Variables Session, string FileName)
+		public static async Task<string> Convert(string Cssx, Variables Session, string FileName)
 		{
 			bool Pushed = false;
 
-			Session.Lock();
+			await Session.LockAsync();
 			try
 			{
 				Session.Push();
@@ -134,7 +123,7 @@ namespace Waher.IoTGateway.Cssx
 
 					Script = Cssx.Substring(j + 1, k - j - 1);
 					Exp = new Expression(Script, FileName);
-					Value = Exp.Evaluate(Session);
+					Value = await Exp.EvaluateAsync(Session);
 
 					if (Value is SKColor Color)
 					{

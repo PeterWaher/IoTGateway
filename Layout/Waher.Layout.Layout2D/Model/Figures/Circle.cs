@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -41,11 +42,10 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.radius = new LengthAttribute(Input, "radius");
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -87,13 +87,14 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
-			if (!(this.radius is null) && this.radius.TryEvaluate(State.Session, out Length R))
+			EvaluationResult<Length> RadiusLength = await this.radius.TryEvaluate(State.Session);
+			if (RadiusLength.Ok)
 			{
-				State.CalcDrawingSize(R, ref this.r, true, ref Relative);
+				State.CalcDrawingSize(RadiusLength.Result, ref this.r, true, State);
 				this.Width = this.ExplicitWidth = this.Height = this.ExplicitHeight = 2 * this.r;
 			}
 			else
@@ -106,26 +107,26 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				this.IncludePoint(this.xCoordinate, this.yCoordinate - this.r);
 				this.IncludePoint(this.xCoordinate, this.yCoordinate + this.r);
 			}
-
-			return Relative;
 		}
 
 		/// <summary>
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			if (this.defined)
 			{
-				if (this.TryGetFill(State, out SKPaint Fill))
+				SKPaint Fill = await this.TryGetFill(State);
+				if (!(Fill is null))
 					State.Canvas.DrawCircle(this.xCoordinate, this.yCoordinate, this.r, Fill);
 
-				if (this.TryGetPen(State, out SKPaint Pen))
+				SKPaint Pen = await this.TryGetPen(State);
+				if (!(Pen is null))
 					State.Canvas.DrawCircle(this.xCoordinate, this.yCoordinate, this.r, Pen);
 			}
 		
-			base.Draw(State);
+			await base.Draw(State);
 		}
 	}
 }

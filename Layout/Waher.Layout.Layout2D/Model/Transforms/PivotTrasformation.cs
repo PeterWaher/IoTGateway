@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
-using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Transforms
@@ -12,7 +12,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 	{
 		private LengthAttribute x;
 		private LengthAttribute y;
-		private StringAttribute _ref;
+		private StringAttribute @ref;
 
 		/// <summary>
 		/// Base abstract class for transformations using an optional pivot point.
@@ -47,21 +47,21 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// </summary>
 		public StringAttribute ReferenceAttribute
 		{
-			get => this._ref;
-			set => this._ref = value;
+			get => this.@ref;
+			set => this.@ref = value;
 		}
 
 		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.x = new LengthAttribute(Input, "x");
 			this.y = new LengthAttribute(Input, "y");
-			this._ref = new StringAttribute(Input, "ref");
+			this.@ref = new StringAttribute(Input, "ref");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -74,7 +74,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 
 			this.x?.Export(Output);
 			this.y?.Export(Output);
-			this._ref?.Export(Output);
+			this.@ref?.Export(Output);
 		}
 
 		/// <summary>
@@ -89,7 +89,7 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 			{
 				Dest.x = this.x?.CopyIfNotPreset();
 				Dest.y = this.y?.CopyIfNotPreset();
-				Dest._ref = this._ref?.CopyIfNotPreset();
+				Dest.@ref = this.@ref?.CopyIfNotPreset();
 			}
 		}
 
@@ -98,14 +98,18 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
-			if (!this.CalcPoint(State, this.x, this.y, this._ref, ref this.xCoordinate, ref this.yCoordinate, ref Relative))
+			CalculatedPoint P = await this.CalcPoint(State, this.x, this.y, this.@ref, this.xCoordinate, this.yCoordinate);
+			if (P.Ok)
+			{
+				this.xCoordinate = P.X;
+				this.yCoordinate = P.Y;
+			}
+			else
 				this.xCoordinate = this.yCoordinate = 0;
-
-			return Relative;
 		}
 
 		/// <summary>

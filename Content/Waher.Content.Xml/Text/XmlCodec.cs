@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Runtime.Inventory;
 
@@ -40,18 +41,12 @@ namespace Waher.Content.Xml.Text
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes
-		{
-			get { return XmlContentTypes; }
-		}
+		public string[] ContentTypes => XmlContentTypes;
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions
-		{
-			get { return XmlFileExtensions; }
-		}
+		public string[] FileExtensions => XmlFileExtensions;
 
 		/// <summary>
 		/// If the decoder decodes an object with a given content type.
@@ -88,7 +83,7 @@ namespace Waher.Content.Xml.Text
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			XmlDocument Doc = new XmlDocument()
 			{
@@ -108,7 +103,7 @@ namespace Waher.Content.Xml.Text
 				Doc.LoadXml(s);
 			}
 
-			return Doc;
+			return Task.FromResult<object>(Doc);
 		}
 
 		/// <summary>
@@ -194,14 +189,13 @@ namespace Waher.Content.Xml.Text
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
-		/// <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
-		/// <returns>Encoded object.</returns>
+		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
+		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if ((Object is XmlDocument || Object is XmlElement) &&
-				InternetContent.IsAccepted(XmlContentTypes, out ContentType, AcceptedContentTypes))
+				InternetContent.IsAccepted(XmlContentTypes, out string ContentType, AcceptedContentTypes))
 			{
 				if (!(Object is XmlDocument Doc))
 				{
@@ -245,7 +239,7 @@ namespace Waher.Content.Xml.Text
 					ms?.Dispose();
 				}
 
-				return Result;
+				return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Result, ContentType));
 			}
 			else
 				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));

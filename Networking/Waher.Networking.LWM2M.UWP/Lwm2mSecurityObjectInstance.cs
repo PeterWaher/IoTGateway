@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Events;
 using Waher.Networking.CoAP;
-using Waher.Networking.LWM2M.ContentFormats;
 using Waher.Networking.LWM2M.Events;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
@@ -21,37 +18,37 @@ namespace Waher.Networking.LWM2M
 		/// Uniquely identifis the LwM2M Server or LwM2M Bootstrap-Server. The format of the CoAP 
 		/// URI is defined in Section 6 of RFC 7252.
 		/// </summary>
-		private Lwm2mResourceString serverUri;
+		private readonly Lwm2mResourceString serverUri;
 
 		/// <summary>
 		/// Determines if the current instance concerns a LwM2M Bootstrap-Server(true) or a 
 		/// standard LwM2M Server(false).
 		/// </summary>
-		private Lwm2mResourceBoolean bootstrapServer;
+		private readonly Lwm2mResourceBoolean bootstrapServer;
 
 		/// <summary>
 		/// Determines which UDP payload security mode is used.
 		/// </summary>
-		private Lwm2mResourceInteger securityMode;
+		private readonly Lwm2mResourceInteger securityMode;
 
 		/// <summary>
 		/// Stores the LwM2M Client‟s Certificate (Certificate mode), public key (RPK mode) or 
 		/// PSK Identity (PSK mode). The format is defined in Section E.1.1.
 		/// </summary>
-		private Lwm2mResourceOpaque publicKeyOrIdentity;
+		private readonly Lwm2mResourceOpaque publicKeyOrIdentity;
 
 		/// <summary>
 		///  Stores the LwM2M Server‟s or LwM2M Bootstrap-Server‟s Certificate(Certificate mode), 
 		///  public key(RPK mode). The format is defined in Section E.1.1.
 		/// </summary>
-		private Lwm2mResourceOpaque serverPublicKey;
+		private readonly Lwm2mResourceOpaque serverPublicKey;
 
 		/// <summary>
 		/// Stores the secret key or private key of the security mode. The format of the keying
 		/// material is defined by the security mode in Section E.1.1. This Resource MUST only be 
 		/// changed by a bootstrap-server and MUST NOT be readable by any server.
 		/// </summary>
-		private Lwm2mResourceOpaque secretKey;
+		private readonly Lwm2mResourceOpaque secretKey;
 
 		/// <summary>
 		/// This identifier uniquely identifies each LwM2M Server configured for the LwM2M Client.
@@ -61,7 +58,7 @@ namespace Waher.Networking.LWM2M
 		/// Specific ID:0 and ID:65535 values MUST NOT be used for identifying the LwM2M Server
 		/// (Section 6.3).
 		/// </summary>
-		private Lwm2mResourceInteger shortServerId;
+		private readonly Lwm2mResourceInteger shortServerId;
 
 		/// <summary>
 		/// Relevant information for a BootstrapServer only.
@@ -125,10 +122,12 @@ namespace Waher.Networking.LWM2M
 			this.Add(new Lwm2mResourceNotSupported(0, InstanceId, 12)); //  BootstrapServer Account Timeout
 		}
 
-		private void CheckFromBootstrapServer(object sender, CoapRequestEventArgs e)
+		private Task CheckFromBootstrapServer(object sender, CoapRequestEventArgs e)
 		{
 			if (!this.Object.Client.IsFromBootstrapServer(e.Request))
 				throw new CoapException(CoapCode.Unauthorized);
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -239,12 +238,12 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void DELETE(CoapMessage Request, CoapResponse Response)
+		public async Task DELETE(CoapMessage Request, CoapResponse Response)
 		{
 			if (this.Object.Client.State == Lwm2mState.Bootstrap &&
 				this.Object.Client.IsFromBootstrapServer(Request))
 			{
-				Task T = this.DeleteBootstrapInfo();
+				await this.DeleteBootstrapInfo();
 				Response.ACK(CoapCode.Deleted);
 			}
 			else
@@ -277,15 +276,18 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public override void PUT(CoapMessage Request, CoapResponse Response)
+		public override Task PUT(CoapMessage Request, CoapResponse Response)
 		{
 			if (this.Object.Client.State == Lwm2mState.Bootstrap &&
 				this.Object.Client.IsFromBootstrapServer(Request))
 			{
-				base.PUT(Request, Response);
+				return base.PUT(Request, Response);
 			}
 			else
+			{
 				Response.RST(CoapCode.Unauthorized);
+				return Task.CompletedTask;
+			}
 		}
 
 		/// <summary>
@@ -307,12 +309,15 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public override void GET(CoapMessage Request, CoapResponse Response)
+		public override Task GET(CoapMessage Request, CoapResponse Response)
 		{
 			if (this.Object.Client.IsFromBootstrapServer(Request))
-				base.GET(Request, Response);
+				return base.GET(Request, Response);
 			else
+			{
 				Response.RST(CoapCode.Unauthorized);
+				return Task.CompletedTask;
+			}
 		}
 
 		internal Lwm2mServerReference GetServerReference(bool BootstrapServer)

@@ -28,6 +28,7 @@ using Waher.Script.Operators.Vectors;
 using Waher.Script.Output;
 using Waher.Script.TypeConversion;
 using Waher.Script.Units;
+using System.Threading.Tasks;
 
 namespace Waher.Script
 {
@@ -4140,17 +4141,57 @@ namespace Waher.Script
 		}
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public bool IsAsynchronous => this.root?.IsAsynchronous ?? false;
+
+		/// <summary>
 		/// Evaluates the expression, using the variables provided in the <paramref name="Variables"/> collection.
+		/// This method should be used for evaluating expressions in a synchronous (blocking) context.
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
+		[Obsolete("Use the EvaluateAsync method for more efficient processing of script containing asynchronous processing elements in parallel environments.")]
 		public object Evaluate(Variables Variables)
 		{
 			IElement Result;
 
 			try
 			{
-				Result = this.root?.Evaluate(Variables) ?? ObjectValue.Null;
+				if (this.root is null)
+					Result = ObjectValue.Null;
+				else if (this.root.IsAsynchronous)
+					Result = this.root.EvaluateAsync(Variables).Result;
+				else
+					Result = this.root.Evaluate(Variables);
+			}
+			catch (ScriptReturnValueException ex)
+			{
+				Result = ex.ReturnValue;
+			}
+
+			return Result.AssociatedObjectValue;
+		}
+
+		/// <summary>
+		/// Evaluates the expression, using the variables provided in the <paramref name="Variables"/> collection.
+		/// This method should be used for evaluating expressions in an asynchronous (non-blocking) context.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public async Task<object> EvaluateAsync(Variables Variables)
+		{
+			IElement Result;
+
+			try
+			{
+				if (this.root is null)
+					Result = ObjectValue.Null;
+				else if (this.root.IsAsynchronous)
+					Result = await this.root.EvaluateAsync(Variables);
+				else
+					Result = this.root.Evaluate(Variables);
 			}
 			catch (ScriptReturnValueException ex)
 			{
@@ -4163,14 +4204,9 @@ namespace Waher.Script
 		/// <summary>
 		/// Root script node.
 		/// </summary>
-		public ScriptNode Root
-		{
-			get { return this.root; }
-		}
+		public ScriptNode Root => this.root;
 
-		/// <summary>
-		/// <see cref="Object.Equals(Object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (obj is Expression Exp)
@@ -4179,9 +4215,7 @@ namespace Waher.Script
 				return false;
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			return this.script.GetHashCode();
@@ -4190,10 +4224,7 @@ namespace Waher.Script
 		/// <summary>
 		/// If the expression contains implicit print operations.
 		/// </summary>
-		public bool ContainsImplicitPrint
-		{
-			get { return this.containsImplicitPrint; }
-		}
+		public bool ContainsImplicitPrint => this.containsImplicitPrint;
 
 		/// <summary>
 		/// Transforms a string by executing embedded script.
@@ -4203,6 +4234,7 @@ namespace Waher.Script
 		/// <param name="StopDelimiter">Stop delimiter.</param>
 		/// <param name="Variables">Collection of variables.</param>
 		/// <returns>Transformed string.</returns>
+		[Obsolete("Use the TransformAsync method for more efficient processing of script containing asynchronous processing elements in parallel environments.")]
 		public static string Transform(string s, string StartDelimiter, string StopDelimiter, Variables Variables)
 		{
 			return Transform(s, StartDelimiter, StopDelimiter, Variables, null);
@@ -4217,6 +4249,7 @@ namespace Waher.Script
 		/// <param name="Variables">Collection of variables.</param>
 		/// <param name="Source">Optional source of <paramref name="s"/>.</param>
 		/// <returns>Transformed string.</returns>
+		[Obsolete("Use the TransformAsync method for more efficient processing of script containing asynchronous processing elements in parallel environments.")]
 		public static string Transform(string s, string StartDelimiter, string StopDelimiter, Variables Variables, string Source)
 		{
 			Expression Exp;
@@ -4238,6 +4271,63 @@ namespace Waher.Script
 
 				Exp = new Expression(Script, Source);
 				Result = Exp.Evaluate(Variables);
+
+				if (!(Result is null))
+				{
+					s2 = Result.ToString();
+					s = s.Insert(i, s2);
+					i += s2.Length;
+				}
+
+				i = s.IndexOf(StartDelimiter, i);
+			}
+
+			return s;
+		}
+
+		/// <summary>
+		/// Transforms a string by executing embedded script.
+		/// </summary>
+		/// <param name="s">String to transform.</param>
+		/// <param name="StartDelimiter">Start delimiter.</param>
+		/// <param name="StopDelimiter">Stop delimiter.</param>
+		/// <param name="Variables">Collection of variables.</param>
+		/// <returns>Transformed string.</returns>
+		public static Task<string> TransformAsync(string s, string StartDelimiter, string StopDelimiter, Variables Variables)
+		{
+			return TransformAsync(s, StartDelimiter, StopDelimiter, Variables, null);
+		}
+
+		/// <summary>
+		/// Transforms a string by executing embedded script.
+		/// </summary>
+		/// <param name="s">String to transform.</param>
+		/// <param name="StartDelimiter">Start delimiter.</param>
+		/// <param name="StopDelimiter">Stop delimiter.</param>
+		/// <param name="Variables">Collection of variables.</param>
+		/// <param name="Source">Optional source of <paramref name="s"/>.</param>
+		/// <returns>Transformed string.</returns>
+		public static async Task<string> TransformAsync(string s, string StartDelimiter, string StopDelimiter, Variables Variables, string Source)
+		{
+			Expression Exp;
+			string Script, s2;
+			object Result;
+			int i = s.IndexOf(StartDelimiter);
+			int j;
+			int StartLen = StartDelimiter.Length;
+			int StopLen = StopDelimiter.Length;
+
+			while (i >= 0)
+			{
+				j = s.IndexOf(StopDelimiter, i + StartLen);
+				if (j < 0)
+					break;
+
+				Script = s.Substring(i + StartLen, j - i - StartLen);
+				s = s.Remove(i, j - i + StopLen);
+
+				Exp = new Expression(Script, Source);
+				Result = await Exp.EvaluateAsync(Variables);
 
 				if (!(Result is null))
 				{
@@ -4733,9 +4823,8 @@ namespace Waher.Script
 		/// <param name="Set1">Set containing element 1.</param>
 		/// <param name="E2">Element 2.</param>
 		/// <param name="Set2">Set containing element 2.</param>
-		/// <param name="Node">Script node requesting the upgrade.</param>
 		/// <returns>If elements have been upgraded to become compatible.</returns>
-		public static bool UpgradeSemiGroup(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet Set2, ScriptNode Node)
+		public static bool UpgradeSemiGroup(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet Set2)
 		{
 			if (E1 is StringValue)
 			{
@@ -4751,7 +4840,7 @@ namespace Waher.Script
 				return true;
 			}
 
-			if (UpgradeField(ref E1, ref Set1, ref E2, ref Set2, Node))
+			if (UpgradeField(ref E1, ref Set1, ref E2, ref Set2))
 				return true;
 
 			return false;
@@ -4764,9 +4853,8 @@ namespace Waher.Script
 		/// <param name="Set1">Set containing element 1.</param>
 		/// <param name="E2">Element 2.</param>
 		/// <param name="Set2">Set containing element 2.</param>
-		/// <param name="Node">Script node requesting the upgrade.</param>
 		/// <returns>If elements have been upgraded to become compatible.</returns>
-		public static bool UpgradeField(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet Set2, ScriptNode Node)
+		public static bool UpgradeField(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet Set2)
 		{
 			object O1 = E1?.AssociatedObjectValue;
 			object O2 = E2?.AssociatedObjectValue;
@@ -4965,8 +5053,11 @@ namespace Waher.Script
 					return false;
 			}
 
-			if (!Callback(ref this.root, State))
+			if (!Callback(this.root, out ScriptNode NewRoot, State))
 				return false;
+
+			if (!(NewRoot is null))
+				this.root = NewRoot;
 
 			if (!DepthFirst)
 			{
@@ -5217,6 +5308,7 @@ namespace Waher.Script
 		/// </summary>
 		/// <param name="Script">Script to parse and evaluate.</param>
 		/// <returns>Result</returns>
+		[Obsolete("Use the EvalAsync method for more efficient processing of script containing asynchronous processing elements in parallel environments.")]
 		public static object Eval(string Script)
 		{
 			return Eval(Script, new Variables());
@@ -5228,10 +5320,33 @@ namespace Waher.Script
 		/// <param name="Script">Script to parse and evaluate.</param>
 		/// <param name="Variables">Variables</param>
 		/// <returns>Result</returns>
+		[Obsolete("Use the EvalAsync method for more efficient processing of script containing asynchronous processing elements in parallel environments.")]
 		public static object Eval(string Script, Variables Variables)
 		{
 			Expression Exp = new Expression(Script);
 			return Exp.Evaluate(Variables);
+		}
+
+		/// <summary>
+		/// Evaluates script, in string format.
+		/// </summary>
+		/// <param name="Script">Script to parse and evaluate.</param>
+		/// <returns>Result</returns>
+		public static Task<object> EvalAsync(string Script)
+		{
+			return EvalAsync(Script, new Variables());
+		}
+
+		/// <summary>
+		/// Evaluates script, in string format.
+		/// </summary>
+		/// <param name="Script">Script to parse and evaluate.</param>
+		/// <param name="Variables">Variables</param>
+		/// <returns>Result</returns>
+		public static Task<object> EvalAsync(string Script, Variables Variables)
+		{
+			Expression Exp = new Expression(Script);
+			return Exp.EvaluateAsync(Variables);
 		}
 
 		// TODO: Optimize constants

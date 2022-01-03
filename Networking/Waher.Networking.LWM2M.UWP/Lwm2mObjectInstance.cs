@@ -7,7 +7,6 @@ using Waher.Persistence.Attributes;
 using Waher.Networking.CoAP;
 using Waher.Networking.CoAP.Options;
 using Waher.Networking.LWM2M.ContentFormats;
-using Waher.Networking.LWM2M.Events;
 
 namespace Waher.Networking.LWM2M
 {
@@ -19,7 +18,7 @@ namespace Waher.Networking.LWM2M
 	[Index("Id", "InstanceId")]
 	public abstract class Lwm2mObjectInstance : CoapResource, ICoapGetMethod, ICoapPutMethod, ICoapPostMethod
 	{
-		private SortedDictionary<int, Lwm2mResource> resources = new SortedDictionary<int, Lwm2mResource>();
+		private readonly SortedDictionary<int, Lwm2mResource> resources = new SortedDictionary<int, Lwm2mResource>();
 		private Lwm2mObject obj = null;
 		private string objectId = null;
 		private ushort id;
@@ -235,9 +234,7 @@ namespace Waher.Networking.LWM2M
 		{
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.Path + ": " + this.GetType().FullName;
@@ -254,7 +251,7 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public virtual void GET(CoapMessage Request, CoapResponse Response)
+		public virtual Task GET(CoapMessage Request, CoapResponse Response)
 		{
 			ILwm2mWriter Writer;
 			bool FromBootstrapServer = this.obj.Client.IsFromBootstrapServer(Request);
@@ -262,13 +259,13 @@ namespace Waher.Networking.LWM2M
 			if (this.id == 0 && !FromBootstrapServer)
 			{
 				Response.RST(CoapCode.Unauthorized);
-				return;
+				return Task.CompletedTask;
 			}
 
 			if (!string.IsNullOrEmpty(Request.SubPath))
 			{
 				Response.RST(CoapCode.NotFound);
-				return;
+				return Task.CompletedTask;
 			}
 
 			if (Request.IsAcceptable(Tlv.ContentFormatCode))
@@ -283,12 +280,12 @@ namespace Waher.Networking.LWM2M
 				Response.Respond(CoapCode.Content, Encoding.UTF8.GetBytes(Output.ToString()), 64,
 					new CoapOptionContentFormat(CoAP.ContentFormats.CoreLinkFormat.ContentFormatCode));
 
-				return;
+				return Task.CompletedTask;
 			}
 			else
 			{
 				Response.RST(CoapCode.NotAcceptable);
-				return;
+				return Task.CompletedTask;
 			}
 
 			this.Export(Writer);
@@ -302,6 +299,8 @@ namespace Waher.Networking.LWM2M
 				Response.Respond(CoapCode.Content, Payload, 64,
 					new CoapOptionContentFormat(Writer.ContentFormat));
 			}
+	
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -352,9 +351,9 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void POST(CoapMessage Request, CoapResponse Response)
+		public Task POST(CoapMessage Request, CoapResponse Response)
 		{
-			this.PUT(Request, Response);
+			return this.PUT(Request, Response);
 		}
 
 		/// <summary>
@@ -368,7 +367,7 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public virtual void PUT(CoapMessage Request, CoapResponse Response)
+		public virtual async Task PUT(CoapMessage Request, CoapResponse Response)
 		{
 			bool FromBootstrapServer = this.obj.Client.IsFromBootstrapServer(Request);
 
@@ -407,7 +406,7 @@ namespace Waher.Networking.LWM2M
 
 			if (Request.ContentFormat != null)      // Write operation
 			{
-				object Decoded = Request.Decode();
+				object Decoded = await Request.DecodeAsync();
 
 				if (Decoded is TlvRecord[] Records)
 				{
@@ -443,7 +442,7 @@ namespace Waher.Networking.LWM2M
 
 					foreach (KeyValuePair<Lwm2mResource, TlvRecord> Rec in ToWrite)
 					{
-						Rec.Key.Read(Rec.Value);
+						await Rec.Key.Read(Rec.Value);
 						Rec.Key.RemoteUpdate(Request);
 					}
 				}

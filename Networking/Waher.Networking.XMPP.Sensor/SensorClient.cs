@@ -46,9 +46,7 @@ namespace Waher.Networking.XMPP.Sensor
 			this.client.RegisterMessageHandler("resp", NamespaceSensorData, this.FieldsHandler, false);
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			base.Dispose();

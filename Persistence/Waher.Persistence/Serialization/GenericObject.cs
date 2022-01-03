@@ -320,9 +320,7 @@ namespace Waher.Persistence.Serialization
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (!(obj is GenericObject GenObj) ||
@@ -381,9 +379,7 @@ namespace Waher.Persistence.Serialization
 				return false;
 		}
 
-		/// <summary>
-		/// <see cref="object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			if (this.propertiesByName is null)

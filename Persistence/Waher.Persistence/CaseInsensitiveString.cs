@@ -32,9 +32,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public string LowerCase => this?.lowerCase;
 
-		/// <summary>
-		/// <see cref="Object.ToString"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.value ?? string.Empty;

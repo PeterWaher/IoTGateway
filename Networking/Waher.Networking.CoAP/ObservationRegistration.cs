@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
 using Waher.Networking.CoAP.Transport;
 
 namespace Waher.Networking.CoAP
@@ -11,9 +8,9 @@ namespace Waher.Networking.CoAP
 	/// </summary>
 	public class ObservationRegistration
 	{
-		private ClientBase client;
-		private CoapEndpoint endpoint;
-		private CoapMessage request;
+		private readonly ClientBase client;
+		private readonly CoapEndpoint endpoint;
+		private readonly CoapMessage request;
 		private uint seqNr = 0;
 
 		/// <summary>

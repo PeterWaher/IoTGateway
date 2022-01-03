@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Xsl;
 using Waher.Runtime.Inventory;
@@ -41,18 +42,12 @@ namespace Waher.Content.Xml.Text
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes
-		{
-			get { return XmlContentTypes; }
-		}
+		public string[] ContentTypes => XmlContentTypes;
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions
-		{
-			get { return XmlFileExtensions; }
-		}
+		public string[] FileExtensions => XmlFileExtensions;
 
 		/// <summary>
 		/// If the decoder decodes an object with a given content type.
@@ -84,7 +79,7 @@ namespace Waher.Content.Xml.Text
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			using (Stream f = new MemoryStream(Data))
 			{
@@ -93,7 +88,7 @@ namespace Waher.Content.Xml.Text
 					XslCompiledTransform Xslt = new XslCompiledTransform();
 					Xslt.Load(r);
 
-					return Xslt;
+					return Task.FromResult<object>(Xslt);
 				}
 			}
 		}

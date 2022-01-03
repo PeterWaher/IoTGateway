@@ -34,9 +34,7 @@ namespace Waher.Content.Html
 			get { return this.entityName; }
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			string s = EntityToCharacter(this.entityName);

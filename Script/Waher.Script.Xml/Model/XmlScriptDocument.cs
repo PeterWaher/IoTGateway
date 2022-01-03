@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -15,6 +16,8 @@ namespace Waher.Script.Xml.Model
 	{
 		private readonly XmlScriptProcessingInstruction[] processingInstructions;
 		private XmlScriptElement root;
+		private readonly int nrInstructions;
+		private bool isAsync;
 
 		/// <summary>
 		/// Represents an script-based XML document.
@@ -30,12 +33,38 @@ namespace Waher.Script.Xml.Model
 		{
 			this.root = Root;
 			this.processingInstructions = ProcessingInstructions;
+			this.nrInstructions = ProcessingInstructions.Length;
+
+			this.CalcIsAsync();
 		}
+
+		private void CalcIsAsync()
+		{
+			this.isAsync = this.root?.IsAsynchronous ?? false;
+			if (this.isAsync)
+				return;
+
+			for (int i = 0; i < this.nrInstructions; i++)
+			{
+				if (this.processingInstructions[i]?.IsAsynchronous ?? false)
+				{
+					this.isAsync = true;
+					break;
+				}
+			}
+		}
+
 
 		/// <summary>
 		/// Root element.
 		/// </summary>
 		public XmlScriptElement Root => this.root;
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => this.isAsync;
 
 		/// <summary>
 		/// Calls the callback method for all child nodes.
@@ -47,7 +76,6 @@ namespace Waher.Script.Xml.Model
 		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
 		{
 			int i, c = this.processingInstructions.Length;
-			ScriptNode Node;
 
 			if (DepthFirst)
 			{
@@ -61,33 +89,44 @@ namespace Waher.Script.Xml.Model
 					return false;
 			}
 
-			for (i = 0; i < c; i++)
+			ScriptNode NewNode;
+			bool RecalcIsAsync = false;
+			bool b;
+
+			for (i = 0; i < this.nrInstructions; i++)
 			{
-				Node = this.processingInstructions[i];
-
-				if (!Callback(ref Node, State))
-					return false;
-
-				if (Node != this.processingInstructions[i])
+				b = !Callback(this.processingInstructions[i], out NewNode, State);
+				if (!(NewNode is null) && NewNode is XmlScriptProcessingInstruction Instruction)
 				{
-					if (Node is XmlScriptProcessingInstruction PI)
-						this.processingInstructions[i] = PI;
-					else
-						throw new ScriptRuntimeException("Incompatible node change.", this);
+					this.processingInstructions[i] = Instruction;
+					RecalcIsAsync = true;
+				}
+
+				if (b)
+				{
+					if (RecalcIsAsync)
+						this.CalcIsAsync();
+
+					return false;
 				}
 			}
 
-			Node = this.root;
-
-			if (!Callback(ref Node, State))
-				return false;
-
-			if (Node != this.root)
+			if (!(this.root is null))
 			{
-				if (Node is XmlScriptElement Root)
-					this.root = Root;
-				else
-					throw new ScriptRuntimeException("Incompatible node change.", this);
+				b = !Callback(this.root, out NewNode, State);
+				if (!(NewNode is null) && NewNode is XmlScriptElement NewRoot)
+				{
+					this.root = NewRoot;
+					RecalcIsAsync = true;
+				}
+
+				if (b)
+				{
+					if (RecalcIsAsync)
+						this.CalcIsAsync();
+
+					return false;
+				}
 			}
 
 			if (!DepthFirst)
@@ -123,6 +162,26 @@ namespace Waher.Script.Xml.Model
 		}
 
 		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!this.isAsync)
+				return this.Evaluate(Variables);
+
+			XmlDocument Doc = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
+
+			await this.BuildAsync(Doc, null, Variables);
+
+			return new ObjectValue(Doc);
+		}
+
+		/// <summary>
 		/// Builds an XML Document object
 		/// </summary>
 		/// <param name="Document">Document being built.</param>
@@ -134,6 +193,21 @@ namespace Waher.Script.Xml.Model
 				PI.Build(Document, Parent, Variables);
 
 			this.root?.Build(Document, Parent, Variables);
+		}
+
+		/// <summary>
+		/// Builds an XML Document object
+		/// </summary>
+		/// <param name="Document">Document being built.</param>
+		/// <param name="Parent">Parent element.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		internal override async Task BuildAsync(XmlDocument Document, XmlElement Parent, Variables Variables)
+		{
+			foreach (XmlScriptProcessingInstruction PI in this.processingInstructions)
+				await PI.BuildAsync(Document, Parent, Variables);
+
+			if (!(this.root is null))
+				await this.root.BuildAsync(Document, Parent, Variables);
 		}
 
 		/// <summary>

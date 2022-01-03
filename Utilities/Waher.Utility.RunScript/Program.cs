@@ -167,10 +167,12 @@ namespace Waher.Utility.RunScript
 					FilesProvider.Start().Wait();
 				}
 
-				Variables Variables = new Variables();
-				Variables.ConsoleOut = Console.Out;
+				Variables Variables = new Variables()
+				{
+					ConsoleOut = Console.Out
+				};
 
-				object Result = Parsed.Evaluate(Variables);
+				object Result = Parsed.EvaluateAsync(Variables).Result;
 
 				Console.Out.WriteLine(Expression.ToString(Result));
 

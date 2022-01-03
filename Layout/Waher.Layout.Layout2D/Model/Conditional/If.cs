@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Exceptions;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -70,9 +71,9 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override async Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
+			await base.FromXml(Input);
 
 			this.condition = new ExpressionAttribute(Input, "condition");
 
@@ -80,7 +81,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 			{
 				if (Node is XmlElement E)
 				{
-					ILayoutElement Child = this.Document.CreateElement(E, this);
+					ILayoutElement Child = await this.Document.CreateElement(E, this);
 					if (Child is True True)
 					{
 						if (this.ifTrue is null)
@@ -156,13 +157,13 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
 			if (!this.conditionResultEvaluated)
 			{
-				object Result = this.condition?.Evaluate(State.Session);
+				object Result = this.condition is null ? null : await this.condition.EvaluateAsync(State.Session);
 				if (Result is bool b)
 					this.conditionResult = b;
 				else
@@ -173,10 +174,8 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 
 			ILayoutElement E = this.conditionResult ? this.ifTrue : this.ifFalse;
 
-			if (E?.MeasureDimensions(State) ?? false)
-				Relative = true;
-
-			return Relative;
+			if (!(E is null))
+				await E.MeasureDimensions(State);
 		}
 
 		/// <summary>
@@ -195,17 +194,17 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			if (this.conditionResult)
 			{
 				if (this.ifTrue?.IsVisible ?? false)
-					this.ifTrue.Draw(State);
+					await this.ifTrue.Draw(State);
 			}
 			else
 			{
 				if (this.ifFalse?.IsVisible ?? false)
-					this.ifFalse.Draw(State);
+					await this.ifFalse.Draw(State);
 			}
 		}
 

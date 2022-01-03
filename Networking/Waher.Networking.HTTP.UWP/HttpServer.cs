@@ -1658,15 +1658,20 @@ namespace Waher.Networking.HTTP
 
 		internal bool HasCustomErrors => !(this.CustomError is null);
 
-		internal void CustomizeError(CustomErrorEventArgs e)
+		internal async Task CustomizeError(CustomErrorEventArgs e)
 		{
-			try
+			CustomErrorEventHandler h = this.CustomError;
+
+			if (!(h is null))
 			{
-				this.CustomError?.Invoke(this, e);
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
+				try
+				{
+					await h(this, e);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
 			}
 		}
 

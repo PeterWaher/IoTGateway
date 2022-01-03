@@ -7,7 +7,6 @@ using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects.VectorSpaces;
-using Waher.Script.Operators;
 
 namespace Waher.Script.Functions.Runtime
 {

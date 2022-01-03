@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Exceptions;
-using Waher.Layout.Layout2D.Model.Content.FlowingText;
 
 namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 {
@@ -41,9 +41,9 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override async Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
+			await base.FromXml(Input);
 
 			List<IFlowingText> Children = new List<IFlowingText>();
 
@@ -51,7 +51,7 @@ namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 			{
 				if (Node is XmlElement E)
 				{
-					ILayoutElement Child = this.Document.CreateElement(E, this);
+					ILayoutElement Child = await this.Document.CreateElement(E, this);
 
 					if (Child is IFlowingText Text)
 						Children.Add(Text);

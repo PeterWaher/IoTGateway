@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
 
@@ -34,11 +35,10 @@ namespace Waher.Layout.Layout2D.Model
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.distance = new LengthAttribute(Input, "distance");
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -69,22 +69,20 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
-			if (!(this.distance is null) && this.distance.TryEvaluate(State.Session, out Length L))
-				State.CalcDrawingSize(L, ref this.dist, true, ref Relative);
+			EvaluationResult<Length> Distance = await this.distance.TryEvaluate(State.Session);
+			if (Distance.Ok)
+				State.CalcDrawingSize(Distance.Result, ref this.dist, true, State);
 			else
 				this.defined = false;
-
-			return Relative;
 		}
 
 		/// <summary>
 		/// Measured distance
 		/// </summary>
 		protected float dist;
-
 	}
 }

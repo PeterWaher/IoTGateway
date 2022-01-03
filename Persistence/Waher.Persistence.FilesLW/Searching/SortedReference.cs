@@ -56,9 +56,7 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		public Guid ObjectId => this.id;
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.id.ToString();

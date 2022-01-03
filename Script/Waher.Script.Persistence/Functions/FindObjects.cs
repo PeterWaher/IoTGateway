@@ -81,13 +81,13 @@ namespace Waher.Script.Persistence.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get
-			{
-				return "FindObjects";
-			}
-		}
+		public override string FunctionName => "FindObjects";
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
 
 		/// <summary>
 		/// Evaluates the function.
@@ -96,6 +96,17 @@ namespace Waher.Script.Persistence.Functions
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
+		{
+			return this.EvaluateAsync(Arguments, Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Arguments">Function arguments.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
 			if (!(Arguments[0].AssociatedObjectValue is Type T))
 				throw new ScriptRuntimeException("First parameter must be a type.", this);
@@ -114,14 +125,14 @@ namespace Waher.Script.Persistence.Functions
 			if (Filter is null && !(FilterObj is null))
 			{
 				Expression Exp = new Expression(FilterObj.ToString(), this.Expression.Source);
-				Filter = this.Convert(Exp.Root, Variables);
+				Filter = await this.ConvertAsync(Exp.Root, Variables);
 			}
 
 			MethodInfo MI = findMethodGeneric.MakeGenericMethod(new Type[] { T });
 			object Result = MI.Invoke(null, new object[] { Offset, MaxCount, Filter, SortOrder });
 			if (Result is Task Task)
 			{
-				Task.Wait();
+				await Task;
 
 				PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
 				Result = PI.GetMethod.Invoke(Task, null);
@@ -140,57 +151,70 @@ namespace Waher.Script.Persistence.Functions
 				return Expression.Encapsulate(Result);
 		}
 
-		private Filter Convert(ScriptNode Node, Variables Variables)
+		private async Task<Filter> ConvertAsync(ScriptNode Node, Variables Variables)
 		{
-			string FieldName;
-			object Value;
-
 			if (Node is null)
 				return null;
 			else if (Node is And And)
-				return new FilterAnd(this.Convert(And.LeftOperand, Variables), this.Convert(And.RightOperand, Variables));
+			{
+				return new FilterAnd(await this.ConvertAsync(And.LeftOperand, Variables),
+					await this.ConvertAsync(And.RightOperand, Variables));
+			}
 			else if (Node is Or Or)
-				return new FilterOr(this.Convert(Or.LeftOperand, Variables), this.Convert(Or.RightOperand, Variables));
+			{
+				return new FilterOr(await this.ConvertAsync(Or.LeftOperand, Variables),
+					await this.ConvertAsync(Or.RightOperand, Variables));
+			}
 			else if (Node is Operators.Dual.And And2)
-				return new FilterAnd(this.Convert(And2.LeftOperand, Variables), this.Convert(And2.RightOperand, Variables));
+			{
+				return new FilterAnd(await this.ConvertAsync(And2.LeftOperand, Variables),
+					await this.ConvertAsync(And2.RightOperand, Variables));
+			}
 			else if (Node is Operators.Dual.Or Or2)
-				return new FilterOr(this.Convert(Or2.LeftOperand, Variables), this.Convert(Or2.RightOperand, Variables));
+			{
+				return new FilterOr(await this.ConvertAsync(Or2.LeftOperand, Variables),
+					await this.ConvertAsync(Or2.RightOperand, Variables));
+			}
 			else if (Node is Not Not)
-				return new FilterNot(this.Convert(Not.Operand, Variables));
+				return new FilterNot(await this.ConvertAsync(Not.Operand, Variables));
 			else if (Node is EqualTo EQ)
 			{
-				this.CheckBinaryOperator(EQ, Variables, out FieldName, out Value);
-				return new FilterFieldEqualTo(FieldName, Value);
+				KeyValuePair<string, object> P = await this.CheckBinaryOperator(EQ, Variables);
+				return new FilterFieldEqualTo(P.Key, P.Value);
 			}
 			else if (Node is NotEqualTo NEQ)
 			{
-				this.CheckBinaryOperator(NEQ, Variables, out FieldName, out Value);
-				return new FilterFieldNotEqualTo(FieldName, Value);
+				KeyValuePair<string, object> P = await this.CheckBinaryOperator(NEQ, Variables);
+				return new FilterFieldNotEqualTo(P.Key, P.Value);
 			}
 			else if (Node is LesserThan LT)
 			{
-				this.CheckBinaryOperator(LT, Variables, out FieldName, out Value);
-				return new FilterFieldLesserThan(FieldName, Value);
+				KeyValuePair<string, object> P = await this.CheckBinaryOperator(LT, Variables);
+				return new FilterFieldLesserThan(P.Key, P.Value);
 			}
 			else if (Node is GreaterThan GT)
 			{
-				this.CheckBinaryOperator(GT, Variables, out FieldName, out Value);
-				return new FilterFieldGreaterThan(FieldName, Value);
+				KeyValuePair<string, object> P = await this.CheckBinaryOperator(GT, Variables);
+				return new FilterFieldGreaterThan(P.Key, P.Value);
 			}
 			else if (Node is LesserThanOrEqualTo LTE)
 			{
-				this.CheckBinaryOperator(LTE, Variables, out FieldName, out Value);
-				return new FilterFieldLesserOrEqualTo(FieldName, Value);
+				KeyValuePair<string, object> P = await this.CheckBinaryOperator(LTE, Variables);
+				return new FilterFieldLesserOrEqualTo(P.Key, P.Value);
 			}
 			else if (Node is GreaterThanOrEqualTo GTE)
 			{
-				this.CheckBinaryOperator(GTE, Variables, out FieldName, out Value);
-				return new FilterFieldGreaterOrEqualTo(FieldName, Value);
+				KeyValuePair<string, object> P = await this.CheckBinaryOperator(GTE, Variables);
+				return new FilterFieldGreaterOrEqualTo(P.Key, P.Value);
 			}
 			else if (Node is Range Range)
 			{
-				this.CheckTernaryOperator(Range, Variables, out FieldName, 
-					out object Min, out object Max);
+				if (!(Range.MiddleOperand is VariableReference v))
+					throw new ScriptRuntimeException("Middle operands in ternary filter operators need to be a variable references, as they refer to field names.", this);
+
+				string FieldName = v.VariableName;
+				object Min = (await Range.LeftOperand.EvaluateAsync(Variables)).AssociatedObjectValue;
+				object Max = (await Range.RightOperand.EvaluateAsync(Variables)).AssociatedObjectValue;
 
 				Filter[] Filters = new Filter[2];
 
@@ -208,37 +232,26 @@ namespace Waher.Script.Persistence.Functions
 			}
 			else if (Node is Like)
 			{
-				this.CheckBinaryOperator((BinaryOperator)Node, Variables, out FieldName, out Value);
-				string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "*");
-				return new FilterFieldLikeRegEx(FieldName, RegEx);
+				KeyValuePair<string, object> P = await this.CheckBinaryOperator((BinaryOperator)Node, Variables);
+				string RegEx = Database.WildcardToRegex(P.Value is string s ? s : Expression.ToString(P.Value), "*");
+				return new FilterFieldLikeRegEx(P.Key, RegEx);
 			}
 			else if (Node is NotLike)
 			{
-				this.CheckBinaryOperator((BinaryOperator)Node, Variables, out FieldName, out Value);
-				string RegEx = Database.WildcardToRegex(Value is string s ? s : Expression.ToString(Value), "*");
-				return new FilterNot(new FilterFieldLikeRegEx(FieldName, RegEx));
+				KeyValuePair<string, object> P = await this.CheckBinaryOperator((BinaryOperator)Node, Variables);
+				string RegEx = Database.WildcardToRegex(P.Value is string s ? s : Expression.ToString(P.Value), "*");
+				return new FilterNot(new FilterFieldLikeRegEx(P.Key, RegEx));
 			}
 			else
 				throw new ScriptRuntimeException("Invalid operation for filters: " + Node.GetType().FullName, this);
 		}
 
-		private void CheckBinaryOperator(BinaryOperator Operator, Variables Variables, out string FieldName, out object Value)
+		private async Task<KeyValuePair<string, object>> CheckBinaryOperator(BinaryOperator Operator, Variables Variables)
 		{
 			if (!(Operator.LeftOperand is VariableReference v))
 				throw new ScriptRuntimeException("Left operands in binary filter operators need to be a variable references, as they refer to field names.", this);
 
-			FieldName = v.VariableName;
-			Value = Operator.RightOperand.Evaluate(Variables).AssociatedObjectValue;
-		}
-
-		private void CheckTernaryOperator(TernaryOperator Operator, Variables Variables, out string FieldName, out object Left, out object Right)
-		{
-			if (!(Operator.MiddleOperand is VariableReference v))
-				throw new ScriptRuntimeException("Middle operands in ternary filter operators need to be a variable references, as they refer to field names.", this);
-
-			FieldName = v.VariableName;
-			Left = Operator.LeftOperand.Evaluate(Variables).AssociatedObjectValue;
-			Right = Operator.RightOperand.Evaluate(Variables).AssociatedObjectValue;
+			return new KeyValuePair<string, object>(v.VariableName, (await Operator.RightOperand.EvaluateAsync(Variables)).AssociatedObjectValue);
 		}
 	}
 }

@@ -60,9 +60,7 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 			this.media = Media;
 		}
 
-		/// <summary>
-		/// <see cref="Field.TypeName"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string TypeName
 		{
 			get { return "fixed"; }

@@ -127,9 +127,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 			set => this.targetHost = value;
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return base.ToString() + "\t" + this.service + "\t" + this.protocol +

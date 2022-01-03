@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.HTTP.HeaderFields;
 
@@ -64,44 +65,41 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// HTTP Status Code.
 		/// </summary>
-		public int StatusCode
-		{
-			get { return this.statusCode; }
-		}
+		public int StatusCode => this.statusCode;
 
 		/// <summary>
 		/// HTTP Header fields to include in the response.
 		/// </summary>
-		public KeyValuePair<string, string>[] HeaderFields
-		{
-			get { return this.headerFields; }
-		}
+		public KeyValuePair<string, string>[] HeaderFields => this.headerFields;
 
 		/// <summary>
 		/// Any content object to return. The object will be encoded before being sent.
 		/// </summary>
-		public object ContentObject
+		[Obsolete("Use GetContentObjectAsync() instead, for better performance processing asynchronous elements in parallel environments.")]
+		public object ContentObject => this.GetContentObjectAsync().Result;
+
+		/// <summary>
+		/// Any content object to return. The object will be encoded before being sent.
+		/// </summary>
+		public async Task<object> GetContentObjectAsync()
 		{
-			get
-			{
-				if (!(this.contentObject is null))
-					return this.contentObject;
-
-				if (this.content is null)
-					return null;
-
-				try
-				{
-					HttpFieldContentType ContentType = new HttpFieldContentType("Content-Type", this.contentType);
-					this.contentObject = InternetContent.Decode(ContentType.Type, this.content, ContentType.Encoding, null, null);
-				}
-				catch (Exception)
-				{
-					this.contentObject = this.content;
-				}
-
+			if (!(this.contentObject is null))
 				return this.contentObject;
+
+			if (this.content is null)
+				return null;
+
+			try
+			{
+				HttpFieldContentType ContentType = new HttpFieldContentType("Content-Type", this.contentType);
+				this.contentObject = await InternetContent.DecodeAsync(ContentType.Type, this.content, ContentType.Encoding, null, null);
 			}
+			catch (Exception)
+			{
+				this.contentObject = this.content;
+			}
+
+			return this.contentObject;
 		}
 
 		/// <summary>

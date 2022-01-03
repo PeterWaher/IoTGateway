@@ -114,9 +114,7 @@ namespace Waher.Script.Objects.VectorSpaces
 			get { return this.dimension; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = null;

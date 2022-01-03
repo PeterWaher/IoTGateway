@@ -76,9 +76,7 @@ namespace Waher.Runtime.Language
 			set { this.untranslated = value; }
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.value;

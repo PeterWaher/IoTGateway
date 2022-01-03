@@ -182,9 +182,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			return this.Verify(Data, this.publicKey, Signature);
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is EllipticCurveEndpoint EcEndpoint &&
@@ -192,9 +190,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
 				this.publicKeyBase64.Equals(EcEndpoint.publicKeyBase64);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = this.curve.CurveName.GetHashCode();

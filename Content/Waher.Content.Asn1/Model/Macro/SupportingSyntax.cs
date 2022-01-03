@@ -45,9 +45,7 @@ namespace Waher.Content.Asn1.Model.Macro
 			return this.notation.Parse(Document, Macro);
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.name;

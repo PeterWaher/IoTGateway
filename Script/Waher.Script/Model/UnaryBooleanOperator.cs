@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Objects;
@@ -38,6 +39,24 @@ namespace Waher.Script.Model
 		}
 
 		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!this.isAsync)
+				return base.Evaluate(Variables);
+
+			IElement Op = await this.op.EvaluateAsync(Variables);
+
+			if (Op is BooleanValue BOp)
+				return await this.EvaluateAsync(BOp.Value);
+			else
+				return await this.EvaluateAsync(Op, Variables);
+		}
+
+		/// <summary>
 		/// Evaluates the operator on scalar operands.
 		/// </summary>
 		/// <param name="Operand">Operand.</param>
@@ -54,11 +73,37 @@ namespace Waher.Script.Model
 		}
 
 		/// <summary>
+		/// Evaluates the operator on scalar operands.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result</returns>
+		public override async Task<IElement> EvaluateScalarAsync(IElement Operand, Variables Variables)
+		{
+			if (Operand is BooleanValue BOp)
+				return await this.EvaluateAsync(BOp.Value);
+			else if (Expression.TryConvert<bool>(Operand.AssociatedObjectValue, out bool b))
+				return await this.EvaluateAsync(b);
+			else
+				throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+		}
+
+		/// <summary>
 		/// Evaluates the boolean operator.
 		/// </summary>
 		/// <param name="Operand">Operand.</param>
 		/// <returns>Result</returns>
 		public abstract IElement Evaluate(bool Operand);
+
+		/// <summary>
+		/// Evaluates the boolean operator.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <returns>Result</returns>
+		public virtual Task<IElement> EvaluateAsync(bool Operand)
+		{
+			return Task.FromResult<IElement>(this.Evaluate(Operand));
+		}
 
 	}
 }

@@ -10,7 +10,7 @@ BodyOnly: 1
 
 ```
 {{
-Doc:=Create(Waher.Content.Markdown.MarkdownDocument,Posted,[]);
-Doc.GeneratePlainText()
+Doc:=Waher.Content.Markdown.MarkdownDocument.CreateAsync(Posted,[]).Result;
+Doc.GeneratePlainText().Result
 }}
 ```

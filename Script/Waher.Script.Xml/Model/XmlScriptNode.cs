@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
@@ -33,7 +34,7 @@ namespace Waher.Script.Xml.Model
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			return Objects.ObjectValue.Null;
+			return ObjectValue.Null;
 		}
 
 		/// <summary>
@@ -45,6 +46,18 @@ namespace Waher.Script.Xml.Model
 		internal abstract void Build(XmlDocument Document, XmlElement Parent, Variables Variables);
 
 		/// <summary>
+		/// Builds an XML Document object
+		/// </summary>
+		/// <param name="Document">Document being built.</param>
+		/// <param name="Parent">Parent element.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		internal virtual Task BuildAsync(XmlDocument Document, XmlElement Parent, Variables Variables)
+		{
+			this.Build(Document, Parent, Variables);
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
 		/// Evaluates a script node to a string.
 		/// </summary>
 		/// <param name="Node">Node to evaluate.</param>
@@ -53,6 +66,17 @@ namespace Waher.Script.Xml.Model
 		public static string EvaluateString(ScriptNode Node, Variables Variables)
 		{
 			return EvaluateString(Node.Evaluate(Variables));
+		}
+
+		/// <summary>
+		/// Evaluates a script node to a string.
+		/// </summary>
+		/// <param name="Node">Node to evaluate.</param>
+		/// <param name="Variables">Variables.</param>
+		/// <returns>String result.</returns>
+		public static async Task<string> EvaluateStringAsync(ScriptNode Node, Variables Variables)
+		{
+			return EvaluateString(await Node.EvaluateAsync(Variables));
 		}
 
 		/// <summary>

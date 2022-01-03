@@ -28,7 +28,21 @@
             Default Argument names
             </summary>
         </member>
+        <member name="P:Waher.Script.Persistence.Functions.DeleteObject.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.Functions.DeleteObject.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.DeleteObject.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>
@@ -64,7 +78,21 @@
             Name of the function
             </summary>
         </member>
+        <member name="P:Waher.Script.Persistence.Functions.FindObjects.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.Functions.FindObjects.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.FindObjects.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>
@@ -96,6 +124,12 @@
             Default Argument names
             </summary>
         </member>
+        <member name="P:Waher.Script.Persistence.Functions.Generalize.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.Functions.Generalize.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function.
@@ -104,14 +138,22 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.Functions.Generalize.Evaluate(Waher.Script.Abstraction.Elements.IElement)">
+        <member name="M:Waher.Script.Persistence.Functions.Generalize.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.Generalize.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement)">
             <summary>
             Generalizes the object in <paramref name="E"/>.
             </summary>
             <param name="E">Element</param>
             <returns>Generaized object.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.Functions.Generalize.Evaluate(System.Object)">
+        <member name="M:Waher.Script.Persistence.Functions.Generalize.EvaluateAsync(System.Object)">
             <summary>
             Generalizes the object in <paramref name="Object"/>.
             </summary>
@@ -143,6 +185,12 @@
             Default Argument names
             </summary>
         </member>
+        <member name="P:Waher.Script.Persistence.Functions.GetSetting.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.Functions.GetSetting.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on two scalar arguments.
@@ -152,9 +200,27 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.Functions.GetSetting.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="M:Waher.Script.Persistence.Functions.GetSetting.EvaluateScalar(System.String,System.String,Waher.Script.Variables)">
             <summary>
             Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.GetSetting.EvaluateScalarAsync(System.String,System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
             </summary>
             <param name="Argument1">Function argument 1.</param>
             <param name="Argument2">Function argument 2.</param>
@@ -219,7 +285,21 @@
             Default Argument names
             </summary>
         </member>
+        <member name="P:Waher.Script.Persistence.Functions.SaveNewObject.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.Functions.SaveNewObject.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.SaveNewObject.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>
@@ -252,6 +332,12 @@
             Default Argument names
             </summary>
         </member>
+        <member name="P:Waher.Script.Persistence.Functions.SetSetting.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.Functions.SetSetting.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on two scalar arguments.
@@ -261,9 +347,27 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.Functions.SetSetting.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="M:Waher.Script.Persistence.Functions.SetSetting.EvaluateScalar(System.String,System.String,Waher.Script.Variables)">
             <summary>
             Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.SetSetting.EvaluateScalarAsync(System.String,System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
             </summary>
             <param name="Argument1">Function argument 1.</param>
             <param name="Argument2">Function argument 2.</param>
@@ -294,7 +398,21 @@
             Default Argument names
             </summary>
         </member>
+        <member name="P:Waher.Script.Persistence.Functions.UpdateObject.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.Functions.UpdateObject.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.Functions.UpdateObject.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>
@@ -476,6 +594,12 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
+        <member name="P:Waher.Script.Persistence.SQL.CreateIndex.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Persistence.SQL.CreateIndex.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.CreateIndex.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -501,14 +625,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.CreateIndex.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.CreateIndex.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.CustomOrderEnumerator">
             <summary>
@@ -559,6 +679,12 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
+        <member name="P:Waher.Script.Persistence.SQL.Delete.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Persistence.SQL.Delete.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.Delete.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -584,14 +710,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Delete.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Delete.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.DistinctEnumerator">
             <summary>
@@ -638,6 +760,12 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
+        <member name="P:Waher.Script.Persistence.SQL.DropCollection.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Persistence.SQL.DropCollection.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.DropCollection.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -663,14 +791,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.DropCollection.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.DropCollection.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.DropIndex">
             <summary>
@@ -686,6 +810,12 @@
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.DropIndex.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Persistence.SQL.DropIndex.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.DropIndex.Evaluate(Waher.Script.Variables)">
             <summary>
@@ -712,14 +842,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.DropIndex.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.DropIndex.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.FieldAggregatorEnumerator">
             <summary>
@@ -933,6 +1059,12 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
+        <member name="P:Waher.Script.Persistence.SQL.InsertObjects.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Persistence.SQL.InsertObjects.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.InsertObjects.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -958,14 +1090,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.InsertObjects.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.InsertObjects.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.InsertSelect">
             <summary>
@@ -982,6 +1110,12 @@
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Persistence.SQL.InsertSelect.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Persistence.SQL.InsertSelect.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.InsertSelect.Evaluate(Waher.Script.Variables)">
             <summary>
@@ -1008,14 +1142,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.InsertSelect.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.InsertSelect.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.InsertValues">
             <summary>
@@ -1034,6 +1164,12 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
+        <member name="P:Waher.Script.Persistence.SQL.InsertValues.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Persistence.SQL.InsertValues.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.InsertValues.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -1049,7 +1185,7 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.InsertValues.GetName(Waher.Script.Model.ScriptNode,Waher.Script.Variables)">
+        <member name="M:Waher.Script.Persistence.SQL.InsertValues.GetNameAsync(Waher.Script.Model.ScriptNode,Waher.Script.Variables)">
             <summary>
             Gets a name from a script node, either by using the name of a variable reference, or evaluating the node to a string.
             </summary>
@@ -1068,14 +1204,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.InsertValues.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.InsertValues.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.IResultSetEnumerator">
             <summary>
@@ -1467,14 +1599,10 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Record.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Record.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.RecordEnumerator">
             <summary>
@@ -1542,6 +1670,12 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
+        <member name="P:Waher.Script.Persistence.SQL.Select.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Persistence.SQL.Select.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.Select.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -1567,14 +1701,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Select.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Select.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.SourceDefinition">
             <summary>
@@ -1712,14 +1842,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.SourceDefinitions.LeftOuterJoin">
             <summary>
@@ -1808,14 +1934,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.SourceReference.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.SourceReference.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.Sources.CollectionSource">
             <summary>
@@ -1996,14 +2118,10 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedObject.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Sources.JoinedObject.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.Sources.JoinedSource">
             <summary>
@@ -2614,6 +2732,12 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
+        <member name="P:Waher.Script.Persistence.SQL.Update.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Persistence.SQL.Update.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Persistence.SQL.Update.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -2639,14 +2763,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Update.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Update.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Persistence.SQL.Wildcard">
             <summary>
@@ -2669,14 +2789,10 @@
             <returns>Result.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Wildcard.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Wildcard.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Persistence.TypeConversion.CiStringToString">
             <summary>

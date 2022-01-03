@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
@@ -61,10 +62,10 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Variables">Collection of parameter values.</param>
 		/// <returns>If parameter value is valid.</returns>
-		public override bool IsParameterValid(Variables Variables)
+		public override Task<bool> IsParameterValid(Variables Variables)
 		{
 			if (!(this.value.HasValue))
-				return false;
+				return Task.FromResult<bool>(false);
 
 			return base.IsParameterValid(Variables);
 		}

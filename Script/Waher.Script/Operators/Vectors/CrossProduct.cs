@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Operators.Vectors
@@ -32,8 +29,9 @@ namespace Waher.Script.Operators.Vectors
 		/// </summary>
 		/// <param name="Left">Left value.</param>
 		/// <param name="Right">Right value.</param>
+		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result</returns>
-		public override IElement EvaluateVector(IVector Left, IVector Right)
+		public override IElement EvaluateVector(IVector Left, IVector Right, Variables Variables)
 		{
 			if (Left.Dimension != 3 || Right.Dimension != 3)
 				throw new ScriptRuntimeException("Cross product works on vectors of dimesion 3.", this);
@@ -54,15 +52,15 @@ namespace Waher.Script.Operators.Vectors
 
 			return VectorDefinition.Encapsulate(new IElement[]
 			{
-				Operators.Arithmetics.Subtract.EvaluateSubtraction(
-					Operators.Arithmetics.Multiply.EvaluateMultiplication(v1[1], v2[2], this),
-					Operators.Arithmetics.Multiply.EvaluateMultiplication(v1[2], v2[1], this), this),
-				Operators.Arithmetics.Subtract.EvaluateSubtraction(
-					Operators.Arithmetics.Multiply.EvaluateMultiplication(v1[2], v2[0], this), 
-					Operators.Arithmetics.Multiply.EvaluateMultiplication(v1[0], v2[2], this), this),
-				Operators.Arithmetics.Subtract.EvaluateSubtraction(
-					Operators.Arithmetics.Multiply.EvaluateMultiplication(v1[0], v2[1], this), 
-					Operators.Arithmetics.Multiply.EvaluateMultiplication(v1[1], v2[0], this), this)
+				Arithmetics.Subtract.EvaluateSubtraction(
+					Arithmetics.Multiply.EvaluateMultiplication(v1[1], v2[2], this),
+					Arithmetics.Multiply.EvaluateMultiplication(v1[2], v2[1], this), this),
+				Arithmetics.Subtract.EvaluateSubtraction(
+					Arithmetics.Multiply.EvaluateMultiplication(v1[2], v2[0], this), 
+					Arithmetics.Multiply.EvaluateMultiplication(v1[0], v2[2], this), this),
+				Arithmetics.Subtract.EvaluateSubtraction(
+					Arithmetics.Multiply.EvaluateMultiplication(v1[0], v2[1], this), 
+					Arithmetics.Multiply.EvaluateMultiplication(v1[1], v2[0], this), this)
 			}, false, this);
 		}
 

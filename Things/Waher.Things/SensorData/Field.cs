@@ -303,10 +303,7 @@ namespace Waher.Things.SensorData
 			set { this.writable = value; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
-		/// <returns>String representation of field.</returns>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();

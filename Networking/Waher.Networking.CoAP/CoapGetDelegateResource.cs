@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.CoAP
 {
@@ -9,13 +8,13 @@ namespace Waher.Networking.CoAP
 	/// </summary>
 	public class CoapGetDelegateResource : CoapResource, ICoapGetMethod
 	{
-		private CoapMethodHandler get;
-		private Notifications notifications;
-		private string title;
-		private string[] resourceTypes;
-		private string[] interfaceDescriptions;
-		private int[] contentFormats;
-		private int? maximumSizeEstimate;
+		private readonly CoapMethodHandler get;
+		private readonly Notifications notifications;
+		private readonly string title;
+		private readonly string[] resourceTypes;
+		private readonly string[] interfaceDescriptions;
+		private readonly int[] contentFormats;
+		private readonly int? maximumSizeEstimate;
 
 		/// <summary>
 		/// CoAP resource defined by a GET delegate method.
@@ -88,12 +87,12 @@ namespace Waher.Networking.CoAP
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void GET(CoapMessage Request, CoapResponse Response)
+		public Task GET(CoapMessage Request, CoapResponse Response)
 		{
 			if (this.get is null)
 				throw new CoapException(CoapCode.MethodNotAllowed);
 			else
-				this.get(Request, Response);
+				return this.get(Request, Response);
 		}
 
 	}

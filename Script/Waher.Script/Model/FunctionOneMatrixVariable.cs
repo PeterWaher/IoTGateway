@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Abstraction.Sets;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Operators.Matrices;
 
@@ -22,6 +21,11 @@ namespace Waher.Script.Model
 			: base(Argument, Start, Length, Expression)
 		{
 		}
+
+		/// <summary>
+		/// Default Argument names
+		/// </summary>
+		public override string[] DefaultArgumentNames => new string[] { "M" };
 
 		/// <summary>
 		/// Evaluates the function.
@@ -46,6 +50,31 @@ namespace Waher.Script.Model
 			}
 			else
 				return this.EvaluateMatrix((IMatrix)MatrixDefinition.Encapsulate(new IElement[] { Argument }, 1, 1, this), Variables);
+		}
+
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override async Task<IElement> EvaluateAsync(IElement Argument, Variables Variables)
+		{
+			if (Argument is IMatrix Matrix)
+			{
+				if (Matrix is DoubleMatrix DoubleMatrix)
+					return await this.EvaluateMatrixAsync(DoubleMatrix, Variables);
+
+				if (Matrix is ComplexMatrix ComplexMatrix)
+					return await this.EvaluateMatrixAsync(ComplexMatrix, Variables);
+
+				if (Matrix is BooleanMatrix BooleanMatrix)
+					return await this.EvaluateMatrixAsync(BooleanMatrix, Variables);
+
+				return await this.EvaluateMatrixAsync(Matrix, Variables);
+			}
+			else
+				return await this.EvaluateMatrixAsync((IMatrix)MatrixDefinition.Encapsulate(new IElement[] { Argument }, 1, 1, this), Variables);
 		}
 
 		/// <summary>
@@ -90,11 +119,47 @@ namespace Waher.Script.Model
 		}
 
 		/// <summary>
-		/// Default Argument names
+		/// Evaluates the function on a matrix argument.
 		/// </summary>
-		public override string[] DefaultArgumentNames
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public virtual Task<IElement> EvaluateMatrixAsync(IMatrix Argument, Variables Variables)
 		{
-			get { return new string[] { "M" }; }
+			return Task.FromResult<IElement>(this.EvaluateMatrix(Argument, Variables));
+		}
+
+		/// <summary>
+		/// Evaluates the function on a matrix argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public virtual Task<IElement> EvaluateMatrixAsync(DoubleMatrix Argument, Variables Variables)
+		{
+			return this.EvaluateMatrixAsync((IMatrix)Argument, Variables);
+		}
+
+		/// <summary>
+		/// Evaluates the function on a matrix argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public virtual Task<IElement> EvaluateMatrixAsync(ComplexMatrix Argument, Variables Variables)
+		{
+			return this.EvaluateMatrixAsync((IMatrix)Argument, Variables);
+		}
+
+		/// <summary>
+		/// Evaluates the function on a matrix argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public virtual Task<IElement> EvaluateMatrixAsync(BooleanMatrix Argument, Variables Variables)
+		{
+			return this.EvaluateMatrixAsync((IMatrix)Argument, Variables);
 		}
 
 	}

@@ -73,7 +73,7 @@ namespace Waher.Script.Operators.Arithmetics
 
 					if (!LeftSet.Equals(RightSet))
 					{
-						if (!Expression.UpgradeField(ref Left, ref LeftSet, ref Right, ref RightSet, Node))
+						if (!Expression.UpgradeField(ref Left, ref LeftSet, ref Right, ref RightSet))
 							throw new ScriptRuntimeException("Incompatible operands.", Node);
 
 						if (Left is IEuclidianDomainElement LE && Right is IEuclidianDomainElement RE)

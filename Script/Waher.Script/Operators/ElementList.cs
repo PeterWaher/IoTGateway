@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -14,6 +15,8 @@ namespace Waher.Script.Operators
 	public class ElementList : ScriptNode
 	{
 		private readonly ScriptNode[] elements;
+		private readonly int nrElements;
+		private bool isAsync;
 
 		/// <summary>
 		/// Represents a list of elements.
@@ -26,15 +29,35 @@ namespace Waher.Script.Operators
 			: base(Start, Length, Expression)
 		{
 			this.elements = Elements;
+			this.nrElements = Elements.Length;
+
+			this.CalcIsAsync();
+		}
+
+		private void CalcIsAsync()
+		{
+			this.isAsync = false;
+
+			for (int i = 0; i < this.nrElements; i++)
+			{
+				if (this.elements[i]?.IsAsynchronous ?? false)
+				{
+					this.isAsync = true;
+					break;
+				}
+			}
 		}
 
 		/// <summary>
 		/// Elements.
 		/// </summary>
-		public ScriptNode[] Elements
-		{
-			get { return this.elements; }
-		}
+		public ScriptNode[] Elements => this.elements;
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => this.isAsync;
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -74,6 +97,46 @@ namespace Waher.Script.Operators
 		}
 
 		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!this.isAsync)
+				return this.Evaluate(Variables);
+
+			LinkedList<IElement> List = new LinkedList<IElement>();
+			int c = 0;
+
+			foreach (ScriptNode E in this.elements)
+			{
+				if (E is null)
+					List.AddLast((IElement)null);
+				else
+					List.AddLast(await E.EvaluateAsync(Variables));
+
+				c++;
+			}
+
+			switch (c)
+			{
+				case 0:
+					return ObjectValue.Null;
+
+				case 1:
+					return List.First.Value;
+
+				case 2:
+					if (List.First.Value is DoubleNumber Re && List.First.Next.Value is DoubleNumber Im)
+						return new ComplexNumber(new Complex(Re.Value, Im.Value));
+					break;
+			}
+
+			return VectorDefinition.Encapsulate(List, true, this);
+		}
+
+		/// <summary>
 		/// Calls the callback method for all child nodes.
 		/// </summary>
 		/// <param name="Callback">Callback method to call.</param>
@@ -82,23 +145,44 @@ namespace Waher.Script.Operators
 		/// <returns>If the process was completed.</returns>
 		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
 		{
-			int i, c = this.elements.Length;
-
 			if (DepthFirst)
 			{
 				if (!ForAllChildNodes(Callback, this.elements, State, DepthFirst))
 					return false;
 			}
 
-			for (i = 0; i < c; i++)
+			ScriptNode Node;
+			bool RecalcIsAsync = false;
+			int i;
+
+			for (i = 0; i < this.nrElements; i++)
 			{
-				if (!(this.elements[i] is null) && !Callback(ref this.elements[i], State))
-					return false;
+				Node = this.elements[i];
+				if (!(Node is null))
+				{
+					bool b = !Callback(Node, out ScriptNode NewNode, State);
+					if (!(NewNode is null))
+					{
+						this.elements[i] = NewNode;
+						RecalcIsAsync = true;
+					}
+
+					if (b)
+					{
+						if (RecalcIsAsync)
+							this.CalcIsAsync();
+
+						return false;
+					}
+				}
 			}
+
+			if (RecalcIsAsync)
+				this.CalcIsAsync();
 
 			if (!DepthFirst)
 			{
-				for (i = 0; i < c; i++)
+				for (i = 0; i < this.nrElements; i++)
 				{
 					if (!ForAllChildNodes(Callback, this.elements, State, DepthFirst))
 						return false;
@@ -108,9 +192,7 @@ namespace Waher.Script.Operators
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is ElementList O &&
@@ -118,9 +200,7 @@ namespace Waher.Script.Operators
 				base.Equals(obj);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

@@ -139,24 +139,20 @@
             <param name="Embed">If emoji should be embedded.</param>
             <returns>URL</returns>
         </member>
-        <member name="M:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.GetImageSource(Waher.Content.Emoji.EmojiInfo,System.String@,System.Int32@,System.Int32@)">
+        <member name="M:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.GetImageSource(Waher.Content.Emoji.EmojiInfo)">
             <summary>
             Gets the image source of an emoji.
             </summary>
             <param name="Emoji">Emoji</param>
-            <param name="Url">URL to emoji.</param>
-            <param name="Width">Width of emoji.</param>
-            <param name="Height">Height of emoji.</param>
+            <returns>Information about image.</returns>
         </member>
-        <member name="M:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.GetImageSource(Waher.Content.Emoji.EmojiInfo,System.Int32,System.String@,System.Int32@,System.Int32@)">
+        <member name="M:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.GetImageSource(Waher.Content.Emoji.EmojiInfo,System.Int32)">
             <summary>
             Gets the image source of an emoji.
             </summary>
             <param name="Emoji">Emoji</param>
             <param name="Level">Level (number of colons used to define the emoji)</param>
-            <param name="Url">URL to emoji.</param>
-            <param name="Width">Width of emoji.</param>
-            <param name="Height">Height of emoji.</param>
+            <returns>Information about image.</returns>
         </member>
         <member name="M:Waher.Content.Emoji.Emoji1.Emoji1LocalFiles.Dispose">
             <summary>

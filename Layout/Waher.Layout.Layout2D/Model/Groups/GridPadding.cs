@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Groups
 {

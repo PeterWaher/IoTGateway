@@ -38,9 +38,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 			this.output = Output;
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			if (!(this.output is null))

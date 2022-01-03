@@ -327,9 +327,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
             return new RsaEndpoint(KeySize, Modulus, Exponent, this.DefaultSymmetricCipher.CreteNew());
         }
 
-        /// <summary>
-        /// <see cref="IDisposable.Dispose"/>
-        /// </summary>
+        /// <inheritdoc/>
         public override void Dispose()
         {
             base.Dispose();
@@ -524,9 +522,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// </summary>
         public override bool Slow => true;
 
-        /// <summary>
-        /// <see cref="Object.ToString()"/>
-        /// </summary>
+        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
             return obj is RsaEndpoint RsaEndpoint &&
@@ -535,9 +531,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
                 this.exponentBase64.Equals(RsaEndpoint.exponentBase64);
         }
 
-        /// <summary>
-        /// <see cref="Object.GetHashCode()"/>
-        /// </summary>
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             int Result = this.keySize.GetHashCode();

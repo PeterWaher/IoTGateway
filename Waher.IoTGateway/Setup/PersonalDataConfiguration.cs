@@ -152,7 +152,7 @@ namespace Waher.IoTGateway.Setup
 
 				try
 				{
-					string Markdown = File.ReadAllText(FileName);
+					string Markdown = await Resources.ReadAllTextAsync(FileName);
 					sb.AppendLine(Markdown);
 				}
 				catch (Exception ex)
@@ -199,7 +199,7 @@ namespace Waher.IoTGateway.Setup
 			if (!Request.HasData)
 				throw new BadRequestException();
 
-			object Obj = Request.DecodeData();
+			object Obj = await Request.DecodeDataAsync();
 			if (!(Obj is Dictionary<string, object> Parameters))
 				throw new BadRequestException();
 

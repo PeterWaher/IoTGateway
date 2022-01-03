@@ -120,7 +120,7 @@ namespace Waher.Things.Arduino
 				this.initialized = false;
 		}
 
-		public Task StartReadout(ISensorReadout Request)
+		public async Task StartReadout(ISensorReadout Request)
 		{
 			try
 			{
@@ -137,7 +137,7 @@ namespace Waher.Things.Arduino
 				if (Request.IsIncluded(FieldType.Momentary))
 				{
 					ushort Raw = Device.analogRead(this.PinNrStr);
-					this.CalcMomentary(Fields, Now, Raw);
+					await this.CalcMomentary(Fields, Now, Raw);
 				}
 
 				if (Request.IsIncluded(FieldType.Status))
@@ -160,11 +160,9 @@ namespace Waher.Things.Arduino
 			{
 				Request.ReportErrors(true, new ThingError(this, ex.Message));
 			}
-
-			return Task.CompletedTask;
 		}
 
-		private void CalcMomentary(List<Field> Fields, DateTime Now, ushort Raw)
+		private async Task CalcMomentary(List<Field> Fields, DateTime Now, ushort Raw)
 		{
 			Fields.Add(new Int32Field(this, Now, "Raw", Raw, FieldType.Momentary, FieldQoS.AutomaticReadout, typeof(Module).Namespace, 26));
 
@@ -178,7 +176,7 @@ namespace Waher.Things.Arduino
 					{ "Raw", (double)Raw }
 				};
 
-				object Value = this.exp.Evaluate(v);
+				object Value = await this.exp.EvaluateAsync(v);
 				Field F;
 
 				if (Value is double dbl)
@@ -224,11 +222,11 @@ namespace Waher.Things.Arduino
 			}
 		}
 
-		public void Pin_ValueChanged(ushort Value)
+		public async Task Pin_ValueChanged(ushort Value)
 		{
 			List<Field> Fields = new List<Field>();
 
-			this.CalcMomentary(Fields, DateTime.Now, Value);
+			await this.CalcMomentary(Fields, DateTime.Now, Value);
 
 			foreach (Field F in Fields)
 				this.NewMomentaryValues(F);

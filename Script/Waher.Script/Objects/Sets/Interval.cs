@@ -238,9 +238,7 @@ namespace Waher.Script.Objects.Sets
 			}
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder Result = new StringBuilder();

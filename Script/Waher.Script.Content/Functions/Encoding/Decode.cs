@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Script.Abstraction.Elements;
@@ -30,10 +31,13 @@ namespace Waher.Script.Content.Functions.Encoding
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "decode"; }
-		}
+		public override string FunctionName => "decode";
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
 
 		/// <summary>
 		/// Evaluates the function on two scalar arguments.
@@ -44,22 +48,34 @@ namespace Waher.Script.Content.Functions.Encoding
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(IElement Argument1, IElement Argument2, Variables Variables)
 		{
+			return this.EvaluateScalarAsync(Argument1, Argument2, Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the function on two scalar arguments.
+		/// </summary>
+		/// <param name="Argument1">Function argument 1.</param>
+		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override Task<IElement> EvaluateScalarAsync(IElement Argument1, IElement Argument2, Variables Variables)
+		{
 			if (!(Argument1.AssociatedObjectValue is byte[] Bin))
 				throw new ScriptRuntimeException("Binary data expected.", this);
 
 			string ContentType = Argument2 is StringValue S2 ? S2.Value : Expression.ToString(Argument2.AssociatedObjectValue);
 
-			return this.DoDecode(Bin, ContentType, null);
+			return this.DoDecodeAsync(Bin, ContentType, null);
 		}
 
-		private IElement DoDecode(byte[] Data, string ContentType, System.Text.Encoding Encoding)
+		private async Task<IElement> DoDecodeAsync(byte[] Data, string ContentType, System.Text.Encoding Encoding)
 		{
 			object Decoded;
 
 			if (Encoding is null)
-				Decoded = InternetContent.Decode(ContentType, Data, null);
+				Decoded = await InternetContent.DecodeAsync(ContentType, Data, null);
 			else
-				Decoded = InternetContent.Decode(ContentType, Data, Encoding, new KeyValuePair<string, string>[0], null);
+				Decoded = await InternetContent.DecodeAsync(ContentType, Data, Encoding, new KeyValuePair<string, string>[0], null);
 
 			if (Decoded is string[][] Records)
 			{
@@ -123,10 +139,22 @@ namespace Waher.Script.Content.Functions.Encoding
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(string Argument1, string Argument2, Variables Variables)
 		{
+			return this.EvaluateScalarAsync(Argument1, Argument2, Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the function on two scalar arguments.
+		/// </summary>
+		/// <param name="Argument1">Function argument 1.</param>
+		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override Task<IElement> EvaluateScalarAsync(string Argument1, string Argument2, Variables Variables)
+		{
 			System.Text.Encoding Encoding = System.Text.Encoding.UTF8;
 			byte[] Bin = Encoding.GetBytes(Argument1);
 
-			return this.DoDecode(Bin, Argument2, Encoding);
+			return this.DoDecodeAsync(Bin, Argument2, Encoding);
 		}
 
 	}

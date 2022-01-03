@@ -70,33 +70,10 @@
             http://waher.se/Layout/Layout2D.xsd
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(System.Xml.XmlDocument,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(Waher.Script.Variables,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Contains a 2D layout document.
             </summary>
-            <param name="Xml">XML Definition</param>
-            <param name="Attachments">Any attachments referenced from the layout.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(System.Xml.XmlDocument,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
-            <summary>
-            Contains a 2D layout document.
-            </summary>
-            <param name="Xml">XML Definition</param>
-            <param name="Session">Session variables</param>
-            <param name="Attachments">Any attachments referenced from the layout.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(System.Xml.XmlElement,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
-            <summary>
-            Contains a 2D layout document.
-            </summary>
-            <param name="Xml">XML Definition</param>
-            <param name="Attachments">Any attachments referenced from the layout.</param>
-        </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(System.Xml.XmlElement,Waher.Script.Variables,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
-            <summary>
-            Contains a 2D layout document.
-            </summary>
-            <param name="Xml">XML Definition</param>
             <param name="Session">Session variables</param>
             <param name="Attachments">Any attachments referenced from the layout.</param>
         </member>
@@ -210,13 +187,12 @@
             <see cref="M:System.IDisposable.Dispose"/>
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.Render(Waher.Layout.Layout2D.RenderSettings,Waher.Layout.Layout2D.Map[]@)">
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.Render(Waher.Layout.Layout2D.RenderSettings)">
             <summary>
             Renders the layout to an image
             </summary>
             <param name="Settings">Rendering settings.</param>
-            <param name="Maps">Generated maps</param>
-            <returns></returns>
+            <returns>Image and generated maps</returns>
         </member>
         <member name="E:Waher.Layout.Layout2D.Layout2DDocument.OnUpdated">
             <summary>
@@ -424,18 +400,24 @@
             </summary>
             <param name="Output">XML Output.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.TryEvaluate(Waher.Script.Variables,`0@)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.EvaluateAsync(Waher.Script.Variables,`0)">
+            <summary>
+            Evaluate the attribute value.
+            </summary>
+            <param name="Session">Current session.</param>
+            <param name="DefaultValue">Default value if value or expression is missing or invalid.</param>
+            <returns>Evaluation result, or default value if not possible to evaluate.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.TryEvaluate(Waher.Layout.Layout2D.Model.Attributes.Attribute{`0},Waher.Script.Variables)">
             <summary>
             Tries to evaluate the attribute value.
             </summary>
+            <param name="Attribute">Attribute to evaluate.</param>
             <param name="Session">Current session.</param>
-            <param name="Result">Result, if successful.</param>
-            <returns>If evaluation was possible.</returns>
+            <returns>Evaluation result.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute">
             <summary>
@@ -581,6 +563,37 @@
             </summary>
             <returns>Attribute reference.</returns>
         </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Attributes.EvaluationResult`1">
+            <summary>
+            Result of asynchronous evaluation.
+            </summary>
+            <typeparam name="T">Type of result.</typeparam>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EvaluationResult`1.#ctor(`0)">
+            <summary>
+            Positive result of asynchronous evaluation.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.EvaluationResult`1.#ctor(System.Boolean,`0)">
+            <summary>
+            Positive result of asynchronous evaluation.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Attributes.EvaluationResult`1.Ok">
+            <summary>
+            If evaluation was successful.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Attributes.EvaluationResult`1.Result">
+            <summary>
+            Evaluated result, if successful.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Attributes.EvaluationResult`1.Empty">
+            <summary>
+            No result
+            </summary>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute">
             <summary>
             Expression attribute
@@ -615,7 +628,7 @@
             <param name="Value">Value</param>
             <returns>String representation.</returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the expression defined by the attribute.
             </summary>
@@ -626,7 +639,7 @@
             or null if no expression is defined.
             </returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.EvaluateElement(Waher.Script.Variables)">
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute.EvaluateElementAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the expression defined by the attribute.
             </summary>
@@ -643,6 +656,147 @@
             Returns a reference to itself, if preset (set by a constant value).
             </summary>
             <returns>Attribute reference.</returns>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Attributes.Extensions">
+            <summary>
+            Attribute extensions, simplifying evaluation of optional attributes.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Extensions.TryEvaluate(Waher.Layout.Layout2D.Model.Attributes.StringAttribute,Waher.Script.Variables)">
+            <summary>
+            Tries to evaluate the attribute value.
+            </summary>
+            <param name="Attribute">Attribute to evaluate.</param>
+            <param name="Session">Current session.</param>
+            <returns>Evaluation result.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Extensions.TryEvaluate(Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute,Waher.Script.Variables)">
+            <summary>
+            Tries to evaluate the attribute value.
+            </summary>
+            <param name="Attribute">Attribute to evaluate.</param>
+            <param name="Session">Current session.</param>
+            <returns>Evaluation result.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Extensions.TryEvaluate(Waher.Layout.Layout2D.Model.Attributes.ColorAttribute,Waher.Script.Variables)">
+            <summary>
+            Tries to evaluate the attribute value.
+            </summary>
+            <param name="Attribute">Attribute to evaluate.</param>
+            <param name="Session">Current session.</param>
+            <returns>Evaluation result.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Extensions.TryEvaluate(Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute,Waher.Script.Variables)">
+            <summary>
+            Tries to evaluate the attribute value.
+            </summary>
+            <param name="Attribute">Attribute to evaluate.</param>
+            <param name="Session">Current session.</param>
+            <returns>Evaluation result.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Extensions.TryEvaluate(Waher.Layout.Layout2D.Model.Attributes.FloatAttribute,Waher.Script.Variables)">
+            <summary>
+            Tries to evaluate the attribute value.
+            </summary>
+            <param name="Attribute">Attribute to evaluate.</param>
+            <param name="Session">Current session.</param>
+            <returns>Evaluation result.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Extensions.TryEvaluate(Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Script.Variables)">
+            <summary>
+            Tries to evaluate the attribute value.
+            </summary>
+            <param name="Attribute">Attribute to evaluate.</param>
+            <param name="Session">Current session.</param>
+            <returns>Evaluation result.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Extensions.TryEvaluate(Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute,Waher.Script.Variables)">
+            <summary>
+            Tries to evaluate the attribute value.
+            </summary>
+            <param name="Attribute">Attribute to evaluate.</param>
+            <param name="Session">Current session.</param>
+            <returns>Evaluation result.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Extensions.TryEvaluate``1(Waher.Layout.Layout2D.Model.Attributes.EnumAttribute{``0},Waher.Script.Variables)">
+            <summary>
+            Tries to evaluate the attribute value.
+            </summary>
+            <param name="Attribute">Attribute to evaluate.</param>
+            <param name="Session">Current session.</param>
+            <returns>Evaluation result.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Extensions.Evaluate(Waher.Layout.Layout2D.Model.Attributes.StringAttribute,Waher.Script.Variables,System.String)">
+            <summary>
+            Tries to evaluate the attribute value.
+            </summary>
+            <param name="Attribute">Attribute to evaluate.</param>
+            <param name="Session">Current session.</param>
+            <param name="DefaultValue">Default value if value or expression is missing or invalid.</param>
+            <returns>Evaluation result.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Extensions.Evaluate(Waher.Layout.Layout2D.Model.Attributes.BooleanAttribute,Waher.Script.Variables,System.Boolean)">
+            <summary>
+            Evaluates the attribute value.
+            </summary>
+            <param name="Attribute">Attribute to evaluate.</param>
+            <param name="Session">Current session.</param>
+            <param name="DefaultValue">Default value if value or expression is missing or invalid.</param>
+            <returns>Evaluation result.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Extensions.Evaluate(Waher.Layout.Layout2D.Model.Attributes.ColorAttribute,Waher.Script.Variables,SkiaSharp.SKColor)">
+            <summary>
+            Evaluates the attribute value.
+            </summary>
+            <param name="Attribute">Attribute to evaluate.</param>
+            <param name="Session">Current session.</param>
+            <param name="DefaultValue">Default value if value or expression is missing or invalid.</param>
+            <returns>Evaluation result.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Extensions.Evaluate(Waher.Layout.Layout2D.Model.Attributes.ExpressionAttribute,Waher.Script.Variables,Waher.Script.Expression)">
+            <summary>
+            Evaluates the attribute value.
+            </summary>
+            <param name="Attribute">Attribute to evaluate.</param>
+            <param name="Session">Current session.</param>
+            <param name="DefaultValue">Default value if value or expression is missing or invalid.</param>
+            <returns>Evaluation result.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Extensions.Evaluate(Waher.Layout.Layout2D.Model.Attributes.FloatAttribute,Waher.Script.Variables,System.Single)">
+            <summary>
+            Evaluates the attribute value.
+            </summary>
+            <param name="Attribute">Attribute to evaluate.</param>
+            <param name="Session">Current session.</param>
+            <param name="DefaultValue">Default value if value or expression is missing or invalid.</param>
+            <returns>Evaluation result.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Extensions.Evaluate(Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Script.Variables,Waher.Layout.Layout2D.Model.Length)">
+            <summary>
+            Evaluates the attribute value.
+            </summary>
+            <param name="Attribute">Attribute to evaluate.</param>
+            <param name="Session">Current session.</param>
+            <param name="DefaultValue">Default value if value or expression is missing or invalid.</param>
+            <returns>Evaluation result.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Extensions.Evaluate(Waher.Layout.Layout2D.Model.Attributes.PositiveIntegerAttribute,Waher.Script.Variables,System.Int32)">
+            <summary>
+            Evaluates the attribute value.
+            </summary>
+            <param name="Attribute">Attribute to evaluate.</param>
+            <param name="Session">Current session.</param>
+            <param name="DefaultValue">Default value if value or expression is missing or invalid.</param>
+            <returns>Evaluation result.</returns>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.Attributes.Extensions.Evaluate``1(Waher.Layout.Layout2D.Model.Attributes.EnumAttribute{``0},Waher.Script.Variables,``0)">
+            <summary>
+            Evaluates the attribute value.
+            </summary>
+            <param name="Attribute">Attribute to evaluate.</param>
+            <param name="Session">Current session.</param>
+            <param name="DefaultValue">Default value if value or expression is missing or invalid.</param>
+            <returns>Evaluation result.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Attributes.FloatAttribute">
             <summary>
@@ -1036,6 +1190,46 @@
             Draws layout entities.
             </summary>
             <param name="State">Current drawing state.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.CalculatedPoint">
+            <summary>
+            Represents a calculated point.
+            </summary>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.CalculatedPoint.#ctor(System.Single,System.Single)">
+            <summary>
+            Represents a successfully calculated point.
+            </summary>
+            <param name="X">X-coordinate</param>
+            <param name="Y">Y-coordinate</param>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.CalculatedPoint.#ctor(System.Single,System.Single,System.Boolean)">
+            <summary>
+            Represents a successfully calculated point.
+            </summary>
+            <param name="X">X-coordinate</param>
+            <param name="Y">Y-coordinate</param>
+            <param name="Ok">If OK</param>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.CalculatedPoint.X">
+            <summary>
+            X-coordinate
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.CalculatedPoint.Y">
+            <summary>
+            Y-coordinate
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.CalculatedPoint.Ok">
+            <summary>
+            If point is successfully evaluated
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.CalculatedPoint.Empty">
+            <summary>
+            No point calculated.
+            </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Conditional.Case">
             <summary>
@@ -2259,14 +2453,14 @@
             Height of current area
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.CalcDrawingSize(Waher.Layout.Layout2D.Model.Length,System.Single@,System.Boolean,System.Boolean@)">
+        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.CalcDrawingSize(Waher.Layout.Layout2D.Model.Length,System.Single@,System.Boolean,Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Converts a defined length to drawing size.
             </summary>
             <param name="L">Length</param>
             <param name="Size">Calculated size.</param>
             <param name="Horizontal">If it is a horizontal size.</param>
-            <param name="Relative">If size is relative, and should be recalculated if dimensions change.</param>
+            <param name="State">Drawing state.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.DrawingState.SetAreaSize(SkiaSharp.SKSize)">
             <summary>
@@ -2287,6 +2481,11 @@
             Restores font settings, from a previous call to <see cref="M:Waher.Layout.Layout2D.Model.DrawingState.Push(Waher.Layout.Layout2D.Model.Fonts.Font)"/>
             </summary>
             <param name="FontState">Previous font state.</param>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.DrawingState.MeasureRelative">
+            <summary>
+            If layout contains relative sizes and dimensions should be recalculated.
+            </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.DynamicContainer">
             <summary>
@@ -2716,27 +2915,24 @@
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Figures.Figure.GetPen(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
-            Gets the pen associated with the element. If not found, the default pen
-            is returned.
+            Gets the pen associated with the element. If not found, the default pen is returned.
             </summary>
             <param name="State">Current state</param>
             <returns>Pen.</returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Figure.TryGetPen(Waher.Layout.Layout2D.Model.DrawingState,SkiaSharp.SKPaint@)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Figure.TryGetPen(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Tries to get the pen associated with the element, if one is defined.
             </summary>
             <param name="State">Current state</param>
-            <param name="Pen">Pen, if defined.</param>
-            <returns>If a pen was defined, and was found.</returns>
+            <returns>Pen, if defined, null otherwise.</returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Figures.Figure.TryGetFill(Waher.Layout.Layout2D.Model.DrawingState,SkiaSharp.SKPaint@)">
+        <member name="M:Waher.Layout.Layout2D.Model.Figures.Figure.TryGetFill(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Tries to get the filling of the figure, if one is defined.
             </summary>
             <param name="State">State object.</param>
-            <param name="Fill">Filling, if defined.</param>
-            <returns>If a filling was defined, and was found.</returns>
+            <returns>Filling, if defined, null otherwise.</returns>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Figures.FigurePoint">
             <summary>
@@ -5552,13 +5748,12 @@
             Inner Height of element
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.CalcSpan(Waher.Script.Variables,System.Int32@,System.Int32@)">
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Cell.CalcSpan(Waher.Script.Variables)">
             <summary>
             Calculates the span of the cell.
             </summary>
             <param name="Session">Current session.</param>
-            <param name="ColSpan">Column span</param>
-            <param name="RowSpan">Row span</param>
+            <returns>Cell span</returns>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.Groups.Cell.PotentialWidth">
             <summary>
@@ -5588,6 +5783,21 @@
             Draws layout entities.
             </summary>
             <param name="State">Current drawing state.</param>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.Groups.CellSpan">
+            <summary>
+            Contains information about a cells span in a grid.
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Groups.CellSpan.ColSpan">
+            <summary>
+            Column span
+            </summary>
+        </member>
+        <member name="F:Waher.Layout.Layout2D.Model.Groups.CellSpan.RowSpan">
+            <summary>
+            Row span
+            </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Groups.FlexibleOrder">
             <summary>
@@ -6156,12 +6366,11 @@
             <param name="State">Current drawing state.</param>
             <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.Margins.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState,System.Boolean@)">
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.Margins.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Called when dimensions have been measured.
             </summary>
             <param name="State">Current drawing state.</param>
-            <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.Groups.Margins.InnerWidth">
             <summary>
@@ -6325,9 +6534,7 @@
             <param name="SetPosition">If position of inner content is to be set..</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.Padding.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Groups.SpatialDistribution">
             <summary>
@@ -6360,12 +6567,11 @@
             <param name="State">Current drawing state.</param>
             <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Groups.SpatialDistribution.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState,System.Boolean@)">
+        <member name="M:Waher.Layout.Layout2D.Model.Groups.SpatialDistribution.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Called when dimensions have been measured.
             </summary>
             <param name="State">Current drawing state.</param>
-            <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Groups.SpatialDistribution.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -6632,17 +6838,15 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             Calls, in order: <see cref="M:Waher.Layout.Layout2D.Model.ILayoutElement.BeforeMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)"/>,
             <see cref="M:Waher.Layout.Layout2D.Model.ILayoutElement.DoMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)"/> and
-            <see cref="M:Waher.Layout.Layout2D.Model.ILayoutElement.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState,System.Boolean@)"/>.
+            <see cref="M:Waher.Layout.Layout2D.Model.ILayoutElement.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)"/>.
             </summary>
             <param name="State">Current drawing state.</param>
-            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.DoMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Measures layout entities and defines unassigned properties, related to dimensions.
             </summary>
             <param name="State">Current drawing state.</param>
-            <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.BeforeMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -6650,12 +6854,11 @@
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState,System.Boolean@)">
+        <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Called when dimensions have been measured.
             </summary>
             <param name="State">Current drawing state.</param>
-            <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -7131,12 +7334,11 @@
             <param name="State">Current drawing state.</param>
             <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState,System.Boolean@)">
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Called when dimensions have been measured.
             </summary>
             <param name="State">Current drawing state.</param>
-            <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.IncludeElement(Waher.Layout.Layout2D.Model.ILayoutElement)">
             <summary>
@@ -7177,7 +7379,7 @@
             <param name="X">X-Coordinate</param>
             <param name="Y">Y-Coordinate</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.IncludePoint(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.StringAttribute,System.Single@,System.Single@,System.Boolean@)">
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.IncludePoint(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.StringAttribute,System.Single,System.Single)">
             <summary>
             Includes a point in the area measurement.
             </summary>
@@ -7187,7 +7389,6 @@
             <param name="RefAttribute">Reference attribute</param>
             <param name="X">Resulting X-coordinate.</param>
             <param name="Y">Resulting Y-coordinate.</param>
-            <param name="Relative">If coordinate is relative, and should be recalculated if dimensions change.</param>
             <returns>If point is well-defined.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
@@ -7388,7 +7589,7 @@
             Measures layout entities and defines unassigned properties, related to dimensions.
             Calls, in order: <see cref="M:Waher.Layout.Layout2D.Model.LayoutElement.BeforeMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)"/>,
             <see cref="M:Waher.Layout.Layout2D.Model.LayoutElement.DoMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)"/> and
-            <see cref="M:Waher.Layout.Layout2D.Model.LayoutElement.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState,System.Boolean@)"/>.
+            <see cref="M:Waher.Layout.Layout2D.Model.LayoutElement.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)"/>.
             </summary>
             <param name="State">Current drawing state.</param>
             <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
@@ -7406,12 +7607,11 @@
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState,System.Boolean@)">
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Called when dimensions have been measured.
             </summary>
             <param name="State">Current drawing state.</param>
-            <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.MeasurePositions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -7430,7 +7630,7 @@
             If the element is visible or not.
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.CalcPoint(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.StringAttribute,System.Single@,System.Single@,System.Boolean@)">
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.CalcPoint(Waher.Layout.Layout2D.Model.DrawingState,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.LengthAttribute,Waher.Layout.Layout2D.Model.Attributes.StringAttribute,System.Single,System.Single)">
             <summary>
             Includes a point in the area measurement.
             </summary>
@@ -7440,7 +7640,6 @@
             <param name="RefAttribute">Reference attribute</param>
             <param name="X">Resulting X-coordinate.</param>
             <param name="Y">Resulting Y-coordinate.</param>
-            <param name="Relative">If coordinate is relative, and should be recalculated if dimensions change.</param>
             <returns>If point is well-defined.</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
@@ -7490,9 +7689,7 @@
             <returns>Direction angle</returns>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.LengthUnit">
             <summary>
@@ -7602,8 +7799,16 @@
             </summary>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Length.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="T:Waher.Layout.Layout2D.Model.MeasureState">
             <summary>
-            <see cref="M:System.Object.ToString"/>
+            Current measuring state
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.MeasureState.Relative">
+            <summary>
+            If layout contains relative sizes and dimensions should be recalculated.
             </summary>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.Pens.Pen">
@@ -8291,12 +8496,11 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Rotate.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState,System.Boolean@)">
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Rotate.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Called when dimensions have been measured.
             </summary>
             <param name="State">Current drawing state.</param>
-            <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Transforms.Rotate.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -8357,12 +8561,11 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Scale.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState,System.Boolean@)">
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Scale.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Called when dimensions have been measured.
             </summary>
             <param name="State">Current drawing state.</param>
-            <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Transforms.Scale.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -8418,12 +8621,11 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewX.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState,System.Boolean@)">
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewX.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Called when dimensions have been measured.
             </summary>
             <param name="State">Current drawing state.</param>
-            <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewX.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -8479,12 +8681,11 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewY.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState,System.Boolean@)">
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewY.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Called when dimensions have been measured.
             </summary>
             <param name="State">Current drawing state.</param>
-            <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Transforms.SkewY.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
@@ -8545,12 +8746,11 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Translate.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState,System.Boolean@)">
+        <member name="M:Waher.Layout.Layout2D.Model.Transforms.Translate.AfterMeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Called when dimensions have been measured.
             </summary>
             <param name="State">Current drawing state.</param>
-            <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.Transforms.Translate.Draw(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>

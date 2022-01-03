@@ -66,9 +66,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 			set => this.bitMap = value;
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return base.ToString() + "\t" + this.protocol.ToString() + 

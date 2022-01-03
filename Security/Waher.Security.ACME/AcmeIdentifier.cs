@@ -55,9 +55,7 @@ namespace Waher.Security.ACME
 		/// </summary>
 		public string Value => this.value;
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.type + ":" + this.value;

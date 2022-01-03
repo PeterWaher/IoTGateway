@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Macro;
 
 namespace Waher.Content.Asn1.Model
@@ -62,7 +63,7 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Pass">Export pass</param>
-		public override void ExportCSharp(StringBuilder Output, CSharpExportState State,
+		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit && !this.TypeDefinition)
@@ -77,7 +78,7 @@ namespace Waher.Content.Asn1.Model
 					State.ClosePending(Output);
 
 					foreach (Asn1Node Node in this.Nodes)
-						Node.ExportCSharp(Output, State, Indent, Pass);
+						await Node.ExportCSharp(Output, State, Indent, Pass);
 
 					Output.Append(Tabs(Indent));
 					Output.Append("public enum ");
@@ -136,7 +137,7 @@ namespace Waher.Content.Asn1.Model
 					Output.AppendLine(" _choice;");
 
 					foreach (Asn1Node Node in this.Nodes)
-						Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
+						await Node.ExportCSharp(Output, State, Indent, CSharpExportPass.Explicit);
 
 					Indent--;
 

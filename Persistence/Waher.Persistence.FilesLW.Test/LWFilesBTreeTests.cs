@@ -633,7 +633,7 @@ namespace Waher.Persistence.FilesLW.Test
 					"NrBlockLoads, NrCacheLoads, NrBlockSaves,Min(Obj/Block),Max(Obj/Block),Avg(Obj/Block)," +
 					"Min(UsedBytes/Block),Max(UsedBytes/Block),Avg(UsedBytes/Block)");
 				Console.Out.WriteLine(new string('-', 80));
-				Console.Out.WriteLine(Exp.Evaluate(v).ToString());
+				Console.Out.WriteLine((await Exp.EvaluateAsync(v)).ToString());
 			}
 		}
 

@@ -61,6 +61,7 @@ namespace Waher.Content.Markdown
 		private bool isDynamic = false;
 		private bool? allowScriptTag = null;
 		private Task asyncTasks = Task.CompletedTask;
+		private object tag = null;
 
 		/// <summary>
 		/// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions.
@@ -68,9 +69,9 @@ namespace Waher.Content.Markdown
 		/// <param name="MarkdownText">Markdown text.</param>
 		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
 		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
-		public MarkdownDocument(string MarkdownText, params Type[] TransparentExceptionTypes)
-			: this(MarkdownText, new MarkdownSettings(), string.Empty, string.Empty, string.Empty, TransparentExceptionTypes)
+		public static Task<MarkdownDocument> CreateAsync(string MarkdownText, params Type[] TransparentExceptionTypes)
 		{
+			return CreateAsync(MarkdownText, new MarkdownSettings(), string.Empty, string.Empty, string.Empty, TransparentExceptionTypes);
 		}
 
 		/// <summary>
@@ -80,9 +81,9 @@ namespace Waher.Content.Markdown
 		/// <param name="Settings">Parser settings.</param>
 		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
 		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
-		public MarkdownDocument(string MarkdownText, MarkdownSettings Settings, params Type[] TransparentExceptionTypes)
-			: this(MarkdownText, Settings, string.Empty, string.Empty, string.Empty, TransparentExceptionTypes)
+		public static Task<MarkdownDocument> CreateAsync(string MarkdownText, MarkdownSettings Settings, params Type[] TransparentExceptionTypes)
 		{
+			return CreateAsync(MarkdownText, Settings, string.Empty, string.Empty, string.Empty, TransparentExceptionTypes);
 		}
 
 		/// <summary>
@@ -96,21 +97,32 @@ namespace Waher.Content.Markdown
 		/// <param name="URL">Full URL of resource hosting the content, if accessed from a web server.</param>
 		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
 		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
-		public MarkdownDocument(string MarkdownText, MarkdownSettings Settings, string FileName, string ResourceName, string URL,
+		public static async Task<MarkdownDocument> CreateAsync(string MarkdownText, MarkdownSettings Settings, string FileName, string ResourceName, string URL,
 			params Type[] TransparentExceptionTypes)
 		{
-			this.markdownText = MarkdownText;
+			bool IsDynamic = false;
+
+			if (Settings.Variables != null)
+			{
+				KeyValuePair<string, bool> P = await Preprocess(MarkdownText, Settings, FileName, TransparentExceptionTypes);
+				MarkdownText = P.Key;
+				IsDynamic = P.Value;
+			}
+
+			return new MarkdownDocument(MarkdownText, IsDynamic, Settings, FileName, ResourceName, URL, TransparentExceptionTypes);
+		}
+
+		private MarkdownDocument(string MarkdownText, bool IsDynamic, MarkdownSettings Settings, string FileName, string ResourceName, string URL, 
+			params Type[] TransparentExceptionTypes)
+		{
+			this.markdownText = MarkdownText.Replace("\r\n", "\n").Replace('\r', '\n');
+			this.isDynamic = IsDynamic;
 			this.emojiSource = Settings.EmojiSource;
 			this.settings = Settings;
 			this.fileName = FileName;
 			this.resourceName = ResourceName;
 			this.url = URL;
 			this.transparentExceptionTypes = TransparentExceptionTypes;
-
-			if (Settings.Variables != null)
-				this.markdownText = Preprocess(this.markdownText, Settings, this.fileName, out this.isDynamic, TransparentExceptionTypes);
-
-			this.markdownText = this.markdownText.Replace("\r\n", "\n").Replace('\r', '\n');
 
 			List<Block> Blocks = this.ParseTextToBlocks(this.markdownText);
 			List<KeyValuePair<string, bool>> Values = new List<KeyValuePair<string, bool>>();
@@ -229,9 +241,10 @@ namespace Waher.Content.Markdown
 		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
 		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
 		/// <returns>Preprocessed markdown.</returns>
-		public static string Preprocess(string Markdown, MarkdownSettings Settings, params Type[] TransparentExceptionTypes)
+		public static async Task<string> Preprocess(string Markdown, MarkdownSettings Settings, params Type[] TransparentExceptionTypes)
 		{
-			return Preprocess(Markdown, Settings, string.Empty, out bool _, TransparentExceptionTypes);
+			KeyValuePair<string, bool> P = await Preprocess(Markdown, Settings, string.Empty, TransparentExceptionTypes);
+			return P.Key;
 		}
 
 		/// <summary>
@@ -242,31 +255,15 @@ namespace Waher.Content.Markdown
 		/// <param name="FileName">Filename of markdown.</param>
 		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
 		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
-		/// <returns>Preprocessed markdown.</returns>
-		public static string Preprocess(string Markdown, MarkdownSettings Settings, string FileName, params Type[] TransparentExceptionTypes)
-		{
-			return Preprocess(Markdown, Settings, FileName, out bool _, TransparentExceptionTypes);
-		}
-
-		/// <summary>
-		/// Preprocesses markdown text.
-		/// </summary>
-		/// <param name="Markdown">Markdown text</param>
-		/// <param name="Settings">Markdown settings.</param>
-		/// <param name="FileName">Filename of markdown.</param>
-		/// <param name="IsDynamic">If the markdown contained preprocessed script.</param>
-		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
-		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
-		/// <returns>Preprocessed markdown.</returns>
-		public static string Preprocess(string Markdown, MarkdownSettings Settings, string FileName, out bool IsDynamic, params Type[] TransparentExceptionTypes)
+		/// <returns>Preprocessed markdown, and if the markdown contains script, making the markdown dynamic.</returns>
+		public static async Task<KeyValuePair<string, bool>> Preprocess(string Markdown, MarkdownSettings Settings, string FileName, params Type[] TransparentExceptionTypes)
 		{
 			Variables Variables = Settings.Variables;
 			Expression Exp;
 			string Script, s2;
 			object Result;
 			int i, j;
-
-			IsDynamic = false;
+			bool IsDynamic = false;
 
 			if (!string.IsNullOrEmpty(FileName))
 			{
@@ -287,7 +284,7 @@ namespace Waher.Content.Markdown
 							if (Tag == "INIT" && !InitScriptFile.NeedsExecution(FileName2))
 								continue;
 
-							Script = File.ReadAllText(FileName2);
+							Script = await Resources.ReadAllTextAsync(FileName2);
 
 							if (!IsDynamic)
 							{
@@ -298,7 +295,7 @@ namespace Waher.Content.Markdown
 							try
 							{
 								Exp = new Expression(Script, FileName2);
-								Exp.Evaluate(Variables);
+								await Exp.EvaluateAsync(Variables);
 							}
 							catch (Exception ex)
 							{
@@ -334,12 +331,12 @@ namespace Waher.Content.Markdown
 					{
 						TextWriter Bak = Variables.ConsoleOut;
 						StringBuilder sb = new StringBuilder();
-
-						Variables.Lock();
+						
+						await Variables.LockAsync();
 						Variables.ConsoleOut = new StringWriter(sb);
 						try
 						{
-							Exp.Evaluate(Variables);
+							await Exp.EvaluateAsync(Variables);
 						}
 						finally
 						{
@@ -351,7 +348,7 @@ namespace Waher.Content.Markdown
 						Result = sb.ToString();
 					}
 					else
-						Result = Exp.Evaluate(Variables);
+						Result = await Exp.EvaluateAsync(Variables);
 				}
 				catch (Exception ex)
 				{
@@ -389,7 +386,7 @@ namespace Waher.Content.Markdown
 					if (!(Result is string s3))
 					{
 						StringBuilder Html = new StringBuilder();
-						InlineScript.GenerateHTML(Result, Html, false, Variables);
+						await InlineScript.GenerateHTML(Result, Html, false, Variables);
 						s3 = Html.ToString();
 					}
 
@@ -400,7 +397,7 @@ namespace Waher.Content.Markdown
 				i = Markdown.IndexOf("{{", i);
 			}
 
-			return Markdown;
+			return new KeyValuePair<string, bool>(Markdown, IsDynamic);
 		}
 
 		internal void CheckException(Exception ex)
@@ -4434,10 +4431,10 @@ namespace Waher.Content.Markdown
 		/// Generates HTML from the markdown text.
 		/// </summary>
 		/// <returns>HTML</returns>
-		public string GenerateHTML()
+		public async Task<string> GenerateHTML()
 		{
 			StringBuilder Output = new StringBuilder();
-			this.GenerateHTML(Output);
+			await this.GenerateHTML(Output);
 			return Output.ToString();
 		}
 
@@ -4445,28 +4442,25 @@ namespace Waher.Content.Markdown
 		/// Generates HTML from the markdown text.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public void GenerateHTML(StringBuilder Output)
+		public async Task GenerateHTML(StringBuilder Output)
 		{
 			if (!string.IsNullOrEmpty(this.fileName) && this.metaData.TryGetValue("MASTER", out KeyValuePair<string, bool>[] Master) && Master.Length == 1)
 			{
-				this.LoadMasterIfNotLoaded(Master[0].Key);
-				this.master.GenerateHTML(Output, false);
+				await this.LoadMasterIfNotLoaded(Master[0].Key);
+				await this.master.GenerateHTML(Output, false);
 			}
 			else
-				this.GenerateHTML(Output, false);
+				await this.GenerateHTML(Output, false);
 		}
 
-		private void LoadMasterIfNotLoaded(string MasterMetaValue)
+		private async Task LoadMasterIfNotLoaded(string MasterMetaValue)
 		{
 			if (this.master is null)
 			{
 				string FileName = this.settings.GetFileName(this.fileName, MasterMetaValue);
-				string MarkdownText = File.ReadAllText(FileName);
-				this.master = new MarkdownDocument(MarkdownText, this.settings)
-				{
-					fileName = FileName
-				};
-
+				string MarkdownText = await Resources.ReadAllTextAsync(FileName);
+				this.master = await CreateAsync(MarkdownText, this.settings);
+				this.master.fileName = FileName;
 				this.master.syntaxHighlighting |= this.syntaxHighlighting;
 
 				if (this.master.metaData.ContainsKey("MASTER"))
@@ -4506,7 +4500,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
 		/// <param name="Inclusion">If the HTML is to be included in another document (true), or if it is a standalone document (false).</param>
-		internal void GenerateHTML(StringBuilder Output, bool Inclusion)
+		internal async Task GenerateHTML(StringBuilder Output, bool Inclusion)
 		{
 			if (this.settings.HtmlSettings is null)
 				this.settings.HtmlSettings = new HtmlSettings();
@@ -4870,7 +4864,7 @@ namespace Waher.Content.Markdown
 			}
 
 			foreach (MarkdownElement E in this.elements)
-				E.GenerateHTML(Output);
+				await E.GenerateHTML(Output);
 
 			if (this.footnoteOrder != null && this.footnoteOrder.Count > 0)
 			{
@@ -4896,7 +4890,7 @@ namespace Waher.Content.Markdown
 								Footnote.AddChildren(Backlink);
 						}
 
-						Footnote.GenerateHTML(Output);
+						await Footnote.GenerateHTML(Output);
 
 						Output.AppendLine("</li>");
 					}
@@ -4957,10 +4951,10 @@ namespace Waher.Content.Markdown
 		/// Generates Plain Text from the markdown text.
 		/// </summary>
 		/// <returns>Plain Text</returns>
-		public string GeneratePlainText()
+		public async Task<string> GeneratePlainText()
 		{
 			StringBuilder Output = new StringBuilder();
-			this.GeneratePlainText(Output);
+			await this.GeneratePlainText(Output);
 			return Output.ToString();
 		}
 
@@ -4968,10 +4962,10 @@ namespace Waher.Content.Markdown
 		/// Generates Plain Text from the markdown text.
 		/// </summary>
 		/// <param name="Output">Plain Text will be output here.</param>
-		public void GeneratePlainText(StringBuilder Output)
+		public async Task GeneratePlainText(StringBuilder Output)
 		{
 			foreach (MarkdownElement E in this.elements)
-				E.GeneratePlainText(Output);
+				await E.GeneratePlainText(Output);
 
 			if (this.footnoteOrder != null && this.footnoteOrder.Count > 0)
 			{
@@ -4986,7 +4980,7 @@ namespace Waher.Content.Markdown
 						Output.Append(Nr.ToString());
 						Output.Append("] ");
 
-						Footnote.GeneratePlainText(Output);
+						await Footnote.GeneratePlainText(Output);
 					}
 				}
 			}
@@ -4996,7 +4990,7 @@ namespace Waher.Content.Markdown
 		/// Generates WPF XAML from the markdown text.
 		/// </summary>
 		/// <returns>WPF XAML</returns>
-		public string GenerateXAML()
+		public Task<string> GenerateXAML()
 		{
 			return this.GenerateXAML(XML.WriterSettings(false, true));
 		}
@@ -5006,10 +5000,10 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="XmlSettings">XML settings.</param>
 		/// <returns>WPF XAML</returns>
-		public string GenerateXAML(XmlWriterSettings XmlSettings)
+		public async Task<string> GenerateXAML(XmlWriterSettings XmlSettings)
 		{
 			StringBuilder Output = new StringBuilder();
-			this.GenerateXAML(Output, XmlSettings);
+			await this.GenerateXAML(Output, XmlSettings);
 			return Output.ToString();
 		}
 
@@ -5017,9 +5011,9 @@ namespace Waher.Content.Markdown
 		/// Generates WPF XAML from the markdown text.
 		/// </summary>
 		/// <param name="Output">WPF XAML will be output here.</param>
-		public void GenerateXAML(StringBuilder Output)
+		public Task GenerateXAML(StringBuilder Output)
 		{
-			this.GenerateXAML(Output, XML.WriterSettings(false, true));
+			return this.GenerateXAML(Output, XML.WriterSettings(false, true));
 		}
 
 		/// <summary>
@@ -5027,11 +5021,11 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="Output">WPF XAML will be output here.</param>
 		/// <param name="XmlSettings">XML settings.</param>
-		public void GenerateXAML(StringBuilder Output, XmlWriterSettings XmlSettings)
+		public async Task GenerateXAML(StringBuilder Output, XmlWriterSettings XmlSettings)
 		{
 			using (XmlWriter w = XmlWriter.Create(Output, XmlSettings))
 			{
-				this.GenerateXAML(w, false);
+				await this.GenerateXAML(w, false);
 			}
 		}
 
@@ -5039,9 +5033,9 @@ namespace Waher.Content.Markdown
 		/// Generates WPF XAML from the markdown text.
 		/// </summary>
 		/// <param name="Output">WPF XAML will be output here.</param>
-		public void GenerateXAML(XmlWriter Output)
+		public Task GenerateXAML(XmlWriter Output)
 		{
-			this.GenerateXAML(Output, false);
+			return this.GenerateXAML(Output, false);
 		}
 
 		/// <summary>
@@ -5049,7 +5043,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="Output">Widows XAML will be output here.</param>
 		/// <param name="Inclusion">If the XAML is to be included in another document (true), or if it is a standalone document (false).</param>
-		internal void GenerateXAML(XmlWriter Output, bool Inclusion)
+		internal async Task GenerateXAML(XmlWriter Output, bool Inclusion)
 		{
 			if (this.settings.XamlSettings is null)
 				this.settings.XamlSettings = new XamlSettings();
@@ -5061,7 +5055,7 @@ namespace Waher.Content.Markdown
 			}
 
 			foreach (MarkdownElement E in this.elements)
-				E.GenerateXAML(Output, TextAlignment.Left);
+				await E.GenerateXAML(Output, TextAlignment.Left);
 
 			if (this.footnoteOrder != null && this.footnoteOrder.Count > 0)
 			{
@@ -5138,7 +5132,7 @@ namespace Waher.Content.Markdown
 						Output.WriteAttributeString("Grid.Column", "1");
 						Output.WriteAttributeString("Grid.Row", Row.ToString());
 
-						Footnote.GenerateXAML(Output, TextAlignment.Left);
+						await Footnote.GenerateXAML(Output, TextAlignment.Left);
 						Output.WriteEndElement();
 
 						Row++;
@@ -5159,7 +5153,7 @@ namespace Waher.Content.Markdown
 		/// Generates Xamarin.Forms XAML from the markdown text.
 		/// </summary>
 		/// <returns>Xamarin.Forms XAML</returns>
-		public string GenerateXamarinForms()
+		public Task<string> GenerateXamarinForms()
 		{
 			return this.GenerateXamarinForms(XML.WriterSettings(false, true));
 		}
@@ -5169,10 +5163,10 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="XmlSettings">XML settings.</param>
 		/// <returns>Xamarin.Forms XAML</returns>
-		public string GenerateXamarinForms(XmlWriterSettings XmlSettings)
+		public async Task<string> GenerateXamarinForms(XmlWriterSettings XmlSettings)
 		{
 			StringBuilder Output = new StringBuilder();
-			this.GenerateXamarinForms(Output, XmlSettings);
+			await this.GenerateXamarinForms(Output, XmlSettings);
 			return Output.ToString();
 		}
 
@@ -5180,9 +5174,9 @@ namespace Waher.Content.Markdown
 		/// Generates Xamarin.Forms XAML from the markdown text.
 		/// </summary>
 		/// <param name="Output">Xamarin.Forms XAML will be output here.</param>
-		public void GenerateXamarinForms(StringBuilder Output)
+		public Task GenerateXamarinForms(StringBuilder Output)
 		{
-			this.GenerateXamarinForms(Output, XML.WriterSettings(false, true));
+			return this.GenerateXamarinForms(Output, XML.WriterSettings(false, true));
 		}
 
 		/// <summary>
@@ -5190,11 +5184,11 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="Output">Xamarin.Forms XAML will be output here.</param>
 		/// <param name="XmlSettings">XML settings.</param>
-		public void GenerateXamarinForms(StringBuilder Output, XmlWriterSettings XmlSettings)
+		public async Task GenerateXamarinForms(StringBuilder Output, XmlWriterSettings XmlSettings)
 		{
 			using (XmlWriter w = XmlWriter.Create(Output, XmlSettings))
 			{
-				this.GenerateXamarinForms(w, false);
+				await this.GenerateXamarinForms(w, false);
 			}
 		}
 
@@ -5202,9 +5196,9 @@ namespace Waher.Content.Markdown
 		/// Generates Xamarin.Forms XAML from the markdown text.
 		/// </summary>
 		/// <param name="Output">Xamarin.Forms XAML will be output here.</param>
-		public void GenerateXamarinForms(XmlWriter Output)
+		public Task GenerateXamarinForms(XmlWriter Output)
 		{
-			this.GenerateXamarinForms(Output, false);
+			return this.GenerateXamarinForms(Output, false);
 		}
 
 		/// <summary>
@@ -5212,7 +5206,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="Output">Widows XamarinForms will be output here.</param>
 		/// <param name="Inclusion">If the XamarinForms is to be included in another document (true), or if it is a standalone document (false).</param>
-		internal void GenerateXamarinForms(XmlWriter Output, bool Inclusion)
+		internal async Task GenerateXamarinForms(XmlWriter Output, bool Inclusion)
 		{
 			if (this.settings.XamlSettings is null)
 				this.settings.XamlSettings = new XamlSettings();
@@ -5225,7 +5219,7 @@ namespace Waher.Content.Markdown
 			}
 
 			foreach (MarkdownElement E in this.elements)
-				E.GenerateXamarinForms(Output, TextAlignment.Left);
+				await E.GenerateXamarinForms(Output, TextAlignment.Left);
 
 			if (this.footnoteOrder != null && this.footnoteOrder.Count > 0)
 			{
@@ -5292,7 +5286,7 @@ namespace Waher.Content.Markdown
 						Output.WriteStartElement("ContentView");
 						Output.WriteAttributeString("Grid.Column", "1");
 						Output.WriteAttributeString("Grid.Row", Row.ToString());
-						Footnote.GenerateXamarinForms(Output, TextAlignment.Left);
+						await Footnote.GenerateXamarinForms(Output, TextAlignment.Left);
 						Output.WriteEndElement();
 
 						Row++;
@@ -5314,7 +5308,7 @@ namespace Waher.Content.Markdown
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
 		/// <returns>Smart Contract XML</returns>
-		public string GenerateSmartContractXml()
+		public Task<string> GenerateSmartContractXml()
 		{
 			return this.GenerateSmartContractXml(XML.WriterSettings(false, true));
 		}
@@ -5325,10 +5319,10 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="XmlSettings">XML settings.</param>
 		/// <returns>Smart Contract XML</returns>
-		public string GenerateSmartContractXml(XmlWriterSettings XmlSettings)
+		public async Task<string> GenerateSmartContractXml(XmlWriterSettings XmlSettings)
 		{
 			StringBuilder Output = new StringBuilder();
-			this.GenerateSmartContractXml(Output, XmlSettings);
+			await this.GenerateSmartContractXml(Output, XmlSettings);
 			return Output.ToString();
 		}
 
@@ -5337,9 +5331,9 @@ namespace Waher.Content.Markdown
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
-		public void GenerateSmartContractXml(StringBuilder Output)
+		public Task GenerateSmartContractXml(StringBuilder Output)
 		{
-			this.GenerateSmartContractXml(Output, XML.WriterSettings(false, true));
+			return this.GenerateSmartContractXml(Output, XML.WriterSettings(false, true));
 		}
 
 		/// <summary>
@@ -5348,13 +5342,13 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
 		/// <param name="XmlSettings">XML settings.</param>
-		public void GenerateSmartContractXml(StringBuilder Output, XmlWriterSettings XmlSettings)
+		public async Task GenerateSmartContractXml(StringBuilder Output, XmlWriterSettings XmlSettings)
 		{
 			XmlSettings.ConformanceLevel = ConformanceLevel.Fragment;
 
 			using (XmlWriter w = XmlWriter.Create(Output, XmlSettings))
 			{
-				this.GenerateSmartContractXml(w, null);
+				await this.GenerateSmartContractXml(w, null);
 			}
 		}
 
@@ -5363,9 +5357,9 @@ namespace Waher.Content.Markdown
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
-		public void GenerateSmartContractXml(XmlWriter Output)
+		public Task GenerateSmartContractXml(XmlWriter Output)
 		{
-			this.GenerateSmartContractXml(Output, null);
+			return this.GenerateSmartContractXml(Output, null);
 		}
 
 		/// <summary>
@@ -5374,7 +5368,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
 		/// <param name="LocalName">Local Name of container element. If no container element, LocalName is null.</param>
-		internal void GenerateSmartContractXml(XmlWriter Output, string LocalName)
+		internal async Task GenerateSmartContractXml(XmlWriter Output, string LocalName)
 		{
 			if (this.settings.XamlSettings is null)
 				this.settings.XamlSettings = new XamlSettings();
@@ -5382,16 +5376,16 @@ namespace Waher.Content.Markdown
 			if (!string.IsNullOrEmpty(LocalName))
 				Output.WriteStartElement(LocalName);
 
-			int Level = 0;
+			SmartContractRenderState State = new SmartContractRenderState();
 
 			foreach (MarkdownElement E in this.elements)
-				E.GenerateSmartContractXml(Output, ref Level);
+				await E.GenerateSmartContractXml(Output, State);
 
-			while (Level > 0)
+			while (State.Level > 0)
 			{
 				Output.WriteEndElement();
 				Output.WriteEndElement();
-				Level--;
+				State.Level--;
 			}
 
 			if (this.footnoteOrder != null && this.footnoteOrder.Count > 0)
@@ -5402,7 +5396,7 @@ namespace Waher.Content.Markdown
 					{
 						Output.WriteStartElement("paragraph");
 						Output.WriteElementString("text", "[" + Nr.ToString() + "] ");
-						Footnote.GenerateSmartContractXml(Output, ref Level);
+						await Footnote.GenerateSmartContractXml(Output, State);
 						Output.WriteEndElement();
 					}
 				}
@@ -5538,10 +5532,7 @@ namespace Waher.Content.Markdown
 		/// <summary>
 		/// Headers in document.
 		/// </summary>
-		public Header[] Headers
-		{
-			get { return this.headers.ToArray(); }
-		}
+		public Header[] Headers => this.headers.ToArray();
 
 		/// <summary>
 		/// Tries to get a meta-data value given its key.
@@ -5894,10 +5885,7 @@ namespace Waher.Content.Markdown
 		/// <summary>
 		/// Source for emojis in the document.
 		/// </summary>
-		public IEmojiSource EmojiSource
-		{
-			get { return this.emojiSource; }
-		}
+		public IEmojiSource EmojiSource => this.emojiSource;
 
 		/// <summary>
 		/// Encodes all special characters in a string so that it can be included in a markdown document without affecting the markdown.
@@ -5912,10 +5900,7 @@ namespace Waher.Content.Markdown
 		/// <summary>
 		/// If syntax highlighting is used in the document.
 		/// </summary>
-		public bool SyntaxHighlighting
-		{
-			get { return this.syntaxHighlighting; }
-		}
+		public bool SyntaxHighlighting => this.syntaxHighlighting;
 
 		/// <summary>
 		/// Filename of Markdown document. Markdown inclusion will be made relative to this filename.
@@ -5979,25 +5964,25 @@ namespace Waher.Content.Markdown
 		/// <summary>
 		/// Markdown settings.
 		/// </summary>
-		public MarkdownSettings Settings
-		{
-			get { return this.settings; }
-		}
+		public MarkdownSettings Settings => this.settings;
 
 		/// <summary>
 		/// If the document contains a Table of Contents.
 		/// </summary>
-		public bool IncludesTableOfContents
-		{
-			get { return this.includesTableOfContents; }
-		}
+		public bool IncludesTableOfContents => this.includesTableOfContents;
 
 		/// <summary>
 		/// If the contents of the document is dynamic (i.e. includes script), or not (i.e. is static).
 		/// </summary>
-		public bool IsDynamic
+		public bool IsDynamic => this.isDynamic;
+
+		/// <summary>
+		/// Property can be used to tag document with client-specific information.
+		/// </summary>
+		public object Tag
 		{
-			get { return this.isDynamic; }
+			get => this.tag;
+			set => this.tag = value;
 		}
 
 		/// <summary>
@@ -6141,7 +6126,7 @@ namespace Waher.Content.Markdown
 		/// <param name="New">New version of the document.</param>
 		/// <param name="KeepUnchanged">If unchanged parts of the document should be kept.</param>
 		/// <returns>Difference document</returns>
-		public static MarkdownDocument Compare(MarkdownDocument Old, MarkdownDocument New, bool KeepUnchanged)
+		public static Task<MarkdownDocument> Compare(MarkdownDocument Old, MarkdownDocument New, bool KeepUnchanged)
 		{
 			return New.Compare(Old, KeepUnchanged);
 		}
@@ -6156,12 +6141,12 @@ namespace Waher.Content.Markdown
 		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
 		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
 		/// <returns>Difference document</returns>
-		public static string Compare(string Old, string New, MarkdownSettings Settings, bool KeepUnchanged,
+		public static async Task<string> Compare(string Old, string New, MarkdownSettings Settings, bool KeepUnchanged,
 			params Type[] TransparentExceptionTypes)
 		{
-			MarkdownDocument OldDoc = new MarkdownDocument(Old, Settings, TransparentExceptionTypes);
-			MarkdownDocument NewDoc = new MarkdownDocument(New, Settings, TransparentExceptionTypes);
-			MarkdownDocument DiffDoc = Compare(OldDoc, NewDoc, KeepUnchanged);
+			MarkdownDocument OldDoc = await MarkdownDocument.CreateAsync(Old, Settings, TransparentExceptionTypes);
+			MarkdownDocument NewDoc = await MarkdownDocument.CreateAsync(New, Settings, TransparentExceptionTypes);
+			MarkdownDocument DiffDoc = await Compare(OldDoc, NewDoc, KeepUnchanged);
 
 			return DiffDoc.MarkdownText;
 		}
@@ -6172,11 +6157,11 @@ namespace Waher.Content.Markdown
 		/// <param name="Previous">Previous version</param>
 		/// <param name="KeepUnchanged">If unchanged parts of the document should be kept.</param>
 		/// <returns>Difference document</returns>
-		public MarkdownDocument Compare(MarkdownDocument Previous, bool KeepUnchanged)
+		public async Task<MarkdownDocument> Compare(MarkdownDocument Previous, bool KeepUnchanged)
 		{
 			// TODO: Meta-data
 
-			MarkdownDocument Result = new MarkdownDocument(string.Empty, this.settings, this.transparentExceptionTypes);
+			MarkdownDocument Result = await MarkdownDocument.CreateAsync(string.Empty, this.settings, this.transparentExceptionTypes);
 			IEnumerable<MarkdownElement> Edit = Compare(Previous.elements, this.elements, KeepUnchanged, Result);
 
 			foreach (MarkdownElement E in Edit)
@@ -6476,7 +6461,7 @@ namespace Waher.Content.Markdown
 		/// <param name="Xml">XML Document.</param>
 		/// <param name="Variables">Current variables.</param>
 		/// <returns>Transformed object (possibly the same if no XML Visualizer found).</returns>
-		public static object TransformXml(XmlDocument Xml, Variables Variables)
+		public static async Task<object> TransformXml(XmlDocument Xml, Variables Variables)
 		{
 			try
 			{
@@ -6484,7 +6469,7 @@ namespace Waher.Content.Markdown
 				if (Visualizer is null)
 					return Xml;
 
-				return Visualizer.TransformXml(Xml, Variables) ?? Xml;
+				return (await Visualizer.TransformXml(Xml, Variables)) ?? Xml;
 			}
 			catch (Exception ex)
 			{

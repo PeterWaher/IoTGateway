@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Script.Model
@@ -21,25 +22,13 @@ namespace Waher.Script.Model
 		{
 		}
 
-		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
-		{
-			IElement Operand = this.op.Evaluate(Variables);
-
-			return this.Evaluate(Operand, Variables);
-		}
-
         /// <summary>
         /// Evaluates the operator.
         /// </summary>
         /// <param name="Operand">Operand.</param>
         /// <param name="Variables">Variables collection.</param>
         /// <returns>Result</returns>
-        public virtual IElement Evaluate(IElement Operand, Variables Variables)
+        public override IElement Evaluate(IElement Operand, Variables Variables)
 		{
 			if (Operand.IsScalar)
 				return this.EvaluateScalar(Operand, Variables);
@@ -55,11 +44,43 @@ namespace Waher.Script.Model
 		}
 
 		/// <summary>
+		/// Evaluates the operator.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result</returns>
+		public override async Task<IElement> EvaluateAsync(IElement Operand, Variables Variables)
+		{
+			if (Operand.IsScalar)
+				return await this.EvaluateScalarAsync(Operand, Variables);
+			else
+			{
+				LinkedList<IElement> Result = new LinkedList<IElement>();
+
+				foreach (IElement Child in Operand.ChildElements)
+					Result.AddLast(await this.EvaluateAsync(Child, Variables));
+
+				return Operand.Encapsulate(Result, this);
+			}
+		}
+
+		/// <summary>
 		/// Evaluates the operator on scalar operands.
 		/// </summary>
 		/// <param name="Operand">Operand.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result</returns>
 		public abstract IElement EvaluateScalar(IElement Operand, Variables Variables);
+
+		/// <summary>
+		/// Evaluates the operator on scalar operands.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result</returns>
+		public virtual Task<IElement> EvaluateScalarAsync(IElement Operand, Variables Variables)
+		{
+			return Task.FromResult<IElement>(this.EvaluateScalar(Operand, Variables));
+		}
 	}
 }

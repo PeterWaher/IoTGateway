@@ -47,14 +47,14 @@ namespace Waher.Script.Persistence.SQL.Sources
 			if (Generic)
 			{
 				IEnumerable<GenericObject> Objects = await Database.Find<GenericObject>(this.collectionName, Offset, Top,
-					TypeSource.Convert(Where, Variables, this.Name), TypeSource.Convert(Order));
+					await TypeSource.ConvertAsync(Where, Variables, this.Name), TypeSource.Convert(Order));
 
 				return new SynchEnumerator(Objects.GetEnumerator());
 			}
 			else
 			{
 				IEnumerable<object> Objects = await Database.Find(this.collectionName, Offset, Top,
-					TypeSource.Convert(Where, Variables, this.Name), TypeSource.Convert(Order));
+					await TypeSource.ConvertAsync(Where, Variables, this.Name), TypeSource.Convert(Order));
 
 				return new SynchEnumerator(Objects.GetEnumerator());
 			}
@@ -74,7 +74,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		public async Task<int?> FindDelete(bool Lazy, int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
-			Filter Filter = TypeSource.Convert(Where, Variables, this.Name);
+			Filter Filter = await TypeSource.ConvertAsync(Where, Variables, this.Name);
 			if (Lazy)
 			{
 				await Database.DeleteLazy(this.collectionName, Offset, Top, Filter, TypeSource.Convert(Order));

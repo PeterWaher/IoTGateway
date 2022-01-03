@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Maker.RemoteWiring;
 using Microsoft.Maker.Serial;
 using Windows.Devices.Enumeration;
@@ -22,13 +20,13 @@ namespace Waher.Things.Arduino
 		internal void Device_DeviceConnectionLost(string message)
 		{
 			this.Ready = false;
-			Log.Error("Device connection lost.", this.Name);    // TODO: Retry
+			Log.Error("Device connection lost: " + message, this.Name);    // TODO: Retry
 		}
 
 		internal void Device_DeviceConnectionFailed(string message)
 		{
 			this.Ready = false;
-			Log.Error("Device connection failed.", this.Name);  // TODO: Retry, after delay
+			Log.Error("Device connection failed: " + message, this.Name);  // TODO: Retry, after delay
 		}
 
 		internal async void Device_DeviceReady()
@@ -103,14 +101,14 @@ namespace Waher.Things.Arduino
 			}
 		}
 
-		internal void Device_AnalogPinUpdated(string pin, ushort value)
+		internal async void Device_AnalogPinUpdated(string pin, ushort value)
 		{
 			try
 			{
 				Pin Pin = this.GetPin(pin);
 
 				if (Pin != null && Pin is AnalogInput AnalogInput)
-					AnalogInput.Pin_ValueChanged(value);
+					await AnalogInput.Pin_ValueChanged(value);
 			}
 			catch (Exception ex)
 			{

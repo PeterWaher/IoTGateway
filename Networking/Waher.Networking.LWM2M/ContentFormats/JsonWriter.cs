@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using Waher.Networking.CoAP;
 using Waher.Security.DTLS;
@@ -12,7 +10,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 	/// </summary>
 	public class JsonWriter : ILwm2mWriter
 	{
-		private StringBuilder sb = new StringBuilder();
+		private readonly StringBuilder sb = new StringBuilder();
 		private bool first = true;
 		private bool ended = false;
 

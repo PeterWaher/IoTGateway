@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 
@@ -94,18 +95,18 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
 			int[] Widths = new int[this.columns];
 			int i, c, d;
 
 			string[][] Headers = new string[c = this.headers.Length][];
 			for (i = 0; i < c; i++)
-				Headers[i] = this.GenerateMarkdown(this.headers[i], Widths);
+				Headers[i] = await this.GenerateMarkdown(this.headers[i], Widths);
 
 			string[][] Rows = new string[d = this.rows.Length][];
 			for (i = 0; i < d; i++)
-				Rows[i] = this.GenerateMarkdown(this.rows[i], Widths);
+				Rows[i] = await this.GenerateMarkdown(this.rows[i], Widths);
 
 			for (i = 0; i < c; i++)
 				this.GenerateMarkdown(Headers[i], Widths, Output);
@@ -180,7 +181,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			Output.AppendLine();
 		}
 
-		private string[] GenerateMarkdown(MarkdownElement[] Elements, int[] Widths)
+		private async Task<string[]> GenerateMarkdown(MarkdownElement[] Elements, int[] Widths)
 		{
 			string[] Result = new string[this.columns];
 			StringBuilder sb = new StringBuilder();
@@ -194,7 +195,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				if (E is null)
 					continue;
 
-				E.GenerateMarkdown(sb);
+				await E.GenerateMarkdown(sb);
 				Result[i] = sb.ToString();
 				sb.Clear();
 
@@ -230,7 +231,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override async Task GenerateHTML(StringBuilder Output)
 		{
 			MarkdownElement E;
 			int i, j, k;
@@ -286,7 +287,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					}
 
 					Output.Append("\">");
-					E.GenerateHTML(Output);
+					await E.GenerateHTML(Output);
 					Output.AppendLine("</th>");
 				}
 
@@ -320,7 +321,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					}
 
 					Output.Append("\">");
-					E.GenerateHTML(Output);
+					await E.GenerateHTML(Output);
 					Output.AppendLine("</td>");
 				}
 
@@ -335,7 +336,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override async Task GeneratePlainText(StringBuilder Output)
 		{
 			bool First;
 
@@ -353,7 +354,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					else
 						Output.Append('\t');
 
-					E.GeneratePlainText(Output);
+					await E.GeneratePlainText(Output);
 				}
 
 				Output.AppendLine();
@@ -373,7 +374,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					else
 						Output.Append('\t');
 
-					E.GeneratePlainText(Output);
+					await E.GeneratePlainText(Output);
 				}
 
 				Output.AppendLine();
@@ -387,7 +388,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			XamlSettings Settings = this.Document.Settings.XamlSettings;
 			int Column;
@@ -421,15 +422,15 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			Output.WriteEndElement();
 
 			for (Row = 0, NrRows = this.headers.Length; Row < NrRows; Row++, RowNr++)
-				this.GenerateXAML(Output, this.headers[Row], RowNr, true);
+				await this.GenerateXAML(Output, this.headers[Row], RowNr, true);
 
 			for (Row = 0, NrRows = this.rows.Length; Row < NrRows; Row++, RowNr++)
-				this.GenerateXAML(Output, this.rows[Row], RowNr, false);
+				await this.GenerateXAML(Output, this.rows[Row], RowNr, false);
 
 			Output.WriteEndElement();
 		}
 
-		private void GenerateXAML(XmlWriter Output, MarkdownElement[] CurrentRow, int RowNr, bool Bold)
+		private async Task GenerateXAML(XmlWriter Output, MarkdownElement[] CurrentRow, int RowNr, bool Bold)
 		{
 			XamlSettings Settings = this.Document.Settings.XamlSettings;
 			MarkdownElement E;
@@ -490,7 +491,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					Output.WriteAttributeString("Margin", Settings.TableCellPadding);
 				}
 
-				E.GenerateXAML(Output, TextAlignment);
+				await E.GenerateXAML(Output, TextAlignment);
 				Output.WriteEndElement();
 				Output.WriteEndElement();
 			}
@@ -501,7 +502,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			XamlSettings Settings = this.Document.Settings.XamlSettings;
 			int Column;
@@ -539,16 +540,16 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			Output.WriteEndElement();
 
 			for (Row = 0, NrRows = this.headers.Length; Row < NrRows; Row++, RowNr++)
-				this.GenerateXamarinForms(Output, this.headers[Row], RowNr, true);
+				await this.GenerateXamarinForms(Output, this.headers[Row], RowNr, true);
 
 			for (Row = 0, NrRows = this.rows.Length; Row < NrRows; Row++, RowNr++)
-				this.GenerateXamarinForms(Output, this.rows[Row], RowNr, false);
+				await this.GenerateXamarinForms(Output, this.rows[Row], RowNr, false);
 
 			Output.WriteEndElement();
 			Output.WriteEndElement();
 		}
 
-		private void GenerateXamarinForms(XmlWriter Output, MarkdownElement[] CurrentRow, int RowNr, bool Bold)
+		private async Task GenerateXamarinForms(XmlWriter Output, MarkdownElement[] CurrentRow, int RowNr, bool Bold)
 		{
 			XamlSettings Settings = this.Document.Settings.XamlSettings;
 			MarkdownElement E;
@@ -604,7 +605,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 						Output.WriteAttributeString("FontAttributes", "Bold");
 
 					StringBuilder Html = new StringBuilder();
-					E.GenerateHTML(Html);
+					await E.GenerateHTML(Html);
 					Output.WriteCData(Html.ToString());
 
 					Output.WriteEndElement();	// Label
@@ -616,7 +617,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					Output.WriteAttributeString("Padding", Settings.TableCellPadding);
 
 					Output.WriteStartElement("StackLayout");
-					E.GenerateXamarinForms(Output, TextAlignment);
+					await E.GenerateXamarinForms(Output, TextAlignment);
 					Output.WriteEndElement();	// StackLayout
 					
 					Output.WriteEndElement();   // ContentView
@@ -629,10 +630,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get { return false; }
-		}
+		internal override bool InlineSpanElement => false;
 
 		/// <summary>
 		/// Loops through all child-elements for the element.

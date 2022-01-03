@@ -74,7 +74,7 @@ namespace Waher.Script.Operators.Arithmetics
 
 					if (!LeftSet.Equals(RightSet))
 					{
-						if (!Expression.UpgradeField(ref Left, ref LeftSet, ref Right, ref RightSet, Node))
+						if (!Expression.UpgradeField(ref Left, ref LeftSet, ref Right, ref RightSet))
 							throw new ScriptRuntimeException("Incompatible operands.", Node);
 
 						LE = Left as IGroupElement;

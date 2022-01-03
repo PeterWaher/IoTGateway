@@ -49,9 +49,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
 			return new Aes256();
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			base.Dispose();

@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP;
@@ -349,14 +350,14 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		protected override string ConfigPrivilege => "Admin.Communication.Domain";
 
-		private Task TestDomainNames(HttpRequest Request, HttpResponse Response)
+		private async Task TestDomainNames(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException();
 
-			object Obj = Request.DecodeData();
+			object Obj = await Request.DecodeDataAsync();
 			if (!(Obj is Dictionary<string, object> Parameters))
 				throw new BadRequestException();
 
@@ -402,8 +403,6 @@ namespace Waher.IoTGateway.Setup
 			Response.StatusCode = 200;
 
 			this.Test(TabID);
-
-			return Task.CompletedTask;
 		}
 
 		private Task TestDomainName(HttpRequest Request, HttpResponse Response)
@@ -508,7 +507,7 @@ namespace Waher.IoTGateway.Setup
 
 			try
 			{
-				Result = CheckIpScript.Evaluate(Variables);
+				Result = await CheckIpScript.EvaluateAsync(Variables);
 			}
 			catch (Exception ex)
 			{
@@ -539,7 +538,7 @@ namespace Waher.IoTGateway.Setup
 					Variables["IP"] = CurrentIP;
 					Variables["Domain"] = DomainName;
 
-					Result = UpdateIpScript.Evaluate(Variables);
+					Result = await UpdateIpScript.EvaluateAsync(Variables);
 
 					await RuntimeSettings.SetAsync("Last.IP." + DomainName, CurrentIP);
 				}
@@ -616,14 +615,14 @@ namespace Waher.IoTGateway.Setup
 			return true;
 		}
 
-		private Task TestCA(HttpRequest Request, HttpResponse Response)
+		private async Task TestCA(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException();
 
-			object Obj = Request.DecodeData();
+			object Obj = await Request.DecodeDataAsync();
 			if (!(Obj is Dictionary<string, object> Parameters))
 				throw new BadRequestException();
 
@@ -691,8 +690,6 @@ namespace Waher.IoTGateway.Setup
 				this.inProgress = true;
 				Task _ = this.CreateCertificate(TabID);
 			}
-		
-			return Task.CompletedTask;
 		}
 
 		private bool inProgress = false;
@@ -1014,7 +1011,7 @@ namespace Waher.IoTGateway.Setup
 											PemOutput.AppendLine("-----END CERTIFICATE-----");
 
 											CertFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.pem");
-											File.WriteAllText(CertFileName, PemOutput.ToString(), Encoding.ASCII);
+											await Resources.WriteAllTextAsync(CertFileName, PemOutput.ToString(), Encoding.ASCII);
 
 											await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Generating temporary key file.", false, "User");
 
@@ -1028,7 +1025,7 @@ namespace Waher.IoTGateway.Setup
 
 											KeyFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.key");
 
-											File.WriteAllText(KeyFileName, PemOutput.ToString(), Encoding.ASCII);
+											await Resources.WriteAllTextAsync(KeyFileName, PemOutput.ToString(), Encoding.ASCII);
 										}
 
 										await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Converting to PFX using " + OpenSslFile, false, "User");
@@ -1064,7 +1061,7 @@ namespace Waher.IoTGateway.Setup
 										await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Loading PFX.", false, "User");
 
 										CertFileName2 = Path.Combine(Gateway.AppDataFolder, "Certificate.pfx");
-										this.pfx = File.ReadAllBytes(CertFileName2);
+										this.pfx = await Resources.ReadAllBytesAsync(CertFileName2);
 										this.password = Password;
 										this.openSslPath = OpenSslFile;
 

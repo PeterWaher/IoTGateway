@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using Waher.Content;
+using System.Threading.Tasks;
 using Waher.Networking.CoAP.Options;
 using Waher.Networking.CoAP.Transport;
 
@@ -14,7 +12,7 @@ namespace Waher.Networking.CoAP
 	/// </summary>
 	/// <param name="Request">Incoming request.</param>
 	/// <param name="Response">Outgoing response.</param>
-	public delegate void CoapMethodHandler(CoapMessage Request, CoapResponse Response);
+	public delegate Task CoapMethodHandler(CoapMessage Request, CoapResponse Response);
 
 	/// <summary>
 	/// CoAP response to return to a received request.
@@ -55,59 +53,41 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// UDP Client through which the message was received.
 		/// </summary>
-		internal ClientBase Client
-		{
-			get { return this.client; }
-		}
+		internal ClientBase Client => this.client;
 
 		/// <summary>
 		/// CoAP Endpoint.
 		/// </summary>
-		public CoapEndpoint Endpoint
-		{
-			get { return this.endpoint; }
-		}
+		public CoapEndpoint Endpoint => this.endpoint;
 
 		/// <summary>
 		/// Remote endpoint.
 		/// </summary>
-		public IPEndPoint RemoteEndpoint
-		{
-			get { return this.remoteEndpoint; }
-		}
+		public IPEndPoint RemoteEndpoint => this.remoteEndpoint;
 
 		/// <summary>
 		/// If a response has been returned.
 		/// </summary>
 		public bool Responded
 		{
-			get { return this.responded; }
-			internal set { this.responded = value; }
+			get => this.responded;
+			internal set => this.responded = value;
 		}
 
 		/// <summary>
 		/// CoAP request message.
 		/// </summary>
-		public CoapMessage Request
-		{
-			get { return this.request; }
-		}
+		public CoapMessage Request => this.request;
 
 		/// <summary>
 		/// How notifications are sent, if at all.
 		/// </summary>
-		public Notifications Notifications
-		{
-			get { return this.notifications; }
-		}
+		public Notifications Notifications => this.notifications;
 
 		/// <summary>
 		/// Additional Response Options
 		/// </summary>
-		public CoapOption[] AdditionalResponseOptions
-		{
-			get { return this.additionalResponseOptions; }
-		}
+		public CoapOption[] AdditionalResponseOptions => this.additionalResponseOptions;
 
 		/// <summary>
 		/// Returns a response to the caller.
@@ -145,7 +125,7 @@ namespace Waher.Networking.CoAP
 		{
 			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.client.IsEncrypted,
 				this.responded ? (ushort?)null : this.request.MessageId,
-				this.ResponseType, Code, this.request.Token, false, Payload, Block2Nr, BlockSize, 
+				this.ResponseType, Code, this.request.Token, false, Payload, Block2Nr, BlockSize,
 				this.resource, null, null, null, null, CoapEndpoint.Merge(Options, this.additionalResponseOptions));
 
 			this.responded = true;
@@ -183,9 +163,24 @@ namespace Waher.Networking.CoAP
 		/// <param name="Payload">Optional payload to be encoded.</param>
 		/// <param name="BlockSize">Block size, in case the <paramref name="Payload"/> needs to be divided into blocks.</param>
 		/// <param name="Options">Optional options.</param>
+		[Obsolete("Use RespondAsync for better asynchronous performance.")]
 		public void Respond(CoapCode Code, object Payload, int BlockSize, params CoapOption[] Options)
 		{
-			byte[] Data = CoapEndpoint.Encode(Payload, out int ContentFormat);
+			this.RespondAsync(Code, Payload, BlockSize, Options).Wait();
+		}
+
+		/// <summary>
+		/// Returns a response to the caller.
+		/// </summary>
+		/// <param name="Code">CoAP message code.</param>
+		/// <param name="Payload">Optional payload to be encoded.</param>
+		/// <param name="BlockSize">Block size, in case the <paramref name="Payload"/> needs to be divided into blocks.</param>
+		/// <param name="Options">Optional options.</param>
+		public async Task RespondAsync(CoapCode Code, object Payload, int BlockSize, params CoapOption[] Options)
+		{
+			KeyValuePair<byte[], int> P = await CoapEndpoint.EncodeAsync(Payload);
+			byte[] Data = P.Key;
+			int ContentFormat = P.Value;
 
 			if (!CoapEndpoint.HasOption(Options, 12))
 				Options = CoapEndpoint.Merge(Options, new CoapOptionContentFormat((ulong)ContentFormat));

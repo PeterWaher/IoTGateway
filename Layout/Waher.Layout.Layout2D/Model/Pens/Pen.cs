@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -86,14 +87,14 @@ namespace Waher.Layout.Layout2D.Model.Pens
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.width = new LengthAttribute(Input, "width");
 			this.cap = new EnumAttribute<SKStrokeCap>(Input, "cap");
 			this.join = new EnumAttribute<SKStrokeJoin>(Input, "join");
 			this.miter = new LengthAttribute(Input, "miter");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -132,40 +133,42 @@ namespace Waher.Layout.Layout2D.Model.Pens
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 			float a;
 
-			if (!(this.width is null) && this.width.TryEvaluate(State.Session, out Length Width))
+			EvaluationResult<Length> Length = await this.width.TryEvaluate(State.Session);
+			if (Length.Ok)
 			{
 				a = this.penWidth ?? 0;
-				State.CalcDrawingSize(Width, ref a, true, ref Relative);
+				State.CalcDrawingSize(Length.Result, ref a, true, State);
 				this.penWidth = a;
 			}
 			else
 				this.penWidth = null;
 
-			if (!(this.cap is null) && this.cap.TryEvaluate(State.Session, out SKStrokeCap Cap))
-				this.penCap = Cap;
+			EvaluationResult<SKStrokeCap> Cap = await this.cap.TryEvaluate(State.Session);
+			if (Cap.Ok)
+				this.penCap = Cap.Result;
 			else
 				this.penCap = null;
 
-			if (!(this.join is null) && this.join.TryEvaluate(State.Session, out SKStrokeJoin Join))
-				this.penJoin = Join;
+			EvaluationResult<SKStrokeJoin> Join = await this.join.TryEvaluate(State.Session);
+			if (Join.Ok)
+				this.penJoin = Join.Result;
 			else
 				this.penJoin = null;
 
-			if (!(this.miter is null) && this.miter.TryEvaluate(State.Session, out Width))
+			Length = await this.miter.TryEvaluate(State.Session);
+			if (Length.Ok)
 			{
 				a = this.penMiter ?? 0;
-				State.CalcDrawingSize(Width, ref a, true, ref Relative);
+				State.CalcDrawingSize(Length.Result, ref a, true, State);
 				this.penMiter = a;
 			}
 			else
 				this.penMiter = null;
-
-			return Relative;
 		}
 
 		/// <summary>

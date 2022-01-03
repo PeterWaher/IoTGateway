@@ -337,9 +337,9 @@ namespace Waher.Client.WPF.Model.PubSub
 					{
 						Form["Payload"].Error = ex.Message;
 
-						MainWindow.UpdateGui(() =>
+						MainWindow.UpdateGui(async () =>
 						{
-							Dialog = new ParameterDialog(Form);
+							Dialog = await ParameterDialog.CreateAsync(Form);
 							Dialog.ShowDialog();
 						});
 
@@ -370,10 +370,9 @@ namespace Waher.Client.WPF.Model.PubSub
 				new TextMultiField(null, "Payload", "XML:", false, new string[] { string.Empty }, null, "XML payload of item.",
 					StringDataType.Instance, null, string.Empty, false, false, false));
 
-			Dialog = new ParameterDialog(Form);
-
-			MainWindow.UpdateGui(() =>
+			MainWindow.UpdateGui(async () =>
 			{
+				Dialog = await ParameterDialog.CreateAsync(Form);
 				Dialog.ShowDialog();
 			});
 		}
@@ -405,6 +404,7 @@ namespace Waher.Client.WPF.Model.PubSub
 					{
 						Service?.Account?.View?.NodeAdded(this, Item);
 						this.OnUpdated();
+						return Task.CompletedTask;
 					});
 				}
 			}
@@ -418,6 +418,7 @@ namespace Waher.Client.WPF.Model.PubSub
 				{
 					Service?.Account?.View?.NodeRemoved(this, N);
 					this.OnUpdated();
+					return Task.CompletedTask;
 				});
 			}
 		}
@@ -442,6 +443,8 @@ namespace Waher.Client.WPF.Model.PubSub
 					Service?.Account?.View?.NodeRemoved(this, Node);
 
 				this.OnUpdated();
+
+				return Task.CompletedTask;
 			});
 		}
 
@@ -489,7 +492,7 @@ namespace Waher.Client.WPF.Model.PubSub
 		{
 			Mouse.OverrideCursor = Cursors.Wait;
 
-			this.PubSubClient.GetNodeConfiguration(this.node, (sender, e) =>
+			this.PubSubClient.GetNodeConfiguration(this.node, async (sender, e) =>
 			{
 				MainWindow.MouseDefault();
 
@@ -530,19 +533,16 @@ namespace Waher.Client.WPF.Model.PubSub
 							return Task.CompletedTask;
 						}, string.Empty, string.Empty, e.Form.Fields);
 
-					ParameterDialog Dialog = new ParameterDialog(Form);
+					ParameterDialog Dialog = await ParameterDialog.CreateAsync(Form);
 
 					MainWindow.UpdateGui(() =>
 					{
 						Dialog.ShowDialog();
+						return Task.CompletedTask;
 					});
-
-					return Task.CompletedTask;
 				}
 				else
 					MainWindow.ErrorBox("Unable to get node properties: " + e.ErrorText);
-
-				return Task.CompletedTask;
 
 			}, null);
 		}

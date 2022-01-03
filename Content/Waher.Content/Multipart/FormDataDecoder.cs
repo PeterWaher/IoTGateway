@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Runtime.Inventory;
 
@@ -31,30 +32,12 @@ namespace Waher.Content.Multipart
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes
-		{
-			get
-			{
-				return new string[]
-				{
-					ContentType
-				};
-			}
-		}
+		public string[] ContentTypes => new string[] { ContentType };
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions
-		{
-			get
-			{
-				return new string[]
-				{
-					"formdata"
-				};
-			}
-		}
+		public string[] FileExtensions => new string[] { "formdata" };
 
 		/// <summary>
 		/// If the decoder decodes an object with a given content type.
@@ -86,11 +69,11 @@ namespace Waher.Content.Multipart
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public async Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			Dictionary<string, object> Form = new Dictionary<string, object>();
 
-			Decode(Data, Fields, Form, null, BaseUri);
+			await Decode(Data, Fields, Form, null, BaseUri);
 
 			return Form;
 		}
@@ -103,7 +86,7 @@ namespace Waher.Content.Multipart
 		/// <param name="Form">Resulting Form, or null if not of interest.</param>
 		/// <param name="List">Decoded embedded objects will be added to this list.</param>
 		/// <param name="BaseUri">Bare URI</param>
-		public static void Decode(byte[] Data, KeyValuePair<string, string>[] Fields, Dictionary<string, object> Form,
+		public static async Task Decode(byte[] Data, KeyValuePair<string, string>[] Fields, Dictionary<string, object> Form,
 			List<EmbeddedContent> List, Uri BaseUri)
 		{
 			string Boundary = null;
@@ -141,7 +124,7 @@ namespace Waher.Content.Multipart
 
 				if (j == d)
 				{
-					AddPart(Data, Start, i, Form, List, BaseUri);
+					await AddPart(Data, Start, i, Form, List, BaseUri);
 
 					i += d;
 					while (i < c && Data[i] <= 32)
@@ -154,10 +137,10 @@ namespace Waher.Content.Multipart
 			}
 
 			if (Start < c)
-				AddPart(Data, Start, c, Form, List, BaseUri);
+				await AddPart(Data, Start, c, Form, List, BaseUri);
 		}
 
-		private static void AddPart(byte[] Data, int Start, int i,
+		private static async Task AddPart(byte[] Data, int Start, int i,
 			Dictionary<string, object> Form, List<EmbeddedContent> List, Uri BaseUri)
 		{
 			int j, k, l, m;
@@ -279,7 +262,7 @@ namespace Waher.Content.Multipart
 						throw new Exception("Unrecognized Content-Transfer-Encoding: " + EmbeddedContent.TransferEncoding);
 				}
 
-				EmbeddedContent.Decoded = InternetContent.Decode(EmbeddedContent.ContentType, Data2, BaseUri);
+				EmbeddedContent.Decoded = await InternetContent.DecodeAsync(EmbeddedContent.ContentType, Data2, BaseUri);
 
 				if (!(Form is null))
 				{
@@ -461,7 +444,7 @@ namespace Waher.Content.Multipart
 		/// <param name="Content">Multi-part content.</param>
 		/// <param name="Boundary">Boundary to use.</param>
 		/// <returns>Encoded multi-part content.</returns>
-		public static byte[] Encode(IEnumerable<EmbeddedContent> Content, string Boundary)
+		public static async Task<byte[]> Encode(IEnumerable<EmbeddedContent> Content, string Boundary)
 		{
 			using (MemoryStream ms = new MemoryStream())
 			{
@@ -469,7 +452,7 @@ namespace Waher.Content.Multipart
 
 				foreach (EmbeddedContent Alternative in Content)
 				{
-					Alternative.AssertEncoded();
+					await Alternative.AssertEncoded();
 
 					Header.Clear();
 					Header.Append("\r\n--");

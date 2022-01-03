@@ -448,9 +448,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		/// <summary>
-		/// <see cref="object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (!(obj is RosterItem Item))
@@ -476,9 +474,7 @@ namespace Waher.Networking.XMPP
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = this.state.GetHashCode();

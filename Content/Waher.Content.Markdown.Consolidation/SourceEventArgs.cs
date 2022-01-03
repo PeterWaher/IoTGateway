@@ -8,7 +8,7 @@ namespace Waher.Content.Markdown.Consolidation
 	/// </summary>
 	/// <param name="Sender">Sender of events.</param>
 	/// <param name="e">Event arguments</param>
-	public delegate void SourceEventHandler(object Sender, SourceEventArgs e);
+	public delegate Task SourceEventHandler(object Sender, SourceEventArgs e);
 
 	/// <summary>
 	/// Event arguments for source events.

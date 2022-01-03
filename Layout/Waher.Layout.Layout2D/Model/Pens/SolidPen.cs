@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -41,11 +41,10 @@ namespace Waher.Layout.Layout2D.Model.Pens
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.color = new ColorAttribute(Input, "color");
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -87,38 +86,38 @@ namespace Waher.Layout.Layout2D.Model.Pens
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
-			if (this.paint is null &&
-				!(this.color is null) &&
-				this.color.TryEvaluate(State.Session, out SKColor Color))
+			if (this.paint is null)
 			{
-				this.paint = new SKPaint()
+				EvaluationResult<SKColor> Color = await this.color.TryEvaluate(State.Session);
+				if (Color.Ok)
 				{
-					FilterQuality = SKFilterQuality.High,
-					IsAntialias = true,
-					Style = SKPaintStyle.Stroke, 
-					Color = Color,
-				};
+					this.paint = new SKPaint()
+					{
+						FilterQuality = SKFilterQuality.High,
+						IsAntialias = true,
+						Style = SKPaintStyle.Stroke,
+						Color = Color.Result,
+					};
 
-				if (this.penWidth.HasValue)
-					this.paint.StrokeWidth = this.penWidth.Value;
+					if (this.penWidth.HasValue)
+						this.paint.StrokeWidth = this.penWidth.Value;
 
-				if (this.penCap.HasValue)
-					this.paint.StrokeCap = this.penCap.Value;
+					if (this.penCap.HasValue)
+						this.paint.StrokeCap = this.penCap.Value;
 
-				if (this.penJoin.HasValue)
-					this.paint.StrokeJoin = this.penJoin.Value;
+					if (this.penJoin.HasValue)
+						this.paint.StrokeJoin = this.penJoin.Value;
 
-				if (this.penMiter.HasValue)
-					this.paint.StrokeMiter = this.penMiter.Value;
+					if (this.penMiter.HasValue)
+						this.paint.StrokeMiter = this.penMiter.Value;
 
-				this.defined = true;
+					this.defined = true;
+				}
 			}
-
-			return Relative;
 		}
 
 	}

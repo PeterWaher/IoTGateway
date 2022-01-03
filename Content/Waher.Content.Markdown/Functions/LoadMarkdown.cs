@@ -1,5 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
@@ -27,20 +28,34 @@ namespace Waher.Content.Markdown.Functions
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "loadmarkdown"; }
-        }
+        public override string FunctionName => "loadmarkdown";
 
-        /// <summary>
-        /// Evaluates the function on a scalar argument.
-        /// </summary>
-        /// <param name="Argument">Function argument.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public override IElement EvaluateScalar(string Argument, Variables Variables)
-        {
-			string Markdown = File.ReadAllText(Argument);
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(string Argument, Variables Variables)
+		{
+			return this.EvaluateScalarAsync(Argument, Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override async Task<IElement> EvaluateScalarAsync(string Argument, Variables Variables)
+		{
+			string Markdown = await Resources.ReadAllTextAsync(Argument);
 			MarkdownSettings Settings = new MarkdownSettings()
 			{
 				Variables = Variables,
@@ -62,7 +77,8 @@ namespace Waher.Content.Markdown.Functions
 				Settings.VideoControls = ParentSettings.VideoControls;
 			}
 
-			Markdown = MarkdownDocument.Preprocess(Markdown, Settings, Argument);
+			KeyValuePair<string, bool> P = await MarkdownDocument.Preprocess(Markdown, Settings, Argument);
+			Markdown = P.Key;
 
 			Match M = MarkdownDocument.endOfHeader.Match(Markdown);
 			if (M.Success)

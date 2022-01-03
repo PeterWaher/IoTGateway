@@ -73,9 +73,7 @@ namespace Waher.Networking.XMPP.MUC
 			this.client.OnGroupChatMessage += Client_OnGroupChatMessage;
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			this.client.UnregisterPresenceHandler("x", NamespaceMucUser, this.UserPresenceHandler, true);

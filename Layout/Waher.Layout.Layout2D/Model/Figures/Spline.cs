@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -62,12 +63,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.head = new StringAttribute(Input, "head");
 			this.tail = new StringAttribute(Input, "tail");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -412,21 +413,21 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
-			if (!(this.head is null) &&
-				this.head.TryEvaluate(State.Session, out string RefId) &&
-				this.Document.TryGetElement(RefId, out ILayoutElement Element) &&
+			EvaluationResult<string> RefId = await this.head.TryEvaluate(State.Session);
+			if (RefId.Ok &&
+				this.Document.TryGetElement(RefId.Result, out ILayoutElement Element) &&
 				Element is Shape Shape)
 			{
 				this.headElement = Shape;
 			}
 
-			if (!(this.tail is null) &&
-				this.tail.TryEvaluate(State.Session, out RefId) &&
-				this.Document.TryGetElement(RefId, out Element) &&
+			RefId = await this.head.TryEvaluate(State.Session);
+			if (RefId.Ok &&
+				this.Document.TryGetElement(RefId.Result, out Element) &&
 				Element is Shape Shape2)
 			{
 				this.tailElement = Shape2;
@@ -434,8 +435,6 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			this.spline?.Dispose();
 			this.spline = null;
-
-			return Relative;
 		}
 
 		private Shape headElement;
@@ -450,11 +449,11 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			if (this.defined)
 			{
-				SKPaint Pen = this.GetPen(State);
+				SKPaint Pen = await this.GetPen(State);
 
 				this.CheckSpline();
 
@@ -462,15 +461,14 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 				if (!(this.tailElement is null) || !(this.headElement is null))
 				{
-					if (!this.TryGetFill(State, out SKPaint Fill))
-						Fill = null;
+					SKPaint Fill = await this.TryGetFill(State);
 
 					this.tailElement?.DrawTail(State, this, Pen, Fill);
 					this.headElement?.DrawHead(State, this, Pen, Fill);
 				}
 			}
-		
-			base.Draw(State);
+
+			await base.Draw(State);
 		}
 
 		private void CheckSpline()
@@ -503,7 +501,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				if (c == 2)
 				{
 					Vertex P2 = this.points[1];
-			
+
 					Direction = CalcDirection(P1, P2);
 				}
 				else

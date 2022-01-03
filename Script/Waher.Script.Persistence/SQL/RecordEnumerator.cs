@@ -81,7 +81,7 @@ namespace Waher.Script.Persistence.SQL
 				{
 					try
 					{
-						this.record[i] = this.columns[i].Evaluate(this.properties);
+						this.record[i] = await this.columns[i].EvaluateAsync(this.properties);
 					}
 					catch (Exception ex)
 					{

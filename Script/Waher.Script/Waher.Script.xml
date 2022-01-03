@@ -2399,9 +2399,24 @@
             <param name="ValueElement">If found, constant value will be placed here.</param>
             <returns>If a constant with the given name was found.</returns>
         </member>
+        <member name="P:Waher.Script.Expression.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Expression.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Expression.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the expression, using the variables provided in the <paramref name="Variables"/> collection.
+            This method should be used for evaluating expressions in a synchronous (blocking) context.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Expression.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the expression, using the variables provided in the <paramref name="Variables"/> collection.
+            This method should be used for evaluating expressions in an asynchronous (non-blocking) context.
             </summary>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
@@ -2412,14 +2427,10 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Expression.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Expression.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Expression.ContainsImplicitPrint">
             <summary>
@@ -2437,6 +2448,27 @@
             <returns>Transformed string.</returns>
         </member>
         <member name="M:Waher.Script.Expression.Transform(System.String,System.String,System.String,Waher.Script.Variables,System.String)">
+            <summary>
+            Transforms a string by executing embedded script.
+            </summary>
+            <param name="s">String to transform.</param>
+            <param name="StartDelimiter">Start delimiter.</param>
+            <param name="StopDelimiter">Stop delimiter.</param>
+            <param name="Variables">Collection of variables.</param>
+            <param name="Source">Optional source of <paramref name="s"/>.</param>
+            <returns>Transformed string.</returns>
+        </member>
+        <member name="M:Waher.Script.Expression.TransformAsync(System.String,System.String,System.String,Waher.Script.Variables)">
+            <summary>
+            Transforms a string by executing embedded script.
+            </summary>
+            <param name="s">String to transform.</param>
+            <param name="StartDelimiter">Start delimiter.</param>
+            <param name="StopDelimiter">Stop delimiter.</param>
+            <param name="Variables">Collection of variables.</param>
+            <returns>Transformed string.</returns>
+        </member>
+        <member name="M:Waher.Script.Expression.TransformAsync(System.String,System.String,System.String,Waher.Script.Variables,System.String)">
             <summary>
             Transforms a string by executing embedded script.
             </summary>
@@ -2576,7 +2608,7 @@
             <param name="Value">Object</param>
             <returns>Encapsulated object.</returns>
         </member>
-        <member name="M:Waher.Script.Expression.UpgradeSemiGroup(Waher.Script.Abstraction.Elements.IElement@,Waher.Script.Abstraction.Sets.ISet@,Waher.Script.Abstraction.Elements.IElement@,Waher.Script.Abstraction.Sets.ISet@,Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Expression.UpgradeSemiGroup(Waher.Script.Abstraction.Elements.IElement@,Waher.Script.Abstraction.Sets.ISet@,Waher.Script.Abstraction.Elements.IElement@,Waher.Script.Abstraction.Sets.ISet@)">
             <summary>
             Upgrades elements if necessary, to a common semi-field, trying to make them compatible.
             </summary>
@@ -2584,10 +2616,9 @@
             <param name="Set1">Set containing element 1.</param>
             <param name="E2">Element 2.</param>
             <param name="Set2">Set containing element 2.</param>
-            <param name="Node">Script node requesting the upgrade.</param>
             <returns>If elements have been upgraded to become compatible.</returns>
         </member>
-        <member name="M:Waher.Script.Expression.UpgradeField(Waher.Script.Abstraction.Elements.IElement@,Waher.Script.Abstraction.Sets.ISet@,Waher.Script.Abstraction.Elements.IElement@,Waher.Script.Abstraction.Sets.ISet@,Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Expression.UpgradeField(Waher.Script.Abstraction.Elements.IElement@,Waher.Script.Abstraction.Sets.ISet@,Waher.Script.Abstraction.Elements.IElement@,Waher.Script.Abstraction.Sets.ISet@)">
             <summary>
             Upgrades elements if necessary, to a common field extension, trying to make them compatible.
             </summary>
@@ -2595,7 +2626,6 @@
             <param name="Set1">Set containing element 1.</param>
             <param name="E2">Element 2.</param>
             <param name="Set2">Set containing element 2.</param>
-            <param name="Node">Script node requesting the upgrade.</param>
             <returns>If elements have been upgraded to become compatible.</returns>
         </member>
         <member name="M:Waher.Script.Expression.ConvertTo(Waher.Script.Abstraction.Elements.IElement,System.Type,Waher.Script.Model.ScriptNode)">
@@ -2708,6 +2738,21 @@
             <returns>Result</returns>
         </member>
         <member name="M:Waher.Script.Expression.Eval(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates script, in string format.
+            </summary>
+            <param name="Script">Script to parse and evaluate.</param>
+            <param name="Variables">Variables</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Expression.EvalAsync(System.String)">
+            <summary>
+            Evaluates script, in string format.
+            </summary>
+            <param name="Script">Script to parse and evaluate.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Expression.EvalAsync(System.String,Waher.Script.Variables)">
             <summary>
             Evaluates script, in string format.
             </summary>
@@ -5305,7 +5350,20 @@
             Default Argument names
             </summary>
         </member>
+        <member name="P:Waher.Script.Functions.Runtime.Create.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Functions.Runtime.Create.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Functions.Runtime.Create.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Runtime.Create.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -5322,14 +5380,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Functions.Runtime.Create.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Functions.Runtime.Create.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Functions.Runtime.Destroy">
             <summary>
@@ -5517,10 +5571,22 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Functions.Runtime.MethodLambda.ToString">
+        <member name="P:Waher.Script.Functions.Runtime.MethodLambda.IsAsynchronous">
             <summary>
-            <see cref="M:System.Object.ToString"/>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
             </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Runtime.MethodLambda.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the lambda expression.
+            </summary>
+            <param name="Arguments">Arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Runtime.MethodLambda.ToString">
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Functions.Runtime.Methods">
             <summary>
@@ -5845,14 +5911,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Functions.Runtime.Remove.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Functions.Runtime.Remove.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Functions.Runtime.Required">
             <summary>
@@ -6620,7 +6682,21 @@
             Optional aliases. If there are no aliases for the function, null is returned.
             </summary>
         </member>
+        <member name="P:Waher.Script.Functions.Strings.Evaluate.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="!:EvaluateAsync(Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Functions.Strings.Evaluate.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.Evaluate.EvaluateScalarAsync(System.String,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>
@@ -8385,7 +8461,23 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Model.BinaryBooleanOperator.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Model.BinaryBooleanOperator.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator on scalar operands.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryBooleanOperator.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the operator on scalar operands.
             </summary>
@@ -8403,6 +8495,22 @@
             <returns>Optimized result, if possble, or null if both operands are required.</returns>
         </member>
         <member name="M:Waher.Script.Model.BinaryBooleanOperator.Evaluate(System.Boolean,System.Boolean)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryBooleanOperator.EvaluateOptimizedResultAsync(System.Boolean)">
+            <summary>
+            Gives the operator a chance to optimize its execution if it knows the value of the left operand. This method is only called
+            if both operands evaluated to boolean values last time the operator was evaluated.
+            </summary>
+            <param name="Left">Value of left operand.</param>
+            <returns>Optimized result, if possble, or null if both operands are required.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryBooleanOperator.EvaluateAsync(System.Boolean,System.Boolean)">
             <summary>
             Evaluates the boolean operator.
             </summary>
@@ -8432,6 +8540,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Model.BinaryDoubleOperator.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Model.BinaryDoubleOperator.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the operator on scalar operands.
@@ -8441,7 +8556,24 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
+        <member name="M:Waher.Script.Model.BinaryDoubleOperator.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator on scalar operands.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
         <member name="M:Waher.Script.Model.BinaryDoubleOperator.Evaluate(System.Double,System.Double)">
+            <summary>
+            Evaluates the double operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryDoubleOperator.EvaluateAsync(System.Double,System.Double)">
             <summary>
             Evaluates the double operator.
             </summary>
@@ -8471,7 +8603,23 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Model.BinaryDualBoolDoubleOperator.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Model.BinaryDualBoolDoubleOperator.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator on scalar operands.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryDualBoolDoubleOperator.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the operator on scalar operands.
             </summary>
@@ -8497,6 +8645,30 @@
             <returns>Result</returns>
         </member>
         <member name="M:Waher.Script.Model.BinaryDualBoolDoubleOperator.Evaluate(System.Double,System.Double)">
+            <summary>
+            Evaluates the double operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryDualBoolDoubleOperator.EvaluateOptimizedResultAsync(System.Boolean)">
+            <summary>
+            Gives the operator a chance to optimize its execution if it knows the value of the left operand. This method is only called
+            if both operands evaluated to boolean values last time the operator was evaluated.
+            </summary>
+            <param name="Left">Value of left operand.</param>
+            <returns>Optimized result, if possble, or null if both operands are required.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryDualBoolDoubleOperator.EvaluateAsync(System.Boolean,System.Boolean)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryDualBoolDoubleOperator.EvaluateAsync(System.Double,System.Double)">
             <summary>
             Evaluates the double operator.
             </summary>
@@ -8559,6 +8731,15 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
+        <member name="M:Waher.Script.Model.BinaryElementWiseOperator.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
         <member name="T:Waher.Script.Model.BinaryOperator">
             <summary>
             Base class for all binary operators.
@@ -8574,6 +8755,11 @@
             Right operand.
             </summary>
         </member>
+        <member name="F:Waher.Script.Model.BinaryOperator.isAsync">
+            <summary>
+            If subtree is asynchroneous.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Model.BinaryOperator.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Base class for all binary operators.
@@ -8583,6 +8769,11 @@
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryOperator.CalcIsAsync">
+            <summary>
+            Recalculates if operator is asynchronous or not.
+            </summary>
         </member>
         <member name="P:Waher.Script.Model.BinaryOperator.LeftOperand">
             <summary>
@@ -8599,6 +8790,12 @@
             Default variable name, if any, null otherwise.
             </summary>
         </member>
+        <member name="P:Waher.Script.Model.BinaryOperator.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Model.BinaryOperator.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
             <summary>
             Calls the callback method for all child nodes.
@@ -8609,14 +8806,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Model.BinaryOperator.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Model.BinaryOperator.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Model.UpgradeBehaviour">
             <summary>
@@ -8660,6 +8853,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Model.BinaryScalarOperator.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Model.BinaryScalarOperator.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the operator.
@@ -8669,7 +8869,25 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
+        <member name="M:Waher.Script.Model.BinaryScalarOperator.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
         <member name="M:Waher.Script.Model.BinaryScalarOperator.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator on scalar operands.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryScalarOperator.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the operator on scalar operands.
             </summary>
@@ -8705,20 +8923,47 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Model.BinaryVectorOperator.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement)">
+        <member name="M:Waher.Script.Model.BinaryVectorOperator.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryVectorOperator.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the operator.
             </summary>
             <param name="Left">Left value.</param>
             <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
-        <member name="M:Waher.Script.Model.BinaryVectorOperator.EvaluateVector(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IVector)">
+        <member name="M:Waher.Script.Model.BinaryVectorOperator.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryVectorOperator.EvaluateVector(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IVector,Waher.Script.Variables)">
             <summary>
             Evaluates the operator on vector operands.
             </summary>
             <param name="Left">Left value.</param>
             <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.BinaryVectorOperator.EvaluateVectorAsync(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IVector,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator on vector operands.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
         <member name="P:Waher.Script.Model.BinaryVectorOperator.ScalarUpgradeBehaviour">
@@ -8745,9 +8990,24 @@
             Constant value.
             </summary>
         </member>
+        <member name="P:Waher.Script.Model.ConstantElement.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ConstantElement.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Model.ConstantElement.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            This method should be used for nodes whose <see cref="P:Waher.Script.Model.ConstantElement.IsAsynchronous"/> is false.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.ConstantElement.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            This method should be used for nodes whose <see cref="P:Waher.Script.Model.ConstantElement.IsAsynchronous"/> is true.
             </summary>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
@@ -8774,14 +9034,10 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Model.ConstantElement.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Model.ConstantElement.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Model.Function">
             <summary>
@@ -8896,6 +9152,12 @@
             Function argument types.
             </summary>
         </member>
+        <member name="P:Waher.Script.Model.FunctionMultiVariate.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.FunctionMultiVariate.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Model.FunctionMultiVariate.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -8903,7 +9165,22 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Model.FunctionMultiVariate.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Model.FunctionMultiVariate.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionMultiVariate.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>
@@ -8921,14 +9198,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Model.FunctionMultiVariate.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Model.FunctionMultiVariate.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Model.FunctionOneMatrixVariable">
             <summary>
@@ -8944,7 +9217,20 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
+        <member name="P:Waher.Script.Model.FunctionOneMatrixVariable.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
         <member name="M:Waher.Script.Model.FunctionOneMatrixVariable.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneMatrixVariable.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>
@@ -8984,10 +9270,37 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="P:Waher.Script.Model.FunctionOneMatrixVariable.DefaultArgumentNames">
+        <member name="M:Waher.Script.Model.FunctionOneMatrixVariable.EvaluateMatrixAsync(Waher.Script.Abstraction.Elements.IMatrix,Waher.Script.Variables)">
             <summary>
-            Default Argument names
+            Evaluates the function on a matrix argument.
             </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneMatrixVariable.EvaluateMatrixAsync(Waher.Script.Objects.Matrices.DoubleMatrix,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a matrix argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneMatrixVariable.EvaluateMatrixAsync(Waher.Script.Objects.Matrices.ComplexMatrix,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a matrix argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneMatrixVariable.EvaluateMatrixAsync(Waher.Script.Objects.Matrices.BooleanMatrix,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a matrix argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
         </member>
         <member name="T:Waher.Script.Model.FunctionOneScalarVariable">
             <summary>
@@ -9051,6 +9364,54 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarVariable.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarVariable.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarVariable.EvaluateScalarAsync(System.Double,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarVariable.EvaluateScalarAsync(System.Numerics.Complex,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarVariable.EvaluateScalarAsync(System.Boolean,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneScalarVariable.EvaluateScalarAsync(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Model.FunctionOneVariable">
             <summary>
             Base class for funcions of one variable.
@@ -9075,6 +9436,12 @@
             Default Argument names
             </summary>
         </member>
+        <member name="P:Waher.Script.Model.FunctionOneVariable.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.FunctionOneVariable.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Model.FunctionOneVariable.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -9082,7 +9449,22 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Model.FunctionOneVariable.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Model.FunctionOneVariable.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneVariable.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>
@@ -9100,14 +9482,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Model.FunctionOneVariable.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Model.FunctionOneVariable.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Model.FunctionOneVectorVariable">
             <summary>
@@ -9123,6 +9501,11 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
+        <member name="P:Waher.Script.Model.FunctionOneVectorVariable.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
         <member name="M:Waher.Script.Model.FunctionOneVectorVariable.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function.
@@ -9132,6 +9515,22 @@
             <returns>Function result.</returns>
         </member>
         <member name="M:Waher.Script.Model.FunctionOneVectorVariable.EvaluateNonVector(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a non-vector. By default, the non-vector argument is converted to a vector of length 1.
+            </summary>
+            <param name="Argument">Non-vector argument.</param>
+            <param name="Variables">Variables.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneVectorVariable.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneVectorVariable.EvaluateNonVectorAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a non-vector. By default, the non-vector argument is converted to a vector of length 1.
             </summary>
@@ -9171,10 +9570,37 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="P:Waher.Script.Model.FunctionOneVectorVariable.DefaultArgumentNames">
+        <member name="M:Waher.Script.Model.FunctionOneVectorVariable.EvaluateVectorAsync(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Variables)">
             <summary>
-            Default Argument names
+            Evaluates the function on a vector argument.
             </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneVectorVariable.EvaluateVectorAsync(Waher.Script.Objects.VectorSpaces.DoubleVector,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a vector argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneVectorVariable.EvaluateVectorAsync(Waher.Script.Objects.VectorSpaces.ComplexVector,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a vector argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionOneVectorVariable.EvaluateVectorAsync(Waher.Script.Objects.VectorSpaces.BooleanVector,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a vector argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
         </member>
         <member name="T:Waher.Script.Model.FunctionTwoScalarVariables">
             <summary>
@@ -9245,6 +9671,60 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Model.FunctionTwoScalarVariables.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionTwoScalarVariables.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionTwoScalarVariables.EvaluateScalarAsync(System.Double,System.Double,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionTwoScalarVariables.EvaluateScalarAsync(System.Numerics.Complex,System.Numerics.Complex,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionTwoScalarVariables.EvaluateScalarAsync(System.Boolean,System.Boolean,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionTwoScalarVariables.EvaluateScalarAsync(System.String,System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Model.FunctionTwoVariables">
             <summary>
             Base class for funcions of one variable.
@@ -9275,6 +9755,12 @@
             Default Argument names
             </summary>
         </member>
+        <member name="P:Waher.Script.Model.FunctionTwoVariables.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.FunctionTwoVariables.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Model.FunctionTwoVariables.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -9282,7 +9768,23 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Model.FunctionTwoVariables.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Model.FunctionTwoVariables.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.FunctionTwoVariables.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function.
             </summary>
@@ -9301,14 +9803,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Model.FunctionTwoVariables.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Model.FunctionTwoVariables.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Model.FunctionZeroVariables">
             <summary>
@@ -9490,7 +9988,21 @@
             Argument types.
             </summary>
         </member>
+        <member name="P:Waher.Script.Model.ILambdaExpression.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Model.ILambdaExpression.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the lambda expression.
+            </summary>
+            <param name="Arguments">Arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.ILambdaExpression.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
             Evaluates the lambda expression.
             </summary>
@@ -9520,14 +10032,10 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Model.NullCheckBinaryOperator.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Model.NullCheckBinaryOperator.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Model.NullCheckTernaryOperator">
             <summary>
@@ -9552,14 +10060,10 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Model.NullCheckTernaryOperator.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Model.NullCheckTernaryOperator.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Model.NullCheckUnaryOperator">
             <summary>
@@ -9582,14 +10086,10 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Model.NullCheckUnaryOperator.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Model.NullCheckUnaryOperator.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Model.NullCheckUnaryScalarOperator">
             <summary>
@@ -9612,14 +10112,10 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Model.NullCheckUnaryScalarOperator.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Model.NullCheckUnaryScalarOperator.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Model.QuaternaryOperator">
             <summary>
@@ -9643,6 +10139,11 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
+        <member name="M:Waher.Script.Model.QuaternaryOperator.CalcIsAsync">
+            <summary>
+            Recalculates if operator is asynchronous or not.
+            </summary>
+        </member>
         <member name="P:Waher.Script.Model.QuaternaryOperator.Middle2Operand">
             <summary>
             Second middle operand.
@@ -9658,14 +10159,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Model.QuaternaryOperator.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Model.QuaternaryOperator.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Model.ScriptLeafNode">
             <summary>
@@ -9714,14 +10211,10 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Model.ScriptLeafNodeVariableReference.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Model.ScriptLeafNodeVariableReference.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Model.PatternMatchResult">
             <summary>
@@ -9748,6 +10241,7 @@
             Delegate for ScriptNode callback methods.
             </summary>
             <param name="Node">Node being processed. Change the reference to change the structure of the expression.</param>
+            <param name="NewNode">A new node to replace the old node, or null if no replacement necessary.</param>
             <param name="State">State object.</param>
             <returns>true if process is to continue, false if it is completed.</returns>
         </member>
@@ -9774,9 +10268,24 @@
             Length of expression covered by node.
             </summary>
         </member>
+        <member name="P:Waher.Script.Model.ScriptNode.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Model.ScriptNode.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            This method should be used for nodes whose <see cref="P:Waher.Script.Model.ScriptNode.IsAsynchronous"/> is false.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            This method should be used for nodes whose <see cref="P:Waher.Script.Model.ScriptNode.IsAsynchronous"/> is true.
             </summary>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
@@ -9838,14 +10347,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Model.ScriptNode.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Model.ScriptNode.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Model.ScriptNode.AreEqual(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode)">
             <summary>
@@ -9878,9 +10383,7 @@
             <returns>Hash code</returns>
         </member>
         <member name="M:Waher.Script.Model.ScriptNode.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Model.ScriptNode.ToBoolean(Waher.Script.Abstraction.Elements.IElement)">
             <summary>
@@ -10156,6 +10659,11 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
+        <member name="M:Waher.Script.Model.TernaryOperator.CalcIsAsync">
+            <summary>
+            Recalculates if operator is asynchronous or not.
+            </summary>
+        </member>
         <member name="P:Waher.Script.Model.TernaryOperator.MiddleOperand">
             <summary>
             Middle operand.
@@ -10171,14 +10679,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Model.TernaryOperator.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Model.TernaryOperator.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Model.UnaryBooleanOperator">
             <summary>
@@ -10201,6 +10705,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Model.UnaryBooleanOperator.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Model.UnaryBooleanOperator.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the operator on scalar operands.
@@ -10209,7 +10720,22 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
+        <member name="M:Waher.Script.Model.UnaryBooleanOperator.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator on scalar operands.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
         <member name="M:Waher.Script.Model.UnaryBooleanOperator.Evaluate(System.Boolean)">
+            <summary>
+            Evaluates the boolean operator.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.UnaryBooleanOperator.EvaluateAsync(System.Boolean)">
             <summary>
             Evaluates the boolean operator.
             </summary>
@@ -10237,7 +10763,22 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Model.UnaryDoubleOperator.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Model.UnaryDoubleOperator.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator on scalar operands.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.UnaryDoubleOperator.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the operator on scalar operands.
             </summary>
@@ -10252,6 +10793,13 @@
             <param name="Operand">Operand.</param>
             <returns>Result</returns>
         </member>
+        <member name="M:Waher.Script.Model.UnaryDoubleOperator.EvaluateAsync(System.Double)">
+            <summary>
+            Evaluates the double operator.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <returns>Result</returns>
+        </member>
         <member name="T:Waher.Script.Model.UnaryOperator">
             <summary>
             Base class for all unary operators.
@@ -10260,6 +10808,11 @@
         <member name="F:Waher.Script.Model.UnaryOperator.op">
             <summary>
             Operand.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Model.UnaryOperator.isAsync">
+            <summary>
+            If subtree is asynchroneous.
             </summary>
         </member>
         <member name="M:Waher.Script.Model.UnaryOperator.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
@@ -10281,6 +10834,42 @@
             Default variable name, if any, null otherwise.
             </summary>
         </member>
+        <member name="P:Waher.Script.Model.UnaryOperator.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.UnaryOperator.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Model.UnaryOperator.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.UnaryOperator.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.UnaryOperator.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.UnaryOperator.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
         <member name="M:Waher.Script.Model.UnaryOperator.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
             <summary>
             Calls the callback method for all child nodes.
@@ -10291,14 +10880,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Model.UnaryOperator.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Model.UnaryOperator.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Model.UnaryScalarOperator">
             <summary>
@@ -10314,13 +10899,6 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Model.UnaryScalarOperator.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
         <member name="M:Waher.Script.Model.UnaryScalarOperator.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the operator.
@@ -10329,7 +10907,23 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
+        <member name="M:Waher.Script.Model.UnaryScalarOperator.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
         <member name="M:Waher.Script.Model.UnaryScalarOperator.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator on scalar operands.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.UnaryScalarOperator.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the operator on scalar operands.
             </summary>
@@ -10397,14 +10991,10 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Model.VariableReference.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Model.VariableReference.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Objects.BooleanValue">
             <summary>
@@ -10423,9 +11013,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.BooleanValue.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.BooleanValue.AssociatedField">
             <summary>
@@ -10464,14 +11052,10 @@
             <returns>Negation of current element.</returns>
         </member>
         <member name="M:Waher.Script.Objects.BooleanValue.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.BooleanValue.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="F:Waher.Script.Objects.BooleanValue.True">
             <summary>
@@ -10529,14 +11113,10 @@
             <returns>If the element is contained in the set.</returns>
         </member>
         <member name="M:Waher.Script.Objects.BooleanValues.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.BooleanValues.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.BooleanValues.Compare(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement)">
             <summary>
@@ -10569,14 +11149,10 @@
             <returns>If the element is contained in the set.</returns>
         </member>
         <member name="M:Waher.Script.Objects.CaseInsensitiveStringValues.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.CaseInsensitiveStringValues.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.CaseInsensitiveStringValues.Compare(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement)">
             <summary>
@@ -10610,9 +11186,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.ComplexNumber.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.ComplexNumber.AssociatedField">
             <summary>
@@ -10651,14 +11225,10 @@
             <returns>Negation of current element.</returns>
         </member>
         <member name="M:Waher.Script.Objects.ComplexNumber.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.ComplexNumber.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.ComplexNumber.Zero">
             <summary>
@@ -10706,14 +11276,10 @@
             <returns>If the element is contained in the set.</returns>
         </member>
         <member name="M:Waher.Script.Objects.ComplexNumbers.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.ComplexNumbers.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="F:Waher.Script.Objects.ComplexNumbers.Instance">
             <summary>
@@ -10721,9 +11287,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.ComplexNumbers.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Objects.DateTimeValue">
             <summary>
@@ -10742,9 +11306,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.DateTimeValue.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.DateTimeValue.AssociatedSet">
             <summary>
@@ -10757,14 +11319,10 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.DateTimeValue.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.DateTimeValue.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.DateTimeValue.TryConvertTo(System.Type,System.Object@)">
             <summary>
@@ -10792,14 +11350,10 @@
             <returns>If the element is contained in the set.</returns>
         </member>
         <member name="M:Waher.Script.Objects.DateTimeValues.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.DateTimeValues.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.DateTimeValues.Compare(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement)">
             <summary>
@@ -10846,9 +11400,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.DoubleNumber.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.DoubleNumber.AssociatedField">
             <summary>
@@ -10887,14 +11439,10 @@
             <returns>Negation of current element.</returns>
         </member>
         <member name="M:Waher.Script.Objects.DoubleNumber.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.DoubleNumber.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.DoubleNumber.Zero">
             <summary>
@@ -10947,14 +11495,10 @@
             <returns>If the element is contained in the set.</returns>
         </member>
         <member name="M:Waher.Script.Objects.DoubleNumbers.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.DoubleNumbers.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.DoubleNumbers.Compare(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement)">
             <summary>
@@ -11005,9 +11549,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.Integer.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.Integer.AssociatedEuclidianDomain">
             <summary>
@@ -11046,14 +11588,10 @@
             <returns>Negation of current element.</returns>
         </member>
         <member name="M:Waher.Script.Objects.Integer.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.Integer.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.Integer.Zero">
             <summary>
@@ -11109,14 +11647,10 @@
             <returns>If the element is contained in the set.</returns>
         </member>
         <member name="M:Waher.Script.Objects.Integers.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.Integers.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="F:Waher.Script.Objects.Integers.Instance">
             <summary>
@@ -11124,9 +11658,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.Integers.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.Integers.Divide(Waher.Script.Abstraction.Elements.IEuclidianDomainElement,Waher.Script.Abstraction.Elements.IEuclidianDomainElement,Waher.Script.Abstraction.Elements.IEuclidianDomainElement@)">
             <summary>
@@ -11229,9 +11761,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.Matrices.BooleanMatrix.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.Matrices.BooleanMatrix.AssociatedRing">
             <summary>
@@ -11484,9 +12014,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.Matrices.ComplexMatrix.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.Matrices.ComplexMatrix.AssociatedRing">
             <summary>
@@ -11739,9 +12267,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.Matrices.DoubleMatrix.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.Matrices.DoubleMatrix.AssociatedRing">
             <summary>
@@ -12018,9 +12544,7 @@
             <exception cref="T:System.ArgumentException">If no named column with the same name was found.</exception>
         </member>
         <member name="M:Waher.Script.Objects.Matrices.ObjectMatrix.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.Matrices.ObjectMatrix.AssociatedRing">
             <summary>
@@ -12198,9 +12722,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.Namespace.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.Namespace.AssociatedSet">
             <summary>
@@ -12213,14 +12735,10 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.Namespace.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.Namespace.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.Namespace.Item(System.String)">
             <summary>
@@ -12247,14 +12765,10 @@
             <returns>If the element is contained in the set.</returns>
         </member>
         <member name="M:Waher.Script.Objects.Namespaces.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.Namespaces.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Objects.ObjectValue">
             <summary>
@@ -12273,9 +12787,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.ObjectValue.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.ObjectValue.AssociatedSet">
             <summary>
@@ -12288,14 +12800,10 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.ObjectValue.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.ObjectValue.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="F:Waher.Script.Objects.ObjectValue.Null">
             <summary>
@@ -12328,14 +12836,10 @@
             <returns>If the element is contained in the set.</returns>
         </member>
         <member name="M:Waher.Script.Objects.ObjectValues.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.ObjectValues.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.ObjectValues.Compare(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement)">
             <summary>
@@ -12373,14 +12877,10 @@
             <returns>If the element is contained in the set.</returns>
         </member>
         <member name="M:Waher.Script.Objects.PhysicalQuantities.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.PhysicalQuantities.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.PhysicalQuantities.Compare(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement)">
             <summary>
@@ -12423,9 +12923,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.PhysicalQuantity.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.PhysicalQuantity.AssociatedField">
             <summary>
@@ -12464,14 +12962,10 @@
             <returns>Negation of current element.</returns>
         </member>
         <member name="M:Waher.Script.Objects.PhysicalQuantity.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.PhysicalQuantity.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.PhysicalQuantity.Zero">
             <summary>
@@ -12533,9 +13027,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.RationalNumber.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.RationalNumber.AssociatedField">
             <summary>
@@ -12628,14 +13120,10 @@
             <returns>Negation of current element.</returns>
         </member>
         <member name="M:Waher.Script.Objects.RationalNumber.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.RationalNumber.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.RationalNumber.Zero">
             <summary>
@@ -12683,14 +13171,10 @@
             <returns>If the element is contained in the set.</returns>
         </member>
         <member name="M:Waher.Script.Objects.RationalNumbers.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.RationalNumbers.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="F:Waher.Script.Objects.RationalNumbers.Instance">
             <summary>
@@ -12698,9 +13182,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.RationalNumbers.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.RationalNumbers.CompareNumbers(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement)">
             <summary>
@@ -12764,9 +13246,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.Sets.EmptySet.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Objects.Sets.FiniteSet">
             <summary>
@@ -12805,9 +13285,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.Sets.FiniteSet.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.Sets.FiniteSet.AssociatedObjectValue">
             <summary>
@@ -12871,19 +13349,13 @@
             <returns>Elements, or null if not possible to get elements.</returns>
         </member>
         <member name="M:Waher.Script.Objects.Sets.ImplicitSet.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.Sets.ImplicitSet.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.Sets.ImplicitSet.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Objects.Sets.IntersectionSet">
             <summary>
@@ -12923,9 +13395,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.Sets.IntersectionSet.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.Sets.IntersectionSet.AssociatedObjectValue">
             <summary>
@@ -13022,9 +13492,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.Sets.Interval.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.Sets.Interval.Dimension">
             <summary>
@@ -13086,9 +13554,7 @@
             <returns>Hash code.</returns>
         </member>
         <member name="M:Waher.Script.Objects.Sets.RealNumbers.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Objects.Sets.SetDifference">
             <summary>
@@ -13128,9 +13594,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.Sets.SetDifference.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.Sets.SetDifference.AssociatedObjectValue">
             <summary>
@@ -13250,9 +13714,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.Sets.UnionSet.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.Sets.UnionSet.AssociatedObjectValue">
             <summary>
@@ -13293,9 +13755,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.StringValue.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.StringValue.AssociatedSemiGroup">
             <summary>
@@ -13322,14 +13782,10 @@
             <returns>Result, if understood, null otherwise.</returns>
         </member>
         <member name="M:Waher.Script.Objects.StringValue.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.StringValue.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.StringValue.TryConvertTo(System.Type,System.Object@)">
             <summary>
@@ -13367,14 +13823,10 @@
             <returns>If the element is contained in the set.</returns>
         </member>
         <member name="M:Waher.Script.Objects.StringValues.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.StringValues.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.StringValues.Compare(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement)">
             <summary>
@@ -13401,9 +13853,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.TypeValue.ToString">
-            <summary>
-            <see cref="M:System.Type.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.TypeValue.AssociatedSet">
             <summary>
@@ -13416,14 +13866,10 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.TypeValue.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Type.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.TypeValue.GetHashCode">
-            <summary>
-            <see cref="M:System.Type.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.TypeValue.TryConvertTo(System.Type,System.Object@)">
             <summary>
@@ -13451,14 +13897,10 @@
             <returns>If the element is contained in the set.</returns>
         </member>
         <member name="M:Waher.Script.Objects.TypeValues.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Type.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.TypeValues.GetHashCode">
-            <summary>
-            <see cref="M:System.Type.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Objects.TypeValues.Compare(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement)">
             <summary>
@@ -13501,9 +13943,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.VectorSpaces.BooleanVector.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.VectorSpaces.BooleanVector.AssociatedVectorSpace">
             <summary>
@@ -13672,9 +14112,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.VectorSpaces.ComplexVector.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.VectorSpaces.ComplexVector.AssociatedVectorSpace">
             <summary>
@@ -13843,9 +14281,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.VectorSpaces.DateTimeVector.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.VectorSpaces.DateTimeVector.AssociatedVectorSpace">
             <summary>
@@ -14014,9 +14450,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.VectorSpaces.DoubleVector.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.VectorSpaces.DoubleVector.AssociatedVectorSpace">
             <summary>
@@ -14203,9 +14637,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Objects.VectorSpaces.ObjectVector.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Script.Objects.VectorSpaces.ObjectVector.AssociatedVectorSpace">
             <summary>
@@ -14454,19 +14886,13 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Arithmetics.Cube.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.Arithmetics.Cube.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
+            <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
-        </member>
-        <member name="M:Waher.Script.Operators.Arithmetics.Cube.Evaluate(Waher.Script.Abstraction.Elements.IElement)">
-            <summary>
-            Evaluates the operator.
-            </summary>
-            <param name="Operand">Operand.</param>
-            <returns>Result</returns>
         </member>
         <member name="M:Waher.Script.Operators.Arithmetics.Cube.Differentiate(System.String,Waher.Script.Variables)">
             <summary>
@@ -14611,10 +15037,11 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Arithmetics.Invert.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.Arithmetics.Invert.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
+            <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
@@ -14703,18 +15130,12 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Arithmetics.MinusOne.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="M:Waher.Script.Operators.Arithmetics.MinusOne.Evaluate(Waher.Script.Abstraction.Elements.IElement)">
+        <member name="M:Waher.Script.Operators.Arithmetics.MinusOne.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the operator.
             </summary>
             <param name="Operand">Operand.</param>
+            <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
         <member name="M:Waher.Script.Operators.Arithmetics.MinusOne.Differentiate(System.String,Waher.Script.Variables)">
@@ -14941,19 +15362,13 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Arithmetics.PlusOne.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.Arithmetics.PlusOne.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
+            <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
-        </member>
-        <member name="M:Waher.Script.Operators.Arithmetics.PlusOne.Evaluate(Waher.Script.Abstraction.Elements.IElement)">
-            <summary>
-            Evaluates the operator.
-            </summary>
-            <param name="Operand">Operand.</param>
-            <returns>Result</returns>
         </member>
         <member name="M:Waher.Script.Operators.Arithmetics.PlusOne.Differentiate(System.String,Waher.Script.Variables)">
             <summary>
@@ -15132,19 +15547,13 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Arithmetics.Square.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.Arithmetics.Square.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
+            <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
-        </member>
-        <member name="M:Waher.Script.Operators.Arithmetics.Square.Evaluate(Waher.Script.Abstraction.Elements.IElement)">
-            <summary>
-            Evaluates the operator.
-            </summary>
-            <param name="Operand">Operand.</param>
-            <returns>Result</returns>
         </member>
         <member name="M:Waher.Script.Operators.Arithmetics.Square.Differentiate(System.String,Waher.Script.Variables)">
             <summary>
@@ -15245,10 +15654,11 @@
             Name of variable
             </summary>
         </member>
-        <member name="M:Waher.Script.Operators.Assignments.Assignment.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.Assignments.Assignment.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
+            <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
@@ -15272,10 +15682,11 @@
             Dynamic Index.
             </summary>
         </member>
-        <member name="M:Waher.Script.Operators.Assignments.DynamicIndexAssignment.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.Assignments.DynamicIndexAssignment.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
+            <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
@@ -15334,6 +15745,13 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Operators.Assignments.FunctionDefinition.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.FunctionDefinition.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -15959,6 +16377,14 @@
             </summary>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Calculus.DefaultDifferentiation.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
         </member>
         <member name="T:Waher.Script.Operators.Comparisons.EqualTo">
             <summary>
@@ -16853,6 +17279,12 @@
             Arguments
             </summary>
         </member>
+        <member name="P:Waher.Script.Operators.DynamicFunctionCall.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Operators.DynamicFunctionCall.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the operator on scalar operands.
@@ -16860,6 +17292,29 @@
             <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.DynamicFunctionCall.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator on scalar operands.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.DynamicFunctionCall.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.DynamicFunctionCall.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Operators.DynamicFunctionCall.GetHashCode">
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Operators.DynamicIndex">
             <summary>
@@ -16887,10 +17342,11 @@
             Index operand.
             </summary>
         </member>
-        <member name="M:Waher.Script.Operators.DynamicIndex.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.DynamicIndex.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
+            <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
@@ -16913,7 +17369,20 @@
             Elements.
             </summary>
         </member>
+        <member name="P:Waher.Script.Operators.ElementList.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Operators.ElementList.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.ElementList.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -16930,14 +17399,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Operators.ElementList.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Operators.ElementList.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Operators.ImplicitPrint">
             <summary>
@@ -16958,6 +17423,12 @@
             Content
             </summary>
         </member>
+        <member name="P:Waher.Script.Operators.ImplicitPrint.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Operators.ImplicitPrint.Evaluate(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -16965,15 +17436,18 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Operators.ImplicitPrint.Equals(System.Object)">
+        <member name="M:Waher.Script.Operators.ImplicitPrint.EvaluateAsync(Waher.Script.Variables)">
             <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.ImplicitPrint.Equals(System.Object)">
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Operators.ImplicitPrint.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Operators.LambdaDefinition">
             <summary>
@@ -17041,7 +17515,38 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.LambdaDefinition.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.LambdaDefinition.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.LambdaDefinition.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
         <member name="M:Waher.Script.Operators.LambdaDefinition.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the lambda expression.
+            </summary>
+            <param name="Arguments">Arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.LambdaDefinition.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
             Evaluates the lambda expression.
             </summary>
@@ -17071,9 +17576,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Operators.LambdaDefinition.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Operators.LambdaDefinition.ToString(Waher.Script.Model.ILambdaExpression)">
             <summary>
@@ -17283,10 +17786,11 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Matrices.ConjugateTranspose.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.Matrices.ConjugateTranspose.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
+            <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
@@ -17523,10 +18027,11 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Matrices.ToMatrix.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.Matrices.ToMatrix.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
+            <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
@@ -17552,10 +18057,11 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Matrices.Transpose.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.Matrices.Transpose.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
+            <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
@@ -17735,10 +18241,11 @@
             Name of method.
             </summary>
         </member>
-        <member name="M:Waher.Script.Operators.Membership.NamedMember.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.Membership.NamedMember.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
+            <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
@@ -17779,10 +18286,11 @@
             Method arguments.
             </summary>
         </member>
-        <member name="M:Waher.Script.Operators.Membership.NamedMethodCall.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.Membership.NamedMethodCall.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
+            <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
@@ -17843,7 +18351,20 @@
             Arguments
             </summary>
         </member>
+        <member name="P:Waher.Script.Operators.NamedFunctionCall.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Operators.NamedFunctionCall.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.NamedFunctionCall.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -17860,14 +18381,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Operators.NamedFunctionCall.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Operators.NamedFunctionCall.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Operators.ObjectExNihilo">
             <summary>
@@ -17888,7 +18405,20 @@
             Members, in order of definition.
             </summary>
         </member>
+        <member name="P:Waher.Script.Operators.ObjectExNihilo.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Operators.ObjectExNihilo.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Operators.ObjectExNihilo.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.ObjectExNihilo.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -17905,14 +18435,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Operators.ObjectExNihilo.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Operators.ObjectExNihilo.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Operators.ObjectExNihilo.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
             <summary>
@@ -17972,7 +18498,20 @@
             Statements
             </summary>
         </member>
+        <member name="P:Waher.Script.Operators.Sequence.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Operators.Sequence.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Operators.Sequence.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Sequence.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -17989,14 +18528,10 @@
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Operators.Sequence.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Operators.Sequence.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Operators.Sets.ImplicitSetDefinition">
             <summary>
@@ -18031,14 +18566,10 @@
             <returns>Result.</returns>
         </member>
         <member name="M:Waher.Script.Operators.Sets.ImplicitSetDefinition.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Operators.Sets.ImplicitSetDefinition.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Operators.Sets.Intersection">
             <summary>
@@ -18231,10 +18762,11 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Sets.ToSet.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.Sets.ToSet.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
+            <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
@@ -18311,12 +18843,13 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Vectors.CartesianProduct.EvaluateVector(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IVector)">
+        <member name="M:Waher.Script.Operators.Vectors.CartesianProduct.EvaluateVector(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IVector,Waher.Script.Variables)">
             <summary>
             Evaluates the operator on vector operands.
             </summary>
             <param name="Left">Left value.</param>
             <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
         <member name="T:Waher.Script.Operators.Vectors.CrossProduct">
@@ -18334,12 +18867,13 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Vectors.CrossProduct.EvaluateVector(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IVector)">
+        <member name="M:Waher.Script.Operators.Vectors.CrossProduct.EvaluateVector(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IVector,Waher.Script.Variables)">
             <summary>
             Evaluates the operator on vector operands.
             </summary>
             <param name="Left">Left value.</param>
             <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
         <member name="T:Waher.Script.Operators.Vectors.DotProduct">
@@ -18357,12 +18891,13 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Vectors.DotProduct.EvaluateVector(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IVector)">
+        <member name="M:Waher.Script.Operators.Vectors.DotProduct.EvaluateVector(Waher.Script.Abstraction.Elements.IVector,Waher.Script.Abstraction.Elements.IVector,Waher.Script.Variables)">
             <summary>
             Evaluates the operator on vector operands.
             </summary>
             <param name="Left">Left value.</param>
             <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
         <member name="T:Waher.Script.Operators.Vectors.ImplicitVectorDefinition">
@@ -18389,14 +18924,10 @@
             <returns>Result.</returns>
         </member>
         <member name="M:Waher.Script.Operators.Vectors.ImplicitVectorDefinition.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Operators.Vectors.ImplicitVectorDefinition.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Operators.Vectors.ToVector">
             <summary>
@@ -18413,10 +18944,11 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Vectors.ToVector.Evaluate(Waher.Script.Variables)">
+        <member name="M:Waher.Script.Operators.Vectors.ToVector.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
+            <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
@@ -19319,19 +19851,13 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Units.AtomicUnit.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Units.AtomicUnit.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Units.AtomicUnit.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Units.BaseQuantities.Current">
             <summary>
@@ -20175,19 +20701,13 @@
             <returns>Inverted unit.</returns>
         </member>
         <member name="M:Waher.Script.Units.Unit.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Units.Unit.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Units.Unit.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Units.Unit.ToString(System.Boolean)">
             <summary>
@@ -20321,9 +20841,7 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Variable.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Variables">
             <summary>
@@ -20412,7 +20930,28 @@
             </summary>
             <exception cref="T:System.TimeoutException">If access to the collection was not granted in the alotted time</exception>
         </member>
+        <member name="M:Waher.Script.Variables.LockAsync">
+            <summary>
+            Locks the collection. The collection is by default thread safe. But if longer transactions require unique access,
+            this method can be used to aquire such unique access. This works, as long as all callers that affect the corresponding
+            state call this method also.
+            
+            Each successful call to this method must be followed by exacty one call to <see cref="M:Waher.Script.Variables.Release"/>.
+            </summary>
+            <exception cref="T:System.TimeoutException">If access to the collection was not granted in the alotted time</exception>
+        </member>
         <member name="M:Waher.Script.Variables.Lock(System.Int32)">
+            <summary>
+            Locks the collection. The collection is by default thread safe. But if longer transactions require unique access,
+            this method can be used to aquire such unique access. This works, as long as all callers that affect the corresponding
+            state call this method also.
+            
+            Each successful call to this method must be followed by exacty one call to <see cref="M:Waher.Script.Variables.Release"/>.
+            </summary>
+            <param name="Timeout">Timeout, in milliseconds. Default timeout is 30000 milliseconds (30 s).</param>
+            <exception cref="T:System.TimeoutException">If access to the collection was not granted in the alotted time</exception>
+        </member>
+        <member name="M:Waher.Script.Variables.LockAsync(System.Int32)">
             <summary>
             Locks the collection. The collection is by default thread safe. But if longer transactions require unique access,
             this method can be used to aquire such unique access. This works, as long as all callers that affect the corresponding

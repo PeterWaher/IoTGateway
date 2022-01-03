@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Graphs;
 
 namespace Waher.Content.Markdown.Model
@@ -15,6 +16,6 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Language">Language used.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>Image, if successful, null otherwise.</returns>
-		PixelInformation GenerateImage(string[] Rows, string Language, MarkdownDocument Document);
+		Task<PixelInformation> GenerateImage(string[] Rows, string Language, MarkdownDocument Document);
 	}
 }

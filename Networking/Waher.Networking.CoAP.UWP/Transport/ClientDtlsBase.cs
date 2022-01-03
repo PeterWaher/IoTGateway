@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Security.DTLS;
 using Waher.Security.DTLS.Events;
@@ -28,11 +25,11 @@ namespace Waher.Networking.CoAP.Transport
 			this.Dtls.OnDatagramReceived += Dtls_OnDatagramReceived;
 		}
 
-		private void Dtls_OnDatagramReceived(object Sender, UdpDatagramEventArgs e)
+		private async void Dtls_OnDatagramReceived(object Sender, UdpDatagramEventArgs e)
 		{
 			try
 			{
-				this.Endpoint.Decode(e.DtlsOverUdp.Tag as ClientBase, e.Datagram, e.RemoteEndpoint);
+				await this.Endpoint.Decode(e.DtlsOverUdp.Tag as ClientBase, e.Datagram, e.RemoteEndpoint);
 			}
 			catch (Exception ex)
 			{

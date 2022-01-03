@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Xml;
-using Waher.Layout.Layout2D.Model.Attributes;
+using System.Threading.Tasks;
 
 namespace Waher.Layout.Layout2D.Model.Figures
 {
@@ -40,12 +38,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			if (this.defined)
-				State.Canvas.DrawPoint(this.xCoordinate, this.yCoordinate, this.GetPen(State));
+				State.Canvas.DrawPoint(this.xCoordinate, this.yCoordinate, await this.GetPen(State));
 		
-			base.Draw(State);
+			await base.Draw(State);
 		}
 	}
 }

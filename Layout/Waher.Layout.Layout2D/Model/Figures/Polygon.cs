@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.References;
 
@@ -39,7 +40,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			if (this.defined)
 			{
@@ -60,15 +61,17 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 					Path.Close();
 
-					if (this.TryGetFill(State, out SKPaint Fill))
+					SKPaint Fill = await this.TryGetFill(State);
+					if (!(Fill is null))
 						State.Canvas.DrawPath(Path, Fill);
 
-					if (this.TryGetPen(State, out SKPaint Pen))
+					SKPaint Pen = await this.TryGetPen(State);
+					if (!(Pen is null))
 						State.Canvas.DrawPath(Path, Pen);
 				}
 			}
-		
-			base.Draw(State);
+
+			await base.Draw(State);
 		}
 	}
 }

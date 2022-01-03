@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -40,11 +41,10 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.cid = new StringAttribute(Input, "cid");
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -87,10 +87,10 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>Loaded image, or null if not possible to load image, or
 		/// image loading is in process.</returns>
-		protected override SKImage LoadImage(DrawingState State)
+		protected override async Task<SKImage> LoadImage(DrawingState State)
 		{
-			if (!(this.cid is null) &&
-				this.cid.TryEvaluate(State.Session, out string ContentId) &&
+			string ContentId = await this.cid.Evaluate(State.Session, string.Empty);
+			if (!string.IsNullOrEmpty(ContentId) &&
 				this.Document.TryGetContent(ContentId, out object Content) &&
 				Content is SKImage Image)
 			{

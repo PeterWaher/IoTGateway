@@ -105,7 +105,10 @@ namespace Waher.Client.WPF.Model.Provisioning
 				await Database.Insert(Question);
 
 				MainWindow.UpdateGui(() =>
-					MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
+				{
+					MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question);
+					return Task.CompletedTask;
+				});
 			}
 		}
 
@@ -138,7 +141,10 @@ namespace Waher.Client.WPF.Model.Provisioning
 				await Database.Insert(Question);
 
 				MainWindow.UpdateGui(() =>
-					MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
+				{
+					MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question);
+					return Task.CompletedTask;
+				});
 			}
 		}
 
@@ -170,7 +176,10 @@ namespace Waher.Client.WPF.Model.Provisioning
 				await Database.Insert(Question);
 
 				MainWindow.UpdateGui(() =>
-					MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question));
+				{
+					MainWindow.currentInstance.NewQuestion(this.Account, this.provisioningClient, Question);
+					return Task.CompletedTask;
+				});
 			}
 		}
 
@@ -408,6 +417,7 @@ namespace Waher.Client.WPF.Model.Provisioning
 					TabItem.Content = View;
 
 					MainWindow.currentInstance.Tabs.SelectedItem = TabItem;
+					return Task.CompletedTask;
 				});
 			}
 			else

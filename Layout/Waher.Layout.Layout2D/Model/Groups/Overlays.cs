@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Xml;
-using Waher.Layout.Layout2D.Model.Attributes;
+using System.Threading.Tasks;
 
 namespace Waher.Layout.Layout2D.Model.Groups
 {
@@ -41,9 +39,9 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>Cell layout object.</returns>
-		public override ICellLayout GetCellLayout(DrawingState State)
+		public override Task<ICellLayout> GetCellLayout(DrawingState State)
 		{
-			return new OverlayCells(State.Session);
+			return Task.FromResult<ICellLayout>(new OverlayCells(State.Session));
 		}
 
 	}

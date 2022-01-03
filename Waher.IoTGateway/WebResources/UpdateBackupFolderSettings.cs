@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Networking.HTTP;
 
 namespace Waher.IoTGateway.WebResources
@@ -47,7 +48,7 @@ namespace Waher.IoTGateway.WebResources
 			if (!Request.HasData)
 				throw new BadRequestException();
 
-			object Obj = Request.DecodeData();
+			object Obj = await Request.DecodeDataAsync();
 
 			if (!(Obj is Dictionary<string, object> Form) ||
 				!Form.TryGetValue("ExportFolder", out Obj) || !(Obj is string ExportFolder) ||
@@ -102,7 +103,7 @@ namespace Waher.IoTGateway.WebResources
 				try
 				{
 					string s = ExportFolder + Path.DirectorySeparatorChar + "test.txt";
-					File.WriteAllText(s, "test");
+					await Resources.WriteAllTextAsync(s, "test");
 					File.Delete(s);
 				}
 				catch (Exception)
@@ -141,7 +142,7 @@ namespace Waher.IoTGateway.WebResources
 				try
 				{
 					string s = KeyFolder + Path.DirectorySeparatorChar + "test.txt";
-					File.WriteAllText(s, "test");
+					await Resources.WriteAllTextAsync(s, "test");
 					File.Delete(s);
 				}
 				catch (Exception)

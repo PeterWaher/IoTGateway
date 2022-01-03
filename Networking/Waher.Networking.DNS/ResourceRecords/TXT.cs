@@ -54,9 +54,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 			set => this.text = value;
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder(base.ToString());

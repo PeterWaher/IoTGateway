@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Content.Markdown.Model.SpanElements
@@ -28,40 +29,37 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// If the element is alone in a paragraph.
 		/// </summary>
-		public bool AloneInParagraph
-		{
-			get { return this.aloneInParagraph; }
-		}
+		public bool AloneInParagraph => this.aloneInParagraph;
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override Task GenerateMarkdown(StringBuilder Output)
 		{
 			Output.Append('!');
-			base.GenerateMarkdown(Output);
+			return base.GenerateMarkdown(Output);
 		}
 
 		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override async Task GenerateHTML(StringBuilder Output)
 		{
 			Multimedia Multimedia = this.Document.GetReference(this.Label);
 
 			if (!(Multimedia is null))
-				Multimedia.MultimediaHandler.GenerateHTML(Output, Multimedia.Items, this.Children, this.aloneInParagraph, this.Document);
+				await Multimedia.MultimediaHandler.GenerateHTML(Output, Multimedia.Items, this.Children, this.aloneInParagraph, this.Document);
 		}
 
 		/// <summary>
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override async Task GeneratePlainText(StringBuilder Output)
 		{
-			base.GeneratePlainText(Output);
+			await base.GeneratePlainText(Output);
 
 			if (this.aloneInParagraph)
 			{
@@ -75,13 +73,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			Multimedia Multimedia = this.Document.GetReference(this.Label);
 
 			if (!(Multimedia is null))
 			{
-				Multimedia.MultimediaHandler.GenerateXAML(Output, TextAlignment, Multimedia.Items, this.Children, 
+				await Multimedia.MultimediaHandler.GenerateXAML(Output, TextAlignment, Multimedia.Items, this.Children, 
 					this.aloneInParagraph, this.Document);
 			}
 		}
@@ -91,13 +89,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			Multimedia Multimedia = this.Document.GetReference(this.Label);
 
 			if (!(Multimedia is null))
 			{
-				Multimedia.MultimediaHandler.GenerateXamarinForms(Output, TextAlignment, Multimedia.Items, this.Children,
+				await Multimedia.MultimediaHandler.GenerateXamarinForms(Output, TextAlignment, Multimedia.Items, this.Children,
 					this.aloneInParagraph, this.Document);
 			}
 		}
@@ -105,18 +103,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
 		/// </summary>
-		internal override bool OutsideParagraph
-		{
-			get { return true; }
-		}
+		internal override bool OutsideParagraph => true;
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get { return true; }
-		}
+		internal override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Determines whether the specified object is equal to the current object.

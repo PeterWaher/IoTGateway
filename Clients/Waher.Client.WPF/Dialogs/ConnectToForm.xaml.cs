@@ -183,19 +183,21 @@ namespace Waher.Client.WPF.Dialogs
 			this.client.Connect();
 		}
 
-		private Task Client_OnRegistrationForm(object _, DataForm Form)
+		private async Task Client_OnRegistrationForm(object _, DataForm Form)
 		{
 			Field FormType = Form["FORM_TYPE"];
 			if (FormType != null && FormType.ValueString == "urn:xmpp:captcha")
 			{
-				ParameterDialog Dialog = new ParameterDialog(Form);
+				ParameterDialog Dialog = await ParameterDialog.CreateAsync(Form);
 
-				MainWindow.UpdateGui(() => Dialog.ShowDialog());
+				MainWindow.UpdateGui(() =>
+				{
+					Dialog.ShowDialog();
+					return Task.CompletedTask;
+				});
 			}
 			else
 				Form.Submit();
-
-			return Task.CompletedTask;
 		}
 
 		private Task Client_OnStateChanged(object Sender, XmppState NewState)
@@ -204,7 +206,7 @@ namespace Waher.Client.WPF.Dialogs
 			return Task.CompletedTask;
 		}
 
-		private void XmppStateChanged(object P)
+		private Task XmppStateChanged(object P)
 		{
 			XmppState NewState = (XmppState)P;
 
@@ -273,6 +275,8 @@ namespace Waher.Client.WPF.Dialogs
 					break;
 
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private void CloseClient()
@@ -303,10 +307,11 @@ namespace Waher.Client.WPF.Dialogs
 			return Task.CompletedTask;
 		}
 
-		private void ShowError(object P)
+		private Task ShowError(object P)
 		{
 			Exception ex = (Exception)P;
 			MessageBox.Show(this, ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+			return Task.CompletedTask;
 		}
 
 		public XmppClient Client

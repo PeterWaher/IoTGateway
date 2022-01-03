@@ -60,9 +60,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 			set => this.os = value;
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return base.ToString() + "\t" + this.cpu + "\t" + this.os;

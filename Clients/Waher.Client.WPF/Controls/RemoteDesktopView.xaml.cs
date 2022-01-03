@@ -310,7 +310,7 @@ namespace Waher.Client.WPF.Controls
 			MainWindow.UpdateGui(this.UpdateScreenGuiThread);
 		}
 
-		private void UpdateScreenGuiThread()
+		private Task UpdateScreenGuiThread()
 		{
 			MemoryStream ms = null;
 			Bitmap Tile = null;
@@ -323,7 +323,7 @@ namespace Waher.Client.WPF.Controls
 			try
 			{
 				if (this.drawing)
-					return;
+					return Task.CompletedTask;
 
 				this.drawing = true;
 
@@ -389,6 +389,8 @@ namespace Waher.Client.WPF.Controls
 				ms?.Dispose();
 				Tile?.Dispose();
 			}
+		
+			return Task.CompletedTask;
 		}
 
 		public async void Dispose()

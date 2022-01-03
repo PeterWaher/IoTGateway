@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
 
 namespace Waher.Networking.XMPP.Contracts
@@ -37,7 +38,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Language">Desired language</param>
 		/// <param name="Contract">Contract hosting the object.</param>
 		/// <returns>Markdown</returns>
-		public string ToHTML(string Language, Contract Contract)
+		public Task<string> ToHTML(string Language, Contract Contract)
 		{
 			return Contract.ToHTML(this.descriptions, Language);
 		}
@@ -48,7 +49,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Language">Desired language</param>
 		/// <param name="Contract">Contract hosting the object.</param>
 		/// <returns>Markdown</returns>
-		public string ToPlainText(string Language, Contract Contract)
+		public Task<string> ToPlainText(string Language, Contract Contract)
 		{
 			return Contract.ToPlainText(this.descriptions, Language);
 		}
@@ -59,7 +60,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Language">Desired language</param>
 		/// <param name="Contract">Contract hosting the object.</param>
 		/// <returns>Markdown</returns>
-		public string ToXAML(string Language, Contract Contract)
+		public Task<string> ToXAML(string Language, Contract Contract)
 		{
 			return Contract.ToXAML(this.descriptions, Language);
 		}
@@ -70,7 +71,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Language">Desired language</param>
 		/// <param name="Contract">Contract hosting the object.</param>
 		/// <returns>Markdown</returns>
-		public string ToXamarinForms(string Language, Contract Contract)
+		public Task<string> ToXamarinForms(string Language, Contract Contract)
 		{
 			return Contract.ToXamarinForms(this.descriptions, Language);
 		}

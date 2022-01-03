@@ -42,6 +42,7 @@
     <EmbeddedResource Include="Schema\EventOutput.xsd" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
     <ProjectReference Include="..\Waher.Events\Waher.Events.csproj" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content.Asn1.Model.Values;
 
 namespace Waher.Content.Asn1.Model
@@ -54,27 +55,27 @@ namespace Waher.Content.Asn1.Model
 		/// <param name="State">C# export state.</param>
 		/// <param name="Indent">Indentation</param>
 		/// <param name="Pass">Export pass</param>
-		public override void ExportCSharp(StringBuilder Output, CSharpExportState State,
+		public override async Task ExportCSharp(StringBuilder Output, CSharpExportState State,
 			int Indent, CSharpExportPass Pass)
 		{
 			if (Pass == CSharpExportPass.Explicit)
 			{
 				Output.Append(Tabs(Indent));
 				Output.Append("public ");
-				this.type.ExportCSharp(Output, State, Indent, Pass);
+				await this.type.ExportCSharp(Output, State, Indent, Pass);
 				Output.Append(' ');
 				Output.Append(ToCSharp(this.fieldName));
 
 				if (!(this.type.Default is null))
 				{
 					Output.Append(" = ");
-					this.type.Default.ExportCSharp(Output, State, Indent, Pass);
+					await this.type.Default.ExportCSharp(Output, State, Indent, Pass);
 				}
 
 				Output.AppendLine(";");
 			}
 			else
-				this.type.ExportCSharp(Output, State, Indent, Pass);
+				await this.type.ExportCSharp(Output, State, Indent, Pass);
 		}
 	}
 }

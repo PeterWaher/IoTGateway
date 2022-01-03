@@ -118,9 +118,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			set => this.postResource = value;
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			base.Dispose();
@@ -153,12 +151,12 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="DataCallback">Callback method to call when data is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Headers">HTTP headers of the request.</param>
-		public void POST(string To, string Resource, object Data,
+		public async Task POST(string To, string Resource, object Data,
 			HttpxResponseEventHandler Callback, HttpxResponseDataEventHandler DataCallback,
 			object State, params HttpField[] Headers)
 		{
-			byte[] Bin = InternetContent.Encode(Data, Encoding.UTF8, out string ContentType);
-			this.POST(To, Resource, Bin, ContentType, Callback, DataCallback, State, Headers);
+			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Data, Encoding.UTF8);
+			this.POST(To, Resource, P.Key, P.Value, Callback, DataCallback, State, Headers);
 		}
 
 		/// <summary>

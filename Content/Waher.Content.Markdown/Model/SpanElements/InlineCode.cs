@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Markdown.Model.Atoms;
 using Waher.Content.Xml;
@@ -34,40 +35,43 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// Inline code.
 		/// </summary>
-		public string Code
-		{
-			get { return this.code; }
-		}
+		public string Code => this.code;
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override Task GenerateMarkdown(StringBuilder Output)
 		{
 			Output.Append('`');
 			Output.Append(this.code);
 			Output.Append('`');
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override Task GenerateHTML(StringBuilder Output)
 		{
 			Output.Append("<code>");
 			Output.Append(XML.HtmlValueEncode(this.code));
 			Output.Append("</code>");
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override Task GeneratePlainText(StringBuilder Output)
 		{
 			Output.Append(this.code);
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -75,7 +79,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			Output.WriteStartElement("TextBlock");
 			Output.WriteAttributeString("xml", "space", null, "preserve");
@@ -87,6 +91,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			Output.WriteValue(this.code);
 
 			Output.WriteEndElement();
+	
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -94,9 +100,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			InlineText.GenerateInlineFormattedTextXamarinForms(Output, this);
+			return InlineText.GenerateInlineFormattedTextXamarinForms(Output, this);
 		}
 
 		/// <summary>
@@ -104,19 +110,18 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="Level">Current section level.</param>
-		public override void GenerateSmartContractXml(XmlWriter Output, ref int Level)
+		/// <param name="State">Current rendering state.</param>
+		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
 			Output.WriteElementString("text", this.code);
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get { return true; }
-		}
+		internal override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Exports the element to XML.

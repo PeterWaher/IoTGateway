@@ -27,6 +27,12 @@ namespace Waher.Script.Persistence.SQL
 		}
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
@@ -42,7 +48,7 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public async Task<IElement> EvaluateAsync(Variables Variables)
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
 			IDataSource Source = await this .source.GetSource(Variables);
 			await Source.DropCollection();
@@ -64,14 +70,17 @@ namespace Waher.Script.Persistence.SQL
 					return false;
 			}
 
-			ScriptNode Node = this.source;
-			if (!(Node is null) && !Callback(ref Node, State))
-				return false;
+			bool b;
 
-			if (Node is SourceDefinition Source2)
-				this.source = Source2;
-			else
-				return false;
+			if (!(this.source is null))
+			{
+				b = !Callback(this.source, out ScriptNode NewNode, State);
+				if (!(NewNode is null) && NewNode is SourceDefinition Source2)
+					this.source = Source2;
+
+				if (b)
+					return false;
+			}
 
 			if (!DepthFirst)
 			{
@@ -82,9 +91,7 @@ namespace Waher.Script.Persistence.SQL
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return (obj is DropCollection O &&
@@ -92,9 +99,7 @@ namespace Waher.Script.Persistence.SQL
 				base.Equals(obj));
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

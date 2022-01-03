@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
@@ -26,10 +27,13 @@ namespace Waher.Content.Markdown.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "markdowntohtml"; }
-		}
+		public override string FunctionName => "markdowntohtml";
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.
@@ -39,16 +43,28 @@ namespace Waher.Content.Markdown.Functions
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(string Argument, Variables Variables)
 		{
+			return this.EvaluateScalarAsync(Argument, Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override async Task<IElement> EvaluateScalarAsync(string Argument, Variables Variables)
+		{
 			MarkdownDocument Doc;
 
 			Argument = "BodyOnly: 1\r\n\r\n" + Argument;
 
 			if (Variables.TryGetVariable(" MarkdownSettings ", out Variable v) && v.ValueObject is MarkdownSettings ParentSettings)
-				Doc = new MarkdownDocument(Argument, ParentSettings);
+				Doc = await MarkdownDocument.CreateAsync(Argument, ParentSettings);
 			else
-				Doc = new MarkdownDocument(Argument);
+				Doc = await MarkdownDocument.CreateAsync(Argument);
 
-			string Html = Doc.GenerateHTML();
+			string Html = await Doc.GenerateHTML();
+
 			return new StringValue(Html);
 		}
 

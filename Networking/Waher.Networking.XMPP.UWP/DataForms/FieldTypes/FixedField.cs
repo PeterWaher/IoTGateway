@@ -53,9 +53,7 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		{
 		}
 
-		/// <summary>
-		/// <see cref="Field.TypeName"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string TypeName
 		{
 			get { return "fixed"; }

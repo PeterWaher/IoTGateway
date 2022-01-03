@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Sockets;
 using Waher.Events;
 using Waher.Networking.CoAP.Options;
 using Waher.Networking.CoAP.Transport;
-using Waher.Runtime.Timing;
 
 namespace Waher.Networking.CoAP
 {
@@ -36,7 +34,13 @@ namespace Waher.Networking.CoAP
 	public abstract class CoapResource
 	{
 		private CoapEndpoint endpoint = null;
-		private ICoapGetMethod get;
+		private readonly ICoapGetMethod get;
+		private readonly ICoapPostMethod post;
+		private readonly ICoapPutMethod put;
+		private readonly ICoapDeleteMethod delete;
+		private readonly ICoapFetchMethod fetch;
+		private readonly ICoapIPatchMethod iPatch;
+		private readonly ICoapPatchMethod patch;
 		private string path;
 		private DateTime nextTrigger = DateTime.MinValue;
 
@@ -48,6 +52,12 @@ namespace Waher.Networking.CoAP
 		{
 			this.path = Path;
 			this.get = this as ICoapGetMethod;
+			this.post = this as ICoapPostMethod;
+			this.put = this as ICoapPutMethod;
+			this.delete = this as ICoapDeleteMethod;
+			this.fetch = this as ICoapFetchMethod;
+			this.iPatch = this as ICoapIPatchMethod;
+			this.patch = this as ICoapPatchMethod;
 		}
 
 		/// <summary>
@@ -55,24 +65,56 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public string Path
 		{
-			get { return this.path; }
-			protected set { this.path = value; }
+			get => this.path;
+			protected set => this.path = value;
 		}
 
 		/// <summary>
 		/// If the resource handles subpaths.
 		/// </summary>
-		public virtual bool HandlesSubPaths
-		{
-			get { return false; }
-		}
+		public virtual bool HandlesSubPaths => false;
+
+		/// <summary>
+		/// GET method interface, if any.
+		/// </summary>
+		public ICoapGetMethod GetMethod => this.get;
+
+		/// <summary>
+		/// POST method interface, if any.
+		/// </summary>
+		public ICoapPostMethod PostMethod => this.post;
+
+		/// <summary>
+		/// PUT method interface, if any.
+		/// </summary>
+		public ICoapPutMethod PutMethod => this.put;
+
+		/// <summary>
+		/// DELETE method interface, if any.
+		/// </summary>
+		public ICoapDeleteMethod DeleteMethod => this.delete;
+
+		/// <summary>
+		/// FETCH method interface, if any.
+		/// </summary>
+		public ICoapFetchMethod FetchMethod => this.fetch;
+
+		/// <summary>
+		/// PATCH method interface, if any.
+		/// </summary>
+		public ICoapPatchMethod PatchMethod => this.patch;
+
+		/// <summary>
+		/// iPATCH method interface, if any.
+		/// </summary>
+		public ICoapIPatchMethod IPatchMethod => this.iPatch;
 
 		/// <summary>
 		/// Endpoint on which the resource is registered.
 		/// </summary>
 		public CoapEndpoint Endpoint
 		{
-			get { return this.endpoint; }
+			get => this.endpoint;
 			internal set
 			{
 				if (!(value is null))
@@ -90,60 +132,39 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// How notifications are sent, if at all.
 		/// </summary>
-		public virtual Notifications Notifications
-		{
-			get { return Notifications.None; }
-		}
+		public virtual Notifications Notifications => Notifications.None;
 
 		/// <summary>
 		/// If the resource is observable.
 		/// </summary>
-		public bool Observable
-		{
-			get { return this.Notifications != Notifications.None; }
-		}
+		public bool Observable => this.Notifications != Notifications.None;
 
 		/// <summary>
 		/// Optional title of resource.
 		/// </summary>
-		public virtual string Title
-		{
-			get { return null; }
-		}
+		public virtual string Title => null;
 
 		/// <summary>
 		/// Optional resource type.
 		/// </summary>
-		public virtual string[] ResourceTypes
-		{
-			get { return null; }
-		}
+		public virtual string[] ResourceTypes => null;
 
 		/// <summary>
 		/// Optional interface descriptions.
 		/// </summary>
-		public virtual string[] InterfaceDescriptions
-		{
-			get { return null; }
-		}
+		public virtual string[] InterfaceDescriptions => null;
 
 		/// <summary>
 		/// Optional array of supported content formats.
 		/// </summary>
-		public virtual int[] ContentFormats
-		{
-			get { return null; }
-		}
+		public virtual int[] ContentFormats => null;
 
 		/// <summary>
 		/// Optional maximum size estimate.
 		/// </summary>
-		public virtual int? MaximumSizeEstimate
-		{
-			get { return null; }
-		}
+		public virtual int? MaximumSizeEstimate => null;
 
-		private Dictionary<string, ObservationRegistration> registrations = new Dictionary<string, ObservationRegistration>();
+		private readonly Dictionary<string, ObservationRegistration> registrations = new Dictionary<string, ObservationRegistration>();
 		private ObservationRegistration[] registeredMessages = null;
 
 		internal ObservationRegistration RegisterSubscription(ClientBase Client,
@@ -301,9 +322,6 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// If resource should be published through /.well-known/core
 		/// </summary>
-		public virtual bool WellKnownCoRE
-		{
-			get { return true; }
-		}
+		public virtual bool WellKnownCoRE => true;
 	}
 }

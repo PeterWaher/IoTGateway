@@ -300,6 +300,8 @@ namespace Waher.Client.WPF.Model.Muc
 						this.Account?.View?.NodeAdded(Node, Node2);
 
 					this.OnUpdated();
+				
+					return Task.CompletedTask;
 				});
 			}
 
@@ -347,6 +349,7 @@ namespace Waher.Client.WPF.Model.Muc
 				MainWindow.UpdateGui(() =>
 				{
 					this.ShowInvitationForm(Form, e, e2);
+					return Task.CompletedTask;
 				});
 
 				return Task.CompletedTask;
@@ -395,6 +398,8 @@ namespace Waher.Client.WPF.Model.Muc
 								};
 
 								this.ShowInvitationForm(Form2, e, e2);
+
+								return Task.CompletedTask;
 							});
 						}
 
@@ -476,10 +481,10 @@ namespace Waher.Client.WPF.Model.Muc
 
 			RoomNode.EnterIfNotAlready(true);
 
-			MainWindow.UpdateGui(() =>
+			MainWindow.UpdateGui(async () =>
 			{
 				MainWindow.ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
-				MainWindow.currentInstance.MucGroupChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, e.ThreadID,
+				await MainWindow.currentInstance.MucGroupChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, e.ThreadID,
 					IsMarkdown, Timestamp, Type, RoomNode, RoomNode.Header);
 			});
 		}
@@ -493,14 +498,15 @@ namespace Waher.Client.WPF.Model.Muc
 			MainWindow.UpdateGui(() =>
 			{
 				MainWindow.currentInstance.MucChatSubject(e.From, XmppClient.GetBareJID(e.To), RoomNode, e.Subject);
+				return Task.CompletedTask;
 			});
 		}
 
 		private Task MucClient_RegistrationRequest(object Sender, MessageFormEventArgs e)
 		{
-			MainWindow.UpdateGui(() =>
+			MainWindow.UpdateGui(async () =>
 			{
-				ParameterDialog Dialog = new ParameterDialog(e.Form);
+				ParameterDialog Dialog = await ParameterDialog.CreateAsync(e.Form);
 				Dialog.ShowDialog();
 			});
 
@@ -509,9 +515,9 @@ namespace Waher.Client.WPF.Model.Muc
 
 		private Task MucClient_OccupantRequest(object Sender, MessageFormEventArgs e)
 		{
-			MainWindow.UpdateGui(() =>
+			MainWindow.UpdateGui(async () =>
 			{
-				ParameterDialog Dialog = new ParameterDialog(e.Form);
+				ParameterDialog Dialog = await ParameterDialog.CreateAsync(e.Form);
 				Dialog.ShowDialog();
 			});
 
@@ -690,7 +696,7 @@ namespace Waher.Client.WPF.Model.Muc
 
 			MainWindow.ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
 
-			MainWindow.currentInstance.MucPrivateChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, e.ThreadID, 
+			await MainWindow.currentInstance.MucPrivateChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, e.ThreadID, 
 				IsMarkdown, Timestamp, Occupant, e.From);
 		}
 
@@ -701,7 +707,7 @@ namespace Waher.Client.WPF.Model.Muc
 			MainWindow.ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
 
 			if (IsMarkdown)
-				View?.Event(Message, string.Empty, new MarkdownDocument(Message, ChatView.GetMarkdownSettings()), Timestamp, e.ThreadID);
+				View?.Event(Message, string.Empty, await MarkdownDocument.CreateAsync(Message, ChatView.GetMarkdownSettings()), Timestamp, e.ThreadID);
 			else
 				View?.Event(Message, string.Empty, e.ThreadID);
 		}

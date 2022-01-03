@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -12,6 +13,7 @@ namespace Waher.Script.Operators
 	{
 		private readonly LinkedList<KeyValuePair<string, ScriptNode>> members;
 		private Dictionary<string, ScriptNode> quick = null;
+		private bool isAsync;
 
 		/// <summary>
 		/// Creates an object from nothing.
@@ -24,15 +26,33 @@ namespace Waher.Script.Operators
 			: base(Start, Length, Expression)
 		{
 			this.members = Members;
+			this.CalcIsAsync();
+		}
+
+		private void CalcIsAsync()
+		{
+			this.isAsync = false;
+
+			foreach (KeyValuePair<string, ScriptNode> P in this.members)
+			{
+				if (P.Value?.IsAsynchronous ?? false)
+				{
+					this.isAsync = true;
+					break;
+				}
+			}
 		}
 
 		/// <summary>
 		/// Members, in order of definition.
 		/// </summary>
-		public LinkedList<KeyValuePair<string, ScriptNode>> Members
-		{
-			get { return this.members; }
-		}
+		public LinkedList<KeyValuePair<string, ScriptNode>> Members => this.members;
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => this.isAsync;
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -45,6 +65,24 @@ namespace Waher.Script.Operators
 
 			foreach (KeyValuePair<string, ScriptNode> P in this.members)
 				Result[P.Key] = P.Value.Evaluate(Variables);
+
+			return new ObjectValue(Result);
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!this.isAsync)
+				return this.Evaluate(Variables);
+
+			Dictionary<string, IElement> Result = new Dictionary<string, IElement>();
+
+			foreach (KeyValuePair<string, ScriptNode> P in this.members)
+				Result[P.Key] = await P.Value.EvaluateAsync(Variables);
 
 			return new ObjectValue(Result);
 		}
@@ -75,21 +113,35 @@ namespace Waher.Script.Operators
 
 			Loop = this.members.First;
 
+			ScriptNode Node;
+			bool RecalcIsAsync = false;
+
 			while (!(Loop is null))
 			{
-				ScriptNode Node = Loop.Value.Value;
+				Node = Loop.Value.Value;
 				if (!(Node is null))
 				{
-					bool Result = Callback(ref Node, State);
-					if (Loop.Value.Value != Node)
-						Loop.Value = new KeyValuePair<string, ScriptNode>(Loop.Value.Key, Node);
+					bool Result = Callback(Node, out ScriptNode NewNode, State);
+					if (!(NewNode is null))
+					{
+						Loop.Value = new KeyValuePair<string, ScriptNode>(Loop.Value.Key, NewNode);
+						RecalcIsAsync = true;
+					}
 
 					if (!Result)
+					{
+						if (RecalcIsAsync)
+							this.CalcIsAsync();
+
 						return false;
+					}
 				}
 
 				Loop = Loop.Next;
 			}
+
+			if (RecalcIsAsync)
+				this.CalcIsAsync();
 
 			if (!DepthFirst)
 			{
@@ -107,9 +159,7 @@ namespace Waher.Script.Operators
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (!(obj is ObjectExNihilo O) || !base.Equals(obj))
@@ -140,9 +190,7 @@ namespace Waher.Script.Operators
 			}
 		}
 
-		/// <summary>
-		/// <see cref="object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();
@@ -166,7 +214,7 @@ namespace Waher.Script.Operators
 		{
 			if (!(CheckAgainst is ObjectValue Obj))
 				return PatternMatchResult.NoMatch;
-			
+
 			if (this.quick is null)
 			{
 				Dictionary<string, ScriptNode> Quick = new Dictionary<string, ScriptNode>();

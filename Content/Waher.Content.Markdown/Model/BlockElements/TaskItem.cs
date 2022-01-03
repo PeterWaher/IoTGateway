@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Content.Markdown.Model.BlockElements
@@ -29,26 +30,20 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <summary>
 		/// If the item is checked or not.
 		/// </summary>
-		public bool IsChecked
-		{
-			get { return this.isChecked; }
-		}
+		public bool IsChecked => this.isChecked;
 
 		/// <summary>
 		/// Position of the checkmark in the original markdown text document.
 		/// </summary>
-		public int CheckPosition
-		{
-			get { return this.checkPosition; }
-		}
+		public int CheckPosition => this.checkPosition;
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
-			PrefixedBlock(Output, this.Child, this.isChecked ? "[x]\t" : "[ ]\t", "\t");
+			await PrefixedBlock(Output, this.Child, this.isChecked ? "[x]\t" : "[ ]\t", "\t");
 			Output.AppendLine();
 		}
 
@@ -56,7 +51,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override async Task GenerateHTML(StringBuilder Output)
 		{
 			Output.Append("<li class=\"taskListItem\"><input disabled=\"disabled");
 			
@@ -96,10 +91,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 						First = false;
 
 						if (E.InlineSpanElement)
-							E.GenerateHTML(Output);
+							await E.GenerateHTML(Output);
 						else
 						{
-							NestedBlock.GenerateHTML(Output);
+							await NestedBlock.GenerateHTML(Output);
 							break;
 						}
 					}
@@ -111,7 +106,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 							EndLabel = false;
 						}
 
-						E.GenerateHTML(Output);
+						await E.GenerateHTML(Output);
 					}
 				}
 
@@ -122,7 +117,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			}
 			else
 			{
-				this.Child.GenerateHTML(Output);
+				await this.Child.GenerateHTML(Output);
 				Output.AppendLine("</label></li>");
 			}
 		}
@@ -131,7 +126,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override async Task GeneratePlainText(StringBuilder Output)
 		{
 			if (this.isChecked)
 				Output.Append("[X] ");
@@ -139,7 +134,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				Output.Append("[ ] ");
 
 			StringBuilder sb = new StringBuilder();
-			this.Child.GeneratePlainText(sb);
+			await this.Child.GeneratePlainText(sb);
 
 			string s = sb.ToString();
 
@@ -154,9 +149,9 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			this.Child.GenerateXAML(Output, TextAlignment);
+			return this.Child.GenerateXAML(Output, TextAlignment);
 		}
 
 		/// <summary>
@@ -164,21 +159,15 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			this.Child.GenerateXamarinForms(Output, TextAlignment);
+			return this.Child.GenerateXamarinForms(Output, TextAlignment);
 		}
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get
-			{
-				return this.Child.InlineSpanElement;
-			}
-		}
+		internal override bool InlineSpanElement => this.Child.InlineSpanElement;
 
 		/// <summary>
 		/// Gets margins for content.

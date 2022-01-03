@@ -29,10 +29,7 @@ namespace Waher.Script.Model
 		/// <summary>
 		/// Optional aliases. If there are no aliases for the function, null is returned.
 		/// </summary>
-		public virtual string[] Aliases
-		{
-			get { return null; }
-		}
+		public virtual string[] Aliases => null;
 
 		/// <summary>
 		/// Default Argument names

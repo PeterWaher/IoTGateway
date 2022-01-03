@@ -5,6 +5,8 @@ using System.Text;
 using System.Xml;
 using Waher.Runtime.Inventory;
 using Waher.Script;
+using System.Threading.Tasks;
+using Waher.Content.Markdown.Functions;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {
@@ -53,7 +55,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
+		public override async Task GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
             bool AloneInParagraph, MarkdownDocument Document)
         {
             Variables Variables = Document.Settings.Variables;
@@ -64,8 +66,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
             {
                 foreach (MultimediaItem Item in Items)
                 {
-                    MarkdownDocument Markdown = this.GetMarkdown(Item, Document.URL);
-                    Markdown.GenerateHTML(Output, true);
+                    MarkdownDocument Markdown = await this.GetMarkdown(Item, Document.URL);
+                    await Markdown.GenerateHTML(Output, true);
 
                     if (AloneInParagraph)
                         Output.AppendLine();
@@ -78,7 +80,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             }
         }
 
-        private MarkdownDocument GetMarkdown(MultimediaItem Item, string ParentURL)
+        private async Task<MarkdownDocument> GetMarkdown(MultimediaItem Item, string ParentURL)
         {
             int i = Item.Url.IndexOf('?');
             string Query;
@@ -130,11 +132,9 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				}
 			}
 
-			string MarkdownText = File.ReadAllText(FileName);
-			MarkdownDocument Markdown = new MarkdownDocument(MarkdownText, Item.Document.Settings, FileName, string.Empty, ParentURL)
-			{
-				Master = Item.Document
-			};
+			string MarkdownText = await Resources.ReadAllTextAsync(FileName);
+            MarkdownDocument Markdown = await MarkdownDocument.CreateAsync(MarkdownText, Item.Document.Settings, FileName, string.Empty, ParentURL);
+            Markdown.Master = Item.Document;
 
             MarkdownDocument Loop = Item.Document;
 
@@ -159,7 +159,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GeneratePlainText(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
+		public override async Task GeneratePlainText(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
             bool AloneInParagraph, MarkdownDocument Document)
         {
             Variables Variables = Document.Settings.Variables;
@@ -170,8 +170,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
             {
                 foreach (MultimediaItem Item in Items)
                 {
-                    MarkdownDocument Markdown = this.GetMarkdown(Item, Document.URL);
-                    Markdown.GeneratePlainText(Output);
+                    MarkdownDocument Markdown = await this.GetMarkdown(Item, Document.URL);
+                    await Markdown.GeneratePlainText(Output);
 
                     if (AloneInParagraph)
                         Output.AppendLine();
@@ -193,7 +193,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
         /// <param name="ChildNodes">Child nodes.</param>
         /// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
         /// <param name="Document">Markdown document containing element.</param>
-        public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
+        public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
             IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
         {
             Variables Variables = Document.Settings.Variables;
@@ -204,8 +204,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
             {
                 foreach (MultimediaItem Item in Items)
                 {
-                    MarkdownDocument Markdown = this.GetMarkdown(Item, Document.URL);
-                    Markdown.GenerateXAML(Output, true);
+                    MarkdownDocument Markdown = await this.GetMarkdown(Item, Document.URL);
+                    await Markdown.GenerateXAML(Output, true);
                 }
             }
             finally
@@ -224,7 +224,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
         /// <param name="ChildNodes">Child nodes.</param>
         /// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
         /// <param name="Document">Markdown document containing element.</param>
-        public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
+        public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
             IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
         {
             Variables Variables = Document.Settings.Variables;
@@ -235,8 +235,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
             {
                 foreach (MultimediaItem Item in Items)
                 {
-                    MarkdownDocument Markdown = this.GetMarkdown(Item, Document.URL);
-                    Markdown.GenerateXamarinForms(Output, true);
+                    MarkdownDocument Markdown = await this.GetMarkdown(Item, Document.URL);
+                    await Markdown.GenerateXamarinForms(Output, true);
                 }
             }
             finally

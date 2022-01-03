@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using SkiaSharp;
 
 namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
@@ -39,13 +40,15 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
-		public override void Measure(DrawingState State, PathState PathState)
+		public override Task Measure(DrawingState State, PathState PathState)
 		{
 			if (this.defined)
 			{
 				PathState.Add(this.xCoordinate, this.yCoordinate);
 				PathState.Add(this.xCoordinate2, this.yCoordinate2);
 			}
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -54,7 +57,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
 		/// <param name="Path">Path being generated.</param>
-		public override void Draw(DrawingState State, PathState PathState, SKPath Path)
+		public override Task Draw(DrawingState State, PathState PathState, SKPath Path)
 		{
 			if (this.defined)
 			{
@@ -63,6 +66,8 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 				this.P2 = PathState.Add(this.xCoordinate2, this.yCoordinate2);
 				Path.QuadTo(P1, P2);
 			}
+		
+			return Task.CompletedTask;
 		}
 	}
 }

@@ -33,9 +33,7 @@ namespace Waher.Events.Console
 			this.beep = Beep;
 		}
 
-		/// <summary>
-		/// <see cref="IEventSink.Queue"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override Task Queue(Event Event)
 		{
 			lock (System.Console.Out)

@@ -60,7 +60,7 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 			else if (this.alias is VariableReference Ref)
 				Alias = Ref.VariableName;
 			else
-				Alias = this.alias.Evaluate(Variables).AssociatedObjectValue?.ToString();
+				Alias = (await this.alias.EvaluateAsync(Variables)).AssociatedObjectValue?.ToString();
 
 			if (this.source is VariableReference Ref2)
 				return GetDataSource(Ref2, Alias, Variables);
@@ -69,7 +69,7 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 				if (this.source is IEvaluateAsync AsyncSource)
 					return GetDataSource(string.Empty, Alias, await AsyncSource.EvaluateAsync(Variables), this.source);
 				else
-					return GetDataSource(string.Empty, Alias, this.source.Evaluate(Variables), this.source);
+					return GetDataSource(string.Empty, Alias, await this.source.EvaluateAsync(Variables), this.source);
 			}
 		}
 
@@ -138,11 +138,28 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 				}
 			}
 
-			if (!(this.source is null) && !Callback(ref this.source, State))
-				return false;
+			ScriptNode NewNode;
+			bool b;
 
-			if (!(this.alias is null) && !Callback(ref this.alias, State))
-				return false;
+			if (!(this.source is null))
+			{
+				b = !Callback(this.source, out NewNode, State);
+				if (!(NewNode is null))
+					this.source = NewNode;
+
+				if (b)
+					return false;
+			}
+
+			if (!(this.alias is null))
+			{
+				b = !Callback(this.alias, out NewNode, State);
+				if (!(NewNode is null))
+					this.alias = NewNode;
+
+				if (b)
+					return false;
+			}
 
 			if (!DepthFirst)
 			{
@@ -156,9 +173,7 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return (obj is SourceReference O &&
@@ -167,9 +182,7 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 				base.Equals(obj));
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

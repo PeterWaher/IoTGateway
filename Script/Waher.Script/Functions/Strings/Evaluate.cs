@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Numerics;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -26,18 +26,18 @@ namespace Waher.Script.Functions.Strings
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "evaluate"; }
-        }
+        public override string FunctionName => "evaluate";
 
         /// <summary>
         /// Optional aliases. If there are no aliases for the function, null is returned.
         /// </summary>
-        public override string[] Aliases
-        {
-            get { return new string[] { "eval" }; }
-        }
+        public override string[] Aliases => new string[] { "eval" };
+
+        /// <summary>
+        /// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+        /// <see cref="EvaluateAsync(Variables)"/>.
+        /// </summary>
+        public override bool IsAsynchronous => true;
 
         /// <summary>
         /// Evaluates the function on a scalar argument.
@@ -47,11 +47,22 @@ namespace Waher.Script.Functions.Strings
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(string Argument, Variables Variables)
         {
+            return this.EvaluateScalarAsync(Argument, Variables).Result;
+        }
+
+        /// <summary>
+        /// Evaluates the function on a scalar argument.
+        /// </summary>
+        /// <param name="Argument">Function argument.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Function result.</returns>
+        public override async Task<IElement> EvaluateScalarAsync(string Argument, Variables Variables)
+        {
             Expression Exp = new Expression(Argument, this.Expression.Source);
 
             try
             {
-                return Exp.Root.Evaluate(Variables);
+                return await Exp.Root.EvaluateAsync(Variables);
             }
             catch (ScriptReturnValueException ex)
             {

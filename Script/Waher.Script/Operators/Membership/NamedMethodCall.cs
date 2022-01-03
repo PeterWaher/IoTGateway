@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -56,17 +55,12 @@ namespace Waher.Script.Operators.Membership
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
 		/// </summary>
+		/// <param name="Operand">Operand.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
+		public override IElement Evaluate(IElement Operand, Variables Variables)
 		{
-			IElement E = this.op.Evaluate(Variables);
-			return this.Evaluate(E, Variables);
-		}
-
-		private IElement Evaluate(IElement E, Variables Variables)
-		{ 
-			object Object = E.AssociatedObjectValue;
+			object Object = Operand.AssociatedObjectValue;
 			Type T, PT;
 			IElement[] Arguments = null;
 			object[] ParameterValues;
@@ -241,15 +235,15 @@ namespace Waher.Script.Operators.Membership
 
 					if (this.method is null)
 					{
-						if (E.IsScalar)
+						if (Operand.IsScalar)
 							throw new ScriptRuntimeException("Invalid number or type of parameters.", this);
 
 						LinkedList<IElement> Elements = new LinkedList<IElement>();
 
-						foreach (IElement Item in E.ChildElements)
+						foreach (IElement Item in Operand.ChildElements)
 							Elements.AddLast(this.Evaluate(Item, Variables));
 
-						return E.Encapsulate(Elements, this);
+						return Operand.Encapsulate(Elements, this);
 					}
 				}
 			}

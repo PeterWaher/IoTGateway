@@ -27,21 +27,10 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
 		/// </summary>
+		/// <param name="Operand">Operand.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
-		{
-			IElement Operand = this.op.Evaluate(Variables);
-
-			return this.Evaluate(Operand);
-		}
-
-		/// <summary>
-		/// Evaluates the operator.
-		/// </summary>
-		/// <param name="Operand">Operand.</param>
-		/// <returns>Result</returns>
-		public virtual IElement Evaluate(IElement Operand)
+		public override IElement Evaluate(IElement Operand, Variables Variables)
 		{
 			if (Operand is DoubleNumber DOp)
 			{
@@ -58,7 +47,7 @@ namespace Waher.Script.Operators.Arithmetics
 			LinkedList<IElement> Result = new LinkedList<IElement>();
 
 			foreach (IElement Child in Operand.ChildElements)
-				Result.AddLast(this.Evaluate(Child));
+				Result.AddLast(this.Evaluate(Child, Variables));
 
 			return Operand.Encapsulate(Result, this);
 		}

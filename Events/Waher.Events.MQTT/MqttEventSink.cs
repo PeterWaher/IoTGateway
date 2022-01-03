@@ -120,9 +120,7 @@ namespace Waher.Events.MQTT
 			get { return this.topic; }
 		}
 
-		/// <summary>
-		/// <see cref="EventSink.Queue"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override Task Queue(Event Event)
 		{
 			lock (this.synchObj)

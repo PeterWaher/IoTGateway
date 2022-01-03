@@ -560,14 +560,10 @@
             <returns>String representation of the value.</returns>
         </member>
         <member name="M:Waher.Things.ControlParameters.ControlParameter.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Things.ControlParameters.ControlParameter.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Things.ControlParameters.ControlParameter.ExportToForm(System.Xml.XmlWriter,Waher.Things.IThingReference)">
             <summary>
@@ -3793,10 +3789,7 @@
             </summary>
         </member>
         <member name="M:Waher.Things.SensorData.Field.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
-            <returns>String representation of field.</returns>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Things.SensorData.Field.ValueString">
             <summary>
@@ -5032,9 +5025,7 @@
             </summary>
         </member>
         <member name="M:Waher.Things.ThingError.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Things.ThingReference">
             <summary>
@@ -5123,9 +5114,7 @@
             </summary>
         </member>
         <member name="M:Waher.Things.ThingReference.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Things.TypeConverters.BooleanFieldToBoolean">
             <summary>

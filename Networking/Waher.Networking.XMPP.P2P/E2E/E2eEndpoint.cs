@@ -226,9 +226,7 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// </summary>
         public virtual bool Slow => false;
 
-        /// <summary>
-        /// <see cref="Object.ToString()"/>
-        /// </summary>
+        /// <inheritdoc/>
         public override string ToString()
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -236,15 +234,11 @@ namespace Waher.Networking.XMPP.P2P.E2E
 			return Xml.ToString();
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
-		public override abstract bool Equals(object obj);
+        /// <inheritdoc/>
+        public override abstract bool Equals(object obj);
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
-		public override abstract int GetHashCode();
+        /// <inheritdoc/>
+        public override abstract int GetHashCode();
 
         /// <summary>
         /// Provides a score for the endpoint. More features, higher score.

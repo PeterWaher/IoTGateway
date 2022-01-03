@@ -561,15 +561,24 @@ namespace Waher.Networking.HTTP
 							ContentType = ex2.ContentType;
 							Content = ex2.Content;
 						}
-						else if (ex2.ContentObject is string s)
+						else
 						{
-							Content = Encoding.UTF8.GetBytes(s);
-							ContentType = "text/plain; charset=utf-8";
-						}
-						else if (!(ex2.ContentObject is null) && this.TryEncode(ex2.ContentObject, out byte[] Content2, out string ContentType2))
-						{
-							Content = Content2;
-							ContentType = ContentType2;
+							object ContentObject = await ex2.GetContentObjectAsync();
+							
+							if (ContentObject is string s)
+							{
+								Content = Encoding.UTF8.GetBytes(s);
+								ContentType = "text/plain; charset=utf-8";
+							}
+							else if (!(ContentObject is null))
+							{
+								EncodingResult Result = await this.TryEncode(ContentObject);
+								if (!(Result is null))
+								{
+									Content = Result.Data;
+									ContentType = Result.ContentType;
+								}
+							}
 						}
 
 						if (!(ex2.HeaderFields is null))
@@ -630,7 +639,7 @@ namespace Waher.Networking.HTTP
 						CustomErrorEventArgs e = new CustomErrorEventArgs(this.statusCode, this.statusMessage, ContentType, Content,
 							this.httpRequest, this);
 
-						this.httpServer.CustomizeError(e);
+						await this.httpServer.CustomizeError(e);
 						Content = e.Content;
 						ContentType = e.ContentType;
 					}
@@ -788,17 +797,19 @@ namespace Waher.Networking.HTTP
 		/// <param name="Object">Object to return. Object will be encoded using Internet Content encoders, as defined in <see cref="Waher.Content"/>.</param>
 		public async Task Return(object Object)
 		{
-			if (this.TryEncode(Object, out byte[] Data, out string ContentType))
-			{
-				this.ContentType = ContentType;
-				this.ContentLength = Data.Length;
+			EncodingResult Result = await this.TryEncode(Object);
 
-				await this.Write(Data);
-			}
-			else
+			if (Result is null)
 			{
 				this.statusCode = 406;  // Not acceptable
 				this.statusMessage = "Not Acceptable";
+			}
+			else
+			{
+				this.ContentType = Result.ContentType;
+				this.ContentLength = Result.Data.Length;
+
+				await this.Write(Result.Data);
 			}
 
 			await this.SendResponse();
@@ -817,26 +828,38 @@ namespace Waher.Networking.HTTP
 			await this.SendResponse();
 		}
 
-		private bool TryEncode(object Object, out byte[] Data, out string ContentType)
+		private class EncodingResult
+		{
+			public byte[] Data;
+			public string ContentType;
+		}
+
+		private async Task<EncodingResult> TryEncode(object Object)
 		{
 			HttpFieldAccept Accept = this.httpRequest?.Header?.Accept;
 
 			if (Accept is null)
 			{
-				Data = InternetContent.Encode(Object, this.encoding, out ContentType);
-				return !(Data is null);
+				KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Object, this.encoding);
+				return new EncodingResult()
+				{
+					Data = P.Key,
+					ContentType = P.Value
+				};
 			}
 			else
 			{
-				Data = null;
-				ContentType = null;
+				string ContentType = null;
+				byte[] Data = null;
 
 				foreach (AcceptRecord Rec in Accept.Records)
 				{
 					switch (Rec.Detail)
 					{
 						case 0: // Wildcard
-							Data = InternetContent.Encode(Object, this.encoding, out ContentType);
+							KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Object, this.encoding);
+							Data = P.Key;
+							ContentType = P.Value;
 							break;
 
 						case 1: // Top Type only
@@ -860,22 +883,37 @@ namespace Waher.Networking.HTTP
 								}
 							}
 
-							Data = Best?.Encode(Object, this.encoding, out ContentType, BestContentType);
+							if (!(Best is null))
+							{
+								P = await Best.EncodeAsync(Object, this.encoding, ContentType, BestContentType);
+								Data = P.Key;
+								ContentType = P.Value;
+							}
 							break;
 
 						case 2: // Top & Sub Type
 						case 3: // Top & Sub Type, and parameters
 							if (InternetContent.Encodes(Object, out Grade Grade2, out IContentEncoder Encoder, Rec.Item))
-								Data = Encoder.Encode(Object, this.encoding, out ContentType, Rec.Item);
+							{
+								P = await Encoder.EncodeAsync(Object, this.encoding, ContentType, Rec.Item);
+								Data = P.Key;
+								ContentType = P.Value;
+							}
 							break;
 					}
 
 					if (!(Data is null))
-						return true;
+					{
+						return new EncodingResult()
+						{
+							Data = Data,
+							ContentType = ContentType
+						};
+					}
 				}
 			}
 
-			return false;
+			return null;
 		}
 
 		/// <summary>

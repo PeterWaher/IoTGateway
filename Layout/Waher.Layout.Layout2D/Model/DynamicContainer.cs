@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Layout.Layout2D.Model
 {
@@ -33,7 +32,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			ILayoutElement[] Children = this.DynamicChildren;
 
@@ -42,7 +41,7 @@ namespace Waher.Layout.Layout2D.Model
 				foreach (ILayoutElement E in Children)
 				{
 					if (E.IsVisible)
-						E.Draw(State);
+						await E.Draw(State);
 				}
 			}
 		}

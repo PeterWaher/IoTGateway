@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Events;
 using Waher.Networking.LWM2M.ContentFormats;
 using Waher.Security;
 using Waher.Runtime.Settings;
@@ -13,7 +11,7 @@ namespace Waher.Networking.LWM2M
 	/// </summary>
 	public class Lwm2mResourceOpaque : Lwm2mResource
 	{
-		private byte[] defaultValue;
+		private readonly byte[] defaultValue;
 		private byte[] value;
 
 		/// <summary>

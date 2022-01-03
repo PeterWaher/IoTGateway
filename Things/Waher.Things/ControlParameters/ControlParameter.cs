@@ -76,9 +76,7 @@ namespace Waher.Things.ControlParameters
 		/// <returns>String representation of the value.</returns>
 		public abstract Task<string> GetStringValue(IThingReference Node);
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return
@@ -86,9 +84,7 @@ namespace Waher.Things.ControlParameters
 				this.name == ((ControlParameter)obj).name;
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			return this.name.GetHashCode();

@@ -35,9 +35,7 @@ namespace Waher.Content.Html
 			get { return this.code; }
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return new string((char)this.code, 1);

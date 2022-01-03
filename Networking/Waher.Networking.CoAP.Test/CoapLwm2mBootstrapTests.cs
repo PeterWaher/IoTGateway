@@ -16,7 +16,7 @@ namespace Waher.Networking.CoAP.Test
 		[TestInitialize]
 		public async Task TestInitialize()
 		{
-			this.coapClient = new CoapEndpoint(new int[] { 5783 }, new int[] { 5784 }, null, null, 
+			this.coapClient = new CoapEndpoint(new int[] { 5783 }, new int[] { 5784 }, null, null,
 				false, false, new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
 
 			this.lwm2mClient = new Lwm2mClient("Lwm2mTestClient", this.coapClient,
@@ -63,17 +63,27 @@ namespace Waher.Networking.CoAP.Test
 			this.lwm2mClient.OnBootstrapCompleted += (sender, e) => Done2.Set();
 			this.lwm2mClient.OnBootstrapFailed += (sender, e) => Error2.Set();
 
-			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) => Done3.Set();
-			this.lwm2mClient.OnRegistrationFailed += (sender, e) => Error3.Set();
+			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) =>
+			{
+				Done3.Set();
+				return Task.CompletedTask;
+			};
+			this.lwm2mClient.OnRegistrationFailed += (sender, e) =>
+			{
+				Error3.Set();
+				return Task.CompletedTask;
+			};
 
 			await this.lwm2mClient.RequestBootstrap(
 				new Lwm2mServerReference("leshan.eclipse.org", 5783),
-				(sender, e)=>
+				(sender, e) =>
 				{
 					if (e.Ok)
 						Done.Set();
 					else
 						Error.Set();
+
+					return Task.CompletedTask;
 				}, null);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000));
@@ -95,8 +105,16 @@ namespace Waher.Networking.CoAP.Test
 			this.lwm2mClient.OnBootstrapCompleted += (sender, e) => Done2.Set();
 			this.lwm2mClient.OnBootstrapFailed += (sender, e) => Error2.Set();
 
-			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) => Done3.Set();
-			this.lwm2mClient.OnRegistrationFailed += (sender, e) => Error3.Set();
+			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) =>
+			{
+				Done3.Set();
+				return Task.CompletedTask;
+			};
+			this.lwm2mClient.OnRegistrationFailed += (sender, e) =>
+			{
+				Error3.Set();
+				return Task.CompletedTask;
+			};
 
 			Assert.IsTrue(await this.lwm2mClient.RequestBootstrap((sender, e) =>
 			{
@@ -104,6 +122,8 @@ namespace Waher.Networking.CoAP.Test
 					Done.Set();
 				else
 					Error.Set();
+
+				return Task.CompletedTask;
 			}, null));
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000));

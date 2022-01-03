@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -72,6 +73,7 @@ namespace Waher.Script.Model
 		private readonly ArgumentType[] argumentTypes;
 		private readonly bool allNormal;
 		private readonly int nrArguments;
+		private bool isAsync;
 
 		/// <summary>
 		/// Base class for funcions of one variable.
@@ -100,23 +102,39 @@ namespace Waher.Script.Model
 					break;
 				}
 			}
+
+			this.CalcIsAsync();
+		}
+
+		private void CalcIsAsync()
+		{
+			this.isAsync = false;
+
+			for (int i = 0; i < this.nrArguments; i++)
+			{
+				if (this.arguments[i]?.IsAsynchronous ?? false)
+				{
+					this.isAsync = true;
+					break;
+				}
+			}
 		}
 
 		/// <summary>
 		/// Function arguments.
 		/// </summary>
-		public ScriptNode[] Arguments
-		{
-			get { return this.arguments; }
-		}
+		public ScriptNode[] Arguments => this.arguments;
 
 		/// <summary>
 		/// Function argument types.
 		/// </summary>
-		public ArgumentType[] ArgumentTypes
-		{
-			get { return this.argumentTypes; }
-		}
+		public ArgumentType[] ArgumentTypes => this.argumentTypes;
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => this.isAsync;
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -144,17 +162,77 @@ namespace Waher.Script.Model
 				return this.EvaluateCanonicalExtension(Arg, Variables);
 		}
 
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!this.isAsync)
+				return this.Evaluate(Variables);
+
+			IElement[] Arg = new IElement[this.nrArguments];
+			ScriptNode Node;
+			int i;
+
+			for (i = 0; i < this.nrArguments; i++)
+			{
+				Node = this.arguments[i];
+				if (Node is null)
+					Arg[i] = ObjectValue.Null;
+				else
+					Arg[i] = await Node.EvaluateAsync(Variables);
+			}
+
+			if (this.allNormal)
+				return await this.EvaluateAsync(Arg, Variables);
+			else
+				return await this.EvaluateCanonicalExtensionAsync(Arg, Variables);
+		}
+
 		private IElement EvaluateCanonicalExtension(IElement[] Arguments, Variables Variables)
 		{
+			int i, j;
+
+			this.Prepare(Arguments, out Encapsulation Encapsulation, out int Dimension, out IEnumerator<IElement>[] e);
+
+			if (!(Encapsulation is null))
+			{
+				LinkedList<IElement> Result = new LinkedList<IElement>();
+				IElement[] Arguments2 = new IElement[this.nrArguments];
+
+				for (j = 0; j < Dimension; j++)
+				{
+					for (i = 0; i < this.nrArguments; i++)
+					{
+						if (e[i] is null || !e[i].MoveNext())
+							Arguments2[i] = Arguments[i];
+						else
+							Arguments2[i] = e[i].Current;
+					}
+
+					Result.AddLast(this.EvaluateCanonicalExtension(Arguments2, Variables));
+				}
+
+				return Encapsulation(Result, this);
+			}
+			else
+				return this.Evaluate(Arguments, Variables);
+		}
+
+		private void Prepare(IElement[] Arguments, out Encapsulation Encapsulation, out int Dimension, out IEnumerator<IElement>[] e)
+		{
 			ICollection<IElement> ChildElements;
-			IEnumerator<IElement>[] e = new IEnumerator<IElement>[this.nrArguments];
 			IElement Argument;
-			Encapsulation Encapsulation = null;
 			IMatrix M;
 			ISet S;
 			IVectorSpaceElement V;
-			int Dimension = -1;
 			int i, j;
+
+			e = new IEnumerator<IElement>[this.nrArguments];
+			Encapsulation = null;
+			Dimension = -1;
 
 			for (i = 0; i < this.nrArguments; i++)
 			{
@@ -293,6 +371,13 @@ namespace Waher.Script.Model
 						throw new ScriptRuntimeException("Unhandled argument type.", this);
 				}
 			}
+		}
+
+		private async Task<IElement> EvaluateCanonicalExtensionAsync(IElement[] Arguments, Variables Variables)
+		{
+			int i, j;
+
+			this.Prepare(Arguments, out Encapsulation Encapsulation, out int Dimension, out IEnumerator<IElement>[] e);
 
 			if (!(Encapsulation is null))
 			{
@@ -309,13 +394,13 @@ namespace Waher.Script.Model
 							Arguments2[i] = e[i].Current;
 					}
 
-					Result.AddLast(this.EvaluateCanonicalExtension(Arguments2, Variables));
+					Result.AddLast(await this.EvaluateCanonicalExtensionAsync(Arguments2, Variables));
 				}
 
 				return Encapsulation(Result, this);
 			}
 			else
-				return this.Evaluate(Arguments, Variables);
+				return await this.EvaluateAsync(Arguments, Variables);
 		}
 
 		/// <summary>
@@ -325,6 +410,17 @@ namespace Waher.Script.Model
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
 		public abstract IElement Evaluate(IElement[] Arguments, Variables Variables);
+
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Arguments">Function arguments.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public virtual Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
+		{
+			return Task.FromResult<IElement>(this.Evaluate(Arguments, Variables));
+		}
 
 		/// <summary>
 		/// Calls the callback method for all child nodes.
@@ -343,11 +439,33 @@ namespace Waher.Script.Model
 					return false;
 			}
 
+			ScriptNode Node;
+			bool RecalcIsAsync = false;
+
 			for (i = 0; i < this.nrArguments; i++)
 			{
-				if (!(this.arguments[i] is null) && !Callback(ref this.arguments[i], State))
-					return false;
+				Node = this.arguments[i];
+				if (!(Node is null))
+				{
+					bool b = !Callback(Node, out ScriptNode NewNode, State);
+					if (!(NewNode is null))
+					{
+						this.arguments[i] = NewNode;
+						RecalcIsAsync = true;
+					}
+
+					if (b)
+					{
+						if (RecalcIsAsync)
+							this.CalcIsAsync();
+
+						return false;
+					}
+				}
 			}
+
+			if (RecalcIsAsync)
+				this.CalcIsAsync();
 
 			if (!DepthFirst)
 			{
@@ -358,9 +476,7 @@ namespace Waher.Script.Model
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is FunctionMultiVariate O &&
@@ -369,9 +485,7 @@ namespace Waher.Script.Model
 				base.Equals(obj);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

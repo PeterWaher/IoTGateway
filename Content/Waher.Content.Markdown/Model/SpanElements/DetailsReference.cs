@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Content.Markdown.Model.SpanElements
@@ -23,33 +24,35 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override async Task GenerateHTML(StringBuilder Output)
 		{
 			if (this.Document.Detail != null)
-				this.Document.Detail.GenerateHTML(Output, true);
+				await this.Document.Detail.GenerateHTML(Output, true);
 			else
-				base.GenerateHTML(Output);
+				await base.GenerateHTML(Output);
 		}
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override Task GenerateMarkdown(StringBuilder Output)
 		{
 			Output.Append("[%Details]");
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override async Task GeneratePlainText(StringBuilder Output)
 		{
 			if (this.Document.Detail != null)
-				this.Document.Detail.GeneratePlainText(Output);
+				await this.Document.Detail.GeneratePlainText(Output);
 			else
-				base.GeneratePlainText(Output);
+				await base.GeneratePlainText(Output);
 		}
 
 		/// <summary>
@@ -57,12 +60,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			if (this.Document.Detail != null)
-				this.Document.Detail.GenerateXAML(Output, false);
+				await this.Document.Detail.GenerateXAML(Output, false);
 			else
-				base.GenerateXAML(Output, TextAlignment);
+				await base.GenerateXAML(Output, TextAlignment);
 		}
 
 		/// <summary>
@@ -70,12 +73,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			if (this.Document.Detail != null)
-				this.Document.Detail.GenerateXamarinForms(Output, false);
+				await this.Document.Detail.GenerateXamarinForms(Output, false);
 			else
-				base.GenerateXamarinForms(Output, TextAlignment);
+				await base.GenerateXamarinForms(Output, TextAlignment);
 		}
 
 		/// <summary>

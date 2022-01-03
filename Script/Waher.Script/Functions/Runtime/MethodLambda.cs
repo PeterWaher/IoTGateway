@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -14,6 +14,7 @@ namespace Waher.Script.Functions.Runtime
 		private readonly object obj;
 		private readonly MethodInfo method;
 		private readonly ParameterInfo[] parameters;
+		private readonly int nrParameters;
 		private string[] argumentNames = null;
 		private ArgumentType[] argumentTypes = null;
 
@@ -27,12 +28,13 @@ namespace Waher.Script.Functions.Runtime
 			this.obj = Object;
 			this.method = Method;
 			this.parameters = Method.GetParameters();
+			this.nrParameters = this.parameters.Length;
 		}
 
 		/// <summary>
 		/// Number of arguments.
 		/// </summary>
-		public int NrArguments => this.parameters.Length;
+		public int NrArguments => this.nrParameters;
 
 		/// <summary>
 		/// Argument Names.
@@ -43,10 +45,10 @@ namespace Waher.Script.Functions.Runtime
 			{
 				if (this.argumentNames is null)
 				{
-					int i, c = this.parameters.Length;
-					string[] Names = new string[c];
+					string[] Names = new string[this.nrParameters];
+					int i;
 
-					for (i = 0; i < c; i++)
+					for (i = 0; i < this.nrParameters; i++)
 						Names[i] = this.parameters[i].Name;
 
 					this.argumentNames = Names;
@@ -65,10 +67,10 @@ namespace Waher.Script.Functions.Runtime
 			{
 				if (this.argumentTypes is null)
 				{
-					int i, c = this.parameters.Length;
-					ArgumentType[] Types = new ArgumentType[c];
+					ArgumentType[] Types = new ArgumentType[this.nrParameters];
+					int i;
 
-					for (i = 0; i < c; i++)
+					for (i = 0; i < this.nrParameters; i++)
 					{
 						Type T = this.parameters[i].GetType();
 						if (T.IsArray || T is IVector)
@@ -122,8 +124,23 @@ namespace Waher.Script.Functions.Runtime
 		}
 
 		/// <summary>
-		/// <see cref="Object.ToString()"/>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
 		/// </summary>
+		public bool IsAsynchronous => false;
+
+		/// <summary>
+		/// Evaluates the lambda expression.
+		/// </summary>
+		/// <param name="Arguments">Arguments.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
+		{
+			return Task.FromResult<IElement>(this.Evaluate(Arguments, Variables));
+		}
+
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return Operators.LambdaDefinition.ToString(this);

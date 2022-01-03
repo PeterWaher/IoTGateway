@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
@@ -8,59 +9,53 @@ using Waher.Script.Operators;
 
 namespace Waher.Script.Fractals.IFS.Variations
 {
-    public abstract class FlameVariationOneParameter : FunctionOneScalarVariable, IFlameVariation
-    {
-        protected double[] homogeneousTransform = new double[] { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
-        protected double variationWeight = 1;
+	public abstract class FlameVariationOneParameter : FunctionOneScalarVariable, IFlameVariation
+	{
+		protected double[] homogeneousTransform = new double[] { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+		protected double variationWeight = 1;
 
-        public FlameVariationOneParameter(ScriptNode Parameter, int Start, int Length, Expression Expression)
-            : base(Parameter, Start, Length, Expression)
-        {
-        }
+		public FlameVariationOneParameter(ScriptNode Parameter, int Start, int Length, Expression Expression)
+			: base(Parameter, Start, Length, Expression)
+		{
+		}
 
-        public override string ToString()
-        {
-            return LambdaDefinition.ToString(this);
-        }
+		public override string ToString()
+		{
+			return LambdaDefinition.ToString(this);
+		}
 
-        #region IFlameVariation Members
+		#region IFlameVariation Members
 
-        public void Initialize(double[] HomogeneousTransform, double VariationWeight)
-        {
-            this.homogeneousTransform = HomogeneousTransform;
-            this.variationWeight = VariationWeight;
-        }
+		public void Initialize(double[] HomogeneousTransform, double VariationWeight)
+		{
+			this.homogeneousTransform = HomogeneousTransform;
+			this.variationWeight = VariationWeight;
+		}
 
-        public abstract void Operate(ref double x, ref double y);
+		public abstract void Operate(ref double x, ref double y);
 
-        #endregion
+		#endregion
 
-        #region ILambdaExpression Members
+		#region ILambdaExpression Members
 
-        IElement ILambdaExpression.Evaluate(IElement[] Arguments, Variables Variables)
-        {
-            double x = Expression.ToDouble(Arguments[0].AssociatedObjectValue);
-            double y = Expression.ToDouble(Arguments[1].AssociatedObjectValue);
+		public IElement Evaluate(IElement[] Arguments, Variables Variables)
+		{
+			double x = Expression.ToDouble(Arguments[0].AssociatedObjectValue);
+			double y = Expression.ToDouble(Arguments[1].AssociatedObjectValue);
 
-            this.Operate(ref x, ref y);
+			this.Operate(ref x, ref y);
 
 			return new DoubleVector(new double[] { x, y });
 		}
 
-		int ILambdaExpression.NrArguments
+		public Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
-			get { return 2; }
+			return Task.FromResult<IElement>(this.Evaluate(Arguments, Variables));
 		}
 
-		string[] ILambdaExpression.ArgumentNames
-		{
-			get { return FlameVariationZeroParameters.parameterNames; }
-		}
-
-		ArgumentType[] ILambdaExpression.ArgumentTypes
-		{
-			get { return FlameVariationZeroParameters.parameterTypes; }
-		}
+		public int NrArguments => 2;
+		public string[] ArgumentNames => FlameVariationZeroParameters.parameterNames;
+		public ArgumentType[] ArgumentTypes => FlameVariationZeroParameters.parameterTypes;
 
 		#endregion
 
@@ -77,37 +72,10 @@ namespace Waher.Script.Fractals.IFS.Variations
 			return false;
 		}
 
-		public ISet AssociatedSet
-		{
-			get
-			{
-				return SetOfVariations.Instance;
-			}
-		}
-
-		public object AssociatedObjectValue
-		{
-			get
-			{
-				return this;
-			}
-		}
-
-		public bool IsScalar
-		{
-			get
-			{
-				return false;
-			}
-		}
-
-		public ICollection<IElement> ChildElements
-		{
-			get
-			{
-				return new IElement[0];
-			}
-		}
+		public ISet AssociatedSet => SetOfVariations.Instance;
+		public object AssociatedObjectValue => this;
+		public bool IsScalar => false;
+		public ICollection<IElement> ChildElements => new IElement[0];
 
 		#endregion
 	}

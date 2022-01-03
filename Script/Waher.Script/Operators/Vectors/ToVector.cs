@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Operators.Vectors
@@ -29,11 +27,12 @@ namespace Waher.Script.Operators.Vectors
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
 		/// </summary>
+		/// <param name="Operand">Operand.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
+		public override IElement Evaluate(IElement Operand, Variables Variables)
 		{
-			return ConvertToVector(this.op.Evaluate(Variables));
+			return ConvertToVector(Operand);
         }
 
 		private IElement ConvertToVector(IElement E)

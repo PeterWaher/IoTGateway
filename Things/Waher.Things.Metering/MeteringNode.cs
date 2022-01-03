@@ -158,9 +158,7 @@ namespace Waher.Things.Metering
 			get { return string.Empty; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();

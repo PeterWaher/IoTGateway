@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -235,7 +236,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override Task GenerateMarkdown(StringBuilder Output)
 		{
 			Output.Append("```");
 			Output.AppendLine(this.language);
@@ -245,19 +246,21 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			Output.AppendLine("```");
 			Output.AppendLine();
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override async Task GenerateHTML(StringBuilder Output)
 		{
 			if (this.handler != null && this.handler.HandlesHTML)
 			{
 				try
 				{
-					if (this.handler.GenerateHTML(Output, this.rows, this.language, this.indent, this.Document))
+					if (await this.handler.GenerateHTML(Output, this.rows, this.language, this.indent, this.Document))
 						return;
 				}
 				catch (Exception ex)
@@ -306,13 +309,13 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override async Task GeneratePlainText(StringBuilder Output)
 		{
 			if (this.handler != null && this.handler.HandlesPlainText)
 			{
 				try
 				{
-					if (this.handler.GeneratePlainText(Output, this.rows, this.language, this.indent, this.Document))
+					if (await this.handler.GeneratePlainText(Output, this.rows, this.language, this.indent, this.Document))
 						return;
 				}
 				catch (Exception ex)
@@ -345,7 +348,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			XamlSettings Settings = this.Document.Settings.XamlSettings;
 
@@ -353,7 +356,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			{
 				try
 				{
-					if (this.handler.GenerateXAML(Output, TextAlignment, this.rows, this.language, this.indent, this.Document))
+					if (await this.handler.GenerateXAML(Output, TextAlignment, this.rows, this.language, this.indent, this.Document))
 						return;
 				}
 				catch (Exception ex)
@@ -419,7 +422,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			XamlSettings Settings = this.Document.Settings.XamlSettings;
 
@@ -427,7 +430,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			{
 				try
 				{
-					if (this.handler.GenerateXamarinForms(Output, TextAlignment, this.rows, this.language, this.indent, this.Document))
+					if (await this.handler.GenerateXamarinForms(Output, TextAlignment, this.rows, this.language, this.indent, this.Document))
 						return;
 				}
 				catch (Exception ex)
@@ -480,18 +483,12 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <summary>
 		/// Code block indentation.
 		/// </summary>
-		public int Indent
-		{
-			get { return this.indent; }
-		}
+		public int Indent => this.indent;
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get { return false; }
-		}
+		internal override bool InlineSpanElement => false;
 
 		/// <summary>
 		/// Exports the element to XML.

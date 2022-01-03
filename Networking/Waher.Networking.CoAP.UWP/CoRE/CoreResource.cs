@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.CoAP.ContentFormats;
 using Waher.Networking.CoAP.Options;
 
@@ -11,7 +12,7 @@ namespace Waher.Networking.CoAP.CoRE
 	/// </summary>
 	public class CoreResource : CoapResource, ICoapGetMethod
 	{
-		private CoapEndpoint endpoint;
+		private readonly CoapEndpoint endpoint;
 
 		/// <summary>
 		/// Manages a CoRE resource for an CoAP endpoint.
@@ -26,10 +27,7 @@ namespace Waher.Networking.CoAP.CoRE
 		/// <summary>
 		/// If the GET method is allowed.
 		/// </summary>
-		public bool AllowsGET
-		{
-			get { return true; }
-		}
+		public bool AllowsGET => true;
 
 		/// <summary>
 		/// Executes the GET method on the resource.
@@ -37,7 +35,7 @@ namespace Waher.Networking.CoAP.CoRE
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void GET(CoapMessage Request, CoapResponse Response)
+		public Task GET(CoapMessage Request, CoapResponse Response)
 		{
 			StringBuilder sb = new StringBuilder();
 			CoapResource[] Resources = this.endpoint.GetResources();
@@ -159,6 +157,8 @@ namespace Waher.Networking.CoAP.CoRE
 
 			Response.Respond(CoapCode.Content, Encoding.UTF8.GetBytes(sb.ToString()),
 				64, new CoapOptionContentFormat(CoreLinkFormat.ContentFormatCode));
+
+			return Task.CompletedTask;
 		}
 
 		private bool Matches(string Pattern, int[] Values)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Xml;
@@ -37,12 +38,29 @@ namespace Waher.Content.Markdown.Functions
 		public override string FunctionName => "FromMarkdown";
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
 		/// Evaluates the function.
 		/// </summary>
 		/// <param name="Argument">Function argument.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(string Argument, Variables Variables)
+		{
+			return this.EvaluateScalarAsync(Argument, Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override Task<IElement> EvaluateScalarAsync(string Argument, Variables Variables)
 		{
 			return Evaluate(Argument, this);
 		}
@@ -53,16 +71,16 @@ namespace Waher.Content.Markdown.Functions
 		/// <param name="Argument">Argument</param>
 		/// <param name="Node">Optional script node.</param>
 		/// <returns>Script element.</returns>
-		public static IElement Evaluate(string Argument, ScriptNode Node)
+		public static async Task<IElement> Evaluate(string Argument, ScriptNode Node)
 		{
-			MarkdownDocument Doc = new MarkdownDocument(Argument);
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Argument);
 			IElement Result = null;
 			LinkedList<IElement> Results = null;
 			IElement Item = null;
 
 			foreach (MarkdownElement E in Doc.Elements)
 			{
-				Item = Evaluate(E);
+				Item = await Evaluate(E);
 
 				if (Result is null)
 					Result = Item;
@@ -89,7 +107,7 @@ namespace Waher.Content.Markdown.Functions
 		/// </summary>
 		/// <param name="Element">Markdown element.</param>
 		/// <returns>Script element.</returns>
-		public static IElement Evaluate(MarkdownElement Element)
+		public static async Task<IElement> Evaluate(MarkdownElement Element)
 		{
 			StringBuilder sb;
 
@@ -104,7 +122,7 @@ namespace Waher.Content.Markdown.Functions
 					LinkedList<IElement> Elements = new LinkedList<IElement>();
 
 					for (i = 0; i < Columns; i++)
-						Headers2[i] = Evaluate(Headers[i]).AssociatedObjectValue?.ToString() ?? string.Empty;
+						Headers2[i] = (await Evaluate(Headers[i])).AssociatedObjectValue?.ToString() ?? string.Empty;
 
 					foreach (MarkdownElement[] Row in Table.Rows)
 					{
@@ -113,7 +131,7 @@ namespace Waher.Content.Markdown.Functions
 							if (E is null)
 								Elements.AddLast(ObjectValue.Null);
 							else
-								Elements.AddLast(Evaluate(E));
+								Elements.AddLast(await Evaluate(E));
 						}
 					}
 
@@ -136,7 +154,7 @@ namespace Waher.Content.Markdown.Functions
 				switch (Language.ToLower())
 				{
 					case "graph":
-						return Model.CodeContent.GraphContent.GetGraph(CodeBlock.Rows);
+						return await Model.CodeContent.GraphContent.GetGraph(CodeBlock.Rows);
 
 					case "xml":
 						sb = new StringBuilder();
@@ -152,7 +170,7 @@ namespace Waher.Content.Markdown.Functions
 					default:
 						if (CodeBlock.Handler is IImageCodeContent ImageCodeContent)
 						{
-							PixelInformation Pixels = ImageCodeContent.GenerateImage(CodeBlock.Rows, Language, Element.Document);
+							PixelInformation Pixels = await ImageCodeContent.GenerateImage(CodeBlock.Rows, Language, Element.Document);
 							return new GraphBitmap(Pixels);
 						}
 						break;
@@ -160,7 +178,7 @@ namespace Waher.Content.Markdown.Functions
 			}
 
 			sb = new StringBuilder();
-			Element.GeneratePlainText(sb);
+			await Element.GeneratePlainText(sb);
 			string s = sb.ToString().Trim();
 
 			if (CommonTypes.TryParse(s, out double d))

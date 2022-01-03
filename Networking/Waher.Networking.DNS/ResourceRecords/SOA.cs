@@ -126,9 +126,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 			set => this.minimum = value;
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return base.ToString() + "\t" + this.mName + "\t" + this.rName +

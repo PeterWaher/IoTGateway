@@ -222,9 +222,7 @@ namespace Waher.Networking.UPnP
 		/// </summary>
 		public Uri PresentationURI { get { return this.presentationURI; } }
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.friendlyName;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Content.Markdown.Model.Atoms
@@ -43,34 +44,34 @@ namespace Waher.Content.Markdown.Model.Atoms
 		/// <param name="Output">XML Output.</param>
 		public override void Export(XmlWriter Output)
 		{
-			MustBeReassembled();
+			throw MustBeReassembled();
 		}
 
 		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override Task GenerateHTML(StringBuilder Output)
 		{
-			MustBeReassembled();
+			throw MustBeReassembled();
 		}
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override Task GenerateMarkdown(StringBuilder Output)
 		{
-			MustBeReassembled();
+			throw MustBeReassembled();
 		}
 
 		/// <summary>
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override Task GeneratePlainText(StringBuilder Output)
 		{
-			MustBeReassembled();
+			throw MustBeReassembled();
 		}
 
 		/// <summary>
@@ -78,9 +79,9 @@ namespace Waher.Content.Markdown.Model.Atoms
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			MustBeReassembled();
+			throw MustBeReassembled();
 		}
 
 		/// <summary>
@@ -88,9 +89,9 @@ namespace Waher.Content.Markdown.Model.Atoms
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			MustBeReassembled();
+			throw MustBeReassembled();
 		}
 
 		/// <summary>
@@ -98,15 +99,15 @@ namespace Waher.Content.Markdown.Model.Atoms
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="Level">Current section level.</param>
-		public override void GenerateSmartContractXml(XmlWriter Output, ref int Level)
+		/// <param name="State">Current rendering state.</param>
+		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
-			MustBeReassembled();
+			throw MustBeReassembled();
 		}
 
-		private static void MustBeReassembled()
+		private static Exception MustBeReassembled()
 		{
-			throw new NotSupportedException("Atomic elements must be reassembled before being exported or used for output.");
+			return new NotSupportedException("Atomic elements must be reassembled before being exported or used for output.");
 		}
 
 		/// <summary>

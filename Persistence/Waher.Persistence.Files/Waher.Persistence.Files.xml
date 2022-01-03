@@ -1835,9 +1835,7 @@
             <exception cref="T:System.ArgumentException">If the collection or field code are not known.</exception>
         </member>
         <member name="M:Waher.Persistence.Files.LabelFile.Dispose">
-            <summary>
-            <see cref="M:System.IDisposable.Dispose"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Persistence.Files.ObjectBTreeFile">
             <summary>
@@ -3859,9 +3857,7 @@
             </summary>
         </member>
         <member name="M:Waher.Persistence.Files.Searching.SortedReference`1.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Persistence.Files.Searching.UnionCursor`1">
             <summary>

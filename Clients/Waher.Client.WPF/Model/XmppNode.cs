@@ -115,6 +115,8 @@ namespace Waher.Client.WPF.Model
 								ResultForm.XmlResponse.Text = e2.Response.OuterXml;
 
 								ResultForm.ShowDialog();
+
+								return Task.CompletedTask;
 							});
 						}
 						else
@@ -161,6 +163,8 @@ namespace Waher.Client.WPF.Model
 								ResultForm.XmlResponse.Text = e2.Response.OuterXml;
 
 								ResultForm.ShowDialog();
+
+								return Task.CompletedTask;
 							});
 						}
 						else

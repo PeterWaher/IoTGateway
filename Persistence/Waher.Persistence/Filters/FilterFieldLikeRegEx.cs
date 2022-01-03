@@ -59,9 +59,7 @@ namespace Waher.Persistence.Filters
 			return this.Copy();
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.FieldName + " LIKE " + this.regularExpression.ToString();

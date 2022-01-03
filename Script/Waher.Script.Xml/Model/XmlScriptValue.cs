@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
@@ -18,6 +19,7 @@ namespace Waher.Script.Xml.Model
 	public class XmlScriptValue : XmlScriptNode
 	{
 		private ScriptNode node;
+		private bool isAsync;
 
 		/// <summary>
 		/// XML Script value node.
@@ -30,7 +32,14 @@ namespace Waher.Script.Xml.Model
 			: base(Start, Length, Expression)
 		{
 			this.node = Node;
+			this.isAsync = Node?.IsAsynchronous ?? false;
 		}
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => this.isAsync;
 
 		/// <summary>
 		/// Calls the callback method for all child nodes.
@@ -47,7 +56,14 @@ namespace Waher.Script.Xml.Model
 					return false;
 			}
 
-			if (!Callback(ref this.node, State))
+			bool b = !Callback(this.node, out ScriptNode NewNode, State);
+			if (!(NewNode is null))
+			{
+				this.node = NewNode;
+				this.isAsync = NewNode.IsAsynchronous;
+			}
+
+			if (b)
 				return false;
 
 			if (!DepthFirst)
@@ -68,6 +84,18 @@ namespace Waher.Script.Xml.Model
 		internal override void Build(XmlDocument Document, XmlElement Parent, Variables Variables)
 		{
 			IElement Element = this.node.Evaluate(Variables);
+			this.AppendChild(Document, Parent, Element.AssociatedObjectValue);
+		}
+
+		/// <summary>
+		/// Builds an XML Document object
+		/// </summary>
+		/// <param name="Document">Document being built.</param>
+		/// <param name="Parent">Parent element.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		internal override async Task BuildAsync(XmlDocument Document, XmlElement Parent, Variables Variables)
+		{
+			IElement Element = await this.node.EvaluateAsync(Variables);
 			this.AppendChild(Document, Parent, Element.AssociatedObjectValue);
 		}
 

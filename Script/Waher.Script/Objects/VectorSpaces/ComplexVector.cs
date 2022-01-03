@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Reflection;
-using System.Text;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -94,9 +93,7 @@ namespace Waher.Script.Objects.VectorSpaces
 			get { return this.dimension; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return Expression.ToString(this.Values);

@@ -443,7 +443,7 @@ namespace Waher.IoTGateway.Setup
 			return false;
 		}
 
-		private Task ContractsClient_IdentityUpdated(object Sender, LegalIdentityEventArgs e)
+		private async Task ContractsClient_IdentityUpdated(object Sender, LegalIdentityEventArgs e)
 		{
 			LegalIdentity ID = e.Identity;
 
@@ -463,20 +463,18 @@ namespace Waher.IoTGateway.Setup
 
 			Log.Notice("Legal Identity updated.", e.Identity.Id, Tags.ToArray());
 
-			this.UpdateClients(ID);
-
-			return Task.CompletedTask;
+			await this.UpdateClients(ID);
 		}
 
-		private void UpdateClients(LegalIdentity ID)
+		private Task UpdateClients(LegalIdentity ID)
 		{
 			allIdentities = this.SetLegalIdentities(allIdentities, ID, true);
 			approvedIdentities = this.SetLegalIdentities(approvedIdentities, ID, false);
 
-			this.UpdateClients();
+			return this.UpdateClients();
 		}
 
-		private void UpdateClients()
+		private async Task UpdateClients()
 		{
 			string[] TabIDs;
 
@@ -490,13 +488,13 @@ namespace Waher.IoTGateway.Setup
 				string FileName = Path.Combine(Gateway.RootFolder, "Settings", "LegalIdentities.md");
 				if (File.Exists(FileName))
 				{
-					string Markdown = File.ReadAllText(FileName);
+					string Markdown = await Resources.ReadAllTextAsync(FileName);
 					Variables v = new Variables(new Variable("Config", this));
-					MarkdownDocument Doc = new MarkdownDocument(Markdown, new MarkdownSettings(Gateway.Emoji1_24x24, true, v));
-					string HTML = Doc.GenerateHTML();
+					MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, new MarkdownSettings(Gateway.Emoji1_24x24, true, v));
+					string HTML = await Doc.GenerateHTML();
 					HTML = HtmlDocument.GetBody(HTML);
 
-					ClientEvents.PushEvent(TabIDs, "UpdateIdentityTable", HTML);
+					await ClientEvents.PushEvent(TabIDs, "UpdateIdentityTable", HTML);
 				}
 			}
 		}
@@ -570,7 +568,7 @@ namespace Waher.IoTGateway.Setup
 			if (!Request.HasData)
 				throw new BadRequestException();
 
-			object Obj = Request.DecodeData();
+			object Obj = await Request.DecodeDataAsync();
 			if (!(Obj is Dictionary<string, object> Parameters))
 				throw new BadRequestException();
 
@@ -687,7 +685,7 @@ namespace Waher.IoTGateway.Setup
 
 				await ClientEvents.PushEvent(new string[] { TabID }, "ApplicationOK", string.Empty);
 
-				this.UpdateClients(e.Identity);
+				await this.UpdateClients(e.Identity);
 			}
 			else
 				await ClientEvents.PushEvent(new string[] { TabID }, "ApplicationError", e.ErrorText);
@@ -782,7 +780,7 @@ namespace Waher.IoTGateway.Setup
 				throw new BadRequestException("No content.");
 
 			string Password;
-			object Obj = Request.DecodeData();
+			object Obj = await Request.DecodeDataAsync();
 			if (!(Obj is Dictionary<string, object> Parameters))
 				throw new BadRequestException("Invalid content.");
 
@@ -824,7 +822,9 @@ namespace Waher.IoTGateway.Setup
 
 			if (Sign)
 			{
-				SignatureRequest.Contract = await Gateway.ContractsClient.SignContractAsync(SignatureRequest.Contract, SignatureRequest.Role, false);
+				Contract Contract = await SignatureRequest.GetContract();
+				Contract = await Gateway.ContractsClient.SignContractAsync(Contract, SignatureRequest.Role, false);
+				SignatureRequest.SetContract(Contract);
 				SignatureRequest.Signed = DateTime.Now;
 				await Database.Update(SignatureRequest);
 			}

@@ -129,9 +129,7 @@ namespace Waher.Networking.CoAP.Options
 			get { return this.size; }
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return base.ToString() + ", nr=" + this.number.ToString() + ", more=" + this.more.ToString() + ", size=" + this.size.ToString();

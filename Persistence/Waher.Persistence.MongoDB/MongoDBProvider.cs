@@ -416,6 +416,7 @@ namespace Waher.Persistence.MongoDB
 		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
 		public Task InsertLazy(object Object, ObjectCallback Callback)
 			=> this.Process(Object, this.Insert(Object), Callback);
 
@@ -423,6 +424,7 @@ namespace Waher.Persistence.MongoDB
 		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
 		public Task InsertLazy(object[] Objects, ObjectsCallback Callback)
 			=> this.Process(Objects, this.Insert(Objects), Callback);
 
@@ -430,6 +432,7 @@ namespace Waher.Persistence.MongoDB
 		/// Inserts an object into the database, if unlocked. If locked, object will be inserted at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
 		public Task InsertLazy(IEnumerable<object> Objects, ObjectsCallback Callback)
 			=> this.Process(Objects, this.Insert(Objects), Callback);
 
@@ -1204,6 +1207,7 @@ namespace Waher.Persistence.MongoDB
 		/// Updates an object in the database, if unlocked. If locked, object will be updated at next opportunity.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
 		public Task UpdateLazy(object Object, ObjectCallback Callback)
 			=> this.Process(Object, this.Update(Object), Callback);
 
@@ -1211,6 +1215,7 @@ namespace Waher.Persistence.MongoDB
 		/// Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
 		public Task UpdateLazy(object[] Objects, ObjectsCallback Callback)
 			=> this.Process(Objects, this.Update(Objects), Callback);
 
@@ -1218,6 +1223,7 @@ namespace Waher.Persistence.MongoDB
 		/// Updates a collection of objects in the database, if unlocked. If locked, objects will be updated at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
 		public Task UpdateLazy(IEnumerable<object> Objects, ObjectsCallback Callback)
 			=> this.Process(Objects, this.Update(Objects), Callback);
 
@@ -1275,6 +1281,7 @@ namespace Waher.Persistence.MongoDB
 		/// Deletes an object in the database, if unlocked. If locked, object will be deleted at next opportunity.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
 		public Task DeleteLazy(object Object, ObjectCallback Callback)
 			=> this.Process(Object, this.Delete(Object), Callback);
 
@@ -1282,6 +1289,7 @@ namespace Waher.Persistence.MongoDB
 		/// Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
 		public Task DeleteLazy(object[] Objects, ObjectsCallback Callback)
 			=> this.Process(Objects, this.Delete(Objects), Callback);
 
@@ -1289,6 +1297,7 @@ namespace Waher.Persistence.MongoDB
 		/// Deletes a collection of objects in the database, if unlocked. If locked, objects will be deleted at next opportunity.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
 		public Task DeleteLazy(IEnumerable<object> Objects, ObjectsCallback Callback)
 			=> this.Process(Objects, this.Delete(Objects), Callback);
 
@@ -1368,6 +1377,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
 		public async Task DeleteLazy<T>(int Offset, int MaxCount, string[] SortOrder, ObjectsCallback Callback)
 			where T : class
 		{
@@ -1384,6 +1394,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="Filter">Optional filter. Can be null.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
 		public async Task DeleteLazy<T>(int Offset, int MaxCount, Filter Filter, string[] SortOrder, ObjectsCallback Callback)
 			where T : class
 		{
@@ -1399,6 +1410,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
 		public async Task DeleteLazy(string Collection, int Offset, int MaxCount, string[] SortOrder, ObjectsCallback Callback)
 		{
 			IEnumerable<object> Objects = await this.FindDelete(Collection, Offset, MaxCount, SortOrder);
@@ -1414,6 +1426,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="Filter">Optional filter. Can be null.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <param name="Callback">Method to call when operation completes.</param>
 		public async Task DeleteLazy(string Collection, int Offset, int MaxCount, Filter Filter, string[] SortOrder, ObjectsCallback Callback)
 		{
 			IEnumerable<object> Objects = await this.FindDelete(Collection, Offset, MaxCount, Filter, SortOrder);

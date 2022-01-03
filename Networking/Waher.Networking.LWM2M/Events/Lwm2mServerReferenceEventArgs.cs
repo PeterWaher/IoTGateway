@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.LWM2M
 {
@@ -9,14 +8,14 @@ namespace Waher.Networking.LWM2M
 	/// </summary>
 	/// <param name="Sender"></param>
 	/// <param name="e"></param>
-	public delegate void Lwm2mServerReferenceEventHandler(object Sender, Lwm2mServerReferenceEventArgs e);
+	public delegate Task Lwm2mServerReferenceEventHandler(object Sender, Lwm2mServerReferenceEventArgs e);
 
 	/// <summary>
 	/// Event arguments for LWM2M server reference events.
 	/// </summary>
 	public class Lwm2mServerReferenceEventArgs : EventArgs
     {
-		private Lwm2mServerReference server;
+		private readonly Lwm2mServerReference server;
 
 		/// <summary>
 		/// Event arguments for LWM2M server reference events.

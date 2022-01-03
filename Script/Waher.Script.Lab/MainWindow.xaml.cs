@@ -176,21 +176,27 @@ namespace Waher.Script.Lab
 				return;
 			}
 
-			Task.Run(() =>
+			Task.Run(async () =>
 			{
 				try
 				{
 					IElement Ans;
 
-					Exp.OnPreview += (sender2, e2) =>
+					Exp.OnPreview += async (sender2, e2) =>
 					{
-						this.Dispatcher.Invoke(() =>
-							ResultBlock = this.ShowResult(ResultBlock, e2.Preview, ScriptBlock));
+						try
+						{
+							ResultBlock = await this.ShowResult(ResultBlock, e2.Preview, ScriptBlock);
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
 					};
 
 					try
 					{
-						Ans = Exp.Root.Evaluate(this.variables);
+						Ans = await Exp.Root.EvaluateAsync(this.variables);
 					}
 					catch (ScriptReturnValueException ex)
 					{
@@ -203,8 +209,7 @@ namespace Waher.Script.Lab
 
 					this.variables["Ans"] = Ans;
 
-					this.Dispatcher.Invoke(() =>
-						ResultBlock = this.ShowResult(ResultBlock, Ans, ScriptBlock));
+					ResultBlock = await this.ShowResult(ResultBlock, Ans, ScriptBlock);
 				}
 				catch (Exception ex)
 				{
@@ -217,15 +222,15 @@ namespace Waher.Script.Lab
 			});
 		}
 
-		private UIElement ShowResult(UIElement ResultBlock, IElement Ans, TextBlock ScriptBlock)
+		private async Task<UIElement> ShowResult(UIElement ResultBlock, IElement Ans, TextBlock ScriptBlock)
 		{
 			if (Ans is Graph G)
 			{
 				PixelInformation Pixels = G.CreatePixels(this.variables, out object[] States);
-				return this.AddImageBlock(ScriptBlock, Pixels, G, States, ResultBlock);
+				return await this.AddImageBlock(ScriptBlock, Pixels, G, States, ResultBlock);
 			}
 			else if (Ans.AssociatedObjectValue is SKImage Img)
-				return this.AddImageBlock(ScriptBlock, PixelInformation.FromImage(Img), null, null, ResultBlock);
+				return await this.AddImageBlock(ScriptBlock, PixelInformation.FromImage(Img), null, null, ResultBlock);
 			else if (Ans.AssociatedObjectValue is Exception ex)
 			{
 				UIElement Last = ResultBlock ?? ScriptBlock;
@@ -235,10 +240,10 @@ namespace Waher.Script.Lab
 				if (ex is AggregateException ex2)
 				{
 					foreach (Exception ex3 in ex2.InnerExceptions)
-						Last = this.AddTextBlock(Last, ex3.Message, Colors.Red, FontWeights.Bold, null);
+						Last = await this.AddTextBlock(Last, ex3.Message, Colors.Red, FontWeights.Bold, null);
 				}
 				else
-					Last = this.AddTextBlock(ScriptBlock, ex.Message, Colors.Red, FontWeights.Bold, ResultBlock);
+					Last = await this.AddTextBlock(ScriptBlock, ex.Message, Colors.Red, FontWeights.Bold, ResultBlock);
 
 				return Last;
 			}
@@ -281,16 +286,25 @@ namespace Waher.Script.Lab
 					Markdown.AppendLine(" |");
 				}
 
-				MarkdownDocument Doc = new MarkdownDocument(Markdown.ToString(), GetMarkdownSettings());
-				string XAML = Doc.GenerateXAML();
+				MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString(), GetMarkdownSettings());
+				string XAML = await Doc.GenerateXAML();
 
 				if (XamlReader.Parse(XAML) is UIElement Parsed)
-					return this.AddBlock(ScriptBlock, Parsed);
+				{
+					TaskCompletionSource<UIElement> Result = new TaskCompletionSource<UIElement>();
+
+					this.Dispatcher.Invoke(() =>
+					{
+						Result.TrySetResult(this.AddBlock(ScriptBlock, Parsed));
+					});
+
+					return await Result.Task;
+				}
 
 				return null;
 			}
 			else
-				return this.AddTextBlock(ScriptBlock, Ans.ToString(), Colors.Red, FontWeights.Normal, ResultBlock);
+				return await this.AddTextBlock(ScriptBlock, Ans.ToString(), Colors.Red, FontWeights.Normal, ResultBlock);
 		}
 
 		public static MarkdownSettings GetMarkdownSettings()
@@ -305,27 +319,41 @@ namespace Waher.Script.Lab
 			};
 		}
 
-		private TextBlock AddTextBlock(UIElement ScriptBlock, string s, Color cl, FontWeight FontWeight, UIElement ResultBlock)
+		private Task<TextBlock> AddTextBlock(UIElement ScriptBlock, string s, Color cl, FontWeight FontWeight, UIElement ResultBlock)
 		{
-			if (ResultBlock is TextBlock TextBlock)
-				TextBlock.Text = s;
-			else
+			TaskCompletionSource<TextBlock> Result = new TaskCompletionSource<TextBlock>();
+
+			this.Dispatcher.Invoke(() =>
 			{
-				TextBlock = new TextBlock()
+				try
 				{
-					Text = s,
-					FontFamily = new FontFamily("Courier New"),
-					Foreground = new SolidColorBrush(cl),
-					TextWrapping = TextWrapping.Wrap,
-					FontWeight = FontWeight
-				};
+					if (ResultBlock is TextBlock TextBlock)
+						TextBlock.Text = s;
+					else
+					{
+						TextBlock = new TextBlock()
+						{
+							Text = s,
+							FontFamily = new FontFamily("Courier New"),
+							Foreground = new SolidColorBrush(cl),
+							TextWrapping = TextWrapping.Wrap,
+							FontWeight = FontWeight
+						};
 
-				TextBlock.PreviewMouseDown += TextBlock_PreviewMouseDown;
+						TextBlock.PreviewMouseDown += TextBlock_PreviewMouseDown;
 
-				this.AddBlock(ScriptBlock, TextBlock);
-			}
+						this.AddBlock(ScriptBlock, TextBlock);
+					}
 
-			return TextBlock;
+					Result.TrySetResult(TextBlock);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			});
+
+			return Result.Task;
 		}
 
 		private UIElement AddBlock(UIElement ScriptBlock, UIElement ResultBlock)
@@ -346,43 +374,57 @@ namespace Waher.Script.Lab
 			this.Input.Focus();
 		}
 
-		private UIElement AddImageBlock(TextBlock ScriptBlock, PixelInformation Pixels, Graph Graph, object[] States, UIElement ResultBlock)
+		private Task<UIElement> AddImageBlock(TextBlock ScriptBlock, PixelInformation Pixels, Graph Graph, object[] States, UIElement ResultBlock)
 		{
-			BitmapImage BitmapImage;
-			byte[] Bin = Pixels.EncodeAsPng();
+			TaskCompletionSource<UIElement> Result = new TaskCompletionSource<UIElement>();
 
-			using (MemoryStream ms = new MemoryStream(Bin))
+			this.Dispatcher.Invoke(() =>
 			{
-				BitmapImage = new BitmapImage();
-				BitmapImage.BeginInit();
-				BitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-				BitmapImage.StreamSource = ms;
-				BitmapImage.EndInit();
-			}
-
-			if (ResultBlock is Image ImageBlock)
-			{
-				ImageBlock.Source = BitmapImage;
-				ImageBlock.Width = Pixels.Width;
-				ImageBlock.Height = Pixels.Height;
-				ImageBlock.Tag = Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Pixels.Width, Pixels.Height, Graph, States);
-			}
-			else
-			{
-				ImageBlock = new Image()
+				try
 				{
-					Source = BitmapImage,
-					Width = Pixels.Width,
-					Height = Pixels.Height,
-					Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Pixels.Width, Pixels.Height, Graph, States)
-				};
+					BitmapImage BitmapImage;
+					byte[] Bin = Pixels.EncodeAsPng();
 
-				ImageBlock.PreviewMouseDown += ImageBlock_PreviewMouseDown;
+					using (MemoryStream ms = new MemoryStream(Bin))
+					{
+						BitmapImage = new BitmapImage();
+						BitmapImage.BeginInit();
+						BitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+						BitmapImage.StreamSource = ms;
+						BitmapImage.EndInit();
+					}
 
-				this.HistoryPanel.Children.Insert(this.HistoryPanel.Children.IndexOf(ScriptBlock) + 1, ImageBlock);
-			}
+					if (ResultBlock is Image ImageBlock)
+					{
+						ImageBlock.Source = BitmapImage;
+						ImageBlock.Width = Pixels.Width;
+						ImageBlock.Height = Pixels.Height;
+						ImageBlock.Tag = Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Pixels.Width, Pixels.Height, Graph, States);
+					}
+					else
+					{
+						ImageBlock = new Image()
+						{
+							Source = BitmapImage,
+							Width = Pixels.Width,
+							Height = Pixels.Height,
+							Tag = new Tuple<byte[], int, int, Graph, object[]>(Bin, Pixels.Width, Pixels.Height, Graph, States)
+						};
 
-			return ImageBlock;
+						ImageBlock.PreviewMouseDown += ImageBlock_PreviewMouseDown;
+
+						this.HistoryPanel.Children.Insert(this.HistoryPanel.Children.IndexOf(ScriptBlock) + 1, ImageBlock);
+					}
+
+					Result.TrySetResult(ImageBlock);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			});
+
+			return Result.Task;
 		}
 
 		private void ImageBlock_PreviewMouseDown(object sender, MouseButtonEventArgs e)

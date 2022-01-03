@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.CoAP.CoRE;
 using Waher.Runtime.Inventory;
@@ -32,40 +33,22 @@ namespace Waher.Networking.CoAP.ContentFormats
 		/// <summary>
 		/// Content format number
 		/// </summary>
-		public int ContentFormat
-		{
-			get { return ContentFormatCode; }
-		}
+		public int ContentFormat => ContentFormatCode;
 
 		/// <summary>
 		/// Internet content type.
 		/// </summary>
-		public string ContentType
-		{
-			get { return LinkFormatContentType; }
-		}
+		public string ContentType => LinkFormatContentType;
 
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes
-		{
-			get
-			{
-				return new string[] { LinkFormatContentType };
-			}
-		}
+		public string[] ContentTypes => new string[] { LinkFormatContentType };
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions
-		{
-			get
-			{
-				return new string[] { "wlnk" };
-			}
-		}
+		public string[] FileExtensions => new string[] { "wlnk" };
 
 		/// <summary>
 		/// Decodes an object.
@@ -77,10 +60,10 @@ namespace Waher.Networking.CoAP.ContentFormats
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string s = Encoding.UTF8.GetString(Data);
-			return new LinkDocument(s, BaseUri);
+			return Task.FromResult<object>(new LinkDocument(s, BaseUri));
 		}
 
 		/// <summary>
@@ -108,11 +91,10 @@ namespace Waher.Networking.CoAP.ContentFormats
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
-		/// <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
-		/// <returns>Encoded object.</returns>
+		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
+		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (!(Object is LinkDocument Doc))
 				throw new ArgumentException("Object not a CoRE link document.", nameof(Object));
@@ -120,9 +102,10 @@ namespace Waher.Networking.CoAP.ContentFormats
 			if (Encoding is null)
 				Encoding = Encoding.UTF8;
 
-			ContentType = LinkFormatContentType + "; charset=" + Encoding.WebName;
+			string ContentType = LinkFormatContentType + "; charset=" + Encoding.WebName;
+			byte[] Bin = Encoding.GetBytes(Doc.Text);
 
-			return Encoding.GetBytes(Doc.Text);
+			return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Bin, ContentType));
 		}
 
 		/// <summary>
@@ -185,6 +168,5 @@ namespace Waher.Networking.CoAP.ContentFormats
 					return false;
 			}
 		}
-
 	}
 }

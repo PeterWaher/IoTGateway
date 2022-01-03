@@ -192,9 +192,7 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 			this.blockSize = BlockSize;
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			if (!(this.w is null))

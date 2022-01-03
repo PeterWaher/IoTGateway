@@ -130,9 +130,7 @@ namespace Waher.Security.JWS
 			}
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			if (!(this.rsa is null))

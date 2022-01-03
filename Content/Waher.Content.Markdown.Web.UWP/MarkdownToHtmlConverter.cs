@@ -8,6 +8,7 @@ using Waher.Networking.HTTP.ScriptExtensions;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Security;
+using System.Threading.Tasks;
 
 namespace Waher.Content.Markdown.Web
 {
@@ -31,16 +32,7 @@ namespace Waher.Content.Markdown.Web
 		/// <summary>
 		/// Converts content from these content types.
 		/// </summary>
-		public string[] FromContentTypes
-		{
-			get
-			{
-				return new string[]
-				{
-					MarkdownCodec.ContentType
-				};
-			}
-		}
+		public string[] FromContentTypes => new string[] { MarkdownCodec.ContentType };
 
 		/// <summary>
 		/// Converts content to these content types. 
@@ -60,10 +52,7 @@ namespace Waher.Content.Markdown.Web
 		/// <summary>
 		/// How well the content is converted.
 		/// </summary>
-		public Grade ConversionGrade
-		{
-			get { return Grade.Excellent; }
-		}
+		public Grade ConversionGrade => Grade.Excellent;
 
 		/// <summary>
 		/// Bare JID used, if the HTTPX URI scheme is supported.
@@ -95,38 +84,26 @@ namespace Waher.Content.Markdown.Web
 		/// <summary>
 		/// Performs the actual conversion.
 		/// </summary>
-		/// <param name="FromContentType">Content type of the content to convert from.</param>
-		/// <param name="From">Stream pointing to binary representation of content.</param>
-		/// <param name="FromFileName">If the content is coming from a file, this parameter contains the name of that file. 
-		/// Otherwise, the parameter is the empty string.</param>
-		/// <param name="ResourceName">Local resource name of file, if accessed from a web server.</param>
-		/// <param name="URL">URL of resource, if accessed from a web server.</param>
-		/// <param name="ToContentType">Content type of the content to convert to. This value might be changed, in case
-		/// the converter finds a better option.</param>
-		/// <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
-		/// <param name="Session">Session states.</param>
-		/// <param name="PossibleContentTypes">Possible content types the converter is allowed to convert to. 
-		/// Can be null if there are no alternatives.</param>
+		/// <param name="State">State of the current conversion.</param>
 		/// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
-		public bool Convert(string FromContentType, Stream From, string FromFileName, string ResourceName, string URL, 
-			ref string ToContentType, Stream To, Variables Session, params string[] PossibleContentTypes)
+		public async Task<bool> ConvertAsync(ConversionState State)
 		{
 			HttpRequest Request = null;
 			string Markdown;
 			bool b;
 
-			using (StreamReader rd = new StreamReader(From))
+			using (StreamReader rd = new StreamReader(State.From))
 			{
 				Markdown = rd.ReadToEnd();
 			}
 
-			if (!(Session is null) && Session.TryGetVariable("Request", out Variable v))
+			if (!(State.Session is null) && State.Session.TryGetVariable("Request", out Variable v))
 			{
 				Request = v.ValueObject as HttpRequest;
 
 				if (!(Request is null))
 				{
-					Page.GetPageVariables(Session, Request.Header.ResourcePart);
+					Page.GetPageVariables(State.Session, Request.Header.ResourcePart);
 
 					int i = Markdown.IndexOf("\r\n\r\n");
 					if (i < 0)
@@ -147,20 +124,20 @@ namespace Waher.Content.Markdown.Web
 							{
 								Value = System.Net.WebUtility.UrlDecode(Value);
 								if (CommonTypes.TryParse(Value, out double d))
-									Session[Parameter] = d;
+									State.Session[Parameter] = d;
 								else if (bool.TryParse(Value, out b))
-									Session[Parameter] = b;
+									State.Session[Parameter] = b;
 								else
-									Session[Parameter] = Value;
+									State.Session[Parameter] = Value;
 							}
 							else
-								Session[Parameter] = string.Empty;
+								State.Session[Parameter] = string.Empty;
 						}
 					}
 				}
 			}
 
-			MarkdownSettings Settings = new MarkdownSettings(emojiSource, true, Session)
+			MarkdownSettings Settings = new MarkdownSettings(emojiSource, true, State.Session)
 			{
 				RootFolder = rootFolder,
 				HtmlSettings = htmlSettings
@@ -172,7 +149,7 @@ namespace Waher.Content.Markdown.Web
 				Settings.LocalHttpxResourcePath = "httpx://" + bareJid + "/";
 			}
 
-			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings, FromFileName, ResourceName, URL, typeof(HttpException));
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings, State.FromFileName, State.LocalResourceName, State.URL, typeof(HttpException));
 
 			if (Doc.TryGetMetaData("UserVariable", out KeyValuePair<string, bool>[] MetaValues))
 			{
@@ -187,26 +164,26 @@ namespace Waher.Content.Markdown.Web
 
 				foreach (KeyValuePair<string, bool> P in MetaValues)
 				{
-					if (Session is null)
+					if (State.Session is null)
 					{
 						Authorized = false;
 						break;
 					}
 
-					if (Session.TryGetVariable(P.Key, out v) && !(v.ValueObject is null))
+					if (State.Session.TryGetVariable(P.Key, out v) && !(v.ValueObject is null))
 						User = v.ValueObject;
 					else
 					{
 						Uri LoginUrl = null;
 						string LoginFileName = null;
-						string FromFolder = Path.GetDirectoryName(FromFileName);
+						string FromFolder = Path.GetDirectoryName(State.FromFileName);
 
 						if (!(Login is null))
 						{
 							foreach (KeyValuePair<string, bool> P2 in Login)
 							{
 								LoginFileName = Path.Combine(FromFolder, P2.Key.Replace('/', Path.DirectorySeparatorChar));
-								LoginUrl = new Uri(new Uri(URL), P2.Key.Replace(Path.DirectorySeparatorChar, '/'));
+								LoginUrl = new Uri(new Uri(State.URL), P2.Key.Replace(Path.DirectorySeparatorChar, '/'));
 
 								if (File.Exists(LoginFileName))
 									break;
@@ -217,11 +194,11 @@ namespace Waher.Content.Markdown.Web
 
 						if (!(LoginFileName is null))
 						{
-							string LoginMarkdown = File.ReadAllText(LoginFileName);
-							MarkdownDocument LoginDoc = new MarkdownDocument(LoginMarkdown, Settings, LoginFileName, LoginUrl.AbsolutePath,
+							string LoginMarkdown = await Resources.ReadAllTextAsync(LoginFileName);
+							MarkdownDocument LoginDoc = await MarkdownDocument.CreateAsync(LoginMarkdown, Settings, LoginFileName, LoginUrl.AbsolutePath,
 								LoginUrl.ToString(), typeof(HttpException));
 
-							if (!Session.TryGetVariable(P.Key, out v))
+							if (!State.Session.TryGetVariable(P.Key, out v))
 							{
 								Authorized = false;
 								break;
@@ -273,7 +250,7 @@ namespace Waher.Content.Markdown.Web
 							if (!(Request is null))
 								Location.Append(System.Net.WebUtility.UrlEncode(Request.Header.GetURL(true, true)));
 							else
-								Location.Append(System.Net.WebUtility.UrlEncode(URL));
+								Location.Append(System.Net.WebUtility.UrlEncode(State.URL));
 
 							throw new TemporaryRedirectException(Location.ToString());
 						}
@@ -285,7 +262,7 @@ namespace Waher.Content.Markdown.Web
 				if (User is null)
 					throw new ForbiddenException("Access denied.");
 
-				Session[" User "] = User;
+				State.Session[" User "] = User;
 			}
 
 			if (Doc.TryGetMetaData("AudioControls", out MetaValues))
@@ -324,7 +301,7 @@ namespace Waher.Content.Markdown.Web
 				}
 			}
 
-			if (!(Session is null) && Session.TryGetVariable("Response", out v))
+			if (!(State.Session is null) && State.Session.TryGetVariable("Response", out v))
 			{
 				if (v.ValueObject is HttpResponse Response)
 				{
@@ -350,9 +327,10 @@ namespace Waher.Content.Markdown.Web
 				}
 			}
 
-			string HTML = Doc.GenerateHTML();
+			string HTML = await Doc.GenerateHTML();
 			byte[] Data = Utf8WithBOM.GetBytes(HTML);
-			To.Write(Data, 0, Data.Length);
+			
+			await State.To.WriteAsync(Data, 0, Data.Length);
 
 			return Doc.IsDynamic;
 		}

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Layout.Layout2D.Model
 {
@@ -124,9 +122,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		public static readonly Length HundredPercent = new Length(100, LengthUnit.Percent);
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			if (this.Unit == LengthUnit.Percent)

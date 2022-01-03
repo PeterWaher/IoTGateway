@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Runtime.Inventory;
 using Waher.Script;
@@ -23,6 +24,6 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Xml">XML Document.</param>
 		/// <param name="Variables">Current variables.</param>
 		/// <returns>Transformed object.</returns>
-		object TransformXml(XmlDocument Xml, Variables Variables);
+		Task<object> TransformXml(XmlDocument Xml, Variables Variables);
 	}
 }

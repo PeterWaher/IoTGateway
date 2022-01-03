@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content.Dsn;
@@ -17,7 +17,7 @@ namespace Waher.Content.Test
 	public class DecodingTests
 	{
 		[AssemblyInitialize]
-		public static void AssemblyInitialize(TestContext Context)
+		public static void AssemblyInitialize(TestContext _)
 		{
 			Runtime.Inventory.Types.Initialize(
 				typeof(CommonTypes).Assembly,
@@ -29,18 +29,18 @@ namespace Waher.Content.Test
 			Encoding.RegisterProvider(new CodePages());
 		}
 
-		private object Decode(string FileName)
+		private async Task<object> DecodeAsync(string FileName)
 		{
-			byte[] Data = File.ReadAllBytes("Data\\" + FileName + ".bin");
-			string ContentType = File.ReadAllText("Data\\" + FileName + ".txt");
+			byte[] Data = await Resources.ReadAllBytesAsync("Data\\" + FileName + ".bin");
+			string ContentType = await Resources.ReadAllTextAsync("Data\\" + FileName + ".txt");
 
-			return InternetContent.Decode(ContentType, Data, null);
+			return await InternetContent.DecodeAsync(ContentType, Data, null);
 		}
 
 		[TestMethod]
-		public void Test_01_Multipart_RelatedContent()
+		public async Task Test_01_Multipart_RelatedContent()
 		{
-			object Decoded = this.Decode("6a00b78b-ebb7-4da7-a8cd-65dd09d3ac59");
+			object Decoded = await this.DecodeAsync("6a00b78b-ebb7-4da7-a8cd-65dd09d3ac59");
 
 			RelatedContent RelatedContent = Decoded as RelatedContent;
 			Assert.IsNotNull(RelatedContent);
@@ -64,9 +64,9 @@ namespace Waher.Content.Test
 		}
 
 		[TestMethod]
-		public void Test_02_Multipart_MixedContent()
+		public async Task Test_02_Multipart_MixedContent()
 		{
-			object Decoded = this.Decode("0b9e5696-c32a-4418-a246-babb188e5beb");
+			object Decoded = await this.DecodeAsync("0b9e5696-c32a-4418-a246-babb188e5beb");
 
 			MixedContent MixedContent = Decoded as MixedContent;
 			Assert.IsNotNull(MixedContent);
@@ -104,9 +104,9 @@ namespace Waher.Content.Test
 		}
 
 		[TestMethod]
-		public void Test_03_Delivery_Status_Notification()
+		public async Task Test_03_Delivery_Status_Notification()
 		{
-			object Decoded = this.Decode("015dd6dd-ed9f-4139-995b-513f7464dd6f");
+			object Decoded = await this.DecodeAsync("015dd6dd-ed9f-4139-995b-513f7464dd6f");
 
 			MixedContent MixedContent = Decoded as MixedContent;
 			Assert.IsNotNull(MixedContent);
@@ -144,9 +144,9 @@ namespace Waher.Content.Test
 		}
 
 		[TestMethod]
-		public void Test_04_BoundaryAtEnd()
+		public async Task Test_04_BoundaryAtEnd()
 		{
-			object Decoded = this.Decode("1773459c-3649-4bb4-a33c-a15651665e92");
+			object Decoded = await this.DecodeAsync("1773459c-3649-4bb4-a33c-a15651665e92");
 
 			ContentAlternatives Alternatives = Decoded as ContentAlternatives;
 			Assert.IsNotNull(Alternatives);
@@ -164,9 +164,9 @@ namespace Waher.Content.Test
 		}
 
 		[TestMethod]
-		public void Test_05_Windows1252()
+		public async Task Test_05_Windows1252()
 		{
-			object Decoded = this.Decode("84784fa7-51a3-46e4-b8c8-38570416acab");
+			object Decoded = await this.DecodeAsync("84784fa7-51a3-46e4-b8c8-38570416acab");
 
 			ContentAlternatives Alternatives = Decoded as ContentAlternatives;
 			Assert.IsNotNull(Alternatives);

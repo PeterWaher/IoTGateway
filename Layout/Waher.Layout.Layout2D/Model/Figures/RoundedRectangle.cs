@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -51,12 +51,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.radiusX = new LengthAttribute(Input, "radiusX");
 			this.radiusY = new LengthAttribute(Input, "radiusY");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -102,21 +102,21 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
-			if (!(this.radiusX is null) && this.radiusX.TryEvaluate(State.Session, out Length L))
-				State.CalcDrawingSize(L, ref this.rx, true, ref Relative);
+			EvaluationResult<Length> RadiusLength = await this.radiusX.TryEvaluate(State.Session);
+			if (RadiusLength.Ok)
+				State.CalcDrawingSize(RadiusLength.Result, ref this.rx, true, State);
 			else
 				this.rx = 0;
 
-			if (!(this.radiusY is null) && this.radiusY.TryEvaluate(State.Session, out L))
-				State.CalcDrawingSize(L, ref this.ry, false, ref Relative);
+			RadiusLength = await this.radiusY.TryEvaluate(State.Session);
+			if (RadiusLength.Ok)
+				State.CalcDrawingSize(RadiusLength.Result, ref this.ry, false, State);
 			else
 				this.ry = 0;
-
-			return Relative;
 		}
 
 		/// <summary>
@@ -133,11 +133,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			if (this.defined)
 			{
-				if (this.TryGetFill(State, out SKPaint Fill))
+				SKPaint Fill = await this.TryGetFill(State);
+				if (!(Fill is null))
 				{
 					State.Canvas.DrawRoundRect(this.xCoordinate, this.yCoordinate,
 						this.xCoordinate2 - this.xCoordinate,
@@ -145,7 +146,8 @@ namespace Waher.Layout.Layout2D.Model.Figures
 						this.rx, this.ry, Fill);
 				}
 
-				if (this.TryGetPen(State, out SKPaint Pen))
+				SKPaint Pen = await this.TryGetPen(State);
+				if (!(Pen is null))
 				{
 					State.Canvas.DrawRoundRect(this.xCoordinate, this.yCoordinate,
 						this.xCoordinate2 - this.xCoordinate,
@@ -154,11 +156,11 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				}
 
 				this.defined = false;
-				base.Draw(State);
+				await base.Draw(State);
 				this.defined = true;
 			}
 			else
-				base.Draw(State);
+				await base.Draw(State);
 		}
 	}
 }

@@ -41,9 +41,7 @@ namespace Waher.Security.JWS
 			this.hmacSHA256 = new HMACSHA256(Secret);
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			if (!(this.hmacSHA256 is null))

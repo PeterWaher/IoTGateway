@@ -15,6 +15,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Things.DisplayableParameters;
+using System.Threading.Tasks;
 
 namespace Waher.Client.WPF.Controls
 {
@@ -187,7 +188,7 @@ namespace Waher.Client.WPF.Controls
 				return false;
 		}
 
-		public void Load(string FileName)
+		public async Task Load(string FileName)
 		{
 			try
 			{
@@ -235,7 +236,7 @@ namespace Waher.Client.WPF.Controls
 
 						this.MainWindow.Tabs.SelectedItem = TabItem;
 
-						ChatView.Load(Xml, FileName);
+						await ChatView.Load(Xml, FileName);
 						break;
 
 					case "SensorData":
@@ -290,7 +291,7 @@ namespace Waher.Client.WPF.Controls
 						TabItem = MainWindow.NewTab(Path.GetFileName(FileName), out TextBlock HeaderLabel);
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
-						QueryResultView ReportView = new QueryResultView(null, null, HeaderLabel);
+						QueryResultView ReportView = await QueryResultView.CreateAsync(null, null, HeaderLabel);
 						TabItem.Content = ReportView;
 
 						this.MainWindow.Tabs.SelectedItem = TabItem;
@@ -329,13 +330,13 @@ namespace Waher.Client.WPF.Controls
 			this.SaveNewFile();
 		}
 
-		public void OpenButton_Click(object sender, RoutedEventArgs e)
+		public async void OpenButton_Click(object sender, RoutedEventArgs e)
 		{
-			if (!this.CheckSaved())
-				return;
-
 			try
 			{
+				if (!this.CheckSaved())
+					return;
+
 				OpenFileDialog Dialog = new OpenFileDialog()
 				{
 					AddExtension = true,
@@ -351,7 +352,7 @@ namespace Waher.Client.WPF.Controls
 				bool? Result = Dialog.ShowDialog(MainWindow.FindWindow(this));
 
 				if (Result.HasValue && Result.Value)
-					this.Load(Dialog.FileName);
+					await this.Load(Dialog.FileName);
 			}
 			catch (Exception ex)
 			{
@@ -404,12 +405,20 @@ namespace Waher.Client.WPF.Controls
 			if (Parent is null)
 			{
 				this.connections.Delete(ChildNode);
-				MainWindow.UpdateGui(() => this.ConnectionTree.Items.Remove(ChildNode));
+				MainWindow.UpdateGui(() =>
+				{
+					this.ConnectionTree.Items.Remove(ChildNode);
+					return Task.CompletedTask;
+				});
 			}
 			else
 				Parent.RemoveChild(ChildNode);
 
-			MainWindow.UpdateGui(() => this.ConnectionTree.Items.Refresh());
+			MainWindow.UpdateGui(() =>
+			{
+				this.ConnectionTree.Items.Refresh();
+				return Task.CompletedTask;
+			});
 		}
 
 		private void Node_Updated(object sender, EventArgs e)
@@ -447,7 +456,11 @@ namespace Waher.Client.WPF.Controls
 				this.refreshTimer = null;
 			}
 
-			MainWindow.UpdateGui(() => this.ConnectionTree.Items.Refresh());
+			MainWindow.UpdateGui(() =>
+			{
+				this.ConnectionTree.Items.Refresh();
+				return Task.CompletedTask;
+			});
 		}
 
 		private void SetStatus(object _)
@@ -458,7 +471,11 @@ namespace Waher.Client.WPF.Controls
 				this.statusTimer = null;
 			}
 
-			MainWindow.UpdateGui(() => this.ConnectionStatus.Content = this.status);
+			MainWindow.UpdateGui(() =>
+			{
+				this.ConnectionStatus.Content = this.status;
+				return Task.CompletedTask;
+			});
 		}
 
 		private void ConnectionListView_SelectionChanged(object sender, SelectionChangedEventArgs e)

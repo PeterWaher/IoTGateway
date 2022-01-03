@@ -183,7 +183,7 @@ namespace Waher.Networking.UPnP
 					if (InputValues.TryGetValue(Argument.Name, out object Value) &&
 						(Variable = this.parent.GetVariable(Argument.RelatedStateVariable)) != null)
 					{
-						Soap.Append(XmlAttributeEncode(Variable.ValueToXmlString(Value)));
+						Soap.Append(XmlAttributeEncode(await Variable.ValueToXmlString(Value)));
 					}
 
 					Soap.Append("</");

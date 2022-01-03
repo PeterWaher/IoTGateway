@@ -57,12 +57,12 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 			if (Generic)
 			{
-				FindParameters = new object[] { await Database.GetCollection(this.type), Offset, Top, Convert(Where, Variables, this.Name), Convert(Order) };
+				FindParameters = new object[] { await Database.GetCollection(this.type), Offset, Top, await ConvertAsync(Where, Variables, this.Name), Convert(Order) };
 				MI = FindMethodGeneric.MakeGenericMethod(typeof(GenericObject));
 			}
 			else
 			{
-				FindParameters = new object[] { Offset, Top, Convert(Where, Variables, this.Name), Convert(Order) };
+				FindParameters = new object[] { Offset, Top, await ConvertAsync(Where, Variables, this.Name), Convert(Order) };
 				MI = FindMethod.MakeGenericMethod(this.type);
 			}
 
@@ -171,7 +171,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		public async Task<int?> FindDelete(bool Lazy, int Offset, int Top, ScriptNode Where, Variables Variables,
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
-			Filter Filter = TypeSource.Convert(Where, Variables, this.Name);
+			Filter Filter = await TypeSource.ConvertAsync(Where, Variables, this.Name);
 
 			object[] FindParameters = new object[] { Offset, Top, Filter, Convert(Order) };
 			object Obj = (Lazy ? DeleteLazyMethod : FindDeleteMethod).MakeGenericMethod(this.type).Invoke(null, FindParameters);
@@ -291,7 +291,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			return Result;
 		}
 
-		internal static Filter Convert(ScriptNode Conditions, Variables Variables, string Name)
+		internal static async Task<Filter> ConvertAsync(ScriptNode Conditions, Variables Variables, string Name)
 		{
 			if (Conditions is null)
 				return null;
@@ -304,8 +304,8 @@ namespace Waher.Script.Persistence.SQL.Sources
 					ScriptNode LO = Reduce(Range.LeftOperand, Name);
 					ScriptNode RO = Reduce(Range.RightOperand, Name);
 					string FieldName = Ref.VariableName;
-					object Min = LO.Evaluate(Variables)?.AssociatedObjectValue ?? null;
-					object Max = RO.Evaluate(Variables)?.AssociatedObjectValue ?? null;
+					object Min = (await LO.EvaluateAsync(Variables))?.AssociatedObjectValue ?? null;
+					object Max = (await RO.EvaluateAsync(Variables))?.AssociatedObjectValue ?? null;
 
 					Filter[] Filters = new Filter[2];
 
@@ -329,8 +329,8 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 				if (Conditions is Operators.Logical.And || Conditions is Operators.Dual.And)
 				{
-					Filter L = Convert(LO, Variables, Name);
-					Filter R = Convert(RO, Variables, Name);
+					Filter L = await ConvertAsync(LO, Variables, Name);
+					Filter R = await ConvertAsync(RO, Variables, Name);
 
 					List<Filter> Filters = new List<Filter>();
 
@@ -349,8 +349,8 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 				if (Conditions is Operators.Logical.Or || Conditions is Operators.Dual.Or)
 				{
-					Filter L = Convert(LO, Variables, Name);
-					Filter R = Convert(RO, Variables, Name);
+					Filter L = await ConvertAsync(LO, Variables, Name);
+					Filter R = await ConvertAsync(RO, Variables, Name);
 
 					List<Filter> Filters = new List<Filter>();
 
@@ -370,7 +370,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 				if (LO is VariableReference LVar)
 				{
 					string FieldName = LVar.VariableName;
-					object Value = RO.Evaluate(Variables)?.AssociatedObjectValue ?? null;
+					object Value = (await RO.EvaluateAsync(Variables))?.AssociatedObjectValue ?? null;
 
 					if (Conditions is Operators.Comparisons.EqualTo ||
 						Conditions is Operators.Comparisons.EqualToElementWise ||
@@ -408,7 +408,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 				else if (RO is VariableReference RVar)
 				{
 					string FieldName = RVar.VariableName;
-					object Value = LO.Evaluate(Variables)?.AssociatedObjectValue ?? null;
+					object Value = (await LO.EvaluateAsync(Variables))?.AssociatedObjectValue ?? null;
 
 					if (Conditions is Operators.Comparisons.EqualTo ||
 						Conditions is Operators.Comparisons.EqualToElementWise ||
@@ -448,7 +448,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			{
 				if (Conditions is Operators.Logical.Not Not)
 				{
-					Filter F = Convert(Reduce(Not.Operand, Name), Variables, Name);
+					Filter F = await ConvertAsync(Reduce(Not.Operand, Name), Variables, Name);
 					if (F is FilterNot Not2)
 						return Not2.ChildFilter;
 					else

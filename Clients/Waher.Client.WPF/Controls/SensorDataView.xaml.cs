@@ -98,7 +98,7 @@ namespace Waher.Client.WPF.Controls
 			return Task.CompletedTask;
 		}
 
-		private void OnErrorsReceived(object P)
+		private Task OnErrorsReceived(object P)
 		{
 			IEnumerable<ThingError> NewErrors = (IEnumerable<ThingError>)P;
 			string LastKey = null;
@@ -122,6 +122,8 @@ namespace Waher.Client.WPF.Controls
 				this.NodesFailedLabel.Content = this.failed.Count.ToString();
 				this.NodesTotalLabel.Content = this.nodes.Count.ToString();
 			}
+		
+			return Task.CompletedTask;
 		}
 
 		private Task Request_OnFieldsReceived(object _, IEnumerable<Field> NewFields)
@@ -130,7 +132,7 @@ namespace Waher.Client.WPF.Controls
 			return Task.CompletedTask;
 		}
 
-		private void OnFieldsReceived(object P)
+		private Task OnFieldsReceived(object P)
 		{
 			IEnumerable<Field> NewFields = (IEnumerable<Field>)P;
 			string LastKey = null;
@@ -153,6 +155,8 @@ namespace Waher.Client.WPF.Controls
 				this.NodesTotalLabel.Content = this.nodes.Count.ToString();
 				this.FieldsLabel.Content = this.SensorDataListView.Items.Count.ToString();
 			}
+		
+			return Task.CompletedTask;
 		}
 
 		private Task Request_OnStateChanged(object _, SensorDataReadoutState NewState)
@@ -161,7 +165,7 @@ namespace Waher.Client.WPF.Controls
 			return Task.CompletedTask;
 		}
 
-		private void OnStateChanged(object P)
+		private Task OnStateChanged(object P)
 		{
 			SensorDataReadoutState NewState = (SensorDataReadoutState)P;
 
@@ -201,6 +205,8 @@ namespace Waher.Client.WPF.Controls
 					this.StateLabel.Content = NewState.ToString();
 					break;
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private void Done()

@@ -69,20 +69,20 @@ namespace Waher.IoTGateway.WebResources
 					throw new BadRequestException("No data in post.");
 
 				Variables PageVariables = Page.GetPageVariables(Request.Session, "/ProposeContract.md");
-				object Posted = Request.DecodeData();
+				object Posted = await Request.DecodeDataAsync();
 
 				if (Posted is XmlDocument Doc)
 				{
-					Contract Contract = Contract.Parse(Doc, out bool HasStatus, out bool ParametersValid);
-					if (HasStatus)
+					ParsedContract ParsedContract = await Contract.Parse(Doc);
+					if (ParsedContract.HasStatus)
 						throw new ForbiddenException("Contract must not have a status section.");
 
-					if (!ParametersValid && Contract.PartsMode != ContractParts.TemplateOnly)
+					if (!ParsedContract.ParametersValid && ParsedContract.Contract.PartsMode != ContractParts.TemplateOnly)
 						throw new BadRequestException("Contract parameter values not valid.");
 
 					StringBuilder sb = new StringBuilder();
 					
-					Networking.XMPP.Contracts.Contract.NormalizeXml(Contract.ForMachines, sb, ContractsClient.NamespaceSmartContracts);
+					Contract.NormalizeXml(ParsedContract.Contract.ForMachines, sb, ContractsClient.NamespaceSmartContracts);
 
 					Doc = new XmlDocument()
 					{
@@ -90,9 +90,9 @@ namespace Waher.IoTGateway.WebResources
 					};
 					Doc.LoadXml(sb.ToString());
 
-					Contract.ForMachines = Doc.DocumentElement;
+					ParsedContract.Contract.ForMachines = Doc.DocumentElement;
 
-					PageVariables["Contract"] = Contract;
+					PageVariables["Contract"] = ParsedContract.Contract;
 				}
 				else if (Posted is bool Command)
 				{

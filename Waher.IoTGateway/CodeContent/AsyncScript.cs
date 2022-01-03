@@ -94,7 +94,7 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public bool GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public Task<bool> GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			string LoadingText;
 			int i = Language.IndexOf(':');
@@ -120,7 +120,7 @@ namespace Waher.IoTGateway.CodeContent
 
 			Document.QueueAsyncTask(() => this.Evaluate(Script, Variables, Id));
 
-			return true;
+			return Task.FromResult<bool>(true);
 		}
 
 		private Expression BuildExpression(string[] Rows)
@@ -133,11 +133,11 @@ namespace Waher.IoTGateway.CodeContent
 			return new Expression(sb.ToString(), this.document?.FileName);
 		}
 
-		private object Evaluate(Expression Script, Variables Variables)
+		private async Task<object> Evaluate(Expression Script, Variables Variables)
 		{
 			try
 			{
-				return Script.Evaluate(Variables);
+				return await Script.EvaluateAsync(Variables);
 			}
 			catch (Exception ex)
 			{
@@ -145,14 +145,14 @@ namespace Waher.IoTGateway.CodeContent
 			}
 		}
 
-		private Task Evaluate(Expression Script, Variables Variables, string Id)
+		private async Task Evaluate(Expression Script, Variables Variables, string Id)
 		{
 			Script.OnPreview += async (sender, e) =>
 			{
 				try
 				{
 					StringBuilder Html2 = new StringBuilder();
-					InlineScript.GenerateHTML(e.Preview.AssociatedObjectValue, Html2, true, Variables);
+					await InlineScript.GenerateHTML(e.Preview.AssociatedObjectValue, Html2, true, Variables);
 
 					await ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html2.ToString()), true);
 				}
@@ -166,17 +166,17 @@ namespace Waher.IoTGateway.CodeContent
 
 			try
 			{
-				object Result = this.Evaluate(Script, Variables);
+				object Result = await this.Evaluate(Script, Variables);
 
-				InlineScript.GenerateHTML(Result, Html, true, Variables);
+				await InlineScript.GenerateHTML(Result, Html, true, Variables);
 			}
 			catch (Exception ex)
 			{
 				Html.Clear();
-				InlineScript.GenerateHTML(ex, Html, true, Variables);
+				await InlineScript.GenerateHTML(ex, Html, true, Variables);
 			}
 
-			return ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html.ToString()), false);
+			await ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html.ToString()), false);
 		}
 
 		/// <summary>
@@ -188,13 +188,13 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public bool GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public async Task<bool> GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
 			Variables Variables = Document.Settings.Variables;
-			object Result = this.Evaluate(Script, Variables);
+			object Result = await this.Evaluate(Script, Variables);
 
-			InlineScript.GeneratePlainText(Result, Output, true);
+			await InlineScript .GeneratePlainText(Result, Output, true);
 
 			return true;
 		}
@@ -209,13 +209,13 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public bool GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public async Task<bool> GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
 			Variables Variables = Document.Settings.Variables;
-			object Result = this.Evaluate(Script, Variables);
+			object Result = await this.Evaluate(Script, Variables);
 
-			InlineScript.GenerateXAML(Result, Output, TextAlignment, true, Variables, Document.Settings.XamlSettings);
+			await InlineScript.GenerateXAML(Result, Output, TextAlignment, true, Variables, Document.Settings.XamlSettings);
 
 			return true;
 		}
@@ -230,13 +230,13 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public bool GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public async Task<bool> GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
 			Variables Variables = Document.Settings.Variables;
-			object Result = this.Evaluate(Script, Variables);
+			object Result = await this.Evaluate(Script, Variables);
 
-			InlineScript.GenerateXamarinForms(Result, Output, TextAlignment, true, Variables, Document.Settings.XamlSettings);
+			await InlineScript .GenerateXamarinForms(Result, Output, TextAlignment, true, Variables, Document.Settings.XamlSettings);
 
 			return true;
 		}

@@ -102,7 +102,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				if (await File.ReadAsync(Bin, 0, Len) != Len)
 					throw new IOException("Unable to read from file.");
 
-				return InternetContent.Decode(ContentType, Bin, Uri);
+				return await InternetContent.DecodeAsync(ContentType, Bin, Uri);
 			}
 			finally
 			{

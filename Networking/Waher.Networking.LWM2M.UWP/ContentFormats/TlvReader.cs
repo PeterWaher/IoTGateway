@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using Waher.Security.DTLS;
 
 namespace Waher.Networking.LWM2M.ContentFormats
 {
@@ -11,7 +8,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 	/// </summary>
 	public class TlvReader
 	{
-		private MemoryStream ms;
+		private readonly MemoryStream ms;
 
 		/// <summary>
 		/// Class used to deserialize data from the TLV (Type-Length-Value) binary format.

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Script.Xml.Model
@@ -33,6 +34,12 @@ namespace Waher.Script.Xml.Model
 		/// </summary>
 		/// <param name="Variables">Current set of variables.</param>
 		internal abstract string GetValue(Variables Variables);
+
+		/// <summary>
+		/// Gets the attribute value.
+		/// </summary>
+		/// <param name="Variables">Current set of variables.</param>
+		internal abstract Task<string> GetValueAsync(Variables Variables);
 
 		/// <summary>
 		/// If the node is applicable in pattern matching against <paramref name="CheckAgainst"/>.

@@ -2,7 +2,6 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Net;
-using Waher.Networking.PeerToPeer;
 
 namespace Waher.Networking.PeerToPeer
 {
@@ -15,7 +14,7 @@ namespace Waher.Networking.PeerToPeer
 		private Guid playerId;
 		private IPEndPoint publicEndpoint;
 		private IPEndPoint localEndpoint;
-		private Dictionary<string, string> playerMetaInfo;
+		private readonly Dictionary<string, string> playerMetaInfo;
 		private PeerConnection connection = null;
 
 		internal Player(Guid PlayerId, IPEndPoint PublicEndpoint, IPEndPoint LocalEndpoint, params KeyValuePair<string, string>[] PlayerMetaInfo)
@@ -111,9 +110,7 @@ namespace Waher.Networking.PeerToPeer
 		{
 			get
 			{
-				string Value;
-
-				if (this.playerMetaInfo.TryGetValue(Key, out Value))
+				if (this.playerMetaInfo.TryGetValue(Key, out string Value))
 					return Value;
 				else
 					return string.Empty;
@@ -129,9 +126,7 @@ namespace Waher.Networking.PeerToPeer
 			internal set { this.connection = value; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = null;

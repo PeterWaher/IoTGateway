@@ -9,7 +9,7 @@ namespace Waher.Networking.Sniffers
 	/// </summary>
 	public class SnifferEnumerator : IEnumerator<ISniffer>
 	{
-		private ISniffer[] list;
+		private readonly ISniffer[] list;
 		private int pos = 0;
 
 		/// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
 
@@ -54,13 +55,13 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.x2 = new LengthAttribute(Input, "x2");
 			this.y2 = new LengthAttribute(Input, "y2");
 			this.ref2 = new StringAttribute(Input, "ref2");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -97,11 +98,17 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
-			if (!this.IncludePoint(State, this.x2, this.y2, this.ref2, ref this.xCoordinate2, ref this.yCoordinate2, ref Relative))
+			CalculatedPoint P = await this.IncludePoint(State, this.x2, this.y2, this.@ref2, this.xCoordinate2, this.yCoordinate2);
+			if (P.Ok)
+			{
+				this.xCoordinate2 = P.X;
+				this.yCoordinate2 = P.Y;
+			}
+			else
 			{
 				float? Value = this.ExplicitWidth;
 				float? Temp;
@@ -118,7 +125,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 					float X = this.xCoordinate + Value.Value;
 					if (X != this.xCoordinate2)
 					{
-						Relative = true;
+						State.MeasureRelative = true;
 						this.xCoordinate2 = X;
 					}
 				}
@@ -136,15 +143,13 @@ namespace Waher.Layout.Layout2D.Model.Figures
 					float Y = this.yCoordinate + Value.Value;
 					if (Y != this.yCoordinate2)
 					{
-						Relative = true;
+						State.MeasureRelative = true;
 						this.yCoordinate2 = Y;
 					}
 				}
 
 				this.IncludePoint(this.xCoordinate2, this.yCoordinate2);
 			}
-
-			return Relative;
 		}
 
 		/// <summary>

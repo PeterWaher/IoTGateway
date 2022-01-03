@@ -88,9 +88,7 @@ namespace Waher.Networking.UPnP
 		/// </summary>
 		public int Depth { get { return this.depth; } }
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.url;

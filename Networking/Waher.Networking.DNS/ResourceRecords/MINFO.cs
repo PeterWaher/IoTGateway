@@ -64,9 +64,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 			set => this.eMailBx = value;
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return base.ToString() + "\t" + this.rMailBx + "\t" + this.eMailBx;

@@ -176,9 +176,7 @@ namespace Waher.Things
 		/// </summary>
 		public static ThingReference Empty { get { return empty; } }
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder Output = new StringBuilder();

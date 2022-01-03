@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Content.Markdown.Model.BlockElements
@@ -39,28 +40,25 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <summary>
 		/// Footnote key
 		/// </summary>
-		public string Key
-		{
-			get { return this.key; }
-		}
+		public string Key => this.key;
 
 		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override async Task GenerateHTML(StringBuilder Output)
 		{
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateHTML(Output);
+				await E.GenerateHTML(Output);
 		}
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
-			PrefixedBlock(Output, this.Children, "[^" + this.key + "]:\t", "\t");
+			await PrefixedBlock(Output, this.Children, "[^" + this.key + "]:\t", "\t");
 			Output.AppendLine();
 		}
 
@@ -68,15 +66,13 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override async Task GeneratePlainText(StringBuilder Output)
 		{
 			foreach (MarkdownElement E in this.Children)
-				E.GeneratePlainText(Output);
+				await E.GeneratePlainText(Output);
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.key;
@@ -87,10 +83,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateXAML(Output, TextAlignment);
+				await E.GenerateXAML(Output, TextAlignment);
 		}
 
 		/// <summary>
@@ -98,10 +94,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateXamarinForms(Output, TextAlignment);
+				await E.GenerateXamarinForms(Output, TextAlignment);
 		}
 
 		/// <summary>

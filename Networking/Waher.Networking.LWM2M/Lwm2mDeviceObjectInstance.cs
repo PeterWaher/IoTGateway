@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Events;
-using Waher.Networking.LWM2M.ContentFormats;
 using Waher.Networking.LWM2M.Events;
-using Waher.Persistence;
-using Waher.Persistence.Attributes;
 
 namespace Waher.Networking.LWM2M
 {
@@ -15,18 +10,18 @@ namespace Waher.Networking.LWM2M
 	/// </summary>
 	public class Lwm2mDeviceObjectInstance : Lwm2mObjectInstance
 	{
-		private Lwm2mResourceString manufacturer;
-		private Lwm2mResourceString modelNr;
-		private Lwm2mResourceString serialNr;
-		private Lwm2mResourceString firmwareVersion;
-		private Lwm2mResourceCommand reboot;
-		private Lwm2mResourceInteger errorCodes;    // TODO: Implement
-		private Lwm2mResourceTime currentTime;
-		private Lwm2mResourceString timeZone;
-		private Lwm2mResourceString supportedBindings;
-		private Lwm2mResourceString deviceType;
-		private Lwm2mResourceString hardwareVersion;
-		private Lwm2mResourceString softwareVersion;
+		private readonly Lwm2mResourceString manufacturer;
+		private readonly Lwm2mResourceString modelNr;
+		private readonly Lwm2mResourceString serialNr;
+		private readonly Lwm2mResourceString firmwareVersion;
+		private readonly Lwm2mResourceCommand reboot;
+		private readonly Lwm2mResourceInteger errorCodes;    // TODO: Implement
+		private readonly Lwm2mResourceTime currentTime;
+		private readonly Lwm2mResourceString timeZone;
+		private readonly Lwm2mResourceString supportedBindings;
+		private readonly Lwm2mResourceString deviceType;
+		private readonly Lwm2mResourceString hardwareVersion;
+		private readonly Lwm2mResourceString softwareVersion;
 
 		/// <summary>
 		/// LWM2M Device object instance.
@@ -93,9 +88,10 @@ namespace Waher.Networking.LWM2M
 			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 22));  // ExtDevInfo 
 		}
 
-		private void Reboot_OnExecute(object sender, EventArgs e)
+		private Task Reboot_OnExecute(object sender, EventArgs e)
 		{
 			this.Object.Client.Reboot();
+			return Task.CompletedTask;
 		}
 
 		private void CurrentTime_OnAfterRegister(object sender, EventArgs e)
@@ -103,9 +99,10 @@ namespace Waher.Networking.LWM2M
 			this.currentTime.TriggerAll(new TimeSpan(0, 0, 1));
 		}
 
-		private void CurrentTime_OnBeforeGet(object sender, CoapRequestEventArgs e)
+		private Task CurrentTime_OnBeforeGet(object sender, CoapRequestEventArgs e)
 		{
 			this.currentTime.TimeValue = DateTime.Now;
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

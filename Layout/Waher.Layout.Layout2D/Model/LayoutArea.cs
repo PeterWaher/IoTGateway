@@ -1,8 +1,7 @@
-﻿using SkiaSharp;
-using System;
+﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
-using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model
 {
@@ -132,10 +131,8 @@ namespace Waher.Layout.Layout2D.Model
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.width = new LengthAttribute(Input, "width");
 			this.height = new LengthAttribute(Input, "height");
 			this.maxWidth = new LengthAttribute(Input, "maxWidth");
@@ -145,6 +142,8 @@ namespace Waher.Layout.Layout2D.Model
 			this.keepAspectRatio = new BooleanAttribute(Input, "keepAspectRatio");
 			this.overflow = new EnumAttribute<Overflow>(Input, "overflow");
 			this.onClick = new ExpressionAttribute(Input, "onClick");
+		
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -193,54 +192,58 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 			float a;
 
-			if (!(this.width is null) && this.width.TryEvaluate(State.Session, out Length L))
+			EvaluationResult<Length> Length = await this.width.TryEvaluate(State.Session);
+			if (Length.Ok)
 			{
 				a = this.Width ?? 0;
-				State.CalcDrawingSize(L, ref a, true, ref Relative);
+				State.CalcDrawingSize(Length.Result, ref a, true, State);
 				this.Width = this.ExplicitWidth = a;
 			}
 
-			if (!(this.height is null) && this.height.TryEvaluate(State.Session, out L))
+			Length = await this.height.TryEvaluate(State.Session);
+			if (Length.Ok)
 			{
 				a = this.Height ?? 0;
-				State.CalcDrawingSize(L, ref a, true, ref Relative);
+				State.CalcDrawingSize(Length.Result, ref a, true, State);
 				this.Height = this.ExplicitHeight = a;
 			}
 
-			if (!(this.minWidth is null) && this.minWidth.TryEvaluate(State.Session, out L))
+			Length = await this.minWidth.TryEvaluate(State.Session);
+			if (Length.Ok)
 			{
 				a = this.MinWidth ?? 0;
-				State.CalcDrawingSize(L, ref a, true, ref Relative);
+				State.CalcDrawingSize(Length.Result, ref a, true, State);
 				this.MinWidth = a;
 			}
 
-			if (!(this.maxWidth is null) && this.maxWidth.TryEvaluate(State.Session, out L))
+			Length = await this.maxWidth.TryEvaluate(State.Session);
+			if (Length.Ok)
 			{
 				a = this.MaxWidth ?? 0;
-				State.CalcDrawingSize(L, ref a, true, ref Relative);
+				State.CalcDrawingSize(Length.Result, ref a, true, State);
 				this.MaxWidth = a;
 			}
 
-			if (!(this.minHeight is null) && this.minHeight.TryEvaluate(State.Session, out L))
+			Length = await this.minHeight.TryEvaluate(State.Session);
+			if (Length.Ok)
 			{
 				a = this.MinHeight ?? 0;
-				State.CalcDrawingSize(L, ref a, true, ref Relative);
+				State.CalcDrawingSize(Length.Result, ref a, true, State);
 				this.MinHeight = a;
 			}
 
-			if (!(this.maxHeight is null) && this.maxHeight.TryEvaluate(State.Session, out L))
+			Length = await this.maxHeight.TryEvaluate(State.Session);
+			if (Length.Ok)
 			{
 				a = this.MaxHeight ?? 0;
-				State.CalcDrawingSize(L, ref a, true, ref Relative);
+				State.CalcDrawingSize(Length.Result, ref a, true, State);
 				this.MaxHeight = a;
 			}
-
-			return Relative;
 		}
 
 	}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Figures.SegmentNodes;
 
@@ -39,18 +40,18 @@ namespace Waher.Layout.Layout2D.Model.References
 		/// Draws the shape
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void DrawShape(DrawingState State)
+		public override Task DrawShape(DrawingState State)
 		{
-			base.Draw(State);
+			return base.Draw(State);
 		}
 
 		/// <summary>
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override Task Draw(DrawingState State)
 		{
-			// Don't draw a shape definition.
+			return Task.CompletedTask;	// Don't draw a shape definition.
 		}
 
 		/// <summary>
@@ -58,14 +59,14 @@ namespace Waher.Layout.Layout2D.Model.References
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
-		public void Measure(DrawingState State, PathState PathState)
+		public async Task Measure(DrawingState State, PathState PathState)
 		{
 			if (this.HasChildren)
 			{
 				foreach (ILayoutElement E in this.Children)
 				{
 					if (E.IsVisible && E is ISegment Segment)
-						Segment.Measure(State, PathState);
+						await Segment.Measure(State, PathState);
 				}
 			}
 		}
@@ -76,14 +77,14 @@ namespace Waher.Layout.Layout2D.Model.References
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
 		/// <param name="Path">Path being generated.</param>
-		public void Draw(DrawingState State, PathState PathState, SKPath Path)
+		public async Task Draw(DrawingState State, PathState PathState, SKPath Path)
 		{
 			if (this.HasChildren)
 			{
 				foreach (ILayoutElement E in this.Children)
 				{
 					if (E.IsVisible && E is ISegment Segment)
-						Segment.Draw(State, PathState, Path);
+						await Segment.Draw(State, PathState, Path);
 				}
 			}
 		}
@@ -95,11 +96,13 @@ namespace Waher.Layout.Layout2D.Model.References
 		/// <param name="DirectedElement">Directed element.</param>
 		/// <param name="DefaultPen">Default pen, if any, null otherwise</param>
 		/// <param name="DefaultFill">Default fill, if any, null otherwise.</param>
-		public void DrawTail(DrawingState State, IDirectedElement DirectedElement,
+		public Task DrawTail(DrawingState State, IDirectedElement DirectedElement,
 			SKPaint DefaultPen, SKPaint DefaultFill)
 		{
 			if (DirectedElement.TryGetStart(out float X, out float Y, out float Direction))
-				this.Draw(State, DefaultPen, DefaultFill, X, Y, Direction);
+				return this.Draw(State, DefaultPen, DefaultFill, X, Y, Direction);
+			else
+				return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -109,11 +112,13 @@ namespace Waher.Layout.Layout2D.Model.References
 		/// <param name="DirectedElement">Directed element.</param>
 		/// <param name="DefaultPen">Default pen, if any, null otherwise</param>
 		/// <param name="DefaultFill">Default fill, if any, null otherwise.</param>
-		public void DrawHead(DrawingState State, IDirectedElement DirectedElement,
+		public Task DrawHead(DrawingState State, IDirectedElement DirectedElement,
 			SKPaint DefaultPen, SKPaint DefaultFill)
 		{
 			if (DirectedElement.TryGetEnd(out float X, out float Y, out float Direction))
-				this.Draw(State, DefaultPen, DefaultFill, X, Y, Direction);
+				return this.Draw(State, DefaultPen, DefaultFill, X, Y, Direction);
+			else
+				return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -125,8 +130,7 @@ namespace Waher.Layout.Layout2D.Model.References
 		/// <param name="X"></param>
 		/// <param name="Y"></param>
 		/// <param name="Direction"></param>
-		public void Draw(DrawingState State, SKPaint DefaultPen, SKPaint DefaultFill, 
-			float X, float Y, float Direction)
+		public async Task Draw(DrawingState State, SKPaint DefaultPen, SKPaint DefaultFill, float X, float Y, float Direction)
 		{
 			if (this.HasChildren)
 			{
@@ -153,40 +157,43 @@ namespace Waher.Layout.Layout2D.Model.References
 
 				try
 				{
-					foreach (ILayoutElement Element in this.Children)
+					if (this.HasChildren)
 					{
-						if (Element is ISegment Segment)
+						foreach (ILayoutElement Element in this.Children)
 						{
-							if (Path is null)
+							if (Element is ISegment Segment)
 							{
-								Path = new SKPath();
-								PathState = new PathState(null, Path, false, false);
+								if (Path is null)
+								{
+									Path = new SKPath();
+									PathState = new PathState(null, Path, false, false);
+								}
+
+								PathState.Set0(X, Y);
+								PathState.TurnTowards(Direction);
+								Path.MoveTo(X, Y);
+
+								await Segment.Draw(State, PathState, Path);
 							}
-
-							PathState.Set0(X, Y);
-							PathState.TurnTowards(Direction);
-							Path.MoveTo(X, Y);
-
-							Segment.Draw(State, PathState, Path);
-						}
-						else
-						{
-							if (!(Path is null))
+							else
 							{
-								PathState.FlushSpline();
+								if (!(Path is null))
+								{
+									PathState.FlushSpline();
 
-								if (!(DefaultFill is null))
-									State.Canvas.DrawPath(Path, DefaultFill);
+									if (!(DefaultFill is null))
+										State.Canvas.DrawPath(Path, DefaultFill);
 
-								if (!(DefaultPen is null))
-									State.Canvas.DrawPath(Path, DefaultPen);
+									if (!(DefaultPen is null))
+										State.Canvas.DrawPath(Path, DefaultPen);
 
-								Path.Dispose();
-								Path = null;
-								PathState = null;
+									Path.Dispose();
+									Path = null;
+									PathState = null;
+								}
+
+								await Element.Draw(State);
 							}
-
-							Element.Draw(State);
 						}
 					}
 

@@ -90,7 +90,7 @@
             </summary>
             <param name="Output">XML output.</param>
         </member>
-        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.ImportGraph(System.Xml.XmlElement)">
+        <member name="M:Waher.Script.Graphs.Canvas2D.CanvasGraph.ImportGraphAsync(System.Xml.XmlElement)">
             <summary>
             Imports graph specifics from XML.
             </summary>
@@ -2614,7 +2614,21 @@
             </summary>
             <param name="Xml">XML input.</param>
         </member>
+        <member name="M:Waher.Script.Graphs.Graph.ImportGraphAsync(System.Xml.XmlElement)">
+            <summary>
+            Imports graph specifics from XML.
+            </summary>
+            <param name="Xml">XML input.</param>
+        </member>
         <member name="M:Waher.Script.Graphs.Graph.Parse(System.String,Waher.Script.Variables)">
+            <summary>
+            Parses an element expression string.
+            </summary>
+            <param name="s">Expression</param>
+            <param name="Variables">Current set of variables.</param>
+            <returns>Parsed element.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph.ParseAsync(System.String,Waher.Script.Variables)">
             <summary>
             Parses an element expression string.
             </summary>
@@ -2770,14 +2784,10 @@
             <returns>Result, if understood, null otherwise.</returns>
         </member>
         <member name="M:Waher.Script.Graphs.Graph2D.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Graphs.Graph2D.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Graphs.Graph2D.CreatePixels(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
             <summary>
@@ -2803,7 +2813,7 @@
             </summary>
             <param name="Output">XML output.</param>
         </member>
-        <member name="M:Waher.Script.Graphs.Graph2D.ImportGraph(System.Xml.XmlElement)">
+        <member name="M:Waher.Script.Graphs.Graph2D.ImportGraphAsync(System.Xml.XmlElement)">
             <summary>
             Imports graph specifics from XML.
             </summary>
@@ -2875,14 +2885,10 @@
             <returns>Script.</returns>
         </member>
         <member name="M:Waher.Script.Graphs.GraphBitmap.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Graphs.GraphBitmap.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Graphs.GraphBitmap.Dispose">
             <summary>
@@ -2895,7 +2901,7 @@
             </summary>
             <param name="Output">XML output.</param>
         </member>
-        <member name="M:Waher.Script.Graphs.GraphBitmap.ImportGraph(System.Xml.XmlElement)">
+        <member name="M:Waher.Script.Graphs.GraphBitmap.ImportGraphAsync(System.Xml.XmlElement)">
             <summary>
             Imports graph specifics from XML.
             </summary>

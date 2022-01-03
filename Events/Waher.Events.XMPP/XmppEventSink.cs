@@ -123,9 +123,7 @@ namespace Waher.Events.XMPP
 			get { return this.destination; }
 		}
 
-		/// <summary>
-		/// <see cref="EventSink.Queue"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override Task Queue(Event Event)
 		{
 			lock (this.synchObj)

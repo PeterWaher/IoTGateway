@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Xml;
-using SkiaSharp;
-using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Transforms
 {

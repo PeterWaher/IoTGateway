@@ -35,7 +35,7 @@ namespace Waher.Content.Html.Test
 			byte[] Data = await Response.Content.ReadAsByteArrayAsync();
 			string ContentType = Response.Content.Headers.ContentType.ToString();
 
-			HtmlDocument Doc = InternetContent.Decode(ContentType, Data, new Uri(Url)) as HtmlDocument;
+			HtmlDocument Doc = await InternetContent.DecodeAsync(ContentType, Data, new Uri(Url)) as HtmlDocument;
 			Assert.IsNotNull(Doc);
 
 			Assert.IsNotNull(Doc.Root);

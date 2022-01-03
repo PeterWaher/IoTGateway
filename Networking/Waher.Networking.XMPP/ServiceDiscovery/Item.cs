@@ -49,9 +49,7 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 		/// </summary>
 		public string Name { get { return this.name; } }
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();

@@ -24,9 +24,6 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// If the element is an empty element.
 		/// </summary>
-		public override bool IsEmptyElement
-		{
-			get { return true; }
-		}
+		public override bool IsEmptyElement => true;
 	}
 }

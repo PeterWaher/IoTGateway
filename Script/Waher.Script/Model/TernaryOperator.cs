@@ -25,15 +25,25 @@ namespace Waher.Script.Model
 			: base(Left, Right, Start, Length, Expression)
 		{
 			this.middle = Middle;
+
+			this.CalcIsAsync();
+		}
+
+		/// <summary>
+		/// Recalculates if operator is asynchronous or not.
+		/// </summary>
+		protected override void CalcIsAsync()
+		{
+			this.isAsync =
+				(this.left?.IsAsynchronous ?? false) ||
+				(this.middle?.IsAsynchronous ?? false) ||
+				(this.right?.IsAsynchronous ?? false);
 		}
 
 		/// <summary>
 		/// Middle operand.
 		/// </summary>
-		public ScriptNode MiddleOperand
-		{
-			get { return this.middle; }
-		}
+		public ScriptNode MiddleOperand => this.middle;
 
 		/// <summary>
 		/// Calls the callback method for all child nodes.
@@ -56,14 +66,66 @@ namespace Waher.Script.Model
 					return false;
 			}
 
-			if (!(this.left is null) && !Callback(ref this.left, State))
-				return false;
+			ScriptNode NewNode;
+			bool RecalcIsAsync = false;
+			bool b;
 
-			if (!(this.middle is null) && !Callback(ref this.middle, State))
-				return false;
+			if (!(this.left is null))
+			{
+				b = !Callback(this.left, out NewNode, State);
+				if (!(NewNode is null))
+				{
+					this.left = NewNode;
+					RecalcIsAsync = true;
+				}
 
-			if (!(this.right is null) && !Callback(ref this.right, State))
-				return false;
+				if (b)
+				{
+					if (RecalcIsAsync)
+						this.CalcIsAsync();
+
+					return false;
+				}
+			}
+
+			if (!(this.middle is null))
+			{
+				b = !Callback(this.middle, out NewNode, State);
+				if (!(NewNode is null))
+				{
+					this.middle = NewNode;
+					RecalcIsAsync = true;
+				}
+
+				if (b)
+				{
+					if (RecalcIsAsync)
+						this.CalcIsAsync();
+
+					return false;
+				}
+			}
+
+			if (!(this.right is null))
+			{
+				b = !Callback(this.right, out NewNode, State);
+				if (!(NewNode is null))
+				{
+					this.right = NewNode;
+					RecalcIsAsync = true;
+				}
+
+				if (b)
+				{
+					if (RecalcIsAsync)
+						this.CalcIsAsync();
+
+					return false;
+				}
+			}
+
+			if (RecalcIsAsync)
+				this.CalcIsAsync();
 
 			if (!DepthFirst)
 			{
@@ -80,9 +142,7 @@ namespace Waher.Script.Model
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is TernaryOperator O &&
@@ -90,9 +150,7 @@ namespace Waher.Script.Model
 				base.Equals(obj);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

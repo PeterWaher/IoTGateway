@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Objects;
@@ -34,9 +34,10 @@ namespace Waher.Script.Model
 	/// Delegate for ScriptNode callback methods.
 	/// </summary>
 	/// <param name="Node">Node being processed. Change the reference to change the structure of the expression.</param>
+	/// <param name="NewNode">A new node to replace the old node, or null if no replacement necessary.</param>
 	/// <param name="State">State object.</param>
 	/// <returns>true if process is to continue, false if it is completed.</returns>
-	public delegate bool ScriptNodeEventHandler(ref ScriptNode Node, object State);
+	public delegate bool ScriptNodeEventHandler(ScriptNode Node, out ScriptNode NewNode, object State);
 
 	/// <summary>
 	/// Base class for all nodes in a parsed script tree.
@@ -78,11 +79,29 @@ namespace Waher.Script.Model
 		}
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public virtual bool IsAsynchronous => false;
+
+		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// This method should be used for nodes whose <see cref="IsAsynchronous"/> is false.
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
 		public abstract IElement Evaluate(Variables Variables);
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// This method should be used for nodes whose <see cref="IsAsynchronous"/> is true.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public virtual Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			return Task.FromResult<IElement>(this.Evaluate(Variables));
+		}
 
 		/// <summary>
 		/// Performs a pattern match operation.
@@ -211,10 +230,10 @@ namespace Waher.Script.Model
 					Node = Nodes[i];
 					if (!(Node is null))
 					{
-						if (!Callback(ref Node, State))
+						if (!Callback(Node, out ScriptNode NewNode, State))
 							return false;
 
-						Nodes[i] = Node;
+						Nodes[i] = NewNode ?? Node;
 					}
 				}
 			}
@@ -222,17 +241,13 @@ namespace Waher.Script.Model
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return this.GetType() == obj.GetType();
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			return this.GetType().GetHashCode();
@@ -327,9 +342,7 @@ namespace Waher.Script.Model
 			return Result;
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			if (this.start >= 0 && this.length > 0 &&

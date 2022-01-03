@@ -43,10 +43,10 @@ namespace Waher.Content.Markdown.Test
 			filesProvider = null;
 		}
 
-		private void DoTest(string MarkdownFileName, string PlainTextFileName)
+		private async Task DoTest(string MarkdownFileName, string PlainTextFileName)
 		{
-			string Markdown = File.ReadAllText("Markdown/Syntax/" + MarkdownFileName);
-			string ExpectedText = File.ReadAllText("PlainText/" + PlainTextFileName);
+			string Markdown = await Resources.ReadAllTextAsync("Markdown/Syntax/" + MarkdownFileName);
+			string ExpectedText = await Resources.ReadAllTextAsync("PlainText/" + PlainTextFileName);
 			Emoji1LocalFiles Emoji1LocalFiles = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", Path.Combine("Graphics", "Emoji1.zip"), "Graphics");
 
 			MarkdownSettings Settings = new MarkdownSettings(Emoji1LocalFiles, true, new Variables())
@@ -56,8 +56,8 @@ namespace Waher.Content.Markdown.Test
 
 			Assert.IsTrue(Emoji1LocalFiles.WaitUntilInitialized(60000));
 
-			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings);
-			string GeneratedText = Doc.GeneratePlainText();
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
+			string GeneratedText = await Doc.GeneratePlainText();
 
 			Console.Out.WriteLine(GeneratedText);
 			Console.Out.WriteLine();
@@ -68,159 +68,159 @@ namespace Waher.Content.Markdown.Test
 		}
 
 		[TestMethod]
-		public void Test_01_Paragraphs()
+		public async Task Test_01_Paragraphs()
 		{
-			this.DoTest("Test_01_Paragraphs.md", "Test_01_Paragraphs.txt");
+			await this.DoTest("Test_01_Paragraphs.md", "Test_01_Paragraphs.txt");
 		}
 
 		[TestMethod]
-		public void Test_02_Links()
+		public async Task Test_02_Links()
 		{
-			this.DoTest("Test_02_Links.md", "Test_02_Links.txt");
+			await this.DoTest("Test_02_Links.md", "Test_02_Links.txt");
 		}
 
 		[TestMethod]
-		public void Test_03_TextFormatting()
+		public async Task Test_03_TextFormatting()
 		{
-			this.DoTest("Test_03_TextFormatting.md", "Test_03_TextFormatting.txt");
+			await this.DoTest("Test_03_TextFormatting.md", "Test_03_TextFormatting.txt");
 		}
 
 		[TestMethod]
-		public void Test_04_Multimedia()
+		public async Task Test_04_Multimedia()
 		{
-			this.DoTest("Test_04_Multimedia.md", "Test_04_Multimedia.txt");
+			await this.DoTest("Test_04_Multimedia.md", "Test_04_Multimedia.txt");
 		}
 
 		[TestMethod]
-		public void Test_05_HTML()
+		public async Task Test_05_HTML()
 		{
-			this.DoTest("Test_05_HTML.md", "Test_05_HTML.txt");
+			await this.DoTest("Test_05_HTML.md", "Test_05_HTML.txt");
 		}
 
 		[TestMethod]
-		public void Test_06_CodeBlocks()
+		public async Task Test_06_CodeBlocks()
 		{
-			this.DoTest("Test_06_CodeBlocks.md", "Test_06_CodeBlocks.txt");
+			await this.DoTest("Test_06_CodeBlocks.md", "Test_06_CodeBlocks.txt");
 		}
 
 		[TestMethod]
-		public void Test_07_BlockQuotes()
+		public async Task Test_07_BlockQuotes()
 		{
-			this.DoTest("Test_07_BlockQuotes.md", "Test_07_BlockQuotes.txt");
+			await this.DoTest("Test_07_BlockQuotes.md", "Test_07_BlockQuotes.txt");
 		}
 
 		[TestMethod]
-		public void Test_08_Headers()
+		public async Task Test_08_Headers()
 		{
-			this.DoTest("Test_08_Headers.md", "Test_08_Headers.txt");
+			await this.DoTest("Test_08_Headers.md", "Test_08_Headers.txt");
 		}
 
 		[TestMethod]
-		public void Test_09_UnorderedLists()
+		public async Task Test_09_UnorderedLists()
 		{
-			this.DoTest("Test_09_UnorderedLists.md", "Test_09_UnorderedLists.txt");
+			await this.DoTest("Test_09_UnorderedLists.md", "Test_09_UnorderedLists.txt");
 		}
 
 		[TestMethod]
-		public void Test_10_LazyOrderedLists()
+		public async Task Test_10_LazyOrderedLists()
 		{
-			this.DoTest("Test_10_LazyOrderedLists.md", "Test_10_LazyOrderedLists.txt");
+			await this.DoTest("Test_10_LazyOrderedLists.md", "Test_10_LazyOrderedLists.txt");
 		}
 
 		[TestMethod]
-		public void Test_11_OrderedLists()
+		public async Task Test_11_OrderedLists()
 		{
-			this.DoTest("Test_11_OrderedLists.md", "Test_11_OrderedLists.txt");
+			await this.DoTest("Test_11_OrderedLists.md", "Test_11_OrderedLists.txt");
 		}
 
 		[TestMethod]
-		public void Test_12_Typography()
+		public async Task Test_12_Typography()
 		{
-			this.DoTest("Test_12_Typography.md", "Test_12_Typography.txt");
+			await this.DoTest("Test_12_Typography.md", "Test_12_Typography.txt");
 		}
 
 		[TestMethod]
-		public void Test_13_Tables()
+		public async Task Test_13_Tables()
 		{
-			this.DoTest("Test_13_Tables.md", "Test_13_Tables.txt");
+			await this.DoTest("Test_13_Tables.md", "Test_13_Tables.txt");
 		}
 
 		[TestMethod]
-		public void Test_14_HorizontalRules()
+		public async Task Test_14_HorizontalRules()
 		{
-			this.DoTest("Test_14_HorizontalRules.md", "Test_14_HorizontalRules.txt");
+			await this.DoTest("Test_14_HorizontalRules.md", "Test_14_HorizontalRules.txt");
 		}
 
 		[TestMethod]
-		public void Test_15_DefinitionLists()
+		public async Task Test_15_DefinitionLists()
 		{
-			this.DoTest("Test_15_DefinitionLists.md", "Test_15_DefinitionLists.txt");
+			await this.DoTest("Test_15_DefinitionLists.md", "Test_15_DefinitionLists.txt");
 		}
 
 		[TestMethod]
-		public void Test_16_MetaData()
+		public async Task Test_16_MetaData()
 		{
-			this.DoTest("Test_16_MetaData.md", "Test_16_MetaData.txt");
+			await this.DoTest("Test_16_MetaData.md", "Test_16_MetaData.txt");
 		}
 
 		[TestMethod]
-		public void Test_17_Footnotes()
+		public async Task Test_17_Footnotes()
 		{
-			this.DoTest("Test_17_Footnotes.md", "Test_17_Footnotes.txt");
+			await this.DoTest("Test_17_Footnotes.md", "Test_17_Footnotes.txt");
 		}
 
 		[TestMethod]
-		public void Test_18_Emojis()
+		public async Task Test_18_Emojis()
 		{
-			this.DoTest("Test_18_Emojis.md", "Test_18_Emojis.txt");
+			await this.DoTest("Test_18_Emojis.md", "Test_18_Emojis.txt");
 		}
 
 		[TestMethod]
-		public void Test_19_Sections()
+		public async Task Test_19_Sections()
 		{
-			this.DoTest("Test_19_Sections.md", "Test_19_Sections.txt");
+			await this.DoTest("Test_19_Sections.md", "Test_19_Sections.txt");
 		}
 
 		[TestMethod]
-		public void Test_20_Script()
+		public async Task Test_20_Script()
 		{
-			this.DoTest("Test_20_Script.md", "Test_20_Script.txt");
+			await this.DoTest("Test_20_Script.md", "Test_20_Script.txt");
 		}
 
 		[TestMethod]
-		public void Test_21_Httpx()
+		public async Task Test_21_Httpx()
 		{
-			this.DoTest("Test_21_Httpx.md", "Test_21_Httpx.txt");
+			await this.DoTest("Test_21_Httpx.md", "Test_21_Httpx.txt");
 		}
 
 		[TestMethod]
-		public void Test_22_TaskLists()
+		public async Task Test_22_TaskLists()
 		{
-			this.DoTest("Test_22_TaskLists.md", "Test_22_TaskLists.txt");
+			await this.DoTest("Test_22_TaskLists.md", "Test_22_TaskLists.txt");
 		}
 
 		[TestMethod]
-		public void Test_23_Superscript()
+		public async Task Test_23_Superscript()
 		{
-			this.DoTest("Test_23_Superscript.md", "Test_23_Superscript.txt");
+			await this.DoTest("Test_23_Superscript.md", "Test_23_Superscript.txt");
 		}
 
 		[TestMethod]
-		public void Test_24_Subscript()
+		public async Task Test_24_Subscript()
 		{
-			this.DoTest("Test_24_Subscript.md", "Test_24_Subscript.txt");
+			await this.DoTest("Test_24_Subscript.md", "Test_24_Subscript.txt");
 		}
 
 		[TestMethod]
-		public void Test_25_HashTags()
+		public async Task Test_25_HashTags()
 		{
-			this.DoTest("Test_25_HashTags.md", "Test_25_HashTags.txt");
+			await this.DoTest("Test_25_HashTags.md", "Test_25_HashTags.txt");
 		}
 
 		[TestMethod]
-		public void Test_26_Comments()
+		public async Task Test_26_Comments()
 		{
-			this.DoTest("Test_26_Comments.md", "Test_26_Comments.txt");
+			await this.DoTest("Test_26_Comments.md", "Test_26_Comments.txt");
 		}
 	}
 }

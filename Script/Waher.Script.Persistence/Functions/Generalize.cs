@@ -21,31 +21,25 @@ namespace Waher.Script.Persistence.Functions
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public Generalize(ScriptNode Argument, int Start, int Length, Expression Expression)
-            : base(Argument, Start, Length, Expression)
-        {
+			: base(Argument, Start, Length, Expression)
+		{
 		}
 
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get
-			{
-				return "Generalize";
-			}
-		}
+		public override string FunctionName => "Generalize";
 
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames
-		{
-			get
-			{
-				return new string[] { "Object" };
-			}
-		}
+		public override string[] DefaultArgumentNames => new string[] { "Object" };
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
 
 		/// <summary>
 		/// Evaluates the function.
@@ -55,7 +49,18 @@ namespace Waher.Script.Persistence.Functions
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement Argument, Variables Variables)
 		{
-			return Evaluate(Argument).Result;
+			return this.EvaluateAsync(Argument, Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override Task<IElement> EvaluateAsync(IElement Argument, Variables Variables)
+		{
+			return EvaluateAsync(Argument);
 		}
 
 		/// <summary>
@@ -63,9 +68,9 @@ namespace Waher.Script.Persistence.Functions
 		/// </summary>
 		/// <param name="E">Element</param>
 		/// <returns>Generaized object.</returns>
-		public static Task<IElement> Evaluate(IElement E)
+		public static Task<IElement> EvaluateAsync(IElement E)
 		{
-			return Evaluate(E.AssociatedObjectValue);
+			return EvaluateAsync(E.AssociatedObjectValue);
 		}
 
 		/// <summary>
@@ -73,7 +78,7 @@ namespace Waher.Script.Persistence.Functions
 		/// </summary>
 		/// <param name="Object">Object</param>
 		/// <returns>Generaized object.</returns>
-		public static async Task<IElement> Evaluate(object Object)
+		public static async Task<IElement> EvaluateAsync(object Object)
 		{
 			if (Object is ICollection<KeyValuePair<string, IElement>> GenObj)
 				return new ObjectValue(GenObj);

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.CoAP;
 using Waher.Persistence;
@@ -69,7 +67,7 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void PUT(CoapMessage Request, CoapResponse Response)
+		public async Task PUT(CoapMessage Request, CoapResponse Response)
 		{
 			if (this.Client.State == Lwm2mState.Bootstrap &&
 				this.Client.IsFromBootstrapServer(Request))
@@ -85,7 +83,7 @@ namespace Waher.Networking.LWM2M
 					Request.Path += Request.SubPath;
 					Request.SubPath = string.Empty;
 
-					Instance.PUT(Request, Response);
+					await Instance.PUT(Request, Response);
 				}
 				else
 					Response.RST(CoapCode.BadRequest);
@@ -105,9 +103,9 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void POST(CoapMessage Request, CoapResponse Response)
+		public Task POST(CoapMessage Request, CoapResponse Response)
 		{
-			this.PUT(Request, Response);
+			return this.PUT(Request, Response);
 		}
 
 	}

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Runtime.Inventory;
 using Waher.Script.Graphs;
@@ -54,11 +56,10 @@ namespace Waher.Script.Content
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
-		/// <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
-		/// <returns>Encoded object.</returns>
+		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
+		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (!(Object is PixelInformation Pixels))
 			{
@@ -68,9 +69,7 @@ namespace Waher.Script.Content
 					throw new ArgumentException("Object not PixelInformation or Graph.", nameof(Object));
 			}
 
-			ContentType = "image/png";
-
-			return Pixels.EncodeAsPng();
+			return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Pixels.EncodeAsPng(), "image/png"));
 		}
 
 		/// <summary>

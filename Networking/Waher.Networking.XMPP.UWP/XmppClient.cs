@@ -1070,17 +1070,15 @@ namespace Waher.Networking.XMPP
 
 		private async void RaiseOnStateChanged(XmppState State)
 		{
-			StateChangedEventHandler h = this.OnStateChanged;
-			if (!(h is null))
+			try
 			{
-				try
-				{
+				StateChangedEventHandler h = this.OnStateChanged;
+				if (!(h is null))
 					await h(this, State);
-				}
-				catch (Exception ex)
-				{
-					this.Exception(ex);
-				}
+			}
+			catch (Exception ex)
+			{
+				this.Exception(ex);
 			}
 		}
 

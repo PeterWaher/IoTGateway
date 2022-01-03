@@ -135,34 +135,43 @@ namespace Waher.Client.WPF.Controls
 			};
 		}
 
-		private void Send_Click(object sender, RoutedEventArgs e)
+		private async void Send_Click(object sender, RoutedEventArgs e)
 		{
-			string Msg = this.Input.Text;
-			string ThreadId;
-
-			this.Input.Text = string.Empty;
-			this.Input.Focus();
-
-			if (this.muc)
+			try
 			{
-				byte[] Bin = new byte[16];
+				string Msg = this.Input.Text;
+				string ThreadId;
 
-				lock (rnd)
+				this.Input.Text = string.Empty;
+				this.Input.Focus();
+
+				if (this.muc)
 				{
-					rnd.GetBytes(Bin);
+					byte[] Bin = new byte[16];
+
+					lock (rnd)
+					{
+						rnd.GetBytes(Bin);
+					}
+
+					ThreadId = Convert.ToBase64String(Bin);
 				}
+				else
+					ThreadId = string.Empty;
 
-				ThreadId = Convert.ToBase64String(Bin);
+				MarkdownDocument Markdown = await this.ChatMessageTransmitted(Msg, ThreadId);
+				await this.node.SendChatMessage(Msg, ThreadId, Markdown);
 			}
-			else
-				ThreadId = string.Empty;
-
-			this.ChatMessageTransmitted(Msg, ThreadId, out MarkdownDocument Markdown);
-			this.node.SendChatMessage(Msg, ThreadId, Markdown);
+			catch (Exception ex)
+			{
+				MainWindow.ErrorBox(ex.Message);
+			}
 		}
 
-		public void ChatMessageTransmitted(string Message, string ThreadId, out MarkdownDocument Markdown)
+		public async Task<MarkdownDocument> ChatMessageTransmitted(string Message, string ThreadId)
 		{
+			MarkdownDocument Markdown;
+
 			if (Message.IndexOf('|') >= 0)
 			{
 				string s;
@@ -181,11 +190,11 @@ namespace Waher.Client.WPF.Controls
 							s += Environment.NewLine;
 
 						s += Message;
-						Markdown = new MarkdownDocument(s, GetMarkdownSettings());
-						Item.Update(s, Markdown);
+						Markdown = await MarkdownDocument.CreateAsync(s, GetMarkdownSettings());
+						await Item.Update(s, Markdown);
 						this.ChatListView.Items.Refresh();
 						this.ChatListView.ScrollIntoView(Item);
-						return;
+						return Markdown;
 					}
 					catch (Exception)
 					{
@@ -203,7 +212,7 @@ namespace Waher.Client.WPF.Controls
 			{
 				try
 				{
-					Markdown = new MarkdownDocument(Message, GetMarkdownSettings());
+					Markdown = await MarkdownDocument.CreateAsync(Message, GetMarkdownSettings());
 				}
 				catch (Exception)
 				{
@@ -212,92 +221,101 @@ namespace Waher.Client.WPF.Controls
 			}
 
 			this.AddItem(ChatItemType.Transmitted, DateTime.Now, Message, string.Empty, Markdown, ThreadId, Colors.Black, Colors.Honeydew);
+
+			return Markdown;
 		}
 
-		private void AddItem(ChatItemType Type, DateTime Timestamp, string Message, string From, MarkdownDocument Markdown, string ThreadId, Color FgColor, Color BgColor)
+		private async void AddItem(ChatItemType Type, DateTime Timestamp, string Message, string From, MarkdownDocument Markdown, string ThreadId, Color FgColor, Color BgColor)
 		{
-			if (this.muc && !string.IsNullOrEmpty(ThreadId))
+			try
 			{
-				switch (Type)
+				if (this.muc && !string.IsNullOrEmpty(ThreadId))
 				{
-					case ChatItemType.Transmitted:
-						int N;
+					switch (Type)
+					{
+						case ChatItemType.Transmitted:
+							int N;
 
-						if (this.node is RoomNode RoomNode)
-							N = RoomNode.NrOccupants;
-						else
-							N = 12;
+							if (this.node is RoomNode RoomNode)
+								N = RoomNode.NrOccupants;
+							else
+								N = 12;
 
-						lock (this.threads)
-						{
-							if (!this.threads.ContainsKey(ThreadId))
+							lock (this.threads)
 							{
-								this.threads[ThreadId] = new Consolidator(ThreadId, N)
+								if (!this.threads.ContainsKey(ThreadId))
 								{
-									Tag = new ConsolidationTag()
-								};
+									this.threads[ThreadId] = new Consolidator(ThreadId, N)
+									{
+										Tag = new ConsolidationTag()
+									};
+								}
 							}
-						}
-						break;
-
-					case ChatItemType.Received:
-						Consolidator Consolidation;
-
-						if (!this.consolidate)
 							break;
 
-						lock (this.threads)
-						{
-							if (!this.threads.TryGetValue(ThreadId, out Consolidation))
+						case ChatItemType.Received:
+							Consolidator Consolidation;
+
+							if (!this.consolidate)
 								break;
-						}
 
-						ConsolidationTag Rec = (ConsolidationTag)Consolidation.Tag;
-						MainWindow.Scheduler.Remove(Rec.UpdateTP);
-
-						Consolidation.Add(ChatItem.GetShortFrom(From), Markdown);
-
-						Rec.UpdateTP = MainWindow.Scheduler.Add(DateTime.Now.AddMilliseconds(100), (_) =>
-						{
-							StringBuilder sb = new StringBuilder();
-							bool First = true;
-
-							Message = Consolidation.GenerateMarkdown();
-							Markdown = new MarkdownDocument(Message, Markdown.Settings, Markdown.TransparentExceptionTypes);
-
-							foreach (string Source in Consolidation.Sources)
+							lock (this.threads)
 							{
-								if (First)
-									First = false;
-								else
-									sb.AppendLine();
-
-								sb.Append(Source);
+								if (!this.threads.TryGetValue(ThreadId, out Consolidation))
+									break;
 							}
 
-							MainWindow.UpdateGui(() =>
+							ConsolidationTag Rec = (ConsolidationTag)Consolidation.Tag;
+							MainWindow.Scheduler.Remove(Rec.UpdateTP);
+
+							await Consolidation.Add(ChatItem.GetShortFrom(From), Markdown);
+
+							Rec.UpdateTP = MainWindow.Scheduler.Add(DateTime.Now.AddMilliseconds(100), async (_) =>
 							{
-								bool Added;
+								StringBuilder sb = new StringBuilder();
+								bool First = true;
 
-								if (Added = (Rec.Item is null))
-									Rec.Item = new ChatItem(Type, Timestamp, string.Empty, string.Empty, null, ThreadId, FgColor, BgColor);
+								Message = Consolidation.GenerateMarkdown();
+								Markdown = await MarkdownDocument.CreateAsync(Message, Markdown.Settings, Markdown.TransparentExceptionTypes);
 
-								Rec.Item.From = sb.ToString();
-								Rec.Item.Update(Message, Markdown);
+								foreach (string Source in await Consolidation.GetSources())
+								{
+									if (First)
+										First = false;
+									else
+										sb.AppendLine();
 
-								if (Added)
-									Rec.ListViewIndex = this.AddListItem(Rec.Item);
-								else
-									this.ChatListView.Items[Rec.ListViewIndex] = this.CreateItem(Rec.Item);
-							});
+									sb.Append(Source);
+								}
 
-						}, null);
+								MainWindow.UpdateGui(async () =>
+								{
+									bool Added;
 
-						return;
+									if (Added = (Rec.Item is null))
+										Rec.Item = await ChatItem.CreateAsync(Type, Timestamp, string.Empty, string.Empty, null, ThreadId, FgColor, BgColor);
+
+									Rec.Item.From = sb.ToString();
+									await Rec.Item.Update(Message, Markdown);
+
+									if (Added)
+										Rec.ListViewIndex = this.AddListItem(Rec.Item);
+									else
+										this.ChatListView.Items[Rec.ListViewIndex] = this.CreateItem(Rec.Item);
+								});
+
+							}, null);
+
+							return;
+					}
 				}
-			}
 
-			this.AddListItem(new ChatItem(Type, Timestamp, Message, From, Markdown, ThreadId, FgColor, BgColor));
+				this.AddListItem(await ChatItem.CreateAsync(Type, Timestamp, Message, From, Markdown, ThreadId, FgColor, BgColor));
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 		}
 
 		private class ConsolidationTag
@@ -327,7 +345,7 @@ namespace Waher.Client.WPF.Controls
 			};
 		}
 
-		public void ChatMessageReceived(string Message, string From, string ThreadId, bool IsMarkdown, DateTime Timestamp, MainWindow MainWindow)
+		public async Task ChatMessageReceived(string Message, string From, string ThreadId, bool IsMarkdown, DateTime Timestamp, MainWindow MainWindow)
 		{
 			MarkdownDocument Markdown;
 
@@ -351,7 +369,7 @@ namespace Waher.Client.WPF.Controls
 
 				try
 				{
-					Markdown = new MarkdownDocument(Message, GetMarkdownSettings());
+					Markdown = await MarkdownDocument.CreateAsync(Message, GetMarkdownSettings());
 				}
 				catch (Exception)
 				{
@@ -364,6 +382,7 @@ namespace Waher.Client.WPF.Controls
 			MainWindow.UpdateGui(() =>
 			{
 				this.AddItem(ChatItemType.Received, Timestamp, Message, From, Markdown, ThreadId, Colors.Black, Colors.AliceBlue);
+				return Task.CompletedTask;
 			});
 		}
 
@@ -462,7 +481,7 @@ namespace Waher.Client.WPF.Controls
 			w.Flush();
 		}
 
-		public void OpenButton_Click(object sender, RoutedEventArgs e)
+		public async void OpenButton_Click(object sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -488,7 +507,7 @@ namespace Waher.Client.WPF.Controls
 					};
 					Xml.Load(Dialog.FileName);
 
-					this.Load(Xml, Dialog.FileName);
+					await this.Load(Xml, Dialog.FileName);
 				}
 			}
 			catch (Exception ex)
@@ -498,7 +517,7 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		public void Load(XmlDocument Xml, string FileName)
+		public async Task Load(XmlDocument Xml, string FileName)
 		{
 			MarkdownDocument Markdown;
 			XmlElement E;
@@ -566,7 +585,7 @@ namespace Waher.Client.WPF.Controls
 
 				try
 				{
-					Markdown = new MarkdownDocument(E.InnerText, GetMarkdownSettings());
+					Markdown = await MarkdownDocument.CreateAsync(E.InnerText, GetMarkdownSettings());
 				}
 				catch (Exception)
 				{
@@ -625,6 +644,7 @@ namespace Waher.Client.WPF.Controls
 			MainWindow.UpdateGui(() =>
 			{
 				this.AddItem(ChatItemType.Event, Timestamp, Message, From, Markdown, ThreadId, EventFgColor, EventBgColor);
+				return Task.CompletedTask;
 			});
 		}
 

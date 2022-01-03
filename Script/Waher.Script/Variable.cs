@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Abstraction.Sets;
 using Waher.Script.Objects;
 
 namespace Waher.Script
@@ -100,9 +97,7 @@ namespace Waher.Script
 			get { return this.value.AssociatedObjectValue; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			if (this.value is ObjectValue v)

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
-using System.Net;
 using Waher.Networking.CoAP;
 using Waher.Networking.CoAP.CoRE;
 using Waher.Security.DTLS;
@@ -14,10 +11,10 @@ namespace Waher.Networking.LWM2M
 	/// </summary>
 	public class Lwm2mServerReference
 	{
-		private string remoteEndpoint;
-		private string uri;
+		private readonly string remoteEndpoint;
+		private readonly string uri;
 		private string locationPath = null;
-		private IDtlsCredentials credentials;
+		private readonly IDtlsCredentials credentials;
 		private LinkDocument linkDoc = null;
 		private bool registered = false;
 

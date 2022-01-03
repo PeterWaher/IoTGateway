@@ -133,7 +133,7 @@ namespace Waher.Utility.Asn1ToCSharp
 							{
 								Console.Out.WriteLine("Loading " + FileName + "...");
 
-								Asn1Document Doc = Asn1Document.FromFile(FileName, ImportFolders.ToArray());
+								Asn1Document Doc = Asn1Document.FromFile(FileName, ImportFolders.ToArray()).Result;
 
 								Console.Out.WriteLine("Generating C#...");
 

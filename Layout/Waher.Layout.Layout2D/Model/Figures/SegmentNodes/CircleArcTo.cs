@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -50,12 +51,12 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.radius = new LengthAttribute(Input, "radius");
 			this.clockwise = new BooleanAttribute(Input, "clockwise");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -101,19 +102,21 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
-			if (!(this.radius is null) && this.radius.TryEvaluate(State.Session, out Length R))
-				State.CalcDrawingSize(R, ref this.r, true, ref Relative);
+			EvaluationResult<Length> RadiusLength = await this.radius.TryEvaluate(State.Session);
+			if (RadiusLength.Ok)
+				State.CalcDrawingSize(RadiusLength.Result, ref this.r, true, State);
 			else
 				this.defined = false;
 
-			if (this.clockwise is null || !this.clockwise.TryEvaluate(State.Session, out this.clockDir))
+			EvaluationResult<bool> Clockwise = await this.clockwise.TryEvaluate(State.Session);
+			if (Clockwise.Ok)
+				this.clockDir = Clockwise.Result;
+			else
 				this.defined = false;
-
-			return Relative;
 		}
 
 		/// <summary>
@@ -121,10 +124,12 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
-		public virtual void Measure(DrawingState State, PathState PathState)
+		public virtual Task Measure(DrawingState State, PathState PathState)
 		{
 			if (this.defined)
 				PathState.Set(this.xCoordinate, this.yCoordinate);
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -143,7 +148,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
 		/// <param name="Path">Path being generated.</param>
-		public virtual void Draw(DrawingState State, PathState PathState, SKPath Path)
+		public virtual Task Draw(DrawingState State, PathState PathState, SKPath Path)
 		{
 			if (this.defined)
 			{
@@ -152,6 +157,8 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 					this.clockDir ? SKPathDirection.Clockwise : SKPathDirection.CounterClockwise,
 					this.xCoordinate, this.yCoordinate);
 			}
+	
+			return Task.CompletedTask;
 		}
 
 		// TODO: IDirectedElement

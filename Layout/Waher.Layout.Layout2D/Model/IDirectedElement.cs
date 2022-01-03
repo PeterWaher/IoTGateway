@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Xml;
-using SkiaSharp;
 
 namespace Waher.Layout.Layout2D.Model
 {

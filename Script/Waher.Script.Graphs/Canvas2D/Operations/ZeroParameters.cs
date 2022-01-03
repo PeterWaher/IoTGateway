@@ -1,6 +1,7 @@
 ﻿using System;
 using SkiaSharp;
 using System.Xml;
+using System.Threading.Tasks;
 
 namespace Waher.Script.Graphs.Canvas2D.Operations
 {
@@ -34,8 +35,9 @@ namespace Waher.Script.Graphs.Canvas2D.Operations
 		}
 
 		/// <inheritdoc/>
-		public override void ImportGraph(XmlElement Xml, Variables _)
+		public override Task ImportGraph(XmlElement Xml, Variables _)
 		{
+			return Task.CompletedTask;
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Xml;
 
@@ -37,10 +38,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
 			Output.Append('[');
-			base.GenerateMarkdown(Output);
+			await base.GenerateMarkdown(Output);
 			Output.Append("](abbr:");
 			Output.Append(this.description);
 			Output.Append(')');
@@ -50,14 +51,14 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override async Task GenerateHTML(StringBuilder Output)
 		{
 			Output.Append("<abbr data-title=\"");
 			Output.Append(XML.HtmlAttributeEncode(this.description).Replace(" ", "&nbsp;"));
 			Output.Append("\">");
 
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateHTML(Output);
+				await E.GenerateHTML(Output);
 
 			Output.Append("</abbr>");
 		}
@@ -67,10 +68,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateXAML(Output, TextAlignment);
+				await E.GenerateXAML(Output, TextAlignment);
 		}
 
 		/// <summary>
@@ -78,10 +79,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateXamarinForms(Output, TextAlignment);
+				await E.GenerateXamarinForms(Output, TextAlignment);
 		}
 
 		/// <summary>

@@ -140,9 +140,7 @@ namespace Waher.Networking.XMPP.Sensor
 			return Task.CompletedTask;
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			base.Dispose();

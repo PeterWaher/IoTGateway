@@ -327,9 +327,7 @@
             </summary>
         </member>
         <member name="M:Waher.Persistence.CaseInsensitiveString.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Persistence.CaseInsensitiveString.GetHashCode">
             <summary>
@@ -3480,9 +3478,7 @@
             <returns>Normalized filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterAnd.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterAnd.Passes(System.Object)">
             <summary>
@@ -3580,9 +3576,7 @@
             <returns>Normalized filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterCustom`1.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Persistence.Filters.FilterField">
             <summary>
@@ -3639,9 +3633,7 @@
             <returns>Copy of filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldEqualTo.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldEqualTo.Compare(System.Object,System.Object)">
             <summary>
@@ -3692,9 +3684,7 @@
             <returns>Copy of filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldGreaterOrEqualTo.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldGreaterOrEqualTo.Compare(System.Object,System.Object)">
             <summary>
@@ -3745,9 +3735,7 @@
             <returns>Copy of filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldGreaterThan.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldGreaterThan.Compare(System.Object,System.Object)">
             <summary>
@@ -3798,9 +3786,7 @@
             <returns>Copy of filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldLesserOrEqualTo.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldLesserOrEqualTo.Compare(System.Object,System.Object)">
             <summary>
@@ -3851,9 +3837,7 @@
             <returns>Copy of filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldLesserThan.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldLesserThan.Compare(System.Object,System.Object)">
             <summary>
@@ -3915,9 +3899,7 @@
             <returns>Normalized filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldLikeRegEx.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldLikeRegEx.Compare(System.Object)">
             <summary>
@@ -3951,9 +3933,7 @@
             <returns>Copy of filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldNotEqualTo.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterFieldNotEqualTo.Compare(System.Object,System.Object)">
             <summary>
@@ -4063,9 +4043,7 @@
             <returns>Normalized filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterNot.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterNot.Passes(System.Object)">
             <summary>
@@ -4104,9 +4082,7 @@
             <returns>Normalized filter.</returns>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterOr.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Persistence.Filters.FilterOr.Passes(System.Object)">
             <summary>
@@ -4164,14 +4140,10 @@
             </summary>
         </member>
         <member name="M:Waher.Persistence.FlagSource.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Persistence.FlagSource.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Persistence.IAsyncEnumerator">
             <summary>
@@ -5758,14 +5730,10 @@
             </summary>
         </member>
         <member name="M:Waher.Persistence.Serialization.GenericObject.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Persistence.Serialization.GenericObject.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Persistence.Serialization.GenericObject.HasProperty(System.String)">
             <summary>

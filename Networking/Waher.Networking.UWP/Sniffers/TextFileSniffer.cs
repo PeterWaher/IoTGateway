@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using Waher.Events;
 
 namespace Waher.Networking.Sniffers
@@ -70,7 +71,7 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// Method is called before writing something to the text file.
 		/// </summary>
-		protected override void BeforeWrite()
+		protected override Task BeforeWrite()
 		{
 			if (!(this.file is null))
 			{
@@ -113,20 +114,22 @@ namespace Waher.Networking.Sniffers
 					}
 				}
 			}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Method is called after writing something to the text file.
 		/// </summary>
-		protected override void AfterWrite()
+		protected override Task AfterWrite()
 		{
-			this.file.Dispose();
+			this.file?.Dispose();
 			this.file = null;
+
+			return Task.CompletedTask;
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			base.Dispose();

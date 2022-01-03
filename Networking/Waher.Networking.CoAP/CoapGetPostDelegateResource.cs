@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.CoAP
 {
@@ -9,7 +8,7 @@ namespace Waher.Networking.CoAP
 	/// </summary>
 	public class CoapGetPostDelegateResource : CoapGetDelegateResource, ICoapPostMethod
 	{
-		private CoapMethodHandler post;
+		private readonly CoapMethodHandler post;
 
 		/// <summary>
 		/// CoAP resource defined by GET and POST delegate methods.
@@ -49,12 +48,12 @@ namespace Waher.Networking.CoAP
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void POST(CoapMessage Request, CoapResponse Response)
+		public Task POST(CoapMessage Request, CoapResponse Response)
 		{
 			if (this.post is null)
 				throw new CoapException(CoapCode.MethodNotAllowed);
 			else
-				this.post(Request, Response);
+				return this.post(Request, Response);
 		}
 	}
 }

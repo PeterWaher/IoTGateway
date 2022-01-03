@@ -125,9 +125,7 @@
             </summary>
         </member>
         <member name="M:Waher.Events.Event.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Events.Event.ShoudAvoid(Waher.Events.IEventSink)">
             <summary>

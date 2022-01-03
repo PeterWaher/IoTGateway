@@ -29,9 +29,7 @@ namespace Waher.Networking.XMPP.Authentication
 			this.nonce = Nonce;
 		}
 
-		/// <summary>
-		/// <see cref="AuthenticationMethod.Challenge"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string Challenge(string Challenge, XmppClient Client)
 		{
 			byte[] ChallengeBinary = Convert.FromBase64String(Challenge);
@@ -134,9 +132,7 @@ namespace Waher.Networking.XMPP.Authentication
 
 		private static readonly byte[] One = new byte[] { 0, 0, 0, 1 };
 
-		/// <summary>
-		/// <see cref="AuthenticationMethod.CheckSuccess"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool CheckSuccess(string Success, XmppClient Client)
 		{
 			byte[] ResponseBinary = Convert.FromBase64String(Success);

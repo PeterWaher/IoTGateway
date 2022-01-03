@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Waher.Content.Markdown.Consolidation
 {
@@ -10,10 +11,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <summary>
 		/// Consolidated sources.
 		/// </summary>
-		string[] Sources
-		{
-			get;
-		}
+		Task<string[]> GetSources();
 
 		/// <summary>
 		/// External tag object that can be tagged to the object by its owner.
@@ -27,10 +25,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <summary>
 		/// Number of sources that have reported content.
 		/// </summary>
-		int NrReportedSources
-		{
-			get;
-		}
+		Task<int> GetNrReportedSources();
 
 		/// <summary>
 		/// Adds incoming markdown information.
@@ -38,7 +33,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Source">Source of information.</param>
 		/// <param name="Markdown">Markdown document.</param>
 		/// <returns>If the source is new.</returns>
-		bool Add(string Source, MarkdownDocument Markdown);
+		Task<bool> Add(string Source, MarkdownDocument Markdown);
 
 		/// <summary>
 		/// Adds incoming markdown information.
@@ -47,7 +42,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Markdown">Markdown document.</param>
 		/// <param name="Id">Optional ID of document.</param>
 		/// <returns>If the source is new.</returns>
-		bool Add(string Source, MarkdownDocument Markdown, string Id);
+		Task<bool> Add(string Source, MarkdownDocument Markdown, string Id);
 
 		/// <summary>
 		/// Adds incoming markdown information.
@@ -55,7 +50,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Source">Source of information.</param>
 		/// <param name="Text">Text input.</param>
 		/// <returns>If the source is new.</returns>
-		bool Add(string Source, string Text);
+		Task<bool> Add(string Source, string Text);
 
 		/// <summary>
 		/// Adds incoming markdown information.
@@ -64,7 +59,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Text">Text input.</param>
 		/// <param name="Id">Optional ID of document.</param>
 		/// <returns>If the source is new.</returns>
-		bool Add(string Source, string Text, string Id);
+		Task<bool> Add(string Source, string Text, string Id);
 
 		/// <summary>
 		/// Updates incoming markdown information.
@@ -73,7 +68,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Markdown">Markdown document.</param>
 		/// <param name="Id">Optional ID of document.</param>
 		/// <returns>If the source is new.</returns>
-		bool Update(string Source, MarkdownDocument Markdown, string Id);
+		Task<bool> Update(string Source, MarkdownDocument Markdown, string Id);
 
 		/// <summary>
 		/// Updates incoming markdown information.
@@ -82,7 +77,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Text">Text input.</param>
 		/// <param name="Id">Optional ID of document.</param>
 		/// <returns>If the source is new.</returns>
-		bool Update(string Source, string Text, string Id);
+		Task<bool> Update(string Source, string Text, string Id);
 
 		/// <summary>
 		/// Event raised when content from a source has been added.

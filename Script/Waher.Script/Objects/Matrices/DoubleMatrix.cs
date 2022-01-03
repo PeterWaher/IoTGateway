@@ -117,9 +117,7 @@ namespace Waher.Script.Objects.Matrices
 			get { return this.columns; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			double[,] v = this.Values;

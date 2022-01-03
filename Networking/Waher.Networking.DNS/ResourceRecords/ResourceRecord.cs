@@ -132,9 +132,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 			return Response;
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.name + "\t" + this.type.ToString() + "\t" + this._class.ToString() +

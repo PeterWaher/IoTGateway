@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Runtime.Inventory;
@@ -516,9 +517,7 @@ namespace Waher.Script.Graphs
 			DestValues = NormalizedY;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (!(obj is Graph2D G))
@@ -560,9 +559,7 @@ namespace Waher.Script.Graphs
 			return !(b1 || b2);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = this.minX.GetHashCode();
@@ -973,7 +970,7 @@ namespace Waher.Script.Graphs
 		/// Imports graph specifics from XML.
 		/// </summary>
 		/// <param name="Xml">XML input.</param>
-		public override void ImportGraph(XmlElement Xml)
+		public override async Task ImportGraphAsync(XmlElement Xml)
 		{
 			Variables Variables = new Variables();
 
@@ -1002,19 +999,19 @@ namespace Waher.Script.Graphs
 						break;
 
 					case "minX":
-						this.minX = Parse(Attr.Value, Variables);
+						this.minX = await ParseAsync(Attr.Value, Variables);
 						break;
 
 					case "maxX":
-						this.maxX = Parse(Attr.Value, Variables);
+						this.maxX = await ParseAsync(Attr.Value, Variables);
 						break;
 
 					case "minY":
-						this.minY = Parse(Attr.Value, Variables);
+						this.minY = await ParseAsync(Attr.Value, Variables);
 						break;
 
 					case "maxY":
-						this.maxY = Parse(Attr.Value, Variables);
+						this.maxY = await ParseAsync(Attr.Value, Variables);
 						break;
 
 					case "showXAxis":
@@ -1038,15 +1035,15 @@ namespace Waher.Script.Graphs
 					switch (E.LocalName)
 					{
 						case "X":
-							this.x.AddLast((IVector)Parse(E.InnerText, Variables));
+							this.x.AddLast((IVector)await ParseAsync(E.InnerText, Variables));
 							break;
 
 						case "Y":
-							this.y.AddLast((IVector)Parse(E.InnerText, Variables));
+							this.y.AddLast((IVector)await ParseAsync(E.InnerText, Variables));
 							break;
 
 						case "Parameters":
-							IVector v = (IVector)Parse(E.InnerText, Variables);
+							IVector v = (IVector)await ParseAsync(E.InnerText, Variables);
 							this.parameters.AddLast(this.ToObjectArray(v));
 							break;
 

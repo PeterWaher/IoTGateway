@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
@@ -189,19 +190,19 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Variables">Collection of parameter values.</param>
 		/// <returns>If parameter value is valid.</returns>
-		public override bool IsParameterValid(Variables Variables)
+		public override Task<bool> IsParameterValid(Variables Variables)
 		{
 			int i;
 
 			if (this.value is null)
-				return false;
+				return Task.FromResult<bool>(false);
 
 			if (!(this.min is null))
 			{
 				i = string.Compare(this.value, this.min);
 
 				if (i < 0 || (i == 0 && !this.minIncluded))
-					return false;
+					return Task.FromResult<bool>(false);
 			}
 
 			if (!(this.max is null))
@@ -209,14 +210,14 @@ namespace Waher.Networking.XMPP.Contracts
 				i = string.Compare(this.value, this.max);
 
 				if (i > 0 || (i == 0 && !this.maxIncluded))
-					return false;
+					return Task.FromResult<bool>(false);
 			}
 
 			if (this.minLength.HasValue && this.value.Length < this.minLength.Value)
-				return false;
+				return Task.FromResult<bool>(false);
 
 			if (this.maxLength.HasValue && this.value.Length > this.maxLength.Value)
-				return false;
+				return Task.FromResult<bool>(false);
 
 			if (!string.IsNullOrEmpty(this.regEx))
 			{
@@ -229,7 +230,7 @@ namespace Waher.Networking.XMPP.Contracts
 						this.match = this.parsed.Match(this.value);
 
 					if (!this.match.Success || this.match.Index > 0 || this.match.Length < this.value.Length)
-						return false;
+						return Task.FromResult<bool>(false);
 				}
 				catch (Exception)
 				{

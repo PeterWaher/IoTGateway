@@ -26,31 +26,16 @@ namespace Waher.Content.Markdown.Model
 			this.end = End;
 		}
 
-		public string[] Rows
-		{
-			get { return this.rows; }
-		}
-
-		public int[] Positions
-		{
-			get { return this.positions; }
-		}
-
 		public int Indent
 		{
 			get { return this.indent; }
 			set { this.indent = value; }
 		}
 
-		public int Start
-		{
-			get { return this.start; }
-		}
-
-		public int End
-		{
-			get { return this.end; }
-		}
+		public string[] Rows => this.rows;
+		public int[] Positions => this.positions;
+		public int Start => this.start;
+		public int End => this.end;
 
 		public bool IsPrefixedBy(string Prefix, bool MustHaveWhiteSpaceAfter)
 		{

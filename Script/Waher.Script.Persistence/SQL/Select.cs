@@ -82,6 +82,12 @@ namespace Waher.Script.Persistence.SQL
 			this.CalcSelectOneObject();
 		}
 
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
 		private void CalcSelectOneObject()
 		{
 			this.selectOneObject =
@@ -108,7 +114,7 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public async Task<IElement> EvaluateAsync(Variables Variables)
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
 			IElement E;
 			int Top;
@@ -117,7 +123,7 @@ namespace Waher.Script.Persistence.SQL
 
 			if (!(this.top is null))
 			{
-				E = this.top.Evaluate(Variables);
+				E = await this.top.EvaluateAsync(Variables);
 				Top = (int)Expression.ToDouble(E.AssociatedObjectValue);
 				if (Top <= 0)
 					throw new ScriptRuntimeException("TOP must evaluate to a positive integer.", this.top);
@@ -127,7 +133,7 @@ namespace Waher.Script.Persistence.SQL
 
 			if (!(this.offset is null))
 			{
-				E = this.offset.Evaluate(Variables);
+				E = await this.offset.EvaluateAsync(Variables);
 				Offset = (int)Expression.ToDouble(E.AssociatedObjectValue);
 				if (Offset < 0)
 					throw new ScriptRuntimeException("OFFSET must evaluate to a non-negative integer.", this.offset);
@@ -325,13 +331,18 @@ namespace Waher.Script.Persistence.SQL
 						Names[i++] = N.Name;
 					else
 					{
-						try
-						{
-							E = this.columnNames[i]?.Evaluate(Variables);
-						}
-						catch (Exception)
-						{
+						if (Node is null)
 							E = null;
+						else
+						{
+							try
+							{
+								E = await Node.EvaluateAsync(Variables);
+							}
+							catch (Exception)
+							{
+								E = null;
+							}
 						}
 
 						if (E is null)
@@ -343,7 +354,7 @@ namespace Waher.Script.Persistence.SQL
 							Names[i] = S.Value;
 						else
 							Names[i] = Expression.ToString(E.AssociatedObjectValue);
-					
+
 						i++;
 					}
 				}
@@ -420,45 +431,73 @@ namespace Waher.Script.Persistence.SQL
 				return false;
 			}
 
-			ScriptNode Node = this.source;
-			if (!(this.source is null) && !Callback(ref Node, State))
-				return false;
+			ScriptNode NewNode;
+			bool b;
 
-			if (Node != this.source)
+			if (!(this.source is null))
 			{
-				if (Node is SourceDefinition SourceDef2)
-					this.source = SourceDef2;
-				else
+				b = !Callback(this.source, out NewNode, State);
+				if (!(NewNode is null) && NewNode is SourceDefinition Source2)
+					this.source = Source2;
+
+				if (b)
 					return false;
 			}
 
-			if (!(this.top is null) && !Callback(ref this.top, State))
-				return false;
+			if (!(this.top is null))
+			{
+				b = !Callback(this.top, out NewNode, State);
+				if (!(NewNode is null))
+					this.top = NewNode;
 
-			if (!(this.where is null) && !Callback(ref this.where, State))
-				return false;
+				if (b)
+					return false;
+			}
 
-			if (!(this.having is null) && !Callback(ref this.having, State))
-				return false;
+			if (!(this.where is null))
+			{
+				b = !Callback(this.where, out NewNode, State);
+				if (!(NewNode is null))
+					this.where = NewNode;
 
-			if (!(this.offset is null) && !Callback(ref this.offset, State))
-				return false;
+				if (b)
+					return false;
+			}
+
+			if (!(this.having is null))
+			{
+				b = !Callback(this.having, out NewNode, State);
+				if (!(NewNode is null))
+					this.having = NewNode;
+
+				if (b)
+					return false;
+			}
+
+			if (!(this.offset is null))
+			{
+				b = !Callback(this.offset, out NewNode, State);
+				if (!(NewNode is null))
+					this.offset = NewNode;
+
+				if (b)
+					return false;
+			}
 
 			if (!(this.orderBy is null))
 			{
 				c = this.orderBy.Length;
 				for (i = 0; i < c; i++)
 				{
-					Node = this.orderBy[i].Key;
+					ScriptNode Node = this.orderBy[i].Key;
 					if (!(Node is null))
 					{
-						ScriptNode Node0 = Node;
+						b = !Callback(Node, out NewNode, State);
+						if (!(NewNode is null))
+							this.orderBy[i] = new KeyValuePair<ScriptNode, bool>(NewNode, this.orderBy[i].Value);
 
-						if (!Callback(ref Node, State))
+						if (b)
 							return false;
-
-						if (Node != Node0)
-							this.orderBy[i] = new KeyValuePair<ScriptNode, bool>(Node, this.orderBy[i].Value);
 					}
 				}
 			}
@@ -492,9 +531,7 @@ namespace Waher.Script.Persistence.SQL
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (!(obj is Select O &&
@@ -538,9 +575,7 @@ namespace Waher.Script.Persistence.SQL
 			}
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

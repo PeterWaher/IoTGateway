@@ -42,7 +42,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void BitsOfBinary_Test_01_GetData()
+		public async Task BitsOfBinary_Test_01_GetData()
 		{
 			this.ConnectClients();
 			try
@@ -52,7 +52,7 @@ namespace Waher.Networking.XMPP.Test
 
 				string s = "Hello world.";
 				byte[] Bin = Encoding.UTF8.GetBytes(s);
-				string ContentId = this.bobClient2.StoreData(Bin, "text/plain");
+				string ContentId = await this.bobClient2.StoreData(Bin, "text/plain");
 
 				this.bobClient1.GetData(this.client2.FullJID, ContentId, (sender, e) =>
 				{
@@ -73,7 +73,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void BitsOfBinary_Test_02_GetData_Expires()
+		public async Task BitsOfBinary_Test_02_GetData_Expires()
 		{
 			this.ConnectClients();
 			try
@@ -83,7 +83,7 @@ namespace Waher.Networking.XMPP.Test
 
 				string s = "Hello world.";
 				byte[] Bin = Encoding.UTF8.GetBytes(s);
-				string ContentId = this.bobClient2.StoreData(Bin, "text/plain", DateTime.Now.AddMinutes(1));
+				string ContentId = await this.bobClient2.StoreData(Bin, "text/plain", DateTime.Now.AddMinutes(1));
 
 				this.bobClient1.GetData(this.client2.FullJID, ContentId, (sender, e) =>
 				{

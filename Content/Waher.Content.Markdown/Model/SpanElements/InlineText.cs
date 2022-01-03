@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Markdown.Model.Atoms;
 using Waher.Content.Xml;
@@ -30,40 +31,44 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		public string Value
 		{
-			get { return this.value; }
-			internal set { this.value = value; }
+			get => this.value;
+			internal set => this.value = value;
 		}
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override Task GenerateMarkdown(StringBuilder Output)
 		{
 			Output.Append(MarkdownDocument.Encode(this.value));
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override Task GenerateHTML(StringBuilder Output)
 		{
 			Output.Append(XML.HtmlValueEncode(this.value));
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override Task GeneratePlainText(StringBuilder Output)
 		{
 			Output.Append(this.value);
+		
+			return Task.CompletedTask;
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.value;
@@ -74,9 +79,11 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			Output.WriteValue(this.value);
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -84,19 +91,19 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			GenerateInlineFormattedTextXamarinForms(Output, this);
+			return GenerateInlineFormattedTextXamarinForms(Output, this);
 		}
 
-		internal static void GenerateInlineFormattedTextXamarinForms(XmlWriter Output, MarkdownElement FormattedText)
+		internal static async Task GenerateInlineFormattedTextXamarinForms(XmlWriter Output, MarkdownElement FormattedText)
 		{
 			Output.WriteStartElement("Label");
 			Output.WriteAttributeString("LineBreakMode", "WordWrap");
 			Output.WriteAttributeString("TextType", "Html");
 
 			StringBuilder Html = new StringBuilder();
-			FormattedText.GenerateHTML(Html);
+			await FormattedText.GenerateHTML(Html);
 			Output.WriteCData(Html.ToString());
 
 			Output.WriteEndElement();
@@ -107,19 +114,18 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="Level">Current section level.</param>
-		public override void GenerateSmartContractXml(XmlWriter Output, ref int Level)
+		/// <param name="State">Current rendering state.</param>
+		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
 			Output.WriteElementString("text", this.value);
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get { return true; }
-		}
+		internal override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Exports the element to XML.

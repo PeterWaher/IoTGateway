@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Script.Model
 {
@@ -13,6 +15,11 @@ namespace Waher.Script.Model
 		protected ScriptNode op;
 
 		/// <summary>
+		/// If subtree is asynchroneous.
+		/// </summary>
+		protected bool isAsync;
+
+		/// <summary>
 		/// Base class for all unary operators.
 		/// </summary>
 		/// <param name="Operand">Operand.</param>
@@ -23,15 +30,13 @@ namespace Waher.Script.Model
 			: base(Start, Length, Expression)
 		{
 			this.op = Operand;
+			this.isAsync = Operand?.IsAsynchronous ?? false;
 		}
 
 		/// <summary>
 		/// Operand.
 		/// </summary>
-		public ScriptNode Operand
-		{
-			get { return this.op; }
-		}
+		public ScriptNode Operand => this.op;
 
 		/// <summary>
 		/// Default variable name, if any, null otherwise.
@@ -45,6 +50,57 @@ namespace Waher.Script.Model
 				else
 					return null;
 			}
+		}
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => this.isAsync;
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override IElement Evaluate(Variables Variables)
+		{
+			IElement Operand = this.op.Evaluate(Variables);
+
+			return this.Evaluate(Operand, Variables);
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!this.isAsync)
+				return this.Evaluate(Variables);
+
+			IElement Operand = await this.op.EvaluateAsync(Variables);
+			return await this.EvaluateAsync(Operand, Variables);
+		}
+
+		/// <summary>
+		/// Evaluates the operator.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result</returns>
+		public abstract IElement Evaluate(IElement Operand, Variables Variables);
+
+		/// <summary>
+		/// Evaluates the operator.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result</returns>
+		public virtual Task<IElement> EvaluateAsync(IElement Operand, Variables Variables)
+		{
+			return Task.FromResult<IElement>(this.Evaluate(Operand, Variables));
 		}
 
 		/// <summary>
@@ -62,8 +118,18 @@ namespace Waher.Script.Model
 					return false;
 			}
 
-			if (!(this.op is null) && !Callback(ref this.op, State))
-				return false;
+			if (!(this.op is null))
+			{
+				bool b = !Callback(this.op, out ScriptNode NewNode, State);
+				if (!(NewNode is null))
+				{
+					this.op = NewNode;
+					this.isAsync = NewNode.IsAsynchronous;
+				}
+
+				if (b)
+					return false;
+			}
 
 			if (!DepthFirst)
 			{
@@ -74,9 +140,7 @@ namespace Waher.Script.Model
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is UnaryOperator O &&
@@ -84,9 +148,7 @@ namespace Waher.Script.Model
 				base.Equals(obj);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

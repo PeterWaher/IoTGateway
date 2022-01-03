@@ -60,7 +60,7 @@ namespace Waher.IoTGateway.WebResources
 			if (!Request.HasData)
 				throw new BadRequestException();
 
-			if (!(Request.DecodeData() is string FileName))
+			if (!(await Request.DecodeDataAsync() is string FileName))
 				throw new BadRequestException();
 
 			string Dir;

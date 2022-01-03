@@ -771,8 +771,18 @@ namespace Waher.IoTGateway
 
 				Types.SetModuleParameter("HTTP", webServer);
 
-				WriteWebServerOpenPorts();
-				webServer.OnNetworkChanged += (sender, e) => WriteWebServerOpenPorts();
+				await WriteWebServerOpenPorts();
+				webServer.OnNetworkChanged += async (sender, e) =>
+				{
+					try
+					{
+						await WriteWebServerOpenPorts();
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				};
 
 				webServer.Register(new HttpFolderResource("/Graphics", Path.Combine(appDataFolder, "Graphics"), false, false, true, false, HostDomainOptions.SameForAllDomains)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/Transforms", Path.Combine(appDataFolder, "Transforms"), false, false, true, false, HostDomainOptions.SameForAllDomains)); // TODO: Add authentication mechanisms for PUT & DELETE.
@@ -940,7 +950,7 @@ namespace Waher.IoTGateway
 								{
 									Log.Informational("Importing language file.", FileName);
 
-									string Xml = File.ReadAllText(LanguageFile);
+									string Xml = await Resources.ReadAllTextAsync(LanguageFile);
 									XmlDocument Doc = new XmlDocument()
 									{
 										PreserveWhitespace = true
@@ -968,7 +978,7 @@ namespace Waher.IoTGateway
 					{
 						try
 						{
-							string Msg = File.ReadAllText(UnhandledException);
+							string Msg = await Resources.ReadAllTextAsync(UnhandledException);
 							File.Delete(UnhandledException);
 							Log.Alert("Unhandled Exception\r\n=======================\r\n\r\n```\r\n" + Msg + "\r\n```");
 						}
@@ -1085,7 +1095,7 @@ namespace Waher.IoTGateway
 			}
 		}
 
-		private static void WriteWebServerOpenPorts()
+		private static async Task WriteWebServerOpenPorts()
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -1094,7 +1104,7 @@ namespace Waher.IoTGateway
 
 			try
 			{
-				File.WriteAllText(appDataFolder + "Ports.txt", sb.ToString());
+				await Resources.WriteAllTextAsync(appDataFolder + "Ports.txt", sb.ToString());
 			}
 			catch (Exception ex)
 			{
@@ -3147,19 +3157,19 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Graph">Graph to send.</param>
 		/// <param name="Settings">Graph settings.</param>
-		public static void SendNotification(Graph Graph, GraphSettings Settings)
+		public static Task SendNotification(Graph Graph, GraphSettings Settings)
 		{
 			PixelInformation Pixels = Graph.CreatePixels(Settings);
-			Gateway.SendNotification(Pixels);
+			return Gateway.SendNotification(Pixels);
 		}
 
 		/// <summary>
 		/// Sends an image as a notification message to configured notification recipients.
 		/// </summary>
 		/// <param name="Pixels">Pixels to send.</param>
-		public static void SendNotification(PixelInformation Pixels)
+		public static async Task SendNotification(PixelInformation Pixels)
 		{
-			byte[] Data = InternetContent.Encode(Pixels, null, out string ContentType);
+			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Pixels, null);
 			StringBuilder sb = new StringBuilder();
 
 			sb.Append("<figure>");
@@ -3168,32 +3178,22 @@ namespace Waher.IoTGateway
 			sb.Append("\" height=\"");
 			sb.Append(Pixels.Height.ToString());
 			sb.Append("\" src=\"data:");
-			sb.Append(ContentType);
+			sb.Append(P.Value);
 			sb.Append(";base64,");
-			sb.Append(Convert.ToBase64String(Data, 0, Data.Length));
+			sb.Append(Convert.ToBase64String(P.Key, 0, P.Key.Length));
 			sb.Append("\" />");
 			sb.Append("</figure>");
 
-			SendNotification(sb.ToString());
+			await SendNotification(sb.ToString());
 		}
 
 		/// <summary>
 		/// Sends a notification message to configured notification recipients.
 		/// </summary>
 		/// <param name="Markdown">Markdown of message.</param>
-		public static void SendNotification(string Markdown)
+		public static Task SendNotification(string Markdown)
 		{
-			SendNotification(Markdown, string.Empty, false);
-		}
-
-		/// <summary>
-		/// Sends a notification message to configured notification recipients.
-		/// </summary>
-		/// <param name="Markdown">Markdown of message.</param>
-		/// <param name="MessageId">Message ID</param>
-		public static void SendNotification(string Markdown, string MessageId)
-		{
-			SendNotification(Markdown, MessageId, false);
+			return SendNotification(Markdown, string.Empty, false);
 		}
 
 		/// <summary>
@@ -3201,9 +3201,19 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Markdown">Markdown of message.</param>
 		/// <param name="MessageId">Message ID</param>
-		public static void SendNotificationUpdate(string Markdown, string MessageId)
+		public static Task SendNotification(string Markdown, string MessageId)
 		{
-			SendNotification(Markdown, MessageId, true);
+			return SendNotification(Markdown, MessageId, false);
+		}
+
+		/// <summary>
+		/// Sends a notification message to configured notification recipients.
+		/// </summary>
+		/// <param name="Markdown">Markdown of message.</param>
+		/// <param name="MessageId">Message ID</param>
+		public static Task SendNotificationUpdate(string Markdown, string MessageId)
+		{
+			return SendNotification(Markdown, MessageId, true);
 		}
 
 		/// <summary>
@@ -3212,12 +3222,12 @@ namespace Waher.IoTGateway
 		/// <param name="Markdown">Markdown of message.</param>
 		/// <param name="MessageId">Message ID</param>
 		/// <param name="Update">If its an update notification</param>
-		private static void SendNotification(string Markdown, string MessageId, bool Update)
+		private static async Task SendNotification(string Markdown, string MessageId, bool Update)
 		{
 			try
 			{
 				CaseInsensitiveString[] Addresses = GetNotificationAddresses();
-				(string Text, string Html) = ConvertMarkdown(Markdown);
+				(string Text, string Html) = await ConvertMarkdown(Markdown);
 
 				foreach (CaseInsensitiveString Admin in Addresses)
 					SendNotification(Admin, Markdown, Text, Html, MessageId, Update);
@@ -3228,7 +3238,7 @@ namespace Waher.IoTGateway
 			}
 		}
 
-		private static (string, string) ConvertMarkdown(string Markdown)
+		private static async Task<(string, string)> ConvertMarkdown(string Markdown)
 		{
 			MarkdownSettings Settings = new MarkdownSettings()
 			{
@@ -3238,9 +3248,9 @@ namespace Waher.IoTGateway
 					XmlEntitiesOnly = true
 				}
 			};
-			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings);
-			string Text = Doc.GeneratePlainText();
-			string Html = HtmlDocument.GetBody(Doc.GenerateHTML());
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
+			string Text = await Doc.GeneratePlainText();
+			string Html = HtmlDocument.GetBody(await Doc.GenerateHTML());
 
 			return (Text, Html);
 		}
@@ -3276,9 +3286,9 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Markdown">Markdown containing text to send.</param>
 		/// <param name="To">Recipient of chat message.</param>
-		public static void SendChatMessage(string Markdown, string To)
+		public static Task SendChatMessage(string Markdown, string To)
 		{
-			SendChatMessage(Markdown, To, string.Empty);
+			return SendChatMessage(Markdown, To, string.Empty);
 		}
 
 		/// <summary>
@@ -3287,9 +3297,9 @@ namespace Waher.IoTGateway
 		/// <param name="Markdown">Markdown containing text to send.</param>
 		/// <param name="To">Recipient of chat message.</param>
 		/// <param name="MessageId">Message ID to use.</param>
-		public static void SendChatMessage(string Markdown, string To, string MessageId)
+		public static Task SendChatMessage(string Markdown, string To, string MessageId)
 		{
-			SendChatMessage(Markdown, To, MessageId, string.Empty);
+			return SendChatMessage(Markdown, To, MessageId, string.Empty);
 		}
 
 		/// <summary>
@@ -3299,9 +3309,9 @@ namespace Waher.IoTGateway
 		/// <param name="To">Recipient of chat message.</param>
 		/// <param name="MessageId">Message ID to use.</param>
 		/// <param name="ThreadId">Thread ID</param>
-		public static void SendChatMessage(string Markdown, string To, string MessageId, string ThreadId)
+		public static async Task SendChatMessage(string Markdown, string To, string MessageId, string ThreadId)
 		{
-			(string Text, string Html) = ConvertMarkdown(Markdown);
+			(string Text, string Html) = await ConvertMarkdown(Markdown);
 			SendChatMessage(MessageType.Chat, Markdown, Text, Html, To, MessageId, ThreadId, false);
 		}
 
@@ -3311,9 +3321,9 @@ namespace Waher.IoTGateway
 		/// <param name="Markdown">Markdown containing text to send.</param>
 		/// <param name="To">Recipient of chat message.</param>
 		/// <param name="MessageId">Message ID of message to update.</param>
-		public static void SendChatMessageUpdate(string Markdown, string To, string MessageId)
+		public static Task SendChatMessageUpdate(string Markdown, string To, string MessageId)
 		{
-			SendChatMessageUpdate(Markdown, To, MessageId, string.Empty);
+			return SendChatMessageUpdate(Markdown, To, MessageId, string.Empty);
 		}
 
 		/// <summary>
@@ -3323,9 +3333,9 @@ namespace Waher.IoTGateway
 		/// <param name="To">Recipient of chat message.</param>
 		/// <param name="MessageId">Message ID of message to update.</param>
 		/// <param name="ThreadId">Thread ID</param>
-		public static void SendChatMessageUpdate(string Markdown, string To, string MessageId, string ThreadId)
+		public static async Task SendChatMessageUpdate(string Markdown, string To, string MessageId, string ThreadId)
 		{
-			(string Text, string Html) = ConvertMarkdown(Markdown);
+			(string Text, string Html) = await ConvertMarkdown(Markdown);
 			SendChatMessage(MessageType.Chat, Markdown, Text, Html, To, MessageId, ThreadId, true);
 		}
 
@@ -3334,9 +3344,9 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Markdown">Markdown containing text to send.</param>
 		/// <param name="To">Recipient of chat message.</param>
-		public static void SendGroupChatMessage(string Markdown, string To)
+		public static Task SendGroupChatMessage(string Markdown, string To)
 		{
-			SendGroupChatMessage(Markdown, To, string.Empty);
+			return SendGroupChatMessage(Markdown, To, string.Empty);
 		}
 
 		/// <summary>
@@ -3345,9 +3355,9 @@ namespace Waher.IoTGateway
 		/// <param name="Markdown">Markdown containing text to send.</param>
 		/// <param name="To">Recipient of chat message.</param>
 		/// <param name="MessageId">Message ID to use.</param>
-		public static void SendGroupChatMessage(string Markdown, string To, string MessageId)
+		public static Task SendGroupChatMessage(string Markdown, string To, string MessageId)
 		{
-			SendGroupChatMessage(Markdown, To, MessageId, string.Empty);
+			return SendGroupChatMessage(Markdown, To, MessageId, string.Empty);
 		}
 
 		/// <summary>
@@ -3357,9 +3367,9 @@ namespace Waher.IoTGateway
 		/// <param name="To">Recipient of chat message.</param>
 		/// <param name="MessageId">Message ID to use.</param>
 		/// <param name="ThreadId">Thread ID</param>
-		public static void SendGroupChatMessage(string Markdown, string To, string MessageId, string ThreadId)
+		public static async Task SendGroupChatMessage(string Markdown, string To, string MessageId, string ThreadId)
 		{
-			(string Text, string Html) = ConvertMarkdown(Markdown);
+			(string Text, string Html) = await ConvertMarkdown(Markdown);
 			SendChatMessage(MessageType.GroupChat, Markdown, Text, Html, To, MessageId, ThreadId, false);
 		}
 
@@ -3369,9 +3379,9 @@ namespace Waher.IoTGateway
 		/// <param name="Markdown">Markdown containing text to send.</param>
 		/// <param name="To">Recipient of chat message.</param>
 		/// <param name="MessageId">Message ID of message to update.</param>
-		public static void SendGroupChatMessageUpdate(string Markdown, string To, string MessageId)
+		public static Task SendGroupChatMessageUpdate(string Markdown, string To, string MessageId)
 		{
-			SendGroupChatMessageUpdate(Markdown, To, MessageId, string.Empty);
+			return SendGroupChatMessageUpdate(Markdown, To, MessageId, string.Empty);
 		}
 
 		/// <summary>
@@ -3381,9 +3391,9 @@ namespace Waher.IoTGateway
 		/// <param name="To">Recipient of chat message.</param>
 		/// <param name="MessageId">Message ID of message to update.</param>
 		/// <param name="ThreadId">Thread ID</param>
-		public static void SendGroupChatMessageUpdate(string Markdown, string To, string MessageId, string ThreadId)
+		public static async Task SendGroupChatMessageUpdate(string Markdown, string To, string MessageId, string ThreadId)
 		{
-			(string Text, string Html) = ConvertMarkdown(Markdown);
+			(string Text, string Html) = await ConvertMarkdown(Markdown);
 			SendChatMessage(MessageType.GroupChat, Markdown, Text, Html, To, MessageId, ThreadId, true);
 		}
 
@@ -3392,9 +3402,9 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Markdown">Markdown containing message text. Used to generate plain text and HTML copies of the same content.</param>
 		/// <returns>Multi-format XML for chat message.</returns>
-		public static string GetMultiFormatChatMessageXml(string Markdown)
+		public static async Task<string> GetMultiFormatChatMessageXml(string Markdown)
 		{
-			(string Text, string Html) = ConvertMarkdown(Markdown);
+			(string Text, string Html) = await ConvertMarkdown(Markdown);
 			return GetMultiFormatChatMessageXml(Text, Html, Markdown);
 		}
 
@@ -3720,7 +3730,6 @@ namespace Waher.IoTGateway
 				{
 					Request = new ContractSignatureRequest()
 					{
-						Contract = Contract,
 						Received = DateTime.Now,
 						Signed = null,
 						ContractId = Contract.ContractId,
@@ -3730,9 +3739,11 @@ namespace Waher.IoTGateway
 						Purpose = Purpose
 					};
 
+					Request.SetContract(Contract);
+
 					await Database.Insert(Request);
 
-					Markdown = File.ReadAllText(Path.Combine(rootFolder, "Settings", "SignatureRequest.md"));
+					Markdown = await Resources.ReadAllTextAsync(Path.Combine(rootFolder, "Settings", "SignatureRequest.md"));
 
 					int i = Markdown.IndexOf("~~~~~~");
 					int c = Markdown.Length;
@@ -3754,7 +3765,7 @@ namespace Waher.IoTGateway
 						new Variable("RequestId", Request.ObjectId),
 						new Variable("Request", Request));
 					MarkdownSettings Settings = new MarkdownSettings(emoji1_24x24, false, Variables);
-					Markdown = MarkdownDocument.Preprocess(Markdown, Settings);
+					Markdown = await MarkdownDocument.Preprocess(Markdown, Settings);
 
 					StringBuilder sb = new StringBuilder(Markdown);
 
@@ -3773,7 +3784,7 @@ namespace Waher.IoTGateway
 						GetUrl("/SignatureRequest.md?RequestId=" + Request.ObjectId) + ") is waiting for your signature.";
 				}
 
-				SendNotification(Markdown);
+				await SendNotification(Markdown);
 			}
 			catch (Exception ex)
 			{
@@ -3962,7 +3973,7 @@ namespace Waher.IoTGateway
 
 		private static readonly Dictionary<string, KeyValuePair<DateTime, MarkdownDocument>> defaultDocuments = new Dictionary<string, KeyValuePair<DateTime, MarkdownDocument>>();
 
-		private static void WebServer_CustomError(object Sender, CustomErrorEventArgs e)
+		private static async Task WebServer_CustomError(object Sender, CustomErrorEventArgs e)
 		{
 			Networking.HTTP.HeaderFields.HttpFieldAccept Accept = e.Request?.Header?.Accept;
 			if (Accept is null || Accept.Value == "*/*")
@@ -3970,7 +3981,7 @@ namespace Waher.IoTGateway
 
 			if (Accept.IsAcceptable("text/html"))
 			{
-				string Html = GetCustomErrorHtml(e.Request, e.StatusCode.ToString() + ".md", e.ContentType, e.Content);
+				string Html = await GetCustomErrorHtml(e.Request, e.StatusCode.ToString() + ".md", e.ContentType, e.Content);
 
 				if (!string.IsNullOrEmpty(Html))
 					e.SetContent("text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html));
@@ -3985,7 +3996,7 @@ namespace Waher.IoTGateway
 		/// <param name="ContentType">Content-Type of embedded content.</param>
 		/// <param name="Content">Binary encoding of embedded content.</param>
 		/// <returns>HTML document, if it could be found and generated, or null otherwise.</returns>
-		public static string GetCustomErrorHtml(HttpRequest Request, string LocalFileName, string ContentType, byte[] Content)
+		public static async Task<string> GetCustomErrorHtml(HttpRequest Request, string LocalFileName, string ContentType, byte[] Content)
 		{
 			bool IsText;
 			bool IsMarkdown;
@@ -4033,7 +4044,7 @@ namespace Waher.IoTGateway
 
 					if (Doc is null || TP2 > TP)
 					{
-						Markdown = File.ReadAllText(FullFileName);
+						Markdown = await Resources.ReadAllTextAsync(FullFileName);
 						Settings = new MarkdownSettings(emoji1_24x24, true)
 						{
 							RootFolder = rootFolder,
@@ -4043,7 +4054,7 @@ namespace Waher.IoTGateway
 						if (!Settings.Variables.ContainsVariable("Request"))
 							Settings.Variables["Request"] = Request;
 
-						Doc = new MarkdownDocument(Markdown, Settings, RootFolder, string.Empty, string.Empty);
+						Doc = await MarkdownDocument.CreateAsync(Markdown, Settings, RootFolder, string.Empty, string.Empty);
 
 						lock (defaultDocuments)
 						{
@@ -4076,16 +4087,27 @@ namespace Waher.IoTGateway
 						if (IsText)
 						{
 							MarkdownSettings Settings2 = new MarkdownSettings(null, false);
-							Detail = new MarkdownDocument("```\r\n" + Markdown + "\r\n```", Settings2);
+							Detail = await MarkdownDocument.CreateAsync("```\r\n" + Markdown + "\r\n```", Settings2);
 						}
 						else
-							Detail = new MarkdownDocument(Markdown, Doc.Settings);
+							Detail = await MarkdownDocument.CreateAsync(Markdown, Doc.Settings);
 					}
 
-					lock (Doc)
+					if (!(Doc.Tag is SemaphoreSlim Semaphore))
+					{
+						Semaphore = new SemaphoreSlim(1);
+						Doc.Tag = Semaphore;
+					}
+
+					await Semaphore.WaitAsync(30000);
+					try
 					{
 						Doc.Detail = Detail;
-						return Doc.GenerateHTML();
+						return await Doc.GenerateHTML();
+					}
+					finally
+					{
+						Semaphore.Release();
 					}
 				}
 				else

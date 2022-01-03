@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.CoAP.Options;
 
 namespace Waher.Networking.CoAP
@@ -13,14 +13,14 @@ namespace Waher.Networking.CoAP
 	{
 		private Dictionary<string, string> uriQuery = null;
 		private Dictionary<string, string> locationQuery = null;
-		private CoapOption[] options;
-		private CoapMessageType type;
-		private CoapCode code;
-		private IPEndPoint from;
+		private readonly CoapOption[] options;
+		private readonly CoapMessageType type;
+		private readonly CoapCode code;
+		private readonly IPEndPoint from;
 		private Uri baseUri = null;
 		private byte[] payload;
-		private ushort messageId;
-		private ulong token;
+		private readonly ushort messageId;
+		private readonly ulong token;
 		private string host = null;
 		private string path = null;
 		private string subPath = null;
@@ -296,14 +296,24 @@ namespace Waher.Networking.CoAP
 		/// Decodes the payload of the message.
 		/// </summary>
 		/// <returns>Decoded payload.</returns>
+		[Obsolete("Use DecodeAsync instead, for better asynchronous performance.")]
 		public object Decode()
+		{
+			return this.DecodeAsync().Result;
+		}
+
+		/// <summary>
+		/// Decodes the payload of the message.
+		/// </summary>
+		/// <returns>Decoded payload.</returns>
+		public async Task<object> DecodeAsync()
 		{
 			if (this.payload is null)
 				return null;
 			else if (!this.contentFormat.HasValue)
 				return this.payload;
 			else
-				return CoapEndpoint.Decode((int)this.contentFormat.Value, this.payload, this.baseUri);
+				return await CoapEndpoint.DecodeAsync((int)this.contentFormat.Value, this.payload, this.baseUri);
 		}
 
 		/// <summary>

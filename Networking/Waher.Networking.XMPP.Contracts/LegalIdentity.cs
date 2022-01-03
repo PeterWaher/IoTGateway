@@ -596,9 +596,7 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (!(obj is LegalIdentity ID))
@@ -660,9 +658,7 @@ namespace Waher.Networking.XMPP.Contracts
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = this.id.GetHashCode();

@@ -153,14 +153,14 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		protected override string ConfigPrivilege => "Admin.Data.Database";
 
-		private Task SelectDatabase(HttpRequest Request, HttpResponse Response)
+		private async Task SelectDatabase(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException();
 
-			object Obj = Request.DecodeData();
+			object Obj = await Request.DecodeDataAsync();
 			if (!(Obj is string PluginName))
 				throw new BadRequestException();
 
@@ -200,20 +200,20 @@ namespace Waher.IoTGateway.Setup
 				ResourceName = Path.Combine(Gateway.RootFolder, ResourceName);
 				if (File.Exists(ResourceName))
 				{
-					string Markdown = File.ReadAllText(ResourceName);
+					string Markdown = await Resources.ReadAllTextAsync(ResourceName);
 					MarkdownSettings Settings = new MarkdownSettings()
 					{
 						Variables = Request.Session
 					};
-					MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings);
+					MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
 
-					Html = Doc.GenerateHTML();
+					Html = await Doc.GenerateHTML();
 					Html = HtmlDocument.GetBody(Html);
 					HasSettings = true;
 				}
 			}
 
-			return Response.Write(JSON.Encode(new Dictionary<string, object>()
+			await Response.Write(JSON.Encode(new Dictionary<string, object>()
 			{
 				{ "html", Html },
 				{ "isDone", this.Step >= 1 },
@@ -229,7 +229,7 @@ namespace Waher.IoTGateway.Setup
 			if (!Request.HasData)
 				throw new BadRequestException();
 
-			object Obj = Request.DecodeData();
+			object Obj = await Request.DecodeDataAsync();
 			if (!(Obj is Dictionary<string, object> Form))
 				throw new BadRequestException();
 

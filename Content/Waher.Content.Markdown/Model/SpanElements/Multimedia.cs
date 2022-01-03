@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Runtime.Inventory;
 using Waher.Events;
@@ -34,29 +35,23 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// Multimedia items.
 		/// </summary>
-		public MultimediaItem[] Items
-		{
-			get { return this.items; }
-		}
+		public MultimediaItem[] Items => this.items;
 
 		/// <summary>
 		/// If the element is alone in a paragraph.
 		/// </summary>
-		public bool AloneInParagraph
-		{
-			get { return this.aloneInParagraph; }
-		}
+		public bool AloneInParagraph => this.aloneInParagraph;
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
 			bool First = true;
 
 			Output.Append("![");
-			base.GenerateMarkdown(Output);
+			await base.GenerateMarkdown(Output);
 			Output.Append(']');
 
 			foreach (MultimediaItem Item in this.items)
@@ -100,18 +95,18 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override Task GenerateHTML(StringBuilder Output)
 		{
-			this.MultimediaHandler.GenerateHTML(Output, this.items, this.Children, this.aloneInParagraph, this.Document);
+			return this.MultimediaHandler.GenerateHTML(Output, this.items, this.Children, this.aloneInParagraph, this.Document);
 		}
 
 		/// <summary>
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override Task GeneratePlainText(StringBuilder Output)
 		{
-			this.MultimediaHandler.GeneratePlainText(Output, this.items, this.Children, this.aloneInParagraph, this.Document);
+			return this.MultimediaHandler.GeneratePlainText(Output, this.items, this.Children, this.aloneInParagraph, this.Document);
 		}
 
 		/// <summary>
@@ -232,9 +227,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			this.MultimediaHandler.GenerateXAML(Output, TextAlignment, this.items, this.Children, this.aloneInParagraph, this.Document);
+			return this.MultimediaHandler.GenerateXAML(Output, TextAlignment, this.items, this.Children, this.aloneInParagraph, this.Document);
 		}
 
 		/// <summary>
@@ -242,26 +237,20 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			this.MultimediaHandler.GenerateXamarinForms(Output, TextAlignment, this.items, this.Children, this.aloneInParagraph, this.Document);
+			return this.MultimediaHandler.GenerateXamarinForms(Output, TextAlignment, this.items, this.Children, this.aloneInParagraph, this.Document);
 		}
 
 		/// <summary>
 		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
 		/// </summary>
-		internal override bool OutsideParagraph
-		{
-			get { return true; }
-		}
+		internal override bool OutsideParagraph => true;
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get { return true; }
-		}
+		internal override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Exports the element to XML.

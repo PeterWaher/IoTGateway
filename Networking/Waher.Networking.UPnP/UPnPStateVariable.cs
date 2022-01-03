@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 
@@ -145,7 +146,7 @@ namespace Waher.Networking.UPnP
 		/// </summary>
 		/// <param name="Value">Value</param>
 		/// <returns>XML string representation.</returns>
-		public string ValueToXmlString(object Value)
+		public async Task<string> ValueToXmlString(object Value)
 		{
 			switch (this.dataType)
 			{
@@ -279,13 +280,13 @@ namespace Waher.Networking.UPnP
 
 				case "bin.base64":
 					if (!(Value is byte[] Bin))
-						Bin = SerializeToBinary(Value);
+						Bin = await SerializeToBinary(Value);
 
 					return Convert.ToBase64String(Bin);
 
 				case "bin.hex":
 					if (!(Value is byte[] Bin2))
-						Bin2 = SerializeToBinary(Value);
+						Bin2 = await SerializeToBinary(Value);
 
 					StringBuilder sb = new StringBuilder();
 
@@ -377,7 +378,7 @@ namespace Waher.Networking.UPnP
 					byte b;
 					char ch;
 
-					for (i = j = 0; i < c; )
+					for (i = j = 0; i < c;)
 					{
 						ch = Value[i++];
 
@@ -417,12 +418,15 @@ namespace Waher.Networking.UPnP
 		/// </summary>
 		/// <param name="Value">Value</param>
 		/// <returns>Binary serialization.</returns>
-		public static byte[] SerializeToBinary(object Value)
+		public static async Task<byte[]> SerializeToBinary(object Value)
 		{
 			if (Value is byte[] Bin)
 				return Bin;
 			else
-				return InternetContent.Encode(Value, Encoding.UTF8, out string _);
+			{
+				KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Value, Encoding.UTF8);
+				return P.Key;
+			}
 		}
 	}
 }

@@ -56,9 +56,7 @@ namespace Waher.Script.Objects
 			set { this.unit = value; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			if (this.unit.IsEmpty)
@@ -151,9 +149,7 @@ namespace Waher.Script.Objects
 			return new PhysicalQuantity(-this.magnitude, this.unit);
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (!(obj is PhysicalQuantity E))
@@ -173,9 +169,7 @@ namespace Waher.Script.Objects
 			}
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			return this.magnitude.GetHashCode() ^ this.unit.GetHashCode();

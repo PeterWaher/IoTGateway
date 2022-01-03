@@ -335,7 +335,10 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 							case 1:
 								MainWindow.UpdateGui(() =>
-									this.Add(e.Result[0].Unlocalized));
+									{
+										this.Add(e.Result[0].Unlocalized);
+										return Task.CompletedTask;
+									});
 								break;
 
 							default:
@@ -355,6 +358,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 										if (Item.HasValue)
 											this.Add(Item.Value.Unlocalized);
 									}
+
+									return Task.CompletedTask;
 								});
 								break;
 						}
@@ -383,9 +388,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 					if (e.Ok)
 					{
-						MainWindow.UpdateGui(() =>
+						MainWindow.UpdateGui(async () =>
 						{
-							ParameterDialog Dialog = new ParameterDialog(e.Form);
+							ParameterDialog Dialog = await ParameterDialog.CreateAsync(e.Form);
 							Dialog.ShowDialog();
 						});
 					}
@@ -476,9 +481,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 					if (e.Ok)
 					{
-						MainWindow.UpdateGui(() =>
+						MainWindow.UpdateGui(async () =>
 						{
-							ParameterDialog Dialog = new ParameterDialog(e.Form);
+							ParameterDialog Dialog = await ParameterDialog.CreateAsync(e.Form);
 							Dialog.ShowDialog();
 						});
 					}
@@ -659,9 +664,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 								if (e2.Ok)
 								{
-									MainWindow.UpdateGui(() =>
+									MainWindow.UpdateGui(async () =>
 									{
-										ParameterDialog Dialog = new ParameterDialog(e2.Form);
+										ParameterDialog Dialog = await ParameterDialog.CreateAsync(e2.Form);
 										Dialog.ShowDialog();
 									});
 								}
@@ -687,9 +692,9 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 								if (e2.Ok)
 								{
-									MainWindow.UpdateGui(() =>
+									MainWindow.UpdateGui(async () =>
 									{
-										ParameterDialog Dialog = new ParameterDialog(e2.Form);
+										ParameterDialog Dialog = await ParameterDialog.CreateAsync(e2.Form);
 										Dialog.ShowDialog();
 									});
 								}
@@ -702,12 +707,12 @@ namespace Waher.Client.WPF.Model.Concentrator
 							{
 								if (e2.Ok)
 								{
-									MainWindow.UpdateGui(() =>
+									MainWindow.UpdateGui(async () =>
 									{
 										TabItem TabItem = MainWindow.NewTab(Command.Name, out TextBlock HeaderLabel);
 										MainWindow.currentInstance.Tabs.Items.Add(TabItem);
 
-										QueryResultView ResultView = new QueryResultView(this, e2.Query, HeaderLabel);
+										QueryResultView ResultView = await QueryResultView.CreateAsync(this, e2.Query, HeaderLabel);
 										TabItem.Content = ResultView;
 
 										TabItem.Focus();
@@ -737,7 +742,7 @@ namespace Waher.Client.WPF.Model.Concentrator
 				if (!string.IsNullOrEmpty(Command.SuccessString))
 					MainWindow.MessageBox(Command.SuccessString, "Success", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
 			}
-			else if (!string.IsNullOrEmpty(e.From))		// If error not sent from node, user has cancelled the command.
+			else if (!string.IsNullOrEmpty(e.From))     // If error not sent from node, user has cancelled the command.
 			{
 				if (!string.IsNullOrEmpty(Command.FailureString))
 					MainWindow.MessageBox(Command.FailureString, "Failure", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);

@@ -18,6 +18,11 @@ namespace Waher.Script.Model
 		protected ScriptNode right;
 
 		/// <summary>
+		/// If subtree is asynchroneous.
+		/// </summary>
+		protected bool isAsync;
+
+		/// <summary>
 		/// Base class for all binary operators.
 		/// </summary>
 		/// <param name="Left">Left operand.</param>
@@ -30,23 +35,29 @@ namespace Waher.Script.Model
 		{
 			this.left = Left;
 			this.right = Right;
+		
+			this.CalcIsAsync();
+		}
+
+		/// <summary>
+		/// Recalculates if operator is asynchronous or not.
+		/// </summary>
+		protected virtual void CalcIsAsync()
+		{
+			this.isAsync =
+				(this.left?.IsAsynchronous ?? false) ||
+				(this.right?.IsAsynchronous ?? false);
 		}
 
 		/// <summary>
 		/// Left operand.
 		/// </summary>
-		public ScriptNode LeftOperand
-		{
-			get { return this.left; }
-		}
+		public ScriptNode LeftOperand => this.left;
 
 		/// <summary>
 		/// Right operand.
 		/// </summary>
-		public ScriptNode RightOperand
-		{
-			get { return this.right; }
-		}
+		public ScriptNode RightOperand => this.right;
 
 		/// <summary>
 		/// Default variable name, if any, null otherwise.
@@ -72,6 +83,12 @@ namespace Waher.Script.Model
 		}
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => this.isAsync;
+
+		/// <summary>
 		/// Calls the callback method for all child nodes.
 		/// </summary>
 		/// <param name="Callback">Callback method to call.</param>
@@ -89,11 +106,48 @@ namespace Waher.Script.Model
 					return false;
 			}
 
-			if (!(this.left is null) && !Callback(ref this.left, State))
-				return false;
+			ScriptNode NewNode;
+			bool RecalcIsAsync = false;
+			bool b;
 
-			if (!(this.right is null) && !Callback(ref this.right, State))
-				return false;
+			if (!(this.left is null))
+			{
+				b = !Callback(this.left, out NewNode, State);
+				if (!(NewNode is null))
+				{
+					this.left = NewNode;
+					RecalcIsAsync = true;
+				}
+
+				if (b)
+				{
+					if (RecalcIsAsync)
+						this.CalcIsAsync();
+
+					return false;
+				}
+			}
+
+			if (!(this.right is null))
+			{
+				b = !Callback(this.right, out NewNode, State);
+				if (!(NewNode is null))
+				{
+					this.right = NewNode;
+					RecalcIsAsync = true;
+				}
+
+				if (b)
+				{
+					if (RecalcIsAsync)
+						this.CalcIsAsync();
+
+					return false;
+				}
+			}
+
+			if (RecalcIsAsync)
+				this.CalcIsAsync();
 
 			if (!DepthFirst)
 			{
@@ -107,9 +161,7 @@ namespace Waher.Script.Model
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is BinaryOperator O &&
@@ -118,9 +170,7 @@ namespace Waher.Script.Model
 				base.Equals(obj);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

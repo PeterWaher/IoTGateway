@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Runtime.Inventory;
@@ -376,9 +377,9 @@ namespace Waher.Script.Graphs3D
 		/// Tries to add an element to the current element, from the right.
 		/// </summary>
 		/// <param name="Element">Element to add.</param>
-		/// <param name="ElementWise">If element-wise addition is to be performed.</param>
+		/// <param name="_">If element-wise addition is to be performed.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		protected ISemiGroupElement AddRight(ISemiGroupElement Element, bool ElementWise)
+		protected ISemiGroupElement AddRight(ISemiGroupElement Element, bool _)
 		{
 			if (this.x.First is null)
 				return Element;
@@ -466,9 +467,7 @@ namespace Waher.Script.Graphs3D
 			return Result;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (!(obj is Graph3D G))
@@ -523,9 +522,7 @@ namespace Waher.Script.Graphs3D
 			return !(b1 || b2);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = this.minX.GetHashCode();
@@ -1516,7 +1513,7 @@ namespace Waher.Script.Graphs3D
 		/// Imports graph specifics from XML.
 		/// </summary>
 		/// <param name="Xml">XML input.</param>
-		public override void ImportGraph(XmlElement Xml)
+		public override async Task ImportGraphAsync(XmlElement Xml)
 		{
 			Variables Variables = new Variables();
 
@@ -1553,27 +1550,27 @@ namespace Waher.Script.Graphs3D
 						break;
 
 					case "minX":
-						this.minX = Parse(Attr.Value, Variables);
+						this.minX = await ParseAsync(Attr.Value, Variables);
 						break;
 
 					case "maxX":
-						this.maxX = Parse(Attr.Value, Variables);
+						this.maxX = await ParseAsync(Attr.Value, Variables);
 						break;
 
 					case "minY":
-						this.minY = Parse(Attr.Value, Variables);
+						this.minY = await ParseAsync(Attr.Value, Variables);
 						break;
 
 					case "maxY":
-						this.maxY = Parse(Attr.Value, Variables);
+						this.maxY = await ParseAsync(Attr.Value, Variables);
 						break;
 
 					case "minZ":
-						this.minZ = Parse(Attr.Value, Variables);
+						this.minZ = await ParseAsync(Attr.Value, Variables);
 						break;
 
 					case "maxZ":
-						this.maxZ = Parse(Attr.Value, Variables);
+						this.maxZ = await ParseAsync(Attr.Value, Variables);
 						break;
 
 					case "showXAxis":
@@ -1615,19 +1612,19 @@ namespace Waher.Script.Graphs3D
 					switch (E.LocalName)
 					{
 						case "X":
-							this.x.AddLast((IMatrix)Parse(E.InnerText, Variables));
+							this.x.AddLast((IMatrix)await ParseAsync(E.InnerText, Variables));
 							break;
 
 						case "Y":
-							this.y.AddLast((IMatrix)Parse(E.InnerText, Variables));
+							this.y.AddLast((IMatrix)await ParseAsync(E.InnerText, Variables));
 							break;
 
 						case "Z":
-							this.z.AddLast((IMatrix)Parse(E.InnerText, Variables));
+							this.z.AddLast((IMatrix)await ParseAsync(E.InnerText, Variables));
 							break;
 
 						case "Normals":
-							IMatrix M = (IMatrix)Parse(E.InnerText, Variables);
+							IMatrix M = (IMatrix)await ParseAsync(E.InnerText, Variables);
 
 							int i, j, c, d;
 
@@ -1650,7 +1647,7 @@ namespace Waher.Script.Graphs3D
 							break;
 
 						case "Parameters":
-							IVector v = (IVector)Parse(E.InnerText, Variables);
+							IVector v = (IVector)await ParseAsync(E.InnerText, Variables);
 							this.parameters.AddLast(this.ToObjectArray(v));
 							break;
 

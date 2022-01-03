@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
@@ -3478,7 +3479,7 @@ namespace Waher.Script.Graphs3D
 		/// Imports graph specifics from XML.
 		/// </summary>
 		/// <param name="Xml">XML input.</param>
-		public override void ImportGraph(XmlElement Xml)
+		public override async Task ImportGraphAsync(XmlElement Xml)
 		{
 			Variables Variables = new Variables();
 			Expression Exp;
@@ -3510,12 +3511,12 @@ namespace Waher.Script.Graphs3D
 
 					case "bgColor":
 						Exp = new Expression(Attr.Value);
-						this.backgroundColor = (SKColor)Exp.Evaluate(Variables);
+						this.backgroundColor = (SKColor)await Exp.EvaluateAsync(Variables);
 						break;
 
 					case "pos":
 						Exp = new Expression(Attr.Value);
-						this.viewerPosition = (Vector3)Exp.Evaluate(Variables);
+						this.viewerPosition = (Vector3)await Exp.EvaluateAsync(Variables);
 						break;
 				}
 			}
@@ -3556,7 +3557,7 @@ namespace Waher.Script.Graphs3D
 				{
 					int Index = int.Parse(E.GetAttribute("index"));
 					Exp = new Expression(E.InnerText);
-					Shaders[Index] = (I3DShader)Exp.Evaluate(Variables);
+					Shaders[Index] = (I3DShader)await Exp.EvaluateAsync(Variables);
 				}
 			}
 
@@ -3568,12 +3569,12 @@ namespace Waher.Script.Graphs3D
 					{
 						case "Projection":
 							Exp = new Expression(E.InnerText);
-							this.projectionTransformation = (Matrix4x4)Exp.Evaluate(Variables);
+							this.projectionTransformation = (Matrix4x4)await Exp.EvaluateAsync(Variables);
 							break;
 
 						case "Model":
 							Exp = new Expression(E.InnerText);
-							this.modelTransformation = (Matrix4x4)Exp.Evaluate(Variables);
+							this.modelTransformation = (Matrix4x4)await Exp.EvaluateAsync(Variables);
 							break;
 
 						case "Pixels":
@@ -3582,7 +3583,7 @@ namespace Waher.Script.Graphs3D
 
 						case "ZBuffer":
 							Exp = new Expression(E.InnerText);
-							double[] v = (double[])Exp.Evaluate(Variables);
+							double[] v = (double[])await Exp.EvaluateAsync(Variables);
 
 							c = v.Length;
 							this.zBuffer = new float[c];
@@ -3640,15 +3641,15 @@ namespace Waher.Script.Graphs3D
 											switch (E3.LocalName)
 											{
 												case "World":
-													P.World = ToVector3DoubleArray((IMatrix)Parse(E.InnerText, Variables));
+													P.World = ToVector3DoubleArray((IMatrix)await ParseAsync(E.InnerText, Variables));
 													break;
 
 												case "Screen":
-													P.Screen = ToVector3DoubleArray((IMatrix)Parse(E.InnerText, Variables));
+													P.Screen = ToVector3DoubleArray((IMatrix)await ParseAsync(E.InnerText, Variables));
 													break;
 
 												case "Normals":
-													P.Normals = ToVector3DoubleArray((IMatrix)Parse(E.InnerText, Variables));
+													P.Normals = ToVector3DoubleArray((IMatrix)await ParseAsync(E.InnerText, Variables));
 													break;
 											}
 										}

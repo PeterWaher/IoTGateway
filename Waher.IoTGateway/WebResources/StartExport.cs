@@ -73,7 +73,7 @@ namespace Waher.IoTGateway.WebResources
 			{
 				Gateway.AssertUserAuthenticated(Request, "Admin.Data.Backup");
 
-				if (!Request.HasData || !(Request.DecodeData() is Dictionary<string, object> RequestObj))
+				if (!Request.HasData || !(await Request.DecodeDataAsync() is Dictionary<string, object> RequestObj))
 					throw new BadRequestException("Invalid request.");
 
 				if (!RequestObj.TryGetValue("TypeOfFile", out object Obj) || !(Obj is string TypeOfFile))
@@ -348,7 +348,7 @@ namespace Waher.IoTGateway.WebResources
 						string Xml = Temp.ToString();
 						string ReportFileName = Path.Combine(Path.GetDirectoryName(ExportInfo.FullBackupFileName),
 							"AutoRepair " + DateTime.Now.ToString("yyyy-MM-ddTHH.mm.ss.ffffff") + ".xml");
-						File.WriteAllText(ReportFileName, Xml);
+						await Resources.WriteAllTextAsync(ReportFileName, Xml);
 					}
 
 					await Persistence.Database.Export(ExportInfo.Exporter, ExportInfo.Exporter.CollectionNames,
@@ -470,12 +470,12 @@ namespace Waher.IoTGateway.WebResources
 					await UploadBackupFile(ExportInfo.LocalKeyFileName, ExportInfo.FullKeyFileName, true, Thread);
 
 				Profiler.Stop();
-				
+
 				//string Uml = Profiler.ExportPlantUml(TimeUnit.DynamicPerProfiling);
 				//string UmlFileName = Path.ChangeExtension(ExportInfo.FullBackupFileName, "uml");
 				//long UmlFileSize;
 				//
-				//File.WriteAllText(UmlFileName, Uml);
+				//await Resources.WriteAllTextAsync(UmlFileName, Uml);
 				//
 				//using (FileStream fs = File.OpenRead(UmlFileName))
 				//{

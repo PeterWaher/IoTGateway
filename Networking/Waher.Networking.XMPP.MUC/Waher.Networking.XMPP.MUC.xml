@@ -824,9 +824,7 @@
             <param name="ComponentAddress">Address to the Publish/Subscribe component.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.Dispose">
-            <summary>
-            <see cref="M:System.IDisposable.Dispose"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Networking.XMPP.MUC.MultiUserChatClient.ComponentAddress">
             <summary>

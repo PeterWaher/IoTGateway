@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Content.Markdown.Model.BlockElements
@@ -34,9 +35,9 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
-			PrefixedBlock(Output, this.Children, ":\t", "\t");
+			await PrefixedBlock(Output, this.Children, ":\t", "\t");
 			Output.AppendLine();
 		}
 
@@ -44,12 +45,12 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override async Task GenerateHTML(StringBuilder Output)
 		{
 			foreach (MarkdownElement E in this.Children)
 			{
 				Output.Append("<dd>");
-				E.GenerateHTML(Output);
+				await E.GenerateHTML(Output);
 				Output.AppendLine("</dd>");
 			}
 		}
@@ -58,12 +59,12 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override async Task GeneratePlainText(StringBuilder Output)
 		{
 			foreach (MarkdownElement E in this.Children)
 			{
 				Output.Append(":\t");
-				E.GeneratePlainText(Output);
+				await E.GeneratePlainText(Output);
 				Output.AppendLine();
 			}
 		}
@@ -73,7 +74,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			XamlSettings Settings = this.Document.Settings.XamlSettings;
 			MarkdownElement Last = null;
@@ -94,7 +95,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				Output.WriteAttributeString("Margin", Settings.DefinitionMargin.ToString() + ",0,0," +
 					(Description == Last ? Settings.DefinitionSeparator : 0).ToString());
 
-				Description.GenerateXAML(Output, TextAlignment);
+				await Description.GenerateXAML(Output, TextAlignment);
 				Output.WriteEndElement();
 			}
 		}
@@ -104,7 +105,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			XamlSettings Settings = this.Document.Settings.XamlSettings;
 			MarkdownElement Last = null;
@@ -123,7 +124,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					Output.WriteAttributeString("TextType", "Html");
 
 					StringBuilder Html = new StringBuilder();
-					Description.GenerateHTML(Html);
+					await Description.GenerateHTML(Html);
 					Output.WriteCData(Html.ToString());
 
 					Output.WriteEndElement();
@@ -136,7 +137,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 						(Description == Last ? Settings.DefinitionSeparator : 0).ToString());
 
 					Output.WriteStartElement("StackLayout");
-					Description.GenerateXamarinForms(Output, TextAlignment);
+					await Description.GenerateXamarinForms(Output, TextAlignment);
 					Output.WriteEndElement();
 
 					Output.WriteEndElement();
@@ -147,10 +148,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get { return false; }
-		}
+		internal override bool InlineSpanElement => false;
 
 		/// <summary>
 		/// Exports the element to XML.

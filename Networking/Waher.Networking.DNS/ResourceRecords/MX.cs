@@ -61,9 +61,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 			set => this.exchange = value;
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return base.ToString() + "\t" + this.preference.ToString() + 

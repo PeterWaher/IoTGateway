@@ -15,12 +15,12 @@ namespace Waher.Networking.LWM2M
 	public abstract class Lwm2mResource : CoapResource, ICoapGetMethod, ICoapPutMethod, ICoapPostMethod
 	{
 		private Lwm2mObjectInstance objInstance = null;
-		private string name;
+		private readonly string name;
 		private ushort id;
 		private ushort instanceId;
 		private ushort resourceId;
-		private bool canWrite;
-		private bool persist;
+		private readonly bool canWrite;
+		private readonly bool persist;
 
 		/// <summary>
 		/// Base class for all LWM2M resources.
@@ -198,7 +198,7 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public virtual void GET(CoapMessage Request, CoapResponse Response)
+		public virtual Task GET(CoapMessage Request, CoapResponse Response)
 		{
 			ILwm2mWriter Writer;
 			bool FromBootstrapServer = this.objInstance.Object.Client.IsFromBootstrapServer(Request);
@@ -206,7 +206,7 @@ namespace Waher.Networking.LWM2M
 			if (this.id == 0 && !FromBootstrapServer)
 			{
 				Response.RST(CoapCode.Unauthorized);
-				return;
+				return Task.CompletedTask;
 			}
 
 			if (Request.Accept is null)
@@ -222,7 +222,7 @@ namespace Waher.Networking.LWM2M
 			else
 			{
 				Response.RST(CoapCode.NotAcceptable);
-				return;
+				return Task.CompletedTask;
 			}
 
 			if (this.OnBeforeGet != null)
@@ -243,6 +243,8 @@ namespace Waher.Networking.LWM2M
 
 			Response.Respond(CoapCode.Content, Payload, 64,
 				new CoapOptionContentFormat(Writer.ContentFormat));
+	
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -281,9 +283,9 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void POST(CoapMessage Request, CoapResponse Response)
+		public Task POST(CoapMessage Request, CoapResponse Response)
 		{
-			this.PUT(Request, Response);
+			return this.PUT(Request, Response);
 		}
 
 		/// <summary>
@@ -297,7 +299,7 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public virtual void PUT(CoapMessage Request, CoapResponse Response)
+		public virtual async Task PUT(CoapMessage Request, CoapResponse Response)
 		{
 			bool FromBootstrapServer = this.objInstance.Object.Client.IsFromBootstrapServer(Request);
 
@@ -342,12 +344,12 @@ namespace Waher.Networking.LWM2M
 					return;
 				}
 
-				object Decoded = Request.Decode();
+				object Decoded = await Request.DecodeAsync();
 
 				if (Decoded is TlvRecord[] Records)
 				{
 					foreach (TlvRecord Rec in Records)
-						this.Read(Rec);
+						await this.Read(Rec);
 				}
 				else
 				{

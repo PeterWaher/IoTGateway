@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -33,10 +31,7 @@ namespace Waher.Script.Operators
 		/// <summary>
 		/// Unit to set.
 		/// </summary>
-		public Unit Unit
-		{
-			get { return this.unit; }
-		}
+		public Unit Unit => this.unit;
 
 		/// <summary>
 		/// Evaluates the operator on scalar operands.

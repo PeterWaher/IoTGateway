@@ -21,10 +21,7 @@ namespace Waher.Script.Model
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames
-		{
-            get { return new string[0]; }
-		}
+		public override string[] DefaultArgumentNames => new string[0];
 
 		/// <summary>
 		/// Calls the callback method for all child nodes.

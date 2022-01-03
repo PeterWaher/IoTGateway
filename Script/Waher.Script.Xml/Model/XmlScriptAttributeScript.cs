@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
@@ -13,6 +14,7 @@ namespace Waher.Script.Xml.Model
 	public class XmlScriptAttributeScript : XmlScriptAttribute 
 	{
 		private ScriptNode node;
+		private bool isAsync;
 
 		/// <summary>
 		/// XML Script attribute node, whose value is defined by script.
@@ -26,7 +28,14 @@ namespace Waher.Script.Xml.Model
 			: base(Name, Start, Length, Expression)
 		{
 			this.node = Node;
+			this.isAsync = Node?.IsAsynchronous ?? false;
 		}
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => this.isAsync;
 
 		/// <summary>
 		/// Calls the callback method for all child nodes.
@@ -43,7 +52,14 @@ namespace Waher.Script.Xml.Model
 					return false;
 			}
 
-			if (!Callback(ref this.node, State))
+			bool b = !Callback(this.node, out ScriptNode NewNode, State);
+			if (!(NewNode is null))
+			{
+				this.node = NewNode;
+				this.isAsync = NewNode.IsAsynchronous;
+			}
+
+			if (b)
 				return false;
 
 			if (!DepthFirst)
@@ -69,12 +85,34 @@ namespace Waher.Script.Xml.Model
 		}
 
 		/// <summary>
+		/// Builds an XML Document object
+		/// </summary>
+		/// <param name="Document">Document being built.</param>
+		/// <param name="Parent">Parent element.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		internal override async Task BuildAsync(XmlDocument Document, XmlElement Parent, Variables Variables)
+		{
+			string s = await EvaluateStringAsync(this.node, Variables);
+			if (!(s is null))
+				Parent.SetAttribute(this.Name, s);
+		}
+
+		/// <summary>
 		/// Gets the attribute value.
 		/// </summary>
 		/// <param name="Variables">Current set of variables.</param>
 		internal override string GetValue(Variables Variables)
 		{
 			return EvaluateString(this.node, Variables);
+		}
+
+		/// <summary>
+		/// Gets the attribute value.
+		/// </summary>
+		/// <param name="Variables">Current set of variables.</param>
+		internal override Task<string> GetValueAsync(Variables Variables)
+		{
+			return EvaluateStringAsync(this.node, Variables);
 		}
 
 		/// <summary>

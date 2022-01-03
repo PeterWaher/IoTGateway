@@ -55,9 +55,9 @@ namespace Waher.Script.Operators.Assignments.Pre
 		public static IElement Decrement(IElement Value, ScriptNode Node)
 		{
 			if (Value is ICommutativeRingWithIdentityElement e)
-				return Operators.Arithmetics.Subtract.EvaluateSubtraction(Value, e.One, Node);
+				return Arithmetics.Subtract.EvaluateSubtraction(Value, e.One, Node);
 			else if (Value.IsScalar)
-				throw new ScriptRuntimeException("Unable to increment variable.", Node);
+				throw new ScriptRuntimeException("Unable to decrement variable.", Node);
 			else
 			{
 				LinkedList<IElement> Elements = new LinkedList<IElement>();

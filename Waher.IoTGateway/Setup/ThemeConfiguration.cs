@@ -191,14 +191,14 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		protected override string ConfigPrivilege => "Admin.Presentation.Theme";
 
-		private Task SetTheme(HttpRequest Request, HttpResponse Response)
+		private async Task SetTheme(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException();
 
-			object Obj = Request.DecodeData();
+			object Obj = await Request.DecodeDataAsync();
 			if (!(Obj is string ThemeId))
 				throw new BadRequestException();
 
@@ -214,8 +214,6 @@ namespace Waher.IoTGateway.Setup
 			this.UpdateTheme(Def, TabID);
 		
 			Response.StatusCode = 200;
-
-			return Task.CompletedTask;
 		}
 
 		private async void UpdateTheme(ThemeDefinition Def, string TabID)

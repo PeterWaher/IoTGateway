@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Runtime.Inventory;
 
@@ -64,7 +65,7 @@ namespace Waher.Security.PKCS.Decoders
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			List<X509Certificate2> Certificates = new List<X509Certificate2>();
 			string s = Encoding.ASCII.GetString(Data);
@@ -86,7 +87,7 @@ namespace Waher.Security.PKCS.Decoders
 				}
 			}
 
-			return Certificates.ToArray();
+			return Task.FromResult<object>(Certificates.ToArray());
 		}
 
 		/// <summary>

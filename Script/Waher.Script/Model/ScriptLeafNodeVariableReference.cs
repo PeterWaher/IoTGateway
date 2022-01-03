@@ -28,14 +28,9 @@ namespace Waher.Script.Model
 		/// <summary>
 		/// Variable Name.
 		/// </summary>
-		public string VariableName
-		{
-			get { return this.variableName; }
-		}
+		public string VariableName => this.variableName;
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is ScriptLeafNodeVariableReference O &&
@@ -43,9 +38,7 @@ namespace Waher.Script.Model
 				base.Equals(obj);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

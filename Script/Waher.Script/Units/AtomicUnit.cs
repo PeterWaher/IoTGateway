@@ -26,9 +26,7 @@ namespace Waher.Script.Units
 			get { return this.name; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (obj is AtomicUnit U)
@@ -37,17 +35,13 @@ namespace Waher.Script.Units
 				return false;
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			return this.name.GetHashCode();
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.name;

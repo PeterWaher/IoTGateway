@@ -97,9 +97,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			this.client.OnPresenceUnsubscribe += Client_OnPresenceUnsubscribe;
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			base.Dispose();

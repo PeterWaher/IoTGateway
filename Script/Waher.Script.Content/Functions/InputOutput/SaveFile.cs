@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
@@ -32,10 +33,18 @@ namespace Waher.Script.Content.Functions.InputOutput
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "savefile"; }
-		}
+		public override string FunctionName => "savefile";
+
+		/// <summary>
+		/// Default Argument names
+		/// </summary>
+		public override string[] DefaultArgumentNames => new string[] { "Object", "FileName" };
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
 
 		/// <summary>
 		/// Evaluates the function.
@@ -46,13 +55,21 @@ namespace Waher.Script.Content.Functions.InputOutput
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement Argument1, IElement Argument2, Variables Variables)
 		{
-			string FileName = Argument2.AssociatedObjectValue.ToString();
-
-			return this.DoSave(Argument1.AssociatedObjectValue, FileName, Variables);
+			return this.EvaluateAsync(Argument1, Argument2, Variables).Result;
 		}
 
-		private IElement DoSave(object Obj, string FileName, Variables Variables)
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Argument1">Function argument 1.</param>
+		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override async Task<IElement> EvaluateAsync(IElement Argument1, IElement Argument2, Variables Variables)
 		{
+			object Obj = Argument1.AssociatedObjectValue;
+			string FileName = Argument2.AssociatedObjectValue.ToString();
+
 			if (Obj is Graph G)
 				Obj = G.CreatePixels(Variables);
 
@@ -61,13 +78,22 @@ namespace Waher.Script.Content.Functions.InputOutput
 			if (InternetContent.TryGetContentType(Path.GetExtension(FileName), out string ContentType) &&
 				InternetContent.Encodes(Obj, out Grade _, out IContentEncoder Encoder, ContentType))
 			{
-				Bin = Encoder.Encode(Obj, System.Text.Encoding.UTF8, out ContentType, ContentType);
+				KeyValuePair<byte[], string> P = await Encoder.EncodeAsync(Obj, System.Text.Encoding.UTF8, ContentType);
+				Bin = P.Key;
+				ContentType = P.Value;
 			}
 
 			if (Bin is null)
-				Bin = InternetContent.Encode(Obj, System.Text.Encoding.UTF8, out ContentType);
+			{
+				KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Obj, System.Text.Encoding.UTF8);
+				Bin = P.Key;
+				ContentType = P.Value;
+			}
 
-			File.WriteAllBytes(FileName, Bin);
+			using (FileStream fs = File.Create(FileName))
+			{
+				await fs.WriteAsync(Bin, 0, Bin.Length);
+			}
 
 			return new StringValue(ContentType);
 		}

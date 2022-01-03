@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using SkiaSharp;
 
 namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
@@ -39,10 +40,12 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
-		public void Measure(DrawingState State, PathState PathState)
+		public Task Measure(DrawingState State, PathState PathState)
 		{
 			if (this.defined)
 				PathState.TurnTowardsRel(this.xCoordinate, this.yCoordinate);
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -51,10 +54,12 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
 		/// <param name="Path">Path being generated.</param>
-		public void Draw(DrawingState State, PathState PathState, SKPath Path)
+		public Task Draw(DrawingState State, PathState PathState, SKPath Path)
 		{
 			if (this.defined)
 				PathState.TurnTowardsRel(this.xCoordinate, this.yCoordinate);
+		
+			return Task.CompletedTask;
 		}
 	}
 }

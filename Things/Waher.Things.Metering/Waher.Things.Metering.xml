@@ -461,9 +461,7 @@
             </summary>
         </member>
         <member name="M:Waher.Things.Metering.MeteringNode.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Things.Metering.MeteringNode.LogErrorAsync(System.String)">
             <summary>

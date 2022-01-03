@@ -75,12 +75,12 @@ namespace Waher.IoTGateway.WebResources
 		/// </summary>
 		public string SnifferId => this.snifferId;
 
-		private void Process(DateTime Timestamp, string Message, string Function)
+		private Task Process(DateTime Timestamp, string Message, string Function)
 		{
 			if (Timestamp >= this.expires)
-				Task.Run(() => this.Close());
+				return this.Close();
 			else
-				Task.Run(() => this.Push(Timestamp, Message, Function, true));
+				return this.Push(Timestamp, Message, Function, true);
 		}
 
 		private async Task Push(DateTime Timestamp, string Message, string Function, bool CloseIfNoTabs)
@@ -147,12 +147,12 @@ namespace Waher.IoTGateway.WebResources
 			this.Dispose();
 		}
 
-		private void Process(DateTime Timestamp, byte[] Data, string Function)
+		private Task Process(DateTime Timestamp, byte[] Data, string Function)
 		{
 			if (Timestamp >= this.expires)
-				Task.Run(() => this.Close());
+				return this.Close();
 			else
-				Task.Run(() => this.Push(Timestamp, this.HexOutput(Data), Function, true));
+				return this.Push(Timestamp, this.HexOutput(Data), Function, true);
 		}
 
 		private string HexOutput(byte[] Data)
@@ -194,9 +194,9 @@ namespace Waher.IoTGateway.WebResources
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Error">Error.</param>
-		public override void Error(DateTime Timestamp, string Error)
+		public override Task Error(DateTime Timestamp, string Error)
 		{
-			this.Process(Timestamp, Error, "Error");
+			return this.Process(Timestamp, Error, "Error");
 		}
 
 		/// <summary>
@@ -204,9 +204,9 @@ namespace Waher.IoTGateway.WebResources
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public override void Exception(DateTime Timestamp, string Exception)
+		public override Task Exception(DateTime Timestamp, string Exception)
 		{
-			this.Process(Timestamp, Exception, "Exception");
+			return this.Process(Timestamp, Exception, "Exception");
 		}
 
 		/// <summary>
@@ -214,9 +214,9 @@ namespace Waher.IoTGateway.WebResources
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Comment">Comment.</param>
-		public override void Information(DateTime Timestamp, string Comment)
+		public override Task Information(DateTime Timestamp, string Comment)
 		{
-			this.Process(Timestamp, Comment, "Information");
+			return this.Process(Timestamp, Comment, "Information");
 		}
 
 		/// <summary>
@@ -224,9 +224,9 @@ namespace Waher.IoTGateway.WebResources
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public override void ReceiveBinary(DateTime Timestamp, byte[] Data)
+		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
-			this.Process(Timestamp, Data, "Rx");
+			return this.Process(Timestamp, Data, "Rx");
 		}
 
 		/// <summary>
@@ -234,9 +234,9 @@ namespace Waher.IoTGateway.WebResources
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public override void ReceiveText(DateTime Timestamp, string Text)
+		public override Task ReceiveText(DateTime Timestamp, string Text)
 		{
-			this.Process(Timestamp, Text, "Rx");
+			return this.Process(Timestamp, Text, "Rx");
 		}
 
 		/// <summary>
@@ -244,9 +244,9 @@ namespace Waher.IoTGateway.WebResources
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public override void TransmitBinary(DateTime Timestamp, byte[] Data)
+		public override Task TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
-			this.Process(Timestamp, Data, "Tx");
+			return this.Process(Timestamp, Data, "Tx");
 		}
 
 		/// <summary>
@@ -254,9 +254,9 @@ namespace Waher.IoTGateway.WebResources
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public override void TransmitText(DateTime Timestamp, string Text)
+		public override Task TransmitText(DateTime Timestamp, string Text)
 		{
-			this.Process(Timestamp, Text, "Tx");
+			return this.Process(Timestamp, Text, "Tx");
 		}
 
 		/// <summary>
@@ -264,9 +264,9 @@ namespace Waher.IoTGateway.WebResources
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Warning">Warning.</param>
-		public override void Warning(DateTime Timestamp, string Warning)
+		public override Task Warning(DateTime Timestamp, string Warning)
 		{
-			this.Process(Timestamp, Warning, "Warning");
+			return this.Process(Timestamp, Warning, "Warning");
 		}
 
 	}

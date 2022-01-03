@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Waher.Content;
@@ -333,16 +334,14 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Validates a contract XML Document, and returns the contract definition in it.
 		/// </summary>
 		/// <param name="Xml">XML representation</param>
-		/// <param name="HasStatus">If a status element was found.</param>
-		/// <param name="ParametersValid">If parameter values are valid.</param>
 		/// <returns>Parsed contract, or null if it contains errors.</returns>
 		/// <exception cref="Exception">If XML is invalid.</exception>
-		public static Contract Parse(XmlDocument Xml, out bool HasStatus, out bool ParametersValid)
+		public static Task<ParsedContract> Parse(XmlDocument Xml)
 		{
 			XSL.Validate(string.Empty, Xml, "contract", ContractsClient.NamespaceSmartContracts, 
 				contractSchema, identitiesSchema, e2eSchema, p2pSchema, xmlSchema);
 
-			return Parse(Xml.DocumentElement, out HasStatus, out ParametersValid);
+			return Parse(Xml.DocumentElement);
 		}
 
 		private static readonly XmlSchema identitiesSchema = XSL.LoadSchema(typeof(Contract).Namespace + ".Schema.LegalIdentities.xsd");
@@ -355,16 +354,17 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Parses a contract from is XML representation.
 		/// </summary>
 		/// <param name="Xml">XML representation</param>
-		/// <param name="HasStatus">If a status element was found.</param>
-		/// <param name="ParametersValid">If parameter values are valid.</param>
 		/// <returns>Parsed contract, or null if it contains errors.</returns>
-		public static Contract Parse(XmlElement Xml, out bool HasStatus, out bool ParametersValid)
+		public static async Task<ParsedContract> Parse(XmlElement Xml)
 		{
-			Contract Result = new Contract();
 			bool HasVisibility = false;
-
-			HasStatus = false;
-			ParametersValid = true;
+			Contract Result = new Contract();
+			ParsedContract ParsedContract = new ParsedContract()
+			{
+				Contract = Result,
+				HasStatus = false,
+				ParametersValid = true
+			};
 
 			foreach (XmlAttribute Attr in Xml.Attributes)
 			{
@@ -817,7 +817,7 @@ namespace Waher.Networking.XMPP.Contracts
 						break;
 
 					case "status":
-						HasStatus = true;
+						ParsedContract.HasStatus = true;
 						foreach (XmlAttribute Attr in E.Attributes)
 						{
 							switch (Attr.Name)
@@ -940,9 +940,9 @@ namespace Waher.Networking.XMPP.Contracts
 
 			foreach (Parameter Parameter in Parameters)
 			{
-				if (!Parameter.IsParameterValid(Variables))
+				if (!await Parameter.IsParameterValid(Variables))
 				{
-					ParametersValid = false;
+					ParsedContract.ParametersValid = false;
 					break;
 				}
 			}
@@ -956,7 +956,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Result.clientSignatures = Signatures.ToArray();
 			Result.attachments = Attachments.ToArray();
 
-			return Result;
+			return ParsedContract;
 		}
 
 		/// <summary>
@@ -1499,7 +1499,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Language">Desired language</param>
 		/// <returns>Markdown</returns>
-		public string ToHTML(string Language)
+		public Task<string> ToHTML(string Language)
 		{
 			return this.ToHTML(this.forHumans, Language);
 		}
@@ -1509,7 +1509,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Language">Desired language</param>
 		/// <returns>Markdown</returns>
-		public string ToPlainText(string Language)
+		public Task<string> ToPlainText(string Language)
 		{
 			return this.ToPlainText(this.forHumans, Language);
 		}
@@ -1519,7 +1519,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Language">Desired language</param>
 		/// <returns>Markdown</returns>
-		public string ToXAML(string Language)
+		public Task<string> ToXAML(string Language)
 		{
 			return this.ToXAML(this.forHumans, Language);
 		}
@@ -1529,7 +1529,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Language">Desired language</param>
 		/// <returns>Markdown</returns>
-		public string ToXamarinForms(string Language)
+		public Task<string> ToXamarinForms(string Language)
 		{
 			return this.ToXamarinForms(this.forHumans, Language);
 		}
@@ -1539,24 +1539,24 @@ namespace Waher.Networking.XMPP.Contracts
 			return Select(Text, Language)?.GenerateMarkdown(this, Type);
 		}
 
-		internal string ToPlainText(HumanReadableText[] Text, string Language)
+		internal Task<string> ToPlainText(HumanReadableText[] Text, string Language)
 		{
-			return Select(Text, Language)?.GeneratePlainText(this);
+			return Select(Text, Language)?.GeneratePlainText(this) ?? Task.FromResult<string>(null);
 		}
 
-		internal string ToHTML(HumanReadableText[] Text, string Language)
+		internal Task<string> ToHTML(HumanReadableText[] Text, string Language)
 		{
-			return Select(Text, Language)?.GenerateHTML(this);
+			return Select(Text, Language)?.GenerateHTML(this) ?? Task.FromResult<string>(null);
 		}
 
-		internal string ToXAML(HumanReadableText[] Text, string Language)
+		internal Task<string> ToXAML(HumanReadableText[] Text, string Language)
 		{
-			return Select(Text, Language)?.GenerateXAML(this);
+			return Select(Text, Language)?.GenerateXAML(this) ?? Task.FromResult<string>(null);
 		}
 
-		internal string ToXamarinForms(HumanReadableText[] Text, string Language)
+		internal Task<string> ToXamarinForms(HumanReadableText[] Text, string Language)
 		{
-			return Select(Text, Language)?.GenerateXamarinForms(this);
+			return Select(Text, Language)?.GenerateXamarinForms(this) ?? Task.FromResult<string>(null);
 		}
 
 		internal HumanReadableText Select(HumanReadableText[] Text, string Language)

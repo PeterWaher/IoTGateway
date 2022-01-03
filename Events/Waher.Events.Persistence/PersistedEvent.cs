@@ -210,9 +210,7 @@ namespace Waher.Events.Persistence
 			set { this.tags = value; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.message;

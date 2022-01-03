@@ -50,9 +50,7 @@ namespace Waher.Networking.HTTP
 			get { return this.total; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return ContentRangeToString(this.first, this.last, this.total);

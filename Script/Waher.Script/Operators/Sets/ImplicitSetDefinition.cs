@@ -112,9 +112,7 @@ namespace Waher.Script.Operators.Sets
 			return new ImplicitSet(this.left, SuperSet, this.setConditions, this.otherConditions, Variables, this.doubleColon);
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is ImplicitSetDefinition O &&
@@ -124,9 +122,7 @@ namespace Waher.Script.Operators.Sets
 				base.Equals(obj);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

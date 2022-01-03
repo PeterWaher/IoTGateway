@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Runtime.Inventory;
@@ -232,7 +233,7 @@ namespace Waher.Script.Graphs.Canvas2D
 		/// Imports graph specifics from XML.
 		/// </summary>
 		/// <param name="Xml">XML input.</param>
-		public override void ImportGraph(XmlElement Xml)
+		public override async Task ImportGraphAsync(XmlElement Xml)
 		{
 			Variables Variables = new Variables();
 
@@ -249,11 +250,11 @@ namespace Waher.Script.Graphs.Canvas2D
 						break;
 
 					case "bgColor":
-						this.bgColor = Graph.ToColor(Parse(Attr.Value, Variables).AssociatedObjectValue);
+						this.bgColor = Graph.ToColor((await ParseAsync(Attr.Value, Variables)).AssociatedObjectValue);
 						break;
 
 					case "defaultColor":
-						this.defaultColor = Graph.ToColor(Parse(Attr.Value, Variables).AssociatedObjectValue);
+						this.defaultColor = Graph.ToColor((await ParseAsync(Attr.Value, Variables)).AssociatedObjectValue);
 						break;
 				}
 			}
@@ -271,7 +272,7 @@ namespace Waher.Script.Graphs.Canvas2D
 					if (!(Activator.CreateInstance(T) is CanvasOperation Op))
 						continue;
 
-					Op.ImportGraph(E, Variables);
+					await Op.ImportGraph(E, Variables);
 
 					this.operations.AddLast(Op);
 				}

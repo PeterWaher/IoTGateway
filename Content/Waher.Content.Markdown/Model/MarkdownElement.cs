@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Content.Markdown.Model
@@ -71,52 +72,49 @@ namespace Waher.Content.Markdown.Model
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public abstract void GenerateMarkdown(StringBuilder Output);
+		public abstract Task GenerateMarkdown(StringBuilder Output);
 
 		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public abstract void GenerateHTML(StringBuilder Output);
+		public abstract Task GenerateHTML(StringBuilder Output);
 
 		/// <summary>
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public abstract void GeneratePlainText(StringBuilder Output);
+		public abstract Task GeneratePlainText(StringBuilder Output);
 
 		/// <summary>
 		/// Generates WPF XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public abstract void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment);
+		public abstract Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment);
 
 		/// <summary>
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">Xamarin.Forms XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public abstract void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment);
+		public abstract Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment);
 
 		/// <summary>
 		/// Generates Human-Readable XML for Smart Contracts from the markdown text.
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="Level">Current section level.</param>
-		public virtual void GenerateSmartContractXml(XmlWriter Output, ref int Level)
+		/// <param name="State">Current rendering state.</param>
+		public virtual Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
-			// Do nothing by default
+			return Task.CompletedTask;	// Do nothing by default
 		}
 
 		/// <summary>
 		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
 		/// </summary>
-		internal virtual bool OutsideParagraph
-		{
-			get { return false; }
-		}
+		internal virtual bool OutsideParagraph => false;
 
 		/// <summary>
 		/// If the element is an inline span element.
@@ -129,10 +127,7 @@ namespace Waher.Content.Markdown.Model
 		/// <summary>
 		/// Baseline alignment
 		/// </summary>
-		internal virtual string BaselineAlignment
-		{
-			get { return "Center"; }
-		}
+		internal virtual string BaselineAlignment => "Center";
 
 		/// <summary>
 		/// Gets margins for content.
@@ -178,9 +173,9 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Output">Markdown will be output here.</param>
 		/// <param name="Child">Child element.</param>
 		/// <param name="Prefix">Block prefix</param>
-		protected static void PrefixedBlock(StringBuilder Output, MarkdownElement Child, string Prefix)
+		protected static Task PrefixedBlock(StringBuilder Output, MarkdownElement Child, string Prefix)
 		{
-			PrefixedBlock(Output, Child, Prefix, Prefix);
+			return PrefixedBlock(Output, Child, Prefix, Prefix);
 		}
 
 		/// <summary>
@@ -189,9 +184,9 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Output">Markdown will be output here.</param>
 		/// <param name="Children">Child elements.</param>
 		/// <param name="Prefix">Block prefix</param>
-		protected static void PrefixedBlock(StringBuilder Output, IEnumerable<MarkdownElement> Children, string Prefix)
+		protected static Task PrefixedBlock(StringBuilder Output, IEnumerable<MarkdownElement> Children, string Prefix)
 		{
-			PrefixedBlock(Output, Children, Prefix, Prefix);
+			return PrefixedBlock(Output, Children, Prefix, Prefix);
 		}
 
 		/// <summary>
@@ -201,9 +196,9 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Child">Child element.</param>
 		/// <param name="PrefixFirstRow">Prefix, for first row.</param>
 		/// <param name="PrefixNextRows">Prefix, for the rest of the rows, if any.</param>
-		protected static void PrefixedBlock(StringBuilder Output, MarkdownElement Child, string PrefixFirstRow, string PrefixNextRows)
+		protected static Task PrefixedBlock(StringBuilder Output, MarkdownElement Child, string PrefixFirstRow, string PrefixNextRows)
 		{
-			PrefixedBlock(Output, new MarkdownElement[] { Child }, PrefixFirstRow, PrefixNextRows);
+			return PrefixedBlock(Output, new MarkdownElement[] { Child }, PrefixFirstRow, PrefixNextRows);
 		}
 
 		/// <summary>
@@ -213,13 +208,13 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Children">Child elements.</param>
 		/// <param name="PrefixFirstRow">Prefix, for first row.</param>
 		/// <param name="PrefixNextRows">Prefix, for the rest of the rows, if any.</param>
-		protected static void PrefixedBlock(StringBuilder Output, IEnumerable<MarkdownElement> Children,
+		protected static async Task PrefixedBlock(StringBuilder Output, IEnumerable<MarkdownElement> Children,
 			string PrefixFirstRow, string PrefixNextRows)
 		{
 			StringBuilder Temp = new StringBuilder();
 
 			foreach (MarkdownElement E in Children)
-				E.GenerateMarkdown(Temp);
+				await E.GenerateMarkdown(Temp);
 
 			string s = Temp.ToString().Replace("\r\n", "\n").Replace('\r', '\n');
 			string[] Rows = s.Split('\n');
@@ -276,9 +271,7 @@ namespace Waher.Content.Markdown.Model
 			return h1;
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder Result = new StringBuilder();

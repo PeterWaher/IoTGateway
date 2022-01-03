@@ -10,6 +10,7 @@ using Waher.Content.Markdown;
 using Waher.Content.Markdown.Model;
 using Waher.Events;
 using Waher.Client.WPF.Model;
+using System.Threading.Tasks;
 
 namespace Waher.Client.WPF.Controls.Chat
 {
@@ -27,7 +28,7 @@ namespace Waher.Client.WPF.Controls.Chat
 	{
 		private readonly ChatItemType type;
 		private readonly DateTime timestamp;
-		private readonly bool lastIsTable;
+		private bool lastIsTable;
 		private readonly string threadId;
 		private string from;
 		private string fromStr;
@@ -43,13 +44,12 @@ namespace Waher.Client.WPF.Controls.Chat
 		/// <param name="Type">Type of chat record.</param>
 		/// <param name="Message">Message</param>
 		/// <param name="From">From where the message came.</param>
-		/// <param name="Markdown">Markdown, if available, or null if plain text.</param>
 		/// <param name="ThreadId">Thread ID</param>
 		/// <param name="FormattedMessage">Formatted message.</param>
 		/// <param name="Data">Optional binary data.</param>
 		/// <param name="ForegroundColor">Foreground Color</param>
 		/// <param name="BackgroundColor">Background Color</param>
-		public ChatItem(ChatItemType Type, DateTime Timestamp, string Message, string From, MarkdownDocument Markdown, string ThreadId,
+		private ChatItem(ChatItemType Type, DateTime Timestamp, string Message, string From, string ThreadId,
 			Color ForegroundColor, Color BackgroundColor)
 			: base(ForegroundColor, BackgroundColor)
 		{
@@ -59,30 +59,38 @@ namespace Waher.Client.WPF.Controls.Chat
 			this.from = From;
 			this.fromStr = GetShortFrom(From);
 			this.threadId = ThreadId;
+		}
+
+		public static async Task<ChatItem> CreateAsync(ChatItemType Type, DateTime Timestamp, string Message, string From, MarkdownDocument Markdown, string ThreadId,
+			Color ForegroundColor, Color BackgroundColor)
+		{
+			ChatItem Result = new ChatItem(Type, Timestamp, Message, From, ThreadId, ForegroundColor, BackgroundColor);
 
 			if (Markdown is null)
 			{
 				XamlSettings Settings = ChatView.GetMarkdownSettings().XamlSettings;
 
-				this.formattedMessage = new TextBlock()
+				Result.formattedMessage = new TextBlock()
 				{
 					TextWrapping = TextWrapping.Wrap,
 					Margin = new Thickness(Settings.ParagraphMarginLeft, Settings.ParagraphMarginTop, Settings.ParagraphMarginRight, Settings.ParagraphMarginBottom),
 					Text = Message
 				};
 
-				if (this.formattedMessage is DependencyObject Root)
-					this.AddEventHandlers(Root);
+				if (Result.formattedMessage is DependencyObject Root)
+					Result.AddEventHandlers(Root);
 
-				this.lastIsTable = false;
+				Result.lastIsTable = false;
 			}
 			else
 			{
-				this.ParseMarkdown(Markdown);
+				await Result.ParseMarkdown(Markdown);
 
 				foreach (MarkdownElement E in Markdown)
-					this.lastIsTable = (E is Content.Markdown.Model.BlockElements.Table);
+					Result.lastIsTable = E is Content.Markdown.Model.BlockElements.Table;
 			}
+
+			return Result;
 		}
 
 		internal bool LastIsTable => this.lastIsTable;
@@ -107,7 +115,7 @@ namespace Waher.Client.WPF.Controls.Chat
 			this.timer = new Timer(this.Refresh, new object[] { ChatListView, MainWindow }, 1000, Timeout.Infinite);
 		}
 
-		private void Refresh(object P)
+		private async void Refresh(object P)
 		{
 			try
 			{
@@ -120,7 +128,7 @@ namespace Waher.Client.WPF.Controls.Chat
 				string s = this.building.ToString();
 				this.building = null;
 
-				MarkdownDocument Markdown = new MarkdownDocument(s, ChatView.GetMarkdownSettings());
+				MarkdownDocument Markdown = await MarkdownDocument.CreateAsync(s, ChatView.GetMarkdownSettings());
 
 				MainWindow.UpdateGui(() => this.Refresh2(ChatListView, s, Markdown));
 			}
@@ -130,11 +138,11 @@ namespace Waher.Client.WPF.Controls.Chat
 			}
 		}
 
-		private void Refresh2(ListView ChatListView, string s, MarkdownDocument Markdown)
+		private async Task Refresh2(ListView ChatListView, string s, MarkdownDocument Markdown)
 		{
 			try
 			{
-				this.Update(s, Markdown);
+				await this.Update(s, Markdown);
 
 				ChatListView.Items.Refresh();
 				ChatListView.ScrollIntoView(this);
@@ -145,13 +153,13 @@ namespace Waher.Client.WPF.Controls.Chat
 			}
 		}
 
-		private void ParseMarkdown(MarkdownDocument Markdown)
+		private async Task ParseMarkdown(MarkdownDocument Markdown)
 		{
 			try
 			{
 				if (Markdown != null)
 				{
-					string XAML = Markdown.GenerateXAML();
+					string XAML = await Markdown.GenerateXAML();
 					this.formattedMessage = XamlReader.Parse(XAML);
 
 					if (this.formattedMessage is DependencyObject Root)
@@ -196,12 +204,12 @@ namespace Waher.Client.WPF.Controls.Chat
 			System.Diagnostics.Process.Start(Uri);
 		}
 
-		public void Update(string Message, MarkdownDocument Markdown)
+		public Task Update(string Message, MarkdownDocument Markdown)
 		{
 			this.message = Message;
 			this.lastUpdated = DateTime.Now;
 
-			this.ParseMarkdown(Markdown);
+			return this.ParseMarkdown(Markdown);
 		}
 
 		/// <summary>

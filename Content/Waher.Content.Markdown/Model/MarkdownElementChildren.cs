@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Content.Markdown.Model
@@ -117,10 +118,7 @@ namespace Waher.Content.Markdown.Model
 		/// <summary>
 		/// Child elements.
 		/// </summary>
-		public IEnumerable<MarkdownElement> Children
-		{
-			get { return this.children; }
-		}
+		public IEnumerable<MarkdownElement> Children => this.children;
 
 		/// <summary>
 		/// Creates an object of the same type, and meta-data, as the current object,
@@ -135,20 +133,20 @@ namespace Waher.Content.Markdown.Model
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateMarkdown(Output);
+				await E.GenerateMarkdown(Output);
 		}
 
 		/// <summary>
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override async Task GeneratePlainText(StringBuilder Output)
 		{
 			foreach (MarkdownElement E in this.Children)
-				E.GeneratePlainText(Output);
+				await E.GeneratePlainText(Output);
 		}
 
 		/// <summary>
@@ -156,20 +154,17 @@ namespace Waher.Content.Markdown.Model
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="Level">Current section level.</param>
-		public override void GenerateSmartContractXml(XmlWriter Output, ref int Level)
+		/// <param name="State">Current rendering state.</param>
+		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateSmartContractXml(Output, ref Level);
+				await E.GenerateSmartContractXml(Output, State);
 		}
 
 		/// <summary>
 		/// If elements of this type should be joined over paragraphs.
 		/// </summary>
-		internal virtual bool JoinOverParagraphs
-		{
-			get { return false; }
-		}
+		internal virtual bool JoinOverParagraphs => false;
 
 		/// <summary>
 		/// Loops through all child-elements for the element.

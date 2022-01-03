@@ -41,9 +41,7 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		public int Height => this.height;
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.resource;

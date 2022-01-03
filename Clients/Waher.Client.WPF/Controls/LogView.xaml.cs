@@ -16,6 +16,7 @@ using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Script.Functions.ComplexNumbers;
 using System.Collections;
+using System.Threading.Tasks;
 
 namespace Waher.Client.WPF.Controls
 {
@@ -60,10 +61,12 @@ namespace Waher.Client.WPF.Controls
 			MainWindow.UpdateGui(this.AddItem, Item);
 		}
 
-		private void AddItem(object P)
+		private Task AddItem(object P)
 		{
 			this.LogListView.Items.Add(P);
 			this.LogListView.ScrollIntoView(P);
+
+			return Task.CompletedTask;
 		}
 
 		public void NewButton_Click(object sender, RoutedEventArgs e)

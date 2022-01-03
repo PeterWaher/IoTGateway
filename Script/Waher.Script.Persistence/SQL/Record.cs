@@ -27,9 +27,7 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		public IElement[] Elements => this.elements;
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (!(obj is Record Rec) || this.count != Rec.count)
@@ -46,9 +44,7 @@ namespace Waher.Script.Persistence.SQL
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			if (!this.hash.HasValue)

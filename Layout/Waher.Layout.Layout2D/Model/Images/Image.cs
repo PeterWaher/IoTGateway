@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Figures;
 
@@ -35,12 +36,12 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
 			if (this.image is null && !this.loadStarted)
 			{
 				this.loadStarted = true;
-				this.image = this.LoadImage(State);
+				this.image = await this.LoadImage(State);
 			}
 
 			if (!(this.image is null))
@@ -60,8 +61,8 @@ namespace Waher.Layout.Layout2D.Model.Images
 					this.ExplicitHeight = Alternative.ExplicitHeight;
 				}
 			}
-
-			return base.DoMeasureDimensions(State);
+		
+			await base.DoMeasureDimensions(State);
 		}
 
 		/// <summary>
@@ -77,7 +78,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>Loaded image, or null if not possible to load image, or
 		/// image loading is in process.</returns>
-		protected abstract SKImage LoadImage(DrawingState State);
+		protected abstract Task<SKImage> LoadImage(DrawingState State);
 
 		/// <summary>
 		/// Gets an alternative representation, in case the image is not available.
@@ -93,7 +94,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			if (!(this.image is null))
 			{
@@ -102,7 +103,7 @@ namespace Waher.Layout.Layout2D.Model.Images
 					this.xCoordinate2, this.yCoordinate2));
 			}
 
-			base.Draw(State);
+			await base.Draw(State);
 		}
 	}
 }

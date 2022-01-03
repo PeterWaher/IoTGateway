@@ -1002,7 +1002,7 @@ namespace Waher.Client.WPF.Model
 			return Task.CompletedTask;
 		}
 
-		private void PresenceSubscribe(object P)
+		private Task PresenceSubscribe(object P)
 		{
 			PresenceEventArgs e = (PresenceEventArgs)P;
 
@@ -1028,6 +1028,8 @@ namespace Waher.Client.WPF.Model
 					// Do nothing.
 					break;
 			}
+
+			return Task.CompletedTask;
 		}
 
 		private Task Client_OnPresenceUnsubscribe(object Sender, PresenceEventArgs e)
@@ -1215,7 +1217,10 @@ namespace Waher.Client.WPF.Model
 							if (ThingRegistry != null && ThingRegistry.SupportsProvisioning)
 							{
 								MainWindow.UpdateGui(() =>
-									MainWindow.currentInstance.NewQuestion(this, ThingRegistry.ProvisioningClient, null));
+								{
+									MainWindow.currentInstance.NewQuestion(this, ThingRegistry.ProvisioningClient, null);
+									return Task.CompletedTask;
+								});
 							}
 						}
 						catch (Exception ex)
@@ -1664,7 +1669,7 @@ namespace Waher.Client.WPF.Model
 		private void ServerlessMessaging_OnNewXmppClient(object Sender, PeerConnectionEventArgs e)
 		{
 			XmppClient Client = e.Client;
-			
+
 			this.e2eEncryption.RegisterHandlers(Client);
 		}
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -10,7 +11,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 	/// </summary>
 	public class Replay : LayoutElement, ISegment
 	{
-		private StringAttribute _ref;
+		private StringAttribute @ref;
 
 		/// <summary>
 		/// Replays the segments of another path.
@@ -32,19 +33,18 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// </summary>
 		public StringAttribute ReferenceAttribute
 		{
-			get => this._ref;
-			set => this._ref = value;
+			get => this.@ref;
+			set => this.@ref = value;
 		}
 
 		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
-			this._ref = new StringAttribute(Input, "ref");
+			this.@ref = new StringAttribute(Input, "ref");
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -55,7 +55,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		{
 			base.ExportAttributes(Output);
 
-			this._ref?.Export(Output);
+			this.@ref?.Export(Output);
 		}
 
 		/// <summary>
@@ -78,7 +78,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 			base.CopyContents(Destination);
 
 			if (Destination is Replay Dest)
-				Dest._ref = this._ref?.CopyIfNotPreset();
+				Dest.@ref = this.@ref?.CopyIfNotPreset();
 		}
 
 		/// <summary>
@@ -86,22 +86,27 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
-		public virtual void Measure(DrawingState State, PathState PathState)
+		public virtual async Task Measure(DrawingState State, PathState PathState)
 		{
-			if (this.defined &&
-				!(this._ref is null) &&
-				this._ref.TryEvaluate(State.Session, out string RefId) &&
-				this.Document.TryGetElement(RefId, out ILayoutElement Element) &&
-				Element is ISegment Segment)
+			if (this.defined)
 			{
-				this.reference = Segment;
-				this.reference.Measure(State, PathState);
+				EvaluationResult<string> RefId = await this.@ref.TryEvaluate(State.Session);
+
+				if (RefId.Ok &&
+					this.Document.TryGetElement(RefId.Result, out ILayoutElement Element) &&
+					Element is ISegment Segment)
+				{
+					this.reference = Segment;
+					await this.reference.Measure(State, PathState);
+				}
+				else
+				{
+					this.reference = null;
+					this.defined = false;
+				}
 			}
 			else
-			{
 				this.reference = null;
-				this.defined = false;
-			}
 		}
 
 		private ISegment reference;
@@ -112,10 +117,12 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
 		/// <param name="Path">Path being generated.</param>
-		public virtual void Draw(DrawingState State, PathState PathState, SKPath Path)
+		public virtual Task Draw(DrawingState State, PathState PathState, SKPath Path)
 		{
 			if (this.defined)
 				this.reference.Draw(State, PathState, Path);
+		
+			return Task.CompletedTask;
 		}
 
 	}

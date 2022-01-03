@@ -69,9 +69,7 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 		/// </summary>
 		public string Language { get { return this.language; } }
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();

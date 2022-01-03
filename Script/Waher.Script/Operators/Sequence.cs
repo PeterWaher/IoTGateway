@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -12,6 +12,7 @@ namespace Waher.Script.Operators
 	public class Sequence : ScriptNode
 	{
 		private readonly LinkedList<ScriptNode> statements;
+		private bool isAsync;
 
 		/// <summary>
 		/// Represents a sequence of statements.
@@ -24,15 +25,35 @@ namespace Waher.Script.Operators
 			: base(Start, Length, Expression)
 		{
 			this.statements = Statements;
+
+			this.CalcIsAsync();
 		}
+
+		private void CalcIsAsync()
+		{
+			this.isAsync = false;
+
+			foreach (ScriptNode Statement in this.statements)
+			{
+				if (Statement?.IsAsynchronous ?? false)
+				{
+					this.isAsync = true;
+					break;
+				}
+			}
+		}
+
 
 		/// <summary>
 		/// Statements
 		/// </summary>
-		public LinkedList<ScriptNode> Statements
-		{
-			get { return this.statements; }
-		}
+		public LinkedList<ScriptNode> Statements => this.statements;
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => this.isAsync;
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -45,6 +66,24 @@ namespace Waher.Script.Operators
 
 			foreach (ScriptNode Node in this.statements)
 				Result = Node.Evaluate(Variables);
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!this.isAsync)
+				return this.Evaluate(Variables);
+
+			IElement Result = null;
+
+			foreach (ScriptNode Node in this.statements)
+				Result = await Node.EvaluateAsync(Variables);
 
 			return Result;
 		}
@@ -74,21 +113,34 @@ namespace Waher.Script.Operators
 			}
 
 			Loop = this.statements.First;
+			bool RecalcIsAsync = false;
 
 			while (!(Loop is null))
 			{
 				ScriptNode Node = Loop.Value;
 				if (!(Node is null))
 				{
-					bool Result = Callback(ref Node, State);
-					Loop.Value = Node;
+					bool Result = Callback(Node, out ScriptNode NewNode, State);
+					if (!(NewNode is null))
+					{
+						Loop.Value = Node;
+						RecalcIsAsync = true;
+					}
 
 					if (!Result)
+					{
+						if (RecalcIsAsync)
+							this.CalcIsAsync();
+
 						return false;
+					}
 				}
 
 				Loop = Loop.Next;
 			}
+
+			if (RecalcIsAsync)
+				this.CalcIsAsync();
 
 			if (!DepthFirst)
 			{
@@ -106,9 +158,7 @@ namespace Waher.Script.Operators
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is Sequence O &&
@@ -116,9 +166,7 @@ namespace Waher.Script.Operators
 				base.Equals(obj);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Content.Markdown.Model.BlockElements
@@ -34,9 +35,9 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
-			base.GenerateMarkdown(Output);
+			await base.GenerateMarkdown(Output);
 			Output.AppendLine();
 		}
 
@@ -44,12 +45,12 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override async Task GenerateHTML(StringBuilder Output)
 		{
 			Output.AppendLine("<dl>");
 
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateHTML(Output);
+				await E.GenerateHTML(Output);
 
 			Output.AppendLine("</dl>");
 		}
@@ -58,7 +59,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override async Task GeneratePlainText(StringBuilder Output)
 		{
 			StringBuilder sb = new StringBuilder();
 			string s;
@@ -80,7 +81,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 						Output.AppendLine();
 				}
 
-				E.GeneratePlainText(sb);
+				await E.GeneratePlainText(sb);
 				s = sb.ToString();
 				sb.Clear();
 				Output.Append(s);
@@ -95,28 +96,22 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <summary>
 		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
 		/// </summary>
-		internal override bool OutsideParagraph
-		{
-			get { return true; }
-		}
+		internal override bool OutsideParagraph => true;
 
 		/// <summary>
 		/// If elements of this type should be joined over paragraphs.
 		/// </summary>
-		internal override bool JoinOverParagraphs
-		{
-			get { return true; }
-		}
+		internal override bool JoinOverParagraphs => true;
 
 		/// <summary>
 		/// Generates WPF XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateXAML(Output, TextAlignment);
+				await E.GenerateXAML(Output, TextAlignment);
 		}
 
 		/// <summary>
@@ -124,19 +119,16 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateXamarinForms(Output, TextAlignment);
+				await E.GenerateXamarinForms(Output, TextAlignment);
 		}
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get { return false; }
-		}
+		internal override bool InlineSpanElement => false;
 
 		/// <summary>
 		/// Adds children to the element.

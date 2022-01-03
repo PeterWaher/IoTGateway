@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
+using Waher.Content;
 using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Images
@@ -41,11 +43,10 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.fileName = new StringAttribute(Input, "fileName");
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -88,13 +89,13 @@ namespace Waher.Layout.Layout2D.Model.Images
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>Loaded image, or null if not possible to load image, or
 		/// image loading is in process.</returns>
-		protected override SKImage LoadImage(DrawingState State)
+		protected override async Task<SKImage> LoadImage(DrawingState State)
 		{
-			if (!(this.fileName is null) &&
-				this.fileName.TryEvaluate(State.Session, out string FileName) &&
-				File.Exists(FileName))
+			string FileName = await this.fileName.Evaluate(State.Session, string.Empty);
+			if (!string.IsNullOrEmpty(FileName) && File.Exists(FileName))
 			{
-				SKBitmap Bitmap = SKBitmap.Decode(FileName);
+				byte[] Bin = await Resources.ReadAllBytesAsync(FileName);
+				SKBitmap Bitmap = SKBitmap.Decode(Bin);
 				return SKImage.FromBitmap(Bitmap);
 			}
 			else

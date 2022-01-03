@@ -117,9 +117,7 @@ namespace Waher.Networking.DNS.Communication
 			set => this.raw = value;
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();

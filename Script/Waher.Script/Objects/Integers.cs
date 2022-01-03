@@ -47,17 +47,13 @@ namespace Waher.Script.Objects
 			return (Element is Integer) || (Element is DoubleNumber d && Math.Truncate(d.Value) == d.Value);
 		}
 
-		/// <summary>
-		/// <see cref="object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is Integers;
 		}
 
-		/// <summary>
-		/// <see cref="object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			return hashCode;
@@ -68,9 +64,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public static readonly Integers Instance = new Integers();
 
-		/// <summary>
-		/// <see cref="object.ToString"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return "ℤ";

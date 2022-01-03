@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
@@ -57,6 +58,15 @@ namespace Waher.Script.Xml.Model
 		internal override string GetValue(Variables Variables)
 		{
 			return this.value;
+		}
+
+		/// <summary>
+		/// Gets the attribute value.
+		/// </summary>
+		/// <param name="Variables">Current set of variables.</param>
+		internal override Task<string> GetValueAsync(Variables Variables)
+		{
+			return Task.FromResult<string>(this.value);
 		}
 
 		/// <summary>

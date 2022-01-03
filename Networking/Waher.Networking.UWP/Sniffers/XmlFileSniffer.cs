@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
 
@@ -202,7 +203,7 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// Method is called before writing something to the text file.
 		/// </summary>
-		protected override void BeforeWrite()
+		protected override async Task BeforeWrite()
 		{
 			DateTime TP = DateTime.Now;
 			string s = GetFileName(this.fileName, TP);
@@ -253,7 +254,7 @@ namespace Waher.Networking.Sniffers
 				{
 					try
 					{
-						byte[] XsltBin = File.ReadAllBytes(this.transform);
+						byte[] XsltBin = await ReadAllBytesAsync(this.transform);
 
 						this.output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"data:text/xsl;base64," +
 							Convert.ToBase64String(XsltBin) + "\"");
@@ -294,8 +295,28 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
+		/// Reads a binary file asynchronously.
 		/// </summary>
+		/// <param name="FileName">Filename.</param>
+		/// <returns>Binary content.</returns>
+		public static async Task<byte[]> ReadAllBytesAsync(string FileName)
+		{
+			using (FileStream fs = File.OpenRead(FileName))
+			{
+				long l = fs.Length;
+				if (l > int.MaxValue)
+					throw new NotSupportedException("File too large.");
+
+				int Len = (int)l;
+				byte[] Bin = new byte[Len];
+
+				await fs.ReadAsync(Bin, 0, Len);
+
+				return Bin;
+			}
+		}
+
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			base.Dispose();

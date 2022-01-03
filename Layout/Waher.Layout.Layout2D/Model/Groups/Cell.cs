@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -131,15 +133,15 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign");
 			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign");
 			this.colSpan = new PositiveIntegerAttribute(Input, "colSpan");
 			this.rowSpan = new PositiveIntegerAttribute(Input, "rowSpan");
 			this.border = new StringAttribute(Input, "border");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -193,7 +195,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="MaxHeight">Maximum height of area assigned to the cell</param>
 		/// <param name="Session">Current session.</param>
 		/// <param name="SetPosition">If position of inner content is to be set..</param>
-		public void Distribute(float? MaxWidth, float? MaxHeight, Variables Session, bool SetPosition)
+		public async Task Distribute(float? MaxWidth, float? MaxHeight, Variables Session, bool SetPosition)
 		{
 			if (MaxWidth.HasValue)
 			{
@@ -203,15 +205,16 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				{
 					float? Width = this.Width;
 
-					if (Width.HasValue &&
-						!(this.halign is null) &&
-						this.halign.TryEvaluate(Session, out HorizontalAlignment HAlignment) &&
-						HAlignment != HorizontalAlignment.Left)
+					if (Width.HasValue)
 					{
-						if (HAlignment == HorizontalAlignment.Right)
-							this.dx = (MaxWidth.Value - Width.Value);
-						else    // Center
-							this.dx = (MaxWidth.Value - Width.Value) / 2;
+						EvaluationResult<HorizontalAlignment> HAlignment = await this.halign.TryEvaluate(Session);
+						if (HAlignment.Ok && HAlignment.Result != HorizontalAlignment.Left)
+						{
+							if (HAlignment.Result == HorizontalAlignment.Right)
+								this.dx = (MaxWidth.Value - Width.Value);
+							else    // Center
+								this.dx = (MaxWidth.Value - Width.Value) / 2;
+						}
 					}
 
 					this.Width = MaxWidth.Value;
@@ -226,15 +229,19 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				{
 					float? Height = this.Height;
 
-					if (Height.HasValue &&
-						!(this.valign is null) &&
-						this.valign.TryEvaluate(Session, out VerticalAlignment VAlignment) &&
-						VAlignment != VerticalAlignment.Top)
+					if (Height.HasValue)
 					{
-						if (VAlignment == VerticalAlignment.Bottom || VAlignment == Groups.VerticalAlignment.BaseLine)
-							this.dy = (MaxHeight.Value - Height.Value);
-						else    // Center
-							this.dy = (MaxHeight.Value - Height.Value) / 2;
+						EvaluationResult<VerticalAlignment> VAlignment = await this.valign.TryEvaluate(Session);
+						if (VAlignment.Ok && VAlignment.Result != VerticalAlignment.Top)
+						{
+							if (VAlignment.Result == VerticalAlignment.Bottom ||
+								VAlignment.Result == Groups.VerticalAlignment.BaseLine)
+							{
+								this.dy = (MaxHeight.Value - Height.Value);
+							}
+							else    // Center
+								this.dy = (MaxHeight.Value - Height.Value) / 2;
+						}
 					}
 
 					this.Height = MaxHeight.Value;
@@ -256,19 +263,15 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// Calculates the span of the cell.
 		/// </summary>
 		/// <param name="Session">Current session.</param>
-		/// <param name="ColSpan">Column span</param>
-		/// <param name="RowSpan">Row span</param>
-		public void CalcSpan(Variables Session, out int ColSpan, out int RowSpan)
+		/// <returns>Cell span</returns>
+		public async Task<CellSpan> CalcSpan(Variables Session)
 		{
-			if (!(this.colSpan is null) && this.colSpan.TryEvaluate(Session, out int Span))
-				ColSpan = Span;
-			else
-				ColSpan = 1;
+			CellSpan Result;
 
-			if (!(this.rowSpan is null) && this.rowSpan.TryEvaluate(Session, out Span))
-				RowSpan = Span;
-			else
-				RowSpan = 1;
+			Result.ColSpan = await this.colSpan.Evaluate(Session, 1);
+			Result.RowSpan = await this.rowSpan.Evaluate(Session, 1);
+
+			return Result;
 		}
 
 		/// <summary>
@@ -286,7 +289,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
 			SKRect? BoundingBox = this.BoundingRect;
 			SKSize? PrevSize;
@@ -295,12 +298,12 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				PrevSize = State.SetAreaSize(BoundingBox.Value.Size);
 			else
 				PrevSize = null;
-			
-			bool Relative = base.DoMeasureDimensions(State);
 
-			if (!(this.border is null) &&
-				this.border.TryEvaluate(State.Session, out string RefId) &&
-				this.Document.TryGetElement(RefId, out ILayoutElement Element) &&
+			await base.DoMeasureDimensions(State);
+
+			EvaluationResult<string> RefId = await this.border.TryEvaluate(State.Session);
+			if (RefId.Ok  &&
+				this.Document.TryGetElement(RefId.Result, out ILayoutElement Element) &&
 				Element is Pen Pen)
 			{
 				this.borderPen = Pen;
@@ -311,8 +314,6 @@ namespace Waher.Layout.Layout2D.Model.Groups
 
 			if (PrevSize.HasValue)
 				State.SetAreaSize(PrevSize.Value);
-
-			return Relative;
 		}
 
 		/// <summary>
@@ -343,7 +344,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			if (!(this.borderPen is null))
 			{
@@ -354,13 +355,13 @@ namespace Waher.Layout.Layout2D.Model.Groups
 			}
 
 			if (this.dx == 0 && this.dy == 0)
-				base.Draw(State);
+				await base.Draw(State);
 			else
 			{
 				SKMatrix M = State.Canvas.TotalMatrix;
 				State.Canvas.Translate(this.dx, this.dy);
 
-				base.Draw(State);
+				await base.Draw(State);
 
 				State.Canvas.SetMatrix(M);
 			}

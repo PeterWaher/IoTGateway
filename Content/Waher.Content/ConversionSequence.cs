@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
 using Waher.Script;
+using System.Threading.Tasks;
 
 namespace Waher.Content
 {
@@ -25,29 +26,17 @@ namespace Waher.Content
 			this.conversionGrade = ConversionGrade;
 		}
 
-		public string[] FromContentTypes
-		{
-			get { return new string[] { this.from }; }
-		}
+		public string[] FromContentTypes => new string[] { this.from };
+		public string[] ToContentTypes => new string[] { this.to };
+		public Grade ConversionGrade => this.conversionGrade;
 
-		public string[] ToContentTypes
-		{
-			get { return new string[] { this.to }; }
-		}
-
-		public Grade ConversionGrade
-		{
-			get { return this.conversionGrade; }
-		}
-
-		public bool Convert(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL, 
-			ref string ToContentType, Stream To, Variables Session, params string[] PossibleContentTypes)
+		public async Task<bool> ConvertAsync(ConversionState State)
 		{
 			Stream Intermediate = null;
 			Stream Intermediate2 = null;
-			bool UseMemoryStreams = To is MemoryStream;
+			bool UseMemoryStreams = State.To is MemoryStream;
 			string FromType;
-			string ToType = FromContentType;
+			string ToType = State.FromContentType;
 			int i, c = this.sequence.Length;
 			bool Dynamic = false;
 
@@ -59,11 +48,13 @@ namespace Waher.Content
 
 					if (i == c - 1)
 					{
-						if (this.sequence[i].Value.Convert(FromType, Intermediate, FromFileName, LocalResourceName, URL, ref ToContentType,
-							To, Session, PossibleContentTypes))
-						{
+						ConversionState State2 = new ConversionState(FromType, Intermediate, State.FromFileName, State.LocalResourceName, 
+							State.URL, State.ToContentType, State.To, State.Session, State.PossibleContentTypes);
+
+						if (await this.sequence[i].Value.ConvertAsync(State2))
 							Dynamic = true;
-						}
+
+						State.ToContentType = State2.ToContentType;
 					}
 					else
 					{
@@ -74,14 +65,16 @@ namespace Waher.Content
 						else
 							Intermediate2 = new TemporaryStream();
 
-						if (this.sequence[i].Value.Convert(FromType, Intermediate ?? From, FromFileName, LocalResourceName,
-							URL, ref ToType, Intermediate2, Session))
-						{
-							Dynamic = true;
-						}
+						ConversionState State2 = new ConversionState(FromType, Intermediate ?? State.From, State.FromFileName,
+							State.LocalResourceName, State.URL, ToType, Intermediate2, State.Session);
 
-						FromFileName = string.Empty;
-						LocalResourceName = string.Empty;
+						if (await this.sequence[i].Value.ConvertAsync(State2))
+							Dynamic = true;
+
+						ToType = State2.ToContentType;
+
+						State.FromFileName = string.Empty;
+						State.LocalResourceName = string.Empty;
 
 						Intermediate?.Dispose();
 						

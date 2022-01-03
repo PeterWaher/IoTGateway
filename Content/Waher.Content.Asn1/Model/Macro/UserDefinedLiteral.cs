@@ -38,9 +38,7 @@ namespace Waher.Content.Asn1.Model.Macro
 			return new Values.Asn1StringValue(this.value);
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return "\"" + this.value + "\"";

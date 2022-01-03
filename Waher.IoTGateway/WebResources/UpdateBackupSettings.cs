@@ -47,7 +47,7 @@ namespace Waher.IoTGateway.WebResources
 			if (!Request.HasData)
 				throw new BadRequestException();
 
-			object Obj = Request.DecodeData();
+			object Obj = await Request.DecodeDataAsync();
 
 			if (!(Obj is Dictionary<string, object> Form))
 				throw new BadRequestException();

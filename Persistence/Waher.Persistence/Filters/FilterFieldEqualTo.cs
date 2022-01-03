@@ -35,9 +35,7 @@ namespace Waher.Persistence.Filters
 			return new FilterFieldEqualTo(this.FieldName, this.Value);
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.FieldName + "=" + this.Value?.ToString();

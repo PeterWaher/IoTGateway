@@ -79,9 +79,7 @@ namespace Waher.Persistence.Filters
 			return new FilterOr(Children.ToArray());
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();

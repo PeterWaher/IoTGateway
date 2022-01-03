@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
-using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Filters
@@ -51,12 +50,12 @@ namespace Waher.Layout.Layout2D.Model.Filters
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.radiusX = new LengthAttribute(Input, "radiusX");
 			this.radiusY = new LengthAttribute(Input, "radiusY");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>

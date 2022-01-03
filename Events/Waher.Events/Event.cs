@@ -166,9 +166,7 @@ namespace Waher.Events
 		/// </summary>
 		public KeyValuePair<string, object>[] Tags { get { return this.tags; } }
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.message;

@@ -138,7 +138,7 @@ namespace Waher.IoTGateway.Setup
 			if (!Request.HasData)
 				throw new BadRequestException();
 
-			object Obj = Request.DecodeData();
+			object Obj = await Request.DecodeDataAsync();
 			if (!(Obj is string Address))
 				throw new BadRequestException();
 
@@ -167,7 +167,7 @@ namespace Waher.IoTGateway.Setup
 				await Database.Update(this);
 
 				if (this.addresses.Length > 0)
-					Gateway.SendNotification("Test\r\n===========\r\n\r\nThis message was generated to test the notification feature of **" + Gateway.ApplicationName + "**.");
+					await Gateway.SendNotification("Test\r\n===========\r\n\r\nThis message was generated to test the notification feature of **" + Gateway.ApplicationName + "**.");
 
 				await Response.Write(1);
 			}

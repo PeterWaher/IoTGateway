@@ -46,17 +46,13 @@ namespace Waher.Script.Objects
 			return (Element is ComplexNumber) || (Element is DoubleNumber);
 		}
 
-		/// <summary>
-		/// <see cref="object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is ComplexNumbers;
 		}
 
-		/// <summary>
-		/// <see cref="object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			return hashCode;
@@ -67,9 +63,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public static readonly ComplexNumbers Instance = new ComplexNumbers();
 
-		/// <summary>
-		/// <see cref="object.ToString"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return "ℂ";

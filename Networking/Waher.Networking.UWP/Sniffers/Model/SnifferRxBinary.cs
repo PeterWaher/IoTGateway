@@ -26,9 +26,7 @@ namespace Waher.Networking.Sniffers.Model
             Sniffer.ReceiveBinary(this.Timestamp, this.Data);
         }
 
-        /// <summary>
-        /// <see cref="Object.ToString()"/>
-        /// </summary>
+        /// <inheritdoc/>
         public override string ToString()
         {
             int Len = this.Data?.Length ?? 0;

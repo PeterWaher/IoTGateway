@@ -69,9 +69,7 @@ namespace Waher.Script.Objects
 			set { this.value = value; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return Expression.ToString(this.value);
@@ -152,9 +150,7 @@ namespace Waher.Script.Objects
 			return new Integer(-this.value);
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (obj is Integer E)
@@ -169,9 +165,7 @@ namespace Waher.Script.Objects
 			return false;
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			return this.value.GetHashCode();

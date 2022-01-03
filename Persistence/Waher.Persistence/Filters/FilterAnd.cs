@@ -123,9 +123,7 @@ namespace Waher.Persistence.Filters
 			return new FilterOr(Segments);
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();

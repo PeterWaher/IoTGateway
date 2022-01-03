@@ -55,10 +55,8 @@ namespace Waher.Content.Html
             Output.Append("]]>");
         }
 
-        /// <summary>
-        /// <see cref="Object.ToString()"/>
-        /// </summary>
-        public override string ToString()
+		/// <inheritdoc/>
+		public override string ToString()
 		{
 			return this.content;
 		}

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Groups
@@ -71,15 +71,15 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// <param name="MaxHeight">Maximum height of area assigned to the cell</param>
 		/// <param name="Session">Current session.</param>
 		/// <param name="SetPosition">If position of inner content is to be set..</param>
-		public void Distribute(float? MaxWidth, float? MaxHeight, Variables Session, bool SetPosition)
+		public Task Distribute(float? MaxWidth, float? MaxHeight, Variables Session, bool SetPosition)
 		{
 			if (this.isCell)
-				this.cell.Distribute(MaxWidth, MaxHeight, Session, SetPosition);
+				return this.cell.Distribute(MaxWidth, MaxHeight, Session, SetPosition);
+			else
+				return Task.CompletedTask;
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();

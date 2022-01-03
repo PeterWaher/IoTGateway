@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
 
@@ -173,7 +174,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		void FromXml(XmlElement Input);
+		Task FromXml(XmlElement Input);
 
 		/// <summary>
 		/// Exports the element to XML.
@@ -198,18 +199,16 @@ namespace Waher.Layout.Layout2D.Model
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// Calls, in order: <see cref="BeforeMeasureDimensions(DrawingState)"/>,
 		/// <see cref="DoMeasureDimensions(DrawingState)"/> and
-		/// <see cref="AfterMeasureDimensions(DrawingState, ref bool)"/>.
+		/// <see cref="AfterMeasureDimensions(DrawingState)"/>.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		bool MeasureDimensions(DrawingState State);
+		Task MeasureDimensions(DrawingState State);
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		bool DoMeasureDimensions(DrawingState State);
+		Task DoMeasureDimensions(DrawingState State);
 
 		/// <summary>
 		/// Called before dimensions are measured.
@@ -221,8 +220,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// Called when dimensions have been measured.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		/// <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
-		void AfterMeasureDimensions(DrawingState State, ref bool Relative);
+		Task AfterMeasureDimensions(DrawingState State);
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to positions.
@@ -234,12 +232,12 @@ namespace Waher.Layout.Layout2D.Model
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		void Draw(DrawingState State);
+		Task Draw(DrawingState State);
 
 		/// <summary>
 		/// Draw the shape represented by the layout element.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		void DrawShape(DrawingState State);
+		Task DrawShape(DrawingState State);
 	}
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
@@ -40,10 +41,13 @@ namespace Waher.Content.Markdown.Functions
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames
-		{
-			get { return new string[] { "FileName" }; }
-		}
+		public override string[] DefaultArgumentNames => new string[] { "FileName" };
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.
@@ -53,6 +57,17 @@ namespace Waher.Content.Markdown.Functions
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(string Argument, Variables Variables)
 		{
+			return this.EvaluateScalarAsync(Argument, Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override async Task<IElement> EvaluateScalarAsync(string Argument, Variables Variables)
+		{
 			string Source = this.Expression.Source;
 			if (string.IsNullOrEmpty(Source))
 				throw new ScriptRuntimeException("Script has no source.", this);
@@ -61,10 +76,10 @@ namespace Waher.Content.Markdown.Functions
 
 			if (NeedsExecution(Source))
 			{
-				string Script = File.ReadAllText(Source);
+				string Script = await Resources.ReadAllTextAsync(Source);
 				Expression Exp = new Expression(Script, Source);
 
-				return Exp.Root.Evaluate(Variables);
+				return await Exp.Root.EvaluateAsync(Variables);
 			}
 			else
 				return ObjectValue.Null;

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -91,16 +91,16 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.name = new StringAttribute(Input, "name");
 			this.size = new LengthAttribute(Input, "size");
 			this.weight = new EnumAttribute<SKFontStyleWeight>(Input, "weight");
 			this.width = new EnumAttribute<SKFontStyleWidth>(Input, "width");
 			this.slant = new EnumAttribute<SKFontStyleSlant>(Input, "slant");
 			this.color = new ColorAttribute(Input, "color");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -154,36 +154,34 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
 			float Size;
 			int Weight;
 			int Width;
 
-			if (this.name is null || !this.name.TryEvaluate(State.Session, out string Name))
-				Name = State.Font.Typeface.FamilyName;
-
 			Size = State.Font.Size;
-			if (!(this.size is null) && this.size.TryEvaluate(State.Session, out Length Length))
-				State.CalcDrawingSize(Length, ref Size, false, ref Relative);
+			EvaluationResult<Length> SizeLength = await this.size.TryEvaluate(State.Session);
+			if (SizeLength.Ok)
+				State.CalcDrawingSize(SizeLength.Result, ref Size, false, State);
 
-			if (!(this.weight is null) && this.weight.TryEvaluate(State.Session, out SKFontStyleWeight W))
-				Weight = (int)W;
+			EvaluationResult<SKFontStyleWeight> WeightValue = await this.weight.TryEvaluate(State.Session);
+			if (WeightValue.Ok)
+				Weight = (int)WeightValue.Result;
 			else
 				Weight = State.Font.Typeface.FontWeight;
 
-			if (!(this.width is null) && this.width.TryEvaluate(State.Session, out SKFontStyleWidth W2))
-				Width = (int)W2;
+			EvaluationResult<SKFontStyleWidth> WidthValue = await this.width.TryEvaluate(State.Session);
+			if (WidthValue.Ok)
+				Width = (int)WidthValue.Result;
 			else
 				Width = State.Font.Typeface.FontWidth;
 
-			if (this.slant is null || !this.slant.TryEvaluate(State.Session, out SKFontStyleSlant Slant))
-				Slant = State.Font.Typeface.FontSlant;
-
-			if (this.color is null || !this.color.TryEvaluate(State.Session, out SKColor Color))
-				Color = State.Text.Color;
+			string Name = await this.name.Evaluate(State.Session, State.Font.Typeface.FamilyName);
+			SKFontStyleSlant Slant = await this.slant.Evaluate(State.Session, State.Font.Typeface.FontSlant);
+			SKColor Color = await this.color.Evaluate(State.Session, State.Text.Color);
 
 			this.font = new SKFont()
 			{
@@ -205,8 +203,6 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 				Typeface = this.font.Typeface,
 				TextSize = this.font.Size
 			};
-
-			return Relative;
 		}
 
 		private SKFont font;

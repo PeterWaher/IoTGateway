@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Waher.Script.Abstraction;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects.VectorSpaces;
 
@@ -217,7 +213,7 @@ namespace Waher.Script.Functions.Vectors
 
 				if (!ResultSet.Equals(Set))
 				{
-					if (Expression.UpgradeField(ref ResultRef, ref ResultSet, ref Ref, ref Set, this))
+					if (Expression.UpgradeField(ref ResultRef, ref ResultSet, ref Ref, ref Set))
 					{
 						Arguments[0] = ResultRef;
 						Arguments[i] = Ref;
@@ -244,7 +240,7 @@ namespace Waher.Script.Functions.Vectors
 
 				if (!ResultSet.Equals(Set))
 				{
-					if (!Expression.UpgradeField(ref ResultRef, ref ResultSet, ref Ref, ref Set, this))
+					if (!Expression.UpgradeField(ref ResultRef, ref ResultSet, ref Ref, ref Set))
 						Ref = new ObjectVector(Ref.ChildElements);
 				}
 

@@ -535,9 +535,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			this.tempFile?.Dispose();

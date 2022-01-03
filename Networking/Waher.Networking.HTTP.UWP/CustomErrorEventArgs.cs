@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP
 {
@@ -9,7 +8,7 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void CustomErrorEventHandler(object Sender, CustomErrorEventArgs e);
+	public delegate Task CustomErrorEventHandler(object Sender, CustomErrorEventArgs e);
 
 	/// <summary>
 	/// Event arguments for custom error content events.

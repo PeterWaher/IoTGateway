@@ -1,9 +1,8 @@
 ﻿using System;
-using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Runtime.Inventory;
-using Waher.Script;
 
 namespace Waher.Networking.HTTP.Test
 {
@@ -13,32 +12,20 @@ namespace Waher.Networking.HTTP.Test
 		{
 		}
 
-		public string[] FromContentTypes
-		{
-			get { return new string[] { "text/x-test2" }; }
-		}
+		public string[] FromContentTypes => new string[] { "text/x-test2" };
+		public string[] ToContentTypes => new string[] { "text/x-test3" };
+		public Grade ConversionGrade => Grade.Ok;
 
-		public string[] ToContentTypes
+		public async Task<bool> ConvertAsync(ConversionState State)
 		{
-			get { return new string[] { "text/x-test3" }; }
-		}
-
-		public Grade ConversionGrade
-		{
-			get { return Grade.Ok; }
-		}
-
-		public bool Convert(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL, 
-			ref string ToContentType, Stream To, Variables Session, params string[] PossibleContentTypes)
-		{
-			byte[] Data = new byte[From.Length];
-			From.Read(Data, 0, (int)From.Length);
+			byte[] Data = new byte[State.From.Length];
+			await State.From.ReadAsync(Data, 0, (int)State.From.Length);
 			string s = Encoding.UTF8.GetString(Data);
 
 			s += "\r\nConverter 3 was here.";
 
 			Data = Encoding.UTF8.GetBytes(s);
-			To.Write(Data, 0, Data.Length);
+			await State.To.WriteAsync(Data, 0, Data.Length);
 
 			return false;
 		}

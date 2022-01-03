@@ -3,6 +3,8 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using System.Threading.Tasks;
+using Waher.Content;
 
 namespace Waher.Events.Files
 {
@@ -177,7 +179,7 @@ namespace Waher.Events.Files
 		/// <summary>
 		/// Method is called before writing something to the text file.
 		/// </summary>
-		protected override void BeforeWrite()
+		protected override async Task BeforeWrite()
 		{
 			string s = GetFileName(this.fileName);
 			if (this.lastFileName != null && this.lastFileName == s)
@@ -216,7 +218,7 @@ namespace Waher.Events.Files
 				{
 					try
 					{
-						byte[] XsltBin = File.ReadAllBytes(this.transform);
+						byte[] XsltBin = await Resources.ReadAllBytesAsync(this.transform);
 
 						this.output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"data:text/xsl;base64," +
 							Convert.ToBase64String(XsltBin) + "\"");

@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
-using Waher.Layout.Layout2D.Model.Pens;
 
 namespace Waher.Layout.Layout2D.Model.Groups
 {
@@ -71,14 +71,14 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.left = new LengthAttribute(Input, "left");
 			this.right = new LengthAttribute(Input, "right");
 			this.top = new LengthAttribute(Input, "top");
 			this.bottom = new LengthAttribute(Input, "bottom");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -128,27 +128,29 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = false;
-
-			if (!(this.left is null) && this.left.TryEvaluate(State.Session, out Length L))
-				State.CalcDrawingSize(L, ref this.leftMargin, true, ref Relative);
+			EvaluationResult<Length> L = await this.left.TryEvaluate(State.Session);
+			if (L.Ok)
+				State.CalcDrawingSize(L.Result, ref this.leftMargin, true, State);
 			else
 				this.leftMargin = 0;
 
-			if (!(this.right is null) && this.right.TryEvaluate(State.Session, out L))
-				State.CalcDrawingSize(L, ref this.rightMargin, true, ref Relative);
+			L = await this.right.TryEvaluate(State.Session);
+			if (L.Ok)
+				State.CalcDrawingSize(L.Result, ref this.rightMargin, true, State);
 			else
 				this.rightMargin = 0;
 
-			if (!(this.top is null) && this.top.TryEvaluate(State.Session, out L))
-				State.CalcDrawingSize(L, ref this.topMargin, true, ref Relative);
+			L = await this.top.TryEvaluate(State.Session);
+			if (L.Ok)
+				State.CalcDrawingSize(L.Result, ref this.topMargin, true, State);
 			else
 				this.topMargin = 0;
 
-			if (!(this.bottom is null) && this.bottom.TryEvaluate(State.Session, out L))
-				State.CalcDrawingSize(L, ref this.bottomMargin, true, ref Relative);
+			L = await this.bottom.TryEvaluate(State.Session);
+			if (L.Ok)
+				State.CalcDrawingSize(L.Result, ref this.bottomMargin, true, State);
 			else
 				this.bottomMargin = 0;
 
@@ -159,22 +161,18 @@ namespace Waher.Layout.Layout2D.Model.Groups
 				InnerWidth - this.leftMargin - this.rightMargin,
 				InnerHeight - this.topMargin - this.bottomMargin));
 
-			if (base.DoMeasureDimensions(State))
-				Relative = true;
+			await base.DoMeasureDimensions(State);
 
 			State.SetAreaSize(Prev);
-
-			return Relative;
 		}
 
 		/// <summary>
 		/// Called when dimensions have been measured.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		/// <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
-		public override void AfterMeasureDimensions(DrawingState State, ref bool Relative)
+		public override async Task AfterMeasureDimensions(DrawingState State)
 		{
-			base.AfterMeasureDimensions(State, ref Relative);
+			await base.AfterMeasureDimensions(State);
 
 			this.innerWidth = this.Width;
 			this.Width = this.innerWidth + this.leftMargin + this.rightMargin;
@@ -255,12 +253,12 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			SKMatrix M = State.Canvas.TotalMatrix;
 			State.Canvas.Translate(this.leftMargin, this.topMargin);
 
-			base.Draw(State);
+			await base.Draw(State);
 
 			State.Canvas.SetMatrix(M);
 		}

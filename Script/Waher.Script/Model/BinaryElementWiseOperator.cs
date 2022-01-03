@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 
@@ -79,6 +80,67 @@ namespace Waher.Script.Model
 			}
 
 			return base.Evaluate(Left, Right, Variables);
+		}
+
+		/// <summary>
+		/// Evaluates the operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result</returns>
+		public override async Task<IElement> EvaluateAsync(IElement Left, IElement Right, Variables Variables)
+		{
+			if (!this.IsAsynchronous)
+				return this.Evaluate(Left, Right, Variables);
+
+			ISet LS = Left.AssociatedSet;
+			ISet RS = Right.AssociatedSet;
+
+			if (!LS.Equals(RS))
+			{
+				bool b;
+
+				try
+				{
+					b = LS is IRightModule RM && RM.ScalarRing.Contains(Right);
+				}
+				catch (Exception)
+				{
+					b = false;
+				}
+
+				if (b)
+				{
+					LinkedList<IElement> Result = new LinkedList<IElement>();
+
+					foreach (IElement LeftChild in Left.ChildElements)
+						Result.AddLast(await this.EvaluateAsync(LeftChild, Right, Variables));
+
+					return Left.Encapsulate(Result, this);
+				}
+
+				try
+				{
+					b = RS is ILeftModule LM && LM.ScalarRing.Contains(Left);
+				}
+				catch (Exception)
+				{
+					b = false;
+				}
+
+				if (b)
+				{
+					LinkedList<IElement> Result = new LinkedList<IElement>();
+
+					foreach (IElement RightChild in Right.ChildElements)
+						Result.AddLast(await this.EvaluateAsync(Left, RightChild, Variables));
+
+					return Right.Encapsulate(Result, this);
+				}
+			}
+
+			return await base.EvaluateAsync(Left, Right, Variables);
 		}
 	}
 }

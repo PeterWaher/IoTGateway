@@ -19,7 +19,6 @@ using Waher.Runtime.Timing;
 using Waher.Runtime.Inventory;
 using Waher.Security;
 using Waher.Security.DTLS;
-using Waher.Security.DTLS.Events;
 #if WINDOWS_UWP
 using Windows.Networking;
 using Windows.Networking.Connectivity;
@@ -476,7 +475,7 @@ namespace Waher.Networking.CoAP
 			Init();
 		}
 
-		internal void Decode(ClientBase Client, byte[] Packet, IPEndPoint From)
+		internal async Task Decode(ClientBase Client, byte[] Packet, IPEndPoint From)
 		{
 			if (Packet.Length < 4)
 			{
@@ -1003,7 +1002,7 @@ namespace Waher.Networking.CoAP
 							CoapMessageEventArgs e = new CoapMessageEventArgs(Client, this, IncomingMessage, null);
 							try
 							{
-								h(this, e);
+								await h(this, e);
 							}
 							catch (CoapException ex)
 							{
@@ -1059,50 +1058,50 @@ namespace Waher.Networking.CoAP
 					switch (IncomingMessage.Code)
 					{
 						case CoapCode.GET:
-							if (Resource is ICoapGetMethod GetMethod && GetMethod.AllowsGET)
-								GetMethod.GET(IncomingMessage, Response);
+							if (Resource.GetMethod?.AllowsGET ?? false)
+								Resource.GetMethod.GET(IncomingMessage, Response);
 							else if (IncomingMessage.Type == CoapMessageType.CON)
 								Response.RST(CoapCode.MethodNotAllowed);
 							break;
 
 						case CoapCode.POST:
-							if (Resource is ICoapPostMethod PostMethod && PostMethod.AllowsPOST)
-								PostMethod.POST(IncomingMessage, Response);
+							if (Resource.PostMethod?.AllowsPOST ?? false)
+								Resource.PostMethod.POST(IncomingMessage, Response);
 							else if (IncomingMessage.Type == CoapMessageType.CON)
 								Response.RST(CoapCode.MethodNotAllowed);
 							break;
 
 						case CoapCode.PUT:
-							if (Resource is ICoapPutMethod PutMethod && PutMethod.AllowsPUT)
-								PutMethod.PUT(IncomingMessage, Response);
+							if (Resource.PutMethod?.AllowsPUT ?? false)
+								Resource.PutMethod.PUT(IncomingMessage, Response);
 							else if (IncomingMessage.Type == CoapMessageType.CON)
 								Response.RST(CoapCode.MethodNotAllowed);
 							break;
 
 						case CoapCode.DELETE:
-							if (Resource is ICoapDeleteMethod DeleteMethod && DeleteMethod.AllowsDELETE)
-								DeleteMethod.DELETE(IncomingMessage, Response);
+							if (Resource.DeleteMethod?.AllowsDELETE ?? false)
+								Resource.DeleteMethod.DELETE(IncomingMessage, Response);
 							else if (IncomingMessage.Type == CoapMessageType.CON)
 								Response.RST(CoapCode.MethodNotAllowed);
 							break;
 
 						case CoapCode.FETCH:
-							if (Resource is ICoapFetchMethod FetchMethod && FetchMethod.AllowsFETCH)
-								FetchMethod.FETCH(IncomingMessage, Response);
+							if (Resource.FetchMethod?.AllowsFETCH ?? false)
+								Resource.FetchMethod.FETCH(IncomingMessage, Response);
 							else if (IncomingMessage.Type == CoapMessageType.CON)
 								Response.RST(CoapCode.MethodNotAllowed);
 							break;
 
 						case CoapCode.PATCH:
-							if (Resource is ICoapPatchMethod PatchMethod && PatchMethod.AllowsPATCH)
-								PatchMethod.PATCH(IncomingMessage, Response);
+							if (Resource.PatchMethod?.AllowsPATCH ?? false)
+								Resource.PatchMethod.PATCH(IncomingMessage, Response);
 							else if (IncomingMessage.Type == CoapMessageType.CON)
 								Response.RST(CoapCode.MethodNotAllowed);
 							break;
 
 						case CoapCode.iPATCH:
-							if (Resource is ICoapIPatchMethod IPatchMethod && IPatchMethod.AllowsiPATCH)
-								IPatchMethod.iPATCH(IncomingMessage, Response);
+							if (Resource.IPatchMethod?.AllowsIPATCH ?? false)
+								Resource.IPatchMethod.IPATCH(IncomingMessage, Response);
 							else if (IncomingMessage.Type == CoapMessageType.CON)
 								Response.RST(CoapCode.MethodNotAllowed);
 							break;
@@ -1908,10 +1907,23 @@ namespace Waher.Networking.CoAP
 		/// <param name="Payload">Payload.</param>
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
+		[Obsolete("Use DecodeAsync for better asynchronous performance.")]
 		public static object Decode(int ContentFormat, byte[] Payload, Uri BaseUri)
 		{
+			return DecodeAsync(ContentFormat, Payload, BaseUri).Result;
+		}
+
+		/// <summary>
+		/// Tries to decode CoAP content.
+		/// </summary>
+		/// <param name="ContentFormat">Content format.</param>
+		/// <param name="Payload">Payload.</param>
+		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
+		/// <returns>Decoded object.</returns>
+		public static async Task<object> DecodeAsync(int ContentFormat, byte[] Payload, Uri BaseUri)
+		{
 			if (contentFormatsByCode.TryGetValue(ContentFormat, out ICoapContentFormat Format))
-				return InternetContent.Decode(Format.ContentType, Payload, BaseUri);
+				return await InternetContent.DecodeAsync(Format.ContentType, Payload, BaseUri);
 			else
 				return Payload;
 		}
@@ -1922,16 +1934,27 @@ namespace Waher.Networking.CoAP
 		/// <param name="Payload">Payload.</param>
 		/// <param name="ContentFormat">Content format of encoded content.</param>
 		/// <returns>Decoded object.</returns>
+		[Obsolete("Use EncodeAsync for better asynchronous performance.")]
 		public static byte[] Encode(object Payload, out int ContentFormat)
 		{
-			byte[] Data = InternetContent.Encode(Payload, Encoding.UTF8, out string ContentType);
-			if (contentFormatsByContentType.TryGetValue(ContentType, out ICoapContentFormat Format))
-			{
-				ContentFormat = Format.ContentFormat;
-				return Data;
-			}
+			KeyValuePair<byte[], int> P = EncodeAsync(Payload).Result;
+			ContentFormat = P.Value;
+			return P.Key;
+		}
+
+		/// <summary>
+		/// Tries to encode CoAP content.
+		/// </summary>
+		/// <param name="Payload">Payload.</param>
+		/// <returns>Decoded object and Content format of encoded content..</returns>
+		public static async Task<KeyValuePair<byte[], int>> EncodeAsync(object Payload)
+		{
+			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Payload, Encoding.UTF8);
+			
+			if (contentFormatsByContentType.TryGetValue(P.Value, out ICoapContentFormat Format))
+				return new KeyValuePair<byte[], int>(P.Key, Format.ContentFormat);
 			else
-				throw new Exception("Unable to encode content of type " + ContentType);
+				throw new Exception("Unable to encode content of type " + P.Value);
 		}
 
 		private async Task<IPEndPoint> GetIPEndPoint(string Destination, int Port, CoapResponseEventHandler Callback, object State)

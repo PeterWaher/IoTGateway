@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Waher.Events;
 using Waher.Runtime.Settings;
+using Waher.Events;
 
 namespace Waher.Content.Emoji.Emoji1
 {
@@ -172,26 +172,17 @@ namespace Waher.Content.Emoji.Emoji1
 		/// <summary>
 		/// Type of files to use.
 		/// </summary>
-		public Emoji1SourceFileType SourceFileType
-		{
-			get { return this.sourceFileType; }
-		}
+		public Emoji1SourceFileType SourceFileType => this.sourceFileType;
 
 		/// <summary>
 		/// Desired width of emojis.
 		/// </summary>
-		public int Width
-		{
-			get { return this.width; }
-		}
+		public int Width => this.width;
 
 		/// <summary>
 		/// Desired height of emojis.
 		/// </summary>
-		public int Height
-		{
-			get { return this.height; }
-		}
+		public int Height => this.height;
 
 		/// <summary>
 		/// If the emoji is supported by the emoji source.
@@ -232,8 +223,9 @@ namespace Waher.Content.Emoji.Emoji1
 		/// <param name="Output">Output</param>
 		/// <param name="Emoji">Emoji</param>
 		/// <param name="EmbedImage">If image should be embedded into the generated HTML, using the data URI scheme.</param>
-		public void GenerateHTML(StringBuilder Output, EmojiInfo Emoji, bool EmbedImage)
+		public Task GenerateHTML(StringBuilder Output, EmojiInfo Emoji, bool EmbedImage)
 		{
+			return GenerateHTML(Output, Emoji, 1, EmbedImage);
 		}
 
 		/// <summary>
@@ -243,7 +235,7 @@ namespace Waher.Content.Emoji.Emoji1
 		/// <param name="Emoji">Emoji</param>
 		/// <param name="Level">Level (number of colons used to define the emoji)</param>
 		/// <param name="EmbedImage">If image should be embedded into the generated HTML, using the data URI scheme.</param>
-		public void GenerateHTML(StringBuilder Output, EmojiInfo Emoji, int Level, bool EmbedImage)
+		public async Task GenerateHTML(StringBuilder Output, EmojiInfo Emoji, int Level, bool EmbedImage)
 		{
 			Output.Append("<img alt=\":");
 			Output.Append(Encode(Emoji.ShortName));
@@ -254,7 +246,7 @@ namespace Waher.Content.Emoji.Emoji1
 			Output.Append("\" height=\"");
 			Output.Append(this.CalcSize(this.height, Level).ToString());
 			Output.Append("\" src=\"");
-			Output.Append(Encode(this.GetUrl(Emoji, EmbedImage)));
+			Output.Append(Encode(await this.GetUrl(Emoji, EmbedImage)));
 			Output.Append("\"/>");
 		}
 
@@ -300,7 +292,7 @@ namespace Waher.Content.Emoji.Emoji1
 		/// <param name="Emoji">Emoji</param>
 		/// <param name="Embed">If emoji should be embedded.</param>
 		/// <returns>URL</returns>
-		public string GetUrl(EmojiInfo Emoji, bool Embed)
+		public async Task<string> GetUrl(EmojiInfo Emoji, bool Embed)
 		{
 			if (Embed || string.IsNullOrEmpty(this.imageUrl))
 			{
@@ -316,7 +308,7 @@ namespace Waher.Content.Emoji.Emoji1
 				Output.Append(";base64,");
 
 				string FileName = this.GetFileName(Emoji);
-				byte[] Data = File.ReadAllBytes(FileName);
+				byte[] Data = await Resources.ReadAllBytesAsync(FileName);
 
 				Output.Append(Convert.ToBase64String(Data));
 
@@ -336,12 +328,10 @@ namespace Waher.Content.Emoji.Emoji1
 		/// Gets the image source of an emoji.
 		/// </summary>
 		/// <param name="Emoji">Emoji</param>
-		/// <param name="Url">URL to emoji.</param>
-		/// <param name="Width">Width of emoji.</param>
-		/// <param name="Height">Height of emoji.</param>
-		public void GetImageSource(EmojiInfo Emoji, out string Url, out int Width, out int Height)
+		/// <returns>Information about image.</returns>
+		public Task<IImageSource> GetImageSource(EmojiInfo Emoji)
 		{
-			this.GetImageSource(Emoji, 1, out Url, out Width, out Height);
+			return this.GetImageSource(Emoji, 1);
 		}
 
 		/// <summary>
@@ -349,14 +339,15 @@ namespace Waher.Content.Emoji.Emoji1
 		/// </summary>
 		/// <param name="Emoji">Emoji</param>
 		/// <param name="Level">Level (number of colons used to define the emoji)</param>
-		/// <param name="Url">URL to emoji.</param>
-		/// <param name="Width">Width of emoji.</param>
-		/// <param name="Height">Height of emoji.</param>
-		public void GetImageSource(EmojiInfo Emoji, int Level, out string Url, out int Width, out int Height)
+		/// <returns>Information about image.</returns>
+		public async Task<IImageSource> GetImageSource(EmojiInfo Emoji, int Level)
 		{
-			Url = this.GetUrl(Emoji, false);
-			Width = this.CalcSize(this.width, Level);
-			Height = this.CalcSize(this.height, Level);
+			return new ImageSource()
+			{
+				Url = await this.GetUrl(Emoji, false),
+				Width = this.CalcSize(this.width, Level),
+				Height = this.CalcSize(this.height, Level)
+			};
 		}
 
 		/// <summary>
@@ -364,11 +355,8 @@ namespace Waher.Content.Emoji.Emoji1
 		/// </summary>
 		public void Dispose()
 		{
-			if (!(this.initialized is null))
-			{
-				this.initialized.Dispose();
-				this.initialized = null;
-			}
+			this.initialized?.Dispose();
+			this.initialized = null;
 		}
 	}
 }

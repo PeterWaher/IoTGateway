@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content.Xml;
 using Waher.Networking.Sniffers;
 
@@ -84,10 +85,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public override void ReceiveBinary(DateTime Timestamp, byte[] Data)
+		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
 			if (this.HasExpired(Timestamp))
-				return;
+				return Task.CompletedTask;
 
 			StringBuilder Xml = this.GetHeader(Timestamp);
 
@@ -95,7 +96,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(Convert.ToBase64String(Data));
 			Xml.Append("</rxBin>");
 
-			this.Send(Xml);
+			return this.Send(Xml);
 		}
 
 		private StringBuilder GetHeader(DateTime Timestamp)
@@ -112,10 +113,11 @@ namespace Waher.Networking.XMPP.Concentrator
 			return Xml;
 		}
 
-		private void Send(StringBuilder Xml)
+		private Task Send(StringBuilder Xml)
 		{
 			Xml.Append("</sniff>");
 			this.concentratorServer.Client.SendMessage(MessageType.Normal, this.fullJID, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -123,10 +125,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public override void TransmitBinary(DateTime Timestamp, byte[] Data)
+		public override Task TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
 			if (this.HasExpired(Timestamp))
-				return;
+				return Task.CompletedTask;
 
 			StringBuilder Xml = this.GetHeader(Timestamp);
 
@@ -134,7 +136,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(Convert.ToBase64String(Data));
 			Xml.Append("</txBin>");
 
-			this.Send(Xml);
+			return this.Send(Xml);
 		}
 
 		/// <summary>
@@ -142,10 +144,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public override void ReceiveText(DateTime Timestamp, string Text)
+		public override Task ReceiveText(DateTime Timestamp, string Text)
 		{
 			if (this.HasExpired(Timestamp))
-				return;
+				return Task.CompletedTask;
 
 			StringBuilder Xml = this.GetHeader(Timestamp);
 
@@ -153,7 +155,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(XML.Encode(Text));
 			Xml.Append("</rx>");
 
-			this.Send(Xml);
+			return this.Send(Xml);
 		}
 
 		/// <summary>
@@ -161,10 +163,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public override void TransmitText(DateTime Timestamp, string Text)
+		public override Task TransmitText(DateTime Timestamp, string Text)
 		{
 			if (this.HasExpired(Timestamp))
-				return;
+				return Task.CompletedTask;
 
 			StringBuilder Xml = this.GetHeader(Timestamp);
 
@@ -172,7 +174,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(XML.Encode(Text));
 			Xml.Append("</tx>");
 
-			this.Send(Xml);
+			return this .Send(Xml);
 		}
 
 		/// <summary>
@@ -180,10 +182,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Comment">Comment.</param>
-		public override void Information(DateTime Timestamp, string Comment)
+		public override Task Information(DateTime Timestamp, string Comment)
 		{
 			if (this.HasExpired(Timestamp))
-				return;
+				return Task.CompletedTask;
 
 			StringBuilder Xml = this.GetHeader(Timestamp);
 
@@ -191,7 +193,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(XML.Encode(Comment));
 			Xml.Append("</info>");
 
-			this.Send(Xml);
+			return this.Send(Xml);
 		}
 
 		/// <summary>
@@ -199,10 +201,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Warning">Warning.</param>
-		public override void Warning(DateTime Timestamp, string Warning)
+		public override Task Warning(DateTime Timestamp, string Warning)
 		{
 			if (this.HasExpired(Timestamp))
-				return;
+				return Task.CompletedTask;
 
 			StringBuilder Xml = this.GetHeader(Timestamp);
 
@@ -210,7 +212,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(XML.Encode(Warning));
 			Xml.Append("</warning>");
 
-			this.Send(Xml);
+			return this.Send(Xml);
 		}
 
 		/// <summary>
@@ -218,10 +220,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Error">Error.</param>
-		public override void Error(DateTime Timestamp, string Error)
+		public override Task Error(DateTime Timestamp, string Error)
 		{
 			if (this.HasExpired(Timestamp))
-				return;
+				return Task.CompletedTask;
 
 			StringBuilder Xml = this.GetHeader(Timestamp);
 
@@ -229,7 +231,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(XML.Encode(Error));
 			Xml.Append("</error>");
 
-			this.Send(Xml);
+			return this.Send(Xml);
 		}
 
 		/// <summary>
@@ -237,10 +239,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public override void Exception(DateTime Timestamp, string Exception)
+		public override Task Exception(DateTime Timestamp, string Exception)
 		{
 			if (this.HasExpired(Timestamp))
-				return;
+				return Task.CompletedTask;
 
 			StringBuilder Xml = this.GetHeader(Timestamp);
 
@@ -248,7 +250,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append(XML.Encode(Exception));
 			Xml.Append("</exception>");
 
-			this.Send(Xml);
+			return this.Send(Xml);
 		}
 	}
 }

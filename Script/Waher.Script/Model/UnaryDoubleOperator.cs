@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Objects;
@@ -38,6 +39,24 @@ namespace Waher.Script.Model
 		}
 
 		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!this.isAsync)
+				return base.Evaluate(Variables);
+
+			IElement Op = await this.op.EvaluateAsync(Variables);
+
+			if (Op is DoubleNumber DOp)
+				return await this.EvaluateAsync(DOp.Value);
+			else
+				return await this.EvaluateAsync(Op, Variables);
+		}
+
+		/// <summary>
 		/// Evaluates the operator on scalar operands.
 		/// </summary>
 		/// <param name="Operand">Operand.</param>
@@ -54,11 +73,36 @@ namespace Waher.Script.Model
 		}
 
 		/// <summary>
+		/// Evaluates the operator on scalar operands.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result</returns>
+		public override async Task<IElement> EvaluateScalarAsync(IElement Operand, Variables Variables)
+		{
+			if (Operand is DoubleNumber DOp)
+				return await this.EvaluateAsync(DOp.Value);
+			else if (Expression.TryConvert<double>(Operand.AssociatedObjectValue, out double d))
+				return await this.EvaluateAsync(d);
+			else
+				throw new ScriptRuntimeException("Scalar operands must be double values or physical magnitudes.", this);
+		}
+
+		/// <summary>
 		/// Evaluates the double operator.
 		/// </summary>
 		/// <param name="Operand">Operand.</param>
 		/// <returns>Result</returns>
 		public abstract IElement Evaluate(double Operand);
 
+		/// <summary>
+		/// Evaluates the double operator.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <returns>Result</returns>
+		public virtual Task<IElement> EvaluateAsync(double Operand)
+		{
+			return Task.FromResult<IElement>(this.Evaluate(Operand));
+		}
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.ExceptionServices;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Objects;
@@ -114,6 +115,95 @@ namespace Waher.Script.Model
 		}
 
 		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!this.isAsync)
+				return this.Evaluate(Variables);
+
+			IElement L = await this.left.EvaluateAsync(Variables);
+			IElement R = null;
+			IElement Result;
+			BooleanValue BL = L as BooleanValue;
+			BooleanValue BR;
+
+			if (this.bothBool.HasValue && this.bothBool.Value && !(BL is null))
+			{
+				bool LValue = BL.Value;
+				Result = await this.EvaluateOptimizedResultAsync(LValue);
+				if (!(Result is null))
+					return Result;
+
+				R = await this.right.EvaluateAsync(Variables);
+				BR = R as BooleanValue;
+
+				if (!(BR is null))
+					return await this.EvaluateAsync(LValue, BR.Value);
+				else
+					this.bothBool = false;
+			}
+
+			if (R is null)
+			{
+				if (!(BL is null) && !this.bothBool.HasValue)
+				{
+					try
+					{
+						R = await this.right.EvaluateAsync(Variables);
+						BR = R as BooleanValue;
+
+						if (!(BR is null))
+						{
+							this.bothBool = true;
+							return await this.EvaluateAsync(BL.Value, BR.Value);
+						}
+						else
+							this.bothBool = false;
+					}
+					catch (Exception ex)
+					{
+						Result = await this.EvaluateOptimizedResultAsync(BL.Value);
+						if (Result is null)
+							ExceptionDispatchInfo.Capture(ex).Throw();
+						else
+						{
+							this.bothBool = true;
+							return Result;
+						}
+					}
+				}
+				else
+					R = await this.right.EvaluateAsync(Variables);
+			}
+
+			if (this.bothDouble.HasValue)
+			{
+				if (this.bothDouble.Value)
+				{
+					if (L is DoubleNumber DL && R is DoubleNumber DR)
+						return await this.EvaluateAsync(DL.Value, DR.Value);
+					else
+						this.bothDouble = false;
+				}
+			}
+			else
+			{
+				if (L is DoubleNumber DL && R is DoubleNumber DR)
+				{
+					this.bothDouble = true;
+					return await this.EvaluateAsync(DL.Value, DR.Value);
+				}
+				else
+					this.bothDouble = false;
+			}
+
+			return await this.EvaluateAsync(L, R, Variables);
+		}
+
+		/// <summary>
 		/// Evaluates the operator on scalar operands.
 		/// </summary>
 		/// <param name="Left">Left value.</param>
@@ -143,6 +233,35 @@ namespace Waher.Script.Model
 		}
 
 		/// <summary>
+		/// Evaluates the operator on scalar operands.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result</returns>
+		public override Task<IElement> EvaluateScalarAsync(IElement Left, IElement Right, Variables Variables)
+		{
+			if (Left is BooleanValue BL && Right is BooleanValue BR)
+				return this.EvaluateAsync(BL.Value, BR.Value);
+			else
+			{
+				double l, r;
+
+				if (Left is DoubleNumber DL)
+					l = DL.Value;
+				else if (!Expression.TryConvert<double>(Left.AssociatedObjectValue, out l))
+					throw new ScriptRuntimeException("Scalar operands must be double values.", this);
+
+				if (Right is DoubleNumber DR)
+					r = DR.Value;
+				else if (!Expression.TryConvert<double>(Right.AssociatedObjectValue, out r))
+					throw new ScriptRuntimeException("Scalar operands must be double values.", this);
+
+				return this.EvaluateAsync(l, r);
+			}
+		}
+
+		/// <summary>
 		/// Gives the operator a chance to optimize its execution if it knows the value of the left operand. This method is only called
 		/// if both operands evaluated to boolean values last time the operator was evaluated.
 		/// </summary>
@@ -165,6 +284,39 @@ namespace Waher.Script.Model
 		/// <param name="Right">Right value.</param>
 		/// <returns>Result</returns>
 		public abstract IElement Evaluate(double Left, double Right);
+
+		/// <summary>
+		/// Gives the operator a chance to optimize its execution if it knows the value of the left operand. This method is only called
+		/// if both operands evaluated to boolean values last time the operator was evaluated.
+		/// </summary>
+		/// <param name="Left">Value of left operand.</param>
+		/// <returns>Optimized result, if possble, or null if both operands are required.</returns>
+		public virtual Task<IElement> EvaluateOptimizedResultAsync(bool Left)
+		{
+			return Task.FromResult<IElement>(this.EvaluateOptimizedResult(Left));
+		}
+
+		/// <summary>
+		/// Evaluates the boolean operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public virtual Task<IElement> EvaluateAsync(bool Left, bool Right)
+		{
+			return Task.FromResult<IElement>(this.Evaluate(Left, Right));
+		}
+
+		/// <summary>
+		/// Evaluates the double operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public virtual Task<IElement> EvaluateAsync(double Left, double Right)
+		{
+			return Task.FromResult<IElement>(this.Evaluate(Left, Right));
+		}
 
 	}
 }

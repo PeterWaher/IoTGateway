@@ -3,8 +3,10 @@ using System.IO;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
+using Waher.Content.Emoji;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
@@ -56,14 +58,14 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
+		public override async Task GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
 			StringBuilder Alt = new StringBuilder();
 			bool SizeSet;
 
 			foreach (MarkdownElement E in ChildNodes)
-				E.GeneratePlainText(Alt);
+				await E.GeneratePlainText(Alt);
 
 			string AltStr = Alt.ToString();
 			bool SameWidth = true;
@@ -182,36 +184,40 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
+		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
 			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
 			foreach (MultimediaItem Item in Items)
 			{
-				OutputWpf(Output, Document.CheckURL(Item.Url, null), 
-					Item.Width, Item.Height, Item.Title);
-
-				break;
+				return OutputWpf(Output, new ImageSource()
+				{
+					Url = Document.CheckURL(Item.Url, null),
+					Width = Item.Width,
+					Height = Item.Height
+				}, Item.Title);
 			}
+
+			return Task.CompletedTask;
 		}
 
-		internal static void OutputWpf(XmlWriter Output, string Source, int? Width, int? Height, string Title)
+		internal static async Task OutputWpf(XmlWriter Output, IImageSource Source, string Title)
 		{
-			Source = CheckDataUri(Source, ref Width, ref Height);
+			Source = await CheckDataUri(Source);
 
 			Output.WriteStartElement("Image");
-			Output.WriteAttributeString("Source", Source);
+			Output.WriteAttributeString("Source", Source.Url);
 
 			bool HasSize = false;
 
-			if (Width.HasValue)
+			if (Source.Width.HasValue)
 			{
-				Output.WriteAttributeString("Width", Width.Value.ToString());
+				Output.WriteAttributeString("Width", Source.Width.Value.ToString());
 				HasSize = true;
 			}
 
-			if (Height.HasValue)
+			if (Source.Height.HasValue)
 			{
-				Output.WriteAttributeString("Height", Height.Value.ToString());
+				Output.WriteAttributeString("Height", Source.Height.Value.ToString());
 				HasSize = true;
 			}
 
@@ -224,23 +230,34 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			Output.WriteEndElement();
 		}
 
-		internal static string CheckDataUri(string Source, ref int? Width, ref int? Height)
+		internal static async Task<IImageSource> CheckDataUri(IImageSource Source)
 		{
+			string Url = Source.Url;
 			int i;
-			if (Source.StartsWith("data:", StringComparison.CurrentCultureIgnoreCase) && 
-				(i = Source.IndexOf("base64,")) > 0)
+
+			if (Url.StartsWith("data:", StringComparison.CurrentCultureIgnoreCase) &&
+				(i = Url.IndexOf("base64,")) > 0)
 			{
-				byte[] Data = Convert.FromBase64String(Source.Substring(i + 7));
+				int? Width = Source.Width;
+				int? Height = Source.Height;
+				byte[] Data = Convert.FromBase64String(Url.Substring(i + 7));
 				using (SKBitmap Bitmap = SKBitmap.Decode(Data))
 				{
 					Width = Bitmap.Width;
 					Height = Bitmap.Height;
 				}
 
-				Source = GetTemporaryFile(Data);
-			}
+				Url = await GetTemporaryFile(Data);
 
-			return Source;
+				return new ImageSource()
+				{
+					Url = Url,
+					Width = Width,
+					Height = Height
+				};
+			}
+			else
+				return Source;
 		}
 
 		/// <summary>
@@ -252,30 +269,34 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
+		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
 			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
 			foreach (MultimediaItem Item in Items)
 			{
-				OutputXamarinForms(Output, Document.CheckURL(Item.Url, null), 
-					Item.Width, Item.Height);
-
-				break;
+				return OutputXamarinForms(Output, new ImageSource()
+				{
+					Url = Document.CheckURL(Item.Url, null),
+					Width = Item.Width,
+					Height = Item.Height
+				});
 			}
+
+			return Task.CompletedTask;
 		}
 
-		internal static void OutputXamarinForms(XmlWriter Output, string Source, int? Width, int? Height)
+		internal static async Task OutputXamarinForms(XmlWriter Output, IImageSource Source)
 		{
-			Source = CheckDataUri(Source, ref Width, ref Height);
+			Source = await CheckDataUri(Source);
 
 			Output.WriteStartElement("Image");
-			Output.WriteAttributeString("Source", Source);
+			Output.WriteAttributeString("Source", Source.Url);
 
-			if (Width.HasValue)
-				Output.WriteAttributeString("WidthRequest", Width.Value.ToString());
+			if (Source.Width.HasValue)
+				Output.WriteAttributeString("WidthRequest", Source.Width.Value.ToString());
 
-			if (Height.HasValue)
-				Output.WriteAttributeString("HeightRequest", Height.Value.ToString());
+			if (Source.Height.HasValue)
+				Output.WriteAttributeString("HeightRequest", Source.Height.Value.ToString());
 
 			// TODO: Tooltip
 
@@ -287,7 +308,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// </summary>
 		/// <param name="BinaryImage">Binary image.</param>
 		/// <returns>Temporary file name.</returns>
-		public static string GetTemporaryFile(byte[] BinaryImage)
+		public static async Task<string> GetTemporaryFile(byte[] BinaryImage)
 		{
 			string FileName;
 
@@ -299,7 +320,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 			if (!File.Exists(FileName))
 			{
-				File.WriteAllBytes(FileName, BinaryImage);
+				await Resources.WriteAllBytesAsync(FileName, BinaryImage);
 
 				lock (synchObject)
 				{

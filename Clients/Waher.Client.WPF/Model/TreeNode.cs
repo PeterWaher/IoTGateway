@@ -476,10 +476,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// If it's possible to chat with the node.
 		/// </summary>
-		public virtual bool CanChat
-		{
-			get { return false; }
-		}
+		public virtual bool CanChat => false;
 
 		/// <summary>
 		/// Sends a chat message.
@@ -488,9 +485,10 @@ namespace Waher.Client.WPF.Model
 		/// <param name="ThreadId">Thread ID for the messge.</param>
 		/// <param name="Markdown">Markdown document, if any, or null if plain text.</param>
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
-		public virtual void SendChatMessage(string Message, string ThreadId, MarkdownDocument Markdown)
+		public virtual Task SendChatMessage(string Message, string ThreadId, MarkdownDocument Markdown)
 		{
 			MainWindow.ErrorBox("You are not allowed to chat with this entity.");
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

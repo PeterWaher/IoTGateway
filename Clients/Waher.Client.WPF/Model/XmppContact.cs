@@ -12,6 +12,7 @@ using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.RDP;
+using System.Threading.Tasks;
 
 namespace Waher.Client.WPF.Model
 {
@@ -278,7 +279,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		public override void SendChatMessage(string Message, string ThreadId, MarkdownDocument Markdown)
+		public override async Task SendChatMessage(string Message, string ThreadId, MarkdownDocument Markdown)
 		{
 			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
 			if (XmppAccountNode != null)
@@ -292,17 +293,17 @@ namespace Waher.Client.WPF.Model
 				else
 				{
 					XmppAccountNode.Client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To,
-						MultiFormatMessage(Message, Markdown), string.Empty, string.Empty, string.Empty, ThreadId, string.Empty, null, null);
+						await MultiFormatMessage(Message, Markdown), string.Empty, string.Empty, string.Empty, ThreadId, string.Empty, null, null);
 				}
 			}
 		}
 
-		public static string MultiFormatMessage(string PlainText, MarkdownDocument Markdown)
+		public static async Task<string> MultiFormatMessage(string PlainText, MarkdownDocument Markdown)
 		{
 			if (PlainText is null)
-				PlainText = Markdown.GeneratePlainText().Trim();
+				PlainText = (await Markdown.GeneratePlainText()).Trim();
 
-			string HTML = HtmlDocument.GetBody(Markdown.GenerateHTML()).Trim();
+			string HTML = HtmlDocument.GetBody(await Markdown.GenerateHTML()).Trim();
 			StringBuilder sb = new StringBuilder();
 
 			sb.Append("<body>");

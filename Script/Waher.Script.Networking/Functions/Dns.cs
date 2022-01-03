@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Networking.DNS;
 using Waher.Networking.DNS.Enumerations;
 using Waher.Networking.DNS.ResourceRecords;
@@ -65,12 +66,29 @@ namespace Waher.Script.Networking.Functions
 		public override string[] DefaultArgumentNames => new string[] { "Name", "QTYPE", "QCLASS" };
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
 		/// Evaluates the function.
 		/// </summary>
 		/// <param name="Arguments">Function arguments.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
+		{
+			return this.EvaluateAsync(Arguments, Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Arguments">Function arguments.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
 			string Name = Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty;
 			string s;
@@ -109,7 +127,7 @@ namespace Waher.Script.Networking.Functions
 				}
 			}
 
-			ResourceRecord[] Records = DnsResolver.Resolve(Name, TYPE, CLASS).Result;
+			ResourceRecord[] Records = await DnsResolver.Resolve(Name, TYPE, CLASS);
 
 			if (Records.Length == 0)
 				throw new ScriptRuntimeException("Unable to resolve name.", this);

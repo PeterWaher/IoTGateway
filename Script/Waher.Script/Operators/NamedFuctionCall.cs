@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -15,7 +14,9 @@ namespace Waher.Script.Operators
 	{
 		private readonly string functionName;
 		private readonly ScriptNode[] arguments;
+		private readonly int nrArguments;
 		private readonly bool nullCheck;
+		private bool isAsync;
 
 		/// <summary>
 		/// Named function call operator
@@ -32,23 +33,40 @@ namespace Waher.Script.Operators
 			this.functionName = FunctionName;
 			this.arguments = Arguments;
 			this.nullCheck = NullCheck;
+			this.nrArguments = this.arguments.Length;
+
+			this.CalcIsAsync();
+		}
+
+		private void CalcIsAsync()
+		{
+			this.isAsync = false;
+
+			for (int i = 0; i < this.nrArguments; i++)
+			{
+				if (this.arguments[i]?.IsAsynchronous ?? false)
+				{
+					this.isAsync = true;
+					break;
+				}
+			}
 		}
 
 		/// <summary>
 		/// Function name.
 		/// </summary>
-		public string FunctionName
-		{
-			get { return this.functionName; }
-		}
+		public string FunctionName => this.functionName;
 
 		/// <summary>
 		/// Arguments
 		/// </summary>
-		public ScriptNode[] Arguments
-		{
-			get { return this.arguments; }
-		}
+		public ScriptNode[] Arguments => this.arguments;
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -57,7 +75,7 @@ namespace Waher.Script.Operators
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			string s = this.arguments.Length.ToString();
+			string s = this.nrArguments.ToString();
 
 			if ((!Variables.TryGetVariable(this.functionName + " " + s, out Variable v) &&
 			   !Variables.TryGetVariable(this.functionName, out v)) ||
@@ -65,17 +83,22 @@ namespace Waher.Script.Operators
 			{
 				if (this.nullCheck)
 					return ObjectValue.Null;
-				else if (this.arguments.Length == 1)
+				else if (this.nrArguments == 1)
 					throw new ScriptRuntimeException("No function defined having 1 argument named '" + this.functionName + "' found.", this);
 				else
 					throw new ScriptRuntimeException("No function defined having " + s + " arguments named '" + this.functionName + "' found.", this);
 			}
 
-			int i, c = this.arguments.Length;
-			IElement[] Arg = new IElement[c];
-			ScriptNode Node;
+			return this.Evaluate(f, Variables);
+		}
 
-			for (i = 0; i < c; i++)
+		private IElement Evaluate(ILambdaExpression f, Variables Variables)
+		{ 
+			IElement[] Arg = new IElement[this.nrArguments];
+			ScriptNode Node;
+			int i;
+
+			for (i = 0; i < this.nrArguments; i++)
 			{
 				Node = this.arguments[i];
 				if (Node is null)
@@ -88,6 +111,46 @@ namespace Waher.Script.Operators
 		}
 
 		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			string s = this.nrArguments.ToString();
+
+			if ((!Variables.TryGetVariable(this.functionName + " " + s, out Variable v) &&
+			   !Variables.TryGetVariable(this.functionName, out v)) ||
+			   (!(v.ValueElement is ILambdaExpression f)))
+			{
+				if (this.nullCheck)
+					return ObjectValue.Null;
+				else if (this.nrArguments == 1)
+					throw new ScriptRuntimeException("No function defined having 1 argument named '" + this.functionName + "' found.", this);
+				else
+					throw new ScriptRuntimeException("No function defined having " + s + " arguments named '" + this.functionName + "' found.", this);
+			}
+
+			if (!this.isAsync && !f.IsAsynchronous)
+				return this.Evaluate(f, Variables);
+
+			IElement[] Arg = new IElement[this.nrArguments];
+			ScriptNode Node;
+			int i;
+
+			for (i = 0; i < this.nrArguments; i++)
+			{
+				Node = this.arguments[i];
+				if (Node is null)
+					Arg[i] = ObjectValue.Null;
+				else
+					Arg[i] = await Node.EvaluateAsync(Variables);
+			}
+
+			return await f.EvaluateAsync(Arg, Variables);
+		}
+
+		/// <summary>
 		/// Calls the callback method for all child nodes.
 		/// </summary>
 		/// <param name="Callback">Callback method to call.</param>
@@ -96,7 +159,7 @@ namespace Waher.Script.Operators
 		/// <returns>If the process was completed.</returns>
 		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
 		{
-			int i, c=this.arguments.Length;
+			int i;
 
 			if (DepthFirst)
 			{
@@ -104,11 +167,33 @@ namespace Waher.Script.Operators
 					return false;
 			}
 
-			for (i = 0; i < c; i++)
+			ScriptNode Node;
+			bool RecalcIsAsync = false;
+
+			for (i = 0; i < this.nrArguments; i++)
 			{
-				if (!(this.arguments[i] is null) && !Callback(ref this.arguments[i], State))
-					return false;
+				Node = this.arguments[i];
+				if (!(Node is null))
+				{
+					bool b = !Callback(Node, out ScriptNode NewNode, State);
+					if (!(NewNode is null))
+					{
+						this.arguments[i] = NewNode;
+						RecalcIsAsync = true;
+					}
+
+					if (b)
+					{
+						if (RecalcIsAsync)
+							this.CalcIsAsync();
+
+						return false;
+					}
+				}
 			}
+
+			if (RecalcIsAsync)
+				this.CalcIsAsync();
 
 			if (!DepthFirst)
 			{
@@ -119,9 +204,7 @@ namespace Waher.Script.Operators
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is NamedFunctionCall O &&
@@ -131,9 +214,7 @@ namespace Waher.Script.Operators
 				base.Equals(obj);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

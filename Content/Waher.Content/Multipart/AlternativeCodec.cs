@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Runtime.Inventory;
 
@@ -31,30 +32,12 @@ namespace Waher.Content.Multipart
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes
-		{
-			get
-			{
-				return new string[]
-				{
-					ContentType
-				};
-			}
-		}
+		public string[] ContentTypes => new string[] { ContentType };
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions
-		{
-			get
-			{
-				return new string[]
-				{
-					"alternative"
-				};
-			}
-		}
+		public string[] FileExtensions => new string[] { "alternative" };
 
 		/// <summary>
 		/// If the decoder decodes an object with a given content type.
@@ -86,11 +69,11 @@ namespace Waher.Content.Multipart
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public async Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			List<EmbeddedContent> List = new List<EmbeddedContent>();
 
-			FormDataDecoder.Decode(Data, Fields, null, List, BaseUri);
+			await FormDataDecoder.Decode(Data, Fields, null, List, BaseUri);
 
 			return new ContentAlternatives(List.ToArray());
 		}
@@ -162,18 +145,17 @@ namespace Waher.Content.Multipart
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
-		/// <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
-		/// <returns>Encoded object.</returns>
+		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
+		public async Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (Object is ContentAlternatives Alternatives &&
 				InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
 			{
 				string Boundary = Guid.NewGuid().ToString();
-				ContentType = AlternativeCodec.ContentType + "; boundary=\"" + Boundary + "\"";
-				return FormDataDecoder.Encode(Alternatives.Content, Boundary);
+				string ContentType = AlternativeCodec.ContentType + "; boundary=\"" + Boundary + "\"";
+				return new KeyValuePair<byte[], string>(await FormDataDecoder.Encode(Alternatives.Content, Boundary), ContentType);
 			}
 			else
 				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));

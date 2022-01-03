@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -72,14 +73,14 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.text = new StringAttribute(Input, "text");
 			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign");
 			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign");
 			this.font = new StringAttribute(Input, "font");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -129,27 +130,26 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
-			if (this.halign is null || !this.halign.TryEvaluate(State.Session, out this.halignment))
-				this.halignment = HorizontalAlignment.Left;
+			this.halignment = await this.halign.Evaluate< HorizontalAlignment>(State.Session, HorizontalAlignment.Left);
+			this.valignment = await this.valign.Evaluate<VerticalAlignment>(State.Session, VerticalAlignment.Top);
 
-			if (this.valign is null || !this.valign.TryEvaluate(State.Session, out this.valignment))
-				this.valignment = VerticalAlignment.Top;
-
-			if (!(this.font is null) && 
-				this.fontRef is null &&
-				this.font.TryEvaluate(State.Session, out string FontId) &&
-				this.Document.TryGetElement(FontId, out ILayoutElement E) &&
-				E is Font Font)
+			if (!(this.font is null) && this.fontRef is null)
 			{
-				this.fontRef = Font;
+				EvaluationResult<string> FontId = await this.font.TryEvaluate(State.Session);
+
+				if (FontId.Ok && this.Document.TryGetElement(FontId.Result, out ILayoutElement E) && E is Font Font)
+					this.fontRef = Font;
 			}
 
-			if (!(this.text is null) && this.text.TryEvaluate(State.Session, out this.textValue))
+			EvaluationResult<string> Text = await this.text.TryEvaluate(State.Session);
+			if (Text.Ok)
 			{
+				this.textValue = Text.Result;
+
 				SKPaint Paint = this.fontRef?.Text ?? State.Text;
 
 				Paint.MeasureText(this.textValue, ref this.bounds);
@@ -159,8 +159,6 @@ namespace Waher.Layout.Layout2D.Model.Content
 			}
 			else
 				this.defined = false;
-
-			return Relative;
 		}
 
 		/// <summary>
@@ -228,7 +226,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			if (this.defined)
 			{
@@ -236,7 +234,7 @@ namespace Waher.Layout.Layout2D.Model.Content
 					this.fontRef?.FontDef ?? State.Font, this.fontRef?.Text ?? State.Text);
 			}
 
-			base.Draw(State);
+			await base.Draw(State);
 		}
 	}
 }

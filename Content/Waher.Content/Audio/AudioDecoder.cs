@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Audio
@@ -57,18 +58,12 @@ namespace Waher.Content.Audio
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes
-		{
-			get { return AudioContentTypes; }
-		}
+		public string[] ContentTypes => AudioContentTypes;
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions
-		{
-			get { return AudioFileExtensions; }
-		}
+		public string[] FileExtensions => AudioFileExtensions;
 
 		/// <summary>
 		/// If the decoder decodes an object with a given content type.
@@ -100,9 +95,9 @@ namespace Waher.Content.Audio
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			return Data;
+			return Task.FromResult<object>(Data);
 		}
 
 		/// <summary>

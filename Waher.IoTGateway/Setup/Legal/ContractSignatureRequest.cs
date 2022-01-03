@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Networking.XMPP.Contracts;
 using Waher.Persistence.Attributes;
@@ -44,33 +45,35 @@ namespace Waher.IoTGateway.Setup.Legal
 		}
 
 		/// <summary>
-		/// Contract to sign
+		/// Gets the parsed contract.
 		/// </summary>
-		[IgnoreMember]
-		public Contract Contract
+		/// <returns>Parsed contract</returns>
+		public async Task<Contract> GetContract()
 		{
-			get
+			if (this.contract is null)
 			{
-				if (this.contract is null)
+				XmlDocument Doc = new XmlDocument()
 				{
-					XmlDocument Doc = new XmlDocument()
-					{
-						PreserveWhitespace = true
-					};
-					Doc.LoadXml(this.contractXml);
-					this.contract = Contract.Parse(Doc.DocumentElement, out bool _, out bool _);
-				}
-
-				return this.contract;
+					PreserveWhitespace = true
+				};
+				Doc.LoadXml(this.contractXml);
+				ParsedContract Parsed = await Contract.Parse(Doc.DocumentElement);
+				this.contract = Parsed.Contract;
 			}
 
-			set
-			{
-				this.contract = value;
-				StringBuilder Xml = new StringBuilder();
-				this.contract.Serialize(Xml, true, true, true, true, true, true, true);
-				this.contractXml = Xml.ToString();
-			}
+			return this.contract;
+		}
+
+		/// <summary>
+		/// Sets a parsed contract.
+		/// </summary>
+		/// <param name="Contract">Parsed contract</param>
+		public void SetContract(Contract Contract)
+		{
+			this.contract = Contract;
+			StringBuilder Xml = new StringBuilder();
+			this.contract.Serialize(Xml, true, true, true, true, true, true, true);
+			this.contractXml = Xml.ToString();
 		}
 
 		/// <summary>

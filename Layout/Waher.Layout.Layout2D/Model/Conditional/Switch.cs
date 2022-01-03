@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Exceptions;
-using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Conditional
 {
@@ -66,9 +66,9 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override async Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
+			await base .FromXml(Input);
 
 			List<Case> Cases = new List<Case>();
 
@@ -76,7 +76,7 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 			{
 				if (Node is XmlElement E)
 				{
-					ILayoutElement Child = this.Document.CreateElement(E, this);
+					ILayoutElement Child = await this.Document.CreateElement(E, this);
 					if (Child is Case Case)
 						Cases.Add(Case);
 					else if (Child is Otherwise Otherwise)
@@ -153,15 +153,15 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
 			if (!this.evaluated)
 			{
 				foreach (Case Case in this.cases)
 				{
-					object Result = Case.ConditionAttribute?.Evaluate(State.Session);
+					object Result = Case.ConditionAttribute is null ? null : await Case.ConditionAttribute.EvaluateAsync(State.Session);
 					if (Result is bool b && b)
 					{
 						this.activeCase = Case;
@@ -175,10 +175,8 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 				this.evaluated = true;
 			}
 
-			if (this.activeCase?.MeasureDimensions(State) ?? false)
-				Relative = true;
-
-			return Relative;
+			if (!(this.activeCase is null))
+				await this.activeCase.MeasureDimensions(State);
 		}
 
 		/// <summary>
@@ -194,10 +192,10 @@ namespace Waher.Layout.Layout2D.Model.Conditional
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			if (this.activeCase?.IsVisible ?? false)
-				this.activeCase.Draw(State);
+				await this.activeCase.Draw(State);
 		}
 
 	}

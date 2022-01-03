@@ -217,7 +217,7 @@ namespace Waher.WebService.Script
 				try
 				{
 					this.watch.Start();
-					Result = this.expression.Root.Evaluate(this.variables);
+					Result = await this.expression.Root.EvaluateAsync(this.variables);
 				}
 				catch (ScriptReturnValueException ex)
 				{
@@ -466,7 +466,7 @@ namespace Waher.WebService.Script
 								if (Item is string s3)
 									Html.Append(this.FormatText(XML.HtmlValueEncode(s3)));
 								else if (Item is MarkdownElement Element)
-									Element.GenerateHTML(Html);
+									await Element.GenerateHTML(Html);
 								else
 									Html.Append(this.FormatText(XML.HtmlValueEncode(Expression.ToString(Item))));
 							}

@@ -26,10 +26,8 @@ namespace Waher.Networking.Sniffers.Model
 			Sniffer.Error(this.Timestamp, this.Text);
 		}
 
-        /// <summary>
-        /// <see cref="Object.ToString()"/>
-        /// </summary>
-        public override string ToString()
+		/// <inheritdoc/>
+		public override string ToString()
         {
             return "ERROR: " + this.Text;
         }

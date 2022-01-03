@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Xml;
+using System.Threading.Tasks;
 using SkiaSharp;
-using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D.Model.Figures
 {
@@ -41,18 +39,20 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			if (this.defined)
 			{
-				if (this.TryGetFill(State, out SKPaint Fill))
+				SKPaint Fill = await this.TryGetFill(State);
+				if (!(Fill is null))
 				{
 					State.Canvas.DrawRect(this.xCoordinate, this.yCoordinate,
 						this.xCoordinate2 - this.xCoordinate, 
 						this.yCoordinate2 - this.yCoordinate, Fill);
 				}
 
-				if (this.TryGetPen(State, out SKPaint Pen))
+				SKPaint Pen = await this.TryGetPen(State);
+				if (!(Pen is null))
 				{
 					State.Canvas.DrawRect(this.xCoordinate, this.yCoordinate,
 						this.xCoordinate2 - this.xCoordinate, 
@@ -60,7 +60,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				}
 			}
 		
-			base.Draw(State);
+			await base.Draw(State);
 		}
 	}
 }

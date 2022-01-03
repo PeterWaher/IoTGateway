@@ -60,7 +60,7 @@ namespace Waher.IoTGateway.WebResources
 			if (!Request.HasData || Request.Session is null)
 				throw new BadRequestException();
 
-			object Obj = Request.DecodeData();
+			object Obj = await Request.DecodeDataAsync();
 			string From;
 
 			if (!(Obj is Dictionary<string, string> Form) ||

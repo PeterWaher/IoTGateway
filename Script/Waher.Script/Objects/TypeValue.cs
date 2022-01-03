@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
 
@@ -34,9 +32,7 @@ namespace Waher.Script.Objects
 			set { this.value = value; }
 		}
 
-		/// <summary>
-		/// <see cref="Type.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.value.FullName;
@@ -58,9 +54,7 @@ namespace Waher.Script.Objects
 			get { return this.value; }
 		}
 
-		/// <summary>
-		/// <see cref="Type.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (!(obj is TypeValue E))
@@ -69,9 +63,7 @@ namespace Waher.Script.Objects
 				return this.value.Equals(E.value);
 		}
 
-		/// <summary>
-		/// <see cref="Type.GetHashCode"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			if (this.value is null)

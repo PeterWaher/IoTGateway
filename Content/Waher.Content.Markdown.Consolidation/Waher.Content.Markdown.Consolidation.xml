@@ -68,12 +68,12 @@
             Thread ID
             </summary>
         </member>
-        <member name="P:Waher.Content.Markdown.Consolidation.Consolidator.Sources">
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.GetSources">
             <summary>
             Consolidated sources.
             </summary>
         </member>
-        <member name="P:Waher.Content.Markdown.Consolidation.Consolidator.NrReportedSources">
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.GetNrReportedSources">
             <summary>
             Number of sources that have reported content.
             </summary>
@@ -266,7 +266,7 @@
             Information about a document.
             </summary>
         </member>
-        <member name="M:Waher.Content.Markdown.Consolidation.DocumentInformation.#ctor(Waher.Content.Markdown.MarkdownDocument,System.String)">
+        <member name="M:Waher.Content.Markdown.Consolidation.DocumentInformation.CreateAsync(Waher.Content.Markdown.MarkdownDocument,System.String)">
             <summary>
             Information about a document.
             </summary>
@@ -308,7 +308,7 @@
             Interface for consolidators.
             </summary>
         </member>
-        <member name="P:Waher.Content.Markdown.Consolidation.IConsolidator.Sources">
+        <member name="M:Waher.Content.Markdown.Consolidation.IConsolidator.GetSources">
             <summary>
             Consolidated sources.
             </summary>
@@ -318,7 +318,7 @@
             External tag object that can be tagged to the object by its owner.
             </summary>
         </member>
-        <member name="P:Waher.Content.Markdown.Consolidation.IConsolidator.NrReportedSources">
+        <member name="M:Waher.Content.Markdown.Consolidation.IConsolidator.GetNrReportedSources">
             <summary>
             Number of sources that have reported content.
             </summary>

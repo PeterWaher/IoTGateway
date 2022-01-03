@@ -424,9 +424,7 @@ namespace Waher.Script.Units
 			return new Unit(Prefixes.ExponentToPrefix(-Exponent, out ResidueExponent), Factors);
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (!(obj is Unit U))
@@ -462,9 +460,7 @@ namespace Waher.Script.Units
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int i = (int)this.prefix;
@@ -475,9 +471,7 @@ namespace Waher.Script.Units
 			return i;
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.ToString(true);

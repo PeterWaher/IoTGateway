@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.CoAP;
 
 namespace Waher.Networking.LWM2M.Events
@@ -10,14 +9,14 @@ namespace Waher.Networking.LWM2M.Events
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void CoapRequestEventHandler(object Sender, CoapRequestEventArgs e);
+	public delegate Task CoapRequestEventHandler(object Sender, CoapRequestEventArgs e);
 
 	/// <summary>
 	/// Event arguments for CoAP request events.
 	/// </summary>
     public class CoapRequestEventArgs : EventArgs
     {
-		private CoapMessage request;
+		private readonly CoapMessage request;
 
 		/// <summary>
 		/// Event arguments for CoAP request events.

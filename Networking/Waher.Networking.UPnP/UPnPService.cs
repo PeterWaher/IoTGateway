@@ -131,9 +131,7 @@ namespace Waher.Networking.UPnP
 		/// </summary>
 		public Uri EventSubURI { get { return this.eventSubURI; } }
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.serviceType;

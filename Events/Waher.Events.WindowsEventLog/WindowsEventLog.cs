@@ -60,13 +60,11 @@ namespace Waher.Events.WindowsEventLog
 			}
 		}
 
-		/// <summary>
-		/// <see cref="EventSink.Queue(Event)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override Task Queue(Event Event)
 		{
 			WindowsEventType Type;
-			uint EventId = 0;   // https://msdn.microsoft.com/en-us/library/aa363651(v=vs.85).aspx
+			uint EventId;   // https://msdn.microsoft.com/en-us/library/aa363651(v=vs.85).aspx
 
 			switch (Event.Type)
 			{

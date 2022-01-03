@@ -388,11 +388,7 @@ namespace Waher.Content
 			return DT1 != DT2;
 		}
 
-		/// <summary>
-		/// Checks if the duration is equal to another object.
-		/// </summary>
-		/// <param name="obj">Object to compare against.</param>
-		/// <returns>If they are equal.</returns>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (!(obj is Duration D))
@@ -401,9 +397,7 @@ namespace Waher.Content
 			return this == D;
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			return (reference + this).GetHashCode();
@@ -411,9 +405,7 @@ namespace Waher.Content
 
 		private static readonly DateTime reference = new DateTime(2000, 1, 1);
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();

@@ -26,17 +26,12 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
 		/// </summary>
+		/// <param name="Operand">Operand.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
+		public override IElement Evaluate(IElement Operand, Variables Variables)
 		{
-			IElement Operand = this.op.Evaluate(Variables);
-			return this.Evaluate(Operand);
-		}
-
-		private IElement Evaluate(IElement Element)
-		{
-			if (Element is IRingElement E)
+			if (Operand is IRingElement E)
 			{
 				E = E.Invert();
 				if (E is null)
@@ -44,16 +39,16 @@ namespace Waher.Script.Operators.Arithmetics
 				else
 					return E;
 			}
-			else if (Element.IsScalar)
+			else if (Operand.IsScalar)
 				throw new ScriptRuntimeException("Operand not invertible.", this);
 			else
 			{
 				LinkedList<IElement> Elements = new LinkedList<IElement>();
 
-				foreach (IElement E2 in Element.ChildElements)
-					Elements.AddLast(this.Evaluate(E2));
+				foreach (IElement E2 in Operand.ChildElements)
+					Elements.AddLast(this.Evaluate(E2, Variables));
 
-				return Element.Encapsulate(Elements, this);
+				return Operand.Encapsulate(Elements, this);
 			}
 		}
 

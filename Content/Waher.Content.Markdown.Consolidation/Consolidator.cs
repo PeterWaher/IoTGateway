@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -16,6 +18,7 @@ namespace Waher.Content.Markdown.Consolidation
 	{
 		private readonly string threadId;
 		private readonly SortedDictionary<string, SourceState> sources = new SortedDictionary<string, SourceState>();
+		private readonly SemaphoreSlim synchObject = new SemaphoreSlim(1);
 		private readonly int maxPaletteSize;
 		private Dictionary<string, KeyValuePair<SKColor, int>> legend = null;
 		private DocumentType type = DocumentType.Empty;
@@ -44,38 +47,42 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <summary>
 		/// Consolidated sources.
 		/// </summary>
-		public string[] Sources
+		public async Task<string[]> GetSources()
 		{
-			get
+			await this.synchObject.WaitAsync();
+			try
 			{
-				lock (this.sources)
-				{
-					string[] Result = new string[this.sources.Count];
-					this.sources.Keys.CopyTo(Result, 0);
-					return Result;
-				}
+				string[] Result = new string[this.sources.Count];
+				this.sources.Keys.CopyTo(Result, 0);
+				return Result;
+			}
+			finally
+			{
+				this.synchObject.Release();
 			}
 		}
 
 		/// <summary>
 		/// Number of sources that have reported content.
 		/// </summary>
-		public int NrReportedSources
+		public async Task<int> GetNrReportedSources()
 		{
-			get
+			await this.synchObject.WaitAsync();
+			try
 			{
-				lock (this.sources)
+				int Result = 0;
+
+				foreach (SourceState State in this.sources.Values)
 				{
-					int Result = 0;
-
-					foreach (SourceState State in this.sources.Values)
-					{
-						if (!State.IsDefault)
-							Result++;
-					}
-
-					return Result;
+					if (!State.IsDefault)
+						Result++;
 				}
+
+				return Result;
+			}
+			finally
+			{
+				this.synchObject.Release();
 			}
 		}
 
@@ -103,7 +110,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Source">Source of information.</param>
 		/// <param name="Markdown">Markdown document.</param>
 		/// <returns>If the source is new.</returns>
-		public bool Add(string Source, MarkdownDocument Markdown)
+		public Task<bool> Add(string Source, MarkdownDocument Markdown)
 		{
 			return this.Add(Source, Markdown, string.Empty);
 		}
@@ -115,7 +122,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Markdown">Markdown document.</param>
 		/// <param name="Id">Optional ID of document.</param>
 		/// <returns>If the source is new.</returns>
-		public bool Add(string Source, MarkdownDocument Markdown, string Id)
+		public Task<bool> Add(string Source, MarkdownDocument Markdown, string Id)
 		{
 			return this.Add(Source, Markdown, Id, false, false);
 		}
@@ -126,7 +133,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Source">Source of information.</param>
 		/// <param name="Text">Text input.</param>
 		/// <returns>If the source is new.</returns>
-		public bool Add(string Source, string Text)
+		public Task<bool> Add(string Source, string Text)
 		{
 			return this.Add(Source, Text, string.Empty);
 		}
@@ -138,7 +145,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Text">Text input.</param>
 		/// <param name="Id">Optional ID of document.</param>
 		/// <returns>If the source is new.</returns>
-		public bool Add(string Source, string Text, string Id)
+		public Task<bool> Add(string Source, string Text, string Id)
 		{
 			return this.Add(Source, Text, Id, false, false);
 		}
@@ -150,7 +157,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Markdown">Markdown document.</param>
 		/// <param name="Id">Optional ID of document.</param>
 		/// <returns>If the source is new.</returns>
-		public bool Update(string Source, MarkdownDocument Markdown, string Id)
+		public Task<bool> Update(string Source, MarkdownDocument Markdown, string Id)
 		{
 			return this.Add(Source, Markdown, Id, true, false);
 		}
@@ -162,7 +169,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Text">Text input.</param>
 		/// <param name="Id">Optional ID of document.</param>
 		/// <returns>If the source is new.</returns>
-		public bool Update(string Source, string Text, string Id)
+		public Task<bool> Update(string Source, string Text, string Id)
 		{
 			return this.Add(Source, Text, Id, true, false);
 		}
@@ -176,10 +183,10 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Update">If a document should be updated.</param>
 		/// <param name="IsDefault">If the content is default content (true), or reported content (false).</param>
 		/// <returns>If the source is new.</returns>
-		private bool Add(string Source, string Text, string Id, bool Update, bool IsDefault)
+		private async Task<bool> Add(string Source, string Text, string Id, bool Update, bool IsDefault)
 		{
-			MarkdownDocument Doc = new MarkdownDocument(Text);
-			return this.Add(Source, Doc, Id, Update, IsDefault);
+			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Text);
+			return await this.Add(Source, Doc, Id, Update, IsDefault);
 		}
 
 		/// <summary>
@@ -188,7 +195,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Source">Source of information.</param>
 		/// <param name="Text">Text input.</param>
 		/// <returns>If the source is new.</returns>
-		public bool AddDefault(string Source, string Text)
+		public Task<bool> AddDefault(string Source, string Text)
 		{
 			return this.Add(Source, Text, string.Empty, false, true);
 		}
@@ -199,7 +206,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Source">Source of information.</param>
 		/// <param name="Markdown">Markdown document.</param>
 		/// <returns>If the source is new.</returns>
-		public bool AddDefault(string Source, MarkdownDocument Markdown)
+		public Task<bool> AddDefault(string Source, MarkdownDocument Markdown)
 		{
 			return this.Add(Source, Markdown, string.Empty, false, true);
 		}
@@ -213,12 +220,13 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <param name="Update">If a document should be updated.</param>
 		/// <param name="IsDefault">If the content is default content (true), or reported content (false).</param>
 		/// <returns>If the source is new.</returns>
-		private bool Add(string Source, MarkdownDocument Markdown, string Id, bool Update, bool IsDefault)
+		private async Task<bool> Add(string Source, MarkdownDocument Markdown, string Id, bool Update, bool IsDefault)
 		{
 			DocumentType Type;
 			bool Result;
 
-			lock (this.sources)
+			await this.synchObject.WaitAsync();
+			try
 			{
 				if ((Result = !this.sources.TryGetValue(Source, out SourceState State)) || State.IsDefault)
 				{
@@ -233,9 +241,9 @@ namespace Waher.Content.Markdown.Consolidation
 					return false;
 
 				if (Update)
-					Type = State.Update(Markdown, Id);
+					Type = await State.Update(Markdown, Id);
 				else
-					Type = State.Add(Markdown, Id);
+					Type = await State.Add(Markdown, Id);
 
 				if ((int)(this.type & Type) != 0)
 					this.type = (DocumentType)Math.Max((int)this.type, (int)Type);
@@ -299,22 +307,26 @@ namespace Waher.Content.Markdown.Consolidation
 						break;
 				}
 			}
+			finally
+			{
+				this.synchObject.Release();
+			}
 
 			if (Update)
-				this.Raise(this.Updated, Source);
+				await this.Raise(this.Updated, Source);
 			else
-				this.Raise(this.Added, Source);
+				await this .Raise(this.Added, Source);
 
 			return Result;
 		}
 
-		private void Raise(SourceEventHandler Handler, string Source)
+		private async Task Raise(SourceEventHandler Handler, string Source)
 		{
 			if (!(Handler is null))
 			{
 				try
 				{
-					Handler(this, new SourceEventArgs(Source));
+					await Handler(this, new SourceEventArgs(Source));
 				}
 				catch (Exception ex)
 				{

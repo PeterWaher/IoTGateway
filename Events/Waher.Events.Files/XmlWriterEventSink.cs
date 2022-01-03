@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -16,7 +17,7 @@ namespace Waher.Events.Files
 		/// </summary>
 		protected XmlWriter output;
 
-		private readonly object synchObject = new object();
+		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
 		private bool disposed = false;
 
 		/// <summary>
@@ -33,17 +34,17 @@ namespace Waher.Events.Files
 		/// <summary>
 		/// Method is called before writing something to the text file.
 		/// </summary>
-		protected virtual void BeforeWrite()
+		protected virtual Task BeforeWrite()
 		{
-			// Do nothing by default.
+			return Task.CompletedTask;  // Do nothing by default.
 		}
 
 		/// <summary>
 		/// Method is called after writing something to the text file.
 		/// </summary>
-		protected virtual void AfterWrite()
+		protected virtual Task AfterWrite()
 		{
-			// Do nothing by default.
+			return Task.CompletedTask;  // Do nothing by default.
 		}
 
 		/// <summary>
@@ -60,14 +61,15 @@ namespace Waher.Events.Files
 		/// Queues an event to be output.
 		/// </summary>
 		/// <param name="Event">Event to queue.</param>
-		public override Task Queue(Event Event)
+		public override async Task Queue(Event Event)
 		{
 			if (this.disposed)
-				return Task.CompletedTask;
+				return;
 
-			lock (this.synchObject)
+			await this.semaphore.WaitAsync();
+			try
 			{
-				this.BeforeWrite();
+				await this.BeforeWrite();
 				try
 				{
 					this.output.WriteStartElement(Event.Type.ToString());
@@ -126,11 +128,13 @@ namespace Waher.Events.Files
 				}
 				finally
 				{
-					this.AfterWrite();
+					await this.AfterWrite();
 				}
 			}
-
-			return Task.CompletedTask;
+			finally
+			{
+				this.semaphore.Release();
+			}
 		}
 
 		private static string[] GetRows(string s)

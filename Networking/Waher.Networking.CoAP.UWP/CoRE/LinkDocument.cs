@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.CoAP.CoRE
 {
@@ -11,11 +8,11 @@ namespace Waher.Networking.CoAP.CoRE
 	/// </summary>
 	public class LinkDocument
 	{
-		private Link[] links;
-		private Uri baseUri;
-		private string text;
+		private readonly Link[] links;
+		private readonly Uri baseUri;
+		private readonly string text;
 		private int pos;
-		private int len;
+		private readonly int len;
 
 		/// <summary>
 		/// CoRE Link Document, as defined in RFC 6690: https://tools.ietf.org/html/rfc6690
@@ -244,9 +241,7 @@ namespace Waher.Networking.CoAP.CoRE
 			get { return this.text; }
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.text;

@@ -150,10 +150,8 @@ namespace Waher.Security.EllipticCurves
 		/// </summary>
 		public bool IsYZero => this.y.IsZero;
 
-		/// <summary>
-		/// <see cref="Object.ToString"/>
-		/// </summary>
-		public override string ToString()
+        /// <inheritdoc/>
+        public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -175,10 +173,8 @@ namespace Waher.Security.EllipticCurves
 			return sb.ToString();
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
-		public override bool Equals(object obj)
+        /// <inheritdoc/>
+        public override bool Equals(object obj)
 		{
 			return obj is PointOnCurve P &&
 				this.x.Equals(P.x) &&
@@ -189,10 +185,8 @@ namespace Waher.Security.EllipticCurves
                 this.homogeneous.Equals(P.homogeneous);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode"/>
-		/// </summary>
-		public override int GetHashCode()
+        /// <inheritdoc/>
+        public override int GetHashCode()
 		{
 			return
 				this.x.GetHashCode() ^

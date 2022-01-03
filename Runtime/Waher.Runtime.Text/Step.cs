@@ -54,9 +54,7 @@ namespace Waher.Runtime.Text
 		/// </summary>
 		public EditOperation Operation => this.operation;
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder Result = new StringBuilder();

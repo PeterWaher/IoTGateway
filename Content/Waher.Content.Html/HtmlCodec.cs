@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Html
@@ -40,18 +41,12 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes
-		{
-			get { return HtmlContentTypes; }
-		}
+		public string[] ContentTypes => HtmlContentTypes;
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions
-		{
-			get { return HtmlFileExtensions; }
-		}
+		public string[] FileExtensions => HtmlFileExtensions;
 
 		/// <summary>
 		/// If the decoder decodes an object with a given content type.
@@ -83,10 +78,10 @@ namespace Waher.Content.Html
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string Html = CommonTypes.GetString(Data, Encoding);
-			return new HtmlDocument(Html);
+			return Task.FromResult<object>(new HtmlDocument(Html));
 		}
 
 		/// <summary>
@@ -166,34 +161,38 @@ namespace Waher.Content.Html
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
-		/// <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
-		/// <returns>Encoded object.</returns>
+		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
+		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
-			if (InternetContent.IsAccepted(HtmlContentTypes, out ContentType, AcceptedContentTypes))
+			if (InternetContent.IsAccepted(HtmlContentTypes, out string ContentType, AcceptedContentTypes))
 			{
 				string Html = null;
+				byte[] Bin;
 
 				if (Object is HtmlDocument HtmlDoc)
 					Html = HtmlDoc.HtmlText;
 				else if (Object is string s)
 					Html = s;
 
-				if (!(Html is null))
+				if (Html is null)
+					Bin = null;
+				else
 				{
 					if (Encoding is null)
 					{
 						ContentType += "; charset=utf-8";
-						return Encoding.UTF8.GetBytes(Html);
+						Bin = Encoding.UTF8.GetBytes(Html);
 					}
 					else
 					{
 						ContentType += "; charset=" + Encoding.WebName;
-						return Encoding.GetBytes(Html);
+						Bin = Encoding.GetBytes(Html);
 					}
 				}
+
+				return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Bin, ContentType));
 			}
 
 			throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));

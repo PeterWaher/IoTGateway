@@ -108,7 +108,7 @@ namespace Waher.Content.Getters
 			else
 			{
 				ContentType = Response.Content.Headers.ContentType.ToString();
-				Decoded = InternetContent.Decode(ContentType, Bin, Uri);
+				Decoded = await InternetContent.DecodeAsync(ContentType, Bin, Uri);
 			}
 
 			if (!Response.IsSuccessStatusCode)

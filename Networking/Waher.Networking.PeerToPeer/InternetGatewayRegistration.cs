@@ -42,9 +42,7 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		internal bool UdpRegistered = false;
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content.Asn1.Exceptions;
 
 namespace Waher.Content.Asn1.Model
@@ -44,7 +45,7 @@ namespace Waher.Content.Asn1.Model
 		/// Loads the ASN.1 document to import.
 		/// </summary>
 		/// <exception cref="FileNotFoundException">If the import file is not found.</exception>
-		public Asn1Document LoadDocument()
+		public async Task<Asn1Document> LoadDocument()
 		{
 			if (!(this.importedDocument is null))
 				return this.importedDocument;
@@ -70,7 +71,7 @@ namespace Waher.Content.Asn1.Model
 					throw new FileNotFoundException("Unable to find import file for module " + this.module);
 			}
 
-			this.importedDocument = Asn1Document.FromFile(FileName, this.document.ImportFolders);
+			this.importedDocument = await Asn1Document.FromFile(FileName, this.document.ImportFolders);
 
 			return this.importedDocument;
 		}

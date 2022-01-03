@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Script;
+using System.Threading.Tasks;
 
 namespace Waher.Layout.Layout2D.Model.Groups
 {
@@ -14,7 +12,7 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// Adds a cell to the layout.
 		/// </summary>
 		/// <param name="Element">Cell element</param>
-		void Add(ILayoutElement Element);
+		Task Add(ILayoutElement Element);
 
 		/// <summary>
 		/// Flushes any waiting elements int he layout pipeline.

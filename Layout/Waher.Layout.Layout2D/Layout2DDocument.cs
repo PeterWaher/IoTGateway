@@ -13,6 +13,8 @@ using Waher.Layout.Layout2D.Events;
 using Waher.Layout.Layout2D.Exceptions;
 using Waher.Layout.Layout2D.Model;
 using Waher.Layout.Layout2D.Model.Backgrounds;
+using System.Threading.Tasks;
+using Waher.Layout.Layout2D.Model.Attributes;
 
 namespace Waher.Layout.Layout2D
 {
@@ -37,48 +39,16 @@ namespace Waher.Layout.Layout2D
 		private readonly Dictionary<string, ILayoutElement> elementsById = new Dictionary<string, ILayoutElement>();
 		private readonly Dictionary<string, object> attachments = new Dictionary<string, object>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly Variables session;
-		private readonly ILayoutElement root;
+		private ILayoutElement root;
 
 		#region Construction
 
 		/// <summary>
 		/// Contains a 2D layout document.
 		/// </summary>
-		/// <param name="Xml">XML Definition</param>
-		/// <param name="Attachments">Any attachments referenced from the layout.</param>
-		public Layout2DDocument(XmlDocument Xml, params KeyValuePair<string, object>[] Attachments)
-			: this(Xml, new Variables(), Attachments)
-		{
-		}
-
-		/// <summary>
-		/// Contains a 2D layout document.
-		/// </summary>
-		/// <param name="Xml">XML Definition</param>
 		/// <param name="Session">Session variables</param>
 		/// <param name="Attachments">Any attachments referenced from the layout.</param>
-		public Layout2DDocument(XmlDocument Xml, Variables Session, params KeyValuePair<string, object>[] Attachments)
-			: this(Xml.DocumentElement, Session, Attachments)
-		{
-		}
-
-		/// <summary>
-		/// Contains a 2D layout document.
-		/// </summary>
-		/// <param name="Xml">XML Definition</param>
-		/// <param name="Attachments">Any attachments referenced from the layout.</param>
-		public Layout2DDocument(XmlElement Xml, params KeyValuePair<string, object>[] Attachments)
-			: this(Xml, new Variables(), Attachments)
-		{
-		}
-
-		/// <summary>
-		/// Contains a 2D layout document.
-		/// </summary>
-		/// <param name="Xml">XML Definition</param>
-		/// <param name="Session">Session variables</param>
-		/// <param name="Attachments">Any attachments referenced from the layout.</param>
-		public Layout2DDocument(XmlElement Xml, Variables Session, params KeyValuePair<string, object>[] Attachments)
+		private Layout2DDocument(Variables Session, params KeyValuePair<string, object>[] Attachments)
 		{
 			this.session = Session;
 
@@ -87,50 +57,9 @@ namespace Waher.Layout.Layout2D
 				foreach (KeyValuePair<string, object> P in Attachments)
 					this.attachments[P.Key] = P.Value;
 			}
-
-			if (Xml.LocalName != LocalName || Xml.NamespaceURI != Namespace)
-				throw new ArgumentException("XML does not represend a 2D layout document.", nameof(Xml));
-
-			lock (elementTypes)
-			{
-				if (!initialized)
-				{
-					Type[] LayoutElementTypes = Types.GetTypesImplementingInterface(typeof(ILayoutElement));
-					Dictionary<string, ILayoutElement> TypesPerKey = new Dictionary<string, ILayoutElement>();
-
-					foreach (Type T in LayoutElementTypes)
-					{
-						TypeInfo TI = T.GetTypeInfo();
-						if (TI.IsAbstract)
-							continue;
-
-						try
-						{
-							ILayoutElement E = (ILayoutElement)Activator.CreateInstance(T, this, null);
-							string Key = E.Namespace + "#" + E.LocalName;
-
-							if (TypesPerKey.ContainsKey(Key))
-								Log.Error("Layout element type already defined: " + Key);
-							else
-								TypesPerKey[Key] = E;
-						}
-						catch (Exception ex)
-						{
-							Log.Critical(ex);
-						}
-					}
-
-					elementTypes = TypesPerKey;
-					initialized = true;
-
-					Types.OnInvalidated += (sender, e) => initialized = false;
-				}
-			}
-
-			root = this.CreateElement(Xml, null);
 		}
 
-		internal ILayoutElement CreateElement(XmlElement Xml, ILayoutElement Parent)
+		internal async Task<ILayoutElement> CreateElement(XmlElement Xml, ILayoutElement Parent)
 		{
 			string Key = Xml.NamespaceURI + "#" + Xml.LocalName;
 
@@ -138,14 +67,11 @@ namespace Waher.Layout.Layout2D
 				throw new LayoutSyntaxException("Layout element not recognized: " + Key);
 
 			ILayoutElement Result = E.Create(this, Parent);
-			Result.FromXml(Xml);
+			await Result.FromXml(Xml);
 
-			if (!(Result.IdAttribute is null) &&
-				Result.IdAttribute.TryEvaluate(this.session, out string Id) &&
-				!string.IsNullOrEmpty(Id))
-			{
-				this.AddElementId(Id, Result);
-			}
+			EvaluationResult<string> Id = await Result.IdAttribute.TryEvaluate(this.session);
+			if (Id.Ok && !string.IsNullOrEmpty(Id.Result))
+				this.AddElementId(Id.Result, Result);
 
 			return Result;
 		}
@@ -155,7 +81,7 @@ namespace Waher.Layout.Layout2D
 		/// </summary>
 		/// <param name="FileName">File name.</param>
 		/// <param name="Attachments">Any attachments referenced from the layout.</param>
-		public static Layout2DDocument FromFile(string FileName, params KeyValuePair<string, object>[] Attachments)
+		public static Task<Layout2DDocument> FromFile(string FileName, params KeyValuePair<string, object>[] Attachments)
 		{
 			return FromFile(FileName, true, Attachments);
 		}
@@ -166,7 +92,7 @@ namespace Waher.Layout.Layout2D
 		/// <param name="FileName">File name.</param>
 		/// <param name="Preprocess">If embedded script should be preprocessed.</param>
 		/// <param name="Attachments">Any attachments referenced from the layout.</param>
-		public static Layout2DDocument FromFile(string FileName, bool Preprocess, params KeyValuePair<string, object>[] Attachments)
+		public static Task<Layout2DDocument> FromFile(string FileName, bool Preprocess, params KeyValuePair<string, object>[] Attachments)
 		{
 			return FromFile(FileName, Preprocess, new Variables(), Attachments);
 		}
@@ -178,10 +104,10 @@ namespace Waher.Layout.Layout2D
 		/// <param name="Preprocess">If embedded script should be preprocessed.</param>
 		/// <param name="Session">Session variables.</param>
 		/// <param name="Attachments">Any attachments referenced from the layout.</param>
-		public static Layout2DDocument FromFile(string FileName, bool Preprocess, Variables Session, params KeyValuePair<string, object>[] Attachments)
+		public static async Task<Layout2DDocument> FromFile(string FileName, bool Preprocess, Variables Session, params KeyValuePair<string, object>[] Attachments)
 		{
-			string Xml = File.ReadAllText(FileName);
-			return FromXml(Xml, Preprocess, Session, Attachments);
+			string Xml = await Resources.ReadAllTextAsync(FileName);
+			return await FromXml(Xml, Preprocess, Session, Attachments);
 		}
 
 		/// <summary>
@@ -190,7 +116,7 @@ namespace Waher.Layout.Layout2D
 		/// <param name="Input">Stream input.</param>
 		/// <param name="DefaultEncoding">Default text encoding to use, if not deduced from a Byte-Order-Mark (BOM) of the file.</param>
 		/// <param name="Attachments">Any attachments referenced from the layout.</param>
-		public static Layout2DDocument FromStream(Stream Input, Encoding DefaultEncoding, params KeyValuePair<string, object>[] Attachments)
+		public static Task<Layout2DDocument> FromStream(Stream Input, Encoding DefaultEncoding, params KeyValuePair<string, object>[] Attachments)
 		{
 			return FromStream(Input, DefaultEncoding, true, Attachments);
 		}
@@ -202,7 +128,7 @@ namespace Waher.Layout.Layout2D
 		/// <param name="DefaultEncoding">Default text encoding to use, if not deduced from a Byte-Order-Mark (BOM) of the file.</param>
 		/// <param name="Preprocess">If embedded script should be preprocessed.</param>
 		/// <param name="Attachments">Any attachments referenced from the layout.</param>
-		public static Layout2DDocument FromStream(Stream Input, Encoding DefaultEncoding, bool Preprocess, params KeyValuePair<string, object>[] Attachments)
+		public static Task<Layout2DDocument> FromStream(Stream Input, Encoding DefaultEncoding, bool Preprocess, params KeyValuePair<string, object>[] Attachments)
 		{
 			return FromStream(Input, DefaultEncoding, Preprocess, new Variables(), Attachments);
 		}
@@ -215,7 +141,7 @@ namespace Waher.Layout.Layout2D
 		/// <param name="Preprocess">If embedded script should be preprocessed.</param>
 		/// <param name="Session">Session variables.</param>
 		/// <param name="Attachments">Any attachments referenced from the layout.</param>
-		public static Layout2DDocument FromStream(Stream Input, Encoding DefaultEncoding, bool Preprocess, Variables Session, params KeyValuePair<string, object>[] Attachments)
+		public static Task<Layout2DDocument> FromStream(Stream Input, Encoding DefaultEncoding, bool Preprocess, Variables Session, params KeyValuePair<string, object>[] Attachments)
 		{
 			long c = Input.Length - Input.Position;
 			if (c > int.MaxValue)
@@ -238,7 +164,7 @@ namespace Waher.Layout.Layout2D
 		/// </summary>
 		/// <param name="Xml">XML Definition</param>
 		/// <param name="Attachments">Any attachments referenced from the layout.</param>
-		public static Layout2DDocument FromXml(string Xml, params KeyValuePair<string, object>[] Attachments)
+		public static Task<Layout2DDocument> FromXml(string Xml, params KeyValuePair<string, object>[] Attachments)
 		{
 			return FromXml(Xml, true, Attachments);
 		}
@@ -249,7 +175,7 @@ namespace Waher.Layout.Layout2D
 		/// <param name="Xml">XML Definition</param>
 		/// <param name="Preprocess">If embedded script should be preprocessed.</param>
 		/// <param name="Attachments">Any attachments referenced from the layout.</param>
-		public static Layout2DDocument FromXml(string Xml, bool Preprocess, params KeyValuePair<string, object>[] Attachments)
+		public static Task<Layout2DDocument> FromXml(string Xml, bool Preprocess, params KeyValuePair<string, object>[] Attachments)
 		{
 			return FromXml(Xml, Preprocess, new Variables(), Attachments);
 		}
@@ -261,15 +187,15 @@ namespace Waher.Layout.Layout2D
 		/// <param name="Preprocess">If embedded script should be preprocessed.</param>
 		/// <param name="Session">Session variables.</param>
 		/// <param name="Attachments">Any attachments referenced from the layout.</param>
-		public static Layout2DDocument FromXml(string Xml, bool Preprocess, Variables Session, params KeyValuePair<string, object>[] Attachments)
+		public static async Task<Layout2DDocument> FromXml(string Xml, bool Preprocess, Variables Session, params KeyValuePair<string, object>[] Attachments)
 		{
 			if (Preprocess)
-				Xml = Expression.Transform(Xml, "{{", "}}", Session);
+				Xml = await Expression.TransformAsync(Xml, "{{", "}}", Session);
 
 			XmlDocument Doc = new XmlDocument();
 			Doc.LoadXml(Xml);
 
-			return FromXml(Doc, Session, Attachments);
+			return await FromXml(Doc, Session, Attachments);
 		}
 
 		/// <summary>
@@ -277,7 +203,28 @@ namespace Waher.Layout.Layout2D
 		/// </summary>
 		/// <param name="Xml">XML Definition</param>
 		/// <param name="Attachments">Any attachments referenced from the layout.</param>
-		public static Layout2DDocument FromXml(XmlDocument Xml, params KeyValuePair<string, object>[] Attachments)
+		public static Task<Layout2DDocument> FromXml(XmlDocument Xml, params KeyValuePair<string, object>[] Attachments)
+		{
+			return FromXml(Xml.DocumentElement, new Variables(), Attachments);
+		}
+
+		/// <summary>
+		/// Parses a 2D layout document from its XML definition.
+		/// </summary>
+		/// <param name="Xml">XML Definition</param>
+		/// <param name="Session">Session variables.</param>
+		/// <param name="Attachments">Any attachments referenced from the layout.</param>
+		public static Task<Layout2DDocument> FromXml(XmlDocument Xml, Variables Session, params KeyValuePair<string, object>[] Attachments)
+		{
+			return FromXml(Xml.DocumentElement, Session, Attachments);
+		}
+
+		/// <summary>
+		/// Parses a 2D layout document from its XML definition.
+		/// </summary>
+		/// <param name="Xml">XML Definition</param>
+		/// <param name="Attachments">Any attachments referenced from the layout.</param>
+		public static Task<Layout2DDocument> FromXml(XmlElement Xml, params KeyValuePair<string, object>[] Attachments)
 		{
 			return FromXml(Xml, new Variables(), Attachments);
 		}
@@ -288,30 +235,52 @@ namespace Waher.Layout.Layout2D
 		/// <param name="Xml">XML Definition</param>
 		/// <param name="Session">Session variables.</param>
 		/// <param name="Attachments">Any attachments referenced from the layout.</param>
-		public static Layout2DDocument FromXml(XmlDocument Xml, Variables Session, params KeyValuePair<string, object>[] Attachments)
+		public static async Task<Layout2DDocument> FromXml(XmlElement Xml, Variables Session, params KeyValuePair<string, object>[] Attachments)
 		{
-			return new Layout2DDocument(Xml, Session, Attachments);
-		}
+			if (Xml.LocalName != LocalName || Xml.NamespaceURI != Namespace)
+				throw new ArgumentException("XML does not represend a 2D layout document.", nameof(Xml));
 
-		/// <summary>
-		/// Parses a 2D layout document from its XML definition.
-		/// </summary>
-		/// <param name="Xml">XML Definition</param>
-		/// <param name="Attachments">Any attachments referenced from the layout.</param>
-		public static Layout2DDocument FromXml(XmlElement Xml, params KeyValuePair<string, object>[] Attachments)
-		{
-			return FromXml(Xml, new Variables(), Attachments);
-		}
+			lock (elementTypes)
+			{
+				if (!initialized)
+				{
+					Type[] LayoutElementTypes = Types.GetTypesImplementingInterface(typeof(ILayoutElement));
+					Dictionary<string, ILayoutElement> TypesPerKey = new Dictionary<string, ILayoutElement>();
+					Layout2DDocument Temp = new Layout2DDocument(new Variables());
 
-		/// <summary>
-		/// Parses a 2D layout document from its XML definition.
-		/// </summary>
-		/// <param name="Xml">XML Definition</param>
-		/// <param name="Session">Session variables.</param>
-		/// <param name="Attachments">Any attachments referenced from the layout.</param>
-		public static Layout2DDocument FromXml(XmlElement Xml, Variables Session, params KeyValuePair<string, object>[] Attachments)
-		{
-			return new Layout2DDocument(Xml, Session, Attachments);
+					foreach (Type T in LayoutElementTypes)
+					{
+						TypeInfo TI = T.GetTypeInfo();
+						if (TI.IsAbstract)
+							continue;
+
+						try
+						{
+							ILayoutElement E = (ILayoutElement)Activator.CreateInstance(T, Temp, null);
+							string Key = E.Namespace + "#" + E.LocalName;
+
+							if (TypesPerKey.ContainsKey(Key))
+								Log.Error("Layout element type already defined: " + Key);
+							else
+								TypesPerKey[Key] = E;
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+					}
+
+					elementTypes = TypesPerKey;
+					initialized = true;
+
+					Types.OnInvalidated += (sender, e) => initialized = false;
+				}
+			}
+
+			Layout2DDocument Result = new Layout2DDocument(Session, Attachments);
+			Result.root = await Result.CreateElement(Xml, null);
+
+			return Result;
 		}
 
 		/// <summary>
@@ -336,11 +305,10 @@ namespace Waher.Layout.Layout2D
 		/// Renders the layout to an image
 		/// </summary>
 		/// <param name="Settings">Rendering settings.</param>
-		/// <param name="Maps">Generated maps</param>
-		/// <returns></returns>
-		public SKImage Render(RenderSettings Settings, out Map[] Maps)
+		/// <returns>Image and generated maps</returns>
+		public async Task<KeyValuePair<SKImage, Map[]>> Render(RenderSettings Settings)
 		{
-			Maps = null;    // TODO: Generate maps.
+			Map[] Maps = null;    // TODO: Generate maps.
 
 			int Width;
 			int Height;
@@ -370,10 +338,16 @@ namespace Waher.Layout.Layout2D
 
 				int Limit = 100;
 
-				while (this.root?.MeasureDimensions(State) ?? false)
+				while (!(this.root is null))
 				{
-					if (--Limit <= 0)
+					State.MeasureRelative = false;
+					await this.root.MeasureDimensions(State);
+
+					if (!State.MeasureRelative)
 						break;
+
+					if (--Limit <= 0)
+						throw new InvalidOperationException("Layout positions not well defined.");
 				}
 
 				this.root?.MeasurePositions(State);
@@ -429,9 +403,10 @@ namespace Waher.Layout.Layout2D
 						break;
 				}
 
-				this.root?.Draw(State);
+				if(!(this.root is null))
+					await this.root.Draw(State);
 
-				return Surface.Snapshot();
+				return new KeyValuePair<SKImage, Map[]>(Surface.Snapshot(), Maps);
 			}
 			finally
 			{
@@ -564,7 +539,7 @@ namespace Waher.Layout.Layout2D
 		/// </summary>
 		/// <param name="Session">Session variables.</param>
 		/// <returns>Render settings.</returns>
-		public RenderSettings GetRenderSettings(Variables Session)
+		public async Task<RenderSettings> GetRenderSettings(Variables Session)
 		{
 			RenderSettings Result = new RenderSettings()
 			{
@@ -573,13 +548,14 @@ namespace Waher.Layout.Layout2D
 
 			if (this.root is Model.Backgrounds.Layout2D Layout2D)
 			{
-				if (!(Layout2D.BackgroundColorAttribute is null) &&
-					Layout2D.BackgroundColorAttribute.TryEvaluate(Session, out string BackgroundId) &&
-					this.TryGetElement(BackgroundId, out ILayoutElement Element) &&
-					Element is SolidBackground SolidBackground &&
-					SolidBackground.ColorAttribute.TryEvaluate(Session, out SKColor Color))
+				EvaluationResult<string> BackgroundId = await Attribute<string>.TryEvaluate(Layout2D.BackgroundColorAttribute, Session);
+				if (BackgroundId.Ok &&
+					this.TryGetElement(BackgroundId.Result, out ILayoutElement Element) &&
+					Element is SolidBackground SolidBackground)
 				{
-					Result.BackgroundColor = Color;
+					EvaluationResult<SKColor> Color = await Attribute<SKColor>.TryEvaluate(SolidBackground.ColorAttribute, Session);
+					if (Color.Ok)
+						Result.BackgroundColor = Color.Result;
 				}
 			}
 

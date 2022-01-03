@@ -58,8 +58,16 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
 
-			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) => Done.Set();
-			this.lwm2mClient.OnRegistrationFailed += (sender, e) => Error.Set();
+			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) =>
+			{
+				Done.Set();
+				return Task.CompletedTask;
+			};
+			this.lwm2mClient.OnRegistrationFailed += (sender, e) =>
+			{
+				Error.Set();
+				return Task.CompletedTask;
+			};
 
 			//this.lwm2mClient.Register(20, new Lwm2mServerReference("leshan.eclipse.org"));
 			this.lwm2mClient.Register(20, new Lwm2mServerReference("leshan.eclipse.org",
@@ -76,8 +84,16 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
 
-			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) => Done.Set();
-			this.lwm2mClient.OnRegistrationFailed += (sender, e) => Error.Set();
+			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) =>
+			{
+				Done.Set();
+				return Task.CompletedTask;
+			};
+			this.lwm2mClient.OnRegistrationFailed += (sender, e) =>
+			{
+				Error.Set();
+				return Task.CompletedTask;
+			};
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 20000));
 		}
@@ -90,8 +106,16 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
 
-			this.lwm2mClient.OnDeregistrationSuccessful += (sender, e) => Done.Set();
-			this.lwm2mClient.OnDeregistrationFailed += (sender, e) => Error.Set();
+			this.lwm2mClient.OnDeregistrationSuccessful += (sender, e) =>
+			{
+				Done.Set();
+				return Task.CompletedTask;
+			};
+			this.lwm2mClient.OnDeregistrationFailed += (sender, e) =>
+			{
+				Error.Set();
+				return Task.CompletedTask;
+			};
 			this.lwm2mClient.Deregister();
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 20000));

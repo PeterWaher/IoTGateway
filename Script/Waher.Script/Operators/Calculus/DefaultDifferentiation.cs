@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -33,10 +31,7 @@ namespace Waher.Script.Operators.Calculus
 		/// <summary>
 		/// Number of differentiations.
 		/// </summary>
-		public int NrDifferentiations
-		{
-			get { return this.nrDifferentiations; }
-		}
+		public int NrDifferentiations => this.nrDifferentiations;
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -59,6 +54,17 @@ namespace Waher.Script.Operators.Calculus
 			}
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Evaluates the operator.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result</returns>
+		public override IElement Evaluate(IElement Operand, Variables Variables)
+		{
+			return ObjectValue.Null;    // Node not evaluated directly.
 		}
 
 		private IElement DifferentiateOnce(ScriptNode Node, Variables Variables)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Content.Markdown.Model;
@@ -129,7 +130,7 @@ namespace Waher.Content.Markdown.GraphViz
 		/// </summary>
 		/// <param name="Limit">Age limit.</param>
 		public static void DeleteOldFiles(DateTime Limit)
-		{ 
+		{
 			int Count = 0;
 
 			foreach (string FileName in Directory.GetFiles(graphVizFolder, "*.*"))
@@ -325,55 +326,55 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public bool GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public async Task<bool> GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, ResultType.Svg, out string Title, out string MapFileName, out string Hash);
-			if (FileName is null)
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Svg);
+			if (Info is null)
 				return false;
 
-			FileName = FileName.Substring(contentRootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
-			if (!FileName.StartsWith("/"))
-				FileName = "/" + FileName;
+			Info.FileName = Info.FileName.Substring(contentRootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
+			if (!Info.FileName.StartsWith("/"))
+				Info.FileName = "/" + Info.FileName;
 
 			Output.Append("<figure>");
 			Output.Append("<img src=\"");
-			Output.Append(XML.HtmlAttributeEncode(FileName));
+			Output.Append(XML.HtmlAttributeEncode(Info.FileName));
 
-			if (!string.IsNullOrEmpty(Title))
+			if (!string.IsNullOrEmpty(Info.Title))
 			{
 				Output.Append("\" alt=\"");
-				Output.Append(XML.HtmlAttributeEncode(Title));
+				Output.Append(XML.HtmlAttributeEncode(Info.Title));
 
 				Output.Append("\" title=\"");
-				Output.Append(XML.HtmlAttributeEncode(Title));
+				Output.Append(XML.HtmlAttributeEncode(Info.Title));
 			}
 
-			if (!string.IsNullOrEmpty(MapFileName))
+			if (!string.IsNullOrEmpty(Info.MapFileName))
 			{
 				Output.Append("\" usemap=\"#Map");
-				Output.Append(Hash);
+				Output.Append(Info.Hash);
 			}
 
 			Output.Append("\" class=\"aloneUnsized\"/>");
 
-			if (!string.IsNullOrEmpty(Title))
+			if (!string.IsNullOrEmpty(Info.Title))
 			{
 				Output.Append("<figcaption>");
-				Output.Append(XML.HtmlValueEncode(Title));
+				Output.Append(XML.HtmlValueEncode(Info.Title));
 				Output.Append("</figcaption>");
 			}
 
 			Output.AppendLine("</figure>");
 
-			if (!string.IsNullOrEmpty(MapFileName))
+			if (!string.IsNullOrEmpty(Info.MapFileName))
 			{
 				Output.Append("<map id=\"Map");
-				Output.Append(Hash);
+				Output.Append(Info.Hash);
 				Output.Append("\" name=\"Map");
-				Output.Append(Hash);
+				Output.Append(Info.Hash);
 				Output.AppendLine("\">");
 
-				string Map = File.ReadAllText(MapFileName);
+				string Map = await Resources.ReadAllTextAsync(Info.MapFileName);
 				string[] MapRows = Map.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
 				int i, c;
 
@@ -392,8 +393,17 @@ namespace Waher.Content.Markdown.GraphViz
 			Png
 		}
 
-		private string GetFileName(string Language, string[] Rows, ResultType Type, out string Title, out string MapFileName, out string Hash)
+		private class GraphInfo
 		{
+			public string FileName;
+			public string Title;
+			public string MapFileName;
+			public string Hash;
+		}
+
+		private async Task<GraphInfo> GetFileName(string Language, string[] Rows, ResultType Type)
+		{
+			GraphInfo Result = new GraphInfo();
 			StringBuilder sb = new StringBuilder();
 
 			foreach (string Row in Rows)
@@ -404,48 +414,47 @@ namespace Waher.Content.Markdown.GraphViz
 
 			if (i > 0)
 			{
-				Title = Language.Substring(i + 1).Trim();
+				Result.Title = Language.Substring(i + 1).Trim();
 				Language = Language.Substring(0, i).TrimEnd();
 			}
 			else
-				Title = string.Empty;
+				Result.Title = string.Empty;
 
 			sb.Append(Language);
 
-			Hash = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(sb.ToString()));
+			Result.Hash = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(sb.ToString()));
 
 			string GraphVizFolder = Path.Combine(contentRootFolder, "GraphViz");
-			string FileName = Path.Combine(GraphVizFolder, Hash);
-			string ResultFileName;
+			string FileName = Path.Combine(GraphVizFolder, Result.Hash);
 
 			switch (Type)
 			{
 				case ResultType.Svg:
 				default:
-					ResultFileName = FileName + ".svg";
+					Result.FileName = FileName + ".svg";
 					break;
 
 				case ResultType.Png:
-					ResultFileName = FileName + ".png";
+					Result.FileName = FileName + ".png";
 					break;
 			}
 
-			MapFileName = FileName + ".map";
+			Result.MapFileName = FileName + ".map";
 
-			if (File.Exists(ResultFileName))
+			if (File.Exists(Result.FileName))
 			{
-				if (!File.Exists(MapFileName))
-					MapFileName = null;
+				if (!File.Exists(Result.MapFileName))
+					Result.MapFileName = null;
 			}
 			else
 			{
 				string TxtFileName = FileName + ".txt";
-				File.WriteAllText(TxtFileName, Graph, Encoding.Default);
+				await Resources.WriteAllTextAsync(TxtFileName, Graph, Encoding.Default);
 
 				StringBuilder Arguments = new StringBuilder();
 
 				Arguments.Append("-Tcmapx -o\"");
-				Arguments.Append(MapFileName);
+				Arguments.Append(Result.MapFileName);
 				Arguments.Append("\" -T");
 				Arguments.Append(Type.ToString().ToLower());
 
@@ -478,10 +487,9 @@ namespace Waher.Content.Markdown.GraphViz
 				}
 
 				Arguments.Append(" -q -o\"");
-				Arguments.Append(ResultFileName);
+				Arguments.Append(Result.FileName);
 				Arguments.Append("\" \"");
 				Arguments.Append(TxtFileName + "\"");
-
 
 				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
 				{
@@ -496,38 +504,52 @@ namespace Waher.Content.Markdown.GraphViz
 				};
 
 				Process P = new Process();
-				bool Error = false;
+				TaskCompletionSource<GraphInfo> ResultSource = new TaskCompletionSource<GraphInfo>();
 
 				P.ErrorDataReceived += (sender, e) =>
 				{
-					Error = true;
-					Log.Error(e.Data);
+					Log.Error("Unable to generate graph: " + e.Data);
+					ResultSource.TrySetResult(null);
 				};
 
+				P.Exited += async (sender, e) =>
+				{
+					try
+					{
+						if (P.ExitCode != 0)
+						{
+							Log.Error("Unable to generate graph. Exit code: " + P.ExitCode.ToString());
+							ResultSource.TrySetResult(null);
+						}
+						else
+						{
+							string Map = await Resources.ReadAllTextAsync(Result.MapFileName);
+							string[] MapRows = Map.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
+							if (MapRows.Length <= 2)
+							{
+								File.Delete(Result.MapFileName);
+								Result.MapFileName = null;
+							}
+
+							ResultSource.TrySetResult(Result);
+						}
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				};
+
+				Task _ = Task.Delay(10000).ContinueWith(Prev => ResultSource.TrySetException(new TimeoutException("GraphViz process did not terminate properly.")));
+
 				P.StartInfo = ProcessInformation;
+				P.EnableRaisingEvents = true;
 				P.Start();
 
-				if (!P.WaitForExit(60000) || Error)
-				{
-					Log.Error("Unable to generate graph.");
-					return null;
-				}
-				else if (P.ExitCode != 0)
-				{
-					Log.Error("Unable to generate graph. Exit code: " + P.ExitCode.ToString());
-					return null;
-				}
-
-				string Map = File.ReadAllText(MapFileName);
-				string[] MapRows = Map.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);
-				if (MapRows.Length <= 2)
-				{
-					File.Delete(MapFileName);
-					MapFileName = null;
-				}
+				return await ResultSource.Task;
 			}
 
-			return ResultFileName;
+			return Result;
 		}
 
 		/// <summary>
@@ -539,10 +561,13 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public bool GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public async Task<bool> GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			this.GetFileName(Language, Rows, ResultType.Svg, out string Title, out string _, out string _);
-			Output.AppendLine(Title);
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Svg);
+			if (Info is null)
+				return false;
+
+			Output.AppendLine(Info.Title);
 
 			return true;
 		}
@@ -557,18 +582,18 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public bool GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public async Task<bool> GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, ResultType.Png, out string Title, out string _, out string _);
-			if (FileName is null)
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png);
+			if (Info is null)
 				return false;
 
 			Output.WriteStartElement("Image");
-			Output.WriteAttributeString("Source", FileName);
+			Output.WriteAttributeString("Source", Info.FileName);
 			Output.WriteAttributeString("Stretch", "None");
 
-			if (!string.IsNullOrEmpty(Title))
-				Output.WriteAttributeString("ToolTip", Title);
+			if (!string.IsNullOrEmpty(Info.Title))
+				Output.WriteAttributeString("ToolTip", Info.Title);
 
 			Output.WriteEndElement();
 
@@ -585,14 +610,14 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public bool GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public async Task<bool> GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, ResultType.Png, out string _, out string _, out string _);
-			if (FileName is null)
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png);
+			if (Info is null)
 				return false;
 
 			Output.WriteStartElement("Image");
-			Output.WriteAttributeString("Source", FileName);
+			Output.WriteAttributeString("Source", Info.FileName);
 			Output.WriteEndElement();
 
 			return true;
@@ -605,13 +630,13 @@ namespace Waher.Content.Markdown.GraphViz
 		/// <param name="Language">Language used.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>Image, if successful, null otherwise.</returns>
-		public PixelInformation GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
+		public async Task<PixelInformation> GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
 		{
-			string FileName = this.GetFileName(Language, Rows, ResultType.Png, out string _, out string _, out string _);
-			if (FileName is null)
+			GraphInfo Info = await this.GetFileName(Language, Rows, ResultType.Png);
+			if (Info is null)
 				return null;
 
-			byte[] Data = File.ReadAllBytes(FileName);
+			byte[] Data = await Resources.ReadAllBytesAsync(Info.FileName);
 
 			using (SKBitmap Bitmap = SKBitmap.Decode(Data))
 			{

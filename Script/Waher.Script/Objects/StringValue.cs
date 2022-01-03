@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
 
@@ -58,9 +57,7 @@ namespace Waher.Script.Objects
             set { this.caseInsensitive = value; }
         }
 
-        /// <summary>
-        /// <see cref="Object.ToString()"/>
-        /// </summary>
+        /// <inheritdoc/>
         public override string ToString()
         {
 			return Expression.ToString(this.value);
@@ -142,9 +139,7 @@ namespace Waher.Script.Objects
             }
         }
 
-        /// <summary>
-        /// <see cref="Object.Equals(object)"/>
-        /// </summary>
+        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
             if (!(obj is StringValue E))
@@ -153,9 +148,7 @@ namespace Waher.Script.Objects
                 return string.Compare(this.value, E.value, this.caseInsensitive || E.caseInsensitive) == 0;
         }
 
-        /// <summary>
-        /// <see cref="Object.GetHashCode()"/>
-        /// </summary>
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             if (this.caseInsensitive)

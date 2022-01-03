@@ -35,17 +35,13 @@ namespace Waher.Script.Persistence.SQL
 				throw new ScriptRuntimeException("Invalid context.", this);
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is Wildcard;
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			return "*".GetHashCode();

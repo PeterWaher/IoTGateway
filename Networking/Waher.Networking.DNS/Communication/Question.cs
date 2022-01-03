@@ -42,9 +42,7 @@ namespace Waher.Networking.DNS.Communication
 		/// </summary>
 		public QCLASS QCLASS => this.qCLASS;
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.qNAME + "\t" + this.qTYPE.ToString() + "\t" + this.qCLASS.ToString();

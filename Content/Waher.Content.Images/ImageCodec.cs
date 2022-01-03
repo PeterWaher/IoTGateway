@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using SkiaSharp;
 using Waher.Runtime.Inventory;
+using System.Threading.Tasks;
 
 namespace Waher.Content.Images
 {
@@ -54,18 +55,12 @@ namespace Waher.Content.Images
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes
-		{
-			get { return ImageContentTypes; }
-		}
+		public string[] ContentTypes => ImageContentTypes;
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions
-		{
-			get { return ImageFileExtensions; }
-		}
+		public string[] FileExtensions => ImageFileExtensions;
 
 		/// <summary>
 		/// If the decoder decodes an object with a given content type.
@@ -102,10 +97,10 @@ namespace Waher.Content.Images
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			SKBitmap Bitmap = SKBitmap.Decode(Data);
-			return SKImage.FromBitmap(Bitmap);
+			return Task.FromResult<object>(SKImage.FromBitmap(Bitmap));
 		}
 
 		/// <summary>
@@ -134,14 +129,14 @@ namespace Waher.Content.Images
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
-		/// <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
-		/// <returns>Encoded object.</returns>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
+		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			SKData Data;
 			bool Dispose = false;
+			string ContentType;
 			byte[] Bin;
 
 			if (!(Object is SKImage Image))
@@ -189,7 +184,7 @@ namespace Waher.Content.Images
 			if (Dispose)
 				Image.Dispose();
 
-			return Bin;
+			return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Bin, ContentType));
 		}
 
 		/// <summary>

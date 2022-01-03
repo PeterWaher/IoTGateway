@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 
@@ -53,34 +54,22 @@ namespace Waher.Content.Markdown.Web.WebScript
 		/// <summary>
 		/// Plain text content types.
 		/// </summary>
-		public static readonly string[] WsContentTypes = new string[] 
-		{
- 			ContentType
-		};
+		public static readonly string[] WsContentTypes = new string[] { ContentType };
 
 		/// <summary>
 		/// Plain text file extensions.
 		/// </summary>
-		public static readonly string[] WsFileExtensions = new string[] 
-		{ 
-			"ws", "script"
-		};
+		public static readonly string[] WsFileExtensions = new string[] { "ws", "script" };
 
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes
-		{
-			get { return WsContentTypes; }
-		}
+		public string[] ContentTypes => WsContentTypes;
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions
-		{
-			get { return WsFileExtensions; }
-		}
+		public string[] FileExtensions => WsFileExtensions;
 
 		/// <summary>
 		/// If the decoder decodes an object with a given content type.
@@ -112,10 +101,10 @@ namespace Waher.Content.Markdown.Web.WebScript
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string s = CommonTypes.GetString(Data, Encoding);
-			return new Expression(s, BaseUri?.ToString());
+			return Task.FromResult<object>(new Expression(s, BaseUri?.ToString()));
 		}
 
 		/// <summary>
@@ -186,34 +175,38 @@ namespace Waher.Content.Markdown.Web.WebScript
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
-		/// <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
-		/// <returns>Encoded object.</returns>
+		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
+		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
-			if (allowEncoding && InternetContent.IsAccepted(WsContentTypes, out ContentType, AcceptedContentTypes))
+			if (allowEncoding && InternetContent.IsAccepted(WsContentTypes, out string ContentType, AcceptedContentTypes))
 			{
 				string s = null;
+				byte[] Bin;
 
 				if (Object is Expression Expression)
 					s = Expression.Script;
 				else if (Object is string s2)
 					s = s2;
 
-				if (!(s is null))
+				if (s is null)
+					Bin = null;
+				else
 				{
 					if (Encoding is null)
 					{
 						ContentType += "; charset=utf-8";
-						return Encoding.UTF8.GetBytes(s);
+						Bin = Encoding.UTF8.GetBytes(s);
 					}
 					else
 					{
 						ContentType += "; charset=" + Encoding.WebName;
-						return Encoding.GetBytes(s);
+						Bin = Encoding.GetBytes(s);
 					}
 				}
+
+				return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Bin, ContentType));
 			}
 
 			throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));

@@ -173,18 +173,14 @@ namespace Waher.Script.Persistence.SQL.Sources
 			}
 		}
 
-		/// <summary>
-		/// <see cref="object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return (obj is JoinedObject Obj &&
 				this.ObjectId == Obj.ObjectId);
 		}
 
-		/// <summary>
-		/// <see cref="object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			return this.ObjectId.GetHashCode();

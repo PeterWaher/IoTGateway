@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.BlockElements;
@@ -66,21 +67,26 @@ namespace Waher.Content.Markdown.Consolidation
 	/// </summary>
 	public class DocumentInformation
 	{
-		private readonly MarkdownDocument markdown;
-		private readonly DocumentType type;
-		private readonly string[] rows;
-		private readonly Type graphType;
-		private readonly Graph graph;
-		private readonly Table table;
-		private readonly string id;
+		private MarkdownDocument markdown;
+		private DocumentType type;
+		private string[] rows;
+		private Type graphType;
+		private Graph graph;
+		private Table table;
+		private string id;
+
+		private DocumentInformation()
+		{
+		}
 
 		/// <summary>
 		/// Information about a document.
 		/// </summary>
 		/// <param name="Markdown">Markdown document</param>
 		/// <param name="Id">Optional ID of document</param>
-		public DocumentInformation(MarkdownDocument Markdown, string Id)
+		public static async Task<DocumentInformation> CreateAsync(MarkdownDocument Markdown, string Id)
 		{
+			DocumentInformation Result = new DocumentInformation();
 			MarkdownElement First = null;
 			int i = 0;
 			bool IsTable = false;
@@ -96,43 +102,43 @@ namespace Waher.Content.Markdown.Consolidation
 				IsCode |= E is CodeBlock;
 			}
 
-			this.markdown = Markdown;
-			this.id = Id;
+			Result.markdown = Markdown;
+			Result.id = Id;
 
 			string s = Markdown.MarkdownText.Trim().Replace("\r\n", "\n").Replace('\r', '\n');
-			this.rows = s.Split('\n');
+			Result.rows = s.Split('\n');
 
 			if (i == 0)
-				this.type = DocumentType.Empty;
+				Result.type = DocumentType.Empty;
 			else if (i == 1)
 			{
-				int c = this.rows.Length;
+				int c = Result.rows.Length;
 
 				if (IsTable)
 				{
-					this.table = (Table)First;
-					this.type = DocumentType.SingleTable;
+					Result.table = (Table)First;
+					Result.type = DocumentType.SingleTable;
 				}
 				else if (IsCode)
 				{
 					if (c >= 3 &&
-						this.rows[0].StartsWith("```", StringComparison.CurrentCultureIgnoreCase) &&
-						this.rows[1].StartsWith("<", StringComparison.CurrentCultureIgnoreCase) &&
-						this.rows[c - 2].EndsWith(">", StringComparison.CurrentCultureIgnoreCase) &&
-						this.rows[c - 1].EndsWith("```"))
+						Result.rows[0].StartsWith("```", StringComparison.CurrentCultureIgnoreCase) &&
+						Result.rows[1].StartsWith("<", StringComparison.CurrentCultureIgnoreCase) &&
+						Result.rows[c - 2].EndsWith(">", StringComparison.CurrentCultureIgnoreCase) &&
+						Result.rows[c - 1].EndsWith("```"))
 					{
 						if (c >= 4 &&
-							this.rows[0].StartsWith("```Graph", StringComparison.CurrentCultureIgnoreCase) &&
-							this.rows[1].StartsWith("<Graph", StringComparison.CurrentCultureIgnoreCase) &&
-							this.rows[c - 2].EndsWith("</Graph>", StringComparison.CurrentCultureIgnoreCase) &&
-							this.rows[c - 1].EndsWith("```"))
+							Result.rows[0].StartsWith("```Graph", StringComparison.CurrentCultureIgnoreCase) &&
+							Result.rows[1].StartsWith("<Graph", StringComparison.CurrentCultureIgnoreCase) &&
+							Result.rows[c - 2].EndsWith("</Graph>", StringComparison.CurrentCultureIgnoreCase) &&
+							Result.rows[c - 1].EndsWith("```"))
 						{
 							try
 							{
 								StringBuilder sb = new StringBuilder();
 
 								for (i = 1, c--; i < c; i++)
-									sb.AppendLine(Rows[i]);
+									sb.AppendLine(Result.rows[i]);
 
 								XmlDocument Xml = new XmlDocument();
 								Xml.LoadXml(sb.ToString());
@@ -142,57 +148,59 @@ namespace Waher.Content.Markdown.Consolidation
 									Xml.DocumentElement.NamespaceURI == Graph.GraphNamespace)
 								{
 									string TypeName = XML.Attribute(Xml.DocumentElement, "type");
-									this.graphType = Types.GetType(TypeName);
-									if (this.graphType is null)
-										this.type = DocumentType.SingleXml;
+									Result.graphType = Types.GetType(TypeName);
+									if (Result.graphType is null)
+										Result.type = DocumentType.SingleXml;
 									else
 									{
-										this.graph = (Graph)Activator.CreateInstance(this.graphType);
-										this.graph.SameScale = XML.Attribute(Xml.DocumentElement, "sameScale", false);
+										Result.graph = (Graph)Activator.CreateInstance(Result.graphType);
+										Result.graph.SameScale = XML.Attribute(Xml.DocumentElement, "sameScale", false);
 
 										foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
 										{
 											if (N is XmlElement E)
 											{
-												this.graph.ImportGraph(E);
+												await Result.graph.ImportGraphAsync(E);
 												break;
 											}
 										}
 
-										this.type = DocumentType.SingleGraph;
+										Result.type = DocumentType.SingleGraph;
 									}
 								}
 								else
-									this.type = DocumentType.SingleXml;
+									Result.type = DocumentType.SingleXml;
 							}
 							catch (Exception)
 							{
-								this.type = DocumentType.SingleXml;
+								Result.type = DocumentType.SingleXml;
 							}
 						}
 						else
-							this.type = DocumentType.SingleXml;
+							Result.type = DocumentType.SingleXml;
 					}
 					else
-						this.type = DocumentType.SingleCode;
+						Result.type = DocumentType.SingleCode;
 				}
 				else
 				{
 					if (string.IsNullOrEmpty(s))
-						this.type = DocumentType.Empty;
+						Result.type = DocumentType.Empty;
 					else
 					{
 						if (c > 1)
-							this.type = DocumentType.SingleParagraph;
-						else if (IsNumeric(this.rows[0]))
-							this.type = DocumentType.SingleNumber;
+							Result.type = DocumentType.SingleParagraph;
+						else if (IsNumeric(Result.rows[0]))
+							Result.type = DocumentType.SingleNumber;
 						else
-							this.type = DocumentType.SingleLine;
+							Result.type = DocumentType.SingleLine;
 					}
 				}
 			}
 			else
-				this.type = DocumentType.Complex;
+				Result.type = DocumentType.Complex;
+
+			return Result;
 		}
 
 		private static bool IsNumeric(string s)

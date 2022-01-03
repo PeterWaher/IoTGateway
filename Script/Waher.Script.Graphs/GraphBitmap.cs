@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
@@ -154,17 +155,13 @@ namespace Waher.Script.Graphs
 			return "[" + Expression.ToString(X) + "," + Expression.ToString(Y) + "]";
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return (obj is GraphBitmap B && (this.pixels?.Equals(B.pixels) ?? (B.pixels is null)));
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			return this.pixels?.GetHashCode() ?? 0;
@@ -199,7 +196,7 @@ namespace Waher.Script.Graphs
 		/// Imports graph specifics from XML.
 		/// </summary>
 		/// <param name="Xml">XML input.</param>
-		public override void ImportGraph(XmlElement Xml)
+		public override Task ImportGraphAsync(XmlElement Xml)
 		{
 			int Width = int.Parse(Xml.GetAttribute("width"));
 			int Height = int.Parse(Xml.GetAttribute("height"));
@@ -213,6 +210,8 @@ namespace Waher.Script.Graphs
 					break;
 				}
 			}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

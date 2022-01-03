@@ -2,6 +2,7 @@
 using System.Xml;
 using Waher.Script;
 using Waher.Layout.Layout2D.Exceptions;
+using System.Threading.Tasks;
 
 namespace Waher.Layout.Layout2D.Model.Attributes
 {
@@ -171,65 +172,94 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		}
 
 		/// <summary>
-		/// Tries to evaluate the attribute value.
+		/// Evaluate the attribute value.
 		/// </summary>
 		/// <param name="Session">Current session.</param>
-		/// <param name="Result">Result, if successful.</param>
-		/// <returns>If evaluation was possible.</returns>
-		public bool TryEvaluate(Variables Session, out T Result)
+		/// <param name="DefaultValue">Default value if value or expression is missing or invalid.</param>
+		/// <returns>Evaluation result, or default value if not possible to evaluate.</returns>
+		public async Task<T> EvaluateAsync(Variables Session, T DefaultValue)
 		{
 			if (this.hasPresetValue)
-			{
-				Result = this.presetValue;
-				return true;
-			}
+				return this.presetValue;
 			else if (this.hasEvaluatedValue)
-			{
-				Result = this.evaluatedValue;
-				return true;
-			}
+				return this.evaluatedValue;
 			else if (this.hasEvaluated)
-			{
-				Result = default;
-				return false;
-			}
-			else if (!(this.expression is null))
+				return DefaultValue;
+			else if (this.expression is null)
+				return DefaultValue;
+			else 
 			{
 				try
 				{
-					object Value = this.expression.Evaluate(Session);
+					object Value = await this.expression.EvaluateAsync(Session);
 					if (Value is T Eval || this.TryConvert(Value, out Eval))
 					{
-						Result = this.evaluatedValue = Eval;
+						this.evaluatedValue = Eval;
 						this.hasEvaluated = true;
 						this.hasEvaluatedValue = true;
 
-						return true;
+						return Eval;
 					}
 					else
 					{
 						this.hasEvaluated = true;
-						Result = default;
-						return false;
+						return DefaultValue;
 					}
 				}
 				catch (Exception)
 				{
 					this.hasEvaluated = true;
-					Result = default;
-					return false;
+					return DefaultValue;
 				}
-			}
-			else
-			{
-				Result = default;
-				return false;
 			}
 		}
 
 		/// <summary>
-		/// <see cref="Object.ToString()"/>
+		/// Tries to evaluate the attribute value.
 		/// </summary>
+		/// <param name="Attribute">Attribute to evaluate.</param>
+		/// <param name="Session">Current session.</param>
+		/// <returns>Evaluation result.</returns>
+		public static async Task<EvaluationResult<T>> TryEvaluate(Attribute<T> Attribute, Variables Session)
+		{
+			if (Attribute is null)
+				return EvaluationResult<T>.Empty;
+			else if (Attribute.hasPresetValue)
+				return new EvaluationResult<T>(Attribute.presetValue);
+			else if (Attribute.hasEvaluatedValue)
+				return new EvaluationResult<T>(Attribute.evaluatedValue);
+			else if (Attribute.hasEvaluated)
+				return EvaluationResult<T>.Empty;
+			else if (!(Attribute.expression is null))
+			{
+				try
+				{
+					object Value = await Attribute.expression.EvaluateAsync(Session);
+					if (Value is T Eval || Attribute.TryConvert(Value, out Eval))
+					{
+						Attribute.evaluatedValue = Eval;
+						Attribute.hasEvaluated = true;
+						Attribute.hasEvaluatedValue = true;
+
+						return new EvaluationResult<T>(Eval);
+					}
+					else
+					{
+						Attribute.hasEvaluated = true;
+						return EvaluationResult<T>.Empty;
+					}
+				}
+				catch (Exception)
+				{
+					Attribute.hasEvaluated = true;
+					return EvaluationResult<T>.Empty;
+				}
+			}
+			else
+				return EvaluationResult<T>.Empty;
+		}
+
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			if (this.hasPresetValue)

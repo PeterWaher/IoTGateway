@@ -50,17 +50,13 @@ namespace Waher.Runtime.ServiceRegistration
 			set => this.value = value;
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.tag + "=" + this.value;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return (obj is Annotation A &&
@@ -68,9 +64,7 @@ namespace Waher.Runtime.ServiceRegistration
 				this.value == A.value);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = 0;

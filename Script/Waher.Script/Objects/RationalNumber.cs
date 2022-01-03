@@ -58,9 +58,7 @@ namespace Waher.Script.Objects
 			set { this.denominator = value; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return "(" + Expression.ToString(this.numerator) + "/" +
@@ -245,9 +243,7 @@ namespace Waher.Script.Objects
 			return new RationalNumber(-this.numerator, this.denominator);
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			if (obj is RationalNumber E)
@@ -267,9 +263,7 @@ namespace Waher.Script.Objects
 			return false;
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = this.numerator.GetHashCode();

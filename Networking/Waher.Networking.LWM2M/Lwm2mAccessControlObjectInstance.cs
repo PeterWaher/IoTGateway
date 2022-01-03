@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Waher.Events;
 using Waher.Networking.CoAP;
-using Waher.Networking.LWM2M.ContentFormats;
-using Waher.Networking.LWM2M.Events;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 
@@ -28,17 +23,17 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// The Object ID are applied for.
 		/// </summary>
-		private Lwm2mResourceInteger aclObjectId;
+		private readonly Lwm2mResourceInteger aclObjectId;
 
 		/// <summary>
 		/// The Object Instance ID are applied for.
 		/// </summary>
-		private Lwm2mResourceInteger aclObjectInstanceId;
+		private readonly Lwm2mResourceInteger aclObjectInstanceId;
 
 		/// <summary>
 		/// ACL privilges.
 		/// </summary>
-		private Lwm2mResourceInteger aclPrivileges;
+		private readonly Lwm2mResourceInteger aclPrivileges;
 
 		/// <summary>
 		/// Short Server ID of a certain LwM2M Server; only such an LwM2M Server can manage the 
@@ -47,7 +42,7 @@ namespace Waher.Networking.LWM2M
 		/// The specific value MAX_ID=65535 means this Access Control Object Instance is created 
 		/// and modified during a Bootstrap phase only. 
 		/// </summary>
-		private Lwm2mResourceInteger accessControlOwner;
+		private readonly Lwm2mResourceInteger accessControlOwner;
 
 		/// <summary>
 		/// LWM2M Access Control object instance.
@@ -193,12 +188,12 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void DELETE(CoapMessage Request, CoapResponse Response)
+		public async Task DELETE(CoapMessage Request, CoapResponse Response)
 		{
 			if (this.Object.Client.State == Lwm2mState.Bootstrap &&
 				this.Object.Client.IsFromBootstrapServer(Request))
 			{
-				Task T = this.DeleteBootstrapInfo();
+				await this.DeleteBootstrapInfo();
 				Response.ACK(CoapCode.Deleted);
 			}
 			else
@@ -231,15 +226,18 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public override void PUT(CoapMessage Request, CoapResponse Response)
+		public override Task PUT(CoapMessage Request, CoapResponse Response)
 		{
 			if (this.Object.Client.State == Lwm2mState.Bootstrap &&
 				this.Object.Client.IsFromBootstrapServer(Request))
 			{
-				base.PUT(Request, Response);
+				return base.PUT(Request, Response);
 			}
 			else
+			{
 				Response.RST(CoapCode.Unauthorized);
+				return Task.CompletedTask;
+			}
 		}
 
 	}

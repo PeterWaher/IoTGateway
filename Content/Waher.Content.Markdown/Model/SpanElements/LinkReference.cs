@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Content.Markdown.Model.SpanElements
@@ -27,19 +28,16 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// Link label
 		/// </summary>
-		public string Label
-		{
-			get { return this.label; }
-		}
+		public string Label => this.label;
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
 			Output.Append('[');
-			base.GenerateMarkdown(Output);
+			await base.GenerateMarkdown(Output);
 			Output.Append("][");
 			Output.Append(this.label);
 			Output.Append(']');
@@ -49,22 +47,20 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override async Task GenerateHTML(StringBuilder Output)
 		{
 			Multimedia Multimedia = this.Document.GetReference(this.label);
 
 			if (!(Multimedia is null))
-				Link.GenerateHTML(Output, Multimedia.Items[0].Url, Multimedia.Items[0].Title, this.Children, this.Document);
+				await Link.GenerateHTML(Output, Multimedia.Items[0].Url, Multimedia.Items[0].Title, this.Children, this.Document);
 			else
 			{
 				foreach (MarkdownElement E in this.Children)
-					E.GenerateHTML(Output);
+					await E.GenerateHTML(Output);
 			}
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.label;
@@ -75,19 +71,19 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			Multimedia Multimedia = this.Document.GetReference(this.label);
 
 			if (!(Multimedia is null))
 			{
-				Link.GenerateXAML(Output, TextAlignment, Multimedia.Items[0].Url, Multimedia.Items[0].Title, this.Children,
+				await Link.GenerateXAML(Output, TextAlignment, Multimedia.Items[0].Url, Multimedia.Items[0].Title, this.Children,
 					this.Document);
 			}
 			else
 			{
 				foreach (MarkdownElement E in this.Children)
-					E.GenerateXAML(Output, TextAlignment);
+					await E.GenerateXAML(Output, TextAlignment);
 			}
 		}
 
@@ -96,18 +92,15 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			InlineText.GenerateInlineFormattedTextXamarinForms(Output, this);
+			return InlineText.GenerateInlineFormattedTextXamarinForms(Output, this);
 		}
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get { return true; }
-		}
+		internal override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Exports the element to XML.

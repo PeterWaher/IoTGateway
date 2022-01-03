@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.Sniffers
 {
@@ -27,19 +28,19 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <inheritdoc/>
-		protected override void WriteLine(string s)
+		protected override async Task WriteLine(string s)
 		{
 			if (this.disposed)
 				return;
 
-			this.BeforeWrite();
+			await this.BeforeWrite();
 			try
 			{
 				this.output.WriteLine(s);
 			}
 			finally
 			{
-				this.AfterWrite();
+				await this.AfterWrite();
 			}
 		}
 

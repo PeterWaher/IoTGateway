@@ -10,6 +10,7 @@ using Waher.Content.Asn1.Model.Restrictions;
 using Waher.Content.Asn1.Model.Sets;
 using Waher.Content.Asn1.Model.Types;
 using Waher.Content.Asn1.Model.Values;
+using System.Threading.Tasks;
 
 namespace Waher.Content.Asn1
 {
@@ -22,13 +23,22 @@ namespace Waher.Content.Asn1
 		internal readonly Dictionary<string, Asn1TypeDefinition> aliases = new Dictionary<string, Asn1TypeDefinition>();
 		internal readonly Dictionary<string, Asn1FieldValueDefinition> values = new Dictionary<string, Asn1FieldValueDefinition>();
 		internal int pos = 0;
-		private readonly Asn1Definitions root;
 		private readonly string text;
 		private readonly string location;
 		private readonly string[] importFolders;
 		private readonly int len;
 		private readonly int lenm1;
+		private Asn1Definitions root;
 		private int unnamedIndex = 1;
+
+		private Asn1Document(string Text, string Location, string[] ImportFolders)
+		{
+			this.text = Text;
+			this.location = Location;
+			this.importFolders = ImportFolders;
+			this.len = this.text.Length;
+			this.lenm1 = this.len - 1;
+		}
 
 		/// <summary>
 		/// Represents an ASN.1 document.
@@ -36,14 +46,14 @@ namespace Waher.Content.Asn1
 		/// <param name="Text">ASN.1 text to parse.</param>
 		/// <param name="Location">Location of file.</param>
 		/// <param name="ImportFolders">Import Folders.</param>
-		public Asn1Document(string Text, string Location, string[] ImportFolders)
+		public async Task<Asn1Document> CreateAsync(string Text, string Location, string[] ImportFolders)
 		{
-			this.text = Text;
-			this.location = Location;
-			this.importFolders = ImportFolders;
-			this.len = this.text.Length;
-			this.lenm1 = this.len - 1;
-			this.root = this.ParseDefinitions();
+			Asn1Document Result = new Asn1Document(Text, Location, ImportFolders)
+			{
+				root = await this.ParseDefinitions()
+			};
+
+			return Result;
 		}
 
 		/// <summary>
@@ -72,9 +82,9 @@ namespace Waher.Content.Asn1
 		/// <param name="FileName">Filename.</param>
 		/// <param name="ImportFolders">Import folders.</param>
 		/// <returns>ASN.1 document</returns>
-		public static Asn1Document FromFile(string FileName, string[] ImportFolders)
+		public static async Task<Asn1Document> FromFile(string FileName, string[] ImportFolders)
 		{
-			string Text = File.ReadAllText(FileName);
+			string Text = await Resources.ReadAllTextAsync(FileName);
 			return new Asn1Document(Text, FileName, ImportFolders);
 		}
 
@@ -237,7 +247,7 @@ namespace Waher.Content.Asn1
 			return new Asn1SyntaxException(Message, this.text, this.pos);
 		}
 
-		private Asn1Definitions ParseDefinitions()
+		private async Task<Asn1Definitions> ParseDefinitions()
 		{
 			string Identifier = this.ParseTypeNameIdentifier();
 			string s = this.PeekNextToken();
@@ -301,12 +311,12 @@ namespace Waher.Content.Asn1
 					break;
 			}
 
-			Asn1Module Body = this.ParseModule();
+			Asn1Module Body = await this.ParseModule();
 
 			return new Asn1Definitions(Identifier, Oid, Tags, Abstract, Body, this);
 		}
 
-		private Asn1Module ParseModule()
+		private async Task<Asn1Module> ParseModule()
 		{
 			string s;
 
@@ -379,7 +389,7 @@ namespace Waher.Content.Asn1
 
 					foreach (Asn1Import Import in Imports)
 					{
-						Asn1Document Doc = Import.LoadDocument();
+						Asn1Document Doc = await Import.LoadDocument();
 
 						foreach (string Identifier in Import.Identifiers)
 						{

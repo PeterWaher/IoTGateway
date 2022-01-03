@@ -181,7 +181,7 @@ namespace Waher.Client.WPF.Model.PubSub
 		{
 			Mouse.OverrideCursor = Cursors.Wait;
 
-			this.Service.PubSubClient.GetItems(this.node, new string[] { this.itemId }, (sender, e) =>
+			this.Service.PubSubClient.GetItems(this.node, new string[] { this.itemId }, async (sender, e) =>
 			{
 				MainWindow.MouseDefault();
 
@@ -210,9 +210,9 @@ namespace Waher.Client.WPF.Model.PubSub
 								{
 									Form["Payload"].Error = ex.Message;
 
-									MainWindow.UpdateGui(() =>
+									MainWindow.UpdateGui(async () =>
 									{
-										Dialog = new ParameterDialog(Form);
+										Dialog = await ParameterDialog.CreateAsync(Form);
 										Dialog.ShowDialog();
 									});
 
@@ -250,18 +250,17 @@ namespace Waher.Client.WPF.Model.PubSub
 							new TextMultiField(null, "Payload", "XML:", false, new string[] { Item.Payload }, null, "XML payload of item.",
 								StringDataType.Instance, null, string.Empty, false, false, false));
 
-						Dialog = new ParameterDialog(Form);
+						Dialog = await ParameterDialog.CreateAsync(Form);
 
 						MainWindow.UpdateGui(() =>
 						{
 							Dialog.ShowDialog();
+							return Task.CompletedTask;
 						});
 					}
 				}
 				else
 					MainWindow.ErrorBox("Unable to get item from server: " + e.ErrorText);
-
-				return Task.CompletedTask;
 
 			}, null);
 		}

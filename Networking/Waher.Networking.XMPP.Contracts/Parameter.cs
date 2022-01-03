@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Script;
 
 namespace Waher.Networking.XMPP.Contracts
@@ -64,7 +65,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Variables">Collection of parameter values.</param>
 		/// <returns>If parameter value is valid.</returns>
-		public virtual bool IsParameterValid(Variables Variables)
+		public virtual async Task<bool> IsParameterValid(Variables Variables)
 		{
 			if (!string.IsNullOrEmpty(this.exp))
 			{
@@ -73,7 +74,7 @@ namespace Waher.Networking.XMPP.Contracts
 					if (this.parsed is null)
 						this.parsed = new Expression(this.exp);
 
-					object Result = this.parsed.Evaluate(Variables);
+					object Result = await this.parsed.EvaluateAsync(Variables);
 
 					if (Result is bool b && !b)
 						return false;

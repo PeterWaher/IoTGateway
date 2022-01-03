@@ -43,9 +43,7 @@ namespace Waher.Persistence
 			internal set => this.count = value;
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = this.reason.GetHashCode();
@@ -54,9 +52,7 @@ namespace Waher.Persistence
 			return Result;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return (obj is FlagSource S &&

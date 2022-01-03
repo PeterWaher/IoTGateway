@@ -47,10 +47,7 @@ namespace Waher.Script.Model
 		/// If only values of variables should be returned (true), or if constants and namespaces should
 		/// also be included in the scope of the reference (false).
 		/// </summary>
-		public bool OnlyVariables
-		{
-			get { return this.onlyVariables; }
-		}
+		public bool OnlyVariables => this.onlyVariables;
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -136,9 +133,7 @@ namespace Waher.Script.Model
 		/// </summary>
 		public string DefaultVariableName => this.variableName;
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return obj is VariableReference O &&
@@ -146,9 +141,7 @@ namespace Waher.Script.Model
 				base.Equals(obj);
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

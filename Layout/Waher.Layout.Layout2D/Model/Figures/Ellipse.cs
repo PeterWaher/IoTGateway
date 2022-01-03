@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -52,12 +53,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.radiusX = new LengthAttribute(Input, "radiusX");
 			this.radiusY = new LengthAttribute(Input, "radiusY");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -103,21 +104,23 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
-			if (!(this.radiusX is null) && this.radiusX.TryEvaluate(State.Session, out Length R))
+			EvaluationResult<Length> RadiusLength = await this.radiusX.TryEvaluate(State.Session);
+			if (RadiusLength.Ok)
 			{
-				State.CalcDrawingSize(R, ref this.rX, true, ref Relative);
+				State.CalcDrawingSize(RadiusLength.Result, ref this.rX, true, State);
 				this.Width = this.ExplicitWidth = 2 * this.rX;
 			}
 			else
 				this.defined = false;
 
-			if (!(this.radiusY is null) && this.radiusY.TryEvaluate(State.Session, out R))
+			RadiusLength = await this.radiusY.TryEvaluate(State.Session);
+			if (RadiusLength.Ok)
 			{
-				State.CalcDrawingSize(R, ref this.rY, false, ref Relative);
+				State.CalcDrawingSize(RadiusLength.Result, ref this.rY, false, State);
 				this.Height = this.ExplicitHeight = 2 * this.rY;
 			}
 			else
@@ -130,26 +133,26 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				this.IncludePoint(this.xCoordinate, this.yCoordinate - this.rY);
 				this.IncludePoint(this.xCoordinate, this.yCoordinate + this.rY);
 			}
-
-			return Relative;
 		}
 
 		/// <summary>
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			if (this.defined)
 			{
-				if (this.TryGetFill(State, out SKPaint Fill))
+				SKPaint Fill = await this.TryGetFill(State);
+				if (!(Fill is null))
 					State.Canvas.DrawOval(this.xCoordinate, this.yCoordinate, this.rX, this.rY, Fill);
 
-				if (this.TryGetPen(State, out SKPaint Pen))
+				SKPaint Pen = await this.TryGetPen(State);
+				if (!(Pen is null))
 					State.Canvas.DrawOval(this.xCoordinate, this.yCoordinate, this.rX, this.rY, Pen);
 			}
 		
-			base.Draw(State);
+			await base.Draw(State);
 		}
 
 	}

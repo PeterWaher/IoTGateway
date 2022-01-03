@@ -40,33 +40,40 @@ namespace Waher.Client.WPF.Controls
 		private NodeQuery query;
 		private StackPanel currentPanel;
 
-		public QueryResultView(Node Node, NodeQuery Query, TextBlock HeaderLabel)
+		private QueryResultView(Node Node, NodeQuery Query, TextBlock HeaderLabel)
 		{
 			this.node = Node;
 			this.query = Query;
 			this.headerLabel = HeaderLabel;
+		
+			InitializeComponent();
+		}
 
-			if (!(this.query is null))
+		public static async Task<QueryResultView> CreateAsync(Node Node, NodeQuery Query, TextBlock HeaderLabel)
+		{
+			QueryResultView Result = new QueryResultView(Node, Query, HeaderLabel);
+
+			if (!(Result.query is null))
 			{
-				this.query.Aborted += Query_Aborted;
-				this.query.EventMessageReceived += Query_EventMessageReceived;
-				this.query.NewTitle += Query_NewTitle;
-				this.query.SectionAdded += Query_SectionAdded;
-				this.query.SectionCompleted += Query_SectionCompleted;
-				this.query.Started += Query_Started;
-				this.query.Done += Query_Done;
-				this.query.StatusMessageReceived += Query_StatusMessageReceived;
-				this.query.TableAdded += Query_TableAdded;
-				this.query.TableCompleted += Query_TableCompleted;
-				this.query.TableUpdated += Query_TableUpdated;
-				this.query.ObjectAdded += Query_ObjectAdded;
+				Result.query.Aborted += Result.Query_Aborted;
+				Result.query.EventMessageReceived += Result.Query_EventMessageReceived;
+				Result.query.NewTitle += Result.Query_NewTitle;
+				Result.query.SectionAdded += Result.Query_SectionAdded;
+				Result.query.SectionCompleted += Result.Query_SectionCompleted;
+				Result.query.Started += Result.Query_Started;
+				Result.query.Done += Result.Query_Done;
+				Result.query.StatusMessageReceived += Result.Query_StatusMessageReceived;
+				Result.query.TableAdded += Result.Query_TableAdded;
+				Result.query.TableCompleted += Result.Query_TableCompleted;
+				Result.query.TableUpdated += Result.Query_TableUpdated;
+				Result.query.ObjectAdded += Result.Query_ObjectAdded;
 
-				this.query.Resume();
+				await Result.query.ResumeAsync();
 			}
 
-			InitializeComponent();
+			Result.currentPanel = Result.ReportPanel;
 
-			this.currentPanel = this.ReportPanel;
+			return Result;
 		}
 
 		public Node Node => this.node;
@@ -86,7 +93,7 @@ namespace Waher.Client.WPF.Controls
 				MainWindow.UpdateGui(this.UpdateGuiSta);
 		}
 
-		private void UpdateGuiSta()
+		private Task UpdateGuiSta()
 		{
 			ThreadStart P;
 			bool More;
@@ -96,7 +103,7 @@ namespace Waher.Client.WPF.Controls
 				lock (this.guiQueue)
 				{
 					if (this.guiQueue.First is null)
-						return;
+						return Task.CompletedTask;
 
 					P = this.guiQueue.First.Value;
 					this.guiQueue.RemoveFirst();
@@ -113,6 +120,8 @@ namespace Waher.Client.WPF.Controls
 				}
 			}
 			while (More);
+	
+			return Task.CompletedTask;
 		}
 
 		private void StatusMessage(string Message)
@@ -608,53 +617,60 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		public void Load(XmlDocument Xml, string FileName)
+		public async void Load(XmlDocument Xml, string FileName)
 		{
-			XSL.Validate(FileName, Xml, reportRoot, reportNamespace, schema);
-
-			this.NewButton_Click(null, null);
-			this.headerLabel.Text = XML.Attribute(Xml.DocumentElement, "title");
-
-			Dictionary<string, Column[]> ColumnsByTableId = new Dictionary<string, Column[]>();
-
-			foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
+			try
 			{
-				if (!(N is XmlElement E))
-					continue;
+				XSL.Validate(FileName, Xml, reportRoot, reportNamespace, schema);
 
-				switch (E.LocalName)
+				this.NewButton_Click(null, null);
+				this.headerLabel.Text = XML.Attribute(Xml.DocumentElement, "title");
+
+				Dictionary<string, Column[]> ColumnsByTableId = new Dictionary<string, Column[]>();
+
+				foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
 				{
-					case "Event":
-						this.Add(new ReportEvent(E));
-						break;
+					if (!(N is XmlElement E))
+						continue;
 
-					case "Object":
-						this.Add(new ReportObject(E));
-						break;
+					switch (E.LocalName)
+					{
+						case "Event":
+							this.Add(new ReportEvent(E));
+							break;
 
-					case "SectionStart":
-						this.Add(new ReportSectionCreated(E));
-						break;
+						case "Object":
+							this.Add(await ReportObject.CreateAsync(E));
+							break;
 
-					case "SectionEnd":
-						this.Add(new ReportSectionCompleted());
-						break;
+						case "SectionStart":
+							this.Add(new ReportSectionCreated(E));
+							break;
 
-					case "TableStart":
-						ReportTableCreated Table = new ReportTableCreated(E);
-						ColumnsByTableId[Table.TableId] = Table.Columns;
+						case "SectionEnd":
+							this.Add(new ReportSectionCompleted());
+							break;
 
-						this.Add(Table);
-						break;
+						case "TableStart":
+							ReportTableCreated Table = new ReportTableCreated(E);
+							ColumnsByTableId[Table.TableId] = Table.Columns;
 
-					case "TableEnd":
-						this.Add(new ReportTableCompleted(E));
-						break;
+							this.Add(Table);
+							break;
 
-					case "Records":
-						this.Add(new ReportTableRecords(E, ColumnsByTableId));
-						break;
+						case "TableEnd":
+							this.Add(new ReportTableCompleted(E));
+							break;
+
+						case "Records":
+							this.Add(new ReportTableRecords(E, ColumnsByTableId));
+							break;
+					}
 				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
 			}
 		}
 

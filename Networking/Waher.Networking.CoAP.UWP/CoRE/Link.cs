@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.CoAP.CoRE
 {
@@ -11,8 +9,8 @@ namespace Waher.Networking.CoAP.CoRE
 	/// </summary>
 	public class Link
 	{
-		private Dictionary<string, string> parameters = new Dictionary<string, string>();
-		private Uri uri;
+		private readonly Dictionary<string, string> parameters = new Dictionary<string, string>();
+		private readonly Uri uri;
 		private Uri anchor = null;
 		private string[] relationTypes = null;
 		private string[] rev = null;
@@ -146,9 +144,7 @@ namespace Waher.Networking.CoAP.CoRE
 			internal set { this.observable = value; }
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();

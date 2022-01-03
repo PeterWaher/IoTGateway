@@ -44,22 +44,11 @@
             Emoji source to use when converting Markdown documents to HTML.
             </summary>
         </member>
-        <member name="M:Waher.Content.Markdown.Web.MarkdownToHtmlConverter.Convert(System.String,System.IO.Stream,System.String,System.String,System.String,System.String@,System.IO.Stream,Waher.Script.Variables,System.String[])">
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToHtmlConverter.ConvertAsync(Waher.Content.ConversionState)">
             <summary>
             Performs the actual conversion.
             </summary>
-            <param name="FromContentType">Content type of the content to convert from.</param>
-            <param name="From">Stream pointing to binary representation of content.</param>
-            <param name="FromFileName">If the content is coming from a file, this parameter contains the name of that file. 
-            Otherwise, the parameter is the empty string.</param>
-            <param name="ResourceName">Local resource name of file, if accessed from a web server.</param>
-            <param name="URL">URL of resource, if accessed from a web server.</param>
-            <param name="ToContentType">Content type of the content to convert to. This value might be changed, in case
-            the converter finds a better option.</param>
-            <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
-            <param name="Session">Session states.</param>
-            <param name="PossibleContentTypes">Possible content types the converter is allowed to convert to. 
-            Can be null if there are no alternatives.</param>
+            <param name="State">State of the current conversion.</param>
             <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
         </member>
         <member name="P:Waher.Content.Markdown.Web.MarkdownToHtmlConverter.HtmlSettings">
@@ -127,7 +116,7 @@
             <param name="Grade">How well the decoder decodes the object.</param>
             <returns>If the decoder can decode an object with the given type.</returns>
         </member>
-        <member name="M:Waher.Content.Markdown.Web.WebScript.WsCodec.Decode(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+        <member name="M:Waher.Content.Markdown.Web.WebScript.WsCodec.DecodeAsync(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
             <summary>
             Decodes an object.
             </summary>
@@ -164,15 +153,14 @@
             <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
             <returns>If the encoder can encode the given object.</returns>
         </member>
-        <member name="M:Waher.Content.Markdown.Web.WebScript.WsCodec.Encode(System.Object,System.Text.Encoding,System.String@,System.String[])">
+        <member name="M:Waher.Content.Markdown.Web.WebScript.WsCodec.EncodeAsync(System.Object,System.Text.Encoding,System.String[])">
             <summary>
             Encodes an object.
             </summary>
             <param name="Object">Object to encode.</param>
             <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
-            <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
             <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
-            <returns>Encoded object.</returns>
+            <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
             <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
         </member>
         <member name="T:Waher.Content.Markdown.Web.WebScript.WsToX">
@@ -200,22 +188,11 @@
             How well the content is converted.
             </summary>
         </member>
-        <member name="M:Waher.Content.Markdown.Web.WebScript.WsToX.Convert(System.String,System.IO.Stream,System.String,System.String,System.String,System.String@,System.IO.Stream,Waher.Script.Variables,System.String[])">
+        <member name="M:Waher.Content.Markdown.Web.WebScript.WsToX.ConvertAsync(Waher.Content.ConversionState)">
             <summary>
             Performs the actual conversion.
             </summary>
-            <param name="FromContentType">Content type of the content to convert from.</param>
-            <param name="From">Stream pointing to binary representation of content.</param>
-            <param name="FromFileName">If the content is coming from a file, this parameter contains the name of that file. 
-            Otherwise, the parameter is the empty string.</param>
-            <param name="LocalResourceName">Local resource name of file, if accessed from a web server.</param>
-            <param name="URL">URL of resource, if accessed from a web server.</param>
-            <param name="ToContentType">Content type of the content to convert to. This value might be changed, in case
-            the converter finds a better option.</param>
-            <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
-            <param name="Session">Session states.</param>
-            <param name="PossibleContentTypes">Possible content types the converter is allowed to convert to. 
-            Can be null if there are no alternatives.</param>
+            <param name="State">State of the current conversion.</param>
             <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
         </member>
         <member name="T:Waher.Networking.HTTP.ScriptExtensions.Page">

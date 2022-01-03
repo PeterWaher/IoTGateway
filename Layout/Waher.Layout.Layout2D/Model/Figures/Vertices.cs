@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.References;
 
@@ -29,9 +30,9 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override async Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
+			await base.FromXml(Input);
 			this.points = this.GetVertices();
 		}
 
@@ -39,14 +40,17 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			List<Vertex> Result = null;
 
-			foreach (ILayoutElement Child in this.Children)
+			if (this.HasChildren)
 			{
-				if (Child is Vertex P)
+				foreach (ILayoutElement Child in this.Children)
 				{
-					if (Result is null)
-						Result = new List<Vertex>();
+					if (Child is Vertex P)
+					{
+						if (Result is null)
+							Result = new List<Vertex>();
 
-					Result.Add(P);
+						Result.Add(P);
+					}
 				}
 			}
 

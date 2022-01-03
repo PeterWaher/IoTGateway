@@ -21,31 +21,19 @@ namespace Waher.Script.Persistence.Functions
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public Pivot(ScriptNode Argument, int Start, int Length, Expression Expression)
-            : base(Argument, Start, Length, Expression)
-        {
+			: base(Argument, Start, Length, Expression)
+		{
 		}
 
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get
-			{
-				return "Pivot";
-			}
-		}
+		public override string FunctionName => "Pivot";
 
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames
-		{
-			get
-			{
-				return new string[] { "Object" };
-			}
-		}
+		public override string[] DefaultArgumentNames => new string[] { "Object" };
 
 		/// <summary>
 		/// Evaluates the function on a matrix argument.

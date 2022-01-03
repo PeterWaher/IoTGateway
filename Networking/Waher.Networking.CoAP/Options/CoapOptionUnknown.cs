@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.CoAP.Options
 {
@@ -11,9 +7,9 @@ namespace Waher.Networking.CoAP.Options
 	/// </summary>
 	public class CoapOptionUnknown : CoapOption
 	{
-		private int nr;
-		private byte[] value;
-		private bool critical;
+		private readonly int nr;
+		private readonly byte[] value;
+		private readonly bool critical;
 
 		/// <summary>
 		/// Unknown CoAP option.

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Events;
 using Waher.Networking.CoAP;
-using Waher.Networking.LWM2M.ContentFormats;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 
@@ -17,12 +14,12 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// Used as link to associate server Object Instance.
 		/// </summary>
-		private Lwm2mResourceInteger shortServerId;
+		private readonly Lwm2mResourceInteger shortServerId;
 
 		/// <summary>
 		/// Specify the lifetime of the registration in seconds (see Section 5.3 Registration).
 		/// </summary>
-		private Lwm2mResourceInteger lifetimeSeconds;
+		private readonly Lwm2mResourceInteger lifetimeSeconds;
 
 		/// <summary>
 		/// If true, the LwM2M Client stores “Notify” operations to the LwM2M Server while the 
@@ -36,7 +33,7 @@ namespace Waher.Networking.LWM2M
 		/// The default value is true. The maximum number of storing Notifications per Server is up 
 		/// to the implementation.
 		/// </summary>
-		private Lwm2mResourceBoolean notificationStoring = null;
+		private readonly Lwm2mResourceBoolean notificationStoring = null;
 
 		/// <summary>
 		/// This Resource defines the transport binding configured for the LwM2M Client. 
@@ -44,13 +41,13 @@ namespace Waher.Networking.LWM2M
 		/// If the LwM2M Client supports the binding specified in this Resource, the LwM2M Client 
 		/// MUST use that transport for the Current Binding Mode.
 		/// </summary>
-		private Lwm2mResourceString binding = null;
+		private readonly Lwm2mResourceString binding = null;
 
 		/// <summary>
 		/// If this Resource is executed the LwM2M Client MUST perform an “Update” operation 
 		/// with this LwM2M Server using that transport for the Current Binding Mode. 
 		/// </summary>
-		private Lwm2mResourceCommand registrationUpdateTrigger = null;
+		private readonly Lwm2mResourceCommand registrationUpdateTrigger = null;
 
 		/// <summary>
 		/// LWM2M Server object instance.
@@ -89,9 +86,10 @@ namespace Waher.Networking.LWM2M
 			this.Add(this.registrationUpdateTrigger);
 		}
 
-		private void RegistrationUpdateTrigger_OnExecute(object sender, EventArgs e)
+		private Task RegistrationUpdateTrigger_OnExecute(object sender, EventArgs e)
 		{
 			this.Object.Client.RegisterUpdate();
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -157,12 +155,12 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void DELETE(CoapMessage Request, CoapResponse Response)
+		public async Task DELETE(CoapMessage Request, CoapResponse Response)
 		{
 			if (this.Object.Client.State == Lwm2mState.Bootstrap &&
 				this.Object.Client.IsFromBootstrapServer(Request))
 			{
-				Task T = this.DeleteBootstrapInfo();
+				await this.DeleteBootstrapInfo();
 				Response.ACK(CoapCode.Deleted);
 			}
 			else
@@ -195,15 +193,18 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public override void PUT(CoapMessage Request, CoapResponse Response)
+		public override Task PUT(CoapMessage Request, CoapResponse Response)
 		{
 			if (this.Object.Client.State == Lwm2mState.Bootstrap &&
 				this.Object.Client.IsFromBootstrapServer(Request))
 			{
-				base.PUT(Request, Response);
+				return base.PUT(Request, Response);
 			}
 			else
+			{
 				Response.RST(CoapCode.Unauthorized);
+				return Task.CompletedTask;
+			}
 		}
 
 		internal bool Register(Lwm2mClient Client)

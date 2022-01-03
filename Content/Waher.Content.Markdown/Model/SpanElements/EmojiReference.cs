@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Emoji;
 using Waher.Content.Markdown.Model.Multimedia;
@@ -59,18 +60,20 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override void GenerateMarkdown(StringBuilder Output)
+		public override Task GenerateMarkdown(StringBuilder Output)
 		{
 			Output.Append(this.delimiter);
 			Output.Append(this.emoji.ShortName);
 			Output.Append(this.delimiter);
+	
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		public override void GenerateHTML(StringBuilder Output)
+		public override Task GenerateHTML(StringBuilder Output)
 		{
 			IEmojiSource EmojiSource = this.Document.EmojiSource;
 
@@ -84,20 +87,22 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.Append(this.emoji.Unicode);
 			else
 				EmojiSource.GenerateHTML(Output, this.emoji, this.level, this.Document.Settings.EmbedEmojis);
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override Task GeneratePlainText(StringBuilder Output)
 		{
 			Output.Append(this.emoji.Unicode);
+		
+			return Task.CompletedTask;
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.delimiter + this.emoji.ShortName + this.delimiter;
@@ -108,10 +113,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			this.Document.EmojiSource.GetImageSource(this.emoji, this.level, out string Url, out int Width, out int Height);
-			ImageContent.OutputWpf(Output, Url, Width, Height, Emoji.Description);
+			IImageSource Source = await this.Document.EmojiSource.GetImageSource(this.emoji, this.level);
+			await ImageContent.OutputWpf(Output, Source, Emoji.Description);
 		}
 
 		/// <summary>
@@ -119,10 +124,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			this.Document.EmojiSource.GetImageSource(this.emoji, this.level, out string Url, out int Width, out int Height);
-			ImageContent.OutputXamarinForms(Output, Url, Width, Height);
+			IImageSource Source = await this.Document.EmojiSource.GetImageSource(this.emoji, this.level);
+			await ImageContent.OutputXamarinForms(Output, Source);
 		}
 
 		/// <summary>
@@ -130,27 +135,23 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="Level">Current section level.</param>
-		public override void GenerateSmartContractXml(XmlWriter Output, ref int Level)
+		/// <param name="State">Current rendering state.</param>
+		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
 			Output.WriteElementString("text", this.emoji.Unicode);
+		
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
 		/// </summary>
-		internal override bool OutsideParagraph
-		{
-			get { return true; }
-		}
+		internal override bool OutsideParagraph => true;
 
 		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
-		internal override bool InlineSpanElement
-		{
-			get { return true; }
-		}
+		internal override bool InlineSpanElement => true;
 
 		/// <summary>
 		/// Exports the element to XML.

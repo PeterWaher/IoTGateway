@@ -338,6 +338,7 @@ namespace Waher.Client.WPF.Model.Muc
 						{
 							bool? Result = Form.ShowDialog();
 							InputReceived.TrySetResult(Result.HasValue && Result.Value);
+							return Task.CompletedTask;
 						});
 
 						if (!await InputReceived.Task)
@@ -485,13 +486,13 @@ namespace Waher.Client.WPF.Model.Muc
 
 		public override bool CanChat => true;
 
-		public override void SendChatMessage(string Message, string ThreadId, MarkdownDocument Markdown)
+		public override async Task SendChatMessage(string Message, string ThreadId, MarkdownDocument Markdown)
 		{
 			if (Markdown is null)
 				this.MucClient.SendGroupChatMessage(this.roomId, this.domain, Message, string.Empty, ThreadId);
 			else
 			{
-				this.MucClient.SendCustomGroupChatMessage(this.roomId, this.domain, XmppContact.MultiFormatMessage(Message, Markdown),
+				this.MucClient.SendCustomGroupChatMessage(this.roomId, this.domain, await XmppContact.MultiFormatMessage(Message, Markdown),
 					string.Empty, ThreadId);
 			}
 		}
@@ -541,6 +542,8 @@ namespace Waher.Client.WPF.Model.Muc
 					}
 
 					this.OnUpdated();
+		
+					return Task.CompletedTask;
 				});
 			}
 
@@ -713,9 +716,9 @@ namespace Waher.Client.WPF.Model.Muc
 					}
 					else
 					{
-						MainWindow.UpdateGui(() =>
+						MainWindow.UpdateGui(async () =>
 						{
-							ParameterDialog Dialog = new ParameterDialog(e2.Form);
+							ParameterDialog Dialog = await ParameterDialog.CreateAsync(e2.Form);
 							Dialog.ShowDialog();
 						});
 					}
@@ -807,6 +810,8 @@ namespace Waher.Client.WPF.Model.Muc
 							return Task.CompletedTask;
 						}, null);
 					}
+			
+					return Task.CompletedTask;
 				});
 			}
 			else

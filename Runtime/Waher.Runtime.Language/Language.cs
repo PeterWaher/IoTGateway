@@ -192,9 +192,7 @@ namespace Waher.Runtime.Language
 			return await Namespace.GetStringAsync(Id, Default);
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			if (string.IsNullOrEmpty(this.name))

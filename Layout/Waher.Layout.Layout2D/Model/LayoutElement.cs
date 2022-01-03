@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Layout.Layout2D.Model.References;
+using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model
 {
@@ -492,10 +494,12 @@ namespace Waher.Layout.Layout2D.Model
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public virtual void FromXml(XmlElement Input)
+		public virtual Task FromXml(XmlElement Input)
 		{
 			this.id = new StringAttribute(Input, "id");
 			this.visible = new BooleanAttribute(Input, "visible");
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -557,17 +561,15 @@ namespace Waher.Layout.Layout2D.Model
 		/// Measures layout entities and defines unassigned properties, related to dimensions.
 		/// Calls, in order: <see cref="BeforeMeasureDimensions(DrawingState)"/>,
 		/// <see cref="DoMeasureDimensions(DrawingState)"/> and
-		/// <see cref="AfterMeasureDimensions(DrawingState, ref bool)"/>.
+		/// <see cref="AfterMeasureDimensions(DrawingState)"/>.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public bool MeasureDimensions(DrawingState State)
+		public async Task MeasureDimensions(DrawingState State)
 		{
 			this.BeforeMeasureDimensions(State);
-			bool Relative = this.DoMeasureDimensions(State);
-			this.AfterMeasureDimensions(State, ref Relative);
-
-			return Relative;
+			await this.DoMeasureDimensions(State);
+			await this.AfterMeasureDimensions(State);
 		}
 
 		/// <summary>
@@ -575,14 +577,13 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public virtual bool DoMeasureDimensions(DrawingState State)
+		public virtual async Task DoMeasureDimensions(DrawingState State)
 		{
-			if (!(this.visible is null) && this.visible.TryEvaluate(State.Session, out bool b))
-				this.isVisible = b;
+			EvaluationResult<bool> Visible = await this.visible.TryEvaluate(State.Session);
+			if (Visible.Ok)
+				this.isVisible = Visible.Result;
 
 			this.defined = true;
-
-			return false;
 		}
 
 		/// <summary>
@@ -598,10 +599,9 @@ namespace Waher.Layout.Layout2D.Model
 		/// Called when dimensions have been measured.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		/// <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
-		public virtual void AfterMeasureDimensions(DrawingState State, ref bool Relative)
+		public virtual Task AfterMeasureDimensions(DrawingState State)
 		{
-			// Do nothing by default.
+			return Task.CompletedTask; // Do nothing by default.
 		}
 
 		/// <summary>
@@ -652,63 +652,64 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="RefAttribute">Reference attribute</param>
 		/// <param name="X">Resulting X-coordinate.</param>
 		/// <param name="Y">Resulting Y-coordinate.</param>
-		/// <param name="Relative">If coordinate is relative, and should be recalculated if dimensions change.</param>
 		/// <returns>If point is well-defined.</returns>
-		protected bool CalcPoint(DrawingState State, LengthAttribute XAttribute,
-			LengthAttribute YAttribute, StringAttribute RefAttribute,
-			ref float X, ref float Y, ref bool Relative)
+		protected async Task<CalculatedPoint> CalcPoint(DrawingState State, LengthAttribute XAttribute,
+			LengthAttribute YAttribute, StringAttribute RefAttribute, float X, float Y)
 		{
-			if (!(XAttribute is null) &&
-				!(YAttribute is null) &&
-				XAttribute.TryEvaluate(State.Session, out Length X1) &&
-				YAttribute.TryEvaluate(State.Session, out Length Y1))
+			EvaluationResult<Length> X1 = await XAttribute.TryEvaluate(State.Session);
+			EvaluationResult<Length> Y1 = await YAttribute.TryEvaluate(State.Session);
+
+			if (X1.Ok && Y1.Ok)
 			{
-				State.CalcDrawingSize(X1, ref X, true, ref Relative);
-				State.CalcDrawingSize(Y1, ref Y, false, ref Relative);
+				State.CalcDrawingSize(X1.Result, ref X, true, State);
+				State.CalcDrawingSize(Y1.Result, ref Y, false, State);
 
-				return true;
-			}
-			else if (!(RefAttribute is null) &&
-				RefAttribute.TryEvaluate(State.Session, out string RefId) &&
-				this.Document.TryGetElement(RefId, out ILayoutElement Element))
-			{
-				float a = Element.Left ?? 0;
-
-				if (X != a)
-				{
-					Relative = true;
-					X = a;
-				}
-
-				a = Element.Top ?? 0;
-
-				if (Y != a)
-				{
-					Relative = true;
-					Y = a;
-				}
-
-				return true;
+				return new CalculatedPoint(X, Y);
 			}
 			else
-				return false;
+			{
+				EvaluationResult<string> Ref = await RefAttribute.TryEvaluate(State.Session);
+				if (Ref.Ok && this.Document.TryGetElement(Ref.Result, out ILayoutElement Element))
+				{
+					float a = Element.Left ?? 0;
+
+					if (X != a)
+					{
+						State.MeasureRelative = true;
+						X = a;
+					}
+
+					a = Element.Top ?? 0;
+
+					if (Y != a)
+					{
+						State.MeasureRelative = true;
+						Y = a;
+					}
+
+					return new CalculatedPoint(X, Y);
+				}
+				else
+					return CalculatedPoint.Empty;
+			}
 		}
 
 		/// <summary>
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public virtual void Draw(DrawingState State)
+		public virtual Task Draw(DrawingState State)
 		{
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// Draw the shape represented by the layout element.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public virtual void DrawShape(DrawingState State)
+		public virtual Task DrawShape(DrawingState State)
 		{
-			this.Draw(State);
+			return this.Draw(State);
 		}
 
 		/// <summary>
@@ -760,9 +761,7 @@ namespace Waher.Layout.Layout2D.Model
 			return CalcDirection(P2.XCoordinate - P1.XCoordinate, P2.YCoordinate - P1.YCoordinate);
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();

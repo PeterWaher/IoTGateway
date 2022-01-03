@@ -5,7 +5,6 @@ using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
-using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Operators.Matrices
 {
@@ -146,7 +145,7 @@ namespace Waher.Script.Operators.Matrices
                     if (!Set.Equals(CommonSuperSet))
                     {
                         Element2 = Element;
-                        if (!Expression.UpgradeField(ref Element2, ref Set, ref SuperSetExample, ref CommonSuperSet, Node))
+                        if (!Expression.UpgradeField(ref Element2, ref Set, ref SuperSetExample, ref CommonSuperSet))
                         {
                             CommonSuperSet = null;
                             break;
@@ -175,7 +174,7 @@ namespace Waher.Script.Operators.Matrices
                         else
                         {
                             Element2 = Element;
-                            if (Expression.UpgradeField(ref Element2, ref Set, ref SuperSetExample, ref CommonSuperSet, Node) && Element2 is IVectorSpaceElement)
+                            if (Expression.UpgradeField(ref Element2, ref Set, ref SuperSetExample, ref CommonSuperSet) && Element2 is IVectorSpaceElement)
                                 SuperElements.AddLast(Element2);
                             else
                             {

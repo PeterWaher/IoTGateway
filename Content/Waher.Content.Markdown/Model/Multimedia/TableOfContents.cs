@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Xml;
@@ -50,7 +51,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
+		public override async Task GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
 			int LastLevel = 0;
@@ -60,7 +61,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			Output.Append("<div class=\"tocTitle\">");
 
 			foreach (MarkdownElement E in ChildNodes)
-				E.GenerateHTML(Output);
+				await E.GenerateHTML(Output);
 
 			Output.AppendLine("</div><div class=\"tocBody\">");
 
@@ -119,7 +120,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				Output.Append("\">");
 
 				foreach (MarkdownElement E in Header.Children)
-					E.GenerateHTML(Output);
+					await E.GenerateHTML(Output);
 
 				Output.Append("</a>");
 				ListItemAdded = true;
@@ -150,7 +151,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GeneratePlainText(StringBuilder Output, MultimediaItem[] Items,
+		public override async Task GeneratePlainText(StringBuilder Output, MultimediaItem[] Items,
 			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
 			LinkedList<int> Stack = new LinkedList<int>();
@@ -199,7 +200,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				Output.Append(".\t");
 
 				foreach (MarkdownElement E in Header.Children)
-					E.GeneratePlainText(Output);
+					await E.GeneratePlainText(Output);
 
 				Output.AppendLine();
 				ListItemAdded = true;
@@ -218,10 +219,10 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items, 
+		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items, 
 			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
-			// TODO: Table of Contents in XAML
+			return Task.CompletedTask;	// TODO: Table of Contents in XAML
 		}
 
 		/// <summary>
@@ -233,10 +234,10 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
+		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, MultimediaItem[] Items,
 			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
-			// TODO: Table of Contents in Xamarin.Forms
+			return Task.CompletedTask;	// TODO: Table of Contents in Xamarin.Forms
 		}
 
 	}

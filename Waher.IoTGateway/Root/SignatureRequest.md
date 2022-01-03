@@ -24,7 +24,7 @@ if (try Page.Request.ObjectId!=RequestId catch true) then
 	Page.Request:=select top 1 * from ContractSignatureRequest where ObjectId=RequestId;
 	if !exists(Page.Request) then NotFound("Signature Request not found.");
 );
-Contract:=Page.Request.Contract;
+Contract:=Page.Request.GetContract().Result;
 Contract.ContractId}}` ||
 |:-------------|:---------------|
 | Received:    | {{MarkdownEncode((Page.Request.Received?.ToShortDateString() ?? "") + (Page.Request.Received?.ToLongTimeString() ?? ""))}} |

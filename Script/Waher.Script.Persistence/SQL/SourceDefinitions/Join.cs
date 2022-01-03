@@ -63,32 +63,38 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 				}
 			}
 
-			ScriptNode Node = this.left;
-			if (!(Node is null) && !Callback(ref Node, State))
-				return false;
+			ScriptNode NewNode;
+			bool b;
 
-			if (Node != this.left)
+			if (!(this.left is null))
 			{
-				if (Node is SourceDefinition Left2)
+				b = !Callback(this.left, out NewNode, State);
+				if (!(NewNode is null) && NewNode is SourceDefinition Left2)
 					this.left = Left2;
-				else
+
+				if (b)
 					return false;
 			}
 
-			Node = this.right;
-			if (!(Node is null) && !Callback(ref Node, State))
-				return false;
-
-			if (Node != this.right)
+			if (!(this.right is null))
 			{
-				if (Node is SourceDefinition Right2)
+				b = !Callback(this.right, out NewNode, State);
+				if (!(NewNode is null) && NewNode is SourceDefinition Right2)
 					this.right = Right2;
-				else
+
+				if (b)
 					return false;
 			}
 
-			if (!(this.conditions is null) && !Callback(ref this.conditions, State))
-				return false;
+			if (!(this.conditions is null))
+			{
+				b = !Callback(this.conditions, out NewNode, State);
+				if (!(NewNode is null))
+					this.conditions = NewNode;
+
+				if (b)
+					return false;
+			}
 
 			if (!DepthFirst)
 			{
@@ -103,9 +109,7 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return (obj is Join O &&
@@ -115,9 +119,7 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 				base.Equals(obj));
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

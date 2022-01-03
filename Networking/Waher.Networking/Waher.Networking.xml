@@ -799,6 +799,11 @@
             <param name="Exception">Exception.</param>
             <param name="Timestamp">Timestamp of event.</param>
         </member>
+        <member name="M:Waher.Networking.Sniffers.ConsoleOutSniffer.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
         <member name="T:Waher.Networking.Sniffers.DebugSniffer">
             <summary>
             Outputs sniffed data to <see cref="T:System.Diagnostics.Debug"/>.
@@ -907,11 +912,34 @@
             </summary>
             <param name="Sniffers">Receiver of sniffer events.</param>
         </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.ReplayAsync(Waher.Networking.Sniffers.Sniffable)">
+            <summary>
+            Replays sniffer events.
+            </summary>
+            <param name="Sniffable">Receiver of sniffer events.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.ReplayAsync(Waher.Networking.Sniffers.ISniffer[])">
+            <summary>
+            Replays sniffer events.
+            </summary>
+            <param name="Sniffers">Receiver of sniffer events.</param>
+        </member>
         <member name="M:Waher.Networking.Sniffers.InMemorySniffer.ToArray">
             <summary>
             Returns recorded events as an array.
             </summary>
             <returns>Recorded events.</returns>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.ToArrayAsync">
+            <summary>
+            Returns recorded events as an array.
+            </summary>
+            <returns>Recorded events.</returns>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.InMemorySniffer.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
         </member>
         <member name="T:Waher.Networking.Sniffers.ISniffable">
             <summary>
@@ -1107,9 +1135,7 @@
             <param name="Sniffer">Sniffer.</param>
         </member>
         <member name="M:Waher.Networking.Sniffers.Model.SnifferError.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.Sniffers.Model.SnifferEvent">
             <summary>
@@ -1158,9 +1184,7 @@
             <param name="Sniffer">Sniffer.</param>
         </member>
         <member name="M:Waher.Networking.Sniffers.Model.SnifferException.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.Sniffers.Model.SnifferInformation">
             <summary>
@@ -1181,9 +1205,7 @@
             <param name="Sniffer">Sniffer.</param>
         </member>
         <member name="M:Waher.Networking.Sniffers.Model.SnifferInformation.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.Sniffers.Model.SnifferRxBinary">
             <summary>
@@ -1204,9 +1226,7 @@
             <param name="Sniffer">Sniffer.</param>
         </member>
         <member name="M:Waher.Networking.Sniffers.Model.SnifferRxBinary.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.Sniffers.Model.SnifferRxText">
             <summary>
@@ -1227,9 +1247,7 @@
             <param name="Sniffer">Sniffer.</param>
         </member>
         <member name="M:Waher.Networking.Sniffers.Model.SnifferRxText.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.Sniffers.Model.SnifferTextEvent">
             <summary>
@@ -1267,9 +1285,7 @@
             <param name="Sniffer">Sniffer.</param>
         </member>
         <member name="M:Waher.Networking.Sniffers.Model.SnifferTxBinary.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.Sniffers.Model.SnifferTxText">
             <summary>
@@ -1290,9 +1306,7 @@
             <param name="Sniffer">Sniffer.</param>
         </member>
         <member name="M:Waher.Networking.Sniffers.Model.SnifferTxText.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.Sniffers.Model.SnifferWarning">
             <summary>
@@ -1313,9 +1327,7 @@
             <param name="Sniffer">Sniffer.</param>
         </member>
         <member name="M:Waher.Networking.Sniffers.Model.SnifferWarning.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.Sniffers.TextSnifferEvent">
             <summary>
@@ -1648,9 +1660,7 @@
             </summary>
         </member>
         <member name="M:Waher.Networking.Sniffers.TextFileSniffer.Dispose">
-            <summary>
-            <see cref="M:System.IDisposable.Dispose"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.Sniffers.TextSnifferBase">
             <summary>
@@ -1679,19 +1689,13 @@
             </summary>
         </member>
         <member name="M:Waher.Networking.Sniffers.TextSnifferBase.ReceiveBinary(System.DateTime,System.Byte[])">
-            <summary>
-            <see cref="M:Waher.Networking.Sniffers.ISniffer.ReceiveBinary(System.DateTime,System.Byte[])"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.Sniffers.TextSnifferBase.TransmitBinary(System.DateTime,System.Byte[])">
-            <summary>
-            <see cref="M:Waher.Networking.Sniffers.ISniffer.TransmitBinary(System.DateTime,System.Byte[])"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.Sniffers.TextSnifferBase.ReceiveText(System.DateTime,System.String)">
-            <summary>
-            <see cref="M:Waher.Networking.Sniffers.ISniffer.ReceiveText(System.DateTime,System.String)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.Sniffers.TextSnifferBase.WriteLine(System.String)">
             <summary>
@@ -1700,29 +1704,19 @@
             <param name="s">String to write.</param>
         </member>
         <member name="M:Waher.Networking.Sniffers.TextSnifferBase.TransmitText(System.DateTime,System.String)">
-            <summary>
-            <see cref="M:Waher.Networking.Sniffers.ISniffer.TransmitText(System.DateTime,System.String)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.Sniffers.TextSnifferBase.Information(System.DateTime,System.String)">
-            <summary>
-            <see cref="M:Waher.Networking.Sniffers.ISniffer.Information(System.DateTime,System.String)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.Sniffers.TextSnifferBase.Warning(System.DateTime,System.String)">
-            <summary>
-            <see cref="M:Waher.Networking.Sniffers.ISniffer.Warning(System.DateTime,System.String)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.Sniffers.TextSnifferBase.Error(System.DateTime,System.String)">
-            <summary>
-            <see cref="M:Waher.Networking.Sniffers.ISniffer.Error(System.DateTime,System.String)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.Sniffers.TextSnifferBase.Exception(System.DateTime,System.String)">
-            <summary>
-            <see cref="M:Waher.Networking.Sniffers.ISniffer.Exception(System.DateTime,System.String)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.Sniffers.TextWriterSniffer">
             <summary>
@@ -1862,10 +1856,15 @@
             Method is called before writing something to the text file.
             </summary>
         </member>
-        <member name="M:Waher.Networking.Sniffers.XmlFileSniffer.Dispose">
+        <member name="M:Waher.Networking.Sniffers.XmlFileSniffer.ReadAllBytesAsync(System.String)">
             <summary>
-            <see cref="M:System.IDisposable.Dispose"/>
+            Reads a binary file asynchronously.
             </summary>
+            <param name="FileName">Filename.</param>
+            <returns>Binary content.</returns>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.XmlFileSniffer.Dispose">
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.Sniffers.XmlWriterSniffer">
             <summary>
@@ -1895,44 +1894,28 @@
             </summary>
         </member>
         <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.ReceiveBinary(System.DateTime,System.Byte[])">
-            <summary>
-            <see cref="M:Waher.Networking.Sniffers.ISniffer.ReceiveBinary(System.DateTime,System.Byte[])"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.TransmitBinary(System.DateTime,System.Byte[])">
-            <summary>
-            <see cref="M:Waher.Networking.Sniffers.ISniffer.TransmitBinary(System.DateTime,System.Byte[])"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.ReceiveText(System.DateTime,System.String)">
-            <summary>
-            <see cref="M:Waher.Networking.Sniffers.ISniffer.ReceiveText(System.DateTime,System.String)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.TransmitText(System.DateTime,System.String)">
-            <summary>
-            <see cref="M:Waher.Networking.Sniffers.ISniffer.TransmitText(System.DateTime,System.String)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.Information(System.DateTime,System.String)">
-            <summary>
-            <see cref="M:Waher.Networking.Sniffers.ISniffer.Information(System.DateTime,System.String)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.Warning(System.DateTime,System.String)">
-            <summary>
-            <see cref="M:Waher.Networking.Sniffers.ISniffer.Warning(System.DateTime,System.String)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.Error(System.DateTime,System.String)">
-            <summary>
-            <see cref="M:Waher.Networking.Sniffers.ISniffer.Error(System.DateTime,System.String)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.Exception(System.DateTime,System.String)">
-            <summary>
-            <see cref="M:Waher.Networking.Sniffers.ISniffer.Exception(System.DateTime,System.String)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.Sniffers.XmlWriterSniffer.Dispose">
             <summary>

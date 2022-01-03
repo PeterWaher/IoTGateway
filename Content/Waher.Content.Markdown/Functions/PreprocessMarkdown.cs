@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
@@ -26,26 +27,40 @@ namespace Waher.Content.Markdown.Functions
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "preprocessmarkdown"; }
-        }
+        public override string FunctionName => "preprocessmarkdown";
 
-        /// <summary>
-        /// Evaluates the function on a scalar argument.
-        /// </summary>
-        /// <param name="Argument">Function argument.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public override IElement EvaluateScalar(string Argument, Variables Variables)
-        {
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(string Argument, Variables Variables)
+		{
+			return this.EvaluateScalarAsync(Argument, Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override async Task<IElement> EvaluateScalarAsync(string Argument, Variables Variables)
+		{
 			MarkdownSettings Settings = new MarkdownSettings()
 			{
 				Variables = Variables,
 				ParseMetaData = false
 			};
 
-			string Markdown = MarkdownDocument.Preprocess(Argument, Settings);
+			string Markdown = await MarkdownDocument.Preprocess(Argument, Settings);
 
 			return new StringValue(Markdown);
         }

@@ -750,7 +750,7 @@
             </summary>
             <param name="Output">XML output.</param>
         </member>
-        <member name="M:Waher.Script.Graphs3D.Canvas3D.ImportGraph(System.Xml.XmlElement)">
+        <member name="M:Waher.Script.Graphs3D.Canvas3D.ImportGraphAsync(System.Xml.XmlElement)">
             <summary>
             Imports graph specifics from XML.
             </summary>
@@ -1920,18 +1920,14 @@
             Tries to add an element to the current element, from the right.
             </summary>
             <param name="Element">Element to add.</param>
-            <param name="ElementWise">If element-wise addition is to be performed.</param>
+            <param name="_">If element-wise addition is to be performed.</param>
             <returns>Result, if understood, null otherwise.</returns>
         </member>
         <member name="M:Waher.Script.Graphs3D.Graph3D.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.Equals(System.Object)"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Graphs3D.Graph3D.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Script.Graphs3D.Graph3D.CreatePixels(Waher.Script.Graphs.GraphSettings,System.Object[]@)">
             <summary>
@@ -2055,7 +2051,7 @@
             </summary>
             <param name="Output">XML output.</param>
         </member>
-        <member name="M:Waher.Script.Graphs3D.Graph3D.ImportGraph(System.Xml.XmlElement)">
+        <member name="M:Waher.Script.Graphs3D.Graph3D.ImportGraphAsync(System.Xml.XmlElement)">
             <summary>
             Imports graph specifics from XML.
             </summary>

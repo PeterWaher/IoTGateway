@@ -297,9 +297,7 @@ namespace Waher.Persistence.Serialization.Model
 			return this.defaultValue.Equals(Value);
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();

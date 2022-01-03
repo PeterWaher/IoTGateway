@@ -170,6 +170,8 @@ namespace Waher.Client.WPF.Controls.Questions
 					MainWindow.currentInstance.CloseTab_Executed(this, null);
 				else if (i < c)
 					QuestionView.QuestionListView.SelectedIndex = i;
+
+				return Task.CompletedTask;
 			});
 
 			await Database.Delete(this);
@@ -196,6 +198,8 @@ namespace Waher.Client.WPF.Controls.Questions
 
 					if (QuestionView.QuestionListView.Items.Count == 0)
 						MainWindow.currentInstance.CloseTab_Executed(this, null);
+
+					return Task.CompletedTask;
 				});
 
 				foreach (Question Question in ToRemove)

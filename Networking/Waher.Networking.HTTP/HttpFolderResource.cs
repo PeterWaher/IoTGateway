@@ -322,13 +322,14 @@ namespace Waher.Networking.HTTP
 				Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
 
 				string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
-				Stream f = CheckAcceptable(Request, Response, ref ContentType, out bool Dynamic, FullPath, Request.Header.Resource);
-				Rec.IsDynamic = Dynamic;
+				AcceptableResponse AcceptableResponse = await CheckAcceptable(Request, Response, ContentType, FullPath, Request.Header.Resource);
+				ContentType = AcceptableResponse.ContentType;
+				Rec.IsDynamic = AcceptableResponse.Dynamic;
 
 				if (Response.ResponseSent)
 					return;
 
-				await SendResponse(f, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified, Response, Request);
+				await SendResponse(AcceptableResponse.Stream, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified, Response, Request);
 			}
 			else
 				await this.RaiseFileNotFound(FullPath, Request, Response);
@@ -563,12 +564,22 @@ namespace Waher.Networking.HTTP
 			return i >= 0;
 		}
 
-		private Stream CheckAcceptable(HttpRequest Request, HttpResponse Response, ref string ContentType, out bool Dynamic,
+		private class AcceptableResponse
+		{
+			public Stream Stream;
+			public string ContentType;
+			public bool Dynamic;
+		}
+
+		private async Task<AcceptableResponse> CheckAcceptable(HttpRequest Request, HttpResponse Response, string ContentType,
 			string FullPath, string ResourceName)
 		{
 			HttpRequestHeader Header = Request.Header;
-
-			Dynamic = false;
+			AcceptableResponse Result = new AcceptableResponse()
+			{
+				ContentType = ContentType,
+				Dynamic = false
+			};
 
 			if (!(Header.Accept is null))
 			{
@@ -676,13 +687,16 @@ namespace Waher.Networking.HTTP
 								}
 							}
 
-							if (Converter.Convert(ContentType, f, FullPath, ResourceName, Request.Header.GetURL(false, false),
-								ref NewContentType, f2, Request.Session, Alternatives?.ToArray()))
+							ConversionState State = new ConversionState(ContentType, f, FullPath, ResourceName,
+								Request.Header.GetURL(false, false), NewContentType, f2, Request.Session, Alternatives?.ToArray());
+
+							if (await Converter.ConvertAsync(State))
 							{
-								Dynamic = true;
+								NewContentType = State.ToContentType;
+								Result.Dynamic = true;
 							}
 
-							ContentType = NewContentType;
+							Result.ContentType = NewContentType;
 							Ok = true;
 						}
 						finally
@@ -702,7 +716,8 @@ namespace Waher.Networking.HTTP
 							}
 						}
 
-						return f;
+						Result.Stream = f;
+						return Result;
 					}
 				}
 
@@ -716,7 +731,7 @@ namespace Waher.Networking.HTTP
 					throw new ForbiddenException("Resource is protected.");
 			}
 
-			return null;
+			return Result;
 		}
 
 		private class ReadProgress
@@ -866,8 +881,9 @@ namespace Waher.Networking.HTTP
 				Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
 
 				string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
-				Stream f = CheckAcceptable(Request, Response, ref ContentType, out bool Dynamic, FullPath, Request.Header.Resource);
-				Rec.IsDynamic = Dynamic;
+				AcceptableResponse AcceptableResponse = await CheckAcceptable(Request, Response, ContentType, FullPath, Request.Header.Resource);
+				ContentType = AcceptableResponse.ContentType;
+				Rec.IsDynamic = AcceptableResponse.Dynamic;
 
 				if (Response.ResponseSent)
 					return;
@@ -876,7 +892,7 @@ namespace Waher.Networking.HTTP
 				{
 					Response = Response,
 					Request = Request,
-					f = f ?? File.Open(FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+					f = AcceptableResponse.Stream ?? File.Open(FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
 				};
 
 				ByteRangeInterval Interval = FirstInterval;
@@ -1118,7 +1134,7 @@ namespace Waher.Networking.HTTP
 
 			string Referer = Request.Header.Referer?.Value;
 
-			Session[" LastPost "] = Request.DecodeData();
+			Session[" LastPost "] = await Request.DecodeDataAsync();
 			Session[" LastPostResource "] = Request.SubPath;
 			Session[" LastPostReferer "] = Referer;
 

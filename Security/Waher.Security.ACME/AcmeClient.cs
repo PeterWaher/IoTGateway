@@ -741,7 +741,7 @@ namespace Waher.Security.ACME
 				}
 			}
 
-			object Decoded = InternetContent.Decode(ContentType, Bin, CertificateLocation);
+			object Decoded = await InternetContent.DecodeAsync(ContentType, Bin, CertificateLocation);
 			if (!(Decoded is X509Certificate2[] Certificates))
 				throw new Exception("Unexpected response returned. Content-Type: " + ContentType);
 

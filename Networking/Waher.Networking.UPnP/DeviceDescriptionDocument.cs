@@ -113,9 +113,7 @@ namespace Waher.Networking.UPnP
 			get { return this.device; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.baseUrl;

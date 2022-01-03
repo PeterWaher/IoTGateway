@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Content.Multipart
 {
@@ -101,9 +102,8 @@ namespace Waher.Content.Multipart
 		}
 
 		/// <summary>
-		/// Transformed body of embedded object . <see cref="TransferEncoding"/> 
-		/// defines how <see cref="Raw"/> is transformed into
-		/// <see cref="TransferDecoded"/>.
+		/// Transformed body of embedded object. <see cref="TransferEncoding"/> 
+		/// defines how <see cref="Raw"/> is transformed into TransferDecoded.
 		/// </summary>
 		public byte[] TransferDecoded
 		{
@@ -113,8 +113,7 @@ namespace Waher.Content.Multipart
 
 		/// <summary>
 		/// Decoded body of embedded object. <see cref="ContentType"/> defines
-		/// how <see cref="TransferDecoded"/> is transformed into
-		/// <see cref="Decoded"/>.
+		/// how <see cref="TransferDecoded"/> is transformed into Decoded.
 		/// </summary>
 		public object Decoded
 		{
@@ -167,9 +166,7 @@ namespace Waher.Content.Multipart
 			set => this.modificationDate = value;
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			if (!string.IsNullOrEmpty(this.name))
@@ -180,14 +177,16 @@ namespace Waher.Content.Multipart
 				return base.ToString();
 		}
 
-		internal void AssertEncoded()
+		internal async Task AssertEncoded()
 		{
 			if (!(this.raw is null))
 				return;
 
 			if (this.transferDecoded is null)
 			{
-				this.transferDecoded = InternetContent.Encode(this.decoded, Encoding.UTF8, out this.contentType);
+				KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(this.decoded, Encoding.UTF8);
+				this.transferDecoded = P.Key;
+				this.contentType = P.Value;
 				this.raw = null;
 			}
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Inventory;
 using Waher.Script;
@@ -38,28 +39,16 @@ namespace Waher.Content.Markdown.Web.WebScript
 		/// <summary>
 		/// Performs the actual conversion.
 		/// </summary>
-		/// <param name="FromContentType">Content type of the content to convert from.</param>
-		/// <param name="From">Stream pointing to binary representation of content.</param>
-		/// <param name="FromFileName">If the content is coming from a file, this parameter contains the name of that file. 
-		/// Otherwise, the parameter is the empty string.</param>
-		/// <param name="LocalResourceName">Local resource name of file, if accessed from a web server.</param>
-		/// <param name="URL">URL of resource, if accessed from a web server.</param>
-		/// <param name="ToContentType">Content type of the content to convert to. This value might be changed, in case
-		/// the converter finds a better option.</param>
-		/// <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
-		/// <param name="Session">Session states.</param>
-		/// <param name="PossibleContentTypes">Possible content types the converter is allowed to convert to. 
-		/// Can be null if there are no alternatives.</param>
+		/// <param name="State">State of the current conversion.</param>
 		/// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
-		public bool Convert(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL,
-			ref string ToContentType, Stream To, Variables Session, params string[] PossibleContentTypes)
+		public async Task<bool> ConvertAsync(ConversionState State)
 		{
-			DateTime TP = File.GetLastWriteTime(FromFileName);
+			DateTime TP = File.GetLastWriteTime(State.FromFileName);
 			Expression Exp = null;
 
 			lock (parsed)
 			{
-				if (parsed.TryGetValue(FromFileName, out KeyValuePair<Expression, DateTime> Rec) && TP == Rec.Value)
+				if (parsed.TryGetValue(State.FromFileName, out KeyValuePair<Expression, DateTime> Rec) && TP == Rec.Value)
 					Exp = Rec.Key;
 			}
 
@@ -67,36 +56,33 @@ namespace Waher.Content.Markdown.Web.WebScript
 			{
 				string Script;
 
-				using (StreamReader rd = new StreamReader(From))
+				using (StreamReader rd = new StreamReader(State.From))
 				{
-					Script = rd.ReadToEnd();
+					Script = await rd.ReadToEndAsync();
 				}
 
-				Exp = new Expression(Script, FromFileName);
+				Exp = new Expression(Script, State.FromFileName);
 
 				lock (parsed)
 				{
-					parsed[FromFileName] = new KeyValuePair<Expression, DateTime>(Exp, TP);
+					parsed[State.FromFileName] = new KeyValuePair<Expression, DateTime>(Exp, TP);
 				}
 			}
 
-			if (Session is null)
-				Session = new Variables();
+			object Result = await Exp.EvaluateAsync(State.Session ?? new Variables());
 
-			object Result = Exp.Evaluate(Session);
-
-			if (!InternetContent.Encodes(Result, out Grade _, out IContentEncoder Encoder, ToContentType))
+			if (!InternetContent.Encodes(Result, out Grade _, out IContentEncoder Encoder, State.ToContentType))
 			{
 				bool AlternativeFound = false;
 
-				if (!(PossibleContentTypes is null))
+				if (!(State.PossibleContentTypes is null))
 				{
-					foreach (string Alternative in PossibleContentTypes)
+					foreach (string Alternative in State.PossibleContentTypes)
 					{
-						if (Alternative != ToContentType &&
+						if (Alternative != State.ToContentType &&
 							InternetContent.Encodes(Result, out Grade _, out Encoder, Alternative))
 						{
-							ToContentType = Alternative;
+							State.ToContentType = Alternative;
 							AlternativeFound = true;
 							break;
 						}
@@ -104,11 +90,11 @@ namespace Waher.Content.Markdown.Web.WebScript
 				}
 
 				if (!AlternativeFound)
-					throw new NotAcceptableException("Unable to encode objects of type " + Result.GetType().FullName + " to Internet Content Type " + ToContentType);
+					throw new NotAcceptableException("Unable to encode objects of type " + Result.GetType().FullName + " to Internet Content Type " + State.ToContentType);
 			}
 
-			byte[] Data = Encoder.Encode(Result, Encoding.UTF8, out string _, ToContentType);
-			To.Write(Data, 0, Data.Length);
+			KeyValuePair<byte[], string> P = await Encoder.EncodeAsync(Result, Encoding.UTF8, State.ToContentType);
+			await State.To.WriteAsync(P.Key, 0, P.Key.Length);
 
 			return true;
 		}

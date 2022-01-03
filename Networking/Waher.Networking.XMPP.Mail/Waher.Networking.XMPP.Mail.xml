@@ -66,9 +66,7 @@
             <param name="Client">XMPP Client to use.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Mail.MailClient.Dispose">
-            <summary>
-            <see cref="M:System.IDisposable.Dispose"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Networking.XMPP.Mail.MailClient.Extensions">
             <summary>

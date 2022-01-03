@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -14,6 +13,7 @@ namespace Waher.Script.Operators
 	public class DynamicFunctionCall : NullCheckUnaryScalarOperator
 	{
 		private readonly ScriptNode[] arguments;
+		private readonly int nrArguments;
 
 		/// <summary>
 		/// Dynamic function call operator
@@ -28,24 +28,44 @@ namespace Waher.Script.Operators
 			: base(Function, NullCheck, Start, Length, Expression)
 		{
 			this.arguments = Arguments;
+			this.nrArguments = this.arguments.Length;
+
+			this.CalcIsAsync();
+		}
+
+		private void CalcIsAsync()
+		{
+			this.isAsync = this.op?.IsAsynchronous ?? false;
+
+			for (int i = 0; i < this.nrArguments; i++)
+			{
+				if (this.arguments[i]?.IsAsynchronous ?? false)
+				{
+					this.isAsync = true;
+					break;
+				}
+			}
 		}
 
 		/// <summary>
 		/// Arguments
 		/// </summary>
-		public ScriptNode[] Arguments
-		{
-			get { return this.arguments; }
-		}
+		public ScriptNode[] Arguments => this.arguments;
 
-        /// <summary>
-        /// Evaluates the operator on scalar operands.
-        /// </summary>
-        /// <param name="Operand">Operand.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Result</returns>
-        public override IElement EvaluateScalar(IElement Operand, Variables Variables)
-        {
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => this.isAsync || base.IsAsynchronous;
+
+		/// <summary>
+		/// Evaluates the operator on scalar operands.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result</returns>
+		public override IElement EvaluateScalar(IElement Operand, Variables Variables)
+		{
 			object Obj = Operand.AssociatedObjectValue;
 			if (Obj is null && this.nullCheck)
 				return ObjectValue.Null;
@@ -53,15 +73,14 @@ namespace Waher.Script.Operators
 			if (!(Obj is ILambdaExpression Lambda))
 				throw new ScriptRuntimeException("Expected a lambda expression.", this);
 
-			int c = this.arguments.Length;
-            if (c != Lambda.NrArguments)
-                throw new ScriptRuntimeException("Expected " + Lambda.NrArguments.ToString() + " arguments.", this);
+			if (this.nrArguments != Lambda.NrArguments)
+				throw new ScriptRuntimeException("Expected " + Lambda.NrArguments.ToString() + " arguments.", this);
 
-            IElement[] Arg = new IElement[c];
+			IElement[] Arg = new IElement[this.nrArguments];
 			ScriptNode Node;
-            int i;
+			int i;
 
-            for (i = 0; i < c; i++)
+			for (i = 0; i < this.nrArguments; i++)
 			{
 				Node = this.arguments[i];
 				if (Node is null)
@@ -70,7 +89,111 @@ namespace Waher.Script.Operators
 					Arg[i] = Node.Evaluate(Variables);
 			}
 
-            return Lambda.Evaluate(Arg, Variables);
-        }
-    }
+			return Lambda.Evaluate(Arg, Variables);
+		}
+
+		/// <summary>
+		/// Evaluates the operator on scalar operands.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result</returns>
+		public override async Task<IElement> EvaluateScalarAsync(IElement Operand, Variables Variables)
+		{
+			object Obj = Operand.AssociatedObjectValue;
+			if (Obj is null && this.nullCheck)
+				return ObjectValue.Null;
+
+			if (!(Obj is ILambdaExpression Lambda))
+				throw new ScriptRuntimeException("Expected a lambda expression.", this);
+
+			if (this.nrArguments != Lambda.NrArguments)
+				throw new ScriptRuntimeException("Expected " + Lambda.NrArguments.ToString() + " arguments.", this);
+
+			IElement[] Arg = new IElement[this.nrArguments];
+			ScriptNode Node;
+			int i;
+
+			for (i = 0; i < this.nrArguments; i++)
+			{
+				Node = this.arguments[i];
+				if (Node is null)
+					Arg[i] = ObjectValue.Null;
+				else
+					Arg[i] = await Node.EvaluateAsync(Variables);
+			}
+
+			return await Lambda.EvaluateAsync(Arg, Variables);
+		}
+
+		/// <summary>
+		/// Calls the callback method for all child nodes.
+		/// </summary>
+		/// <param name="Callback">Callback method to call.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+		/// <returns>If the process was completed.</returns>
+		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
+		{
+			int i;
+
+			if (DepthFirst)
+			{
+				if (!ForAllChildNodes(Callback, this.arguments, State, DepthFirst))
+					return false;
+			}
+
+			ScriptNode Node;
+			bool RecalcIsAsync = false;
+
+			for (i = 0; i < this.nrArguments; i++)
+			{
+				Node = this.arguments[i];
+				if (!(Node is null))
+				{
+					bool b = !Callback(Node, out ScriptNode NewNode, State);
+					if (!(NewNode is null))
+					{
+						this.arguments[i] = NewNode;
+						RecalcIsAsync = true;
+					}
+
+					if (b)
+					{
+						if (RecalcIsAsync)
+							this.CalcIsAsync();
+
+						return false;
+					}
+				}
+			}
+
+			if (RecalcIsAsync)
+				this.CalcIsAsync();
+
+			if (!DepthFirst)
+			{
+				if (!ForAllChildNodes(Callback, this.arguments, State, DepthFirst))
+					return false;
+			}
+
+			return true;
+		}
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			return obj is DynamicFunctionCall O &&
+				AreEqual(this.arguments, O.arguments) &&
+				base.Equals(obj);
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			int Result = base.GetHashCode();
+			Result ^= Result << 5 ^ GetHashCode(this.arguments);
+			return Result;
+		}
+	}
 }

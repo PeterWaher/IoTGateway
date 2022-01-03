@@ -36,19 +36,16 @@ namespace Waher.Script.Operators.Membership
 		/// <summary>
 		/// Name of method.
 		/// </summary>
-		public string Name
-		{
-			get { return this.name; }
-		}
+		public string Name => this.name;
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
 		/// </summary>
+		/// <param name="Operand">Operand.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
+		public override IElement Evaluate(IElement Operand, Variables Variables)
 		{
-			IElement Operand = this.op.Evaluate(Variables);
 			object Value = Operand.AssociatedObjectValue;
 			object Instance;
 

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
-using Waher.Layout.Layout2D.Exceptions;
 using Waher.Layout.Layout2D.Model.Attributes;
-using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Groups
 {
@@ -42,11 +40,10 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.columns = new PositiveIntegerAttribute(Input, "columns");
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -88,10 +85,9 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>Cell layout object.</returns>
-		public override ICellLayout GetCellLayout(DrawingState State)
+		public override async Task<ICellLayout> GetCellLayout(DrawingState State)
 		{
-			if (this.columns is null || !this.columns.TryEvaluate(State.Session, out int NrColumns))
-				NrColumns = 1;
+			int NrColumns = await this.columns.Evaluate(State.Session, 1);
 
 			return new GridCells(State.Session, NrColumns);
 		}

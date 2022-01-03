@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -100,7 +99,7 @@ namespace Waher.Script.Operators.Vectors
                     if (!Set.Equals(CommonSuperSet))
                     {
                         Element2 = Element;
-                        if (!Expression.UpgradeField(ref Element2, ref Set, ref SuperSetExample, ref CommonSuperSet, Node))
+                        if (!Expression.UpgradeField(ref Element2, ref Set, ref SuperSetExample, ref CommonSuperSet))
                         {
                             CommonSuperSet = null;
                             break;
@@ -138,7 +137,7 @@ namespace Waher.Script.Operators.Vectors
                         else
                         {
                             Element2 = Element;
-                            if (Expression.UpgradeField(ref Element2, ref Set, ref SuperSetExample, ref CommonSuperSet, Node))
+                            if (Expression.UpgradeField(ref Element2, ref Set, ref SuperSetExample, ref CommonSuperSet))
                                 SuperElements.AddLast(Element2);
                             else
                             {

@@ -27,9 +27,7 @@ namespace Waher.Networking.XMPP.Authentication
 		/// </summary>
 		public override string HashMethodName => "DIGEST-MD5";
 
-		/// <summary>
-		/// <see cref="AuthenticationMethod.Challenge"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string Challenge(string Challenge, XmppClient Client)
 		{
 			byte[] ChallengeBinary = Convert.FromBase64String(Challenge);
@@ -187,9 +185,7 @@ namespace Waher.Networking.XMPP.Authentication
 			}
 		}
 
-		/// <summary>
-		/// <see cref="AuthenticationMethod.CheckSuccess"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool CheckSuccess(string Success, XmppClient Client)
 		{
 			return true;

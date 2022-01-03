@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Layout.Layout2D.Model.Backgrounds;
-using Waher.Layout.Layout2D.Model.Fonts;
 using Waher.Layout.Layout2D.Model.Pens;
 
 namespace Waher.Layout.Layout2D.Model.Figures
@@ -49,12 +48,12 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.pen = new StringAttribute(Input, "pen");
 			this.fill = new StringAttribute(Input, "fill");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -85,20 +84,17 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		}
 
 		/// <summary>
-		/// Gets the pen associated with the element. If not found, the default pen
-		/// is returned.
+		/// Gets the pen associated with the element. If not found, the default pen is returned.
 		/// </summary>
 		/// <param name="State">Current state</param>
 		/// <returns>Pen.</returns>
-		public SKPaint GetPen(DrawingState State)
+		public async Task<SKPaint> GetPen(DrawingState State)
 		{
-			if (!(this.pen is null) && this.pen.TryEvaluate(State.Session, out string PenId))
+			EvaluationResult<string> PenId = await this.pen.TryEvaluate(State.Session);
+			if (PenId.Ok)
 			{
-				if (this.Document.TryGetElement(PenId, out ILayoutElement E) &&
-					E is Pen PenDefinition)
-				{
+				if (this.Document.TryGetElement(PenId.Result, out ILayoutElement E) && E is Pen PenDefinition)
 					return PenDefinition.Paint;
-				}
 				else
 					return State.DefaultPen;
 			}
@@ -112,54 +108,38 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Tries to get the pen associated with the element, if one is defined.
 		/// </summary>
 		/// <param name="State">Current state</param>
-		/// <param name="Pen">Pen, if defined.</param>
-		/// <returns>If a pen was defined, and was found.</returns>
-		public bool TryGetPen(DrawingState State, out SKPaint Pen)
+		/// <returns>Pen, if defined, null otherwise.</returns>
+		public async Task<SKPaint> TryGetPen(DrawingState State)
 		{
-			if (!(this.pen is null) && this.pen.TryEvaluate(State.Session, out string PenId))
+			EvaluationResult<string> PenId = await this.pen.TryEvaluate(State.Session);
+			if (PenId.Ok)
 			{
-				if (this.Document.TryGetElement(PenId, out ILayoutElement E) &&
-					E is Pen PenDefinition)
-				{
-					Pen = PenDefinition.Paint;
-					return true;
-				}
+				if (this.Document.TryGetElement(PenId.Result, out ILayoutElement E) && E is Pen PenDefinition)
+					return PenDefinition.Paint;
 			}
 			else if (!(State.ShapePen is null))
-			{
-				Pen = State.ShapePen;
-				return true;
-			}
+				return State.ShapePen;
 
-			Pen = null;
-			return false;
+			return null;
 		}
 
 		/// <summary>
 		/// Tries to get the filling of the figure, if one is defined.
 		/// </summary>
 		/// <param name="State">State object.</param>
-		/// <param name="Fill">Filling, if defined.</param>
-		/// <returns>If a filling was defined, and was found.</returns>
-		public bool TryGetFill(DrawingState State, out SKPaint Fill)
+		/// <returns>Filling, if defined, null otherwise.</returns>
+		public async Task<SKPaint> TryGetFill(DrawingState State)
 		{
-			if (!(this.fill is null) && this.fill.TryEvaluate(State.Session, out string FillId))
+			EvaluationResult<string> FillId = await this.fill.TryEvaluate(State.Session);
+			if (FillId.Ok)
 			{
-				if (this.Document.TryGetElement(FillId, out ILayoutElement E) &&
-					E is Background FillDefinition)
-				{
-					Fill = FillDefinition.Paint;
-					return true;
-				}
+				if (this.Document.TryGetElement(FillId.Result, out ILayoutElement E) && E is Background FillDefinition)
+					return FillDefinition.Paint;
 			}
 			else if (!(State.ShapeFill is null))
-			{
-				Fill = State.ShapeFill;
-				return true;
-			}
+				return State.ShapeFill;
 
-			Fill = null;
-			return false;
+			return null;
 		}
 
 	}

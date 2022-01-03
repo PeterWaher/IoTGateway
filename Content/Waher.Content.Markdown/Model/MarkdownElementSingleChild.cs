@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Markdown.Model.BlockElements;
 
@@ -29,10 +30,7 @@ namespace Waher.Content.Markdown.Model
 		/// <summary>
 		/// Child element.
 		/// </summary>
-		public MarkdownElement Child
-		{
-			get { return this.child; }
-		}
+		public MarkdownElement Child => this.child;
 
 		/// <summary>
 		/// Creates an object of the same type, and meta-data, as the current object,
@@ -47,9 +45,9 @@ namespace Waher.Content.Markdown.Model
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override void GeneratePlainText(StringBuilder Output)
+		public override Task GeneratePlainText(StringBuilder Output)
 		{
-			this.child?.GeneratePlainText(Output);
+			return this.child?.GeneratePlainText(Output) ?? Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -57,10 +55,10 @@ namespace Waher.Content.Markdown.Model
 		/// Ref: https://gitlab.com/IEEE-SA/XMPPI/IoT/-/blob/master/SmartContracts.md#human-readable-text
 		/// </summary>
 		/// <param name="Output">Smart Contract XML will be output here.</param>
-		/// <param name="Level">Current section level.</param>
-		public override void GenerateSmartContractXml(XmlWriter Output, ref int Level)
+		/// <param name="State">Current rendering state.</param>
+		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
-			this.child?.GenerateSmartContractXml(Output, ref Level);
+			return this.child?.GenerateSmartContractXml(Output, State) ?? Task.CompletedTask;
 		}
 
 		/// <summary>

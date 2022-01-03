@@ -96,7 +96,7 @@ namespace Waher.Client.WPF.Controls
 				return;
 			}
 
-			Task.Run(() =>
+			Task.Run(async () =>
 			{
 				try
 				{
@@ -104,13 +104,13 @@ namespace Waher.Client.WPF.Controls
 
 					Exp.OnPreview += (sender2, e2) =>
 					{
-						this.Dispatcher.Invoke(() =>
-							ResultBlock = this.ShowResult(ResultBlock, e2.Preview, ScriptBlock));
+						this.Dispatcher.Invoke(async () =>
+							ResultBlock = await this.ShowResult(ResultBlock, e2.Preview, ScriptBlock));
 					};
 
 					try
 					{
-						Ans = Exp.Root.Evaluate(this.variables);
+						Ans = await Exp.Root.EvaluateAsync(this.variables);
 					}
 					catch (ScriptReturnValueException ex)
 					{
@@ -123,9 +123,9 @@ namespace Waher.Client.WPF.Controls
 
 					this.variables["Ans"] = Ans;
 
-					MainWindow.UpdateGui(() =>
+					MainWindow.UpdateGui(async () =>
 					{
-						ResultBlock = this.ShowResult(ResultBlock, Ans, ScriptBlock);
+						ResultBlock = await this.ShowResult(ResultBlock, Ans, ScriptBlock);
 					});
 				}
 				catch (Exception ex)
@@ -136,7 +136,7 @@ namespace Waher.Client.WPF.Controls
 			});
 		}
 
-		private UIElement ShowResult(UIElement ResultBlock, IElement Ans, TextBlock ScriptBlock)
+		private async Task<UIElement> ShowResult(UIElement ResultBlock, IElement Ans, TextBlock ScriptBlock)
 		{
 			try
 			{
@@ -202,8 +202,8 @@ namespace Waher.Client.WPF.Controls
 						Markdown.AppendLine(" |");
 					}
 
-					MarkdownDocument Doc = new MarkdownDocument(Markdown.ToString(), ChatView.GetMarkdownSettings());
-					string XAML = Doc.GenerateXAML();
+					MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString(), ChatView.GetMarkdownSettings());
+					string XAML = await Doc.GenerateXAML();
 
 					if (XamlReader.Parse(XAML) is UIElement Parsed)
 						return this.AddBlock(ScriptBlock, Parsed);
@@ -400,7 +400,11 @@ namespace Waher.Client.WPF.Controls
 
 		internal void Print(string Output)
 		{
-			MainWindow.UpdateGui(() => this.AddTextBlock(null, Output, Colors.Blue, FontWeights.Normal, null, false));
+			MainWindow.UpdateGui(() =>
+			{
+				this.AddTextBlock(null, Output, Colors.Blue, FontWeights.Normal, null, false);
+				return Task.CompletedTask;
+			});
 		}
 
 		public void NewButton_Click(object sender, RoutedEventArgs e)

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -26,11 +24,11 @@ namespace Waher.Script.Operators.Matrices
         /// <summary>
         /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
         /// </summary>
+        /// <param name="Operand">Operand.</param>
         /// <param name="Variables">Variables collection.</param>
         /// <returns>Result.</returns>
-        public override IElement Evaluate(Variables Variables)
+        public override IElement Evaluate(IElement Operand, Variables Variables)
         {
-            IElement Operand = this.op.Evaluate(Variables);
             if (Operand is IMatrix Matrix)
                 return Matrix.Transpose();
 

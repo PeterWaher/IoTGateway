@@ -136,6 +136,7 @@ namespace Waher.Client.WPF.Controls.Questions
 								MainWindow.UpdateGui(() =>
 								{
 									this.AddToken(Details, Token2, e.Certificate, OnYes, OnNo, Range);
+									return Task.CompletedTask;
 								});
 							}
 

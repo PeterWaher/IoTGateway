@@ -388,19 +388,13 @@
             </summary>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Networking.XMPP.P2P.E2E.E2eEndpoint.Score">
             <summary>
@@ -680,14 +674,10 @@
             <returns>If signature is valid.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.EllipticCurveEndpoint.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.XMPP.P2P.E2E.NistEndpoint">
             <summary>
@@ -1214,9 +1204,7 @@
             <returns>Endpoint object.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Dispose">
-            <summary>
-            <see cref="M:System.IDisposable.Dispose"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.SupportsSharedSecrets">
             <summary>
@@ -1322,14 +1310,10 @@
             </summary>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.Equals(System.Object)">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.E2E.RsaEndpoint.GetHashCode">
-            <summary>
-            <see cref="M:System.Object.GetHashCode"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Networking.XMPP.P2P.EndpointSecurity">
             <summary>
@@ -2516,9 +2500,7 @@
             <param name="E2E">End-to-end encryption interface.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.Dispose">
-            <summary>
-            <see cref="M:System.IDisposable.Dispose"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Waher.Networking.XMPP.P2P.SOCKS5.Socks5Proxy.Extensions">
             <summary>
@@ -2758,9 +2740,7 @@
             <returns>New instance</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.Dispose">
-            <summary>
-            <see cref="M:System.IDisposable.Dispose"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="M:Waher.Networking.XMPP.P2P.SymmetricCiphers.Aes256.GetIV(System.String,System.String,System.String,System.String,System.UInt32)">
             <summary>

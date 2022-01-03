@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Runtime.Inventory;
 
@@ -26,24 +27,12 @@ namespace Waher.Security.JWT
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes
-		{
-			get
-			{
-				return new string[] { ContentType };
-			}
-		}
+		public string[] ContentTypes => new string[] { ContentType };
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions
-		{
-			get
-			{
-				return new string[] { "jwt" };
-			}
-		}
+		public string[] FileExtensions => new string[] { "jwt" };
 
 		/// <summary>
 		/// Decodes an object.
@@ -55,11 +44,11 @@ namespace Waher.Security.JWT
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public object Decode(string ContentType, byte[] Data, Encoding Encoding,
+		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding,
 			KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			string Token = (Encoding ?? Encoding.ASCII).GetString(Data);
-			return new JwtToken(Token);
+			return Task.FromResult<object>(new JwtToken(Token));
 		}
 
 		/// <summary>
@@ -127,23 +116,24 @@ namespace Waher.Security.JWT
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
-		/// <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
-		/// <returns>Encoded object.</returns>
+		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
+		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (!(Object is JwtToken Token))
 				throw new ArgumentException("Object not a JWT token.", nameof(Object));
 
-			ContentType = JwtCodec.ContentType;
-
+			string ContentType = JwtCodec.ContentType;
 			string s = Token.Header + "." + Token.Payload + "." + Token.Signature;
+			byte[] Bin;
 
 			if (Encoding is null)
-				return Encoding.ASCII.GetBytes(s);
+				Bin = Encoding.ASCII.GetBytes(s);
 			else
-				return Encoding.GetBytes(s);
+				Bin = Encoding.GetBytes(s);
+
+			return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Bin, ContentType));
 		}
 
 		/// <summary>

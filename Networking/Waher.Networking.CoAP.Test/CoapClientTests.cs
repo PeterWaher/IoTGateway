@@ -97,11 +97,11 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Error = new ManualResetEvent(false);
 			object Result = null;
 
-			await this.client.GET(Uri, true, Credentials, (sender, e) =>
+			await this.client.GET(Uri, true, Credentials, async (sender, e) =>
 			{
 				if (e.Ok)
 				{
-					Result = e.Message.Decode();
+					Result = await e.Message.DecodeAsync();
 					Done.Set();
 				}
 				else
@@ -124,12 +124,12 @@ namespace Waher.Networking.CoAP.Test
 			ulong Token = 0;
 			int Count = 0;
 
-			await this.client.Observe(Uri, true, null, (sender, e) =>
+			await this.client.Observe(Uri, true, null, async (sender, e) =>
 			{
 				if (e.Ok)
 				{
 					Token = e.Message.Token;
-					Result = e.Message.Decode();
+					Result = await e.Message.DecodeAsync();
 					Console.Out.WriteLine(Result.ToString());
 
 					Count++;
@@ -152,6 +152,8 @@ namespace Waher.Networking.CoAP.Test
 				else
 					Error.Set();
 
+				return Task.CompletedTask;
+
 			}, null, Options);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
@@ -164,11 +166,11 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
 
-			await this.client.POST(Uri, true, Payload, BlockSize, null, (sender, e) =>
+			await this.client.POST(Uri, true, Payload, BlockSize, null, async (sender, e) =>
 			{
 				if (e.Ok)
 				{
-					object Result = e.Message.Decode();
+					object Result = await e.Message.DecodeAsync();
 					if (Result != null)
 						Console.Out.WriteLine(Result.ToString());
 
@@ -186,11 +188,11 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
 
-			await this.client.PUT(Uri, true, Payload, BlockSize, null, (sender, e) =>
+			await this.client.PUT(Uri, true, Payload, BlockSize, null, async (sender, e) =>
 			{
 				if (e.Ok)
 				{
-					object Result = e.Message.Decode();
+					object Result = await e.Message.DecodeAsync();
 					if (Result != null)
 						Console.Out.WriteLine(Result.ToString());
 

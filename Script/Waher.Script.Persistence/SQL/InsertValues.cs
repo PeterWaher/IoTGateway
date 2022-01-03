@@ -43,6 +43,12 @@ namespace Waher.Script.Persistence.SQL
 		}
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
@@ -58,7 +64,7 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public async Task<IElement> EvaluateAsync(Variables Variables)
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
 			IDataSource Source = await this .source.GetSource(Variables);
 			GenericObject Obj = new GenericObject(Source.CollectionName, Source.TypeName, Guid.Empty);
@@ -69,10 +75,10 @@ namespace Waher.Script.Persistence.SQL
 
 			for (i = 0; i < this.nrFields; i++)
 			{
-				Column = GetName(this.columns.Elements[i], Variables);
+				Column = await GetNameAsync(this.columns.Elements[i], Variables);
 
 				Node = this.values.Elements[i];
-				E = Node.Evaluate(Variables);
+				E = await Node.EvaluateAsync(Variables);
 
 				Obj[Column] = E.AssociatedObjectValue;
 			}
@@ -89,13 +95,13 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Variables">Variables</param>
 		/// <returns>Name</returns>
 		/// <exception cref="ScriptRuntimeException">If node is not a variable reference, or does not evaluate to a string value.</exception>
-		public static string GetName(ScriptNode Node, Variables Variables)
+		public static async Task<string> GetNameAsync(ScriptNode Node, Variables Variables)
 		{
 			if (Node is VariableReference Ref)
 				return Ref.VariableName;
 			else
 			{
-				IElement E = Node.Evaluate(Variables);
+				IElement E = await Node.EvaluateAsync(Variables);
 				if (E.AssociatedObjectValue is string s)
 					return s;
 				else
@@ -124,32 +130,38 @@ namespace Waher.Script.Persistence.SQL
 					return false;
 			}
 
-			ScriptNode Node = this.source;
-			if (!(Node is null) && !Callback(ref Node, State))
-				return false;
+			ScriptNode NewNode;
+			bool b;
 
-			if (Node is SourceDefinition Source2)
-				this.source = Source2;
-			else
-				return false;
+			if (!(this.source is null))
+			{
+				b = !Callback(this.source, out NewNode, State);
+				if (!(NewNode is null) && NewNode is SourceDefinition Source2)
+					this.source = Source2;
 
-			Node = this.columns;
-			if (!(Node is null) && !Callback(ref Node, State))
-				return false;
+				if (b)
+					return false;
+			}
 
-			if (Node is ElementList List1)
-				this.columns = List1;
-			else
-				return false;
+			if (!(this.columns is null))
+			{
+				b = !Callback(this.columns, out NewNode, State);
+				if (!(NewNode is null) && NewNode is ElementList NewColumns)
+					this.columns = NewColumns;
 
-			Node = this.values;
-			if (!(Node is null) && !Callback(ref Node, State))
-				return false;
+				if (b)
+					return false;
+			}
 
-			if (Node is ElementList List2)
-				this.values = List2;
-			else
-				return false;
+			if (!(this.values is null))
+			{
+				b = !Callback(this.values, out NewNode, State);
+				if (!(NewNode is null) && NewNode is ElementList NewValues)
+					this.values = NewValues;
+
+				if (b)
+					return false;
+			}
 
 			if (!DepthFirst)
 			{
@@ -166,9 +178,7 @@ namespace Waher.Script.Persistence.SQL
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return (obj is InsertValues O &&
@@ -178,9 +188,7 @@ namespace Waher.Script.Persistence.SQL
 				base.Equals(obj));
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

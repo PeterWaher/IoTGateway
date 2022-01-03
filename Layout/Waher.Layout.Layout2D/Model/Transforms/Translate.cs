@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -50,12 +51,12 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.translateX = new LengthAttribute(Input, "translateX");
 			this.translateY = new LengthAttribute(Input, "translateY");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -100,18 +101,19 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// Called when dimensions have been measured.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		/// <param name="Relative">If layout contains relative sizes and dimensions should be recalculated.</param>
-		public override void AfterMeasureDimensions(DrawingState State, ref bool Relative)
+		public override async Task AfterMeasureDimensions(DrawingState State)
 		{
-			base.AfterMeasureDimensions(State, ref Relative);
+			await base.AfterMeasureDimensions(State);
 
-			if (!(this.translateX is null) && this.translateX.TryEvaluate(State.Session, out Length L))
-				State.CalcDrawingSize(L, ref this.dx, true, ref Relative);
+			EvaluationResult<Length> L = await this.translateX.TryEvaluate(State.Session);
+			if (L.Ok)
+				State.CalcDrawingSize(L.Result, ref this.dx, true, State);
 			else
 				this.dx = 0;
 
-			if (!(this.translateY is null) && this.translateY.TryEvaluate(State.Session, out L))
-				State.CalcDrawingSize(L, ref this.dy, false, ref Relative);
+			L = await this.translateY.TryEvaluate(State.Session);
+			if (L.Ok)
+				State.CalcDrawingSize(L.Result, ref this.dy, false, State);
 			else
 				this.dy = 0;
 
@@ -126,12 +128,12 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			SKMatrix M = State.Canvas.TotalMatrix;
 			State.Canvas.Translate(this.dx, this.dy);
 
-			base.Draw(State);
+			await base.Draw(State);
 
 			State.Canvas.SetMatrix(M);
 		}

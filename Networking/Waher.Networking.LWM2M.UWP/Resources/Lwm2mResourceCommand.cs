@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Networking.CoAP;
 using Waher.Networking.LWM2M.ContentFormats;
@@ -51,9 +50,10 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public override void GET(CoapMessage Request, CoapResponse Response)
+		public override Task GET(CoapMessage Request, CoapResponse Response)
 		{
 			Response.Respond(CoapCode.MethodNotAllowed);
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

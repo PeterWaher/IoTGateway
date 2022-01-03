@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 
 namespace Waher.Networking.CoAP.Options
 {
@@ -8,7 +7,7 @@ namespace Waher.Networking.CoAP.Options
 	/// </summary>
 	public abstract class CoapOptionUInt : CoapOption
 	{
-		private ulong value;
+		private readonly ulong value;
 
 		/// <summary>
 		/// Base class for all uint-valued CoAP options.
@@ -58,9 +57,7 @@ namespace Waher.Networking.CoAP.Options
 			return ToBinary(this.value);
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return base.ToString() + " = " + this.value.ToString();

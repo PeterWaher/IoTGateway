@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Networking.LWM2M.ContentFormats;
@@ -305,7 +306,7 @@ namespace Waher.Networking.CoAP.Test
 			}
 		}
 		[TestMethod]
-		public void LWM2M_TLV_Test_07_Decode_BootstrapInfo()
+		public async Task LWM2M_TLV_Test_07_Decode_BootstrapInfo()
 		{
 			byte[] Tlv = new byte[]
 			{
@@ -319,7 +320,7 @@ namespace Waher.Networking.CoAP.Test
 				0x6f, 0xc1, 0x0b, 0x01, 0xc1, 0x0c, 0x00
 			};
 
-			object Decoded = InternetContent.Decode(TlvDecoder.ContentType, Tlv, null);
+			object Decoded = await InternetContent.DecodeAsync(TlvDecoder.ContentType, Tlv, null);
 			Assert.IsNotNull(Decoded);
 
 			TlvRecord[] Records = Decoded as TlvRecord[];

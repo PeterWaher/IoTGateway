@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Text
@@ -20,7 +21,7 @@ namespace Waher.Content.Text
 		/// <summary>
 		/// Plain text content types.
 		/// </summary>
-		public static readonly string[] PlainTextContentTypes = new string[] 
+		public static readonly string[] PlainTextContentTypes = new string[]
 		{
 			"text/plain",
  			"text/css",
@@ -33,8 +34,8 @@ namespace Waher.Content.Text
 		/// <summary>
 		/// Plain text file extensions.
 		/// </summary>
-		public static readonly string[] PlainTextFileExtensions = new string[] 
-		{ 
+		public static readonly string[] PlainTextFileExtensions = new string[]
+		{
 			"txt",
 			"text",
 			"css",
@@ -47,18 +48,12 @@ namespace Waher.Content.Text
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes
-		{
-			get { return PlainTextContentTypes; }
-		}
+		public string[] ContentTypes => PlainTextContentTypes;
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions
-		{
-			get { return PlainTextFileExtensions; }
-		}
+		public string[] FileExtensions => PlainTextFileExtensions;
 
 		/// <summary>
 		/// If the decoder decodes an object with a given content type.
@@ -95,9 +90,9 @@ namespace Waher.Content.Text
 		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
+		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			return CommonTypes.GetString(Data, Encoding);
+			return Task.FromResult<object>(CommonTypes.GetString(Data, Encoding));
 		}
 
 		/// <summary>
@@ -219,24 +214,28 @@ namespace Waher.Content.Text
 		/// </summary>
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
-		/// <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
-		/// <returns>Encoded object.</returns>
+		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
+		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (this.Encodes(Object, out Grade _, AcceptedContentTypes))
 			{
+				string ContentType;
+				byte[] Bin;
+
 				if (Encoding is null)
 				{
 					ContentType = "text/plain; charset=utf-8";
-					return Encoding.UTF8.GetBytes(Object.ToString());
+					Bin = Encoding.UTF8.GetBytes(Object.ToString());
 				}
 				else
 				{
 					ContentType = "text/plain; charset=" + Encoding.WebName;
-					return Encoding.GetBytes(Object.ToString());
+					Bin = Encoding.GetBytes(Object.ToString());
 				}
+
+				return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Bin, ContentType));
 			}
 			else
 				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));

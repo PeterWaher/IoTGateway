@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Content;
@@ -10,7 +11,6 @@ using Waher.Layout.Layout2D.Model.Images;
 using Waher.Layout.Layout2D.Model.Transforms;
 using Waher.Script;
 using Waher.Script.Exceptions;
-using Waher.Script.Functions.Vectors;
 using Waher.Script.Graphs;
 using Waher.Script.Objects.Matrices;
 
@@ -92,14 +92,14 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.expression = new ExpressionAttribute(Input, "expression");
 			this.halign = new EnumAttribute<HorizontalAlignment>(Input, "halign");
 			this.valign = new EnumAttribute<VerticalAlignment>(Input, "valign");
 			this.font = new StringAttribute(Input, "font");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -149,19 +149,22 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
 			if (this.evaluated is null)
 			{
-				if (!(this.expression is null) && this.expression.TryEvaluate(State.Session, out this.parsed))
+				EvaluationResult<Expression> Parsed = await this.expression.TryEvaluate(State.Session);
+				if (Parsed.Ok)
 				{
 					object Result;
 
+					this.parsed = Parsed.Result;
+
 					try
 					{
-						Result = this.parsed.Evaluate(State.Session);
+						Result = await this.parsed.EvaluateAsync(State.Session);
 					}
 					catch (ScriptReturnValueException ex)
 					{
@@ -254,29 +257,29 @@ namespace Waher.Layout.Layout2D.Model.Content
 					this.defined = false;
 			}
 
-			if (!(this.font is null) &&
-				this.fontRef is null &&
-				this.font.TryEvaluate(State.Session, out string FontId) &&
-				this.Document.TryGetElement(FontId, out ILayoutElement E) &&
-				E is Font Font)
+			if (!(this.font is null) && this.fontRef is null)
 			{
-				this.fontRef = Font;
+				EvaluationResult<string> FontId = await this.font.TryEvaluate(State.Session);
+
+				if (FontId.Ok &&
+					this.Document.TryGetElement(FontId.Result, out ILayoutElement E) &&
+					E is Font Font)
+				{
+					this.fontRef = Font;
+				}
 			}
 
 			if (!(this.evaluated is null))
 			{
 				FontState Bak = State.Push(this.fontRef);
 
-				if (this.evaluated.MeasureDimensions(State))
-					Relative = true;
+				await this.evaluated.MeasureDimensions(State);
 
 				State.Restore(Bak);
 
 				this.Width = this.evaluated.Width;
 				this.Height = this.evaluated.Height;
 			}
-
-			return Relative;
 		}
 
 		/// <summary>
@@ -313,13 +316,16 @@ namespace Waher.Layout.Layout2D.Model.Content
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			FontState Bak = State.Push(this.fontRef);
-			this.evaluated?.Draw(State);
+
+			if (!(this.evaluated is null))
+				await this.evaluated.Draw(State);
+
 			State.Restore(Bak);
 
-			base.Draw(State);
+			await base.Draw(State);
 		}
 	}
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
 
@@ -15,8 +17,8 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		protected XmlWriter output;
 
+		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
 		private readonly BinaryPresentationMethod binaryPresentationMethod;
-		private readonly object synchObject = new object();
 		private bool disposed = false;
 
 		/// <summary>
@@ -33,36 +35,37 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// Method is called before writing something to the text file.
 		/// </summary>
-		protected virtual void BeforeWrite()
+		protected virtual Task BeforeWrite()
 		{
-			// Do nothing by default.
+			return Task.CompletedTask;  // Do nothing by default.
 		}
 
 		/// <summary>
 		/// Method is called after writing something to the text file.
 		/// </summary>
-		protected virtual void AfterWrite()
+		protected virtual Task AfterWrite()
 		{
-			// Do nothing by default.
+			return Task.CompletedTask;  // Do nothing by default.
 		}
 
-		/// <summary>
-		/// <see cref="ISniffer.ReceiveBinary(DateTime, byte[])"/>
-		/// </summary>
-		public override void ReceiveBinary(DateTime Timestamp, byte[] Data)
+		/// <inheritdoc/>
+		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
 			if (Data.Length > 0)
-				this.HexOutput(Timestamp, Data, "Rx");
+				return this.HexOutput(Timestamp, Data, "Rx");
+			else
+				return Task.CompletedTask;
 		}
 
-		private void HexOutput(DateTime Timestamp, byte[] Data, string TagName)
+		private async Task HexOutput(DateTime Timestamp, byte[] Data, string TagName)
 		{
 			if (this.disposed)
 				return;
 
-			lock (this.synchObject)
+			await this.semaphore.WaitAsync();
+			try
 			{
-				this.BeforeWrite();
+				await this.BeforeWrite();
 				if (!(this.output is null))
 				{
 					try
@@ -124,9 +127,13 @@ namespace Waher.Networking.Sniffers
 					}
 					finally
 					{
-						this.AfterWrite();
+						await this.AfterWrite();
 					}
 				}
+			}
+			finally
+			{
+				this.semaphore.Release();
 			}
 		}
 
@@ -154,24 +161,22 @@ namespace Waher.Networking.Sniffers
 			return sb.ToString();
 		}
 
-		/// <summary>
-		/// <see cref="ISniffer.TransmitBinary(DateTime, byte[])"/>
-		/// </summary>
-		public override void TransmitBinary(DateTime Timestamp, byte[] Data)
+		/// <inheritdoc/>
+		public override Task TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
 			if (Data.Length > 0)
-				this.HexOutput(Timestamp, Data, "Tx");
+				return this.HexOutput(Timestamp, Data, "Tx");
+			else
+				return Task.CompletedTask;
 		}
 
-		/// <summary>
-		/// <see cref="ISniffer.ReceiveText(DateTime, String)"/>
-		/// </summary>
-		public override void ReceiveText(DateTime Timestamp, string Text)
+		/// <inheritdoc/>
+		public override Task ReceiveText(DateTime Timestamp, string Text)
 		{
-			this.WriteLine(Timestamp, "Rx", Text);
+			return this.WriteLine(Timestamp, "Rx", Text);
 		}
 
-		private void WriteLine(DateTime Timestamp, string TagName, string Text)
+		private async Task WriteLine(DateTime Timestamp, string TagName, string Text)
 		{
 			if (this.disposed)
 				return;
@@ -191,11 +196,12 @@ namespace Waher.Networking.Sniffers
 				i = Text.IndexOfAny(controlCharacters, i);
 			}
 
-			lock (this.synchObject)
+			await this.semaphore.WaitAsync();
+			try
 			{
 				try
 				{
-					this.BeforeWrite();
+					await this.BeforeWrite();
 					if (!(this.output is null))
 					{
 						try
@@ -211,7 +217,7 @@ namespace Waher.Networking.Sniffers
 						}
 						finally
 						{
-							this.AfterWrite();
+							await this.AfterWrite();
 						}
 					}
 				}
@@ -219,6 +225,10 @@ namespace Waher.Networking.Sniffers
 				{
 					Log.Critical(ex);
 				}
+			}
+			finally
+			{
+				this.semaphore.Release();
 			}
 		}
 
@@ -243,44 +253,34 @@ namespace Waher.Networking.Sniffers
 			return s.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
 		}
 
-		/// <summary>
-		/// <see cref="ISniffer.TransmitText(DateTime, String)"/>
-		/// </summary>
-		public override void TransmitText(DateTime Timestamp, string Text)
+		/// <inheritdoc/>
+		public override Task TransmitText(DateTime Timestamp, string Text)
 		{
-			this.WriteLine(Timestamp, "Tx", Text);
+			return this.WriteLine(Timestamp, "Tx", Text);
 		}
 
-		/// <summary>
-		/// <see cref="ISniffer.Information(DateTime, String)"/>
-		/// </summary>
-		public override void Information(DateTime Timestamp, string Comment)
+		/// <inheritdoc/>
+		public override Task Information(DateTime Timestamp, string Comment)
 		{
-			this.WriteLine(Timestamp, "Info", Comment);
+			return this.WriteLine(Timestamp, "Info", Comment);
 		}
 
-		/// <summary>
-		/// <see cref="ISniffer.Warning(DateTime, String)"/>
-		/// </summary>
-		public override void Warning(DateTime Timestamp, string Warning)
+		/// <inheritdoc/>
+		public override Task Warning(DateTime Timestamp, string Warning)
 		{
-			this.WriteLine(Timestamp, "Warning", Warning);
+			return this.WriteLine(Timestamp, "Warning", Warning);
 		}
 
-		/// <summary>
-		/// <see cref="ISniffer.Error(DateTime, String)"/>
-		/// </summary>
-		public override void Error(DateTime Timestamp, string Error)
+		/// <inheritdoc/>
+		public override Task Error(DateTime Timestamp, string Error)
 		{
-			this.WriteLine(Timestamp, "Error", Error);
+			return this.WriteLine(Timestamp, "Error", Error);
 		}
 
-		/// <summary>
-		/// <see cref="ISniffer.Exception(DateTime, String)"/>
-		/// </summary>
-		public override void Exception(DateTime Timestamp, string Exception)
+		/// <inheritdoc/>
+		public override Task Exception(DateTime Timestamp, string Exception)
 		{
-			this.WriteLine(Timestamp, "Exception", Exception);
+			return this.WriteLine(Timestamp, "Exception", Exception);
 		}
 
 		/// <summary>
@@ -289,6 +289,7 @@ namespace Waher.Networking.Sniffers
 		public virtual void Dispose()
 		{
 			this.disposed = true;
+			this.semaphore.Dispose();
 		}
 	}
 }

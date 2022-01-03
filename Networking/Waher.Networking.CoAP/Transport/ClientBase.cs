@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Threading.Tasks;
-using Waher.Security.DTLS;
 
 namespace Waher.Networking.CoAP.Transport
 {

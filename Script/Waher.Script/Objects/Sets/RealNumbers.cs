@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
-using Waher.Script.Model;
-using Waher.Script.Objects;
 
 namespace Waher.Script.Objects.Sets
 {
@@ -56,10 +52,8 @@ namespace Waher.Script.Objects.Sets
             return hashCode;
         }
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
-		public override string ToString()
+        /// <inheritdoc/>
+        public override string ToString()
 		{
 			return "ℝ";
 		}

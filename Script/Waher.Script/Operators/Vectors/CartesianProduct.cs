@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Operators.Vectors
 {
@@ -31,8 +29,9 @@ namespace Waher.Script.Operators.Vectors
 		/// </summary>
 		/// <param name="Left">Left value.</param>
 		/// <param name="Right">Right value.</param>
+		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result</returns>
-		public override IElement EvaluateVector(IVector Left, IVector Right)
+		public override IElement EvaluateVector(IVector Left, IVector Right, Variables Variables)
 		{
 			if (Left.Dimension != Right.Dimension)
 				throw new ScriptRuntimeException("Vectors of different dimensions.", this);

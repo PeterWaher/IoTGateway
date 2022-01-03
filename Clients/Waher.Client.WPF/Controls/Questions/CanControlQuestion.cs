@@ -314,6 +314,8 @@ namespace Waher.Client.WPF.Controls.Questions
 								Tag = ParameterName
 							});
 						}
+
+						return Task.CompletedTask;
 					});
 				}
 				else

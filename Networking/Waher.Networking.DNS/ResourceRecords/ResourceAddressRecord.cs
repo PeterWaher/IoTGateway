@@ -69,9 +69,7 @@ namespace Waher.Networking.DNS.ResourceRecords
 			set => this.address = value is null ? null : new IPAddress(value);
 		}
 
-		/// <summary>
-		/// <see cref="object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return base.ToString() + "\t" + this.address?.ToString();

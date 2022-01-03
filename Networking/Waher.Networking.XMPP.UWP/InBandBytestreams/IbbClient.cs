@@ -44,9 +44,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			this.client.RegisterMessageHandler("data", Namespace, this.DataHandler, false);
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			base.Dispose();

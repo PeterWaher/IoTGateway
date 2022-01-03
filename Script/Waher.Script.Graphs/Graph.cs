@@ -11,6 +11,7 @@ using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Objects.Sets;
 using Waher.Script.Units;
+using System.Threading.Tasks;
 
 namespace Waher.Script.Graphs
 {
@@ -1338,7 +1339,17 @@ namespace Waher.Script.Graphs
 		/// Imports graph specifics from XML.
 		/// </summary>
 		/// <param name="Xml">XML input.</param>
-		public abstract void ImportGraph(XmlElement Xml);
+		[Obsolete("Use the ImportGraphAsync method for more efficient processing of script containing asynchronous processing elements in parallel environments.")]
+		public void ImportGraph(XmlElement Xml)
+		{
+			this.ImportGraphAsync(Xml).Wait();
+		}
+
+		/// <summary>
+		/// Imports graph specifics from XML.
+		/// </summary>
+		/// <param name="Xml">XML input.</param>
+		public abstract Task ImportGraphAsync(XmlElement Xml);
 
 		/// <summary>
 		/// Parses an element expression string.
@@ -1346,14 +1357,26 @@ namespace Waher.Script.Graphs
 		/// <param name="s">Expression</param>
 		/// <param name="Variables">Current set of variables.</param>
 		/// <returns>Parsed element.</returns>
+		[Obsolete("Use the ParseAsync method for more efficient processing of script containing asynchronous processing elements in parallel environments.")]
 		public static IElement Parse(string s, Variables Variables)
+		{
+			return ParseAsync(s, Variables).Result;
+		}
+
+		/// <summary>
+		/// Parses an element expression string.
+		/// </summary>
+		/// <param name="s">Expression</param>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <returns>Parsed element.</returns>
+		public static async Task<IElement> ParseAsync(string s, Variables Variables)
 		{
 			Expression Exp = new Expression(s);
 			IElement Result;
 
 			try
 			{
-				Result = Exp.Root.Evaluate(Variables);
+				Result = await Exp.Root.EvaluateAsync(Variables);
 			}
 			catch (ScriptReturnValueException ex)
 			{

@@ -32,10 +32,8 @@ namespace Waher.Script.Objects
 			set { this.value = value; }
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
-		public override string ToString()
+        /// <inheritdoc/>
+        public override string ToString()
         {
 			if (this.value is null)
 				return "null";
@@ -59,9 +57,7 @@ namespace Waher.Script.Objects
             get { return this.value; }
         }
 
-        /// <summary>
-        /// <see cref="Object.Equals(object)"/>
-        /// </summary>
+        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
 			if (obj is ObjectValue E)
@@ -77,9 +73,7 @@ namespace Waher.Script.Objects
 				return false;
         }
 
-        /// <summary>
-        /// <see cref="Object.GetHashCode()"/>
-        /// </summary>
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             if (this.value is null)

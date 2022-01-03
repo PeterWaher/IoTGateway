@@ -66,13 +66,12 @@
             <param name="Document">Markdown document containing element.</param>
             <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
         </member>
-        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GetFileName(System.String,System.String[],System.String@,Waher.Script.Variables)">
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.GetFileName(System.String,System.String[],Waher.Script.Variables)">
             <summary>
             Generates an image, saves it, and returns the file name of the image file.
             </summary>
             <param name="Language">Language</param>
             <param name="Rows">Code Block rows</param>
-            <param name="Title">Title</param>
             <param name="Session">Session variables.</param>
             <returns>File name</returns>
         </member>

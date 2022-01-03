@@ -5,7 +5,6 @@ using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Matrices;
 
 namespace Waher.Script.Objects.Matrices
@@ -184,9 +183,7 @@ namespace Waher.Script.Objects.Matrices
 			}
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			IElement[,] v = this.Values;

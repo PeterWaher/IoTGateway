@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.CoAP.Transport;
 
@@ -12,15 +9,15 @@ namespace Waher.Networking.CoAP
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void CoapResponseEventHandler(object Sender, CoapResponseEventArgs e);
+	public delegate Task CoapResponseEventHandler(object Sender, CoapResponseEventArgs e);
 
 	/// <summary>
 	/// Event arguments for CoAP response callbacks.
 	/// </summary>
 	public class CoapResponseEventArgs : CoapMessageEventArgs
 	{
-		private object state;
-		private bool ok;
+		private readonly object state;
+		private readonly bool ok;
 
 		/// <summary>
 		/// Event arguments for CoAP response callbacks.

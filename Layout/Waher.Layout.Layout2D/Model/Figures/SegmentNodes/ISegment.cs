@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using SkiaSharp;
 
 namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
@@ -13,7 +14,7 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
-		void Measure(DrawingState State, PathState PathState);
+		Task Measure(DrawingState State, PathState PathState);
 
 		/// <summary>
 		/// Draws layout entities.
@@ -21,6 +22,6 @@ namespace Waher.Layout.Layout2D.Model.Figures.SegmentNodes
 		/// <param name="State">Current drawing state.</param>
 		/// <param name="PathState">Current path state.</param>
 		/// <param name="Path">Path being generated.</param>
-		void Draw(DrawingState State, PathState PathState, SKPath Path);
+		Task Draw(DrawingState State, PathState PathState, SKPath Path);
 	}
 }

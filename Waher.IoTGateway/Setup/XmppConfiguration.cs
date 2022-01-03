@@ -457,14 +457,14 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		protected override string ConfigPrivilege => "Admin.Communication.XMPP";
 
-		private Task ConnectToHost(HttpRequest Request, HttpResponse Response)
+		private async Task ConnectToHost(HttpRequest Request, HttpResponse Response)
 		{
 			Gateway.AssertUserAuthenticated(Request, this.ConfigPrivilege);
 
 			if (!Request.HasData)
 				throw new BadRequestException();
 
-			object Obj = Request.DecodeData();
+			object Obj = await Request.DecodeDataAsync();
 			if (!(Obj is Dictionary<string, object> Parameters))
 				throw new BadRequestException();
 
@@ -540,8 +540,6 @@ namespace Waher.IoTGateway.Setup
 			this.Connect(TabID);
 
 			Response.StatusCode = 200;
-
-			return Task.CompletedTask;
 		}
 
 		private Task RandomizePassword(HttpRequest Request, HttpResponse Response)

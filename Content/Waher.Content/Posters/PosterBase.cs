@@ -58,9 +58,9 @@ namespace Waher.Content.Posters
 		/// <returns>Decoded response.</returns>
 		public virtual async Task<object> PostAsync(Uri Uri, object Data, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
-			byte[] Bin = InternetContent.Encode(Data, System.Text.Encoding.UTF8, out string ContentType);
-			KeyValuePair<byte[], string> Result = await this.PostAsync(Uri, Bin, ContentType, TimeoutMs, Headers);
-			return InternetContent.Decode(Result.Value, Result.Key, Uri);
+			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Data, System.Text.Encoding.UTF8);
+			KeyValuePair<byte[], string> Result = await this.PostAsync(Uri, P.Key, P.Value, TimeoutMs, Headers);
+			return await InternetContent.DecodeAsync(Result.Value, Result.Key, Uri);
 		}
 
 		/// <summary>

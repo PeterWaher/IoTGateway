@@ -1,6 +1,7 @@
 ﻿using System;
 using SkiaSharp;
 using System.Xml;
+using System.Threading.Tasks;
 
 namespace Waher.Script.Graphs.Canvas2D.Operations
 {
@@ -52,14 +53,14 @@ namespace Waher.Script.Graphs.Canvas2D.Operations
 		}
 
 		/// <inheritdoc/>
-		public override void ImportGraph(XmlElement Xml, Variables Variables)
+		public override async Task ImportGraph(XmlElement Xml, Variables Variables)
 		{
 			foreach (XmlAttribute Attr in Xml.Attributes)
 			{
 				switch (Attr.Name)
 				{
 					case "p":
-						this.parameter = Graph.ToColor(Graph.Parse(Attr.Value, Variables));
+						this.parameter = Graph.ToColor(await Graph.ParseAsync(Attr.Value, Variables));
 						break;
 				}
 			}

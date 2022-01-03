@@ -1,6 +1,5 @@
 ﻿using System;
 using Waher.Runtime.Inventory;
-using Waher.Script.Abstraction;
 using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Script.Functions.Runtime.PropertyEnumerators

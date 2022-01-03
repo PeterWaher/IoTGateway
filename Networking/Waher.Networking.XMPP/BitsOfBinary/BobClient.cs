@@ -5,6 +5,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.StanzaErrors;
 using System.Threading.Tasks;
+using Waher.Content;
 
 namespace Waher.Networking.XMPP.BitsOfBinary
 {
@@ -38,9 +39,7 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 			this.client.RegisterIqGetHandler("data", Namespace, this.GetData, true);
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override void Dispose()
 		{
 			base.Dispose();
@@ -61,7 +60,7 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 		/// <param name="Data">Binary data.</param>
 		/// <param name="ContentType">Internet content type.</param>
 		/// <returns>Content ID</returns>
-		public string StoreData(byte[] Data, string ContentType)
+		public Task<string> StoreData(byte[] Data, string ContentType)
 		{
 			return this.StoreData(Data, ContentType, null);
 		}
@@ -76,7 +75,7 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 		/// Note: The caller is responsible for removing the data at the corresponding point in time.
 		/// Call <see cref="DeleteData(string)"/> or <see cref="DeleteAll"/> to delete bits of binary.</param>
 		/// <returns>Content ID</returns>
-		public string StoreData(byte[] Data, string ContentType, DateTime? Expires)
+		public async Task<string> StoreData(byte[] Data, string ContentType, DateTime? Expires)
 		{
 			string Hash = Security.Hashes.ComputeSHA256HashString(Data);
 			StringBuilder Xml = new StringBuilder();
@@ -102,7 +101,7 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 			Xml.Append(Convert.ToBase64String(Data));
 			Xml.Append("</data>");
 
-			File.WriteAllText(this.GetFileName(Hash), Xml.ToString(), Encoding.ASCII);
+			await Resources.WriteAllTextAsync(this.GetFileName(Hash), Xml.ToString(), Encoding.ASCII);
 
 			return Hash;
 		}

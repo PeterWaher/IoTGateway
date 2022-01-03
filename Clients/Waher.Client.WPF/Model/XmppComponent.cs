@@ -87,9 +87,9 @@ namespace Waher.Client.WPF.Model
 			{
 				if (e.Ok)
 				{
-					MainWindow.UpdateGui(() =>
+					MainWindow.UpdateGui(async () =>
 					{
-						ParameterDialog Dialog = new ParameterDialog(e.SearchForm);
+						ParameterDialog Dialog = await ParameterDialog.CreateAsync(e.SearchForm);
 						Dialog.ShowDialog();
 					});
 				}
@@ -111,6 +111,8 @@ namespace Waher.Client.WPF.Model
 						TabItem.Content = View;
 
 						MainWindow.currentInstance.Tabs.SelectedItem = TabItem;
+
+						return Task.CompletedTask;
 					});
 				}
 				else
@@ -167,6 +169,7 @@ namespace Waher.Client.WPF.Model
 				MainWindow.UpdateGui(() =>
 				{
 					View.NodeRemoved(Parent, Node);
+					return Task.CompletedTask;
 				});
 			}
 		}

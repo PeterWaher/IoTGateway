@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
-using Waher.Layout.Layout2D.Model.Figures;
 
 namespace Waher.Layout.Layout2D.Model.References
 {
@@ -11,7 +10,7 @@ namespace Waher.Layout.Layout2D.Model.References
 	/// </summary>
 	public class Copy : LayoutElement
 	{
-		private StringAttribute _ref;
+		private StringAttribute @ref;
 
 		/// <summary>
 		/// Copies the layout from a reference
@@ -33,19 +32,18 @@ namespace Waher.Layout.Layout2D.Model.References
 		/// </summary>
 		public StringAttribute ReferenceAttribute
 		{
-			get => this._ref;
-			set => this._ref = value;
+			get => this.@ref;
+			set => this.@ref = value;
 		}
 
 		/// <summary>
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
-			this._ref = new StringAttribute(Input, "ref");
+			this.@ref = new StringAttribute(Input, "ref");
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -56,7 +54,7 @@ namespace Waher.Layout.Layout2D.Model.References
 		{
 			base.ExportAttributes(Output);
 
-			this._ref?.Export(Output);
+			this.@ref?.Export(Output);
 		}
 
 		/// <summary>
@@ -79,7 +77,7 @@ namespace Waher.Layout.Layout2D.Model.References
 			base.CopyContents(Destination);
 
 			if (Destination is Copy Dest)
-				Dest._ref = this._ref?.CopyIfNotPreset();
+				Dest.@ref = this.@ref?.CopyIfNotPreset();
 		}
 
 		/// <summary>
@@ -87,29 +85,27 @@ namespace Waher.Layout.Layout2D.Model.References
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
-			if (this.defined &&
-				!(this._ref is null) &&
-				this._ref.TryEvaluate(State.Session, out string RefId) &&
-				this.Document.TryGetElement(RefId, out this.reference))
+			if (this.defined)
 			{
-				this.reference = this.reference.Copy(this);
+				EvaluationResult<string> RefId = await this.@ref.TryEvaluate(State.Session);
+				if (RefId.Ok && this.Document.TryGetElement(RefId.Result, out this.reference))
+				{
+					this.reference = this.reference.Copy(this);
 
-				if (this.reference.MeasureDimensions(State))
-					Relative = true;
+					await this.reference.MeasureDimensions(State);
 
-				this.Width = this.reference.Width;
-				this.ExplicitWidth = this.reference.ExplicitWidth;
-				this.Height = this.reference.Height;
-				this.ExplicitHeight = this.reference.ExplicitHeight;
+					this.Width = this.reference.Width;
+					this.ExplicitWidth = this.reference.ExplicitWidth;
+					this.Height = this.reference.Height;
+					this.ExplicitHeight = this.reference.ExplicitHeight;
+				}
+				else
+					this.defined = false;
 			}
-			else
-				this.defined = false;
-
-			return Relative;
 		}
 
 		private ILayoutElement reference;
@@ -132,12 +128,12 @@ namespace Waher.Layout.Layout2D.Model.References
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			if (this.defined)
-				this.reference.DrawShape(State);
+				await this.reference.DrawShape(State);
 		
-			base.Draw(State);
+			await base.Draw(State);
 		}
 	}
 }

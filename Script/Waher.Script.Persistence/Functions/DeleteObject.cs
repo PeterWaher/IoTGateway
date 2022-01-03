@@ -2,6 +2,7 @@
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Persistence;
+using System.Threading.Tasks;
 
 namespace Waher.Script.Persistence.Functions
 {
@@ -25,24 +26,18 @@ namespace Waher.Script.Persistence.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get
-			{
-				return "DeleteObject";
-			}
-		}
+		public override string FunctionName => "DeleteObject";
 
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames
-		{
-			get
-			{
-				return new string[] { "Object" };
-			}
-		}
+		public override string[] DefaultArgumentNames => new string[] { "Object" };
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.
@@ -52,7 +47,18 @@ namespace Waher.Script.Persistence.Functions
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
 		{
-			Database.Delete(Argument.AssociatedObjectValue).Wait();
+			return this.EvaluateScalarAsync(Argument, Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override async Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
+		{
+			await Database.Delete(Argument.AssociatedObjectValue);
 			return Argument;
 		}
 

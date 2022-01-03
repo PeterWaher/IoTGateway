@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Waher.Events;
 using Waher.Networking.LWM2M.ContentFormats;
-using Waher.Persistence;
 using Waher.Runtime.Settings;
 
 namespace Waher.Networking.LWM2M
@@ -13,9 +10,9 @@ namespace Waher.Networking.LWM2M
 	/// </summary>
 	public class Lwm2mResourceInteger : Lwm2mResource
 	{
-		private long? defaultValue;
+		private readonly long? defaultValue;
 		private long? value;
-		bool signed;
+		private readonly bool signed;
 
 		/// <summary>
 		/// Class managing an LWM2M resource integer.
@@ -41,7 +38,7 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public override async Task ReadPersistedValue()
 		{
-			this.value = await RuntimeSettings.GetAsync(this.Path, this.value.HasValue ? this.value.Value : long.MinValue);
+			this.value = await RuntimeSettings.GetAsync(this.Path, this.value ?? long.MinValue);
 			if (this.value == long.MinValue)
 				this.value = null;
 		}

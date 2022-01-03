@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 
@@ -33,7 +34,7 @@ namespace Waher.Script.Graphs.Canvas2D.Operations
 		/// </summary>
 		/// <param name="Xml">XML input.</param>
 		/// <param name="Variables">Set of variables.</param>
-		public abstract void ImportGraph(XmlElement Xml, Variables Variables);
+		public abstract Task ImportGraph(XmlElement Xml, Variables Variables);
 
 	}
 }

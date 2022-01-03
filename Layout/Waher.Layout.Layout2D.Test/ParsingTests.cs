@@ -8,6 +8,7 @@ using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Graphs;
+using System.Threading.Tasks;
 
 namespace Waher.Layout.Layout2D.Test
 {
@@ -28,9 +29,10 @@ namespace Waher.Layout.Layout2D.Test
 				typeof(Layout2DDocument).Assembly);
 		}
 
-		protected virtual void Test(string FileName, params KeyValuePair<string, object>[] ContentAttachments)
+		protected virtual Task Test(string FileName, params KeyValuePair<string, object>[] ContentAttachments)
 		{
 			Layout2DDocument.FromFile("Xml\\" + FileName + ".xml", ContentAttachments);
+			return Task.CompletedTask;
 		}
 
 		[TestMethod]

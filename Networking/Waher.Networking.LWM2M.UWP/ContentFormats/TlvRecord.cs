@@ -397,9 +397,7 @@ namespace Waher.Networking.LWM2M.ContentFormats
 			}
 		}
 
-		/// <summary>
-		/// <see cref="Object.ToString()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();

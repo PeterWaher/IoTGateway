@@ -9,7 +9,6 @@ using Waher.Networking.CoAP.ContentFormats;
 using Waher.Networking.CoAP.CoRE;
 using Waher.Networking.CoAP.Options;
 using Waher.Networking.LWM2M.ContentFormats;
-using Waher.Security.DTLS;
 
 namespace Waher.Networking.LWM2M
 {
@@ -19,14 +18,14 @@ namespace Waher.Networking.LWM2M
 	/// </summary>
 	public class Lwm2mClient : CoapResource, IDisposable, ICoapDeleteMethod
 	{
-		private SortedDictionary<int, Lwm2mObject> objects = new SortedDictionary<int, Lwm2mObject>();
+		private readonly SortedDictionary<int, Lwm2mObject> objects = new SortedDictionary<int, Lwm2mObject>();
 		private CoapEndpoint coapEndpoint;
 		private Lwm2mServerReference[] serverReferences;
 		private Lwm2mServerReference bootstrapSever;
 		private IPEndPoint[] bootstrapSeverIp = null;
 		private Lwm2mState state = Lwm2mState.Deregistered;
-		private BootstreapResource bsResource;
-		private string clientName;
+		private readonly BootstreapResource bsResource;
+		private readonly string clientName;
 		private string lastLinks = string.Empty;
 		private int lifetimeSeconds = 0;
 		private int registrationEpoch = 0;
@@ -272,7 +271,7 @@ namespace Waher.Networking.LWM2M
 				null, 64, this.bootstrapSever.Credentials, this.BootstrapResponse, new object[] { Callback, State });
 		}
 
-		private void BootstrapResponse(object Sender, CoapResponseEventArgs e)
+		private async Task BootstrapResponse(object Sender, CoapResponseEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			CoapResponseEventHandler Callback = (CoapResponseEventHandler)P[0];
@@ -282,7 +281,7 @@ namespace Waher.Networking.LWM2M
 			{
 				try
 				{
-					Callback.Invoke(this, e);
+					await Callback.Invoke(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -303,7 +302,7 @@ namespace Waher.Networking.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void DELETE(CoapMessage Request, CoapResponse Response)
+		public async Task DELETE(CoapMessage Request, CoapResponse Response)
 		{
 			if (this.state != Lwm2mState.Bootstrap)
 			{
@@ -316,7 +315,7 @@ namespace Waher.Networking.LWM2M
 				}
 			}
 
-			Task T = this.DeleteBootstrapInfo();
+			await this.DeleteBootstrapInfo();
 			Response.ACK(CoapCode.Deleted);
 		}
 
@@ -398,7 +397,7 @@ namespace Waher.Networking.LWM2M
 
 		internal class BootstreapResource : CoapResource, ICoapPostMethod
 		{
-			private Lwm2mClient client;
+			private readonly Lwm2mClient client;
 
 			public BootstreapResource(Lwm2mClient Client)
 				: base("/bs")
@@ -408,11 +407,11 @@ namespace Waher.Networking.LWM2M
 
 			public bool AllowsPOST => true;
 
-			public void POST(CoapMessage Request, CoapResponse Response)
+			public async Task POST(CoapMessage Request, CoapResponse Response)
 			{
 				if (this.client.IsFromBootstrapServer(Request))
 				{
-					Task T = this.client.BootstrapCompleted();
+					await this.client.BootstrapCompleted();
 					Response.Respond(CoapCode.Changed);
 				}
 				else
@@ -550,7 +549,7 @@ namespace Waher.Networking.LWM2M
 				this.RegisterUpdate();
 		}
 
-		private void RegisterResponse(object Sender, CoapResponseEventArgs e)
+		private async Task RegisterResponse(object Sender, CoapResponseEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			Lwm2mServerReference Server = (Lwm2mServerReference)P[0];
@@ -565,15 +564,20 @@ namespace Waher.Networking.LWM2M
 				if (e.Ok && this.state == Lwm2mState.Registration)
 					this.State = Lwm2mState.Operation;
 
+				Lwm2mServerReferenceEventHandler h;
+
 				if (e.Ok)
 				{
 					if (!Update)
 						Server.LocationPath = e.Message.LocationPath;
 
-					this.OnRegistrationSuccessful?.Invoke(this, new Lwm2mServerReferenceEventArgs(Server));
+					h = this.OnRegistrationSuccessful;
 				}
 				else
-					this.OnRegistrationFailed?.Invoke(this, new Lwm2mServerReferenceEventArgs(Server));
+					h = this.OnRegistrationFailed;
+
+				if (!(h is null))
+					await h(this, new Lwm2mServerReferenceEventArgs(Server));
 			}
 			catch (Exception ex)
 			{
@@ -630,7 +634,7 @@ namespace Waher.Networking.LWM2M
 			}
 		}
 
-		private void DeregisterResponse(object Sender, CoapResponseEventArgs e)
+		private async Task DeregisterResponse(object Sender, CoapResponseEventArgs e)
 		{
 			Lwm2mServerReference Server = (Lwm2mServerReference)e.State;
 
@@ -638,10 +642,9 @@ namespace Waher.Networking.LWM2M
 
 			try
 			{
-				if (e.Ok)
-					this.OnDeregistrationSuccessful?.Invoke(this, new Lwm2mServerReferenceEventArgs(Server));
-				else
-					this.OnDeregistrationFailed?.Invoke(this, new Lwm2mServerReferenceEventArgs(Server));
+				Lwm2mServerReferenceEventHandler h = e.Ok ? this.OnDeregistrationSuccessful : this.OnDeregistrationFailed;
+				if (!(h is null))
+					await h(this, new Lwm2mServerReferenceEventArgs(Server));
 			}
 			catch (Exception ex)
 			{

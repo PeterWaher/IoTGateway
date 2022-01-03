@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.CoAP
 {
@@ -15,12 +14,12 @@ namespace Waher.Networking.CoAP
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		void iPATCH(CoapMessage Request, CoapResponse Response);
+		Task IPATCH(CoapMessage Request, CoapResponse Response);
 
 		/// <summary>
 		/// If the iPATCH method is allowed.
 		/// </summary>
-		bool AllowsiPATCH
+		bool AllowsIPATCH
 		{
 			get;
 		}

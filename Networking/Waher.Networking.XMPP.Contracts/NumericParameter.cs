@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
@@ -129,19 +130,19 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Variables">Collection of parameter values.</param>
 		/// <returns>If parameter value is valid.</returns>
-		public override bool IsParameterValid(Variables Variables)
+		public override Task<bool> IsParameterValid(Variables Variables)
 		{
 			double Diff;
 
 			if (!(this.value.HasValue))
-				return false;
+				return Task.FromResult<bool>(false);
 
 			if (this.min.HasValue)
 			{
 				Diff = this.value.Value - this.min.Value;
 
 				if (Diff < 0 || (Diff == 0 && !this.minIncluded))
-					return false;
+					return Task.FromResult<bool>(false);
 			}
 
 			if (this.max.HasValue)
@@ -149,7 +150,7 @@ namespace Waher.Networking.XMPP.Contracts
 				Diff = this.value.Value - this.max.Value;
 
 				if (Diff > 0 || (Diff == 0 && !this.maxIncluded))
-					return false;
+					return Task.FromResult<bool>(false);
 			}
 
 			return base.IsParameterValid(Variables);

@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Functions.Runtime.PropertyEnumerators;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using Waher.Script.Objects.Matrices;
-using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Functions.Runtime
 {

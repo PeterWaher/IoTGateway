@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
@@ -31,11 +32,13 @@ namespace Waher.Client.WPF.Controls.Report
 		/// Contains information about a report object.
 		/// </summary>
 		/// <param name="Xml">XML Definition.</param>
-		public ReportObject(XmlElement Xml)
+		public static async Task<ReportObject> CreateAsync(XmlElement Xml)
 		{
-			this.binary = Convert.FromBase64String(Xml.InnerText);
-			this.contentType = XML.Attribute(Xml, "contentType");
-			this.@object = InternetContent.Decode(this.contentType, this.binary, null);
+			byte[] Binary = Convert.FromBase64String(Xml.InnerText);
+			string ContentType = XML.Attribute(Xml, "contentType");
+			object Object = await InternetContent.DecodeAsync(ContentType, Binary, null);
+
+			return new ReportObject(Object, Binary, ContentType);
 		}
 
 		/// <summary>

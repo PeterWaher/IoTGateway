@@ -31,6 +31,12 @@ namespace Waher.Script.Persistence.SQL
 		}
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
@@ -46,10 +52,10 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public async Task<IElement> EvaluateAsync(Variables Variables)
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
 			IDataSource Source = await this .source.GetSource(Variables);
-			string Name = InsertValues.GetName(this.name, Variables);
+			string Name = await InsertValues.GetNameAsync(this.name, Variables);
 
 			if (!await Source.DropIndex(Name))
 				throw new ScriptRuntimeException("Index not found.", this);
@@ -75,17 +81,28 @@ namespace Waher.Script.Persistence.SQL
 					return false;
 			}
 
-			if (!(this.name is null) && !Callback(ref this.name, State))
-				return false;
+			ScriptNode NewNode;
+			bool b;
 
-			ScriptNode Node = this.source;
-			if (!(Node is null) && !Callback(ref Node, State))
-				return false;
+			if (!(this.name is null))
+			{
+				b = !Callback(this.name, out NewNode, State);
+				if (!(NewNode is null))
+					this.name = NewNode;
 
-			if (Node is SourceDefinition Source2)
-				this.source = Source2;
-			else
-				return false;
+				if (b)
+					return false;
+			}
+
+			if (!(this.source is null))
+			{
+				b = !Callback(this.source, out NewNode, State);
+				if (!(NewNode is null) && NewNode is SourceDefinition Source2)
+					this.source = Source2;
+
+				if (b)
+					return false;
+			}
 
 			if (!DepthFirst)
 			{
@@ -99,9 +116,7 @@ namespace Waher.Script.Persistence.SQL
 			return true;
 		}
 
-		/// <summary>
-		/// <see cref="Object.Equals(object)"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
 			return (obj is DropIndex O &&
@@ -110,9 +125,7 @@ namespace Waher.Script.Persistence.SQL
 				base.Equals(obj));
 		}
 
-		/// <summary>
-		/// <see cref="Object.GetHashCode()"/>
-		/// </summary>
+		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
 			int Result = base.GetHashCode();

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -60,7 +58,7 @@ namespace Waher.Script.Objects.VectorSpaces
 						Set2 = Element.AssociatedSet;
 						if (!Set.Equals(Set2))
 						{
-							if (!Expression.UpgradeField(ref Ref, ref Set, ref Ref2, ref Set2, null))
+							if (!Expression.UpgradeField(ref Ref, ref Set, ref Ref2, ref Set2))
 								throw new ScriptException("No common scalar ring found.");
 						}
 					}

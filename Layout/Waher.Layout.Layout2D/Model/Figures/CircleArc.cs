@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
@@ -85,15 +86,15 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.radius = new LengthAttribute(Input, "radius");
 			this.startDegrees = new FloatAttribute(Input, "startDegrees");
 			this.endDegrees = new FloatAttribute(Input, "endDegrees");
 			this.clockwise = new BooleanAttribute(Input, "clockwise");
 			this.center = new BooleanAttribute(Input, "center");
+
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -145,30 +146,30 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
-			if (!(this.radius is null) && this.radius.TryEvaluate(State.Session, out Length R))
-				State.CalcDrawingSize(R, ref this.r, true, ref Relative);
+			EvaluationResult<Length> RadiusLength = await this.radius.TryEvaluate(State.Session);
+			if (RadiusLength.Ok)
+				State.CalcDrawingSize(RadiusLength.Result, ref this.r, true, State);
 			else
 				this.defined = false;
 
-			if (!(this.startDegrees is null) && this.startDegrees.TryEvaluate(State.Session, out this.start))
-				this.start = (float)Math.IEEERemainder(this.start, 360);
+			EvaluationResult<float> Degrees = await this.startDegrees.TryEvaluate(State.Session);
+			if (Degrees.Ok)
+				this.start = (float)Math.IEEERemainder(Degrees.Result, 360);
 			else
 				this.defined = false;
 
-			if (!(this.endDegrees is null) && this.endDegrees.TryEvaluate(State.Session, out this.end))
-				this.end = (float)Math.IEEERemainder(this.end, 360);
+			Degrees = await this.endDegrees.TryEvaluate(State.Session);
+			if (Degrees.Ok)
+				this.end = (float)Math.IEEERemainder(Degrees.Result, 360);
 			else
 				this.defined = false;
 
-			if (this.clockwise is null || !this.clockwise.TryEvaluate(State.Session, out this.clockDir))
-				this.clockDir = true;
-
-			if (this.center is null || !this.center.TryEvaluate(State.Session, out this.includeCenter))
-				this.includeCenter = false;
+			this.clockDir = await this.clockwise.Evaluate(State.Session, true);
+			this.includeCenter = await this.center.Evaluate(State.Session, false);
 
 			if (this.defined)
 			{
@@ -221,15 +222,13 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				if (this.includeCenter)
 					this.IncludePoint(this.xCoordinate, this.yCoordinate);
 			}
-
-			return Relative;
 		}
 
 		/// <summary>
 		/// Draws layout entities.
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
-		public override void Draw(DrawingState State)
+		public override async Task Draw(DrawingState State)
 		{
 			if (this.defined)
 			{
@@ -259,14 +258,16 @@ namespace Waher.Layout.Layout2D.Model.Figures
 						Sweep -= 360;
 				}
 
-				if (this.TryGetFill(State, out SKPaint Fill))
+				SKPaint Fill = await this.TryGetFill(State);
+				if (!(Fill is null))
 					State.Canvas.DrawArc(Oval, this.start, Sweep, this.includeCenter, Fill);
 
-				if (this.TryGetPen(State, out SKPaint Pen))
+				SKPaint Pen = await this.TryGetPen(State);
+				if (!(Pen is null))
 					State.Canvas.DrawArc(Oval, this.start, Sweep, this.includeCenter, Pen);
 			}
 		
-			base.Draw(State);
+			await base.Draw(State);
 		}
 
 	}

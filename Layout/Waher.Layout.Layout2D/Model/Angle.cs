@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
 
@@ -34,11 +35,10 @@ namespace Waher.Layout.Layout2D.Model
 		/// Populates the element (including children) with information from its XML definition.
 		/// </summary>
 		/// <param name="Input">XML definition.</param>
-		public override void FromXml(XmlElement Input)
+		public override Task FromXml(XmlElement Input)
 		{
-			base.FromXml(Input);
-
 			this.degrees = new FloatAttribute(Input, "degrees");
+			return base.FromXml(Input);
 		}
 
 		/// <summary>
@@ -69,17 +69,13 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		/// <param name="State">Current drawing state.</param>
 		/// <returns>If layout contains relative sizes and dimensions should be recalculated.</returns>
-		public override bool DoMeasureDimensions(DrawingState State)
+		public override async Task DoMeasureDimensions(DrawingState State)
 		{
-			bool Relative = base.DoMeasureDimensions(State);
+			await base.DoMeasureDimensions(State);
 
-			if (this.degrees is null || !this.degrees.TryEvaluate(State.Session, out this.angle))
-			{
-				this.angle = 0;
-				this.defined = false;
-			}
-
-			return Relative;
+			EvaluationResult<float> Degrees = await this.degrees.TryEvaluate(State.Session);
+			this.angle = Degrees.Result;
+			this.defined &= Degrees.Ok;
 		}
 
 		/// <summary>

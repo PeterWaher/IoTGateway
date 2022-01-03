@@ -149,7 +149,7 @@ namespace Waher.IoTGateway
 
 			// TODO: Check User authenticated
 
-			object Obj = Request.DecodeData();
+			object Obj = await Request.DecodeDataAsync();
 			if (!(Obj is string Location))
 				throw new BadRequestException("Expected location.");
 

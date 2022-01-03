@@ -16,8 +16,9 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script xml signature XMLDSIG</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <FileVersion>1.0.0</FileVersion>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>2.0.0</FileVersion>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
+    <Version>2.0.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

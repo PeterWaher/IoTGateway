@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Windows;
+using System.Threading.Tasks;
 using Waher.Networking.Sniffers;
 using Windows.UI;
 using Windows.UI.Xaml.Controls;
@@ -43,7 +41,7 @@ namespace Waher.Mock
 			set { this.maxItems = value; }
 		}
 
-		private async void Add(SniffItem SniffItem)
+		private async Task Add(SniffItem SniffItem)
 		{
 			await this.listView.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
 			{
@@ -62,9 +60,9 @@ namespace Waher.Mock
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public override void ReceiveBinary(DateTime Timestamp, byte[] Data)
+		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data)
 		{
-			this.Add(new SniffItem(Timestamp, SniffItemType.DataReceived, HexToString(Data), Data, Colors.White, Colors.Navy));
+			return this.Add(new SniffItem(Timestamp, SniffItemType.DataReceived, HexToString(Data), Data, Colors.White, Colors.Navy));
 		}
 
 		/// <summary>
@@ -72,9 +70,9 @@ namespace Waher.Mock
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Data">Binary Data.</param>
-		public override void TransmitBinary(DateTime Timestamp, byte[] Data)
+		public override Task TransmitBinary(DateTime Timestamp, byte[] Data)
 		{
-			this.Add(new SniffItem(Timestamp, SniffItemType.DataTransmitted, HexToString(Data), Data, Colors.Black, Colors.White));
+			return this.Add(new SniffItem(Timestamp, SniffItemType.DataTransmitted, HexToString(Data), Data, Colors.Black, Colors.White));
 		}
 
 		internal static string HexToString(byte[] Data)
@@ -102,9 +100,9 @@ namespace Waher.Mock
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public override void ReceiveText(DateTime Timestamp, string Text)
+		public override Task ReceiveText(DateTime Timestamp, string Text)
 		{
-			this.Add(new SniffItem(Timestamp, SniffItemType.TextReceived, Text, null, Colors.White, Colors.Navy));
+			return this.Add(new SniffItem(Timestamp, SniffItemType.TextReceived, Text, null, Colors.White, Colors.Navy));
 		}
 
 		/// <summary>
@@ -112,9 +110,9 @@ namespace Waher.Mock
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Text">Text</param>
-		public override void TransmitText(DateTime Timestamp, string Text)
+		public override Task TransmitText(DateTime Timestamp, string Text)
 		{
-			this.Add(new SniffItem(Timestamp, SniffItemType.TextTransmitted, Text, null, Colors.Black, Colors.White));
+			return this.Add(new SniffItem(Timestamp, SniffItemType.TextTransmitted, Text, null, Colors.Black, Colors.White));
 		}
 
 		/// <summary>
@@ -122,9 +120,9 @@ namespace Waher.Mock
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Comment">Comment.</param>
-		public override void Information(DateTime Timestamp, string Comment)
+		public override Task Information(DateTime Timestamp, string Comment)
 		{
-			this.Add(new SniffItem(Timestamp, SniffItemType.Information, Comment, null, Colors.Yellow, Colors.DarkGreen));
+			return this.Add(new SniffItem(Timestamp, SniffItemType.Information, Comment, null, Colors.Yellow, Colors.DarkGreen));
 		}
 
 		/// <summary>
@@ -132,9 +130,9 @@ namespace Waher.Mock
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Warning">Warning.</param>
-		public override void Warning(DateTime Timestamp, string Warning)
+		public override Task Warning(DateTime Timestamp, string Warning)
 		{
-			this.Add(new SniffItem(Timestamp, SniffItemType.Warning, Warning, null, Colors.Black, Colors.Yellow));
+			return this.Add(new SniffItem(Timestamp, SniffItemType.Warning, Warning, null, Colors.Black, Colors.Yellow));
 		}
 
 		/// <summary>
@@ -142,9 +140,9 @@ namespace Waher.Mock
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Error">Error.</param>
-		public override void Error(DateTime Timestamp, string Error)
+		public override Task Error(DateTime Timestamp, string Error)
 		{
-			this.Add(new SniffItem(Timestamp, SniffItemType.Error, Error, null, Colors.White, Colors.Red));
+			return this.Add(new SniffItem(Timestamp, SniffItemType.Error, Error, null, Colors.White, Colors.Red));
 		}
 
 		/// <summary>
@@ -152,9 +150,9 @@ namespace Waher.Mock
 		/// </summary>
 		/// <param name="Timestamp">Timestamp of event.</param>
 		/// <param name="Exception">Exception.</param>
-		public override void Exception(DateTime Timestamp, string Exception)
+		public override Task Exception(DateTime Timestamp, string Exception)
 		{
-			this.Add(new SniffItem(Timestamp, SniffItemType.Exception, Exception, null, Colors.White, Colors.DarkRed));
+			return this.Add(new SniffItem(Timestamp, SniffItemType.Exception, Exception, null, Colors.White, Colors.DarkRed));
 		}
 	}
 }

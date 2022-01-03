@@ -22,7 +22,7 @@ XEP-0206: XMPP Over BOSH
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.1.4</AssemblyVersion>
     <FileVersion>1.1.4</FileVersion>
-    <Version>1.1.4</Version>
+    <Version>2.0.0</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>

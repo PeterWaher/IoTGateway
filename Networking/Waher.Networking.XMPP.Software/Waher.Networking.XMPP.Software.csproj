@@ -15,10 +15,10 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp iot iiot remote software updates</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.1.2</AssemblyVersion>
-    <FileVersion>1.1.2</FileVersion>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
+    <FileVersion>2.0.0</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.1.2</Version>
+    <Version>2.0.0</Version>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>
 

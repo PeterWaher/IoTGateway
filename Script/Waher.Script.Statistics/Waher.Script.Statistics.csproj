@@ -16,10 +16,10 @@ Script Syntax: https://waher.se/Script.md#statisticsRelatedFunctionsWaherScriptS
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution parsing statistics</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.8</AssemblyVersion>
-    <FileVersion>1.0.8</FileVersion>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
+    <FileVersion>2.0.0</FileVersion>
     <PackageIconUrl></PackageIconUrl>
-    <Version>1.0.8</Version>
+    <Version>2.0.0</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Script\Waher.Script.Statistics\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

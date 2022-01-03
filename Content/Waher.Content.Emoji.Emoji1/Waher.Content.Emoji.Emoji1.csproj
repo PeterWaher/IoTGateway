@@ -14,10 +14,10 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>emoji emoji1 emojione</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.8</AssemblyVersion>
-    <FileVersion>1.0.8</FileVersion>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
+    <FileVersion>2.0.0</FileVersion>
     <PackageIconUrl></PackageIconUrl>
-    <Version>1.0.8</Version>
+    <Version>2.0.0</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content.Emoji.Emoji1\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

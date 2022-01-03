@@ -14,10 +14,10 @@ namespace Waher.Content.Asn1.Test
 	[TestClass]
 	public class CSharpTests
 	{
-		public static string GenerateCSharp(string FileName)
+		public static async Task<string> GenerateCSharp(string FileName)
 		{
 			string BaseNamespace = "Test";
-			Asn1Document Doc = ParsingTests.ParseAsn1Document(FileName);
+			Asn1Document Doc = await ParsingTests.ParseAsn1Document(FileName);
 			CSharpExportSettings Settings = new CSharpExportSettings(BaseNamespace, EncodingSchemes.All);
 			string CSharp = Doc.ExportCSharp(Settings);
 			List<SyntaxTree> Modules = new List<SyntaxTree>() { CSharpSyntaxTree.ParseText(CSharp) };
@@ -104,99 +104,99 @@ namespace Waher.Content.Asn1.Test
 		}
 
 		[TestMethod]
-		public void Test_01_WorldSchema()
+		public async Task Test_01_WorldSchema()
 		{
-			GenerateCSharp("World-Schema.asn1");
+			await GenerateCSharp("World-Schema.asn1");
 		}
 
 		[TestMethod]
-		public void Test_02_MyShopPurchaseOrders()
+		public async Task Test_02_MyShopPurchaseOrders()
 		{
-			GenerateCSharp("MyShopPurchaseOrders.asn1");
+			await GenerateCSharp("MyShopPurchaseOrders.asn1");
 		}
 
 		[TestMethod]
-		public void Test_03_RFC1155()
+		public async Task Test_03_RFC1155()
 		{
-			GenerateCSharp("SNMPv1\\RFC1155-SMI.asn1");
+			await GenerateCSharp("SNMPv1\\RFC1155-SMI.asn1");
 		}
 
 		[TestMethod]
-		public void Test_04_RFC1157()
+		public async Task Test_04_RFC1157()
 		{
-			GenerateCSharp("SNMPv1\\RFC1157-SNMP.asn1");
+			await GenerateCSharp("SNMPv1\\RFC1157-SNMP.asn1");
 		}
 
 		[TestMethod]
-		public void Test_05_RFC1158()
+		public async Task Test_05_RFC1158()
 		{
-			GenerateCSharp("SNMPv1\\RFC1158-MIB.asn1");
+			await GenerateCSharp("SNMPv1\\RFC1158-MIB.asn1");
 		}
 
 		[TestMethod]
-		public void Test_06_RFC1212()
+		public async Task Test_06_RFC1212()
 		{
-			GenerateCSharp("SNMPv1\\RFC1212.asn1");
+			await GenerateCSharp("SNMPv1\\RFC1212.asn1");
 		}
 
 		[TestMethod]
-		public void Test_07_RFC1213()
+		public async Task Test_07_RFC1213()
 		{
-			GenerateCSharp("SNMPv1\\RFC1213-MIB.asn1");
+			await GenerateCSharp("SNMPv1\\RFC1213-MIB.asn1");
 		}
 
 		[TestMethod]
-		public void Test_08_RFC1215()
+		public async Task Test_08_RFC1215()
 		{
-			GenerateCSharp("SNMPv1\\RFC1215.asn1");
+			await GenerateCSharp("SNMPv1\\RFC1215.asn1");
 		}
 
 		[TestMethod]
-		public void Test_09_RFC1901_COMMUNITY_BASED_SNMPv2()
+		public async Task Test_09_RFC1901_COMMUNITY_BASED_SNMPv2()
 		{
-			GenerateCSharp("SNMPv2\\COMMUNITY-BASED-SNMPv2.asn1");
+			await GenerateCSharp("SNMPv2\\COMMUNITY-BASED-SNMPv2.asn1");
 		}
 
 		[TestMethod]
-		public void Test_10_RFC2578_SNMPV2_SMI()
+		public async Task Test_10_RFC2578_SNMPV2_SMI()
 		{
-			GenerateCSharp("SNMPv2\\SNMPV2-SMI.asn1");
+			await GenerateCSharp("SNMPv2\\SNMPV2-SMI.asn1");
 		}
 
 		[TestMethod]
-		public void Test_11_RFC2579_SNMPV2_TC()
+		public async Task Test_11_RFC2579_SNMPV2_TC()
 		{
-			GenerateCSharp("SNMPv2\\SNMPV2-TC.asn1");
+			await GenerateCSharp("SNMPv2\\SNMPV2-TC.asn1");
 		}
 
 		[TestMethod]
-		public void Test_12_RFC2580_SNMPV2_CONF()
+		public async Task Test_12_RFC2580_SNMPV2_CONF()
 		{
-			GenerateCSharp("SNMPv2\\SNMPV2-CONF.asn1");
+			await GenerateCSharp("SNMPv2\\SNMPV2-CONF.asn1");
 		}
 
 		[TestMethod]
-		public void Test_13_RFC3416_SNMPV2_PDU()
+		public async Task Test_13_RFC3416_SNMPV2_PDU()
 		{
-			GenerateCSharp("SNMPv2\\SNMPV2-PDU.asn1");
+			await GenerateCSharp("SNMPv2\\SNMPV2-PDU.asn1");
 		}
 
 		[TestMethod]
-		public void Test_14_1451_1()
+		public async Task Test_14_1451_1()
 		{
-			GenerateCSharp("IEEE1451\\P21451-N1-T1-MIB.asn1");
+			await GenerateCSharp("IEEE1451\\P21451-N1-T1-MIB.asn1");
 		}
 
 		[TestMethod]
-		public void Test_15_1451_2()
+		public async Task Test_15_1451_2()
 		{
-			GenerateCSharp("IEEE1451\\P21451-N1-T2-MIB.asn1");
+			await GenerateCSharp("IEEE1451\\P21451-N1-T2-MIB.asn1");
 		}
 
 		[TestMethod]
-		public void Test_16_1451_3()
+		public async Task Test_16_1451_3()
 		{
-			GenerateCSharp("IEEE1451\\P21451-N1-T3-MIB.asn1");
+			await GenerateCSharp("IEEE1451\\P21451-N1-T3-MIB.asn1");
 		}
 
 	}

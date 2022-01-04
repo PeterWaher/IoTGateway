@@ -258,6 +258,9 @@ namespace Waher.Content.Markdown
 		/// <returns>Preprocessed markdown, and if the markdown contains script, making the markdown dynamic.</returns>
 		public static async Task<KeyValuePair<string, bool>> Preprocess(string Markdown, MarkdownSettings Settings, string FileName, params Type[] TransparentExceptionTypes)
 		{
+			if (Settings.Variables is null)
+				Settings.Variables = new Variables();
+
 			Variables Variables = Settings.Variables;
 			Expression Exp;
 			string Script, s2;

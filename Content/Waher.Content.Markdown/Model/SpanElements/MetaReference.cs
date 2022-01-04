@@ -78,7 +78,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			if (this.Document.TryGetMetaData(this.key, out Values))
 				return true;
 
-			if (this.Document.Settings.Variables.TryGetVariable(this.key, out Variable Variable))
+			Variables Variables = this.Document.Settings.Variables;
+			if (!(Variables is null) && Variables.TryGetVariable(this.key, out Variable Variable))
 			{
 				Values = new KeyValuePair<string, bool>[] { new KeyValuePair<string, bool>(Variable.ValueObject?.ToString() ?? string.Empty, false) };
 				return true;

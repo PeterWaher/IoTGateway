@@ -220,7 +220,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="State">Current rendering state.</param>
 		public override async Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
-			while (Level >= this.level)
+			while (State.Level >= this.level)
 			{
 				Output.WriteEndElement();
 				Output.WriteEndElement();

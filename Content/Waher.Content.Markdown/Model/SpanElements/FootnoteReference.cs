@@ -140,9 +140,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="State">Current rendering state.</param>
 		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
-			Output.WriteStartElement("super");
-			Output.WriteElementString("text", this.key);
-			Output.WriteEndElement();
+			if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
+			{
+				Output.WriteStartElement("super");
+				Output.WriteElementString("text", Nr.ToString());
+				Output.WriteEndElement();
+			}
 		
 			return Task.CompletedTask;
 		}

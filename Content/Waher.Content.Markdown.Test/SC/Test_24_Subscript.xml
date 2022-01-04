@@ -1,0 +1,16 @@
+﻿<paragraph>
+	<text>Some</text>
+	<sub>
+		<text>subscript</text>
+	</sub>
+</paragraph>
+<paragraph>
+	<text>a</text>
+	<sub>
+		<text>i</text>
+	</sub>
+	<text>=A</text>
+	<sub>
+		<text>i,j</text>
+	</sub>
+</paragraph>

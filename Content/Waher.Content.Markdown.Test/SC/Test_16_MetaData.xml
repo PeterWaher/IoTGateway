@@ -1,0 +1,8 @@
+﻿<paragraph>
+	<text>Title of document: </text>
+	<parameter name="Title" />
+	<text>Subtitle of document: </text>
+	<parameter name="Subtitle" />
+	<text>Author: </text>
+	<parameter name="Author" />
+</paragraph>

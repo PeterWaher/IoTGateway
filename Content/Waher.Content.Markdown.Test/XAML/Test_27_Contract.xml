@@ -1,0 +1,34 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="28" Foreground="Navy">Request for Tenders - Transport Service (Example)</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This contract defines an auction consignment of the service of buying a transport service. The assignment of a seller to this consignment is negotiated by an online auction managed by <Italic>TAG Marketplace</Italic>™. The document defines the rules for the automatic processing and matching of prospective sellers to this request for tenders.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="24" Foreground="Navy">Introduction</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This contract defines the request to buy the service of transportation of item(s) using the <Italic>TAG Marketplace</Italic>™ auctioning service. The <Bold>Buyer</Bold> have asked the <Bold>Auctioneer</Bold> to find the best match among offers from prospective <Italic>Sellers</Italic> to this Request for Tenders. The <Bold>Auctioneer</Bold> matches incoming bids from potential <Italic>Sellers</Italic>, until the best candidate is found, the first acceptable bid has been received, or the auction expires due to lack of sufficient interest.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="24" Foreground="Navy">Manifest</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">The <Bold>Buyer</Bold> requests transport of <Bold /> item(s) of <Bold /> ().</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="24" Foreground="Navy">Pickup Point</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">The carrier will pick up the delivery at <Bold>  </Bold>, <Bold> </Bold>,  <Bold />.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="24" Foreground="Navy">Delivery Point</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">The carrier will transport the delivery to <Bold>  </Bold>, <Bold> </Bold>,  <Bold />.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="24" Foreground="Navy">Auction Consignment</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Upon the signature of this contract, the <Bold>Buyer</Bold> consigns to the <Bold>Auctioneer</Bold> the task of finding a service provider that sells the requested service of transporting the item(s) specified in the <Italic>Manifest</Italic> above, with an initial <Italic>asking price</Italic> of <Bold> </Bold>. The <Bold>Auctioneer</Bold> publishes information about the <Italic>Request for Tenders</Italic> to prospective <Italic>Sellers</Italic> who can make <Italic>Offers</Italic> for the duration of <Bold /> days from the signature of the agreement, or until the first <Italic>acceptable</Italic> bid of <Bold> </Bold> is received. Any bid above <Bold> </Bold> will be automatically rejected. Information of the best bid will also be presented.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">The consignment concludes at the end of <Bold /> days from the signature of the agreement, or when the first <Italic>acceptable</Italic> bid of <Bold> </Bold> is received. If no bids are available when the auction expires, the consignment concludes without any payments being processed. Otherwise, two payments will be made:</TextBlock>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">•</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap">An instant payment representing the agreed upon price for the best or first accepted bid plus the agreed upon commission, as a percentage of the price (<Bold> %</Bold>), will be made from the <Bold>Buyer</Bold> to the <Italic>Auctioneer</Italic>.</TextBlock>
+		</StackPanel>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,0">•</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap">An instant payment representing the agreed upon price for the best or first accepted bid, will be made from the <Bold>Auctioneer</Bold> to the <Bold>Seller</Bold>. The <Bold>Auctioneer</Bold> keeps its <Bold> %</Bold> as payment for its services.</TextBlock>
+		</StackPanel>
+	</Grid>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">All payments will be made using <Italic>e-Daler</Italic>. A buyer without funds in their <Italic>wallet</Italic> will have their request for tender invalidated, and the sale assignment cancelled.</TextBlock>
+</StackPanel>

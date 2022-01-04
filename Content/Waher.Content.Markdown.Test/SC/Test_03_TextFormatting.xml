@@ -1,0 +1,77 @@
+﻿<paragraph>
+	<italic>
+		<text>single asterisks</text>
+	</italic>
+</paragraph>
+<paragraph>
+	<underline>
+		<text>single underscores</text>
+	</underline>
+</paragraph>
+<paragraph>
+	<strikeThrough>
+		<text>single tildes</text>
+	</strikeThrough>
+</paragraph>
+<paragraph>
+	<bold>
+		<text>double asterisks</text>
+	</bold>
+</paragraph>
+<paragraph>
+	<text>double underscores</text>
+</paragraph>
+<paragraph>
+	<text>double tildes</text>
+</paragraph>
+<paragraph>
+	<text>un</text>
+	<italic>
+		<text>frigging</text>
+	</italic>
+	<text>believable</text>
+</paragraph>
+<paragraph>
+	<text>This * will not be formatted, nor this * asterisk.</text>
+</paragraph>
+<paragraph>
+	<text>This _ will not be formatted, nor this _ underscore.</text>
+</paragraph>
+<paragraph>
+	<text>This ~ will not be formatted, nor this ~ tilde.</text>
+</paragraph>
+<paragraph>
+	<text>*this text is surrounded by literal asterisks*</text>
+</paragraph>
+<paragraph>
+	<text>Use the </text>
+	<text>printf()</text>
+	<text> function.</text>
+</paragraph>
+<paragraph>
+	<text>There is a literal backtick (`) here.</text>
+</paragraph>
+<paragraph>
+	<text>A single backtick in a code span: </text>
+	<text>`</text>
+</paragraph>
+<paragraph>
+	<text>A backtick-delimited string in a code span: </text>
+	<text>`foo`</text>
+</paragraph>
+<paragraph>
+	<text>Please don</text>
+	<text>’</text>
+	<text>t use any </text>
+	<text>&lt;blink&gt;</text>
+	<text> tags.</text>
+</paragraph>
+<paragraph>
+	<text>&amp;#8212;</text>
+	<text> is the decimal-encoded equivalent of </text>
+	<text>&amp;mdash;</text>
+	<text>.</text>
+</paragraph>
+<paragraph>
+	<text>*literal asterisks*</text>
+</paragraph>

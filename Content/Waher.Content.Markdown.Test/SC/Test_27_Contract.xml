@@ -1,0 +1,262 @@
+﻿<section>
+	<header>
+		<text>Request for Tenders - Transport Service (Example)</text>
+	</header>
+	<body>
+		<paragraph>
+			<text>This contract defines an auction consignment of the service of buying a transport service. The assignment of a seller to this consignment is negotiated by an online auction managed by </text>
+			<italic>
+				<text>TAG Marketplace</text>
+			</italic>
+			<text>™. The document defines the rules for the automatic processing and matching of prospective sellers to this request for tenders.</text>
+		</paragraph>
+		<section>
+			<header>
+				<text>Introduction</text>
+			</header>
+			<body>
+				<paragraph>
+					<text>This contract defines the request to buy the service of transportation of item(s) using the </text>
+					<italic>
+						<text>TAG Marketplace</text>
+					</italic>
+					<text>™ auctioning service. The </text>
+					<bold>
+						<text>Buyer</text>
+					</bold>
+					<text> have asked the </text>
+					<bold>
+						<text>Auctioneer</text>
+					</bold>
+					<text> to find the best match among offers from prospective </text>
+					<italic>
+						<text>Sellers</text>
+					</italic>
+					<text> to this Request for Tenders. The </text>
+					<bold>
+						<text>Auctioneer</text>
+					</bold>
+					<text> matches incoming bids from potential </text>
+					<italic>
+						<text>Sellers</text>
+					</italic>
+					<text>, until the best candidate is found, the first acceptable bid has been received, or the auction expires due to lack of sufficient interest.</text>
+				</paragraph>
+			</body>
+		</section>
+		<section>
+			<header>
+				<text>Manifest</text>
+			</header>
+			<body>
+				<paragraph>
+					<text>The </text>
+					<bold>
+						<text>Buyer</text>
+					</bold>
+					<text> requests transport of </text>
+					<bold>
+						<parameter name="Quantity" />
+					</bold>
+					<text> item(s) of </text>
+					<bold>
+						<parameter name="ProductNumber" />
+					</bold>
+					<text> (</text>
+					<parameter name="Description" />
+					<text>).</text>
+				</paragraph>
+			</body>
+		</section>
+		<section>
+			<header>
+				<text>Pickup Point</text>
+			</header>
+			<body>
+				<paragraph>
+					<text>The carrier will pick up the delivery at </text>
+					<bold>
+						<parameter name="FromAddress1" />
+						<text> </text>
+						<parameter name="FromAddress2" />
+						<text> </text>
+						<parameter name="FromAddress3" />
+					</bold>
+					<text>, </text>
+					<bold>
+						<parameter name="FromPostalCode" />
+						<text> </text>
+						<parameter name="FromCity" />
+					</bold>
+					<text>,  </text>
+					<bold>
+						<parameter name="FromCountry" />
+					</bold>
+					<text>.</text>
+				</paragraph>
+			</body>
+		</section>
+		<section>
+			<header>
+				<text>Delivery Point</text>
+			</header>
+			<body>
+				<paragraph>
+					<text>The carrier will transport the delivery to </text>
+					<bold>
+						<parameter name="ToAddress1" />
+						<text> </text>
+						<parameter name="ToAddress2" />
+						<text> </text>
+						<parameter name="ToAddress3" />
+					</bold>
+					<text>, </text>
+					<bold>
+						<parameter name="ToPostalCode" />
+						<text> </text>
+						<parameter name="ToCity" />
+					</bold>
+					<text>,  </text>
+					<bold>
+						<parameter name="ToCountry" />
+					</bold>
+					<text>.</text>
+				</paragraph>
+			</body>
+		</section>
+		<section>
+			<header>
+				<text>Auction Consignment</text>
+			</header>
+			<body>
+				<paragraph>
+					<text>Upon the signature of this contract, the </text>
+					<bold>
+						<text>Buyer</text>
+					</bold>
+					<text> consigns to the </text>
+					<bold>
+						<text>Auctioneer</text>
+					</bold>
+					<text> the task of finding a service provider that sells the requested service of transporting the item(s) specified in the </text>
+					<italic>
+						<text>Manifest</text>
+					</italic>
+					<text> above, with an initial </text>
+					<italic>
+						<text>asking price</text>
+					</italic>
+					<text> of </text>
+					<bold>
+						<parameter name="AskingPrice" />
+						<text> </text>
+						<parameter name="Currency" />
+					</bold>
+					<text>. The </text>
+					<bold>
+						<text>Auctioneer</text>
+					</bold>
+					<text> publishes information about the </text>
+					<italic>
+						<text>Request for Tenders</text>
+					</italic>
+					<text> to prospective </text>
+					<italic>
+						<text>Sellers</text>
+					</italic>
+					<text> who can make </text>
+					<italic>
+						<text>Offers</text>
+					</italic>
+					<text> for the duration of </text>
+					<bold>
+						<parameter name="AvailableDays" />
+					</bold>
+					<text> days from the signature of the agreement, or until the first </text>
+					<italic>
+						<text>acceptable</text>
+					</italic>
+					<text> bid of </text>
+					<bold>
+						<parameter name="AcceptPrice" />
+						<text> </text>
+						<parameter name="Currency" />
+					</bold>
+					<text> is received. Any bid above </text>
+					<bold>
+						<parameter name="RejectPrice" />
+						<text> </text>
+						<parameter name="Currency" />
+					</bold>
+					<text> will be automatically rejected. Information of the best bid will also be presented.</text>
+				</paragraph>
+				<paragraph>
+					<text>The consignment concludes at the end of </text>
+					<bold>
+						<parameter name="AvailableDays" />
+					</bold>
+					<text> days from the signature of the agreement, or when the first </text>
+					<italic>
+						<text>acceptable</text>
+					</italic>
+					<text> bid of </text>
+					<bold>
+						<parameter name="AcceptPrice" />
+						<text> </text>
+						<parameter name="Currency" />
+					</bold>
+					<text> is received. If no bids are available when the auction expires, the consignment concludes without any payments being processed. Otherwise, two payments will be made:</text>
+				</paragraph>
+				<bulletItems>
+					<item>
+						<text>An instant payment representing the agreed upon price for the best or first accepted bid plus the agreed upon commission, as a percentage of the price (</text>
+						<bold>
+							<parameter name="CommissionPercent" />
+							<text> %</text>
+						</bold>
+						<text>), will be made from the </text>
+						<bold>
+							<text>Buyer</text>
+						</bold>
+						<text> to the </text>
+						<italic>
+							<text>Auctioneer</text>
+						</italic>
+						<text>.</text>
+					</item>
+					<item>
+						<text>An instant payment representing the agreed upon price for the best or first accepted bid, will be made from the </text>
+						<bold>
+							<text>Auctioneer</text>
+						</bold>
+						<text> to the </text>
+						<bold>
+							<text>Seller</text>
+						</bold>
+						<text>. The </text>
+						<bold>
+							<text>Auctioneer</text>
+						</bold>
+						<text> keeps its </text>
+						<bold>
+							<parameter name="CommissionPercent" />
+							<text> %</text>
+						</bold>
+						<text> as payment for its services.</text>
+					</item>
+				</bulletItems>
+				<paragraph>
+					<text>All payments will be made using </text>
+					<italic>
+						<text>e-Daler</text>
+					</italic>
+					<text>. A buyer without funds in their </text>
+					<italic>
+						<text>wallet</text>
+					</italic>
+					<text> will have their request for tender invalidated, and the sale assignment cancelled.</text>
+				</paragraph>
+			</body>
+		</section>
+	</body>
+</section>

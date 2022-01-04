@@ -1,0 +1,76 @@
+﻿<paragraph>
+	<text>This is </text>
+	<text>an example</text>
+	<text> inline link.</text>
+</paragraph>
+<paragraph>
+	<text>This link</text>
+	<text> has no title attribute.</text>
+</paragraph>
+<paragraph>
+	<text>See my </text>
+	<text>About</text>
+	<text> page for details.</text>
+</paragraph>
+<paragraph>
+	<text>This is </text>
+	<text>an example</text>
+	<text> reference-style link.</text>
+</paragraph>
+<paragraph>
+	<text>This is </text>
+	<text>an example</text>
+	<text> reference-style link.</text>
+</paragraph>
+<paragraph>
+	<text>This is </text>
+	<text>an example</text>
+	<text> reference-style link.</text>
+</paragraph>
+<paragraph>
+	<text>Visit </text>
+	<text>Daring Fireball</text>
+	<text> for more information.</text>
+</paragraph>
+<paragraph>
+	<text>I get 10 times more traffic from </text>
+	<text>Google</text>
+	<text> than from </text>
+	<text>Yahoo</text>
+	<text> or </text>
+	<text>MSN</text>
+	<text>.</text>
+</paragraph>
+<paragraph>
+	<text>I get 10 times more traffic from </text>
+	<text>Google</text>
+	<text> than from </text>
+	<text>Yahoo</text>
+	<text> or </text>
+	<text>MSN</text>
+	<text>.</text>
+</paragraph>
+<paragraph>
+	<text>I get 10 times more traffic from </text>
+	<text>Google</text>
+	<text> than from </text>
+	<text>Yahoo</text>
+	<text> or </text>
+	<text>MSN</text>
+	<text>.</text>
+</paragraph>
+<paragraph>
+	<text>You can also write links, such as </text>
+	<text>http://lils.is/</text>
+	<text> inline.</text>
+</paragraph>
+<paragraph>
+	<text>Or on separate paragraphs:</text>
+</paragraph>
+<paragraph>
+	<text>http://lils.is/</text>
+</paragraph>
+<paragraph>
+	<text>Recognized multi-media content put on separate rows are automatically handled as multi-media:</text>
+</paragraph>
+<text>https://www.youtube.com/watch?v=whBPLc8m4SU</text>

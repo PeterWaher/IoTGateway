@@ -1,0 +1,20 @@
+﻿<paragraph>
+	<text>Simple task list:</text>
+</paragraph>
+<text>Unchecked</text>
+<text>Checked</text>
+<text>Also checked</text>
+<paragraph>
+	<text>Nested task list:</text>
+</paragraph>
+<text>Unchecked</text>
+<text>Checked </text>
+<text>Unchecked subitem</text>
+<text>Checked subitem </text>
+<text>Unchecked subsubitem</text>
+<text>Checked subsubitem</text>
+<text>Second checked subsubitem</text>
+<text>Second unchecked subsubitem</text>
+<text>Second checked subitem</text>
+<text>Second unchecked subitem</text>
+<text>Also checked</text>

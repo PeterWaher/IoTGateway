@@ -1,0 +1,76 @@
+﻿<paragraph>
+	<text>Some</text>
+	<super>
+		<text>superscript</text>
+	</super>
+</paragraph>
+<paragraph>
+	<text>a</text>
+	<super>
+		<text>b+c</text>
+	</super>
+	<text>=a</text>
+	<super>
+		<text>b</text>
+	</super>
+	<text>a</text>
+	<super>
+		<text>c</text>
+	</super>
+</paragraph>
+<paragraph>
+	<text>a</text>
+	<text>²</text>
+	<text>+b</text>
+	<text>²</text>
+	<text>=c</text>
+	<text>²</text>
+</paragraph>
+<paragraph>
+	<text>a</text>
+	<super>
+		<text>n</text>
+	</super>
+	<text>+b</text>
+	<super>
+		<text>n</text>
+	</super>
+	<text>≠</text>
+	<text>c</text>
+	<super>
+		<text>n</text>
+	</super>
+	<text>, n</text>
+	<text>≥</text>
+	<text>3</text>
+</paragraph>
+<paragraph>
+	<text>a</text>
+	<super>
+		<text>(b+c)/2</text>
+	</super>
+	<text>=sqrt(a</text>
+	<super>
+		<text>b</text>
+	</super>
+	<text>a</text>
+	<super>
+		<text>c</text>
+	</super>
+	<text>)</text>
+</paragraph>
+<paragraph>
+	<text>a</text>
+	<super>
+		<text>(b+c)/2</text>
+	</super>
+	<text>=sqrt(a</text>
+	<super>
+		<text>b</text>
+	</super>
+	<text>a</text>
+	<super>
+		<text>c</text>
+	</super>
+	<text>)</text>
+</paragraph>

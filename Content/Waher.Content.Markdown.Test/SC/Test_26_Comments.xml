@@ -1,0 +1,16 @@
+﻿<paragraph>
+	<text>This is paragraph 1</text>
+</paragraph>
+<paragraph>
+	<text>This is paragraph 2</text>
+</paragraph>
+<paragraph>
+	<text>This is the third paragraph.</text>
+</paragraph>
+<paragraph>
+	<text>In this fourth paragraph</text>
+	<text>a line break is inserted.</text>
+</paragraph>
+<paragraph>
+	<text>The fifth paragraph is separated from the fourth by a line containing only spaces.</text>
+</paragraph>

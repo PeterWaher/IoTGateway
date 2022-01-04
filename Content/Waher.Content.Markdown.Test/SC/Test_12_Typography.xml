@@ -1,0 +1,343 @@
+﻿<paragraph>
+	<text>. .. </text>
+	<text>…</text>
+	<text> </text>
+	<text>…</text>
+	<text>.</text>
+</paragraph>
+<paragraph>
+	<text>- </text>
+	<text>–</text>
+	<text> </text>
+	<text>—</text>
+	<text> </text>
+	<text>—</text>
+	<text>-</text>
+</paragraph>
+<paragraph>
+	<text>Straight quotes " into </text>
+	<text>“</text>
+	<text>curly</text>
+	<text>”</text>
+	<text> quote HTML entities</text>
+</paragraph>
+<paragraph>
+	<text>Straight quotes ' into </text>
+	<text>‘</text>
+	<text>curly</text>
+	<text>’</text>
+	<text> quote HTML entities</text>
+</paragraph>
+<paragraph>
+	<text>©</text>
+	<text> </text>
+	<text>©</text>
+	<text> </text>
+	<text>®</text>
+	<text> </text>
+	<text>®</text>
+	<text> </text>
+	<text>℗</text>
+	<text> </text>
+	<text>℗</text>
+	<text> </text>
+	<text>Ⓢ</text>
+	<text> </text>
+	<text>Ⓢ</text>
+</paragraph>
+<paragraph>
+	<text>«</text>
+	<text> </text>
+	<text>⋘</text>
+	<text> </text>
+	<text>←</text>
+	<text> </text>
+	<text>↔</text>
+	<text> </text>
+	<text>⇐</text>
+	<text> </text>
+	<text>⇔</text>
+	<text> </text>
+	<text>≤</text>
+	<text> </text>
+	<text>≠</text>
+	<text> </text>
+	<text>»</text>
+	<text> </text>
+	<text>⋙</text>
+	<text> </text>
+	<text>≥</text>
+	<text> </text>
+	<text>→</text>
+	<text> </text>
+	<text>⇒</text>
+	<text> </text>
+	<text>≡</text>
+	<text> </text>
+	<text>∓</text>
+	<text> </text>
+	<text>±</text>
+</paragraph>
+<paragraph>
+	<text>⟦</text>
+	<text> </text>
+	<text>⟧</text>
+	<text> </text>
+	<text>‰</text>
+	<text> </text>
+	<text>‱</text>
+	<text> </text>
+	<text>°</text>
+	<text> </text>
+	<text>¹</text>
+	<text> </text>
+	<text>²</text>
+	<text> </text>
+	<text>³</text>
+	<text> </text>
+	<super>
+		<text>4</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>5</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>6</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>7</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>8</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>9</text>
+	</super>
+	<text> </text>
+	<text>ª</text>
+	<text> </text>
+	<super>
+		<text>b</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>c</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>d</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>e</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>f</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>g</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>h</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>i</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>j</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>k</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>l</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>m</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>n</text>
+	</super>
+	<text> </text>
+	<text>º</text>
+	<text> </text>
+	<super>
+		<text>p</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>q</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>r</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>s</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>t</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>u</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>v</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>w</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>x</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>y</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>z</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>A</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>B</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>C</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>D</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>E</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>F</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>G</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>H</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>I</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>J</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>K</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>L</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>M</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>N</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>O</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>P</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>Q</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>R</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>S</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>T</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>U</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>V</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>W</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>X</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>Y</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>Z</text>
+	</super>
+	<text> </text>
+	<text>™</text>
+	<text> </text>
+	<super>
+		<text>st</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>nd</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>rd</text>
+	</super>
+	<text> </text>
+	<super>
+		<text>th</text>
+	</super>
+</paragraph>

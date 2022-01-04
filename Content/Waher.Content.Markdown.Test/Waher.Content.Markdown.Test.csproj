@@ -49,6 +49,7 @@
     <None Remove="HTML\Test_24_Subscript.html" />
     <None Remove="HTML\Test_25_HashTags.html" />
     <None Remove="HTML\Test_26_Comments.html" />
+    <None Remove="HTML\Test_27_Contract.html" />
     <None Remove="Markdown\Diff\Diff\Test_01_Simple.md" />
     <None Remove="Markdown\Diff\Diff\Test_02_Paragraphs.md" />
     <None Remove="Markdown\Diff\Diff\Test_03_Bullets.md" />
@@ -60,6 +61,7 @@
     <None Remove="Markdown\Diff\Old\Test_03_Bullets.md" />
     <None Remove="Markdown\Syntax\Test_25_HashTags.md" />
     <None Remove="Markdown\Syntax\Test_26_Comments.md" />
+    <None Remove="Markdown\Syntax\Test_27_Contract.md" />
     <None Remove="Markdown\Test_01_Paragraphs.md" />
     <None Remove="Markdown\Test_02_Links.md" />
     <None Remove="Markdown\Test_03_TextFormatting.md" />
@@ -110,6 +112,34 @@
     <None Remove="PlainText\Test_24_Subscript.txt" />
     <None Remove="PlainText\Test_25_HashTags.txt" />
     <None Remove="PlainText\Test_26_Comments.txt" />
+    <None Remove="PlainText\Test_27_Contract.txt" />
+    <None Remove="SC\Test_01_Paragraphs.xml" />
+    <None Remove="SC\Test_02_Links.xml" />
+    <None Remove="SC\Test_03_TextFormatting.xml" />
+    <None Remove="SC\Test_04_Multimedia.xml" />
+    <None Remove="SC\Test_05_HTML.xml" />
+    <None Remove="SC\Test_06_CodeBlocks.xml" />
+    <None Remove="SC\Test_07_BlockQuotes.xml" />
+    <None Remove="SC\Test_08_Headers.xml" />
+    <None Remove="SC\Test_09_UnorderedLists.xml" />
+    <None Remove="SC\Test_10_LazyOrderedLists.xml" />
+    <None Remove="SC\Test_11_OrderedLists.xml" />
+    <None Remove="SC\Test_12_Typography.xml" />
+    <None Remove="SC\Test_13_Tables.xml" />
+    <None Remove="SC\Test_14_HorizontalRules.xml" />
+    <None Remove="SC\Test_15_DefinitionLists.xml" />
+    <None Remove="SC\Test_16_MetaData.xml" />
+    <None Remove="SC\Test_17_Footnotes.xml" />
+    <None Remove="SC\Test_18_Emojis.xml" />
+    <None Remove="SC\Test_19_Sections.xml" />
+    <None Remove="SC\Test_20_Script.xml" />
+    <None Remove="SC\Test_21_Httpx.xml" />
+    <None Remove="SC\Test_22_TaskLists.xml" />
+    <None Remove="SC\Test_23_Superscript.xml" />
+    <None Remove="SC\Test_24_Subscript.xml" />
+    <None Remove="SC\Test_25_HashTags.xml" />
+    <None Remove="SC\Test_26_Comments.xml" />
+    <None Remove="SC\Test_27_Contract.xml" />
     <None Remove="XAML\Test_01_Paragraphs.xml" />
     <None Remove="XAML\Test_02_Links.xml" />
     <None Remove="XAML\Test_03_TextFormatting.xml" />
@@ -136,6 +166,7 @@
     <None Remove="XAML\Test_24_Subscript.xml" />
     <None Remove="XAML\Test_25_HashTags.xml" />
     <None Remove="XAML\Test_26_Comments.xml" />
+    <None Remove="XAML\Test_27_Contract.xml" />
     <None Remove="XF\Test_01_Paragraphs.xml" />
     <None Remove="XF\Test_02_Links.xml" />
     <None Remove="XF\Test_03_TextFormatting.xml" />
@@ -162,6 +193,7 @@
     <None Remove="XF\Test_24_Subscript.xml" />
     <None Remove="XF\Test_25_HashTags.xml" />
     <None Remove="XF\Test_26_Comments.xml" />
+    <None Remove="XF\Test_27_Contract.xml" />
     <None Remove="XML\Test_01_Paragraphs.xml" />
     <None Remove="XML\Test_02_Links.xml" />
     <None Remove="XML\Test_03_TextFormatting.xml" />
@@ -188,9 +220,13 @@
     <None Remove="XML\Test_24_Subscript.xml" />
     <None Remove="XML\Test_25_HashTags.xml" />
     <None Remove="XML\Test_26_Comments.xml" />
+    <None Remove="XML\Test_27_Contract.xml" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="HTML\Test_27_Contract.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="HTML\Test_26_Comments.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -374,6 +410,12 @@
     <Content Include="Markdown\Syntax\Test_24_Subscript.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Markdown\Syntax\Test_27_Contract.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PlainText\Test_27_Contract.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="PlainText\Test_26_Comments.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -450,6 +492,90 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PlainText\Test_24_Subscript.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_01_Paragraphs.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_02_Links.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_03_TextFormatting.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_04_Multimedia.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_05_HTML.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_06_CodeBlocks.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_07_BlockQuotes.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_08_Headers.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_09_UnorderedLists.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_10_LazyOrderedLists.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_11_OrderedLists.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_12_Typography.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_13_Tables.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_14_HorizontalRules.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_15_DefinitionLists.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_16_MetaData.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_17_Footnotes.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_18_Emojis.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_19_Sections.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_20_Script.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_21_Httpx.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_22_TaskLists.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_23_Superscript.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_24_Subscript.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_25_HashTags.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_26_Comments.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SC\Test_27_Contract.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XAML\Test_27_Contract.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XAML\Test_26_Comments.xml">
@@ -605,7 +731,13 @@
     <Content Include="XF\Test_25_HashTags.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="XF\Test_27_Contract.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="XF\Test_26_Comments.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XML\Test_27_Contract.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XML\Test_26_Comments.xml">

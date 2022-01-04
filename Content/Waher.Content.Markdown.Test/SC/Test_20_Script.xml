@@ -1,0 +1,15 @@
+﻿<paragraph>
+	<text>4*5 is </text>
+	<text>20</text>
+	<text>.</text>
+</paragraph>
+<paragraph>
+	<text>Result of execution: </text>
+	<bold>
+		<text>some text</text>
+	</bold>
+	<text>.</text>
+</paragraph>
+<paragraph>
+	<text>Waher.Script.Graphs.Graph2D</text>
+</paragraph>

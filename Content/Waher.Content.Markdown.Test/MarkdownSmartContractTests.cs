@@ -9,31 +9,26 @@ using System.Threading.Tasks;
 namespace Waher.Content.Markdown.Test
 {
 	[TestClass]
-	public class MarkdownXamlTests
+	public class MarkdownSmartContractTests
 	{
 		private async Task DoTest(string MarkdownFileName, string XamlFileName)
 		{
 			string Markdown = await Resources.ReadAllTextAsync("Markdown/Syntax/" + MarkdownFileName);
-			string ExpectedText = await Resources.ReadAllTextAsync("XAML/" + XamlFileName);
+			string ExpectedText = await Resources.ReadAllTextAsync("SC/" + XamlFileName);
 			ExpectedText = ExpectedText.Replace("&#xD;\r", "&#xD;");
 			Emoji1LocalFiles Emoji1LocalFiles = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", Path.Combine("Graphics", "Emoji1.zip"), "Graphics");
 
-			MarkdownSettings Settings = new MarkdownSettings(Emoji1LocalFiles, true, new Variables())
-			{
-				HttpxProxy = "/HttpxProxy/%URL%"
-			};
-
-			Assert.IsTrue(Emoji1LocalFiles.WaitUntilInitialized(60000));
+			MarkdownSettings Settings = new MarkdownSettings(null, true, new Variables());
 
 			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
-			string GeneratedXaml = await Doc.GenerateXAML(XML.WriterSettings(true, true));
+			string GeneratedXaml = await Doc.GenerateSmartContractXml(XML.WriterSettings(true, true));
 
 			Console.Out.WriteLine(GeneratedXaml);
 			Console.Out.WriteLine();
 			Console.Out.WriteLine();
 			Console.Out.WriteLine();
 
-			MarkdownHtmlTests.AssertEqual(ExpectedText, GeneratedXaml, "Generated XAML does not match expected XAML.");
+			MarkdownHtmlTests.AssertEqual(ExpectedText, GeneratedXaml, "Generated XML does not match expected XML.");
 		}
 
 		[TestMethod]

@@ -222,5 +222,11 @@ namespace Waher.Content.Markdown.Test
 		{
 			await this.DoTest("Test_26_Comments.md", "Test_26_Comments.txt");
 		}
+
+		[TestMethod]
+		public async Task Test_27_Contract()
+		{
+			await this.DoTest("Test_27_Contract.md", "Test_27_Contract.txt");
+		}
 	}
 }

@@ -1,0 +1,20 @@
+﻿<section>
+	<header>
+		<text>Header</text>
+	</header>
+	<body>
+		<paragraph>
+			<text>This </text>
+			<text>paragraph</text>
+			<text> contains </text>
+			<text>3</text>
+			<text> </text>
+			<text>hashtags</text>
+			<text>.</text>
+		</paragraph>
+		<paragraph>
+			<text>Hashtags</text>
+			<text> at the beginning of a row works, as headers require space after # and the tag.</text>
+		</paragraph>
+	</body>
+</section>

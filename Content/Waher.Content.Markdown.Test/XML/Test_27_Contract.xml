@@ -1,0 +1,248 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData />
+	<elements>
+		<Header id="requestForTendersTransportServiceExample" level="1">
+			<InlineText>Request for Tenders - Transport Service (Example)</InlineText>
+		</Header>
+		<Paragraph>
+			<InlineText>This contract defines an auction consignment of the service of buying a transport service. The assignment of a seller to this consignment is negotiated by an online auction managed by </InlineText>
+			<Emphasize>
+				<InlineText>TAG Marketplace</InlineText>
+			</Emphasize>
+			<InlineText>™. The document defines the rules for the automatic processing and matching of prospective sellers to this request for tenders.</InlineText>
+		</Paragraph>
+		<Header id="introduction" level="2">
+			<InlineText>Introduction</InlineText>
+		</Header>
+		<Paragraph>
+			<InlineText>This contract defines the request to buy the service of transportation of item(s) using the </InlineText>
+			<Emphasize>
+				<InlineText>TAG Marketplace</InlineText>
+			</Emphasize>
+			<InlineText>™ auctioning service. The </InlineText>
+			<Strong>
+				<InlineText>Buyer</InlineText>
+			</Strong>
+			<InlineText> have asked the </InlineText>
+			<Strong>
+				<InlineText>Auctioneer</InlineText>
+			</Strong>
+			<InlineText> to find the best match among offers from prospective </InlineText>
+			<Emphasize>
+				<InlineText>Sellers</InlineText>
+			</Emphasize>
+			<InlineText> to this Request for Tenders. The </InlineText>
+			<Strong>
+				<InlineText>Auctioneer</InlineText>
+			</Strong>
+			<InlineText> matches incoming bids from potential </InlineText>
+			<Emphasize>
+				<InlineText>Sellers</InlineText>
+			</Emphasize>
+			<InlineText>, until the best candidate is found, the first acceptable bid has been received, or the auction expires due to lack of sufficient interest.</InlineText>
+		</Paragraph>
+		<Header id="manifest" level="2">
+			<InlineText>Manifest</InlineText>
+		</Header>
+		<Paragraph>
+			<InlineText>The </InlineText>
+			<Strong>
+				<InlineText>Buyer</InlineText>
+			</Strong>
+			<InlineText> requests transport of </InlineText>
+			<Strong>
+				<MetaReference key="Quantity" />
+			</Strong>
+			<InlineText> item(s) of </InlineText>
+			<Strong>
+				<MetaReference key="ProductNumber" />
+			</Strong>
+			<InlineText> (</InlineText>
+			<MetaReference key="Description" />
+			<InlineText>).</InlineText>
+		</Paragraph>
+		<Header id="pickupPoint" level="2">
+			<InlineText>Pickup Point</InlineText>
+		</Header>
+		<Paragraph>
+			<InlineText>The carrier will pick up the delivery at </InlineText>
+			<Strong>
+				<MetaReference key="FromAddress1" />
+				<InlineText> </InlineText>
+				<MetaReference key="FromAddress2" />
+				<InlineText> </InlineText>
+				<MetaReference key="FromAddress3" />
+			</Strong>
+			<InlineText>, </InlineText>
+			<Strong>
+				<MetaReference key="FromPostalCode" />
+				<InlineText> </InlineText>
+				<MetaReference key="FromCity" />
+			</Strong>
+			<InlineText>,  </InlineText>
+			<Strong>
+				<MetaReference key="FromCountry" />
+			</Strong>
+			<InlineText>.</InlineText>
+		</Paragraph>
+		<Header id="deliveryPoint" level="2">
+			<InlineText>Delivery Point</InlineText>
+		</Header>
+		<Paragraph>
+			<InlineText>The carrier will transport the delivery to </InlineText>
+			<Strong>
+				<MetaReference key="ToAddress1" />
+				<InlineText> </InlineText>
+				<MetaReference key="ToAddress2" />
+				<InlineText> </InlineText>
+				<MetaReference key="ToAddress3" />
+			</Strong>
+			<InlineText>, </InlineText>
+			<Strong>
+				<MetaReference key="ToPostalCode" />
+				<InlineText> </InlineText>
+				<MetaReference key="ToCity" />
+			</Strong>
+			<InlineText>,  </InlineText>
+			<Strong>
+				<MetaReference key="ToCountry" />
+			</Strong>
+			<InlineText>.</InlineText>
+		</Paragraph>
+		<Header id="auctionConsignment" level="2">
+			<InlineText>Auction Consignment</InlineText>
+		</Header>
+		<Paragraph>
+			<InlineText>Upon the signature of this contract, the </InlineText>
+			<Strong>
+				<InlineText>Buyer</InlineText>
+			</Strong>
+			<InlineText> consigns to the </InlineText>
+			<Strong>
+				<InlineText>Auctioneer</InlineText>
+			</Strong>
+			<InlineText> the task of finding a service provider that sells the requested service of transporting the item(s) specified in the </InlineText>
+			<Emphasize>
+				<InlineText>Manifest</InlineText>
+			</Emphasize>
+			<InlineText> above, with an initial </InlineText>
+			<Emphasize>
+				<InlineText>asking price</InlineText>
+			</Emphasize>
+			<InlineText> of </InlineText>
+			<Strong>
+				<MetaReference key="AskingPrice" />
+				<InlineText> </InlineText>
+				<MetaReference key="Currency" />
+			</Strong>
+			<InlineText>. The </InlineText>
+			<Strong>
+				<InlineText>Auctioneer</InlineText>
+			</Strong>
+			<InlineText> publishes information about the </InlineText>
+			<Emphasize>
+				<InlineText>Request for Tenders</InlineText>
+			</Emphasize>
+			<InlineText> to prospective </InlineText>
+			<Emphasize>
+				<InlineText>Sellers</InlineText>
+			</Emphasize>
+			<InlineText> who can make </InlineText>
+			<Emphasize>
+				<InlineText>Offers</InlineText>
+			</Emphasize>
+			<InlineText> for the duration of </InlineText>
+			<Strong>
+				<MetaReference key="AvailableDays" />
+			</Strong>
+			<InlineText> days from the signature of the agreement, or until the first </InlineText>
+			<Emphasize>
+				<InlineText>acceptable</InlineText>
+			</Emphasize>
+			<InlineText> bid of </InlineText>
+			<Strong>
+				<MetaReference key="AcceptPrice" />
+				<InlineText> </InlineText>
+				<MetaReference key="Currency" />
+			</Strong>
+			<InlineText> is received. Any bid above </InlineText>
+			<Strong>
+				<MetaReference key="RejectPrice" />
+				<InlineText> </InlineText>
+				<MetaReference key="Currency" />
+			</Strong>
+			<InlineText> will be automatically rejected. Information of the best bid will also be presented.</InlineText>
+		</Paragraph>
+		<Paragraph>
+			<InlineText>The consignment concludes at the end of </InlineText>
+			<Strong>
+				<MetaReference key="AvailableDays" />
+			</Strong>
+			<InlineText> days from the signature of the agreement, or when the first </InlineText>
+			<Emphasize>
+				<InlineText>acceptable</InlineText>
+			</Emphasize>
+			<InlineText> bid of </InlineText>
+			<Strong>
+				<MetaReference key="AcceptPrice" />
+				<InlineText> </InlineText>
+				<MetaReference key="Currency" />
+			</Strong>
+			<InlineText> is received. If no bids are available when the auction expires, the consignment concludes without any payments being processed. Otherwise, two payments will be made:</InlineText>
+		</Paragraph>
+		<BulletList>
+			<UnnumberedItem prefix="* ">
+				<NestedBlock>
+					<InlineText>An instant payment representing the agreed upon price for the best or first accepted bid plus the agreed upon commission, as a percentage of the price (</InlineText>
+					<Strong>
+						<MetaReference key="CommissionPercent" />
+						<InlineText> %</InlineText>
+					</Strong>
+					<InlineText>), will be made from the </InlineText>
+					<Strong>
+						<InlineText>Buyer</InlineText>
+					</Strong>
+					<InlineText> to the </InlineText>
+					<Emphasize>
+						<InlineText>Auctioneer</InlineText>
+					</Emphasize>
+					<InlineText>.</InlineText>
+				</NestedBlock>
+			</UnnumberedItem>
+			<UnnumberedItem prefix="* ">
+				<NestedBlock>
+					<InlineText>An instant payment representing the agreed upon price for the best or first accepted bid, will be made from the </InlineText>
+					<Strong>
+						<InlineText>Auctioneer</InlineText>
+					</Strong>
+					<InlineText> to the </InlineText>
+					<Strong>
+						<InlineText>Seller</InlineText>
+					</Strong>
+					<InlineText>. The </InlineText>
+					<Strong>
+						<InlineText>Auctioneer</InlineText>
+					</Strong>
+					<InlineText> keeps its </InlineText>
+					<Strong>
+						<MetaReference key="CommissionPercent" />
+						<InlineText> %</InlineText>
+					</Strong>
+					<InlineText> as payment for its services.</InlineText>
+				</NestedBlock>
+			</UnnumberedItem>
+		</BulletList>
+		<Paragraph>
+			<InlineText>All payments will be made using </InlineText>
+			<Emphasize>
+				<InlineText>e-Daler</InlineText>
+			</Emphasize>
+			<InlineText>. A buyer without funds in their </InlineText>
+			<Emphasize>
+				<InlineText>wallet</InlineText>
+			</Emphasize>
+			<InlineText> will have their request for tender invalidated, and the sale assignment cancelled.</InlineText>
+		</Paragraph>
+	</elements>
+	<references />
+</parsedMakdown>

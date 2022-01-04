@@ -1,0 +1,231 @@
+﻿<paragraph>
+	<text>Unordered lists use asterisks, pluses, and hyphens — interchangably — as list markers:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<text>Red</text>
+	</item>
+	<item>
+		<text>Green</text>
+	</item>
+	<item>
+		<text>Blue</text>
+	</item>
+</bulletItems>
+<paragraph>
+	<text>is equivalent to:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<text>Red</text>
+	</item>
+	<item>
+		<text>Green</text>
+	</item>
+	<item>
+		<text>Blue</text>
+	</item>
+</bulletItems>
+<paragraph>
+	<text>and:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<text>Red</text>
+	</item>
+	<item>
+		<text>Green</text>
+	</item>
+	<item>
+		<text>Blue</text>
+	</item>
+</bulletItems>
+<paragraph>
+	<text>To make lists look nice, you can wrap items with hanging indents:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<text>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.</text>
+	</item>
+	<item>
+		<text>Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.</text>
+	</item>
+</bulletItems>
+<paragraph>
+	<text>But if you want to be lazy, you don’t have to:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<text>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.</text>
+	</item>
+	<item>
+		<text>Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.</text>
+	</item>
+</bulletItems>
+<paragraph>
+	<text>On separate lines:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<text>Bird</text>
+	</item>
+	<item>
+		<text>Magic</text>
+	</item>
+</bulletItems>
+<paragraph>
+	<text>List items may consist of multiple paragraphs. Each subsequent paragraph in a list item must be indented by either 4 spaces or one tab:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<paragraph>
+			<text>This is a list item with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.</text>
+		</paragraph>
+		<paragraph>
+			<text>Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus. Donec sit amet nisl. Aliquam semper ipsum sit amet velit.</text>
+		</paragraph>
+	</item>
+	<item>
+		<text>Suspendisse id sem consectetuer libero luctus adipiscing.</text>
+	</item>
+</bulletItems>
+<paragraph>
+	<text>It looks nice if you indent every line of the subsequent paragraphs, but here again, Markdown will allow you to be lazy:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<paragraph>
+			<text>This is a list item with two paragraphs.</text>
+		</paragraph>
+		<paragraph>
+			<text>This is the second paragraph in the list item. You</text>
+			<text>’</text>
+			<text>re only required to indent the first line. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</text>
+		</paragraph>
+	</item>
+	<item>
+		<text>Another item in the same list.</text>
+	</item>
+</bulletItems>
+<paragraph>
+	<text>To put a blockquote within a list item, the blockquote’s &gt; delimiters need to be indented:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<paragraph>
+			<text>A list item with a blockquote:</text>
+		</paragraph>
+		<paragraph>
+			<text>This is a blockquote inside a list item.</text>
+		</paragraph>
+	</item>
+</bulletItems>
+<paragraph>
+	<text>To put a code block within a list item, the code block needs to be indented twice — 8 spaces or two tabs:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<paragraph>
+			<text>A list item with a code block:</text>
+		</paragraph>
+	</item>
+</bulletItems>
+<paragraph>
+	<text>Nested lists:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<text>Item 1</text>
+	</item>
+	<item>
+		<text>Item 2 </text>
+		<bulletItems>
+			<item>
+				<text>Item 2a</text>
+			</item>
+			<item>
+				<text>Item 2b</text>
+			</item>
+		</bulletItems>
+	</item>
+</bulletItems>
+<paragraph>
+	<text>Nested lists 2:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<text>Item 1</text>
+	</item>
+	<item>
+		<text>Item 2 </text>
+		<numberedItems>
+			<item>
+				<text>Item 2a</text>
+			</item>
+			<item>
+				<text>Item 2b</text>
+			</item>
+		</numberedItems>
+	</item>
+	<item>
+		<text>Item 3</text>
+	</item>
+</bulletItems>
+<paragraph>
+	<text>Nested lists 3:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<text>Item 1</text>
+	</item>
+	<item>
+		<text>Item 2 </text>
+		<numberedItems>
+			<item>
+				<text>Item 2a</text>
+			</item>
+			<item>
+				<text>Item 2b</text>
+			</item>
+		</numberedItems>
+	</item>
+	<item>
+		<text>Item 3</text>
+	</item>
+</bulletItems>
+<paragraph>
+	<text>Three levels:</text>
+</paragraph>
+<bulletItems>
+	<item>
+		<text>Item 1</text>
+	</item>
+	<item>
+		<text>Item 2 </text>
+		<bulletItems>
+			<item>
+				<text>Item 2a</text>
+			</item>
+			<item>
+				<text>Item 2b </text>
+				<bulletItems>
+					<item>
+						<text>Item 2bi</text>
+					</item>
+					<item>
+						<text>Item 2bii</text>
+					</item>
+					<item>
+						<text>Item 2biii</text>
+					</item>
+				</bulletItems>
+			</item>
+			<item>
+				<text>Item 2c</text>
+			</item>
+		</bulletItems>
+	</item>
+	<item>
+		<text>Item 3</text>
+	</item>
+</bulletItems>

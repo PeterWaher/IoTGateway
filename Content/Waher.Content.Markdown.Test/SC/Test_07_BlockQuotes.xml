@@ -1,0 +1,62 @@
+﻿<paragraph>
+	<text>Markdown uses email-style &gt; characters for blockquoting. If you’re familiar with quoting passages of text in an email message, then you know how to create a blockquote in Markdown. It looks best if you hard wrap the text and put a &gt; before every line:</text>
+</paragraph>
+<paragraph>
+	<text>This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.</text>
+</paragraph>
+<paragraph>
+	<text>Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.</text>
+</paragraph>
+<paragraph>
+	<text>Markdown allows you to be lazy and only put the &gt; before the first line of a hard-wrapped paragraph:</text>
+</paragraph>
+<paragraph>
+	<text>This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.</text>
+</paragraph>
+<paragraph>
+	<text>Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.</text>
+</paragraph>
+<paragraph>
+	<text>Blockquotes can be nested (i.e. a blockquote-in-a-blockquote) by adding additional levels of &gt;:</text>
+</paragraph>
+<paragraph>
+	<text>This is the first level of quoting.</text>
+</paragraph>
+<paragraph>
+	<text>This is nested blockquote.</text>
+</paragraph>
+<paragraph>
+	<text>Back to the first level.</text>
+</paragraph>
+<paragraph>
+	<text>Blockquotes can contain other Markdown elements, including headers, lists, and code blocks:</text>
+</paragraph>
+<section>
+	<header>
+		<text>This is a header.</text>
+	</header>
+	<body>
+		<numberedItems>
+			<item>
+				<text>This is the first list item.</text>
+			</item>
+			<item>
+				<text>This is the second list item.</text>
+			</item>
+		</numberedItems>
+		<paragraph>
+			<text>Here</text>
+			<text>’</text>
+			<text>s some example code:</text>
+		</paragraph>
+		<paragraph>
+			<text>Blockquotes can also be used do illustrate editing:</text>
+		</paragraph>
+		<paragraph>
+			<text>This paragraph has been inserted</text>
+		</paragraph>
+		<paragraph>
+			<text>While this paragraph has been deleted</text>
+		</paragraph>
+	</body>
+</section>

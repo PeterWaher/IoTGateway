@@ -1,0 +1,37 @@
+﻿<paragraph>
+	<text>http://example.com/</text>
+</paragraph>
+<paragraph>
+	<text>address@example.com</text>
+</paragraph>
+<text>&#xD;
+    </text>
+<text>&#xD;
+        </text>
+<text>Foo</text>
+<text>&#xD;
+    </text>
+<text>&#xD;
+</text>
+<paragraph>
+	<text>This is an example of </text>
+	<text>bold text</text>
+	<text>.</text>
+</paragraph>
+<paragraph>
+	<text>©</text>
+	<text> Waher Data AB 2016-2022. All rights reserved.</text>
+</paragraph>
+<paragraph>
+	<text>AT</text>
+	<text>&amp;T</text>
+</paragraph>
+<paragraph>
+	<text>4 &lt; 5</text>
+</paragraph>
+<paragraph>
+	<text>|</text>
+</paragraph>
+<paragraph>
+	<text>|</text>
+</paragraph>

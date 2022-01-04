@@ -1,0 +1,54 @@
+﻿<text>Table of Contents</text>
+<section>
+	<header>
+		<text>This is an H1</text>
+	</header>
+	<body>
+		<section>
+			<header>
+				<text>This is an H2</text>
+			</header>
+			<body />
+		</section>
+	</body>
+</section>
+<section>
+	<header>
+		<text>This is a second H1</text>
+	</header>
+	<body>
+		<section>
+			<header>
+				<text>This is a second H2</text>
+			</header>
+			<body>
+				<section>
+					<header>
+						<text>This is an H6</text>
+					</header>
+					<body />
+				</section>
+			</body>
+		</section>
+	</body>
+</section>
+<section>
+	<header>
+		<text>This is a third H1</text>
+	</header>
+	<body>
+		<section>
+			<header>
+				<text>This is a third H2</text>
+			</header>
+			<body>
+				<section>
+					<header>
+						<text>This is an H3</text>
+					</header>
+					<body />
+				</section>
+			</body>
+		</section>
+	</body>
+</section>

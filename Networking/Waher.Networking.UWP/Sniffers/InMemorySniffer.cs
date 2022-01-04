@@ -13,9 +13,10 @@ namespace Waher.Networking.Sniffers
 	public class InMemorySniffer : SnifferBase, IEnumerable<SnifferEvent>, IDisposable
 	{
 		private readonly LinkedList<SnifferEvent> events = new LinkedList<SnifferEvent>();
+		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
 		private readonly int maxCount;
 		private int count = 0;
-		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
+		private bool disposed = false;
 
 		/// <summary>
 		/// Sniffer that stores events in memory.
@@ -116,18 +117,21 @@ namespace Waher.Networking.Sniffers
 
 		private async Task Add(SnifferEvent Event)
 		{
-			await this.semaphore.WaitAsync();
-			try
+			if (!this.disposed)
 			{
-				this.events.AddLast(Event);
-				if (this.count >= this.maxCount)
-					this.events.RemoveFirst();
-				else
-					this.count++;
-			}
-			finally
-			{
-				this.semaphore.Release();
+				await this.semaphore.WaitAsync();
+				try
+				{
+					this.events.AddLast(Event);
+					if (this.count >= this.maxCount)
+						this.events.RemoveFirst();
+					else
+						this.count++;
+				}
+				finally
+				{
+					this.semaphore.Release();
+				}
 			}
 		}
 
@@ -207,16 +211,21 @@ namespace Waher.Networking.Sniffers
 		/// <returns>Recorded events.</returns>
 		public async Task<SnifferEvent[]> ToArrayAsync()
 		{
-			await this.semaphore.WaitAsync();
-			try
+			if (this.disposed)
+				return new SnifferEvent[0];
+			else
 			{
-				SnifferEvent[] Result = new SnifferEvent[this.count];
-				this.events.CopyTo(Result, 0);
-				return Result;
-			}
-			finally
-			{
-				this.semaphore.Release();
+				await this.semaphore.WaitAsync();
+				try
+				{
+					SnifferEvent[] Result = new SnifferEvent[this.count];
+					this.events.CopyTo(Result, 0);
+					return Result;
+				}
+				finally
+				{
+					this.semaphore.Release();
+				}
 			}
 		}
 
@@ -225,7 +234,11 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public virtual void Dispose()
 		{
-			this.semaphore.Dispose();
+			if (!this.disposed)
+			{
+				this.semaphore.Dispose();
+				this.disposed = true;
+			}
 		}
 	}
 }

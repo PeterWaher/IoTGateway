@@ -25,7 +25,18 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Language">Desired language</param>
 		/// <param name="Contract">Contract hosting the object.</param>
-		/// <param name="Type">Type of Markdown being generated.</param>
+		/// <returns>Markdown</returns>
+		public string ToMarkdown(string Language, Contract Contract)
+		{
+			return this.ToMarkdown(Language, Contract, MarkdownType.ForRendering);
+		}
+
+		/// <summary>
+		/// Creates a human-readable Markdown document for the contract.
+		/// </summary>
+		/// <param name="Language">Desired language</param>
+		/// <param name="Contract">Contract hosting the object.</param>
+		/// <param name="Type">Type of Markdown being generated. (Default=<see cref="MarkdownType.ForRendering"/>)</param>
 		/// <returns>Markdown</returns>
 		public string ToMarkdown(string Language, Contract Contract, MarkdownType Type)
 		{

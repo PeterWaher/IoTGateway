@@ -3930,13 +3930,21 @@
             Discriptions of the object, in different languages.
             </summary>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.LocalizableDescription.ToMarkdown(System.String,Waher.Networking.XMPP.Contracts.Contract)">
+            <summary>
+            Creates a human-readable Markdown document for the contract.
+            </summary>
+            <param name="Language">Desired language</param>
+            <param name="Contract">Contract hosting the object.</param>
+            <returns>Markdown</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.LocalizableDescription.ToMarkdown(System.String,Waher.Networking.XMPP.Contracts.Contract,Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownType)">
             <summary>
             Creates a human-readable Markdown document for the contract.
             </summary>
             <param name="Language">Desired language</param>
             <param name="Contract">Contract hosting the object.</param>
-            <param name="Type">Type of Markdown being generated.</param>
+            <param name="Type">Type of Markdown being generated. (Default=<see cref="F:Waher.Networking.XMPP.Contracts.HumanReadable.MarkdownType.ForRendering"/>)</param>
             <returns>Markdown</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.LocalizableDescription.ToHTML(System.String,Waher.Networking.XMPP.Contracts.Contract)">

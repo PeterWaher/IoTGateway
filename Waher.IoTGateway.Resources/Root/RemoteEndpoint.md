@@ -16,7 +16,7 @@ Parameter: EP
 Endpoint details
 ===================
 
-| {{Obj:=Waher.IoTGateway.Gateway.LoginAuditor.GetAnnotatedStateObject(EP).Result;
+| {{Obj:=Waher.IoTGateway.Gateway.LoginAuditor.GetAnnotatedStateObject(EP);
 (Obj?.Endpoint)??(NotFound("Endpoint not found in database: "+EP))}}             ||
 |:--------------------------------|:----------------------------------------------|
 | Created:                        | {{MarkdownEncode(Obj.Created.ToString())}}    |

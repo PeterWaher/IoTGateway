@@ -140,7 +140,7 @@ the Analyze button to analyze the database and generate a report.
 {{foreach Rec in Export.GetRegisteredFolders() do ]]
 
 <p>
-<input id="((CategoryId:=Rec.CategoryId))" name="((CategoryId))" type="checkbox" ((Export.GetExportFolderAsync(CategoryId).Result ? "checked" : ""))/>
+<input id="((CategoryId:=Rec.CategoryId))" name="((CategoryId))" type="checkbox" ((Export.GetExportFolderAsync(CategoryId) ? "checked" : ""))/>
 <label for="((CategoryId))">((Rec.DisplayName))</label>
 </p>
 
@@ -159,7 +159,7 @@ the Analyze button to analyze the database and generate a report.
 <fieldset id="SelectedCollections" style="display:none">
 <legend>Collections</legend>
 <div id='Collections'>
-{{foreach CollectionName in Waher.Persistence.Database.GetCollections().Result do ]]
+{{foreach CollectionName in Waher.Persistence.Database.GetCollections() do ]]
 <p>
 <input type="checkbox" name="Collection_((CollectionName))" data-collection="((CollectionName))" id="Collection_((CollectionName))"/>
 <label for="Collection_((CollectionName))" title="If checked, objects in collection ((CollectionName)) will be exported.">((CollectionName))</label>

@@ -37,7 +37,7 @@ You are not connected to a broker that supports smart contracts. For this reason
 		]]
 
 <fieldset>
-<legend>((Translator.GetLanguageAsync(Language).Result?.Name ?? Language))</legend>
+<legend>((Translator.GetLanguageAsync(Language)?.Name ?? Language))</legend>
 
 Roles
 ----------

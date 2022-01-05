@@ -10,7 +10,7 @@ BodyOnly: 1
 
 ```xml
 {{
-Doc:=Waher.Content.Markdown.MarkdownDocument.CreateAsync(Posted,[]).Result;
-Doc.GenerateXAML(Waher.Content.Xml.XML.WriterSettings(true,true)).Result
+Doc:=Waher.Content.Markdown.MarkdownDocument.CreateAsync(Posted,[]);
+Doc.GenerateXAML(Waher.Content.Xml.XML.WriterSettings(true,true))
 }}
 ```

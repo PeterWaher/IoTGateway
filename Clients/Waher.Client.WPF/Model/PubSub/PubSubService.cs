@@ -227,7 +227,7 @@ namespace Waher.Client.WPF.Model.PubSub
 		{
 			Mouse.OverrideCursor = Cursors.Wait;
 
-			this.pubSubClient.GetDefaultNodeConfiguration(async (sender, e) =>
+			this.pubSubClient.GetDefaultNodeConfiguration((sender, e) =>
 			{
 				MainWindow.MouseDefault();
 
@@ -294,16 +294,16 @@ namespace Waher.Client.WPF.Model.PubSub
 							return Task.CompletedTask;
 						}, string.Empty, string.Empty, Fields);
 
-					ParameterDialog Dialog = await ParameterDialog.CreateAsync(Form);
-
-					MainWindow.UpdateGui(() =>
+					MainWindow.UpdateGui(async () =>
 					{
+						ParameterDialog Dialog = await ParameterDialog.CreateAsync(Form);
 						Dialog.ShowDialog();
-						return Task.CompletedTask;
 					});
 				}
 				else
 					MainWindow.ErrorBox("Unable to get default node properties: " + e.ErrorText);
+
+				return Task.CompletedTask;
 
 			}, null);
 		}

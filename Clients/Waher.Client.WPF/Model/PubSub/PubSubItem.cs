@@ -1,21 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Windows.Media;
 using System.Windows.Input;
 using System.Xml;
-using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
-using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.DataTypes;
-using Waher.Networking.XMPP.PubSub;
-using Waher.Networking.XMPP.ServiceDiscovery;
-using Waher.Things;
 using Waher.Things.DisplayableParameters;
-using Waher.Things.SensorData;
 using Waher.Client.WPF.Dialogs;
 using System.Threading.Tasks;
 
@@ -181,7 +174,7 @@ namespace Waher.Client.WPF.Model.PubSub
 		{
 			Mouse.OverrideCursor = Cursors.Wait;
 
-			this.Service.PubSubClient.GetItems(this.node, new string[] { this.itemId }, async (sender, e) =>
+			this.Service.PubSubClient.GetItems(this.node, new string[] { this.itemId }, (sender, e) =>
 			{
 				MainWindow.MouseDefault();
 
@@ -250,17 +243,17 @@ namespace Waher.Client.WPF.Model.PubSub
 							new TextMultiField(null, "Payload", "XML:", false, new string[] { Item.Payload }, null, "XML payload of item.",
 								StringDataType.Instance, null, string.Empty, false, false, false));
 
-						Dialog = await ParameterDialog.CreateAsync(Form);
-
-						MainWindow.UpdateGui(() =>
+						MainWindow.UpdateGui(async () =>
 						{
+							Dialog = await ParameterDialog.CreateAsync(Form);
 							Dialog.ShowDialog();
-							return Task.CompletedTask;
 						});
 					}
 				}
 				else
 					MainWindow.ErrorBox("Unable to get item from server: " + e.ErrorText);
+
+				return Task.CompletedTask;
 
 			}, null);
 		}

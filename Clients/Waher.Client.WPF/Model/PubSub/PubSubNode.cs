@@ -6,7 +6,6 @@ using System.Windows.Media;
 using System.Windows.Input;
 using System.Xml;
 using Waher.Events;
-using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
@@ -492,7 +491,7 @@ namespace Waher.Client.WPF.Model.PubSub
 		{
 			Mouse.OverrideCursor = Cursors.Wait;
 
-			this.PubSubClient.GetNodeConfiguration(this.node, async (sender, e) =>
+			this.PubSubClient.GetNodeConfiguration(this.node, (sender, e) =>
 			{
 				MainWindow.MouseDefault();
 
@@ -533,16 +532,16 @@ namespace Waher.Client.WPF.Model.PubSub
 							return Task.CompletedTask;
 						}, string.Empty, string.Empty, e.Form.Fields);
 
-					ParameterDialog Dialog = await ParameterDialog.CreateAsync(Form);
-
-					MainWindow.UpdateGui(() =>
+					MainWindow.UpdateGui(async () =>
 					{
+						ParameterDialog Dialog = await ParameterDialog.CreateAsync(Form);
 						Dialog.ShowDialog();
-						return Task.CompletedTask;
 					});
 				}
 				else
 					MainWindow.ErrorBox("Unable to get node properties: " + e.ErrorText);
+
+				return Task.CompletedTask;
 
 			}, null);
 		}

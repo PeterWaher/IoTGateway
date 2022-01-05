@@ -183,21 +183,21 @@ namespace Waher.Client.WPF.Dialogs
 			this.client.Connect();
 		}
 
-		private async Task Client_OnRegistrationForm(object _, DataForm Form)
+		private Task Client_OnRegistrationForm(object _, DataForm Form)
 		{
 			Field FormType = Form["FORM_TYPE"];
 			if (FormType != null && FormType.ValueString == "urn:xmpp:captcha")
 			{
-				ParameterDialog Dialog = await ParameterDialog.CreateAsync(Form);
-
-				MainWindow.UpdateGui(() =>
+				MainWindow.UpdateGui(async () =>
 				{
+					ParameterDialog Dialog = await ParameterDialog.CreateAsync(Form);
 					Dialog.ShowDialog();
-					return Task.CompletedTask;
 				});
 			}
 			else
 				Form.Submit();
+
+			return Task.CompletedTask;
 		}
 
 		private Task Client_OnStateChanged(object Sender, XmppState NewState)

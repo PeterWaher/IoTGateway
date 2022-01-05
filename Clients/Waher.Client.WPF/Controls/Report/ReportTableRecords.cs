@@ -183,6 +183,11 @@ namespace Waher.Client.WPF.Controls.Report
 		public Record[] Records => this.records;
 
 		/// <summary>
+		/// Columns
+		/// </summary>
+		public Column[] Columns => this.columns;
+
+		/// <summary>
 		/// Exports element to XML
 		/// </summary>
 		/// <param name="Output">XML output</param>

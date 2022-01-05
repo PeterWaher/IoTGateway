@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
+using Waher.Script.Operators.Membership;
 
 namespace Waher.Script.Functions.Runtime
 {
@@ -98,6 +99,23 @@ namespace Waher.Script.Functions.Runtime
 		/// <returns>Result.</returns>
 		public IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
+			return this.EvaluateAsync(Arguments, Variables).Result;
+		}
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public bool IsAsynchronous => true;
+
+		/// <summary>
+		/// Evaluates the lambda expression.
+		/// </summary>
+		/// <param name="Arguments">Arguments.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
+		{
 			int i, c = Arguments.Length;
 			object[] P = new object[c];
 			object Obj;
@@ -120,24 +138,9 @@ namespace Waher.Script.Functions.Runtime
 				P[i] = Obj;
 			}
 
-			return Expression.Encapsulate(this.method.Invoke(this.obj, P));
-		}
-
-		/// <summary>
-		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
-		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
-		/// </summary>
-		public bool IsAsynchronous => false;
-
-		/// <summary>
-		/// Evaluates the lambda expression.
-		/// </summary>
-		/// <param name="Arguments">Arguments.</param>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
-		{
-			return Task.FromResult<IElement>(this.Evaluate(Arguments, Variables));
+			object Result = this.method.Invoke(this.obj, P);
+			Result = await NamedMethodCall.WaitPossibleTask(Result);
+			return Expression.Encapsulate(Result);
 		}
 
 		/// <inheritdoc/>

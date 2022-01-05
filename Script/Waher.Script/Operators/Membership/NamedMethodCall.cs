@@ -5,6 +5,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using System.Threading.Tasks;
 
 namespace Waher.Script.Operators.Membership
 {
@@ -39,18 +40,18 @@ namespace Waher.Script.Operators.Membership
 		/// <summary>
 		/// Name
 		/// </summary>
-		public string Name
-		{
-			get { return this.name; }
-		}
+		public string Name => this.name;
 
 		/// <summary>
 		/// Method arguments.
 		/// </summary>
-		public ScriptNode[] Parameters
-		{
-			get { return this.parameters; }
-		}
+		public ScriptNode[] Parameters => this.parameters;
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -59,6 +60,17 @@ namespace Waher.Script.Operators.Membership
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(IElement Operand, Variables Variables)
+		{
+			return this.EvaluateAsync(Operand, Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(IElement Operand, Variables Variables)
 		{
 			object Object = Operand.AssociatedObjectValue;
 			Type T, PT;
@@ -253,12 +265,13 @@ namespace Waher.Script.Operators.Membership
 				if (!(this.byReference is null))
 					throw new ScriptException("Canonical extensions of method calls having reference type arguments not supported.");	// TODO
 
-				return this.EvaluateCanonical(Instance, this.method, this.methodParametersTypes, Arguments,
+				return await this.EvaluateCanonicalAsync(Instance, this.method, this.methodParametersTypes, Arguments,
 					this.methodArguments, this.methodArgumentExtensions);
 			}
 			else
 			{
 				Value = this.method.Invoke(Instance, this.methodArguments);
+				Value = await WaitPossibleTask(Value);
 
 				if (!(this.byReference is null))
 				{
@@ -279,7 +292,25 @@ namespace Waher.Script.Operators.Membership
 			}
 		}
 
-		private IElement EvaluateCanonical(object Object, MethodInfo Method, ParameterInfo[] ParametersTypes,
+		/// <summary>
+		/// Waits for any asynchronous process to terminate.
+		/// </summary>
+		/// <param name="Result">Result, possibly asynchronous result.</param>
+		/// <returns>Finished result</returns>
+		public static async Task<object> WaitPossibleTask(object Result)
+		{
+			if (Result is Task Task)
+			{
+				await Task;
+
+				PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
+				Result = PI.GetMethod.Invoke(Task, null);
+			}
+
+			return Result;
+		}
+
+		private async Task<IElement> EvaluateCanonicalAsync(object Object, MethodInfo Method, ParameterInfo[] ParametersTypes,
 			IElement[] Arguments, object[] ArgumentValues, bool[] Extend)
 		{
 			IEnumerator<IElement>[] Enumerators = null;
@@ -315,7 +346,11 @@ namespace Waher.Script.Operators.Membership
 			}
 
 			if (First is null)
-				return Expression.Encapsulate(Method.Invoke(Object, ArgumentValues));
+			{
+				object Value = Method.Invoke(Object, ArgumentValues);
+				Value = await WaitPossibleTask(Value);
+				return Expression.Encapsulate(Value);
+			}
 
 			LinkedList<IElement> Elements = new LinkedList<IElement>();
 			Arguments = (IElement[])Arguments.Clone();
@@ -336,7 +371,7 @@ namespace Waher.Script.Operators.Membership
 				if (i < this.nrParameters)
 					break;
 
-				Elements.AddLast(this.EvaluateCanonical(Object, Method, ParametersTypes, Arguments, ArgumentValues, Extend));
+				Elements.AddLast(await this.EvaluateCanonicalAsync(Object, Method, ParametersTypes, Arguments, ArgumentValues, Extend));
 			}
 
 			for (i = 0; i < this.nrParameters; i++)
@@ -377,5 +412,65 @@ namespace Waher.Script.Operators.Membership
 		private object[] methodArguments = null;
 		private bool[] methodArgumentExtensions = null;
 		private readonly object synchObject = new object();
+
+		/// <summary>
+		/// Calls the callback method for all child nodes.
+		/// </summary>
+		/// <param name="Callback">Callback method to call.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+		/// <returns>If the process was completed.</returns>
+		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
+		{
+			int i;
+
+			if (DepthFirst)
+			{
+				if (!ForAllChildNodes(Callback, this.parameters, State, DepthFirst))
+					return false;
+			}
+
+			ScriptNode Node;
+
+			for (i = 0; i < this.nrParameters; i++)
+			{
+				Node = this.parameters[i];
+				if (!(Node is null))
+				{
+					bool b = !Callback(Node, out ScriptNode NewNode, State);
+					if (!(NewNode is null))
+						this.parameters[i] = NewNode;
+
+					if (b)
+						return false;
+				}
+			}
+
+			if (!DepthFirst)
+			{
+				if (!ForAllChildNodes(Callback, this.parameters, State, DepthFirst))
+					return false;
+			}
+
+			return true;
+		}
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			return obj is NamedMethodCall O &&
+				this.name == O.name &&
+				AreEqual(this.parameters, O.parameters) &&
+				base.Equals(obj);
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			int Result = base.GetHashCode();
+			Result ^= Result << 5 ^ GetHashCode(this.name);
+			Result ^= Result << 5 ^ GetHashCode(this.parameters);
+			return Result;
+		}
 	}
 }

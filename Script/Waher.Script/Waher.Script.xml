@@ -6685,7 +6685,7 @@
         <member name="P:Waher.Script.Functions.Strings.Evaluate.IsAsynchronous">
             <summary>
             If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
-            <see cref="!:EvaluateAsync(Variables)"/>.
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
             </summary>
         </member>
         <member name="M:Waher.Script.Functions.Strings.Evaluate.EvaluateScalar(System.String,Waher.Script.Variables)">
@@ -18286,6 +18286,12 @@
             Method arguments.
             </summary>
         </member>
+        <member name="P:Waher.Script.Operators.Membership.NamedMethodCall.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Operators.Membership.NamedMethodCall.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -18293,6 +18299,36 @@
             <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.NamedMethodCall.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.NamedMethodCall.WaitPossibleTask(System.Object)">
+            <summary>
+            Waits for any asynchronous process to terminate.
+            </summary>
+            <param name="Result">Result, possibly asynchronous result.</param>
+            <returns>Finished result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.NamedMethodCall.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.NamedMethodCall.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.NamedMethodCall.GetHashCode">
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Operators.Membership.NotIn">
             <summary>

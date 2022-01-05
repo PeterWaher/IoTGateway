@@ -35,7 +35,7 @@ namespace Waher.Script.Functions.Strings
 
         /// <summary>
         /// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
-        /// <see cref="EvaluateAsync(Variables)"/>.
+        /// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
         /// </summary>
         public override bool IsAsynchronous => true;
 

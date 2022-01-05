@@ -2576,6 +2576,10 @@ Static methods on types are available as method calls using the member operator 
 	ID1:=System.Guid.NewGuid();
 	System.Text.Encoding.UTF8.GetBytes(ID1.ToString())
 
+**Note**: If method is asynchronous, meaning it returns an object of type `Type<T>` for some type
+`T`, the script engine will await for the task to complete, and return the finished result rather
+than the `Task` object.
+
 ### Creating objects
 
 You can create objects using the `Create` function. The first parameter contains the class of the object you want to create. The following arguments
@@ -2605,6 +2609,10 @@ You can call methods and access fields and properties on an object, using the me
 If an object has the index property `Item` defined, it can be accessed using the index operator:
 
 	ID["FIRST"]
+
+**Note**: If method is asynchronous, meaning it returns an object of type `Type<T>` for some type
+`T`, the script engine will await for the task to complete, and return the finished result rather
+than the `Task` object.
 
 =========================================================================================================================================================
 

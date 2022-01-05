@@ -11,6 +11,7 @@ using Waher.Script.Model;
 using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Comparisons;
 using Waher.Script.Operators.Logical;
+using Waher.Script.Operators.Membership;
 
 namespace Waher.Script.Persistence.Functions
 {
@@ -130,13 +131,7 @@ namespace Waher.Script.Persistence.Functions
 
 			MethodInfo MI = findMethodGeneric.MakeGenericMethod(new Type[] { T });
 			object Result = MI.Invoke(null, new object[] { Offset, MaxCount, Filter, SortOrder });
-			if (Result is Task Task)
-			{
-				await Task;
-
-				PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
-				Result = PI.GetMethod.Invoke(Task, null);
-			}
+			Result = await NamedMethodCall.WaitPossibleTask(Result);
 
 			if (Result is IEnumerable E)
 			{

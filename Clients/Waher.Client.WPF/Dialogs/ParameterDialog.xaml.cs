@@ -498,7 +498,7 @@ namespace Waher.Client.WPF.Dialogs
 				ComboBox.IsEditable = true;
 				ComboBox.Text = Field.ValueString;
 				ComboBox.AddHandler(System.Windows.Controls.Primitives.TextBoxBase.TextChangedEvent,
-					new System.Windows.Controls.TextChangedEventHandler(ComboBox_TextChanged));
+					new TextChangedEventHandler(ComboBox_TextChanged));
 			}
 			else
 			{

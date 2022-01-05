@@ -127,21 +127,8 @@ namespace Waher.Client.WPF.Model.PubSub
 		public string Link => this.link;
 		public string Payload => this.payload;
 
-		public override string TypeName
-		{
-			get
-			{
-				return "Publish/Subscribe Item";
-			}
-		}
-
-		public override ImageSource ImageResource
-		{
-			get
-			{
-				return XmppAccountNode.box;
-			}
-		}
+		public override string TypeName => "Publish/Subscribe Item";
+		public override ImageSource ImageResource => XmppAccountNode.box;
 
 		public override void Write(XmlWriter Output)
 		{

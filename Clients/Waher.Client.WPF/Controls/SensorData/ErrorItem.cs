@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows.Media;
 using Waher.Client.WPF.Model;
-using Waher.Content;
 using Waher.Things;
-using Waher.Things.SensorData;
 
 namespace Waher.Client.WPF.Controls.SensorData
 {

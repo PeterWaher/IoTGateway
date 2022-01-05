@@ -1,23 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using Waher.Content;
-using Waher.Events;
-using Waher.Networking.XMPP;
-using Waher.Networking.XMPP.DataForms;
-using Waher.Networking.XMPP.DataForms.FieldTypes;
-using Waher.Networking.XMPP.Provisioning;
-using Waher.Networking.XMPP.Provisioning.SearchOperators;
-using Waher.Persistence;
-using Waher.Persistence.Filters;
-using Waher.Client.WPF.Controls;
-using Waher.Client.WPF.Controls.Questions;
-using Waher.Client.WPF.Dialogs;
 
 namespace Waher.Client.WPF.Model
 {

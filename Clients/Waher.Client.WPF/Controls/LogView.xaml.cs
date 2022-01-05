@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
@@ -8,14 +7,11 @@ using System.Xml.Schema;
 using System.Xml.Xsl;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using Microsoft.Win32;
 using Waher.Client.WPF.Controls.Logs;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
-using Waher.Script.Functions.ComplexNumbers;
-using System.Collections;
 using System.Threading.Tasks;
 
 namespace Waher.Client.WPF.Controls

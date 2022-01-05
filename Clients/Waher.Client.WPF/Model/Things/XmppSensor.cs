@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Waher.Content;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Sensor;

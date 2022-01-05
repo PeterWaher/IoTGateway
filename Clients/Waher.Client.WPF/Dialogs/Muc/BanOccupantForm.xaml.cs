@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows;
-using Waher.Networking.XMPP;
 
 namespace Waher.Client.WPF.Dialogs.Muc
 {

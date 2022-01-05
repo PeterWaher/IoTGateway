@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml;
 using Waher.Content;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
-using Waher.Things;
 using Waher.Things.SensorData;
 
 namespace Waher.Client.WPF.Model.Things

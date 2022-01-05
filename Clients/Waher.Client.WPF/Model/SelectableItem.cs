@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml;
 using System.Windows;
-using System.Windows.Media;
-using Waher.Events;
-using Waher.Networking.Sniffers;
 
 namespace Waher.Client.WPF.Model
 {

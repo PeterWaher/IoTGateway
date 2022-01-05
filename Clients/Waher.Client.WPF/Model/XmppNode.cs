@@ -3,7 +3,6 @@ using System.Windows.Controls;
 using Waher.Networking.XMPP;
 using System.Windows;
 using Waher.Client.WPF.Dialogs.Xmpp;
-using System.Xml;
 using System.Threading.Tasks;
 
 namespace Waher.Client.WPF.Model
@@ -74,7 +73,7 @@ namespace Waher.Client.WPF.Model
 				if (Result.HasValue && Result.Value)
 				{
 					this.Account.Client.SendMessage((MessageType)Enum.Parse(typeof(MessageType), Form.Type.Text),
-						Form.To.Text.Trim(), Form.CustomXml.Text, Form.Body.Text, Form.Subject.Text, Form.Language.Text,
+						Form.To.Text.Trim(), Form.CustomXml.Text, Form.Body.Text, Form.Subject.Text, Form.MessageLanguage.Text,
 						Form.ThreadId.Text, Form.ParentThreadId.Text);
 				}
 			}

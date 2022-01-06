@@ -6099,6 +6099,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.Scalar.Boolean.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="M:Waher.Script.Functions.Scalar.Boolean.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
             <summary>
             Performs a pattern match operation.
@@ -6219,6 +6227,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.Scalar.Double.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="M:Waher.Script.Functions.Scalar.Double.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
             <summary>
             Performs a pattern match operation.
@@ -6319,6 +6335,14 @@
             <returns>Function result.</returns>
         </member>
         <member name="M:Waher.Script.Functions.Scalar.Integer.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Scalar.Integer.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>
@@ -6492,6 +6516,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.Scalar.Number.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="M:Waher.Script.Functions.Scalar.Number.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
             <summary>
             Performs a pattern match operation.
@@ -6650,6 +6682,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.Scalar.String.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="M:Waher.Script.Functions.Scalar.String.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
             <summary>
             Performs a pattern match operation.
@@ -6729,6 +6769,14 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Functions.Strings.IsEmpty.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.IsEmpty.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>

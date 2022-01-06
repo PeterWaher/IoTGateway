@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
@@ -57,6 +56,17 @@ namespace Waher.Script.Graphs.Functions.Colors
 		{
 			SKColor Color = Graph.ToColor(Argument.AssociatedObjectValue);
 			return new ObjectValue(ToGrayScale(Color));
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
+		{
+			return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
 		}
 
 		/// <summary>

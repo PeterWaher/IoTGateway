@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using Waher.Content;
-using Waher.Content.Xml;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -46,6 +44,17 @@ namespace Waher.Script.Content.Functions.Encoding
 				throw new ScriptRuntimeException("Binary data expected.", this);
 
 			return new StringValue(System.Text.Encoding.UTF8.GetString(Bin));
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
+		{
+			return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
 		}
 
 	}

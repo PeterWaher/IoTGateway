@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using Waher.Security;
 using Waher.Security.SHA3;
 
 namespace Waher.Script.Cryptography.Functions.HashFunctions
@@ -48,6 +47,17 @@ namespace Waher.Script.Cryptography.Functions.HashFunctions
 			SHA3_224 H = new SHA3_224();
 
 			return new ObjectValue(H.ComputeVariable(Bin));
+		}
+
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
+		{
+			return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
 		}
 
 	}

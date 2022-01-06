@@ -1108,6 +1108,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.GrayScale.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="M:Waher.Script.Graphs.Functions.Colors.GrayScale.ToGrayScale(SkiaSharp.SKColor)">
             <summary>
             Converts a color to grayscale.
@@ -2140,6 +2148,14 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Graphs.Functions.SameScale.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Functions.SameScale.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>

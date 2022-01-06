@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Xml;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -68,5 +69,16 @@ namespace Waher.Script.Xml.Functions
             else
 			    return base.EvaluateScalar(Argument, Variables);
 		}
-	}
+
+        /// <summary>
+        /// Evaluates the function on a scalar argument.
+        /// </summary>
+        /// <param name="Argument">Function argument.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Function result.</returns>
+        public override Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
+        {
+            return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
+        }
+    }
 }

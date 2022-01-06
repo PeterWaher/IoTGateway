@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -54,13 +55,24 @@ namespace Waher.Script.Functions.Strings
 			return base.EvaluateScalar(Argument, Variables);
 		}
 
-		/// <summary>
-		/// Evaluates the function on a scalar argument.
-		/// </summary>
-		/// <param name="Argument">Function argument.</param>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Function result.</returns>
-		public override IElement EvaluateScalar(string Argument, Variables Variables)
+        /// <summary>
+        /// Evaluates the function on a scalar argument.
+        /// </summary>
+        /// <param name="Argument">Function argument.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Function result.</returns>
+        public override Task<IElement> EvaluateScalarAsync(IElement Argument, Variables Variables)
+        {
+            return Task.FromResult<IElement>(this.EvaluateScalar(Argument, Variables));
+        }
+
+        /// <summary>
+        /// Evaluates the function on a scalar argument.
+        /// </summary>
+        /// <param name="Argument">Function argument.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Function result.</returns>
+        public override IElement EvaluateScalar(string Argument, Variables Variables)
         {
             if (string.IsNullOrEmpty(Argument))
                 return BooleanValue.True;

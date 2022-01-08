@@ -48,7 +48,7 @@ namespace Waher.Content.Markdown.Model
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
 			foreach (MarkdownElement E in ChildNodes)
-				await E.GenerateHTML(Output);
+				await E.GeneratePlainText(Output);
 
 			if (AloneInParagraph)
 			{

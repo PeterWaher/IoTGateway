@@ -235,8 +235,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			string Url = Source.Url;
 			int i;
 
-			if (Url.StartsWith("data:", StringComparison.CurrentCultureIgnoreCase) &&
-				(i = Url.IndexOf("base64,")) > 0)
+			if (Url.StartsWith("data:", StringComparison.CurrentCultureIgnoreCase) && (i = Url.IndexOf("base64,")) > 0)
 			{
 				int? Width = Source.Width;
 				int? Height = Source.Height;

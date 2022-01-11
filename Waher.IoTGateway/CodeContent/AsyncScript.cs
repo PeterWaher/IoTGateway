@@ -224,19 +224,19 @@ namespace Waher.IoTGateway.CodeContent
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
 		/// <param name="Rows">Code rows.</param>
 		/// <param name="Language">Language used.</param>
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public async Task<bool> GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			Expression Script = this.BuildExpression(Rows);
 			Variables Variables = Document.Settings.Variables;
 			object Result = await this.Evaluate(Script, Variables);
 
-			await InlineScript .GenerateXamarinForms(Result, Output, TextAlignment, true, Variables, Document.Settings.XamlSettings);
+			await InlineScript.GenerateXamarinForms(Result, Output, State, true, Variables, Document.Settings.XamlSettings);
 
 			return true;
 		}

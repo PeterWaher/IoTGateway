@@ -108,28 +108,24 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
 			XamlSettings Settings = this.Document.Settings.XamlSettings;
 			int TopMargin = Settings.ParagraphMarginTop;
 
 			foreach (MarkdownElement Term in this.Children)
 			{
-				Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, 
+				Paragraph.GenerateXamarinFormsContentView(Output, State.TextAlignment, 
 					Settings.ParagraphMarginLeft.ToString() + "," + TopMargin.ToString() + "," +
 					Settings.ParagraphMarginRight.ToString() + ",0");
 
-				Output.WriteStartElement("Label");
-				Output.WriteAttributeString("LineBreakMode", "WordWrap");
-				Output.WriteAttributeString("TextType", "Html");
-				Output.WriteAttributeString("FontAttributes", "Bold");
-				
-				StringBuilder Html = new StringBuilder();
-				await Term.GenerateHTML(Html);
+				bool BoldBak = State.Bold;
+				State.Bold = true;
 
-				Output.WriteCData(Html.ToString());
-				Output.WriteEndElement();
+				await Paragraph.GenerateXamarinFormsLabel(Output, Term, true, State);
+
+				State.Bold = BoldBak;
 				Output.WriteEndElement();
 
 				TopMargin = 0;

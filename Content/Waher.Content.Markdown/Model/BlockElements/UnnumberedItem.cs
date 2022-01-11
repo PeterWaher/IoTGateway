@@ -48,7 +48,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			Output.Append("<li");
 
-			if (this.Document.Detail != null)
+			if (!(this.Document.Detail is null))
 			{
 				if (this.Child is Link Link)
 				{
@@ -60,7 +60,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					string Label = LinkReference.Label;
 					SpanElements.Multimedia Multimedia = this.Document.GetReference(Label);
 
-					if (Multimedia != null && Multimedia.Items.Length == 1 && string.Compare(Multimedia.Items[0].Url, this.Document.Detail.ResourceName, true) == 0)
+					if (!(Multimedia is null) && Multimedia.Items.Length == 1 && string.Compare(Multimedia.Items[0].Url, this.Document.Detail.ResourceName, true) == 0)
 						Output.Append(" class=\"active\"");
 				}
 			}
@@ -103,10 +103,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
-			return this.Child.GenerateXamarinForms(Output, TextAlignment);
+			return this.Child.GenerateXamarinForms(Output, State);
 		}
 
 		/// <summary>

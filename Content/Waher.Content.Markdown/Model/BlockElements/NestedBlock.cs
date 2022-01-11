@@ -98,11 +98,11 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
 			if (this.HasOneChild)
-				await this.FirstChild.GenerateXamarinForms(Output, TextAlignment);
+				await this.FirstChild.GenerateXamarinForms(Output, State);
 			else
 			{
 				StringBuilder Html = null;
@@ -129,7 +129,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 							Html = null;
 						}
 
-						await E.GenerateXamarinForms(Output, TextAlignment);
+						await E.GenerateXamarinForms(Output, State);
 					}
 				}
 

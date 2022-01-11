@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Emoji;
+using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.Multimedia;
 
 namespace Waher.Content.Markdown.Model.SpanElements
@@ -43,18 +44,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// Emoji information.
 		/// </summary>
-		public EmojiInfo Emoji
-		{
-			get { return this.emoji; }
-		}
+		public EmojiInfo Emoji => this.emoji;
 
 		/// <summary>
 		/// Level (number of colons used to define the emoji)
 		/// </summary>
-		public int Level
-		{
-			get { return this.level; }
-		}
+		public int Level => this.level;
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
@@ -65,7 +60,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			Output.Append(this.delimiter);
 			Output.Append(this.emoji.ShortName);
 			Output.Append(this.delimiter);
-	
+
 			return Task.CompletedTask;
 		}
 
@@ -87,7 +82,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.Append(this.emoji.Unicode);
 			else
 				EmojiSource.GenerateHTML(Output, this.emoji, this.level, this.Document.Settings.EmbedEmojis);
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -98,7 +93,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override Task GeneratePlainText(StringBuilder Output)
 		{
 			Output.Append(this.emoji.Unicode);
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -115,19 +110,46 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			IImageSource Source = await this.Document.EmojiSource.GetImageSource(this.emoji, this.level);
-			await ImageContent.OutputWpf(Output, Source, Emoji.Description);
+			IEmojiSource EmojiSource = this.Document.EmojiSource;
+
+			if (EmojiSource is null)
+			{
+				Output.WriteValue(this.delimiter);
+				Output.WriteValue(this.emoji.ShortName);
+				Output.WriteValue(this.delimiter);
+			}
+			else if (!EmojiSource.EmojiSupported(this.emoji))
+				Output.WriteValue(this.emoji.Unicode);
+			else
+			{
+				IImageSource Source = await EmojiSource.GetImageSource(this.emoji, this.level);
+				await ImageContent.OutputWpf(Output, Source, Emoji.Description);
+			}
 		}
 
 		/// <summary>
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
-			IImageSource Source = await this.Document.EmojiSource.GetImageSource(this.emoji, this.level);
-			await ImageContent.OutputXamarinForms(Output, Source);
+			if (State.InLabel)
+				Paragraph.GenerateXamarinFormsSpan(Output, this.emoji.Unicode, State);
+			else
+			{
+				IEmojiSource EmojiSource = this.Document.EmojiSource;
+
+				if (EmojiSource is null)
+					Paragraph.GenerateXamarinFormsSpan(Output, this.delimiter + this.emoji.ShortName + this.delimiter, State);
+				else if (!EmojiSource.EmojiSupported(this.emoji))
+					Paragraph.GenerateXamarinFormsSpan(Output, this.emoji.Unicode, State);
+				else
+				{
+					IImageSource Source = await this.Document.EmojiSource.GetImageSource(this.emoji, this.level);
+					await ImageContent.OutputXamarinForms(Output, Source);
+				}
+			}
 		}
 
 		/// <summary>
@@ -139,7 +161,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
 			Output.WriteElementString("text", this.emoji.Unicode);
-		
+
 			return Task.CompletedTask;
 		}
 

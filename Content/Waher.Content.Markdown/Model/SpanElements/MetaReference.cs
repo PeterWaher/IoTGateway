@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Xml;
 using Waher.Script;
 
@@ -158,10 +159,33 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
-			return InlineText.GenerateInlineFormattedTextXamarinForms(Output, this);
+			StringBuilder sb = new StringBuilder();
+			bool FirstOnRow = true;
+
+			if (this.TryGetMetaData(out KeyValuePair<string, bool>[] Values))
+			{
+				foreach (KeyValuePair<string, bool> P in Values)
+				{
+					if (FirstOnRow)
+						FirstOnRow = false;
+					else
+						sb.Append(' ');
+
+					sb.Append(P.Key);
+					if (P.Value)
+					{
+						sb.Append(Environment.NewLine);
+						FirstOnRow = true;
+					}
+				}
+			}
+
+			Paragraph.GenerateXamarinFormsSpan(Output, sb.ToString(), State);
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

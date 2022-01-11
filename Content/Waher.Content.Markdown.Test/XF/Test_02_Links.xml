@@ -1,42 +1,219 @@
 ﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is <a href="http://example.com/" title="Title" target="_blank">an example</a> inline link.]]></Label>
+		<Label LineBreakMode="WordWrap">
+			<Label.FormattedText>
+				<FormattedString>
+					<Span Text="This is " />
+					<Span Text="an example" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://example.com/" />
+						</Span.GestureRecognizers>
+					</Span>
+					<Span Text=" inline link." />
+				</FormattedString>
+			</Label.FormattedText>
+		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<a href="http://example.net/" target="_blank">This link</a> has no title attribute.]]></Label>
+		<Label LineBreakMode="WordWrap">
+			<Label.FormattedText>
+				<FormattedString>
+					<Span Text="This link" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://example.net/" />
+						</Span.GestureRecognizers>
+					</Span>
+					<Span Text=" has no title attribute." />
+				</FormattedString>
+			</Label.FormattedText>
+		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[See my <a href="/about/">About</a> page for details.]]></Label>
+		<Label LineBreakMode="WordWrap">
+			<Label.FormattedText>
+				<FormattedString>
+					<Span Text="See my " />
+					<Span Text="About" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="/about/" />
+						</Span.GestureRecognizers>
+					</Span>
+					<Span Text=" page for details." />
+				</FormattedString>
+			</Label.FormattedText>
+		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is <a href="http://example.com/" title="Optional Title Here" target="_blank">an example</a> reference-style link.]]></Label>
+		<Label LineBreakMode="WordWrap">
+			<Label.FormattedText>
+				<FormattedString>
+					<Span Text="This is " />
+					<Span Text="an example" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://example.com/" />
+						</Span.GestureRecognizers>
+					</Span>
+					<Span Text=" reference-style link." />
+				</FormattedString>
+			</Label.FormattedText>
+		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is <a href="http://example.com/" title="Optional Title Here" target="_blank">an example</a> reference-style link.]]></Label>
+		<Label LineBreakMode="WordWrap">
+			<Label.FormattedText>
+				<FormattedString>
+					<Span Text="This is " />
+					<Span Text="an example" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://example.com/" />
+						</Span.GestureRecognizers>
+					</Span>
+					<Span Text=" reference-style link." />
+				</FormattedString>
+			</Label.FormattedText>
+		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[This is <a href="http://example.com/" title="Optional Title Here" target="_blank">an example</a> reference-style link.]]></Label>
+		<Label LineBreakMode="WordWrap">
+			<Label.FormattedText>
+				<FormattedString>
+					<Span Text="This is " />
+					<Span Text="an example" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://example.com/" />
+						</Span.GestureRecognizers>
+					</Span>
+					<Span Text=" reference-style link." />
+				</FormattedString>
+			</Label.FormattedText>
+		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Visit <a href="http://daringfireball.net/" target="_blank">Daring Fireball</a> for more information.]]></Label>
+		<Label LineBreakMode="WordWrap">
+			<Label.FormattedText>
+				<FormattedString>
+					<Span Text="Visit " />
+					<Span Text="Daring Fireball" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://daringfireball.net/" />
+						</Span.GestureRecognizers>
+					</Span>
+					<Span Text=" for more information." />
+				</FormattedString>
+			</Label.FormattedText>
+		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[I get 10 times more traffic from <a href="http://google.com/" title="Google" target="_blank">Google</a> than from <a href="http://search.yahoo.com/" title="Yahoo Search" target="_blank">Yahoo</a> or <a href="http://search.msn.com/" title="MSN Search" target="_blank">MSN</a>.]]></Label>
+		<Label LineBreakMode="WordWrap">
+			<Label.FormattedText>
+				<FormattedString>
+					<Span Text="I get 10 times more traffic from " />
+					<Span Text="Google" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://google.com/" />
+						</Span.GestureRecognizers>
+					</Span>
+					<Span Text=" than from " />
+					<Span Text="Yahoo" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://search.yahoo.com/" />
+						</Span.GestureRecognizers>
+					</Span>
+					<Span Text=" or " />
+					<Span Text="MSN" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://search.msn.com/" />
+						</Span.GestureRecognizers>
+					</Span>
+					<Span Text="." />
+				</FormattedString>
+			</Label.FormattedText>
+		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[I get 10 times more traffic from <a href="http://google.com/" title="Google" target="_blank">Google</a> than from <a href="http://search.yahoo.com/" title="Yahoo Search" target="_blank">Yahoo</a> or <a href="http://search.msn.com/" title="MSN Search" target="_blank">MSN</a>.]]></Label>
+		<Label LineBreakMode="WordWrap">
+			<Label.FormattedText>
+				<FormattedString>
+					<Span Text="I get 10 times more traffic from " />
+					<Span Text="Google" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://google.com/" />
+						</Span.GestureRecognizers>
+					</Span>
+					<Span Text=" than from " />
+					<Span Text="Yahoo" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://search.yahoo.com/" />
+						</Span.GestureRecognizers>
+					</Span>
+					<Span Text=" or " />
+					<Span Text="MSN" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://search.msn.com/" />
+						</Span.GestureRecognizers>
+					</Span>
+					<Span Text="." />
+				</FormattedString>
+			</Label.FormattedText>
+		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[I get 10 times more traffic from <a href="http://google.com/" title="Google" target="_blank">Google</a> than from <a href="http://search.yahoo.com/" title="Yahoo Search" target="_blank">Yahoo</a> or <a href="http://search.msn.com/" title="MSN Search" target="_blank">MSN</a>.]]></Label>
+		<Label LineBreakMode="WordWrap">
+			<Label.FormattedText>
+				<FormattedString>
+					<Span Text="I get 10 times more traffic from " />
+					<Span Text="Google" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://google.com/" />
+						</Span.GestureRecognizers>
+					</Span>
+					<Span Text=" than from " />
+					<Span Text="Yahoo" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://search.yahoo.com/" />
+						</Span.GestureRecognizers>
+					</Span>
+					<Span Text=" or " />
+					<Span Text="MSN" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://search.msn.com/" />
+						</Span.GestureRecognizers>
+					</Span>
+					<Span Text="." />
+				</FormattedString>
+			</Label.FormattedText>
+		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[You can also write links, such as <a href="http://lils.is/" target="_blank">http://lils.is/</a> inline.]]></Label>
+		<Label LineBreakMode="WordWrap">
+			<Label.FormattedText>
+				<FormattedString>
+					<Span Text="You can also write links, such as " />
+					<Span Text="http://lils.is/" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://lils.is/" />
+						</Span.GestureRecognizers>
+					</Span>
+					<Span Text=" inline." />
+				</FormattedString>
+			</Label.FormattedText>
+		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
 		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Or on separate paragraphs:]]></Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<a href="http://lils.is/" target="_blank">http://lils.is/</a>]]></Label>
+		<Label LineBreakMode="WordWrap">
+			<Label.FormattedText>
+				<FormattedString>
+					<Span Text="http://lils.is/" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://lils.is/" />
+						</Span.GestureRecognizers>
+					</Span>
+				</FormattedString>
+			</Label.FormattedText>
+		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
 		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[Recognized multi-media content put on separate rows are automatically handled as multi-media:]]></Label>

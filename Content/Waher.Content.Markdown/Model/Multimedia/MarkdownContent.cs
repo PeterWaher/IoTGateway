@@ -29,7 +29,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
         /// <returns>How well the handler supports the content.</returns>
         public override Grade Supports(MultimediaItem Item)
         {
-			if (Item.Document != null && !string.IsNullOrEmpty(Item.Document.FileName) &&
+			if (!(Item.Document is null) && !string.IsNullOrEmpty(Item.Document.FileName) &&
 				Item.Url.IndexOf(':') < 0 && Item.ContentType == MarkdownCodec.ContentType)
 			{
 				return Grade.Excellent;

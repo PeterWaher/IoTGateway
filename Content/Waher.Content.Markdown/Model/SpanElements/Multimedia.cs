@@ -166,7 +166,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					break;
 			}
 
-			return Best;    // Will allways be != null, since Multimedia.LinkContent will be chosen by default if no better is found.
+			return Best;    // Will allways not be null, since Multimedia.LinkContent will be chosen by default if no better is found.
 		}
 
 		/// <summary>
@@ -236,10 +236,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
-			return this.MultimediaHandler.GenerateXamarinForms(Output, TextAlignment, this.items, this.Children, this.aloneInParagraph, this.Document);
+			return this.MultimediaHandler.GenerateXamarinForms(Output, State.TextAlignment, this.items, this.Children, this.aloneInParagraph, this.Document);
 		}
 
 		/// <summary>

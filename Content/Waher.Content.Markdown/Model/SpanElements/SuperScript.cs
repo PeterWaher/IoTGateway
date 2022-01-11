@@ -76,10 +76,16 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
-			return InlineText.GenerateInlineFormattedTextXamarinForms(Output, this);
+			bool Bak = State.Superscript;
+			State.Superscript = true;
+
+			foreach (MarkdownElement E in this.Children)
+				await E.GenerateXamarinForms(Output, State);
+
+			State.Superscript = Bak;
 		}
 
 		/// <summary>
@@ -117,6 +123,28 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				else
 					Output.Append(superScriptLetters[i]);
 			}
+		}
+
+		/// <summary>
+		/// Converts a string to superscript (as far as it goes).
+		/// </summary>
+		/// <param name="s">String</param>
+		/// <returns>String with superscript characters.</returns>
+		public static string ToSuperscript(string s)
+		{
+			StringBuilder sb = new StringBuilder();
+			int i;
+
+			foreach (char ch in s)
+			{
+				i = normlScriptLetters.IndexOf(ch);
+				if (i < 0)
+					sb.Append(ch);
+				else
+					sb.Append(superScriptLetters[i]);
+			}
+
+			return sb.ToString();
 		}
 
 		private const string normlScriptLetters = "abcdefghijklmnoprstuvwxyzABDEGHIJKLMNOPRTUW0123456789+-=()";

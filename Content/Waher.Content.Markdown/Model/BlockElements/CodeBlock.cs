@@ -256,7 +256,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override async Task GenerateHTML(StringBuilder Output)
 		{
-			if (this.handler != null && this.handler.HandlesHTML)
+			if (!(this.handler is null) && this.handler.HandlesHTML)
 			{
 				try
 				{
@@ -311,7 +311,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override async Task GeneratePlainText(StringBuilder Output)
 		{
-			if (this.handler != null && this.handler.HandlesPlainText)
+			if (!(this.handler is null) && this.handler.HandlesPlainText)
 			{
 				try
 				{
@@ -352,7 +352,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			XamlSettings Settings = this.Document.Settings.XamlSettings;
 
-			if (this.handler != null && this.handler.HandlesXAML)
+			if (!(this.handler is null) && this.handler.HandlesXAML)
 			{
 				try
 				{
@@ -421,16 +421,16 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
 			XamlSettings Settings = this.Document.Settings.XamlSettings;
 
-			if (this.handler != null && this.handler.HandlesXAML)
+			if (!(this.handler is null) && this.handler.HandlesXAML)
 			{
 				try
 				{
-					if (await this.handler.GenerateXamarinForms(Output, TextAlignment, this.rows, this.language, this.indent, this.Document))
+					if (await this.handler.GenerateXamarinForms(Output, State, this.rows, this.language, this.indent, this.Document))
 						return;
 				}
 				catch (Exception ex)
@@ -441,7 +441,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					{
 						foreach (Exception ex3 in ex2.InnerExceptions)
 						{
-							Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
+							Paragraph.GenerateXamarinFormsContentView(Output, State.TextAlignment, Settings);
 							Output.WriteStartElement("Label");
 							Output.WriteAttributeString("LineBreakMode", "WordWrap");
 							Output.WriteAttributeString("TextColor", "Red");
@@ -452,7 +452,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					}
 					else
 					{
-						Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
+						Paragraph.GenerateXamarinFormsContentView(Output, State.TextAlignment, Settings);
 						Output.WriteStartElement("Label");
 						Output.WriteAttributeString("LineBreakMode", "WordWrap");
 						Output.WriteAttributeString("TextColor", "Red");
@@ -463,7 +463,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				}
 			}
 
-			Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
+			Paragraph.GenerateXamarinFormsContentView(Output, State.TextAlignment, Settings);
 			Output.WriteStartElement("StackLayout");
 			Output.WriteAttributeString("Orientation", "Vertical");
 

@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Xml;
 
 namespace Waher.Content.Markdown.Model.SpanElements
@@ -27,10 +28,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// URL
 		/// </summary>
-		public string URL
-		{
-			get { return this.url; }
-		}
+		public string URL => this.url;
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.
@@ -102,10 +100,15 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
-			return InlineText.GenerateInlineFormattedTextXamarinForms(Output, this);
+			string Bak = State.Hyperlink;
+			State.Hyperlink = this.url;
+			Paragraph.GenerateXamarinFormsSpan(Output, this.url, State);
+			State.Hyperlink = Bak;
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

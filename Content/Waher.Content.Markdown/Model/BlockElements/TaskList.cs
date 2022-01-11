@@ -170,8 +170,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
 			XamlSettings Settings = this.Document.Settings.XamlSettings;
 			int Row = 0;
@@ -215,7 +215,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 					if (TaskItem.IsChecked)
 					{
-						Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, "0," + TopMargin.ToString() + "," +
+						Paragraph.GenerateXamarinFormsContentView(Output, State.TextAlignment, "0," + TopMargin.ToString() + "," +
 							Settings.ListContentMargin.ToString() + "," + BottomMargin.ToString());
 						Output.WriteAttributeString("Grid.Column", "0");
 						Output.WriteAttributeString("Grid.Row", Row.ToString());
@@ -230,19 +230,9 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					Output.WriteAttributeString("Orientation", "Vertical");
 
 					if (ParagraphBullet)
-						await E.GenerateXamarinForms(Output, TextAlignment);
+						await E.GenerateXamarinForms(Output, State);
 					else
-					{
-						Output.WriteStartElement("Label");
-						Output.WriteAttributeString("LineBreakMode", "WordWrap");
-						Output.WriteAttributeString("TextType", "Html");
-
-						StringBuilder Html = new StringBuilder();
-						await TaskItem.Child.GenerateHTML(Html);
-						Output.WriteCData(Html.ToString());
-
-						Output.WriteEndElement();
-					}
+						await Paragraph.GenerateXamarinFormsLabel(Output, TaskItem, false, State);
 
 					Output.WriteEndElement();
 				}

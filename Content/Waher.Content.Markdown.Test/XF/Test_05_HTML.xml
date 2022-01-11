@@ -1,9 +1,29 @@
 ﻿<StackLayout xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" Spacing="0" xmlns="http://xamarin.com/schemas/2014/forms">
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<a href="http://example.com/" target="_blank">http://example.com/</a>]]></Label>
+		<Label LineBreakMode="WordWrap">
+			<Label.FormattedText>
+				<FormattedString>
+					<Span Text="http://example.com/" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="http://example.com/" />
+						</Span.GestureRecognizers>
+					</Span>
+				</FormattedString>
+			</Label.FormattedText>
+		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
-		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<a href="&#x6D;&#x61;&#x69;&#x6C;&#x74;&#x6F;&#x3A;&#x61;&#x64;&#x64;&#x72;&#x65;&#x73;&#x73;&#x40;&#x65;&#x78;&#x61;&#x6D;&#x70;&#x6C;&#x65;&#x2E;&#x63;&#x6F;&#x6D;">&#x61;&#x64;&#x64;&#x72;&#x65;&#x73;&#x73;&#x40;&#x65;&#x78;&#x61;&#x6D;&#x70;&#x6C;&#x65;&#x2E;&#x63;&#x6F;&#x6D;</a>]]></Label>
+		<Label LineBreakMode="WordWrap">
+			<Label.FormattedText>
+				<FormattedString>
+					<Span Text="mailto:address@example.com" TextColor="{Binding HyperlinkColor}">
+						<Span.GestureRecognizers>
+							<TapGestureRecognizer Command="{Binding HyperlinkClicked}" CommandParameter="mailto:address@example.com" />
+						</Span.GestureRecognizers>
+					</Span>
+				</FormattedString>
+			</Label.FormattedText>
+		</Label>
 	</ContentView>
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
 		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[<table>

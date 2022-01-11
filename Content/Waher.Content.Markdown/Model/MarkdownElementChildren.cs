@@ -116,9 +116,9 @@ namespace Waher.Content.Markdown.Model
 		}
 
 		/// <summary>
-		/// Child elements.
+		/// Any children of the element.
 		/// </summary>
-		public IEnumerable<MarkdownElement> Children => this.children;
+		public override IEnumerable<MarkdownElement> Children => this.children;
 
 		/// <summary>
 		/// Creates an object of the same type, and meta-data, as the current object,

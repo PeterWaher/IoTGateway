@@ -75,7 +75,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			Output.WriteComment(this.html);
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -83,10 +83,11 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
-			return InlineText.GenerateInlineFormattedTextXamarinForms(Output, this);
+			Output.WriteComment(this.html);
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

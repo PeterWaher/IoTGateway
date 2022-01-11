@@ -208,7 +208,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 						Output.Append("</p>");
 				}
 			}
-			else if (Result is ObjectMatrix M && M.ColumnNames != null)
+			else if (Result is ObjectMatrix M && !(M.ColumnNames is null))
 			{
 				Output.Append("<table><thead><tr>");
 
@@ -426,29 +426,38 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
 			object Result = await this.EvaluateExpression();
 			if (Result is null)
 				return;
 
-			await GenerateXamarinForms(Result, Output, TextAlignment, this.aloneInParagraph, this.variables, this.Document.Settings.XamlSettings);
+			await GenerateXamarinForms(Result, Output, State, this.aloneInParagraph, this.variables, this.Document.Settings.XamlSettings);
 		}
 
 		/// <summary>
 		/// Generates WPF XAML from Script output.
 		/// </summary>
 		/// <param name="Result">Script output.</param>
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
 		/// <param name="Output">HTML output.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
 		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
 		/// <param name="Variables">Current variables.</param>
 		/// <param name="XamlSettings">XAML Settings</param>
-		public static async Task GenerateXamarinForms(object Result, XmlWriter Output, TextAlignment TextAlignment, bool AloneInParagraph,
+		public static async Task GenerateXamarinForms(object Result, XmlWriter Output, XamarinRenderingState State, bool AloneInParagraph,
 			Variables Variables, XamlSettings XamlSettings)
 		{
 			string s;
+			
+			if (State.InLabel)
+			{
+				s = Result?.ToString();
+				if (!string.IsNullOrEmpty(s))
+					Paragraph.GenerateXamarinFormsSpan(Output, Result?.ToString() ?? string.Empty, State);
+
+				return;
+			}
 
 			if (Result is Graph G)
 			{
@@ -488,7 +497,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				{
 					foreach (Exception ex3 in ex2.InnerExceptions)
 					{
-						Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, XamlSettings);
+						Paragraph.GenerateXamarinFormsContentView(Output, State.TextAlignment, XamlSettings);
 						Output.WriteStartElement("Label");
 						Output.WriteAttributeString("LineBreakMode", "WordWrap");
 						Output.WriteAttributeString("TextColor", "Red");
@@ -500,7 +509,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				else
 				{
 					if (AloneInParagraph)
-						Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, XamlSettings);
+						Paragraph.GenerateXamarinFormsContentView(Output, State.TextAlignment, XamlSettings);
 
 					Output.WriteStartElement("Label");
 					Output.WriteAttributeString("LineBreakMode", "WordWrap");
@@ -515,7 +524,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			else
 			{
 				if (AloneInParagraph)
-					Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, XamlSettings);
+					Paragraph.GenerateXamarinFormsContentView(Output, State.TextAlignment, XamlSettings);
 
 				Output.WriteStartElement("Label");
 				Output.WriteAttributeString("LineBreakMode", "WordWrap");

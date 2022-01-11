@@ -91,10 +91,20 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
-			return InlineText.GenerateInlineFormattedTextXamarinForms(Output, this);
+			Multimedia Multimedia = this.Document.GetReference(this.label);
+
+			string Bak = State.Hyperlink;
+
+			if (!(Multimedia is null))
+				State.Hyperlink = Multimedia.Items[0].Url;
+
+			foreach (MarkdownElement E in this.Children)
+				await E.GenerateXamarinForms(Output, State);
+
+			State.Hyperlink = Bak;
 		}
 
 		/// <summary>

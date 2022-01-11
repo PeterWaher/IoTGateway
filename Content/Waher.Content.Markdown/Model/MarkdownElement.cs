@@ -25,18 +25,17 @@ namespace Waher.Content.Markdown.Model
 		/// <summary>
 		/// Markdown document.
 		/// </summary>
-		public MarkdownDocument Document
-		{
-			get { return this.document; }
-		}
+		public MarkdownDocument Document => this.document;
+
+		/// <summary>
+		/// Any children of the element.
+		/// </summary>
+		public virtual IEnumerable<MarkdownElement> Children => new MarkdownElement[0];
 
 		/// <summary>
 		/// If the element is a block element.
 		/// </summary>
-		public virtual bool IsBlockElement
-		{
-			get { return false; }
-		}
+		public virtual bool IsBlockElement => false;
 
 		/// <summary>
 		/// If the current object has same meta-data as <paramref name="E"/>
@@ -97,8 +96,8 @@ namespace Waher.Content.Markdown.Model
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">Xamarin.Forms XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public abstract Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment);
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public abstract Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State);
 
 		/// <summary>
 		/// Generates Human-Readable XML for Smart Contracts from the markdown text.

@@ -104,8 +104,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
 			XamlSettings Settings = this.Document.Settings.XamlSettings;
 			MarkdownElement Last = null;
@@ -117,7 +117,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			{
 				if (Description.InlineSpanElement && !Description.OutsideParagraph)
 				{
-					Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings);
+					Paragraph.GenerateXamarinFormsContentView(Output, State.TextAlignment, Settings);
 
 					Output.WriteStartElement("Label");
 					Output.WriteAttributeString("LineBreakMode", "WordWrap");
@@ -137,7 +137,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 						(Description == Last ? Settings.DefinitionSeparator : 0).ToString());
 
 					Output.WriteStartElement("StackLayout");
-					await Description.GenerateXamarinForms(Output, TextAlignment);
+					await Description.GenerateXamarinForms(Output, State);
 					Output.WriteEndElement();
 
 					Output.WriteEndElement();

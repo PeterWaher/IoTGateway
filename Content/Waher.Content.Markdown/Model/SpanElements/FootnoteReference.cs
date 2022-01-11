@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content.Markdown.Model.BlockElements;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -118,7 +119,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.WriteEndElement();
 				Output.WriteEndElement();
 			}
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -126,10 +127,20 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
-			return InlineText.GenerateInlineFormattedTextXamarinForms(Output, this);
+			if (this.Document.TryGetFootnoteNumber(this.key, out int Nr))
+			{
+				bool Bak = State.Superscript;
+				State.Superscript = true;
+
+				Paragraph.GenerateXamarinFormsSpan(Output, Nr.ToString(), State);
+
+				State.Superscript = Bak;
+			}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -146,7 +157,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.WriteElementString("text", Nr.ToString());
 				Output.WriteEndElement();
 			}
-		
+
 			return Task.CompletedTask;
 		}
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content.Markdown.Model.SpanElements;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -97,23 +98,139 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
-			GenerateXamarinFormsContentView(Output, TextAlignment, this.Document.Settings.XamlSettings);
+			GenerateXamarinFormsContentView(Output, State.TextAlignment, this.Document.Settings.XamlSettings);
+			await GenerateXamarinFormsLabel(Output, this, false, State);
+			Output.WriteEndElement();
+		}
+
+		internal static async Task GenerateXamarinFormsLabel(XmlWriter Output, MarkdownElement Element, bool IncludeElement, XamarinRenderingState State)
+		{
+			bool HasLink = !Element.ForEach((E, _) =>
+			{
+				return !(
+					E is AutomaticLinkMail ||
+					E is AutomaticLinkUrl ||
+					E is Link ||
+					E is LinkReference);
+			}, null);
 
 			Output.WriteStartElement("Label");
 			Output.WriteAttributeString("LineBreakMode", "WordWrap");
-			Output.WriteAttributeString("TextType", "Html");
 
-			StringBuilder Html = new StringBuilder();
+			if (HasLink)
+			{
+				if (State.InLabel)
+				{
+					if (IncludeElement)
+						await Element.GenerateXamarinForms(Output, State);
+					else
+					{
+						foreach (MarkdownElement E in Element.Children)
+							await E.GenerateXamarinForms(Output, State);
+					}
+				}
+				else
+				{
+					State.InLabel = true;
 
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateHTML(Html);
+					Output.WriteStartElement("Label.FormattedText");
+					Output.WriteStartElement("FormattedString");
 
-			Output.WriteCData(Html.ToString());
+					if (IncludeElement)
+						await Element.GenerateXamarinForms(Output, State);
+					else
+					{
+						foreach (MarkdownElement E in Element.Children)
+							await E.GenerateXamarinForms(Output, State);
+					}
+
+					Output.WriteEndElement();
+					Output.WriteEndElement();
+
+					State.InLabel = false;
+				}
+			}
+			else
+			{
+				Output.WriteAttributeString("TextType", "Html");
+
+				if (State.Bold)
+					Output.WriteAttributeString("FontAttributes", "Bold");
+
+				StringBuilder Html = new StringBuilder();
+
+				if (IncludeElement)
+					await Element.GenerateHTML(Html);
+				else
+				{
+					foreach (MarkdownElement E in Element.Children)
+						await E.GenerateHTML(Html);
+				}
+
+				Output.WriteCData(Html.ToString());
+			}
 
 			Output.WriteEndElement();
+		}
+
+		internal static void GenerateXamarinFormsSpan(XmlWriter Output, string Text, XamarinRenderingState State)
+		{
+			if (!State.InLabel)
+			{
+				Output.WriteStartElement("Label");
+				Output.WriteAttributeString("LineBreakMode", "WordWrap");
+				Output.WriteStartElement("Label.FormattedText");
+				Output.WriteStartElement("FormattedString");
+			}
+
+			Output.WriteStartElement("Span");
+
+			if (State.Superscript)
+				Text = SuperScript.ToSuperscript(Text);
+			else if (State.Subscript)
+				Text = SubScript.ToSubscript(Text);
+
+			Output.WriteAttributeString("Text", Text);
+
+			if (State.Bold && State.Italic)
+				Output.WriteAttributeString("FontAttributes", "Italic, Bold");
+			else if (State.Bold)
+				Output.WriteAttributeString("FontAttributes", "Bold");
+			else if (State.Italic)
+				Output.WriteAttributeString("FontAttributes", "Italic");
+
+			if (State.StrikeThrough && State.Underline)
+				Output.WriteAttributeString("TextDecorations", "Strikethrough, Underline");
+			else if (State.StrikeThrough)
+				Output.WriteAttributeString("TextDecorations", "Strikethrough");
+			else if (State.Underline)
+				Output.WriteAttributeString("TextDecorations", "Underline");
+
+			if (State.Code)
+				Output.WriteAttributeString("FontFamily", "Courier New");
+
+			if (!(State.Hyperlink is null))
+			{
+				Output.WriteAttributeString("TextColor", "{Binding HyperlinkColor}");
+
+				Output.WriteStartElement("Span.GestureRecognizers");
+				Output.WriteStartElement("TapGestureRecognizer");
+				Output.WriteAttributeString("Command", "{Binding HyperlinkClicked}");
+				Output.WriteAttributeString("CommandParameter", State.Hyperlink);
+				Output.WriteEndElement();
+				Output.WriteEndElement();
+			}
+
+			if (!State.InLabel)
+			{
+				Output.WriteEndElement();
+				Output.WriteEndElement();
+				Output.WriteEndElement();
+			}
+
 			Output.WriteEndElement();
 		}
 

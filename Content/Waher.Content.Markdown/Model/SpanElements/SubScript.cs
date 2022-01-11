@@ -76,10 +76,16 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
-			return InlineText.GenerateInlineFormattedTextXamarinForms(Output, this);
+			bool Bak = State.Subscript;
+			State.Subscript = true;
+
+			foreach (MarkdownElement E in this.Children)
+				await E.GenerateXamarinForms(Output, State);
+
+			State.Subscript = Bak;
 		}
 
 		/// <summary>
@@ -119,8 +125,30 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			}
 		}
 
-		private const string nrmScriptLetters = "0123456789+-=()aeoxhklmnpst";
-		private const string subScriptLetters = "₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₒₓₕₖₗₘₙₚₛₜ";
+		/// <summary>
+		/// Converts a string to subscript (as far as it goes).
+		/// </summary>
+		/// <param name="s">String</param>
+		/// <returns>String with subscript characters.</returns>
+		public static string ToSubscript(string s)
+		{
+			StringBuilder sb = new StringBuilder();
+			int i;
+
+			foreach (char ch in s)
+			{
+				i = nrmScriptLetters.IndexOf(ch);
+				if (i < 0)
+					sb.Append(ch);
+				else
+					sb.Append(subScriptLetters[i]);
+			}
+
+			return sb.ToString();
+		}
+
+		private const string nrmScriptLetters = "0123456789+-=()aeoxhklmnpstijruv";
+		private const string subScriptLetters = "₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₒₓₕₖₗₘₙₚₛₜᵢⱼᵣᵤᵥ";
 
 		/// <summary>
 		/// If the element is an inline span element.

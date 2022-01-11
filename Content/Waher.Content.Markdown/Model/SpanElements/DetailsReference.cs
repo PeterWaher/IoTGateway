@@ -26,7 +26,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override async Task GenerateHTML(StringBuilder Output)
 		{
-			if (this.Document.Detail != null)
+			if (!(this.Document.Detail is null))
 				await this.Document.Detail.GenerateHTML(Output, true);
 			else
 				await base.GenerateHTML(Output);
@@ -49,7 +49,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override async Task GeneratePlainText(StringBuilder Output)
 		{
-			if (this.Document.Detail != null)
+			if (!(this.Document.Detail is null))
 				await this.Document.Detail.GeneratePlainText(Output);
 			else
 				await base.GeneratePlainText(Output);
@@ -62,7 +62,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
-			if (this.Document.Detail != null)
+			if (!(this.Document.Detail is null))
 				await this.Document.Detail.GenerateXAML(Output, false);
 			else
 				await base.GenerateXAML(Output, TextAlignment);
@@ -72,13 +72,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
-			if (this.Document.Detail != null)
+			if (!(this.Document.Detail is null))
 				await this.Document.Detail.GenerateXamarinForms(Output, false);
 			else
-				await base.GenerateXamarinForms(Output, TextAlignment);
+				await base.GenerateXamarinForms(Output, State);
 		}
 
 		/// <summary>

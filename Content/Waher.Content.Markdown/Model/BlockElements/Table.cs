@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -46,49 +47,50 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <summary>
 		/// Headers in table.
 		/// </summary>
-		public MarkdownElement[][] Headers
-		{
-			get { return this.headers; }
-		}
+		public MarkdownElement[][] Headers => this.headers;
 
 		/// <summary>
 		/// Rows in table.
 		/// </summary>
-		public MarkdownElement[][] Rows
-		{
-			get { return this.rows; }
-		}
+		public MarkdownElement[][] Rows => this.rows;
 
 		/// <summary>
 		/// Table cell alignments.
 		/// </summary>
-		public TextAlignment[] Alignments
-		{
-			get { return this.alignments; }
-		}
+		public TextAlignment[] Alignments => this.alignments;
 
 		/// <summary>
 		/// Table caption.
 		/// </summary>
-		public string Caption
-		{
-			get { return this.caption; }
-		}
+		public string Caption => this.caption;
 
 		/// <summary>
 		/// ID of table.
 		/// </summary>
-		public string Id
-		{
-			get { return this.id; }
-		}
+		public string Id => this.id;
 
 		/// <summary>
 		/// Number of columns.
 		/// </summary>
-		public int Columns
+		public int Columns => this.columns;
+
+		/// <summary>
+		/// Any children of the element.
+		/// </summary>
+		public override IEnumerable<MarkdownElement> Children
 		{
-			get { return this.columns; }
+			get
+			{
+				List<MarkdownElement> Result = new List<MarkdownElement>();
+
+				foreach (MarkdownElement[] Row in this.headers)
+					Result.AddRange(Row);
+
+				foreach (MarkdownElement[] Row in this.rows)
+					Result.AddRange(Row);
+
+				return Result;
+			}
 		}
 
 		/// <summary>
@@ -501,8 +503,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// Generates Xamarin.Forms XAML for the markdown element.
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		public override async Task GenerateXamarinForms(XmlWriter Output, TextAlignment TextAlignment)
+		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
+		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
 			XamlSettings Settings = this.Document.Settings.XamlSettings;
 			int Column;
@@ -597,18 +599,13 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				{
 					Paragraph.GenerateXamarinFormsContentView(Output, TextAlignment, Settings.TableCellPadding);
 
-					Output.WriteStartElement("Label");
-					Output.WriteAttributeString("LineBreakMode", "WordWrap");
-					Output.WriteAttributeString("TextType", "Html");
+					XamarinRenderingState State = new XamarinRenderingState()
+					{
+						Bold = Bold
+					};
 
-					if (Bold)
-						Output.WriteAttributeString("FontAttributes", "Bold");
+					await Paragraph.GenerateXamarinFormsLabel(Output, E, true, State);
 
-					StringBuilder Html = new StringBuilder();
-					await E.GenerateHTML(Html);
-					Output.WriteCData(Html.ToString());
-
-					Output.WriteEndElement();	// Label
 					Output.WriteEndElement();	// Paragraph
 				}
 				else
@@ -617,7 +614,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					Output.WriteAttributeString("Padding", Settings.TableCellPadding);
 
 					Output.WriteStartElement("StackLayout");
-					await E.GenerateXamarinForms(Output, TextAlignment);
+					await E.GenerateXamarinForms(Output, new XamarinRenderingState());
 					Output.WriteEndElement();	// StackLayout
 					
 					Output.WriteEndElement();   // ContentView
@@ -647,7 +644,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			{
 				foreach (MarkdownElement E in Row)
 				{
-					if (E != null && !E.ForEach(Callback, State))
+					if (!(E is null) && !E.ForEach(Callback, State))
 						return false;
 				}
 			}
@@ -656,7 +653,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			{
 				foreach (MarkdownElement E in Row)
 				{
-					if (E != null && !E.ForEach(Callback, State))
+					if (!(E is null) && !E.ForEach(Callback, State))
 						return false;
 				}
 			}

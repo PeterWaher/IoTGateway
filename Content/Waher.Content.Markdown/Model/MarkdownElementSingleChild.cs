@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -31,6 +32,11 @@ namespace Waher.Content.Markdown.Model
 		/// Child element.
 		/// </summary>
 		public MarkdownElement Child => this.child;
+
+		/// <summary>
+		/// Any children of the element.
+		/// </summary>
+		public override IEnumerable<MarkdownElement> Children => new MarkdownElement[] { this.child };
 
 		/// <summary>
 		/// Creates an object of the same type, and meta-data, as the current object,
@@ -72,7 +78,7 @@ namespace Waher.Content.Markdown.Model
 			if (!Callback(this, State))
 				return false;
 
-			if (this.child != null && !this.child.ForEach(Callback, State))
+			if (!(this.child is null) && !this.child.ForEach(Callback, State))
 				return false;
 
 			return true;

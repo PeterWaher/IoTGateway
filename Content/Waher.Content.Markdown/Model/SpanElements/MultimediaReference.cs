@@ -95,7 +95,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			if (!(Multimedia is null))
 			{
-				await Multimedia.MultimediaHandler.GenerateXamarinForms(Output, State.TextAlignment, Multimedia.Items, this.Children,
+				await Multimedia.MultimediaHandler.GenerateXamarinForms(Output, State, Multimedia.Items, this.Children,
 					this.aloneInParagraph, this.Document);
 			}
 		}

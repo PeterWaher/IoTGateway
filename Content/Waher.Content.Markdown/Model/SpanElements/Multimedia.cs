@@ -239,7 +239,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="State">Xamarin Forms XAML Rendering State.</param>
 		public override Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
-			return this.MultimediaHandler.GenerateXamarinForms(Output, State.TextAlignment, this.items, this.Children, this.aloneInParagraph, this.Document);
+			return this.MultimediaHandler.GenerateXamarinForms(Output, State, this.items, this.Children, this.aloneInParagraph, this.Document);
 		}
 
 		/// <summary>

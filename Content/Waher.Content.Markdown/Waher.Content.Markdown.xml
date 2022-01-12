@@ -3655,12 +3655,12 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
-        <member name="M:Waher.Content.Markdown.Model.IMultimediaContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+        <member name="M:Waher.Content.Markdown.Model.IMultimediaContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.XamarinRenderingState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
-            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="State">Xamarin Forms XAML Rendering State.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -4108,12 +4108,12 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
-        <member name="M:Waher.Content.Markdown.Model.MultimediaContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+        <member name="M:Waher.Content.Markdown.Model.MultimediaContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.XamarinRenderingState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
-            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="State">Xamarin Forms XAML Rendering State.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -4232,12 +4232,12 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
-        <member name="M:Waher.Content.Markdown.Model.Multimedia.AudioContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.AudioContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.XamarinRenderingState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
-            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="State">Xamarin Forms XAML Rendering State.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -4287,12 +4287,12 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
-        <member name="M:Waher.Content.Markdown.Model.Multimedia.ImageContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.ImageContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.XamarinRenderingState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
-            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="State">Xamarin Forms XAML Rendering State.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -4359,12 +4359,12 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
-        <member name="M:Waher.Content.Markdown.Model.Multimedia.MarkdownContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.MarkdownContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.XamarinRenderingState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
-            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="State">Xamarin Forms XAML Rendering State.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -4424,12 +4424,12 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
-        <member name="M:Waher.Content.Markdown.Model.Multimedia.TableOfContents.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.TableOfContents.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.XamarinRenderingState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
-            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="State">Xamarin Forms XAML Rendering State.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -4479,12 +4479,12 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
-        <member name="M:Waher.Content.Markdown.Model.Multimedia.VideoContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.VideoContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.XamarinRenderingState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
-            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="State">Xamarin Forms XAML Rendering State.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -4534,12 +4534,12 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
-        <member name="M:Waher.Content.Markdown.Model.Multimedia.WebPageContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.WebPageContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.XamarinRenderingState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
-            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="State">Xamarin Forms XAML Rendering State.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -4589,12 +4589,12 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
-        <member name="M:Waher.Content.Markdown.Model.Multimedia.YouTubeContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.YouTubeContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.XamarinRenderingState,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates Xamarin.Forms XAML for the markdown element.
             </summary>
             <param name="Output">XAML will be output here.</param>
-            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="State">Xamarin Forms XAML Rendering State.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>

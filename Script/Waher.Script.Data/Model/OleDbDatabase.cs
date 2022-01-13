@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Data.Common;
 using System.Data.OleDb;
 using System.Threading.Tasks;
@@ -41,10 +42,11 @@ namespace Waher.Script.Data.Model
 		{
 			using (OleDbCommand Command = this.connection.CreateCommand())
 			{
+				Command.CommandType = CommandType.Text;
 				Command.CommandText = Statement;
 				DbDataReader Reader = await Command.ExecuteReaderAsync();
 
-				return await MsSqlDatabase.ParseAndCloseReader(Reader);
+				return await Reader.ParseAndClose();
 			}
 		}
 	}

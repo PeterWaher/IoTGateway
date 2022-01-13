@@ -1581,6 +1581,25 @@ The following functions can be used to create fractal images based on Iterated F
 
 **Note**: To close a connection, destroy the variable containing the connection using the Destroy or Delete function.
 
+##### Stored Procedures
+
+Stored Procedures in the database are available directly by reference on the connection object. If you have a stored procedure in the
+database named `proc` that takes two arguments `P1` and `P2`, and a connection that you have stored in `db`, you call the procedure
+as follows:
+
+```
+db.proc(P1,P2)
+```
+
+You can also create a lambda expression to the stored procedure, and store it in a variable for reference:
+
+```
+f:=db.proc;
+f(P1,P2)
+```
+
+This syntax is available for all database conncetions that support stored procedures.
+
 #### External Database-related functions (Waher.Script.Data.MySQL)
 
 | Function | Description | Example |

@@ -1,9 +1,12 @@
 ﻿using System;
-using System.Data.Common;
+using System.Collections.Generic;
+using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 using MySqlConnector;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Data.Model;
+using Waher.Script.Model;
 
 namespace Waher.Script.Data.MySQL.Model
 {
@@ -12,6 +15,8 @@ namespace Waher.Script.Data.MySQL.Model
 	/// </summary>
 	public class MySqlDatabase : IDatabaseConnection
 	{
+		private readonly Dictionary<string, StoredProcedure> procedures = new Dictionary<string, StoredProcedure>();
+		private readonly SemaphoreSlim synchObject = new SemaphoreSlim(1);
 		private MySqlConnection connection;
 
 		/// <summary>
@@ -42,11 +47,61 @@ namespace Waher.Script.Data.MySQL.Model
 		{
 			using (MySqlCommand Command = this.connection.CreateCommand())
 			{
+				Command.CommandType = CommandType.Text;
 				Command.CommandText = Statement;
 				MySqlDataReader Reader = await Command.ExecuteReaderAsync();
-				
-				return await MsSqlDatabase.ParseAndCloseReader(Reader);
+
+				return await Reader.ParseAndClose();
 			}
 		}
+
+		/// <summary>
+		/// Gets a Schema table, given its collection name. 
+		/// For a list of collections: https://mysqlconnector.net/overview/schema-collections/
+		/// </summary>
+		/// <param name="Name">Schema collection</param>
+		/// <returns>Schema table, as a matrix</returns>
+		public async Task<IElement> GetSchema(string Name)
+		{
+			DataTable Table = await this.connection.GetSchemaAsync(Name);
+			return Table.ToMatrix();
+		}
+
+		/// <summary>
+		/// Creates a lambda expression for accessing a stored procedure.
+		/// </summary>
+		/// <param name="Name">Name of stored procedure.</param>
+		/// <returns>Lambda expression.</returns>
+		public async Task<ILambdaExpression> GetProcedure(string Name)
+		{
+			await this.synchObject.WaitAsync();
+			try
+			{
+				if (this.procedures.TryGetValue(Name, out StoredProcedure Result))
+					return Result;
+
+				MySqlCommand Command = this.connection.CreateCommand();
+				Command.CommandType = CommandType.StoredProcedure;
+				Command.CommandText = Name;
+
+				await MySqlCommandBuilder.DeriveParametersAsync(Command);
+
+				Result = new StoredProcedure(Command);
+				this.procedures[Name] = Result;
+
+				return new StoredProcedure(Command);
+			}
+			finally
+			{
+				this.synchObject.Release();
+			}
+		}
+
+		/// <summary>
+		/// Creates a lambda expression for accessing a stored procedure.
+		/// </summary>
+		/// <param name="Name">Name of stored procedure.</param>
+		/// <returns>Lambda expression.</returns>
+		public Task<ILambdaExpression> this[string Name] => this.GetProcedure(Name);
 	}
 }

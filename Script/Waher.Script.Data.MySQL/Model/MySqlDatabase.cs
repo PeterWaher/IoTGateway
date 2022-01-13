@@ -82,7 +82,7 @@ namespace Waher.Script.Data.MySQL.Model
 
 				MySqlCommand Command = this.connection.CreateCommand();
 				Command.CommandType = CommandType.StoredProcedure;
-				Command.CommandText = Name;
+				Command.CommandText = this.connection.Database + "." + Name;
 
 				await MySqlCommandBuilder.DeriveParametersAsync(Command);
 

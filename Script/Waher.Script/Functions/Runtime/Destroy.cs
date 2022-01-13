@@ -29,26 +29,17 @@ namespace Waher.Script.Functions.Runtime
         /// <summary>
         /// Name of variable.
         /// </summary>
-        public string VariableName
-        {
-            get { return this.variableName; }
-        }
+        public string VariableName => this.variableName;
 
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "destroy"; }
-        }
+        public override string FunctionName => "destroy";
 
         /// <summary>
         /// Optional aliases. If there are no aliases for the function, null is returned.
         /// </summary>
-        public override string[] Aliases
-        {
-            get { return new string[] { "delete" }; }
-        }
+        public override string[] Aliases => new string[] { "delete" };
 
         /// <summary>
         /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.

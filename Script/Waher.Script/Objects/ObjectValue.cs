@@ -8,7 +8,7 @@ namespace Waher.Script.Objects
     /// <summary>
     /// Object value.
     /// </summary>
-    public sealed class ObjectValue : Element
+    public sealed class ObjectValue : Element, IDisposable
     {
         private static readonly ObjectValues associatedSet = new ObjectValues();
 
@@ -118,5 +118,14 @@ namespace Waher.Script.Objects
 					return Expression.TryConvert(this.value, DesiredType, out Value);
 			}
 		}
-    }
+
+        /// <summary>
+        /// <see cref="IDisposable.Dispose"/>
+        /// </summary>
+		public void Dispose()
+		{
+            if (this.value is IDisposable D)
+                D.Dispose();
+		}
+	}
 }

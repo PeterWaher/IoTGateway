@@ -12866,6 +12866,11 @@
             <param name="Value">Converted value.</param>
             <returns>If conversion was possible.</returns>
         </member>
+        <member name="M:Waher.Script.Objects.ObjectValue.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
         <member name="T:Waher.Script.Objects.ObjectValues">
             <summary>
             Set of object values.

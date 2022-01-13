@@ -1570,6 +1570,25 @@ The following functions can be used to create fractal images based on Iterated F
 | `TwintrianVariation`	  |							   |					   |
 | `WavesVariation`		  |							   |					   |
 
+#### External Database-related functions (Waher.Script.Data)
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `ConnectMsSql(ConnectionString[,UserName,Password])` | Connects to an external Microsoft SQL Server database usig a connection string, and optionally providing credentials. | `db:=ConnectMsSql(cs,UserName,Password)` |
+| `ConnectOdbc(ConnectionString[,UserName,Password])`  | Connects to an external ODBC database usig a connection string, and optionally providing credentials. | `db:=ConnectOdbc(cs,UserName,Password)` |
+| `ConnectOleDb(ConnectionString[,UserName,Password])` | Connects to an external OLE DB database usig a connection string, and optionally providing credentials. | `db:=ConnectOleDb(cs,UserName,Password)` |
+| `SQL(Database,Statement)`                            | Executes an SQL statement given by the string `Statement` on the database connection provided in `Database`. | `SQL(db,"select * from country")` |
+
+**Note**: To close a connection, destroy the variable containing the connection using the Destroy or Delete function.
+
+#### External Database-related functions (Waher.Script.Data.MySQL)
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `ConnectMySql(ConnectionString[,UserName,Password])` | Connects to an external MySQL Server database usig a connection string, and optionally providing credentials. | `db:=ConnectMySql(cs,UserName,Password)` |
+
+**Note**: To close a connection, destroy the variable containing the connection using the Destroy or Delete function.
+
 #### Networking-related functions (Waher.Script.Networking)
 
 The following functions are available in the `Waher.Script.Networking` library.

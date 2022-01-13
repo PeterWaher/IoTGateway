@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -26,7 +27,14 @@ namespace Waher.Script.Operators.Vectors
 		public VectorIndex(ScriptNode Left, ScriptNode Right, bool NullCheck, int Start, int Length, Expression Expression)
 			: base(Left, Right, NullCheck, Start, Length, Expression)
 		{
+			this.isAsync = true;
 		}
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -35,13 +43,23 @@ namespace Waher.Script.Operators.Vectors
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
+			return this.EvaluateAsync(Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
 			IElement Left = this.left.Evaluate(Variables);
 			if (this.nullCheck && Left.AssociatedObjectValue is null)
 				return Left;
 
 			IElement Right = this.right.Evaluate(Variables);
 
-			return EvaluateIndex(Left, Right, this.nullCheck, this);
+			return await EvaluateIndex(Left, Right, this.nullCheck, this);
 		}
 
 		/// <summary>
@@ -52,7 +70,7 @@ namespace Waher.Script.Operators.Vectors
 		/// <param name="NullCheck">If null should be returned if left operand is null.</param>
 		/// <param name="Node">Node performing the operation.</param>
 		/// <returns>Result</returns>
-		public static IElement EvaluateIndex(IElement Vector, IElement Index, bool NullCheck, ScriptNode Node)
+		public static async Task<IElement> EvaluateIndex(IElement Vector, IElement Index, bool NullCheck, ScriptNode Node)
 		{
 			if (Vector is IVector V)
 				return EvaluateIndex(V, Index, Node);
@@ -71,14 +89,14 @@ namespace Waher.Script.Operators.Vectors
 				if (!TryGetIndexProperty(T, out PropertyInfo ItemProperty, out ParameterInfo[] Parameters))
 					throw new ScriptRuntimeException("The index operator operates on vectors.", Node);
 
-				return EvaluateIndex(Object, T, ItemProperty, Parameters, Index, Node);
+				return await EvaluateIndex(Object, T, ItemProperty, Parameters, Index, Node);
 			}
 			else
 			{
 				LinkedList<IElement> Elements = new LinkedList<IElement>();
 
 				foreach (IElement E in Vector.ChildElements)
-					Elements.AddLast(EvaluateIndex(E, Index, NullCheck, Node));
+					Elements.AddLast(await EvaluateIndex(E, Index, NullCheck, Node));
 
 				return Vector.Encapsulate(Elements, Node);
 			}
@@ -126,12 +144,12 @@ namespace Waher.Script.Operators.Vectors
 
 		private static readonly Dictionary<Type, KeyValuePair<PropertyInfo, ParameterInfo[]>> indexProperties = new Dictionary<Type, KeyValuePair<PropertyInfo, ParameterInfo[]>>();
 
-		private static IElement EvaluateIndex(object Object, Type T, PropertyInfo ItemProperty, ParameterInfo[] Parameters,
+		private static async Task<IElement> EvaluateIndex(object Object, Type T, PropertyInfo ItemProperty, ParameterInfo[] Parameters,
 			IElement Index, ScriptNode Node)
 		{
 			if (Index.TryConvertTo(Parameters[0].ParameterType, out object IndexValue))
 			{
-				object Result = ItemProperty.GetValue(Object, new object[] { IndexValue });
+				object Result = await WaitPossibleTask(ItemProperty.GetValue(Object, new object[] { IndexValue }));
 				return Expression.Encapsulate(Result);
 			}
 
@@ -141,7 +159,7 @@ namespace Waher.Script.Operators.Vectors
 			LinkedList<IElement> Elements = new LinkedList<IElement>();
 
 			foreach (IElement E in Index.ChildElements)
-				Elements.AddLast(EvaluateIndex(Object, T, ItemProperty, Parameters, E, Node));
+				Elements.AddLast(await EvaluateIndex(Object, T, ItemProperty, Parameters, E, Node));
 
 			return Index.Encapsulate(Elements, Node);
 		}

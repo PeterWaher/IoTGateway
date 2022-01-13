@@ -67,16 +67,8 @@ namespace Waher.Script.Persistence.SQL.Sources
 			}
 
 			object Obj = MI.Invoke(null, FindParameters);
-			if (!(Obj is Task Task))
-				throw new ScriptRuntimeException("Unexpected response.", Node);
+			Obj = await ScriptNode.WaitPossibleTask(Obj);
 
-			await Task;
-
-			PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
-			if (PI is null)
-				throw new ScriptRuntimeException("Unexpected response.", Node);
-
-			Obj = PI.GetValue(Task);
 			if (!(Obj is IEnumerable Enumerable))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
 
@@ -175,19 +167,11 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 			object[] FindParameters = new object[] { Offset, Top, Filter, Convert(Order) };
 			object Obj = (Lazy ? DeleteLazyMethod : FindDeleteMethod).MakeGenericMethod(this.type).Invoke(null, FindParameters);
-			if (!(Obj is Task Task))
-				throw new ScriptRuntimeException("Unexpected response.", Node);
-
-			await Task;
-
+			
 			if (Lazy)
 				return null;
 
-			PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
-			if (PI is null)
-				throw new ScriptRuntimeException("Unexpected response.", Node);
-
-			Obj = PI.GetValue(Task);
+			Obj = await ScriptNode.WaitPossibleTask(Obj);
 			if (!(Obj is IEnumerable<object> Objects))
 				throw new ScriptRuntimeException("Unexpected response.", Node);
 

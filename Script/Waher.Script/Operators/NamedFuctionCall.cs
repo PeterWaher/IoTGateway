@@ -16,7 +16,6 @@ namespace Waher.Script.Operators
 		private readonly ScriptNode[] arguments;
 		private readonly int nrArguments;
 		private readonly bool nullCheck;
-		private bool isAsync;
 
 		/// <summary>
 		/// Named function call operator
@@ -34,22 +33,6 @@ namespace Waher.Script.Operators
 			this.arguments = Arguments;
 			this.nullCheck = NullCheck;
 			this.nrArguments = this.arguments.Length;
-
-			this.CalcIsAsync();
-		}
-
-		private void CalcIsAsync()
-		{
-			this.isAsync = false;
-
-			for (int i = 0; i < this.nrArguments; i++)
-			{
-				if (this.arguments[i]?.IsAsynchronous ?? false)
-				{
-					this.isAsync = true;
-					break;
-				}
-			}
 		}
 
 		/// <summary>
@@ -75,24 +58,10 @@ namespace Waher.Script.Operators
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			string s = this.nrArguments.ToString();
-
-			if ((!Variables.TryGetVariable(this.functionName + " " + s, out Variable v) &&
-			   !Variables.TryGetVariable(this.functionName, out v)) ||
-			   (!(v.ValueElement is ILambdaExpression f)))
-			{
-				if (this.nullCheck)
-					return ObjectValue.Null;
-				else if (this.nrArguments == 1)
-					throw new ScriptRuntimeException("No function defined having 1 argument named '" + this.functionName + "' found.", this);
-				else
-					throw new ScriptRuntimeException("No function defined having " + s + " arguments named '" + this.functionName + "' found.", this);
-			}
-
-			return this.Evaluate(f, Variables);
+			return this.EvaluateAsync(Variables).Result;
 		}
 
-		private IElement Evaluate(ILambdaExpression f, Variables Variables)
+		private async Task<IElement> EvaluateAsync(ILambdaExpression f, Variables Variables)
 		{ 
 			IElement[] Arg = new IElement[this.nrArguments];
 			ScriptNode Node;
@@ -107,7 +76,10 @@ namespace Waher.Script.Operators
 					Arg[i] = Node.Evaluate(Variables);
 			}
 
-			return f.Evaluate(Arg, Variables);
+			if (f.IsAsynchronous)
+				return await f.EvaluateAsync(Arg, Variables);
+			else
+				return f.Evaluate(Arg, Variables);
 		}
 
 		/// <summary>
@@ -121,7 +93,7 @@ namespace Waher.Script.Operators
 
 			if ((!Variables.TryGetVariable(this.functionName + " " + s, out Variable v) &&
 			   !Variables.TryGetVariable(this.functionName, out v)) ||
-			   (!(v.ValueElement is ILambdaExpression f)))
+			   (!(v.ValueObject is ILambdaExpression f)))
 			{
 				if (this.nullCheck)
 					return ObjectValue.Null;
@@ -130,9 +102,6 @@ namespace Waher.Script.Operators
 				else
 					throw new ScriptRuntimeException("No function defined having " + s + " arguments named '" + this.functionName + "' found.", this);
 			}
-
-			if (!this.isAsync && !f.IsAsynchronous)
-				return this.Evaluate(f, Variables);
 
 			IElement[] Arg = new IElement[this.nrArguments];
 			ScriptNode Node;
@@ -168,7 +137,6 @@ namespace Waher.Script.Operators
 			}
 
 			ScriptNode Node;
-			bool RecalcIsAsync = false;
 
 			for (i = 0; i < this.nrArguments; i++)
 			{
@@ -177,23 +145,12 @@ namespace Waher.Script.Operators
 				{
 					bool b = !Callback(Node, out ScriptNode NewNode, State);
 					if (!(NewNode is null))
-					{
 						this.arguments[i] = NewNode;
-						RecalcIsAsync = true;
-					}
 
 					if (b)
-					{
-						if (RecalcIsAsync)
-							this.CalcIsAsync();
-
 						return false;
-					}
 				}
 			}
-
-			if (RecalcIsAsync)
-				this.CalcIsAsync();
 
 			if (!DepthFirst)
 			{

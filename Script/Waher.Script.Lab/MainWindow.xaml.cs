@@ -300,8 +300,6 @@ namespace Waher.Script.Lab
 				});
 
 				return await Result.Task;
-
-				return null;
 			}
 			else
 				return await this.AddTextBlock(ScriptBlock, Ans.ToString(), Colors.Red, FontWeights.Normal, ResultBlock);

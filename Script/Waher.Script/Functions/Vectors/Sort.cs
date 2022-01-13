@@ -292,7 +292,7 @@ namespace Waher.Script.Functions.Vectors
 
 						Comparers[i - 1] = new PropertyOrder(this, s, Sign);
 					}
-					else if (Element is ILambdaExpression Lambda)
+					else if (Element.AssociatedObjectValue is ILambdaExpression Lambda)
 					{
 						if (Lambda.NrArguments != 2)
 							throw new ScriptRuntimeException("Lambda expressions must take exactly two parameters.", this);

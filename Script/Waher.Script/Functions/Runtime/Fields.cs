@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -29,10 +30,13 @@ namespace Waher.Script.Functions.Runtime
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "fields"; }
-		}
+		public override string FunctionName => "fields";
+
+		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -41,7 +45,17 @@ namespace Waher.Script.Functions.Runtime
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			IElement E = this.Argument.Evaluate(Variables);
+			return this.EvaluateAsync(Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			IElement E = await this.Argument.EvaluateAsync(Variables);
 			object Obj = E.AssociatedObjectValue;
 			List<IElement> Elements = new List<IElement>();
 
@@ -59,7 +73,7 @@ namespace Waher.Script.Functions.Runtime
 				foreach (FieldInfo FI in T.GetRuntimeFields())
 				{
 					Elements.Add(new StringValue(FI.Name));
-					Elements.Add(Expression.Encapsulate(FI.GetValue(Obj)));
+					Elements.Add(Expression.Encapsulate(await WaitPossibleTask(FI.GetValue(Obj))));
 				}
 
 				ObjectMatrix M = new ObjectMatrix(Elements.Count / 2, 2, Elements)

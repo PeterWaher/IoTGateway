@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Reflection;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Model;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects;
+using System.Threading.Tasks;
 
 namespace Waher.Script.Functions.Runtime.PropertyEnumerators
 {
@@ -25,7 +27,7 @@ namespace Waher.Script.Functions.Runtime.PropertyEnumerators
 		/// </summary>
 		/// <param name="Object">Object</param>
 		/// <returns>Property enumeration as a script element.</returns>
-		public IElement EnumerateProperties(object Object)
+		public async Task<IElement> EnumerateProperties(object Object)
 		{
 			List<IElement> Elements = new List<IElement>();
 			Type T = Object.GetType();
@@ -36,7 +38,7 @@ namespace Waher.Script.Functions.Runtime.PropertyEnumerators
 					continue;
 
 				Elements.Add(new StringValue(PI.Name));
-				Elements.Add(Expression.Encapsulate(PI.GetValue(Object)));
+				Elements.Add(Expression.Encapsulate(await ScriptNode.WaitPossibleTask(PI.GetValue(Object))));
 			}
 
 			ObjectMatrix M = new ObjectMatrix(Elements.Count / 2, 2, Elements)

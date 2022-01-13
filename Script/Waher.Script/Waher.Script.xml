@@ -5521,7 +5521,20 @@
             Name of the function
             </summary>
         </member>
+        <member name="P:Waher.Script.Functions.Runtime.Fields.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Functions.Runtime.Fields.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Runtime.Fields.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -5790,7 +5803,20 @@
             Name of the function
             </summary>
         </member>
+        <member name="P:Waher.Script.Functions.Runtime.Properties.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Functions.Runtime.Properties.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Runtime.Properties.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -10439,6 +10465,21 @@
             </summary>
             <param name="Value">Element value.</param>
             <returns>Boolean, if successful.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.ScriptNode.WaitPossibleTask(System.Object)">
+            <summary>
+            Waits for any asynchronous process to terminate.
+            </summary>
+            <param name="Result">Result, possibly asynchronous result.</param>
+            <returns>Finished result</returns>
+        </member>
+        <member name="M:Waher.Script.Model.ScriptNode.UnnestPossibleTaskSync(System.Object)">
+            <summary>
+            Checks if <paramref name="Result"/> is an asynchronous results. If so, blocks the current thread until the result
+            is completed, and returns the completed result instead.
+            </summary>
+            <param name="Result">Result</param>
+            <returns>Finished result.</returns>
         </member>
         <member name="T:Waher.Script.Model.ScriptParser">
             <summary>
@@ -18142,7 +18183,25 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Membership.As.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Membership.As.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator on scalar operands.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.As.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the operator on scalar operands.
             </summary>
@@ -18172,7 +18231,20 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
+        <member name="P:Waher.Script.Operators.Membership.DynamicMember.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Operators.Membership.DynamicMember.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.DynamicMember.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -18259,7 +18331,25 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Membership.Is.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Membership.Is.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator on scalar operands.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.Is.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the operator on scalar operands.
             </summary>
@@ -18294,7 +18384,21 @@
             Name of method.
             </summary>
         </member>
+        <member name="P:Waher.Script.Operators.Membership.NamedMember.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Operators.Membership.NamedMember.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Operand">Operand.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.NamedMember.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -18360,13 +18464,6 @@
             <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
-        </member>
-        <member name="M:Waher.Script.Operators.Membership.NamedMethodCall.WaitPossibleTask(System.Object)">
-            <summary>
-            Waits for any asynchronous process to terminate.
-            </summary>
-            <param name="Result">Result, possibly asynchronous result.</param>
-            <returns>Finished result</returns>
         </member>
         <member name="M:Waher.Script.Operators.Membership.NamedMethodCall.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
             <summary>
@@ -19197,7 +19294,20 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
+        <member name="P:Waher.Script.Operators.Vectors.VectorIndex.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
         <member name="M:Waher.Script.Operators.Vectors.VectorIndex.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Vectors.VectorIndex.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>

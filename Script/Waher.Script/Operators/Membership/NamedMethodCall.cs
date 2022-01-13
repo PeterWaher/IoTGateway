@@ -6,6 +6,8 @@ using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using System.Threading.Tasks;
+using Waher.Runtime.Inventory;
+using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Operators.Membership
 {
@@ -28,13 +30,14 @@ namespace Waher.Script.Operators.Membership
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public NamedMethodCall(ScriptNode Operand, string Name, ScriptNode[] Parameters, bool NullCheck, 
+		public NamedMethodCall(ScriptNode Operand, string Name, ScriptNode[] Parameters, bool NullCheck,
 			int Start, int Length, Expression Expression)
 			: base(Operand, NullCheck, Start, Length, Expression)
 		{
 			this.name = Name;
 			this.parameters = Parameters;
 			this.nrParameters = Parameters.Length;
+			this.isAsync = true;
 		}
 
 		/// <summary>
@@ -99,6 +102,7 @@ namespace Waher.Script.Operators.Membership
 				if (this.lastType != T)
 				{
 					this.method = null;
+					this.methodType = MethodType.Method;
 					this.methods = null;
 					this.byReference = null;
 					this.lastType = T;
@@ -108,11 +112,12 @@ namespace Waher.Script.Operators.Membership
 				for (i = 0; i < this.nrParameters; i++)
 					Arguments[i] = this.parameters[i].Evaluate(Variables);
 
-				if (!(this.method is null))
+				if (!(this.method is null) && this.methodType == MethodType.Method)
 				{
 					if (this.methodParametersTypes.Length != this.nrParameters)
 					{
 						this.method = null;
+						this.methodType = MethodType.Method;
 						this.methods = null;
 						this.byReference = null;
 					}
@@ -146,6 +151,7 @@ namespace Waher.Script.Operators.Membership
 						if (i < this.methodParametersTypes.Length)
 						{
 							this.method = null;
+							this.methodType = MethodType.Method;
 							this.methods = null;
 							this.byReference = null;
 						}
@@ -161,80 +167,84 @@ namespace Waher.Script.Operators.Membership
 					ParameterValues = null;
 					Extend = null;
 
-					foreach (KeyValuePair<MethodInfo, ParameterInfo[]> P in this.methods)
+					foreach (MethodRec Rec in this.methods)
 					{
 						DoExtend = false;
 
 						if (Instance is null)
 						{
-							if (!P.Key.IsStatic)
+							if (!Rec.Method.IsStatic)
 								continue;
 						}
 						else
 						{
-							if (P.Key.IsStatic)
+							if (Rec.Method.IsStatic)
 								continue;
 						}
 
-						for (i = 0; i < this.nrParameters; i++)
+						if (Rec.MethodType == MethodType.Method)
 						{
-							PT = P.Value[i].ParameterType;
-
-							if (PT.IsByRef && Arguments[i].TryConvertTo(PT.GetElementType(), out Value))
+							for (i = 0; i < this.nrParameters; i++)
 							{
-								if (ParameterValues is null)
+								PT = Rec.Parameters[i].ParameterType;
+
+								if (PT.IsByRef && Arguments[i].TryConvertTo(PT.GetElementType(), out Value))
 								{
-									Extend = new bool[this.nrParameters];
-									ParameterValues = new object[this.nrParameters];
+									if (ParameterValues is null)
+									{
+										Extend = new bool[this.nrParameters];
+										ParameterValues = new object[this.nrParameters];
+									}
+
+									Extend[i] = false;
+									ParameterValues[i] = Value;
+
+									if (ByRef is null)
+										ByRef = new List<KeyValuePair<string, int>>();
+
+									if (this.parameters[i] is VariableReference Ref)
+										ByRef.Add(new KeyValuePair<string, int>(Ref.VariableName, i));
+									else
+										ByRef.Add(new KeyValuePair<string, int>(null, i));
 								}
+								else if (Arguments[i].TryConvertTo(PT, out Value))
+								{
+									if (ParameterValues is null)
+									{
+										Extend = new bool[this.nrParameters];
+										ParameterValues = new object[this.nrParameters];
+									}
 
-								Extend[i] = false;
-								ParameterValues[i] = Value;
-
-								if (ByRef is null)
-									ByRef = new List<KeyValuePair<string, int>>();
-
-								if (this.parameters[i] is VariableReference Ref)
-									ByRef.Add(new KeyValuePair<string, int>(Ref.VariableName, i));
+									Extend[i] = false;
+									ParameterValues[i] = Value;
+								}
 								else
-									ByRef.Add(new KeyValuePair<string, int>(null, i));
-							}
-							else if (Arguments[i].TryConvertTo(PT, out Value))
-							{
-								if (ParameterValues is null)
 								{
-									Extend = new bool[this.nrParameters];
-									ParameterValues = new object[this.nrParameters];
-								}
+									if (Arguments[i].IsScalar)
+										break;
 
-								Extend[i] = false;
-								ParameterValues[i] = Value;
+									if (Extend is null)
+									{
+										Extend = new bool[this.nrParameters];
+										ParameterValues = new object[this.nrParameters];
+									}
+
+									Extend[i] = true;
+									ParameterValues[i] = null;
+									DoExtend = true;
+								}
 							}
-							else
+
+							if (i < this.nrParameters)
 							{
-								if (Arguments[i].IsScalar)
-									break;
-
-								if (Extend is null)
-								{
-									Extend = new bool[this.nrParameters];
-									ParameterValues = new object[this.nrParameters];
-								}
-
-								Extend[i] = true;
-								ParameterValues[i] = null;
-								DoExtend = true;
+								ByRef?.Clear();
+								continue;
 							}
 						}
 
-						if (i < this.nrParameters)
-						{
-							ByRef?.Clear();
-							continue;
-						}
-
-						this.method = P.Key;
-						this.methodParametersTypes = P.Value;
+						this.method = Rec.Method;
+						this.methodType = Rec.MethodType;
+						this.methodParametersTypes = Rec.Parameters;
 						this.methodArguments = ParameterValues;
 						this.methodArgumentExtensions = Extend;
 
@@ -242,6 +252,7 @@ namespace Waher.Script.Operators.Membership
 							this.byReference = ByRef.ToArray();
 						else
 							this.byReference = null;
+
 						break;
 					}
 
@@ -263,55 +274,74 @@ namespace Waher.Script.Operators.Membership
 			if (DoExtend)
 			{
 				if (!(this.byReference is null))
-					throw new ScriptException("Canonical extensions of method calls having reference type arguments not supported.");	// TODO
+					throw new ScriptException("Canonical extensions of method calls having reference type arguments not supported.");   // TODO
 
-				return await this.EvaluateCanonicalAsync(Instance, this.method, this.methodParametersTypes, Arguments,
-					this.methodArguments, this.methodArgumentExtensions);
+				return await this.EvaluateCanonicalAsync(Instance, this.method, this.methodType, this.methodParametersTypes, 
+					Arguments, this.methodArguments, this.methodArgumentExtensions, Variables);
 			}
 			else
 			{
-				Value = this.method.Invoke(Instance, this.methodArguments);
-				Value = await WaitPossibleTask(Value);
-
-				if (!(this.byReference is null))
-				{
-					int j, c = this.byReference.Length;
-					string s;
-
-					for (i = 0; i < c; i++)
-					{
-						j = this.byReference[i].Value;
-						if (string.IsNullOrEmpty(s = this.byReference[i].Key))
-							Operators.PatternMatch.Match(this.parameters[j], Expression.Encapsulate(this.methodArguments[j]), Variables, this);
-						else
-							Variables[s] = this.methodArguments[j];
-					}
-				}
-
+				Value = await this.EvaluateAsync(Instance, this.method, this.methodType, Arguments, this.methodArguments, Variables);
 				return Expression.Encapsulate(Value);
 			}
 		}
 
-		/// <summary>
-		/// Waits for any asynchronous process to terminate.
-		/// </summary>
-		/// <param name="Result">Result, possibly asynchronous result.</param>
-		/// <returns>Finished result</returns>
-		public static async Task<object> WaitPossibleTask(object Result)
+		private async Task<IElement> EvaluateAsync(object Instance, MethodInfo Method, MethodType MethodType,
+			IElement[] Arguments, object[] ArgumentValues, Variables Variables)
 		{
-			if (Result is Task Task)
-			{
-				await Task;
+			object Value;
 
-				PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
-				Result = PI.GetMethod.Invoke(Task, null);
+			switch (MethodType)
+			{
+				case MethodType.Method:
+				default:
+					Value = Method.Invoke(Instance, ArgumentValues);
+					Value = await WaitPossibleTask(Value);
+
+					if (!(this.byReference is null))
+					{
+						int i, j, c = this.byReference.Length;
+						string s;
+
+						for (i = 0; i < c; i++)
+						{
+							j = this.byReference[i].Value;
+							if (string.IsNullOrEmpty(s = this.byReference[i].Key))
+								Operators.PatternMatch.Match(this.parameters[j], Expression.Encapsulate(this.methodArguments[j]), Variables, this);
+							else
+								Variables[s] = this.methodArguments[j];
+						}
+					}
+
+					break;
+
+				case MethodType.LambdaProperty:
+					Value = Method.Invoke(Instance, Types.NoParameters);
+					Value = await WaitPossibleTask(Value);
+
+					if (!(Value is ILambdaExpression LambdaExpression))
+						throw new ScriptRuntimeException("Lambda expression property expected.", this);
+
+					Value = await LambdaExpression.EvaluateAsync(Arguments, Variables);
+					break;
+
+				case MethodType.LambdaIndexProperty:
+					Value = Method.Invoke(Instance, new object[] { this.name });
+					Value = await WaitPossibleTask(Value);
+
+					LambdaExpression = Value as ILambdaExpression;
+					if (LambdaExpression is null)
+						throw new ScriptRuntimeException("Lambda expression property expected.", this);
+
+					Value = await LambdaExpression.EvaluateAsync(Arguments, Variables);
+					break;
 			}
 
-			return Result;
+			return Expression.Encapsulate(Value);
 		}
 
-		private async Task<IElement> EvaluateCanonicalAsync(object Object, MethodInfo Method, ParameterInfo[] ParametersTypes,
-			IElement[] Arguments, object[] ArgumentValues, bool[] Extend)
+		private async Task<IElement> EvaluateCanonicalAsync(object Object, MethodInfo Method, MethodType MethodType,
+			ParameterInfo[] ParametersTypes, IElement[] Arguments, object[] ArgumentValues, bool[] Extend, Variables Variables)
 		{
 			IEnumerator<IElement>[] Enumerators = null;
 			ICollection<IElement> Children;
@@ -347,8 +377,7 @@ namespace Waher.Script.Operators.Membership
 
 			if (First is null)
 			{
-				object Value = Method.Invoke(Object, ArgumentValues);
-				Value = await WaitPossibleTask(Value);
+				object Value = await this.EvaluateAsync(Object, Method, MethodType, Arguments, ArgumentValues, Variables);
 				return Expression.Encapsulate(Value);
 			}
 
@@ -371,7 +400,8 @@ namespace Waher.Script.Operators.Membership
 				if (i < this.nrParameters)
 					break;
 
-				Elements.AddLast(await this.EvaluateCanonicalAsync(Object, Method, ParametersTypes, Arguments, ArgumentValues, Extend));
+				Elements.AddLast(await this.EvaluateCanonicalAsync(Object, Method, MethodType, ParametersTypes, Arguments, 
+					ArgumentValues, Extend, Variables));
 			}
 
 			for (i = 0; i < this.nrParameters; i++)
@@ -383,9 +413,9 @@ namespace Waher.Script.Operators.Membership
 			return First.Encapsulate(Elements, this);
 		}
 
-		private KeyValuePair<MethodInfo, ParameterInfo[]>[] GetMethods(Type Type)
+		private MethodRec[] GetMethods(Type Type)
 		{
-			List<KeyValuePair<MethodInfo, ParameterInfo[]>> Result = new List<KeyValuePair<MethodInfo, ParameterInfo[]>>();
+			List<MethodRec> Result = new List<MethodRec>();
 			ParameterInfo[] ParameterInfo;
 			IEnumerable<MethodInfo> Methods = Type.GetRuntimeMethods();
 
@@ -398,16 +428,59 @@ namespace Waher.Script.Operators.Membership
 				if (ParameterInfo.Length != this.nrParameters)
 					continue;
 
-				Result.Add(new KeyValuePair<MethodInfo, ParameterInfo[]>(MI, ParameterInfo));
+				Result.Add(new MethodRec()
+				{
+					Method = MI,
+					Parameters = ParameterInfo,
+					MethodType = MethodType.Method
+				});
+			}
+
+			if (Result.Count == 0)
+			{
+				PropertyInfo PI = Type.GetRuntimeProperty(this.name);
+				if (!(PI is null) && PI.GetIndexParameters().Length == 0)
+				{
+					Result.Add(new MethodRec()
+					{
+						Method = PI.GetMethod,
+						Parameters = new ParameterInfo[0],
+						MethodType = MethodType.LambdaProperty
+					});
+				}
+				else if (VectorIndex.TryGetIndexProperty(Type, out PI, out ParameterInfo[] Parameters))
+				{
+					Result.Add(new MethodRec()
+					{
+						Method = PI.GetMethod,
+						Parameters = Parameters,
+						MethodType = MethodType.LambdaIndexProperty
+					});
+				}
 			}
 
 			return Result.ToArray();
 		}
 
+		private enum MethodType
+		{
+			Method,
+			LambdaProperty,
+			LambdaIndexProperty
+		}
+
+		private class MethodRec
+		{
+			public MethodInfo Method;
+			public ParameterInfo[] Parameters;
+			public MethodType MethodType;
+		}
+
 		private Type lastType = null;
 		private MethodInfo method = null;
+		private MethodType methodType = MethodType.Method;
 		private ParameterInfo[] methodParametersTypes = null;
-		private KeyValuePair<MethodInfo, ParameterInfo[]>[] methods = null;
+		private MethodRec[] methods = null;
 		private KeyValuePair<string, int>[] byReference = null;
 		private object[] methodArguments = null;
 		private bool[] methodArgumentExtensions = null;

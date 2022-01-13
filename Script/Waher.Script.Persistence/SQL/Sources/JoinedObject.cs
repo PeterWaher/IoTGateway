@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using Waher.Persistence;
 using Waher.Persistence.Serialization;
+using Waher.Script.Model;
 using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Persistence.SQL.Sources
@@ -83,12 +84,12 @@ namespace Waher.Script.Persistence.SQL.Sources
 				if (!(Rec.PI is null))
 				{
 					if (Rec.Indexed)
-						return Rec.PI.GetValue(Rec.Left ? this.left : this.right, new object[] { Index });
+						return ScriptNode.UnnestPossibleTaskSync(Rec.PI.GetValue(Rec.Left ? this.left : this.right, new object[] { Index }));	// TODO: Async
 					else
-						return Rec.PI.GetValue(Rec.Left ? this.left : this.right);
+						return ScriptNode.UnnestPossibleTaskSync(Rec.PI.GetValue(Rec.Left ? this.left : this.right));	// TODO: Async
 				}
 				else if (!(Rec.FI is null))
-					return Rec.FI.GetValue(Rec.Left ? this.left : this.right);
+					return ScriptNode.UnnestPossibleTaskSync(Rec.FI.GetValue(Rec.Left ? this.left : this.right));	// TODO: Async
 				else
 					return null;
 			}

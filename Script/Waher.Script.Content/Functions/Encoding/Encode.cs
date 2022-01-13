@@ -89,7 +89,7 @@ namespace Waher.Script.Content.Functions.Encoding
 				string[] AcceptedTypes = new string[c];
 
 				for (i = 0; i < c; i++)
-					AcceptedTypes[i] = A.GetValue(i)?.ToString();
+					AcceptedTypes[i] = (await WaitPossibleTask(A.GetValue(i)))?.ToString();
 
 				KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Arguments[0].AssociatedObjectValue, System.Text.Encoding.UTF8, AcceptedTypes);
 				Bin = P.Key;

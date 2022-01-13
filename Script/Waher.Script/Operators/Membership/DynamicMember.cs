@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -24,14 +25,31 @@ namespace Waher.Script.Operators.Membership
 		public DynamicMember(ScriptNode Left, ScriptNode Right, bool NullCheck, int Start, int Length, Expression Expression)
 			: base(Left, Right, NullCheck, Start, Length, Expression)
 		{
-		}
+            this.isAsync = true;
+        }
 
-		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
+        /// <summary>
+        /// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+        /// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+        /// </summary>
+        public override bool IsAsynchronous => true;
+
+        /// <summary>
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+        /// </summary>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public override IElement Evaluate(Variables Variables)
+        {
+            return this.EvaluateAsync(Variables).Result;
+        }
+
+        /// <summary>
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+        /// </summary>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
             IElement Operand = this.left.Evaluate(Variables);
 			if (this.nullCheck && Operand.AssociatedObjectValue is null)
@@ -39,7 +57,7 @@ namespace Waher.Script.Operators.Membership
 
 			IElement Name = this.right.Evaluate(Variables);
 
-            return EvaluateDynamicMember(Operand, Name, this.nullCheck, this);
+            return await EvaluateDynamicMember(Operand, Name, this.nullCheck, this);
 		}
 
 		/// <summary>
@@ -50,14 +68,14 @@ namespace Waher.Script.Operators.Membership
 		/// <param name="NullCheck">If null should be returned if left operand is null.</param>
 		/// <param name="Node">Script node.</param>
 		/// <returns>Resulting value.</returns>
-		public static IElement EvaluateDynamicMember(IElement Operand, IElement Member, bool NullCheck, ScriptNode Node)
+		public static async Task<IElement> EvaluateDynamicMember(IElement Operand, IElement Member, bool NullCheck, ScriptNode Node)
         {
             if (Member.IsScalar)
             {
                 if (!(Member is StringValue s))
                     throw new ScriptRuntimeException("Member names must be strings.", Node);
 
-                return NamedMember.EvaluateDynamic(Operand, s.Value, NullCheck, Node);
+                return await NamedMember.EvaluateDynamic(Operand, s.Value, NullCheck, Node);
             }
             else
             {
@@ -66,7 +84,7 @@ namespace Waher.Script.Operators.Membership
                     LinkedList<IElement> Elements = new LinkedList<IElement>();
 
                     foreach (IElement E in Member.ChildElements)
-                        Elements.AddLast(EvaluateDynamicMember(Operand, E, NullCheck, Node));
+                        Elements.AddLast(await EvaluateDynamicMember(Operand, E, NullCheck, Node));
 
                     return Member.Encapsulate(Elements, Node);
                 }
@@ -84,7 +102,7 @@ namespace Waher.Script.Operators.Membership
                         try
                         {
                             while (eOperand.MoveNext() && eMember.MoveNext())
-                                Elements.AddLast(EvaluateDynamicMember(eOperand.Current, eMember.Current, NullCheck, Node));
+                                Elements.AddLast(await EvaluateDynamicMember(eOperand.Current, eMember.Current, NullCheck, Node));
                         }
                         finally
                         {
@@ -103,7 +121,7 @@ namespace Waher.Script.Operators.Membership
                             LinkedList<IElement> MemberResult = new LinkedList<IElement>();
 
                             foreach (IElement MemberChild in MemberElements)
-                                MemberResult.AddLast(EvaluateDynamicMember(OperandChild, MemberChild, NullCheck, Node));
+                                MemberResult.AddLast(await EvaluateDynamicMember (OperandChild, MemberChild, NullCheck, Node));
 
                             OperandResult.AddLast(Member.Encapsulate(MemberResult, Node));
                         }

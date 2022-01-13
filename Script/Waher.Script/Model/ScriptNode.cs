@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -369,6 +370,41 @@ namespace Waher.Script.Model
 				return Functions.Scalar.Boolean.ToBoolean(s.Value);
 			else
 				return null;
+		}
+
+		/// <summary>
+		/// Waits for any asynchronous process to terminate.
+		/// </summary>
+		/// <param name="Result">Result, possibly asynchronous result.</param>
+		/// <returns>Finished result</returns>
+		public static async Task<object> WaitPossibleTask(object Result)
+		{
+			if (Result is Task Task)
+			{
+				await Task;
+
+				PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
+				Result = PI.GetMethod.Invoke(Task, null);
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Checks if <paramref name="Result"/> is an asynchronous results. If so, blocks the current thread until the result
+		/// is completed, and returns the completed result instead.
+		/// </summary>
+		/// <param name="Result">Result</param>
+		/// <returns>Finished result.</returns>
+		public static object UnnestPossibleTaskSync(object Result)
+		{
+			if (Result is Task Task)
+			{
+				PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
+				Result = PI.GetMethod.Invoke(Task, null);
+			}
+
+			return Result;
 		}
 
 	}

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Waher.Persistence;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Model;
 using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Persistence.SQL
@@ -99,7 +100,7 @@ namespace Waher.Script.Persistence.SQL
 					{
 						try
 						{
-							Rec.Item1.GetValue(this.obj, new object[] { Name });
+							ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj, new object[] { Name }));	// TODO: Async
 							return true;
 						}
 						catch (Exception)
@@ -193,12 +194,12 @@ namespace Waher.Script.Persistence.SQL
 				Result = true;  // null may be a valid response. Check variable collections first.
 			
 				if (Rec.Item1 is null)
-					Value = Rec.Item2.GetValue(this.obj);
+					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item2.GetValue(this.obj));	// TODO: Async
 				else if (Rec.Item3)
 				{
 					try
 					{
-						Value = Rec.Item1.GetValue(this.obj, new object[] { Name });
+						Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj, new object[] { Name }));	// TODO: Async
 					}
 					catch (KeyNotFoundException)
 					{
@@ -207,7 +208,7 @@ namespace Waher.Script.Persistence.SQL
 					}
 				}
 				else
-					Value = Rec.Item1.GetValue(this.obj);
+					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj));	// TODO: Async
 
 				if (!(Value is null))
 				{
@@ -281,12 +282,12 @@ namespace Waher.Script.Persistence.SQL
 				Result = true;  // null may be a valid response. Check variable collections first.
 
 				if (Rec.Item1 is null)
-					Value = Rec.Item2.GetValue(this.obj);
+					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item2.GetValue(this.obj));	// TODO: Async
 				else if (Rec.Item3)
 				{
 					try
 					{
-						Value = Rec.Item1.GetValue(this.obj, new object[] { Name });
+						Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj, new object[] { Name }));	// TODO: Async
 					}
 					catch (KeyNotFoundException)
 					{
@@ -295,7 +296,7 @@ namespace Waher.Script.Persistence.SQL
 					}
 				}
 				else
-					Value = Rec.Item1.GetValue(this.obj);
+					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj));	// TODO: Async
 
 				if (!(Value is null))
 					return true;

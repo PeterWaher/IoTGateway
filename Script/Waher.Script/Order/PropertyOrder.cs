@@ -78,9 +78,9 @@ namespace Waher.Script.Order
 			}
 
 			if (!(this.lastPropertyInfo is null))
-				Value = this.lastPropertyInfo.GetValue(Value);
+				Value = ScriptNode.UnnestPossibleTaskSync(this.lastPropertyInfo.GetValue(Value));
 			else if (!(this.lastFieldInfo is null))
-				Value = this.lastFieldInfo.GetValue(Value);
+				Value = ScriptNode.UnnestPossibleTaskSync(this.lastFieldInfo.GetValue(Value));
 			else
 				Value = null;
 

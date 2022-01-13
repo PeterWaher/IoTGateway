@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -49,6 +50,29 @@ namespace Waher.Script.Operators.Membership
         }
 
         /// <summary>
+        /// Evaluates the operator.
+        /// </summary>
+        /// <param name="Left">Left value.</param>
+        /// <param name="Right">Right value.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result</returns>
+        public override Task<IElement> EvaluateAsync(IElement Left, IElement Right, Variables Variables)
+        {
+            if (Right is TypeValue TypeValue)
+            {
+                Type T = TypeValue.Value;
+                object Obj = Left.AssociatedObjectValue;
+
+                if (!(Obj is null) && T.GetTypeInfo().IsAssignableFrom(Obj.GetType().GetTypeInfo()))
+                    return Task.FromResult<IElement>(BooleanValue.True);
+                else
+                    return Task.FromResult<IElement>(BooleanValue.False);
+            }
+            else
+                return base.EvaluateAsync(Left, Right, Variables);
+        }
+
+        /// <summary>
         /// Evaluates the operator on scalar operands.
         /// </summary>
         /// <param name="Left">Left value.</param>
@@ -72,11 +96,31 @@ namespace Waher.Script.Operators.Membership
         }
 
         /// <summary>
+        /// Evaluates the operator on scalar operands.
+        /// </summary>
+        /// <param name="Left">Left value.</param>
+        /// <param name="Right">Right value.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result</returns>
+        public override Task<IElement> EvaluateScalarAsync(IElement Left, IElement Right, Variables Variables)
+        {
+            if (Right is TypeValue TypeValue)
+            {
+                Type T = TypeValue.Value;
+                object Obj = Left.AssociatedObjectValue;
+
+                if (!(Obj is null) && T.GetTypeInfo().IsAssignableFrom(Obj.GetType().GetTypeInfo()))
+                    return Task.FromResult<IElement>(BooleanValue.True);
+                else
+                    return Task.FromResult<IElement>(BooleanValue.False);
+            }
+            else
+                throw new ScriptRuntimeException("Right operand in an IS operation must be a type value.", this);
+        }
+
+        /// <summary>
         /// How scalar operands of different types are to be treated. By default, scalar operands are required to be of the same type.
         /// </summary>
-        public override UpgradeBehaviour ScalarUpgradeBehaviour
-        {
-            get { return UpgradeBehaviour.DifferentTypesOk; }
-        }
+        public override UpgradeBehaviour ScalarUpgradeBehaviour => UpgradeBehaviour.DifferentTypesOk;
     }
 }

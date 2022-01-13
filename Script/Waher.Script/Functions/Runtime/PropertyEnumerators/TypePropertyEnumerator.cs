@@ -5,6 +5,7 @@ using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Objects;
+using System.Threading.Tasks;
 
 namespace Waher.Script.Functions.Runtime.PropertyEnumerators
 {
@@ -25,7 +26,7 @@ namespace Waher.Script.Functions.Runtime.PropertyEnumerators
 		/// </summary>
 		/// <param name="Object">Object</param>
 		/// <returns>Property enumeration as a script element.</returns>
-		public IElement EnumerateProperties(object Object)
+		public Task<IElement> EnumerateProperties(object Object)
 		{
 			if (Object is Type T)
 			{
@@ -34,10 +35,10 @@ namespace Waher.Script.Functions.Runtime.PropertyEnumerators
 				foreach (PropertyInfo PI in T.GetRuntimeProperties())
 					Elements.Add(new StringValue(PI.Name));
 
-				return new ObjectVector(Elements);
+				return Task.FromResult<IElement>(new ObjectVector(Elements));
 			}
 			else
-				return ObjectValue.Null;
+				return Task.FromResult<IElement>(ObjectValue.Null);
 		}
 
 		/// <summary>

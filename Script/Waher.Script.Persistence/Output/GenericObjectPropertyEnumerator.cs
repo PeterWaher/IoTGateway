@@ -6,6 +6,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Functions.Runtime.PropertyEnumerators;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects;
+using System.Threading.Tasks;
 
 namespace Waher.Script.Persistence.Output
 {
@@ -26,7 +27,7 @@ namespace Waher.Script.Persistence.Output
 		/// </summary>
 		/// <param name="Object">Object</param>
 		/// <returns>Property enumeration as a script element.</returns>
-		public IElement EnumerateProperties(object Object)
+		public Task<IElement> EnumerateProperties(object Object)
 		{
 			if (Object is GenericObject Obj)
 			{
@@ -61,10 +62,10 @@ namespace Waher.Script.Persistence.Output
 					ColumnNames = new string[] { "Name", "Value" }
 				};
 
-				return M;
+				return Task.FromResult<IElement>(M);
 			}
 			else
-				return ObjectValue.Null;
+				return Task.FromResult<IElement>(ObjectValue.Null);
 		}
 
 		/// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 
@@ -14,6 +15,6 @@ namespace Waher.Script.Functions.Runtime.PropertyEnumerators
 		/// </summary>
 		/// <param name="Object">Object</param>
 		/// <returns>Property enumeration as a script element.</returns>
-		IElement EnumerateProperties(object Object);
+		Task<IElement> EnumerateProperties(object Object);
 	}
 }

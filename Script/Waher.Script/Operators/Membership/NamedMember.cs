@@ -2,12 +2,14 @@
 using System.Reflection;
 using System.Collections.Generic;
 using System.Runtime.ExceptionServices;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Functions.Runtime;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 using Waher.Script.Operators.Vectors;
+using System.Threading;
 
 namespace Waher.Script.Operators.Membership
 {
@@ -31,6 +33,7 @@ namespace Waher.Script.Operators.Membership
 			: base(Operand, NullCheck, Start, Length, Expression)
 		{
 			this.name = Name;
+            this.isAsync = true;
 		}
 
 		/// <summary>
@@ -39,12 +42,29 @@ namespace Waher.Script.Operators.Membership
 		public string Name => this.name;
 
 		/// <summary>
+		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
+		/// </summary>
+		public override bool IsAsynchronous => true;
+
+		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
 		/// </summary>
 		/// <param name="Operand">Operand.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(IElement Operand, Variables Variables)
+		{
+			return this.EvaluateAsync(Operand, Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(IElement Operand, Variables Variables)
 		{
 			object Value = Operand.AssociatedObjectValue;
 			object Instance;
@@ -63,7 +83,8 @@ namespace Waher.Script.Operators.Membership
 			else
 				Instance = null;
 
-			lock (this.synchObject)
+			await this.synchObject.WaitAsync();
+			try
 			{
 				if (T != this.type)
 				{
@@ -73,6 +94,7 @@ namespace Waher.Script.Operators.Membership
 					this.methods = null;
 					this.nameIndex = null;
 					this.property = T.GetRuntimeProperty(this.name);
+					
 					if (this.property is null)
 					{
 						this.field = T.GetRuntimeField(this.name);
@@ -97,7 +119,7 @@ namespace Waher.Script.Operators.Membership
 								this.methods = Methods?.ToArray();
 								if (this.methods is null)
 								{
-									if (VectorIndex.TryGetIndexProperty(T,out this.property, out _))
+									if (VectorIndex.TryGetIndexProperty(T, out this.property, out _))
 										this.nameIndex = new string[] { this.name };
 								}
 							}
@@ -112,9 +134,9 @@ namespace Waher.Script.Operators.Membership
 					try
 					{
 						if (!(this.nameIndex is null))
-							Result = this.property.GetValue(Instance, this.nameIndex);
+							Result = await WaitPossibleTask(this.property.GetValue(Instance, this.nameIndex));
 						else
-							Result = this.property.GetValue(Instance, null);
+							Result = await WaitPossibleTask(this.property.GetValue(Instance, null));
 					}
 					catch (Exception ex)
 					{
@@ -130,7 +152,7 @@ namespace Waher.Script.Operators.Membership
 				{
 					try
 					{
-						Result = this.field.GetValue(Instance);
+						Result = await WaitPossibleTask(this.field.GetValue(Instance));
 					}
 					catch (Exception ex)
 					{
@@ -154,11 +176,15 @@ namespace Waher.Script.Operators.Membership
 				else if (Operand.IsScalar)
 					throw new ScriptRuntimeException("Member '" + this.name + "' not found on type '" + T.FullName + "'.", this);
 			}
+			finally
+			{
+				this.synchObject.Release();
+			}
 
 			LinkedList<IElement> Elements = new LinkedList<IElement>();
 
 			foreach (IElement E in Operand.ChildElements)
-				Elements.AddLast(EvaluateDynamic(E, this.name, this.nullCheck, this));
+				Elements.AddLast(await EvaluateDynamic(E, this.name, this.nullCheck, this));
 
 			return Operand.Encapsulate(Elements, this);
 		}
@@ -169,7 +195,7 @@ namespace Waher.Script.Operators.Membership
 		private EventInfo _event = null;
 		private MethodLambda[] methods = null;
 		private string[] nameIndex = null;
-		private readonly object synchObject = new object();
+		private readonly SemaphoreSlim synchObject = new SemaphoreSlim(1);
 
 		internal static readonly Type[] stringType = new Type[] { typeof(string) };
 
@@ -181,7 +207,7 @@ namespace Waher.Script.Operators.Membership
 		/// <param name="NullCheck">If null should be returned if left operand is null.</param>
 		/// <param name="Node">Script node performing the evaluation.</param>
 		/// <returns>Result.</returns>
-		public static IElement EvaluateDynamic(IElement Operand, string Name, bool NullCheck, ScriptNode Node)
+		public static async Task<IElement> EvaluateDynamic(IElement Operand, string Name, bool NullCheck, ScriptNode Node)
 		{
 			object Value = Operand.AssociatedObjectValue;
 			object Instance;
@@ -201,14 +227,14 @@ namespace Waher.Script.Operators.Membership
 
 			PropertyInfo Property = T.GetRuntimeProperty(Name);
 			if (!(Property is null))
-				return Expression.Encapsulate(Property.GetValue(Instance, null));
+				return Expression.Encapsulate(await WaitPossibleTask(Property.GetValue(Instance, null)));
 
 			FieldInfo Field = T.GetRuntimeField(Name);
 			if (!(Field is null))
-				return Expression.Encapsulate(Field.GetValue(Instance));
+				return Expression.Encapsulate(await WaitPossibleTask(Field.GetValue(Instance)));
 
 			if (VectorIndex.TryGetIndexProperty(T, out Property, out _))
-				return Expression.Encapsulate(Property.GetValue(Instance, new string[] { Name }));
+				return Expression.Encapsulate(await WaitPossibleTask(Property.GetValue(Instance, new string[] { Name })));
 
 			if (Operand.IsScalar)
 				throw new ScriptRuntimeException("Member '" + Name + "' not found on type '" + T.FullName + "'.", Node);
@@ -216,7 +242,7 @@ namespace Waher.Script.Operators.Membership
 			LinkedList<IElement> Elements = new LinkedList<IElement>();
 
 			foreach (IElement E in Operand.ChildElements)
-				Elements.AddLast(EvaluateDynamic(E, Name, NullCheck, Node));
+				Elements.AddLast(await EvaluateDynamic(E, Name, NullCheck, Node));
 
 			return Operand.Encapsulate(Elements, Node);
 		}

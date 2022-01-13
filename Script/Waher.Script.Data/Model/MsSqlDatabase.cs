@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
+using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Data.Model
 {
@@ -61,62 +62,91 @@ namespace Waher.Script.Data.Model
 		{
 			try
 			{
-				if (!Reader.HasRows)
-					return ObjectValue.Null;
+				LinkedList<IElement> Results = null;
+				IElement Result = null;
+				bool First = true;
 
-				string[] ColumnNames;
-
-				if (Reader.CanGetColumnSchema())
+				do
 				{
-					ReadOnlyCollection<DbColumn> Columns = Reader.GetColumnSchema();
-					List<string> Names = new List<string>();
-					int i = 1;
-
-					foreach (DbColumn Column in Columns)
+					if (First)
+						First = false;
+					else
 					{
-						if (string.IsNullOrEmpty(Column.ColumnName))
-							Names.Add(i.ToString());
+						if (Results is null)
+							Results = new LinkedList<IElement>();
+
+						Results.AddLast(Result);
+						Result = null;
+					}
+
+					if (!Reader.HasRows)
+						Result = ObjectValue.Null;
+					else
+					{
+						string[] ColumnNames;
+
+						if (Reader.CanGetColumnSchema())
+						{
+							ReadOnlyCollection<DbColumn> Columns = Reader.GetColumnSchema();
+							List<string> Names = new List<string>();
+							int i = 1;
+
+							foreach (DbColumn Column in Columns)
+							{
+								if (string.IsNullOrEmpty(Column.ColumnName))
+									Names.Add(i.ToString());
+								else
+									Names.Add(Column.ColumnName);
+
+								i++;
+							}
+
+							ColumnNames = Names.ToArray();
+						}
 						else
-							Names.Add(Column.ColumnName);
+							ColumnNames = null;
 
-						i++;
+						int NrRows = 0;
+						int NrColumns = 0;
+						LinkedList<IElement> Elements = new LinkedList<IElement>();
+						object[] Row = null;
+
+						while (await Reader.ReadAsync())
+						{
+							if (NrColumns == 0)
+							{
+								NrColumns = Reader.FieldCount;
+								Row = new object[NrColumns];
+							}
+
+							Reader.GetValues(Row);
+
+							foreach (object Item in Row)
+								Elements.AddLast(Expression.Encapsulate(Item));
+
+							NrRows++;
+						}
+
+						if (NrRows == 1 && NrColumns == 1)
+							Result = Elements.First.Value;
+						else
+						{
+							Result = new ObjectMatrix(NrRows, NrColumns, Elements)
+							{
+								ColumnNames = ColumnNames
+							};
+						}
 					}
-
-					ColumnNames = Names.ToArray();
 				}
+				while (await Reader.NextResultAsync());
+
+				if (Results is null)
+					return Result;
 				else
-					ColumnNames = null;
-
-				int NrRows = 0;
-				int NrColumns = 0;
-				LinkedList<IElement> Elements = new LinkedList<IElement>();
-				object[] Row = null;
-
-				while (await Reader.ReadAsync())
 				{
-					if (NrColumns == 0)
-					{
-						NrColumns = Reader.FieldCount;
-						Row = new object[NrColumns];
-					}
-
-					Reader.GetValues(Row);
-
-					foreach (object Item in Row)
-						Elements.AddLast(Expression.Encapsulate(Item));
-
-					NrRows++;
+					Results.AddLast(Result);
+					return VectorDefinition.Encapsulate(Results, false, null);
 				}
-
-				if (NrRows == 1 && NrColumns == 1)
-					return Elements.First.Value;
-
-				return new ObjectMatrix(NrRows, NrColumns, Elements)
-				{
-					ColumnNames = ColumnNames
-				};
-				
-				// TODO: Multiple result sets
 			}
 			finally
 			{

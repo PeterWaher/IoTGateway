@@ -289,17 +289,17 @@ namespace Waher.Script.Lab
 				MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown.ToString(), GetMarkdownSettings());
 				string XAML = await Doc.GenerateXAML();
 
-				if (XamlReader.Parse(XAML) is UIElement Parsed)
+				TaskCompletionSource<UIElement> Result = new TaskCompletionSource<UIElement>();
+
+				this.Dispatcher.Invoke(() =>
 				{
-					TaskCompletionSource<UIElement> Result = new TaskCompletionSource<UIElement>();
-
-					this.Dispatcher.Invoke(() =>
-					{
+					if (XamlReader.Parse(XAML) is UIElement Parsed)
 						Result.TrySetResult(this.AddBlock(ScriptBlock, Parsed));
-					});
+					else
+						Result.TrySetException(new Exception("Unable to parse XAML."));
+				});
 
-					return await Result.Task;
-				}
+				return await Result.Task;
 
 				return null;
 			}

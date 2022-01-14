@@ -14,10 +14,10 @@
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.1.4</AssemblyVersion>
-    <FileVersion>1.1.4</FileVersion>
+    <AssemblyVersion>1.1.5</AssemblyVersion>
+    <FileVersion>1.1.5</FileVersion>
     <PackageIconUrl></PackageIconUrl>
-    <Version>1.1.4</Version>
+    <Version>1.1.5</Version>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Things\Waher.Things\</UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>

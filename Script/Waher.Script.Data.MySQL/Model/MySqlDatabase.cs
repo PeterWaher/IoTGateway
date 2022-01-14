@@ -89,7 +89,7 @@ namespace Waher.Script.Data.MySQL.Model
 				Result = new StoredProcedure(Command);
 				this.procedures[Name] = Result;
 
-				return new StoredProcedure(Command);
+				return Result;
 			}
 			finally
 			{

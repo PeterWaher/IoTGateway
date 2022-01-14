@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.Odbc;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Model;
 
 namespace Waher.Script.Data.Model
 {
@@ -12,6 +15,8 @@ namespace Waher.Script.Data.Model
 	/// </summary>
 	public class OdbcDatabase : IDatabaseConnection
 	{
+		private readonly Dictionary<string, OdbcStoredProcedure> procedures = new Dictionary<string, OdbcStoredProcedure>();
+		private readonly SemaphoreSlim synchObject = new SemaphoreSlim(1);
 		private OdbcConnection connection;
 
 		/// <summary>
@@ -49,5 +54,54 @@ namespace Waher.Script.Data.Model
 				return await Reader.ParseAndClose();
 			}
 		}
+
+		/// <summary>
+		/// Gets a Schema table, given its collection name. 
+		/// For a list of collections: https://mysqlconnector.net/overview/schema-collections/
+		/// </summary>
+		/// <param name="Name">Schema collection</param>
+		/// <returns>Schema table, as a matrix</returns>
+		public Task<IElement> GetSchema(string Name)
+		{
+			DataTable Table = this.connection.GetSchema(Name);
+			return Task.FromResult<IElement>(Table.ToMatrix());
+		}
+
+		/// <summary>
+		/// Creates a lambda expression for accessing a stored procedure.
+		/// </summary>
+		/// <param name="Name">Name of stored procedure.</param>
+		/// <returns>Lambda expression.</returns>
+		public async Task<ILambdaExpression> GetProcedure(string Name)
+		{
+			await this.synchObject.WaitAsync();
+			try
+			{
+				if (this.procedures.TryGetValue(Name, out OdbcStoredProcedure Result))
+					return Result;
+
+				OdbcCommand Command = this.connection.CreateCommand();
+				Command.CommandType = CommandType.StoredProcedure;
+				Command.CommandText = this.connection.Database + "." + Name;
+
+				OdbcCommandBuilder.DeriveParameters(Command);
+
+				Result = new OdbcStoredProcedure(Command);
+				this.procedures[Name] = Result;
+
+				return Result;
+			}
+			finally
+			{
+				this.synchObject.Release();
+			}
+		}
+
+		/// <summary>
+		/// Creates a lambda expression for accessing a stored procedure.
+		/// </summary>
+		/// <param name="Name">Name of stored procedure.</param>
+		/// <returns>Lambda expression.</returns>
+		public Task<ILambdaExpression> this[string Name] => this.GetProcedure(Name);
 	}
 }

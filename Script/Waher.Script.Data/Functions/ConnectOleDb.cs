@@ -81,7 +81,6 @@ namespace Waher.Script.Data.Functions
 			{
 				case 1:
 				default:
-
 					Connection = new OleDbConnection(ConnectionString);
 					break;
 

@@ -82,7 +82,6 @@ namespace Waher.Script.Data.Functions
 			{
 				case 1:
 				default:
-					
 					Connection = new SqlConnection(ConnectionString);
 					break;
 

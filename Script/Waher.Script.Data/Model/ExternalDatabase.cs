@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Operators;
 
 namespace Waher.Script.Data.Model
 {
@@ -101,5 +102,10 @@ namespace Waher.Script.Data.Model
 			return this.ExecuteSqlStatement(SqlStatement);
 		}
 
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			return LambdaDefinition.ToString(this);
+		}
 	}
 }

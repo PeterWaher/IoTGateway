@@ -61,27 +61,6 @@ namespace Waher.Script.Operators
 			return this.EvaluateAsync(Variables).Result;
 		}
 
-		private async Task<IElement> EvaluateAsync(ILambdaExpression f, Variables Variables)
-		{ 
-			IElement[] Arg = new IElement[this.nrArguments];
-			ScriptNode Node;
-			int i;
-
-			for (i = 0; i < this.nrArguments; i++)
-			{
-				Node = this.arguments[i];
-				if (Node is null)
-					Arg[i] = ObjectValue.Null;
-				else
-					Arg[i] = Node.Evaluate(Variables);
-			}
-
-			if (f.IsAsynchronous)
-				return await f.EvaluateAsync(Arg, Variables);
-			else
-				return f.Evaluate(Arg, Variables);
-		}
-
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
 		/// </summary>
@@ -116,7 +95,10 @@ namespace Waher.Script.Operators
 					Arg[i] = await Node.EvaluateAsync(Variables);
 			}
 
-			return await f.EvaluateAsync(Arg, Variables);
+			if (f.IsAsynchronous)
+				return await f.EvaluateAsync(Arg, Variables);
+			else
+				return f.Evaluate(Arg, Variables);
 		}
 
 		/// <summary>

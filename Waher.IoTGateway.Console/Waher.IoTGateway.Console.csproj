@@ -34,6 +34,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="MySqlConnector" Version="2.1.2" />
+    <PackageReference Include="Npgsql" Version="6.0.2" />
     <PackageReference Include="SkiaSharp" Version="2.80.2" />
   </ItemGroup>
   <ItemGroup>
@@ -57,6 +59,9 @@
     <ProjectReference Include="..\Runtime\Waher.Runtime.ServiceRegistration\Waher.Runtime.ServiceRegistration.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Content\Waher.Script.Content.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Cryptography\Waher.Script.Cryptography.csproj" />
+    <ProjectReference Include="..\Script\Waher.Script.Data.MySQL\Waher.Script.Data.MySQL.csproj" />
+    <ProjectReference Include="..\Script\Waher.Script.Data.PostgreSQL\Waher.Script.Data.PostgreSQL.csproj" />
+    <ProjectReference Include="..\Script\Waher.Script.Data\Waher.Script.Data.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Fractals\Waher.Script.Fractals.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Graphs3D\Waher.Script.Graphs3D.csproj" />
     <ProjectReference Include="..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj" />

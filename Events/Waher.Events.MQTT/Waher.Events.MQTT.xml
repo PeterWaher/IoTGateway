@@ -88,9 +88,7 @@
             </summary>
         </member>
         <member name="M:Waher.Events.MQTT.MqttEventSink.Queue(Waher.Events.Event)">
-            <summary>
-            <see cref="M:Waher.Events.EventSink.Queue(Waher.Events.Event)"/>
-            </summary>
+            <inheritdoc/>
         </member>
     </members>
 </doc>

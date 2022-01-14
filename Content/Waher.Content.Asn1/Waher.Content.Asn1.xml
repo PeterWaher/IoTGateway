@@ -482,7 +482,7 @@
             Represents an ASN.1 document.
             </summary>
         </member>
-        <member name="M:Waher.Content.Asn1.Asn1Document.#ctor(System.String,System.String,System.String[])">
+        <member name="M:Waher.Content.Asn1.Asn1Document.CreateAsync(System.String,System.String,System.String[])">
             <summary>
             Represents an ASN.1 document.
             </summary>
@@ -1769,9 +1769,7 @@
             <returns>Parsed ASN.1 node.</returns>
         </member>
         <member name="M:Waher.Content.Asn1.Model.Macro.SupportingSyntax.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedItem">
             <summary>
@@ -1813,9 +1811,7 @@
             <returns>Parsed ASN.1 node.</returns>
         </member>
         <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedLiteral.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedOption">
             <summary>
@@ -1893,9 +1889,7 @@
             <returns>Parsed ASN.1 node.</returns>
         </member>
         <member name="M:Waher.Content.Asn1.Model.Macro.UserDefinedPart.ToString">
-            <summary>
-            <see cref="M:System.Object.ToString"/>
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="T:Waher.Content.Asn1.Model.Macro.UserDefinedSpecifiedPart">
             <summary>

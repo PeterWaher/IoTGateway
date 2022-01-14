@@ -29,6 +29,19 @@ namespace Waher.Script.Data.Functions
 		/// <summary>
 		/// Creates a connection to an external MS SQL database.
 		/// </summary>
+		/// <param name="Host">Host machine of database.</param>
+		/// <param name="Database">Database to connect to.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression.</param>
+		public ConnectMsSql(ScriptNode Host, ScriptNode Database, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Host, Database }, argumentTypes2Scalar, Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
+		/// Creates a connection to an external MS SQL database.
+		/// </summary>
 		/// <param name="ConnectionString">Connection string.</param>
 		/// <param name="UserName">User Name</param>
 		/// <param name="Password">Password</param>
@@ -100,6 +113,12 @@ namespace Waher.Script.Data.Functions
 					Connection = new SqlConnection(ConnectionString);
 					break;
 
+				case 2:
+					string Database = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
+
+					ConnectionString = "Data Source=" + ConnectionString + ";Initial Catalog=" + Database + ";Integrated Security=true";
+					Connection = new SqlConnection(ConnectionString);
+					break;
 				case 3:
 					string UserName = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
 					string Password = Arguments[2].AssociatedObjectValue?.ToString() ?? string.Empty;
@@ -113,7 +132,7 @@ namespace Waher.Script.Data.Functions
 					break;
 
 				case 4:
-					string Database = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
+					Database = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
 					UserName = Arguments[2].AssociatedObjectValue?.ToString() ?? string.Empty;
 					Password = Arguments[3].AssociatedObjectValue?.ToString() ?? string.Empty;
 					Password2 = new SecureString();
@@ -124,7 +143,6 @@ namespace Waher.Script.Data.Functions
 					Password2.MakeReadOnly();
 
 					ConnectionString = "Data Source=" + ConnectionString + ";Initial Catalog=" + Database;
-
 					Connection = new SqlConnection(ConnectionString, new SqlCredential(UserName, Password2));
 					break;
 			}

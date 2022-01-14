@@ -1575,7 +1575,7 @@ The following functions can be used to create fractal images based on Iterated F
 | Function | Description | Example |
 |----------|-------------|---------|
 | `ConnectMsSql(ConnectionString[,UserName,Password])` | Connects to an external Microsoft SQL Server database using a connection string, and optionally providing credentials. | `db:=ConnectMsSql(cs,UserName,Password)` |
-| `ConnectMsSql(Host,Database,UserName,Password)`      | Connects to an external Microsoft SQL Server database `Database` hosted by a machine reachable on `Host`, providing credentials. | `db:=ConnectMsSql("Host","Database",UserName,Password)` |
+| `ConnectMsSql(Host,Database[,UserName,Password])`    | Connects to an external Microsoft SQL Server database `Database` hosted by a machine reachable on `Host`, providing optional credentials. If no credentials are provided, Integrated Security is used. | `db:=ConnectMsSql("Host","Database",UserName,Password)` |
 | `ConnectOdbc(ConnectionString[,UserName,Password])`  | Connects to an external ODBC database using a connection string, and optionally providing credentials. | `db:=ConnectOdbc(cs,UserName,Password)` |
 | `ConnectOleDb(ConnectionString[,UserName,Password])` | Connects to an external OLE DB database using a connection string, and optionally providing credentials. | `db:=ConnectOleDb(cs,UserName,Password)` |
 

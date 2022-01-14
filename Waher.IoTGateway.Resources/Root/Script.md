@@ -1574,9 +1574,10 @@ The following functions can be used to create fractal images based on Iterated F
 
 | Function | Description | Example |
 |----------|-------------|---------|
-| `ConnectMsSql(ConnectionString[,UserName,Password])` | Connects to an external Microsoft SQL Server database usig a connection string, and optionally providing credentials. | `db:=ConnectMsSql(cs,UserName,Password)` |
-| `ConnectOdbc(ConnectionString[,UserName,Password])`  | Connects to an external ODBC database usig a connection string, and optionally providing credentials. | `db:=ConnectOdbc(cs,UserName,Password)` |
-| `ConnectOleDb(ConnectionString[,UserName,Password])` | Connects to an external OLE DB database usig a connection string, and optionally providing credentials. | `db:=ConnectOleDb(cs,UserName,Password)` |
+| `ConnectMsSql(ConnectionString[,UserName,Password])` | Connects to an external Microsoft SQL Server database using a connection string, and optionally providing credentials. | `db:=ConnectMsSql(cs,UserName,Password)` |
+| `ConnectMsSql(Host,Database,UserName,Password)`      | Connects to an external Microsoft SQL Server database `Database` hosted by a machine reachable on `Host`, providing credentials. | `db:=ConnectMsSql("Host","Database",UserName,Password)` |
+| `ConnectOdbc(ConnectionString[,UserName,Password])`  | Connects to an external ODBC database using a connection string, and optionally providing credentials. | `db:=ConnectOdbc(cs,UserName,Password)` |
+| `ConnectOleDb(ConnectionString[,UserName,Password])` | Connects to an external OLE DB database using a connection string, and optionally providing credentials. | `db:=ConnectOleDb(cs,UserName,Password)` |
 | `SQL(Database,Statement)`                            | Executes an SQL statement given by the string `Statement` on the database connection provided in `Database`. | `SQL(db,"select * from country")` |
 
 **Note**: To close a connection, destroy the variable containing the connection using the Destroy or Delete function.
@@ -1600,11 +1601,21 @@ f(P1,P2)
 
 This syntax is available for all database conncetions that support stored procedures.
 
-#### External Database-related functions (Waher.Script.Data.MySQL)
+#### External MySQL Database-related functions (Waher.Script.Data.MySQL)
 
 | Function | Description | Example |
 |----------|-------------|---------|
 | `ConnectMySql(ConnectionString[,UserName,Password])` | Connects to an external MySQL Server database usig a connection string, and optionally providing credentials. | `db:=ConnectMySql(cs,UserName,Password)` |
+| `ConnectMySql(Host,Database,UserName,Password)`      | Connects to an external MySQL Server database `Database` hosted by a machine reachable on `Host`, and providing credentials. | `db:=ConnectMySql("Server","Database",UserName,Password)` |
+
+**Note**: To close a connection, destroy the variable containing the connection using the Destroy or Delete function.
+
+#### External PostgreSQL Database-related functions (Waher.Script.Data.PostgreSQL)
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `ConnectPostgreSql(ConnectionString[,UserName,Password])` | Connects to an external PostgreSQL Server database using a connection string, and optionally providing credentials. | `db:=ConnectPostgreSql(cs,UserName,Password)` |
+| `ConnectPostgreSql(Host,Database,UserName,Password)`      | Connects to an external PostgreSQL Server database `Database` hosted by a machine reachable on `Host`, and providing credentials. | `db:=ConnectPostgreSql("Server","Database",UserName,Password)` |
 
 **Note**: To close a connection, destroy the variable containing the connection using the Destroy or Delete function.
 

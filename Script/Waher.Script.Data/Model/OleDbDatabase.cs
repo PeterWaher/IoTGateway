@@ -13,7 +13,7 @@ namespace Waher.Script.Data.Model
 	/// <summary>
 	/// Manages an OLE DB SQL Server connection
 	/// </summary>
-	public class OleDbDatabase : IDatabaseConnection
+	public class OleDbDatabase : ISqlDatabaseConnection
 	{
 		private readonly Dictionary<string, OleDbStoredProcedure> procedures = new Dictionary<string, OleDbStoredProcedure>();
 		private readonly SemaphoreSlim synchObject = new SemaphoreSlim(1);

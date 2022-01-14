@@ -8,10 +8,10 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Class library that adds functions for accessing external MySQL databases.
+    <Description>Class library that adds functions for accessing external PostgreSQL databases.
 
 Script Syntax:
-https://waher.se/Script.md#externalMySQLDatabaseRelatedFunctionsWaherScriptDataMySQL</Description>
+https://waher.se/Script.md#externalPostgreSQLDatabaseRelatedFunctionsWaherScriptDataPostgreSQL</Description>
     <Copyright>Copyright © Waher Data AB 2022. All rights reserved.</Copyright>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script.Data</PackageProjectUrl>
@@ -19,15 +19,19 @@ https://waher.se/Script.md#externalMySQLDatabaseRelatedFunctionsWaherScriptDataM
     <PackageIconUrl />
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>script execution parsing external MySQL database</PackageTags>
+    <PackageTags>script execution parsing external PostgreSQL database</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>2.0.0</AssemblyVersion>
     <FileVersion>2.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\My Projects\IoTGateway\Script\Waher.Script.Data.MySQL\Waher.Script.Data.MySQL.xml</DocumentationFile>
+    <DocumentationFile>C:\My Projects\IoTGateway\Script\Waher.Script.Data.PostgreSQL\Waher.Script.Data.PostgreSQL.xml</DocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql" Version="6.0.2" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
@@ -38,10 +42,6 @@ https://waher.se/Script.md#externalMySQLDatabaseRelatedFunctionsWaherScriptDataM
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MySqlConnector" Version="2.1.2" />
   </ItemGroup>
 
   <ItemGroup>

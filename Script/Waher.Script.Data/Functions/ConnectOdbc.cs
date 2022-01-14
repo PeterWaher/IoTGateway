@@ -15,7 +15,7 @@ namespace Waher.Script.Data.Functions
 	public class ConnectOdbc : FunctionMultiVariate
 	{
 		/// <summary>
-		/// Creates a connection to an external database.
+		/// Creates a connection to an external ODBC database.
 		/// </summary>
 		/// <param name="ConnectionString">Connection string.</param>
 		/// <param name="Start">Start position in script expression.</param>
@@ -52,7 +52,7 @@ namespace Waher.Script.Data.Functions
 
 		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
-		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
 		/// </summary>
 		public override bool IsAsynchronous => true;
 

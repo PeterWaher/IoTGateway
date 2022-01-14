@@ -83,7 +83,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Profiling", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Data", "Script\Waher.Script.Data\Waher.Script.Data.csproj", "{A6E2A33D-EABC-4F64-9408-42A9F2715D67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.Data.MySQL", "Script\Waher.Script.Data.MySQL\Waher.Script.Data.MySQL.csproj", "{8B444C04-667C-4A7A-BAD5-EC4CAD13D90C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Data.MySQL", "Script\Waher.Script.Data.MySQL\Waher.Script.Data.MySQL.csproj", "{8B444C04-667C-4A7A-BAD5-EC4CAD13D90C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.Data.PostgreSQL", "Script\Waher.Script.Data.PostgreSQL\Waher.Script.Data.PostgreSQL.csproj", "{70FC9DB1-8E00-4C95-934F-B44D382E14CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -223,6 +225,10 @@ Global
 		{8B444C04-667C-4A7A-BAD5-EC4CAD13D90C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B444C04-667C-4A7A-BAD5-EC4CAD13D90C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B444C04-667C-4A7A-BAD5-EC4CAD13D90C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70FC9DB1-8E00-4C95-934F-B44D382E14CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70FC9DB1-8E00-4C95-934F-B44D382E14CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70FC9DB1-8E00-4C95-934F-B44D382E14CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70FC9DB1-8E00-4C95-934F-B44D382E14CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

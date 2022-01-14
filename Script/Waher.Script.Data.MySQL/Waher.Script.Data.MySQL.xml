@@ -1,0 +1,172 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Script.Data.MySQL</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Script.Data.MySQL.Functions.ConnectMySql">
+            <summary>
+            Creates a connection to an external MySQL database.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Data.MySQL.Functions.ConnectMySql.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a connection to an external MySQL database.
+            </summary>
+            <param name="ConnectionString">Connection string.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.Data.MySQL.Functions.ConnectMySql.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a connection to an external MySQL database.
+            </summary>
+            <param name="ConnectionString">Connection string.</param>
+            <param name="UserName">User Name</param>
+            <param name="Password">Password</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.Data.MySQL.Functions.ConnectMySql.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a connection to an external MySQL database.
+            </summary>
+            <param name="Host">Host machine of database.</param>
+            <param name="Database">Database to connect to.</param>
+            <param name="UserName">User Name</param>
+            <param name="Password">Password</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.Data.MySQL.Functions.ConnectMySql.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Data.MySQL.Functions.ConnectMySql.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Data.MySQL.Functions.ConnectMySql.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Data.MySQL.Functions.ConnectMySql.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Data.MySQL.Functions.ConnectMySql.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Data.MySQL.Model.MySqlDatabase">
+            <summary>
+            Manages a MySQL Server connection
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Data.MySQL.Model.MySqlDatabase.#ctor(MySqlConnector.MySqlConnection)">
+            <summary>
+            Manages a MySQL Server connection
+            </summary>
+            <param name="Connection">Connection</param>
+        </member>
+        <member name="M:Waher.Script.Data.MySQL.Model.MySqlDatabase.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Data.MySQL.Model.MySqlDatabase.ExecuteSqlStatement(System.String)">
+            <summary>
+            Executes an SQL Statement on the database.
+            </summary>
+            <param name="Statement">SQL Statement.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Data.MySQL.Model.MySqlDatabase.GetSchema(System.String)">
+            <summary>
+            Gets a Schema table, given its collection name. 
+            For a list of collections: https://mysqlconnector.net/overview/schema-collections/
+            </summary>
+            <param name="Name">Schema collection</param>
+            <returns>Schema table, as a matrix</returns>
+        </member>
+        <member name="M:Waher.Script.Data.MySQL.Model.MySqlDatabase.GetProcedure(System.String)">
+            <summary>
+            Creates a lambda expression for accessing a stored procedure.
+            </summary>
+            <param name="Name">Name of stored procedure.</param>
+            <returns>Lambda expression.</returns>
+        </member>
+        <member name="P:Waher.Script.Data.MySQL.Model.MySqlDatabase.Item(System.String)">
+            <summary>
+            Creates a lambda expression for accessing a stored procedure.
+            </summary>
+            <param name="Name">Name of stored procedure.</param>
+            <returns>Lambda expression.</returns>
+        </member>
+        <member name="T:Waher.Script.Data.MySQL.Model.StoredProcedure">
+            <summary>
+            Represents a stored precedure in a MySQL Database.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Data.MySQL.Model.StoredProcedure.NrArguments">
+            <summary>
+            Number of arguments.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Data.MySQL.Model.StoredProcedure.ArgumentNames">
+            <summary>
+            Argument Names.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Data.MySQL.Model.StoredProcedure.ArgumentTypes">
+            <summary>
+            Argument types.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Data.MySQL.Model.StoredProcedure.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Data.MySQL.Model.StoredProcedure.Dispose">
+            <summary>
+            <see cref="M:System.IDisposable.Dispose"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Data.MySQL.Model.StoredProcedure.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the lambda expression.
+            </summary>
+            <param name="Arguments">Arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Data.MySQL.Model.StoredProcedure.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the lambda expression.
+            </summary>
+            <param name="Arguments">Arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Data.MySQL.Model.StoredProcedure.ToString">
+            <inheritdoc/>
+        </member>
+    </members>
+</doc>

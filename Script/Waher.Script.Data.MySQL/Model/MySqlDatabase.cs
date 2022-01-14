@@ -13,7 +13,7 @@ namespace Waher.Script.Data.MySQL.Model
 	/// <summary>
 	/// Manages a MySQL Server connection
 	/// </summary>
-	public class MySqlDatabase : IDatabaseConnection
+	public class MySqlDatabase : ISqlDatabaseConnection
 	{
 		private readonly Dictionary<string, StoredProcedure> procedures = new Dictionary<string, StoredProcedure>();
 		private readonly SemaphoreSlim synchObject = new SemaphoreSlim(1);

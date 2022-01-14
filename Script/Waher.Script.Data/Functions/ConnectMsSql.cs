@@ -41,6 +41,21 @@ namespace Waher.Script.Data.Functions
 		}
 
 		/// <summary>
+		/// Creates a connection to an external MS SQL database.
+		/// </summary>
+		/// <param name="Host">Host machine of database.</param>
+		/// <param name="Database">Database to connect to.</param>
+		/// <param name="UserName">User Name</param>
+		/// <param name="Password">Password</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression.</param>
+		public ConnectMsSql(ScriptNode Host, ScriptNode Database, ScriptNode UserName, ScriptNode Password, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Host, Database, UserName, Password }, argumentTypes4Scalar, Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
 		/// Name of the function
 		/// </summary>
 		public override string FunctionName => "ConnectMsSql";
@@ -48,11 +63,11 @@ namespace Waher.Script.Data.Functions
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames => new string[] { "ConnectionString", "UserName", "Password" };
+		public override string[] DefaultArgumentNames => new string[] { "Host", "Database", "UserName", "Password" };
 
 		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
-		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
 		/// </summary>
 		public override bool IsAsynchronous => true;
 
@@ -94,6 +109,22 @@ namespace Waher.Script.Data.Functions
 						Password2.AppendChar(ch);
 
 					Password2.MakeReadOnly();
+					Connection = new SqlConnection(ConnectionString, new SqlCredential(UserName, Password2));
+					break;
+
+				case 4:
+					string Database = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
+					UserName = Arguments[2].AssociatedObjectValue?.ToString() ?? string.Empty;
+					Password = Arguments[3].AssociatedObjectValue?.ToString() ?? string.Empty;
+					Password2 = new SecureString();
+
+					foreach (char ch in Password)
+						Password2.AppendChar(ch);
+
+					Password2.MakeReadOnly();
+
+					ConnectionString = "Data Source=" + ConnectionString + ";Initial Catalog=" + Database;
+
 					Connection = new SqlConnection(ConnectionString, new SqlCredential(UserName, Password2));
 					break;
 			}

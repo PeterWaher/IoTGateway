@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
-using System.Security;
 using System.Threading.Tasks;
 using MySqlConnector;
 using Waher.Script.Abstraction.Elements;
@@ -11,12 +9,12 @@ using Waher.Script.Objects;
 namespace Waher.Script.Data.MySQL.Functions
 {
 	/// <summary>
-	/// Creates a connection to an external MS SQL database.
+	/// Creates a connection to an external MySQL database.
 	/// </summary>
 	public class ConnectMySql : FunctionMultiVariate
 	{
 		/// <summary>
-		/// Creates a connection to an external MS SQL database.
+		/// Creates a connection to an external MySQL database.
 		/// </summary>
 		/// <param name="ConnectionString">Connection string.</param>
 		/// <param name="Start">Start position in script expression.</param>
@@ -28,7 +26,7 @@ namespace Waher.Script.Data.MySQL.Functions
 		}
 
 		/// <summary>
-		/// Creates a connection to an external MS SQL database.
+		/// Creates a connection to an external MySQL database.
 		/// </summary>
 		/// <param name="ConnectionString">Connection string.</param>
 		/// <param name="UserName">User Name</param>
@@ -42,6 +40,21 @@ namespace Waher.Script.Data.MySQL.Functions
 		}
 
 		/// <summary>
+		/// Creates a connection to an external MySQL database.
+		/// </summary>
+		/// <param name="Host">Host machine of database.</param>
+		/// <param name="Database">Database to connect to.</param>
+		/// <param name="UserName">User Name</param>
+		/// <param name="Password">Password</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression.</param>
+		public ConnectMySql(ScriptNode Host, ScriptNode Database, ScriptNode UserName, ScriptNode Password, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Host, Database, UserName, Password }, argumentTypes4Scalar, Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
 		/// Name of the function
 		/// </summary>
 		public override string FunctionName => "ConnectMySql";
@@ -49,11 +62,11 @@ namespace Waher.Script.Data.MySQL.Functions
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames => new string[] { "ConnectionString", "UserName", "Password" };
+		public override string[] DefaultArgumentNames => new string[] { "Host", "Database", "UserName", "Password" };
 
 		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
-		/// <see cref="EvaluateAsync(Variables)"/>.
+		/// <see cref="ScriptNode.EvaluateAsync(Variables)"/>.
 		/// </summary>
 		public override bool IsAsynchronous => true;
 
@@ -83,7 +96,6 @@ namespace Waher.Script.Data.MySQL.Functions
 			{
 				case 1:
 				default:
-					Connection = new MySqlConnection(ConnectionString);
 					break;
 
 				case 3:
@@ -91,10 +103,18 @@ namespace Waher.Script.Data.MySQL.Functions
 					string Password = Arguments[2].AssociatedObjectValue?.ToString() ?? string.Empty;
 
 					ConnectionString += ";User ID=" + UserName + ";Password=" + Password;
-					Connection = new MySqlConnection(ConnectionString);
+					break;
+
+				case 4:
+					string Database = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
+					UserName = Arguments[2].AssociatedObjectValue?.ToString() ?? string.Empty;
+					Password = Arguments[3].AssociatedObjectValue?.ToString() ?? string.Empty;
+
+					ConnectionString = "Server=" + ConnectionString + ";Database=" + Database + ";User ID=" + UserName + ";Password=" + Password;
 					break;
 			}
 
+			Connection = new MySqlConnection(ConnectionString);
 			await Connection.OpenAsync();
 
 			return new ObjectValue(new MySqlDatabase(Connection));

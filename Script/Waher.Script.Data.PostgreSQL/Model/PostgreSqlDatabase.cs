@@ -1,28 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
+using Npgsql;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Data.Model;
 using Waher.Script.Model;
 
-namespace Waher.Script.Data.Model
+namespace Waher.Script.Data.PostgreSQL.Model
 {
 	/// <summary>
-	/// Manages a Microsoft SQL Server connection
+	/// Manages a MySQL Server connection
 	/// </summary>
-	public class MsSqlDatabase : ISqlDatabaseConnection
+	public class PostgreSqlDatabase : ISqlDatabaseConnection
 	{
-		private readonly Dictionary<string, MsSqlStoredProcedure> procedures = new Dictionary<string, MsSqlStoredProcedure>();
+		private readonly Dictionary<string, StoredProcedure> procedures = new Dictionary<string, StoredProcedure>();
 		private readonly SemaphoreSlim synchObject = new SemaphoreSlim(1);
-		private SqlConnection connection;
+		private NpgsqlConnection connection;
 
 		/// <summary>
-		/// Manages a Microsoft SQL Server connection
+		/// Manages a MySQL Server connection
 		/// </summary>
 		/// <param name="Connection">Connection</param>
-		public MsSqlDatabase(SqlConnection Connection)
+		public PostgreSqlDatabase(NpgsqlConnection Connection)
 		{
 			this.connection = Connection;
 		}
@@ -44,11 +45,11 @@ namespace Waher.Script.Data.Model
 		/// <returns>Result</returns>
 		public async Task<IElement> ExecuteSqlStatement(string Statement)
 		{
-			using (SqlCommand Command = this.connection.CreateCommand())
+			using (NpgsqlCommand Command = this.connection.CreateCommand())
 			{
 				Command.CommandType = CommandType.Text;
 				Command.CommandText = Statement;
-				SqlDataReader Reader = await Command.ExecuteReaderAsync();
+				NpgsqlDataReader Reader = await Command.ExecuteReaderAsync();
 
 				return await Reader.ParseAndClose();
 			}
@@ -60,10 +61,10 @@ namespace Waher.Script.Data.Model
 		/// </summary>
 		/// <param name="Name">Schema collection</param>
 		/// <returns>Schema table, as a matrix</returns>
-		public Task<IElement> GetSchema(string Name)
+		public async Task<IElement> GetSchema(string Name)
 		{
-			DataTable Table = this.connection.GetSchema(Name);
-			return Task.FromResult<IElement>(Table.ToMatrix());
+			DataTable Table = await this.connection.GetSchemaAsync(Name);
+			return Table.ToMatrix();
 		}
 
 		/// <summary>
@@ -76,16 +77,16 @@ namespace Waher.Script.Data.Model
 			await this.synchObject.WaitAsync();
 			try
 			{
-				if (this.procedures.TryGetValue(Name, out MsSqlStoredProcedure Result))
+				if (this.procedures.TryGetValue(Name, out StoredProcedure Result))
 					return Result;
 
-				SqlCommand Command = this.connection.CreateCommand();
+				NpgsqlCommand Command = this.connection.CreateCommand();
 				Command.CommandType = CommandType.StoredProcedure;
 				Command.CommandText = this.connection.Database + "." + Name;
-				
-				SqlCommandBuilder.DeriveParameters(Command);
 
-				Result = new MsSqlStoredProcedure(Command);
+				NpgsqlCommandBuilder.DeriveParameters(Command);
+
+				Result = new StoredProcedure(Command);
 				this.procedures[Name] = Result;
 
 				return Result;

@@ -60,7 +60,7 @@ namespace Waher.Script.Data.Functions
 		/// <returns>Function result.</returns>
 		public override Task<IElement> EvaluateScalarAsync(IElement Argument1, IElement Argument2, Variables Variables)
 		{
-			if (!(Argument1?.AssociatedObjectValue is IDatabaseConnection DatabaseConnection))
+			if (!(Argument1?.AssociatedObjectValue is ISqlDatabaseConnection DatabaseConnection))
 				throw new ScriptRuntimeException("First argument must be a database connection.", this);
 
 			if (!(Argument2?.AssociatedObjectValue is string SqlStatement))

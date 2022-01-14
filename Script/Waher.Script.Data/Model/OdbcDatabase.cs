@@ -13,7 +13,7 @@ namespace Waher.Script.Data.Model
 	/// <summary>
 	/// Manages an ODBC SQL connection
 	/// </summary>
-	public class OdbcDatabase : IDatabaseConnection
+	public class OdbcDatabase : ISqlDatabaseConnection
 	{
 		private readonly Dictionary<string, OdbcStoredProcedure> procedures = new Dictionary<string, OdbcStoredProcedure>();
 		private readonly SemaphoreSlim synchObject = new SemaphoreSlim(1);

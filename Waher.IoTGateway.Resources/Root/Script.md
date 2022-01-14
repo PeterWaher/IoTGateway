@@ -1578,9 +1578,25 @@ The following functions can be used to create fractal images based on Iterated F
 | `ConnectMsSql(Host,Database,UserName,Password)`      | Connects to an external Microsoft SQL Server database `Database` hosted by a machine reachable on `Host`, providing credentials. | `db:=ConnectMsSql("Host","Database",UserName,Password)` |
 | `ConnectOdbc(ConnectionString[,UserName,Password])`  | Connects to an external ODBC database using a connection string, and optionally providing credentials. | `db:=ConnectOdbc(cs,UserName,Password)` |
 | `ConnectOleDb(ConnectionString[,UserName,Password])` | Connects to an external OLE DB database using a connection string, and optionally providing credentials. | `db:=ConnectOleDb(cs,UserName,Password)` |
-| `SQL(Database,Statement)`                            | Executes an SQL statement given by the string `Statement` on the database connection provided in `Database`. | `SQL(db,"select * from country")` |
 
 **Note**: To close a connection, destroy the variable containing the connection using the Destroy or Delete function.
+
+##### Closing a connection
+
+To close a connection, destroy the variable containing the connection using the Destroy or Delete function:
+
+```
+Destroy(db)
+```
+
+##### Executing custom SQL on an extenral database
+
+To execute custom SQL on an external database, treat the connection as a lambda expression taking one parameter: The script to execute.
+Any results or result sets will be returned to the script after completing the execution. Example:
+
+```
+Nr:=db("SELECT COUNT(*) from city");
+```
 
 ##### Stored Procedures
 
@@ -1603,21 +1619,25 @@ This syntax is available for all database conncetions that support stored proced
 
 #### External MySQL Database-related functions (Waher.Script.Data.MySQL)
 
+This module adds external database support for MySQL databases. Connections established to MySQL databases work in script, as
+all connection types defined in the [Waher.Script.Data](#externalDatabaseRelatedFunctionsWaherScriptData) library, so the corresponding
+subsections will not be repeated here.
+
 | Function | Description | Example |
 |----------|-------------|---------|
 | `ConnectMySql(ConnectionString[,UserName,Password])` | Connects to an external MySQL Server database usig a connection string, and optionally providing credentials. | `db:=ConnectMySql(cs,UserName,Password)` |
 | `ConnectMySql(Host,Database,UserName,Password)`      | Connects to an external MySQL Server database `Database` hosted by a machine reachable on `Host`, and providing credentials. | `db:=ConnectMySql("Server","Database",UserName,Password)` |
 
-**Note**: To close a connection, destroy the variable containing the connection using the Destroy or Delete function.
-
 #### External PostgreSQL Database-related functions (Waher.Script.Data.PostgreSQL)
+
+This module adds external database support for PostgreSQL databases. Connections established to PostgreSQL databases work in script, as
+all connection types defined in the [Waher.Script.Data](#externalDatabaseRelatedFunctionsWaherScriptData) library, so the corresponding
+subsections will not be repeated here.
 
 | Function | Description | Example |
 |----------|-------------|---------|
 | `ConnectPostgreSql(ConnectionString[,UserName,Password])` | Connects to an external PostgreSQL Server database using a connection string, and optionally providing credentials. | `db:=ConnectPostgreSql(cs,UserName,Password)` |
 | `ConnectPostgreSql(Host,Database,UserName,Password)`      | Connects to an external PostgreSQL Server database `Database` hosted by a machine reachable on `Host`, and providing credentials. | `db:=ConnectPostgreSql("Server","Database",UserName,Password)` |
-
-**Note**: To close a connection, destroy the variable containing the connection using the Destroy or Delete function.
 
 #### Networking-related functions (Waher.Script.Networking)
 

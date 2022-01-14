@@ -13,7 +13,7 @@ namespace Waher.Script.Data.Model
 	/// <summary>
 	/// Manages an OLE DB SQL Server connection
 	/// </summary>
-	public class OleDbDatabase : ISqlDatabaseConnection
+	public class OleDbDatabase : ExternalDatabase
 	{
 		private readonly Dictionary<string, OleDbStoredProcedure> procedures = new Dictionary<string, OleDbStoredProcedure>();
 		private readonly SemaphoreSlim synchObject = new SemaphoreSlim(1);
@@ -31,7 +31,7 @@ namespace Waher.Script.Data.Model
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		public override void Dispose()
 		{
 			this.connection?.Close();
 			this.connection?.Dispose();
@@ -43,7 +43,7 @@ namespace Waher.Script.Data.Model
 		/// </summary>
 		/// <param name="Statement">SQL Statement.</param>
 		/// <returns>Result</returns>
-		public async Task<IElement> ExecuteSqlStatement(string Statement)
+		public override async Task<IElement> ExecuteSqlStatement(string Statement)
 		{
 			using (OleDbCommand Command = this.connection.CreateCommand())
 			{
@@ -61,7 +61,7 @@ namespace Waher.Script.Data.Model
 		/// </summary>
 		/// <param name="Name">Schema collection</param>
 		/// <returns>Schema table, as a matrix</returns>
-		public Task<IElement> GetSchema(string Name)
+		public override Task<IElement> GetSchema(string Name)
 		{
 			DataTable Table = this.connection.GetSchema(Name);
 			return Task.FromResult<IElement>(Table.ToMatrix());
@@ -72,7 +72,7 @@ namespace Waher.Script.Data.Model
 		/// </summary>
 		/// <param name="Name">Name of stored procedure.</param>
 		/// <returns>Lambda expression.</returns>
-		public async Task<ILambdaExpression> GetProcedure(string Name)
+		public override async Task<ILambdaExpression> GetProcedure(string Name)
 		{
 			await this.synchObject.WaitAsync();
 			try
@@ -96,12 +96,5 @@ namespace Waher.Script.Data.Model
 				this.synchObject.Release();
 			}
 		}
-
-		/// <summary>
-		/// Creates a lambda expression for accessing a stored procedure.
-		/// </summary>
-		/// <param name="Name">Name of stored procedure.</param>
-		/// <returns>Lambda expression.</returns>
-		public Task<ILambdaExpression> this[string Name] => this.GetProcedure(Name);
 	}
 }

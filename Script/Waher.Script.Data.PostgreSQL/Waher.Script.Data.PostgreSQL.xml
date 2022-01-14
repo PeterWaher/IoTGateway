@@ -111,13 +111,6 @@
             <param name="Name">Name of stored procedure.</param>
             <returns>Lambda expression.</returns>
         </member>
-        <member name="P:Waher.Script.Data.PostgreSQL.Model.PostgreSqlDatabase.Item(System.String)">
-            <summary>
-            Creates a lambda expression for accessing a stored procedure.
-            </summary>
-            <param name="Name">Name of stored procedure.</param>
-            <returns>Lambda expression.</returns>
-        </member>
         <member name="T:Waher.Script.Data.PostgreSQL.Model.StoredProcedure">
             <summary>
             Represents a stored precedure in a MySQL Database.

@@ -8,7 +8,7 @@ namespace Waher.Script.Data.Model
 	/// <summary>
 	/// Interface for database connections
 	/// </summary>
-	public interface ISqlDatabaseConnection : IDisposable
+	public interface IDatabaseConnection : ILambdaExpression, IDisposable
 	{
 		/// <summary>
 		/// Executes an SQL Statement on the database.

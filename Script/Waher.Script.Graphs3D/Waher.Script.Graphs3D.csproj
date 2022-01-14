@@ -39,7 +39,7 @@ https://waher.se/Script.md#3dGraphFunctionsWaherScriptGraphs3d</Description>
     <None Remove="Functions\Transforms\**" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="SkiaSharp" Version="2.80.2" />
+    <PackageReference Include="SkiaSharp" Version="2.80.3" />
     <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>

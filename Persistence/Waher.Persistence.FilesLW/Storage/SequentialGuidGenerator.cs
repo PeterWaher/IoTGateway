@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 using System.Security.Cryptography;
 #endif
 using System.Text;
@@ -17,7 +17,7 @@ namespace Waher.Persistence.Files.Storage
 	{
 		private readonly static DateTime reference = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 		private RandomNumberGenerator gen;
 #else
 		private Random gen;
@@ -34,7 +34,7 @@ namespace Waher.Persistence.Files.Storage
 		/// </summary>
 		public SequentialGuidGenerator()
 		{
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 			StringBuilder sb = new StringBuilder();
 
 			sb.Append(Environment.MachineName);
@@ -93,7 +93,7 @@ namespace Waher.Persistence.Files.Storage
 
 			lock (this.gen)
 			{
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 				this.gen.GetBytes(this.random);
 #else
 				this.gen.NextBytes(this.random);
@@ -126,7 +126,7 @@ namespace Waher.Persistence.Files.Storage
 		/// </summary>
 		public void Dispose()
 		{
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 			this.gen?.Dispose();
 #endif
 			this.gen = null;

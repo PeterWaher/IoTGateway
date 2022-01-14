@@ -20,11 +20,11 @@ namespace Waher.Persistence.Serialization
 		private AutoResetEvent serializerAdded = new AutoResetEvent(false);
 		private readonly ISerializerContext context;
 		private readonly object synchObj = new object();
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 		private readonly bool compiled;
 #endif
 
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 		/// <summary>
 		/// Maintains a set of serializers.
 		/// </summary>
@@ -41,7 +41,7 @@ namespace Waher.Persistence.Serialization
 		{
 			this.context = Context;
 			this.serializers = new Dictionary<Type, IObjectSerializer>();
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 			this.compiled = Compiled;
 #endif
 
@@ -186,7 +186,7 @@ namespace Waher.Persistence.Serialization
 
 			try
 			{
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 				Result = await ObjectSerializer.Create(Type, this.context, this.compiled);
 #else
 				Result = await ObjectSerializer.Create(Type, this.context);

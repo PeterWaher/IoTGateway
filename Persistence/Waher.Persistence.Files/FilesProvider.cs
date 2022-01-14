@@ -54,7 +54,7 @@ namespace Waher.Persistence.Files
 	/// </summary>
 	public class FilesProvider : IDisposable, IDatabaseProvider, ISerializerContext
 	{
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 #endif
 		private static bool asyncFileIo = true;
@@ -82,7 +82,7 @@ namespace Waher.Persistence.Files
 		private int bulkCount = 0;
 		private readonly bool encrypted;
 		private readonly CustomKeyHandler customKeyMethod;
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 		private readonly bool compiled;
 		private bool deleteObsoleteKeys = true;
 #endif
@@ -131,7 +131,7 @@ namespace Waher.Persistence.Files
 			this.timeoutMilliseconds = TimeoutMilliseconds;
 			this.encrypted = Encrypted;
 			this.customKeyMethod = CustomKeyMethod;
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 			this.compiled = Compiled;
 			this.serializers = new SerializerCollection(this, this.compiled);
 #else
@@ -144,7 +144,7 @@ namespace Waher.Persistence.Files
 			this.blocks = new Cache<long, byte[]>(BlocksInCache, TimeSpan.MaxValue, TimeSpan.FromHours(1), true);
 		}
 
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 		/// <summary>
 		/// Persists objects into binary files.
 		/// </summary>
@@ -216,7 +216,7 @@ namespace Waher.Persistence.Files
 				false, false, null, null);
 		}
 
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 		/// <summary>
 		/// Persists objects into binary files.
 		/// </summary>
@@ -341,7 +341,7 @@ namespace Waher.Persistence.Files
 				false, false, null, Thread);
 		}
 
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 		/// <summary>
 		/// Persists objects into binary files.
 		/// </summary>
@@ -525,7 +525,7 @@ namespace Waher.Persistence.Files
 			get { return this.encrypted; }
 		}
 
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 		/// <summary>
 		/// If object serializers should be compiled or not.
 		/// </summary>
@@ -835,7 +835,7 @@ namespace Waher.Persistence.Files
 		{
 			byte[] Key, IV;
 
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 			if (!(this.customKeyMethod is null))
 			{
 #endif
@@ -846,7 +846,7 @@ namespace Waher.Persistence.Files
 					Key = Sha256.ComputeHash(P.Key);
 					IV = Sha256.ComputeHash(P.Value);
 				}
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 			}
 			else
 			{
@@ -1403,7 +1403,7 @@ namespace Waher.Persistence.Files
 		{
 			StringBuilder sb = new StringBuilder();
 
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 			string s;
 			bool Exists;
 			byte[] Hash;
@@ -3167,7 +3167,7 @@ namespace Waher.Persistence.Files
 							}
 						}
 
-#if NETSTANDARD1_5
+#if NETSTANDARD2_0
 						if (File.Encrypted && this.customKeyMethod is null)
 						{
 							try

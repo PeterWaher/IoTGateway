@@ -250,7 +250,7 @@
 	<Assembly fileName='MongoDB.Driver.Core.dll'/>
 	<Assembly fileName='MongoDB.Libmongocrypt.dll'/>
 	<Assembly fileName='MySqlConnector.dll'/>
-	<Assembly fileName='Ngpsql.dll'/>
+	<Assembly fileName='Npgsql.dll'/>
 	<Assembly fileName='SharpCompress.dll'/>
 	<Assembly fileName='SkiaSharp.dll'/>
 	<Assembly fileName='snappy32.dll'/>

@@ -534,7 +534,7 @@
 							<File Id='MongoDB.Driver.Core.dll' Name='MongoDB.Driver.Core.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MongoDB.Driver.Core.dll' Vital='yes'/>
 							<File Id='MongoDB.Libmongocrypt.dll' Name='MongoDB.Libmongocrypt.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MongoDB.Libmongocrypt.dll' Vital='yes'/>
 							<File Id='MySqlConnector.dll' Name='MySqlConnector.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MySqlConnector.dll' Vital='yes'/>
-							<File Id='Ngpsql.dll' Name='Ngpsql.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Ngpsql.dll' Vital='yes'/>
+							<File Id='Npgsql.dll' Name='Npgsql.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Npgsql.dll' Vital='yes'/>
 							<File Id='sni.dll' Name='sni.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\sni.dll' Vital='yes'/>
 							<File Id='SharpCompress.dll' Name='SharpCompress.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\SharpCompress.dll' Vital='yes'/>
 							<File Id='SkiaSharp.dll' Name='SkiaSharp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\SkiaSharp.dll' Vital='yes'/>
@@ -549,7 +549,7 @@
 							<RemoveFile Id='RemoveMongoDB.Driver.Core.dll' Name='MongoDB.Driver.Core.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMongoDB.Libmongocrypt.dll' Name='MongoDB.Libmongocrypt.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMySqlConnector.dll' Name='MySqlConnector.dll' On='uninstall'/>
-							<RemoveFile Id='RemoveNgpsql.dll' Name='Ngpsql.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveNpgsql.dll' Name='Npgsql.dll' On='uninstall'/>
 							<RemoveFile Id='Removesni.dll' Name='sni.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveSharpCompress.dll' Name='SharpCompress.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveSkiaSharp.dll' Name='SkiaSharp.dll' On='uninstall'/>

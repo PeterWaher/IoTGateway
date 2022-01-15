@@ -143,10 +143,14 @@
 							<File Id='System.Data.Common.dll' Name='System.Data.Common.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Data.Common.dll' Vital='yes'/>
 							<File Id='System.Data.DataSetExtensions.dll' Name='System.Data.DataSetExtensions.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Data.DataSetExtensions.dll' Vital='yes'/>
 							<File Id='System.Data.dll' Name='System.Data.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Data.dll' Vital='yes'/>
+							<File Id='System.Data.Odbc.dll' Name='System.Data.Odbc.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Data.Odbc.dll' Vital='yes'/>
+							<File Id='System.Data.OleDb.dll' Name='System.Data.OleDb.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Data.OleDb.dll' Vital='yes'/>
+							<File Id='System.Data.SqlClient.dll' Name='System.Data.SqlClient.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Data.SqlClient.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.Contracts.dll' Name='System.Diagnostics.Contracts.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.Contracts.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.Debug.dll' Name='System.Diagnostics.Debug.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.Debug.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.DiagnosticSource.dll' Name='System.Diagnostics.DiagnosticSource.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.DiagnosticSource.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.EventLog.dll' Name='System.Diagnostics.EventLog.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.EventLog.dll' Vital='yes'/>
+							<File Id='System.Diagnostics.EventLog.Messages.dll' Name='System.Diagnostics.EventLog.Messages.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.EventLog.Messages.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.FileVersionInfo.dll' Name='System.Diagnostics.FileVersionInfo.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.FileVersionInfo.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.Process.dll' Name='System.Diagnostics.Process.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.Process.dll' Vital='yes'/>
 							<File Id='System.Diagnostics.PerformanceCounter.dll' Name='System.Diagnostics.PerformanceCounter.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\System.Diagnostics.PerformanceCounter.dll' Vital='yes'/>
@@ -312,10 +316,14 @@
 							<RemoveFile Id='RemoveSystem.Data.Common.dll' Name='System.Data.Common.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Data.DataSetExtensions.dll' Name='System.Data.DataSetExtensions.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Data.dll' Name='System.Data.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Data.Odbc.dll' Name='System.Data.Odbc.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Data.OleDb.dll' Name='System.Data.OleDb.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Data.SqlClient.dll' Name='System.Data.SqlClient.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Diagnostics.Contracts.dll' Name='System.Diagnostics.Contracts.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Diagnostics.Debug.dll' Name='System.Diagnostics.Debug.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Diagnostics.DiagnosticSource.dll' Name='System.Diagnostics.DiagnosticSource.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Diagnostics.EventLog.dll' Name='System.Diagnostics.EventLog.dll' On='uninstall' />
+							<RemoveFile Id='RemoveSystem.Diagnostics.EventLog.Messages.dll' Name='System.Diagnostics.EventLog.Messages.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Diagnostics.FileVersionInfo.dll' Name='System.Diagnostics.FileVersionInfo.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Diagnostics.PerformanceCounter.dll' Name='System.Diagnostics.PerformanceCounter.dll' On='uninstall' />
 							<RemoveFile Id='RemoveSystem.Diagnostics.Process.dll' Name='System.Diagnostics.Process.dll' On='uninstall' />
@@ -520,10 +528,14 @@
 							<File Id='DnsClient.dll' Name='DnsClient.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\DnsClient.dll' Vital='yes' KeyPath='yes'/>
 							<File Id='libSkiaSharp.dll' Name='libSkiaSharp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\libSkiaSharp.dll' Vital='yes'/>
 							<File Id='libzstd.dll' Name='libzstd.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\libzstd.dll' Vital='yes'/>
+							<File Id='mongocrypt.dll' Name='mongocrypt.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\mongocrypt.dll' Vital='yes'/>
 							<File Id='MongoDB.Bson.dll' Name='MongoDB.Bson.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MongoDB.Bson.dll' Vital='yes'/>
 							<File Id='MongoDB.Driver.dll' Name='MongoDB.Driver.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MongoDB.Driver.dll' Vital='yes'/>
 							<File Id='MongoDB.Driver.Core.dll' Name='MongoDB.Driver.Core.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MongoDB.Driver.Core.dll' Vital='yes'/>
 							<File Id='MongoDB.Libmongocrypt.dll' Name='MongoDB.Libmongocrypt.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MongoDB.Libmongocrypt.dll' Vital='yes'/>
+							<File Id='MySqlConnector.dll' Name='MySqlConnector.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\MySqlConnector.dll' Vital='yes'/>
+							<File Id='Ngpsql.dll' Name='Ngpsql.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Ngpsql.dll' Vital='yes'/>
+							<File Id='sni.dll' Name='sni.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\sni.dll' Vital='yes'/>
 							<File Id='SharpCompress.dll' Name='SharpCompress.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\SharpCompress.dll' Vital='yes'/>
 							<File Id='SkiaSharp.dll' Name='SkiaSharp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\SkiaSharp.dll' Vital='yes'/>
 							<File Id='snappy32.dll' Name='snappy32.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\snappy32.dll' Vital='yes'/>
@@ -531,10 +543,14 @@
 							<RemoveFile Id='RemoveDnsClient.dll' Name='DnsClient.dll' On='uninstall'/>
 							<RemoveFile Id='RemovelibSkiaSharp.dll' Name='libSkiaSharp.dll' On='uninstall'/>
 							<RemoveFile Id='Removelibzstd.dll' Name='libzstd.dll' On='uninstall'/>
+							<RemoveFile Id='Removemongocrypt.dll' Name='mongocrypt.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMongoDB.Bson.dll' Name='MongoDB.Bson.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMongoDB.Driver.dll' Name='MongoDB.Driver.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMongoDB.Driver.Core.dll' Name='MongoDB.Driver.Core.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMongoDB.Libmongocrypt.dll' Name='MongoDB.Libmongocrypt.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveMySqlConnector.dll' Name='MySqlConnector.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveNgpsql.dll' Name='Ngpsql.dll' On='uninstall'/>
+							<RemoveFile Id='Removesni.dll' Name='sni.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveSharpCompress.dll' Name='SharpCompress.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveSkiaSharp.dll' Name='SkiaSharp.dll' On='uninstall'/>
 							<RemoveFile Id='Removesnappy32.dll' Name='snappy32.dll' On='uninstall'/>
@@ -625,6 +641,9 @@
 							<File Id='Waher.Script.dll' Name='Waher.Script.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.dll' Vital='yes'/>
 							<File Id='Waher.Script.Content.dll' Name='Waher.Script.Content.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Content.dll' Vital='yes'/>
 							<File Id='Waher.Script.Cryptography.dll' Name='Waher.Script.Cryptography.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Cryptography.dll' Vital='yes'/>
+							<File Id='Waher.Script.Data.dll' Name='Waher.Script.Data.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Data.dll' Vital='yes'/>
+							<File Id='Waher.Script.Data.MySQL.dll' Name='Waher.Script.Data.MySQL.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Data.MySQL.dll' Vital='yes'/>
+							<File Id='Waher.Script.Data.PostgreSQL.dll' Name='Waher.Script.Data.PostgreSQL.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Data.PostgreSQL.dll' Vital='yes'/>
 							<File Id='Waher.Script.Fractals.dll' Name='Waher.Script.Fractals.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Fractals.dll' Vital='yes'/>
 							<File Id='Waher.Script.Graphs.dll' Name='Waher.Script.Graphs.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Graphs.dll' Vital='yes'/>
 							<File Id='Waher.Script.Graphs3D.dll' Name='Waher.Script.Graphs3D.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Graphs3D.dll' Vital='yes'/>
@@ -734,6 +753,9 @@
 							<RemoveFile Id='RemoveWaher.Script.dll' Name='Waher.Script.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Content.dll' Name='Waher.Script.Content.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Cryptography.dll' Name='Waher.Script.Cryptography.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Data.dll' Name='Waher.Script.Data.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Data.MySQL.dll' Name='Waher.Script.Data.MySQL.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Data.PostgreSQL.dll' Name='Waher.Script.Data.PostgreSQL.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Fractals.dll' Name='Waher.Script.Fractals.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Graphs.dll' Name='Waher.Script.Graphs.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Graphs3D.dll' Name='Waher.Script.Graphs3D.dll' On='uninstall'/>
@@ -833,6 +855,9 @@
 							<File Id='Waher.Script.pdb' Name='Waher.Script.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Content.pdb' Name='Waher.Script.Content.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Content.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Cryptography.pdb' Name='Waher.Script.Cryptography.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Cryptography.pdb' Vital='yes'/>
+							<File Id='Waher.Script.Data.pdb' Name='Waher.Script.Data.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Data.pdb' Vital='yes'/>
+							<File Id='Waher.Script.Data.MySQL.pdb' Name='Waher.Script.Data.MySQL.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Data.MySQL.pdb' Vital='yes'/>
+							<File Id='Waher.Script.Data.PostgreSQL.pdb' Name='Waher.Script.Data.PostgreSQL.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Data.PostgreSQL.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Fractals.pdb' Name='Waher.Script.Fractals.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Fractals.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Graphs.pdb' Name='Waher.Script.Graphs.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Graphs.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Graphs3D.pdb' Name='Waher.Script.Graphs3D.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Graphs3D.pdb' Vital='yes'/>
@@ -920,6 +945,9 @@
 							<RemoveFile Id='RemoveWaher.Script.pdb' Name='Waher.Script.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Content.pdb' Name='Waher.Script.Content.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Cryptography.pdb' Name='Waher.Script.Cryptography.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Data.pdb' Name='Waher.Script.Data.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Data.MySQL.pdb' Name='Waher.Script.Data.MySQL.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Data.PostgreSQL.pdb' Name='Waher.Script.Data.PostgreSQL.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Fractals.pdb' Name='Waher.Script.Fractals.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Graphs.pdb' Name='Waher.Script.Graphs.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Graphs3D.pdb' Name='Waher.Script.Graphs3D.pdb' On='uninstall'/>

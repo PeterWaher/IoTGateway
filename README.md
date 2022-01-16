@@ -475,6 +475,7 @@ The [Utilities](Utilities) folder contains applications that help the developer 
 | **Waher.Utility.RunScript**        | .NET Core 3.1 |       | The [Waher.Utility.RunScript](Utilities/Waher.Utility.RunScript) is a command-line tool that allows you to execute script. |
 | **Waher.Utility.Sign**             | .NET Core 3.1 |       | The [Waher.Utility.Sign](Utilities/Waher.Utility.Sign) is a command-line tool that helps you sign files using asymmetric keys. |
 | **Waher.Utility.Transform**        | .NET Core 3.1 |       | The [Waher.Utility.Transform](Utilities/Waher.Utility.Transform) is a command-line tool that transforms an XML file utilizing an XSL Transform (XSLT). |
+| **Waher.Utility.Translate**        | .NET Core 3.1 |       | The [Waher.Utility.Translate](Utilities/Waher.Utility.Translate) is a command-line tool that helps translating resource strings from one language to another. It uses an internal database to check for updates, and performs translations only of new or updated strings accordingly. |
 
 Web Services
 ----------------------

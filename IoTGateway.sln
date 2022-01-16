@@ -491,6 +491,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Data.MySQL", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Data.PostgreSQL", "Script\Waher.Script.Data.PostgreSQL\Waher.Script.Data.PostgreSQL.csproj", "{F431BD0E-74E1-4028-B377-453F78C9E0E3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Utility.Translate", "Utilities\Waher.Utility.Translate\Waher.Utility.Translate.csproj", "{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -5524,6 +5526,30 @@ Global
 		{F431BD0E-74E1-4028-B377-453F78C9E0E3}.Release|x64.Build.0 = Release|Any CPU
 		{F431BD0E-74E1-4028-B377-453F78C9E0E3}.Release|x86.ActiveCfg = Release|Any CPU
 		{F431BD0E-74E1-4028-B377-453F78C9E0E3}.Release|x86.Build.0 = Release|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Debug|ARM.Build.0 = Debug|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Debug|x64.Build.0 = Debug|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Debug|x86.Build.0 = Debug|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Release|ARM.ActiveCfg = Release|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Release|ARM.Build.0 = Release|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Release|ARM64.Build.0 = Release|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Release|x64.ActiveCfg = Release|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Release|x64.Build.0 = Release|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Release|x86.ActiveCfg = Release|Any CPU
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -5730,6 +5756,7 @@ Global
 		{148F39FE-F8F4-48E0-AFDA-93A70ADD24A1} = {A26DA5FE-E41B-458F-AA90-EB0ADC43E39B}
 		{17C50486-E8BC-496C-939E-0805A84BFE39} = {A26DA5FE-E41B-458F-AA90-EB0ADC43E39B}
 		{F431BD0E-74E1-4028-B377-453F78C9E0E3} = {A26DA5FE-E41B-458F-AA90-EB0ADC43E39B}
+		{46A2764B-90E8-40FE-9E5A-59CE0ED3AD01} = {5DB13D03-2513-4181-B5BF-891A6974B4A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

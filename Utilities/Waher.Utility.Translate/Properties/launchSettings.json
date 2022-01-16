@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Waher.Utility.Translate": {
+      "commandName": "Project",
+      "commandLineArgs": "-d Test -e -rf \"C:\\My Projects\\IdApp\\IdApp\\IdApp\\AppResources.resx\" -rl en -tf \"C:\\My Projects\\IdApp\\IdApp\\IdApp\\AppResources.pt.resx\" -tl pt -df Diff.resx"
+    }
+  }
+}

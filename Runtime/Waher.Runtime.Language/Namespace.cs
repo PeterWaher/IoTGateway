@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
@@ -16,7 +15,7 @@ namespace Waher.Runtime.Language
 	[TypeName(TypeNameSerialization.None)]
 	public class Namespace
 	{
-		private readonly SortedDictionary<int, LanguageString> stringsById = new SortedDictionary<int, LanguageString>();
+		private readonly SortedDictionary<string, LanguageString> stringsById = new SortedDictionary<string, LanguageString>();
 		private readonly object synchObject = new object();
 		private Guid objectId = Guid.Empty;
 		private Guid languageId = Guid.Empty;
@@ -63,7 +62,17 @@ namespace Waher.Runtime.Language
 		/// </summary>
 		/// <param name="Id">String ID.</param>
 		/// <returns>String object, if found, or null if not found.</returns>
-		public async Task<LanguageString> GetStringAsync(int Id)
+		public Task<LanguageString> GetStringAsync(int Id)
+		{
+			return this.GetStringAsync(Id.ToString());
+		}
+
+		/// <summary>
+		/// Gets the string object, given its ID, if available.
+		/// </summary>
+		/// <param name="Id">String ID.</param>
+		/// <returns>String object, if found, or null if not found.</returns>
+		public async Task<LanguageString> GetStringAsync(string Id)
 		{
 			lock (this.synchObject)
 			{
@@ -91,13 +100,24 @@ namespace Waher.Runtime.Language
 		/// <param name="Id">String ID</param>
 		/// <param name="Default">Default (untranslated) string.</param>
 		/// <returns>Localized string.</returns>
-		public async Task<string> GetStringAsync(int Id, string Default)
+		public Task<string> GetStringAsync(int Id, string Default)
+		{
+			return this.GetStringAsync(Id.ToString(), Default);
+		}
+
+		/// <summary>
+		/// Gets the string value of a string ID. If no such string exists, a string is created with the default value.
+		/// </summary>
+		/// <param name="Id">String ID</param>
+		/// <param name="Default">Default (untranslated) string.</param>
+		/// <returns>Localized string.</returns>
+		public async Task<string> GetStringAsync(string Id, string Default)
 		{
 			LanguageString StringObj = await this.GetStringAsync(Id);
 			if (!(StringObj is null))
 				return StringObj.Value;
 
-			StringObj = await this.CreateStringAsync(Id, Default, true);
+			StringObj = await this.CreateStringAsync(Id, Default, TranslationLevel.Untranslated);
 
 			return StringObj.Value;
 		}
@@ -135,17 +155,17 @@ namespace Waher.Runtime.Language
 		/// </summary>
 		/// <param name="Id">String ID</param>
 		/// <param name="Value">Localized value.</param>
-		/// <param name="Untranslated">If the string is untranslated.</param>
+		/// <param name="Level">Translation level of the string.</param>
 		/// <returns>Namespace object.</returns>
-		public async Task<LanguageString> CreateStringAsync(int Id, string Value, bool Untranslated)
+		public async Task<LanguageString> CreateStringAsync(string Id, string Value, TranslationLevel Level)
 		{
 			LanguageString Result = await this.GetStringAsync(Id);
 			if (!(Result is null))
 			{
-				if (Result.Value != Value && (!Untranslated || Result.Untranslated))
+				if (Result.Value != Value && (Level >= Result.Level))
 				{
 					Result.Value = Value;
-					Result.Untranslated = Untranslated;
+					Result.Level = Level;
 
 					await Database.Update(Result);
 				}
@@ -159,7 +179,7 @@ namespace Waher.Runtime.Language
 					NamespaceId = this.objectId,
 					Id = Id,
 					Value = Value,
-					Untranslated = Untranslated
+					Level = Level
 				};
 
 				lock (synchObject)
@@ -177,7 +197,7 @@ namespace Waher.Runtime.Language
 		/// Deletes a string from the namespace.
 		/// </summary>
 		/// <param name="Id">String ID.</param>
-		public async Task DeleteStringAsync(int Id)
+		public async Task DeleteStringAsync(string Id)
 		{
 			LanguageString s = await this.GetStringAsync(Id);
 			if (!(s is null))

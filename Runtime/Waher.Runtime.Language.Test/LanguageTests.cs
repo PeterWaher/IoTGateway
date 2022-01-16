@@ -92,7 +92,7 @@ namespace Waher.Runtime.Language.Test
 		{
 			Language Language = await Translator.GetLanguageAsync("en");
 			Namespace Namespace = await Language.GetNamespaceAsync("Test");
-			string s = await Namespace.GetStringAsync(1, "Hello world.");
+			string s = await Namespace.GetStringAsync("1", "Hello world.");
 			Assert.AreEqual("Hello world.", s);
 		}
 
@@ -110,7 +110,7 @@ namespace Waher.Runtime.Language.Test
 		public async Task Language_Test_08_GetString2()
 		{
 			Language Language = await Translator.GetLanguageAsync("en");
-			string s = await Language.GetStringAsync(typeof(LanguageTests), 1, "Hello world.");
+			string s = await Language.GetStringAsync(typeof(LanguageTests), "1", "Hello world.");
 			Assert.AreEqual("Hello world.", s);
 		}
 

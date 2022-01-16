@@ -209,8 +209,8 @@ namespace Waher.Runtime.Language
 			byte[] Flag;
 			int? FlagWidth;
 			int? FlagHeight;
-			int? Id = null;
-			bool Untranslated = false;
+			string Id = null;
+			TranslationLevel Level = TranslationLevel.HumanTranslated;
 			bool InString = false;
 
 			while (Xml.Read())
@@ -298,7 +298,7 @@ namespace Waher.Runtime.Language
 
 							case "String":
 								Id = null;
-								Untranslated = false;
+								Level = TranslationLevel.HumanTranslated;
 								InString = true;
 								Value = null;
 
@@ -309,11 +309,15 @@ namespace Waher.Runtime.Language
 										switch (Xml.Name)
 										{
 											case "id":
-												Id = int.Parse(Xml.Value);
+												Id = Xml.Value;
+												break;
+
+											case "level":
+												Level = (TranslationLevel)Enum.Parse(typeof(TranslationLevel), Xml.Value);
 												break;
 
 											case "untranslated":
-												Untranslated = (Xml.Value == "true");
+												Level = (Xml.Value == "true") ? TranslationLevel.Untranslated : TranslationLevel.HumanTranslated;
 												break;
 										}
 									}
@@ -326,12 +330,12 @@ namespace Waher.Runtime.Language
 					case XmlNodeType.EndElement:
 						if (InString)
 						{
-							if (Id.HasValue && !(Value is null))
+							if (!string.IsNullOrEmpty(Id) && !(Value is null))
 							{
 								if (string.IsNullOrEmpty(Value))
-									await Namespace.DeleteStringAsync(Id.Value);
+									await Namespace.DeleteStringAsync(Id);
 								else
-									await Namespace.CreateStringAsync(Id.Value, Value, Untranslated);
+									await Namespace.CreateStringAsync(Id, Value, Level);
 							}
 
 							InString = false;

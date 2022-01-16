@@ -19,8 +19,8 @@
 											<xs:complexType>
 												<xs:simpleContent>
 													<xs:extension base="xs:string">
-														<xs:attribute name="id" type="xs:positiveInteger" use="required"/>
-														<xs:attribute name="untranslated" type="xs:boolean" use="optional" default="false"/>
+														<xs:attribute name="id" type="xs:string" use="required"/>
+														<xs:attribute name="level" type="TranslationLevel" use="optional" default="HumanTranslated"/>
 													</xs:extension>
 												</xs:simpleContent>
 											</xs:complexType>
@@ -40,5 +40,13 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
+
+	<xs:simpleType name="TranslationLevel">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Untranslated"/>
+			<xs:enumeration value="MachineTranslated"/>
+			<xs:enumeration value="HumanTranslated"/>
+		</xs:restriction>
+	</xs:simpleType>
 
 </xs:schema>

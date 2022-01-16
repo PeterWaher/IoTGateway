@@ -73,8 +73,37 @@
             <param name="Default">Default (untranslated) string.</param>
             <returns>Localized string.</returns>
         </member>
+        <member name="M:Waher.Runtime.Language.Language.GetStringAsync(System.Type,System.String,System.String)">
+            <summary>
+            Gets the string value of a string ID. If no such string exists, a string is created with the default value.
+            </summary>
+            <param name="Type">Type, whose namespace defines in what language namespace the string will be fetched.</param>
+            <param name="Id">String ID</param>
+            <param name="Default">Default (untranslated) string.</param>
+            <returns>Localized string.</returns>
+        </member>
         <member name="M:Waher.Runtime.Language.Language.ToString">
             <inheritdoc/>
+        </member>
+        <member name="T:Waher.Runtime.Language.TranslationLevel">
+            <summary>
+            Translation level.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Language.TranslationLevel.Untranslated">
+            <summary>
+            String is untranslated.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Language.TranslationLevel.MachineTranslated">
+            <summary>
+            String is machine translated.
+            </summary>
+        </member>
+        <member name="F:Waher.Runtime.Language.TranslationLevel.HumanTranslated">
+            <summary>
+            String is humanly translated, or verified by human.
+            </summary>
         </member>
         <member name="T:Waher.Runtime.Language.LanguageString">
             <summary>
@@ -106,9 +135,14 @@
             Localized value.
             </summary>
         </member>
-        <member name="P:Waher.Runtime.Language.LanguageString.Untranslated">
+        <member name="P:Waher.Runtime.Language.LanguageString.Level">
             <summary>
             If the string is untranslated.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Language.LanguageString.Untranslated">
+            <summary>
+            Lega
             </summary>
         </member>
         <member name="M:Waher.Runtime.Language.LanguageString.ToString">
@@ -146,7 +180,22 @@
             <param name="Id">String ID.</param>
             <returns>String object, if found, or null if not found.</returns>
         </member>
+        <member name="M:Waher.Runtime.Language.Namespace.GetStringAsync(System.String)">
+            <summary>
+            Gets the string object, given its ID, if available.
+            </summary>
+            <param name="Id">String ID.</param>
+            <returns>String object, if found, or null if not found.</returns>
+        </member>
         <member name="M:Waher.Runtime.Language.Namespace.GetStringAsync(System.Int32,System.String)">
+            <summary>
+            Gets the string value of a string ID. If no such string exists, a string is created with the default value.
+            </summary>
+            <param name="Id">String ID</param>
+            <param name="Default">Default (untranslated) string.</param>
+            <returns>Localized string.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Language.Namespace.GetStringAsync(System.String,System.String)">
             <summary>
             Gets the string value of a string ID. If no such string exists, a string is created with the default value.
             </summary>
@@ -160,16 +209,16 @@
             </summary>
             <returns>Strings.</returns>
         </member>
-        <member name="M:Waher.Runtime.Language.Namespace.CreateStringAsync(System.Int32,System.String,System.Boolean)">
+        <member name="M:Waher.Runtime.Language.Namespace.CreateStringAsync(System.String,System.String,Waher.Runtime.Language.TranslationLevel)">
             <summary>
             Creates a new language string, or updates an existing language string, if one exist with the same properties.
             </summary>
             <param name="Id">String ID</param>
             <param name="Value">Localized value.</param>
-            <param name="Untranslated">If the string is untranslated.</param>
+            <param name="Level">Translation level of the string.</param>
             <returns>Namespace object.</returns>
         </member>
-        <member name="M:Waher.Runtime.Language.Namespace.DeleteStringAsync(System.Int32)">
+        <member name="M:Waher.Runtime.Language.Namespace.DeleteStringAsync(System.String)">
             <summary>
             Deletes a string from the namespace.
             </summary>

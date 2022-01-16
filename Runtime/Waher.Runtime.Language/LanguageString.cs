@@ -1,12 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Waher.Persistence;
 using Waher.Persistence.Attributes;
 
 namespace Waher.Runtime.Language
 {
+	/// <summary>
+	/// Translation level.
+	/// </summary>
+	public enum TranslationLevel
+	{
+		/// <summary>
+		/// String is untranslated.
+		/// </summary>
+		Untranslated = 0,
+
+		/// <summary>
+		/// String is machine translated.
+		/// </summary>
+		MachineTranslated = 1,
+
+		/// <summary>
+		/// String is humanly translated, or verified by human.
+		/// </summary>
+		HumanTranslated = 2
+	}
+
 	/// <summary>
 	/// Contains a localized string.
 	/// </summary>
@@ -17,9 +34,9 @@ namespace Waher.Runtime.Language
 	{
 		private Guid objectId = Guid.Empty;
 		private Guid namespaceId = Guid.Empty;
-		private int id = 0;
+		private string id = string.Empty;
 		private string value = string.Empty;
-		private bool untranslated = false;
+		private TranslationLevel level = TranslationLevel.HumanTranslated;
 
 		/// <summary>
 		/// Contains information about a namespace in a language.
@@ -50,7 +67,7 @@ namespace Waher.Runtime.Language
 		/// <summary>
 		/// String ID.
 		/// </summary>
-		public int Id
+		public string Id
 		{
 			get { return this.id; }
 			set { this.id = value; }
@@ -69,11 +86,22 @@ namespace Waher.Runtime.Language
 		/// <summary>
 		/// If the string is untranslated.
 		/// </summary>
-		[DefaultValue(false)]
+		[DefaultValue(TranslationLevel.HumanTranslated)]
+		public TranslationLevel Level
+		{
+			get { return this.level; }
+			set { this.level = value; }
+		}
+
+		/// <summary>
+		/// Lega
+		/// </summary>
+		[Obsolete("Use Level instead.")]
+		[IgnoreMember]
 		public bool Untranslated
 		{
-			get { return this.untranslated; }
-			set { this.untranslated = value; }
+			get => this.level == TranslationLevel.Untranslated;
+			set => this.level = value ? TranslationLevel.Untranslated : TranslationLevel.HumanTranslated;
 		}
 
 		/// <inheritdoc/>

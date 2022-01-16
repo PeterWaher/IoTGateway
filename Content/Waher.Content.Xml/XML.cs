@@ -575,7 +575,7 @@ namespace Waher.Content.Xml
 				Settings.Indent = true;
 				Settings.IndentChars = "\t";
 				Settings.NewLineChars = "\r\n";
-				Settings.NewLineHandling = NewLineHandling.Entitize;
+				Settings.NewLineHandling = NewLineHandling.Replace;
 			}
 			else
 				Settings.Indent = false;

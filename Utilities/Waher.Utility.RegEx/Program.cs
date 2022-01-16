@@ -219,7 +219,7 @@ namespace Waher.Utility.RegEx
 						Indent = true,
 						IndentChars = "\t",
 						NewLineChars = "\r\n",
-						NewLineHandling = NewLineHandling.Entitize,
+						NewLineHandling = NewLineHandling.Replace,
 						NewLineOnAttributes = false,
 						OmitXmlDeclaration = false,
 						WriteEndDocumentOnClose = true

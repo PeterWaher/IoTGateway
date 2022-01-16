@@ -1302,7 +1302,7 @@ namespace Waher.Script.Graphs
 				IndentChars = "\t",
 				NamespaceHandling = NamespaceHandling.OmitDuplicates,
 				NewLineChars = "\r\n",
-				NewLineHandling = NewLineHandling.Entitize,
+				NewLineHandling = NewLineHandling.Replace,
 				NewLineOnAttributes = false,
 				OmitXmlDeclaration = true
 			};

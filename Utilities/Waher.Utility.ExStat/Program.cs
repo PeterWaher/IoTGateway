@@ -126,7 +126,7 @@ namespace Waher.Utility.ExStat
 					Indent = true,
 					IndentChars = "\t",
 					NewLineChars = "\n",
-					NewLineHandling = NewLineHandling.Entitize,
+					NewLineHandling = NewLineHandling.Replace,
 					NewLineOnAttributes = false,
 					OmitXmlDeclaration = false,
 					WriteEndDocumentOnClose = true,
@@ -175,66 +175,65 @@ namespace Waher.Utility.ExStat
 
 						try
 						{
-							using (FileStream fs = File.OpenRead(FileName))
+							using FileStream fs = File.OpenRead(FileName);
+
+							do
 							{
-								do
+								SkipHyphens = false;
+								i = 0;
+
+								if (Last > 0)
 								{
-									SkipHyphens = false;
+									if (Last < BufSize)
+										Array.Copy(Buffer, Last, Buffer, 0, (i = BufSize - Last));
+									else
+										SkipHyphens = true;
+
+									Last = 0;
+								}
+
+								NrRead = fs.Read(Buffer, i, BufSize - i);
+								if (NrRead <= 0)
+									break;
+
+								if (SkipHyphens)
+								{
+									while (i < BufSize && NrRead > 0 && Buffer[i] == '-')
+										i++;
+
+									Last = i;
+								}
+								else
+								{
+									NrRead += i;
 									i = 0;
+								}
 
-									if (Last > 0)
+								j = NrRead - 4;
+								while (i < j)
+								{
+									if (Buffer[i] == '-' && Buffer[i + 1] == '-' && Buffer[i + 2] == '-' &&
+										Buffer[i + 3] == '-' && Buffer[i + 4] == '-')
 									{
-										if (Last < BufSize)
-											Array.Copy(Buffer, Last, Buffer, 0, (i = BufSize - Last));
-										else
-											SkipHyphens = true;
+										s = Encoding.Default.GetString(Buffer, Last, i - Last);
+										Process(s, Statistics);
 
-										Last = 0;
-									}
-
-									NrRead = fs.Read(Buffer, i, BufSize - i);
-									if (NrRead <= 0)
-										break;
-
-									if (SkipHyphens)
-									{
-										while (i < BufSize && NrRead > 0 && Buffer[i] == '-')
+										i += 5;
+										while (i < NrRead && Buffer[i] == '-')
 											i++;
 
 										Last = i;
 									}
 									else
-									{
-										NrRead += i;
-										i = 0;
-									}
-
-									j = NrRead - 4;
-									while (i < j)
-									{
-										if (Buffer[i] == '-' && Buffer[i + 1] == '-' && Buffer[i + 2] == '-' &&
-											Buffer[i + 3] == '-' && Buffer[i + 4] == '-')
-										{
-											s = Encoding.Default.GetString(Buffer, Last, i - Last);
-											Process(s, Statistics);
-
-											i += 5;
-											while (i < NrRead && Buffer[i] == '-')
-												i++;
-
-											Last = i;
-										}
-										else
-											i++;
-									}
+										i++;
 								}
-								while (NrRead == BufSize);
+							}
+							while (NrRead == BufSize);
 
-								if (Last < NrRead)
-								{
-									s = Encoding.Default.GetString(Buffer, Last, NrRead - Last);
-									Process(s, Statistics);
-								}
+							if (Last < NrRead)
+							{
+								s = Encoding.Default.GetString(Buffer, Last, NrRead - Last);
+								Process(s, Statistics);
 							}
 						}
 						catch (Exception ex)
@@ -635,8 +634,8 @@ namespace Waher.Utility.ExStat
 			if (j < 0)
 				return;
 
-			string Message = s.Substring(i, j - i).Trim();
-			string StackTrace = s.Substring(j).TrimEnd();
+			string Message = s[i..j].Trim();
+			string StackTrace = s[j..].TrimEnd();
 
 			Statistics.PerType.Inc(Type, Message, StackTrace);
 			Statistics.PerMessage.Inc(Message, Type, StackTrace);

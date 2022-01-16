@@ -118,7 +118,7 @@ namespace Waher.Networking.Sniffers
 				Indent = true,
 				IndentChars = "\t",
 				NewLineChars = "\r\n",
-				NewLineHandling = NewLineHandling.Entitize,
+				NewLineHandling = NewLineHandling.Replace,
 				NewLineOnAttributes = false,
 				OmitXmlDeclaration = false,
 				WriteEndDocumentOnClose = true

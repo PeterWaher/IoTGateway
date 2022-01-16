@@ -2641,7 +2641,7 @@ namespace Waher.Persistence.Files
 				Indent = true,
 				IndentChars = "\t",
 				NewLineChars = "\r\n",
-				NewLineHandling = NewLineHandling.Entitize,
+				NewLineHandling = NewLineHandling.Replace,
 				NewLineOnAttributes = false,
 				OmitXmlDeclaration = true
 			};
@@ -3544,7 +3544,7 @@ namespace Waher.Persistence.Files
 				Indent = true,
 				IndentChars = "\t",
 				NewLineChars = "\r\n",
-				NewLineHandling = NewLineHandling.Entitize,
+				NewLineHandling = NewLineHandling.Replace,
 				NewLineOnAttributes = false,
 				OmitXmlDeclaration = false,
 				WriteEndDocumentOnClose = true,

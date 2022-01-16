@@ -55,7 +55,7 @@ namespace Waher.Utility.Extract.ExportFormats
 				Indent = true,
 				IndentChars = "\t",
 				NewLineChars = "\r\n",
-				NewLineHandling = NewLineHandling.Entitize,
+				NewLineHandling = NewLineHandling.Replace,
 				NewLineOnAttributes = false,
 				OmitXmlDeclaration = false,
 				WriteEndDocumentOnClose = true
@@ -72,6 +72,7 @@ namespace Waher.Utility.Extract.ExportFormats
 
 		public string FileName => string.Empty;
 		public string[] CollectionNames => null;
+		public Dictionary<string, bool> FileNames => this.fileNames;
 
 		public void Dispose()
 		{
@@ -620,11 +621,10 @@ namespace Waher.Utility.Extract.ExportFormats
 			if (!Directory.Exists(Folder))
 				Directory.CreateDirectory(Folder);
 
-			using (FileStream fs = System.IO.File.Create(FileName))
-			{
-				File.Position = 0;
-				await File.CopyToAsync(fs);
-			}
+			using FileStream fs = System.IO.File.Create(FileName);
+
+			File.Position = 0;
+			await File.CopyToAsync(fs);
 		}
 
 		public ICryptoTransform CreateDecryptor(byte[] Key, byte[] IV)

@@ -33,7 +33,7 @@ namespace Waher.IoTGateway.Exceptions
 				Indent = true,
 				IndentChars = "\t",
 				NewLineChars = "\n",
-				NewLineHandling = NewLineHandling.Entitize,
+				NewLineHandling = NewLineHandling.Replace,
 				NewLineOnAttributes = false,
 				OmitXmlDeclaration = false,
 				WriteEndDocumentOnClose = true,

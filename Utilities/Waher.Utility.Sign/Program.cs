@@ -85,17 +85,16 @@ namespace Waher.Utility.Sign
 
                                 try
                                 {
-                                    using (IE2eEndpoint Endpoint2 = (IE2eEndpoint)Activator.CreateInstance(T))
-                                    {
-                                        if (Endpoint2.Namespace == EndpointSecurity.IoTHarmonizationE2E)
-                                        {
-                                            if (Output is null)
-                                                Console.Out.WriteLine(Endpoint2.LocalName);
-                                            else
-                                                Output.WriteElementString("Cipher", Namespace, Endpoint2.LocalName);
-                                        }
-                                    }
-                                }
+									using IE2eEndpoint Endpoint2 = (IE2eEndpoint)Activator.CreateInstance(T);
+
+									if (Endpoint2.Namespace == EndpointSecurity.IoTHarmonizationE2E)
+									{
+										if (Output is null)
+											Console.Out.WriteLine(Endpoint2.LocalName);
+										else
+											Output.WriteElementString("Cipher", Namespace, Endpoint2.LocalName);
+									}
+								}
                                 catch (Exception)
                                 {
                                     continue;
@@ -196,7 +195,7 @@ namespace Waher.Utility.Sign
                                 Indent = true,
                                 IndentChars = "\t",
                                 NewLineChars = "\r\n",
-                                NewLineHandling = NewLineHandling.Entitize,
+                                NewLineHandling = NewLineHandling.Replace,
                                 NewLineOnAttributes = false,
                                 OmitXmlDeclaration = false,
                                 WriteEndDocumentOnClose = true,

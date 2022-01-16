@@ -156,34 +156,30 @@ namespace Waher.Utility.AnalyzeDB
 				{
 					Database.Register(FilesProvider);
 
-					using (StreamWriter f = File.CreateText(OutputFileName))
+					using StreamWriter f = File.CreateText(OutputFileName);
+					XmlWriterSettings Settings = new XmlWriterSettings()
 					{
-						XmlWriterSettings Settings = new XmlWriterSettings()
-						{
-							Encoding = Encoding,
-							Indent = true,
-							IndentChars = "\t",
-							NewLineChars = Console.Out.NewLine,
-							OmitXmlDeclaration = false,
-							WriteEndDocumentOnClose = true
-						};
+						Encoding = Encoding,
+						Indent = true,
+						IndentChars = "\t",
+						NewLineChars = Console.Out.NewLine,
+						OmitXmlDeclaration = false,
+						WriteEndDocumentOnClose = true
+					};
 
-						using (XmlWriter w = XmlWriter.Create(f, Settings))
+					using XmlWriter w = XmlWriter.Create(f, Settings);
+					if (string.IsNullOrEmpty(XsltPath))
+					{
+						i = ProgramDataFolder.LastIndexOf(Path.DirectorySeparatorChar);
+						if (i > 0)
 						{
-							if (string.IsNullOrEmpty(XsltPath))
-							{
-								i = ProgramDataFolder.LastIndexOf(Path.DirectorySeparatorChar);
-								if (i > 0)
-								{
-									s = Path.Combine(ProgramDataFolder.Substring(0, i), "Transforms", "DbStatXmlToHtml.xslt");
-									if (File.Exists(s))
-										XsltPath = s;
-								}
-							}
-
-							Database.Analyze(w, XsltPath, ProgramDataFolder, Export);
+							s = Path.Combine(ProgramDataFolder.Substring(0, i), "Transforms", "DbStatXmlToHtml.xslt");
+							if (File.Exists(s))
+								XsltPath = s;
 						}
 					}
+
+					Database.Analyze(w, XsltPath, ProgramDataFolder, Export);
 				}
 
 				return 0;

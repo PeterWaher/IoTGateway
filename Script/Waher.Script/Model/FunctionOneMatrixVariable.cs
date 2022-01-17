@@ -137,7 +137,7 @@ namespace Waher.Script.Model
 		/// <returns>Function result.</returns>
 		public virtual Task<IElement> EvaluateMatrixAsync(DoubleMatrix Argument, Variables Variables)
 		{
-			return this.EvaluateMatrixAsync((IMatrix)Argument, Variables);
+			return Task.FromResult<IElement>(this.EvaluateMatrix(Argument, Variables));
 		}
 
 		/// <summary>
@@ -148,7 +148,7 @@ namespace Waher.Script.Model
 		/// <returns>Function result.</returns>
 		public virtual Task<IElement> EvaluateMatrixAsync(ComplexMatrix Argument, Variables Variables)
 		{
-			return this.EvaluateMatrixAsync((IMatrix)Argument, Variables);
+			return Task.FromResult<IElement>(this.EvaluateMatrix(Argument, Variables));
 		}
 
 		/// <summary>
@@ -159,7 +159,7 @@ namespace Waher.Script.Model
 		/// <returns>Function result.</returns>
 		public virtual Task<IElement> EvaluateMatrixAsync(BooleanMatrix Argument, Variables Variables)
 		{
-			return this.EvaluateMatrixAsync((IMatrix)Argument, Variables);
+			return Task.FromResult<IElement>(this.EvaluateMatrix(Argument, Variables));
 		}
 
 	}

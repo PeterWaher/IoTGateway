@@ -308,7 +308,7 @@ namespace Waher.Script.Model
 							e[i] = null;
 						else if (!((V = Argument as IVectorSpaceElement) is null))
 						{
-							Arguments[i] = Operators.Sets.SetDefinition.Encapsulate(V.ChildElements, this);
+							Arguments[i] = Operators.Sets.SetDefinition.Encapsulate(V.ChildElements);
 							e[i] = null;
 						}
 						else if (!((M = Argument as IMatrix) is null))
@@ -323,7 +323,7 @@ namespace Waher.Script.Model
 							for (j = 0; j < Dimension; j++)
 								Vectors.AddLast(M.GetRow(j));
 
-							Arguments[i] = Argument = Operators.Sets.SetDefinition.Encapsulate(Vectors, this);
+							Arguments[i] = Argument = Operators.Sets.SetDefinition.Encapsulate(Vectors);
 							ChildElements = Argument.ChildElements;
 
 							e[i] = ChildElements.GetEnumerator();
@@ -332,7 +332,7 @@ namespace Waher.Script.Model
 						}
 						else
 						{
-							Arguments[i] = Operators.Sets.SetDefinition.Encapsulate(new IElement[] { Argument }, this);
+							Arguments[i] = Operators.Sets.SetDefinition.Encapsulate(new IElement[] { Argument });
 							e[i] = null;
 						}
 						break;

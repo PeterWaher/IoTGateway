@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -56,6 +57,28 @@ namespace Waher.Script.Operators.Comparisons
 			IElement Middle = this.middle.Evaluate(Variables);
 			IElement Right = this.right.Evaluate(Variables);
 
+			return this.Evaluate(Left, Middle, Right);
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!this.isAsync)
+				return this.Evaluate(Variables);
+
+			IElement Left = await this.left.EvaluateAsync(Variables);
+			IElement Middle = await this.middle.EvaluateAsync(Variables);
+			IElement Right = await this.right.EvaluateAsync(Variables);
+
+			return this.Evaluate(Left, Middle, Right);
+		}
+
+		private IElement Evaluate(IElement Left, IElement Middle, IElement Right)
+		{
 			if (!(Middle.AssociatedSet is IOrderedSet S))
 				throw new ScriptRuntimeException("Cannot compare operands.", this);
 

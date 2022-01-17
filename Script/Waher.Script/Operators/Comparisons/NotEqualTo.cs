@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
@@ -25,15 +26,34 @@ namespace Waher.Script.Operators.Comparisons
 		{
 		}
 
-        /// <summary>
-        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-        /// </summary>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Result.</returns>
-        public override IElement Evaluate(Variables Variables)
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override IElement Evaluate(Variables Variables)
+		{
+			IElement Left = this.left.Evaluate(Variables);
+			IElement Right = this.right.Evaluate(Variables);
+
+			if (Left.Equals(Right))
+				return BooleanValue.False;
+			else
+				return BooleanValue.True;
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
         {
-            IElement Left = this.left.Evaluate(Variables);
-            IElement Right = this.right.Evaluate(Variables);
+			if (!this.isAsync)
+				return this.Evaluate(Variables);
+
+			IElement Left = await this.left.EvaluateAsync(Variables);
+            IElement Right = await this.right.EvaluateAsync(Variables);
 
 			if (Left.Equals(Right))
                 return BooleanValue.False;

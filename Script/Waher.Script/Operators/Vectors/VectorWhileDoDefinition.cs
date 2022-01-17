@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -51,6 +52,34 @@ namespace Waher.Script.Operators.Vectors
             return this.Encapsulate(Elements);
         }
 
+        /// <summary>
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+        /// </summary>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public override async Task<IElement> EvaluateAsync(Variables Variables)
+        {
+            if (!this.isAsync)
+                return this.Evaluate(Variables);
+
+            LinkedList<IElement> Elements = new LinkedList<IElement>();
+            BooleanValue Condition;
+
+            Condition = await this.left.EvaluateAsync(Variables) as BooleanValue;
+            if (Condition is null)
+                throw new ScriptRuntimeException("Condition must evaluate to a boolean value.", this);
+
+            while (Condition.Value)
+            {
+                Elements.AddLast(await this.right.EvaluateAsync(Variables));
+
+                Condition = await this.left.EvaluateAsync(Variables) as BooleanValue;
+                if (Condition is null)
+                    throw new ScriptRuntimeException("Condition must evaluate to a boolean value.", this);
+            }
+
+            return this.Encapsulate(Elements);
+        }
         /// <summary>
         /// Encapsulates the calculated elements.
         /// </summary>

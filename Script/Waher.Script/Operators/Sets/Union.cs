@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
@@ -41,5 +42,26 @@ namespace Waher.Script.Operators.Sets
 
 			return new UnionSet(S1, S2);
         }
-    }
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!this.isAsync)
+				return this.Evaluate(Variables);
+
+			IElement L = await this.left.EvaluateAsync(Variables);
+			if (!(L is ISet S1))
+				S1 = new FiniteSet(new IElement[] { L });
+
+			IElement R = await this.right.EvaluateAsync(Variables);
+			if (!(R is ISet S2))
+				S2 = new FiniteSet(new IElement[] { R });
+
+			return new UnionSet(S1, S2);
+		}
+	}
 }

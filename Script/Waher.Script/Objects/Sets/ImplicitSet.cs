@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -110,6 +111,28 @@ namespace Waher.Script.Objects.Sets
 			return true;
 		}
 
+		private static async Task<bool> SatisfiesConditionsAsync(ScriptNode[] SetConditions, ScriptNode[] OtherConditions, Variables Variables)
+		{
+			if (!(SetConditions is null))
+			{
+				foreach (ScriptNode Condition in SetConditions)
+				{
+					if (!await SatisfiesConditionAsync(Condition, Variables))
+						return false;
+				}
+			}
+
+			if (!(OtherConditions is null))
+			{
+				foreach (ScriptNode Condition in OtherConditions)
+				{
+					if (!await SatisfiesConditionAsync(Condition, Variables))
+						return false;
+				}
+			}
+
+			return true;
+		}
 		private static bool SatisfiesCondition(ScriptNode Condition, Variables Variables)
 		{
 			IElement Result = Condition.Evaluate(Variables);
@@ -122,6 +145,17 @@ namespace Waher.Script.Objects.Sets
 				return false;
 		}
 
+		private static async Task<bool> SatisfiesConditionAsync(ScriptNode Condition, Variables Variables)
+		{
+			IElement Result = await Condition.EvaluateAsync(Variables);
+
+			if (Result is BooleanValue B)
+				return B.Value;
+			else if (Expression.TryConvert<bool>(Result.AssociatedObjectValue, out bool b))
+				return b;
+			else
+				return false;
+		}
 		/// <summary>
 		/// An enumeration of child elements. If the element is a scalar, this property will return null.
 		/// </summary>
@@ -341,6 +375,199 @@ namespace Waher.Script.Objects.Sets
 
 							if (SatisfiesConditions(null, OtherConditions, Variables))
 								Items.AddLast(Pattern.Evaluate(Variables));
+						}
+
+						for (j = 0; j < c; j++)
+						{
+							e = Enumerators[j];
+							if (e.MoveNext())
+								break;
+
+							e.Reset();
+							e.MoveNext();
+						}
+					}
+					while (j < c);
+
+					return Items;
+				}
+				finally
+				{
+					Variables.Pop();
+				}
+
+			}
+			else
+				return null;
+		}
+
+		/// <summary>
+		/// Calculates elements specified using implicit notation.
+		/// </summary>
+		/// <param name="Pattern">Pattern forming elements.</param>
+		/// <param name="SuperSetElements">Optional super-set of elements. Can be null.</param>
+		/// <param name="SetConditions">Set membership conditions that need to be fulfilled.</param>
+		/// <param name="OtherConditions">Other conditions that need to be fulfilled.</param>
+		/// <param name="Variables">Current set of variables.</param>
+		/// <returns>Enumerable set of elements, or null if not able to calculate element set.</returns>
+		public static async Task<IEnumerable<IElement>> CalculateElementsAsync(ScriptNode Pattern, IEnumerable<IElement> SuperSetElements,
+			In[] SetConditions, ScriptNode[] OtherConditions, Variables Variables)
+		{
+			if (!(SuperSetElements is null))
+			{
+				Dictionary<string, IElement> LocalVariables = new Dictionary<string, IElement>();
+				LinkedList<IElement> Items = new LinkedList<IElement>();
+
+				Variables.Push();
+				try
+				{
+					foreach (IElement Element in SuperSetElements)
+					{
+						LocalVariables.Clear();
+						switch (Pattern.PatternMatch(Element, LocalVariables))
+						{
+							case PatternMatchResult.Match:
+								foreach (KeyValuePair<string, IElement> P in LocalVariables)
+									Variables[P.Key] = P.Value;
+
+								try
+								{
+									if (!await SatisfiesConditionsAsync(SetConditions, OtherConditions, Variables))
+										continue;
+								}
+								catch (Exception)
+								{
+									continue;
+								}
+
+								break;
+
+							case PatternMatchResult.NoMatch:
+								continue;
+
+							case PatternMatchResult.Unknown:
+							default:
+								return null;
+						}
+
+						Items.AddLast(Element);
+					}
+				}
+				finally
+				{
+					Variables.Pop();
+				}
+
+				return Items;
+			}
+			else if (SuperSetElements is null && !(SetConditions is null))
+			{
+				int i, c = SetConditions.Length;
+				IEnumerator<IElement>[] Enumerators = new IEnumerator<IElement>[c];
+				string[][] AffectedVariables = new string[c][];
+
+				for (i = 0; i < c; i++)
+				{
+					IEnumerable<IElement> Members = GetSetMembers(await SetConditions[i].RightOperand.EvaluateAsync(Variables));
+					if (Members is null)
+						return null;
+
+					Enumerators[i] = Members.GetEnumerator();
+					if (!Enumerators[i].MoveNext())
+						return null;
+				}
+
+				Variables.Push();
+				try
+				{
+					LinkedList<IElement> Items = new LinkedList<IElement>();
+					Dictionary<string, IElement> LocalVariables = new Dictionary<string, IElement>();
+					IEnumerator<IElement> e;
+					bool Collision = false;
+					bool Match;
+					int j = c - 1;
+
+					do
+					{
+						if (Collision)
+							LocalVariables.Clear();
+						else
+						{
+							for (i = 0; i <= j; i++)
+							{
+								if (!(AffectedVariables[i] is null))
+								{
+									foreach (string s in AffectedVariables[i])
+										LocalVariables.Remove(s);
+								}
+							}
+						}
+
+						Match = true;
+
+						for (i = 0; Match && (i <= j || (Collision && i < c)); i++)
+						{
+							e = Enumerators[i];
+
+							if (AffectedVariables[i] is null)
+							{
+								Dictionary<string, IElement> v = new Dictionary<string, IElement>();
+
+								switch (SetConditions[i].LeftOperand.PatternMatch(e.Current, v))
+								{
+									case PatternMatchResult.Match:
+										string[] v2 = new string[v.Count];
+										v.Keys.CopyTo(v2, 0);
+										AffectedVariables[i] = v2;
+
+										foreach (KeyValuePair<string, IElement> P in v)
+										{
+											if (LocalVariables.TryGetValue(P.Key, out IElement E))
+											{
+												Collision = true;
+
+												if (!e.Current.Equals(E))
+													Match = false;
+											}
+											else
+												LocalVariables[P.Key] = P.Value;
+										}
+										break;
+
+									case PatternMatchResult.NoMatch:
+										Match = false;
+										break;
+
+									case PatternMatchResult.Unknown:
+									default:
+										return null;
+								}
+							}
+							else
+							{
+								switch (SetConditions[i].LeftOperand.PatternMatch(e.Current, LocalVariables))
+								{
+									case PatternMatchResult.Match:
+										break;
+
+									case PatternMatchResult.NoMatch:
+										Match = false;
+										break;
+
+									case PatternMatchResult.Unknown:
+									default:
+										return null;
+								}
+							}
+						}
+
+						if (Match)
+						{
+							foreach (KeyValuePair<string, IElement> P in LocalVariables)
+								Variables[P.Key] = P.Value;
+
+							if (await SatisfiesConditionsAsync(null, OtherConditions, Variables))
+								Items.AddLast(await Pattern.EvaluateAsync(Variables));
 						}
 
 						for (j = 0; j < c; j++)

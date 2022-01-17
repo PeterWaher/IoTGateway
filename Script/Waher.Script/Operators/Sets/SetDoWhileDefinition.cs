@@ -30,7 +30,7 @@ namespace Waher.Script.Operators.Sets
         /// <returns>Encapsulated elements.</returns>
         protected override IElement Encapsulate(LinkedList<IElement> Elements)
         {
-            return SetDefinition.Encapsulate(Elements, this);
+            return SetDefinition.Encapsulate(Elements);
         }
 
     }

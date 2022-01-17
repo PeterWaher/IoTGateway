@@ -44,12 +44,12 @@ namespace Waher.Script.Operators.Sets
 				return Operand;
 
 			if (Operand is IVector V)
-				return SetDefinition.Encapsulate(V.VectorElements, this);
+				return SetDefinition.Encapsulate(V.VectorElements);
 
 			if (this.nullCheck && Operand.AssociatedObjectValue is null)
 				return Operand;
 
-			return SetDefinition.Encapsulate(new IElement[] { Operand }, this);
+			return SetDefinition.Encapsulate(new IElement[] { Operand });
 		}
 
 		/// <summary>

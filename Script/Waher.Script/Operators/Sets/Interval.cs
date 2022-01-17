@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -56,5 +57,27 @@ namespace Waher.Script.Operators.Sets
 
             return new Objects.Sets.Interval(F.Value, T.Value, true, true, S is null ? (double?)null : S.Value);
         }
-    }
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!this.isAsync)
+				return this.Evaluate(Variables);
+
+			IElement From = await this.left.EvaluateAsync(Variables);
+			IElement To = await this.middle.EvaluateAsync(Variables);
+			IElement StepSize = this.right is null ? null : await this.right.EvaluateAsync(Variables);
+
+			DoubleNumber S = StepSize as DoubleNumber;
+
+			if (!(From is DoubleNumber F) || !(To is DoubleNumber T) || (S is null && !(StepSize is null)))
+				throw new ScriptRuntimeException("The interval operator requires double-valued operands.", this);
+
+			return new Objects.Sets.Interval(F.Value, T.Value, true, true, S is null ? (double?)null : S.Value);
+		}
+	}
 }

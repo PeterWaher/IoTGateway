@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -40,6 +41,23 @@ namespace Waher.Script.Operators.Matrices
             return Encapsulate(Rows, this);
         }
 
+        /// <summary>
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+        /// </summary>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public override async Task<IElement> EvaluateAsync(Variables Variables)
+        {
+            if (!this.isAsync)
+                return this.Evaluate(Variables);
+
+            LinkedList<IElement> Rows = new LinkedList<IElement>();
+
+            foreach (ScriptNode Node in this.Elements)
+                Rows.AddLast(await Node.EvaluateAsync(Variables));
+
+            return Encapsulate(Rows, this);
+        }
         /// <summary>
         /// Encapsulates the elements of a matrix.
         /// </summary>

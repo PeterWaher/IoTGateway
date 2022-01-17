@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -32,10 +33,7 @@ namespace Waher.Script.Operators.Assignments
 		/// <summary>
 		/// Name
 		/// </summary>
-		public string Name
-		{
-			get { return this.name; }
-		}
+		public string Name => this.name;
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -46,6 +44,28 @@ namespace Waher.Script.Operators.Assignments
 		{
 			IElement Left = this.left.Evaluate(Variables);
 			IElement Right = this.right.Evaluate(Variables);
+
+			return this.Evaluate(Left, Right);
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!this.isAsync)
+				return this.Evaluate(Variables);
+
+			IElement Left = await this.left.EvaluateAsync(Variables);
+			IElement Right = await this.right.EvaluateAsync(Variables);
+
+			return this.Evaluate(Left, Right);
+		}
+
+		private IElement Evaluate(IElement Left, IElement Right)
+		{ 
 			object LeftValue = Left.AssociatedObjectValue;
 			Type Type = LeftValue.GetType();
 

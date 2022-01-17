@@ -8772,6 +8772,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Model.BinaryElementWiseDoubleOperator.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Model.BinaryElementWiseDoubleOperator.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the operator.
@@ -13435,6 +13442,17 @@
             <param name="Variables">Current set of variables.</param>
             <returns>Enumerable set of elements, or null if not able to calculate element set.</returns>
         </member>
+        <member name="M:Waher.Script.Objects.Sets.ImplicitSet.CalculateElementsAsync(Waher.Script.Model.ScriptNode,System.Collections.Generic.IEnumerable{Waher.Script.Abstraction.Elements.IElement},Waher.Script.Operators.Membership.In[],Waher.Script.Model.ScriptNode[],Waher.Script.Variables)">
+            <summary>
+            Calculates elements specified using implicit notation.
+            </summary>
+            <param name="Pattern">Pattern forming elements.</param>
+            <param name="SuperSetElements">Optional super-set of elements. Can be null.</param>
+            <param name="SetConditions">Set membership conditions that need to be fulfilled.</param>
+            <param name="OtherConditions">Other conditions that need to be fulfilled.</param>
+            <param name="Variables">Current set of variables.</param>
+            <returns>Enumerable set of elements, or null if not able to calculate element set.</returns>
+        </member>
         <member name="M:Waher.Script.Objects.Sets.ImplicitSet.GetSetMembers(Waher.Script.Abstraction.Elements.IElement)">
             <summary>
             Gets the elements of a (supposed) set.
@@ -14894,6 +14912,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.Add.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Arithmetics.Add.EvaluateAddition(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Model.ScriptNode)">
             <summary>
             Adds two operands.
@@ -15047,6 +15072,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.Divide.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Arithmetics.Divide.EvaluateDivision(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Model.ScriptNode)">
             <summary>
             Divides the right operand from the left one.
@@ -15177,6 +15209,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.LeftDivide.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Arithmetics.LeftDivide.EvaluateDivision(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Model.ScriptNode)">
             <summary>
             Divides the left operand from the right one.
@@ -15256,6 +15295,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Arithmetics.Multiply.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.Multiply.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -15494,6 +15540,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.Power.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Arithmetics.Power.EvaluatePower(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Model.ScriptNode)">
             <summary>
             Calculates Left ^ Right.
@@ -15567,6 +15620,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Arithmetics.Residue.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.Residue.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -15673,6 +15733,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Arithmetics.Subtract.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.Subtract.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -15806,6 +15873,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Assignments.DynamicMemberAssignment.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Assignments.DynamicMemberAssignment.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Performs scalar dynamic member assignment.
@@ -15874,6 +15948,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Assignments.MatrixColumnAssignment.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Assignments.MatrixIndexAssignment">
             <summary>
             Matrix Index Assignment operator.
@@ -15890,6 +15971,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Assignments.MatrixIndexAssignment.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.MatrixIndexAssignment.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -15918,6 +16006,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Assignments.MatrixRowAssignment.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Assignments.NamedMemberAssignment">
             <summary>
             Named member Assignment operator.
@@ -15939,6 +16034,13 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Operators.Assignments.NamedMemberAssignment.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.NamedMemberAssignment.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -16067,6 +16169,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Assignments.VectorIndexAssignment.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Assignments.WithSelf.AddToSelf">
             <summary>
             Add to self operator.
@@ -16083,6 +16192,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Assignments.WithSelf.AddToSelf.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.AddToSelf.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -16111,6 +16227,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.BinaryAndWithSelf.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Assignments.WithSelf.BinaryOrWithSelf">
             <summary>
             Binary Or with self operator.
@@ -16127,6 +16250,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Assignments.WithSelf.BinaryOrWithSelf.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.BinaryOrWithSelf.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -16155,6 +16285,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.DivideFromSelf.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Assignments.WithSelf.LogicalAndWithSelf">
             <summary>
             Logical And with self operator.
@@ -16171,6 +16308,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Assignments.WithSelf.LogicalAndWithSelf.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.LogicalAndWithSelf.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -16199,6 +16343,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.LogicalOrWithSelf.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Assignments.WithSelf.MultiplyWithSelf">
             <summary>
             Multiply with self operator.
@@ -16215,6 +16366,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Assignments.WithSelf.MultiplyWithSelf.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.MultiplyWithSelf.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -16243,6 +16401,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.PowerOfSelf.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Assignments.WithSelf.ResidueFromSelf">
             <summary>
             Residue from self operator.
@@ -16259,6 +16424,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Assignments.WithSelf.ResidueFromSelf.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.ResidueFromSelf.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -16287,6 +16459,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.ShiftSelfLeft.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Assignments.WithSelf.ShiftSelfRight">
             <summary>
             Shift self right operator.
@@ -16309,6 +16488,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.ShiftSelfRight.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Assignments.WithSelf.SubtractFromSelf">
             <summary>
             Subtract from self operator.
@@ -16325,6 +16511,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Assignments.WithSelf.SubtractFromSelf.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Assignments.WithSelf.SubtractFromSelf.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -16502,6 +16695,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Comparisons.EqualTo.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Comparisons.EqualTo.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
             <summary>
             Performs a pattern match operation.
@@ -16614,6 +16814,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Comparisons.IdenticalTo.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Comparisons.IdenticalTo.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -16783,6 +16990,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Comparisons.NotEqualTo.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Comparisons.NotEqualTo.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
             <summary>
             Performs a pattern match operation.
@@ -16882,6 +17096,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Comparisons.Range.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Comparisons.Range.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
             <summary>
             Performs a pattern match operation.
@@ -16906,6 +17127,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Conditional.DoWhile.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Conditional.DoWhile.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -16942,6 +17170,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Conditional.For.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Conditional.ForEach">
             <summary>
             FOR-EACH operator.
@@ -16964,6 +17199,13 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Operators.Conditional.ForEach.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Conditional.ForEach.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -16993,6 +17235,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Conditional.If.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Conditional.NullCheck">
             <summary>
             Binary null check operator.
@@ -17009,6 +17258,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Conditional.NullCheck.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Conditional.NullCheck.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -17051,6 +17307,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Conditional.TryCatch.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Conditional.TryCatchFinally">
             <summary>
             Try-Catch-Finally operator.
@@ -17068,6 +17331,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Conditional.TryCatchFinally.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Conditional.TryCatchFinally.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -17096,6 +17366,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Conditional.TryFinally.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Conditional.WhileDo">
             <summary>
             WHILE-DO operator.
@@ -17112,6 +17389,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Conditional.WhileDo.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Conditional.WhileDo.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -17447,6 +17731,11 @@
         <member name="T:Waher.Script.Operators.ElementList">
             <summary>
             Represents a list of elements.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Operators.ElementList.isAsync">
+            <summary>
+            If any of the elements are asynchronous
             </summary>
         </member>
         <member name="M:Waher.Script.Operators.ElementList.#ctor(Waher.Script.Model.ScriptNode[],System.Int32,System.Int32,Waher.Script.Expression)">
@@ -17847,6 +18136,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Matrices.ColumnVector.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Matrices.ColumnVector.EvaluateIndex(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Boolean,Waher.Script.Model.ScriptNode)">
             <summary>
             Evaluates the column index operator.
@@ -17903,6 +18199,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Matrices.MatrixDefinition.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Matrices.MatrixDefinition.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -18022,6 +18325,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Matrices.MatrixIndex.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Matrices.MatrixIndex.EvaluateIndex(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,System.Boolean,Waher.Script.Model.ScriptNode)">
             <summary>
             Evaluates the matrix index operator.
@@ -18081,6 +18391,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Matrices.RowVector.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Matrices.RowVector.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -18277,6 +18594,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Membership.In.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.In.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -18656,6 +18980,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.PatternMatch.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Operators.PatternMatch.Match(Waher.Script.Model.ScriptNode,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables,Waher.Script.Model.ScriptNode)">
             <summary>
             Performs a pattern-matching operation
@@ -18751,6 +19082,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Sets.ImplicitSetDefinition.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Sets.ImplicitSetDefinition.Equals(System.Object)">
             <inheritdoc/>
         </member>
@@ -18773,6 +19111,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Sets.Intersection.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Sets.Intersection.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -18812,6 +19157,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Sets.Interval.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Sets.SetDefinition">
             <summary>
             Creates a set.
@@ -18833,12 +19185,18 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Operators.Sets.SetDefinition.Encapsulate(System.Collections.Generic.ICollection{Waher.Script.Abstraction.Elements.IElement},Waher.Script.Model.ScriptNode)">
+        <member name="M:Waher.Script.Operators.Sets.SetDefinition.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Sets.SetDefinition.Encapsulate(System.Collections.Generic.ICollection{Waher.Script.Abstraction.Elements.IElement})">
             <summary>
             Encapsulates the elements of a set.
             </summary>
             <param name="Elements">Set elements.</param>
-            <param name="Node">Script node from where the encapsulation is done.</param>
             <returns>Encapsulated set.</returns>
         </member>
         <member name="M:Waher.Script.Operators.Sets.SetDefinition.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
@@ -18986,6 +19344,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Sets.Union.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Operators.SetUnit">
             <summary>
             Sets a physical unit
@@ -19109,6 +19474,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Vectors.ImplicitVectorDefinition.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Vectors.ImplicitVectorDefinition.Equals(System.Object)">
             <inheritdoc/>
         </member>
@@ -19167,6 +19539,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Vectors.VectorDefinition.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Vectors.VectorDefinition.Encapsulate(System.Collections.Generic.ICollection{Waher.Script.Abstraction.Elements.IElement},System.Boolean,Waher.Script.Model.ScriptNode)">
             <summary>
             Encapsulates the elements of a vector.
@@ -19199,6 +19578,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Vectors.VectorDoWhileDefinition.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Vectors.VectorDoWhileDefinition.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -19238,6 +19624,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Vectors.VectorForDefinition.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Vectors.VectorForDefinition.Encapsulate(System.Collections.Generic.LinkedList{Waher.Script.Abstraction.Elements.IElement})">
             <summary>
             Encapsulates the calculated elements.
@@ -19265,6 +19658,13 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Operators.Vectors.VectorForEachDefinition.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Vectors.VectorForEachDefinition.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -19357,6 +19757,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Operators.Vectors.VectorWhileDoDefinition.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Vectors.VectorWhileDoDefinition.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>

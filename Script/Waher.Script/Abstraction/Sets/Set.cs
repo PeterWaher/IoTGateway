@@ -34,7 +34,7 @@ namespace Waher.Script.Abstraction.Sets
         /// <returns>Encapsulated object of similar type as the current object.</returns>
         public override IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
         {
-            return Operators.Sets.SetDefinition.Encapsulate(Elements, Node);
+            return Operators.Sets.SetDefinition.Encapsulate(Elements);
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Operators.Binary;
@@ -34,6 +35,18 @@ namespace Waher.Script.Operators.Assignments.WithSelf
         public override IElement Evaluate(Variables Variables)
 		{
             IElement Result = this.and.Evaluate(Variables);
+            Variables[this.VariableName] = Result;
+            return Result;
+        }
+
+        /// <summary>
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+        /// </summary>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public override async Task<IElement> EvaluateAsync(Variables Variables)
+        {
+            IElement Result = await this.and.EvaluateAsync(Variables);
             Variables[this.VariableName] = Result;
             return Result;
         }

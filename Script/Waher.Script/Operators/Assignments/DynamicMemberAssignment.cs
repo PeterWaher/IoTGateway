@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -37,6 +38,31 @@ namespace Waher.Script.Operators.Assignments
 			IElement Left = this.left.Evaluate(Variables);
 			IElement Middle = this.middle.Evaluate(Variables);
 			IElement Right = this.right.Evaluate(Variables);
+
+			if (Middle.IsScalar)
+				return this.Evaluate(Left, Middle, Right, Variables);
+			else
+			{
+				foreach (IElement MiddleElement in Middle.ChildElements)
+					this.Evaluate(Left, MiddleElement, Right, Variables);
+
+				return Right;
+			}
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!this.isAsync)
+				return this.Evaluate(Variables);
+
+			IElement Left = await this.left.EvaluateAsync(Variables);
+			IElement Middle = await this.middle.EvaluateAsync(Variables);
+			IElement Right = await this.right.EvaluateAsync(Variables);
 
 			if (Middle.IsScalar)
 				return this.Evaluate(Left, Middle, Right, Variables);

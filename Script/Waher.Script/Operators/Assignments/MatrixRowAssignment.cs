@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -43,6 +44,38 @@ namespace Waher.Script.Operators.Assignments
                 throw new ScriptRuntimeException("Index must be a non-negative integer.", this);
 
             IElement Value = this.right.Evaluate(Variables);
+            if (!(Value is IVector V))
+                throw new ScriptRuntimeException("Matrix rows must be vectors.", this);
+
+            if (M.Columns != V.Dimension)
+                throw new ScriptRuntimeException("Vector dimension does not match number of columns in matrix.", this);
+
+            M.SetRow((int)d, V);
+
+            return Value;
+        }
+
+        /// <summary>
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+        /// </summary>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public override async Task<IElement> EvaluateAsync(Variables Variables)
+        {
+            if (!this.isAsync)
+                return this.Evaluate(Variables);
+
+            IElement Left = await this.left.EvaluateAsync(Variables);
+            if (!(Left is IMatrix M))
+                throw new ScriptRuntimeException("Matrix row vector assignment can only be performed on matrices.", this);
+
+            IElement Index = await this.middle.EvaluateAsync(Variables);
+            double d;
+
+            if (!(Index is DoubleNumber IE) || (d = IE.Value) < 0 || d > int.MaxValue || d != Math.Truncate(d))
+                throw new ScriptRuntimeException("Index must be a non-negative integer.", this);
+
+            IElement Value = await this.right.EvaluateAsync(Variables);
             if (!(Value is IVector V))
                 throw new ScriptRuntimeException("Matrix rows must be vectors.", this);
 

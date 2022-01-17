@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -58,6 +59,48 @@ namespace Waher.Script.Operators.Vectors
 			}
 
 			IEnumerable<IElement> Elements = ImplicitSet.CalculateElements(this.left, VectorElements,
+				this.setConditions, this.otherConditions, Variables);
+
+			if (!(Elements is ICollection<IElement> Elements2))
+			{
+				Elements2 = new List<IElement>();
+
+				foreach (IElement E in Elements)
+					Elements2.Add(E);
+			}
+
+			return VectorDefinition.Encapsulate(Elements2, CanEncapsulateAsMatrix, this);
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!this.isAsync)
+				return this.Evaluate(Variables);
+
+			IEnumerable<IElement> VectorElements;
+			bool CanEncapsulateAsMatrix;
+
+			if (this.right is null)
+			{
+				VectorElements = null;
+				CanEncapsulateAsMatrix = true;
+			}
+			else
+			{
+				IElement E = await this.right.EvaluateAsync(Variables);
+				CanEncapsulateAsMatrix = (E is IMatrix);
+				VectorElements = ImplicitSet.GetSetMembers(E);
+
+				if (VectorElements is null)
+					throw new ScriptRuntimeException("Unable to evaluate vector elements.", this.right);
+			}
+
+			IEnumerable<IElement> Elements = await ImplicitSet.CalculateElementsAsync(this.left, VectorElements,
 				this.setConditions, this.otherConditions, Variables);
 
 			if (!(Elements is ICollection<IElement> Elements2))

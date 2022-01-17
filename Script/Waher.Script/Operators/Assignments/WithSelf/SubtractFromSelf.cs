@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -34,11 +35,29 @@ namespace Waher.Script.Operators.Assignments.WithSelf
 				throw new ScriptRuntimeException("Variable not found.", this);
 
 			IElement E = this.op.Evaluate(Variables);
-            E = Operators.Arithmetics.Subtract.EvaluateSubtraction(v.ValueElement, E, this);
+            E = Arithmetics.Subtract.EvaluateSubtraction(v.ValueElement, E, this);
 
             Variables[this.VariableName] = E;
 
             return E;
         }
-    }
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!Variables.TryGetVariable(this.VariableName, out Variable v))
+				throw new ScriptRuntimeException("Variable not found.", this);
+
+			IElement E = await this.op.EvaluateAsync(Variables);
+			E = Arithmetics.Subtract.EvaluateSubtraction(v.ValueElement, E, this);
+
+			Variables[this.VariableName] = E;
+
+			return E;
+		}
+	}
 }

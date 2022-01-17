@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -46,6 +47,32 @@ namespace Waher.Script.Operators.Conditional
 			IElement Right = this.right.Evaluate(Variables);
 
 			return this.Evaluate(Left, Right, Variables);
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			IElement Left;
+
+			try
+			{
+				Left = await this.left.EvaluateAsync(Variables);
+			}
+			catch (Exception)
+			{
+				return await this.right.EvaluateAsync(Variables);
+			}
+
+			if (!(Left.AssociatedObjectValue is null))
+				return Left;
+
+			IElement Right = await this.right.EvaluateAsync(Variables);
+
+			return await this.EvaluateAsync(Left, Right, Variables);
 		}
 
 		/// <summary>

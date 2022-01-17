@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -42,6 +43,24 @@ namespace Waher.Script.Operators.Matrices
 			return EvaluateIndex(Left, Right, this.nullCheck, this);
 		}
 
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!this.isAsync)
+				return this.Evaluate(Variables);
+
+			IElement Left = await this.left.EvaluateAsync(Variables);
+			if (this.nullCheck && Left.AssociatedObjectValue is null)
+				return Left;
+
+			IElement Right = await this.right.EvaluateAsync(Variables);
+
+			return EvaluateIndex(Left, Right, this.nullCheck, this);
+		}
 		/// <summary>
 		/// Evaluates the column index operator.
 		/// </summary>

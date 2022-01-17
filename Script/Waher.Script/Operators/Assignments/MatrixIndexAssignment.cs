@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -47,6 +48,37 @@ namespace Waher.Script.Operators.Assignments
             }
 
             IElement Value = this.right.Evaluate(Variables);
+
+            M.SetElement((int)x, (int)y, Value);
+
+            return Value;
+        }
+
+        /// <summary>
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+        /// </summary>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public override async Task<IElement> EvaluateAsync(Variables Variables)
+        {
+            if (!this.isAsync)
+                return this.Evaluate(Variables);
+
+            IElement Left = await this.left.EvaluateAsync(Variables);
+            if (!(Left is IMatrix M))
+                throw new ScriptRuntimeException("Matrix element assignment can only be performed on matrices.", this);
+
+            IElement ColIndex = await this.middle.EvaluateAsync(Variables);
+            IElement RowIndex = await this.middle2.EvaluateAsync(Variables);
+            double x, y;
+
+            if (!(ColIndex is DoubleNumber X) || (x = X.Value) < 0 || x > int.MaxValue || x != Math.Truncate(x) ||
+                !(RowIndex is DoubleNumber Y) || (y = Y.Value) < 0 || y > int.MaxValue || y != Math.Truncate(y))
+            {
+                throw new ScriptRuntimeException("Indices must be non-negative integers.", this);
+            }
+
+            IElement Value = await this.right.EvaluateAsync(Variables);
 
             M.SetElement((int)x, (int)y, Value);
 

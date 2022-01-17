@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -32,10 +33,7 @@ namespace Waher.Script.Operators.Vectors
         /// <summary>
         /// Variable Name.
         /// </summary>
-        public string VariableName
-        {
-            get { return this.variableName; }
-        }
+        public string VariableName => this.variableName;
 
         /// <summary>
         /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -91,7 +89,79 @@ namespace Waher.Script.Operators.Vectors
                     Done = true;
                 else
                 {
-                    From = Operators.Arithmetics.Add.EvaluateAddition(From, Step, this) as ICommutativeRingWithIdentityElement;
+                    From = Arithmetics.Add.EvaluateAddition(From, Step, this) as ICommutativeRingWithIdentityElement;
+                    if (From is null)
+                        throw new ScriptRuntimeException("Invalid step size.", this);
+
+                    if (Direction > 0)
+                        Done = S.Compare(From, To) < 0;
+                    else
+                        Done = S.Compare(From, To) > 0;
+                }
+            }
+            while (!Done);
+
+            return this.Encapsulate(Elements);
+        }
+
+        /// <summary>
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+        /// </summary>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public override async Task<IElement> EvaluateAsync(Variables Variables)
+        {
+            if (!this.isAsync)
+                return this.Evaluate(Variables);
+
+            if (!(await this.left.EvaluateAsync(Variables) is ICommutativeRingWithIdentityElement From))
+                throw new ScriptRuntimeException("Invalid range.", this);
+
+            if (!(await this.middle.EvaluateAsync(Variables) is ICommutativeRingWithIdentityElement To))
+                throw new ScriptRuntimeException("Invalid range.", this);
+
+            if (!(From.AssociatedSet is IOrderedSet S))
+                throw new ScriptRuntimeException("Cannot compare range.", this);
+
+            IElement Step;
+            int Direction = S.Compare(From, To);
+            bool Done;
+
+            if (!(this.middle2 is null))
+            {
+                Step = await this.middle2.EvaluateAsync(Variables);
+
+                if (Direction < 0)
+                {
+                    if (S.Compare(Step, From.Zero) <= 0)
+                        throw new ScriptRuntimeException("Invalid step size for corresponding range.", this);
+                }
+                else if (Direction > 0)
+                {
+                    if (S.Compare(Step, From.Zero) >= 0)
+                        throw new ScriptRuntimeException("Invalid step size for corresponding range.", this);
+                }
+            }
+            else
+            {
+                if (Direction <= 0)
+                    Step = From.One;
+                else
+                    Step = From.One.Negate();
+            }
+
+            LinkedList<IElement> Elements = new LinkedList<IElement>();
+
+            do
+            {
+                Variables[this.variableName] = From;
+                Elements.AddLast(await this.right.EvaluateAsync(Variables));
+
+                if (Direction == 0)
+                    Done = true;
+                else
+                {
+                    From = Arithmetics.Add.EvaluateAddition(From, Step, this) as ICommutativeRingWithIdentityElement;
                     if (From is null)
                         throw new ScriptRuntimeException("Invalid step size.", this);
 

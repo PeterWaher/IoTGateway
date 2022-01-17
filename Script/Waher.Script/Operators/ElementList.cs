@@ -16,7 +16,11 @@ namespace Waher.Script.Operators
 	{
 		private readonly ScriptNode[] elements;
 		private readonly int nrElements;
-		private bool isAsync;
+
+		/// <summary>
+		/// If any of the elements are asynchronous
+		/// </summary>
+		protected bool isAsync;
 
 		/// <summary>
 		/// Represents a list of elements.

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -38,6 +39,28 @@ namespace Waher.Script.Operators.Assignments
 			IElement Index = this.middle.Evaluate(Variables);
 			IElement Value = this.right.Evaluate(Variables);
 
+			return this.Evaluate(Left, Index, Value);
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			if (!this.isAsync)
+				return this.Evaluate(Variables);
+
+			IElement Left = await this.left.EvaluateAsync(Variables);
+			IElement Index = await this.middle.EvaluateAsync(Variables);
+			IElement Value = await this.right.EvaluateAsync(Variables);
+
+			return this.Evaluate(Left, Index, Value);
+		}
+
+		private IElement Evaluate(IElement Left, IElement Index, IElement Value)
+		{
 			if (Left is IVector V)
 			{
 				double d;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -26,10 +27,7 @@ namespace Waher.Script.Functions.Runtime
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "return"; }
-        }
+        public override string FunctionName => "return";
 
         /// <summary>
         /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -42,6 +40,16 @@ namespace Waher.Script.Functions.Runtime
         }
 
         /// <summary>
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+        /// </summary>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public override async Task<IElement> EvaluateAsync(Variables Variables)
+        {
+            throw new ScriptReturnValueException(await this.Argument.EvaluateAsync(Variables));
+        }
+
+        /// <summary>
         /// Evaluates the function.
         /// </summary>
         /// <param name="Argument">Function argument.</param>
@@ -49,7 +57,7 @@ namespace Waher.Script.Functions.Runtime
         /// <returns>Function result.</returns>
         public override IElement Evaluate(IElement Argument, Variables Variables)
         {
-            return ObjectValue.Null;
+            throw new ScriptReturnValueException(Argument);
         }
     }
 }

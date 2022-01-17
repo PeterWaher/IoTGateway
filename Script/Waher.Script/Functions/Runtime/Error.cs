@@ -26,30 +26,12 @@ namespace Waher.Script.Functions.Runtime
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "error"; }
-        }
+        public override string FunctionName => "error";
 
         /// <summary>
         /// Optional aliases. If there are no aliases for the function, null is returned.
         /// </summary>
-        public override string[] Aliases
-        {
-            get { return new string[] { "exception" }; }
-        }
-
-        /// <summary>
-        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-        /// </summary>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Result.</returns>
-        public override IElement Evaluate(Variables Variables)
-        {
-            IElement E = this.Argument.Evaluate(Variables);
-            string Msg = E.ToString();
-            throw new ScriptRuntimeException(Msg, this);
-        }
+        public override string[] Aliases => new string[] { "exception" };
 
         /// <summary>
         /// Evaluates the function.
@@ -59,7 +41,8 @@ namespace Waher.Script.Functions.Runtime
         /// <returns>Function result.</returns>
         public override IElement Evaluate(IElement Argument, Variables Variables)
         {
-            return ObjectValue.Null;
+            string Msg = Argument.ToString();
+            throw new ScriptRuntimeException(Msg, this);
         }
     }
 }

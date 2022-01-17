@@ -5453,13 +5453,6 @@
             Optional aliases. If there are no aliases for the function, null is returned.
             </summary>
         </member>
-        <member name="M:Waher.Script.Functions.Runtime.Error.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
         <member name="M:Waher.Script.Functions.Runtime.Error.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function.
@@ -5488,6 +5481,13 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Functions.Runtime.Exists.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Runtime.Exists.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -6004,6 +6004,13 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Functions.Runtime.Return.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Runtime.Return.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>

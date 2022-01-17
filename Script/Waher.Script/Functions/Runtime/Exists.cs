@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -25,10 +26,7 @@ namespace Waher.Script.Functions.Runtime
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "exists"; }
-        }
+        public override string FunctionName => "exists";
 
         /// <summary>
         /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -61,6 +59,43 @@ namespace Waher.Script.Functions.Runtime
 				else
 					return BooleanValue.True;
 			}
+            catch (Exception)
+            {
+                return BooleanValue.False;
+            }
+        }
+
+        /// <summary>
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+        /// </summary>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public override async Task<IElement> EvaluateAsync(Variables Variables)
+        {
+            try
+            {
+                IElement E = await this.Argument.EvaluateAsync(Variables);
+                if (E is DoubleNumber D)
+                {
+                    if (double.IsNaN(D.Value))
+                        return BooleanValue.False;
+                    else
+                        return BooleanValue.True;
+                }
+
+                if (E is ComplexNumber C)
+                {
+                    if (double.IsNaN(C.Value.Real) || double.IsNaN(C.Value.Imaginary))
+                        return BooleanValue.False;
+                    else
+                        return BooleanValue.True;
+                }
+
+                if (E is ObjectValue O && O.Value is null)
+                    return BooleanValue.False;
+                else
+                    return BooleanValue.True;
+            }
             catch (Exception)
             {
                 return BooleanValue.False;

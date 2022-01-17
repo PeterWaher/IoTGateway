@@ -35,8 +35,8 @@ namespace Waher.Utility.Translate
 		/// -tf TO_FILE           Resource file of translation. If it exists, will be used
 		///                       to update the reference database of manual translations.
 		/// -df DIFF_FILE         Resource file containing translated strings only.
-		/// -ns NAMESPACE         Optional namespace. If not provided, name of
-		///                       reference file, without path.
+		/// -ns NAMESPACE         Optional namespace. If not provided, the language to
+		///                       translate to will be used.
 		/// -tk TRANSLATION_KEY   Microsoft Translator Key. Will be stored in the database
 		///                       if provided, for reference. If not provided, value in
 		///                       database will be used.
@@ -207,8 +207,8 @@ namespace Waher.Utility.Translate
 					Console.Out.WriteLine("-tf TO_FILE           Resource file of translation. If it exists, will be used");
 					Console.Out.WriteLine("                      to update the reference database of manual translations.");
 					Console.Out.WriteLine("-df DIFF_FILE         Resource file containing translated strings only.");
-					Console.Out.WriteLine("-ns NAMESPACE         Optional namespace. If not provided, name of");
-					Console.Out.WriteLine("                      reference file, without path.");
+					Console.Out.WriteLine("-ns NAMESPACE         Optional namespace. If not provided, the language to");
+					Console.Out.WriteLine("                      translate to will be used.");
 					Console.Out.WriteLine("-tk TRANSLATION_KEY   Microsoft Translator Key. Will be stored in the database");
 					Console.Out.WriteLine("                      if provided, for reference. If not provided, value in");
 					Console.Out.WriteLine("                      database will be used.");
@@ -231,7 +231,7 @@ namespace Waher.Utility.Translate
 					throw new Exception("No translation language specified.");
 
 				if (string.IsNullOrEmpty(Namespace))
-					Namespace = Path.GetFileName(ReferenceFileName);
+					Namespace = TranslationLanguage;
 
 				Types.Initialize(
 					typeof(Database).Assembly,

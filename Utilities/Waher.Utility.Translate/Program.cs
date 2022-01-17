@@ -281,20 +281,20 @@ namespace Waher.Utility.Translate
 
 					List<TranslationItem> ToTranslate = new List<TranslationItem>();
 					List<string> StringIds = new List<string>();
-					string FromComment = null;
-					string FromSchema = null;
+					XmlComment FromComment = null;
+					XmlElement FromSchema = null;
 					List<KeyValuePair<string, string>> Headers = new List<KeyValuePair<string, string>>();
 
 					foreach (XmlNode N in From.DocumentElement.ChildNodes)
 					{
 						if (N is XmlComment Comment)
-							FromComment = Comment.OuterXml;
+							FromComment = Comment;
 						else if (N is XmlElement E)
 						{
 							switch (E.LocalName)
 							{
 								case "schema":
-									FromSchema = E.OuterXml;
+									FromSchema = E;
 									break;
 
 								case "resheader":
@@ -402,7 +402,7 @@ namespace Waher.Utility.Translate
 						ConformanceLevel = ConformanceLevel.Document,
 						Encoding = Encoding.UTF8,
 						Indent = true,
-						IndentChars = "\t",
+						IndentChars = "  ",
 						NewLineChars = Environment.NewLine,
 						NewLineHandling = NewLineHandling.Replace
 					};
@@ -412,11 +412,11 @@ namespace Waher.Utility.Translate
 						Output.WriteStartDocument();
 						Output.WriteStartElement("root");
 
-						if (!string.IsNullOrEmpty(FromComment))
-							Output.WriteRaw(FromComment);
+						if (!(FromComment is null))
+							FromComment.WriteTo(Output);
 
-						if (!string.IsNullOrEmpty(FromSchema))
-							Output.WriteRaw(FromSchema);
+						if (!(FromSchema is null))
+							FromSchema.WriteTo(Output);
 
 						foreach (KeyValuePair<string, string> P in Headers)
 						{

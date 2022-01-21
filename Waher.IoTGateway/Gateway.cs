@@ -1036,7 +1036,7 @@ namespace Waher.IoTGateway
 				Link.Append(Gateway.Domain);
 
 			Link.Append("/QR/");
-			Link.Append(e.Text);
+			Link.Append(WebUtility.UrlEncode(e.Text));
 
 			e.Url = Link.ToString();
 		}

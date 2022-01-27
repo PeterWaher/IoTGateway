@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Events
 {
@@ -27,10 +26,13 @@ namespace Waher.Events
 		/// <param name="EventSink">Event Sink.</param>
 		public static void Register(IEventSink EventSink)
 		{
-			lock (dynamicSinks)
+			if (!(EventSink is null))
 			{
-				dynamicSinks.Add(EventSink);
-				staticSinks = dynamicSinks.ToArray();
+				lock (dynamicSinks)
+				{
+					dynamicSinks.Add(EventSink);
+					staticSinks = dynamicSinks.ToArray();
+				}
 			}
 		}
 
@@ -41,12 +43,15 @@ namespace Waher.Events
 		/// <returns>If the sink was found and removed.</returns>
 		public static bool Unregister(IEventSink EventSink)
 		{
-			lock (dynamicSinks)
+			if (!(EventSink is null))
 			{
-				if (dynamicSinks.Remove(EventSink))
+				lock (dynamicSinks)
 				{
-					staticSinks = dynamicSinks.ToArray();
-					return true;
+					if (dynamicSinks.Remove(EventSink))
+					{
+						staticSinks = dynamicSinks.ToArray();
+						return true;
+					}
 				}
 			}
 
@@ -110,13 +115,7 @@ namespace Waher.Events
 		/// <summary>
 		/// Registered sinks.
 		/// </summary>
-		public static IEventSink[] Sinks
-		{
-			get
-			{
-				return staticSinks;
-			}
-		}
+		public static IEventSink[] Sinks => staticSinks;
 
 		/// <summary>
 		/// Logs an event. It will be distributed to registered event sinks.

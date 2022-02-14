@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Layout.Layout2D.Model.Conditional
+﻿namespace Waher.Layout.Layout2D.Model.Conditional
 {
 	/// <summary>
 	/// Layout to show, if none of the cases apply.

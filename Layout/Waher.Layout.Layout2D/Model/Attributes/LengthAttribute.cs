@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Layout.Layout2D.Exceptions;

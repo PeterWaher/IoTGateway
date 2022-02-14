@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Layout.Layout2D.Model.Content.FlowingText
+﻿namespace Waher.Layout.Layout2D.Model.Content.FlowingText
 {
 	/// <summary>
 	/// Represents a segment of bold text in flowing text.

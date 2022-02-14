@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Layout.Layout2D.Model.Groups
+﻿namespace Waher.Layout.Layout2D.Model.Groups
 {
 	/// <summary>
 	/// Provides padding for a layout element in a grid.

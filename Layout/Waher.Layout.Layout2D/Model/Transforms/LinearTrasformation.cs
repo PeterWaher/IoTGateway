@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Layout.Layout2D.Model.Transforms
+﻿namespace Waher.Layout.Layout2D.Model.Transforms
 {
 	/// <summary>
 	/// Base abstract class for linear transforms.

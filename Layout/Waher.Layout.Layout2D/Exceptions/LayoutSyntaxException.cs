@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Layout.Layout2D.Exceptions
+﻿namespace Waher.Layout.Layout2D.Exceptions
 {
 	/// <summary>
 	/// Syntax-related layout exception

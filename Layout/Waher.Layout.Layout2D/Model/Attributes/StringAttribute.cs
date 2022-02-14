@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Xml;
+﻿using System.Xml;
 using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model.Attributes

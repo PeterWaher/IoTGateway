@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Layout.Layout2D.Model.References
+﻿namespace Waher.Layout.Layout2D.Model.References
 {
 	/// <summary>
 	/// Defines a vertex in the graf

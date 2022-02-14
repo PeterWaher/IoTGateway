@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Layout.Layout2D.Model.Attributes
+﻿namespace Waher.Layout.Layout2D.Model.Attributes
 {
 	/// <summary>
 	/// Result of asynchronous evaluation.

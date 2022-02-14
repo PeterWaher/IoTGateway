@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Layout.Layout2D.Model
+﻿namespace Waher.Layout.Layout2D.Model
 {
 	/// <summary>
 	/// Current measuring state

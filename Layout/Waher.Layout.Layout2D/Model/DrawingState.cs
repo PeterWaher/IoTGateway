@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
 using SkiaSharp;
-using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Layout.Layout2D.Model.Fonts;
 using Waher.Script;
 

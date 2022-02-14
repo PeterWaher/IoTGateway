@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Layout.Layout2D.Model.Groups
+﻿namespace Waher.Layout.Layout2D.Model.Groups
 {
 	/// <summary>
 	/// Contains information about a cells span in a grid.

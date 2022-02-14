@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Layout.Layout2D
+﻿namespace Waher.Layout.Layout2D
 {
 	/// <summary>
 	/// Contains information about an actionable area in a generated image.

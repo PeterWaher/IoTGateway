@@ -160,7 +160,7 @@ namespace Waher.Content.Markdown.Layout2D
 		public async Task<bool> GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
-			if (Info.FileName is null)
+			if (Info?.FileName is null)
 				return false;
 
 			string FileName = Info.FileName.Substring(contentRootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
@@ -293,7 +293,7 @@ namespace Waher.Content.Markdown.Layout2D
 		public async Task<bool> GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
-			if (Info.FileName is null)
+			if (Info?.FileName is null)
 				return false;
 
 			Output.WriteStartElement("Image");
@@ -321,7 +321,7 @@ namespace Waher.Content.Markdown.Layout2D
 		public async Task<bool> GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
-			if (Info.FileName is null)
+			if (Info?.FileName is null)
 				return false;
 
 			Output.WriteStartElement("Image");
@@ -341,7 +341,7 @@ namespace Waher.Content.Markdown.Layout2D
 		public async Task<PixelInformation> GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
 		{
 			GraphInfo Info = await GetFileName(Language, Rows, Document.Settings.Variables);
-			if (Info.FileName is null)
+			if (Info?.FileName is null)
 				return null;
 
 			byte[] Data = await Resources.ReadAllBytesAsync(Info.FileName);

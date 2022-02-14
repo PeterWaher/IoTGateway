@@ -175,9 +175,9 @@ namespace Waher.Layout.Layout2D.Model
 			this.Left = this.Right = this.Width = null;
 			this.Top = this.Bottom = this.Height = null;
 
-			if (this.width0.HasValue)
+			if (this.width0.HasValue || this.ExplicitWidth.HasValue)
 			{
-				this.Width = this.width0;
+				this.Width = this.ExplicitWidth ?? this.width0;
 				if (this.left0.HasValue)
 					this.Left = this.left0;
 				else
@@ -189,9 +189,9 @@ namespace Waher.Layout.Layout2D.Model
 				this.Left = this.left0;
 			}
 
-			if (this.height0.HasValue)
+			if (this.height0.HasValue || this.ExplicitHeight.HasValue)
 			{
-				this.Height = this.height0;
+				this.Height = this.ExplicitHeight ?? this.height0;
 				if (this.top0.HasValue)
 					this.Top = this.top0;
 				else

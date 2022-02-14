@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+          background="WhiteBackground" pen="BlackPen"
+          font="Text" textColor="Black">
+	<SolidPen id="BlackPen" color="Black" width="1px"/>
+	<SolidBackground id="WhiteBackground" color="WhiteSmoke"/>
+	<SolidBackground id="DebugBg" color="DarkBlue"/>
+	<SolidBackground id="InformationalBg" color="LightGray"/>
+	<SolidBackground id="NoticeBg" color="LightYellow"/>
+	<SolidBackground id="WarningBg" color="Yellow"/>
+	<SolidBackground id="ErrorBg" color="Red"/>
+	<SolidBackground id="CriticalBg" color="DarkRed"/>
+	<SolidBackground id="AlertBg" color="Purple"/>
+	<SolidBackground id="EmergencyBg" color="Black"/>
+	<Font id="Text" name="Arial" size="12pt" color="Black"/>
+	<Font id="DebugFg" name="Arial" size="12pt" color="White"/>
+	<Font id="InformationalFg" name="Arial" size="12pt" color="Black"/>
+	<Font id="NoticeFg" name="Arial" size="12pt" color="Black"/>
+	<Font id="WarningFg" name="Arial" size="12pt" color="Black"/>
+	<Font id="ErrorFg" name="Arial" size="12pt" color="Yellow"/>
+	<Font id="CriticalFg" name="Arial" size="12pt" color="White"/>
+	<Font id="AlertFg" name="Arial" size="12pt" color="White"/>
+	<Font id="EmergencyFg" name="Arial" size="12pt" color="White"/>
+	<Grid columns="2">
+		<Cell>
+			<Margins left="0.5em" right="0.5em">
+				<Label text="Debug" x="100%" y="50%" halign="Right" valign="Center" font="Text"/>
+			</Margins>
+		</Cell>
+		<Cell>
+			<Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+				<RoundedRectangle radiusX="3mm" radiusY="3mm" width="0%" height="1cm" fill="DebugBg">
+					<Margins left="0.5em" right="0.5em">
+						<Label text="0" x="50%" y="50%" halign="Center" valign="Center" font="DebugFg"/>
+					</Margins>
+				</RoundedRectangle>
+			</Margins>
+		</Cell>
+		<Cell>
+			<Margins left="0.5em" right="0.5em">
+				<Label text="Informational" x="100%" y="50%" halign="Right" valign="Center" font="Text"/>
+			</Margins>
+		</Cell>
+		<Cell>
+			<Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+				<RoundedRectangle radiusX="3mm" radiusY="3mm" width="100%" height="1cm" fill="InformationalBg">
+					<Margins left="0.5em" right="0.5em">
+						<Label text="1300" x="50%" y="50%" halign="Center" valign="Center" font="InformationalFg"/>
+					</Margins>
+				</RoundedRectangle>
+			</Margins>
+		</Cell>
+		<Cell>
+			<Margins left="0.5em" right="0.5em">
+				<Label text="Notice" x="100%" y="50%" halign="Right" valign="Center" font="Text"/>
+			</Margins>
+		</Cell>
+		<Cell>
+			<Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+				<RoundedRectangle radiusX="3mm" radiusY="3mm" width="0%" height="1cm" fill="NoticeBg">
+					<Margins left="0.5em" right="0.5em">
+						<Label text="0" x="50%" y="50%" halign="Center" valign="Center" font="NoticeFg"/>
+					</Margins>
+				</RoundedRectangle>
+			</Margins>
+		</Cell>
+		<Cell>
+			<Margins left="0.5em" right="0.5em">
+				<Label text="Warning" x="100%" y="50%" halign="Right" valign="Center" font="Text"/>
+			</Margins>
+		</Cell>
+		<Cell>
+			<Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+				<RoundedRectangle radiusX="3mm" radiusY="3mm" width="0%" height="1cm" fill="WarningBg">
+					<Margins left="0.5em" right="0.5em">
+						<Label text="0" x="50%" y="50%" halign="Center" valign="Center" font="WarningFg"/>
+					</Margins>
+				</RoundedRectangle>
+			</Margins>
+		</Cell>
+		<Cell>
+			<Margins left="0.5em" right="0.5em">
+				<Label text="Error" x="100%" y="50%" halign="Right" valign="Center" font="Text"/>
+			</Margins>
+		</Cell>
+		<Cell>
+			<Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+				<RoundedRectangle radiusX="3mm" radiusY="3mm" width="0%" height="1cm" fill="ErrorBg">
+					<Margins left="0.5em" right="0.5em">
+						<Label text="0" x="50%" y="50%" halign="Center" valign="Center" font="ErrorFg"/>
+					</Margins>
+				</RoundedRectangle>
+			</Margins>
+		</Cell>
+		<Cell>
+			<Margins left="0.5em" right="0.5em">
+				<Label text="Critical" x="100%" y="50%" halign="Right" valign="Center" font="Text"/>
+			</Margins>
+		</Cell>
+		<Cell>
+			<Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+				<RoundedRectangle radiusX="3mm" radiusY="3mm" width="0%" height="1cm" fill="CriticalBg">
+					<Margins left="0.5em" right="0.5em">
+						<Label text="0" x="50%" y="50%" halign="Center" valign="Center" font="CriticalFg"/>
+					</Margins>
+				</RoundedRectangle>
+			</Margins>
+		</Cell>
+		<Cell>
+			<Margins left="0.5em" right="0.5em">
+				<Label text="Alert" x="100%" y="50%" halign="Right" valign="Center" font="Text"/>
+			</Margins>
+		</Cell>
+		<Cell>
+			<Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+				<RoundedRectangle radiusX="3mm" radiusY="3mm" width="0%" height="1cm" fill="AlertBg">
+					<Margins left="0.5em" right="0.5em">
+						<Label text="0" x="50%" y="50%" halign="Center" valign="Center" font="AlertFg"/>
+					</Margins>
+				</RoundedRectangle>
+			</Margins>
+		</Cell>
+		<Cell>
+			<Margins left="0.5em" right="0.5em">
+				<Label text="Emergency" x="100%" y="50%" halign="Right" valign="Center" font="Text"/>
+			</Margins>
+		</Cell>
+		<Cell>
+			<Margins left="1mm" top="1mm" bottom="1mm" right="1mm">
+				<RoundedRectangle radiusX="3mm" radiusY="3mm" width="0%" height="1cm" fill="EmergencyBg">
+					<Margins left="0.5em" right="0.5em">
+						<Label text="0" x="50%" y="50%" halign="Center" valign="Center" font="EmergencyFg"/>
+					</Margins>
+				</RoundedRectangle>
+			</Margins>
+		</Cell>
+	</Grid>
+</Layout2D>

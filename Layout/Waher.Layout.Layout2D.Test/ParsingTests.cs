@@ -29,265 +29,270 @@ namespace Waher.Layout.Layout2D.Test
 				typeof(Layout2DDocument).Assembly);
 		}
 
-		protected virtual Task Test(string FileName, params KeyValuePair<string, object>[] ContentAttachments)
+		protected virtual async Task Test(string FileName, params KeyValuePair<string, object>[] ContentAttachments)
 		{
-			Layout2DDocument.FromFile("Xml\\" + FileName + ".xml", ContentAttachments);
-			return Task.CompletedTask;
+			await Layout2DDocument.FromFile("Xml\\" + FileName + ".xml", ContentAttachments);
 		}
 
 		[TestMethod]
-		public void Test_01_Lengths()
+		public async Task Test_01_Lengths()
 		{
-			this.Test("Test_01_Lengths");
+			await this.Test("Test_01_Lengths");
 		}
 
 		[TestMethod]
-		public void Test_02_Circle()
+		public async Task Test_02_Circle()
 		{
-			this.Test("Test_02_Circle");
+			await this.Test("Test_02_Circle");
 		}
 
 		[TestMethod]
-		public void Test_03_CircleArc()
+		public async Task Test_03_CircleArc()
 		{
-			this.Test("Test_03_CircleArc");
+			await this.Test("Test_03_CircleArc");
 		}
 
 		[TestMethod]
-		public void Test_04_Dot()
+		public async Task Test_04_Dot()
 		{
-			this.Test("Test_04_Dot");
+			await this.Test("Test_04_Dot");
 		}
 
 		[TestMethod]
-		public void Test_05_Ellipse()
+		public async Task Test_05_Ellipse()
 		{
-			this.Test("Test_05_Ellipse");
+			await this.Test("Test_05_Ellipse");
 		}
 
 		[TestMethod]
-		public void Test_06_EllipseArc()
+		public async Task Test_06_EllipseArc()
 		{
-			this.Test("Test_06_EllipseArc");
+			await this.Test("Test_06_EllipseArc");
 		}
 
 		[TestMethod]
-		public void Test_07_Line()
+		public async Task Test_07_Line()
 		{
-			this.Test("Test_07_Line");
+			await this.Test("Test_07_Line");
 		}
 
 		[TestMethod]
-		public void Test_08_Loop()
+		public async Task Test_08_Loop()
 		{
-			this.Test("Test_08_Loop");
+			await this.Test("Test_08_Loop");
 		}
 
 		[TestMethod]
-		public void Test_09_Polygon()
+		public async Task Test_09_Polygon()
 		{
-			this.Test("Test_09_Polygon");
+			await this.Test("Test_09_Polygon");
 		}
 
 		[TestMethod]
-		public void Test_10_PolyLine()
+		public async Task Test_10_PolyLine()
 		{
-			this.Test("Test_10_PolyLine");
+			await this.Test("Test_10_PolyLine");
 		}
 
 		[TestMethod]
-		public void Test_11_Rectangle()
+		public async Task Test_11_Rectangle()
 		{
-			this.Test("Test_11_Rectangle");
+			await this.Test("Test_11_Rectangle");
 		}
 
 		[TestMethod]
-		public void Test_12_RoundedRectangle()
+		public async Task Test_12_RoundedRectangle()
 		{
-			this.Test("Test_12_RoundedRectangle");
+			await this.Test("Test_12_RoundedRectangle");
 		}
 
 		[TestMethod]
-		public void Test_13_Spline()
+		public async Task Test_13_Spline()
 		{
-			this.Test("Test_13_Spline");
+			await this.Test("Test_13_Spline");
 		}
 
 		[TestMethod]
-		public void Test_14_Path()
+		public async Task Test_14_Path()
 		{
-			this.Test("Test_14_Path");
+			await this.Test("Test_14_Path");
 		}
 
 		[TestMethod]
-		public void Test_15_Arrow()
+		public async Task Test_15_Arrow()
 		{
-			this.Test("Test_15_Arrow");
+			await this.Test("Test_15_Arrow");
 		}
 
 		[TestMethod]
-		public void Test_16_Rotate()
+		public async Task Test_16_Rotate()
 		{
-			this.Test("Test_16_Rotate");
+			await this.Test("Test_16_Rotate");
 		}
 
 		[TestMethod]
-		public void Test_17_Rotate_Pivot()
+		public async Task Test_17_Rotate_Pivot()
 		{
-			this.Test("Test_17_Rotate_Pivot");
+			await this.Test("Test_17_Rotate_Pivot");
 		}
 
 		[TestMethod]
-		public void Test_18_Translate()
+		public async Task Test_18_Translate()
 		{
-			this.Test("Test_18_Translate");
+			await this.Test("Test_18_Translate");
 		}
 
 		[TestMethod]
-		public void Test_19_Scale()
+		public async Task Test_19_Scale()
 		{
-			this.Test("Test_19_Scale");
+			await this.Test("Test_19_Scale");
 		}
 
 		[TestMethod]
-		public void Test_20_Scale_Pivot()
+		public async Task Test_20_Scale_Pivot()
 		{
-			this.Test("Test_20_Scale_Pivot");
+			await this.Test("Test_20_Scale_Pivot");
 		}
 
 		[TestMethod]
-		public void Test_21_SkewX()
+		public async Task Test_21_SkewX()
 		{
-			this.Test("Test_21_SkewX");
+			await this.Test("Test_21_SkewX");
 		}
 
 		[TestMethod]
-		public void Test_22_SkewX_Pivot()
+		public async Task Test_22_SkewX_Pivot()
 		{
-			this.Test("Test_22_SkewX_Pivot");
+			await this.Test("Test_22_SkewX_Pivot");
 		}
 
 		[TestMethod]
-		public void Test_23_SkewY()
+		public async Task Test_23_SkewY()
 		{
-			this.Test("Test_23_SkewY");
+			await this.Test("Test_23_SkewY");
 		}
 
 		[TestMethod]
-		public void Test_24_SkewY_Pivot()
+		public async Task Test_24_SkewY_Pivot()
 		{
-			this.Test("Test_24_SkewY_Pivot");
+			await this.Test("Test_24_SkewY_Pivot");
 		}
 
 		[TestMethod]
-		public void Test_25_Horizontal()
+		public async Task Test_25_Horizontal()
 		{
-			this.Test("Test_25_Horizontal");
+			await this.Test("Test_25_Horizontal");
 		}
 
 		[TestMethod]
-		public void Test_26_Vertical()
+		public async Task Test_26_Vertical()
 		{
-			this.Test("Test_26_Vertical");
+			await this.Test("Test_26_Vertical");
 		}
 
 		[TestMethod]
-		public void Test_27_Overlays()
+		public async Task Test_27_Overlays()
 		{
-			this.Test("Test_27_Overlays");
+			await this.Test("Test_27_Overlays");
 		}
 
 		[TestMethod]
-		public void Test_28_Flexible_LRTD()
+		public async Task Test_28_Flexible_LRTD()
 		{
-			this.Test("Test_28_Flexible_LRTD");
+			await this.Test("Test_28_Flexible_LRTD");
 		}
 
 		[TestMethod]
-		public void Test_29_Flexible_RLTD()
+		public async Task Test_29_Flexible_RLTD()
 		{
-			this.Test("Test_29_Flexible_RLTD");
+			await this.Test("Test_29_Flexible_RLTD");
 		}
 
 		[TestMethod]
-		public void Test_30_Flexible_LRDT()
+		public async Task Test_30_Flexible_LRDT()
 		{
-			this.Test("Test_30_Flexible_LRDT");
+			await this.Test("Test_30_Flexible_LRDT");
 		}
 
 		[TestMethod]
-		public void Test_31_Flexible_RLDT()
+		public async Task Test_31_Flexible_RLDT()
 		{
-			this.Test("Test_31_Flexible_RLDT");
+			await this.Test("Test_31_Flexible_RLDT");
 		}
 
 		[TestMethod]
-		public void Test_32_Flexible_TDLR()
+		public async Task Test_32_Flexible_TDLR()
 		{
-			this.Test("Test_32_Flexible_TDLR");
+			await this.Test("Test_32_Flexible_TDLR");
 		}
 
 		[TestMethod]
-		public void Test_33_Flexible_TDRL()
+		public async Task Test_33_Flexible_TDRL()
 		{
-			this.Test("Test_33_Flexible_TDRL");
+			await this.Test("Test_33_Flexible_TDRL");
 		}
 
 		[TestMethod]
-		public void Test_34_Flexible_DTLR()
+		public async Task Test_34_Flexible_DTLR()
 		{
-			this.Test("Test_34_Flexible_DTLR");
+			await this.Test("Test_34_Flexible_DTLR");
 		}
 
 		[TestMethod]
-		public void Test_35_Flexible_DTRL()
+		public async Task Test_35_Flexible_DTRL()
 		{
-			this.Test("Test_35_Flexible_DTRL");
+			await this.Test("Test_35_Flexible_DTRL");
 		}
 
 		[TestMethod]
-		public void Test_36_Grid()
+		public async Task Test_36_Grid()
 		{
-			this.Test("Test_36_Grid");
+			await this.Test("Test_36_Grid");
 		}
 
 		[TestMethod]
-		public void Test_37_Images()
+		public async Task Test_37_Images()
 		{
 			SKBitmap Bitmap = SKBitmap.Decode("Images\\Icon_64x64_File.png");
 			SKImage Image = SKImage.FromBitmap(Bitmap);
 
-			this.Test("Test_37_Images", new KeyValuePair<string, object>("img0001", Image));
+			await this.Test("Test_37_Images", new KeyValuePair<string, object>("img0001", Image));
 		}
 
 		[TestMethod]
-		public void Test_38_Labels()
+		public async Task Test_38_Labels()
 		{
-			this.Test("Test_38_Labels");
+			await this.Test("Test_38_Labels");
 		}
 
 		[TestMethod]
-		public void Test_39_Stack()
+		public async Task Test_39_Stack()
 		{
-			this.Test("Test_39_Stack");
+			await this.Test("Test_39_Stack");
 		}
 
 		[TestMethod]
-		public void Test_40_HorizontalBars()
+		public async Task Test_40_HorizontalBars()
 		{
-			this.Test("Test_40_HorizontalBars");
+			await this.Test("Test_40_HorizontalBars");
 		}
 
 		[TestMethod]
-		public void Test_41_FlexibleLegend()
+		public async Task Test_41_FlexibleLegend()
 		{
-			this.Test("Test_41_FlexibleLegend");
+			await this.Test("Test_41_FlexibleLegend");
 		}
 
 		[TestMethod]
-		public void Test_42_Pie()
+		public async Task Test_42_Pie()
 		{
-			this.Test("Test_42_Pie");
+			await this.Test("Test_42_Pie");
+		}
+
+		[TestMethod]
+		public async Task Test_43_HorizontalBars()
+		{
+			await this.Test("Test_43_HorizontalBars");
 		}
 	}
 }

@@ -2473,28 +2473,77 @@ namespace Waher.Networking.XMPP.Contracts
 
 		#endregion
 
-		#region Get Created Contracts
+		#region Get Created Contract References
 
 		/// <summary>
-		/// Get contracts the account has created.
+		/// Get references to contracts the account has created.
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetCreatedContracts(IdReferencesEventHandler Callback, object State)
+		public void GetCreatedContractReferences(IdReferencesEventHandler Callback, object State)
 		{
-			this.GetCreatedContracts(this.componentAddress, Callback, State);
+			this.GetCreatedContractReferences(this.componentAddress, 0, int.MaxValue, Callback, State);
 		}
 
 		/// <summary>
-		/// Get contracts the account has created.
+		/// Get references to contracts the account has created.
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetCreatedContracts(string Address, IdReferencesEventHandler Callback, object State)
+		public void GetCreatedContractReferences(string Address, IdReferencesEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(Address, "<getCreatedContracts xmlns='" + NamespaceSmartContracts + "'/>",
-				this.IdReferencesResponse, new object[] { Callback, State });
+			this.GetCreatedContractReferences(Address, 0, int.MaxValue, Callback, State);
+		}
+
+		/// <summary>
+		/// Get references to contracts the account has created.
+		/// </summary>
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetCreatedContractReferences(int Offset, int MaxCount, IdReferencesEventHandler Callback, object State)
+		{
+			this.GetCreatedContractReferences(this.componentAddress, Offset, MaxCount, Callback, State);
+		}
+
+		/// <summary>
+		/// Get references to contracts the account has created.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetCreatedContractReferences(string Address, int Offset, int MaxCount, IdReferencesEventHandler Callback, object State)
+		{
+			if (Offset < 0)
+				throw new ArgumentException("Offsets cannot be negative.", nameof(Offset));
+
+			if (MaxCount <= 0)
+				throw new ArgumentException("Must be postitive.", nameof(MaxCount));
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<getCreatedContracts references='true' xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+
+			if (Offset > 0)
+			{
+				Xml.Append("' offset='");
+				Xml.Append(Offset.ToString());
+			}
+
+			if (MaxCount < int.MaxValue)
+			{
+				Xml.Append("' maxCount='");
+				Xml.Append(MaxCount.ToString());
+			}
+
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(Address, Xml.ToString(), this.IdReferencesResponse, new object[] { Callback, State });
 		}
 
 		private async Task IdReferencesResponse(object Sender, IqResultEventArgs e)
@@ -2524,33 +2573,214 @@ namespace Waher.Networking.XMPP.Contracts
 		}
 
 		/// <summary>
-		/// Get contracts the account has created.
+		/// Get references to contracts the account has created.
 		/// </summary>
 		/// <returns>Contract IDs</returns>
-		public Task<string[]> GetCreatedContractsAsync()
+		public Task<string[]> GetCreatedContractReferencesAsync()
 		{
-			return this.GetCreatedContractsAsync(this.componentAddress);
+			return this.GetCreatedContractReferencesAsync(this.componentAddress, 0, int.MaxValue);
+		}
+
+		/// <summary>
+		/// Get references to contracts the account has created.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <returns>Contract IDs</returns>
+		public Task<string[]> GetCreatedContractReferencesAsync(string Address)
+		{ 
+			return this.GetCreatedContractReferencesAsync(Address, 0, int.MaxValue);
+		}
+
+		/// <summary>
+		/// Get references to contracts the account has created.
+		/// </summary>
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <returns>Contract IDs</returns>
+		public Task<string[]> GetCreatedContractReferencesAsync(int Offset, int MaxCount)
+		{
+			return this.GetCreatedContractReferencesAsync(this.componentAddress, Offset, MaxCount);
+		}
+
+		/// <summary>
+		/// Get references to contracts the account has created.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <returns>Contract IDs</returns>
+		public Task<string[]> GetCreatedContractReferencesAsync(string Address, int Offset, int MaxCount)
+		{
+			TaskCompletionSource<string[]> Result = new TaskCompletionSource<string[]>();
+
+			this.GetCreatedContractReferences(Address, Offset, MaxCount, (sender, e) =>
+				{
+					if (e.Ok)
+						Result.SetResult(e.References);
+					else
+						Result.SetException(e.StanzaError ?? new Exception("Unable to get created contract references."));
+
+					return Task.CompletedTask;
+
+				}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
+		#region Get Created Contracts
+
+		/// <summary>
+		/// Get contracts the account has created.
+		/// </summary>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetCreatedContracts(ContractsEventHandler Callback, object State)
+		{
+			this.GetCreatedContracts(this.componentAddress, 0, int.MaxValue, Callback, State);
 		}
 
 		/// <summary>
 		/// Get contracts the account has created.
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
-		/// <returns>Contract IDs</returns>
-		public Task<string[]> GetCreatedContractsAsync(string Address)
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetCreatedContracts(string Address, ContractsEventHandler Callback, object State)
 		{
-			TaskCompletionSource<string[]> Result = new TaskCompletionSource<string[]>();
+			this.GetCreatedContracts(Address, 0, int.MaxValue, Callback, State);
+		}
 
-			this.GetCreatedContracts(Address, (sender, e) =>
+		/// <summary>
+		/// Get contracts the account has created.
+		/// </summary>
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetCreatedContracts(int Offset, int MaxCount, ContractsEventHandler Callback, object State)
+		{
+			this.GetCreatedContracts(this.componentAddress, Offset, MaxCount, Callback, State);
+		}
+
+		/// <summary>
+		/// Get contracts the account has created.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetCreatedContracts(string Address, int Offset, int MaxCount, ContractsEventHandler Callback, object State)
+		{
+			if (Offset < 0)
+				throw new ArgumentException("Offsets cannot be negative.", nameof(Offset));
+
+			if (MaxCount <= 0)
+				throw new ArgumentException("Must be postitive.", nameof(MaxCount));
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<getCreatedContracts references='false' xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+
+			if (Offset > 0)
+			{
+				Xml.Append("' offset='");
+				Xml.Append(Offset.ToString());
+			}
+
+			if (MaxCount < int.MaxValue)
+			{
+				Xml.Append("' maxCount='");
+				Xml.Append(MaxCount.ToString());
+			}
+
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(Address, Xml.ToString(), this.ContractsResponse, new object[] { Callback, State });
+		}
+
+		private async Task ContractsResponse(object Sender, IqResultEventArgs e)
+		{
+			object[] P = (object[])e.State;
+			ContractsEventHandler Callback = (ContractsEventHandler)P[0];
+			XmlElement E = e.FirstElement;
+			List<Contract> Contracts = new List<Contract>();
+
+			if (e.Ok && E != null)
+			{
+				foreach (XmlNode N in E.ChildNodes)
 				{
-					if (e.Ok)
-						Result.SetResult(e.References);
-					else
-						Result.SetException(e.StanzaError ?? new Exception("Unable to get created contracts."));
+					if (N is XmlElement E2 && E2.LocalName == "contract" && E2.NamespaceURI == NamespaceSmartContracts)
+					{
+						ParsedContract ParsedContract = await Contract.Parse(E2);
 
-					return Task.CompletedTask;
+						if (!(ParsedContract is null))
+							Contracts.Add(ParsedContract.Contract);
+					}
+				}
+			}
+			else
+				e.Ok = false;
 
-				}, null);
+			e.State = P[1];
+			if (!(Callback is null))
+				await Callback(this, new ContractsEventArgs(e, Contracts.ToArray()));
+		}
+
+		/// <summary>
+		/// Get contracts the account has created.
+		/// </summary>
+		/// <returns>Contracts</returns>
+		public Task<Contract[]> GetCreatedContractsAsync()
+		{
+			return this.GetCreatedContractsAsync(this.componentAddress, 0, int.MaxValue);
+		}
+
+		/// <summary>
+		/// Get contracts the account has created.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <returns>Contracts</returns>
+		public Task<Contract[]> GetCreatedContractsAsync(string Address)
+		{
+			return this.GetCreatedContractsAsync(Address, 0, int.MaxValue);
+		}
+
+		/// <summary>
+		/// Get contracts the account has created.
+		/// </summary>
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <returns>Contracts</returns>
+		public Task<Contract[]> GetCreatedContractsAsync(int Offset, int MaxCount)
+		{
+			return this.GetCreatedContractsAsync(this.componentAddress, Offset, MaxCount);
+		}
+
+		/// <summary>
+		/// Get contracts the account has created.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <returns>Contracts</returns>
+		public Task<Contract[]> GetCreatedContractsAsync(string Address, int Offset, int MaxCount)
+		{
+			TaskCompletionSource<Contract[]> Result = new TaskCompletionSource<Contract[]>();
+
+			this.GetCreatedContracts(Address, Offset, MaxCount, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.Contracts);
+				else
+					Result.SetException(e.StanzaError ?? new Exception("Unable to get created contracts."));
+
+				return Task.CompletedTask;
+
+			}, null);
 
 			return Result.Task;
 		}
@@ -2662,6 +2892,114 @@ namespace Waher.Networking.XMPP.Contracts
 
 		#endregion
 
+		#region Get Signed Contract References
+
+		/// <summary>
+		/// Get references to contracts the account has signed.
+		/// </summary>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetSignedContractReferences(IdReferencesEventHandler Callback, object State)
+		{
+			this.GetSignedContractReferences(this.componentAddress, 0, int.MaxValue, Callback, State);
+		}
+
+		/// <summary>
+		/// Get references to contracts the account has signed.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetSignedContractReferences(string Address, IdReferencesEventHandler Callback, object State)
+		{ 
+			this.GetSignedContractReferences(Address, 0, int.MaxValue, Callback, State);
+		}
+
+		/// <summary>
+		/// Get references to contracts the account has signed.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetSignedContractReferences(string Address, int Offset, int MaxCount, IdReferencesEventHandler Callback, object State)
+		{
+			if (Offset < 0)
+				throw new ArgumentException("Offsets cannot be negative.", nameof(Offset));
+
+			if (MaxCount <= 0)
+				throw new ArgumentException("Must be postitive.", nameof(MaxCount));
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<getSignedContracts references='true' xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+
+			if (Offset > 0)
+			{
+				Xml.Append("' offset='");
+				Xml.Append(Offset.ToString());
+			}
+
+			if (MaxCount < int.MaxValue)
+			{
+				Xml.Append("' maxCount='");
+				Xml.Append(MaxCount.ToString());
+			}
+
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(Address, Xml.ToString(), this.IdReferencesResponse, new object[] { Callback, State });
+		}
+
+		/// <summary>
+		/// Get references to contracts the account has signed.
+		/// </summary>
+		/// <returns>Contract IDs</returns>
+		public Task<string[]> GetSignedContractReferencesAsync()
+		{
+			return this.GetSignedContractReferencesAsync(this.componentAddress, 0, int.MaxValue);
+		}
+
+		/// <summary>
+		/// Get references to contracts the account has signed.
+		/// </summary>
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <returns>Contract IDs</returns>
+		public Task<string[]> GetSignedContractReferencesAsync(int Offset, int MaxCount)
+		{
+			return this.GetSignedContractReferencesAsync(this.componentAddress, Offset, MaxCount);
+		}
+
+		/// <summary>
+		/// Get references to contracts the account has signed.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <returns>Contract IDs</returns>
+		public Task<string[]> GetSignedContractReferencesAsync(string Address, int Offset, int MaxCount)
+		{
+			TaskCompletionSource<string[]> Result = new TaskCompletionSource<string[]>();
+
+			this.GetSignedContractReferences(Address, Offset, MaxCount, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(e.References);
+				else
+					Result.SetException(e.StanzaError ?? new Exception("Unable to get signed contract references."));
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
 		#region Get Signed Contracts
 
 		/// <summary>
@@ -2669,9 +3007,9 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetSignedContracts(IdReferencesEventHandler Callback, object State)
+		public void GetSignedContracts(ContractsEventHandler Callback, object State)
 		{
-			this.GetSignedContracts(this.componentAddress, Callback, State);
+			this.GetSignedContracts(this.componentAddress, 0, int.MaxValue, Callback, State);
 		}
 
 		/// <summary>
@@ -2680,34 +3018,96 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GetSignedContracts(string Address, IdReferencesEventHandler Callback, object State)
+		public void GetSignedContracts(string Address, ContractsEventHandler Callback, object State)
 		{
-			this.client.SendIqGet(Address, "<getSignedContracts xmlns='" + NamespaceSmartContracts + "'/>",
-				this.IdReferencesResponse, new object[] { Callback, State });
+			this.GetSignedContracts(Address, 0, int.MaxValue, Callback, State);
 		}
 
 		/// <summary>
 		/// Get contracts the account has signed.
 		/// </summary>
-		/// <returns>Contract IDs</returns>
-		public Task<string[]> GetSignedContractsAsync()
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetSignedContracts(int Offset, int MaxCount, ContractsEventHandler Callback, object State)
 		{
-			return this.GetSignedContractsAsync(this.componentAddress);
+			this.GetSignedContracts(this.componentAddress, Offset, MaxCount, Callback, State);
 		}
 
 		/// <summary>
 		/// Get contracts the account has signed.
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
-		/// <returns>Contract IDs</returns>
-		public Task<string[]> GetSignedContractsAsync(string Address)
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetSignedContracts(string Address, int Offset, int MaxCount, ContractsEventHandler Callback, object State)
 		{
-			TaskCompletionSource<string[]> Result = new TaskCompletionSource<string[]>();
+			if (Offset < 0)
+				throw new ArgumentException("Offsets cannot be negative.", nameof(Offset));
 
-			this.GetSignedContracts(Address, (sender, e) =>
+			if (MaxCount <= 0)
+				throw new ArgumentException("Must be postitive.", nameof(MaxCount));
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<getSignedContracts references='false' xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+
+			if (Offset > 0)
+			{
+				Xml.Append("' offset='");
+				Xml.Append(Offset.ToString());
+			}
+
+			if (MaxCount < int.MaxValue)
+			{
+				Xml.Append("' maxCount='");
+				Xml.Append(MaxCount.ToString());
+			}
+
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(Address, Xml.ToString(), this.ContractsResponse, new object[] { Callback, State });
+		}
+
+		/// <summary>
+		/// Get contracts the account has signed.
+		/// </summary>
+		/// <returns>Contract IDs</returns>
+		public Task<Contract[]> GetSignedContractsAsync()
+		{
+			return this.GetSignedContractsAsync(this.componentAddress, 0, int.MaxValue);
+		}
+
+		/// <summary>
+		/// Get contracts the account has signed.
+		/// </summary>
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <returns>Contract IDs</returns>
+		public Task<Contract[]> GetSignedContractsAsync(int Offset, int MaxCount)
+		{
+			return this.GetSignedContractsAsync(this.componentAddress, Offset, MaxCount);
+		}
+
+		/// <summary>
+		/// Get contracts the account has signed.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
+		/// <param name="MaxCount">Result will be limited to this number of items.</param>
+		/// <returns>Contract IDs</returns>
+		public Task<Contract[]> GetSignedContractsAsync(string Address, int Offset, int MaxCount)
+		{
+			TaskCompletionSource<Contract[]> Result = new TaskCompletionSource<Contract[]>();
+
+			this.GetSignedContracts(Address, Offset, MaxCount, (sender, e) =>
 			{
 				if (e.Ok)
-					Result.SetResult(e.References);
+					Result.SetResult(e.Contracts);
 				else
 					Result.SetException(e.StanzaError ?? new Exception("Unable to get signed contracts."));
 

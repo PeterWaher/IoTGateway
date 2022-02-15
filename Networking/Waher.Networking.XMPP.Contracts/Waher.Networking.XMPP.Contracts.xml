@@ -1166,18 +1166,101 @@
             <param name="CanActAsTemplate">If the contract can act as a template.</param>
             <returns>Contract.</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContracts(Waher.Networking.XMPP.Contracts.IdReferencesEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContractReferences(Waher.Networking.XMPP.Contracts.IdReferencesEventHandler,System.Object)">
+            <summary>
+            Get references to contracts the account has created.
+            </summary>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContractReferences(System.String,Waher.Networking.XMPP.Contracts.IdReferencesEventHandler,System.Object)">
+            <summary>
+            Get references to contracts the account has created.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContractReferences(System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.IdReferencesEventHandler,System.Object)">
+            <summary>
+            Get references to contracts the account has created.
+            </summary>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContractReferences(System.String,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.IdReferencesEventHandler,System.Object)">
+            <summary>
+            Get references to contracts the account has created.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContractReferencesAsync">
+            <summary>
+            Get references to contracts the account has created.
+            </summary>
+            <returns>Contract IDs</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContractReferencesAsync(System.String)">
+            <summary>
+            Get references to contracts the account has created.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <returns>Contract IDs</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContractReferencesAsync(System.Int32,System.Int32)">
+            <summary>
+            Get references to contracts the account has created.
+            </summary>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
+            <returns>Contract IDs</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContractReferencesAsync(System.String,System.Int32,System.Int32)">
+            <summary>
+            Get references to contracts the account has created.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
+            <returns>Contract IDs</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContracts(Waher.Networking.XMPP.Contracts.ContractsEventHandler,System.Object)">
             <summary>
             Get contracts the account has created.
             </summary>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to the callback method.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContracts(System.String,Waher.Networking.XMPP.Contracts.IdReferencesEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContracts(System.String,Waher.Networking.XMPP.Contracts.ContractsEventHandler,System.Object)">
             <summary>
             Get contracts the account has created.
             </summary>
             <param name="Address">Address of server (component).</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContracts(System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.ContractsEventHandler,System.Object)">
+            <summary>
+            Get contracts the account has created.
+            </summary>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContracts(System.String,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.ContractsEventHandler,System.Object)">
+            <summary>
+            Get contracts the account has created.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to the callback method.</param>
         </member>
@@ -1185,14 +1268,31 @@
             <summary>
             Get contracts the account has created.
             </summary>
-            <returns>Contract IDs</returns>
+            <returns>Contracts</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContractsAsync(System.String)">
             <summary>
             Get contracts the account has created.
             </summary>
             <param name="Address">Address of server (component).</param>
-            <returns>Contract IDs</returns>
+            <returns>Contracts</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContractsAsync(System.Int32,System.Int32)">
+            <summary>
+            Get contracts the account has created.
+            </summary>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
+            <returns>Contracts</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContractsAsync(System.String,System.Int32,System.Int32)">
+            <summary>
+            Get contracts the account has created.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
+            <returns>Contracts</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignContract(Waher.Networking.XMPP.Contracts.Contract,System.String,System.Boolean,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
             <summary>
@@ -1242,18 +1342,85 @@
             and only if no parameters and attributes are changed. (Otherwise the signature would break.)</param>
             <returns>Contract</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContracts(Waher.Networking.XMPP.Contracts.IdReferencesEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContractReferences(Waher.Networking.XMPP.Contracts.IdReferencesEventHandler,System.Object)">
+            <summary>
+            Get references to contracts the account has signed.
+            </summary>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContractReferences(System.String,Waher.Networking.XMPP.Contracts.IdReferencesEventHandler,System.Object)">
+            <summary>
+            Get references to contracts the account has signed.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContractReferences(System.String,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.IdReferencesEventHandler,System.Object)">
+            <summary>
+            Get references to contracts the account has signed.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContractReferencesAsync">
+            <summary>
+            Get references to contracts the account has signed.
+            </summary>
+            <returns>Contract IDs</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContractReferencesAsync(System.Int32,System.Int32)">
+            <summary>
+            Get references to contracts the account has signed.
+            </summary>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
+            <returns>Contract IDs</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContractReferencesAsync(System.String,System.Int32,System.Int32)">
+            <summary>
+            Get references to contracts the account has signed.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
+            <returns>Contract IDs</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContracts(Waher.Networking.XMPP.Contracts.ContractsEventHandler,System.Object)">
             <summary>
             Get contracts the account has signed.
             </summary>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to the callback method.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContracts(System.String,Waher.Networking.XMPP.Contracts.IdReferencesEventHandler,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContracts(System.String,Waher.Networking.XMPP.Contracts.ContractsEventHandler,System.Object)">
             <summary>
             Get contracts the account has signed.
             </summary>
             <param name="Address">Address of server (component).</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContracts(System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.ContractsEventHandler,System.Object)">
+            <summary>
+            Get contracts the account has signed.
+            </summary>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContracts(System.String,System.Int32,System.Int32,Waher.Networking.XMPP.Contracts.ContractsEventHandler,System.Object)">
+            <summary>
+            Get contracts the account has signed.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to the callback method.</param>
         </member>
@@ -1263,11 +1430,21 @@
             </summary>
             <returns>Contract IDs</returns>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContractsAsync(System.String)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContractsAsync(System.Int32,System.Int32)">
+            <summary>
+            Get contracts the account has signed.
+            </summary>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
+            <returns>Contract IDs</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContractsAsync(System.String,System.Int32,System.Int32)">
             <summary>
             Get contracts the account has signed.
             </summary>
             <param name="Address">Address of server (component).</param>
+            <param name="Offset">Result will start with the response at this offset into result set.</param>
+            <param name="MaxCount">Result will be limited to this number of items.</param>
             <returns>Contract IDs</returns>
         </member>
         <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.ContractSigned">
@@ -2345,6 +2522,30 @@
         <member name="P:Waher.Networking.XMPP.Contracts.ContractReferenceEventArgs.ContractIdUriString">
             <summary>
             ID of contract being signed, as an URI string.
+            </summary>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.ContractsEventHandler">
+            <summary>
+            Delegate for Contracts callback methods.
+            </summary>
+            <param name="Sender">Sender</param>
+            <param name="e">Event arguments</param>
+        </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.ContractsEventArgs">
+            <summary>
+            Event arguments for Contracts responses
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.Contracts.Contract[])">
+            <summary>
+            Event arguments for ID References responses
+            </summary>
+            <param name="e">IQ response event arguments.</param>
+            <param name="Contracts">Contracts.</param>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractsEventArgs.Contracts">
+            <summary>
+            Contracts
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractSignedEventHandler">

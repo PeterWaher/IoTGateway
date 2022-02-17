@@ -1484,6 +1484,38 @@
             <param name="ContractId">ID of contract to get.</param>
             <returns>Contract</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContracts(System.String[],Waher.Networking.XMPP.Contracts.ContractsEventHandler,System.Object)">
+            <summary>
+            Gets a collection of contracts
+            </summary>
+            <param name="ContractIds">IDs of contracts to get.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContracts(System.String,System.String[],Waher.Networking.XMPP.Contracts.ContractsEventHandler,System.Object)">
+            <summary>
+            Gets a collection of contracts
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ContractIds">IDs of contracts to get.</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractsAsync(System.String[])">
+            <summary>
+            Gets a collection of contracts
+            </summary>
+            <param name="ContractIds">IDs of contracts to get.</param>
+            <returns>Contract</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetContractsAsync(System.String,System.String[])">
+            <summary>
+            Gets a collection of contracts
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ContractIds">IDs of contracts to get.</param>
+            <returns>Contracts that could be retrieved, and references for the IDs that could not be retrieved.</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ObsoleteContract(System.String,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
             <summary>
             Obsoletes a contract
@@ -2536,16 +2568,22 @@
             Event arguments for Contracts responses
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractsEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.Contracts.Contract[])">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsEventArgs.#ctor(Waher.Networking.XMPP.IqResultEventArgs,Waher.Networking.XMPP.Contracts.Contract[],System.String[])">
             <summary>
             Event arguments for ID References responses
             </summary>
             <param name="e">IQ response event arguments.</param>
             <param name="Contracts">Contracts.</param>
+            <param name="ReferencesOnly">References to contracts that could not be returned.</param>
         </member>
         <member name="P:Waher.Networking.XMPP.Contracts.ContractsEventArgs.Contracts">
             <summary>
             Contracts
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractsEventArgs.References">
+            <summary>
+            References to contracts that could not be returned.
             </summary>
         </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ContractSignedEventHandler">

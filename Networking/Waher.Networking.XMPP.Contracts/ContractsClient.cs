@@ -2587,7 +2587,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of server (component).</param>
 		/// <returns>Contract IDs</returns>
 		public Task<string[]> GetCreatedContractReferencesAsync(string Address)
-		{ 
+		{
 			return this.GetCreatedContractReferencesAsync(Address, 0, int.MaxValue);
 		}
 
@@ -2708,17 +2708,28 @@ namespace Waher.Networking.XMPP.Contracts
 			ContractsEventHandler Callback = (ContractsEventHandler)P[0];
 			XmlElement E = e.FirstElement;
 			List<Contract> Contracts = new List<Contract>();
+			List<string> References = new List<string>();
 
 			if (e.Ok && E != null)
 			{
 				foreach (XmlNode N in E.ChildNodes)
 				{
-					if (N is XmlElement E2 && E2.LocalName == "contract" && E2.NamespaceURI == NamespaceSmartContracts)
+					if (N is XmlElement E2 && E2.NamespaceURI == NamespaceSmartContracts)
 					{
-						ParsedContract ParsedContract = await Contract.Parse(E2);
+						switch (E2.LocalName)
+						{
+							case "contract":
+								ParsedContract ParsedContract = await Contract.Parse(E2);
 
-						if (!(ParsedContract is null))
-							Contracts.Add(ParsedContract.Contract);
+								if (!(ParsedContract is null))
+									Contracts.Add(ParsedContract.Contract);
+								break;
+
+							case "ref":
+								string ContractId = XML.Attribute(E2, "id");
+								References.Add(ContractId);
+								break;
+						}
 					}
 				}
 			}
@@ -2727,7 +2738,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			e.State = P[1];
 			if (!(Callback is null))
-				await Callback(this, new ContractsEventArgs(e, Contracts.ToArray()));
+				await Callback(this, new ContractsEventArgs(e, Contracts.ToArray(), References.ToArray()));
 		}
 
 		/// <summary>
@@ -2911,7 +2922,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void GetSignedContractReferences(string Address, IdReferencesEventHandler Callback, object State)
-		{ 
+		{
 			this.GetSignedContractReferences(Address, 0, int.MaxValue, Callback, State);
 		}
 
@@ -3202,6 +3213,150 @@ namespace Waher.Networking.XMPP.Contracts
 				else
 					Result.SetException(e.StanzaError ?? new Exception("Unable to get the contract."));
 
+				return Task.CompletedTask;
+
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
+		#region Get Contracts
+
+		/// <summary>
+		/// Gets a collection of contracts
+		/// </summary>
+		/// <param name="ContractIds">IDs of contracts to get.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetContracts(string[] ContractIds, ContractsEventHandler Callback, object State)
+		{
+			Dictionary<string, List<string>> ByTrustProvider = new Dictionary<string, List<string>>();
+			string LastTrustProvider = string.Empty;
+			List<string> LastList = null;
+
+			foreach (string ContractId in ContractIds)
+			{
+				string TrustProvider = this.GetTrustProvider(ContractId);
+
+				if (TrustProvider != LastTrustProvider || LastList is null)
+				{
+					if (!ByTrustProvider.TryGetValue(TrustProvider, out LastList))
+					{
+						LastList = new List<string>();
+						ByTrustProvider[TrustProvider] = LastList;
+					}
+
+					LastTrustProvider = TrustProvider;
+				}
+
+				LastList.Add(ContractId);
+			}
+
+			List<Contract> Contracts = new List<Contract>();
+			List<string> References = new List<string>();
+			bool Ok = true;
+			int NrLeft = ByTrustProvider.Count;
+
+			foreach (KeyValuePair<string, List<string>> P in ByTrustProvider)
+			{
+				this.GetContracts(P.Key, P.Value.ToArray(), (sender, e) =>
+				{
+					lock (Contracts)
+					{
+						if (e.Ok)
+						{
+							Contracts.AddRange(e.Contracts);
+							References.AddRange(e.References);
+						}
+						else
+							Ok = false;
+
+						NrLeft--;
+						if (NrLeft > 0)
+							return Task.CompletedTask;
+					}
+
+					if (!(Callback is null))
+					{
+						try
+						{
+							ContractsEventArgs e2 = new ContractsEventArgs(e, Contracts.ToArray(), References.ToArray());
+							e2.Ok = Ok;
+
+							Callback(this, e2);
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+					}
+
+					return Task.CompletedTask;
+				}, State);
+			}
+		}
+
+		/// <summary>
+		/// Gets a collection of contracts
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractIds">IDs of contracts to get.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void GetContracts(string Address, string[] ContractIds, ContractsEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<getContracts xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+			Xml.Append("'>");
+
+			foreach (string ContractId in ContractIds)
+			{
+				Xml.Append("<ref id='");
+				Xml.Append(XML.Encode(ContractId));
+				Xml.Append("'/>");
+			}
+
+			Xml.Append("</getContracts>");
+
+			this.client.SendIqGet(Address, Xml.ToString(), this.ContractsResponse, new object[] { Callback, State });
+		}
+
+		/// <summary>
+		/// Gets a collection of contracts
+		/// </summary>
+		/// <param name="ContractIds">IDs of contracts to get.</param>
+		/// <returns>Contract</returns>
+		public Task<ContractsEventArgs> GetContractsAsync(string[] ContractIds)
+		{
+			TaskCompletionSource<ContractsEventArgs> Result = new TaskCompletionSource<ContractsEventArgs>();
+
+			this.GetContracts(ContractIds, (sender, e) =>
+			{
+				Result.SetResult(e);
+				return Task.CompletedTask;
+
+			}, null);
+
+			return Result.Task;
+		}
+
+		/// <summary>
+		/// Gets a collection of contracts
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractIds">IDs of contracts to get.</param>
+		/// <returns>Contracts that could be retrieved, and references for the IDs that could not be retrieved.</returns>
+		public Task<ContractsEventArgs> GetContractsAsync(string Address, string[] ContractIds)
+		{
+			TaskCompletionSource<ContractsEventArgs> Result = new TaskCompletionSource<ContractsEventArgs>();
+
+			this.GetContracts(Address, ContractIds, (sender, e) =>
+			{
+				Result.SetResult(e);
 				return Task.CompletedTask;
 
 			}, null);

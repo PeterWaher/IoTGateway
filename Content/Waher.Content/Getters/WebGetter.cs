@@ -120,8 +120,8 @@ namespace Waher.Content.Getters
 					else
 						Message = Decoded.ToString();
 				}
-
-				throw new WebException(Message, Response.StatusCode, ContentType, Bin, Decoded);
+				
+				throw new WebException(Message, Response.StatusCode, ContentType, Bin, Decoded, Response.Headers);
 			}
 
 			return Decoded;

@@ -1268,14 +1268,14 @@
             <summary>
             Get contracts the account has created.
             </summary>
-            <returns>Contracts</returns>
+            <returns>Response with results.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContractsAsync(System.String)">
             <summary>
             Get contracts the account has created.
             </summary>
             <param name="Address">Address of server (component).</param>
-            <returns>Contracts</returns>
+            <returns>Response with results.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContractsAsync(System.Int32,System.Int32)">
             <summary>
@@ -1283,7 +1283,7 @@
             </summary>
             <param name="Offset">Result will start with the response at this offset into result set.</param>
             <param name="MaxCount">Result will be limited to this number of items.</param>
-            <returns>Contracts</returns>
+            <returns>Response with results.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetCreatedContractsAsync(System.String,System.Int32,System.Int32)">
             <summary>
@@ -1292,7 +1292,7 @@
             <param name="Address">Address of server (component).</param>
             <param name="Offset">Result will start with the response at this offset into result set.</param>
             <param name="MaxCount">Result will be limited to this number of items.</param>
-            <returns>Contracts</returns>
+            <returns>Response with results.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.SignContract(Waher.Networking.XMPP.Contracts.Contract,System.String,System.Boolean,Waher.Networking.XMPP.Contracts.SmartContractEventHandler,System.Object)">
             <summary>
@@ -1428,7 +1428,7 @@
             <summary>
             Get contracts the account has signed.
             </summary>
-            <returns>Contract IDs</returns>
+            <returns>Response with results.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContractsAsync(System.Int32,System.Int32)">
             <summary>
@@ -1436,7 +1436,7 @@
             </summary>
             <param name="Offset">Result will start with the response at this offset into result set.</param>
             <param name="MaxCount">Result will be limited to this number of items.</param>
-            <returns>Contract IDs</returns>
+            <returns>Response with results.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.GetSignedContractsAsync(System.String,System.Int32,System.Int32)">
             <summary>
@@ -1445,7 +1445,7 @@
             <param name="Address">Address of server (component).</param>
             <param name="Offset">Result will start with the response at this offset into result set.</param>
             <param name="MaxCount">Result will be limited to this number of items.</param>
-            <returns>Contract IDs</returns>
+            <returns>Response with results.</returns>
         </member>
         <member name="E:Waher.Networking.XMPP.Contracts.ContractsClient.ContractSigned">
             <summary>

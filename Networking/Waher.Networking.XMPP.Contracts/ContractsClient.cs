@@ -2744,8 +2744,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Get contracts the account has created.
 		/// </summary>
-		/// <returns>Contracts</returns>
-		public Task<Contract[]> GetCreatedContractsAsync()
+		/// <returns>Response with results.</returns>
+		public Task<ContractsEventArgs> GetCreatedContractsAsync()
 		{
 			return this.GetCreatedContractsAsync(this.componentAddress, 0, int.MaxValue);
 		}
@@ -2754,8 +2754,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Get contracts the account has created.
 		/// </summary>
 		/// <param name="Address">Address of server (component).</param>
-		/// <returns>Contracts</returns>
-		public Task<Contract[]> GetCreatedContractsAsync(string Address)
+		/// <returns>Response with results.</returns>
+		public Task<ContractsEventArgs> GetCreatedContractsAsync(string Address)
 		{
 			return this.GetCreatedContractsAsync(Address, 0, int.MaxValue);
 		}
@@ -2765,8 +2765,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
 		/// <param name="MaxCount">Result will be limited to this number of items.</param>
-		/// <returns>Contracts</returns>
-		public Task<Contract[]> GetCreatedContractsAsync(int Offset, int MaxCount)
+		/// <returns>Response with results.</returns>
+		public Task<ContractsEventArgs> GetCreatedContractsAsync(int Offset, int MaxCount)
 		{
 			return this.GetCreatedContractsAsync(this.componentAddress, Offset, MaxCount);
 		}
@@ -2777,18 +2777,14 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
 		/// <param name="MaxCount">Result will be limited to this number of items.</param>
-		/// <returns>Contracts</returns>
-		public Task<Contract[]> GetCreatedContractsAsync(string Address, int Offset, int MaxCount)
+		/// <returns>Response with results.</returns>
+		public Task<ContractsEventArgs> GetCreatedContractsAsync(string Address, int Offset, int MaxCount)
 		{
-			TaskCompletionSource<Contract[]> Result = new TaskCompletionSource<Contract[]>();
+			TaskCompletionSource<ContractsEventArgs> Result = new TaskCompletionSource<ContractsEventArgs>();
 
 			this.GetCreatedContracts(Address, Offset, MaxCount, (sender, e) =>
 			{
-				if (e.Ok)
-					Result.SetResult(e.Contracts);
-				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to get created contracts."));
-
+				Result.SetResult(e);
 				return Task.CompletedTask;
 
 			}, null);
@@ -3087,8 +3083,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Get contracts the account has signed.
 		/// </summary>
-		/// <returns>Contract IDs</returns>
-		public Task<Contract[]> GetSignedContractsAsync()
+		/// <returns>Response with results.</returns>
+		public Task<ContractsEventArgs> GetSignedContractsAsync()
 		{
 			return this.GetSignedContractsAsync(this.componentAddress, 0, int.MaxValue);
 		}
@@ -3098,8 +3094,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
 		/// <param name="MaxCount">Result will be limited to this number of items.</param>
-		/// <returns>Contract IDs</returns>
-		public Task<Contract[]> GetSignedContractsAsync(int Offset, int MaxCount)
+		/// <returns>Response with results.</returns>
+		public Task<ContractsEventArgs> GetSignedContractsAsync(int Offset, int MaxCount)
 		{
 			return this.GetSignedContractsAsync(this.componentAddress, Offset, MaxCount);
 		}
@@ -3110,18 +3106,14 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Address">Address of server (component).</param>
 		/// <param name="Offset">Result will start with the response at this offset into result set.</param>
 		/// <param name="MaxCount">Result will be limited to this number of items.</param>
-		/// <returns>Contract IDs</returns>
-		public Task<Contract[]> GetSignedContractsAsync(string Address, int Offset, int MaxCount)
+		/// <returns>Response with results.</returns>
+		public Task<ContractsEventArgs> GetSignedContractsAsync(string Address, int Offset, int MaxCount)
 		{
-			TaskCompletionSource<Contract[]> Result = new TaskCompletionSource<Contract[]>();
+			TaskCompletionSource<ContractsEventArgs> Result = new TaskCompletionSource<ContractsEventArgs>();
 
 			this.GetSignedContracts(Address, Offset, MaxCount, (sender, e) =>
 			{
-				if (e.Ok)
-					Result.SetResult(e.Contracts);
-				else
-					Result.SetException(e.StanzaError ?? new Exception("Unable to get signed contracts."));
-
+				Result.SetResult(e);
 				return Task.CompletedTask;
 
 			}, null);

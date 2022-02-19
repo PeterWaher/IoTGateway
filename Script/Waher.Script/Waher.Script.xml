@@ -20152,6 +20152,25 @@
             <param name="Value">Value</param>
             <returns>Expression string.</returns>
         </member>
+        <member name="T:Waher.Script.Output.VariablesOutput">
+            <summary>
+            Converts values of type Variables to expression strings.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Output.VariablesOutput.Supports(System.Type)">
+            <summary>
+            If the interface understands objects such as <paramref name="Object"/>.
+            </summary>
+            <param name="Object">Object</param>
+            <returns>How well objects of this type are supported.</returns>
+        </member>
+        <member name="M:Waher.Script.Output.VariablesOutput.GetString(System.Object)">
+            <summary>
+            Gets a string representing a value.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>Expression string.</returns>
+        </member>
         <member name="T:Waher.Script.PreviewEventHandler">
             <summary>
             Delegate for preview events.

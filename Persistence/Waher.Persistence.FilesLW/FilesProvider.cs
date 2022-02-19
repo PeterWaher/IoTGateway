@@ -1491,9 +1491,9 @@ namespace Waher.Persistence.Files
 		{
 			string s = CollectionName;
 			char[] ch = null;
-			int i = 0;
+			int i = -1;
 
-			while ((i = s.IndexOfAny(forbiddenCharacters, i)) >= 0)
+			while ((i = s.IndexOfAny(forbiddenCharacters, i + 1)) >= 0)
 			{
 				if (ch is null)
 					ch = s.ToCharArray();

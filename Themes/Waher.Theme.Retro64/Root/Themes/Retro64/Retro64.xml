@@ -24,8 +24,9 @@
 	</BasicProperties>
 	<CustomProperties>
 		<Property name="PosColor" value="#C0C0C0"/>
-		<Property name="PosSelectedColor" value="#888888"/>
+		<Property name="PosSelectedColor" value="#8686CE"/>
 		<Property name="NegColor" value="#FFA0A0"/>
+		<Property name="NegSelectedColor" value="#A975BD"/>
 		<Property name="TagColor" value="#4C83AE"/>
 		<Property name="DropDownColor" value="#E4F0FE"/>
 		<Property name="DropDownTextColor" value="#000000"/>

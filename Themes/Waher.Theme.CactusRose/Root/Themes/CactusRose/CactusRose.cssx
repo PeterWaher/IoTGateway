@@ -1037,6 +1037,12 @@ fieldset > legend
 	background-color:¤NegColor¤;
 }
 
+.negButtonPressed
+{
+	background-color:¤NegSelectedColor¤;
+	box-shadow: 0.1em 0.1em 0.1em rgba(0,0,0,0.5);
+}
+
 .posButtonSm
 {
 	padding:0.75em 0.25em 0.75em 0.25em;
@@ -1060,6 +1066,15 @@ fieldset > legend
 	line-height:0.2em;
 	background-color:¤NegColor¤;
 	width:7em;
+}
+
+.negButtonSmPressed
+{
+	padding:0.75em 0.25em 0.75em 0.25em;
+	line-height:0.2em;
+	width:7em;
+	background-color:¤NegSelectedColor¤;
+	box-shadow: 0.1em 0.1em 0.1em rgba(0,0,0,0.5);
 }
 
 .error 

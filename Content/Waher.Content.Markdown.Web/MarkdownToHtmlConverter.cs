@@ -111,6 +111,8 @@ namespace Waher.Content.Markdown.Web
 
 					if (i > 0)
 					{
+						HttpRequestHeader RequestHeader = Request.Header;
+						Variables Variables = State.Session;
 						string Header = Markdown.Substring(0, i);
 						string Parameter;
 
@@ -120,18 +122,18 @@ namespace Waher.Content.Markdown.Web
 								continue;
 
 							Parameter = Row.Substring(10).Trim();
-							if (Request.Header.TryGetQueryParameter(Parameter, out string Value))
+							if (RequestHeader.TryGetQueryParameter(Parameter, out string Value))
 							{
 								Value = System.Net.WebUtility.UrlDecode(Value);
 								if (CommonTypes.TryParse(Value, out double d))
-									State.Session[Parameter] = d;
+									Variables[Parameter] = d;
 								else if (bool.TryParse(Value, out b))
-									State.Session[Parameter] = b;
+									Variables[Parameter] = b;
 								else
-									State.Session[Parameter] = Value;
+									Variables[Parameter] = Value;
 							}
 							else
-								State.Session[Parameter] = string.Empty;
+								Variables[Parameter] = string.Empty;
 						}
 					}
 				}

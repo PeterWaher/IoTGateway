@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -58,6 +59,18 @@ namespace Waher.Script.Graphs.Functions.Colors
 		public override IElement EvaluateScalar(IElement Argument1, IElement Argument2, Variables Variables)
 		{
 			return this.Evaluate(Argument1.AssociatedObjectValue, Argument2.AssociatedObjectValue);
+		}
+
+		/// <summary>
+		/// Evaluates the function on two scalar arguments.
+		/// </summary>
+		/// <param name="Argument1">Function argument 1.</param>
+		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override Task<IElement> EvaluateScalarAsync(IElement Argument1, IElement Argument2, Variables Variables)
+		{
+			return Task.FromResult<IElement>(this.Evaluate(Argument1.AssociatedObjectValue, Argument2.AssociatedObjectValue));
 		}
 
 		private IElement Evaluate(object Argument1, object Argument2)

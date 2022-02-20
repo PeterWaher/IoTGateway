@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Xsl;
 using Waher.Script;
@@ -58,6 +59,18 @@ namespace Waher.Content.Xsl.Functions
 				throw new ScriptRuntimeException("Second parameter must be an XSL Transform (XSLT) object.", this);
 
 			return this.DoTransform(s, Xslt);
+		}
+
+		/// <summary>
+		/// Evaluates the function on two scalar arguments.
+		/// </summary>
+		/// <param name="Argument1">Function argument 1.</param>
+		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override Task<IElement> EvaluateScalarAsync(IElement Argument1, IElement Argument2, Variables Variables)
+		{
+			return Task.FromResult<IElement>(this.EvaluateScalar(Argument1, Argument2, Variables));
 		}
 
 		private IElement DoTransform(string Xml, XslCompiledTransform Xslt)

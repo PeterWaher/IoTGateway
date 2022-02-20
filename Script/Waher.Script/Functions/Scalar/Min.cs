@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -50,6 +51,18 @@ namespace Waher.Script.Functions.Scalar
             else
                 return Argument2;
         }
+
+		/// <summary>
+		/// Evaluates the function on two scalar arguments.
+		/// </summary>
+		/// <param name="Argument1">Function argument 1.</param>
+		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override Task<IElement> EvaluateScalarAsync(IElement Argument1, IElement Argument2, Variables Variables)
+		{
+			return Task.FromResult<IElement>(this.EvaluateScalar(Argument1, Argument2, Variables));
+		}
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

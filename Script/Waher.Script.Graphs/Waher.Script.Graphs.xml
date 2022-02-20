@@ -933,6 +933,15 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Graphs.Functions.Colors.Alpha.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="M:Waher.Script.Graphs.Functions.Colors.Alpha.EvaluateScalar(System.String,System.String,Waher.Script.Variables)">
             <summary>
             Evaluates the function on two scalar arguments.

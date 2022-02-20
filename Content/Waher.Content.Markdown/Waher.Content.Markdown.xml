@@ -5815,6 +5815,13 @@
             <param name="Name">Variable name.</param>
             <returns>If a variable with that name exists.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineScript.Add(System.String,System.Object)">
+            <summary>
+            Adds a variable to the collection.
+            </summary>
+            <param name="Name">Variable name.</param>
+            <param name="Value">Associated variable object value.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineScript.Equals(System.Object)">
             <summary>
             Determines whether the specified object is equal to the current object.

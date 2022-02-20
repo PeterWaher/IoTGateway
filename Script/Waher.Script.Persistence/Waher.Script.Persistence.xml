@@ -1259,14 +1259,14 @@
             Object properties.
             </summary>
             <param name="Object">Object</param>
-            <param name="Variables">Variables</param>
+            <param name="ContextVariables">Context Variables</param>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.ObjectProperties.#ctor(System.Object,Waher.Script.Variables,System.Boolean)">
             <summary>
             Object properties.
             </summary>
             <param name="Object">Object</param>
-            <param name="Variables">Variables</param>
+            <param name="ContextVariables">Context Variables</param>
             <param name="ReadOnly">If access to object properties is read-only (default=true).</param>
         </member>
         <member name="P:Waher.Script.Persistence.SQL.ObjectProperties.Object">

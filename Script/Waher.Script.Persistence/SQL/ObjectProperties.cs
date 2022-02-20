@@ -15,7 +15,6 @@ namespace Waher.Script.Persistence.SQL
 	{
 		private IDictionary<string, object> dictionary;
 		private Type type;
-		private readonly Variables variables2;
 		private object obj;
 		private Dictionary<string, Tuple<PropertyInfo, FieldInfo, bool>> properties = null;
 		private readonly bool readOnly;
@@ -24,9 +23,9 @@ namespace Waher.Script.Persistence.SQL
 		/// Object properties.
 		/// </summary>
 		/// <param name="Object">Object</param>
-		/// <param name="Variables">Variables</param>
-		public ObjectProperties(object Object, Variables Variables)
-			: this(Object, Variables, true)
+		/// <param name="ContextVariables">Context Variables</param>
+		public ObjectProperties(object Object, Variables ContextVariables)
+			: this(Object, ContextVariables, true)
 		{
 		}
 
@@ -34,9 +33,9 @@ namespace Waher.Script.Persistence.SQL
 		/// Object properties.
 		/// </summary>
 		/// <param name="Object">Object</param>
-		/// <param name="Variables">Variables</param>
+		/// <param name="ContextVariables">Context Variables</param>
 		/// <param name="ReadOnly">If access to object properties is read-only (default=true).</param>
-		public ObjectProperties(object Object, Variables Variables, bool ReadOnly)
+		public ObjectProperties(object Object, Variables ContextVariables, bool ReadOnly)
 			: base()
 		{
 			if (Object is IElement E)
@@ -46,9 +45,9 @@ namespace Waher.Script.Persistence.SQL
 
 			this.dictionary = this.obj as IDictionary<string, object>;
 			this.type = this.obj.GetType();
-			this.variables2 = Variables;
 			this.readOnly = ReadOnly;
-			this.ConsoleOut = Variables.ConsoleOut;
+			this.ContextVariables = ContextVariables;
+			this.ConsoleOut = ContextVariables.ConsoleOut;
 		}
 
 		/// <summary>
@@ -86,7 +85,7 @@ namespace Waher.Script.Persistence.SQL
 			if (!(this.dictionary is null) && this.dictionary.ContainsKey(Name))
 				return true;
 
-			if (this.variables2.ContainsVariable(Name) || base.ContainsVariable(Name) || string.Compare(Name, "this", true) == 0)
+			if (base.ContainsVariable(Name) || string.Compare(Name, "this", true) == 0)
 				return true;
 
 			lock (this.variables)
@@ -220,9 +219,6 @@ namespace Waher.Script.Persistence.SQL
 			if (base.TryGetVariable(Name, out Variable))
 				return true;
 
-			if (this.variables2.TryGetVariable(Name, out Variable))
-				return true;
-
 			Variable = Result ? this.CreateVariable(Name, null) : null;
 			return Result;
 		}
@@ -302,13 +298,7 @@ namespace Waher.Script.Persistence.SQL
 					return true;
 			}
 
-			if (this.variables2.TryGetVariable(Name, out Variable Variable))
-			{
-				Value = Variable.ValueObject;
-				return true;
-			}
-
-			if (base.TryGetVariable(Name, out Variable))
+			if (base.TryGetVariable(Name, out Variable Variable))
 			{
 				Value = Variable.ValueObject;
 				return true;
@@ -333,8 +323,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <param name="Value">Associated variable object value.</param>
 		public override void Add(string Name, object Value)
 		{
-			if (this.readOnly ||
-				string.Compare(Name, "this", true) == 0)
+			if (this.readOnly || string.Compare(Name, "this", true) == 0)
 			{
 				base.Add(Name, Value);
 				return;
@@ -387,8 +376,8 @@ namespace Waher.Script.Persistence.SQL
 				return;
 			}
 
-			if (this.variables2.ContainsVariable(Name))
-				this.variables2.Add(Name, Value);
+			if (this.ContextVariables.ContainsVariable(Name))
+				this.ContextVariables.Add(Name, Value);
 			else
 				base.Add(Name, Value);
 		}

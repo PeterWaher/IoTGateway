@@ -6420,6 +6420,15 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.Scalar.Max.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="M:Waher.Script.Functions.Scalar.Max.EvaluateScalar(System.Double,System.Double,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
@@ -6461,6 +6470,15 @@
         <member name="M:Waher.Script.Functions.Scalar.Min.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Scalar.Min.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on two scalar arguments.
             </summary>
             <param name="Argument1">Function argument 1.</param>
             <param name="Argument2">Function argument 2.</param>
@@ -8519,6 +8537,13 @@
             </summary>
             <param name="Name">Variable name.</param>
             <returns>If a variable with that name exists.</returns>
+        </member>
+        <member name="M:Waher.Script.IContextVariables.Add(System.String,System.Object)">
+            <summary>
+            Adds a variable to the collection.
+            </summary>
+            <param name="Name">Variable name.</param>
+            <param name="Value">Associated variable object value.</param>
         </member>
         <member name="T:Waher.Script.Model.BinaryBooleanOperator">
             <summary>

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Script
+﻿namespace Waher.Script
 {
 	/// <summary>
 	/// Variables available in a specific context.
@@ -21,5 +19,12 @@ namespace Waher.Script
 		/// <param name="Name">Variable name.</param>
 		/// <returns>If a variable with that name exists.</returns>
 		bool ContainsVariable(string Name);
+
+		/// <summary>
+		/// Adds a variable to the collection.
+		/// </summary>
+		/// <param name="Name">Variable name.</param>
+		/// <param name="Value">Associated variable object value.</param>
+		void Add(string Name, object Value);
 	}
 }

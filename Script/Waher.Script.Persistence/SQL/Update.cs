@@ -67,6 +67,9 @@ namespace Waher.Script.Persistence.SQL
 			LinkedList<object> ToUpdate = new LinkedList<object>();
 			int Count = 0;
 
+			if (!(this.properties is null))
+				this.properties.ContextVariables = Variables;
+
 			while (await e.MoveNextAsync())
 			{
 				if (this.properties is null)

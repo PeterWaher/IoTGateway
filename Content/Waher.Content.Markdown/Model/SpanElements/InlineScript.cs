@@ -619,6 +619,16 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
+		/// Adds a variable to the collection.
+		/// </summary>
+		/// <param name="Name">Variable name.</param>
+		/// <param name="Value">Associated variable object value.</param>
+		public void Add(string Name, object Value)
+		{
+			throw new NotSupportedException("Variable collection is read-only.");
+		}
+
+		/// <summary>
 		/// Determines whether the specified object is equal to the current object.
 		/// </summary>
 		/// <param name="obj">The object to compare with the current object.</param>

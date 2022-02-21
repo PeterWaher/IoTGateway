@@ -849,12 +849,27 @@ namespace Waher.IoTGateway.Setup
 					catch (AcmeMalformedException)  // Not sure why this is necessary. Perhaps because it takes time to propagate the keys correctly on the remote end?
 					{
 						await Task.Delay(5000);
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Retrying.", false, "User");
 						Order = await Account.OrderCertificate(DomainNames, null, null);
 					}
 
 					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Order created.", false, "User");
 
-					foreach (AcmeAuthorization Authorization in await Order.GetAuthorizations())
+					AcmeAuthorization[] Authorizations;
+
+					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Getting authorizations.", false, "User");
+					try
+					{
+						Authorizations = await Order.GetAuthorizations();
+					}
+					catch (AcmeMalformedException)  // Not sure why this is necessary. Perhaps because it takes time to propagate the keys correctly on the remote end?
+					{
+						await Task.Delay(5000);
+						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Retrying.", false, "User");
+						Authorizations = await Order.GetAuthorizations();
+					}
+
+					foreach (AcmeAuthorization Authorization in Authorizations)
 					{
 						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Processing authorization for " + Authorization.Value, false, "User");
 

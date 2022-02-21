@@ -24,6 +24,46 @@ namespace Waher.Script.Model
 		protected static readonly ArgumentType[] argumentTypes1Normal = new ArgumentType[] { ArgumentType.Normal };
 
 		/// <summary>
+		/// Two normal parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypes2Normal = new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal };
+
+		/// <summary>
+		/// Three normal parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypes3Normal = new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal };
+
+		/// <summary>
+		/// Four normal parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypes4Normal = new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal };
+
+		/// <summary>
+		/// Five normal parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypes5Normal = new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal };
+
+		/// <summary>
+		/// Six normal parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypes6Normal = new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal };
+
+		/// <summary>
+		/// Seven normal parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypes7Normal = new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal };
+
+		/// <summary>
+		/// Eight normal parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypes8Normal = new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal };
+
+		/// <summary>
+		/// Nine normal parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypes9Normal = new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal };
+
+		/// <summary>
 		/// One scalar parameter.
 		/// </summary>
 		protected static readonly ArgumentType[] argumentTypes1Scalar = new ArgumentType[] { ArgumentType.Scalar };

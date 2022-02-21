@@ -9200,6 +9200,46 @@
             One scalar parameter.
             </summary>
         </member>
+        <member name="F:Waher.Script.Model.FunctionMultiVariate.argumentTypes2Normal">
+            <summary>
+            Two normal parameters.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Model.FunctionMultiVariate.argumentTypes3Normal">
+            <summary>
+            Three normal parameters.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Model.FunctionMultiVariate.argumentTypes4Normal">
+            <summary>
+            Four normal parameters.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Model.FunctionMultiVariate.argumentTypes5Normal">
+            <summary>
+            Five normal parameters.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Model.FunctionMultiVariate.argumentTypes6Normal">
+            <summary>
+            Six normal parameters.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Model.FunctionMultiVariate.argumentTypes7Normal">
+            <summary>
+            Seven normal parameters.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Model.FunctionMultiVariate.argumentTypes8Normal">
+            <summary>
+            Eight normal parameters.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Model.FunctionMultiVariate.argumentTypes9Normal">
+            <summary>
+            Nine normal parameters.
+            </summary>
+        </member>
         <member name="F:Waher.Script.Model.FunctionMultiVariate.argumentTypes1Scalar">
             <summary>
             One scalar parameter.

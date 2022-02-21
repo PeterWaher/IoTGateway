@@ -22,8 +22,7 @@ namespace Waher.Script.Cryptography.Functions.Encryption
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression.</param>
 		public Aes256Decrypt(ScriptNode Content, ScriptNode Key, ScriptNode IV, int Start, int Length, Expression Expression)
-			: base(new ScriptNode[] { Content, Key, IV }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal },
-				  Start, Length, Expression)
+			: base(new ScriptNode[] { Content, Key, IV }, argumentTypes3Normal, Start, Length, Expression)
 		{
 		}
 
@@ -38,8 +37,7 @@ namespace Waher.Script.Cryptography.Functions.Encryption
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression.</param>
 		public Aes256Decrypt(ScriptNode Content, ScriptNode Key, ScriptNode IV, ScriptNode CipherMode, int Start, int Length, Expression Expression)
-			: base(new ScriptNode[] { Content, Key, IV, CipherMode }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal },
-				  Start, Length, Expression)
+			: base(new ScriptNode[] { Content, Key, IV, CipherMode }, argumentTypes4Normal, Start, Length, Expression)
 		{
 		}
 
@@ -55,8 +53,7 @@ namespace Waher.Script.Cryptography.Functions.Encryption
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression.</param>
 		public Aes256Decrypt(ScriptNode Content, ScriptNode Key, ScriptNode IV, ScriptNode CipherMode, ScriptNode PaddingMode, int Start, int Length, Expression Expression)
-			: base(new ScriptNode[] { Content, Key, IV, CipherMode, PaddingMode }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal },
-				  Start, Length, Expression)
+			: base(new ScriptNode[] { Content, Key, IV, CipherMode, PaddingMode }, argumentTypes5Normal, Start, Length, Expression)
 		{
 		}
 

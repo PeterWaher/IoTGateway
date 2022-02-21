@@ -530,7 +530,17 @@ namespace Waher.Utility.Acme
 
                     LogInformational("Creating order.");
 
-                    AcmeOrder Order = await Account.OrderCertificate(DomainNames, notBefore, notAfter);
+                    AcmeOrder Order;
+
+                    try
+                    {
+                        Order = await Account.OrderCertificate(DomainNames, notBefore, notAfter);
+                    }
+                    catch (AcmeMalformedException)  // Not sure why this is necessary. Perhaps because it takes time to propagate the keys correctly on the remote end?
+                    {
+                        await Task.Delay(5000);
+                        Order = await Account.OrderCertificate(DomainNames, null, null);
+                    }
 
                     LogInformational("Order created.",
                         new KeyValuePair<string, object>("Status", Order.Status),

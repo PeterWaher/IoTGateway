@@ -840,7 +840,18 @@ namespace Waher.IoTGateway.Setup
 					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "New key generated.", false, "User");
 
 					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Creating order.", false, "User");
-					AcmeOrder Order = await Account.OrderCertificate(DomainNames, null, null);
+					AcmeOrder Order;
+
+					try
+					{
+						Order = await Account.OrderCertificate(DomainNames, null, null);
+					}
+					catch (AcmeMalformedException)  // Not sure why this is necessary. Perhaps because it takes time to propagate the keys correctly on the remote end?
+					{
+						await Task.Delay(5000);
+						Order = await Account.OrderCertificate(DomainNames, null, null);
+					}
+
 					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Order created.", false, "User");
 
 					foreach (AcmeAuthorization Authorization in await Order.GetAuthorizations())

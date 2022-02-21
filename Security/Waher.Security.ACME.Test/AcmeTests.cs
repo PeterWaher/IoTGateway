@@ -131,6 +131,7 @@ namespace Waher.Security.ACME.Test
 		public async Task ACME_Test_06_OrderCertificate()
 		{
 			AcmeOrder Order = await this.OrderCertificate("example.com", "www.example.com");
+
 			Assert.IsNotNull(Order);
 			Assert.IsTrue(Order.AuthorizationUris.Length > 0);
 			Assert.IsNull(Order.Certificate);
@@ -146,7 +147,16 @@ namespace Waher.Security.ACME.Test
 		private async Task<AcmeOrder> OrderCertificate(params string[] Domains)
 		{
 			AcmeAccount Account = await this.client.GetAccount();
-			return await Account.OrderCertificate(Domains, null, null);
+
+			try
+			{
+				return await Account.OrderCertificate(Domains, null, null);
+			}
+			catch (AcmeMalformedException)	// Not sure why this is necessary. Perhaps because it takes time to propagate the keys correctly on the remote end?
+			{
+				await Task.Delay(5000);
+				return await Account.OrderCertificate(Domains, null, null);
+			}
 		}
 
 		[TestMethod]

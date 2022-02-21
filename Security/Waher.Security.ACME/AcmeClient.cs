@@ -228,7 +228,7 @@ namespace Waher.Security.ACME
 				new KeyValuePair<string, object>("signature", Signature)
 			}, null);
 
-			HttpContent Content = new ByteArrayContent(System.Text.Encoding.ASCII.GetBytes(Json));
+			HttpContent Content = new ByteArrayContent(Encoding.ASCII.GetBytes(Json));
 			Content.Headers.Add("Content-Type", JwsAlgorithm.JwsContentType);
 
 			if (!string.IsNullOrEmpty(Accept))
@@ -576,8 +576,7 @@ namespace Waher.Security.ACME
 			if (NotAfter.HasValue)
 				Payload.Add(new KeyValuePair<string, object>("notAfter", NotAfter.Value));
 
-			AcmeResponse Response = await this.POST(this.directory.NewOrder, AccountLocation,
-				Payload.ToArray());
+			AcmeResponse Response = await this.POST(this.directory.NewOrder, AccountLocation, Payload.ToArray());
 
 			return new AcmeOrder(this, AccountLocation, Response.Location, Response.Payload, Response.ResponseMessage);
 		}

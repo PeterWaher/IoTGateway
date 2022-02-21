@@ -539,6 +539,7 @@ namespace Waher.Utility.Acme
                     catch (AcmeMalformedException)  // Not sure why this is necessary. Perhaps because it takes time to propagate the keys correctly on the remote end?
                     {
                         await Task.Delay(5000);
+                        LogInformational("Retrying.");
                         Order = await Account.OrderCertificate(DomainNames, null, null);
                     }
 
@@ -550,10 +551,22 @@ namespace Waher.Utility.Acme
                         new KeyValuePair<string, object>("Identifiers", Order.Identifiers));
 
                     List<string> FileNames = null;
+                    AcmeAuthorization[] Authorizations;
 
                     try
                     {
-                        foreach (AcmeAuthorization Authorization in await Order.GetAuthorizations())
+                        Authorizations = await Order.GetAuthorizations();
+                    }
+                    catch (AcmeMalformedException)  // Not sure why this is necessary. Perhaps because it takes time to propagate the keys correctly on the remote end?
+                    {
+                        await Task.Delay(5000);
+                        LogInformational("Retrying.");
+                        Authorizations = await Order.GetAuthorizations();
+                    }
+
+                    try
+                    {
+                        foreach (AcmeAuthorization Authorization in Authorizations)
                         {
                             LogInformational("Processing authorization.",
                                 new KeyValuePair<string, object>("Type", Authorization.Type),

@@ -85,7 +85,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Data", "Script
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Data.MySQL", "Script\Waher.Script.Data.MySQL\Waher.Script.Data.MySQL.csproj", "{8B444C04-667C-4A7A-BAD5-EC4CAD13D90C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.Data.PostgreSQL", "Script\Waher.Script.Data.PostgreSQL\Waher.Script.Data.PostgreSQL.csproj", "{70FC9DB1-8E00-4C95-934F-B44D382E14CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Data.PostgreSQL", "Script\Waher.Script.Data.PostgreSQL\Waher.Script.Data.PostgreSQL.csproj", "{70FC9DB1-8E00-4C95-934F-B44D382E14CB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Threading", "Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj", "{D51F054A-85AD-40C6-9AD9-051E1A2D71F3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Threading", "Script\Waher.Script.Threading\Waher.Script.Threading.csproj", "{C7973D12-709E-4673-A03A-1A395B4AB64C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -229,6 +233,14 @@ Global
 		{70FC9DB1-8E00-4C95-934F-B44D382E14CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{70FC9DB1-8E00-4C95-934F-B44D382E14CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{70FC9DB1-8E00-4C95-934F-B44D382E14CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D51F054A-85AD-40C6-9AD9-051E1A2D71F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D51F054A-85AD-40C6-9AD9-051E1A2D71F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D51F054A-85AD-40C6-9AD9-051E1A2D71F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D51F054A-85AD-40C6-9AD9-051E1A2D71F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7973D12-709E-4673-A03A-1A395B4AB64C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7973D12-709E-4673-A03A-1A395B4AB64C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7973D12-709E-4673-A03A-1A395B4AB64C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7973D12-709E-4673-A03A-1A395B4AB64C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -252,6 +264,7 @@ Global
 		{C034A35D-4D48-4B6B-809A-1BE7F37C9850} = {EECF8A99-FA34-4A25-B67A-97EC55EE5C7E}
 		{2269E977-2063-471D-8314-2174717AA2BA} = {EECF8A99-FA34-4A25-B67A-97EC55EE5C7E}
 		{2F49A001-8C02-4EDF-8F80-F4DDF4708E40} = {0D510A76-814B-4D6E-8D13-9C59507F7A7C}
+		{D51F054A-85AD-40C6-9AD9-051E1A2D71F3} = {0D510A76-814B-4D6E-8D13-9C59507F7A7C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09539FCE-8EB5-447C-A9AF-6FA30BE14418}

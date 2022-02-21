@@ -650,6 +650,7 @@
 							<File Id='Waher.Script.Networking.dll' Name='Waher.Script.Networking.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Networking.dll' Vital='yes'/>
 							<File Id='Waher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Persistence.dll' Vital='yes'/>
 							<File Id='Waher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Statistics.dll' Vital='yes'/>
+							<File Id='Waher.Script.Threading.dll' Name='Waher.Script.Threading.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Threading.dll' Vital='yes'/>
 							<File Id='Waher.Script.Xml.dll' Name='Waher.Script.Xml.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.Xml.dll' Vital='yes'/>
 							<File Id='Waher.Script.XmlDSig.dll' Name='Waher.Script.XmlDSig.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Script.XmlDSig.dll' Vital='yes'/>
 							<File Id='Waher.Security.dll' Name='Waher.Security.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Security.dll' Vital='yes'/>
@@ -762,6 +763,7 @@
 							<RemoveFile Id='RemoveWaher.Script.Networking.dll' Name='Waher.Script.Networking.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Threading.dll' Name='Waher.Script.Threading.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Xml.dll' Name='Waher.Script.Xml.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.XmlDSig.dll' Name='Waher.Script.XmlDSig.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.dll' Name='Waher.Security.dll' On='uninstall'/>

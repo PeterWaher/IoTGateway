@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Waher.Script.Threading</name>
+    </assembly>
+    <members>
+        <member name="T:Waher.Script.Threading.Functions.Semaphore">
+            <summary>
+            Protects script by using a semaphore to make sure that only one thread evaluates a particular script.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Threading.Functions.Semaphore.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Protects script by using a semaphore to make sure that only one thread evaluates a particular script.
+            </summary>
+            <param name="Name">Semaphore name.</param>
+            <param name="Node">Node to evaluate when semaphore allows.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Threading.Functions.Semaphore.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Threading.Functions.Semaphore.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Threading.Functions.Semaphore.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Threading.Functions.Semaphore.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Threading.Functions.Semaphore.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument1">Function argument 1.</param>
+            <param name="Argument2">Function argument 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Threading.Functions.Semaphore.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+    </members>
+</doc>

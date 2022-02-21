@@ -660,6 +660,10 @@
       <Project>{8850d7c6-da07-4bcb-b39a-7090eb39f581}</Project>
       <Name>Waher.Script.Statistics</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script.Threading\Waher.Script.Threading.csproj">
+      <Project>{1244e2b8-2574-444e-8def-d85f7beeb00d}</Project>
+      <Name>Waher.Script.Threading</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script.XmlDSig\Waher.Script.XmlDSig.csproj">
       <Project>{ad578b08-0e8d-47e6-a748-b53fd2702582}</Project>
       <Name>Waher.Script.XmlDSig</Name>

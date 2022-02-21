@@ -425,6 +425,8 @@
 	<Assembly fileName='Waher.Script.Persistence.pdb'/>
 	<Assembly fileName='Waher.Script.Statistics.dll'/>
 	<Assembly fileName='Waher.Script.Statistics.pdb'/>
+	<Assembly fileName='Waher.Script.Threading.dll'/>
+	<Assembly fileName='Waher.Script.Threading.pdb'/>
 	<Assembly fileName='Waher.Script.Xml.dll'/>
 	<Assembly fileName='Waher.Script.Xml.pdb'/>
 	<Assembly fileName='Waher.Script.XmlDSig.dll'/>

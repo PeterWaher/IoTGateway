@@ -1688,6 +1688,14 @@ The following functions are available in the `Waher.Script.Statistics` library.
 | `Uniform([Min,Max][,N]])`                  | Generates a random number using the Uniform distribution. If no interval is given, the standard interval [0,1] is assumed. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Uniform(0,10,10000),0,10,10);VerticalBars(Labels,Counts)` |
 | `Weibull(Shape,Scale[,N]])`                | Generates a random number using the Weibull distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Weibull(5,3,10000),0,10,10);VerticalBars(Labels,Counts)` |
 
+#### Threading-related functions (Waher.Script.Threading)
+
+The following functions are available in the `Waher.Script.Threading` library.
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| Semaphore(Name,Script) | Protects the evaluation of the script defined by `Script` by using a semaphore of name `Name`. Only one thread can evaluate script in a named semaphore at the same time. | Semaphore('Lock1',f(a,b)) |
+
 #### Content-related functions (Waher.Script.Content)
 
 The following functions are available in the `Waher.Script.Content` library.

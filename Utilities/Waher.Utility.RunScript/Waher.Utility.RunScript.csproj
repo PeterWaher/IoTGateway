@@ -43,12 +43,17 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script.Content\Waher.Script.Content.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script.Cryptography\Waher.Script.Cryptography.csproj" />
+    <ProjectReference Include="..\..\Script\Waher.Script.Data.MySQL\Waher.Script.Data.MySQL.csproj" />
+    <ProjectReference Include="..\..\Script\Waher.Script.Data.PostgreSQL\Waher.Script.Data.PostgreSQL.csproj" />
+    <ProjectReference Include="..\..\Script\Waher.Script.Data\Waher.Script.Data.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script.Fractals\Waher.Script.Fractals.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script.Graphs3D\Waher.Script.Graphs3D.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script.Networking\Waher.Script.Networking.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script.Statistics\Waher.Script.Statistics.csproj" />
+    <ProjectReference Include="..\..\Script\Waher.Script.Threading\Waher.Script.Threading.csproj" />
+    <ProjectReference Include="..\..\Script\Waher.Script.XmlDSig\Waher.Script.XmlDSig.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script.Xml\Waher.Script.Xml.csproj" />
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
   </ItemGroup>

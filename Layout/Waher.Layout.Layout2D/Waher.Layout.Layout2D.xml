@@ -70,6 +70,11 @@
             http://waher.se/Layout/Layout2D.xsd
             </summary>
         </member>
+        <member name="F:Waher.Layout.Layout2D.Layout2DDocument.SchemaResourceName">
+            <summary>
+            Schema resource name.
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Layout2DDocument.#ctor(Waher.Script.Variables,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Contains a 2D layout document.

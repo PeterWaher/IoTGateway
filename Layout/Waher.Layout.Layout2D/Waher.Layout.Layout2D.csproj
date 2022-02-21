@@ -26,6 +26,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Schema\Layout2D.xsd" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Schema\Layout2D.xsd" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

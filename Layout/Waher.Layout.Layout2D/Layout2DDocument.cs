@@ -33,6 +33,11 @@ namespace Waher.Layout.Layout2D
 		/// </summary>
 		public const string Namespace = "http://waher.se/Layout/Layout2D.xsd";
 
+		/// <summary>
+		/// Schema resource name.
+		/// </summary>
+		public static readonly string SchemaResourceName = typeof(Layout2DDocument).Namespace + ".Schema.Layout2D.xsd";
+
 		private static Dictionary<string, ILayoutElement> elementTypes = new Dictionary<string, ILayoutElement>();
 		private static bool initialized = false;
 

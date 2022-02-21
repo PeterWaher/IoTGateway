@@ -1692,9 +1692,28 @@ The following functions are available in the `Waher.Script.Statistics` library.
 
 The following functions are available in the `Waher.Script.Threading` library.
 
-| Function | Description | Example |
-|----------|-------------|---------|
-| Semaphore(Name,Script) | Protects the evaluation of the script defined by `Script` by using a semaphore of name `Name`. Only one thread can evaluate script in a named semaphore at the same time. | Semaphore('Lock1',f(a,b)) |
+| Function                              | Description | Example |
+|---------------------------------------|-------------|---------|
+| Semaphore(Name,Script)                | Protects the evaluation of the script defined by `Script` by using a semaphore of name `Name`. Only one thread can evaluate script in a named semaphore at the same time. | Semaphore('Lock1',f(a,b)) |
+| Sleep(ms)                             | Sleeps for a certain number of milliseconds, without consuming processor power. | `Sleep(100)` |
+| Parallel(Tasks[,Tasks[,Tasks[,...]]]) | Evaluates tasks in parallel. These tasks can either be arguments to the function, or expressed as items in vector arguments. Elements in such vector arguments are evaluated in parallel. Each task receives its own cloned variables collection. | `Parallel([f(a,b), f(c,d)])` |
+
+Example of parallel execution:
+
+```
+f(s):=
+(
+	Start:=Now;
+	foreach x in 1..10 do
+	(
+		Sleep(Uniform(500,1500));
+		Semaphore("Output",printline(s+": "+x));
+	);
+	Now.Subtract(Start).TotalSeconds
+);
+
+Parallel(f("A"),f("B"),f("C"))
+```
 
 #### Content-related functions (Waher.Script.Content)
 

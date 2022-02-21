@@ -29,6 +29,11 @@ namespace Waher.Script.Threading.Functions
 		public override string FunctionName => "Semaphore";
 
 		/// <summary>
+		/// Default Argument names
+		/// </summary>
+		public override string[] DefaultArgumentNames => new string[] { "Name", "Script" };
+
+		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
 		/// <see cref="EvaluateAsync(Variables)"/>.
 		/// </summary>

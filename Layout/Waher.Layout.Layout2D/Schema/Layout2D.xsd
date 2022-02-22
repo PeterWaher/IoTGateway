@@ -6,1136 +6,1012 @@
            xmlns:mstns="http://waher.se/Layout/Layout2D.xsd"
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-  <xs:element name="Layout2D">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="LayoutContainer">
-          <xs:attribute name="font" type="xs:string" use="optional"/>
-          <xs:attribute name="pen" type="xs:string" use="optional"/>
-          <xs:attribute name="background" type="xs:string" use="optional"/>
-          <xs:attribute name="textColor" type="Color" use="optional"/>
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
-
-  <xs:complexType name="LayoutElement">
-    <xs:attribute name="id" type="xs:ID" use="optional"/>
-    <xs:attribute name="visible" type="xs:boolean" use="optional" default="true"/>
-  </xs:complexType>
-
-  <xs:complexType name="Point">
-    <xs:complexContent>
-      <xs:extension base="LayoutElement">
-        <xs:attribute name="x" type="Length" use="optional"/>
-        <xs:attribute name="y" type="Length" use="optional"/>
-        <xs:attribute name="ref" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Point2">
-    <xs:complexContent>
-      <xs:extension base="Point">
-        <xs:attribute name="x2" type="Length" use="optional"/>
-        <xs:attribute name="y2" type="Length" use="optional"/>
-        <xs:attribute name="ref2" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Point2Weight">
-    <xs:complexContent>
-      <xs:extension base="Point2">
-        <xs:attribute name="w" type="xs:float" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Point3">
-    <xs:complexContent>
-      <xs:extension base="Point2">
-        <xs:attribute name="x3" type="Length" use="optional"/>
-        <xs:attribute name="y3" type="Length" use="optional"/>
-        <xs:attribute name="ref3" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="LayoutArea">
-    <xs:complexContent>
-      <xs:extension base="LayoutElement">
-        <xs:attribute name="width" type="Length" use="optional"/>
-        <xs:attribute name="height" type="Length" use="optional"/>
-        <xs:attribute name="maxWidth" type="Length" use="optional"/>
-        <xs:attribute name="maxHeight" type="Length" use="optional"/>
-        <xs:attribute name="minWidth" type="Length" use="optional"/>
-        <xs:attribute name="minHeight" type="Length" use="optional"/>
-        <xs:attribute name="keepAspectRatio" type="xs:boolean" use="optional"/>
-        <xs:attribute name="overflow" type="Overflow" use="optional"/>
-        <xs:attribute name="onClick" type="Expression" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:simpleType name="Overflow">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Clip"/>
-      <xs:enumeration value="Ignore"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="Expression">
-    <xs:restriction base="xs:string"/>
-  </xs:simpleType>
-
-  <xs:complexType name="LayoutContainer">
-    <xs:complexContent>
-      <xs:extension base="LayoutArea">
-        <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <xs:group ref="Pens"/>
-          <xs:group ref="Backgrounds"/>
-          <xs:group ref="Fonts"/>
-          <xs:group ref="Figures"/>
-          <xs:group ref="Images"/>
-          <xs:group ref="Transforms"/>
-          <xs:group ref="Groups"/>
-          <xs:group ref="Conditional"/>
-          <xs:group ref="References"/>
-          <xs:group ref="Content"/>
-          <xs:group ref="Filters"/>
-          <xs:any namespace="##other"/>
-        </xs:choice>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:simpleType name="Length">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="([+-]?(\d*[.])?\d+([eE][+-]?\d+)?\s*(px|pt|pc|cm|in|mm|em|ex|ch|rem|vw|vh|vmin|vmax|%))|([{].*[}])"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="Color">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="AliceBlue"/>
-      <xs:enumeration value="PaleGreen"/>
-      <xs:enumeration value="PaleGoldenrod"/>
-      <xs:enumeration value="Orchid"/>
-      <xs:enumeration value="OrangeRed"/>
-      <xs:enumeration value="Orange"/>
-      <xs:enumeration value="OliveDrab"/>
-      <xs:enumeration value="Olive"/>
-      <xs:enumeration value="OldLace"/>
-      <xs:enumeration value="Navy"/>
-      <xs:enumeration value="NavajoWhite"/>
-      <xs:enumeration value="Moccasin"/>
-      <xs:enumeration value="MistyRose"/>
-      <xs:enumeration value="MintCream"/>
-      <xs:enumeration value="MidnightBlue"/>
-      <xs:enumeration value="MediumVioletRed"/>
-      <xs:enumeration value="MediumTurquoise"/>
-      <xs:enumeration value="MediumSpringGreen"/>
-      <xs:enumeration value="LightSlateGray"/>
-      <xs:enumeration value="LightSteelBlue"/>
-      <xs:enumeration value="LightYellow"/>
-      <xs:enumeration value="Lime"/>
-      <xs:enumeration value="LimeGreen"/>
-      <xs:enumeration value="Linen"/>
-      <xs:enumeration value="PaleTurquoise"/>
-      <xs:enumeration value="Magenta"/>
-      <xs:enumeration value="MediumAquamarine"/>
-      <xs:enumeration value="MediumBlue"/>
-      <xs:enumeration value="MediumOrchid"/>
-      <xs:enumeration value="MediumPurple"/>
-      <xs:enumeration value="MediumSeaGreen"/>
-      <xs:enumeration value="MediumSlateBlue"/>
-      <xs:enumeration value="Maroon"/>
-      <xs:enumeration value="PaleVioletRed"/>
-      <xs:enumeration value="PapayaWhip"/>
-      <xs:enumeration value="PeachPuff"/>
-      <xs:enumeration value="Snow"/>
-      <xs:enumeration value="SpringGreen"/>
-      <xs:enumeration value="SteelBlue"/>
-      <xs:enumeration value="Tan"/>
-      <xs:enumeration value="Teal"/>
-      <xs:enumeration value="Thistle"/>
-      <xs:enumeration value="SlateGray"/>
-      <xs:enumeration value="Tomato"/>
-      <xs:enumeration value="Violet"/>
-      <xs:enumeration value="Wheat"/>
-      <xs:enumeration value="White"/>
-      <xs:enumeration value="WhiteSmoke"/>
-      <xs:enumeration value="Yellow"/>
-      <xs:enumeration value="YellowGreen"/>
-      <xs:enumeration value="Turquoise"/>
-      <xs:enumeration value="LightSkyBlue"/>
-      <xs:enumeration value="SlateBlue"/>
-      <xs:enumeration value="Silver"/>
-      <xs:enumeration value="Peru"/>
-      <xs:enumeration value="Pink"/>
-      <xs:enumeration value="Plum"/>
-      <xs:enumeration value="PowderBlue"/>
-      <xs:enumeration value="Purple"/>
-      <xs:enumeration value="Red"/>
-      <xs:enumeration value="SkyBlue"/>
-      <xs:enumeration value="RosyBrown"/>
-      <xs:enumeration value="SaddleBrown"/>
-      <xs:enumeration value="Salmon"/>
-      <xs:enumeration value="SandyBrown"/>
-      <xs:enumeration value="SeaGreen"/>
-      <xs:enumeration value="SeaShell"/>
-      <xs:enumeration value="Sienna"/>
-      <xs:enumeration value="RoyalBlue"/>
-      <xs:enumeration value="LightSeaGreen"/>
-      <xs:enumeration value="LightSalmon"/>
-      <xs:enumeration value="LightPink"/>
-      <xs:enumeration value="Crimson"/>
-      <xs:enumeration value="Cyan"/>
-      <xs:enumeration value="DarkBlue"/>
-      <xs:enumeration value="DarkCyan"/>
-      <xs:enumeration value="DarkGoldenrod"/>
-      <xs:enumeration value="DarkGray"/>
-      <xs:enumeration value="Cornsilk"/>
-      <xs:enumeration value="DarkGreen"/>
-      <xs:enumeration value="DarkMagenta"/>
-      <xs:enumeration value="DarkOliveGreen"/>
-      <xs:enumeration value="DarkOrange"/>
-      <xs:enumeration value="DarkOrchid"/>
-      <xs:enumeration value="DarkRed"/>
-      <xs:enumeration value="DarkSalmon"/>
-      <xs:enumeration value="DarkKhaki"/>
-      <xs:enumeration value="DarkSeaGreen"/>
-      <xs:enumeration value="CornflowerBlue"/>
-      <xs:enumeration value="Chocolate"/>
-      <xs:enumeration value="AntiqueWhite"/>
-      <xs:enumeration value="Aqua"/>
-      <xs:enumeration value="Aquamarine"/>
-      <xs:enumeration value="Azure"/>
-      <xs:enumeration value="Beige"/>
-      <xs:enumeration value="Bisque"/>
-      <xs:enumeration value="Coral"/>
-      <xs:enumeration value="Black"/>
-      <xs:enumeration value="Blue"/>
-      <xs:enumeration value="BlueViolet"/>
-      <xs:enumeration value="Brown"/>
-      <xs:enumeration value="BurlyWood"/>
-      <xs:enumeration value="CadetBlue"/>
-      <xs:enumeration value="Chartreuse"/>
-      <xs:enumeration value="BlanchedAlmond"/>
-      <xs:enumeration value="Transparent"/>
-      <xs:enumeration value="DarkSlateBlue"/>
-      <xs:enumeration value="DarkTurquoise"/>
-      <xs:enumeration value="IndianRed"/>
-      <xs:enumeration value="Indigo"/>
-      <xs:enumeration value="Ivory"/>
-      <xs:enumeration value="Khaki"/>
-      <xs:enumeration value="Lavender"/>
-      <xs:enumeration value="LavenderBlush"/>
-      <xs:enumeration value="HotPink"/>
-      <xs:enumeration value="LawnGreen"/>
-      <xs:enumeration value="LightBlue"/>
-      <xs:enumeration value="LightCoral"/>
-      <xs:enumeration value="LightCyan"/>
-      <xs:enumeration value="LightGoldenrodYellow"/>
-      <xs:enumeration value="LightGray"/>
-      <xs:enumeration value="LightGreen"/>
-      <xs:enumeration value="LemonChiffon"/>
-      <xs:enumeration value="DarkSlateGray"/>
-      <xs:enumeration value="Honeydew"/>
-      <xs:enumeration value="Green"/>
-      <xs:enumeration value="DarkViolet"/>
-      <xs:enumeration value="DeepPink"/>
-      <xs:enumeration value="DeepSkyBlue"/>
-      <xs:enumeration value="DimGray"/>
-      <xs:enumeration value="DodgerBlue"/>
-      <xs:enumeration value="Firebrick"/>
-      <xs:enumeration value="GreenYellow"/>
-      <xs:enumeration value="FloralWhite"/>
-      <xs:enumeration value="Fuchsia"/>
-      <xs:enumeration value="Gainsboro"/>
-      <xs:enumeration value="GhostWhite"/>
-      <xs:enumeration value="Gold"/>
-      <xs:enumeration value="Goldenrod"/>
-      <xs:enumeration value="Gray"/>
-      <xs:enumeration value="ForestGreen"/>
-      <xs:enumeration value="Empty"/>
-      <xs:pattern value="AliceBlue|PaleGreen|PaleGoldenrod|Orchid|OrangeRed|Orange|OliveDrab|Olive|OldLace|Navy|NavajoWhite|Moccasin|MistyRose|MintCream|MidnightBlue|MediumVioletRed|MediumTurquoise|MediumSpringGreen|LightSlateGray|LightSteelBlue|LightYellow|Lime|LimeGreen|Linen|PaleTurquoise|Magenta|MediumAquamarine|MediumBlue|MediumOrchid|MediumPurple|MediumSeaGreen|ediumSlateBlue|Maroon|PaleVioletRed|PapayaWhip|PeachPuff|Snow|SpringGreen|SteelBlue|Tan|Teal|Thistle|SlateGray|Tomato|Violet|Wheat|White|WhiteSmoke|Yellow|YellowGreen|Turquoise|LightSkyBlue|SlateBlue|Silver|Peru|Pink|Plum|PowderBlue|Purple|Red|SkyBlue|RosyBrown|SaddleBrown|Salmon|SandyBrown|SeaGreen|SeaShell|Sienna|RoyalBlue|LightSeaGreen|LightSalmon|LightPink|Crimson|Cyan|DarkBlue|DarkCyan|DarkGoldenrod|DarkGray|Cornsilk|DarkGreen|DarkMagenta|DarkOliveGreen|DarkOrange|DarkOrchid|DarkRed|DarkSalmon|DarkKhaki|DarkSeaGreen|CornflowerBlue|Chocolate|AntiqueWhite|Aqua|Aquamarine|Azure|Beige|Bisque|Coral|Black|Blue|BlueViolet|Brown|BurlyWood|CadetBlue|Chartreuse|BlanchedAlmond|Transparent|DarkSlateBlue|DarkTurquoise|IndianRed|Indigo|Ivory|Khaki|Lavender|LavenderBlush|HotPink|LawnGreen|LightBlue|LightCoral|LightCyan|LightGoldenrodYellow|LightGray|LightGreen|LemonChiffon|DarkSlateGray|Honeydew|Green|DarkViolet|DeepPink|DeepSkyBlue|DimGray|DodgerBlue|Firebrick|GreenYellow|FloralWhite|Fuchsia|Gainsboro|GhostWhite|Gold|Goldenrod|Gray|ForestGreen|Empty|#[0-9a-fA-F]{6,8}|[{].*[}]"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:group name="Pens">
-    <xs:choice>
-      <xs:element name="SolidPen" type="SolidPen"/>
-    </xs:choice>
-  </xs:group>
-
-  <xs:complexType name="Pen">
-    <xs:complexContent>
-      <xs:extension base="LayoutElement">
-        <xs:attribute name="width" type="Length" use="optional"/>
-        <xs:attribute name="cap" type="PenCap" use="optional"/>
-        <xs:attribute name="join" type="PenJoin" use="optional"/>
-        <xs:attribute name="miter" type="Length" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  
-  <xs:simpleType name="PenCap">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Butt"/>
-      <xs:enumeration value="Round"/>
-      <xs:enumeration value="Square"/>
-    </xs:restriction>
-  </xs:simpleType>
-  
-  <xs:simpleType name="PenJoin">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Miter"/>
-      <xs:enumeration value="Round"/>
-      <xs:enumeration value="Bevel"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:complexType name="SolidPen">
-    <xs:complexContent>
-      <xs:extension base="Pen">
-        <xs:attribute name="color" type="Color" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:group name="Backgrounds">
-    <xs:choice>
-      <xs:element name="SolidBackground" type="SolidBackground"/>
-    </xs:choice>
-  </xs:group>
-
-  <xs:complexType name="Background">
-    <xs:complexContent>
-      <xs:extension base="LayoutElement">
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="SolidBackground">
-    <xs:complexContent>
-      <xs:extension base="Background">
-        <xs:attribute name="color" type="Color" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:group name="Fonts">
-    <xs:choice>
-      <xs:element name="Font" type="Font"/>
-    </xs:choice>
-  </xs:group>
-
-  <xs:complexType name="Font">
-    <xs:complexContent>
-      <xs:extension base="LayoutElement">
-        <xs:attribute name="name" type="xs:string" use="optional"/>
-        <xs:attribute name="size" type="Length" use="optional"/>
-        <xs:attribute name="weight" type="FontWeight" use="optional"/>
-        <xs:attribute name="width" type="FontWidth" use="optional"/>
-        <xs:attribute name="slant" type="FontSlant" use="optional"/>
-        <xs:attribute name="color" type="Color" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:simpleType name="FontWeight">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Invisible"/>
-      <xs:enumeration value="Thin"/>
-      <xs:enumeration value="ExtraLight"/>
-      <xs:enumeration value="Light"/>
-      <xs:enumeration value="Normal"/>
-      <xs:enumeration value="Medium"/>
-      <xs:enumeration value="SemiBold"/>
-      <xs:enumeration value="Bold"/>
-      <xs:enumeration value="ExtraBold"/>
-      <xs:enumeration value="Black"/>
-      <xs:enumeration value="ExtraBlack"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="FontWidth">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="UltraCondensed"/>
-      <xs:enumeration value="ExtraCondensed"/>
-      <xs:enumeration value="Condensed"/>
-      <xs:enumeration value="SemiCondensed"/>
-      <xs:enumeration value="Normal"/>
-      <xs:enumeration value="SemiExpanded"/>
-      <xs:enumeration value="Expanded"/>
-      <xs:enumeration value="ExtraExpanded"/>
-      <xs:enumeration value="UltraExpanded"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="FontSlant">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Upright"/>
-      <xs:enumeration value="Italic"/>
-      <xs:enumeration value="Oblique"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:complexType name="Figure">
-    <xs:complexContent>
-      <xs:extension base="LayoutContainer">
-        <xs:attribute name="pen" type="xs:string" use="optional"/>
-        <xs:attribute name="fill" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  
-  <xs:group name="Figures">
-    <xs:choice>
-      <xs:element name="Dot" type="FigurePoint"/>
-      <xs:element name="Line" type="Line"/>
-      <xs:element name="Circle" type="Circle"/>
-      <xs:element name="CircleArc" type="CircleArc"/>
-      <xs:element name="EllipseArc" type="EllipseArc"/>
-      <xs:element name="Ellipse" type="Ellipse"/>
-      <xs:element name="Rectangle" type="Rectangle"/>
-      <xs:element name="RoundedRectangle" type="RoundedRectangle"/>
-      <xs:element name="PolyLine" type="PolyLine"/>
-      <xs:element name="Polygon" type="Polygon"/>
-      <xs:element name="Spline" type="Spline"/>
-      <xs:element name="Loop" type="Loop"/>
-      <xs:element name="Path" type="Path"/>
-    </xs:choice>
-  </xs:group>
-
-  <xs:complexType name="FigurePoint">
-    <xs:complexContent>
-      <xs:extension base="Figure">
-        <xs:attribute name="x" type="Length" use="optional"/>
-        <xs:attribute name="y" type="Length" use="optional"/>
-        <xs:attribute name="ref" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="FigurePoint2">
-    <xs:complexContent>
-      <xs:extension base="FigurePoint">
-        <xs:attribute name="x2" type="Length" use="optional"/>
-        <xs:attribute name="y2" type="Length" use="optional"/>
-        <xs:attribute name="ref2" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="FigurePoint3">
-    <xs:complexContent>
-      <xs:extension base="FigurePoint2">
-        <xs:attribute name="x3" type="Length" use="optional"/>
-        <xs:attribute name="y3" type="Length" use="optional"/>
-        <xs:attribute name="ref3" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Line">
-    <xs:complexContent>
-      <xs:extension base="FigurePoint2">
-        <xs:attribute name="head" type="xs:string" use="optional"/>
-        <xs:attribute name="tail" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Circle">
-    <xs:complexContent>
-      <xs:extension base="FigurePoint">
-        <xs:attribute name="radius" type="Length" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="CircleArc">
-    <xs:complexContent>
-      <xs:extension base="Circle">
-        <xs:attribute name="startDegrees" type="xs:float" use="optional"/>
-        <xs:attribute name="endDegrees" type="xs:float" use="optional"/>
-        <xs:attribute name="clockwise" type="xs:boolean" use="optional" default="true"/>
-        <xs:attribute name="center" type="xs:boolean" use="optional" default="false"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Ellipse">
-    <xs:complexContent>
-      <xs:extension base="FigurePoint">
-        <xs:attribute name="radiusX" type="Length" use="optional"/>
-        <xs:attribute name="radiusY" type="Length" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="EllipseArc">
-    <xs:complexContent>
-      <xs:extension base="Ellipse">
-        <xs:attribute name="startDegrees" type="xs:float" use="optional"/>
-        <xs:attribute name="endDegrees" type="xs:float" use="optional"/>
-        <xs:attribute name="clockwise" type="xs:boolean" use="optional" default="true"/>
-        <xs:attribute name="center" type="xs:boolean" use="optional" default="false"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Rectangle">
-    <xs:complexContent>
-      <xs:extension base="FigurePoint2"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="RoundedRectangle">
-    <xs:complexContent>
-      <xs:extension base="Rectangle">
-        <xs:attribute name="radiusX" type="Length" use="optional"/>
-        <xs:attribute name="radiusY" type="Length" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Vertices">
-    <xs:complexContent>
-      <xs:extension base="Figure">
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Vertex">
-    <xs:complexContent>
-      <xs:extension base="Point"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="PolyLine">
-    <xs:complexContent>
-      <xs:extension base="Vertices">
-        <xs:attribute name="head" type="xs:string" use="optional"/>
-        <xs:attribute name="tail" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Polygon">
-    <xs:complexContent>
-      <xs:extension base="Vertices"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Spline">
-    <xs:complexContent>
-      <xs:extension base="Vertices">
-        <xs:attribute name="head" type="xs:string" use="optional"/>
-        <xs:attribute name="tail" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Loop">
-    <xs:complexContent>
-      <xs:extension base="Vertices"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Path">
-    <xs:complexContent>
-      <xs:extension base="Figure">
-        <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <xs:element name="MoveTo" type="Point"/>
-          <xs:element name="MoveToRel" type="Point"/>
-          <xs:element name="LineTo" type="Point"/>
-          <xs:element name="LineToRel" type="Point"/>
-          <xs:element name="CircleArcTo" type="CircleArcTo"/>
-          <xs:element name="CircleArcToRel" type="CircleArcTo"/>
-          <xs:element name="EllipseArcTo" type="EllipseArcTo"/>
-          <xs:element name="EllipseArcToRel" type="EllipseArcTo"/>
-          <xs:element name="QuadraticTo" type="Point2"/>
-          <xs:element name="QuadraticToRel" type="Point2"/>
-          <xs:element name="ConicTo" type="Point2Weight"/>
-          <xs:element name="ConicToRel" type="Point2Weight"/>
-          <xs:element name="CubicTo" type="Point3"/>
-          <xs:element name="CubicToRel" type="Point3"/>
-          <xs:element name="SplineTo" type="Point"/>
-          <xs:element name="SplineToRel" type="Point"/>
-          <xs:element name="Forward" type="Distance"/>
-          <xs:element name="Backward" type="Distance"/>
-          <xs:element name="TurnLeft" type="Angle"/>
-          <xs:element name="TurnRight" type="Angle"/>
-          <xs:element name="TurnTowards" type="Point"/>
-          <xs:element name="TurnTowardsRel" type="Point"/>
-          <xs:element name="CloseLine" type="LayoutElement"/>
-          <xs:element name="CloseLoop" type="LayoutElement"/>
-          <xs:element name="Replay" type="Copy"/>
-        </xs:choice>
-        <xs:attribute name="head" type="xs:string" use="optional"/>
-        <xs:attribute name="tail" type="xs:string" use="optional"/>
-        <xs:attribute name="shapeFill" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Distance">
-    <xs:complexContent>
-      <xs:extension base="LayoutElement">
-        <xs:attribute name="distance" type="Length" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Angle">
-    <xs:complexContent>
-      <xs:extension base="LayoutElement">
-        <xs:attribute name="degrees" type="xs:float" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="CircleArcTo">
-    <xs:complexContent>
-      <xs:extension base="Point">
-        <xs:attribute name="radius" type="Length" use="required"/>
-        <xs:attribute name="clockwise" type="xs:boolean" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="EllipseArcTo">
-    <xs:complexContent>
-      <xs:extension base="Point">
-        <xs:attribute name="radiusX" type="Length" use="required"/>
-        <xs:attribute name="radiusY" type="Length" use="required"/>
-        <xs:attribute name="clockwise" type="xs:boolean" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:group name="Images">
-    <xs:choice>
-      <xs:element name="ImageFile" type="ImageFile"/>
-      <xs:element name="ImageResource" type="ImageResource"/>
-      <xs:element name="ImageUrl" type="ImageUrl"/>
-      <xs:element name="ImageInternal" type="ImageInternal"/>
-    </xs:choice>
-  </xs:group>
-
-  <xs:complexType name="Image">
-    <xs:complexContent>
-      <xs:extension base="FigurePoint2"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="ImageFile">
-    <xs:complexContent>
-      <xs:extension base="Image">
-        <xs:attribute name="fileName" type="xs:string" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="ImageResource">
-    <xs:complexContent>
-      <xs:extension base="Image">
-        <xs:attribute name="resource" type="xs:string" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="ImageUrl">
-    <xs:complexContent>
-      <xs:extension base="Image">
-        <xs:attribute name="url" type="xs:anyURI" use="required"/>
-        <xs:attribute name="alt" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="ImageInternal">
-    <xs:complexContent>
-      <xs:extension base="Image">
-        <xs:attribute name="cid" type="xs:string" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:group name="Transforms">
-    <xs:choice>
-      <xs:element name="Scale" type="Scale"/>
-      <xs:element name="Translate" type="Translate"/>
-      <xs:element name="Rotate" type="Rotate"/>
-      <xs:element name="SkewX" type="SkewX"/>
-      <xs:element name="SkewY" type="SkewY"/>
-    </xs:choice>
-  </xs:group>
-
-  <xs:complexType name="LinearTransformation" abstract="true">
-    <xs:complexContent>
-      <xs:extension base="LayoutContainer"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="PivotTransformation" abstract="true">
-    <xs:complexContent>
-      <xs:extension base="LinearTransformation">
-        <xs:attribute name="x" type="Length" use="optional"/>
-        <xs:attribute name="y" type="Length" use="optional"/>
-        <xs:attribute name="ref" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Scale">
-    <xs:complexContent>
-      <xs:extension base="PivotTransformation">
-        <xs:attribute name="scaleX" type="xs:float" use="optional"/>
-        <xs:attribute name="scaleY" type="xs:float" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Translate">
-    <xs:complexContent>
-      <xs:extension base="LinearTransformation">
-        <xs:attribute name="translateX" type="Length" use="optional"/>
-        <xs:attribute name="translateY" type="Length" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Rotate">
-    <xs:complexContent>
-      <xs:extension base="PivotTransformation">
-        <xs:attribute name="degrees" type="xs:float" use="optional"/>
-        <xs:attribute name="x" type="Length" use="optional"/>
-        <xs:attribute name="y" type="Length" use="optional"/>
-        <xs:attribute name="ref" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="SkewX">
-    <xs:complexContent>
-      <xs:extension base="PivotTransformation">
-        <xs:attribute name="factor" type="xs:float" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="SkewY">
-    <xs:complexContent>
-      <xs:extension base="PivotTransformation">
-        <xs:attribute name="factor" type="xs:float" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:group name="Groups">
-    <xs:choice>
-      <xs:element name="Horizontal" type="Horizontal"/>
-      <xs:element name="Vertical" type="Vertical"/>
-      <xs:element name="Flexible" type="Flexible"/>
-      <xs:element name="Grid" type="Grid"/>
-      <xs:element name="Overlays" type="Overlays"/>
-      <xs:element name="Cell" type="Cell"/>
-      <xs:element name="Margins" type="Margins"/>
-    </xs:choice>
-  </xs:group>
-
-  <xs:complexType name="SpatialDistribution" abstract="true">
-    <xs:complexContent>
-      <xs:extension base="LayoutContainer"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Cell">
-    <xs:complexContent>
-      <xs:extension base="LayoutContainer">
-        <xs:attribute name="halign" type="HorizontalAlignment" use="optional"/>
-        <xs:attribute name="valign" type="VerticalAlignment" use="optional"/>
-        <xs:attribute name="colSpan" type="xs:positiveInteger" use="optional"/>
-        <xs:attribute name="rowSpan" type="xs:positiveInteger" use="optional"/>
-        <xs:attribute name="border" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:simpleType name="VerticalAlignment">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Top"/>
-      <xs:enumeration value="Center"/>
-      <xs:enumeration value="BaseLine"/>
-      <xs:enumeration value="Bottom"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="HorizontalAlignment">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Left"/>
-      <xs:enumeration value="Center"/>
-      <xs:enumeration value="Right"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:complexType name="Horizontal">
-    <xs:complexContent>
-      <xs:extension base="SpatialDistribution"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Vertical">
-    <xs:complexContent>
-      <xs:extension base="SpatialDistribution"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Flexible">
-    <xs:complexContent>
-      <xs:extension base="SpatialDistribution">
-        <xs:attribute name="order" type="FlexibleOrder" use="optional"/>
-        <xs:attribute name="horizontalDirection" type="HorizontalDirection" use="optional"/>
-        <xs:attribute name="verticalDirection" type="VerticalDirection" use="optional"/>
-        <xs:attribute name="halign" type="HorizontalAlignment" use="optional"/>
-        <xs:attribute name="valign" type="VerticalAlignment" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:simpleType name="FlexibleOrder">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="HorizontalVertical"/>
-      <xs:enumeration value="VerticalHorizontal"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="HorizontalDirection">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="LeftRight"/>
-      <xs:enumeration value="RightLeft"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:simpleType name="VerticalDirection">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="TopDown"/>
-      <xs:enumeration value="BottomUp"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:complexType name="Grid">
-    <xs:complexContent>
-      <xs:extension base="SpatialDistribution">
-        <xs:attribute name="columns" type="xs:positiveInteger" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Overlays">
-    <xs:complexContent>
-      <xs:extension base="SpatialDistribution"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Margins">
-    <xs:complexContent>
-      <xs:extension base="LayoutContainer">
-        <xs:attribute name="left" type="Length" use="optional"/>
-        <xs:attribute name="right" type="Length" use="optional"/>
-        <xs:attribute name="top" type="Length" use="optional"/>
-        <xs:attribute name="bottom" type="Length" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:group name="Conditional">
-    <xs:choice>
-      <xs:element name="If" type="If"/>
-      <xs:element name="Switch" type="Switch"/>
-      <xs:element name="ForEach" type="ForEach"/>
-      <xs:element name="For" type="For"/>
-      <xs:element name="While" type="While"/>
-    </xs:choice>
-  </xs:group>
-
-  <xs:complexType name="If">
-    <xs:complexContent>
-      <xs:extension base="LayoutElement">
-        <xs:sequence>
-          <xs:element name="True" type="LayoutContainer" minOccurs="1" maxOccurs="1"/>
-          <xs:element name="False" type="LayoutContainer" minOccurs="0" maxOccurs="1"/>
-        </xs:sequence>
-        <xs:attribute name="condition" type="Expression" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Switch">
-    <xs:complexContent>
-      <xs:extension base="LayoutElement">
-        <xs:sequence>
-          <xs:element name="Case" minOccurs="1" maxOccurs="unbounded">
-            <xs:complexType>
-              <xs:complexContent>
-                <xs:extension base="LayoutContainer">
-                  <xs:attribute name="condition" type="Expression" use="required"/>
-                </xs:extension>
-              </xs:complexContent>
-            </xs:complexType>
-          </xs:element>
-          <xs:element name="Otherwise" type="LayoutContainer" minOccurs="0" maxOccurs="1"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="ForEach">
-    <xs:complexContent>
-      <xs:extension base="LayoutContainer">
-        <xs:attribute name="variable" type="xs:string" use="required"/>
-        <xs:attribute name="expression" type="Expression" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="For">
-    <xs:complexContent>
-      <xs:extension base="LayoutContainer">
-        <xs:attribute name="variable" type="xs:string" use="required"/>
-        <xs:attribute name="from" type="Expression" use="required"/>
-        <xs:attribute name="to" type="Expression" use="required"/>
-        <xs:attribute name="step" type="Expression" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="While">
-    <xs:complexContent>
-      <xs:extension base="LayoutContainer">
-        <xs:attribute name="expression" type="Expression" use="required"/>
-        <xs:attribute name="testAfter" type="xs:boolean" use="optional" default="false"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:group name="References">
-    <xs:choice>
-      <xs:element name="Vertex" type="Point"/>
-      <xs:element name="Shape" type="Shape"/>
-      <xs:element name="Copy" type="Copy"/>
-    </xs:choice>
-  </xs:group>
-
-  <xs:complexType name="Shape">
-    <xs:complexContent>
-      <xs:extension base="LayoutContainer"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Copy">
-    <xs:complexContent>
-      <xs:extension base="LayoutElement">
-        <xs:attribute name="ref" type="xs:string" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:group name="Content">
-    <xs:choice>
-      <xs:element name="Label" type="Label"/>
-      <xs:element name="Script" type="Script"/>
-      <xs:element name="Paragraph" type="Paragraph"/>
-    </xs:choice>
-  </xs:group>
-
-  <xs:complexType name="Label">
-    <xs:complexContent>
-      <xs:extension base="Point">
-        <xs:attribute name="text" type="xs:string" use="required"/>
-        <xs:attribute name="halign" type="HorizontalAlignment" use="optional" default="Left"/>
-        <xs:attribute name="valign" type="VerticalAlignment" use="optional" default="BaseLine"/>
-        <xs:attribute name="font" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Script">
-    <xs:complexContent>
-      <xs:extension base="Point">
-        <xs:attribute name="expression" type="Expression" use="required"/>
-        <xs:attribute name="halign" type="HorizontalAlignment" use="optional" default="Left"/>
-        <xs:attribute name="valign" type="VerticalAlignment" use="optional" default="BaseLine"/>
-        <xs:attribute name="font" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Paragraph">
-    <xs:complexContent>
-      <xs:extension base="LayoutArea">
-        <xs:sequence minOccurs="0" maxOccurs="unbounded">
-          <xs:group ref="FlowingText"/>
-        </xs:sequence>
-        <xs:attribute name="font" type="xs:string" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:group name="FlowingText">
-    <xs:choice>
-      <xs:element name="Text" type="Text"/>
-      <xs:element name="InlineScript" type="InlineScript"/>
-      <xs:element name="Bold" type="Bold"/>
-      <xs:element name="Italic" type="Italic"/>
-      <xs:element name="Underline" type="Underline"/>
-      <xs:element name="StrikeThrough" type="StrikeThrough"/>
-      <xs:element name="TextColor" type="TextColor"/>
-      <xs:element name="FontRef" type="FontRef"/>
-      <xs:element name="Subscript" type="Subscript"/>
-      <xs:element name="Superscript" type="Superscript"/>
-    </xs:choice>
-  </xs:group>
-
-  <xs:complexType name="Text">
-    <xs:complexContent>
-      <xs:extension base="LayoutElement">
-        <xs:attribute name="text" type="xs:string" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="InlineScript">
-    <xs:complexContent>
-      <xs:extension base="LayoutElement">
-        <xs:attribute name="expression" type="Expression" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="EmbeddedText">
-    <xs:complexContent>
-      <xs:extension base="LayoutElement">
-        <xs:sequence minOccurs="0" maxOccurs="unbounded">
-          <xs:group ref="FlowingText"/>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Bold">
-    <xs:complexContent>
-      <xs:extension base="EmbeddedText"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Italic">
-    <xs:complexContent>
-      <xs:extension base="EmbeddedText"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Underline">
-    <xs:complexContent>
-      <xs:extension base="EmbeddedText"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="StrikeThrough">
-    <xs:complexContent>
-      <xs:extension base="EmbeddedText"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Superscript">
-    <xs:complexContent>
-      <xs:extension base="EmbeddedText"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Subscript">
-    <xs:complexContent>
-      <xs:extension base="EmbeddedText"/>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="TextColor">
-    <xs:complexContent>
-      <xs:extension base="EmbeddedText">
-        <xs:attribute name="color" type="Color" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="FontRef">
-    <xs:complexContent>
-      <xs:extension base="EmbeddedText">
-        <xs:attribute name="font" type="xs:string" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:group name="Filters">
-    <xs:choice>
-      <xs:element name="Blur" type="Blur"/>
-      <xs:element name="Dilate" type="Dilate"/>
-      <xs:element name="Erode" type="Erode"/>
-      <xs:element name="Shadow" type="Shadow"/>
-    </xs:choice>
-  </xs:group>
-
-  <xs:complexType name="Blur">
-    <xs:complexContent>
-      <xs:extension base="LayoutContainer">
-        <xs:attribute name="sigmaX" type="xs:float" use="optional"/>
-        <xs:attribute name="sigmaY" type="xs:float" use="optional"/>
-        <xs:attribute name="tileMode" type="TileMode" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:simpleType name="TileMode">
-    <xs:restriction base="xs:string">
-      <xs:enumeration value="Clamp"/>
-      <xs:enumeration value="Repeat"/>
-      <xs:enumeration value="Mirror"/>
-      <xs:enumeration value="Decal"/>
-    </xs:restriction>
-  </xs:simpleType>
-
-  <xs:complexType name="Dilate">
-    <xs:complexContent>
-      <xs:extension base="LayoutContainer">
-        <xs:attribute name="radiusX" type="Length" use="optional"/>
-        <xs:attribute name="radiusY" type="Length" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Erode">
-    <xs:complexContent>
-      <xs:extension base="LayoutContainer">
-        <xs:attribute name="radiusX" type="Length" use="optional"/>
-        <xs:attribute name="radiusY" type="Length" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="Shadow">
-    <xs:complexContent>
-      <xs:extension base="LayoutContainer">
-        <xs:attribute name="dX" type="Length" use="optional"/>
-        <xs:attribute name="dY" type="Length" use="optional"/>
-        <xs:attribute name="sigmaX" type="xs:float" use="optional"/>
-        <xs:attribute name="sigmaY" type="xs:float" use="optional"/>
-        <xs:attribute name="color" type="Color" use="optional"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
+	<xs:element name="Layout2D">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="LayoutContainer">
+					<xs:attribute name="font" type="xs:string" use="optional"/>
+					<xs:attribute name="pen" type="xs:string" use="optional"/>
+					<xs:attribute name="background" type="xs:string" use="optional"/>
+					<xs:attribute name="textColor" type="Color" use="optional"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="LayoutElement">
+		<xs:attribute name="id" type="xs:ID" use="optional"/>
+		<xs:attribute name="visible" type="Boolean" use="optional" default="true"/>
+	</xs:complexType>
+
+	<xs:complexType name="Point">
+		<xs:complexContent>
+			<xs:extension base="LayoutElement">
+				<xs:attribute name="x" type="Length" use="optional"/>
+				<xs:attribute name="y" type="Length" use="optional"/>
+				<xs:attribute name="ref" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Point2">
+		<xs:complexContent>
+			<xs:extension base="Point">
+				<xs:attribute name="x2" type="Length" use="optional"/>
+				<xs:attribute name="y2" type="Length" use="optional"/>
+				<xs:attribute name="ref2" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Point2Weight">
+		<xs:complexContent>
+			<xs:extension base="Point2">
+				<xs:attribute name="w" type="Float" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Point3">
+		<xs:complexContent>
+			<xs:extension base="Point2">
+				<xs:attribute name="x3" type="Length" use="optional"/>
+				<xs:attribute name="y3" type="Length" use="optional"/>
+				<xs:attribute name="ref3" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="LayoutArea">
+		<xs:complexContent>
+			<xs:extension base="LayoutElement">
+				<xs:attribute name="width" type="Length" use="optional"/>
+				<xs:attribute name="height" type="Length" use="optional"/>
+				<xs:attribute name="maxWidth" type="Length" use="optional"/>
+				<xs:attribute name="maxHeight" type="Length" use="optional"/>
+				<xs:attribute name="minWidth" type="Length" use="optional"/>
+				<xs:attribute name="minHeight" type="Length" use="optional"/>
+				<xs:attribute name="keepAspectRatio" type="Boolean" use="optional"/>
+				<xs:attribute name="overflow" type="Overflow" use="optional"/>
+				<xs:attribute name="onClick" type="Expression" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:simpleType name="Overflow">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Clip"/>
+			<xs:enumeration value="Ignore"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="Expression">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+
+	<xs:complexType name="LayoutContainer">
+		<xs:complexContent>
+			<xs:extension base="LayoutArea">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:group ref="Pens"/>
+					<xs:group ref="Backgrounds"/>
+					<xs:group ref="Fonts"/>
+					<xs:group ref="Figures"/>
+					<xs:group ref="Images"/>
+					<xs:group ref="Transforms"/>
+					<xs:group ref="Groups"/>
+					<xs:group ref="Conditional"/>
+					<xs:group ref="References"/>
+					<xs:group ref="Content"/>
+					<xs:group ref="Filters"/>
+					<xs:any namespace="##other"/>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:group name="Pens">
+		<xs:choice>
+			<xs:element name="SolidPen" type="SolidPen"/>
+		</xs:choice>
+	</xs:group>
+
+	<xs:complexType name="Pen">
+		<xs:complexContent>
+			<xs:extension base="LayoutElement">
+				<xs:attribute name="width" type="Length" use="optional"/>
+				<xs:attribute name="cap" type="PenCap" use="optional"/>
+				<xs:attribute name="join" type="PenJoin" use="optional"/>
+				<xs:attribute name="miter" type="Length" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:simpleType name="PenCap">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Butt"/>
+			<xs:enumeration value="Round"/>
+			<xs:enumeration value="Square"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="PenJoin">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Miter"/>
+			<xs:enumeration value="Round"/>
+			<xs:enumeration value="Bevel"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="SolidPen">
+		<xs:complexContent>
+			<xs:extension base="Pen">
+				<xs:attribute name="color" type="Color" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:group name="Backgrounds">
+		<xs:choice>
+			<xs:element name="SolidBackground" type="SolidBackground"/>
+		</xs:choice>
+	</xs:group>
+
+	<xs:complexType name="Background">
+		<xs:complexContent>
+			<xs:extension base="LayoutElement">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="SolidBackground">
+		<xs:complexContent>
+			<xs:extension base="Background">
+				<xs:attribute name="color" type="Color" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:group name="Fonts">
+		<xs:choice>
+			<xs:element name="Font" type="Font"/>
+		</xs:choice>
+	</xs:group>
+
+	<xs:complexType name="Font">
+		<xs:complexContent>
+			<xs:extension base="LayoutElement">
+				<xs:attribute name="name" type="xs:string" use="optional"/>
+				<xs:attribute name="size" type="Length" use="optional"/>
+				<xs:attribute name="weight" type="FontWeight" use="optional"/>
+				<xs:attribute name="width" type="FontWidth" use="optional"/>
+				<xs:attribute name="slant" type="FontSlant" use="optional"/>
+				<xs:attribute name="color" type="Color" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:simpleType name="FontWeight">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Invisible"/>
+			<xs:enumeration value="Thin"/>
+			<xs:enumeration value="ExtraLight"/>
+			<xs:enumeration value="Light"/>
+			<xs:enumeration value="Normal"/>
+			<xs:enumeration value="Medium"/>
+			<xs:enumeration value="SemiBold"/>
+			<xs:enumeration value="Bold"/>
+			<xs:enumeration value="ExtraBold"/>
+			<xs:enumeration value="Black"/>
+			<xs:enumeration value="ExtraBlack"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="FontWidth">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="UltraCondensed"/>
+			<xs:enumeration value="ExtraCondensed"/>
+			<xs:enumeration value="Condensed"/>
+			<xs:enumeration value="SemiCondensed"/>
+			<xs:enumeration value="Normal"/>
+			<xs:enumeration value="SemiExpanded"/>
+			<xs:enumeration value="Expanded"/>
+			<xs:enumeration value="ExtraExpanded"/>
+			<xs:enumeration value="UltraExpanded"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="FontSlant">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Upright"/>
+			<xs:enumeration value="Italic"/>
+			<xs:enumeration value="Oblique"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="Figure">
+		<xs:complexContent>
+			<xs:extension base="LayoutContainer">
+				<xs:attribute name="pen" type="xs:string" use="optional"/>
+				<xs:attribute name="fill" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:group name="Figures">
+		<xs:choice>
+			<xs:element name="Dot" type="FigurePoint"/>
+			<xs:element name="Line" type="Line"/>
+			<xs:element name="Circle" type="Circle"/>
+			<xs:element name="CircleArc" type="CircleArc"/>
+			<xs:element name="EllipseArc" type="EllipseArc"/>
+			<xs:element name="Ellipse" type="Ellipse"/>
+			<xs:element name="Rectangle" type="Rectangle"/>
+			<xs:element name="RoundedRectangle" type="RoundedRectangle"/>
+			<xs:element name="PolyLine" type="PolyLine"/>
+			<xs:element name="Polygon" type="Polygon"/>
+			<xs:element name="Spline" type="Spline"/>
+			<xs:element name="Loop" type="Loop"/>
+			<xs:element name="Path" type="Path"/>
+		</xs:choice>
+	</xs:group>
+
+	<xs:complexType name="FigurePoint">
+		<xs:complexContent>
+			<xs:extension base="Figure">
+				<xs:attribute name="x" type="Length" use="optional"/>
+				<xs:attribute name="y" type="Length" use="optional"/>
+				<xs:attribute name="ref" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="FigurePoint2">
+		<xs:complexContent>
+			<xs:extension base="FigurePoint">
+				<xs:attribute name="x2" type="Length" use="optional"/>
+				<xs:attribute name="y2" type="Length" use="optional"/>
+				<xs:attribute name="ref2" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="FigurePoint3">
+		<xs:complexContent>
+			<xs:extension base="FigurePoint2">
+				<xs:attribute name="x3" type="Length" use="optional"/>
+				<xs:attribute name="y3" type="Length" use="optional"/>
+				<xs:attribute name="ref3" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Line">
+		<xs:complexContent>
+			<xs:extension base="FigurePoint2">
+				<xs:attribute name="head" type="xs:string" use="optional"/>
+				<xs:attribute name="tail" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Circle">
+		<xs:complexContent>
+			<xs:extension base="FigurePoint">
+				<xs:attribute name="radius" type="Length" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="CircleArc">
+		<xs:complexContent>
+			<xs:extension base="Circle">
+				<xs:attribute name="startDegrees" type="Float" use="optional"/>
+				<xs:attribute name="endDegrees" type="Float" use="optional"/>
+				<xs:attribute name="clockwise" type="Boolean" use="optional" default="true"/>
+				<xs:attribute name="center" type="Boolean" use="optional" default="false"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Ellipse">
+		<xs:complexContent>
+			<xs:extension base="FigurePoint">
+				<xs:attribute name="radiusX" type="Length" use="optional"/>
+				<xs:attribute name="radiusY" type="Length" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="EllipseArc">
+		<xs:complexContent>
+			<xs:extension base="Ellipse">
+				<xs:attribute name="startDegrees" type="Float" use="optional"/>
+				<xs:attribute name="endDegrees" type="Float" use="optional"/>
+				<xs:attribute name="clockwise" type="Boolean" use="optional" default="true"/>
+				<xs:attribute name="center" type="Boolean" use="optional" default="false"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Rectangle">
+		<xs:complexContent>
+			<xs:extension base="FigurePoint2"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="RoundedRectangle">
+		<xs:complexContent>
+			<xs:extension base="Rectangle">
+				<xs:attribute name="radiusX" type="Length" use="optional"/>
+				<xs:attribute name="radiusY" type="Length" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Vertices">
+		<xs:complexContent>
+			<xs:extension base="Figure">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Vertex">
+		<xs:complexContent>
+			<xs:extension base="Point"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="PolyLine">
+		<xs:complexContent>
+			<xs:extension base="Vertices">
+				<xs:attribute name="head" type="xs:string" use="optional"/>
+				<xs:attribute name="tail" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Polygon">
+		<xs:complexContent>
+			<xs:extension base="Vertices"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Spline">
+		<xs:complexContent>
+			<xs:extension base="Vertices">
+				<xs:attribute name="head" type="xs:string" use="optional"/>
+				<xs:attribute name="tail" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Loop">
+		<xs:complexContent>
+			<xs:extension base="Vertices"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Path">
+		<xs:complexContent>
+			<xs:extension base="Figure">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="MoveTo" type="Point"/>
+					<xs:element name="MoveToRel" type="Point"/>
+					<xs:element name="LineTo" type="Point"/>
+					<xs:element name="LineToRel" type="Point"/>
+					<xs:element name="CircleArcTo" type="CircleArcTo"/>
+					<xs:element name="CircleArcToRel" type="CircleArcTo"/>
+					<xs:element name="EllipseArcTo" type="EllipseArcTo"/>
+					<xs:element name="EllipseArcToRel" type="EllipseArcTo"/>
+					<xs:element name="QuadraticTo" type="Point2"/>
+					<xs:element name="QuadraticToRel" type="Point2"/>
+					<xs:element name="ConicTo" type="Point2Weight"/>
+					<xs:element name="ConicToRel" type="Point2Weight"/>
+					<xs:element name="CubicTo" type="Point3"/>
+					<xs:element name="CubicToRel" type="Point3"/>
+					<xs:element name="SplineTo" type="Point"/>
+					<xs:element name="SplineToRel" type="Point"/>
+					<xs:element name="Forward" type="Distance"/>
+					<xs:element name="Backward" type="Distance"/>
+					<xs:element name="TurnLeft" type="Angle"/>
+					<xs:element name="TurnRight" type="Angle"/>
+					<xs:element name="TurnTowards" type="Point"/>
+					<xs:element name="TurnTowardsRel" type="Point"/>
+					<xs:element name="CloseLine" type="LayoutElement"/>
+					<xs:element name="CloseLoop" type="LayoutElement"/>
+					<xs:element name="Replay" type="Copy"/>
+				</xs:choice>
+				<xs:attribute name="head" type="xs:string" use="optional"/>
+				<xs:attribute name="tail" type="xs:string" use="optional"/>
+				<xs:attribute name="shapeFill" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Distance">
+		<xs:complexContent>
+			<xs:extension base="LayoutElement">
+				<xs:attribute name="distance" type="Length" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Angle">
+		<xs:complexContent>
+			<xs:extension base="LayoutElement">
+				<xs:attribute name="degrees" type="Float" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="CircleArcTo">
+		<xs:complexContent>
+			<xs:extension base="Point">
+				<xs:attribute name="radius" type="Length" use="required"/>
+				<xs:attribute name="clockwise" type="Boolean" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="EllipseArcTo">
+		<xs:complexContent>
+			<xs:extension base="Point">
+				<xs:attribute name="radiusX" type="Length" use="required"/>
+				<xs:attribute name="radiusY" type="Length" use="required"/>
+				<xs:attribute name="clockwise" type="Boolean" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:group name="Images">
+		<xs:choice>
+			<xs:element name="ImageFile" type="ImageFile"/>
+			<xs:element name="ImageResource" type="ImageResource"/>
+			<xs:element name="ImageUrl" type="ImageUrl"/>
+			<xs:element name="ImageInternal" type="ImageInternal"/>
+		</xs:choice>
+	</xs:group>
+
+	<xs:complexType name="Image">
+		<xs:complexContent>
+			<xs:extension base="FigurePoint2"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="ImageFile">
+		<xs:complexContent>
+			<xs:extension base="Image">
+				<xs:attribute name="fileName" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="ImageResource">
+		<xs:complexContent>
+			<xs:extension base="Image">
+				<xs:attribute name="resource" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="ImageUrl">
+		<xs:complexContent>
+			<xs:extension base="Image">
+				<xs:attribute name="url" type="xs:string" use="required"/>
+				<xs:attribute name="alt" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="ImageInternal">
+		<xs:complexContent>
+			<xs:extension base="Image">
+				<xs:attribute name="cid" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:group name="Transforms">
+		<xs:choice>
+			<xs:element name="Scale" type="Scale"/>
+			<xs:element name="Translate" type="Translate"/>
+			<xs:element name="Rotate" type="Rotate"/>
+			<xs:element name="SkewX" type="SkewX"/>
+			<xs:element name="SkewY" type="SkewY"/>
+		</xs:choice>
+	</xs:group>
+
+	<xs:complexType name="LinearTransformation" abstract="true">
+		<xs:complexContent>
+			<xs:extension base="LayoutContainer"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="PivotTransformation" abstract="true">
+		<xs:complexContent>
+			<xs:extension base="LinearTransformation">
+				<xs:attribute name="x" type="Length" use="optional"/>
+				<xs:attribute name="y" type="Length" use="optional"/>
+				<xs:attribute name="ref" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Scale">
+		<xs:complexContent>
+			<xs:extension base="PivotTransformation">
+				<xs:attribute name="scaleX" type="Float" use="optional"/>
+				<xs:attribute name="scaleY" type="Float" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Translate">
+		<xs:complexContent>
+			<xs:extension base="LinearTransformation">
+				<xs:attribute name="translateX" type="Length" use="optional"/>
+				<xs:attribute name="translateY" type="Length" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Rotate">
+		<xs:complexContent>
+			<xs:extension base="PivotTransformation">
+				<xs:attribute name="degrees" type="Float" use="optional"/>
+				<xs:attribute name="x" type="Length" use="optional"/>
+				<xs:attribute name="y" type="Length" use="optional"/>
+				<xs:attribute name="ref" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="SkewX">
+		<xs:complexContent>
+			<xs:extension base="PivotTransformation">
+				<xs:attribute name="factor" type="Float" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="SkewY">
+		<xs:complexContent>
+			<xs:extension base="PivotTransformation">
+				<xs:attribute name="factor" type="Float" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:group name="Groups">
+		<xs:choice>
+			<xs:element name="Horizontal" type="Horizontal"/>
+			<xs:element name="Vertical" type="Vertical"/>
+			<xs:element name="Flexible" type="Flexible"/>
+			<xs:element name="Grid" type="Grid"/>
+			<xs:element name="Overlays" type="Overlays"/>
+			<xs:element name="Cell" type="Cell"/>
+			<xs:element name="Margins" type="Margins"/>
+		</xs:choice>
+	</xs:group>
+
+	<xs:complexType name="SpatialDistribution" abstract="true">
+		<xs:complexContent>
+			<xs:extension base="LayoutContainer"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Cell">
+		<xs:complexContent>
+			<xs:extension base="LayoutContainer">
+				<xs:attribute name="halign" type="HorizontalAlignment" use="optional"/>
+				<xs:attribute name="valign" type="VerticalAlignment" use="optional"/>
+				<xs:attribute name="colSpan" type="PositiveInteger" use="optional"/>
+				<xs:attribute name="rowSpan" type="PositiveInteger" use="optional"/>
+				<xs:attribute name="border" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:simpleType name="VerticalAlignment">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Top"/>
+			<xs:enumeration value="Center"/>
+			<xs:enumeration value="BaseLine"/>
+			<xs:enumeration value="Bottom"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="HorizontalAlignment">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Left"/>
+			<xs:enumeration value="Center"/>
+			<xs:enumeration value="Right"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="Horizontal">
+		<xs:complexContent>
+			<xs:extension base="SpatialDistribution"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Vertical">
+		<xs:complexContent>
+			<xs:extension base="SpatialDistribution"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Flexible">
+		<xs:complexContent>
+			<xs:extension base="SpatialDistribution">
+				<xs:attribute name="order" type="FlexibleOrder" use="optional"/>
+				<xs:attribute name="horizontalDirection" type="HorizontalDirection" use="optional"/>
+				<xs:attribute name="verticalDirection" type="VerticalDirection" use="optional"/>
+				<xs:attribute name="halign" type="HorizontalAlignment" use="optional"/>
+				<xs:attribute name="valign" type="VerticalAlignment" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:simpleType name="FlexibleOrder">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="HorizontalVertical"/>
+			<xs:enumeration value="VerticalHorizontal"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="HorizontalDirection">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="LeftRight"/>
+			<xs:enumeration value="RightLeft"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="VerticalDirection">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="TopDown"/>
+			<xs:enumeration value="BottomUp"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="Grid">
+		<xs:complexContent>
+			<xs:extension base="SpatialDistribution">
+				<xs:attribute name="columns" type="PositiveInteger" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Overlays">
+		<xs:complexContent>
+			<xs:extension base="SpatialDistribution"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Margins">
+		<xs:complexContent>
+			<xs:extension base="LayoutContainer">
+				<xs:attribute name="left" type="Length" use="optional"/>
+				<xs:attribute name="right" type="Length" use="optional"/>
+				<xs:attribute name="top" type="Length" use="optional"/>
+				<xs:attribute name="bottom" type="Length" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:group name="Conditional">
+		<xs:choice>
+			<xs:element name="If" type="If"/>
+			<xs:element name="Switch" type="Switch"/>
+			<xs:element name="ForEach" type="ForEach"/>
+			<xs:element name="For" type="For"/>
+			<xs:element name="While" type="While"/>
+		</xs:choice>
+	</xs:group>
+
+	<xs:complexType name="If">
+		<xs:complexContent>
+			<xs:extension base="LayoutElement">
+				<xs:sequence>
+					<xs:element name="True" type="LayoutContainer" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="False" type="LayoutContainer" minOccurs="0" maxOccurs="1"/>
+				</xs:sequence>
+				<xs:attribute name="condition" type="Expression" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Switch">
+		<xs:complexContent>
+			<xs:extension base="LayoutElement">
+				<xs:sequence>
+					<xs:element name="Case" minOccurs="1" maxOccurs="unbounded">
+						<xs:complexType>
+							<xs:complexContent>
+								<xs:extension base="LayoutContainer">
+									<xs:attribute name="condition" type="Expression" use="required"/>
+								</xs:extension>
+							</xs:complexContent>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="Otherwise" type="LayoutContainer" minOccurs="0" maxOccurs="1"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="ForEach">
+		<xs:complexContent>
+			<xs:extension base="LayoutContainer">
+				<xs:attribute name="variable" type="xs:string" use="required"/>
+				<xs:attribute name="expression" type="Expression" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="For">
+		<xs:complexContent>
+			<xs:extension base="LayoutContainer">
+				<xs:attribute name="variable" type="xs:string" use="required"/>
+				<xs:attribute name="from" type="Expression" use="required"/>
+				<xs:attribute name="to" type="Expression" use="required"/>
+				<xs:attribute name="step" type="Expression" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="While">
+		<xs:complexContent>
+			<xs:extension base="LayoutContainer">
+				<xs:attribute name="expression" type="Expression" use="required"/>
+				<xs:attribute name="testAfter" type="Boolean" use="optional" default="false"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:group name="References">
+		<xs:choice>
+			<xs:element name="Vertex" type="Point"/>
+			<xs:element name="Shape" type="Shape"/>
+			<xs:element name="Copy" type="Copy"/>
+		</xs:choice>
+	</xs:group>
+
+	<xs:complexType name="Shape">
+		<xs:complexContent>
+			<xs:extension base="LayoutContainer"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Copy">
+		<xs:complexContent>
+			<xs:extension base="LayoutElement">
+				<xs:attribute name="ref" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:group name="Content">
+		<xs:choice>
+			<xs:element name="Label" type="Label"/>
+			<xs:element name="Script" type="Script"/>
+			<xs:element name="Paragraph" type="Paragraph"/>
+		</xs:choice>
+	</xs:group>
+
+	<xs:complexType name="Label">
+		<xs:complexContent>
+			<xs:extension base="Point">
+				<xs:attribute name="text" type="xs:string" use="required"/>
+				<xs:attribute name="halign" type="HorizontalAlignment" use="optional" default="Left"/>
+				<xs:attribute name="valign" type="VerticalAlignment" use="optional" default="BaseLine"/>
+				<xs:attribute name="font" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Script">
+		<xs:complexContent>
+			<xs:extension base="Point">
+				<xs:attribute name="expression" type="Expression" use="required"/>
+				<xs:attribute name="halign" type="HorizontalAlignment" use="optional" default="Left"/>
+				<xs:attribute name="valign" type="VerticalAlignment" use="optional" default="BaseLine"/>
+				<xs:attribute name="font" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Paragraph">
+		<xs:complexContent>
+			<xs:extension base="LayoutArea">
+				<xs:sequence minOccurs="0" maxOccurs="unbounded">
+					<xs:group ref="FlowingText"/>
+				</xs:sequence>
+				<xs:attribute name="font" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:group name="FlowingText">
+		<xs:choice>
+			<xs:element name="Text" type="Text"/>
+			<xs:element name="InlineScript" type="InlineScript"/>
+			<xs:element name="Bold" type="Bold"/>
+			<xs:element name="Italic" type="Italic"/>
+			<xs:element name="Underline" type="Underline"/>
+			<xs:element name="StrikeThrough" type="StrikeThrough"/>
+			<xs:element name="TextColor" type="TextColor"/>
+			<xs:element name="FontRef" type="FontRef"/>
+			<xs:element name="Subscript" type="Subscript"/>
+			<xs:element name="Superscript" type="Superscript"/>
+		</xs:choice>
+	</xs:group>
+
+	<xs:complexType name="Text">
+		<xs:complexContent>
+			<xs:extension base="LayoutElement">
+				<xs:attribute name="text" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="InlineScript">
+		<xs:complexContent>
+			<xs:extension base="LayoutElement">
+				<xs:attribute name="expression" type="Expression" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="EmbeddedText">
+		<xs:complexContent>
+			<xs:extension base="LayoutElement">
+				<xs:sequence minOccurs="0" maxOccurs="unbounded">
+					<xs:group ref="FlowingText"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Bold">
+		<xs:complexContent>
+			<xs:extension base="EmbeddedText"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Italic">
+		<xs:complexContent>
+			<xs:extension base="EmbeddedText"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Underline">
+		<xs:complexContent>
+			<xs:extension base="EmbeddedText"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="StrikeThrough">
+		<xs:complexContent>
+			<xs:extension base="EmbeddedText"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Superscript">
+		<xs:complexContent>
+			<xs:extension base="EmbeddedText"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Subscript">
+		<xs:complexContent>
+			<xs:extension base="EmbeddedText"/>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="TextColor">
+		<xs:complexContent>
+			<xs:extension base="EmbeddedText">
+				<xs:attribute name="color" type="Color" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="FontRef">
+		<xs:complexContent>
+			<xs:extension base="EmbeddedText">
+				<xs:attribute name="font" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:group name="Filters">
+		<xs:choice>
+			<xs:element name="Blur" type="Blur"/>
+			<xs:element name="Dilate" type="Dilate"/>
+			<xs:element name="Erode" type="Erode"/>
+			<xs:element name="Shadow" type="Shadow"/>
+		</xs:choice>
+	</xs:group>
+
+	<xs:complexType name="Blur">
+		<xs:complexContent>
+			<xs:extension base="LayoutContainer">
+				<xs:attribute name="sigmaX" type="Float" use="optional"/>
+				<xs:attribute name="sigmaY" type="Float" use="optional"/>
+				<xs:attribute name="tileMode" type="TileMode" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:simpleType name="TileMode">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Clamp"/>
+			<xs:enumeration value="Repeat"/>
+			<xs:enumeration value="Mirror"/>
+			<xs:enumeration value="Decal"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="Dilate">
+		<xs:complexContent>
+			<xs:extension base="LayoutContainer">
+				<xs:attribute name="radiusX" type="Length" use="optional"/>
+				<xs:attribute name="radiusY" type="Length" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Erode">
+		<xs:complexContent>
+			<xs:extension base="LayoutContainer">
+				<xs:attribute name="radiusX" type="Length" use="optional"/>
+				<xs:attribute name="radiusY" type="Length" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="Shadow">
+		<xs:complexContent>
+			<xs:extension base="LayoutContainer">
+				<xs:attribute name="dX" type="Length" use="optional"/>
+				<xs:attribute name="dY" type="Length" use="optional"/>
+				<xs:attribute name="sigmaX" type="Float" use="optional"/>
+				<xs:attribute name="sigmaY" type="Float" use="optional"/>
+				<xs:attribute name="color" type="Color" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:simpleType name="Boolean">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="(\{.*\})|true|false"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="Float">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="(\{.*\})|([+-]?\d*(\.\d+)?([eE][+-]?\d+)?)"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="PositiveInteger">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="(\{.*\})|[1-9]\d*"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="Length">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([+-]?(\d*[.])?\d+([eE][+-]?\d+)?\s*(px|pt|pc|cm|in|mm|em|ex|ch|rem|vw|vh|vmin|vmax|%))|([{].*[}])"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="Color">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="AliceBlue|PaleGreen|PaleGoldenrod|Orchid|OrangeRed|Orange|OliveDrab|Olive|OldLace|Navy|NavajoWhite|Moccasin|MistyRose|MintCream|MidnightBlue|MediumVioletRed|MediumTurquoise|MediumSpringGreen|LightSlateGray|LightSteelBlue|LightYellow|Lime|LimeGreen|Linen|PaleTurquoise|Magenta|MediumAquamarine|MediumBlue|MediumOrchid|MediumPurple|MediumSeaGreen|ediumSlateBlue|Maroon|PaleVioletRed|PapayaWhip|PeachPuff|Snow|SpringGreen|SteelBlue|Tan|Teal|Thistle|SlateGray|Tomato|Violet|Wheat|White|WhiteSmoke|Yellow|YellowGreen|Turquoise|LightSkyBlue|SlateBlue|Silver|Peru|Pink|Plum|PowderBlue|Purple|Red|SkyBlue|RosyBrown|SaddleBrown|Salmon|SandyBrown|SeaGreen|SeaShell|Sienna|RoyalBlue|LightSeaGreen|LightSalmon|LightPink|Crimson|Cyan|DarkBlue|DarkCyan|DarkGoldenrod|DarkGray|Cornsilk|DarkGreen|DarkMagenta|DarkOliveGreen|DarkOrange|DarkOrchid|DarkRed|DarkSalmon|DarkKhaki|DarkSeaGreen|CornflowerBlue|Chocolate|AntiqueWhite|Aqua|Aquamarine|Azure|Beige|Bisque|Coral|Black|Blue|BlueViolet|Brown|BurlyWood|CadetBlue|Chartreuse|BlanchedAlmond|Transparent|DarkSlateBlue|DarkTurquoise|IndianRed|Indigo|Ivory|Khaki|Lavender|LavenderBlush|HotPink|LawnGreen|LightBlue|LightCoral|LightCyan|LightGoldenrodYellow|LightGray|LightGreen|LemonChiffon|DarkSlateGray|Honeydew|Green|DarkViolet|DeepPink|DeepSkyBlue|DimGray|DodgerBlue|Firebrick|GreenYellow|FloralWhite|Fuchsia|Gainsboro|GhostWhite|Gold|Goldenrod|Gray|ForestGreen|Empty|#[0-9a-fA-F]{6,8}|[{].*[}]"/>
+		</xs:restriction>
+	</xs:simpleType>
 
 </xs:schema>

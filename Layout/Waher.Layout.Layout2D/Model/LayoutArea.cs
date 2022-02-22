@@ -200,7 +200,7 @@ namespace Waher.Layout.Layout2D.Model
 			if (Length.Ok)
 			{
 				a = this.Width ?? 0;
-				State.CalcDrawingSize(Length.Result, ref a, true, State);
+				State.CalcDrawingSize(Length.Result, ref a, true);
 				this.Width = this.ExplicitWidth = a;
 			}
 
@@ -208,7 +208,7 @@ namespace Waher.Layout.Layout2D.Model
 			if (Length.Ok)
 			{
 				a = this.Height ?? 0;
-				State.CalcDrawingSize(Length.Result, ref a, true, State);
+				State.CalcDrawingSize(Length.Result, ref a, true);
 				this.Height = this.ExplicitHeight = a;
 			}
 
@@ -216,7 +216,7 @@ namespace Waher.Layout.Layout2D.Model
 			if (Length.Ok)
 			{
 				a = this.MinWidth ?? 0;
-				State.CalcDrawingSize(Length.Result, ref a, true, State);
+				State.CalcDrawingSize(Length.Result, ref a, true);
 				this.MinWidth = a;
 			}
 
@@ -224,7 +224,7 @@ namespace Waher.Layout.Layout2D.Model
 			if (Length.Ok)
 			{
 				a = this.MaxWidth ?? 0;
-				State.CalcDrawingSize(Length.Result, ref a, true, State);
+				State.CalcDrawingSize(Length.Result, ref a, true);
 				this.MaxWidth = a;
 			}
 
@@ -232,7 +232,7 @@ namespace Waher.Layout.Layout2D.Model
 			if (Length.Ok)
 			{
 				a = this.MinHeight ?? 0;
-				State.CalcDrawingSize(Length.Result, ref a, true, State);
+				State.CalcDrawingSize(Length.Result, ref a, true);
 				this.MinHeight = a;
 			}
 
@@ -240,7 +240,7 @@ namespace Waher.Layout.Layout2D.Model
 			if (Length.Ok)
 			{
 				a = this.MaxHeight ?? 0;
-				State.CalcDrawingSize(Length.Result, ref a, true, State);
+				State.CalcDrawingSize(Length.Result, ref a, true);
 				this.MaxHeight = a;
 			}
 		}

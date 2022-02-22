@@ -128,6 +128,11 @@ namespace Waher.Layout.Layout2D.Model.Attributes
 		public bool Undefined => !this.hasPresetValue && this.expression is null;
 
 		/// <summary>
+		/// If the attribute is defined.
+		/// </summary>
+		public bool Defined => this.hasPresetValue || !(this.expression is null);
+
+		/// <summary>
 		/// Tries to parse a string value
 		/// </summary>
 		/// <param name="StringValue">String value for attribute.</param>

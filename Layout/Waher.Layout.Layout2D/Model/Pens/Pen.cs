@@ -142,7 +142,7 @@ namespace Waher.Layout.Layout2D.Model.Pens
 			if (Length.Ok)
 			{
 				a = this.penWidth ?? 0;
-				State.CalcDrawingSize(Length.Result, ref a, true, State);
+				State.CalcDrawingSize(Length.Result, ref a, true);
 				this.penWidth = a;
 			}
 			else
@@ -164,7 +164,7 @@ namespace Waher.Layout.Layout2D.Model.Pens
 			if (Length.Ok)
 			{
 				a = this.penMiter ?? 0;
-				State.CalcDrawingSize(Length.Result, ref a, true, State);
+				State.CalcDrawingSize(Length.Result, ref a, true);
 				this.penMiter = a;
 			}
 			else

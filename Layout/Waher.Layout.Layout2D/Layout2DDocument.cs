@@ -553,6 +553,27 @@ namespace Waher.Layout.Layout2D
 
 			if (this.root is Model.Backgrounds.Layout2D Layout2D)
 			{
+				if (Layout2D.WidthAttribute.Defined || Layout2D.HeightAttribute.Defined)
+				{
+					DrawingState State = new DrawingState(null, Result, Session);
+					
+					EvaluationResult<Length> Width = await Attribute<Length>.TryEvaluate(Layout2D.WidthAttribute, Session);
+					if (Width.Ok)
+					{
+						float w = Result.Width;
+						State.CalcDrawingSize(Width.Result, ref w, true);
+						Result.Width = (int)(w + 0.5f);
+					}
+
+					EvaluationResult<Length> Height = await Attribute<Length>.TryEvaluate(Layout2D.HeightAttribute, Session);
+					if (Height.Ok)
+					{
+						float h = Result.Height;
+						State.CalcDrawingSize(Height.Result, ref h, false);
+						Result.Height = (int)(h + 0.5f);
+					}
+				}
+
 				EvaluationResult<string> BackgroundId = await Attribute<string>.TryEvaluate(Layout2D.BackgroundColorAttribute, Session);
 				if (BackgroundId.Ok &&
 					this.TryGetElement(BackgroundId.Result, out ILayoutElement Element) &&

@@ -153,8 +153,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <param name="L">Length</param>
 		/// <param name="Size">Calculated size.</param>
 		/// <param name="Horizontal">If it is a horizontal size.</param>
-		/// <param name="State">Drawing state.</param>
-		public void CalcDrawingSize(Length L, ref float Size, bool Horizontal, DrawingState State)
+		public void CalcDrawingSize(Length L, ref float Size, bool Horizontal)
 		{
 			switch (L.Unit)
 			{
@@ -193,7 +192,7 @@ namespace Waher.Layout.Layout2D.Model
 					float Size2 = L.Value * this.text.TextSize;
 					if (Size != Size2)
 					{
-						State.MeasureRelative = true;
+						this.MeasureRelative = true;
 						Size = Size2;
 					}
 					break;
@@ -210,7 +209,7 @@ namespace Waher.Layout.Layout2D.Model
 					Size2 = L.Value * this.height_x.Value;
 					if (Size != Size2)
 					{
-						State.MeasureRelative = true;
+						this.MeasureRelative = true;
 						Size = Size2;
 					}
 					break;
@@ -223,7 +222,7 @@ namespace Waher.Layout.Layout2D.Model
 					Size2 = L.Value * this.width_0.Value;
 					if (Size != Size2)
 					{
-						State.MeasureRelative = true;
+						this.MeasureRelative = true;
 						Size = Size2;
 					}
 					break;
@@ -233,7 +232,7 @@ namespace Waher.Layout.Layout2D.Model
 					Size2 = L.Value * this.textRoot.TextSize;
 					if (Size != Size2)
 					{
-						State.MeasureRelative = true;
+						this.MeasureRelative = true;
 						Size = Size2;
 					}
 					break;
@@ -243,7 +242,7 @@ namespace Waher.Layout.Layout2D.Model
 					Size2 = L.Value * this.viewportSize.Width / 100;
 					if (Size != Size2)
 					{
-						State.MeasureRelative = true;
+						this.MeasureRelative = true;
 						Size = Size2;
 					}
 					break;
@@ -253,7 +252,7 @@ namespace Waher.Layout.Layout2D.Model
 					Size2 = L.Value * this.viewportSize.Height / 100;
 					if (Size != Size2)
 					{
-						State.MeasureRelative = true;
+						this.MeasureRelative = true;
 						Size = Size2;
 					}
 					break;
@@ -267,7 +266,7 @@ namespace Waher.Layout.Layout2D.Model
 
 					if (Size != Size2)
 					{
-						State.MeasureRelative = true;
+						this.MeasureRelative = true;
 						Size = Size2;
 					}
 					break;
@@ -281,7 +280,7 @@ namespace Waher.Layout.Layout2D.Model
 
 					if (Size != Size2)
 					{
-						State.MeasureRelative = true;
+						this.MeasureRelative = true;
 						Size = Size2;
 					}
 					break;
@@ -295,7 +294,7 @@ namespace Waher.Layout.Layout2D.Model
 
 					if (Size != Size2)
 					{
-						State.MeasureRelative = true;
+						this.MeasureRelative = true;
 						Size = Size2;
 					}
 					break;

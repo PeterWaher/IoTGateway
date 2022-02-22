@@ -131,25 +131,25 @@ namespace Waher.Layout.Layout2D.Model.Groups
 		{
 			EvaluationResult<Length> L = await this.left.TryEvaluate(State.Session);
 			if (L.Ok)
-				State.CalcDrawingSize(L.Result, ref this.leftMargin, true, State);
+				State.CalcDrawingSize(L.Result, ref this.leftMargin, true);
 			else
 				this.leftMargin = 0;
 
 			L = await this.right.TryEvaluate(State.Session);
 			if (L.Ok)
-				State.CalcDrawingSize(L.Result, ref this.rightMargin, true, State);
+				State.CalcDrawingSize(L.Result, ref this.rightMargin, true);
 			else
 				this.rightMargin = 0;
 
 			L = await this.top.TryEvaluate(State.Session);
 			if (L.Ok)
-				State.CalcDrawingSize(L.Result, ref this.topMargin, true, State);
+				State.CalcDrawingSize(L.Result, ref this.topMargin, true);
 			else
 				this.topMargin = 0;
 
 			L = await this.bottom.TryEvaluate(State.Session);
 			if (L.Ok)
-				State.CalcDrawingSize(L.Result, ref this.bottomMargin, true, State);
+				State.CalcDrawingSize(L.Result, ref this.bottomMargin, true);
 			else
 				this.bottomMargin = 0;
 

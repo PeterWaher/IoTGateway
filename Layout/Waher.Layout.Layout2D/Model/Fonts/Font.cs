@@ -164,7 +164,7 @@ namespace Waher.Layout.Layout2D.Model.Fonts
 			Size = State.Font.Size;
 			EvaluationResult<Length> SizeLength = await this.size.TryEvaluate(State.Session);
 			if (SizeLength.Ok)
-				State.CalcDrawingSize(SizeLength.Result, ref Size, false, State);
+				State.CalcDrawingSize(SizeLength.Result, ref Size, false);
 
 			EvaluationResult<SKFontStyleWeight> WeightValue = await this.weight.TryEvaluate(State.Session);
 			if (WeightValue.Ok)

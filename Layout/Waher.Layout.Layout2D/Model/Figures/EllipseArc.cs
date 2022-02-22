@@ -166,13 +166,13 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			EvaluationResult<Length> RadiusLength = await this.radiusX.TryEvaluate(State.Session);
 			if (RadiusLength.Ok)
-				State.CalcDrawingSize(RadiusLength.Result, ref this.rX, true, State);
+				State.CalcDrawingSize(RadiusLength.Result, ref this.rX, true);
 			else
 				this.defined = false;
 
 			RadiusLength = await this.radiusY.TryEvaluate(State.Session);
 			if (RadiusLength.Ok)
-				State.CalcDrawingSize(RadiusLength.Result, ref this.rY, false, State);
+				State.CalcDrawingSize(RadiusLength.Result, ref this.rY, false);
 			else
 				this.defined = false;
 

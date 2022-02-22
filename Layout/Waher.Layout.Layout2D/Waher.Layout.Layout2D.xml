@@ -376,6 +376,11 @@
             If the attribute is undefined.
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.Defined">
+            <summary>
+            If the attribute is defined.
+            </summary>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.Attributes.Attribute`1.TryParse(System.String,`0@)">
             <summary>
             Tries to parse a string value
@@ -2458,14 +2463,13 @@
             Height of current area
             </summary>
         </member>
-        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.CalcDrawingSize(Waher.Layout.Layout2D.Model.Length,System.Single@,System.Boolean,Waher.Layout.Layout2D.Model.DrawingState)">
+        <member name="M:Waher.Layout.Layout2D.Model.DrawingState.CalcDrawingSize(Waher.Layout.Layout2D.Model.Length,System.Single@,System.Boolean)">
             <summary>
             Converts a defined length to drawing size.
             </summary>
             <param name="L">Length</param>
             <param name="Size">Calculated size.</param>
             <param name="Horizontal">If it is a horizontal size.</param>
-            <param name="State">Drawing state.</param>
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.DrawingState.SetAreaSize(SkiaSharp.SKSize)">
             <summary>

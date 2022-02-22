@@ -106,13 +106,13 @@ namespace Waher.Layout.Layout2D.Model.Transforms
 
 			EvaluationResult<Length> L = await this.translateX.TryEvaluate(State.Session);
 			if (L.Ok)
-				State.CalcDrawingSize(L.Result, ref this.dx, true, State);
+				State.CalcDrawingSize(L.Result, ref this.dx, true);
 			else
 				this.dx = 0;
 
 			L = await this.translateY.TryEvaluate(State.Session);
 			if (L.Ok)
-				State.CalcDrawingSize(L.Result, ref this.dy, false, State);
+				State.CalcDrawingSize(L.Result, ref this.dy, false);
 			else
 				this.dy = 0;
 

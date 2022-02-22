@@ -660,8 +660,8 @@ namespace Waher.Layout.Layout2D.Model
 
 			if (X1.Ok && Y1.Ok)
 			{
-				State.CalcDrawingSize(X1.Result, ref X, true, State);
-				State.CalcDrawingSize(Y1.Result, ref Y, false, State);
+				State.CalcDrawingSize(X1.Result, ref X, true);
+				State.CalcDrawingSize(Y1.Result, ref Y, false);
 
 				return new CalculatedPoint(X, Y);
 			}

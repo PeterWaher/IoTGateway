@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model
 {
@@ -194,6 +195,12 @@ namespace Waher.Layout.Layout2D.Model
 		/// </summary>
 		/// <param name="Destination">Destination element</param>
 		void CopyContents(ILayoutElement Destination);
+
+		/// <summary>
+		/// Registers any IDs defined with the encapsulating document.
+		/// </summary>
+		/// <param name="Session">Session variables.</param>
+		Task RegisterIDs(Variables Session);
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to dimensions.

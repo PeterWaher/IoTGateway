@@ -588,6 +588,27 @@ namespace Waher.Layout.Layout2D
 			return Result;
 		}
 
+		/// <summary>
+		/// Makes a copy of the layout document.
+		/// </summary>
+		/// <param name="Session">Session variables.</param>
+		/// <returns>Copy of layout document.</returns>
+		public Layout2DDocument Copy(Variables Session)
+		{
+			KeyValuePair<string, object>[] Attachments = new KeyValuePair<string, object>[this.attachments.Count];
+			int i = 0;
+
+			foreach (KeyValuePair<string, object> P in this.attachments)
+				Attachments[i++] = P;
+
+			Layout2DDocument Result = new Layout2DDocument(Session, Attachments);
+
+			Result.root = this.root.Copy(null);
+			Result.root.RegisterIDs(Session);
+
+			return Result;
+		}
+
 	}
 
 	/* TODO:

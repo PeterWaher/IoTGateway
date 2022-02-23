@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Layout.Layout2D.Model.Attributes;
+using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model
 {
@@ -341,6 +342,21 @@ namespace Waher.Layout.Layout2D.Model
 					if (E.IsVisible)
 						await E.Draw(State);
 				}
+			}
+		}
+
+		/// <summary>
+		/// Registers any IDs defined with the encapsulating document.
+		/// </summary>
+		/// <param name="Session">Session variables.</param>
+		public override async Task RegisterIDs(Variables Session)
+		{
+			await base.RegisterIDs(Session);
+
+			if (this.HasChildren)
+			{
+				foreach (ILayoutElement E in this.children)
+					await E.RegisterIDs(Session);
 			}
 		}
 

@@ -5,6 +5,7 @@ using System.Xml;
 using SkiaSharp;
 using Waher.Layout.Layout2D.Model.Attributes;
 using Waher.Layout.Layout2D.Model.References;
+using Waher.Script;
 
 namespace Waher.Layout.Layout2D.Model
 {
@@ -800,5 +801,20 @@ namespace Waher.Layout.Layout2D.Model
 
 			return sb.ToString();
 		}
+
+		/// <summary>
+		/// Registers any IDs defined with the encapsulating document.
+		/// </summary>
+		/// <param name="Session">Session variables.</param>
+		public virtual async Task RegisterIDs(Variables Session)
+		{
+			if (this.id.Defined)
+			{
+				EvaluationResult<string> Id = await this.id.TryEvaluate(Session);
+				if (Id.Ok && !string.IsNullOrEmpty(Id.Result))
+					this.document.AddElementId(Id.Result, this);
+			}
+		}
+
 	}
 }

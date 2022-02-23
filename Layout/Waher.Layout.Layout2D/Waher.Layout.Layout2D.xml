@@ -266,6 +266,13 @@
             <param name="Session">Session variables.</param>
             <returns>Render settings.</returns>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Layout2DDocument.Copy(Waher.Script.Variables)">
+            <summary>
+            Makes a copy of the layout document.
+            </summary>
+            <param name="Session">Session variables.</param>
+            <returns>Copy of layout document.</returns>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Map">
             <summary>
             Contains information about an actionable area in a generated image.
@@ -6842,6 +6849,12 @@
             </summary>
             <param name="Destination">Destination element</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.RegisterIDs(Waher.Script.Variables)">
+            <summary>
+            Registers any IDs defined with the encapsulating document.
+            </summary>
+            <param name="Session">Session variables.</param>
+        </member>
         <member name="M:Waher.Layout.Layout2D.Model.ILayoutElement.MeasureDimensions(Waher.Layout.Layout2D.Model.DrawingState)">
             <summary>
             Measures layout entities and defines unassigned properties, related to dimensions.
@@ -7406,6 +7419,12 @@
             </summary>
             <param name="State">Current drawing state.</param>
         </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutContainer.RegisterIDs(Waher.Script.Variables)">
+            <summary>
+            Registers any IDs defined with the encapsulating document.
+            </summary>
+            <param name="Session">Session variables.</param>
+        </member>
         <member name="T:Waher.Layout.Layout2D.Model.LayoutElement">
             <summary>
             Abstract base class for layout elements.
@@ -7699,6 +7718,12 @@
         </member>
         <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.ToString">
             <inheritdoc/>
+        </member>
+        <member name="M:Waher.Layout.Layout2D.Model.LayoutElement.RegisterIDs(Waher.Script.Variables)">
+            <summary>
+            Registers any IDs defined with the encapsulating document.
+            </summary>
+            <param name="Session">Session variables.</param>
         </member>
         <member name="T:Waher.Layout.Layout2D.Model.LengthUnit">
             <summary>

@@ -3456,6 +3456,41 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Functions.Analytic.CosSin">
+            <summary>
+            CosSin(x), calculates both Cos(x) and Sin(x)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Analytic.CosSin.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            CosSin(x), calculates both Cos(x) and Sin(x)
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Analytic.CosSin.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Analytic.CosSin.EvaluateScalar(System.Double,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Analytic.CosSin.EvaluateScalar(System.Numerics.Complex,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Functions.Analytic.Cot">
             <summary>
             Cot(x)
@@ -3927,6 +3962,41 @@
             <returns>Function result.</returns>
         </member>
         <member name="M:Waher.Script.Functions.Analytic.Sin.EvaluateScalar(System.Numerics.Complex,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Functions.Analytic.SinCos">
+            <summary>
+            SinCos(x), calculates both Sin(x) and Cos(x)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Analytic.SinCos.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            SinCos(x), calculates both Sin(x) and Cos(x)
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Analytic.SinCos.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Analytic.SinCos.EvaluateScalar(System.Double,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Analytic.SinCos.EvaluateScalar(System.Numerics.Complex,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
             </summary>

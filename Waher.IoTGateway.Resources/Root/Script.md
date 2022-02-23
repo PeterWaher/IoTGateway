@@ -820,27 +820,29 @@ The following table lists available exponential and power functions:
 
 The following table lists available trigonometric functions:
 
-| Function | Description | Example |
-|----------|-------------|---------|
-| `Cos(z)` | Cosine, `z` in radians. | `Cos(100°)` |
-| `Cot(z)` | Cotangent, `z` in radians. | `Cot(100°)` |
-| `Csc(z)` | Cosecant, `z` in radians. | `Csc(100°)` |
-| `Sec(z)` | Secant, `z` in radians. | `Sec(100°)` |
-| `Sin(z)` | Sine, `z` in radians. | `Sin(100°)` |
-| `Tan(z)` | Tangent, `z` in radians. | `Tan(100°)` |
-| `ACos(z)` | Alias for `ArcCos(z)`. | `ACos(Cos(100°))` |
-| `ACot(z)` | Alias for `ArcCot(z)`. | `ACot(Cot(100°))` |
-| `ACsc(z)` | Alias for `ArcCsc(z)`. | `ACsc(Csc(100°))` |
-| `ASec(z)` | Alias for `ArcSec(z)`. | `ASec(Sec(100°))` |
-| `ASin(z)` | Alias for `ArcSin(z)`. | `ASin(Sin(100°))` |
-| `ATan(z)` | Alias for `ArcTan(z)`. | `ATan(Tan(100°))` |
-| `ATan(x,y)` | Alias for `ArcTan(x,y)`. | `ATan(3,4)` |
-| `ArcCos(z))` | Inverse Cosine. | `ArcCos(Cos(100°))` |
-| `ArcCot(z))` | Inverse Cotangent. | `ArcCot(Cot(100°))` |
-| `ArcCsc(z))` | Inverse Cosecant. | `ArcCsc(Csc(100°))` |
-| `ArcSec(z))` | Inverse Secant. | `ArcSec(Sec(100°))` |
-| `ArcSin(z)` | Inverse Sine. | `ArcSin(Sin(100°))` |
-| `ArcTan(z))` | Inverse Tangent. | `ArcTan(Tan(100°))` |
+| Function       | Description | Example |
+|----------------|-------------|---------|
+| `Cos(z)`       | Cosine, `z` in radians. | `Cos(100°)` |
+| `CosSin(z)`    | Cosine and Sine, `z` in radians. | `CosSin(100°)` |
+| `Cot(z)`       | Cotangent, `z` in radians. | `Cot(100°)` |
+| `Csc(z)`       | Cosecant, `z` in radians. | `Csc(100°)` |
+| `Sec(z)`       | Secant, `z` in radians. | `Sec(100°)` |
+| `Sin(z)`       | Sine, `z` in radians. | `Sin(100°)` |
+| `SinCos(z)`    | Sine and Cosine, `z` in radians. | `SinCos(100°)` |
+| `Tan(z)`       | Tangent, `z` in radians. | `Tan(100°)` |
+| `ACos(z)`      | Alias for `ArcCos(z)`. | `ACos(Cos(100°))` |
+| `ACot(z)`      | Alias for `ArcCot(z)`. | `ACot(Cot(100°))` |
+| `ACsc(z)`      | Alias for `ArcCsc(z)`. | `ACsc(Csc(100°))` |
+| `ASec(z)`      | Alias for `ArcSec(z)`. | `ASec(Sec(100°))` |
+| `ASin(z)`      | Alias for `ArcSin(z)`. | `ASin(Sin(100°))` |
+| `ATan(z)`      | Alias for `ArcTan(z)`. | `ATan(Tan(100°))` |
+| `ATan(x,y)`    | Alias for `ArcTan(x,y)`. | `ATan(3,4)` |
+| `ArcCos(z))`   | Inverse Cosine. | `ArcCos(Cos(100°))` |
+| `ArcCot(z))`   | Inverse Cotangent. | `ArcCot(Cot(100°))` |
+| `ArcCsc(z))`   | Inverse Cosecant. | `ArcCsc(Csc(100°))` |
+| `ArcSec(z))`   | Inverse Secant. | `ArcSec(Sec(100°))` |
+| `ArcSin(z)`    | Inverse Sine. | `ArcSin(Sin(100°))` |
+| `ArcTan(z))`   | Inverse Tangent. | `ArcTan(Tan(100°))` |
 | `ArcTan(x,y))` | Returns the angle whose tangent is the quotient of two specified numbers. | `ArcTan(3,4)` |
 
 #### Hyperbolic functions

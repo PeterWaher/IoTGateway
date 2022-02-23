@@ -4,49 +4,45 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 
-namespace Waher.Content.Html
+namespace Waher.Content.Html.Css
 {
 	/// <summary>
-	/// HTML encoder/decoder.
+	/// CSS encoder/decoder.
 	/// </summary>
-	public class HtmlCodec : IContentDecoder, IContentEncoder
+	public class CssCodec : IContentDecoder, IContentEncoder
 	{
 		/// <summary>
-		/// HTML encoder/decoder.
+		/// CSS encoder/decoder.
 		/// </summary>
-		public HtmlCodec()
+		public CssCodec()
 		{
 		}
 
 		/// <summary>
-		/// HTML content types.
+		/// CSS content types.
 		/// </summary>
-		public static readonly string[] HtmlContentTypes = new string[]
+		public static readonly string[] CssContentTypes = new string[]
 		{
-			"text/html",
-			"application/xhtml+xml"
+			"text/css"
 		};
 
 		/// <summary>
-		/// HTML file extensions.
+		/// Plain text file extensions.
 		/// </summary>
-		public static readonly string[] HtmlFileExtensions = new string[]
+		public static readonly string[] CssFileExtensions = new string[]
 		{
-			"htm",
-			"html",
-			"xhtml",
-			"xhtm"
+			"css"
 		};
 
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
-		public string[] ContentTypes => HtmlContentTypes;
+		public string[] ContentTypes => CssContentTypes;
 
 		/// <summary>
 		/// Supported file extensions.
 		/// </summary>
-		public string[] FileExtensions => HtmlFileExtensions;
+		public string[] FileExtensions => CssFileExtensions;
 
 		/// <summary>
 		/// If the decoder decodes an object with a given content type.
@@ -56,9 +52,9 @@ namespace Waher.Content.Html
 		/// <returns>If the decoder can decode an object with the given type.</returns>
 		public bool Decodes(string ContentType, out Grade Grade)
 		{
-			if (Array.IndexOf<string>(HtmlContentTypes, ContentType) >= 0)
+			if (Array.IndexOf<string>(CssContentTypes, ContentType) >= 0)
 			{
-				Grade = Grade.Ok;
+				Grade = Grade.Barely;
 				return true;
 			}
 			else
@@ -80,8 +76,8 @@ namespace Waher.Content.Html
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public Task<object> DecodeAsync(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			string Html = CommonTypes.GetString(Data, Encoding);
-			return Task.FromResult<object>(new HtmlDocument(Html));
+			string Css = CommonTypes.GetString(Data, Encoding);
+			return Task.FromResult<object>(new CssDocument(Css));
 		}
 
 		/// <summary>
@@ -94,14 +90,8 @@ namespace Waher.Content.Html
 		{
 			switch (FileExtension.ToLower())
 			{
-				case "htm":
-				case "html":
-					ContentType = "text/html";
-					return true;
-
-				case "xhtml":
-				case "xhtm":
-					ContentType = "application/xhtml+xml";
+				case "css":
+					ContentType = CssContentTypes[0];
 					return true;
 
 				default:
@@ -120,12 +110,8 @@ namespace Waher.Content.Html
 		{
 			switch (ContentType.ToLower())
 			{
-				case "text/html":
-					FileExtension = "html";
-					return true;
-
-				case "application/xhtml+xml":
-					FileExtension = "xhtml";
+				case "text/css":
+					FileExtension = CssFileExtensions[0];
 					return true;
 
 				default:
@@ -143,11 +129,11 @@ namespace Waher.Content.Html
 		/// <returns>If the encoder can encode the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if (Object is HtmlDocument || (Object is string s && s.TrimEnd().EndsWith("</html>", StringComparison.OrdinalIgnoreCase)))
+			if (Object is CssDocument)
 			{
-				if (InternetContent.IsAccepted(HtmlContentTypes, AcceptedContentTypes))
+				if (InternetContent.IsAccepted(CssContentTypes, AcceptedContentTypes))
 				{
-					Grade = Grade.Ok;
+					Grade = Grade.Barely;
 					return true;
 				}
 			}
@@ -166,31 +152,25 @@ namespace Waher.Content.Html
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
-			if (InternetContent.IsAccepted(HtmlContentTypes, out string ContentType, AcceptedContentTypes))
+			if (InternetContent.IsAccepted(CssContentTypes, out string ContentType, AcceptedContentTypes))
 			{
-				string Html = null;
 				byte[] Bin;
 
-				if (Object is HtmlDocument HtmlDoc)
-					Html = HtmlDoc.HtmlText;
-				else if (Object is string s)
-					Html = s;
-
-				if (Html is null)
-					Bin = null;
-				else
+				if (Object is CssDocument CssDoc)
 				{
 					if (Encoding is null)
 					{
 						ContentType += "; charset=utf-8";
-						Bin = Encoding.UTF8.GetBytes(Html);
+						Bin = Encoding.UTF8.GetBytes(CssDoc.Css);
 					}
 					else
 					{
 						ContentType += "; charset=" + Encoding.WebName;
-						Bin = Encoding.GetBytes(Html);
+						Bin = Encoding.GetBytes(CssDoc.Css);
 					}
 				}
+				else
+					Bin = null;
 
 				return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Bin, ContentType));
 			}

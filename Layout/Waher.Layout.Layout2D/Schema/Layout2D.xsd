@@ -308,6 +308,7 @@
 			<xs:extension base="Circle">
 				<xs:attribute name="startDegrees" type="Float" use="optional"/>
 				<xs:attribute name="endDegrees" type="Float" use="optional"/>
+				<xs:attribute name="spanDegrees" type="Float" use="optional"/>
 				<xs:attribute name="clockwise" type="Boolean" use="optional" default="true"/>
 				<xs:attribute name="center" type="Boolean" use="optional" default="false"/>
 			</xs:extension>
@@ -328,6 +329,7 @@
 			<xs:extension base="Ellipse">
 				<xs:attribute name="startDegrees" type="Float" use="optional"/>
 				<xs:attribute name="endDegrees" type="Float" use="optional"/>
+				<xs:attribute name="spanDegrees" type="Float" use="optional"/>
 				<xs:attribute name="clockwise" type="Boolean" use="optional" default="true"/>
 				<xs:attribute name="center" type="Boolean" use="optional" default="false"/>
 			</xs:extension>

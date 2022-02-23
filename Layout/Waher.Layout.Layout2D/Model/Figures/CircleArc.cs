@@ -14,11 +14,13 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		private LengthAttribute radius;
 		private FloatAttribute startDegrees;
 		private FloatAttribute endDegrees;
+		private FloatAttribute spanDegrees;
 		private BooleanAttribute clockwise;
 		private BooleanAttribute center;
 		private float r;
 		private float start;
 		private float end;
+		private float span;
 		private bool clockDir;
 		private bool includeCenter;
 
@@ -65,6 +67,15 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		}
 
 		/// <summary>
+		/// Span Degrees
+		/// </summary>
+		public FloatAttribute SpanDegreesAttribute
+		{
+			get => this.spanDegrees;
+			set => this.spanDegrees = value;
+		}
+
+		/// <summary>
 		/// Clockwise
 		/// </summary>
 		public BooleanAttribute ClockwiseAttribute
@@ -91,6 +102,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			this.radius = new LengthAttribute(Input, "radius");
 			this.startDegrees = new FloatAttribute(Input, "startDegrees");
 			this.endDegrees = new FloatAttribute(Input, "endDegrees");
+			this.spanDegrees = new FloatAttribute(Input, "spanDegrees");
 			this.clockwise = new BooleanAttribute(Input, "clockwise");
 			this.center = new BooleanAttribute(Input, "center");
 
@@ -108,6 +120,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			this.radius?.Export(Output);
 			this.startDegrees?.Export(Output);
 			this.endDegrees?.Export(Output);
+			this.spanDegrees?.Export(Output);
 			this.clockwise?.Export(Output);
 			this.center?.Export(Output);
 		}
@@ -136,6 +149,7 @@ namespace Waher.Layout.Layout2D.Model.Figures
 				Dest.radius = this.radius?.CopyIfNotPreset();
 				Dest.startDegrees = this.startDegrees?.CopyIfNotPreset();
 				Dest.endDegrees = this.endDegrees?.CopyIfNotPreset();
+				Dest.spanDegrees = this.spanDegrees?.CopyIfNotPreset();
 				Dest.clockwise = this.clockwise?.CopyIfNotPreset();
 				Dest.center = this.center?.CopyIfNotPreset();
 			}
@@ -156,6 +170,9 @@ namespace Waher.Layout.Layout2D.Model.Figures
 			else
 				this.defined = false;
 
+			this.clockDir = await this.clockwise.Evaluate(State.Session, true);
+			this.includeCenter = await this.center.Evaluate(State.Session, false);
+
 			EvaluationResult<float> Degrees = await this.startDegrees.TryEvaluate(State.Session);
 			if (Degrees.Ok)
 				this.start = (float)Math.IEEERemainder(Degrees.Result, 360);
@@ -164,63 +181,94 @@ namespace Waher.Layout.Layout2D.Model.Figures
 
 			Degrees = await this.endDegrees.TryEvaluate(State.Session);
 			if (Degrees.Ok)
+			{
 				this.end = (float)Math.IEEERemainder(Degrees.Result, 360);
-			else
-				this.defined = false;
 
-			this.clockDir = await this.clockwise.Evaluate(State.Session, true);
-			this.includeCenter = await this.center.Evaluate(State.Session, false);
+				if (this.clockDir)
+					this.span = this.end - this.start;
+				else
+					this.span = this.start - this.end;
+
+				if (this.span < 0)
+					this.span += 360;
+			}
+			else
+			{
+				Degrees = await this.spanDegrees.TryEvaluate(State.Session);
+				if (Degrees.Ok)
+				{
+					this.span = Degrees.Result;
+					if (this.clockDir)
+						this.end = this.start + this.span;
+					else
+						this.end = this.start - this.span;
+
+					this.end = (float)Math.IEEERemainder(this.end, 360);
+				}
+				else
+					this.defined = false;
+			}
 
 			if (this.defined)
 			{
-				float a = this.start;
-				float r = (float)Math.IEEERemainder(this.start, 90);
-				bool First = true;
-
-				this.IncludePoint(this.xCoordinate, this.yCoordinate, this.r, this.r, this.start);
-
-				if (this.clockDir)
+				if (this.span >= 360)
 				{
-					if (this.end < this.start)
-						this.end += 360;
-
-					while (a < this.end)
-					{
-						if (First)
-						{
-							a += 90 - r;
-							First = false;
-						}
-						else
-							a += 90;
-
-						this.IncludePoint(this.xCoordinate, this.yCoordinate, this.r, this.r, a);
-					}
+					this.IncludePoint(this.xCoordinate - this.r, this.yCoordinate);
+					this.IncludePoint(this.xCoordinate + this.r, this.yCoordinate);
+					this.IncludePoint(this.xCoordinate, this.yCoordinate - this.r);
+					this.IncludePoint(this.xCoordinate, this.yCoordinate + this.r);
 				}
 				else
 				{
-					if (this.end > this.start)
-						this.end -= 360;
+					float a = this.start;
+					float r = (float)Math.IEEERemainder(this.start, 90);
+					bool First = true;
 
-					while (a > this.end)
+					this.IncludePoint(this.xCoordinate, this.yCoordinate, this.r, this.r, this.start);
+
+					if (this.clockDir)
 					{
-						if (First)
+						if (this.end < this.start)
+							this.end += 360;
+
+						while (a < this.end)
 						{
-							a -= r;
-							First = false;
+							if (First)
+							{
+								a += 90 - r;
+								First = false;
+							}
+							else
+								a += 90;
+
+							this.IncludePoint(this.xCoordinate, this.yCoordinate, this.r, this.r, a);
 						}
-						else
-							a -= 90;
-
-						this.IncludePoint(this.xCoordinate, this.yCoordinate, this.r, this.r, a);
 					}
+					else
+					{
+						if (this.end > this.start)
+							this.end -= 360;
+
+						while (a > this.end)
+						{
+							if (First)
+							{
+								a -= r;
+								First = false;
+							}
+							else
+								a -= 90;
+
+							this.IncludePoint(this.xCoordinate, this.yCoordinate, this.r, this.r, a);
+						}
+					}
+
+					if (this.start != this.end)
+						this.IncludePoint(this.xCoordinate, this.yCoordinate, this.r, this.r, this.end);
+
+					if (this.includeCenter)
+						this.IncludePoint(this.xCoordinate, this.yCoordinate);
 				}
-
-				if (this.start != this.end)
-					this.IncludePoint(this.xCoordinate, this.yCoordinate, this.r, this.r, this.end);
-
-				if (this.includeCenter)
-					this.IncludePoint(this.xCoordinate, this.yCoordinate);
 			}
 		}
 
@@ -232,39 +280,39 @@ namespace Waher.Layout.Layout2D.Model.Figures
 		{
 			if (this.defined)
 			{
-				float Sweep;
-				SKRect Oval = new SKRect(
-					this.xCoordinate - this.r, this.yCoordinate - this.r,
-					this.xCoordinate + this.r, this.yCoordinate + this.r);
-
-				this.start = (float)Math.IEEERemainder(this.start, 360);
-				if (this.start < 0)
-					this.start += 360;
-
-				this.end = (float)Math.IEEERemainder(this.end, 360);
-				if (this.end < 0)
-					this.end += 360;
-
-				if (this.clockDir)
+				if (this.span >= 360)
 				{
-					Sweep = this.end - this.start;
-					if (Sweep < 0)
-						Sweep += 360;
+					SKPaint Fill = await this.TryGetFill(State);
+					if (!(Fill is null))
+						State.Canvas.DrawCircle(this.xCoordinate, this.yCoordinate, this.r, Fill);
+
+					SKPaint Pen = await this.TryGetPen(State);
+					if (!(Pen is null))
+						State.Canvas.DrawCircle(this.xCoordinate, this.yCoordinate, this.r, Pen);
 				}
 				else
 				{
-					Sweep = this.end - this.start;
-					if (Sweep > 0)
-						Sweep -= 360;
+					float Sweep = this.clockDir ? this.span : -this.span;
+					SKRect Oval = new SKRect(
+						this.xCoordinate - this.r, this.yCoordinate - this.r,
+						this.xCoordinate + this.r, this.yCoordinate + this.r);
+
+					this.start = (float)Math.IEEERemainder(this.start, 360);
+					if (this.start < 0)
+						this.start += 360;
+
+					this.end = (float)Math.IEEERemainder(this.end, 360);
+					if (this.end < 0)
+						this.end += 360;
+
+					SKPaint Fill = await this.TryGetFill(State);
+					if (!(Fill is null))
+						State.Canvas.DrawArc(Oval, this.start, Sweep, this.includeCenter, Fill);
+
+					SKPaint Pen = await this.TryGetPen(State);
+					if (!(Pen is null))
+						State.Canvas.DrawArc(Oval, this.start, Sweep, this.includeCenter, Pen);
 				}
-
-				SKPaint Fill = await this.TryGetFill(State);
-				if (!(Fill is null))
-					State.Canvas.DrawArc(Oval, this.start, Sweep, this.includeCenter, Fill);
-
-				SKPaint Pen = await this.TryGetPen(State);
-				if (!(Pen is null))
-					State.Canvas.DrawArc(Oval, this.start, Sweep, this.includeCenter, Pen);
 			}
 		
 			await base.Draw(State);

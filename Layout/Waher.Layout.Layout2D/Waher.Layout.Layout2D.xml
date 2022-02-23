@@ -2657,6 +2657,11 @@
             End Degrees
             </summary>
         </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.SpanDegreesAttribute">
+            <summary>
+            Span Degrees
+            </summary>
+        </member>
         <member name="P:Waher.Layout.Layout2D.Model.Figures.CircleArc.ClockwiseAttribute">
             <summary>
             Clockwise
@@ -2838,6 +2843,11 @@
         <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.EndDegreesAttribute">
             <summary>
             End Degrees
+            </summary>
+        </member>
+        <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.SpanDegreesAttribute">
+            <summary>
+            Span Degrees
             </summary>
         </member>
         <member name="P:Waher.Layout.Layout2D.Model.Figures.EllipseArc.ClockwiseAttribute">

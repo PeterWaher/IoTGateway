@@ -601,9 +601,11 @@ namespace Waher.Layout.Layout2D
 			foreach (KeyValuePair<string, object> P in this.attachments)
 				Attachments[i++] = P;
 
-			Layout2DDocument Result = new Layout2DDocument(Session, Attachments);
+			Layout2DDocument Result = new Layout2DDocument(Session, Attachments)
+			{
+				root = this.root.Copy(null)
+			};
 
-			Result.root = this.root.Copy(null);
 			Result.root.RegisterIDs(Session);
 
 			return Result;

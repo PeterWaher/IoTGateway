@@ -51,6 +51,14 @@
             <param name="Name">Namespace.</param>
             <returns>Namespace object, if found, or null if not found.</returns>
         </member>
+        <member name="M:Waher.Runtime.Language.Language.GetNamespaceAsync(System.String,System.Boolean)">
+            <summary>
+            Gets the namespace object, given its name, if available.
+            </summary>
+            <param name="Name">Namespace.</param>
+            <param name="CreateIfNotFound">If a new <see cref="T:Waher.Runtime.Language.Namespace"/> object should be created, if one is not found.</param>
+            <returns>Namespace object, if found or created, or null if not found.</returns>
+        </member>
         <member name="M:Waher.Runtime.Language.Language.GetNamespacesAsync">
             <summary>
             Gets available namespaces.

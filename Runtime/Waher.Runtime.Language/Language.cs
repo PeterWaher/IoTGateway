@@ -119,6 +119,21 @@ namespace Waher.Runtime.Language
 		}
 
 		/// <summary>
+		/// Gets the namespace object, given its name, if available.
+		/// </summary>
+		/// <param name="Name">Namespace.</param>
+		/// <param name="CreateIfNotFound">If a new <see cref="Namespace"/> object should be created, if one is not found.</param>
+		/// <returns>Namespace object, if found or created, or null if not found.</returns>
+		public async Task<Namespace> GetNamespaceAsync(string Name, bool CreateIfNotFound)
+		{
+			Namespace ns = await this.GetNamespaceAsync(Name);
+			if (ns is null && CreateIfNotFound)
+				ns = await this.CreateNamespaceAsync(Name);
+
+			return ns;
+		}
+
+		/// <summary>
 		/// Gets available namespaces.
 		/// </summary>
 		/// <returns>Namespaces.</returns>

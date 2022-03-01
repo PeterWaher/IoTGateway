@@ -665,7 +665,10 @@ Examples:
 
 In the first example, the function `f`, which takes three parameters, is supposed to return a vector of two elements. If it does, 
 the variables `x` and `y` are assigned the elements of this return vector. In the second example, the `v` is supposed to be a assigned
-a vector. If the result of the function call is not a vector, it is converted to a vector before being assigned to `v`.
+a vector. If the result of the function call is not a vector, it is converted to a vector before being assigned to `v`. The third
+example matches the 2x2 matrix result evaluated on the right, with the matrix notation on the left. The fourth example matches an
+object created ex-nihilo (such as a JSON object), with an object definition, including checks of data types (and possible conversions),
+tests of valid values, as well as checks for required and optional fields.
 
 #### Special Assignment Operators
 

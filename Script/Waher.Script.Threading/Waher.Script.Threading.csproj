@@ -19,6 +19,8 @@ Script Syntax: https://waher.se/Script.md#threadingRelatedFunctionsWaherScriptTh
     <PackageTags>script execution parsing threading parallel semaphore</PackageTags>
     <AssemblyVersion>2.0.0</AssemblyVersion>
     <FileVersion>2.0.0</FileVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

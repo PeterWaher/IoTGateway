@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 
@@ -35,6 +36,7 @@ namespace Waher.Networking.XMPP.PubSub
 		private int? maxItems = null;
 		private int? maxPayloadSize = null;
 		private int? itemExpireSeconds = null;
+		private DateTime? nodeExpires = null;
 		private bool? deliverNotifications = null;
 		private bool? deliverPayloads = null;
 		private bool? notifyConfig = null;
@@ -124,6 +126,11 @@ namespace Waher.Networking.XMPP.PubSub
 					case "pubsub#item_expire":
 						if (int.TryParse(F.ValueString, out i) && i > 0)
 							this.itemExpireSeconds = i;
+						break;
+
+					case "pubsub#node_expire":
+						if (XML.TryParse(F.ValueString, out DateTime TP))
+							this.nodeExpires = TP;
 						break;
 
 					case "pubsub#max_payload_size":
@@ -499,6 +506,15 @@ namespace Waher.Networking.XMPP.PubSub
 		}
 
 		/// <summary>
+		/// Date when node, and all of its items, expire.
+		/// </summary>
+		public DateTime? NodeExpires
+		{
+			get { return this.nodeExpires; }
+			set { this.nodeExpires = value; }
+		}
+
+		/// <summary>
 		/// Notification type
 		/// </summary>
 		public NotificationType? NotificationType
@@ -569,6 +585,9 @@ namespace Waher.Networking.XMPP.PubSub
 
 			if (this.itemExpireSeconds.HasValue)
 				Fields.Add(new TextSingleField("pubsub#item_expire", this.itemExpireSeconds.Value.ToString()));
+
+			if (this.nodeExpires.HasValue)
+				Fields.Add(new TextSingleField("pubsub#node_expire", XML.Encode(this.nodeExpires.Value, true)));
 
 			if (this.maxPayloadSize.HasValue)
 				Fields.Add(new TextSingleField("pubsub#max_payload_size", this.maxPayloadSize.Value.ToString()));

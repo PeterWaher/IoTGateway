@@ -44,6 +44,19 @@
             <param name="DefaultImplementation">Default implementation to use for interface.</param>
             <returns>If a default implementation was found.</returns>
         </member>
+        <member name="T:Waher.Runtime.Inventory.DependencyOrder">
+            <summary>
+            Orders modules in dependency order.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.DependencyOrder.Compare(Waher.Runtime.Inventory.IModule,Waher.Runtime.Inventory.IModule)">
+            <summary>
+            Compares two modules.
+            </summary>
+            <param name="x">Module 1</param>
+            <param name="y">Module 2</param>
+            <returns>Signed comparison result.</returns>
+        </member>
         <member name="T:Waher.Runtime.Inventory.Grade">
             <summary>
             Grade enumeration
@@ -101,6 +114,53 @@
             </summary>
             <param name="Object">Object</param>
             <returns>How well objects of this type are supported.</returns>
+        </member>
+        <member name="T:Waher.Runtime.Inventory.ModuleDependencyAttribute">
+            <summary>
+            Defines a module dependency for a module class. Modules are started after a dependency, and is stopped before a dependency.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.ModuleDependencyAttribute.#ctor(System.String)">
+            <summary>
+            Defines a module dependency for a module class. Modules are started after a dependency, and is stopped before a dependency.
+            </summary>
+            <param name="ModuleTypeName">Type name of module dependency.</param>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.ModuleDependencyAttribute.#ctor(System.Type)">
+            <summary>
+            Defines a module dependency for a module class. Modules are started after a dependency, and is stopped before a dependency.
+            </summary>
+            <param name="ModuleType">Type of module dependency.</param>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.ModuleDependencyAttribute.#ctor(Waher.Runtime.Inventory.IModule)">
+            <summary>
+            Defines a module dependency for a module class. Modules are started after a dependency, and is stopped before a dependency.
+            </summary>
+            <param name="Module">Module dependency.</param>
+        </member>
+        <member name="P:Waher.Runtime.Inventory.ModuleDependencyAttribute.ModeTypeName">
+            <summary>
+            Module Type Name
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Inventory.ModuleDependencyAttribute.ModuleType">
+            <summary>
+            Module Type
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.ModuleDependencyAttribute.DependsOn(Waher.Runtime.Inventory.IModule)">
+            <summary>
+            Checks if there is a dependency on a given module.
+            </summary>
+            <param name="Module">Module</param>
+            <returns>If a dependency exists.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.ModuleDependencyAttribute.DependsOn(System.Type)">
+            <summary>
+            Checks if there is a dependency on a given module.
+            </summary>
+            <param name="ModuleType">Module Type</param>
+            <returns>If a dependency exists.</returns>
         </member>
         <member name="T:Waher.Runtime.Inventory.SingletonAttribute">
             <summary>

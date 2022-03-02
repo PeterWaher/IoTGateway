@@ -1051,6 +1051,8 @@ namespace Waher.IoTGateway
 
 		private class ModuleStartOrder : IComparer<IModule>
 		{
+			private readonly DependencyOrder dependencyOrder = new DependencyOrder();
+
 			public int Compare(IModule x, IModule y)
 			{
 				int c1 = this.ModuleCategory(x);
@@ -1060,7 +1062,7 @@ namespace Waher.IoTGateway
 				if (i != 0)
 					return i;
 
-				return string.Compare(x.GetType().FullName, y.GetType().FullName);
+				return this.dependencyOrder.Compare(x, y);
 			}
 
 			private int ModuleCategory(IModule x)
@@ -1637,6 +1639,7 @@ namespace Waher.IoTGateway
 					case "libglesv2.dll":
 					case "libskiasharp.dll":
 					case "libzstd.dll":
+					case "mongocrypt.dll":
 					case "mscordaccore.dll":
 					case "mscordbi.dll":
 					case "mscorlib.dll":
@@ -1645,11 +1648,13 @@ namespace Waher.IoTGateway
 					case "netstandard.dll":
 					case "snappy32.dll":
 					case "snappy64.dll":
+					case "sni.dll":
 					case "sos.dll":
 					case "sos.netcore.dll":
 					case "ucrtbase.dll":
 					case "windowsbase.dll":
 					case "waher.persistence.fileslw.dll":
+					case "waher.persistence.serialization.dll":
 						return false;
 				}
 

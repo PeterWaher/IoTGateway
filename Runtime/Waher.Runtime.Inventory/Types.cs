@@ -422,8 +422,10 @@ namespace Waher.Runtime.Inventory
 				}
 			}
 
-			if (!(Order is null))
-				Modules.Sort(Order);
+			if (Order is null)
+				Order = new DependencyOrder();
+
+			Modules.Sort(Order);
 
 			return Modules.ToArray();
 		}
@@ -518,18 +520,12 @@ namespace Waher.Runtime.Inventory
 		/// <summary>
 		/// Contains an empty array of types.
 		/// </summary>
-		public static Type[] NoTypes
-		{
-			get { return noTypes; }
-		}
+		public static Type[] NoTypes => noTypes;
 
 		/// <summary>
 		/// Contains an empty array of parameter values.
 		/// </summary>
-		public static object[] NoParameters
-		{
-			get { return noParameters; }
-		}
+		public static object[] NoParameters => noParameters;
 
 		/// <summary>
 		/// Sets a module parameter. This parameter value will be accessible to modules when they are loaded.
@@ -565,10 +561,7 @@ namespace Waher.Runtime.Inventory
 		/// <summary>
 		/// If the inventory has been initialized.
 		/// </summary>
-		public static bool IsInitialized
-		{
-			get { return isInitialized; }
-		}
+		public static bool IsInitialized => isInitialized;
 
 		/// <summary>
 		/// Initializes the inventory engine, registering types and interfaces available in <paramref name="Assemblies"/>.

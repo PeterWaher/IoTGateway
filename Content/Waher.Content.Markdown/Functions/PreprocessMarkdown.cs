@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
@@ -60,9 +60,9 @@ namespace Waher.Content.Markdown.Functions
 				ParseMetaData = false
 			};
 
-			string Markdown = await MarkdownDocument.Preprocess(Argument, Settings);
+			KeyValuePair<string, bool> P = await MarkdownDocument.Preprocess(Argument, Settings, string.Empty, false);
 
-			return new StringValue(Markdown);
+			return new StringValue(P.Key);
         }
 
     }

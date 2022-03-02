@@ -77,7 +77,7 @@ namespace Waher.Content.Markdown.Functions
 				Settings.VideoControls = ParentSettings.VideoControls;
 			}
 
-			KeyValuePair<string, bool> P = await MarkdownDocument.Preprocess(Markdown, Settings, Argument);
+			KeyValuePair<string, bool> P = await MarkdownDocument.Preprocess(Markdown, Settings, Argument, true);
 			Markdown = P.Key;
 
 			Match M = MarkdownDocument.endOfHeader.Match(Markdown);

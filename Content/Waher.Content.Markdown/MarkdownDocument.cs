@@ -243,7 +243,7 @@ namespace Waher.Content.Markdown
 		/// <returns>Preprocessed markdown.</returns>
 		public static async Task<string> Preprocess(string Markdown, MarkdownSettings Settings, params Type[] TransparentExceptionTypes)
 		{
-			KeyValuePair<string, bool> P = await Preprocess(Markdown, Settings, string.Empty, TransparentExceptionTypes);
+			KeyValuePair<string, bool> P = await Preprocess(Markdown, Settings, string.Empty, false, TransparentExceptionTypes);
 			return P.Key;
 		}
 
@@ -256,7 +256,23 @@ namespace Waher.Content.Markdown
 		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
 		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
 		/// <returns>Preprocessed markdown, and if the markdown contains script, making the markdown dynamic.</returns>
-		public static async Task<KeyValuePair<string, bool>> Preprocess(string Markdown, MarkdownSettings Settings, string FileName, params Type[] TransparentExceptionTypes)
+		public static Task<KeyValuePair<string, bool>> Preprocess(string Markdown, MarkdownSettings Settings, string FileName, params Type[] TransparentExceptionTypes)
+		{
+			return Preprocess(Markdown, Settings, FileName, false, TransparentExceptionTypes);
+		}
+
+		/// <summary>
+		/// Preprocesses markdown text.
+		/// </summary>
+		/// <param name="Markdown">Markdown text</param>
+		/// <param name="Settings">Markdown settings.</param>
+		/// <param name="FileName">Filename of markdown.</param>
+		/// <param name="FromScript">If call is made from script. If true, method will assumed the variables collection is properly
+		/// locked from the caller of the original script.</param>
+		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
+		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
+		/// <returns>Preprocessed markdown, and if the markdown contains script, making the markdown dynamic.</returns>
+		public static async Task<KeyValuePair<string, bool>> Preprocess(string Markdown, MarkdownSettings Settings, string FileName, bool FromScript, params Type[] TransparentExceptionTypes)
 		{
 			if (Settings.Variables is null)
 				Settings.Variables = new Variables();
@@ -334,8 +350,10 @@ namespace Waher.Content.Markdown
 					{
 						TextWriter Bak = Variables.ConsoleOut;
 						StringBuilder sb = new StringBuilder();
-						
-						await Variables.LockAsync();
+
+						if (!FromScript)
+							await Variables.LockAsync();
+
 						Variables.ConsoleOut = new StringWriter(sb);
 						try
 						{
@@ -345,7 +363,9 @@ namespace Waher.Content.Markdown
 						{
 							Variables.ConsoleOut.Flush();
 							Variables.ConsoleOut = Bak;
-							Variables.Release();
+						
+						if (!FromScript)
+								Variables.Release();
 						}
 
 						Result = sb.ToString();

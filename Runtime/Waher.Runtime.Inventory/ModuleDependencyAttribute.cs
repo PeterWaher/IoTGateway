@@ -75,10 +75,12 @@ namespace Waher.Runtime.Inventory
 		/// <returns>If a dependency exists.</returns>
 		public bool DependsOn(Type ModuleType)
 		{
-			if (this.moduleType is null)
+			Type DependencyType = this.ModuleType;
+
+			if (DependencyType is null)
 				return this.moduleTypeName == ModuleType.FullName;
 			else
-				return this.moduleType == ModuleType;
+				return DependencyType == ModuleType;
 		}
 	}
 }

@@ -48,7 +48,7 @@ namespace Waher.Runtime.Inventory
 				}
 			}
 
-			int i = YDependsOnX.CompareTo(XDependsOnY);
+			int i = XDependsOnY.CompareTo(YDependsOnX);
 			if (i != 0)
 				return i;
 			else

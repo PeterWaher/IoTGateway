@@ -143,11 +143,6 @@
             Module Type Name
             </summary>
         </member>
-        <member name="P:Waher.Runtime.Inventory.ModuleDependencyAttribute.ModuleType">
-            <summary>
-            Module Type
-            </summary>
-        </member>
         <member name="M:Waher.Runtime.Inventory.ModuleDependencyAttribute.DependsOn(Waher.Runtime.Inventory.IModule)">
             <summary>
             Checks if there is a dependency on a given module.

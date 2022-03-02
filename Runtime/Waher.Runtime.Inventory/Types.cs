@@ -453,36 +453,31 @@ namespace Waher.Runtime.Inventory
 			if (modules is null || modules.Length == 0)
 			{
 				IModule[] Modules = GetLoadedModules(Order);
-				List<Task> Tasks = new List<Task>();
+				bool Ok = true;
 
 				foreach (IModule Module2 in Modules)
 				{
 					try
 					{
-						Tasks.Add(StartModule(Module2, 60000)); // 1 min timeout
+						if (!await StartModule(Module2, 60000))		// 1 min timeout
+							Ok = false;
 					}
 					catch (Exception ex)
 					{
 						Log.Critical(ex);
+						Ok = false;
 					}
 				}
 
 				modules = Modules;
 
-				if (Tasks.Count > 0)
-				{
-					Task TimeoutTask = Task.Delay(Timeout);
-					Task Result = await Task.WhenAny(Task.WhenAll(Tasks.ToArray()), TimeoutTask);
-					return Result != TimeoutTask;
-				}
-				else
-					return true;
+				return Ok;
 			}
 			else
 				return true;
 		}
 
-		private static async Task StartModule(IModule Module, int TimeoutMilliseconds)
+		private static async Task<bool> StartModule(IModule Module, int TimeoutMilliseconds)
 		{
 			Type T = Module.GetType();
 
@@ -495,13 +490,20 @@ namespace Waher.Runtime.Inventory
 				Task<int> First = await Task.WhenAny<int>(StartTask, TimeoutTask);
 
 				if (await First != 0)
+				{
 					Log.Warning("Starting module takes too long time. Startup continues in the background.", T.FullName);
+					return false;
+				}
 				else
+				{
 					Log.Informational("Module started.", T.FullName);
+					return true;
+				}
 			}
 			catch (Exception ex)
 			{
 				Log.Error("Unable to start module: " + ex.Message, T.FullName);
+				return false;
 			}
 		}
 

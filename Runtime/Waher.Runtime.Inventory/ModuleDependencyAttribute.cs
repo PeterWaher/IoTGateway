@@ -8,8 +8,7 @@ namespace Waher.Runtime.Inventory
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
 	public class ModuleDependencyAttribute : Attribute
 	{
-		private string moduleTypeName;
-		private Type moduleType;
+		private readonly string moduleTypeName;
 
 		/// <summary>
 		/// Defines a module dependency for a module class. Modules are started after a dependency, and is stopped before a dependency.
@@ -27,7 +26,6 @@ namespace Waher.Runtime.Inventory
 		public ModuleDependencyAttribute(Type ModuleType)
 			: this(ModuleType.FullName)
 		{
-			this.moduleType = ModuleType;
 		}
 
 		/// <summary>
@@ -43,20 +41,6 @@ namespace Waher.Runtime.Inventory
 		/// Module Type Name
 		/// </summary>
 		public string ModeTypeName => this.ModeTypeName;
-
-		/// <summary>
-		/// Module Type
-		/// </summary>
-		public Type ModuleType
-		{
-			get
-			{
-				if (this.moduleType is null)
-					this.moduleType = Type.GetType(this.moduleTypeName);
-
-				return this.moduleType;
-			}
-		}
 
 		/// <summary>
 		/// Checks if there is a dependency on a given module.
@@ -75,12 +59,7 @@ namespace Waher.Runtime.Inventory
 		/// <returns>If a dependency exists.</returns>
 		public bool DependsOn(Type ModuleType)
 		{
-			Type DependencyType = this.ModuleType;
-
-			if (DependencyType is null)
-				return this.moduleTypeName == ModuleType.FullName;
-			else
-				return DependencyType == ModuleType;
+			return this.moduleTypeName == ModuleType.FullName;
 		}
 	}
 }

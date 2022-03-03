@@ -998,7 +998,13 @@ namespace Waher.Client.WPF.Model
 
 		private Task Client_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
 		{
-			MainWindow.UpdateGui(this.PresenceSubscribe, e);
+			RosterItem Item = e.Client[e.FromBareJID];
+
+			if (!(Item is null) && (Item.State == SubscriptionState.Both || Item.State == SubscriptionState.From))
+				e.Accept();
+			else
+				MainWindow.UpdateGui(this.PresenceSubscribe, e);
+
 			return Task.CompletedTask;
 		}
 

@@ -77,13 +77,22 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Title">Optional title.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="Document">Markdown document.</param>
-		public static async Task GenerateHTML(StringBuilder Output, string Url, string Title, IEnumerable<MarkdownElement> ChildNodes, 
+		public static async Task GenerateHTML(StringBuilder Output, string Url, string Title, IEnumerable<MarkdownElement> ChildNodes,
 			MarkdownDocument Document)
 		{
 			bool IsRelative = Url.IndexOf(':') < 0;
 
-			Output.Append("<a href=\"");
-			Output.Append(XML.HtmlAttributeEncode(Document.CheckURL(Url, null)));
+			if (!IsRelative && Url.StartsWith("javascript:", StringComparison.OrdinalIgnoreCase))
+			{
+				Output.Append("<a href=\"#\" onclick=\"");
+				Output.Append(XML.HtmlAttributeEncode(System.Net.WebUtility.UrlDecode(Url.Substring(11))));
+				IsRelative = true;
+			}
+			else
+			{
+				Output.Append("<a href=\"");
+				Output.Append(XML.HtmlAttributeEncode(Document.CheckURL(Url, null)));
+			}
 
 			if (!string.IsNullOrEmpty(Title))
 			{
@@ -127,7 +136,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Title">Optional title.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="Document">Markdown document.</param>
-		public static async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string Url, string Title, 
+		public static async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string Url, string Title,
 			IEnumerable<MarkdownElement> ChildNodes, MarkdownDocument Document)
 		{
 			Output.WriteStartElement("Hyperlink");

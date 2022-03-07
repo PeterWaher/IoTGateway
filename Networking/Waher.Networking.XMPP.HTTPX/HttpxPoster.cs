@@ -147,7 +147,8 @@ namespace Waher.Networking.XMPP.HTTPX
 
 							if (e.HasData)
 							{
-								State.Data = new MemoryStream();
+								if (State.Data is null)
+									State.Data = new MemoryStream();
 
 								if (!(e.Data is null))
 								{
@@ -163,6 +164,9 @@ namespace Waher.Networking.XMPP.HTTPX
 
 					}, async (sender, e) =>
 					{
+						if (State.Data is null)
+							State.Data = new MemoryStream();
+
 						await State.Data.WriteAsync(e.Data, 0, e.Data.Length);
 						if (e.Last)
 							State.Done.TrySetResult(true);

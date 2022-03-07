@@ -256,5 +256,16 @@ namespace Waher.IoTGateway.Setup
 			return Result;
 		}
 
+		/// <summary>
+		/// Tries to get the theme definition, given its ID.
+		/// </summary>
+		/// <param name="ThemeId">Theme ID</param>
+		/// <param name="Definition">Definition if found.</param>
+		/// <returns>If a theme with the corresponding ID was found.</returns>
+		public static bool TryGetTheme(string ThemeId, out ThemeDefinition Definition)
+		{
+			return themeDefinitions.TryGetValue(ThemeId, out Definition);
+		}
+
 	}
 }

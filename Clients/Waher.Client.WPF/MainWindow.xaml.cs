@@ -173,7 +173,7 @@ namespace Waher.Client.WPF
 		}
 
 		internal static Scheduler Scheduler => scheduler;
-		
+
 		internal static readonly string registryKey = Registry.CurrentUser + @"\Software\Waher Data AB\Waher.Client.WPF";
 
 		private async void Window_Loaded(object sender, RoutedEventArgs e)
@@ -793,7 +793,7 @@ namespace Waher.Client.WPF
 
 							await ChatView.ChatMessageReceived(Message, FromBareJid, ThreadId, IsMarkdown, Timestamp, this);
 							return;
-						} 
+						}
 					}
 				}
 			}
@@ -825,7 +825,7 @@ namespace Waher.Client.WPF
 			return null;
 		}
 
-		public async Task MucGroupChatMessage(string FromFullJid, string ToBareJid, string Message, string ThreadId, bool IsMarkdown, 
+		public async Task MucGroupChatMessage(string FromFullJid, string ToBareJid, string Message, string ThreadId, bool IsMarkdown,
 			DateTime Timestamp, ChatItemType Type, RoomNode Node, string Title)
 		{
 			ChatView ChatView = this.FindRoomView(FromFullJid, ToBareJid);
@@ -875,7 +875,7 @@ namespace Waher.Client.WPF
 
 				if (ChatView.Node is OccupantNode Occupant)
 				{
-					if (Occupant.Jid != FromFullJid)
+					if (Occupant.RoomId + "@" + Occupant.Domain + "/" + Occupant.NickName != FromFullJid)
 						continue;
 				}
 				else
@@ -1054,7 +1054,7 @@ namespace Waher.Client.WPF
 				System.Windows.MessageBox.Show(this, e.ErrorText, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			else
 				System.Windows.MessageBox.Show(this, P.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-	
+
 			return Task.CompletedTask;
 		}
 

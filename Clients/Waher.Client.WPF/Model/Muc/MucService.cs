@@ -481,9 +481,10 @@ namespace Waher.Client.WPF.Model.Muc
 
 			RoomNode.EnterIfNotAlready(true);
 
+			MainWindow.ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
+
 			MainWindow.UpdateGui(async () =>
 			{
-				MainWindow.ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
 				await MainWindow.currentInstance.MucGroupChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, e.ThreadID,
 					IsMarkdown, Timestamp, Type, RoomNode, RoomNode.Header);
 			});
@@ -696,8 +697,11 @@ namespace Waher.Client.WPF.Model.Muc
 
 			MainWindow.ParseChatMessage(e, out string Message, out bool IsMarkdown, out DateTime Timestamp);
 
-			await MainWindow.currentInstance.MucPrivateChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, e.ThreadID, 
+			MainWindow.UpdateGui(async () =>
+			{
+				await MainWindow.currentInstance.MucPrivateChatMessage(e.From, XmppClient.GetBareJID(e.To), Message, e.ThreadID,
 				IsMarkdown, Timestamp, Occupant, e.From);
+			});
 		}
 
 		private async Task MucClient_RoomMessage(object Sender, RoomMessageEventArgs e)

@@ -1972,6 +1972,7 @@ namespace Waher.Persistence.Files
 		{
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(Object);
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(Object));
+			await File.CheckIndicesInitialized(Serializer);
 			await File.SaveNewObject(Object, Serializer, false, null);
 		}
 
@@ -2002,6 +2003,7 @@ namespace Waher.Persistence.Files
 		{
 			ObjectSerializer Serializer = await this.GetObjectSerializerEx(Object);
 			ObjectBTreeFile File = await this.GetFile(await Serializer.CollectionName(Object));
+			await File.CheckIndicesInitialized(Serializer);
 			await File.SaveNewObject(Object, Serializer, true, Callback);
 		}
 
@@ -2040,6 +2042,7 @@ namespace Waher.Persistence.Files
 			string CollectionName2;
 			Type T = null;
 			Type T2;
+			bool CheckIndices = false;
 
 			foreach (object Object in Objects)
 			{
@@ -2054,6 +2057,7 @@ namespace Waher.Persistence.Files
 
 					T = T2;
 					Serializer = await this.GetObjectSerializerEx(Object);
+					CheckIndices = true;
 				}
 
 				CollectionName2 = await Serializer.CollectionName(Object);
@@ -2067,6 +2071,13 @@ namespace Waher.Persistence.Files
 
 					CollectionName = CollectionName2;
 					File = await this.GetFile(CollectionName);
+					CheckIndices = true;
+				}
+
+				if (CheckIndices)
+				{
+					await File.CheckIndicesInitialized(Serializer);
+					CheckIndices = false;
 				}
 
 				List.AddLast(Object);
@@ -2110,7 +2121,7 @@ namespace Waher.Persistence.Files
 			if (File is null)
 				return new T[0];
 
-			await File.CheckIndicesInitialized<T>();
+			await File.CheckIndicesInitialized(Serializer);
 			await File.BeginRead();
 			try
 			{

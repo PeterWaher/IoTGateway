@@ -70,7 +70,6 @@ namespace Waher.Persistence.Files
 		private int ivSeedLen;
 		private readonly bool encrypted;
 		private readonly bool mainSynch;
-		private bool indicesCreated = false;
 
 		private enum WriteOp
 		{
@@ -4335,7 +4334,7 @@ namespace Waher.Persistence.Files
 					{
 						Array.Copy(BitConverter.GetBytes(NrObjects), 0, Block, 2, 4);
 						this.QueueSaveBlockLocked(BlockIndex, Block);
-						
+
 						Statistics.LogComment("Size of subtree rooted at block " + BlockIndex.ToString() + " updated. Incorrect count: " + Header.SizeSubtree.ToString() + ", Actual count: " + NrObjects.ToString());
 						// TODO: Find out why this happens.
 					}
@@ -5188,10 +5187,7 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Available indices.
 		/// </summary>
-		public IndexBTreeFile[] Indices
-		{
-			get { return this.indices; }
-		}
+		public IndexBTreeFile[] Indices => this.indices;
 
 		/// <summary>
 		/// Finds the best index for finding objects using  a given property.
@@ -5371,9 +5367,19 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public async Task CheckIndicesInitialized<T>()
 		{
-			if (!this.indicesCreated)
+			ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(typeof(T));
+			await this.CheckIndicesInitialized(Serializer);
+		}
+
+		/// <summary>
+		/// Checks that indices have been loaded and are active for searching.
+		/// </summary>
+		/// <param name="Serializer">Serializer with index information.</param>
+		/// <returns>If successful in checkin indices.</returns>
+		public async Task CheckIndicesInitialized(ObjectSerializer Serializer)
+		{
+			if (!(Serializer.Tag is bool b) || !b)
 			{
-				ObjectSerializer Serializer = await this.provider.GetObjectSerializerEx(typeof(T));
 				string CollectionName = await Serializer.CollectionName(null) ?? this.collectionName;
 				ObjectBTreeFile File = await this.provider.GetFile(CollectionName);
 				if (File == this)
@@ -5381,7 +5387,7 @@ namespace Waher.Persistence.Files
 					foreach (string[] Index in Serializer.Indices)
 						await this.provider.GetIndexFile(File, RegenerationOptions.RegenerateIfIndexNotInstantiated, Index);
 
-					this.indicesCreated = true;
+					Serializer.Tag = true;
 				}
 			}
 		}
@@ -5401,9 +5407,6 @@ namespace Waher.Persistence.Files
 			ICursor<T> Result;
 
 			this.nrSearches++;
-
-			if (!this.indicesCreated)
-				throw new InvalidOperationException("Indices not initialized.");
 
 			if (Filter is null)
 			{

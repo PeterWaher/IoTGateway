@@ -2380,6 +2380,13 @@
             Checks that indices have been loaded and are active for searching.
             </summary>
         </member>
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.CheckIndicesInitialized(Waher.Persistence.Serialization.ObjectSerializer)">
+            <summary>
+            Checks that indices have been loaded and are active for searching.
+            </summary>
+            <param name="Serializer">Serializer with index information.</param>
+            <returns>If successful in checkin indices.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.ObjectBTreeFile.FindLocked``1(System.Int32,System.Int32,Waher.Persistence.Filters.Filter,System.String[])">
             <summary>
             Finds objects of a given class <typeparamref name="T"/>.

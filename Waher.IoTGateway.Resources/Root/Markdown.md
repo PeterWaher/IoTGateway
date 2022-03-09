@@ -1891,7 +1891,7 @@ result loaded to the client. You can use the `preview` function to display a par
     foreach x in 1..60 do
     (
         System.Threading.Thread.Sleep(1000);
-        CPU:=join(CPU,PerformanceCounterValue("Processor","_Total","% Processor Time"));
+        CPU:=join(CPU,(PerformanceCounterValue("Processor","_Total","% Processor Time") ??? Uniform(0,100)));
         TP:=join(TP,Now.Subtract(Start).TotalSeconds);
         preview(PlotCPU(TP,CPU))
     );
@@ -1928,7 +1928,7 @@ Start:=Now;
 foreach x in 1..60 do
 (
     System.Threading.Thread.Sleep(1000);
-    CPU:=join(CPU,PerformanceCounterValue("Processor","_Total","% Processor Time"));
+    CPU:=join(CPU,(PerformanceCounterValue("Processor","_Total","% Processor Time") ??? Uniform(0,100)));
     TP:=join(TP,Now.Subtract(Start).TotalSeconds);
     preview(PlotCPU(TP,CPU))
 );
@@ -1938,7 +1938,7 @@ foreach x in 1..60 do
 `Waher.Content.Markdown.Model.XmlVisualizer`), the XML is first transformed before being visualized. For example, script may compute
 a 2D Layout XML document, that is then used to generate a visual image, as shown in the following example:
 
-    ```async:Online Status
+    ```async:Some statistics
     <Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
               background="ThemeBackground" pen="BlackPen"
               font="Text" textColor="Black">
@@ -1964,7 +1964,7 @@ a 2D Layout XML document, that is then used to generate a visual image, as shown
 
 Is shown as
 
-```async:Online Status
+```async:Some statistics
 <Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
           background="ThemeBackground" pen="BlackPen"
           font="Text" textColor="Black">

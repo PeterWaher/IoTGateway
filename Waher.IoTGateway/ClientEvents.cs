@@ -511,7 +511,7 @@ namespace Waher.IoTGateway
 
 		private static Cache<string, ContentQueue> GetContentCache()
 		{
-			Cache<string, ContentQueue> Result = new Cache<string, ContentQueue>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(60), true);
+			Cache<string, ContentQueue> Result = new Cache<string, ContentQueue>(int.MaxValue, TimeSpan.MaxValue, TimeSpan.FromSeconds(90), true);
 			Result.Removed += ContentCacheItem_Removed;
 			return Result;
 		}

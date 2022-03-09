@@ -183,6 +183,7 @@ namespace Waher.Persistence.Serialization
 		private PropertyInfo archiveProperty = null;
 		private FieldInfo archiveField = null;
 		private MethodInfo obsoleteMethod = null;
+		private object tag = null;
 		private int archiveDays = 0;
 		private bool archive = false;
 		private bool archiveDynamic = false;
@@ -2513,36 +2514,30 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Gets the type of the value.
 		/// </summary>
-		public Type ValueType
-		{
-			get
-			{
-				return this.type;
-			}
-		}
+		public Type ValueType => this.type;
 
 		/// <summary>
 		/// Array of indices defined for the underlying type.
 		/// </summary>
-		public string[][] Indices
-		{
-			get { return this.indices; }
-		}
+		public string[][] Indices => this.indices;
 
 		/// <summary>
 		/// If the type is nullable.
 		/// </summary>
-		public bool IsNullable
-		{
-			get { return this.isNullable; }
-		}
+		public bool IsNullable => this.isNullable;
 
 		/// <summary>
 		/// If objects serialized by the serializer include subobjects by reference.
 		/// </summary>
-		public bool HasByReference
+		public bool HasByReference => this.hasByRef;
+
+		/// <summary>
+		/// Property that can be used by the creator to associate the serializer with data.
+		/// </summary>
+		public object Tag
 		{
-			get { return this.hasByRef; }
+			get => this.tag;
+			set => this.tag = value;
 		}
 
 		/// <summary>

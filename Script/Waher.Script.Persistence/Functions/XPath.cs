@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -74,6 +75,16 @@ namespace Waher.Script.Persistence.Functions
 				return base.Evaluate(Variables);
 			else
 				return this.EvaluateScalar(this.xpath, Variables);
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			return Task.FromResult<IElement>(this.Evaluate(Variables));
 		}
 
 		/// <summary>

@@ -466,6 +466,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.Functions.XPath.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Persistence.Functions.XPath.EvaluateScalar(System.String,Waher.Script.Variables)">
             <summary>
             Evaluates the function on a scalar argument.
@@ -1733,6 +1740,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinition.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="T:Waher.Script.Persistence.SQL.SourceDefinitions.CrossJoin">
             <summary>
             CROSS JOIN of two source definitions.
@@ -2782,6 +2796,13 @@
             <param name="Expression">Expression containing script.</param>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Wildcard.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Persistence.SQL.Wildcard.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -65,14 +66,14 @@ namespace Waher.Script.Functions.Runtime
 				return ObjectValue.Null;
 		}
 
-		/// <summary>
-		/// Calls the callback method for all child nodes.
-		/// </summary>
-		/// <param name="Callback">Callback method to call.</param>
-		/// <param name="State">State object to pass on to the callback method.</param>
-		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
-		/// <returns>If the process was completed.</returns>
-		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
+        /// <summary>
+        /// Calls the callback method for all child nodes.
+        /// </summary>
+        /// <param name="Callback">Callback method to call.</param>
+        /// <param name="State">State object to pass on to the callback method.</param>
+        /// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+        /// <returns>If the process was completed.</returns>
+        public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
 		{
 			return true;
 		}

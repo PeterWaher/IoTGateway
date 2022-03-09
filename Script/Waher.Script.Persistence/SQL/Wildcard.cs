@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -33,6 +34,16 @@ namespace Waher.Script.Persistence.SQL
 				return Expression.Encapsulate(GroupObject.Objects);
 			else
 				throw new ScriptRuntimeException("Invalid context.", this);
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			return Task.FromResult<IElement>(this.Evaluate(Variables));
 		}
 
 		/// <inheritdoc/>

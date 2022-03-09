@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -40,6 +41,20 @@ namespace Waher.Script.Functions.Runtime
         public override IElement Evaluate(Variables Variables)
         {
             IElement E = this.Argument.Evaluate(Variables);
+            if (E is ObjectValue O && O.Value is null)
+                throw new ScriptRuntimeException("Not defined.", this);
+
+            return E;
+        }
+
+        /// <summary>
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+        /// </summary>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public override async Task<IElement> EvaluateAsync(Variables Variables)
+        {
+            IElement E = await this.Argument.EvaluateAsync(Variables);
             if (E is ObjectValue O && O.Value is null)
                 throw new ScriptRuntimeException("Not defined.", this);
 

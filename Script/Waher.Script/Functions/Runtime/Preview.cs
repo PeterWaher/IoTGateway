@@ -1,4 +1,5 @@
-﻿using Waher.Script.Abstraction.Elements;
+﻿using System.Threading.Tasks;
+using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
@@ -42,6 +43,18 @@ namespace Waher.Script.Functions.Runtime
         }
 
         /// <summary>
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+        /// </summary>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public override async Task<IElement> EvaluateAsync(Variables Variables)
+        {
+            IElement E = await this.Argument.EvaluateAsync(Variables);
+            this.Expression.Preview(E);
+            return E;
+        }
+
+        /// <summary>
         /// Evaluates the function.
         /// </summary>
         /// <param name="Argument">Function argument.</param>
@@ -49,7 +62,7 @@ namespace Waher.Script.Functions.Runtime
         /// <returns>Function result.</returns>
         public override IElement Evaluate(IElement Argument, Variables Variables)
         {
-            return ObjectValue.Null;
+            return Argument;
         }
     }
 }

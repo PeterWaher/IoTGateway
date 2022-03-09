@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -36,14 +37,36 @@ namespace Waher.Script.Functions.Runtime
 		}
 
 		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// Evaluates the function.
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
+		/// <returns>Function result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
 			IElement E = this.Argument.Evaluate(Variables);
-			object Obj = E.AssociatedObjectValue;
+			return this.Evaluate(E, Variables);
+		}
+
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			IElement E = await this.Argument.EvaluateAsync(Variables);
+			return this.Evaluate(E, Variables);
+		}
+
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement Evaluate(IElement Argument, Variables Variables)
+		{
+			object Obj = Argument.AssociatedObjectValue;
 			List<IElement> Elements = new List<IElement>();
 
 			if (Obj is Type T)
@@ -93,17 +116,6 @@ namespace Waher.Script.Functions.Runtime
 			sb.Append(')');
 
 			return sb.ToString();
-		}
-
-		/// <summary>
-		/// Evaluates the function.
-		/// </summary>
-		/// <param name="Argument">Function argument.</param>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Function result.</returns>
-		public override IElement Evaluate(IElement Argument, Variables Variables)
-		{
-			return ObjectValue.Null;
 		}
 	}
 }

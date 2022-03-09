@@ -54,7 +54,7 @@ namespace Waher.Script.Functions.Runtime
 		/// <returns>Result.</returns>
 		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
-			IElement E = this.Argument.Evaluate(Variables);
+			IElement E = await this.Argument.EvaluateAsync(Variables);
 			object Obj = E.AssociatedObjectValue;
 			IPropertyEnumerator Enumerator = GetEnumerator(Obj.GetType());
 

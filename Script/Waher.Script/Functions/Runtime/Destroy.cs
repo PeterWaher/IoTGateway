@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -73,12 +74,43 @@ namespace Waher.Script.Functions.Runtime
         }
 
         /// <summary>
-        /// Evaluates the function.
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
         /// </summary>
-        /// <param name="Argument">Function argument.</param>
         /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public override IElement Evaluate(IElement Argument, Variables Variables)
+        /// <returns>Result.</returns>
+		public override async Task<IElement> EvaluateAsync(Variables Variables)
+		{
+            IElement Element;
+
+            if (!string.IsNullOrEmpty(this.variableName))
+            {
+                if (Variables.TryGetVariable(this.variableName, out Variable v))
+                {
+                    Variables.Remove(this.variableName);
+                    Element = v.ValueElement;
+                }
+                else
+                    Element = null;
+            }
+            else
+                Element = await this.Argument.EvaluateAsync(Variables);
+
+            if (!(Element is null))
+            {
+                if (Element.AssociatedObjectValue is IDisposable D)
+                    D.Dispose();
+            }
+
+            return ObjectValue.Null;
+        }
+
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement Evaluate(IElement Argument, Variables Variables)
         {
             return ObjectValue.Null;
         }

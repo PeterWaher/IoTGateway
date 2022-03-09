@@ -5491,6 +5491,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.Runtime.Destroy.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Functions.Runtime.Destroy.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function.
@@ -5692,10 +5699,17 @@
         </member>
         <member name="M:Waher.Script.Functions.Runtime.Methods.Evaluate(Waher.Script.Variables)">
             <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            Evaluates the function.
             </summary>
             <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Runtime.Methods.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
         </member>
         <member name="M:Waher.Script.Functions.Runtime.Methods.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
@@ -5725,6 +5739,13 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Functions.Runtime.Optional.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Runtime.Optional.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -5773,6 +5794,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.Runtime.Preview.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
         <member name="M:Waher.Script.Functions.Runtime.Preview.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
             <summary>
             Evaluates the function.
@@ -5801,6 +5829,13 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Functions.Runtime.Print.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Runtime.Print.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -5840,6 +5875,13 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Functions.Runtime.PrintLine.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Runtime.PrintLine.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -6032,6 +6074,13 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Functions.Runtime.Required.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Runtime.Required.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>
@@ -16801,6 +16850,13 @@
             </summary>
         </member>
         <member name="M:Waher.Script.Operators.Calculus.DefaultDifferentiation.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Calculus.DefaultDifferentiation.EvaluateAsync(Waher.Script.Variables)">
             <summary>
             Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
             </summary>

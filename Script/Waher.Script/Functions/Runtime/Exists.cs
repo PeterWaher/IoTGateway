@@ -11,6 +11,8 @@ namespace Waher.Script.Functions.Runtime
     /// </summary>
     public class Exists : FunctionOneVariable
     {
+        private readonly VariableReference varRef;
+
         /// <summary>
         /// Checks if an expression exists, or has a valid value.
         /// </summary>
@@ -21,6 +23,7 @@ namespace Waher.Script.Functions.Runtime
         public Exists(ScriptNode Argument, int Start, int Length, Expression Expression)
             : base(Argument, Start, Length, Expression)
         {
+            this.varRef = Argument as VariableReference;
         }
 
         /// <summary>
@@ -35,6 +38,14 @@ namespace Waher.Script.Functions.Runtime
         /// <returns>Result.</returns>
         public override IElement Evaluate(Variables Variables)
         {
+            if (!(this.varRef is null))
+            {
+                if (!Variables.TryGetVariable(this.varRef.VariableName, out Variable v))
+                    return BooleanValue.False;
+
+                return v.ValueObject is null ? BooleanValue.False : BooleanValue.True;
+            }
+
             try
             {
                 IElement E = this.Argument.Evaluate(Variables);
@@ -72,6 +83,14 @@ namespace Waher.Script.Functions.Runtime
         /// <returns>Result.</returns>
         public override async Task<IElement> EvaluateAsync(Variables Variables)
         {
+            if (!(this.varRef is null))
+            {
+                if (!Variables.TryGetVariable(this.varRef.VariableName, out Variable v))
+                    return BooleanValue.False;
+
+                return v.ValueObject is null ? BooleanValue.False : BooleanValue.True;
+            }
+
             try
             {
                 IElement E = await this.Argument.EvaluateAsync(Variables);

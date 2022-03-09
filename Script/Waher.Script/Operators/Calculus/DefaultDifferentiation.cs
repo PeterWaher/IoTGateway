@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -52,8 +53,18 @@ namespace Waher.Script.Operators.Calculus
 				Result = this.DifferentiateOnce(Node, Variables);
 				Node = Result as ScriptNode;
 			}
-
+			
 			return Result;
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			return Task.FromResult<IElement>(this.Evaluate(Variables));
 		}
 
 		/// <summary>

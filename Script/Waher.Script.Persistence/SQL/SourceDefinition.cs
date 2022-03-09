@@ -39,5 +39,14 @@ namespace Waher.Script.Persistence.SQL
 			return ObjectValue.Null;    // Node not evaluated directly.
 		}
 
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override Task<IElement> EvaluateAsync(Variables Variables)
+		{
+			return Task.FromResult<IElement>(ObjectValue.Null);    // Node not evaluated directly.
+		}
 	}
 }

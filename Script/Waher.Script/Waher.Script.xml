@@ -6868,6 +6868,74 @@
             <param name="AlreadyFound">Variables already identified.</param>
             <returns>Pattern match result</returns>
         </member>
+        <member name="T:Waher.Script.Functions.Strings.After">
+            <summary>
+            After(s,Delimiter)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.After.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            After(s,Delimiter)
+            </summary>
+            <param name="String">String.</param>
+            <param name="Delimiter">Delimiter</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Strings.After.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.Strings.After.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.After.EvaluateScalar(System.String,System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument1">String.</param>
+            <param name="Argument2">Delimiter</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Functions.Strings.Before">
+            <summary>
+            Before(s,Delimiter)
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.Before.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Before(s,Delimiter)
+            </summary>
+            <param name="String">String.</param>
+            <param name="Delimiter">Delimiter</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Strings.Before.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.Strings.Before.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.Before.EvaluateScalar(System.String,System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument1">String.</param>
+            <param name="Argument2">Delimiter</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Functions.Strings.Evaluate">
             <summary>
             Evaluate(s)

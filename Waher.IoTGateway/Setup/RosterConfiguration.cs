@@ -111,6 +111,9 @@ namespace Waher.IoTGateway.Setup
 
 		private async Task XmppClient_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
 		{
+			if (e.FromBareJID.ToLower() == Gateway.XmppClient.BareJID.ToLower())
+				return;
+
 			StringBuilder Markdown = new StringBuilder();
 
 			Markdown.Append("Presence subscription request received from **");

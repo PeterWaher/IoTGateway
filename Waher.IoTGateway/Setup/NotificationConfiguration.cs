@@ -158,6 +158,9 @@ namespace Waher.IoTGateway.Setup
 					if (string.IsNullOrEmpty(s))
 						continue;
 
+					if (s.ToLower() == Gateway.XmppClient.BareJID.ToLower())
+						continue;
+
 					MailAddress Addr = new MailAddress(s);
 					Addresses.Add(Addr.Address);
 				}

@@ -97,12 +97,13 @@ namespace Waher.Client.WPF.Controls
 				{
 					IElement Ans;
 
-					Exp.OnPreview += (sender2, e2) =>
+					void Preview(object sender2, PreviewEventArgs e2)
 					{
 						this.Dispatcher.Invoke(async () =>
 							ResultBlock = await this.ShowResult(ResultBlock, e2.Preview, ScriptBlock));
 					};
 
+					this.variables.OnPreview += Preview;
 					try
 					{
 						Ans = await Exp.Root.EvaluateAsync(this.variables);
@@ -114,6 +115,10 @@ namespace Waher.Client.WPF.Controls
 					catch (Exception ex)
 					{
 						Ans = new ObjectValue(ex);
+					}
+					finally
+					{
+						this.variables.OnPreview -= Preview;
 					}
 
 					this.variables["Ans"] = Ans;

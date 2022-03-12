@@ -1,22 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Networking.MQTT;
 using Waher.Persistence.Attributes;
-using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
-using Waher.Runtime.Timing;
-using Waher.Things;
 using Waher.Things.Attributes;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Ip;
-using Waher.Things.Metering;
 using Waher.Things.Mqtt.Model;
-using System.Threading;
 
 namespace Waher.Things.Mqtt
 {
@@ -28,23 +21,13 @@ namespace Waher.Things.Mqtt
 		private string willTopic = string.Empty;
 		private string willData = string.Empty;
 		private string brokerKey = null;
-		private bool tls = true;
 		private bool willRetain = false;
 
 		public MqttBrokerNode()
 			: base()
 		{
 			this.Port = 8883;
-		}
-
-		[Page(7, "IP")]
-		[Header(8, "Encrypted (TLS)", 50)]
-		[ToolTip(9, "Check if Transpotrt Layer Encryption (TLS) should be used.")]
-		[DefaultValue(true)]
-		public bool Tls
-		{
-			get { return this.tls; }
-			set { this.tls = value; }
+			this.Tls = true;
 		}
 
 		[Page(2, "MQTT")]
@@ -135,7 +118,7 @@ namespace Waher.Things.Mqtt
 			get
 			{
 				string PrevKey = this.brokerKey;
-				this.brokerKey = MqttBrokers.GetKey(this.Host, this.Port, this.tls, this.userName, this.password);
+				this.brokerKey = MqttBrokers.GetKey(this.Host, this.Port, this.Tls, this.userName, this.password);
 
 				if (PrevKey != this.brokerKey && !string.IsNullOrEmpty(PrevKey))
 					MqttBrokers.DestroyBroker(PrevKey);
@@ -153,7 +136,7 @@ namespace Waher.Things.Mqtt
 
 		internal MqttBroker GetBroker()
 		{
-			return MqttBrokers.GetBroker(this, this.Key, this.Host, this.Port, this.tls, this.userName, this.password,
+			return MqttBrokers.GetBroker(this, this.Key, this.Host, this.Port, this.Tls, this.userName, this.password,
 				this.willTopic, this.willData, this.willRetain, this.willQoS);
 		}
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking;
@@ -12,9 +11,10 @@ using Waher.Things.DisplayableParameters;
 
 namespace Waher.Things.Ip
 {
-	public abstract class IpHostPort : IpHost
+	public class IpHostPort : IpHost
 	{
 		private int port = 0;
+		private bool tls = false;
 
 		/// <summary>
 		/// Port number.
@@ -31,6 +31,18 @@ namespace Waher.Things.Ip
 		}
 
 		/// <summary>
+		/// Port number.
+		/// </summary>
+		[Page(1, "IP")]
+		[Header(11, "Encrypted (TLS)", 70)]
+		[ToolTip(12, "Check if Transpotrt Layer Encryption (TLS) should be used.")]
+		public bool Tls
+		{
+			get { return this.tls; }
+			set { this.tls = value; }
+		}
+
+		/// <summary>
 		/// Connect to the remote host and port using a binary protocol over TCP.
 		/// </summary>
 		/// <param name="Sniffers">Sniffers</param>
@@ -39,6 +51,10 @@ namespace Waher.Things.Ip
 		{
 			BinaryTcpClient Client = new BinaryTcpClient(Sniffers);
 			await Client.ConnectAsync(this.Host, this.port);
+
+			if (this.tls)
+				await Client.UpgradeToTlsAsClient(System.Security.Authentication.SslProtocols.Tls12);
+
 			return Client;
 		}
 
@@ -52,6 +68,10 @@ namespace Waher.Things.Ip
 		{
 			TextTcpClient Client = new TextTcpClient(Encoding, Sniffers);
 			await Client.ConnectAsync(this.Host, this.port);
+
+			if (this.tls)
+				await Client.UpgradeToTlsAsClient(System.Security.Authentication.SslProtocols.Tls12);
+			
 			return Client;
 		}
 

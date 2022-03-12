@@ -51,7 +51,7 @@ namespace Waher.Script.Fractals.ColorModels
             else
             {
                 N = 1024;
-                Variables.ConsoleOut.WriteLine("N = " + N.ToString(), Variables);
+                Variables.ConsoleOut?.WriteLine("N = " + N.ToString(), Variables);
             }
 
             if (i < c)
@@ -59,7 +59,7 @@ namespace Waher.Script.Fractals.ColorModels
             else
             {
                 BandSize = 16;
-                Variables.ConsoleOut.WriteLine("BandSize = " + BandSize.ToString(), Variables);
+                Variables.ConsoleOut?.WriteLine("BandSize = " + BandSize.ToString(), Variables);
             }
 
             if (i < c)
@@ -71,7 +71,7 @@ namespace Waher.Script.Fractals.ColorModels
                     Seed = gen.Next();
                 }
 
-                Variables.ConsoleOut.WriteLine("Seed = " + Seed.ToString(), Variables);
+                Variables.ConsoleOut?.WriteLine("Seed = " + Seed.ToString(), Variables);
             }
 
             return new ObjectVector(CreatePalette(N, BandSize, Seed, this));

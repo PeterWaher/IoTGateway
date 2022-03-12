@@ -5,6 +5,8 @@ using System.Threading;
 using Waher.Script.Exceptions;
 using System.Collections;
 using System.Threading.Tasks;
+using Waher.Script.Abstraction.Elements;
+using Waher.Events;
 
 namespace Waher.Script
 {
@@ -398,5 +400,88 @@ namespace Waher.Script
 		{
 			this.active = true;
 		}
+
+		/// <summary>
+		/// Event raised when there is a new value to preview.
+		/// </summary>
+		public event PreviewEventHandler OnPreview;
+
+		/// <summary>
+		/// If previews are desired.
+		/// </summary>
+		public bool HandlesPreview
+		{
+			get
+			{
+				if (!(this.OnPreview is null))
+					return true;
+
+				if (this.contextVariables is Variables v)
+					return v.HandlesPreview;
+				else
+					return false;
+			}
+		}
+
+		/// <summary>
+		/// Reports a preview of the final result.
+		/// </summary>
+		/// <param name="Expression">Expression being executed.</param>
+		/// <param name="Result">Preview</param>
+		public void Preview(Expression Expression, IElement Result)
+		{
+			PreviewEventHandler h = this.OnPreview;
+
+			if (!(h is null))
+			{
+				try
+				{
+					h(this, new PreviewEventArgs(Expression, this, Result));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			if (this.contextVariables is Variables v)
+				v.Preview(Expression, Result);
+		}
+
+
+		/// <summary>
+		/// Reports current status of execution.
+		/// </summary>
+		/// <param name="Expression">Expression.</param>
+		/// <param name="Result">Status Message</param>
+		public void Status(Expression Expression, string Result)
+		{
+			StatusEventHandler h = this.OnStatus;
+			if (!(h is null))
+			{
+				try
+				{
+					h(this, new StatusEventArgs(Expression, this, Result));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// If status messages are desired.
+		/// </summary>
+		public bool HandlesStatus
+		{
+			get { return !(this.OnStatus is null); }
+		}
+
+		/// <summary>
+		/// Event raised when a status message has been reported.
+		/// </summary>
+		public event StatusEventHandler OnStatus = null;
+
 	}
 }

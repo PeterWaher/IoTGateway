@@ -166,7 +166,7 @@ namespace Waher.Script.Fractals.IFS
                     Seed = gen.Next();
                 }
 
-				Variables.ConsoleOut.WriteLine("Seed = " + Seed.ToString(), Variables);
+				Variables.ConsoleOut?.WriteLine("Seed = " + Seed.ToString(), Variables);
 			}
 
 			if (i < c)

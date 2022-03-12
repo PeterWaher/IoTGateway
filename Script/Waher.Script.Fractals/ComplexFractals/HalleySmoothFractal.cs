@@ -396,7 +396,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 				}
 			}
 
-			Node.Expression.Preview(new GraphBitmap(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
+			Variables.Preview(Node.Expression, new GraphBitmap(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
 
 			double[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
 			FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
@@ -565,7 +565,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 				}
 			}
 
-			Node.Expression.Preview(new GraphBitmap(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
+			Variables.Preview(Node.Expression, new GraphBitmap(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
 
 			double[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
 			FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
@@ -710,7 +710,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 				}
 			}
 
-			Node.Expression.Preview(new GraphBitmap(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
+			Variables.Preview(Node.Expression, new GraphBitmap(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
 
 			double[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
 			FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);

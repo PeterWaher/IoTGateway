@@ -284,7 +284,7 @@ namespace Waher.Script.Fractals.IFS
                     Seed = gen.Next();
                 }
 
-				Variables.ConsoleOut.WriteLine("Seed = " + Seed.ToString(), Variables);
+				Variables.ConsoleOut?.WriteLine("Seed = " + Seed.ToString(), Variables);
 			}
 
 			if (i < c)
@@ -302,9 +302,9 @@ namespace Waher.Script.Fractals.IFS
             {
                 EstimateSize(out xc, out yc, out dr, Functions, dimx, dimy, Seed, 5000, Variables, this);
 
-                Variables.ConsoleOut.WriteLine("X-center: " + Expression.ToString(xc), Variables);
-                Variables.ConsoleOut.WriteLine("Y-center: " + Expression.ToString(yc), Variables);
-                Variables.ConsoleOut.WriteLine("Width: " + Expression.ToString(dr), Variables);
+                Variables.ConsoleOut?.WriteLine("X-center: " + Expression.ToString(xc), Variables);
+                Variables.ConsoleOut?.WriteLine("Y-center: " + Expression.ToString(yc), Variables);
+                Variables.ConsoleOut?.WriteLine("Width: " + Expression.ToString(dr), Variables);
             }
 
             return CalcFlame(xc, yc, dr, N, Functions, dimx, dimy, Seed, SuperSampling, Gamma,
@@ -478,7 +478,7 @@ namespace Waher.Script.Fractals.IFS
             if (SuperSampling < 1)
                 throw new ScriptRuntimeException("SuperSampling must be a postitive integer.", Node);
 
-            if (!Node.Expression.HandlesPreview)
+            if (!Variables.HandlesPreview)
                 Preview = false;
 
 			Array.Sort<FlameFunction>(Functions, (f1, f2) =>
@@ -665,13 +665,13 @@ namespace Waher.Script.Fractals.IFS
                 }
             }
 
-			if (Preview || Node.Expression.HandlesStatus)
+			if (Preview || v.HandlesStatus)
             {
-                System.DateTime Start = System.DateTime.Now;
-                System.DateTime NextPreview = Start.AddSeconds(1);
-				System.DateTime PrevPreview = Start;
-				System.DateTime Temp;
-				System.DateTime Temp2;
+                DateTime Start = DateTime.Now;
+                DateTime NextPreview = Start.AddSeconds(1);
+				DateTime PrevPreview = Start;
+				DateTime Temp;
+				DateTime Temp2;
 				TimeSpan TimeLeft;
                 int NextPreviewDeciSeconds = 10;
 				int NrIterationsPerPreview = 4096;
@@ -687,7 +687,7 @@ namespace Waher.Script.Fractals.IFS
                     if (Pos-- <= 0)
                     {
 						Pos = NrIterationsPerPreview;
-                        Temp = System.DateTime.Now;
+                        Temp = DateTime.Now;
                         if (Temp > NextPreview)
                         {
                             NextPreview = Temp.AddSeconds(NextPreviewDeciSeconds * 0.1);
@@ -696,9 +696,9 @@ namespace Waher.Script.Fractals.IFS
 
 							if (Preview)
 							{
-								Node.Expression.Preview(new GraphBitmap(P.RenderBitmapRgba(Gamma, Vibrancy, true, SKColors.White)));
+								v.Preview(Node.Expression, new GraphBitmap(P.RenderBitmapRgba(Gamma, Vibrancy, true, SKColors.White)));
 
-								Temp2 = System.DateTime.Now;
+								Temp2 = DateTime.Now;
 
 								double d = (Temp2 - Temp).TotalSeconds;
 								double d2 = (Temp - PrevPreview).TotalSeconds;
@@ -716,7 +716,7 @@ namespace Waher.Script.Fractals.IFS
 							IterationsPerSeconds = NrIterationsSinceLast / (Temp - PrevPreview).TotalSeconds;
 							PercentDone = (100 * (1.0 - ((double)P.N) / P.N0));
 							TimeLeft = new TimeSpan((long)((Temp - Start).Ticks * 100 / PercentDone));
-							Node.Expression.Status(P.N.ToString() + " iterations left, " + NrIterations.ToString() + " iterations done, " + IterationsPerSeconds.ToString("F0") + " iterations/s, " + PercentDone.ToString("F1") + "% done, Time Left: " + TimeLeft.ToString() + ".");
+							v.Status(Node.Expression, P.N.ToString() + " iterations left, " + NrIterations.ToString() + " iterations done, " + IterationsPerSeconds.ToString("F0") + " iterations/s, " + PercentDone.ToString("F1") + "% done, Time Left: " + TimeLeft.ToString() + ".");
 							PrevNrIterations = NrIterations;
 							PrevPreview = Temp;
 						}
@@ -733,7 +733,7 @@ namespace Waher.Script.Fractals.IFS
                 }
                 while (P.IncHistogram());
 
-				Node.Expression.Status(string.Empty);
+				v.Status(Node.Expression, string.Empty);
 			}
             else
             {

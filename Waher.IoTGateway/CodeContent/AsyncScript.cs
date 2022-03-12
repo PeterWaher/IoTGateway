@@ -147,7 +147,7 @@ namespace Waher.IoTGateway.CodeContent
 
 		private async Task Evaluate(Expression Script, Variables Variables, string Id)
 		{
-			Script.OnPreview += async (sender, e) =>
+			async void Preview(object sender, PreviewEventArgs e)
 			{
 				try
 				{
@@ -164,6 +164,7 @@ namespace Waher.IoTGateway.CodeContent
 
 			StringBuilder Html = new StringBuilder();
 
+			Variables.OnPreview += Preview;
 			try
 			{
 				object Result = await this.Evaluate(Script, Variables);
@@ -174,6 +175,10 @@ namespace Waher.IoTGateway.CodeContent
 			{
 				Html.Clear();
 				await InlineScript.GenerateHTML(ex, Html, true, Variables);
+			}
+			finally
+			{
+				Variables.OnPreview -= Preview;
 			}
 
 			await ClientEvents.ReportAsynchronousResult(Id, "text/html; charset=utf-8", Encoding.UTF8.GetBytes(Html.ToString()), false);

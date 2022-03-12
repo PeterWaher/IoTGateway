@@ -38,7 +38,7 @@ namespace Waher.Script.Functions.Runtime
         public override IElement Evaluate(Variables Variables)
         {
             IElement E = this.Argument.Evaluate(Variables);
-            this.Expression.Preview(E);
+            Variables.Preview(this.Expression, E);
             return E;
         }
 
@@ -50,7 +50,7 @@ namespace Waher.Script.Functions.Runtime
         public override async Task<IElement> EvaluateAsync(Variables Variables)
         {
             IElement E = await this.Argument.EvaluateAsync(Variables);
-            this.Expression.Preview(E);
+            Variables.Preview(this.Expression, E);
             return E;
         }
 

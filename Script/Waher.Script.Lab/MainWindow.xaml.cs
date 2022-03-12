@@ -182,7 +182,7 @@ namespace Waher.Script.Lab
 				{
 					IElement Ans;
 
-					Exp.OnPreview += async (sender2, e2) =>
+					async void Preview(object sender2, PreviewEventArgs e2)
 					{
 						try
 						{
@@ -194,6 +194,7 @@ namespace Waher.Script.Lab
 						}
 					};
 
+					this.variables.OnPreview += Preview;
 					try
 					{
 						Ans = await Exp.Root.EvaluateAsync(this.variables);
@@ -205,6 +206,10 @@ namespace Waher.Script.Lab
 					catch (Exception ex)
 					{
 						Ans = new ObjectValue(ex);
+					}
+					finally
+					{
+						this.variables.OnPreview -= Preview;
 					}
 
 					this.variables["Ans"] = Ans;

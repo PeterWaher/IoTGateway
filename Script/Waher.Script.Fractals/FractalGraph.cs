@@ -131,7 +131,7 @@ namespace Waher.Script.Fractals
 			int x, y;
 			int DynamicPixels = Size;
 			double Sum = Size;
-			bool DoPreview = Node.Expression.HandlesPreview;
+			bool DoPreview = Variables.HandlesPreview;
 			DateTime LastPreview = DateTime.Now;
 			DateTime TP;
 
@@ -189,15 +189,15 @@ namespace Waher.Script.Fractals
 						LastPreview = TP;
 
 						if (DoPreview)
-							Node.Expression.Preview(new GraphBitmap(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
+							Variables.Preview(Node.Expression, new GraphBitmap(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette)));
 
-						Node.Expression.Status("Smoothing. Change: " + (100 * Sum / DynamicPixels).ToString("F3") + "%, Limit: " + LimitPercentChange.ToString("F3") + "%, Iterations: " + Iterations.ToString());
+						Variables.Status(Node.Expression, "Smoothing. Change: " + (100 * Sum / DynamicPixels).ToString("F3") + "%, Limit: " + LimitPercentChange.ToString("F3") + "%, Iterations: " + Iterations.ToString());
 					}
 				}
 			}
 
-			Variables.ConsoleOut.Write("Iterations: " + Iterations.ToString());
-			Node.Expression.Status(string.Empty);
+			Variables.ConsoleOut?.Write("Iterations: " + Iterations.ToString());
+			Variables.Status(Node.Expression, string.Empty);
 		}
 
 		public static void Smooth(double[] R, double[] G, double[] B, double[] A, 
@@ -231,7 +231,7 @@ namespace Waher.Script.Fractals
 			int x, y;
 			int DynamicPixels = Size;
 			double Sum = Size;
-			bool DoPreview = Node.Expression.HandlesPreview;
+			bool DoPreview = Variables.HandlesPreview;
 			DateTime LastPreview = DateTime.Now;
 			DateTime TP;
 
@@ -343,15 +343,15 @@ namespace Waher.Script.Fractals
 						LastPreview = TP;
 
 						if (DoPreview)
-							Node.Expression.Preview(new GraphBitmap(FractalGraph.ToPixels(R, G, B, A, Width, Height)));
+							Variables.Preview(Node.Expression, new GraphBitmap(FractalGraph.ToPixels(R, G, B, A, Width, Height)));
 
-						Node.Expression.Status("Smoothing. Change: " + (100 * Sum / DynamicPixels).ToString("F3") + "%, Limit: " + LimitPercentChange.ToString("F3") + "%, Iterations: " + Iterations.ToString());
+						Variables.Status(Node.Expression, "Smoothing. Change: " + (100 * Sum / DynamicPixels).ToString("F3") + "%, Limit: " + LimitPercentChange.ToString("F3") + "%, Iterations: " + Iterations.ToString());
 					}
 				}
 			}
 
-			Variables.ConsoleOut.Write("Iterations: " + Iterations.ToString());
-			Node.Expression.Status(string.Empty);
+			Variables.ConsoleOut?.Write("Iterations: " + Iterations.ToString());
+			Variables.Status(Node.Expression, string.Empty);
 		}
 
 		public static double[] FindBoundaries(double[] ColorIndex, int Width, int Height)

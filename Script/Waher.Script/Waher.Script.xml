@@ -2646,38 +2646,6 @@
             <param name="Node">Script node making the request.</param>
             <returns>Converted value.</returns>
         </member>
-        <member name="M:Waher.Script.Expression.Preview(Waher.Script.Abstraction.Elements.IElement)">
-            <summary>
-            Reports a preview of the final result.
-            </summary>
-            <param name="Result">Preview</param>
-        </member>
-        <member name="P:Waher.Script.Expression.HandlesPreview">
-            <summary>
-            If previews are desired.
-            </summary>
-        </member>
-        <member name="E:Waher.Script.Expression.OnPreview">
-            <summary>
-            Event raised when a preview of the final result has been reported.
-            </summary>
-        </member>
-        <member name="M:Waher.Script.Expression.Status(System.String)">
-            <summary>
-            Reports current status of execution.
-            </summary>
-            <param name="Result">Status Message</param>
-        </member>
-        <member name="P:Waher.Script.Expression.HandlesStatus">
-            <summary>
-            If status messages are desired.
-            </summary>
-        </member>
-        <member name="E:Waher.Script.Expression.OnStatus">
-            <summary>
-            Event raised when a status message has been reported.
-            </summary>
-        </member>
         <member name="P:Waher.Script.Expression.Tag">
             <summary>
             This property allows the caller to tag the expression with an arbitrary object.
@@ -20442,16 +20410,22 @@
             Event arguments for preview events.
             </summary>
         </member>
-        <member name="M:Waher.Script.PreviewEventArgs.#ctor(Waher.Script.Expression,Waher.Script.Abstraction.Elements.IElement)">
+        <member name="M:Waher.Script.PreviewEventArgs.#ctor(Waher.Script.Expression,Waher.Script.Variables,Waher.Script.Abstraction.Elements.IElement)">
             <summary>
             Event arguments for preview events.
             </summary>
             <param name="Expression">Expression being evaluated.</param>
+            <param name="Variables">Variables collection.</param>
             <param name="Preview">Preview of result.</param>
         </member>
         <member name="P:Waher.Script.PreviewEventArgs.Expression">
             <summary>
             Expression being evaluated.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.PreviewEventArgs.Variables">
+            <summary>
+            Current Variables Collection.
             </summary>
         </member>
         <member name="P:Waher.Script.PreviewEventArgs.Preview">
@@ -20471,16 +20445,22 @@
             Event arguments for status events.
             </summary>
         </member>
-        <member name="M:Waher.Script.StatusEventArgs.#ctor(Waher.Script.Expression,System.String)">
+        <member name="M:Waher.Script.StatusEventArgs.#ctor(Waher.Script.Expression,Waher.Script.Variables,System.String)">
             <summary>
             Event arguments for status events.
             </summary>
             <param name="Expression">Expression being evaluated.</param>
+            <param name="Variables">Current variables collection.</param>
             <param name="Status">Current status of execution.</param>
         </member>
         <member name="P:Waher.Script.StatusEventArgs.Expression">
             <summary>
             Expression being evaluated.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.StatusEventArgs.Variables">
+            <summary>
+            Current Variables collection.
             </summary>
         </member>
         <member name="P:Waher.Script.StatusEventArgs.Status">
@@ -21889,6 +21869,40 @@
         <member name="M:Waher.Script.Variables.CancelAbort">
             <summary>
             Allows new script to be evaluated using this collection of variables.
+            </summary>
+        </member>
+        <member name="E:Waher.Script.Variables.OnPreview">
+            <summary>
+            Event raised when there is a new value to preview.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Variables.HandlesPreview">
+            <summary>
+            If previews are desired.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Variables.Preview(Waher.Script.Expression,Waher.Script.Abstraction.Elements.IElement)">
+            <summary>
+            Reports a preview of the final result.
+            </summary>
+            <param name="Expression">Expression being executed.</param>
+            <param name="Result">Preview</param>
+        </member>
+        <member name="M:Waher.Script.Variables.Status(Waher.Script.Expression,System.String)">
+            <summary>
+            Reports current status of execution.
+            </summary>
+            <param name="Expression">Expression.</param>
+            <param name="Result">Status Message</param>
+        </member>
+        <member name="P:Waher.Script.Variables.HandlesStatus">
+            <summary>
+            If status messages are desired.
+            </summary>
+        </member>
+        <member name="E:Waher.Script.Variables.OnStatus">
+            <summary>
+            Event raised when a status message has been reported.
             </summary>
         </member>
     </members>

@@ -92,7 +92,6 @@ namespace Waher.WebService.Script
 
 			this.expression = Expression;
 			this.expression.Tag = this;
-			this.expression.OnPreview += Expression_OnPreview;
 		}
 
 		internal void NewResult(IElement Result)
@@ -214,6 +213,7 @@ namespace Waher.WebService.Script
 
 			try
 			{
+				this.variables.OnPreview += Expression_OnPreview;
 				try
 				{
 					this.watch.Start();
@@ -234,6 +234,7 @@ namespace Waher.WebService.Script
 				}
 				finally
 				{
+					this.variables.OnPreview -= Expression_OnPreview;
 					this.watch.Stop();
 
 					Timer Temp = this.watchdog;

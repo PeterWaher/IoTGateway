@@ -14,6 +14,16 @@
 			<String id="10">Port</String>
 			<String id="11">Encrypted (TLS)</String>
 			<String id="12">Check if Transpotrt Layer Encryption (TLS) should be used.</String>
+			<String id="13">Connect</String>
+			<String id="14">Certificate Valid</String>
+			<String id="15">Subject</String>
+			<String id="16">Issuer</String>
+			<String id="17">S/N</String>
+			<String id="18">Effective</String>
+			<String id="19">Expires</String>
+			<String id="20">Digest</String>
+			<String id="21">Algorithm</String>
+			<String id="22">Public Key</String>
 		</Namespace>
 	</Language>
 </Translation>

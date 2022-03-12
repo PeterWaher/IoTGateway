@@ -2838,6 +2838,30 @@
             </summary>
             <param name="Output">XML output.</param>
         </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.ReducedXmlString(Waher.Script.Objects.DoubleNumber)">
+            <summary>
+            Generates an XML value string of an element, possible with reduced resolution, to avoid unnecessary digits when
+            repersenting graphs remotely.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.ReducedXmlString(Waher.Script.Objects.VectorSpaces.DoubleVector)">
+            <summary>
+            Generates an XML value string of an element, possible with reduced resolution, to avoid unnecessary digits when
+            repersenting graphs remotely.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
+        <member name="M:Waher.Script.Graphs.Graph2D.ReducedXmlString(Waher.Script.Abstraction.Elements.IElement)">
+            <summary>
+            Generates an XML value string of an element, possible with reduced resolution, to avoid unnecessary digits when
+            repersenting graphs remotely.
+            </summary>
+            <param name="Value">Value</param>
+            <returns>String representation.</returns>
+        </member>
         <member name="M:Waher.Script.Graphs.Graph2D.ImportGraphAsync(System.Xml.XmlElement)">
             <summary>
             Imports graph specifics from XML.

@@ -1441,12 +1441,12 @@ namespace Waher.Script.Graphs3D
 			Output.WriteAttributeString("axisTypeX", this.axisTypeX.FullName);
 			Output.WriteAttributeString("axisTypeY", this.axisTypeY.FullName);
 			Output.WriteAttributeString("axisTypeZ", this.axisTypeZ.FullName);
-			Output.WriteAttributeString("minX", Expression.ToString(this.minX));
-			Output.WriteAttributeString("maxX", Expression.ToString(this.maxX));
-			Output.WriteAttributeString("minY", Expression.ToString(this.minY));
-			Output.WriteAttributeString("maxY", Expression.ToString(this.maxY));
-			Output.WriteAttributeString("minZ", Expression.ToString(this.minZ));
-			Output.WriteAttributeString("maxZ", Expression.ToString(this.maxZ));
+			Output.WriteAttributeString("minX", Graph2D.ReducedXmlString(this.minX));
+			Output.WriteAttributeString("maxX", Graph2D.ReducedXmlString(this.maxX));
+			Output.WriteAttributeString("minY", Graph2D.ReducedXmlString(this.minY));
+			Output.WriteAttributeString("maxY", Graph2D.ReducedXmlString(this.maxY));
+			Output.WriteAttributeString("minZ", Graph2D.ReducedXmlString(this.minZ));
+			Output.WriteAttributeString("maxZ", Graph2D.ReducedXmlString(this.maxZ));
 			Output.WriteAttributeString("showXAxis", this.showXAxis ? "true" : "false");
 			Output.WriteAttributeString("showYAxis", this.showYAxis ? "true" : "false");
 			Output.WriteAttributeString("showZAxis", this.showZAxis ? "true" : "false");
@@ -1456,13 +1456,13 @@ namespace Waher.Script.Graphs3D
 			Output.WriteAttributeString("overSampling", this.overSampling.ToString());
 
 			foreach (IVector v in this.x)
-				Output.WriteElementString("X", Expression.ToString(v));
+				Output.WriteElementString("X", Graph2D.ReducedXmlString(v));
 
 			foreach (IVector v in this.y)
-				Output.WriteElementString("Y", Expression.ToString(v));
+				Output.WriteElementString("Y", Graph2D.ReducedXmlString(v));
 
 			foreach (IVector v in this.z)
-				Output.WriteElementString("Z", Expression.ToString(v));
+				Output.WriteElementString("Z", Graph2D.ReducedXmlString(v));
 
 			foreach (Vector4[,] M in this.normals)
 			{

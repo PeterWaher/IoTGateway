@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
@@ -943,19 +945,19 @@ namespace Waher.Script.Graphs
 			Output.WriteAttributeString("labelY", this.labelY);
 			Output.WriteAttributeString("axisTypeX", this.axisTypeX.FullName);
 			Output.WriteAttributeString("axisTypeY", this.axisTypeY.FullName);
-			Output.WriteAttributeString("minX", Expression.ToString(this.minX));
-			Output.WriteAttributeString("maxX", Expression.ToString(this.maxX));
-			Output.WriteAttributeString("minY", Expression.ToString(this.minY));
-			Output.WriteAttributeString("maxY", Expression.ToString(this.maxY));
+			Output.WriteAttributeString("minX", ReducedXmlString(this.minX));
+			Output.WriteAttributeString("maxX", ReducedXmlString(this.maxX));
+			Output.WriteAttributeString("minY", ReducedXmlString(this.minY));
+			Output.WriteAttributeString("maxY", ReducedXmlString(this.maxY));
 			Output.WriteAttributeString("showXAxis", this.showXAxis ? "true" : "false");
 			Output.WriteAttributeString("showYAxis", this.showYAxis ? "true" : "false");
 			Output.WriteAttributeString("showGrid", this.showGrid ? "true" : "false");
 
 			foreach (IVector v in this.x)
-				Output.WriteElementString("X", Expression.ToString(v));
+				Output.WriteElementString("X", ReducedXmlString(v));
 
 			foreach (IVector v in this.y)
-				Output.WriteElementString("Y", Expression.ToString(v));
+				Output.WriteElementString("Y", ReducedXmlString(v));
 
 			foreach (object[] v in this.parameters)
 				Output.WriteElementString("Parameters", Expression.ToString(new ObjectVector(v)));
@@ -964,6 +966,62 @@ namespace Waher.Script.Graphs
 				Output.WriteElementString("Painter", Painter.GetType().FullName);
 
 			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Generates an XML value string of an element, possible with reduced resolution, to avoid unnecessary digits when
+		/// repersenting graphs remotely.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>String representation.</returns>
+		public static string ReducedXmlString(DoubleNumber Value)
+		{
+			return ((float)Value.Value).ToString().Replace(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+		}
+
+		/// <summary>
+		/// Generates an XML value string of an element, possible with reduced resolution, to avoid unnecessary digits when
+		/// repersenting graphs remotely.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>String representation.</returns>
+		public static string ReducedXmlString(DoubleVector Value)
+		{
+			StringBuilder sb = null;
+
+			foreach (double d in Value.Values)
+			{
+				if (sb is null)
+					sb = new StringBuilder("[");
+				else
+					sb.Append(",");
+
+				sb.Append(((float)d).ToString().Replace(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."));
+			}
+
+			if (sb is null)
+				return "[]";
+			else
+			{
+				sb.Append(']');
+				return sb.ToString();
+			}
+		}
+
+		/// <summary>
+		/// Generates an XML value string of an element, possible with reduced resolution, to avoid unnecessary digits when
+		/// repersenting graphs remotely.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>String representation.</returns>
+		public static string ReducedXmlString(IElement Value)
+		{
+			if (Value is DoubleNumber N)
+				return ReducedXmlString(N);
+			else if (Value is DoubleVector v)
+				return ReducedXmlString(v);
+			else
+				return Expression.ToString(Value);
 		}
 
 		/// <summary>

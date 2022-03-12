@@ -443,22 +443,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		private async Task NodeResponse(IqResultEventArgs e, bool Parameters, bool Messages, NodeInformationEventHandler Callback, object _)
 		{
 			XmlElement E;
-			NodeInformation NodeInfo = null;
+			NodeInformation NodeInfo;
 
 			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "nodeInfo")
-			{
-				foreach (XmlNode N in E.ChildNodes)
-				{
-					if (N is XmlElement E2 && E2.LocalName == "nd")
-					{
-						NodeInfo = this.GetNodeInformation(E2, Parameters, Messages);
-						break;
-					}
-				}
-
-				if (NodeInfo is null)
-					e.Ok = false;
-			}
+				NodeInfo = this.GetNodeInformation(E, Parameters, Messages);
 			else
 			{
 				e.Ok = false;

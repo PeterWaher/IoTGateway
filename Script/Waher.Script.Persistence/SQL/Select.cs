@@ -79,7 +79,7 @@ namespace Waher.Script.Persistence.SQL
 			if (!(this.columns is null) && this.columns.Length != this.columnNames.Length)
 				throw new ArgumentException("GroupBy and GroupByNames must be of equal length.", nameof(GroupByNames));
 
-			this.CalcSelectOneObject();
+			this.selectOneObject = this.CalcSelectOneObject();
 		}
 
 		/// <summary>
@@ -88,14 +88,37 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		public override bool IsAsynchronous => true;
 
-		private void CalcSelectOneObject()
+		private bool CalcSelectOneObject()
 		{
-			this.selectOneObject =
-				(this.columns is null || this.columns.Length == 1) &&
+			if ((this.columns is null || this.columns.Length == 1) &&
 				!(this.top is null) &&
 				this.top is ConstantElement TopConstant &&
 				TopConstant.Constant is DoubleNumber D &&
-				D.Value == 1;
+				D.Value == 1)
+			{
+				return true;    // select top 1 * ...
+			}
+			else
+			{
+				if (!(this.columns is null))
+				{
+					bool AllXPath = true;
+
+					foreach (ScriptNode Column in this.columns)
+					{
+						if (!(Column is Functions.XPath))
+						{
+							AllXPath = false;
+							break;
+						}
+					}
+
+					if (AllXPath)
+						return true;
+				}
+
+				return false;
+			}
 		}
 
 		/// <summary>
@@ -312,7 +335,6 @@ namespace Waher.Script.Persistence.SQL
 				return Operators.Vectors.VectorDefinition.Encapsulate(Elements, false, this);
 			}
 
-			ObjectMatrix Result = new ObjectMatrix(NrRecords, c, Elements);
 			string[] Names = new string[c];
 
 			foreach (KeyValuePair<string, int> P in ColumnIndices)
@@ -368,6 +390,24 @@ namespace Waher.Script.Persistence.SQL
 				i++;
 			}
 
+			if (this.selectOneObject && NrRecords == 1)
+			{
+				Dictionary<string, IElement> ObjExNihilo = new Dictionary<string, IElement>();
+				bool AllNamed = true;
+
+				for (i = 0; i < c; i++)
+				{
+					if (Names[i] is null)
+						AllNamed = false;
+					else
+						ObjExNihilo[Names[i]] = Elements[i];
+				}
+
+				if (AllNamed)
+					return new ObjectValue(ObjExNihilo);
+			}
+
+			ObjectMatrix Result = new ObjectMatrix(NrRecords, c, Elements);
 			Result.ColumnNames = Names;
 
 			return Result;

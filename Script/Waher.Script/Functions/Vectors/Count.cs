@@ -4,6 +4,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Functions.Vectors
 {
@@ -63,19 +64,39 @@ namespace Waher.Script.Functions.Vectors
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			ICollection<IElement> ChildElements;
+			IElement Item0;
+			int Count;
 
 			if (Arguments[0] is IVector v)
 				ChildElements = v.VectorElements;
 			else if (Arguments[0] is ISet S)
 				ChildElements = S.ChildElements;
+			else if (Arguments[0] is ObjectValue Obj && Obj.Value is System.Collections.ICollection Collection)
+			{
+				if (Arguments.Length == 1)
+					return new DoubleNumber(Collection.Count);
+				else
+				{
+					Item0 = Arguments[1];
+					Count = 0;
+
+					foreach (object Item in Collection)
+					{
+						if (Item0.Equals(Expression.Encapsulate(Item)))
+							Count++;
+					}
+
+					return new DoubleNumber(Count);
+				}
+			}
 			else
 				ChildElements = new IElement[] { Arguments[0] };
 
 			if (Arguments.Length == 1)
 				return new DoubleNumber(ChildElements.Count);
 
-			IElement Item0 = Arguments[1];
-			int Count = 0;
+			Item0 = Arguments[1];
+			Count = 0;
 
 			foreach (IElement Item in ChildElements)
 			{

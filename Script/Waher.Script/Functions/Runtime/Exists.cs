@@ -46,8 +46,8 @@ namespace Waher.Script.Functions.Runtime
 				if (Variables.TryGetVariable(s, out Variable v))
 					return v.ValueObject is null ? BooleanValue.False : BooleanValue.True;
 
-				if (Expression.TryGetConstant(s, Variables, out IElement _))
-					return BooleanValue.True;
+				if (Expression.TryGetConstant(s, Variables, out IElement ConstantValue))
+					return ConstantValue.AssociatedObjectValue is null ? BooleanValue.False : BooleanValue.True;
 
 				if (Types.IsRootNamespace(s))
 					return BooleanValue.True;
@@ -98,10 +98,22 @@ namespace Waher.Script.Functions.Runtime
 		{
 			if (!(this.varRef is null))
 			{
-				if (!Variables.TryGetVariable(this.varRef.VariableName, out Variable v))
-					return BooleanValue.False;
+				string s = this.varRef.VariableName;
 
-				return v.ValueObject is null ? BooleanValue.False : BooleanValue.True;
+				if (Variables.TryGetVariable(s, out Variable v))
+					return v.ValueObject is null ? BooleanValue.False : BooleanValue.True;
+
+				if (Expression.TryGetConstant(s, Variables, out IElement ConstantValue))
+					return ConstantValue.AssociatedObjectValue is null ? BooleanValue.False : BooleanValue.True;
+
+				if (Types.IsRootNamespace(s))
+					return BooleanValue.True;
+
+				IElement E = Expression.GetFunctionLambdaDefinition(s, this.Start, this.Length, this.Expression);
+				if (!(E is null))
+					return BooleanValue.True;
+
+				return BooleanValue.False;
 			}
 
 			try

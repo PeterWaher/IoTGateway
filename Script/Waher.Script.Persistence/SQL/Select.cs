@@ -24,12 +24,12 @@ namespace Waher.Script.Persistence.SQL
 		private readonly KeyValuePair<ScriptNode, bool>[] orderBy;
 		private readonly bool distinct;
 		private readonly bool generic;
+		private readonly bool selectOneObject;
 		private SourceDefinition source;
 		private ScriptNode top;
 		private ScriptNode where;
 		private ScriptNode having;
 		private ScriptNode offset;
-		private bool selectOneObject;
 
 		/// <summary>
 		/// Executes a SELECT statement against the object database.
@@ -407,8 +407,10 @@ namespace Waher.Script.Persistence.SQL
 					return new ObjectValue(ObjExNihilo);
 			}
 
-			ObjectMatrix Result = new ObjectMatrix(NrRecords, c, Elements);
-			Result.ColumnNames = Names;
+			ObjectMatrix Result = new ObjectMatrix(NrRecords, c, Elements)
+			{
+				ColumnNames = Names
+			};
 
 			return Result;
 		}

@@ -27,7 +27,7 @@ namespace Waher.Things.ControlParameters
 	{
 		private readonly DurationGetHandler getHandler;
 		private readonly DurationSetHandler setHandler;
-		private readonly Duration min, max;
+		private readonly Duration? min, max;
 
 		/// <summary>
 		/// Duration control parameter.
@@ -112,7 +112,7 @@ namespace Waher.Things.ControlParameters
 		/// Gets the value of the control parameter.
 		/// </summary>
 		/// <returns>Current value, or null if not available.</returns>
-		public async Task<Duration> Get(IThingReference Node)
+		public async Task<Duration?> Get(IThingReference Node)
 		{
 			try
 			{
@@ -132,9 +132,9 @@ namespace Waher.Things.ControlParameters
 		/// <returns>String representation of the value.</returns>
 		public override async Task<string> GetStringValue(IThingReference Node)
 		{
-			Duration Value = await this.Get(Node);
+			Duration? Value = await this.Get(Node);
 
-			if (!(Value is null))
+			if (Value.HasValue)
 				return Value.ToString();
 			else
 				return string.Empty;

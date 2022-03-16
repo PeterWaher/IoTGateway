@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Things;
-using Waher.Things.SensorData;
-
-namespace Waher.Networking.XMPP.Sensor
+﻿namespace Waher.Networking.XMPP.Sensor
 {
 	/// <summary>
 	/// Sensor Data Readout States.

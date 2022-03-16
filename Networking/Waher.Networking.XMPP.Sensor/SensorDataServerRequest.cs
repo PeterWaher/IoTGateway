@@ -397,7 +397,6 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			FieldType FieldTypes;
 			FieldQoS FieldQoS;
-			EnumField EnumField;
 			string FieldDataTypeName;
 			bool First;
 
@@ -516,7 +515,7 @@ namespace Waher.Networking.XMPP.Sensor
 				Xml.WriteAttributeString("v", CommonTypes.Encode(QuantityField.Value, QuantityField.NrDecimals));
 				Xml.WriteAttributeString("u", QuantityField.Unit);
 			}
-			else if ((EnumField = Field as EnumField) != null)
+			else if (Field is EnumField EnumField)
 			{
 				Xml.WriteAttributeString("v", Field.ValueString);
 				Xml.WriteAttributeString("t", EnumField.EnumerationType);

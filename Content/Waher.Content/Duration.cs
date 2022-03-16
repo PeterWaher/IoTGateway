@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -9,7 +8,7 @@ namespace Waher.Content
 	/// Represents a duration value, as defined by the xsd:duration data type:
 	/// http://www.w3.org/TR/xmlschema-2/#duration
 	/// </summary>
-	public class Duration
+	public struct Duration : IComparable<Duration>
 	{
 		private static readonly Regex parser = new Regex(@"(?'Negation'-)?P((?'Years'\d+)Y)?((?'Months'\d+)M)?((?'Days'\d+)D)?(T((?'Hours'\d+)H)?((?'Minutes'\d+)M)?((?'Seconds'\d+([.]\d*)?)S)?)?", RegexOptions.Singleline | RegexOptions.Compiled);
 
@@ -20,21 +19,6 @@ namespace Waher.Content
 		private int minutes;
 		private double seconds;
 		private bool negation;
-
-		/// <summary>
-		/// Represents a duration value, as defined by the xsd:duration data type:
-		/// http://www.w3.org/TR/xmlschema-2/#duration
-		/// </summary>
-		public Duration()
-		{
-			this.years = 0;
-			this.months = 0;
-			this.days = 0;
-			this.hours = 0;
-			this.minutes = 0;
-			this.seconds = 0;
-			this.negation = false;
-		}
 
 		/// <summary>
 		/// Represents a duration value, as defined by the xsd:duration data type:
@@ -83,7 +67,7 @@ namespace Waher.Content
 			Match M = parser.Match(s);
 			if (!M.Success || M.Index > 0 || M.Length != s.Length)
 			{
-				Result = null;
+				Result = default;
 				return false;
 			}
 
@@ -294,9 +278,8 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>&lt;<paramref name="D2"/>.</returns>
 		public static bool operator <(Duration D1, Duration D2)
 		{
-			DateTime Now = DateTime.Today;
-			DateTime DT1 = Now + D1;
-			DateTime DT2 = Now + D2;
+			DateTime DT1 = JSON.UnixEpoch + D1;
+			DateTime DT2 = JSON.UnixEpoch + D2;
 
 			return DT1 < DT2;
 		}
@@ -309,9 +292,8 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>&lt;=<paramref name="D2"/>.</returns>
 		public static bool operator <=(Duration D1, Duration D2)
 		{
-			DateTime Now = DateTime.Today;
-			DateTime DT1 = Now + D1;
-			DateTime DT2 = Now + D2;
+			DateTime DT1 = JSON.UnixEpoch + D1;
+			DateTime DT2 = JSON.UnixEpoch + D2;
 
 			return DT1 <= DT2;
 		}
@@ -324,9 +306,8 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>&gt;<paramref name="D2"/>.</returns>
 		public static bool operator >(Duration D1, Duration D2)
 		{
-			DateTime Now = DateTime.Today;
-			DateTime DT1 = Now + D1;
-			DateTime DT2 = Now + D2;
+			DateTime DT1 = JSON.UnixEpoch + D1;
+			DateTime DT2 = JSON.UnixEpoch + D2;
 
 			return DT1 > DT2;
 		}
@@ -339,9 +320,8 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>&gt;=<paramref name="D2"/>.</returns>
 		public static bool operator >=(Duration D1, Duration D2)
 		{
-			DateTime Now = DateTime.Today;
-			DateTime DT1 = Now + D1;
-			DateTime DT2 = Now + D2;
+			DateTime DT1 = JSON.UnixEpoch + D1;
+			DateTime DT2 = JSON.UnixEpoch + D2;
 
 			return DT1 >= DT2;
 		}
@@ -360,9 +340,8 @@ namespace Waher.Content
 			if ((object)D1 is null)
 				return true;
 
-			DateTime Now = DateTime.Today;
-			DateTime DT1 = Now + D1;
-			DateTime DT2 = Now + D2;
+			DateTime DT1 = JSON.UnixEpoch + D1;
+			DateTime DT2 = JSON.UnixEpoch + D2;
 
 			return DT1 == DT2;
 		}
@@ -381,9 +360,8 @@ namespace Waher.Content
 			if ((object)D1 is null)
 				return false;
 
-			DateTime Now = DateTime.Today;
-			DateTime DT1 = Now + D1;
-			DateTime DT2 = Now + D2;
+			DateTime DT1 = JSON.UnixEpoch + D1;
+			DateTime DT2 = JSON.UnixEpoch + D2;
 
 			return DT1 != DT2;
 		}
@@ -527,6 +505,25 @@ namespace Waher.Content
 		public static Duration FromSeconds(int Seconds)
 		{
 			return new Duration(Seconds < 0, 0, 0, 0, 0, 0, Math.Abs(Seconds));
+		}
+
+		/// <summary>
+		/// Compares the current instance with another object of the same type and returns
+		/// an integer that indicates whether the current instance precedes, follows, or
+		/// occurs in the same position in the sort order as the other object.
+		/// </summary>
+		/// <param name="other">An object to compare with this instance.</param>
+		/// <returns>A value that indicates the relative order of the objects being compared. The
+		/// return value has these meanings: Value Meaning Less than zero This instance precedes
+		/// other in the sort order. Zero This instance occurs in the same position in the
+		/// sort order as other. Greater than zero This instance follows other in the sort
+		/// order.</returns>
+		public int CompareTo(Duration other)
+		{
+			DateTime TP1 = JSON.UnixEpoch + this;
+			DateTime TP2 = JSON.UnixEpoch + other;
+			
+			return TP1.CompareTo(TP2);
 		}
 	}
 }

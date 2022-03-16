@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Things;
 using Waher.Things.SensorData;
@@ -13,19 +11,19 @@ namespace Waher.Networking.XMPP.Sensor
 	/// </summary>
 	public class Subscription
 	{
-		private Dictionary<IThingReference, bool> nodes = new Dictionary<IThingReference, bool>();
-		private Dictionary<string, FieldSubscriptionRule> fields = null;
+		private readonly Dictionary<IThingReference, bool> nodes = new Dictionary<IThingReference, bool>();
+		private readonly Dictionary<string, FieldSubscriptionRule> fields = null;
+		private readonly FieldType fieldTypes;
 		private Availability availability = Availability.Online;
-		private FieldType fieldTypes;
-		private Duration maxAge;
-		private Duration minInterval;
-		private Duration maxInterval;
+		private Duration? maxAge;
+		private Duration? minInterval;
+		private Duration? maxInterval;
 		private DateTime lastTrigger = DateTime.Now;
-		private string from;
-		private string serviceToken;
-		private string deviceToken;
-		private string userToken;
-		private string id;
+		private readonly string from;
+		private readonly string serviceToken;
+		private readonly string deviceToken;
+		private readonly string userToken;
+		private readonly string id;
 		private bool active = true;
 		private bool supressedTrigger = false;
 
@@ -44,7 +42,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="DeviceToken">Device Token.</param>
 		/// <param name="UserToken">User Token.</param>
 		public Subscription(string Id, string From, IThingReference[] Nodes, Dictionary<string, FieldSubscriptionRule> Fields,
-			FieldType FieldTypes, Duration MaxAge, Duration MinInterval, Duration MaxInterval, string ServiceToken, string DeviceToken,
+			FieldType FieldTypes, Duration? MaxAge, Duration? MinInterval, Duration? MaxInterval, string ServiceToken, string DeviceToken,
 			string UserToken)
 		{
 			this.nodes = new Dictionary<IThingReference, bool>();
@@ -136,17 +134,17 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Maximum age of historical data.
 		/// </summary>
-		public Duration MaxAge { get { return this.maxAge; } }
+		public Duration? MaxAge { get { return this.maxAge; } }
 
 		/// <summary>
 		/// Smallest interval for reporting events. Events are not reported more often than this limit.
 		/// </summary>
-		public Duration MinInterval { get { return this.minInterval; } }
+		public Duration? MinInterval { get { return this.minInterval; } }
 
 		/// <summary>
 		/// Largest interval for reporting events. Events are not reported less often than this limit.
 		/// </summary>
-		public Duration MaxInterval { get { return this.maxInterval; } }
+		public Duration? MaxInterval { get { return this.maxInterval; } }
 
 		/// <summary>
 		/// Subscription made by this JID.
@@ -243,7 +241,7 @@ namespace Waher.Networking.XMPP.Sensor
 				return false;
 			}
 
-			if (this.maxInterval != null && (TP = this.lastTrigger + this.maxInterval) <= Now)
+			if (this.maxInterval.HasValue && (TP = this.lastTrigger + this.maxInterval.Value) <= Now)
 			{
 				this.lastTrigger = TP;
 				return true;

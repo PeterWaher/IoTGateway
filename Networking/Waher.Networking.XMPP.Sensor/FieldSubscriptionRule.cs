@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Waher.Things.SensorData;
 
 namespace Waher.Networking.XMPP.Sensor
 {
@@ -11,12 +7,12 @@ namespace Waher.Networking.XMPP.Sensor
 	/// </summary>
 	public class FieldSubscriptionRule
 	{
-		private string fieldName;
+		private readonly string fieldName;
 		private object currentValue;
-		private double? changedBy;
-		private double? changedUp;
-		private double? changedDown;
-		private bool hasChangeRule;
+		private readonly double? changedBy;
+		private readonly double? changedUp;
+		private readonly double? changedDown;
+		private readonly bool hasChangeRule;
 
 		/// <summary>
 		/// Maintains the status of a field subscription rule.
@@ -133,6 +129,11 @@ namespace Waher.Networking.XMPP.Sensor
 		}
 
 		/// <summary>
+		/// If a change rule is defined.
+		/// </summary>
+		public bool HasChangedRule => this.hasChangeRule;
+
+		/// <summary>
 		/// Checks if a new value triggers an event to the subscribing party.
 		/// </summary>
 		/// <param name="NewValue">Newly measured value.</param>
@@ -143,10 +144,10 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				double Diff;
 
-				if (this.currentValue is string)
-					Diff = ((string)this.currentValue).CompareTo((string)NewValue);
-				else if (this.currentValue is double)
-					Diff = ((double)NewValue) - ((double)this.currentValue);
+				if (this.currentValue is string s)
+					Diff = s.CompareTo((string)NewValue);
+				else if (this.currentValue is double d)
+					Diff = ((double)NewValue) - d;
 				else
 				{
 					this.currentValue = NewValue;

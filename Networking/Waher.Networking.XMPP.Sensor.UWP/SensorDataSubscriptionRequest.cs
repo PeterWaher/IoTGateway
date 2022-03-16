@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Events;
 using Waher.Things;
 using Waher.Things.SensorData;
 
@@ -15,9 +14,9 @@ namespace Waher.Networking.XMPP.Sensor
 	public class SensorDataSubscriptionRequest : SensorDataClientRequest 
 	{
 		private readonly FieldSubscriptionRule[] fieldRules;
-		private readonly Duration minInterval;
-		private readonly Duration maxInterval;
-		private readonly Duration maxAge;
+		private readonly Duration? minInterval;
+		private readonly Duration? maxInterval;
+		private readonly Duration? maxAge;
 		private bool unsubscribed = false;
 
 		/// <summary>
@@ -37,7 +36,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="DeviceToken">Optional device token.</param>
 		/// <param name="UserToken">Optional user token.</param>
 		internal SensorDataSubscriptionRequest(string Id, SensorClient SensorClient, string RemoteJID, string Actor, IThingReference[] Nodes, 
-			FieldType Types, FieldSubscriptionRule[] FieldRules, Duration MinInterval, Duration MaxInterval, Duration MaxAge, string ServiceToken, 
+			FieldType Types, FieldSubscriptionRule[] FieldRules, Duration? MinInterval, Duration? MaxInterval, Duration? MaxAge, string ServiceToken, 
 			string DeviceToken, string UserToken)
 			: base(Id, SensorClient, RemoteJID, Actor, Nodes, Types, ExtractFieldNames(FieldRules), 
 				  DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue, ServiceToken, DeviceToken, UserToken)
@@ -65,7 +64,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Smallest interval for reporting events. Events are not reported more often than this limit.
 		/// </summary>
-		public Duration MinInterval
+		public Duration? MinInterval
 		{
 			get { return this.minInterval; }
 		}
@@ -73,7 +72,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Largest interval for reporting events. Events are not reported less often than this limit.
 		/// </summary>
-		public Duration MaxInterval
+		public Duration? MaxInterval
 		{
 			get { return this.maxInterval; }
 		}
@@ -81,7 +80,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Maximum age of historical data.
 		/// </summary>
-		public Duration MaxAge
+		public Duration? MaxAge
 		{
 			get { return this.maxAge; }
 		}

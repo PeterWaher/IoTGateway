@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Xml;
 using Waher.Events;
 using Waher.Things;
 using Waher.Things.SensorData;
@@ -13,9 +11,9 @@ namespace Waher.Networking.XMPP.Sensor
 	/// </summary>
 	public class InternalReadoutRequest : SensorDataServerRequest
 	{
-		private InternalReadoutFieldsEventHandler onFieldsReported;
-		private InternalReadoutErrorsEventHandler onErrorsReported;
-		private object state;
+		private readonly InternalReadoutFieldsEventHandler onFieldsReported;
+		private readonly InternalReadoutErrorsEventHandler onErrorsReported;
+		private readonly object state;
 
 		/// <summary>
 		/// Manages a sensor data server request.

@@ -452,9 +452,9 @@ namespace Waher.Networking.XMPP.Sensor
 			Dictionary<string, FieldSubscriptionRule> Fields = null;
 			XmlElement E = e.Query;
 			FieldType FieldTypes = (FieldType)0;
-			Duration MaxAge = null;
-			Duration MinInterval = null;
-			Duration MaxInterval = null;
+			Duration? MaxAge = null;
+			Duration? MinInterval = null;
+			Duration? MaxInterval = null;
 			string ServiceToken = string.Empty;
 			string DeviceToken = string.Empty;
 			string UserToken = string.Empty;
@@ -474,17 +474,23 @@ namespace Waher.Networking.XMPP.Sensor
 						break;
 
 					case "maxAge":
-						if (!Duration.TryParse(Attr.Value, out MaxAge))
+						if (Duration.TryParse(Attr.Value, out Duration D))
+							MaxAge = D;
+						else
 							MaxAge = null;
 						break;
 
 					case "minInt":
-						if (!Duration.TryParse(Attr.Value, out MinInterval))
+						if (Duration.TryParse(Attr.Value, out D))
+							MinInterval = D;
+						else
 							MinInterval = null;
 						break;
 
 					case "maxInt":
-						if (!Duration.TryParse(Attr.Value, out MaxInterval))
+						if (Duration.TryParse(Attr.Value, out D))
+							MaxInterval = D;
+						else
 							MaxInterval = null;
 						break;
 
@@ -684,7 +690,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 		private void PerformSubscription(bool Req, IqEventArgs e, string Id, Dictionary<string, FieldSubscriptionRule> FieldNames,
 			IThingReference[] Nodes, FieldType FieldTypes, string ServiceToken, string DeviceToken, string UserToken,
-			Duration MaxAge, Duration MinInterval, Duration MaxInterval)
+			Duration? MaxAge, Duration? MinInterval, Duration? MaxInterval)
 		{
 			DateTime Now = DateTime.Now;
 			Subscription Subscription;
@@ -778,13 +784,13 @@ namespace Waher.Networking.XMPP.Sensor
 
 		internal void UpdateSubscriptionTimers(DateTime ReferenceTimestamp, Subscription Subscription)
 		{
-			Duration D;
+			Duration? D;
 
-			if ((D = Subscription.MinInterval) != null)
-				this.scheduler.Add(ReferenceTimestamp + D, this.CheckMinInterval, Subscription);
+			if ((D = Subscription.MinInterval).HasValue)
+				this.scheduler.Add(ReferenceTimestamp + D.Value, this.CheckMinInterval, Subscription);
 
-			if ((D = Subscription.MaxInterval) != null)
-				this.scheduler.Add(ReferenceTimestamp + D, this.CheckMaxInterval, Subscription);
+			if ((D = Subscription.MaxInterval).HasValue)
+				this.scheduler.Add(ReferenceTimestamp + D.Value, this.CheckMaxInterval, Subscription);
 		}
 
 		private void CheckMinInterval(object P)
@@ -794,7 +800,10 @@ namespace Waher.Networking.XMPP.Sensor
 			if (Subscription.Active && Subscription.SupressedTrigger)
 			{
 				Subscription.SupressedTrigger = false;
-				Subscription.LastTrigger += Subscription.MinInterval;
+
+				if (Subscription.MinInterval.HasValue)
+					Subscription.LastTrigger += Subscription.MinInterval.Value;
+
 				this.TriggerSubscription(Subscription);
 			}
 		}
@@ -805,7 +814,9 @@ namespace Waher.Networking.XMPP.Sensor
 			if (!Subscription.Active)
 				return;
 
-			DateTime TP = Subscription.LastTrigger + Subscription.MaxInterval;
+			DateTime TP = Subscription.LastTrigger;
+			if (Subscription.MaxInterval.HasValue)
+				TP += Subscription.MaxInterval.Value;
 
 			if (TP <= DateTime.Now)
 			{
@@ -813,7 +824,7 @@ namespace Waher.Networking.XMPP.Sensor
 				this.TriggerSubscription(Subscription);
 			}
 			else
-				this.scheduler.Add(Subscription.LastTrigger + Subscription.MaxInterval, this.CheckMaxInterval, Subscription);
+				this.scheduler.Add(TP, this.CheckMaxInterval, Subscription);
 		}
 
 		private bool RemoveSubscriptionLocked(string From, string Id, bool RemoveFromThings)

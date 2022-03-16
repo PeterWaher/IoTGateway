@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Xml;
-using Waher.Events;
 using Waher.Things;
 using Waher.Things.SensorData;
 
@@ -14,18 +11,18 @@ namespace Waher.Networking.XMPP.Sensor
 	public abstract class SensorDataRequest
 	{
 		private Dictionary<string, bool> fieldsByName = null;
-		private string id;
-		private string remoteJid;
-		private string actor;
+		private readonly string id;
+		private readonly string remoteJid;
+		private readonly string actor;
 		private IThingReference[] nodes;
 		private FieldType types;
 		private string[] fieldsNames;
-		private DateTime from;
-		private DateTime to;
+		private readonly DateTime from;
+		private readonly DateTime to;
 		private DateTime when;
-		private string serviceToken;
-		private string deviceToken;
-		private string userToken;
+		private readonly string serviceToken;
+		private readonly string deviceToken;
+		private readonly string userToken;
 		private object tag = null;
 		private int nodesLeft;
 

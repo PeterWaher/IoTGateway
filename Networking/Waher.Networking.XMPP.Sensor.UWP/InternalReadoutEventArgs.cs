@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Networking.XMPP.Sensor
+﻿namespace Waher.Networking.XMPP.Sensor
 {
 	/// <summary>
 	/// Base class for internal readout event arguments.
 	/// </summary>
 	public abstract class InternalReadoutEventArgs
 	{
-		private bool done;
-		private object state;
+		private readonly bool done;
+		private readonly object state;
 
 		/// <summary>
 		/// Base class for internal readout event arguments.

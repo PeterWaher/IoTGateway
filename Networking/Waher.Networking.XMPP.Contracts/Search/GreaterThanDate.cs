@@ -1,18 +1,17 @@
 ﻿using System;
-using Waher.Content;
 
 namespace Waher.Networking.XMPP.Contracts.Search
 {
 	/// <summary>
 	/// Limits searches to items with values greater than this value.
 	/// </summary>
-	public class GreaterThanDuration : SearchFilterDurationOperand
+	public class GreaterThanDate : SearchFilterDateOperand
 	{
 		/// <summary>
 		/// Limits searches to items with values greater than this value.
 		/// </summary>
-		/// <param name="Value">Duration value</param>
-		public GreaterThanDuration(Duration Value)
+		/// <param name="Value">Date value</param>
+		public GreaterThanDate(DateTime Value)
 			: base(Value)
 		{
 		}

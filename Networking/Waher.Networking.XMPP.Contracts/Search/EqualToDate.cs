@@ -1,15 +1,17 @@
-﻿namespace Waher.Networking.XMPP.Contracts.Search
+﻿using System;
+
+namespace Waher.Networking.XMPP.Contracts.Search
 {
 	/// <summary>
 	/// Limits searches to items with values equal to this value.
 	/// </summary>
-	public class EqualToNumber : SearchFilterNumberOperand
+	public class EqualToDate : SearchFilterDateOperand
 	{
 		/// <summary>
 		/// Limits searches to items with values equal to this value.
 		/// </summary>
-		/// <param name="Value">Number value</param>
-		public EqualToNumber(double Value)
+		/// <param name="Value">Date value</param>
+		public EqualToDate(DateTime Value)
 			: base(Value)
 		{
 		}

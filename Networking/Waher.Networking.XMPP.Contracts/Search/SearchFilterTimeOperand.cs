@@ -1,35 +1,34 @@
 ﻿using System;
 using System.Text;
-using Waher.Content.Xml;
 
 namespace Waher.Networking.XMPP.Contracts.Search
 {
 	/// <summary>
-	/// Abstract base class for String-valued Smart Contract Search filter operands.
+	/// Abstract base class for Time Smart Contract Search filter operands.
 	/// </summary>
-	public abstract class SearchFilterStringOperand : SearchFilterOperand
+	public abstract class SearchFilterTimeOperand : SearchFilterOperand
 	{
-		private readonly string value;
+		private readonly TimeSpan value;
 
 		/// <summary>
-		/// Abstract base class for String-valued Smart Contract Search filter operands.
+		/// Abstract base class for Time Smart Contract Search filter operands.
 		/// </summary>
 		/// <param name="Value">String value</param>
-		public SearchFilterStringOperand(string Value)
+		public SearchFilterTimeOperand(TimeSpan Value)
 			: base()
 		{
 			this.value = Value;
 		}
 
 		/// <summary>
-		/// String value.
+		/// Date value.
 		/// </summary>
-		public string Value => this.value;
+		public TimeSpan Value => this.value;
 
 		/// <summary>
 		/// Local XML element suffix.
 		/// </summary>
-		public override string ElementSuffix => "Str";
+		public override string ElementSuffix => "T";
 
 		/// <summary>
 		/// Serializes the search filter to XML.
@@ -42,7 +41,7 @@ namespace Waher.Networking.XMPP.Contracts.Search
 			Xml.Append(this.OperandName);
 			Xml.Append(ElementSuffix);
 			Xml.Append('>');
-			Xml.Append(XML.Encode(this.value));
+			Xml.Append(this.value.ToString());
 			Xml.Append("</");
 			Xml.Append(this.OperandName);
 			Xml.Append(ElementSuffix);

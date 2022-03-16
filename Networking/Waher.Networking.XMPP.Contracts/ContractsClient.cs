@@ -652,7 +652,7 @@ namespace Waher.Networking.XMPP.Contracts
 					IE2eEndpoint ServerKey = null;
 					XmlElement E;
 
-					if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "publicKey" && E.NamespaceURI == NamespaceLegalIdentities)
+					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "publicKey" && E.NamespaceURI == NamespaceLegalIdentities)
 					{
 						foreach (XmlNode N in E.ChildNodes)
 						{
@@ -664,7 +664,7 @@ namespace Waher.Networking.XMPP.Contracts
 							}
 						}
 
-						e.Ok = ServerKey != null;
+						e.Ok = !(ServerKey is null);
 					}
 					else
 						e.Ok = false;
@@ -907,7 +907,7 @@ namespace Waher.Networking.XMPP.Contracts
 						LegalIdentity Identity2 = null;
 						XmlElement E;
 
-						if (e2.Ok && (E = e2.FirstElement) != null &&
+						if (e2.Ok && !((E = e2.FirstElement) is null) &&
 							E.LocalName == "identity" &&
 							E.NamespaceURI == NamespaceLegalIdentities)
 						{
@@ -1116,7 +1116,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			await this.GetServerPublicKey(Identity.Provider, async (sender, e) =>
 			{
-				if (e.Ok && e.Key != null)
+				if (e.Ok && !(e.Key is null))
 				{
 					bool Valid = e.Key.Verify(Data, Identity.ServerSignature);
 
@@ -1139,7 +1139,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 					await this.GetServerPublicKey(Identity.Provider, (sender2, e2) =>
 					{
-						if (e2.Ok && e2.Key != null)
+						if (e2.Ok && !(e2.Key is null))
 						{
 							if (e.Key.Equals(e2.Key))
 								return this.ReturnStatus(IdentityStatus.ProviderSignatureInvalid, Callback, State);
@@ -1518,7 +1518,7 @@ namespace Waher.Networking.XMPP.Contracts
 			LegalIdentity[] Identities = null;
 			XmlElement E;
 
-			if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "identities" && E.NamespaceURI == NamespaceLegalIdentities)
+			if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identities" && E.NamespaceURI == NamespaceLegalIdentities)
 			{
 				List<LegalIdentity> IdentitiesList = new List<LegalIdentity>();
 
@@ -1618,7 +1618,7 @@ namespace Waher.Networking.XMPP.Contracts
 				LegalIdentity Identity = null;
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
 					Identity = LegalIdentity.Parse(E);
 				else
 					e.Ok = false;
@@ -1694,7 +1694,7 @@ namespace Waher.Networking.XMPP.Contracts
 					LegalIdentity Identity = null;
 					XmlElement E;
 
-					if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
 					{
 						Identity = LegalIdentity.Parse(E);
 						await this.UpdateSettings(Identity);
@@ -1773,7 +1773,7 @@ namespace Waher.Networking.XMPP.Contracts
 					LegalIdentity Identity = null;
 					XmlElement E;
 
-					if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+					if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
 					{
 						Identity = LegalIdentity.Parse(E);
 						await this.UpdateSettings(Identity);
@@ -2059,7 +2059,7 @@ namespace Waher.Networking.XMPP.Contracts
 				LegalIdentity Identity = null;
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "identity" && E.NamespaceURI == NamespaceLegalIdentities)
 					Identity = LegalIdentity.Parse(E);
 				else
 					e.Ok = false;
@@ -2131,8 +2131,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Callback">Method to call when registration response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void CreateContract(XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
-			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration Duration,
-			Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate,
+			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration? Duration,
+			Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate,
 			SmartContractEventHandler Callback, object State)
 		{
 			this.CreateContract(this.componentAddress, ForMachines, ForHumans, Roles, Parts, Parameters, Visibility, PartsMode,
@@ -2160,8 +2160,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Callback">Method to call when registration response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void CreateContract(string Address, XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
-			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration Duration,
-			Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate,
+			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration? Duration,
+			Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate,
 			SmartContractEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -2201,7 +2201,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Contract Contract = null;
 			XmlElement E;
 
-			if (e.Ok && (E = e.FirstElement) != null &&
+			if (e.Ok && !((E = e.FirstElement) is null) &&
 				E.LocalName == "contract" &&
 				E.NamespaceURI == NamespaceSmartContracts)
 			{
@@ -2235,8 +2235,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
 		/// <returns>Contract.</returns>
 		public Task<Contract> CreateContractAsync(XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
-			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration Duration,
-			Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate)
+			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration? Duration,
+			Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate)
 		{
 			return this.CreateContractAsync(this.componentAddress, ForMachines, ForHumans, Roles, Parts, Parameters, Visibility,
 				PartsMode, Duration, ArchiveRequired, ArchiveOptional, SignAfter, SignBefore, CanActAsTemplate);
@@ -2262,8 +2262,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
 		/// <returns>Contract.</returns>
 		public Task<Contract> CreateContractAsync(string Address, XmlElement ForMachines, HumanReadableText[] ForHumans, Role[] Roles,
-			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration Duration,
-			Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate)
+			Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility, ContractParts PartsMode, Duration? Duration,
+			Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
 
@@ -2304,7 +2304,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Callback">Method to call when registration response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void CreateContract(string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
-			ContractParts PartsMode, Duration Duration, Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter,
+			ContractParts PartsMode, Duration? Duration, Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter,
 			DateTime? SignBefore, bool CanActAsTemplate, SmartContractEventHandler Callback, object State)
 		{
 			this.CreateContract(this.componentAddress, TemplateId, Parts, Parameters, Visibility, PartsMode,
@@ -2330,7 +2330,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Callback">Method to call when registration response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void CreateContract(string Address, string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
-			ContractParts PartsMode, Duration Duration, Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter,
+			ContractParts PartsMode, Duration? Duration, Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter,
 			DateTime? SignBefore, bool CanActAsTemplate, SmartContractEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -2394,7 +2394,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("</parts>");
 
-			if (Parameters != null && Parameters.Length > 0)
+			if (!(Parameters is null) && Parameters.Length > 0)
 			{
 				Xml.Append("<parameters>");
 
@@ -2426,7 +2426,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
 		/// <returns>Contract.</returns>
 		public Task<Contract> CreateContractAsync(string TemplateId, Part[] Parts, Parameter[] Parameters, ContractVisibility Visibility,
-			ContractParts PartsMode, Duration Duration, Duration ArchiveRequired, Duration ArchiveOptional, DateTime? SignAfter,
+			ContractParts PartsMode, Duration? Duration, Duration? ArchiveRequired, Duration? ArchiveOptional, DateTime? SignAfter,
 			DateTime? SignBefore, bool CanActAsTemplate)
 		{
 			return this.CreateContractAsync(this.componentAddress, TemplateId, Parts, Parameters, Visibility,
@@ -2451,7 +2451,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="CanActAsTemplate">If the contract can act as a template.</param>
 		/// <returns>Contract.</returns>
 		public Task<Contract> CreateContractAsync(string Address, string TemplateId, Part[] Parts, Parameter[] Parameters,
-			ContractVisibility Visibility, ContractParts PartsMode, Duration Duration, Duration ArchiveRequired, Duration ArchiveOptional,
+			ContractVisibility Visibility, ContractParts PartsMode, Duration? Duration, Duration? ArchiveRequired, Duration? ArchiveOptional,
 			DateTime? SignAfter, DateTime? SignBefore, bool CanActAsTemplate)
 		{
 			TaskCompletionSource<Contract> Result = new TaskCompletionSource<Contract>();
@@ -2553,7 +2553,7 @@ namespace Waher.Networking.XMPP.Contracts
 			XmlElement E = e.FirstElement;
 			List<string> IDs = new List<string>();
 
-			if (e.Ok && E != null)
+			if (e.Ok && !(E is null))
 			{
 				foreach (XmlNode N in E.ChildNodes)
 				{
@@ -2710,7 +2710,7 @@ namespace Waher.Networking.XMPP.Contracts
 			List<Contract> Contracts = new List<Contract>();
 			List<string> References = new List<string>();
 
-			if (e.Ok && E != null)
+			if (e.Ok && !(E is null))
 			{
 				foreach (XmlNode N in E.ChildNodes)
 				{
@@ -3274,8 +3274,10 @@ namespace Waher.Networking.XMPP.Contracts
 					{
 						try
 						{
-							ContractsEventArgs e2 = new ContractsEventArgs(e, Contracts.ToArray(), References.ToArray());
-							e2.Ok = Ok;
+							ContractsEventArgs e2 = new ContractsEventArgs(e, Contracts.ToArray(), References.ToArray())
+							{
+								Ok = Ok
+							};
 
 							Callback(this, e2);
 						}
@@ -3953,7 +3955,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			await this.GetServerPublicKey(Contract.Provider, async (sender, e) =>
 			{
-				if (e.Ok && e.Key != null)
+				if (e.Ok && !(e.Key is null))
 				{
 					bool Valid = e.Key.Verify(Data, Contract.ServerSignature.DigitalSignature);
 
@@ -3977,7 +3979,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 					await this.GetServerPublicKey(Contract.Provider, (sender2, e2) =>
 					{
-						if (e2.Ok && e2.Key != null)
+						if (e2.Ok && !(e2.Key is null))
 						{
 							if (e.Key.Equals(e2.Key))
 								return this.ReturnStatus(ContractStatus.ProviderSignatureInvalid, Callback, State);
@@ -4183,7 +4185,7 @@ namespace Waher.Networking.XMPP.Contracts
 					XmlElement E = e.FirstElement;
 					List<SchemaReference> Schemas = new List<SchemaReference>();
 
-					if (e.Ok && E != null && E.LocalName == "schemas" && E.NamespaceURI == NamespaceSmartContracts)
+					if (e.Ok && !(E is null) && E.LocalName == "schemas" && E.NamespaceURI == NamespaceSmartContracts)
 					{
 						foreach (XmlNode N in E.ChildNodes)
 						{
@@ -4323,7 +4325,7 @@ namespace Waher.Networking.XMPP.Contracts
 					XmlElement E = e.FirstElement;
 					byte[] Schema = null;
 
-					if (e.Ok && E != null && E.LocalName == "schema" && E.NamespaceURI == NamespaceSmartContracts)
+					if (e.Ok && !(E is null) && E.LocalName == "schema" && E.NamespaceURI == NamespaceSmartContracts)
 						Schema = Convert.FromBase64String(E.InnerText);
 					else
 						e.Ok = false;
@@ -4553,7 +4555,7 @@ namespace Waher.Networking.XMPP.Contracts
 				NetworkIdentity[] Identities = null;
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "networkIdentities" && E.NamespaceURI == NamespaceSmartContracts)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "networkIdentities" && E.NamespaceURI == NamespaceSmartContracts)
 				{
 					List<NetworkIdentity> IdentitiesList = new List<NetworkIdentity>();
 
@@ -4726,7 +4728,7 @@ namespace Waher.Networking.XMPP.Contracts
 				List<string> IDs = null;
 				bool More = false;
 
-				if (e.Ok && E != null && E.LocalName == "searchResult" && E.NamespaceURI == NamespaceSmartContracts)
+				if (e.Ok && !(E is null) && E.LocalName == "searchResult" && E.NamespaceURI == NamespaceSmartContracts)
 				{
 					More = XML.Attribute(E, "more", false);
 					IDs = new List<string>();

@@ -14,7 +14,7 @@ namespace Waher.Networking.XMPP.Contracts.Search
 		/// <summary>
 		/// Abstract base class for Numerical Smart Contract Search filter operands.
 		/// </summary>
-		/// <param name="Value">String value</param>
+		/// <param name="Value">Numerical value</param>
 		public SearchFilterNumberOperand(double Value)
 			: base()
 		{
@@ -25,6 +25,11 @@ namespace Waher.Networking.XMPP.Contracts.Search
 		/// Numerical value.
 		/// </summary>
 		public double Value => this.value;
+
+		/// <summary>
+		/// Local XML element suffix.
+		/// </summary>
+		public override string ElementSuffix => "Num";
 
 		/// <summary>
 		/// Serializes the search filter to XML.

@@ -5,13 +5,13 @@ namespace Waher.Networking.XMPP.Contracts.Search
 	/// <summary>
 	/// Limits searches to items with values not equal to this value.
 	/// </summary>
-	public class NotEqualToNumber : SearchFilterNumberOperand
+	public class NotEqualToTime : SearchFilterTimeOperand
 	{
 		/// <summary>
 		/// Limits searches to items with values not equal to this value.
 		/// </summary>
-		/// <param name="Value">Number value</param>
-		public NotEqualToNumber(double Value)
+		/// <param name="Value">Time value</param>
+		public NotEqualToTime(TimeSpan Value)
 			: base(Value)
 		{
 		}

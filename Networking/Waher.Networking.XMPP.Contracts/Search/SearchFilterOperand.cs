@@ -25,10 +25,12 @@ namespace Waher.Networking.XMPP.Contracts.Search
 		/// <summary>
 		/// Local XML element name of string operand.
 		/// </summary>
-		public abstract string OperandName
-		{
-			get;
-		}
+		public abstract string OperandName { get; }
+
+		/// <summary>
+		/// Local XML element suffix.
+		/// </summary>
+		public abstract string ElementSuffix { get; }
 
 	}
 }

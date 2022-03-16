@@ -46,10 +46,8 @@ namespace Waher.Networking.XMPP.Contracts.Search
 			{
 				if (Op is LikeRegEx)
 					Op.Serialize(Xml, string.Empty);
-				else if (Op is SearchFilterStringOperand)
-					Op.Serialize(Xml, "Str");
-				else if (Op is SearchFilterNumberOperand)
-					Op.Serialize(Xml, "Num");
+				else if (Op is SearchFilterOperand SearchFilterOperand)
+					Op.Serialize(Xml, SearchFilterOperand.ElementSuffix);
 				else
 					Op.Serialize(Xml, string.Empty);
 			}

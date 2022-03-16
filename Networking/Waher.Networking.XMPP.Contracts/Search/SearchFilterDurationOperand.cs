@@ -27,6 +27,11 @@ namespace Waher.Networking.XMPP.Contracts.Search
 		public Duration Value => this.value;
 
 		/// <summary>
+		/// Local XML element suffix.
+		/// </summary>
+		public override string ElementSuffix => "Dr";
+
+		/// <summary>
 		/// Serializes the search filter to XML.
 		/// </summary>
 		/// <param name="Xml">XML output.</param>

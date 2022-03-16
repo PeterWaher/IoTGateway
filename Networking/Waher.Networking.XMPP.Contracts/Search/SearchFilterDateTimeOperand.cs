@@ -27,6 +27,11 @@ namespace Waher.Networking.XMPP.Contracts.Search
 		public DateTime Value => this.value;
 
 		/// <summary>
+		/// Local XML element suffix.
+		/// </summary>
+		public override string ElementSuffix => "DT";
+
+		/// <summary>
 		/// Serializes the search filter to XML.
 		/// </summary>
 		/// <param name="Xml">XML output.</param>
@@ -37,7 +42,7 @@ namespace Waher.Networking.XMPP.Contracts.Search
 			Xml.Append(this.OperandName);
 			Xml.Append(ElementSuffix);
 			Xml.Append('>');
-			Xml.Append(XML.Encode(this.value));
+			Xml.Append(XML.Encode(this.value, false));
 			Xml.Append("</");
 			Xml.Append(this.OperandName);
 			Xml.Append(ElementSuffix);

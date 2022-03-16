@@ -3,15 +3,15 @@
 namespace Waher.Networking.XMPP.Contracts.Search
 {
 	/// <summary>
-	/// Limits searches to items with values note equal to this value.
+	/// Limits searches to items with values not equal to this value.
 	/// </summary>
-	public class NotEqualToDateTime : SearchFilterDateTimeOperand
+	public class NotEqualToBoolean : SearchFilterBooleanOperand
 	{
 		/// <summary>
-		/// Limits searches to items with values note equal to this value.
+		/// Limits searches to items with values not equal to this value.
 		/// </summary>
-		/// <param name="Value">DateTime value</param>
-		public NotEqualToDateTime(DateTime Value)
+		/// <param name="Value">Boolean value</param>
+		public NotEqualToBoolean(bool Value)
 			: base(Value)
 		{
 		}

@@ -41,9 +41,9 @@ namespace Waher.Networking.XMPP.Contracts
 		private DateTime to = DateTime.MaxValue;
 		private DateTime? signAfter = null;
 		private DateTime? signBefore = null;
-		private Duration duration = null;
-		private Duration archiveReq = null;
-		private Duration archiveOpt = null;
+		private Duration? duration = null;
+		private Duration? archiveReq = null;
+		private Duration? archiveOpt = null;
 		private bool canActAsTemplate = false;
 
 		/// <summary>
@@ -175,7 +175,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Duration of the contract. Is counted from the time it is signed by the required parties.
 		/// </summary>
-		public Duration Duration
+		public Duration? Duration
 		{
 			get { return this.duration; }
 			set { this.duration = value; }
@@ -184,7 +184,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Requied time to archive a signed smart contract, after it becomes obsolete.
 		/// </summary>
-		public Duration ArchiveRequired
+		public Duration? ArchiveRequired
 		{
 			get { return this.archiveReq; }
 			set { this.archiveReq = value; }
@@ -193,7 +193,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Optional time to archive a signed smart contract, after it becomes obsolete, and after its required archivation period.
 		/// </summary>
-		public Duration ArchiveOptional
+		public Duration? ArchiveOptional
 		{
 			get { return this.archiveOpt; }
 			set { this.archiveOpt = value; }
@@ -385,21 +385,21 @@ namespace Waher.Networking.XMPP.Contracts
 						break;
 
 					case "duration":
-						if (Duration.TryParse(Attr.Value, out Duration D))
+						if (Waher.Content.Duration.TryParse(Attr.Value, out Duration D))
 							Result.duration = D;
 						else
 							return null;
 						break;
 
 					case "archiveReq":
-						if (Duration.TryParse(Attr.Value, out D))
+						if (Waher.Content.Duration.TryParse(Attr.Value, out D))
 							Result.archiveReq = D;
 						else
 							return null;
 						break;
 
 					case "archiveOpt":
-						if (Duration.TryParse(Attr.Value, out D))
+						if (Waher.Content.Duration.TryParse(Attr.Value, out D))
 							Result.archiveOpt = D;
 						else
 							return null;
@@ -725,6 +725,66 @@ namespace Waher.Networking.XMPP.Contracts
 											Value = E2.HasAttribute("value") ? XML.Attribute(E2, "value", false) : (bool?)null,
 											Guide = XML.Attribute(E2, "guide"),
 											Expression = XML.Attribute(E2, "exp"),
+											Descriptions = Descriptions.ToArray()
+										});
+										break;
+
+									case "dateParameter":
+										Parameters.Add(new DateParameter()
+										{
+											Name = Name,
+											Value = E2.HasAttribute("value") ? XML.Attribute(E2, "value", DateTime.MinValue).Date : (DateTime?)null,
+											Guide = XML.Attribute(E2, "guide"),
+											Expression = XML.Attribute(E2, "exp"),
+											Min = E2.HasAttribute("min") ? XML.Attribute(E2, "min", DateTime.MinValue).Date : (DateTime?)null,
+											MinIncluded = XML.Attribute(E2, "minIncluded", true),
+											Max = E2.HasAttribute("max") ? XML.Attribute(E2, "max", DateTime.MinValue).Date : (DateTime?)null,
+											MaxIncluded = XML.Attribute(E2, "maxIncluded", true),
+											Descriptions = Descriptions.ToArray()
+										});
+										break;
+
+									case "dateTimeParameter":
+										Parameters.Add(new DateTimeParameter()
+										{
+											Name = Name,
+											Value = E2.HasAttribute("value") ? XML.Attribute(E2, "value", DateTime.MinValue) : (DateTime?)null,
+											Guide = XML.Attribute(E2, "guide"),
+											Expression = XML.Attribute(E2, "exp"),
+											Min = E2.HasAttribute("min") ? XML.Attribute(E2, "min", DateTime.MinValue) : (DateTime?)null,
+											MinIncluded = XML.Attribute(E2, "minIncluded", true),
+											Max = E2.HasAttribute("max") ? XML.Attribute(E2, "max", DateTime.MinValue) : (DateTime?)null,
+											MaxIncluded = XML.Attribute(E2, "maxIncluded", true),
+											Descriptions = Descriptions.ToArray()
+										});
+										break;
+
+									case "timeParameter":
+										Parameters.Add(new TimeParameter()
+										{
+											Name = Name,
+											Value = E2.HasAttribute("value") ? XML.Attribute(E2, "value", TimeSpan.Zero) : (TimeSpan?)null,
+											Guide = XML.Attribute(E2, "guide"),
+											Expression = XML.Attribute(E2, "exp"),
+											Min = E2.HasAttribute("min") ? XML.Attribute(E2, "min", TimeSpan.Zero) : (TimeSpan?)null,
+											MinIncluded = XML.Attribute(E2, "minIncluded", true),
+											Max = E2.HasAttribute("max") ? XML.Attribute(E2, "max", TimeSpan.Zero) : (TimeSpan?)null,
+											MaxIncluded = XML.Attribute(E2, "maxIncluded", true),
+											Descriptions = Descriptions.ToArray()
+										});
+										break;
+
+									case "durationParameter":
+										Parameters.Add(new DurationParameter()
+										{
+											Name = Name,
+											Value = E2.HasAttribute("value") ? XML.Attribute(E2, "value", Waher.Content.Duration.Zero) : (Duration?)null,
+											Guide = XML.Attribute(E2, "guide"),
+											Expression = XML.Attribute(E2, "exp"),
+											Min = E2.HasAttribute("min") ? XML.Attribute(E2, "min", Waher.Content.Duration.Zero) : (Duration?)null,
+											MinIncluded = XML.Attribute(E2, "minIncluded", true),
+											Max = E2.HasAttribute("max") ? XML.Attribute(E2, "max", Waher.Content.Duration.Zero) : (Duration?)null,
+											MaxIncluded = XML.Attribute(E2, "maxIncluded", true),
 											Descriptions = Descriptions.ToArray()
 										});
 										break;
@@ -1232,7 +1292,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append("</parts>");
 
-			if (this.parameters != null && this.parameters.Length > 0)
+			if (!(this.parameters is null) && this.parameters.Length > 0)
 			{
 				Xml.Append("<parameters>");
 
@@ -1242,13 +1302,13 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append("</parameters>");
 			}
 
-			if (this.forHumans != null && this.forHumans.Length > 0)
+			if (!(this.forHumans is null) && this.forHumans.Length > 0)
 			{
 				foreach (HumanReadableText Text in this.forHumans)
 					Text.Serialize(Xml);
 			}
 
-			if (IncludeClientSignatures && this.clientSignatures != null)
+			if (IncludeClientSignatures && !(this.clientSignatures is null))
 			{
 				foreach (Signature Signature in this.clientSignatures)
 					Signature.Serialize(Xml);
@@ -1288,7 +1348,7 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append("\" provider=\"");
 				Xml.Append(XML.Encode(this.provider));
 
-				if (this.contentSchemaDigest != null && this.contentSchemaDigest.Length > 0)
+				if (!(this.contentSchemaDigest is null) && this.contentSchemaDigest.Length > 0)
 				{
 					Xml.Append("\" schemaDigest=\"");
 					Xml.Append(Convert.ToBase64String(this.contentSchemaDigest));

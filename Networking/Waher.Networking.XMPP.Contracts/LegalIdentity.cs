@@ -218,7 +218,7 @@ namespace Waher.Networking.XMPP.Contracts
 								if (N2 is XmlElement E2)
 								{
 									IE2eEndpoint Key = EndpointSecurity.ParseE2eKey(E2);
-									if (Key != null && Key.Namespace == EndpointSecurity.IoTHarmonizationE2E)
+									if (!(Key is null) && Key.Namespace == EndpointSecurity.IoTHarmonizationE2E)
 									{
                                         Result.clientPubKey = Key.PublicKey;
 

@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Text;
-using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
-using Waher.Script;
 
 namespace Waher.Networking.XMPP.Contracts
 {
 	/// <summary>
-	/// Numerical contractual parameter
+	/// Date and Time contractual parameter
 	/// </summary>
-	public class NumericalParameter : RangeParameter<double>
+	public class DateTimeParameter : RangeParameter<DateTime>
 	{
 		/// <summary>
 		/// Serializes the parameter, in normalized form.
@@ -19,13 +17,13 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Xml">XML Output</param>
 		public override void Serialize(StringBuilder Xml)
 		{
-			Xml.Append("<numericalParameter name=\"");
+			Xml.Append("<dateTimeParameter name=\"");
 			Xml.Append(XML.Encode(this.Name));
 
 			if (this.Value.HasValue)
 			{
 				Xml.Append("\" value=\"");
-				Xml.Append(CommonTypes.Encode(this.Value.Value));
+				Xml.Append(XML.Encode(this.Value.Value, false));
 			}
 
 			if (!string.IsNullOrEmpty(this.Guide))
@@ -43,7 +41,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (this.Min.HasValue)
 			{
 				Xml.Append("\" min=\"");
-				Xml.Append(CommonTypes.Encode(this.Min.Value));
+				Xml.Append(XML.Encode(this.Min.Value, false));
 				Xml.Append("\" minIncluded=\"");
 				Xml.Append(XML.Encode(CommonTypes.Encode(this.MinIncluded)));
 			}
@@ -51,7 +49,7 @@ namespace Waher.Networking.XMPP.Contracts
 			if (this.Max.HasValue)
 			{
 				Xml.Append("\" max=\"");
-				Xml.Append(CommonTypes.Encode(this.Max.Value));
+				Xml.Append(XML.Encode(this.Max.Value, false));
 				Xml.Append("\" maxIncluded=\"");
 				Xml.Append(XML.Encode(CommonTypes.Encode(this.MaxIncluded)));
 			}
@@ -65,7 +63,7 @@ namespace Waher.Networking.XMPP.Contracts
 				foreach (HumanReadableText Description in this.Descriptions)
 					Description.Serialize(Xml, "description", false);
 
-				Xml.Append("</numericalParameter>");
+				Xml.Append("</dateTimeParameter>");
 			}
 		}
 
@@ -76,29 +74,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
 		public override void SetValue(object Value)
 		{
-			if (Value is double d)
-				this.Value = d;
-			else if (Value is float f)
-				this.Value = f;
-			else if (Value is decimal dec)
-				this.Value = (double)dec;
-			else if (Value is int i)
-				this.Value = i;
-			else if (Value is long l)
-				this.Value = l;
-			else if (Value is short s)
-				this.Value = s;
-			else if (Value is sbyte sb)
-				this.Value = sb;
-			else if (Value is uint ui)
-				this.Value = ui;
-			else if (Value is ulong ul)
-				this.Value = ul;
-			else if (Value is ushort us)
-				this.Value = us;
-			else if (Value is byte ub)
-				this.Value = ub;
-			else if (Value is string str && CommonTypes.TryParse(str, out d))
+			if (Value is DateTime d)
 				this.Value = d;
 			else
 				throw new ArgumentException("Invalid parameter type.", nameof(Value));

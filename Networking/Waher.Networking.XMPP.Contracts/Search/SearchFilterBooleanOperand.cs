@@ -1,35 +1,35 @@
 ﻿using System;
 using System.Text;
-using Waher.Content.Xml;
+using Waher.Content;
 
 namespace Waher.Networking.XMPP.Contracts.Search
 {
 	/// <summary>
-	/// Abstract base class for String-valued Smart Contract Search filter operands.
+	/// Abstract base class for Boolean Smart Contract Search filter operands.
 	/// </summary>
-	public abstract class SearchFilterStringOperand : SearchFilterOperand
+	public abstract class SearchFilterBooleanOperand : SearchFilterOperand
 	{
-		private readonly string value;
+		private readonly bool value;
 
 		/// <summary>
-		/// Abstract base class for String-valued Smart Contract Search filter operands.
+		/// Abstract base class for Boolean Smart Contract Search filter operands.
 		/// </summary>
-		/// <param name="Value">String value</param>
-		public SearchFilterStringOperand(string Value)
+		/// <param name="Value">Boolean value</param>
+		public SearchFilterBooleanOperand(bool Value)
 			: base()
 		{
 			this.value = Value;
 		}
 
 		/// <summary>
-		/// String value.
+		/// Boolean value.
 		/// </summary>
-		public string Value => this.value;
+		public bool Value => this.value;
 
 		/// <summary>
 		/// Local XML element suffix.
 		/// </summary>
-		public override string ElementSuffix => "Str";
+		public override string ElementSuffix => "B";
 
 		/// <summary>
 		/// Serializes the search filter to XML.
@@ -42,7 +42,7 @@ namespace Waher.Networking.XMPP.Contracts.Search
 			Xml.Append(this.OperandName);
 			Xml.Append(ElementSuffix);
 			Xml.Append('>');
-			Xml.Append(XML.Encode(this.value));
+			Xml.Append(CommonTypes.Encode(this.value));
 			Xml.Append("</");
 			Xml.Append(this.OperandName);
 			Xml.Append(ElementSuffix);

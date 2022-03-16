@@ -375,6 +375,7 @@ namespace Waher.Persistence.Serialization
 				StringBuilder CSharp = new StringBuilder();
 				IEnumerable<MemberInfo> Members = GetMembers(this.typeInfo);
 				Dictionary<string, string> ShortNames = new Dictionary<string, string>();
+				Dictionary<Type, bool> MemberTypes = new Dictionary<Type, bool>();
 				Type MemberType;
 				System.Reflection.TypeInfo MemberTypeInfo;
 				FieldInfo FI;
@@ -452,6 +453,8 @@ namespace Waher.Persistence.Serialization
 							MemberTypeInfo = MemberType.GetTypeInfo();
 						}
 					}
+
+					MemberTypes[MemberType] = true;
 
 					foreach (Attribute Attr in Member.GetCustomAttributes(true))
 					{
@@ -2257,6 +2260,9 @@ namespace Waher.Persistence.Serialization
 					{ GetLocation(typeof(ObjectSerializer)), true },
 					{ GetLocation(typeof(MultiReadSingleWriteObject)), true }
 				};
+
+				foreach (Type T in MemberTypes.Keys)
+					Dependencies[GetLocation(T)] = true;
 
 				System.Reflection.TypeInfo LoopInfo;
 				Type Loop = Type;

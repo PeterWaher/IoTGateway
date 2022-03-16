@@ -20,6 +20,26 @@ namespace Waher.Things.Ip
 		private bool tls = false;
 
 		/// <summary>
+		/// If the node accepts a presumptive child, i.e. can receive as a child (if that child accepts the node as a parent).
+		/// </summary>
+		/// <param name="Child">Presumptive child node.</param>
+		/// <returns>If the child is acceptable.</returns>
+		public override Task<bool> AcceptsChildAsync(INode Child)
+		{
+			return Task.FromResult<bool>(false);
+		}
+
+		/// <summary>
+		/// Gets the type name of the node.
+		/// </summary>
+		/// <param name="Language">Language to use.</param>
+		/// <returns>Localized type node.</returns>
+		public override Task<string> GetTypeNameAsync(Language Language)
+		{
+			return Language.GetStringAsync(typeof(IpHostPort), 23, "Port on IP Host");
+		}
+
+		/// <summary>
 		/// Port number.
 		/// </summary>
 		[Page(1, "IP")]

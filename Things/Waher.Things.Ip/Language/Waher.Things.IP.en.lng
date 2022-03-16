@@ -24,6 +24,7 @@
 			<String id="20">Digest</String>
 			<String id="21">Algorithm</String>
 			<String id="22">Public Key</String>
+			<String id="23">Port on IP Host</String>
 		</Namespace>
 	</Language>
 </Translation>

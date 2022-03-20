@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Persistence
 {
@@ -102,7 +101,7 @@ namespace Waher.Persistence
 			if (obj is CaseInsensitiveString S)
 				return this.lowerCase.CompareTo(S.lowerCase);
 			else if (obj is string S2)
-				return this.lowerCase.CompareTo(S2.ToLower());
+				return this.lowerCase.CompareTo(S2?.ToLower());
 			else
 				return -1;
 		}
@@ -148,7 +147,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool operator <(CaseInsensitiveString S1, CaseInsensitiveString S2)
 		{
-			return string.Compare(S1.lowerCase, S2.lowerCase) < 0;
+			return string.Compare(S1?.lowerCase, S2?.lowerCase) < 0;
 		}
 
 		/// <summary>
@@ -156,7 +155,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool operator >(CaseInsensitiveString S1, CaseInsensitiveString S2)
 		{
-			return string.Compare(S1.lowerCase, S2.lowerCase) > 0;
+			return string.Compare(S1?.lowerCase, S2?.lowerCase) > 0;
 		}
 
 		/// <summary>
@@ -164,7 +163,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool operator <=(CaseInsensitiveString S1, CaseInsensitiveString S2)
 		{
-			return string.Compare(S1.lowerCase, S2.lowerCase) <= 0;
+			return string.Compare(S1?.lowerCase, S2?.lowerCase) <= 0;
 		}
 
 		/// <summary>
@@ -172,7 +171,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool operator >=(CaseInsensitiveString S1, CaseInsensitiveString S2)
 		{
-			return string.Compare(S1.lowerCase, S2.lowerCase) >= 0;
+			return string.Compare(S1?.lowerCase, S2?.lowerCase) >= 0;
 		}
 
 		/// <summary>
@@ -180,7 +179,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool operator ==(CaseInsensitiveString S1, string S2)
 		{
-			return S1.lowerCase == S2.ToLower();
+			return S1?.lowerCase == S2?.ToLower();
 		}
 
 		/// <summary>
@@ -188,7 +187,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool operator !=(CaseInsensitiveString S1, string S2)
 		{
-			return S1.lowerCase != S2.ToLower();
+			return S1?.lowerCase != S2?.ToLower();
 		}
 
 		/// <summary>
@@ -196,7 +195,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool operator <(CaseInsensitiveString S1, string S2)
 		{
-			return string.Compare(S1.lowerCase, S2.ToLower()) < 0;
+			return string.Compare(S1?.lowerCase, S2?.ToLower()) < 0;
 		}
 
 		/// <summary>
@@ -204,7 +203,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool operator >(CaseInsensitiveString S1, string S2)
 		{
-			return string.Compare(S1.lowerCase, S2.ToLower()) > 0;
+			return string.Compare(S1?.lowerCase, S2?.ToLower()) > 0;
 		}
 
 		/// <summary>
@@ -212,7 +211,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool operator <=(CaseInsensitiveString S1, string S2)
 		{
-			return string.Compare(S1.lowerCase, S2.ToLower()) <= 0;
+			return string.Compare(S1?.lowerCase, S2?.ToLower()) <= 0;
 		}
 
 		/// <summary>
@@ -220,7 +219,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool operator >=(CaseInsensitiveString S1, string S2)
 		{
-			return string.Compare(S1.lowerCase, S2.ToLower()) >= 0;
+			return string.Compare(S1?.lowerCase, S2?.ToLower()) >= 0;
 		}
 
 		/// <summary>
@@ -228,7 +227,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool operator ==(string S1, CaseInsensitiveString S2)
 		{
-			return S1.ToLower() == S2.lowerCase;
+			return S1?.ToLower() == S2?.lowerCase;
 		}
 
 		/// <summary>
@@ -236,7 +235,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool operator !=(string S1, CaseInsensitiveString S2)
 		{
-			return S1.ToLower() != S2.lowerCase;
+			return S1?.ToLower() != S2?.lowerCase;
 		}
 
 		/// <summary>
@@ -244,7 +243,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool operator <(string S1, CaseInsensitiveString S2)
 		{
-			return string.Compare(S1.ToLower(), S2.lowerCase) < 0;
+			return string.Compare(S1?.ToLower(), S2?.lowerCase) < 0;
 		}
 
 		/// <summary>
@@ -252,7 +251,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool operator >(string S1, CaseInsensitiveString S2)
 		{
-			return string.Compare(S1.ToLower(), S2.lowerCase) > 0;
+			return string.Compare(S1?.ToLower(), S2?.lowerCase) > 0;
 		}
 
 		/// <summary>
@@ -260,7 +259,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool operator <=(string S1, CaseInsensitiveString S2)
 		{
-			return string.Compare(S1.ToLower(), S2.lowerCase) <= 0;
+			return string.Compare(S1?.ToLower(), S2?.lowerCase) <= 0;
 		}
 
 		/// <summary>
@@ -268,7 +267,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static bool operator >=(string S1, CaseInsensitiveString S2)
 		{
-			return string.Compare(S1.ToLower(), S2.lowerCase) >= 0;
+			return string.Compare(S1?.ToLower(), S2?.lowerCase) >= 0;
 		}
 
 		/// <summary>
@@ -276,7 +275,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static CaseInsensitiveString operator +(CaseInsensitiveString S1, CaseInsensitiveString S2)
 		{
-			return new CaseInsensitiveString(S1.value + S2.value);
+			return new CaseInsensitiveString(S1?.value + S2?.value);
 		}
 
 		/// <summary>
@@ -292,7 +291,7 @@ namespace Waher.Persistence
 		/// </summary>
 		public static string operator +(string S1, CaseInsensitiveString S2)
 		{
-			return S1 + S2.value;
+			return S1 + S2?.value;
 		}
 
 		/// <summary>
@@ -594,7 +593,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public static CaseInsensitiveString Concat(CaseInsensitiveString str0, CaseInsensitiveString str1)
 		{
-			return new CaseInsensitiveString(string.Concat(str0.value, str1.value));
+			return new CaseInsensitiveString(string.Concat(str0?.value, str1?.value));
 		}
 
 		/// <summary>
@@ -617,7 +616,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public static CaseInsensitiveString Concat(CaseInsensitiveString str0, CaseInsensitiveString str1, CaseInsensitiveString str2, CaseInsensitiveString str3)
 		{
-			return new CaseInsensitiveString(string.Concat(str0.value, str1.value, str2.value, str3.value));
+			return new CaseInsensitiveString(string.Concat(str0?.value, str1?.value, str2?.value, str3?.value));
 		}
 
 		/// <summary>
@@ -729,7 +728,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public static CaseInsensitiveString Concat(CaseInsensitiveString str0, CaseInsensitiveString str1, CaseInsensitiveString str2)
 		{
-			return new CaseInsensitiveString(string.Concat(str0.value, str1.value, str2.value));
+			return new CaseInsensitiveString(string.Concat(str0?.value, str1?.value, str2?.value));
 		}
 
 		/// <summary>
@@ -1064,7 +1063,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Join(CaseInsensitiveString separator, params object[] values)
 		{
-			return new CaseInsensitiveString(string.Join(separator.value, values));
+			return new CaseInsensitiveString(string.Join(separator?.value, values));
 		}
 
 		/// <summary>
@@ -1087,7 +1086,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Join(CaseInsensitiveString separator, params CaseInsensitiveString[] value)
 		{
-			return new CaseInsensitiveString(string.Join(separator.value, value.ToStringArray()));
+			return new CaseInsensitiveString(string.Join(separator?.value, value.ToStringArray()));
 		}
 
 		/// <summary>
@@ -1113,7 +1112,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Join<T>(CaseInsensitiveString separator, IEnumerable<T> values)
 		{
-			return new CaseInsensitiveString(string.Join(separator.value, values));
+			return new CaseInsensitiveString(string.Join(separator?.value, values));
 		}
 
 		/// <summary>
@@ -1150,7 +1149,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Join(CaseInsensitiveString separator, CaseInsensitiveString[] value, int startIndex, int count)
 		{
-			return new CaseInsensitiveString(string.Join(separator.value, value.ToStringArray(), startIndex, count));
+			return new CaseInsensitiveString(string.Join(separator?.value, value.ToStringArray(), startIndex, count));
 		}
 
 		/// <summary>
@@ -1174,7 +1173,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public static CaseInsensitiveString Join(CaseInsensitiveString separator, IEnumerable<CaseInsensitiveString> values)
 		{
-			return new CaseInsensitiveString(string.Join<CaseInsensitiveString>(separator.value, values));
+			return new CaseInsensitiveString(string.Join<CaseInsensitiveString>(separator?.value, values));
 		}
 
 		/// <summary>
@@ -1704,7 +1703,7 @@ namespace Waher.Persistence
 		/// </exception>
 		public CaseInsensitiveString Insert(int startIndex, CaseInsensitiveString value)
 		{
-			return new CaseInsensitiveString(this.value.Insert(startIndex, value.value));
+			return new CaseInsensitiveString(this.value.Insert(startIndex, value?.value));
 		}
 
 		/// <summary>
@@ -2240,7 +2239,7 @@ namespace Waher.Persistence
 			while (i >= 0)
 			{
 				s = s.Remove(i + Diff, c);
-				s = s.Insert(i + Diff, newValue.value);
+				s = s.Insert(i + Diff, newValue?.value);
 
 				i = s2.IndexOf(oldValue.lowerCase, i + c);
 				Diff += d - c;

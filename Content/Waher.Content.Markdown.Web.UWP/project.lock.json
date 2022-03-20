@@ -2625,7 +2625,7 @@
           "Waher.Networking.UWP": "1.0.0"
         }
       },
-      "Waher.Persistence/1.6.1": {
+      "Waher.Persistence/1.6.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2706,7 +2706,7 @@
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.WHOIS.UWP": "1.0.0",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Security": "1.0.8"
         }
@@ -5296,7 +5296,7 @@
           "Waher.Networking.UWP": "1.0.0"
         }
       },
-      "Waher.Persistence/1.6.1": {
+      "Waher.Persistence/1.6.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5377,7 +5377,7 @@
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.WHOIS.UWP": "1.0.0",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Security": "1.0.8"
         }
@@ -8003,7 +8003,7 @@
           "Waher.Networking.UWP": "1.0.0"
         }
       },
-      "Waher.Persistence/1.6.1": {
+      "Waher.Persistence/1.6.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8084,7 +8084,7 @@
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.WHOIS.UWP": "1.0.0",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Security": "1.0.8"
         }
@@ -10683,7 +10683,7 @@
           "Waher.Networking.UWP": "1.0.0"
         }
       },
-      "Waher.Persistence/1.6.1": {
+      "Waher.Persistence/1.6.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10764,7 +10764,7 @@
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.WHOIS.UWP": "1.0.0",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Security": "1.0.8"
         }
@@ -13399,7 +13399,7 @@
           "Waher.Networking.UWP": "1.0.0"
         }
       },
-      "Waher.Persistence/1.6.1": {
+      "Waher.Persistence/1.6.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13480,7 +13480,7 @@
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.WHOIS.UWP": "1.0.0",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Security": "1.0.8"
         }
@@ -16079,7 +16079,7 @@
           "Waher.Networking.UWP": "1.0.0"
         }
       },
-      "Waher.Persistence/1.6.1": {
+      "Waher.Persistence/1.6.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16160,7 +16160,7 @@
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.WHOIS.UWP": "1.0.0",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Security": "1.0.8"
         }
@@ -18795,7 +18795,7 @@
           "Waher.Networking.UWP": "1.0.0"
         }
       },
-      "Waher.Persistence/1.6.1": {
+      "Waher.Persistence/1.6.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18876,7 +18876,7 @@
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.WHOIS.UWP": "1.0.0",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Security": "1.0.8"
         }
@@ -28936,7 +28936,7 @@
       "path": "../../Networking/Waher.Networking.WHOIS.UWP/Waher.Networking.WHOIS.UWP.csproj",
       "msbuildProject": "../../Networking/Waher.Networking.WHOIS.UWP/Waher.Networking.WHOIS.UWP.csproj"
     },
-    "Waher.Persistence/1.6.1": {
+    "Waher.Persistence/1.6.2": {
       "type": "project",
       "path": "../../Persistence/Waher.Persistence/Waher.Persistence.csproj",
       "msbuildProject": "../../Persistence/Waher.Persistence/Waher.Persistence.csproj"

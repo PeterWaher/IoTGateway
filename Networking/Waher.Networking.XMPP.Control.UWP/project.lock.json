@@ -2591,7 +2591,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Persistence/1.6.1": {
+      "Waher.Persistence/1.6.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2621,7 +2621,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
@@ -2637,7 +2637,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Threading": "1.2.1"
         }
       },
@@ -5238,7 +5238,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Persistence/1.6.1": {
+      "Waher.Persistence/1.6.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5268,7 +5268,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
@@ -5284,7 +5284,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Threading": "1.2.1"
         }
       },
@@ -7921,7 +7921,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Persistence/1.6.1": {
+      "Waher.Persistence/1.6.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7951,7 +7951,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
@@ -7967,7 +7967,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Threading": "1.2.1"
         }
       },
@@ -10577,7 +10577,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Persistence/1.6.1": {
+      "Waher.Persistence/1.6.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10607,7 +10607,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
@@ -10623,7 +10623,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Threading": "1.2.1"
         }
       },
@@ -13269,7 +13269,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Persistence/1.6.1": {
+      "Waher.Persistence/1.6.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13299,7 +13299,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
@@ -13315,7 +13315,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Threading": "1.2.1"
         }
       },
@@ -15925,7 +15925,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Persistence/1.6.1": {
+      "Waher.Persistence/1.6.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15955,7 +15955,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
@@ -15971,7 +15971,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Threading": "1.2.1"
         }
       },
@@ -18617,7 +18617,7 @@
           "Waher.Security": "1.0.0"
         }
       },
-      "Waher.Persistence/1.6.1": {
+      "Waher.Persistence/1.6.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18647,7 +18647,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
@@ -18663,7 +18663,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Persistence": "1.6.1",
+          "Waher.Persistence": "1.6.2",
           "Waher.Runtime.Threading": "1.2.1"
         }
       },
@@ -28748,7 +28748,7 @@
       "path": "../Waher.Networking.XMPP.UWP/project.json",
       "msbuildProject": "../Waher.Networking.XMPP.UWP/Waher.Networking.XMPP.UWP.csproj"
     },
-    "Waher.Persistence/1.6.1": {
+    "Waher.Persistence/1.6.2": {
       "type": "project",
       "path": "../../Persistence/Waher.Persistence/Waher.Persistence.csproj",
       "msbuildProject": "../../Persistence/Waher.Persistence/Waher.Persistence.csproj"

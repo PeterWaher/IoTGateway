@@ -480,5 +480,47 @@ namespace Waher.Security.LoginMonitor
 			}
 		}
 
+		/// <summary>
+		/// Reports a TLS hacking attempt from an endpoint. Can be used to deny TLS negotiation to proceed, and conserving resources
+		/// through use of <see cref="CanStartTls(string)"/>.
+		/// </summary>
+		/// <param name="RemoteEndpoint">Remote endpoint performing the attack.</param>
+		/// <param name="Message">Message to log.</param>
+		/// <param name="Protocoll">Protocol used.</param>
+		public static async Task ReportTlsHackAttempt(string RemoteEndpoint, string Message, string Protocoll)
+		{
+			lock (tlsHackEndpoints)
+			{
+				tlsHackEndpoints[RemoteEndpoint] = DateTime.Now;
+			}
+
+			LoginAuditor.Fail(Message, string.Empty, RemoteEndpoint, "SMTP", await Annotate(RemoteEndpoint));
+		}
+
+		private static readonly Dictionary<string, DateTime> tlsHackEndpoints = new Dictionary<string, DateTime>();
+
+		/// <summary>
+		/// Checks if TLS negotiation can start, for a given endpoint. If the endpoint has tries a TLS hack attempt during the
+		/// last hour, the answer will be no.
+		/// </summary>
+		/// <param name="RemoteEndpoint">Remote endpoint wishing to start TLS.</param>
+		/// <returns>If TLS-negotiation can proceed.</returns>
+		public static bool CanStartTls(string RemoteEndpoint)
+		{
+			lock (tlsHackEndpoints)
+			{
+				if (tlsHackEndpoints.TryGetValue(RemoteEndpoint, out DateTime TP))
+				{
+					if (DateTime.Now.Subtract(TP).TotalHours < 1)
+						return false;
+
+					tlsHackEndpoints.Remove(RemoteEndpoint);
+					return true;
+				}
+				else
+					return true;
+			}
+		}
+
 	}
 }

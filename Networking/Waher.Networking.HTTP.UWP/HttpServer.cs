@@ -973,90 +973,94 @@ namespace Waher.Networking.HTTP
 
 		private async Task SwitchToTls(BinaryTcpClient Client)
 		{
-			try
-			{
-				this.Information("Switching to TLS.");
-
-				await Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls12,
-					this.clientCertificates, null, this.trustClientCertificates);
-
-				if (this.HasSniffers)
-				{
-					this.Information("TLS established.");
-
-					if (!(Client.RemoteCertificate is null))
-					{
-						if (this.HasSniffers)
-						{
-							StringBuilder sb = new StringBuilder();
-
-							sb.Append("Remote Certificate received. Valid: ");
-							sb.Append(Client.RemoteCertificateValid.ToString());
-							sb.Append(", Subject: ");
-							sb.Append(Client.RemoteCertificate.Subject);
-							sb.Append(", Issuer: ");
-							sb.Append(Client.RemoteCertificate.Issuer);
-							sb.Append(", S/N: ");
-							sb.Append(Convert.ToBase64String(Client.RemoteCertificate.GetSerialNumber()));
-							sb.Append(", Hash: ");
-							sb.Append(Convert.ToBase64String(Client.RemoteCertificate.GetCertHash()));
-
-							this.Information(sb.ToString());
-						}
-					}
-				}
-
-				HttpClientConnection Connection = new HttpClientConnection(this, Client, true, this.Sniffers);
-
-				if (this.HasSniffers)
-				{
-					foreach (ISniffer Sniffer in this.Sniffers)
-						Connection.Add(Sniffer);
-				}
-
-				Client.Continue();
-
-				lock (this.connections)
-				{
-					this.connections[Connection.Id] = Connection;
-				}
-			}
-			catch (AuthenticationException ex)
-			{
-				await this.LoginFailure(ex, Client);
-			}
-			catch (Win32Exception ex)
-			{
-				await this.LoginFailure(ex, Client);
-			}
-			catch (SocketException)
-			{
-				Client.Dispose();
-			}
-			catch (IOException)
-			{
-				Client.Dispose();
-			}
-			catch (Exception ex)
-			{
-				Client.Dispose();
-				Log.Critical(ex);
-			}
-		}
-
-		private async Task LoginFailure(Exception ex, BinaryTcpClient Client)
-		{
-			Exception ex2 = Log.UnnestException(ex);
+			string RemoteIpEndpoint;
 			EndPoint EP = Client.Client.Client.RemoteEndPoint;
-			string RemoteEndpoint;
 
 			if (EP is IPEndPoint IpEP)
-				RemoteEndpoint = IpEP.Address.ToString();
+				RemoteIpEndpoint = IpEP.Address.ToString();
 			else
-				RemoteEndpoint = EP.ToString();
+				RemoteIpEndpoint = EP.ToString();
 
-			Security.LoginMonitor.LoginAuditor.Fail("TLS handshake failed: " + ex2.Message, string.Empty, RemoteEndpoint,
-				"HTTPS", await Security.LoginMonitor.LoginAuditor.Annotate(RemoteEndpoint));
+			if (Security.LoginMonitor.LoginAuditor.CanStartTls(RemoteIpEndpoint))
+			{
+				try
+				{
+					this.Information("Switching to TLS.");
+
+					await Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls12,
+					this.clientCertificates, null, this.trustClientCertificates);
+
+					if (this.HasSniffers)
+					{
+						this.Information("TLS established.");
+
+						if (!(Client.RemoteCertificate is null))
+						{
+							if (this.HasSniffers)
+							{
+								StringBuilder sb = new StringBuilder();
+
+								sb.Append("Remote Certificate received. Valid: ");
+								sb.Append(Client.RemoteCertificateValid.ToString());
+								sb.Append(", Subject: ");
+								sb.Append(Client.RemoteCertificate.Subject);
+								sb.Append(", Issuer: ");
+								sb.Append(Client.RemoteCertificate.Issuer);
+								sb.Append(", S/N: ");
+								sb.Append(Convert.ToBase64String(Client.RemoteCertificate.GetSerialNumber()));
+								sb.Append(", Hash: ");
+								sb.Append(Convert.ToBase64String(Client.RemoteCertificate.GetCertHash()));
+
+								this.Information(sb.ToString());
+							}
+						}
+					}
+
+					HttpClientConnection Connection = new HttpClientConnection(this, Client, true, this.Sniffers);
+
+					if (this.HasSniffers)
+					{
+						foreach (ISniffer Sniffer in this.Sniffers)
+							Connection.Add(Sniffer);
+					}
+
+					Client.Continue();
+
+					lock (this.connections)
+					{
+						this.connections[Connection.Id] = Connection;
+					}
+				}
+				catch (AuthenticationException ex)
+				{
+					await this.LoginFailure(ex, Client, RemoteIpEndpoint);
+				}
+				catch (Win32Exception ex)
+				{
+					await this.LoginFailure(ex, Client, RemoteIpEndpoint);
+				}
+				catch (SocketException)
+				{
+					Client.Dispose();
+				}
+				catch (IOException)
+				{
+					Client.Dispose();
+				}
+				catch (Exception ex)
+				{
+					Client.Dispose();
+					Log.Critical(ex);
+				}
+			}
+			else
+				Client.Dispose();
+		}
+
+		private async Task LoginFailure(Exception ex, BinaryTcpClient Client, string RemoteIpEndpoint)
+		{
+			Exception ex2 = Log.UnnestException(ex);
+			await Security.LoginMonitor.LoginAuditor.ReportTlsHackAttempt(RemoteIpEndpoint, "TLS handshake failed: " + ex2.Message, "HTTPS");
 
 			Client.Dispose();
 		}

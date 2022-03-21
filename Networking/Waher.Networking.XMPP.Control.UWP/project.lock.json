@@ -2533,7 +2533,7 @@
           "Waher.Script": "2.2.0"
         }
       },
-      "Waher.Content.Xml/2.0.1": {
+      "Waher.Content.Xml/2.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2681,7 +2681,7 @@
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.3",
           "Waher.Content": "2.2.0",
-          "Waher.Content.Xml": "2.0.1",
+          "Waher.Content.Xml": "2.0.2",
           "Waher.Events": "1.1.1",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Runtime.Language": "1.1.1"
@@ -5180,7 +5180,7 @@
           "Waher.Script": "2.2.0"
         }
       },
-      "Waher.Content.Xml/2.0.1": {
+      "Waher.Content.Xml/2.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5328,7 +5328,7 @@
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.3",
           "Waher.Content": "2.2.0",
-          "Waher.Content.Xml": "2.0.1",
+          "Waher.Content.Xml": "2.0.2",
           "Waher.Events": "1.1.1",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Runtime.Language": "1.1.1"
@@ -7863,7 +7863,7 @@
           "Waher.Script": "2.2.0"
         }
       },
-      "Waher.Content.Xml/2.0.1": {
+      "Waher.Content.Xml/2.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8011,7 +8011,7 @@
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.3",
           "Waher.Content": "2.2.0",
-          "Waher.Content.Xml": "2.0.1",
+          "Waher.Content.Xml": "2.0.2",
           "Waher.Events": "1.1.1",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Runtime.Language": "1.1.1"
@@ -10519,7 +10519,7 @@
           "Waher.Script": "2.2.0"
         }
       },
-      "Waher.Content.Xml/2.0.1": {
+      "Waher.Content.Xml/2.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10667,7 +10667,7 @@
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.3",
           "Waher.Content": "2.2.0",
-          "Waher.Content.Xml": "2.0.1",
+          "Waher.Content.Xml": "2.0.2",
           "Waher.Events": "1.1.1",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Runtime.Language": "1.1.1"
@@ -13211,7 +13211,7 @@
           "Waher.Script": "2.2.0"
         }
       },
-      "Waher.Content.Xml/2.0.1": {
+      "Waher.Content.Xml/2.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13359,7 +13359,7 @@
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.3",
           "Waher.Content": "2.2.0",
-          "Waher.Content.Xml": "2.0.1",
+          "Waher.Content.Xml": "2.0.2",
           "Waher.Events": "1.1.1",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Runtime.Language": "1.1.1"
@@ -15867,7 +15867,7 @@
           "Waher.Script": "2.2.0"
         }
       },
-      "Waher.Content.Xml/2.0.1": {
+      "Waher.Content.Xml/2.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16015,7 +16015,7 @@
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.3",
           "Waher.Content": "2.2.0",
-          "Waher.Content.Xml": "2.0.1",
+          "Waher.Content.Xml": "2.0.2",
           "Waher.Events": "1.1.1",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Runtime.Language": "1.1.1"
@@ -18559,7 +18559,7 @@
           "Waher.Script": "2.2.0"
         }
       },
-      "Waher.Content.Xml/2.0.1": {
+      "Waher.Content.Xml/2.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18707,7 +18707,7 @@
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.3",
           "Waher.Content": "2.2.0",
-          "Waher.Content.Xml": "2.0.1",
+          "Waher.Content.Xml": "2.0.2",
           "Waher.Events": "1.1.1",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Runtime.Language": "1.1.1"
@@ -28723,7 +28723,7 @@
       "path": "../../Content/Waher.Content/Waher.Content.csproj",
       "msbuildProject": "../../Content/Waher.Content/Waher.Content.csproj"
     },
-    "Waher.Content.Xml/2.0.1": {
+    "Waher.Content.Xml/2.0.2": {
       "type": "project",
       "path": "../../Content/Waher.Content.Xml/Waher.Content.Xml.csproj",
       "msbuildProject": "../../Content/Waher.Content.Xml/Waher.Content.Xml.csproj"

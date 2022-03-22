@@ -106,7 +106,7 @@ purposes.
 						<xs:attribute name='id' type='xs:string' use='required'>
 							<xs:annotation>
 								<xs:documentation>The identifier of a contract the legal identity wishes to base the new contract on (i.e. act as template for the new contract).</xs:documentation>
-								<xs:documentation>Contract must exist, be well-defined, and be in an Approved, BeingSigned or Signed state to be used. Referencing contracts that are Proposed, Obsolete or Rejected must result in a failure.</xs:documentation>
+								<xs:documentation>Contract must exist, be well-defined, and be in an Approved, BeingSigned or Signed state to be used. Referencing contracts that are Proposed, Obsolete, Rejected or Failed must result in a failure.</xs:documentation>
 								<xs:documentation>Note: If the contract resides on another trust provider, the actual trust provider must first get it using getContract. If not able to, the operation fails.</xs:documentation>
 								<xs:documentation>Note: Contract IDs are case insensitive in searches and references.</xs:documentation>
 							</xs:annotation>
@@ -750,6 +750,11 @@ purposes.
 			<xs:enumeration value='Signed'>
 				<xs:annotation>
 					<xs:documentation>The contract has been signed by all required parties, and is legally binding.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value='Failed'>
+				<xs:annotation>
+					<xs:documentation>The contract, once signed, has either manually, or automatically, been deemed failed, by the Trust Provider. This can happen when any of the parties fail to fulfill their obligations as defined by the contract.</xs:documentation>
 				</xs:annotation>
 			</xs:enumeration>
 			<xs:enumeration value='Obsoleted'>

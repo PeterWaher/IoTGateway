@@ -36,6 +36,11 @@ namespace Waher.Networking.XMPP.Contracts
 		Signed,
 
 		/// <summary>
+		/// The contract has either manually, or automatically, been deemed failed, by the Trust Provider. This can happen when any of the parties fail to fulfill their obligations as defined by the contract.
+		/// </summary>
+		Failed,
+
+		/// <summary>
 		/// The contract has been explicitly obsoleted by its owner, or by the Trust Provider.
 		/// </summary>
 		Obsoleted,

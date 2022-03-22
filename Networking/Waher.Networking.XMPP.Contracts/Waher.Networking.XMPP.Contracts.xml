@@ -2410,6 +2410,11 @@
             The contract has been signed by all required parties, and is legally binding.
             </summary>
         </member>
+        <member name="F:Waher.Networking.XMPP.Contracts.ContractState.Failed">
+            <summary>
+            The contract has either manually, or automatically, been deemed failed, by the Trust Provider. This can happen when any of the parties fail to fulfill their obligations as defined by the contract.
+            </summary>
+        </member>
         <member name="F:Waher.Networking.XMPP.Contracts.ContractState.Obsoleted">
             <summary>
             The contract has been explicitly obsoleted by its owner, or by the Trust Provider.

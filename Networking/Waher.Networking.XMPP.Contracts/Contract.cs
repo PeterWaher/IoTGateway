@@ -1120,6 +1120,7 @@ namespace Waher.Networking.XMPP.Contracts
 				case ContractState.Obsoleted:
 				case ContractState.Deleted:
 				case ContractState.Rejected:
+				case ContractState.Failed:
 					return false;
 			}
 

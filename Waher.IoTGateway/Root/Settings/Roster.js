@@ -467,9 +467,10 @@ function AddGroupKeyTimeout(Control)
 				{
 					Suggestions = JSON.parse(xhttp.responseText);
 				}
-				catch (Exception)
+				catch (e)
 				{
-					window.alert("Invalid JSON: " + xhttp.responseText);
+					console.log(e);
+					console.log(xhttp.responseText);
 					Suggestions = null;
 				}
 

@@ -99,7 +99,8 @@ function CheckEventsWS(TabID)
 		}
 		catch (e)
 		{
-			throw "Invalid JSON received: " + event.data;
+			console.log(e);
+			console.log(s);
 		}
 
 		EvaluateEvent(Event);
@@ -156,7 +157,8 @@ function CheckEventsXHTTP(TabID)
 						}
 						catch (e)
 						{
-							throw "Invalid JSON received: " + s;
+							console.log(e);
+							console.log(s);
 						}
 
 						if (Events)

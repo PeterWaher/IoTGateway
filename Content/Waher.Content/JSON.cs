@@ -665,8 +665,17 @@ namespace Waher.Content
 					}
 					else if (Object is DateTime TP)
 						Json.Append(((int)((TP.ToUniversalTime() - UnixEpoch).TotalSeconds)).ToString());
-					else
+					else if (Object is int || Object is long || Object is short || Object is byte ||
+						Object is uint || Object is ulong || Object is ushort || Object is sbyte)
+					{
 						Json.Append(Object.ToString());
+					}
+					else
+					{
+						Json.Append('"');
+						Json.Append(Encode(Object.ToString()));
+						Json.Append('"');
+					}
 				}
 				else if (Object is string s)
 				{

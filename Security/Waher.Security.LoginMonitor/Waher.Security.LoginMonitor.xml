@@ -172,6 +172,23 @@
             <param name="Protocol">Protocol</param>
             <param name="Tags">Any informative tags.</param>
         </member>
+        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.ReportTlsHackAttempt(System.String,System.String,System.String)">
+            <summary>
+            Reports a TLS hacking attempt from an endpoint. Can be used to deny TLS negotiation to proceed, and conserving resources
+            through use of <see cref="M:Waher.Security.LoginMonitor.LoginAuditor.CanStartTls(System.String)"/>.
+            </summary>
+            <param name="RemoteEndpoint">Remote endpoint performing the attack.</param>
+            <param name="Message">Message to log.</param>
+            <param name="Protocoll">Protocol used.</param>
+        </member>
+        <member name="M:Waher.Security.LoginMonitor.LoginAuditor.CanStartTls(System.String)">
+            <summary>
+            Checks if TLS negotiation can start, for a given endpoint. If the endpoint has tries a TLS hack attempt during the
+            last hour, the answer will be no.
+            </summary>
+            <param name="RemoteEndpoint">Remote endpoint wishing to start TLS.</param>
+            <returns>If TLS-negotiation can proceed.</returns>
+        </member>
         <member name="T:Waher.Security.LoginMonitor.LoginInterval">
             <summary>
             Number of failing login attempts possible during given time period.

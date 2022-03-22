@@ -3760,7 +3760,56 @@ namespace Waher.Networking.XMPP.Contracts
 				return;
 			}
 
-			string SchemaKey = Contract.ForMachinesNamespace + "#" + Contract.ForMachinesLocalName + "#" + Convert.ToBase64String(Contract.ContentSchemaDigest);
+			XmlDocument Doc;
+
+			try
+			{
+				Doc = new XmlDocument()
+				{
+					PreserveWhitespace = true
+				};
+
+				Doc.LoadXml(Contract.ForMachines.OuterXml);
+			}
+			catch (Exception)
+			{
+				await this.ReturnStatus(ContractStatus.MachineReadableNotWellDefined, Callback, State);
+				return;
+			}
+
+			Dictionary<string, XmlSchema> Schemas = new Dictionary<string, XmlSchema>();
+			LinkedList<XmlNode> ToCheck = new LinkedList<XmlNode>();
+
+			ToCheck.AddLast(Doc.DocumentElement);
+
+			while (!(ToCheck.First is null))
+			{
+				XmlNode N = ToCheck.First.Value;
+				ToCheck.RemoveFirst();
+
+				while (!(N is null))
+				{
+					if (N is XmlElement E)
+					{
+						if (!string.IsNullOrEmpty(E.NamespaceURI))
+							Schemas[E.NamespaceURI] = null;
+
+						foreach (XmlNode N2 in E.ChildNodes)
+							ToCheck.AddLast(N2);
+					}
+
+					N = N.NextSibling;
+				}
+			}
+
+			int NrSchemas = Schemas.Count;
+			if (NrSchemas == 0 || !Schemas.ContainsKey(Contract.ForMachinesNamespace))
+			{
+				await this.ReturnStatus(ContractStatus.MachineReadableNotWellDefined, Callback, State);
+				return;
+			}
+
+			string SchemaKey = Contract.ForMachinesNamespace + "#" + Convert.ToBase64String(Contract.ContentSchemaDigest);
 			byte[] SchemaBin;
 			XmlSchema Schema;
 
@@ -3778,40 +3827,74 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 			}
 
-			if (SchemaBin is null)
-			{
-				TaskCompletionSource<ContractStatus> T = new TaskCompletionSource<ContractStatus>();
+			if (!(Schema is null))
+				Schemas[Contract.ForMachinesNamespace] = Schema;
 
-				this.GetSchema(Contract.ForMachinesNamespace, new SchemaDigest(Contract.ContentSchemaHashFunction, Contract.ContentSchemaDigest),
-					(_, e) =>
+			string[] Namespaces = new string[Schemas.Count];
+			Schemas.Keys.CopyTo(Namespaces, 0);
+
+			foreach (string Namespace in Namespaces)
+			{
+				if (Schemas.TryGetValue(Namespace, out Schema) && !(Schema is null))
+					continue;
+
+				TaskCompletionSource<ContractStatus> T = new TaskCompletionSource<ContractStatus>();
+				SchemaDigest SchemaDigest;
+
+				if (Namespace == Contract.ForMachinesNamespace)
+					SchemaDigest = new SchemaDigest(Contract.ContentSchemaHashFunction, Contract.ContentSchemaDigest);
+				else
+					SchemaDigest = null;
+
+				this.GetSchema(Namespace, SchemaDigest, (_, e) =>
+				{
+					if (e.Ok)
 					{
-						if (e.Ok)
+						try
 						{
-							try
+							SchemaBin = e.Schema;
+							using (MemoryStream ms = new MemoryStream(SchemaBin))
 							{
-								SchemaBin = e.Schema;
-								using (MemoryStream ms = new MemoryStream(SchemaBin))
+								Schema = XSL.LoadSchema(ms, string.Empty);
+							}
+
+							Schemas[Namespace] = Schema;
+
+							if (Namespace == Contract.ForMachinesNamespace)
+							{
+								byte[] Digest = Hashes.ComputeHash(Contract.ContentSchemaHashFunction, SchemaBin);
+
+								if (Convert.ToBase64String(Digest) != Convert.ToBase64String(Contract.ContentSchemaDigest))
 								{
-									Schema = XSL.LoadSchema(ms, string.Empty);
+									T.TrySetResult(ContractStatus.FraudulentSchema);
+									return Task.CompletedTask;
 								}
 
 								lock (this.schemas)
 								{
 									this.schemas[SchemaKey] = new KeyValuePair<byte[], XmlSchema>(SchemaBin, Schema);
 								}
-
-								T.TrySetResult(ContractStatus.Valid);
 							}
-							catch (Exception)
+							else
 							{
-								T.TrySetResult(ContractStatus.CorruptSchema);
+								lock (this.schemas)
+								{
+									this.schemas[Namespace] = new KeyValuePair<byte[], XmlSchema>(SchemaBin, Schema);
+								}
 							}
-						}
-						else
-							T.TrySetResult(ContractStatus.NoSchemaAccess);
 
-						return Task.CompletedTask;
-					}, null);
+							T.TrySetResult(ContractStatus.Valid);
+						}
+						catch (Exception)
+						{
+							T.TrySetResult(ContractStatus.CorruptSchema);
+						}
+					}
+					else
+						T.TrySetResult(ContractStatus.NoSchemaAccess);
+
+					return Task.CompletedTask;
+				}, null);
 
 				ContractStatus Temp = await T.Task;
 				if (Temp != ContractStatus.Valid)
@@ -3821,22 +3904,12 @@ namespace Waher.Networking.XMPP.Contracts
 				}
 			}
 
-			byte[] Digest = Hashes.ComputeHash(Contract.ContentSchemaHashFunction, SchemaBin);
-			if (Convert.ToBase64String(Digest) != Convert.ToBase64String(Contract.ContentSchemaDigest))
-			{
-				await this.ReturnStatus(ContractStatus.FraudulentSchema, Callback, State);
-				return;
-			}
-
 			try
 			{
-				XmlDocument Doc = new XmlDocument()
-				{
-					PreserveWhitespace = true
-				};
-				Doc.LoadXml(Contract.ForMachines.OuterXml);
+				XmlSchema[] Schemas2 = new XmlSchema[Schemas.Count];
+				Schemas.Values.CopyTo(Schemas2, 0);
 
-				XSL.Validate(string.Empty, Doc, Contract.ForMachinesLocalName, Contract.ForMachinesNamespace, Schema);
+				XSL.Validate(string.Empty, Doc, Contract.ForMachinesLocalName, Contract.ForMachinesNamespace, Schemas2);
 			}
 			catch (Exception)
 			{

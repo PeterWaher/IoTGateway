@@ -7,13 +7,21 @@
         {
             if (xhttp.status === 200)
             {
-                Response = JSON.parse(xhttp.responseText);
+                try
+                {
+                    Response = JSON.parse(xhttp.responseText);
 
-                document.getElementById("PluginSettings").innerHTML = Response.html;
-                document.getElementById("TestButton").style.display = Response.hasSettings ? "inline" : "none";
-                document.getElementById("NextButton").style.display = Response.isDone ? "inline" : "none";
-                document.getElementById("Ok").style.display = Response.isDone ? "inline" : "none";
-                document.getElementById("Restart").style.display = Response.isDone && Response.restart ? "inline" : "none";
+                    document.getElementById("PluginSettings").innerHTML = Response.html;
+                    document.getElementById("TestButton").style.display = Response.hasSettings ? "inline" : "none";
+                    document.getElementById("NextButton").style.display = Response.isDone ? "inline" : "none";
+                    document.getElementById("Ok").style.display = Response.isDone ? "inline" : "none";
+                    document.getElementById("Restart").style.display = Response.isDone && Response.restart ? "inline" : "none";
+                }
+                catch (e)
+                {
+                    console.log(e);
+                    console.log(xhttp.responseText);
+                }
             }
             else
                 ShowError(xhttp);

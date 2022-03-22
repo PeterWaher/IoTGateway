@@ -7,14 +7,22 @@
         {
             if (xhttp.status === 200)
             {
-                var Signed = JSON.parse(xhttp.responseText);
+                try
+                {
+                    var Signed = JSON.parse(xhttp.responseText);
 
-                if (Signed)
-                    window.alert("Contract successfully signed.");
-                else
-                    window.alert("Contract rejected. Request has been removed.");
+                    if (Signed)
+                        window.alert("Contract successfully signed.");
+                    else
+                        window.alert("Contract rejected. Request has been removed.");
 
-                Ok();
+                    Ok();
+                }
+                catch (e)
+                {
+                    console.log(e);
+                    console.log(xhttp.responseText);
+                }
             }
             else
             {

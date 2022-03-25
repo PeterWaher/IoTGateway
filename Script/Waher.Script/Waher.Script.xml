@@ -2594,6 +2594,13 @@
             <param name="Object">Object.</param>
             <returns>Double value.</returns>
         </member>
+        <member name="M:Waher.Script.Expression.ToDecimal(System.Object)">
+            <summary>
+            Converts an object to a double value.
+            </summary>
+            <param name="Object">Object.</param>
+            <returns>Double value.</returns>
+        </member>
         <member name="M:Waher.Script.Expression.ToComplex(System.Object)">
             <summary>
             Converts an object to a complex value.

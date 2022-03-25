@@ -4722,6 +4722,65 @@ namespace Waher.Script
 		}
 
 		/// <summary>
+		/// Converts an object to a double value.
+		/// </summary>
+		/// <param name="Object">Object.</param>
+		/// <returns>Double value.</returns>
+		public static decimal ToDecimal(object Object)
+		{
+			if (Object is double db)
+				return (decimal)db;
+			else if (Object is int i)
+				return i;
+			else if (Object is bool b)
+				return b ? 1 : 0;
+			else if (Object is byte bt)
+				return bt;
+			else if (Object is char ch)
+				return ch;
+			else if (Object is decimal dc)
+				return dc;
+			else if (Object is short sh)
+				return sh;
+			else if (Object is long l)
+				return l;
+			else if (Object is sbyte sb)
+				return sb;
+			else if (Object is float f)
+				return (decimal)f;
+			else if (Object is ushort us)
+				return us;
+			else if (Object is uint ui)
+				return ui;
+			else if (Object is ulong ul)
+				return ul;
+			else if (Object is BigInteger i2)
+				return (decimal)i2;
+			else if (Object is Complex z)
+			{
+				if (z.Imaginary == 0)
+					return (decimal)z.Real;
+				else
+					throw new ScriptException("Expected a double value.");
+			}
+			else
+			{
+				string s = Object.ToString();
+
+				if (decimal.TryParse(s, out decimal d))
+					return d;
+
+				if (System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator != "." &&
+					decimal.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
+				{
+					return d;
+				}
+
+				throw new ScriptException("Expected a decimal value.");
+			}
+		}
+
+		/// <summary>
 		/// Converts an object to a complex value.
 		/// </summary>
 		/// <param name="Object">Object.</param>

@@ -4687,7 +4687,7 @@
             Limits searches to items with values equal to this value.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.Search.EqualToNumber.#ctor(System.Double)">
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.EqualToNumber.#ctor(System.Decimal)">
             <summary>
             Limits searches to items with values equal to this value.
             </summary>
@@ -5159,7 +5159,7 @@
             Limits searches to items with values greater than this value.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.Search.GreaterThanNumber.#ctor(System.Double)">
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.GreaterThanNumber.#ctor(System.Decimal)">
             <summary>
             Limits searches to items with values greater than this value.
             </summary>
@@ -5239,7 +5239,7 @@
             Limits searches to items with values greater than or equal to this value.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.Search.GreaterThanOrEqualToNumber.#ctor(System.Double)">
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.GreaterThanOrEqualToNumber.#ctor(System.Decimal)">
             <summary>
             Limits searches to items with values greater than or equal to this value.
             </summary>
@@ -5383,7 +5383,7 @@
             Limits searches to items with values lesser than this value.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.Search.LesserThanNumber.#ctor(System.Double)">
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.LesserThanNumber.#ctor(System.Decimal)">
             <summary>
             Limits searches to items with values lesser than this value.
             </summary>
@@ -5463,7 +5463,7 @@
             Limits searches to items with values lesser than or equal to this value.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.Search.LesserThanOrEqualToNumber.#ctor(System.Double)">
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.LesserThanOrEqualToNumber.#ctor(System.Decimal)">
             <summary>
             Limits searches to items with values lesser than or equal to this value.
             </summary>
@@ -5623,7 +5623,7 @@
             Limits searches to items with values not equal to this value.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.Search.NotEqualToNumber.#ctor(System.Double)">
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.NotEqualToNumber.#ctor(System.Decimal)">
             <summary>
             Limits searches to items with values not equal to this value.
             </summary>
@@ -5820,7 +5820,7 @@
             Abstract base class for Numerical Smart Contract Search filter operands.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.Search.SearchFilterNumberOperand.#ctor(System.Double)">
+        <member name="M:Waher.Networking.XMPP.Contracts.Search.SearchFilterNumberOperand.#ctor(System.Decimal)">
             <summary>
             Abstract base class for Numerical Smart Contract Search filter operands.
             </summary>

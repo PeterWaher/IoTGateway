@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.Contracts.Search
 		/// Limits searches to items with values greater than or equal to this value.
 		/// </summary>
 		/// <param name="Value">Number value</param>
-		public GreaterThanOrEqualToNumber(double Value)
+		public GreaterThanOrEqualToNumber(decimal Value)
 			: base(Value)
 		{
 		}

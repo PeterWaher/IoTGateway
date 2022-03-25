@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Text;
-using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.Contracts.HumanReadable;
-using Waher.Script;
 
 namespace Waher.Networking.XMPP.Contracts
 {
 	/// <summary>
 	/// Numerical contractual parameter
 	/// </summary>
-	public class NumericalParameter : RangeParameter<double>
+	public class NumericalParameter : RangeParameter<decimal>
 	{
 		/// <summary>
 		/// Serializes the parameter, in normalized form.
@@ -77,11 +75,11 @@ namespace Waher.Networking.XMPP.Contracts
 		public override void SetValue(object Value)
 		{
 			if (Value is double d)
-				this.Value = d;
+				this.Value = (decimal)d;
 			else if (Value is float f)
-				this.Value = f;
+				this.Value = (decimal)f;
 			else if (Value is decimal dec)
-				this.Value = (double)dec;
+				this.Value = dec;
 			else if (Value is int i)
 				this.Value = i;
 			else if (Value is long l)
@@ -98,8 +96,8 @@ namespace Waher.Networking.XMPP.Contracts
 				this.Value = us;
 			else if (Value is byte ub)
 				this.Value = ub;
-			else if (Value is string str && CommonTypes.TryParse(str, out d))
-				this.Value = d;
+			else if (Value is string str && CommonTypes.TryParse(str, out dec))
+				this.Value = dec;
 			else
 				throw new ArgumentException("Invalid parameter type.", nameof(Value));
 		}

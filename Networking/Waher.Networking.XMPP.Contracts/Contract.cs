@@ -707,12 +707,12 @@ namespace Waher.Networking.XMPP.Contracts
 										Parameters.Add(new NumericalParameter()
 										{
 											Name = Name,
-											Value = E2.HasAttribute("value") ? XML.Attribute(E2, "value", 0.0) : (double?)null,
+											Value = E2.HasAttribute("value") ? XML.Attribute(E2, "value", 0.0m) : (decimal?)null,
 											Guide = XML.Attribute(E2, "guide"),
 											Expression = XML.Attribute(E2, "exp"),
-											Min = E2.HasAttribute("min") ? XML.Attribute(E2, "min", 0.0) : (double?)null,
+											Min = E2.HasAttribute("min") ? XML.Attribute(E2, "min", 0.0m) : (decimal?)null,
 											MinIncluded = XML.Attribute(E2, "minIncluded", true),
-											Max = E2.HasAttribute("max") ? XML.Attribute(E2, "max", 0.0) : (double?)null,
+											Max = E2.HasAttribute("max") ? XML.Attribute(E2, "max", 0.0m) : (decimal?)null,
 											MaxIncluded = XML.Attribute(E2, "maxIncluded", true),
 											Descriptions = Descriptions.ToArray()
 										});

@@ -9,13 +9,13 @@ namespace Waher.Networking.XMPP.Contracts.Search
 	/// </summary>
 	public abstract class SearchFilterNumberOperand : SearchFilterOperand
 	{
-		private readonly double value;
+		private readonly decimal value;
 
 		/// <summary>
 		/// Abstract base class for Numerical Smart Contract Search filter operands.
 		/// </summary>
 		/// <param name="Value">Numerical value</param>
-		public SearchFilterNumberOperand(double Value)
+		public SearchFilterNumberOperand(decimal Value)
 			: base()
 		{
 			this.value = Value;
@@ -24,7 +24,7 @@ namespace Waher.Networking.XMPP.Contracts.Search
 		/// <summary>
 		/// Numerical value.
 		/// </summary>
-		public double Value => this.value;
+		public decimal Value => this.value;
 
 		/// <summary>
 		/// Local XML element suffix.

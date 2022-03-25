@@ -450,13 +450,13 @@ purposes.
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base='Parameter'>
-				<xs:attribute name='value' type='xs:double' use='optional'>
+				<xs:attribute name='value' type='xs:decimal' use='optional'>
 					<xs:annotation>
 						<xs:documentation>The value of the parameter.</xs:documentation>
 						<xs:documentation>The value attribute is required for contracts, but optional for templates.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
-				<xs:attribute name='min' type='xs:double' use='optional'>
+				<xs:attribute name='min' type='xs:decimal' use='optional'>
 					<xs:annotation>
 						<xs:documentation>Optional minimum value of the parameter.</xs:documentation>
 					</xs:annotation>
@@ -466,7 +466,7 @@ purposes.
 						<xs:documentation>If the `min` value is part of the valid range or not.</xs:documentation>
 					</xs:annotation>
 				</xs:attribute>
-				<xs:attribute name='max' type='xs:double' use='optional'>
+				<xs:attribute name='max' type='xs:decimal' use='optional'>
 					<xs:annotation>
 						<xs:documentation>Optional maximum value of the parameter.</xs:documentation>
 					</xs:annotation>
@@ -1603,32 +1603,32 @@ purposes.
 									<xs:documentation>Return public contracts defining a named string-valued parameter that matches this regular expression.</xs:documentation>
 								</xs:annotation>
 							</xs:element>
-							<xs:element name='eqNum' type='xs:double'>
+							<xs:element name='eqNum' type='xs:decimal'>
 								<xs:annotation>
 									<xs:documentation>Return public contracts defining a named numerical parameter equal to this value.</xs:documentation>
 								</xs:annotation>
 							</xs:element>
-							<xs:element name='neqNum' type='xs:double'>
+							<xs:element name='neqNum' type='xs:decimal'>
 								<xs:annotation>
 									<xs:documentation>Return public contracts defining a named numerical parameter not equal to this value.</xs:documentation>
 								</xs:annotation>
 							</xs:element>
-							<xs:element name='gtNum' type='xs:double'>
+							<xs:element name='gtNum' type='xs:decimal'>
 								<xs:annotation>
 									<xs:documentation>Return public contracts defining a named numerical parameter greater than this value.</xs:documentation>
 								</xs:annotation>
 							</xs:element>
-							<xs:element name='gteNum' type='xs:double'>
+							<xs:element name='gteNum' type='xs:decimal'>
 								<xs:annotation>
 									<xs:documentation>Return public contracts defining a named numerical parameter greater than or equal to this value.</xs:documentation>
 								</xs:annotation>
 							</xs:element>
-							<xs:element name='ltNum' type='xs:double'>
+							<xs:element name='ltNum' type='xs:decimal'>
 								<xs:annotation>
 									<xs:documentation>Return public contracts defining a named numerical parameter lesser than this value.</xs:documentation>
 								</xs:annotation>
 							</xs:element>
-							<xs:element name='lteNum' type='xs:double'>
+							<xs:element name='lteNum' type='xs:decimal'>
 								<xs:annotation>
 									<xs:documentation>Return public contracts defining a named numerical parameter lesser than or equal to this value.</xs:documentation>
 								</xs:annotation>

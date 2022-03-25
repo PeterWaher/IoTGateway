@@ -9,7 +9,7 @@
 		/// Limits searches to items with values equal to this value.
 		/// </summary>
 		/// <param name="Value">Number value</param>
-		public EqualToNumber(double Value)
+		public EqualToNumber(decimal Value)
 			: base(Value)
 		{
 		}

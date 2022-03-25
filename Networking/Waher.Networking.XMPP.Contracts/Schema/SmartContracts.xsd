@@ -354,7 +354,12 @@ purposes.
 				</xs:element>
 				<xs:element name='durationParameter' type='DurationParameter'>
 					<xs:annotation>
-						<xs:documentation>Date parameter.</xs:documentation>
+						<xs:documentation>Duration parameter.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name='calcParameter' type='CalcParameter'>
+					<xs:annotation>
+						<xs:documentation>Calculation parameter.</xs:documentation>
 					</xs:annotation>
 				</xs:element>
 			</xs:choice>
@@ -637,6 +642,18 @@ purposes.
 					</xs:annotation>
 				</xs:attribute>
 			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name='CalcParameter'>
+		<xs:annotation>
+			<xs:documentation>Type representing a Calculation contractual parameter.</xs:documentation>
+			<xs:documentation>The exp attribute is used to calculate the value of the parameter, rather than validate its valid.</xs:documentation>
+			<xs:documentation>Expressions used to calculate values reference other parameter values by name.</xs:documentation>
+			<xs:documentation>Only non-calculation parameters (anywhere in the contract), or calculation parameters defined before a calculation parameter being evaluated, can be referenced however, in order to avoid circular recursion.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base='Parameter'/>
 		</xs:complexContent>
 	</xs:complexType>
 

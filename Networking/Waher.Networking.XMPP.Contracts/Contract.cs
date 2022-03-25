@@ -789,6 +789,17 @@ namespace Waher.Networking.XMPP.Contracts
 										});
 										break;
 
+
+									case "calcParameter":
+										Parameters.Add(new CalcParameter()
+										{
+											Name = Name,
+											Guide = XML.Attribute(E2, "guide"),
+											Expression = XML.Attribute(E2, "exp"),
+											Descriptions = Descriptions.ToArray()
+										});
+										break;
+
 									default:
 										return null;
 								}

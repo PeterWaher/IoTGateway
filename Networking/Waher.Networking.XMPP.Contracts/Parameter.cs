@@ -71,10 +71,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				try
 				{
-					if (this.parsed is null)
-						this.parsed = new Expression(this.exp);
-
-					object Result = await this.parsed.EvaluateAsync(Variables);
+					object Result = await this.Parsed.EvaluateAsync(Variables);
 
 					if (Result is bool b && !b)
 						return false;
@@ -86,6 +83,20 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Parsed expression.
+		/// </summary>
+		public Expression Parsed
+		{
+			get
+			{
+				if (this.parsed is null)
+					this.parsed = new Expression(this.exp);
+
+				return this.parsed;
+			}
 		}
 
 		/// <summary>

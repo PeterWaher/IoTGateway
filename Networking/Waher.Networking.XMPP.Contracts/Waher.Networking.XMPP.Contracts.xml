@@ -91,6 +91,42 @@
             <param name="Value">Value</param>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
         </member>
+        <member name="T:Waher.Networking.XMPP.Contracts.CalcParameter">
+            <summary>
+            Calculation contractual parameter
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.CalcParameter.ObjectValue">
+            <summary>
+            Parameter value.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.CalcParameter.Serialize(System.Text.StringBuilder)">
+            <summary>
+            Serializes the parameter, in normalized form.
+            </summary>
+            <param name="Xml">XML Output</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.CalcParameter.IsParameterValid(Waher.Script.Variables)">
+            <summary>
+            Checks if the parameter value is valid.
+            </summary>
+            <param name="Variables">Collection of parameter values.</param>
+            <returns>If parameter value is valid.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.CalcParameter.Populate(Waher.Script.Variables)">
+            <summary>
+            Populates a variable collection with the value of the parameter.
+            </summary>
+            <param name="Variables">Variable collection.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.CalcParameter.SetValue(System.Object)">
+            <summary>
+            Sets the parameter value.
+            </summary>
+            <param name="Value">Value</param>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.ClientSignature">
             <summary>
             Represents a digital signature on a contract.
@@ -4376,6 +4412,11 @@
             </summary>
             <param name="Variables">Collection of parameter values.</param>
             <returns>If parameter value is valid.</returns>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.Parameter.Parsed">
+            <summary>
+            Parsed expression.
+            </summary>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.Parameter.Populate(Waher.Script.Variables)">
             <summary>

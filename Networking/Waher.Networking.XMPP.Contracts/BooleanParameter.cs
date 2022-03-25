@@ -44,6 +44,18 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append(CommonTypes.Encode(this.value.Value));
 			}
 
+			if (!string.IsNullOrEmpty(this.Guide))
+			{
+				Xml.Append("\" guide=\"");
+				Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
+			}
+
+			if (!string.IsNullOrEmpty(this.Expression))
+			{
+				Xml.Append("\" exp=\"");
+				Xml.Append(XML.Encode(this.Expression.Normalize(NormalizationForm.FormC)));
+			}
+
 			if (this.Descriptions is null || this.Descriptions.Length == 0)
 				Xml.Append("\"/>");
 			else

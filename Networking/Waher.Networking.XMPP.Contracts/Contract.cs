@@ -1250,7 +1250,10 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append('>');
 
-			NormalizeXml(this.forMachines ?? string.Empty, Xml, ContractsClient.NamespaceSmartContracts);
+			if (this.forMachines is null)
+				throw new InvalidOperationException("No Machine-readable XML provided.");
+
+			NormalizeXml(this.forMachines, Xml, ContractsClient.NamespaceSmartContracts);
 
 			if (!(this.roles is null))
 			{

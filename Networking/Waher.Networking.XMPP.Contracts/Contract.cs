@@ -1250,7 +1250,7 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Xml.Append('>');
 
-			NormalizeXml(this.forMachines, Xml, ContractsClient.NamespaceSmartContracts);
+			NormalizeXml(this.forMachines ?? string.Empty, Xml, ContractsClient.NamespaceSmartContracts);
 
 			if (!(this.roles is null))
 			{

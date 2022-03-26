@@ -98,7 +98,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <exception cref="ArgumentException">If <paramref name="Value"/> is not of the correct type.</exception>
 		public override void SetValue(object Value)
 		{
-			throw new ArgumentException("Calculation parameters cannot be set.", nameof(Value));
+			// Ignore
 		}
 
 	}

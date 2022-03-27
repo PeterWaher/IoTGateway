@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -145,5 +146,85 @@ namespace Waher.Script.Functions.DateAndTime
 					throw new ScriptRuntimeException("Invalid number of parameters.", this);
 			}
 		}
+
+
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			System.DateTime TP;
+
+			if (CheckAgainst is DateTimeValue DTV)
+				TP = DTV.Value;
+			else
+			{
+				if (CheckAgainst is DoubleNumber D)
+					TP = new System.DateTime((long)D.Value);
+				else
+				{
+					string s = CheckAgainst.AssociatedObjectValue?.ToString() ?? string.Empty;
+
+					if (!System.DateTime.TryParse(s, out TP))
+					{
+						if (long.TryParse(s, out long Ticks))
+							TP = new System.DateTime(Ticks);
+						else
+							return PatternMatchResult.NoMatch;
+					}
+				}
+			}
+
+			TP = TP.ToUniversalTime();
+
+			int c = Arguments.Length;
+			if (c == 1)
+				return this.Arguments[0].PatternMatch(new DateTimeValue(TP), AlreadyFound);
+
+			if (c < 3)
+				return PatternMatchResult.NoMatch;
+
+			PatternMatchResult Result = this.Arguments[0].PatternMatch(new DoubleNumber(TP.Year), AlreadyFound);
+			if (Result != PatternMatchResult.Match)
+				return Result;
+
+			Result = this.Arguments[1].PatternMatch(new DoubleNumber(TP.Month), AlreadyFound);
+			if (Result != PatternMatchResult.Match)
+				return Result;
+
+			Result = this.Arguments[2].PatternMatch(new DoubleNumber(TP.Day), AlreadyFound);
+			if (Result != PatternMatchResult.Match)
+				return Result;
+
+			if (c == 3)
+				return TP.TimeOfDay == System.TimeSpan.Zero ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
+
+			if (c < 6)
+				return PatternMatchResult.NoMatch;
+
+			Result = this.Arguments[3].PatternMatch(new DoubleNumber(TP.Hour), AlreadyFound);
+			if (Result != PatternMatchResult.Match)
+				return Result;
+
+			Result = this.Arguments[4].PatternMatch(new DoubleNumber(TP.Minute), AlreadyFound);
+			if (Result != PatternMatchResult.Match)
+				return Result;
+
+			Result = this.Arguments[5].PatternMatch(new DoubleNumber(TP.Second), AlreadyFound);
+			if (Result != PatternMatchResult.Match)
+				return Result;
+
+			if (c == 6)
+				return TP.Millisecond == 0 ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
+
+			if (c != 7)
+				return PatternMatchResult.NoMatch;
+
+			return this.Arguments[6].PatternMatch(new DoubleNumber(TP.Millisecond), AlreadyFound);
+		}
+
 	}
 }

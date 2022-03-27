@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -124,5 +125,91 @@ namespace Waher.Script.Functions.DateAndTime
 					throw new ScriptRuntimeException("Invalid number of parameters.", this);
 			}
 		}
+
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			System.TimeSpan TS;
+
+			if (CheckAgainst is ObjectValue Obj && Obj.AssociatedObjectValue is System.TimeSpan TS2)
+				TS = TS2;
+			else
+			{
+				if (CheckAgainst is DoubleNumber D)
+					TS = new System.TimeSpan((long)D.Value);
+				else
+				{
+					string s = CheckAgainst.AssociatedObjectValue?.ToString() ?? string.Empty;
+
+					if (!System.TimeSpan.TryParse(s, out TS))
+					{
+						if (long.TryParse(s, out long Ticks))
+							TS = new System.TimeSpan(Ticks);
+						else
+							return PatternMatchResult.NoMatch;
+					}
+				}
+			}
+
+			switch (Arguments.Length)
+			{
+				case 1:
+					return this.Arguments[0].PatternMatch(new ObjectValue(TS), AlreadyFound);
+
+				case 3:
+					PatternMatchResult Result = this.Arguments[0].PatternMatch(new DoubleNumber(TS.Hours), AlreadyFound);
+					if (Result != PatternMatchResult.Match)
+						return Result;
+
+					Result = this.Arguments[1].PatternMatch(new DoubleNumber(TS.Minutes), AlreadyFound);
+					if (Result != PatternMatchResult.Match)
+						return Result;
+
+					return this.Arguments[2].PatternMatch(new DoubleNumber(TS.Seconds), AlreadyFound);
+
+				case 4:
+					Result = this.Arguments[0].PatternMatch(new DoubleNumber(TS.Days), AlreadyFound);
+					if (Result != PatternMatchResult.Match)
+						return Result;
+
+					Result = this.Arguments[1].PatternMatch(new DoubleNumber(TS.Hours), AlreadyFound);
+					if (Result != PatternMatchResult.Match)
+						return Result;
+
+					Result = this.Arguments[2].PatternMatch(new DoubleNumber(TS.Minutes), AlreadyFound);
+					if (Result != PatternMatchResult.Match)
+						return Result;
+
+					return this.Arguments[3].PatternMatch(new DoubleNumber(TS.Seconds), AlreadyFound);
+
+				case 5:
+					Result = this.Arguments[0].PatternMatch(new DoubleNumber(TS.Days), AlreadyFound);
+					if (Result != PatternMatchResult.Match)
+						return Result;
+
+					Result = this.Arguments[1].PatternMatch(new DoubleNumber(TS.Hours), AlreadyFound);
+					if (Result != PatternMatchResult.Match)
+						return Result;
+
+					Result = this.Arguments[2].PatternMatch(new DoubleNumber(TS.Minutes), AlreadyFound);
+					if (Result != PatternMatchResult.Match)
+						return Result;
+
+					Result = this.Arguments[3].PatternMatch(new DoubleNumber(TS.Seconds), AlreadyFound);
+					if (Result != PatternMatchResult.Match)
+						return Result;
+
+					return this.Arguments[4].PatternMatch(new DoubleNumber(TS.Milliseconds), AlreadyFound);
+
+				default:
+					return PatternMatchResult.NoMatch;
+			}
+		}
+
 	}
 }

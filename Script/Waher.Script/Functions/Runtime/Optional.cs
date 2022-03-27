@@ -7,64 +7,64 @@ using Waher.Script.Objects;
 
 namespace Waher.Script.Functions.Runtime
 {
-    /// <summary>
-    /// Makes sure an expression is defined. Otherwise, an exception is thrown.
-    /// </summary>
-    public class Optional : FunctionOneVariable
-    {
-        /// <summary>
-        /// Makes sure an expression is defined. Otherwise, an exception is thrown.
-        /// </summary>
-        /// <param name="Argument">Argument.</param>
-        /// <param name="Start">Start position in script expression.</param>
-        /// <param name="Length">Length of expression covered by node.</param>
-        /// <param name="Expression">Expression containing script.</param>
-        public Optional(ScriptNode Argument, int Start, int Length, Expression Expression)
-            : base(Argument, Start, Length, Expression)
-        {
-        }
+	/// <summary>
+	/// Makes sure an expression is defined. Otherwise, an exception is thrown.
+	/// </summary>
+	public class Optional : FunctionOneVariable
+	{
+		/// <summary>
+		/// Makes sure an expression is defined. Otherwise, an exception is thrown.
+		/// </summary>
+		/// <param name="Argument">Argument.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
+		public Optional(ScriptNode Argument, int Start, int Length, Expression Expression)
+			: base(Argument, Start, Length, Expression)
+		{
+		}
 
-        /// <summary>
-        /// Name of the function
-        /// </summary>
-        public override string FunctionName
-        {
-            get { return "optional"; }
-        }
+		/// <summary>
+		/// Name of the function
+		/// </summary>
+		public override string FunctionName
+		{
+			get { return "optional"; }
+		}
 
-        /// <summary>
-        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-        /// </summary>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Result.</returns>
-        public override IElement Evaluate(Variables Variables)
-        {
-            try
-            {
-                return this.Argument.Evaluate(Variables);
-            }
-            catch (Exception)
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override IElement Evaluate(Variables Variables)
+		{
+			try
 			{
-                return ObjectValue.Null;
+				return this.Argument.Evaluate(Variables);
 			}
-        }
+			catch (Exception)
+			{
+				return ObjectValue.Null;
+			}
+		}
 
-        /// <summary>
-        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-        /// </summary>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Result.</returns>
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
 		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
-            try
-            {
-                return await this.Argument.EvaluateAsync(Variables);
-            }
-            catch (Exception)
-            {
-                return ObjectValue.Null;
-            }
-        }
+			try
+			{
+				return await this.Argument.EvaluateAsync(Variables);
+			}
+			catch (Exception)
+			{
+				return ObjectValue.Null;
+			}
+		}
 
 		/// <summary>
 		/// Evaluates the function.
@@ -74,7 +74,7 @@ namespace Waher.Script.Functions.Runtime
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement Argument, Variables Variables)
 		{
-            return Argument;
+			return Argument;
 		}
 
 		/// <summary>
@@ -85,7 +85,28 @@ namespace Waher.Script.Functions.Runtime
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-            return this.Argument.PatternMatch(CheckAgainst, AlreadyFound);
+			if (CheckAgainst is ObjectValue V && V.AssociatedObjectValue is null)
+			{
+				return this.ForAllChildNodes((ScriptNode Node, out ScriptNode NewNode, object State) =>
+				{
+					NewNode = null;
+
+					if (Node is VariableReference Ref)
+					{
+						if (AlreadyFound.TryGetValue(Ref.VariableName, out IElement Value) &&
+							(!(Value is ObjectValue Obj) || !(Obj.Value is null)))
+						{
+							return false;
+						}
+
+						AlreadyFound[Ref.VariableName] = null;
+					}
+
+					return true;
+				}, null, false) ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
+			}
+			else
+				return this.Argument.PatternMatch(CheckAgainst, AlreadyFound);
 		}
 	}
 }

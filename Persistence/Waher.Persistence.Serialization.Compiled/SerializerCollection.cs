@@ -84,6 +84,7 @@ namespace Waher.Persistence.Serialization
 			}
 
 			this.serializers[typeof(GenericObject)] = new GenericObjectSerializer(this.context, false);
+			this.serializers[typeof(ICollection<KeyValuePair<string, object>>)] = new GenericObjectSerializer(this.context, false);
 			this.serializers[typeof(object)] = new GenericObjectSerializer(this.context, true);
 		}
 

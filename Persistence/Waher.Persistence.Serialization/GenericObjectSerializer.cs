@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
+using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Persistence.Serialization
 {
@@ -566,17 +567,7 @@ namespace Waher.Persistence.Serialization
 					Writer = Writer.CreateNew();
 
 				if (WriteTypeCode)
-				{
-					if (TypedValue is null)
-					{
-						Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
-						return;
-					}
-					else
-						Writer.WriteBits(ObjectSerializer.TYPE_OBJECT, 6);
-				}
-				else if (TypedValue is null)
-					throw new NullReferenceException("Value cannot be null.");
+					Writer.WriteBits(ObjectSerializer.TYPE_OBJECT, 6);
 
 				if (Embedded && Writer.BitOffset > 0)
 				{
@@ -629,7 +620,7 @@ namespace Waher.Persistence.Serialization
 						Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 					else
 					{
-						if (Obj is GenericObject)
+						if (Obj is ICollection<KeyValuePair<string, object>>)
 							await this.Serialize(Writer, true, true, Obj, State);
 						else
 						{
@@ -651,6 +642,62 @@ namespace Waher.Persistence.Serialization
 						WriterBak.Write(NewObjectId);
 						TypedValue.ObjectId = NewObjectId;
 					}
+
+					byte[] Bin = Writer.GetSerialization();
+
+					WriterBak.WriteVariableLengthUInt64((ulong)Bin.Length);
+					WriterBak.WriteRaw(Bin);
+				}
+			}
+			else if (Value is ICollection<KeyValuePair<string, object>> GenObj)
+			{
+				ISerializer WriterBak = Writer;
+				IObjectSerializer Serializer;
+				object Obj;
+
+				if (!Embedded)
+					Writer = Writer.CreateNew();
+
+				if (WriteTypeCode)
+					Writer.WriteBits(ObjectSerializer.TYPE_OBJECT, 6);
+
+				if (Embedded && Writer.BitOffset > 0)
+					Writer.WriteBit(false);
+
+				bool Normalized = this.NormalizedNames;
+
+				Writer.WriteVariableLengthUInt64(0);
+				if (Embedded)
+					Writer.WriteVariableLengthUInt64(0);
+
+				foreach (KeyValuePair<string, object> Property in GenObj)
+				{
+					if (Normalized)
+						Writer.WriteVariableLengthUInt64(await this.Context.GetFieldCode(null, Property.Key));
+					else
+						Writer.Write(Property.Key);
+
+					Obj = Property.Value;
+					if (Obj is IElement Element)
+						Obj = Element.AssociatedObjectValue;
+
+					if (Obj is null)
+						Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+					else if (Obj is ICollection<KeyValuePair<string, object>>)
+						await this.Serialize(Writer, true, true, Obj, State);
+					else
+					{
+						Serializer = await this.Context.GetObjectSerializer(Obj.GetType());
+						await Serializer.Serialize(Writer, true, true, Obj, State);
+					}
+				}
+
+				Writer.WriteVariableLengthUInt64(0);
+
+				if (!Embedded)
+				{
+					Guid NewObjectId = this.Context.CreateGuid();
+					WriterBak.Write(NewObjectId);
 
 					byte[] Bin = Writer.GetSerialization();
 

@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Serialization;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Objects;
 
 #if !LW
 using Waher.Persistence.Files.Test.Classes;
@@ -1691,6 +1693,225 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.Guid, Obj2.Guid);
 			AssertEx.Same(Obj.NormalEnum, Obj2.NormalEnum);
 			AssertEx.Same(Obj.FlagsEnum, Obj2.FlagsEnum);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_16_GenObject1()
+		{
+			GenObj1 Obj = new GenObj1()
+			{
+				EmbeddedObj = new GenericObject(string.Empty, string.Empty, Guid.Empty,
+					new KeyValuePair<string, object>("A", 10),
+					new KeyValuePair<string, object>("B", "Hello"))
+			};
+
+			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
+
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(GenObj1));
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			GenObj1 Obj2 = (GenObj1)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			Assert.IsNotNull(Obj2.EmbeddedObj);
+			Assert.AreEqual(Obj.EmbeddedObj.Count, Obj2.EmbeddedObj.Count);
+			Assert.IsTrue(Obj2.EmbeddedObj.TryGetFieldValue("A", out object A));
+			Assert.IsTrue(Obj2.EmbeddedObj.TryGetFieldValue("B", out object B));
+			Assert.AreEqual(10, A);
+			Assert.AreEqual("Hello", B);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_17_GenObject2()
+		{
+			GenObj2 Obj = new GenObj2()
+			{
+				EmbeddedObj = new Dictionary<string, object>()
+				{
+					{ "A", 10 },
+					{ "B", "Hello" }
+				}
+			};
+
+			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
+
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(GenObj2));
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			GenObj2 Obj2 = (GenObj2)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			Assert.IsNotNull(Obj2.EmbeddedObj);
+			Assert.IsTrue(Obj2.EmbeddedObj.TryGetValue("A", out object A));
+			Assert.IsTrue(Obj2.EmbeddedObj.TryGetValue("B", out object B));
+			Assert.AreEqual(10, A);
+			Assert.AreEqual("Hello", B);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_18_GenObject3()
+		{
+			GenObj3 Obj = new GenObj3()
+			{
+				EmbeddedObj = new Dictionary<string, IElement>()
+				{
+					{ "A", new DoubleNumber(10) },
+					{ "B", new StringValue("Hello") }
+				}
+			};
+
+			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
+
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(GenObj3));
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			GenObj3 Obj2 = (GenObj3)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			Assert.IsNotNull(Obj2.EmbeddedObj);
+			Assert.IsTrue(Obj2.EmbeddedObj.TryGetValue("A", out IElement A));
+			Assert.IsTrue(Obj2.EmbeddedObj.TryGetValue("B", out IElement B));
+			Assert.AreEqual(10.0, A.AssociatedObjectValue);
+			Assert.AreEqual("Hello", B.AssociatedObjectValue);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_19_GenObject4()
+		{
+			GenObj4 Obj = new GenObj4()
+			{
+				EmbeddedObj = new KeyValuePair<string, object>[]
+				{
+					new KeyValuePair<string, object>("A", 10),
+					new KeyValuePair<string, object>("B", "Hello")
+				}
+			};
+
+			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
+
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(GenObj4));
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			GenObj4 Obj2 = (GenObj4)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			Assert.IsNotNull(Obj2.EmbeddedObj);
+			object A = null;
+			object B = null;
+
+			foreach (KeyValuePair<string, object> P in Obj2.EmbeddedObj)
+			{
+				switch (P.Key)
+				{
+					case "A":
+						A = P.Value;
+						break;
+
+					case "B":
+						B = P.Value;
+						break;
+				}
+			}
+
+			Assert.AreEqual(10, A);
+			Assert.AreEqual("Hello", B);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_20_GenObject5()
+		{
+			GenObj5 Obj = new GenObj5()
+			{
+				EmbeddedObj = new KeyValuePair<string, IElement>[]
+				{
+					new KeyValuePair<string, IElement>("A", new DoubleNumber(10)),
+					new KeyValuePair<string, IElement>("B", new StringValue("Hello"))
+				}
+			};
+
+			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
+
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(GenObj5));
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			GenObj5 Obj2 = (GenObj5)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			Assert.IsNotNull(Obj2.EmbeddedObj);
+			object A = null;
+			object B = null;
+
+			foreach (KeyValuePair<string, IElement> P in Obj2.EmbeddedObj)
+			{
+				switch (P.Key)
+				{
+					case "A":
+						A = P.Value.AssociatedObjectValue;
+						break;
+
+					case "B":
+						B = P.Value.AssociatedObjectValue;
+						break;
+				}
+			}
+
+			Assert.AreEqual(10.0, A);
+			Assert.AreEqual("Hello", B);
 		}
 
 		// TODO: Objects, by reference, nullable (incl. null strings, arrays)

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 using Waher.Persistence.Serialization.ReferenceTypes;
 using Waher.Persistence.Serialization.ValueTypes;
+using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Persistence.Serialization
 {
@@ -84,7 +85,10 @@ namespace Waher.Persistence.Serialization
 			}
 
 			this.serializers[typeof(GenericObject)] = new GenericObjectSerializer(this.context, false);
-			this.serializers[typeof(ICollection<KeyValuePair<string, object>>)] = new GenericObjectSerializer(this.context, false);
+			this.serializers[typeof(Dictionary<string, object>)] = new StringDictionaryObjectSerializer(this.context);
+			this.serializers[typeof(Dictionary<string, IElement>)] = new ObjectExNihiloObjectSerializer(this.context);
+			this.serializers[typeof(KeyValuePair<string, object>[])] = new TagsObjectSerializer(this.context);
+			this.serializers[typeof(KeyValuePair<string, IElement>[])] = new TagElementsObjectSerializer(this.context);
 			this.serializers[typeof(object)] = new GenericObjectSerializer(this.context, true);
 		}
 

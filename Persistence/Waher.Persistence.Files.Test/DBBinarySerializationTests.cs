@@ -28,10 +28,10 @@ namespace Waher.Persistence.FilesLW.Test
 	}
 
 	[TestClass]
-	public class DBFilesBinarySerializationTests
+	public class DBBinarySerializationTests
 	{
 		[TestMethod]
-		public void DBFiles_BinSerialization_Test_01_Serialization()
+		public void BinSerialization_Test_01_Serialization()
 		{
 			ISerializer Serializer = new DebugSerializer(new BinarySerializer(string.Empty, Encoding.UTF8), Console.Out);
 

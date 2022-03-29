@@ -19819,6 +19819,33 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Vectors.VectorDefinition.Encapsulate(System.Array,System.Boolean,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Encapsulates the elements of a vector.
+            </summary>
+            <param name="Elements">Vector elements.</param>
+            <param name="CanEncapsulateAsMatrix">If the method can encapsulate the contents as a matrix.</param>
+            <param name="Node">Script node from where the encapsulation is done.</param>
+            <returns>Encapsulated vector.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Vectors.VectorDefinition.Encapsulate(Waher.Script.Abstraction.Elements.IElement[],System.Boolean,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Encapsulates the elements of a vector.
+            </summary>
+            <param name="Elements">Vector elements.</param>
+            <param name="CanEncapsulateAsMatrix">If the method can encapsulate the contents as a matrix.</param>
+            <param name="Node">Script node from where the encapsulation is done.</param>
+            <returns>Encapsulated vector.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Vectors.VectorDefinition.Encapsulate(System.Collections.Generic.IEnumerable{System.Object},System.Boolean,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Encapsulates the elements of a vector.
+            </summary>
+            <param name="Elements">Vector elements.</param>
+            <param name="CanEncapsulateAsMatrix">If the method can encapsulate the contents as a matrix.</param>
+            <param name="Node">Script node from where the encapsulation is done.</param>
+            <returns>Encapsulated vector.</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Vectors.VectorDefinition.Encapsulate(System.Collections.Generic.ICollection{Waher.Script.Abstraction.Elements.IElement},System.Boolean,Waher.Script.Model.ScriptNode)">
             <summary>
             Encapsulates the elements of a vector.

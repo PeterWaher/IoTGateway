@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Persistence.Serialization.ReferenceTypes;
+using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Persistence.Serialization
 {
@@ -895,6 +897,54 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
+		/// Reads a tag array.
+		/// </summary>
+		/// <typeparam name="T">Element type.</typeparam>
+		/// <param name="Reader">Deserializer.</param>
+		/// <param name="FieldDataType">Field data type.</param>
+		/// <returns>String value.</returns>
+		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
+		public static async Task<KeyValuePair<string, object>[]> ReadTagArray(ISerializerContext Context, IDeserializer Reader, uint FieldDataType)
+		{
+			switch (FieldDataType)
+			{
+				case ObjectSerializer.TYPE_OBJECT:
+					TagsObjectSerializer Serializer = new TagsObjectSerializer(Context);
+					return (KeyValuePair<string, object>[])await Serializer.Deserialize(Reader, FieldDataType, true);
+
+				case ObjectSerializer.TYPE_NULL:
+					return null;
+
+				default:
+					throw new Exception("Object expected.");
+			}
+		}
+
+		/// <summary>
+		/// Reads a tag array.
+		/// </summary>
+		/// <typeparam name="T">Element type.</typeparam>
+		/// <param name="Reader">Deserializer.</param>
+		/// <param name="FieldDataType">Field data type.</param>
+		/// <returns>String value.</returns>
+		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
+		public static async Task<KeyValuePair<string, IElement>[]> ReadTagElementArray(ISerializerContext Context, IDeserializer Reader, uint FieldDataType)
+		{
+			switch (FieldDataType)
+			{
+				case ObjectSerializer.TYPE_OBJECT:
+					TagElementsObjectSerializer Serializer = new TagElementsObjectSerializer(Context);
+					return (KeyValuePair<string, IElement>[])await Serializer.Deserialize(Reader, FieldDataType, true);
+
+				case ObjectSerializer.TYPE_NULL:
+					return null;
+
+				default:
+					throw new Exception("Object expected.");
+			}
+		}
+
+		/// <summary>
 		/// Reads a typed array.
 		/// </summary>
 		/// <typeparam name="T">Element type.</typeparam>
@@ -969,6 +1019,36 @@ namespace Waher.Persistence.Serialization
 				default:
 					throw new Exception("Array expected.");
 			}
+		}
+
+		/// <summary>
+		/// Writes a tag array.
+		/// </summary>
+		/// <param name="Context">Serialization context.</param>
+		/// <param name="Writer">Serializer.</param>
+		/// <param name="Value">Value to serialize.</param>
+		/// <param name="State">State object, passed on in recursive calls.</param>
+		public static async Task WriteTagArray(ISerializerContext Context, ISerializer Writer, KeyValuePair<string, object>[] Value, object State)
+		{
+			if (Value is null)
+				Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+			else
+				await new TagsObjectSerializer(Context).Serialize(Writer, true, true, Value, State);
+		}
+
+		/// <summary>
+		/// Writes a tag array.
+		/// </summary>
+		/// <param name="Context">Serialization context.</param>
+		/// <param name="Writer">Serializer.</param>
+		/// <param name="Value">Value to serialize.</param>
+		/// <param name="State">State object, passed on in recursive calls.</param>
+		public static async Task WriteTagElementArray(ISerializerContext Context, ISerializer Writer, KeyValuePair<string, IElement>[] Value, object State)
+		{
+			if (Value is null)
+				Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+			else
+				await new TagElementsObjectSerializer(Context).Serialize(Writer, true, true, Value, State);
 		}
 
 		/// <summary>

@@ -13067,6 +13067,176 @@
             <param name="Column">Zero-based column index into the matrix.</param>
             <param name="Vector">New column vector.</param>
         </member>
+        <member name="T:Waher.Script.Objects.Measurement">
+            <summary>
+            Physical measurement
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Objects.Measurement.ZeroElement">
+            <summary>
+            0
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Objects.Measurement.OneElement">
+            <summary>
+            1
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Objects.Measurement.#ctor(System.Double,Waher.Script.Units.Unit,System.Double)">
+            <summary>
+            Physical quantity.
+            </summary>
+            <param name="Magnitude">Magnitude</param>
+            <param name="Unit">Unit</param>
+            <param name="Error">Error</param>
+        </member>
+        <member name="P:Waher.Script.Objects.Measurement.Magnitude">
+            <summary>
+            Magnitude
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Objects.Measurement.Unit">
+            <summary>
+            Unit
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Objects.Measurement.Error">
+            <summary>
+            Magnitude
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Objects.Measurement.Estimate">
+            <summary>
+            Estimate of measurement
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Objects.Measurement.Max">
+            <summary>
+            Estimate of measurement
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Objects.Measurement.Min">
+            <summary>
+            Estimate of measurement
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Objects.Measurement.ToString">
+            <inheritdoc/>
+        </member>
+        <member name="P:Waher.Script.Objects.Measurement.AssociatedField">
+            <summary>
+            Associated Field.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Objects.Measurement.AssociatedObjectValue">
+            <summary>
+            Associated object value.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Objects.Measurement.Multiply(Waher.Script.Abstraction.Elements.ICommutativeRingElement)">
+            <summary>
+            Tries to multiply an element to the current element.
+            </summary>
+            <param name="Element">Element to multiply.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.Measurement.Invert">
+            <summary>
+            Inverts the element, if possible.
+            </summary>
+            <returns>Inverted element, or null if not possible.</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.Measurement.Add(Waher.Script.Abstraction.Elements.IAbelianGroupElement)">
+            <summary>
+            Tries to add an element to the current element.
+            </summary>
+            <param name="Element">Element to add.</param>
+            <returns>Result, if understood, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.Measurement.Negate">
+            <summary>
+            Negates the element.
+            </summary>
+            <returns>Negation of current element.</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.Measurement.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Objects.Measurement.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="P:Waher.Script.Objects.Measurement.Zero">
+            <summary>
+            Returns the zero element of the group.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Objects.Measurement.One">
+            <summary>
+            Returns the identity element of the commutative ring with identity.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Objects.Measurement.TryConvertTo(System.Type,System.Object@)">
+            <summary>
+            Converts the value to a .NET type.
+            </summary>
+            <param name="DesiredType">Desired .NET type.</param>
+            <param name="Value">Converted value.</param>
+            <returns>If conversion was possible.</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.Measurement.CompareTo(System.Object)">
+            <summary>
+            <see cref="M:System.IComparable.CompareTo(System.Object)"/>
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Objects.Measurement.TryParse(System.String,Waher.Script.Objects.Measurement@)">
+            <summary>
+            Tries to parse a string to a physical quantity.
+            </summary>
+            <param name="s">String</param>
+            <param name="Value">Parsed Value</param>
+            <returns>If the string could be parsed into a physical quantity.</returns>
+        </member>
+        <member name="T:Waher.Script.Objects.Measurements">
+            <summary>
+            Pseudo-field of physical measurements.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Objects.Measurements.#ctor">
+            <summary>
+            Pseudo-field of physical quantities.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Objects.Measurements.One">
+            <summary>
+            Returns the identity element of the commutative ring with identity.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Objects.Measurements.Zero">
+            <summary>
+            Returns the zero element of the group.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Objects.Measurements.Contains(Waher.Script.Abstraction.Elements.IElement)">
+            <summary>
+            Checks if the set contains an element.
+            </summary>
+            <param name="Element">Element.</param>
+            <returns>If the element is contained in the set.</returns>
+        </member>
+        <member name="M:Waher.Script.Objects.Measurements.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Objects.Measurements.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Script.Objects.Measurements.Compare(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement)">
+            <summary>
+            Compares two double values.
+            </summary>
+            <param name="x">Value 1</param>
+            <param name="y">Value 2</param>
+            <returns>Result</returns>
+        </member>
         <member name="T:Waher.Script.Objects.Namespace">
             <summary>
             Namespace.
@@ -17675,6 +17845,30 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="T:Waher.Script.Operators.CreateMeasurement">
+            <summary>
+            Creates a measurement.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.CreateMeasurement.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a measurement.
+            </summary>
+            <param name="Operand1">Operand 1.</param>
+            <param name="Operand2">Operand 2.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Operators.CreateMeasurement.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator on scalar operands.
+            </summary>
+            <param name="Operand1">Operand 1.</param>
+            <param name="Operand2">Operand 2.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
         <member name="T:Waher.Script.Operators.Dual.And">
             <summary>
             Unspecified And.
@@ -20739,6 +20933,38 @@
             If conversion not possible, null is returned.</returns>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.ITypeConverter.From"/>.</exception>
         </member>
+        <member name="T:Waher.Script.TypeConversion.MeasurementToDouble">
+            <summary>
+            Converts a <see cref="T:Waher.Script.Objects.Measurement"/> to a double number.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.MeasurementToDouble.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.MeasurementToDouble.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.MeasurementToDouble.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.MeasurementToDouble.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.MeasurementToDouble.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.MeasurementToDouble.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.MeasurementToDouble.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.MeasurementToDouble.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.MeasurementToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.MeasurementToDouble.From"/>.</exception>
+        </member>
         <member name="T:Waher.Script.TypeConversion.PhysicalQuantityToDouble">
             <summary>
             Converts a <see cref="T:Waher.Script.Objects.PhysicalQuantity"/> to a double number.
@@ -20770,6 +20996,38 @@
             <param name="Value">Object to be converted.</param>
             <returns>Object of type <see cref="P:Waher.Script.TypeConversion.PhysicalQuantityToDouble.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
             <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.PhysicalQuantityToDouble.From"/>.</exception>
+        </member>
+        <member name="T:Waher.Script.TypeConversion.PhysicalQuantityToMeasurement">
+            <summary>
+            Converts a <see cref="T:Waher.Script.Objects.PhysicalQuantity"/> to a <see cref="T:Waher.Script.Objects.Measurement"/>.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.PhysicalQuantityToMeasurement.From">
+            <summary>
+            Converter converts objects of this type.
+            </summary>
+        </member>
+        <member name="P:Waher.Script.TypeConversion.PhysicalQuantityToMeasurement.To">
+            <summary>
+            Converter converts objects to this type.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.PhysicalQuantityToMeasurement.Convert(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.PhysicalQuantityToMeasurement.To"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.PhysicalQuantityToMeasurement.To"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.PhysicalQuantityToMeasurement.From"/>.</exception>
+        </member>
+        <member name="M:Waher.Script.TypeConversion.PhysicalQuantityToMeasurement.ConvertToElement(System.Object)">
+            <summary>
+            Converts the object in <paramref name="Value"/> to an object of type <see cref="P:Waher.Script.TypeConversion.PhysicalQuantityToMeasurement.To"/>, encapsulated in an
+            <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.
+            </summary>
+            <param name="Value">Object to be converted.</param>
+            <returns>Object of type <see cref="P:Waher.Script.TypeConversion.PhysicalQuantityToMeasurement.To"/>, encapsulated in an <see cref="T:Waher.Script.Abstraction.Elements.IElement"/>.</returns>
+            <exception cref="T:System.ArgumentException">If <paramref name="Value"/> is not of type <see cref="P:Waher.Script.TypeConversion.PhysicalQuantityToMeasurement.From"/>.</exception>
         </member>
         <member name="T:Waher.Script.Units.AtomicUnit">
             <summary>

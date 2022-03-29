@@ -53,7 +53,7 @@ namespace Waher.Script.Test
 			else if (Result is ObjectMatrix OM)
 				Result = OM.Values;
 
-			if (Result is Dictionary<string, IElement> R && 
+			if (Result is Dictionary<string, IElement> R &&
 				ExpectedValue is Dictionary<string, IElement> E)
 			{
 				AssertEqual(E.Count, R.Count, Script);
@@ -1115,7 +1115,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public async Task Parsing_Test_55_ImplicitSetNotation()
+		public async Task Evaluation_Test_55_ImplicitSetNotation()
 		{
 			await Test("S:={x in Z:x>10};5 in S", false);
 			await Test("S:={x in Z:x>10};15 in S", true);
@@ -1153,7 +1153,7 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public async Task Parsing_Test_56_ImplicitVectorNotation()
+		public async Task Evaluation_Test_56_ImplicitVectorNotation()
 		{
 			await Test("v:=[1,2,3,4,5,6,7,8,9,10];[x in v:x>5]", new double[] { 6, 7, 8, 9, 10 });
 			await Test("v:=1..100;[x in v:floor(sqrt(x))^2=x]", new double[] { 1, 4, 9, 16, 25, 36, 49, 64, 81, 100 });
@@ -1161,11 +1161,21 @@ namespace Waher.Script.Test
 		}
 
 		[TestMethod]
-		public async Task Parsing_Test_57_ImplicitMatrixNotation()
+		public async Task Evaluation_Test_57_ImplicitMatrixNotation()
 		{
-			await Test("v:=1..100;[[x,y]:x in v,(y:=floor(sqrt(x)))^2=x]", new double[,] { { 1, 1 },{ 4, 2 }, { 9, 3 }, { 16, 4 },{ 25, 5 },{ 36, 6 },{ 49, 7 },{ 64, 8 },{ 81, 9 },{ 100, 10 } });
+			await Test("v:=1..100;[[x,y]:x in v,(y:=floor(sqrt(x)))^2=x]", new double[,] { { 1, 1 }, { 4, 2 }, { 9, 3 }, { 16, 4 }, { 25, 5 }, { 36, 6 }, { 49, 7 }, { 64, 8 }, { 81, 9 }, { 100, 10 } });
 			await Test("X:=1..2;Y:=5..7;P:=[[x,y]:x in X, y in Y]", new double[,] { { 1, 5 }, { 2, 5 }, { 1, 6 }, { 2, 6 }, { 1, 7 }, { 2, 7 } });
 			await Test("M:=Identity(2);[Reverse(Row):Row in M]", new double[,] { { 0, 1 }, { 1, 0 } });
+		}
+
+		[TestMethod]
+		public async Task Evaluation_Test_58_Measurements()
+		{
+			await Test("10 m +- 1cm", new Measurement(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1)), 0.01));
+
+			await Test("(10 m +- 1cm) + (2 km +- 10m)", new Measurement(2010, new Unit(Prefix.None, "m"), 10.01));
+			await Test("(10 m +- 1cm) * (2 s +- 100ms)", new Measurement(20, new Unit(Prefix.None, "m", "s"), 1.02));
+			await Test("(10 m +- 1cm) / (2 s +- 100ms)", new Measurement(5, new Unit(Prefix.None, new KeyValuePair<string, int>("m", 1), new KeyValuePair<string, int>("s", -1)), 0.255));
 		}
 
 	}

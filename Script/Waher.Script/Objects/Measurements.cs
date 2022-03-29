@@ -1,0 +1,77 @@
+﻿using Waher.Script.Abstraction.Sets;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
+using Waher.Script.Units;
+
+namespace Waher.Script.Objects
+{
+	/// <summary>
+	/// Pseudo-field of physical measurements.
+	/// </summary>
+	public sealed class Measurements : Field, IOrderedSet
+	{
+        private static readonly int hashCode = typeof(Measurements).FullName.GetHashCode();
+
+		/// <summary>
+		/// Pseudo-field of physical quantities.
+		/// </summary>
+		public Measurements()
+		{
+		}
+
+		/// <summary>
+		/// Returns the identity element of the commutative ring with identity.
+		/// </summary>
+		public override ICommutativeRingWithIdentityElement One
+		{
+			get { return Measurement.OneElement; }
+		}
+
+		/// <summary>
+		/// Returns the zero element of the group.
+		/// </summary>
+		public override IAbelianGroupElement Zero
+		{
+			get { return Measurement.ZeroElement; }
+		}
+
+		/// <summary>
+		/// Checks if the set contains an element.
+		/// </summary>
+		/// <param name="Element">Element.</param>
+		/// <returns>If the element is contained in the set.</returns>
+		public override bool Contains(IElement Element)
+		{
+			return Element is Measurement;
+		}
+
+		/// <inheritdoc/>
+		public override bool Equals(object obj)
+		{
+			return obj is Measurements;
+		}
+
+		/// <inheritdoc/>
+		public override int GetHashCode()
+		{
+			return hashCode;
+		}
+
+		/// <summary>
+		/// Compares two double values.
+		/// </summary>
+		/// <param name="x">Value 1</param>
+		/// <param name="y">Value 2</param>
+		/// <returns>Result</returns>
+		public int Compare(IElement x, IElement y)
+		{
+			Measurement d1 = (Measurement)x;
+			Measurement d2 = (Measurement)y;
+
+			if (Unit.TryConvert(d2.Magnitude, d2.Unit, d1.Unit, out double Magnitude2))
+				return d1.Magnitude.CompareTo(Magnitude2);
+			else
+				throw new ScriptException("Incompatible units.");
+		}
+	}
+}

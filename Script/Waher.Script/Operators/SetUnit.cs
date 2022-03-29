@@ -52,6 +52,17 @@ namespace Waher.Script.Operators
 					throw new ScriptRuntimeException("Unable to convert from " + Q.Unit.ToString() + " to " + this.unit.ToString() + ".", this);
 			}
 
+			if (Operand is Measurement M)
+			{
+				if (Unit.TryConvert(M.Magnitude, M.Unit, this.unit, out double Magnitude) &&
+					Unit.TryConvert(M.Error, M.Unit, this.unit, out double Error))
+				{
+					return new Measurement(Magnitude, this.unit, Error);
+				}
+				else
+					throw new ScriptRuntimeException("Unable to convert from " + M.Unit.ToString() + " to " + this.unit.ToString() + ".", this);
+			}
+
 			throw new ScriptRuntimeException("Unable to set physical unit.", this);
 		}
 	}

@@ -185,6 +185,8 @@ namespace Waher.Content.Markdown.Functions
 				return new DoubleNumber(d);
 			else if (CommonTypes.TryParse(s, out bool b))
 				return new BooleanValue(b);
+			else if (Measurement.TryParse(s, out Measurement M))
+				return M;
 			else if (PhysicalQuantity.TryParse(s, out PhysicalQuantity Q))
 				return Q;
 			else if (XML.TryParse(s, out DateTime TP))

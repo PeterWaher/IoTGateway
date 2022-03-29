@@ -63,15 +63,15 @@ namespace Waher.Script.Model
 						return this.EvaluateScalar(StringValue1.Value, StringValue2.Value, Variables);
 
 					double arg1, arg2;
-					PhysicalQuantity Q;
 
 					if (!(DoubleNumber1 is null))
 						arg1 = DoubleNumber1.Value;
 					else
 					{
-						Q = Argument1 as PhysicalQuantity;
-						if (!(Q is null))
-							arg1 = Q.Magnitude;
+                        if (Argument1 is PhysicalQuantity Q1)
+                            arg1 = Q1.Magnitude;
+                        else if(Argument1 is Measurement M1)
+							arg1 = M1.Magnitude;
 						else
 							return this.EvaluateScalar(Argument1, Argument2, Variables);
 					}
@@ -80,11 +80,12 @@ namespace Waher.Script.Model
 						arg2 = DoubleNumber2.Value;
 					else
 					{
-						Q = Argument2 as PhysicalQuantity;
-						if (!(Q is null))
-							arg2 = Q.Magnitude;
-						else
-							return this.EvaluateScalar(Argument1, Argument2, Variables);
+                        if (Argument2 is PhysicalQuantity Q2)
+                            arg2 = Q2.Magnitude;
+                        else if (Argument2 is Measurement M2)
+                            arg2 = M2.Magnitude;
+                        else
+                            return this.EvaluateScalar(Argument1, Argument2, Variables);
 					}
 
 					return this.EvaluateScalar(arg1, arg2, Variables);
@@ -267,15 +268,15 @@ namespace Waher.Script.Model
                         return await this.EvaluateScalarAsync(StringValue1.Value, StringValue2.Value, Variables);
 
                     double arg1, arg2;
-                    PhysicalQuantity Q;
 
                     if (!(DoubleNumber1 is null))
                         arg1 = DoubleNumber1.Value;
                     else
                     {
-                        Q = Argument1 as PhysicalQuantity;
-                        if (!(Q is null))
-                            arg1 = Q.Magnitude;
+                        if (Argument1 is PhysicalQuantity Q1)
+                            arg1 = Q1.Magnitude;
+                        else if (Argument1 is Measurement M1)
+                            arg1 = M1.Magnitude;
                         else
                             return await this.EvaluateScalarAsync(Argument1, Argument2, Variables);
                     }
@@ -284,9 +285,10 @@ namespace Waher.Script.Model
                         arg2 = DoubleNumber2.Value;
                     else
                     {
-                        Q = Argument2 as PhysicalQuantity;
-                        if (!(Q is null))
-                            arg2 = Q.Magnitude;
+                        if (Argument2 is PhysicalQuantity Q2)
+                            arg2 = Q2.Magnitude;
+                        else if (Argument2 is Measurement M2)
+                            arg2 = M2.Magnitude;
                         else
                             return await this.EvaluateScalarAsync(Argument1, Argument2, Variables);
                     }

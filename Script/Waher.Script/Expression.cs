@@ -2061,14 +2061,25 @@ namespace Waher.Script
 				{
 					case '+':
 						this.pos++;
-						if ((ch = this.PeekNextChar()) == '=' || ch == '+')
+						ch = this.PeekNextChar();
+
+						if (ch == '=' || ch == '+')
 						{
 							this.pos--;
 							return Left;
 						}
+						else if (ch == '-')
+						{
+							this.pos++;
 
-						Right = this.AssertRightOperandNotNull(this.ParseBinomialCoefficients());
-						Left = new Add(Left, Right, Start, this.pos - Start, this);
+							Right = this.AssertRightOperandNotNull(this.ParseBinomialCoefficients());
+							Left = new CreateMeasurement(Left, Right, Start, this.pos - Start, this);
+						}
+						else
+						{
+							Right = this.AssertRightOperandNotNull(this.ParseBinomialCoefficients());
+							Left = new Add(Left, Right, Start, this.pos - Start, this);
+						}
 						continue;
 
 					case '-':
@@ -2103,6 +2114,13 @@ namespace Waher.Script
 								this.pos--;
 								return Left;
 						}
+
+					case '±':
+						this.pos++;
+
+						Right = this.AssertRightOperandNotNull(this.ParseBinomialCoefficients());
+						Left = new CreateMeasurement(Left, Right, Start, this.pos - Start, this);
+						break;
 
 					default:
 						return Left;

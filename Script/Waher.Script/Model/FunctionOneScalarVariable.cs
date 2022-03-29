@@ -50,7 +50,10 @@ namespace Waher.Script.Model
 				if (Argument is PhysicalQuantity PhysicalQuantity)
 					return this.EvaluateScalar(PhysicalQuantity.Magnitude, Variables);
 
-				return this.EvaluateScalar(Argument, Variables);
+                if (Argument is Measurement Measurement)
+                    return this.EvaluateScalar(Measurement.Magnitude, Variables);
+
+                return this.EvaluateScalar(Argument, Variables);
             }
             else
             {
@@ -191,6 +194,9 @@ namespace Waher.Script.Model
 
                 if (Argument is PhysicalQuantity PhysicalQuantity)
                     return await this.EvaluateScalarAsync(PhysicalQuantity.Magnitude, Variables);
+
+                if (Argument is Measurement Measurement)
+                    return await this.EvaluateScalarAsync(Measurement.Magnitude, Variables);
 
                 return await this.EvaluateScalarAsync(Argument, Variables);
             }

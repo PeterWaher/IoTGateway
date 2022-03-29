@@ -2970,3 +2970,25 @@ units recognized by the `Waher.Script` library:
 | mph   | SM/h |
 | fps   | ft/s |
 [Speed]
+
+=========================================================================================================================================================
+
+Measurements
+-----------------
+
+The script also supports measurements, which contain a magnitude and an error. The magnitude can
+be a number or a physical quantity. Artithmetics operators propagate errors accordingly.
+The `±` character is used to separate the magnitude from the error. For ease of typing,
+`+-` can also be used to the same effect.
+
+Examples:
+
+	10 m +- 1cm
+	(10 m +- 1cm) + (2 km +- 10m)
+	(10 m +- 1cm) * (2 s +- 100ms)
+	(10 m +- 1cm) / (2 s +- 100ms)
+
+If `m` is a measurement, you can use `m.Estimate` to access the estimated or expected
+value, and `m.Max` and `m.Min` to get the maximum and minimum values in the range
+respectively. Values will be returned as Physical Quantities. Note that necessary unit 
+conversions will be performed.

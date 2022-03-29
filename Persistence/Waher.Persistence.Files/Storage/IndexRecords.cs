@@ -273,8 +273,11 @@ namespace Waher.Persistence.Files.Storage
 					Writer.Write((byte[])Value);
 					break;
 
-				case ObjectSerializer.TYPE_ARRAY:
 				case ObjectSerializer.TYPE_OBJECT:
+					Writer.Write(Value?.ToString() ?? string.Empty);
+					break;
+
+				case ObjectSerializer.TYPE_ARRAY:
 				default:
 					return false;
 			}

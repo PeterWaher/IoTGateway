@@ -182,98 +182,119 @@ namespace Waher.Persistence.Files.Storage
 			else
 				TypeCode = ObjectSerializer.GetFieldDataTypeCode(Value.GetType());
 
-			Writer.WriteBits((byte)TypeCode, 6);
-
 			switch (TypeCode)
 			{
 				case ObjectSerializer.TYPE_BOOLEAN:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.WriteBit((bool)Value);
 					break;
 
 				case ObjectSerializer.TYPE_BYTE:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((byte)Value);
 					break;
 
 				case ObjectSerializer.TYPE_INT16:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((short)Value);
 					break;
 
 				case ObjectSerializer.TYPE_INT32:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((int)Value);
 					break;
 
 				case ObjectSerializer.TYPE_INT64:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((long)Value);
 					break;
 
 				case ObjectSerializer.TYPE_SBYTE:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((sbyte)Value);
 					break;
 
 				case ObjectSerializer.TYPE_UINT16:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((ushort)Value);
 					break;
 
 				case ObjectSerializer.TYPE_UINT32:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((uint)Value);
 					break;
 
 				case ObjectSerializer.TYPE_UINT64:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((ulong)Value);
 					break;
 
 				case ObjectSerializer.TYPE_DECIMAL:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((decimal)Value);
 					break;
 
 				case ObjectSerializer.TYPE_DOUBLE:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((double)Value);
 					break;
 
 				case ObjectSerializer.TYPE_SINGLE:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((float)Value);
 					break;
 
 				case ObjectSerializer.TYPE_DATETIME:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((DateTime)Value);
 					break;
 
 				case ObjectSerializer.TYPE_DATETIMEOFFSET:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((DateTimeOffset)Value);
 					break;
 
 				case ObjectSerializer.TYPE_TIMESPAN:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((TimeSpan)Value);
 					break;
 
 				case ObjectSerializer.TYPE_CHAR:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((char)Value);
 					break;
 
 				case ObjectSerializer.TYPE_STRING:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((string)Value);
 					break;
 
 				case ObjectSerializer.TYPE_CI_STRING:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write(((CaseInsensitiveString)Value).Value);
 					break;
 
 				case ObjectSerializer.TYPE_ENUM:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((Enum)Value);
 					break;
 
 				case ObjectSerializer.TYPE_GUID:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((Guid)Value);
 					break;
 
 				case ObjectSerializer.TYPE_NULL:
+					Writer.WriteBits((byte)TypeCode, 6);
 					break;
 
 				case ObjectSerializer.TYPE_BYTEARRAY:
+					Writer.WriteBits((byte)TypeCode, 6);
 					Writer.Write((byte[])Value);
 					break;
 
 				case ObjectSerializer.TYPE_OBJECT:
+					Writer.WriteBits((byte)ObjectSerializer.TYPE_STRING, 6);
 					Writer.Write(Value?.ToString() ?? string.Empty);
 					break;
 

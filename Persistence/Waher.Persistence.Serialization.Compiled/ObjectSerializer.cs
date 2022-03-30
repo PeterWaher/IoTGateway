@@ -1155,19 +1155,14 @@ namespace Waher.Persistence.Serialization
 							AppendType(MemberType, CSharp);
 							CSharp.AppendLine("));");
 							CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-
-							if (Nullable)
-							{
-								CSharp.AppendLine();
-								CSharp.Append("\t\t\t\t\t\t\tcase ");
-								CSharp.Append(TYPE_NULL);
-								CSharp.AppendLine(":");
-								CSharp.Append("\t\t\t\t\t\t\t\tResult.");
-								CSharp.Append(Member.Name);
-								CSharp.AppendLine(" = null;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-							}
-
+							CSharp.AppendLine();
+							CSharp.Append("\t\t\t\t\t\t\tcase ");
+							CSharp.Append(TYPE_NULL);
+							CSharp.AppendLine(":");
+							CSharp.Append("\t\t\t\t\t\t\t\tResult.");
+							CSharp.Append(Member.Name);
+							CSharp.AppendLine(Nullable ? " = null;" : " = default;");
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 							CSharp.AppendLine();
 							CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 							CSharp.Append("\t\t\t\t\t\t\t\tthrow new SerializationException(\"Unable to set ");
@@ -1467,7 +1462,7 @@ namespace Waher.Persistence.Serialization
 										CSharp.AppendLine(":");
 										CSharp.Append("\t\t\t\t\t\t\t\tResult.");
 										CSharp.Append(Member.Name);
-										CSharp.AppendLine(" = null;");
+										CSharp.AppendLine(Nullable ? " = null;" : " = default;");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 										CSharp.AppendLine();
 										CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
@@ -1542,7 +1537,7 @@ namespace Waher.Persistence.Serialization
 										CSharp.AppendLine(":");
 										CSharp.Append("\t\t\t\t\t\t\t\tResult.");
 										CSharp.Append(Member.Name);
-										CSharp.AppendLine(" = null;");
+										CSharp.AppendLine(Nullable ? " = null;" : " = default;");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 
 										if (MemberTypeInfo.IsAssignableFrom(typeof(bool)))
@@ -4597,11 +4592,22 @@ namespace Waher.Persistence.Serialization
 		public static IEnumerable<MemberInfo> GetMembers(System.Reflection.TypeInfo T)
 		{
 			LinkedList<MemberInfo> Result = new LinkedList<MemberInfo>();
+			Dictionary<string, bool> Names = new Dictionary<string, bool>();
 
 			while (!(T is null))
 			{
 				foreach (MemberInfo MI in T.DeclaredMembers)
-					Result.AddLast(MI);
+				{
+#if NETSTANDARD2_0
+					if (MI.MemberType != MemberTypes.Property && MI.MemberType != MemberTypes.Field)
+						continue;
+#endif
+					if (!Names.ContainsKey(MI.Name))
+					{
+						Result.AddLast(MI);
+						Names[MI.Name] = true;  // To avoid repetition of virtual members.
+					}
+				}
 
 				if (!(T.BaseType is null))
 					T = T.BaseType.GetTypeInfo();
@@ -4702,6 +4708,7 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_BYTEARRAY: return typeof(byte[]);
 				case ObjectSerializer.TYPE_GUID: return typeof(Guid);
 				case ObjectSerializer.TYPE_ARRAY: return typeof(Array);
+				case ObjectSerializer.TYPE_NULL:
 				case ObjectSerializer.TYPE_OBJECT: return typeof(object);
 				default:
 					StringBuilder sb = new StringBuilder();
@@ -4786,7 +4793,7 @@ namespace Waher.Persistence.Serialization
 				return ObjectSerializer.TYPE_CI_STRING;
 			else if (TI.IsArray)
 			{
-				if (FieldDataType == typeof(KeyValuePair<string,object>[]) ||
+				if (FieldDataType == typeof(KeyValuePair<string, object>[]) ||
 					FieldDataType == typeof(KeyValuePair<string, IElement>[]))
 				{
 					return ObjectSerializer.TYPE_OBJECT;

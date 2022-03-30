@@ -10,6 +10,7 @@ using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Statistics;
 using Waher.Runtime.Inventory;
 using Waher.Script;
+using Waher.Content;
 
 #if !LW
 using Waher.Persistence.Files.Test.Classes;
@@ -64,7 +65,8 @@ namespace Waher.Persistence.FilesLW.Test
 				typeof(ObjectSerializer).Assembly,
 				typeof(DBFilesBTreeTests).Assembly,
 				typeof(Expression).Assembly,
-				typeof(Script.Persistence.SQL.Select).Assembly);
+				typeof(Script.Persistence.SQL.Select).Assembly,
+				typeof(Duration).Assembly);
 		}
 
 		[TestInitialize]

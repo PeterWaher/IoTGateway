@@ -1914,6 +1914,43 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.AreEqual("Hello", B);
 		}
 
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_21_Structs()
+		{
+			Structs Obj = new Structs()
+			{
+				Duration = new Content.Duration(true, 1, 2, 3, 4, 5, 6)
+			};
+
+			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
+
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(Structs));
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+			Structs Obj2 = (Structs)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			Assert.IsNotNull(Obj2.Duration);
+			Assert.AreEqual(true, Obj2.Duration.Negation);
+			Assert.AreEqual(1, Obj2.Duration.Years);
+			Assert.AreEqual(2, Obj2.Duration.Months);
+			Assert.AreEqual(3, Obj2.Duration.Days);
+			Assert.AreEqual(4, Obj2.Duration.Hours);
+			Assert.AreEqual(5, Obj2.Duration.Minutes);
+			Assert.AreEqual(6, Obj2.Duration.Seconds);
+		}
+
 		// TODO: Objects, by reference, nullable (incl. null strings, arrays)
 		// TODO: Multidimensional arrays
 	}

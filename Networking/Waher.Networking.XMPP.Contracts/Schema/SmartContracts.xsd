@@ -347,7 +347,7 @@ purposes.
 						<xs:documentation>Time parameter.</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name='dateTimeParameter' type='TimeParameter'>
+				<xs:element name='dateTimeParameter' type='DateTimeParameter'>
 					<xs:annotation>
 						<xs:documentation>Date and Time parameter.</xs:documentation>
 					</xs:annotation>

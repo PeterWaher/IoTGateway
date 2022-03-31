@@ -2430,7 +2430,7 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.2.1"
+          "Waher.Script": "2.2.2"
         }
       },
       "Waher.Events/1.1.1": {
@@ -2504,7 +2504,7 @@
           "Waher.Events": "1.1.1"
         }
       },
-      "Waher.Script/2.2.1": {
+      "Waher.Script/2.2.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -4984,7 +4984,7 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.2.1"
+          "Waher.Script": "2.2.2"
         }
       },
       "Waher.Events/1.1.1": {
@@ -5058,7 +5058,7 @@
           "Waher.Events": "1.1.1"
         }
       },
-      "Waher.Script/2.2.1": {
+      "Waher.Script/2.2.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7574,7 +7574,7 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.2.1"
+          "Waher.Script": "2.2.2"
         }
       },
       "Waher.Events/1.1.1": {
@@ -7648,7 +7648,7 @@
           "Waher.Events": "1.1.1"
         }
       },
-      "Waher.Script/2.2.1": {
+      "Waher.Script/2.2.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10137,7 +10137,7 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.2.1"
+          "Waher.Script": "2.2.2"
         }
       },
       "Waher.Events/1.1.1": {
@@ -10211,7 +10211,7 @@
           "Waher.Events": "1.1.1"
         }
       },
-      "Waher.Script/2.2.1": {
+      "Waher.Script/2.2.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12736,7 +12736,7 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.2.1"
+          "Waher.Script": "2.2.2"
         }
       },
       "Waher.Events/1.1.1": {
@@ -12810,7 +12810,7 @@
           "Waher.Events": "1.1.1"
         }
       },
-      "Waher.Script/2.2.1": {
+      "Waher.Script/2.2.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15299,7 +15299,7 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.2.1"
+          "Waher.Script": "2.2.2"
         }
       },
       "Waher.Events/1.1.1": {
@@ -15373,7 +15373,7 @@
           "Waher.Events": "1.1.1"
         }
       },
-      "Waher.Script/2.2.1": {
+      "Waher.Script/2.2.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -17898,7 +17898,7 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.0.28",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.2.1"
+          "Waher.Script": "2.2.2"
         }
       },
       "Waher.Events/1.1.1": {
@@ -17972,7 +17972,7 @@
           "Waher.Events": "1.1.1"
         }
       },
-      "Waher.Script/2.2.1": {
+      "Waher.Script/2.2.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -27914,7 +27914,7 @@
       "path": "../../Runtime/Waher.Runtime.Temporary/Waher.Runtime.Temporary.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Temporary/Waher.Runtime.Temporary.csproj"
     },
-    "Waher.Script/2.2.1": {
+    "Waher.Script/2.2.2": {
       "type": "project",
       "path": "../../Script/Waher.Script/Waher.Script.csproj",
       "msbuildProject": "../../Script/Waher.Script/Waher.Script.csproj"

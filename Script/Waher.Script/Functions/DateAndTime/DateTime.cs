@@ -109,18 +109,10 @@ namespace Waher.Script.Functions.DateAndTime
 					return new DateTimeValue(new System.DateTime(L));
 				else if (Obj is double Dbl)
 					return new DateTimeValue(new System.DateTime((long)Dbl));
-				else if (!(Obj is null))
-				{
-					string s = Obj.ToString();
-
-					if (System.DateTime.TryParse(s, out System.DateTime TP) ||
-						System.DateTime.TryParse(s + ":00", out TP))
-					{
-						return new DateTimeValue(TP);
-					}
-				}
-
-				throw new ScriptRuntimeException("Unable to parse DateTime value.", this);
+				else if (!(Obj is null) && TryParse(Obj.ToString(), out System.DateTime TP))
+					return new DateTimeValue(TP);
+				else
+					throw new ScriptRuntimeException("Unable to parse DateTime value.", this);
 			}
 
 			double[] d = new double[c];
@@ -149,6 +141,125 @@ namespace Waher.Script.Functions.DateAndTime
 				default:
 					throw new ScriptRuntimeException("Invalid number of parameters.", this);
 			}
+		}
+
+		/// <summary>
+		/// Parses DateTime values from short forms of strings.
+		/// </summary>
+		/// <param name="s">String</param>
+		/// <param name="TP">Parsed DateTime value.</param>
+		/// <returns>If successful or not.</returns>
+		public static bool TryParse(string s, out System.DateTime TP)
+		{
+			s = s.Trim();
+
+			DateTimeKind Kind;
+
+			if (s.EndsWith("z", StringComparison.CurrentCultureIgnoreCase))
+			{
+				Kind = DateTimeKind.Utc;
+				s = s.Substring(0, s.Length - 1).TrimEnd();
+			}
+			else
+				Kind = DateTimeKind.Unspecified;
+
+			int c = s.Length;
+			int Pos = 0;
+
+			if (!TryParseInt(s, ref Pos, '-', out int Year) || Year <= 0 || Year > 9999)
+			{
+				TP = System.DateTime.MinValue;
+				return false;
+			}
+			else if (Pos >= c)
+			{
+				TP = new System.DateTime(Year, 1, 1, 0, 0, 0, Kind);
+				return true;
+			}
+
+			if (!TryParseInt(s, ref Pos, '-', out int Month) || Month < 1 || Month > 12)
+			{
+				TP = System.DateTime.MinValue;
+				return false;
+			}
+			else if (Pos >= c)
+			{
+				TP = new System.DateTime(Year, Month, 1, 0, 0, 0, Kind);
+				return true;
+			}
+
+			if (!TryParseInt(s, ref Pos, 'T', out int Day) || Day < 1 || Day > System.DateTime.DaysInMonth(Year, Month))
+			{
+				TP = System.DateTime.MinValue;
+				return false;
+			}
+			else if (Pos >= c)
+			{
+				TP = new System.DateTime(Year, Month, Day, 0, 0, 0, Kind);
+				return true;
+			}
+
+			if (!TryParseInt(s, ref Pos, ':', out int Hour) || Hour < 0 || Hour > 23)
+			{
+				TP = System.DateTime.MinValue;
+				return false;
+			}
+			else if (Pos >= c)
+			{
+				TP = new System.DateTime(Year, Month, Day, Hour, 0, 0, Kind);
+				return true;
+			}
+
+			if (!TryParseInt(s, ref Pos, ':', out int Minute) || Minute < 0 || Minute > 59)
+			{
+				TP = System.DateTime.MinValue;
+				return false;
+			}
+			else if (Pos >= c)
+			{
+				TP = new System.DateTime(Year, Month, Day, Hour, Minute, 0, Kind);
+				return true;
+			}
+
+			if (!TryParseInt(s, ref Pos, '.', out int Second) || Second < 0 || Second > 59)
+			{
+				TP = System.DateTime.MinValue;
+				return false;
+			}
+			else if (Pos >= c)
+			{
+				TP = new System.DateTime(Year, Month, Day, Hour, Minute, Second, Kind);
+				return true;
+			}
+
+			if (!TryParseInt(s, ref Pos, '\x0', out int MilliSecond) || MilliSecond < 0 || MilliSecond > 999 || Pos < c)
+			{
+				TP = System.DateTime.MinValue;
+				return false;
+			}
+
+			TP = new System.DateTime(Year, Month, Day, Hour, Minute, Second, MilliSecond, Kind);
+			return true;
+		}
+
+		internal static bool TryParseInt(string s, ref int Index, char ExpectedDelimiter, out int i)
+		{
+			int j = s.IndexOf(ExpectedDelimiter, Index);
+
+			if (j < 0)
+				j = s.Length;
+			else if (j == 0)
+			{
+				i = 0;
+				return false;
+			}
+
+			if (!int.TryParse(s.Substring(Index, j - Index), out i))
+				return false;
+
+			Index = j + 1;
+
+			return true;
 		}
 
 		/// <summary>

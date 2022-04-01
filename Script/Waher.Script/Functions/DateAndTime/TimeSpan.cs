@@ -96,7 +96,13 @@ namespace Waher.Script.Functions.DateAndTime
 			int i, c = Arguments.Length;
 
 			if (c == 1)
-				return new ObjectValue(System.TimeSpan.Parse(Arguments[0].AssociatedObjectValue?.ToString()));
+			{
+				object Obj = Arguments[0].AssociatedObjectValue;
+				if (!(Obj is null) && TryParse(Obj.ToString(), out System.TimeSpan TS))
+					return new ObjectValue(TS);
+				else
+					throw new ScriptRuntimeException("Unable to parse TimeSpan value.", this);
+			}
 
 			double[] d = new double[c];
 			DoubleNumber n;
@@ -124,6 +130,70 @@ namespace Waher.Script.Functions.DateAndTime
 				default:
 					throw new ScriptRuntimeException("Invalid number of parameters.", this);
 			}
+		}
+
+		/// <summary>
+		/// Parses TimeSpan values from short forms of strings.
+		/// </summary>
+		/// <param name="s">String</param>
+		/// <param name="TS">Parsed TimeSpan value.</param>
+		/// <returns>If successful or not.</returns>
+		public static bool TryParse(string s, out System.TimeSpan TS)
+		{
+			s = s.Trim();
+
+			int c = s.Length;
+			int Pos = 0;
+
+			if (!DateTime.TryParseInt(s, ref Pos, '.', out int Days) || Days < System.TimeSpan.MinValue.Days || Days > System.TimeSpan.MaxValue.Days)
+				Days = 0;
+			else if (Pos >= c)
+			{
+				TS = new System.TimeSpan(Days, 0, 0, 0);
+				return true;
+			}
+
+			if (!DateTime.TryParseInt(s, ref Pos, ':', out int Hour) || Hour < 0 || Hour > 23)
+			{
+				TS = System.TimeSpan.Zero;
+				return false;
+			}
+			else if (Pos >= c)
+			{
+				TS = new System.TimeSpan(Days, Hour, 0, 0);
+				return true;
+			}
+
+			if (!DateTime.TryParseInt(s, ref Pos, ':', out int Minute) || Minute < 0 || Minute > 59)
+			{
+				TS = System.TimeSpan.Zero;
+				return false;
+			}
+			else if (Pos >= c)
+			{
+				TS = new System.TimeSpan(Days, Hour, Minute, 0);
+				return true;
+			}
+
+			if (!DateTime.TryParseInt(s, ref Pos, '.', out int Second) || Second < 0 || Second > 59)
+			{
+				TS = System.TimeSpan.Zero;
+				return false;
+			}
+			else if (Pos >= c)
+			{
+				TS = new System.TimeSpan(Days, Hour, Minute, Second);
+				return true;
+			}
+
+			if (!DateTime.TryParseInt(s, ref Pos, '\x0', out int MilliSecond) || MilliSecond < 0 || MilliSecond > 999 || Pos < c)
+			{
+				TS = System.TimeSpan.Zero;
+				return false;
+			}
+
+			TS = new System.TimeSpan(Days, Hour, Minute, Second, MilliSecond);
+			return true;
 		}
 
 		/// <summary>

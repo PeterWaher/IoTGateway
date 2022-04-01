@@ -4402,6 +4402,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTime.TryParse(System.String,System.DateTime@)">
+            <summary>
+            Parses DateTime values from short forms of strings.
+            </summary>
+            <param name="s">String</param>
+            <param name="TP">Parsed DateTime value.</param>
+            <returns>If successful or not.</returns>
+        </member>
         <member name="M:Waher.Script.Functions.DateAndTime.DateTime.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
             <summary>
             Performs a pattern match operation.
@@ -4637,6 +4645,14 @@
             <param name="Arguments">Function arguments.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.TimeSpan.TryParse(System.String,System.TimeSpan@)">
+            <summary>
+            Parses TimeSpan values from short forms of strings.
+            </summary>
+            <param name="s">String</param>
+            <param name="TS">Parsed TimeSpan value.</param>
+            <returns>If successful or not.</returns>
         </member>
         <member name="M:Waher.Script.Functions.DateAndTime.TimeSpan.PatternMatch(Waher.Script.Abstraction.Elements.IElement,System.Collections.Generic.Dictionary{System.String,Waher.Script.Abstraction.Elements.IElement})">
             <summary>

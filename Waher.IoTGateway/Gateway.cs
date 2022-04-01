@@ -3407,18 +3407,30 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Markdown">Markdown containing message text. Used to generate plain text and HTML copies of the same content.</param>
 		/// <returns>Multi-format XML for chat message.</returns>
-		public static async Task<string> GetMultiFormatChatMessageXml(string Markdown)
+		public static Task<string> GetMultiFormatChatMessageXml(string Markdown)
 		{
-			(string Text, string Html) = await ConvertMarkdown(Markdown);
-			return GetMultiFormatChatMessageXml(Text, Html, Markdown);
+			return GetMultiFormatChatMessageXml(Markdown, true, true);
 		}
 
 		/// <summary>
 		/// Gets XML for a multi-formatted chat message.
 		/// </summary>
-		/// <param name="Text">Plain-text version of message.</param>
-		/// <param name="Html">HTML version of message.</param>
-		/// <param name="Markdown">Markdown containing message text.</param>
+		/// <param name="Markdown">Markdown containing message text. Used to generate plain text and HTML copies of the same content.</param>
+		/// <param name="TextVersion">If a Text version of the message should be included.</param>
+		/// <param name="HtmlVersion">If a HTML version of the message should be included.</param>
+		/// <returns>Multi-format XML for chat message.</returns>
+		public static async Task<string> GetMultiFormatChatMessageXml(string Markdown, bool TextVersion, bool HtmlVersion)
+		{
+			(string Text, string Html) = await ConvertMarkdown(Markdown);
+			return GetMultiFormatChatMessageXml(TextVersion ? Text : null, HtmlVersion ? Html : null, Markdown);
+		}
+
+		/// <summary>
+		/// Gets XML for a multi-formatted chat message.
+		/// </summary>
+		/// <param name="Text">Plain-text version of message. If empty or null, plain text is excluded from message.</param>
+		/// <param name="Html">HTML version of message. If empty or null, HTML is excluded from message.</param>
+		/// <param name="Markdown">Markdown containing message text. If empty or null, markdown is excluded from message.</param>
 		/// <returns>Multi-format XML for chat message.</returns>
 		public static string GetMultiFormatChatMessageXml(string Text, string Html, string Markdown)
 		{
@@ -3431,32 +3443,43 @@ namespace Waher.IoTGateway
 		/// Appends the XML for a multi-formatted chat message to a string being built.
 		/// </summary>
 		/// <param name="Xml">XML output.</param>
-		/// <param name="Text">Plain-text version of message.</param>
-		/// <param name="Html">HTML version of message.</param>
-		/// <param name="Markdown">Markdown containing message text.</param>
+		/// <param name="Text">Plain-text version of message. If empty or null, plain text is excluded from message.</param>
+		/// <param name="Html">HTML version of message. If empty or null, HTML is excluded from message.</param>
+		/// <param name="Markdown">Markdown containing message text. If empty or null, markdown is excluded from message.</param>
 		public static void AppendMultiFormatChatMessageXml(StringBuilder Xml, string Text, string Html, string Markdown)
 		{
-			Xml.Append("<body>");
-			Xml.Append(XML.Encode(Text));
-			Xml.Append("</body>");
-
-			Xml.Append("<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">");
-			Xml.Append(XML.Encode(Markdown));
-			Xml.Append("</content>");
-
-			Xml.Append("<html xmlns='http://jabber.org/protocol/xhtml-im'>");
-			Xml.Append("<body xmlns='http://www.w3.org/1999/xhtml'>");
-
-			HtmlDocument Doc = new HtmlDocument("<root>" + Html + "</root>");
-			IEnumerable<HtmlNode> Children = (Doc.Body ?? Doc.Root).Children;
-
-			if (!(Children is null))
+			if (string.IsNullOrEmpty(Text))
+				Xml.Append("<body/>");
+			else
 			{
-				foreach (HtmlNode N in Children)
-					N.Export(Xml);
+				Xml.Append("<body>");
+				Xml.Append(XML.Encode(Text));
+				Xml.Append("</body>");
 			}
 
-			Xml.Append("</body></html>");
+			if (!string.IsNullOrEmpty(Markdown))
+			{
+				Xml.Append("<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">");
+				Xml.Append(XML.Encode(Markdown));
+				Xml.Append("</content>");
+			}
+
+			if (!string.IsNullOrEmpty(Html))
+			{
+				Xml.Append("<html xmlns='http://jabber.org/protocol/xhtml-im'>");
+				Xml.Append("<body xmlns='http://www.w3.org/1999/xhtml'>");
+
+				HtmlDocument Doc = new HtmlDocument("<root>" + Html + "</root>");
+				IEnumerable<HtmlNode> Children = (Doc.Body ?? Doc.Root).Children;
+
+				if (!(Children is null))
+				{
+					foreach (HtmlNode N in Children)
+						N.Export(Xml);
+				}
+
+				Xml.Append("</body></html>");
+			}
 		}
 
 		private static void SendChatMessage(MessageType Type, string Markdown, string Text, string Html, string To, string MessageId, string ThreadId, bool Update)

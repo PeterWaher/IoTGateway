@@ -1082,6 +1082,7 @@ fieldset > legend
 	padding:1em;
     border:0.1em solid ¤HeaderColor¤;
 	background-color: ¤Blend(BackgroundColor,"Red",0.075)¤;
+    display: inline-block;
 }
 
 mark

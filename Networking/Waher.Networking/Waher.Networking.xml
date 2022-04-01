@@ -818,6 +818,146 @@
         <member name="M:Waher.Networking.Sniffers.DebugSniffer.WriteLine(System.String)">
             <inheritdoc/>
         </member>
+        <member name="T:Waher.Networking.Sniffers.Extensions">
+            <summary>
+            Method extensions for sniffers and sniffable objects.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.ReceiveBinary(Waher.Networking.Sniffers.ISniffable,System.Byte[])">
+            <summary>
+            Called when binary data has been received.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.ReceiveBinary(Waher.Networking.Sniffers.ISniffable,System.DateTime,System.Byte[])">
+            <summary>
+            Called when binary data has been received.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.TransmitBinary(Waher.Networking.Sniffers.ISniffable,System.Byte[])">
+            <summary>
+            Called when binary data has been transmitted.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.TransmitBinary(Waher.Networking.Sniffers.ISniffable,System.DateTime,System.Byte[])">
+            <summary>
+            Called when binary data has been transmitted.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.ReceiveText(Waher.Networking.Sniffers.ISniffable,System.String)">
+            <summary>
+            Called when text has been received.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.ReceiveText(Waher.Networking.Sniffers.ISniffable,System.DateTime,System.String)">
+            <summary>
+            Called when text has been received.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.TransmitText(Waher.Networking.Sniffers.ISniffable,System.String)">
+            <summary>
+            Called when text has been transmitted.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.TransmitText(Waher.Networking.Sniffers.ISniffable,System.DateTime,System.String)">
+            <summary>
+            Called when text has been transmitted.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.Information(Waher.Networking.Sniffers.ISniffable,System.String)">
+            <summary>
+            Called to inform the viewer of something.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Comment">Comment.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.Information(Waher.Networking.Sniffers.ISniffable,System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of something.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Comment">Comment.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.Warning(Waher.Networking.Sniffers.ISniffable,System.String)">
+            <summary>
+            Called to inform the viewer of a warning state.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Warning">Warning.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.Warning(Waher.Networking.Sniffers.ISniffable,System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of a warning state.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Warning">Warning.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.Error(Waher.Networking.Sniffers.ISniffable,System.String)">
+            <summary>
+            Called to inform the viewer of an error state.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Error">Error.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.Error(Waher.Networking.Sniffers.ISniffable,System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of an error state.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Error">Error.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.Exception(Waher.Networking.Sniffers.ISniffable,System.String)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Exception">Exception.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.Exception(Waher.Networking.Sniffers.ISniffable,System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Exception">Exception.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.Exception(Waher.Networking.Sniffers.ISniffable,System.Exception)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Exception">Exception.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.Extensions.Exception(Waher.Networking.Sniffers.ISniffable,System.DateTime,System.Exception)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Sniffable">Sniffable object.</param>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Exception">Exception.</param>
+        </member>
         <member name="T:Waher.Networking.Sniffers.InMemorySniffer">
             <summary>
             Sniffer that stores events in memory.

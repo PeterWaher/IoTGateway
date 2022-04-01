@@ -1455,14 +1455,55 @@ namespace Waher.Script.Graphs3D
 			Output.WriteAttributeString("inclination", Expression.ToString(this.inclination));
 			Output.WriteAttributeString("overSampling", this.overSampling.ToString());
 
+			Dictionary<string, string> Series = new Dictionary<string, string>();
+			string Label;
+			string s;
+			int i = 1;
+
 			foreach (IVector v in this.x)
-				Output.WriteElementString("X", Graph2D.ReducedXmlString(v));
+			{
+				s = Graph2D.ReducedXmlString(v);
+				if (Series.TryGetValue(s, out Label))
+					Output.WriteElementString("X", Label);
+				else
+				{
+					Label = "X" + (i++).ToString();
+					Series[s] = Label;
+					Output.WriteElementString("X", Label + ":=" + s);
+				}
+			}
+
+			i = 1;
 
 			foreach (IVector v in this.y)
-				Output.WriteElementString("Y", Graph2D.ReducedXmlString(v));
+			{
+				s = Graph2D.ReducedXmlString(v);
+				if (Series.TryGetValue(s, out Label))
+					Output.WriteElementString("Y", Label);
+				else
+				{
+					Label = "Y" + (i++).ToString();
+					Series[s] = Label;
+					Output.WriteElementString("Y", Label + ":=" + s);
+				}
+			}
+
+			i = 1;
 
 			foreach (IVector v in this.z)
-				Output.WriteElementString("Z", Graph2D.ReducedXmlString(v));
+			{
+				s = Graph2D.ReducedXmlString(v);
+				if (Series.TryGetValue(s, out Label))
+					Output.WriteElementString("Z", Label);
+				else
+				{
+					Label = "Z" + (i++).ToString();
+					Series[s] = Label;
+					Output.WriteElementString("Z", Label + ":=" + s);
+				}
+			}
+
+			i = 1;
 
 			foreach (Vector4[,] M in this.normals)
 			{
@@ -1474,7 +1515,7 @@ namespace Waher.Script.Graphs3D
 				{
 					int c = M.GetLength(0);
 					int d = M.GetLength(1);
-					int i, j;
+					int j;
 
 					sb.Append('[');
 					for (i = 0; i < c; i++)
@@ -1497,11 +1538,32 @@ namespace Waher.Script.Graphs3D
 					sb.Append(']');
 				}
 
-				Output.WriteElementString("Normals", sb.ToString());
+				s = sb.ToString();
+
+				if (Series.TryGetValue(s, out Label))
+					Output.WriteElementString("Normals", Label);
+				else
+				{
+					Label = "N" + (i++).ToString();
+					Series[s] = Label;
+					Output.WriteElementString("Normals", Label + ":=" + s);
+				}
 			}
+			
+			i = 1;
 
 			foreach (object[] v in this.parameters)
-				Output.WriteElementString("Parameters", Expression.ToString(new ObjectVector(v)));
+			{
+				s = Expression.ToString(new ObjectVector(v));
+				if (Series.TryGetValue(s, out Label))
+					Output.WriteElementString("Parameters", Label);
+				else
+				{
+					Label = "P" + (i++).ToString();
+					Series[s] = Label;
+					Output.WriteElementString("Parameters", Label + ":=" + s);
+				}
+			}
 
 			foreach (IPainter3D Painter in this.painters)
 				Output.WriteElementString("Painter", Painter.GetType().FullName);

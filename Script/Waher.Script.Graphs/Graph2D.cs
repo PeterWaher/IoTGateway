@@ -953,14 +953,53 @@ namespace Waher.Script.Graphs
 			Output.WriteAttributeString("showYAxis", this.showYAxis ? "true" : "false");
 			Output.WriteAttributeString("showGrid", this.showGrid ? "true" : "false");
 
+			Dictionary<string, string> Series = new Dictionary<string, string>();
+			string Label;
+			string s;
+			int i = 1;
+
 			foreach (IVector v in this.x)
-				Output.WriteElementString("X", ReducedXmlString(v));
+			{
+				s = ReducedXmlString(v);
+				if (Series.TryGetValue(s, out Label))
+					Output.WriteElementString("X", Label);
+				else
+				{
+					Label = "X" + (i++).ToString();
+					Series[s] = Label;
+					Output.WriteElementString("X", Label + ":=" + s);
+				}
+			}
+
+			i = 1;
 
 			foreach (IVector v in this.y)
-				Output.WriteElementString("Y", ReducedXmlString(v));
+			{
+				s = ReducedXmlString(v);
+				if (Series.TryGetValue(s, out Label))
+					Output.WriteElementString("Y", Label);
+				else
+				{
+					Label = "Y" + (i++).ToString();
+					Series[s] = Label;
+					Output.WriteElementString("Y", Label + ":=" + s);
+				}
+			}
+
+			i = 1;
 
 			foreach (object[] v in this.parameters)
-				Output.WriteElementString("Parameters", Expression.ToString(new ObjectVector(v)));
+			{
+				s = Expression.ToString(new ObjectVector(v));
+				if (Series.TryGetValue(s, out Label))
+					Output.WriteElementString("Parameters", Label);
+				else
+				{
+					Label = "P" + (i++).ToString();
+					Series[s] = Label;
+					Output.WriteElementString("Parameters", Label + ":=" + s);
+				}
+			}
 
 			foreach (IPainter2D Painter in this.painters)
 				Output.WriteElementString("Painter", Painter.GetType().FullName);
@@ -1014,14 +1053,220 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		/// <param name="Value">Value</param>
 		/// <returns>String representation.</returns>
+		public static string ReducedXmlString(DateTimeVector Value)
+		{
+			StringBuilder sb = null;
+
+			foreach (DateTime d in Value.Values)
+			{
+				if (sb is null)
+					sb = new StringBuilder("DateTime([");
+				else
+					sb.Append(",");
+
+				int Year = d.Year;
+				int Month = d.Month;
+				int Day = d.Day;
+				int Hour = d.Hour;
+				int Minute = d.Minute;
+				int Second = d.Second;
+				int MSecond = d.Millisecond;
+				int Mask = 0;
+
+				if (Month != 0)
+					Mask |= 1;
+
+				if (Day != 0)
+					Mask |= 2;
+
+				if (Hour != 0)
+					Mask |= 4;
+
+				if (Minute != 0)
+					Mask |= 8;
+
+				if (Second != 0)
+					Mask |= 16;
+
+				if (MSecond != 0)
+					Mask |= 32;
+
+				sb.Append('"');
+				sb.Append(Year.ToString());
+
+				if (Mask > 0)
+				{
+					Mask >>= 1;
+					sb.Append('-');
+					sb.Append(Month.ToString());
+
+					if (Mask > 0)
+					{
+						Mask >>= 1;
+						sb.Append('-');
+						sb.Append(Day.ToString());
+
+						if (Mask > 0)
+						{
+							Mask >>= 1;
+							sb.Append('T');
+							sb.Append(Hour.ToString());
+
+							if (Mask > 0)
+							{
+								Mask >>= 1;
+								sb.Append(':');
+								sb.Append(Minute.ToString());
+
+								if (Mask > 0)
+								{
+									Mask >>= 1;
+									sb.Append(':');
+									sb.Append(Second.ToString());
+
+									if (Mask > 0)
+									{
+										Mask >>= 1;
+										sb.Append('.');
+										sb.Append(MSecond.ToString());
+									}
+								}
+							}
+						}
+					}
+				}
+
+				if (d.Kind == DateTimeKind.Utc)
+					sb.Append('z');
+
+				sb.Append('"');
+			}
+
+			if (sb is null)
+				return "[]";
+			else
+			{
+				sb.Append("])");
+				return sb.ToString();
+			}
+		}
+
+		/// <summary>
+		/// Generates an XML value string of an element, possible with reduced resolution, to avoid unnecessary digits when
+		/// repersenting graphs remotely.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>String representation.</returns>
+		public static string ReducedXmlStringTimeSpans(ObjectVector Value)
+		{
+			StringBuilder sb = null;
+
+			foreach (IElement E in Value.Values)
+			{
+				if (!(E.AssociatedObjectValue is TimeSpan TS))
+					continue;
+
+				if (sb is null)
+					sb = new StringBuilder("TimeSpan([");
+				else
+					sb.Append(",");
+
+				int Days = TS.Days;
+				int Hours = TS.Hours;
+				int Minutes = TS.Minutes;
+				int Seconds = TS.Seconds;
+				int MSeconds = TS.Milliseconds;
+				int Mask = 0;
+
+				if (Hours != 0)
+					Mask |= 1;
+
+				if (Minutes != 0)
+					Mask |= 2;
+
+				if (Seconds != 0)
+					Mask |= 4;
+
+				if (MSeconds != 0)
+					Mask |= 5;
+
+				sb.Append('"');
+
+				if (Days != 0 || Mask == 0)
+					sb.Append(Days.ToString());
+
+				if (Mask > 0)
+				{
+					Mask >>= 1;
+
+					if (Days != 0)
+						sb.Append('.');
+
+					sb.Append(Hours.ToString());
+
+					if (Mask > 0)
+					{
+						Mask >>= 1;
+						sb.Append(':');
+						sb.Append(Minutes.ToString());
+
+						if (Mask > 0)
+						{
+							Mask >>= 1;
+							sb.Append(':');
+							sb.Append(Seconds.ToString());
+
+							if (Mask > 0)
+							{
+								Mask >>= 1;
+								sb.Append('.');
+								sb.Append(MSeconds.ToString());
+							}
+						}
+					}
+				}
+
+				sb.Append('"');
+			}
+
+			if (sb is null)
+				return "[]";
+			else
+			{
+				sb.Append("])");
+				return sb.ToString();
+			}
+		}
+
+		/// <summary>
+		/// Generates an XML value string of an element, possible with reduced resolution, to avoid unnecessary digits when
+		/// repersenting graphs remotely.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>String representation.</returns>
 		public static string ReducedXmlString(IElement Value)
 		{
 			if (Value is DoubleNumber N)
 				return ReducedXmlString(N);
 			else if (Value is DoubleVector v)
 				return ReducedXmlString(v);
+			else if (Value is DateTimeVector DT)
+				return ReducedXmlString(DT);
+			else if (Value is ObjectVector ov && IsTimeSpanVector(ov))
+				return ReducedXmlStringTimeSpans(ov);
 			else
 				return Expression.ToString(Value);
+		}
+
+		private static bool IsTimeSpanVector(ObjectVector v)
+		{
+			foreach (IElement E in v.VectorElements)
+			{
+				if (!(E.AssociatedObjectValue is TimeSpan))
+					return false;
+			}
+
+			return true;
 		}
 
 		/// <summary>

@@ -3452,16 +3452,16 @@ namespace Waher.IoTGateway
 				Xml.Append("<body/>");
 			else
 			{
-				Xml.Append("<body>");
-				Xml.Append(XML.Encode(Text));
-				Xml.Append("</body>");
+				Xml.Append("<body><![CDATA[");
+				Xml.Append(Text.Replace("]]>", "] ]>"));
+				Xml.Append("]]></body>");
 			}
 
 			if (!string.IsNullOrEmpty(Markdown))
 			{
-				Xml.Append("<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">");
-				Xml.Append(XML.Encode(Markdown));
-				Xml.Append("</content>");
+				Xml.Append("<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\"><![CDATA[");
+				Xml.Append(Markdown.Replace("]]>", "] ]>"));
+				Xml.Append("]]></content>");
 			}
 
 			if (!string.IsNullOrEmpty(Html))

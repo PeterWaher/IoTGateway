@@ -900,7 +900,7 @@ namespace Waher.IoTGateway
 					}
 				}
 
-				Types.GetLoadedModules();	// Makes sure all modules are instantiated, allowing static constructors to add
+				Types.GetLoadedModules();   // Makes sure all modules are instantiated, allowing static constructors to add
 											// appropriate data sources, if necessary.
 
 				if (!(GetDataSources is null))
@@ -3243,21 +3243,31 @@ namespace Waher.IoTGateway
 			}
 		}
 
-		private static async Task<(string, string)> ConvertMarkdown(string Markdown)
+		private static Task<(string, string)> ConvertMarkdown(string Markdown)
 		{
-			MarkdownSettings Settings = new MarkdownSettings()
-			{
-				ParseMetaData = false,
-				HtmlSettings = new HtmlSettings()
-				{
-					XmlEntitiesOnly = true
-				}
-			};
-			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
-			string Text = await Doc.GeneratePlainText();
-			string Html = HtmlDocument.GetBody(await Doc.GenerateHTML());
+			return ConvertMarkdown(Markdown, true, true);
+		}
 
-			return (Text, Html);
+		private static async Task<(string, string)> ConvertMarkdown(string Markdown, bool TextVersion, bool HtmlVersion)
+		{
+			if (TextVersion || HtmlVersion)
+			{
+				MarkdownSettings Settings = new MarkdownSettings()
+				{
+					ParseMetaData = false,
+					HtmlSettings = new HtmlSettings()
+					{
+						XmlEntitiesOnly = true
+					}
+				};
+				MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Markdown, Settings);
+				string Text = TextVersion ? await Doc.GeneratePlainText() : null;
+				string Html = HtmlVersion ? HtmlDocument.GetBody(await Doc.GenerateHTML()) : null;
+
+				return (Text, Html);
+			}
+			else
+				return (null, null);
 		}
 
 		/// <summary>
@@ -3421,8 +3431,8 @@ namespace Waher.IoTGateway
 		/// <returns>Multi-format XML for chat message.</returns>
 		public static async Task<string> GetMultiFormatChatMessageXml(string Markdown, bool TextVersion, bool HtmlVersion)
 		{
-			(string Text, string Html) = await ConvertMarkdown(Markdown);
-			return GetMultiFormatChatMessageXml(TextVersion ? Text : null, HtmlVersion ? Html : null, Markdown);
+			(string Text, string Html) = await ConvertMarkdown(Markdown, TextVersion, HtmlVersion);
+			return GetMultiFormatChatMessageXml(Text, Html, Markdown);
 		}
 
 		/// <summary>

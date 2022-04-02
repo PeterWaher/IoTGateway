@@ -1797,7 +1797,7 @@ namespace Waher.Networking.XMPP
 						}
 						else if (ch == '>')
 							this.inputState = 5;
-						else
+						else if (ch != ']')
 							this.inputState -= 2;
 						break;
 

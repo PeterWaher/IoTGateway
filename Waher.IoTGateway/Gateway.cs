@@ -3463,14 +3463,14 @@ namespace Waher.IoTGateway
 			else
 			{
 				Xml.Append("<body><![CDATA[");
-				Xml.Append(Text.Replace("]]>", "] ]>"));
+				Xml.Append(Text.Replace("]]>", "]] >"));
 				Xml.Append("]]></body>");
 			}
 
 			if (!string.IsNullOrEmpty(Markdown))
 			{
 				Xml.Append("<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\"><![CDATA[");
-				Xml.Append(Markdown.Replace("]]>", "] ]>"));
+				Xml.Append(Markdown.Replace("]]>", "]] >"));
 				Xml.Append("]]></content>");
 			}
 

@@ -602,7 +602,7 @@ namespace Waher.Networking.XMPP.P2P
 						}
 						else if (ch == '>')
 							this.inputState = 5;
-						else
+						else if (ch != ']')
 							this.inputState -= 2;
 						break;
 

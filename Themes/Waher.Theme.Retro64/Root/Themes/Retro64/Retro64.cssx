@@ -1079,6 +1079,13 @@ fieldset > legend
     display: inline-block;
 }
 
+.result
+{
+	color:¤Theme.NegColor¤;
+	font-weight:bold;
+    display: inline;
+}
+
 mark
 {
     background-color:¤Alpha(TagColor,32)¤;

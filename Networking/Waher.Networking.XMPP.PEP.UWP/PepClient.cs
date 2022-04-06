@@ -69,7 +69,7 @@ namespace Waher.Networking.XMPP.PEP
 				{
 					try
 					{
-						ToUnregister.AddLast((IPersonalEvent)Activator.CreateInstance(T));
+						ToUnregister.AddLast((IPersonalEvent)Types.Instantiate(T));
 					}
 					catch (Exception ex)
 					{
@@ -339,7 +339,7 @@ namespace Waher.Networking.XMPP.PEP
 
 				try
 				{
-					IPersonalEvent PersonalEvent = (IPersonalEvent)Activator.CreateInstance(T);
+					IPersonalEvent PersonalEvent = (IPersonalEvent)Types.Instantiate(T);
 					Result[PersonalEvent.LocalName + " " + PersonalEvent.Namespace] = PersonalEvent;
 				}
 				catch (Exception ex)
@@ -366,7 +366,7 @@ namespace Waher.Networking.XMPP.PEP
 			if (!typeof(IPersonalEvent).GetTypeInfo().IsAssignableFrom(PersonalEventType.GetTypeInfo()))
 				throw new ArgumentException("Not a personal event type.", nameof(PersonalEventType));
 
-			IPersonalEvent PersonalEvent = (IPersonalEvent)Activator.CreateInstance(PersonalEventType);
+			IPersonalEvent PersonalEvent = (IPersonalEvent)Types.Instantiate(PersonalEventType);
 
 			lock (this.handlers)
 			{

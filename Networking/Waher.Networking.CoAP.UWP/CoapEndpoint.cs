@@ -96,7 +96,7 @@ namespace Waher.Networking.CoAP
 
 				try
 				{
-					Option = (CoapOption)Activator.CreateInstance(T);
+					Option = (CoapOption)Types.Instantiate(T);
 					if (Options.ContainsKey(Option.OptionNumber))
 						throw new Exception("Option number " + Option.OptionNumber + " already defined.");
 
@@ -122,7 +122,7 @@ namespace Waher.Networking.CoAP
 
 				try
 				{
-					ContentFormat = (ICoapContentFormat)Activator.CreateInstance(T);
+					ContentFormat = (ICoapContentFormat)Types.Instantiate(T);
 					if (ByCode.ContainsKey(ContentFormat.ContentFormat))
 						throw new Exception("Content format number " + ContentFormat.ContentFormat + " already defined.");
 

@@ -8,7 +8,8 @@ namespace Waher.WebService.Script
 	/// <summary>
 	/// Pluggable module registering the script service to the web server.
 	/// </summary>
-    public class ScriptServiceModule : IModule
+	[Singleton]
+	public class ScriptServiceModule : IModule
 	{
 		private HttpServer webServer;
 		private ScriptService instance;

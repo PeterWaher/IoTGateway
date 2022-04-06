@@ -8,6 +8,7 @@ using Waher.Things.Ip;
 
 namespace Waher.Things.Mqtt
 {
+	[Singleton]
 	public class MqttModule : IModule
 	{
 		public async Task Start()

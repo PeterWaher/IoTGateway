@@ -9,6 +9,7 @@ namespace Waher.Runtime.Transactions
 	/// <summary>
 	/// Module making sure no unfinished transactions are left when system ends.
 	/// </summary>
+	[Singleton]
 	public class TransactionModule : IModule
 	{
 		private readonly static List<ITransactions> transactions = new List<ITransactions>();

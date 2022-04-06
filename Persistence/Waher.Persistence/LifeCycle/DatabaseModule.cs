@@ -9,6 +9,7 @@ namespace Waher.Persistence.LifeCycle
 	/// <summary>
 	/// Database module.
 	/// </summary>
+	[Singleton]
 	public class DatabaseModule : IModule
 	{
 		private static IDatabaseProvider databaseProvider = null;

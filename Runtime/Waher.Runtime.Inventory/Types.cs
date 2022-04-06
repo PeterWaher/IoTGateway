@@ -459,7 +459,7 @@ namespace Waher.Runtime.Inventory
 				{
 					try
 					{
-						if (!await StartModule(Module2, 60000))		// 1 min timeout
+						if (!await StartModule(Module2, Timeout))		// 1 min timeout
 							Ok = false;
 					}
 					catch (Exception ex)

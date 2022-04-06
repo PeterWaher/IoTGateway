@@ -3447,7 +3447,7 @@ namespace Waher.Script
 
 						try
 						{
-							IConstant Constant = (IConstant)Activator.CreateInstance(T);
+							IConstant Constant = (IConstant)Types.Instantiate(T);
 
 							s = Constant.ConstantName;
 							if (Found.ContainsKey(s))
@@ -3497,7 +3497,7 @@ namespace Waher.Script
 
 						try
 						{
-							IKeyWord KeyWord = (IKeyWord)Activator.CreateInstance(T);
+							IKeyWord KeyWord = (IKeyWord)Types.Instantiate(T);
 
 							s = KeyWord.KeyWord;
 							if (Found.ContainsKey(s))

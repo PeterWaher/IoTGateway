@@ -558,7 +558,7 @@ namespace Waher.IoTGateway
 				{
 					try
 					{
-						SystemConfiguration SystemConfiguration = (SystemConfiguration)Activator.CreateInstance(P.Value);
+						SystemConfiguration SystemConfiguration = (SystemConfiguration)Types.Instantiate(P.Value);
 						SystemConfiguration.Complete = false;
 						SystemConfiguration.Created = DateTime.Now;
 

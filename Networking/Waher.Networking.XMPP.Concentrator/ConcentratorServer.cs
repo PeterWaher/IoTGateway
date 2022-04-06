@@ -1951,7 +1951,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				try
 				{
-					PresumptiveChild = (INode)Activator.CreateInstance(T);
+					PresumptiveChild = (INode)Types.Instantiate(T);
 
 					if (await Node.AcceptsChildAsync(PresumptiveChild) && await PresumptiveChild.AcceptsParentAsync(Node))
 					{
@@ -2021,7 +2021,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			try
 			{
-				PresumptiveChild = (INode)Activator.CreateInstance(Type);
+				PresumptiveChild = (INode)Types.Instantiate(Type);
 			}
 			catch (Exception)
 			{
@@ -2088,7 +2088,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			try
 			{
-				PresumptiveChild = (INode)Activator.CreateInstance(Type);
+				PresumptiveChild = (INode)Types.Instantiate(Type);
 			}
 			catch (Exception)
 			{

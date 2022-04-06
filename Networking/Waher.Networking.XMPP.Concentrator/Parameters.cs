@@ -11,6 +11,7 @@ using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
 using Waher.Things.Attributes;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
@@ -807,7 +808,7 @@ namespace Waher.Networking.XMPP.Concentrator
 								if (DataType is null)
 								{
 									ValueToSet = Field.ValueString;
-									ValueToSet2 = Activator.CreateInstance(PropertyType, ValueToSet);
+									ValueToSet2 = Types.Instantiate(PropertyType, ValueToSet);
 								}
 								else
 								{

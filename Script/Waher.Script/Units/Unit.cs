@@ -979,7 +979,7 @@ namespace Waher.Script.Units
 			{
 				try
 				{
-					BaseQuantity = (IBaseQuantity)Activator.CreateInstance(Type);
+					BaseQuantity = (IBaseQuantity)Types.Instantiate(Type);
 				}
 				catch (Exception ex)
 				{
@@ -997,7 +997,7 @@ namespace Waher.Script.Units
 			{
 				try
 				{
-					CompoundQuantity = (ICompoundQuantity)Activator.CreateInstance(Type);
+					CompoundQuantity = (ICompoundQuantity)Types.Instantiate(Type);
 				}
 				catch (Exception ex)
 				{
@@ -1013,7 +1013,7 @@ namespace Waher.Script.Units
 			{
 				try
 				{
-					DerivedQuantity = (IDerivedQuantity)Activator.CreateInstance(Type);
+					DerivedQuantity = (IDerivedQuantity)Types.Instantiate(Type);
 				}
 				catch (Exception ex)
 				{

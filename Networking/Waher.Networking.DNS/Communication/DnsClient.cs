@@ -609,7 +609,7 @@ namespace Waher.Networking.DNS.Communication
 			{
 				Type[] Parameters = new Type[] { typeof(string) };
 
-				idnMapping = Activator.CreateInstance(T);
+				idnMapping = Types.Instantiate(T);
 				getAscii = T.GetRuntimeMethod("GetAscii", Parameters);
 				getUnicode = T.GetRuntimeMethod("GetUnicode", Parameters);
 			}

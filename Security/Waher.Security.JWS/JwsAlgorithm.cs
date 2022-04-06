@@ -129,7 +129,7 @@ namespace Waher.Security.JWS
 
 						try
 						{
-							Algorithm = (IJwsAlgorithm)Activator.CreateInstance(T);
+							Algorithm = (IJwsAlgorithm)Types.Instantiate(T);
 
 							if (algorithms.ContainsKey(Algorithm.Name))
 								Log.Warning("JWS algorithm with name " + Algorithm.Name + " already registered.");

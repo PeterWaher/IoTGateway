@@ -192,7 +192,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 							try
 							{
-								Handler = (IMultimediaContent)Activator.CreateInstance(Type);
+								Handler = (IMultimediaContent)Types.Instantiate(Type);
 							}
 							catch (Exception ex)
 							{

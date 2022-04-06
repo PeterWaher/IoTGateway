@@ -96,7 +96,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 				try
 				{
-					ICodeContent CodeContent = (ICodeContent)Activator.CreateInstance(T);
+					ICodeContent CodeContent = (ICodeContent)Types.Instantiate(T);
 					CodeContents.Add(CodeContent);
 				}
 				catch (Exception ex)
@@ -113,7 +113,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 				try
 				{
-					IXmlVisualizer XmlVisualizer = (IXmlVisualizer)Activator.CreateInstance(T);
+					IXmlVisualizer XmlVisualizer = (IXmlVisualizer)Types.Instantiate(T);
 					XmlVisualizers.Add(XmlVisualizer);
 				}
 				catch (Exception ex)

@@ -51,7 +51,7 @@ namespace Waher.Security.DTLS
 
 				try
 				{
-					ICipher Cipher = (ICipher)Activator.CreateInstance(T);
+					ICipher Cipher = (ICipher)Types.Instantiate(T);
 					Ciphers.Add(Cipher);
 					PerCode[Cipher.IanaCipherSuite] = Cipher;
 				}

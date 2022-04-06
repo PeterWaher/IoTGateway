@@ -167,7 +167,7 @@ namespace Waher.Content
 
 						try
 						{
-							Encoder = (IContentEncoder)Activator.CreateInstance(T);
+							Encoder = (IContentEncoder)Types.Instantiate(T);
 						}
 						catch (Exception)
 						{
@@ -409,7 +409,7 @@ namespace Waher.Content
 
 						try
 						{
-							Decoder = (IContentDecoder)Activator.CreateInstance(T);
+							Decoder = (IContentDecoder)Types.Instantiate(T);
 						}
 						catch (Exception)
 						{
@@ -886,7 +886,7 @@ namespace Waher.Content
 
 					try
 					{
-						Converter = (IContentConverter)Activator.CreateInstance(T);
+						Converter = (IContentConverter)Types.Instantiate(T);
 					}
 					catch (Exception)
 					{
@@ -996,7 +996,7 @@ namespace Waher.Content
 
 				try
 				{
-					Getter = (IContentGetter)Activator.CreateInstance(T);
+					Getter = (IContentGetter)Types.Instantiate(T);
 				}
 				catch (Exception)
 				{
@@ -1187,7 +1187,7 @@ namespace Waher.Content
 
 				try
 				{
-					Poster = (IContentPoster)Activator.CreateInstance(T);
+					Poster = (IContentPoster)Types.Instantiate(T);
 				}
 				catch (Exception)
 				{

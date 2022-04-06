@@ -200,7 +200,7 @@ namespace Waher.Networking.XMPP.P2P
 
 							try
 							{
-								IE2eEndpoint Endpoint = (IE2eEndpoint)Activator.CreateInstance(T);
+								IE2eEndpoint Endpoint = (IE2eEndpoint)Types.Instantiate(T);
 								E2eTypes[Endpoint.Namespace + "#" + Endpoint.LocalName] = Endpoint;
 							}
 							catch (Exception ex)

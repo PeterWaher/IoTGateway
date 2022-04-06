@@ -123,7 +123,7 @@ namespace Waher.IoTGateway.Setup
 
 				try
 				{
-					Activities.Add((IProcessingActivity)Activator.CreateInstance(T));
+					Activities.Add((IProcessingActivity)Types.Instantiate(T));
 				}
 				catch (Exception ex)
 				{

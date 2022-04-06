@@ -507,7 +507,7 @@ namespace Waher.Security.ACME
 				if (T is null)
 					throw new Exception("Unable to set RSA key size to anything but default (" + NewKey.KeySize.ToString() + " bits).");
 
-				NewKey = Activator.CreateInstance(T, KeySize) as RSA;
+				NewKey = Runtime.Inventory.Types.Instantiate(T, KeySize) as RSA;
 			}
 
 			RsaSsaPkcsSha256 Jws2 = new RsaSsaPkcsSha256(NewKey);

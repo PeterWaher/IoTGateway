@@ -413,7 +413,7 @@ namespace Waher.Runtime.Inventory
 
 				try
 				{
-					Module = (IModule)Activator.CreateInstance(T);
+					Module = (IModule)Types.Instantiate(T);
 					Modules.Add(Module);
 				}
 				catch (Exception ex)
@@ -967,7 +967,7 @@ namespace Waher.Runtime.Inventory
 			{
 				try
 				{
-					InterfaceType Enumerator = (InterfaceType)Activator.CreateInstance(T2);
+					InterfaceType Enumerator = (InterfaceType)Types.Instantiate(T2);
 					Grade Grade = Enumerator.Supports(Object);
 					if (Grade > BestGrade)
 					{

@@ -261,7 +261,7 @@ namespace Waher.Layout.Layout2D
 
 						try
 						{
-							ILayoutElement E = (ILayoutElement)Activator.CreateInstance(T, Temp, null);
+							ILayoutElement E = (ILayoutElement)Types.Instantiate(T, Temp, null);
 							string Key = E.Namespace + "#" + E.LocalName;
 
 							if (TypesPerKey.ContainsKey(Key))

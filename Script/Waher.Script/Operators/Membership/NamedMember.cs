@@ -33,7 +33,7 @@ namespace Waher.Script.Operators.Membership
 			: base(Operand, NullCheck, Start, Length, Expression)
 		{
 			this.name = Name;
-            this.isAsync = true;
+			this.isAsync = true;
 		}
 
 		/// <summary>
@@ -94,7 +94,7 @@ namespace Waher.Script.Operators.Membership
 					this.methods = null;
 					this.nameIndex = null;
 					this.property = T.GetRuntimeProperty(this.name);
-					
+
 					if (this.property is null)
 					{
 						this.field = T.GetRuntimeField(this.name);
@@ -107,7 +107,7 @@ namespace Waher.Script.Operators.Membership
 
 								foreach (MethodInfo MI in T.GetRuntimeMethods())
 								{
-									if (MI.Name == Name)
+									if (!MI.IsAbstract && MI.IsPublic && MI.Name == Name)
 									{
 										if (Methods is null)
 											Methods = new List<MethodLambda>();
@@ -119,11 +119,28 @@ namespace Waher.Script.Operators.Membership
 								this.methods = Methods?.ToArray();
 								if (this.methods is null)
 								{
-									if (VectorIndex.TryGetIndexProperty(T, out this.property, out _))
+									if (VectorIndex.TryGetIndexProperty(T, true, false, out this.property, out _))
 										this.nameIndex = new string[] { this.name };
 								}
 							}
+							else
+							{
+								if (!this._event.AddMethod.IsPublic)
+									throw new ScriptRuntimeException("Event not accessible: " + this.name, this);
+							}
 						}
+						else
+						{
+							if (!this.field.IsPublic)
+								throw new ScriptRuntimeException("Field not accessible: " + this.name, this);
+						}
+					}
+					else
+					{
+						if (!this.property.CanRead)
+							throw new ScriptRuntimeException("Property cannot be read: " + this.name, this);
+						else if (!this.property.GetMethod.IsPublic)
+							throw new ScriptRuntimeException("Property not accessible: " + this.name, this);
 					}
 				}
 
@@ -227,13 +244,25 @@ namespace Waher.Script.Operators.Membership
 
 			PropertyInfo Property = T.GetRuntimeProperty(Name);
 			if (!(Property is null))
-				return Expression.Encapsulate(await WaitPossibleTask(Property.GetValue(Instance, null)));
+			{
+				if (!Property.CanRead)
+					throw new ScriptRuntimeException("Property cannot be read: " + Name, Node);
+				else if (!Property.GetMethod.IsPublic)
+					throw new ScriptRuntimeException("Property not accessible: " + Name, Node);
+				else
+					return Expression.Encapsulate(await WaitPossibleTask(Property.GetValue(Instance, null)));
+			}
 
 			FieldInfo Field = T.GetRuntimeField(Name);
 			if (!(Field is null))
-				return Expression.Encapsulate(await WaitPossibleTask(Field.GetValue(Instance)));
+			{
+				if (!Field.IsPublic)
+					throw new ScriptRuntimeException("Field not accessible: " + Name, Node);
+				else
+					return Expression.Encapsulate(await WaitPossibleTask(Field.GetValue(Instance)));
+			}
 
-			if (VectorIndex.TryGetIndexProperty(T, out Property, out _))
+			if (VectorIndex.TryGetIndexProperty(T, true, false, out Property, out _))
 				return Expression.Encapsulate(await WaitPossibleTask(Property.GetValue(Instance, new string[] { Name })));
 
 			if (Operand.IsScalar)

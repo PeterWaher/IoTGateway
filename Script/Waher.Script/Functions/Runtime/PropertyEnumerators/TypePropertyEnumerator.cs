@@ -33,7 +33,10 @@ namespace Waher.Script.Functions.Runtime.PropertyEnumerators
 				List<IElement> Elements = new List<IElement>();
 
 				foreach (PropertyInfo PI in T.GetRuntimeProperties())
-					Elements.Add(new StringValue(PI.Name));
+				{
+					if (PI.CanRead && PI.GetMethod.IsPublic && PI.GetIndexParameters().Length == 0)
+						Elements.Add(new StringValue(PI.Name));
+				}
 
 				return Task.FromResult<IElement>(new ObjectVector(Elements));
 			}

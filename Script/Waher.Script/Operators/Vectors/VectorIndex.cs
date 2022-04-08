@@ -86,7 +86,7 @@ namespace Waher.Script.Operators.Vectors
 				}
 
 				Type T = Object.GetType();
-				if (!TryGetIndexProperty(T, out PropertyInfo ItemProperty, out ParameterInfo[] Parameters))
+				if (!TryGetIndexProperty(T, true, false, out PropertyInfo ItemProperty, out ParameterInfo[] Parameters))
 					throw new ScriptRuntimeException("The index operator operates on vectors.", Node);
 
 				return await EvaluateIndex(Object, T, ItemProperty, Parameters, Index, Node);
@@ -106,10 +106,12 @@ namespace Waher.Script.Operators.Vectors
 		/// Tries to get a one-dimensional index property of a Type.
 		/// </summary>
 		/// <param name="T">Type</param>
+		/// <param name="ForReading">If index property is for reading.</param>
+		/// <param name="ForWriting">If index property is for writing.</param>
 		/// <param name="PropertyInfo">Property information of index property.</param>
 		/// <param name="Parameters">Parameter definitions of index property.</param>
 		/// <returns>If a one-dimensional index property was found.</returns>
-		public static bool TryGetIndexProperty(Type T, out PropertyInfo PropertyInfo, out ParameterInfo[] Parameters)
+		public static bool TryGetIndexProperty(Type T, bool ForReading, bool ForWriting, out PropertyInfo PropertyInfo, out ParameterInfo[] Parameters)
 		{
 			lock (indexProperties)
 			{
@@ -123,6 +125,12 @@ namespace Waher.Script.Operators.Vectors
 				foreach (PropertyInfo P2 in T.GetRuntimeProperties())
 				{
 					if (P2.Name != "Item")
+						continue;
+
+					if (ForReading && (!P2.CanRead || !P2.GetMethod.IsPublic))
+						continue;
+
+					if (ForWriting && (!P2.CanWrite || !P2.SetMethod.IsPublic))
 						continue;
 
 					Parameters = P2.GetIndexParameters();

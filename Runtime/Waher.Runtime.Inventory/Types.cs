@@ -459,7 +459,7 @@ namespace Waher.Runtime.Inventory
 				{
 					try
 					{
-						if (!await StartModule(Module2, Timeout))		// 1 min timeout
+						if (!await StartModule(Module2, Timeout))       // 1 min timeout
 							Ok = false;
 					}
 					catch (Exception ex)
@@ -810,13 +810,23 @@ namespace Waher.Runtime.Inventory
 			Type T = Object.GetType();
 			PropertyInfo PI = T.GetRuntimeProperty(PropertyName);
 			if (!(PI is null))
-				return PI.GetValue(Object);
+			{
+				if (PI.CanRead && PI.GetMethod.IsPublic)
+					return PI.GetValue(Object);
+				else
+					throw new ArgumentException("Property not readable or accessible.", nameof(PropertyName));
+			}
 
 			FieldInfo FI = T.GetRuntimeField(PropertyName);
 			if (!(FI is null))
-				return FI.GetValue(Object);
+			{
+				if (FI.IsPublic)
+					return FI.GetValue(Object);
+				else
+					throw new ArgumentException("Field not accessible.", nameof(PropertyName));
+			}
 
-			throw new ArgumentException("Property (or field) not found: " + PropertyName, nameof(PropertyName));
+			throw new ArgumentException("Property (or field) not found.", nameof(PropertyName));
 		}
 
 		/// <summary>
@@ -835,14 +845,24 @@ namespace Waher.Runtime.Inventory
 			Type T = Object.GetType();
 			PropertyInfo PI = T.GetRuntimeProperty(PropertyName);
 			if (!(PI is null))
-				PI.SetValue(Object, Value);
+			{
+				if (PI.CanWrite && PI.SetMethod.IsPublic)
+					PI.SetValue(Object, Value);
+				else
+					throw new ArgumentException("Property not writable or accessible.", nameof(PropertyName));
+			}
 			else
 			{
 				FieldInfo FI = T.GetRuntimeField(PropertyName);
 				if (!(FI is null))
-					FI.SetValue(Object, Value);
+				{
+					if (FI.IsPublic)
+						FI.SetValue(Object, Value);
+					else
+						throw new ArgumentException("Field not accessible.", nameof(PropertyName));
+				}
 				else
-					throw new ArgumentException("Property (or field) not found: " + PropertyName, nameof(PropertyName));
+					throw new ArgumentException("Property (or field) not found.", nameof(PropertyName));
 			}
 		}
 
@@ -888,6 +908,9 @@ namespace Waher.Runtime.Inventory
 			{
 				foreach (MethodInfo MI in T.GetRuntimeMethods())
 				{
+					if (!MI.IsPublic)
+						continue;
+
 					ParameterInfo[] P = MI.GetParameters();
 					if (P.Length != c)
 						continue;
@@ -913,10 +936,15 @@ namespace Waher.Runtime.Inventory
 			{
 				MethodInfo MI = T.GetRuntimeMethod(MethodName, ArgumentTypes);
 				if (!(MI is null))
-					return MI.Invoke(Object, Arguments);
+				{
+					if (MI.IsPublic)
+						return MI.Invoke(Object, Arguments);
+					else
+						throw new ArgumentException("Method not accessible.", nameof(MethodName));
+				}
 			}
 
-			throw new ArgumentException("Method with corresponding arguments not found: " + MethodName, nameof(MethodName));
+			throw new ArgumentException("Method with corresponding arguments not found.", nameof(MethodName));
 		}
 
 		/// <summary>
@@ -1008,7 +1036,7 @@ namespace Waher.Runtime.Inventory
 				{
 					foreach (MethodInfo MI in typeof(Enum).GetRuntimeMethods())
 					{
-						if (MI.ContainsGenericParameters && MI.IsStatic && MI.Name == "TryParse" &&
+						if (MI.ContainsGenericParameters && MI.IsStatic && MI.IsPublic && MI.Name == "TryParse" &&
 							MI.ReturnType == typeof(bool) && MI.GetParameters().Length == 2)
 						{
 							TryParse = MI;

@@ -112,11 +112,32 @@ namespace Waher.Script.Persistence.SQL
 				}
 
 				PropertyInfo PI = this.type.GetRuntimeProperty(Name);
-				FieldInfo FI = PI is null ? this.type.GetRuntimeField(Name) : null;
+				FieldInfo FI;
+
+				if (PI is null)
+				{
+					FI = this.type.GetRuntimeField(Name);
+
+					if (!(FI is null) && !FI.IsPublic)
+					{
+						this.properties[Name] = null;
+						return false;
+					}
+				}
+				else
+				{
+					FI = null;
+
+					if (!PI.CanRead || !PI.CanWrite || !PI.GetMethod.IsPublic || !PI.SetMethod.IsPublic)
+					{
+						this.properties[Name] = null;
+						return false;
+					}
+				}
 
 				if (PI is null && FI is null)
 				{
-					if (VectorIndex.TryGetIndexProperty(this.type, out PI, out _))
+					if (VectorIndex.TryGetIndexProperty(this.type, true, true, out PI, out _))
 					{
 						this.properties[Name] = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
 						return true;
@@ -165,13 +186,28 @@ namespace Waher.Script.Persistence.SQL
 				if (!this.properties.TryGetValue(Name, out Rec))
 				{
 					PropertyInfo PI = this.type.GetRuntimeProperty(Name);
-					FieldInfo FI = PI is null ? this.type.GetRuntimeField(Name) : null;
+					FieldInfo FI;
+
+					if (PI is null)
+					{
+						FI = this.type.GetRuntimeField(Name);
+
+						if (!(FI is null) && !FI.IsPublic)
+							FI = null;
+					}
+					else
+					{
+						FI = null;
+
+						if (!PI.CanRead || !PI.CanWrite || !PI.GetMethod.IsPublic || !PI.SetMethod.IsPublic)
+							PI = null;
+					}
 
 					if (PI is null && FI is null)
 					{
 						if (this.dictionary is null)
 						{
-							if (VectorIndex.TryGetIndexProperty(this.type, out PI, out _))
+							if (VectorIndex.TryGetIndexProperty(this.type, true, true, out PI, out _))
 								Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
 							else
 								Rec = null;
@@ -250,13 +286,28 @@ namespace Waher.Script.Persistence.SQL
 				if (!this.properties.TryGetValue(Name, out Rec))
 				{
 					PropertyInfo PI = this.type.GetRuntimeProperty(Name);
-					FieldInfo FI = PI is null ? this.type.GetRuntimeField(Name) : null;
+					FieldInfo FI;
+
+					if (PI is null)
+					{
+						FI = this.type.GetRuntimeField(Name);
+
+						if (!(FI is null) && !FI.IsPublic)
+							FI = null;
+					}
+					else
+					{
+						FI = null;
+
+						if (!PI.CanRead || !PI.CanWrite || !PI.GetMethod.IsPublic || !PI.SetMethod.IsPublic)
+							PI = null;
+					}
 
 					if (PI is null && FI is null)
 					{
 						if (this.dictionary is null)
 						{
-							if (VectorIndex.TryGetIndexProperty(this.type, out PI, out _))
+							if (VectorIndex.TryGetIndexProperty(this.type, true, true, out PI, out _))
 								Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
 							else
 								Rec = null;
@@ -345,11 +396,26 @@ namespace Waher.Script.Persistence.SQL
 				if (!this.properties.TryGetValue(Name, out Rec))
 				{
 					PropertyInfo PI = this.type.GetRuntimeProperty(Name);
-					FieldInfo FI = PI is null ? this.type.GetRuntimeField(Name) : null;
+					FieldInfo FI;
+
+					if (PI is null)
+					{
+						FI = this.type.GetRuntimeField(Name);
+
+						if (!(FI is null) && !FI.IsPublic)
+							FI = null;
+					}
+					else
+					{
+						FI = null;
+
+						if (!PI.CanRead || !PI.CanWrite || !PI.GetMethod.IsPublic || !PI.SetMethod.IsPublic)
+							PI = null;
+					}
 
 					if (PI is null && FI is null)
 					{
-						if (VectorIndex.TryGetIndexProperty(this.type, out PI, out _))
+						if (VectorIndex.TryGetIndexProperty(this.type, true, true, out PI, out _))
 							Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
 						else
 							Rec = null;

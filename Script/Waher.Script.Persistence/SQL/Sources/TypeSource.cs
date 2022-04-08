@@ -556,8 +556,15 @@ namespace Waher.Script.Persistence.SQL.Sources
 			{
 				if (!this.isLabel.TryGetValue(Label, out bool Result))
 				{
-					Result = !(this.type.GetRuntimeProperty(Label) is null &&
-						this.type.GetRuntimeField(Label) is null);
+					PropertyInfo PI = this.type.GetRuntimeProperty(Label);
+
+					if (PI is null)
+					{
+						FieldInfo FI = this.type.GetRuntimeField(Label);
+						Result = FI?.IsPublic ?? false;
+					}
+					else
+						Result = PI.CanRead && PI.GetMethod.IsPublic;
 
 					this.isLabel[Label] = Result;
 				}

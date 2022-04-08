@@ -84,12 +84,12 @@ namespace Waher.Script.Persistence.SQL.Sources
 				if (!(Rec.PI is null))
 				{
 					if (Rec.Indexed)
-						return ScriptNode.UnnestPossibleTaskSync(Rec.PI.GetValue(Rec.Left ? this.left : this.right, new object[] { Index }));	// TODO: Async
+						return ScriptNode.UnnestPossibleTaskSync(Rec.PI.GetValue(Rec.Left ? this.left : this.right, new object[] { Index }));   // TODO: Async
 					else
-						return ScriptNode.UnnestPossibleTaskSync(Rec.PI.GetValue(Rec.Left ? this.left : this.right));	// TODO: Async
+						return ScriptNode.UnnestPossibleTaskSync(Rec.PI.GetValue(Rec.Left ? this.left : this.right));   // TODO: Async
 				}
 				else if (!(Rec.FI is null))
-					return ScriptNode.UnnestPossibleTaskSync(Rec.FI.GetValue(Rec.Left ? this.left : this.right));	// TODO: Async
+					return ScriptNode.UnnestPossibleTaskSync(Rec.FI.GetValue(Rec.Left ? this.left : this.right));   // TODO: Async
 				else
 					return null;
 			}
@@ -104,13 +104,23 @@ namespace Waher.Script.Persistence.SQL.Sources
 			{
 				PI = this.leftType.GetRuntimeProperty(Index);
 				if (!(PI is null))
-					return new Rec() { PI = PI, Left = true };
+				{
+					if (PI.CanRead && PI.GetMethod.IsPublic)
+						return new Rec() { PI = PI, Left = true };
+					else
+						return new Rec();
+				}
 
 				FI = this.leftType.GetRuntimeField(Index);
 				if (!(FI is null))
-					return new Rec() { FI = FI, Left = true };
+				{
+					if (FI.IsPublic)
+						return new Rec() { FI = FI, Left = true };
+					else
+						return new Rec();
+				}
 
-				if (VectorIndex.TryGetIndexProperty(this.leftType, out PI, out _))
+				if (VectorIndex.TryGetIndexProperty(this.leftType, true, false, out PI, out _))
 					return new Rec() { PI = PI, Left = true, Indexed = true };
 			}
 
@@ -118,13 +128,23 @@ namespace Waher.Script.Persistence.SQL.Sources
 			{
 				PI = this.rightType.GetRuntimeProperty(Index);
 				if (!(PI is null))
-					return new Rec() { PI = PI };
+				{
+					if (PI.CanRead && PI.GetMethod.IsPublic)
+						return new Rec() { PI = PI };
+					else
+						return new Rec();
+				}
 
 				FI = this.rightType.GetRuntimeField(Index);
 				if (!(FI is null))
-					return new Rec() { FI = FI };
+				{
+					if (FI.IsPublic)
+						return new Rec() { FI = FI };
+					else
+						return new Rec();
+				}
 
-				if (VectorIndex.TryGetIndexProperty(this.rightType, out PI, out _))
+				if (VectorIndex.TryGetIndexProperty(this.rightType, true, false, out PI, out _))
 					return new Rec() { PI = PI, Indexed = true };
 			}
 

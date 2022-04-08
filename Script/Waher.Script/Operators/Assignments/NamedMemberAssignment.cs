@@ -79,15 +79,25 @@ namespace Waher.Script.Operators.Assignments
 					{
 						this.field = null;
 						this.nameIndex = null;
+
+						if (!this.property.CanWrite)
+							throw new ScriptRuntimeException("Property cannot be set: " + this.name, this);
+						else if (!this.property.SetMethod.IsPublic)
+							throw new ScriptRuntimeException("Property not accessible: " + this.name, this);
 					}
 					else
 					{
 						this.field = Type.GetRuntimeField(this.name);
 						if (!(this.field is null))
+						{
 							this.nameIndex = null;
+
+							if (!this.field.IsPublic)
+								throw new ScriptRuntimeException("Field not accessible: " + this.name, this);
+						}
 						else
 						{
-							if (VectorIndex.TryGetIndexProperty(Type, out this.property, out _))
+							if (VectorIndex.TryGetIndexProperty(Type, false, true, out this.property, out _))
 							{
 								if (this.nameIndex is null)
 									this.nameIndex = new string[] { this.name };

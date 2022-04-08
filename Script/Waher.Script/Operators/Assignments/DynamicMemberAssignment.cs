@@ -96,26 +96,38 @@ namespace Waher.Script.Operators.Assignments
 			PropertyInfo Property = Type.GetRuntimeProperty(Name);
 			if (!(Property is null))
 			{
-				Type = Property.PropertyType;
-				if (!Type.GetTypeInfo().IsAssignableFrom(Right.GetType().GetTypeInfo()))
-					Property.SetValue(LeftValue, Expression.ConvertTo(Right, Type, this), null);
+				if (!Property.CanWrite)
+					throw new ScriptRuntimeException("Property cannot be set: " + Name, this);
+				else if (!Property.SetMethod.IsPublic)
+					throw new ScriptRuntimeException("Property not accessible: " + Name, this);
 				else
-					Property.SetValue(LeftValue, Right, null);
+				{
+					Type = Property.PropertyType;
+					if (!Type.GetTypeInfo().IsAssignableFrom(Right.GetType().GetTypeInfo()))
+						Property.SetValue(LeftValue, Expression.ConvertTo(Right, Type, this), null);
+					else
+						Property.SetValue(LeftValue, Right, null);
+				}
 			}
 			else
 			{
 				FieldInfo Field = Type.GetRuntimeField(Name);
 				if (!(Field is null))
 				{
-					Type = Field.FieldType;
-					if (!Type.GetTypeInfo().IsAssignableFrom(Right.GetType().GetTypeInfo()))
-						Field.SetValue(Left, Expression.ConvertTo(Right, Type, this));
+					if (!Field.IsPublic)
+						throw new ScriptRuntimeException("Field not accessible: " + Name, this);
 					else
-						Field.SetValue(Left, Right);
+					{
+						Type = Field.FieldType;
+						if (!Type.GetTypeInfo().IsAssignableFrom(Right.GetType().GetTypeInfo()))
+							Field.SetValue(Left, Expression.ConvertTo(Right, Type, this));
+						else
+							Field.SetValue(Left, Right);
+					}
 				}
 				else
 				{
-					if (VectorIndex.TryGetIndexProperty(Type, out Property, out _))
+					if (VectorIndex.TryGetIndexProperty(Type, false, true, out Property, out _))
 					{
 						Type = Property.PropertyType;
 						if (Type == typeof(object))

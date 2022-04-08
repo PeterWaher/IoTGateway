@@ -34,7 +34,7 @@ namespace Waher.Script.Functions.Runtime.PropertyEnumerators
 
 			foreach (PropertyInfo PI in T.GetRuntimeProperties())
 			{
-				if (PI.GetIndexParameters().Length > 0)
+				if (!PI.CanRead || !PI.GetMethod.IsPublic || PI.GetIndexParameters().Length > 0)
 					continue;
 
 				Elements.Add(new StringValue(PI.Name));

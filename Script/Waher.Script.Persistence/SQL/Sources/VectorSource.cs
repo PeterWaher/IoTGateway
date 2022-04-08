@@ -223,10 +223,21 @@ namespace Waher.Script.Persistence.SQL.Sources
 
 					foreach (Type T in this.types.Keys)
 					{
-						if (!(T.GetRuntimeProperty(Label) is null &&
-							T.GetRuntimeField(Label) is null))
+						PropertyInfo PI = T.GetRuntimeProperty(Label);
+
+						if (PI is null)
 						{
-							Result = true;
+							FieldInfo FI = T.GetRuntimeField(Label);
+
+							if (!(FI is null))
+							{
+								Result = FI.IsPublic;
+								break;
+							}
+						}
+						else
+						{
+							Result = PI.CanRead && PI.GetMethod.IsPublic;
 							break;
 						}
 					}

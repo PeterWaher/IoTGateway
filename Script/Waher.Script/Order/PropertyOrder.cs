@@ -57,23 +57,23 @@ namespace Waher.Script.Order
 
 				if (!(PI is null))
 				{
-					this.lastPropertyInfo = PI;
 					this.lastFieldInfo = null;
+
+					if (PI.CanRead && PI.GetMethod.IsPublic)
+						this.lastPropertyInfo = PI;
+					else
+						this.lastPropertyInfo = null;
 				}
 				else
 				{
+					this.lastPropertyInfo = null;
+
 					FieldInfo FI = T.GetRuntimeField(this.name);
 
-					if (!(PI is null))
-					{
-						this.lastPropertyInfo = null;
+					if (!(FI is null) && FI.IsPublic)
 						this.lastFieldInfo = FI;
-					}
 					else
-					{
-						this.lastPropertyInfo = null;
 						this.lastFieldInfo = null;
-					}
 				}
 			}
 

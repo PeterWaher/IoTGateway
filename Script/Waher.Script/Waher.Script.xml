@@ -20234,11 +20234,13 @@
             <param name="Node">Node performing the operation.</param>
             <returns>Result</returns>
         </member>
-        <member name="M:Waher.Script.Operators.Vectors.VectorIndex.TryGetIndexProperty(System.Type,System.Reflection.PropertyInfo@,System.Reflection.ParameterInfo[]@)">
+        <member name="M:Waher.Script.Operators.Vectors.VectorIndex.TryGetIndexProperty(System.Type,System.Boolean,System.Boolean,System.Reflection.PropertyInfo@,System.Reflection.ParameterInfo[]@)">
             <summary>
             Tries to get a one-dimensional index property of a Type.
             </summary>
             <param name="T">Type</param>
+            <param name="ForReading">If index property is for reading.</param>
+            <param name="ForWriting">If index property is for writing.</param>
             <param name="PropertyInfo">Property information of index property.</param>
             <param name="Parameters">Parameter definitions of index property.</param>
             <returns>If a one-dimensional index property was found.</returns>

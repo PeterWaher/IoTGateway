@@ -62,7 +62,10 @@ namespace Waher.Script.Functions.Runtime
 			if (Obj is Type T)
 			{
 				foreach (FieldInfo FI in T.GetRuntimeFields())
-					Elements.Add(new StringValue(FI.Name));
+				{
+					if (FI.IsPublic)
+						Elements.Add(new StringValue(FI.Name));
+				}
 
 				return new ObjectVector(Elements);
 			}
@@ -72,8 +75,11 @@ namespace Waher.Script.Functions.Runtime
 
 				foreach (FieldInfo FI in T.GetRuntimeFields())
 				{
-					Elements.Add(new StringValue(FI.Name));
-					Elements.Add(Expression.Encapsulate(await WaitPossibleTask(FI.GetValue(Obj))));
+					if (FI.IsPublic)
+					{
+						Elements.Add(new StringValue(FI.Name));
+						Elements.Add(Expression.Encapsulate(await WaitPossibleTask(FI.GetValue(Obj))));
+					}
 				}
 
 				ObjectMatrix M = new ObjectMatrix(Elements.Count / 2, 2, Elements)

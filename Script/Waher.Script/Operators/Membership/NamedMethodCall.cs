@@ -421,7 +421,7 @@ namespace Waher.Script.Operators.Membership
 
 			foreach (MethodInfo MI in Methods)
 			{
-				if (MI.Name != this.name)
+				if (MI.IsAbstract || !MI.IsPublic || MI.Name != this.name)
 					continue;
 
 				ParameterInfo = MI.GetParameters();
@@ -441,14 +441,21 @@ namespace Waher.Script.Operators.Membership
 				PropertyInfo PI = Type.GetRuntimeProperty(this.name);
 				if (!(PI is null) && PI.GetIndexParameters().Length == 0)
 				{
-					Result.Add(new MethodRec()
+					if (!PI.CanRead)
+						throw new ScriptRuntimeException("Property cannot be read: " + this.name, this);
+					else if (!PI.GetMethod.IsPublic)
+						throw new ScriptRuntimeException("Property not accessible: " + this.name, this);
+					else
 					{
-						Method = PI.GetMethod,
-						Parameters = new ParameterInfo[0],
-						MethodType = MethodType.LambdaProperty
-					});
+						Result.Add(new MethodRec()
+						{
+							Method = PI.GetMethod,
+							Parameters = new ParameterInfo[0],
+							MethodType = MethodType.LambdaProperty
+						});
+					}
 				}
-				else if (VectorIndex.TryGetIndexProperty(Type, out PI, out ParameterInfo[] Parameters))
+				else if (VectorIndex.TryGetIndexProperty(Type, true, false, out PI, out ParameterInfo[] Parameters))
 				{
 					Result.Add(new MethodRec()
 					{

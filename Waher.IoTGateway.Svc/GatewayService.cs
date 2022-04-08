@@ -51,7 +51,7 @@ namespace Waher.IoTGateway.Svc
 				if (!Started)
 				{
 					Log.Alert("Gateway being started in another process.");
-						ThreadPool.QueueUserWorkItem(_ => this.Stop());
+					ThreadPool.QueueUserWorkItem(_ => this.Stop());
 					return;
 				}
 			}
@@ -230,7 +230,7 @@ namespace Waher.IoTGateway.Svc
 			try
 			{
 				using PendingTimer Timer = new PendingTimer(this);
-				
+
 				this.Flush();
 				Gateway.Stop().Wait();
 				Log.Terminate();

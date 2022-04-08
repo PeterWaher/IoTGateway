@@ -684,7 +684,7 @@ namespace Waher.IoTGateway
 							{
 								string s = SystemConfiguration.GetType().FullName;
 
-								if (webServer != null && SystemConfigurations.TryGetValue(s, out SystemConfiguration OldConfiguration))
+								if (!(webServer is null) && SystemConfigurations.TryGetValue(s, out SystemConfiguration OldConfiguration))
 									await OldConfiguration.UnregisterSetup(webServer);
 
 								SystemConfigurations[s] = SystemConfiguration;

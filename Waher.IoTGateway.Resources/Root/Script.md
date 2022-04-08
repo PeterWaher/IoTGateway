@@ -2064,6 +2064,16 @@ The following predefined constants are also available:
 |:--------------------------:|------------------------------------------------------------------------------|
 | `MUC`                      | Gives access to remote data sources hosted by neurons in MUC rooms.          |
 
+#### Payment Extensions (available in Paiwise)
+
+The following functions are available in applications running on the Paiwise nuget. This includes the
+IoT Broker or the Neuron^TM.
+
+| Function                 | Description                                                                                                           | Example                     |
+|--------------------------|-----------------------------------------------------------------------------------------------------------------------|-----------------------------|
+| `ExchangeRate(From,To)`  | Gets the current exchange rate between two currencies. Requires a currency converter to be configured for the system. | `ExchangeRate("USD","EUR")` |
+
+
 =========================================================================================================================================================
 
 URI Schemes

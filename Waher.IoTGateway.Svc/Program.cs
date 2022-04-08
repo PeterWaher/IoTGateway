@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
-using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Events.Console;

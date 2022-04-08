@@ -30,11 +30,12 @@
             <exception cref="T:System.Exception">If trying to set the path to a different path than the one set previously.
             The path can only be set once, for security reasons.</exception>
         </member>
-        <member name="M:Waher.Content.Markdown.PlantUml.PlantUml.DeleteOldFiles(System.DateTime)">
+        <member name="M:Waher.Content.Markdown.PlantUml.PlantUml.DeleteOldFiles(System.TimeSpan,System.Boolean)">
             <summary>
-            Deletes generated files older than <paramref name="Limit"/>.
+            Deletes generated files older than <paramref name="MaxAge"/>.
             </summary>
-            <param name="Limit">Age limit.</param>
+            <param name="MaxAge">Age limit.</param>
+            <param name="Reschedule">If rescheduling should be done.</param>
         </member>
         <member name="M:Waher.Content.Markdown.PlantUml.PlantUml.SearchForInstallationFolder(System.String@,System.String@)">
             <summary>

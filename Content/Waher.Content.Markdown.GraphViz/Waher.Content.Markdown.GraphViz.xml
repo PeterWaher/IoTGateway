@@ -29,11 +29,12 @@
             <exception cref="T:System.Exception">If trying to set the installation folder to a different folder than the one set previously.
             The folder can only be set once, for security reasons.</exception>
         </member>
-        <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.DeleteOldFiles(System.DateTime)">
+        <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.DeleteOldFiles(System.TimeSpan,System.Boolean)">
             <summary>
-            Deletes generated files older than <paramref name="Limit"/>.
+            Deletes generated files older than <paramref name="MaxAge"/>.
             </summary>
-            <param name="Limit">Age limit.</param>
+            <param name="MaxAge">Age limit.</param>
+            <param name="Reschedule">If rescheduling should be done.</param>
         </member>
         <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.SearchForInstallationFolder">
             <summary>

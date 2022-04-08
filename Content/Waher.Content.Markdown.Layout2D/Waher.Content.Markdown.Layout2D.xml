@@ -21,11 +21,12 @@
             <param name="ContentRootFolder">Content root folder. If hosting markdown under a web server, this would correspond
             to the roof folder for the web content.</param>
         </member>
-        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.DeleteOldFiles(System.DateTime)">
+        <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.DeleteOldFiles(System.TimeSpan,System.Boolean)">
             <summary>
-            Deletes generated files older than <paramref name="Limit"/>.
+            Deletes generated files older than <paramref name="MaxAge"/>.
             </summary>
-            <param name="Limit">Age limit.</param>
+            <param name="MaxAge">Age limit.</param>
+            <param name="Reschedule">If rescheduling should be done.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Layout2D.XmlLayout.Supports(System.String)">
             <summary>

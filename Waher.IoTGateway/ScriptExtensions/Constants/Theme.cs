@@ -72,9 +72,9 @@ namespace Waher.IoTGateway.ScriptExtensions.Constants
 				GraphViz.DefaultFgColor = Color;
 				PlantUml.DefaultFgColor = Color;
 
-				GraphViz.DeleteOldFiles(DateTime.Now);
-				PlantUml.DeleteOldFiles(DateTime.Now);
-				XmlLayout.DeleteOldFiles(DateTime.Now);
+				GraphViz.DeleteOldFiles(TimeSpan.Zero, false);
+				PlantUml.DeleteOldFiles(TimeSpan.Zero, false);
+				XmlLayout.DeleteOldFiles(TimeSpan.Zero, false);
 			}
 		}
 

@@ -105,20 +105,23 @@ namespace Waher.Content.Markdown.PlantUml
 			if (!Directory.Exists(plantUmlFolder))
 				Directory.CreateDirectory(plantUmlFolder);
 
-			DeleteOldFiles(null);
+			DeleteOldFiles(TimeSpan.FromDays(7));
 		}
 
 		private static void DeleteOldFiles(object P)
 		{
-			DeleteOldFiles(DateTime.Now.AddDays(-7));
+			if (P is TimeSpan MaxAge)
+				DeleteOldFiles(MaxAge, true);
 		}
 
 		/// <summary>
-		/// Deletes generated files older than <paramref name="Limit"/>.
+		/// Deletes generated files older than <paramref name="MaxAge"/>.
 		/// </summary>
-		/// <param name="Limit">Age limit.</param>
-		public static void DeleteOldFiles(DateTime Limit)
+		/// <param name="MaxAge">Age limit.</param>
+		/// <param name="Reschedule">If rescheduling should be done.</param>
+		public static void DeleteOldFiles(TimeSpan MaxAge, bool Reschedule)
 		{
+			DateTime Limit = DateTime.Now - MaxAge;
 			int Count = 0;
 
 			foreach (string FileName in Directory.GetFiles(plantUmlFolder, "*.*"))
@@ -140,9 +143,12 @@ namespace Waher.Content.Markdown.PlantUml
 			if (Count > 0)
 				Log.Informational(Count.ToString() + " old file(s) deleted.", plantUmlFolder);
 
-			lock (rnd)
+			if (Reschedule)
 			{
-				scheduler.Add(DateTime.Now.AddDays(rnd.NextDouble() * 2), DeleteOldFiles, null);
+				lock (rnd)
+				{
+					scheduler.Add(DateTime.Now.AddDays(rnd.NextDouble() * 2), DeleteOldFiles, MaxAge);
+				}
 			}
 		}
 

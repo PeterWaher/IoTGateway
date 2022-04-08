@@ -64,7 +64,7 @@ namespace Waher.Script.Persistence.SQL
 					this.obj = value;
 
 				this.dictionary = this.obj as IDictionary<string, object>;
-				
+
 				Type T = this.obj.GetType();
 
 				if (this.type != T)
@@ -99,7 +99,7 @@ namespace Waher.Script.Persistence.SQL
 					{
 						try
 						{
-							ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj, new object[] { Name }));	// TODO: Async
+							ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj, new object[] { Name })); // TODO: Async
 							return true;
 						}
 						catch (Exception)
@@ -137,7 +137,7 @@ namespace Waher.Script.Persistence.SQL
 
 				if (PI is null && FI is null)
 				{
-					if (VectorIndex.TryGetIndexProperty(this.type, true, true, out PI, out _))
+					if (VectorIndex.TryGetIndexProperty(this.type, true, false, out PI, out _))
 					{
 						this.properties[Name] = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
 						return true;
@@ -207,7 +207,7 @@ namespace Waher.Script.Persistence.SQL
 					{
 						if (this.dictionary is null)
 						{
-							if (VectorIndex.TryGetIndexProperty(this.type, true, true, out PI, out _))
+							if (VectorIndex.TryGetIndexProperty(this.type, true, false, out PI, out _))
 								Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
 							else
 								Rec = null;
@@ -227,14 +227,14 @@ namespace Waher.Script.Persistence.SQL
 			if (!(Rec is null))
 			{
 				Result = true;  // null may be a valid response. Check variable collections first.
-			
+
 				if (Rec.Item1 is null)
-					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item2.GetValue(this.obj));	// TODO: Async
+					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item2.GetValue(this.obj));    // TODO: Async
 				else if (Rec.Item3)
 				{
 					try
 					{
-						Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj, new object[] { Name }));	// TODO: Async
+						Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj, new object[] { Name })); // TODO: Async
 					}
 					catch (KeyNotFoundException)
 					{
@@ -243,7 +243,7 @@ namespace Waher.Script.Persistence.SQL
 					}
 				}
 				else
-					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj));	// TODO: Async
+					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj));    // TODO: Async
 
 				if (!(Value is null))
 				{
@@ -307,7 +307,7 @@ namespace Waher.Script.Persistence.SQL
 					{
 						if (this.dictionary is null)
 						{
-							if (VectorIndex.TryGetIndexProperty(this.type, true, true, out PI, out _))
+							if (VectorIndex.TryGetIndexProperty(this.type, true, false, out PI, out _))
 								Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
 							else
 								Rec = null;
@@ -329,12 +329,12 @@ namespace Waher.Script.Persistence.SQL
 				Result = true;  // null may be a valid response. Check variable collections first.
 
 				if (Rec.Item1 is null)
-					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item2.GetValue(this.obj));	// TODO: Async
+					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item2.GetValue(this.obj));    // TODO: Async
 				else if (Rec.Item3)
 				{
 					try
 					{
-						Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj, new object[] { Name }));	// TODO: Async
+						Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj, new object[] { Name })); // TODO: Async
 					}
 					catch (KeyNotFoundException)
 					{
@@ -343,7 +343,7 @@ namespace Waher.Script.Persistence.SQL
 					}
 				}
 				else
-					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj));	// TODO: Async
+					Value = ScriptNode.UnnestPossibleTaskSync(Rec.Item1.GetValue(this.obj));    // TODO: Async
 
 				if (!(Value is null))
 					return true;
@@ -415,7 +415,7 @@ namespace Waher.Script.Persistence.SQL
 
 					if (PI is null && FI is null)
 					{
-						if (VectorIndex.TryGetIndexProperty(this.type, true, true, out PI, out _))
+						if (VectorIndex.TryGetIndexProperty(this.type, true, false, out PI, out _))
 							Rec = new Tuple<PropertyInfo, FieldInfo, bool>(PI, FI, true);
 						else
 							Rec = null;
@@ -434,10 +434,17 @@ namespace Waher.Script.Persistence.SQL
 
 				if (Rec.Item1 is null)
 					Rec.Item2.SetValue(this.obj, Value);
-				else if (Rec.Item3)
-					Rec.Item1.SetValue(this.obj, Value, new object[] { Name });
 				else
-					Rec.Item1.SetValue(this.obj, Value);
+				{
+					if (!Rec.Item1.CanWrite)
+						throw new InvalidOperationException("Property cannot be set.");
+					else if (!Rec.Item1.SetMethod.IsPublic)
+						throw new InvalidOperationException("Property not accessible.");
+					else if (Rec.Item3)
+						Rec.Item1.SetValue(this.obj, Value, new object[] { Name });
+					else
+						Rec.Item1.SetValue(this.obj, Value);
+				}
 
 				return;
 			}

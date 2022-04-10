@@ -79,26 +79,7 @@ namespace Waher.IoTGateway.Cssx
 				Pushed = true;
 
 				ThemeDefinition Def = Theme.CurrentTheme;
-				if (!(Def is null))
-				{
-					Session["TextColor"] = Def.TextColor;
-					Session["BackgroundColor"] = Def.BackgroundColor;
-					Session["HeaderColor"] = Def.HeaderColor;
-					Session["HeaderTextColor"] = Def.HeaderTextColor;
-					Session["ButtonColor"] = Def.ButtonColor;
-					Session["ButtonTextColor"] = Def.ButtonTextColor;
-					Session["MenuTextColor"] = Def.MenuTextColor;
-					Session["InsertColor"] = Def.InsertColor;
-					Session["DeleteColor"] = Def.DeleteColor;
-					Session["LinkColorUnvisited"] = Def.LinkColorUnvisited;
-					Session["LinkColorVisited"] = Def.LinkColorVisited;
-					Session["LinkColorHot"] = Def.LinkColorHot;
-					Session["BackgroundImages"] = Def.BackgroundImages;
-					Session["BannerImages"] = Def.BannerImages;
-
-					foreach (KeyValuePair<string, string> P in Def.GetCustomProperties())
-						Session[P.Key] = P.Value;
-				}
+				Def?.Prepare(Session);
 
 				StringBuilder Result = new StringBuilder();
 				Expression Exp;

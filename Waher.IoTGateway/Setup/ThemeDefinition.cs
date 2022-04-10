@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Xml;
 using SkiaSharp;
 using Waher.Content.Xml;
+using Waher.Script;
 using Waher.Script.Graphs.Functions.Colors;
 
 namespace Waher.IoTGateway.Setup
@@ -387,6 +388,34 @@ namespace Waher.IoTGateway.Setup
 				Result[i++] = P;
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Prepares a collection of variables for transforming content based on a theme.
+		/// </summary>
+		/// <param name="Variables">Variables to prepare.</param>
+		public void Prepare(Variables Variables)
+		{
+			Variables["TextColor"] = this.textColor;
+			Variables["BackgroundColor"] = this.backgroundColor;
+			Variables["HeaderColor"] = this.headerColor;
+			Variables["HeaderTextColor"] = this.headerTextColor;
+			Variables["ButtonColor"] = this.buttonColor;
+			Variables["ButtonTextColor"] = this.buttonTextColor;
+			Variables["MenuTextColor"] = this.menuTextColor;
+			Variables["InsertColor"] = this.insertColor;
+			Variables["DeleteColor"] = this.deleteColor;
+			Variables["LinkColorUnvisited"] = this.linkColorUnvisited;
+			Variables["LinkColorVisited"] = this.linkColorVisited;
+			Variables["LinkColorHot"] = this.linkColorHot;
+			Variables["FontFamily"] = this.fontFamily;
+			Variables["GraphBgColor"] = this.graphBgColor;
+			Variables["GraphFgColor"] = this.graphFgColor;
+			Variables["BackgroundImages"] = this.backgroundImages;
+			Variables["BannerImages"] = this.bannerImages;
+
+			foreach (KeyValuePair<string, string> P in this.GetCustomProperties())
+				Variables[P.Key] = P.Value;
 		}
 
 	}

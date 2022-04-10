@@ -25,8 +25,9 @@ namespace Waher.Content.Images
 		/// </summary>
 		public static readonly string[] ImageContentTypes = new string[] 
 		{
+			"image/webp", 
 			"image/png", 
-			"image/bmp", 
+			"image/bmp",
 			"image/gif", 
 			"image/jpeg", 
 			"image/tiff", 
@@ -40,8 +41,9 @@ namespace Waher.Content.Images
 		/// </summary>
 		public static readonly string[] ImageFileExtensions = new string[] 
 		{
+			"webp", 
 			"png", 
-			"bmp", 
+			"bmp",
 			"gif", 
 			"jpg", 
 			"jpeg", 
@@ -150,7 +152,12 @@ namespace Waher.Content.Images
 					throw new ArgumentException("Object not an image derived from SkiaSharp.SKImage or SkiaSharp.SKBitmap.", nameof(Object));
 			}
 
-			if (InternetContent.IsAccepted("image/png", AcceptedContentTypes))
+			if (InternetContent.IsAccepted("image/webp", AcceptedContentTypes))
+			{
+				Data = Image.Encode(SKEncodedImageFormat.Webp, 100);
+				ContentType = "image/png";
+			}
+			else if (InternetContent.IsAccepted("image/png", AcceptedContentTypes))
 			{
 				Data = Image.Encode(SKEncodedImageFormat.Png, 100);
 				ContentType = "image/png";

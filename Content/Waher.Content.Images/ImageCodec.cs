@@ -155,7 +155,7 @@ namespace Waher.Content.Images
 			if (InternetContent.IsAccepted("image/webp", AcceptedContentTypes))
 			{
 				Data = Image.Encode(SKEncodedImageFormat.Webp, 100);
-				ContentType = "image/png";
+				ContentType = "image/webp";
 			}
 			else if (InternetContent.IsAccepted("image/png", AcceptedContentTypes))
 			{

@@ -25,6 +25,10 @@
     <DocumentationFile>C:\My Projects\IoTGateway\Networking\Waher.Networking.XMPP.RDP\Waher.Networking.XMPP.RDP.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\My Projects\IoTGateway\Networking\Waher.Networking.XMPP.RDP\Waher.Networking.XMPP.RDP.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>

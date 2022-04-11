@@ -2298,3 +2298,9 @@ It allows clients to prepare.
 The value of this tag will be used when returning the document over an HTTP interface. The value will be literally used as a `Vary`
 HTTP header value of the generated HTML contents. Together with the [Cache-Control](#cacheControl) meta-tag they provide a means to 
 control how the generated page will be cached.
+
+### Viewport
+
+Defines Viewport meta-data for the page, for better presentation on mobile-phones and devices. See
+[Using the viewport meta tag to control layout on mobile browsers](https://developer.mozilla.org/en-US/docs/Web/HTML/Viewport_meta_tag) 
+for more information.

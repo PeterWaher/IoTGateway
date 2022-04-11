@@ -4774,6 +4774,15 @@ namespace Waher.Content.Markdown
 							}
 							break;
 
+						case "VIEWPORT":
+							foreach (KeyValuePair<string, bool> P in MetaData.Value)
+							{
+								Output.Append("<meta name=\"viewport\" content=\"");
+								Output.Append(XML.HtmlAttributeEncode(P.Key));
+								Output.AppendLine("\"/>");
+							}
+							break;
+
 						default:
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{

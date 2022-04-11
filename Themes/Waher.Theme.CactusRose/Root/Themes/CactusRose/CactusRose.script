@@ -1,3 +1,5 @@
+Timeout:=3600000;
+
 CactusRose1600x1600:=JuliaSmoothFractal((-0.16015625,-0.532937500000001),(z)->exp(z^3)-0.59,0.15625,RandomLinearAnalogousHsl(1024,16,1525287947),1600,1600);
 CactusRose1600x1600Dimmed:=Blend(CactusRose1600x1600,"White",0.85);
 CactusRose800x800:=JuliaSmoothFractal((-0.16015625,-0.532937500000001),(z)->exp(z^3)-0.59,0.15625,RandomLinearAnalogousHsl(1024,16,1525287947),800,800);

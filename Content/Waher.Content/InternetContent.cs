@@ -24,11 +24,13 @@ namespace Waher.Content
 		private static string[] canDecodeFileExtensions = null;
 		private static string[] canGetUriSchemes = null;
 		private static string[] canPostToUriSchemes = null;
+		private static string[] canHeadUriSchemes = null;
 		private static IContentEncoder[] encoders = null;
 		private static IContentDecoder[] decoders = null;
 		private static IContentConverter[] converters = null;
 		private static IContentGetter[] getters = null;
 		private static IContentPoster[] posters = null;
+		private static IContentHeader[] headers = null;
 		private readonly static Dictionary<string, KeyValuePair<Grade, IContentDecoder>> decoderByContentType =
 			new Dictionary<string, KeyValuePair<Grade, IContentDecoder>>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, KeyValuePair<Grade, IContentEncoder>> encodersByType =
@@ -39,6 +41,7 @@ namespace Waher.Content
 		private readonly static Dictionary<string, List<IContentConverter>> convertersByFrom = new Dictionary<string, List<IContentConverter>>();
 		private readonly static Dictionary<string, IContentGetter[]> gettersByScheme = new Dictionary<string, IContentGetter[]>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, IContentPoster[]> postersByScheme = new Dictionary<string, IContentPoster[]>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly static Dictionary<string, IContentHeader[]> headersByScheme = new Dictionary<string, IContentHeader[]>(StringComparer.CurrentCultureIgnoreCase);
 
 		static InternetContent()
 		{
@@ -1077,7 +1080,7 @@ namespace Waher.Content
 		public static Task<object> GetAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
-				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
+				throw new ArgumentException("URI Scheme not recognized (GET): " + Uri.Scheme, nameof(Uri));
 
 			return Getter.GetAsync(Uri, Headers);
 		}
@@ -1092,7 +1095,7 @@ namespace Waher.Content
 		public static Task<object> GetAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
-				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
+				throw new ArgumentException("URI Scheme not recognized (GET): " + Uri.Scheme, nameof(Uri));
 
 			return Getter.GetAsync(Uri, TimeoutMs, Headers);
 		}
@@ -1106,7 +1109,7 @@ namespace Waher.Content
 		public static Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
-				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
+				throw new ArgumentException("URI Scheme not recognized (GET): " + Uri.Scheme, nameof(Uri));
 
 			return Getter.GetTempStreamAsync(Uri, Headers);
 		}
@@ -1121,7 +1124,7 @@ namespace Waher.Content
 		public static Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanGet(Uri, out Grade _, out IContentGetter Getter))
-				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
+				throw new ArgumentException("URI Scheme not recognized (GET): " + Uri.Scheme, nameof(Uri));
 
 			return Getter.GetTempStreamAsync(Uri, TimeoutMs, Headers);
 		}
@@ -1269,7 +1272,7 @@ namespace Waher.Content
 		public static Task<object> PostAsync(Uri Uri, object Data, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPost(Uri, out Grade _, out IContentPoster Poster))
-				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
+				throw new ArgumentException("URI Scheme not recognized (POST): " + Uri.Scheme, nameof(Uri));
 
 			return Poster.PostAsync(Uri, Data, Headers);
 		}
@@ -1285,7 +1288,7 @@ namespace Waher.Content
 		public static Task<object> PostAsync(Uri Uri, object Data, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPost(Uri, out Grade _, out IContentPoster Poster))
-				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
+				throw new ArgumentException("URI Scheme not recognized (POST): " + Uri.Scheme, nameof(Uri));
 
 			return Poster.PostAsync(Uri, Data, TimeoutMs, Headers);
 		}
@@ -1301,7 +1304,7 @@ namespace Waher.Content
 		public static Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPost(Uri, out Grade _, out IContentPoster Poster))
-				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
+				throw new ArgumentException("URI Scheme not recognized (POST): " + Uri.Scheme, nameof(Uri));
 
 			return Poster.PostAsync(Uri, EncodedData, ContentType, Headers);
 		}
@@ -1318,9 +1321,171 @@ namespace Waher.Content
 		public static Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (!CanPost(Uri, out Grade _, out IContentPoster Poster))
-				throw new ArgumentException("URI Scheme not recognized: " + Uri.Scheme, nameof(Uri));
+				throw new ArgumentException("URI Scheme not recognized (POST): " + Uri.Scheme, nameof(Uri));
 
 			return Poster.PostAsync(Uri, EncodedData, ContentType, TimeoutMs, Headers);
+		}
+
+		#endregion
+
+		#region Getting headers of resources
+
+		/// <summary>
+		/// Internet URI Schemes where it is possible to get headers.
+		/// </summary>
+		public static string[] CanHeadUriSchemes
+		{
+			get
+			{
+				if (canHeadUriSchemes is null)
+				{
+					SortedDictionary<string, bool> UriSchemes = new SortedDictionary<string, bool>();
+
+					foreach (IContentHeader Header in Headers)
+					{
+						foreach (string Scheme in Header.UriSchemes)
+							UriSchemes[Scheme] = true;
+					}
+
+					string[] Schemes = new string[UriSchemes.Count];
+					UriSchemes.Keys.CopyTo(Schemes, 0);
+
+					canHeadUriSchemes = Schemes;
+				}
+
+				return canHeadUriSchemes;
+			}
+		}
+
+		/// <summary>
+		/// Available Internet Content Header-retrievers.
+		/// </summary>
+		public static IContentHeader[] Headers
+		{
+			get
+			{
+				if (headers is null)
+					BuildHeaders();
+
+				return headers;
+			}
+		}
+
+		private static void BuildHeaders()
+		{
+			List<IContentHeader> Headers = new List<IContentHeader>();
+			Type[] HeaderTypes = Types.GetTypesImplementingInterface(typeof(IContentHeader));
+			Dictionary<string, List<IContentHeader>> ByScheme = new Dictionary<string, List<IContentHeader>>();
+			IContentHeader Header;
+			TypeInfo TI;
+
+			foreach (Type T in HeaderTypes)
+			{
+				TI = T.GetTypeInfo();
+				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+					continue;
+
+				try
+				{
+					Header = (IContentHeader)Types.Instantiate(T);
+				}
+				catch (Exception)
+				{
+					continue;
+				}
+
+				Headers.Add(Header);
+
+				foreach (string Schema in Header.UriSchemes)
+				{
+					if (!ByScheme.TryGetValue(Schema, out List<IContentHeader> List))
+					{
+						List = new List<IContentHeader>();
+						ByScheme[Schema] = List;
+					}
+
+					List.Add(Header);
+				}
+			}
+
+			lock (headersByScheme)
+			{
+				foreach (KeyValuePair<string, List<IContentHeader>> P in ByScheme)
+					headersByScheme[P.Key] = P.Value.ToArray();
+			}
+
+			headers = Headers.ToArray();
+		}
+
+		/// <summary>
+		/// If the headers of a resource can be gotten, given its URI.
+		/// </summary>
+		/// <param name="Uri">URI of resource.</param>
+		/// <param name="Grade">How well the headers of the resource can be retrieved.</param>
+		/// <param name="Header">Best header-retriever for the URI.</param>
+		/// <returns>If the headers of a resource with the given URI can be retrieved.</returns>
+		public static bool CanHead(Uri Uri, out Grade Grade, out IContentHeader Header)
+		{
+			if (Uri is null)
+				throw new ArgumentNullException("URI cannot be null.", nameof(Uri));
+
+			if (headers is null)
+				BuildHeaders();
+
+			IContentHeader[] Headers;
+
+			lock (headersByScheme)
+			{
+				if (Uri is null || !headersByScheme.TryGetValue(Uri.Scheme, out Headers))
+				{
+					Header = null;
+					Grade = Grade.NotAtAll;
+					return false;
+				}
+			}
+
+			Grade = Grade.NotAtAll;
+			Header = null;
+
+			foreach (IContentHeader Header2 in Headers)
+			{
+				if (Header2.CanHead(Uri, out Grade Grade2) && Grade2 > Grade)
+				{
+					Grade = Grade2;
+					Header = Header2;
+				}
+			}
+
+			return !(Header is null);
+		}
+
+		/// <summary>
+		/// Heads a resource, given its URI.
+		/// </summary>
+		/// <param name="Uri">Uniform resource identifier.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Object.</returns>
+		public static Task<object> HeadAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanHead(Uri, out Grade _, out IContentHeader Header))
+				throw new ArgumentException("URI Scheme not recognized (HEAD): " + Uri.Scheme, nameof(Uri));
+
+			return Header.HeadAsync(Uri, Headers);
+		}
+
+		/// <summary>
+		/// Heads a resource, given its URI.
+		/// </summary>
+		/// <param name="Uri">Uniform resource identifier.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Object.</returns>
+		public static Task<object> HeadAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanHead(Uri, out Grade _, out IContentHeader Header))
+				throw new ArgumentException("URI Scheme not recognized (HEAD): " + Uri.Scheme, nameof(Uri));
+
+			return Header.HeadAsync(Uri, TimeoutMs, Headers);
 		}
 
 		#endregion

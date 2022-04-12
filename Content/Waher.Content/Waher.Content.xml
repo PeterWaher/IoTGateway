@@ -865,6 +865,31 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
         </member>
+        <member name="M:Waher.Content.Getters.WebGetter.CanHead(System.Uri,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the getter is able to get headers of a resource, given its URI.
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Grade">How well the header would be able to get the headers of a resource given the indicated URI.</param>
+            <returns>If the header can get the headers of a resource with the indicated URI.</returns>
+        </member>
+        <member name="M:Waher.Content.Getters.WebGetter.HeadAsync(System.Uri,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets the headers of a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded headers object.</returns>
+        </member>
+        <member name="M:Waher.Content.Getters.WebGetter.HeadAsync(System.Uri,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets the headers of a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded headers object.</returns>
+        </member>
         <member name="T:Waher.Content.IContentConverter">
             <summary>
             Basic interface for Internet Content encoders. A class implementing this interface and having a default constructor, will be able
@@ -996,6 +1021,42 @@
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+        </member>
+        <member name="T:Waher.Content.IContentHeader">
+            <summary>
+            Basic interface for Internet Content headers. A class implementing this interface and having a default constructor, will be able
+            to partake in retrieving headers through the static <see cref="T:Waher.Content.InternetContent"/> class. No registration is required.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.IContentHeader.UriSchemes">
+            <summary>
+            Supported URI schemes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.IContentHeader.CanHead(System.Uri,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the getter is able to get headers of a resource, given its URI.
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Grade">How well the header would be able to get the headers of a resource given the indicated URI.</param>
+            <returns>If the header can get the headers of a resource with the indicated URI.</returns>
+        </member>
+        <member name="M:Waher.Content.IContentHeader.HeadAsync(System.Uri,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets the headers of a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded headers object.</returns>
+        </member>
+        <member name="M:Waher.Content.IContentHeader.HeadAsync(System.Uri,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets the headers of a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded headers object.</returns>
         </member>
         <member name="T:Waher.Content.IContentPoster">
             <summary>
@@ -1420,6 +1481,42 @@
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
+        </member>
+        <member name="P:Waher.Content.InternetContent.CanHeadUriSchemes">
+            <summary>
+            Internet URI Schemes where it is possible to get headers.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.InternetContent.Headers">
+            <summary>
+            Available Internet Content Header-retrievers.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.InternetContent.CanHead(System.Uri,Waher.Runtime.Inventory.Grade@,Waher.Content.IContentHeader@)">
+            <summary>
+            If the headers of a resource can be gotten, given its URI.
+            </summary>
+            <param name="Uri">URI of resource.</param>
+            <param name="Grade">How well the headers of the resource can be retrieved.</param>
+            <param name="Header">Best header-retriever for the URI.</param>
+            <returns>If the headers of a resource with the given URI can be retrieved.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.HeadAsync(System.Uri,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Heads a resource, given its URI.
+            </summary>
+            <param name="Uri">Uniform resource identifier.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Object.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.HeadAsync(System.Uri,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Heads a resource, given its URI.
+            </summary>
+            <param name="Uri">Uniform resource identifier.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Object.</returns>
         </member>
         <member name="T:Waher.Content.JSON">
             <summary>

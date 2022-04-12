@@ -11,7 +11,7 @@ namespace Waher.Content.Getters
 	/// <summary>
 	/// Gets resources from the Web (i.e. using HTTP or HTTPS).
 	/// </summary>
-	public class WebGetter : IContentGetter
+	public class WebGetter : IContentGetter, IContentHeader
 	{
 		/// <summary>
 		/// Gets resources from the Web (i.e. using HTTP or HTTPS).
@@ -120,7 +120,7 @@ namespace Waher.Content.Getters
 					else
 						Message = Decoded.ToString();
 				}
-				
+
 				throw new WebException(Message, Response.StatusCode, ContentType, Bin, Decoded, Response.Headers);
 			}
 
@@ -201,6 +201,82 @@ namespace Waher.Content.Getters
 					}
 
 					return new KeyValuePair<string, TemporaryStream>(ContentType, File);
+				}
+			}
+		}
+
+		/// <summary>
+		/// If the getter is able to get headers of a resource, given its URI.
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Grade">How well the header would be able to get the headers of a resource given the indicated URI.</param>
+		/// <returns>If the header can get the headers of a resource with the indicated URI.</returns>
+		public bool CanHead(Uri Uri, out Grade Grade)
+		{
+			return this.CanGet(Uri, out Grade);
+		}
+
+		/// <summary>
+		/// Gets the headers of a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded headers object.</returns>
+		public Task<object> HeadAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
+		{
+			return this.HeadAsync(Uri, 60000, Headers);
+		}
+
+		/// <summary>
+		/// Gets the headers of a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded headers object.</returns>
+		public async Task<object> HeadAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			using (HttpClient HttpClient = new HttpClient()
+			{
+				Timeout = TimeSpan.FromMilliseconds(TimeoutMs)
+			})
+			{
+				using (HttpRequestMessage Request = new HttpRequestMessage()
+				{
+					RequestUri = Uri,
+					Method = HttpMethod.Head
+				})
+				{
+					PrepareHeaders(Request, Headers);
+
+					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
+					Dictionary<string, object> Result = new Dictionary<string, object>();
+
+					foreach (KeyValuePair<string, IEnumerable<string>> Header in Response.Headers)
+					{
+						string s = null;
+						List<string> List = null;
+
+						foreach (string Value in Header.Value)
+						{
+							if (s is null)
+								s = Value;
+							else
+							{
+								if (List is null)
+									List = new List<string>() { s };
+
+								List.Add(Value);
+							}
+						}
+
+						if (List is null)
+							Result[Header.Key] = s;
+						else
+							Result[Header.Key] = List.ToArray();
+					}
+
+					return Result;
 				}
 			}
 		}

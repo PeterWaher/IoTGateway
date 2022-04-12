@@ -355,6 +355,7 @@ namespace Waher.Networking.XMPP
 		private bool openBracketReceived = false;
 		private bool monitorContactResourcesAlive = true;
 		private bool upgradeToTls = false;
+		private bool legacyTls = false;
 		private bool disposed = false;
 
 #if WINDOWS_UWP
@@ -740,8 +741,20 @@ namespace Waher.Networking.XMPP
 					this.client.OnDisconnected += this.Client_OnDisconnected;
 					this.client.OnPaused += this.Client_OnPaused;
 
-					if (await this.client.ConnectAsync(this.host, this.port))
+					if (await this.client.ConnectAsync(this.host, this.port, this.legacyTls))
 					{
+						if (this.legacyTls)
+						{
+							this.State = XmppState.StartingEncryption;
+#if WINDOWS_UWP
+							await this.client.UpgradeToTlsAsClient(SocketProtectionLevel.Tls12, this.trustServer);
+#else
+							await this.client.UpgradeToTlsAsClient(this.clientCertificate, SslProtocols.Tls12, this.trustServer);
+#endif
+							this.upgradeToTls = false;
+							this.client.Continue();
+						}
+
 						this.State = XmppState.StreamNegotiation;
 
 						this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
@@ -750,7 +763,7 @@ namespace Waher.Networking.XMPP
 					}
 					else
 					{
-						await this.ConnectionError(new System.Exception("Unable to connect to " + this.host + ":" + this.port.ToString()));
+						await this.ConnectionError(new Exception("Unable to connect to " + this.host + ":" + this.port.ToString()));
 						return;
 					}
 				}
@@ -907,43 +920,34 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Host or IP address of XMPP server.
 		/// </summary>
-		public string Host
-		{
-			get { return this.host; }
-		}
+		public string Host => this.host;
 
 		/// <summary>
 		/// Port number to connect to.
 		/// </summary>
-		public int Port
-		{
-			get { return this.port; }
-		}
+		public int Port => this.port;
 
 		/// <summary>
 		/// Underlying text transport layer, if such was provided to create the XMPP client.
 		/// </summary>
-		public ITextTransportLayer TextTransportLayer
-		{
-			get { return this.textTransportLayer; }
-		}
+		public ITextTransportLayer TextTransportLayer => this.textTransportLayer;
 
 		internal string StreamHeader
 		{
-			get { return this.streamHeader; }
-			set { this.streamHeader = value; }
+			get => this.streamHeader;
+			set => this.streamHeader = value;
 		}
 
 		internal string StreamFooter
 		{
-			get { return this.streamFooter; }
-			set { this.streamFooter = value; }
+			get => this.streamFooter;
+			set => this.streamFooter = value;
 		}
 
 		internal DateTime NextPing
 		{
-			get { return this.nextPing; }
-			set { this.nextPing = value; }
+			get => this.nextPing;
+			set => this.nextPing = value;
 		}
 
 		/// <summary>
@@ -951,8 +955,18 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool TrustServer
 		{
-			get { return this.trustServer; }
-			set { this.trustServer = value; }
+			get => this.trustServer;
+			set => this.trustServer = value;
+		}
+
+		/// <summary>
+		/// Legacy TLS means TLS negotiation is done directly after connection.
+		/// By default, this is false, and TLS is negotiated using STARTTLS.
+		/// </summary>
+		public bool LegacyTls
+		{
+			get => this.legacyTls;
+			set => this.legacyTls = value;
 		}
 
 		/// <summary>
@@ -964,48 +978,33 @@ namespace Waher.Networking.XMPP
 		public X509Certificate ServerCertificate
 #endif
 		{
-			get { return this.client.RemoteCertificate; }
+			get => this.client.RemoteCertificate;
 		}
 
 		/// <summary>
 		/// If the server certificate is valid.
 		/// </summary>
-		public bool ServerCertificateValid
-		{
-			get { return this.client.RemoteCertificateValid; }
-		}
+		public bool ServerCertificateValid=> this.client.RemoteCertificateValid;
 
 		/// <summary>
 		/// Name of the client in the XMPP network.
 		/// </summary>
-		public string ClientName
-		{
-			get { return this.clientName; }
-		}
+		public string ClientName => this.clientName;
 
 		/// <summary>
 		/// Version of the client in the XMPP network.
 		/// </summary>
-		public string ClientVersion
-		{
-			get { return this.clientVersion; }
-		}
+		public string ClientVersion => this.clientVersion;
 
 		/// <summary>
 		/// OS of the client in the XMPP network.
 		/// </summary>
-		public string ClientOS
-		{
-			get { return this.clientOS; }
-		}
+		public string ClientOS => this.clientOS;
 
 		/// <summary>
 		/// Language of the client in the XMPP network.
 		/// </summary>
-		public string Language
-		{
-			get { return this.language; }
-		}
+		public string Language => this.language;
 
 		/// <summary>
 		/// Monitors contact resources to see they are alive.

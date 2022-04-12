@@ -174,13 +174,14 @@ namespace Waher.Networking.XMPP.Push
 		/// <param name="LocalName">Rule applies only if the content of the message matches this local name.</param>
 		/// <param name="Namespace">Rule applies only if the namespace of the message matches this namespace.</param>
 		/// <param name="Channel">The push notification will be sent to this channel.</param>
+		/// <param name="MessageVariable">Variable to put the Message XML in, before patternmatching or content script is executed.</param>
 		/// <param name="PatternMatchingScript">Optional pattern-matching script. It will be applied to the incoming message, and
 		/// can be used to populate variables that will later be used to construct the push notification content.</param>
 		/// <param name="ContentScript">Script creating the content of the push notification.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void AddRule(string MessageType, string LocalName, string Namespace, string Channel, string PatternMatchingScript,
-			string ContentScript, IqResultEventHandlerAsync Callback, object State)
+		public void AddRule(string MessageType, string LocalName, string Namespace, string Channel, string MessageVariable, 
+			string PatternMatchingScript, string ContentScript, IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -194,6 +195,8 @@ namespace Waher.Networking.XMPP.Push
 			Xml.Append(XML.Encode(Namespace));
 			Xml.Append("' channel='");
 			Xml.Append(XML.Encode(Channel));
+			Xml.Append("' variable='");
+			Xml.Append(XML.Encode(MessageVariable));
 			Xml.Append("'>");
 
 			if (!string.IsNullOrEmpty(PatternMatchingScript))
@@ -225,12 +228,12 @@ namespace Waher.Networking.XMPP.Push
 		/// <param name="PatternMatchingScript">Optional pattern-matching script. It will be applied to the incoming message, and
 		/// can be used to populate variables that will later be used to construct the push notification content.</param>
 		/// <param name="ContentScript">Script creating the content of the push notification.</param>
-		public Task AddRuleAsync(string MessageType, string LocalName, string Namespace, string Channel, string PatternMatchingScript,
-			string ContentScript)
+		public Task AddRuleAsync(string MessageType, string LocalName, string Namespace, string Channel, string MessageVariable, 
+			string PatternMatchingScript, string ContentScript)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			this.AddRule(MessageType, LocalName, Namespace, Channel, PatternMatchingScript, ContentScript, (sender, e) =>
+			this.AddRule(MessageType, LocalName, Namespace, Channel, MessageVariable, PatternMatchingScript, ContentScript, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);

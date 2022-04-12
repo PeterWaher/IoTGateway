@@ -80,7 +80,7 @@
             Clears available push notification rules for the client.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.AddRule(System.String,System.String,System.String,System.String,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.AddRule(System.String,System.String,System.String,System.String,System.String,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
             <summary>
             Adds a push notification rule to the client account.
             </summary>
@@ -88,13 +88,14 @@
             <param name="LocalName">Rule applies only if the content of the message matches this local name.</param>
             <param name="Namespace">Rule applies only if the namespace of the message matches this namespace.</param>
             <param name="Channel">The push notification will be sent to this channel.</param>
+            <param name="MessageVariable">Variable to put the Message XML in, before patternmatching or content script is executed.</param>
             <param name="PatternMatchingScript">Optional pattern-matching script. It will be applied to the incoming message, and
             can be used to populate variables that will later be used to construct the push notification content.</param>
             <param name="ContentScript">Script creating the content of the push notification.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.AddRuleAsync(System.String,System.String,System.String,System.String,System.String,System.String)">
+        <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.AddRuleAsync(System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
             <summary>
             Adds a push notification rule to the client account.
             </summary>

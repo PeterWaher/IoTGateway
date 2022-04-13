@@ -5656,9 +5656,12 @@ namespace Waher.Networking.XMPP
 
 			if (QoS == QoSLevel.Unacknowledged)
 			{
-				Xml.Append(" to='");
-				Xml.Append(XML.Encode(To));
-				Xml.Append('\'');
+				if (!string.IsNullOrEmpty(To))
+				{
+					Xml.Append(" to='");
+					Xml.Append(XML.Encode(To));
+					Xml.Append('\'');
+				}
 
 				if (this.sendFromAddress && !string.IsNullOrEmpty(this.fullJid))
 				{

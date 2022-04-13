@@ -225,6 +225,7 @@ namespace Waher.Networking.XMPP.Push
 		/// <param name="LocalName">Rule applies only if the content of the message matches this local name.</param>
 		/// <param name="Namespace">Rule applies only if the namespace of the message matches this namespace.</param>
 		/// <param name="Channel">The push notification will be sent to this channel.</param>
+		/// <param name="MessageVariable">Variable to put the incoming message content in, before script is executed.</param>
 		/// <param name="PatternMatchingScript">Optional pattern-matching script. It will be applied to the incoming message, and
 		/// can be used to populate variables that will later be used to construct the push notification content.</param>
 		/// <param name="ContentScript">Script creating the content of the push notification.</param>

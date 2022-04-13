@@ -35,14 +35,19 @@ namespace Waher.IoTGateway.Events
 				case EventType.Emergency:
 					StringBuilder Markdown = new StringBuilder();
 
-					if (Event.Type == EventType.Alert)
-						Markdown.AppendLine("Alert");
-					else
-						Markdown.AppendLine("Emergency");
+					if (!Event.Message.Contains("=======" + Environment.NewLine))
+					{
+						if (Event.Type == EventType.Alert)
+							Markdown.AppendLine("Alert");
+						else
+							Markdown.AppendLine("Emergency");
 
-					Markdown.AppendLine("===============");
-					Markdown.AppendLine();
+						Markdown.AppendLine("===============");
+						Markdown.AppendLine();
+					}
+
 					Markdown.AppendLine(Event.Message);
+
 					Markdown.AppendLine();
 					Markdown.AppendLine("| Information ||");
 					Markdown.AppendLine("|:------|:-----|");

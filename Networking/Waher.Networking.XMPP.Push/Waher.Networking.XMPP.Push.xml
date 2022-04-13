@@ -46,7 +46,7 @@
         </member>
         <member name="F:Waher.Networking.XMPP.Push.PushNotificationClient.MessagePushNamespace">
             <summary>
-            http://waher.se/Schema/MessagePush.xsd
+            http://waher.se/Schema/PushNotification.xsd
             </summary>
         </member>
         <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.#ctor(Waher.Networking.XMPP.XmppClient)">

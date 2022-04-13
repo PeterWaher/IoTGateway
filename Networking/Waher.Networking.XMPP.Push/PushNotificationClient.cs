@@ -11,9 +11,9 @@ namespace Waher.Networking.XMPP.Push
 	public class PushNotificationClient : XmppExtension
 	{
 		/// <summary>
-		/// http://waher.se/Schema/MessagePush.xsd
+		/// http://waher.se/Schema/PushNotification.xsd
 		/// </summary>
-		public const string MessagePushNamespace = "http://waher.se/Schema/MessagePush.xsd";
+		public const string MessagePushNamespace = "http://waher.se/Schema/PushNotification.xsd";
 
 		/// <summary>
 		/// Push Notification Client

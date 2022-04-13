@@ -75,6 +75,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
 			Filter Filter = await TypeSource.ConvertAsync(Where, Variables, this.Name);
+			
 			if (Lazy)
 			{
 				await Database.DeleteLazy(this.collectionName, Offset, Top, Filter, TypeSource.Convert(Order));

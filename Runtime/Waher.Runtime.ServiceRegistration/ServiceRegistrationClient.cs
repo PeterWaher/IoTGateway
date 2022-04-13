@@ -212,5 +212,15 @@ namespace Waher.Runtime.ServiceRegistration
 			return true;
 		}
 
+		/// <summary>
+		/// Gets the original registration time.
+		/// </summary>
+		/// <returns>Registration time, or null if not registered.</returns>
+		public static async Task<DateTime?> GetRegistrationTime()
+		{
+			Registration Registration = await Database.FindFirstDeleteRest<Registration>();
+			return Registration?.Created;
+		}
+
 	}
 }

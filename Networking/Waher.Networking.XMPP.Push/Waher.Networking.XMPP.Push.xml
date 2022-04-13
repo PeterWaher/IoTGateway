@@ -4,6 +4,31 @@
         <name>Waher.Networking.XMPP.Push</name>
     </assembly>
     <members>
+        <member name="T:Waher.Networking.XMPP.Push.ClientType">
+            <summary>
+            Type of client requesting notification.
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Push.ClientType.Android">
+            <summary>
+            Android device
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Push.ClientType.iOS">
+            <summary>
+            iOS device
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Push.ClientType.Web">
+            <summary>
+            Web site
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Push.ClientType.Other">
+            <summary>
+            Other type of devic
+            </summary>
+        </member>
         <member name="T:Waher.Networking.XMPP.Push.PushMessagingService">
             <summary>
             Push messaging service used.
@@ -40,21 +65,23 @@
             Implemented extensions.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.NewToken(System.String,Waher.Networking.XMPP.Push.PushMessagingService,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.NewToken(System.String,Waher.Networking.XMPP.Push.PushMessagingService,Waher.Networking.XMPP.Push.ClientType,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
             <summary>
             Reports a new push token to the server.
             </summary>
             <param name="Token">Token received from the push service.</param>
             <param name="Service">Service providing the token.</param>
+            <param name="ClientType">Client Type.</param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.NewTokenAsync(System.String,Waher.Networking.XMPP.Push.PushMessagingService)">
+        <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.NewTokenAsync(System.String,Waher.Networking.XMPP.Push.PushMessagingService,Waher.Networking.XMPP.Push.ClientType)">
             <summary>
             Reports a new push token to the server.
             </summary>
             <param name="Token">Token received from the push service.</param>
             <param name="Service">Service providing the token.</param>
+            <param name="ClientType">Client Type.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.RemoveToken(Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
             <summary>
@@ -91,7 +118,15 @@
             <param name="MessageVariable">Variable to put the Message XML in, before patternmatching or content script is executed.</param>
             <param name="PatternMatchingScript">Optional pattern-matching script. It will be applied to the incoming message, and
             can be used to populate variables that will later be used to construct the push notification content.</param>
-            <param name="ContentScript">Script creating the content of the push notification.</param>
+            <param name="ContentScript">Script creating the content of the push notification.
+            
+            If Content results in a string, it will be sent as a simple notification.
+            
+            If Content results in an object, use the property names defined by Firebase XMPP API, to configure properties:
+            https://firebase.google.com/docs/cloud-messaging/xmpp-server-ref?authuser=0#downstream-xmpp-messages-json
+            
+            All other properties defined in the resulting object, will be treated as data tags in the notification.
+            </param>
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
@@ -106,7 +141,15 @@
             <param name="MessageVariable">Variable to put the incoming message content in, before script is executed.</param>
             <param name="PatternMatchingScript">Optional pattern-matching script. It will be applied to the incoming message, and
             can be used to populate variables that will later be used to construct the push notification content.</param>
-            <param name="ContentScript">Script creating the content of the push notification.</param>
+            <param name="ContentScript">Script creating the content of the push notification.
+            
+            If Content results in a string, it will be sent as a simple notification.
+            
+            If Content results in an object, use the property names defined by Firebase XMPP API, to configure properties:
+            https://firebase.google.com/docs/cloud-messaging/xmpp-server-ref?authuser=0#downstream-xmpp-messages-json
+            
+            All other properties defined in the resulting object, will be treated as data tags in the notification.
+            </param>
         </member>
         <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.RemoveRule(System.String,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
             <summary>

@@ -44,9 +44,10 @@ namespace Waher.Networking.XMPP.Push
 		/// </summary>
 		/// <param name="Token">Token received from the push service.</param>
 		/// <param name="Service">Service providing the token.</param>
+		/// <param name="ClientType">Client Type.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void NewToken(string Token, PushMessagingService Service, IqResultEventHandlerAsync Callback, object State)
+		public void NewToken(string Token, PushMessagingService Service, ClientType ClientType, IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -54,6 +55,8 @@ namespace Waher.Networking.XMPP.Push
 			Xml.Append(MessagePushNamespace);
 			Xml.Append("' service='");
 			Xml.Append(Service.ToString());
+			Xml.Append("' clientType='");
+			Xml.Append(ClientType.ToString());
 			Xml.Append("' token='");
 			Xml.Append(XML.Encode(Token));
 			Xml.Append("'/>");
@@ -66,11 +69,12 @@ namespace Waher.Networking.XMPP.Push
 		/// </summary>
 		/// <param name="Token">Token received from the push service.</param>
 		/// <param name="Service">Service providing the token.</param>
-		public Task NewTokenAsync(string Token, PushMessagingService Service)
+		/// <param name="ClientType">Client Type.</param>
+		public Task NewTokenAsync(string Token, PushMessagingService Service, ClientType ClientType)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 
-			this.NewToken(Token, Service, (sender, e) =>
+			this.NewToken(Token, Service, ClientType, (sender, e) =>
 			{
 				if (e.Ok)
 					Result.TrySetResult(true);
@@ -177,7 +181,15 @@ namespace Waher.Networking.XMPP.Push
 		/// <param name="MessageVariable">Variable to put the Message XML in, before patternmatching or content script is executed.</param>
 		/// <param name="PatternMatchingScript">Optional pattern-matching script. It will be applied to the incoming message, and
 		/// can be used to populate variables that will later be used to construct the push notification content.</param>
-		/// <param name="ContentScript">Script creating the content of the push notification.</param>
+		/// <param name="ContentScript">Script creating the content of the push notification.
+		/// 
+		/// If Content results in a string, it will be sent as a simple notification.
+		/// 
+		/// If Content results in an object, use the property names defined by Firebase XMPP API, to configure properties:
+		/// https://firebase.google.com/docs/cloud-messaging/xmpp-server-ref?authuser=0#downstream-xmpp-messages-json
+		/// 
+		/// All other properties defined in the resulting object, will be treated as data tags in the notification.
+		/// </param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void AddRule(string MessageType, string LocalName, string Namespace, string Channel, string MessageVariable, 
@@ -228,7 +240,15 @@ namespace Waher.Networking.XMPP.Push
 		/// <param name="MessageVariable">Variable to put the incoming message content in, before script is executed.</param>
 		/// <param name="PatternMatchingScript">Optional pattern-matching script. It will be applied to the incoming message, and
 		/// can be used to populate variables that will later be used to construct the push notification content.</param>
-		/// <param name="ContentScript">Script creating the content of the push notification.</param>
+		/// <param name="ContentScript">Script creating the content of the push notification.
+		/// 
+		/// If Content results in a string, it will be sent as a simple notification.
+		/// 
+		/// If Content results in an object, use the property names defined by Firebase XMPP API, to configure properties:
+		/// https://firebase.google.com/docs/cloud-messaging/xmpp-server-ref?authuser=0#downstream-xmpp-messages-json
+		/// 
+		/// All other properties defined in the resulting object, will be treated as data tags in the notification.
+		/// </param>
 		public Task AddRuleAsync(string MessageType, string LocalName, string Namespace, string Channel, string MessageVariable, 
 			string PatternMatchingScript, string ContentScript)
 		{

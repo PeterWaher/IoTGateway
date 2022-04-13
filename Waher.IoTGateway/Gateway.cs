@@ -70,6 +70,7 @@ using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 using Waher.Script.Graphs;
+using Waher.Runtime.ServiceRegistration;
 
 namespace Waher.IoTGateway
 {
@@ -526,9 +527,11 @@ namespace Waher.IoTGateway
 					WsCodec.AllowRawEncoding(false, true);
 				HttpFolderResource.ProtectContentType(WsCodec.ContentType);
 
+				LinkedList<SystemConfiguration> NewConfigurations = null;
 				Dictionary<string, Type> SystemConfigurationTypes = new Dictionary<string, Type>();
 				Dictionary<string, SystemConfiguration> SystemConfigurations = new Dictionary<string, SystemConfiguration>();
 				bool Configured = true;
+				bool? Simplify = null;
 
 				foreach (Type SystemConfigurationType in Types.GetTypesImplementingInterface(typeof(ISystemConfiguration)))
 				{
@@ -543,14 +546,30 @@ namespace Waher.IoTGateway
 					string s = SystemConfiguration.GetType().FullName;
 
 					if (SystemConfigurations.ContainsKey(s))
-						await Database.Delete(SystemConfiguration);
+						await Database.Delete(SystemConfiguration);     // No duplicates allowed by mistake
 					else
 					{
 						SystemConfigurations[s] = SystemConfiguration;
 						SystemConfigurationTypes.Remove(s);
 
-						if (!SystemConfiguration.Complete)
-							Configured = false;
+						if (!SystemConfiguration.Complete && Configured)
+						{
+							if (!Simplify.HasValue)
+								Simplify = (await ServiceRegistrationClient.GetRegistrationTime()).HasValue;
+
+							if (Simplify.Value && await SystemConfiguration.SimplifiedConfiguration())
+							{
+								await SystemConfiguration.MakeCompleted();
+								await Database.Update(SystemConfiguration);
+
+								if (NewConfigurations is null)
+									NewConfigurations = new LinkedList<SystemConfiguration>();
+
+								NewConfigurations.AddLast(SystemConfiguration);
+							}
+							else
+								Configured = false;
+						}
 					}
 				}
 
@@ -565,7 +584,25 @@ namespace Waher.IoTGateway
 						await Database.Insert(SystemConfiguration);
 
 						SystemConfigurations[P.Key] = SystemConfiguration;
-						Configured = false;
+
+						if (Configured)
+						{
+							if (!Simplify.HasValue)
+								Simplify = (await ServiceRegistrationClient.GetRegistrationTime()).HasValue;
+
+							if (Simplify.Value && await SystemConfiguration.SimplifiedConfiguration())
+							{
+								await SystemConfiguration.MakeCompleted();
+								await Database.Update(SystemConfiguration);
+
+								if (NewConfigurations is null)
+									NewConfigurations = new LinkedList<SystemConfiguration>();
+
+								NewConfigurations.AddLast(SystemConfiguration);
+							}
+							else
+								Configured = false;
+						}
 					}
 					catch (Exception ex)
 					{
@@ -980,7 +1017,17 @@ namespace Waher.IoTGateway
 						{
 							string Msg = await Resources.ReadAllTextAsync(UnhandledException);
 							File.Delete(UnhandledException);
-							Log.Alert("Unhandled Exception\r\n=======================\r\n\r\n```\r\n" + Msg + "\r\n```");
+
+							StringBuilder sb = new StringBuilder();
+
+							sb.AppendLine("Unhandled Exception");
+							sb.AppendLine("=======================");
+							sb.AppendLine();
+							sb.AppendLine("```");
+							sb.AppendLine(Msg);
+							sb.AppendLine("```");
+
+							Log.Alert(sb.ToString());
 						}
 						catch (Exception ex)
 						{
@@ -992,6 +1039,33 @@ namespace Waher.IoTGateway
 						Log.Informational("Server started.");
 					else
 						Log.Critical("Unable to start all modules.");
+
+					if (!(NewConfigurations is null))
+					{
+						foreach (SystemConfiguration Configuration in NewConfigurations)
+						{
+							StringBuilder sb = new StringBuilder();
+
+							sb.AppendLine("New System Configuration");
+							sb.AppendLine("=============================");
+							sb.AppendLine();
+							sb.AppendLine("A new system configuration is available.");
+							sb.AppendLine("It has been set to simplified configuration, to not stop processing.");
+							sb.AppendLine("You should review the configuration however, as soon as possible.");
+							sb.AppendLine();
+							sb.Append("[Click here to review the new system configuration](http");
+
+							if (DomainConfiguration.Instance.UseEncryption)
+								sb.Append('s');
+
+							sb.Append("://");
+							sb.Append(DomainConfiguration.Instance.Domain);
+							sb.Append(Configuration.Resource);
+							sb.AppendLine(").");
+
+							Log.Alert(sb.ToString());
+						}
+					}
 				}
 				catch (Exception ex)
 				{

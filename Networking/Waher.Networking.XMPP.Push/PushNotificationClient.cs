@@ -88,7 +88,7 @@ namespace Waher.Networking.XMPP.Push
 		}
 
 		#endregion
-		
+
 		#region Remove Token
 
 		/// <summary>
@@ -192,7 +192,7 @@ namespace Waher.Networking.XMPP.Push
 		/// </param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void AddRule(string MessageType, string LocalName, string Namespace, string Channel, string MessageVariable, 
+		public void AddRule(MessageType MessageType, string LocalName, string Namespace, string Channel, string MessageVariable,
 			string PatternMatchingScript, string ContentScript, IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -200,7 +200,10 @@ namespace Waher.Networking.XMPP.Push
 			Xml.Append("<addRule xmlns='");
 			Xml.Append(MessagePushNamespace);
 			Xml.Append("' type='");
-			Xml.Append(XML.Encode(MessageType));
+
+			if (MessageType != MessageType.Normal)
+				Xml.Append(MessageType.ToString().ToLower());
+
 			Xml.Append("' localName='");
 			Xml.Append(XML.Encode(LocalName));
 			Xml.Append("' namespace='");
@@ -249,7 +252,7 @@ namespace Waher.Networking.XMPP.Push
 		/// 
 		/// All other properties defined in the resulting object, will be treated as data tags in the notification.
 		/// </param>
-		public Task AddRuleAsync(string MessageType, string LocalName, string Namespace, string Channel, string MessageVariable, 
+		public Task AddRuleAsync(MessageType MessageType, string LocalName, string Namespace, string Channel, string MessageVariable,
 			string PatternMatchingScript, string ContentScript)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
@@ -279,14 +282,17 @@ namespace Waher.Networking.XMPP.Push
 		/// <param name="Namespace">Rule applies only if the namespace of the message matches this namespace.</param>
 		/// <param name="Callback">Method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
-		public void RemoveRule(string MessageType, string LocalName, string Namespace, IqResultEventHandlerAsync Callback, object State)
+		public void RemoveRule(MessageType MessageType, string LocalName, string Namespace, IqResultEventHandlerAsync Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<removeRule xmlns='");
 			Xml.Append(MessagePushNamespace);
 			Xml.Append("' type='");
-			Xml.Append(XML.Encode(MessageType));
+
+			if (MessageType != MessageType.Normal)
+				Xml.Append(MessageType.ToString().ToLower());
+
 			Xml.Append("' localName='");
 			Xml.Append(XML.Encode(LocalName));
 			Xml.Append("' namespace='");
@@ -302,7 +308,7 @@ namespace Waher.Networking.XMPP.Push
 		/// <param name="MessageType">Rule applies to messages of this type.</param>
 		/// <param name="LocalName">Rule applies only if the content of the message matches this local name.</param>
 		/// <param name="Namespace">Rule applies only if the namespace of the message matches this namespace.</param>
-		public Task RemoveRuleAsync(string MessageType, string LocalName, string Namespace)
+		public Task RemoveRuleAsync(MessageType MessageType, string LocalName, string Namespace)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
 

@@ -107,7 +107,7 @@
             Clears available push notification rules for the client.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.AddRule(System.String,System.String,System.String,System.String,System.String,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.AddRule(Waher.Networking.XMPP.MessageType,System.String,System.String,System.String,System.String,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
             <summary>
             Adds a push notification rule to the client account.
             </summary>
@@ -130,7 +130,7 @@
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.AddRuleAsync(System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
+        <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.AddRuleAsync(Waher.Networking.XMPP.MessageType,System.String,System.String,System.String,System.String,System.String,System.String)">
             <summary>
             Adds a push notification rule to the client account.
             </summary>
@@ -151,7 +151,7 @@
             All other properties defined in the resulting object, will be treated as data tags in the notification.
             </param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.RemoveRule(System.String,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+        <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.RemoveRule(Waher.Networking.XMPP.MessageType,System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
             <summary>
             Removes a push notification rule from the client account.
             </summary>
@@ -161,7 +161,7 @@
             <param name="Callback">Method to call when response is returned.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
-        <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.RemoveRuleAsync(System.String,System.String,System.String)">
+        <member name="M:Waher.Networking.XMPP.Push.PushNotificationClient.RemoveRuleAsync(Waher.Networking.XMPP.MessageType,System.String,System.String)">
             <summary>
             Removes a push notification rule from the client account.
             </summary>

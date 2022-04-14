@@ -5635,23 +5635,11 @@ namespace Waher.Networking.XMPP
 				Xml.Append('\'');
 			}
 
-			switch (Type)
+			if (Type != MessageType.Normal)
 			{
-				case MessageType.Chat:
-					Xml.Append(" type='chat'");
-					break;
-
-				case MessageType.Error:
-					Xml.Append(" type='error'");
-					break;
-
-				case MessageType.GroupChat:
-					Xml.Append(" type='groupchat'");
-					break;
-
-				case MessageType.Headline:
-					Xml.Append(" type='headline'");
-					break;
+				Xml.Append(" type='");
+				Xml.Append(Type.ToString().ToLower());
+				Xml.Append("'");
 			}
 
 			if (QoS == QoSLevel.Unacknowledged)

@@ -82,5 +82,26 @@ namespace Waher.Script.Xml.Model
 			else
 				return PatternMatchResult.NoMatch;
 		}
+
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(string CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			return CheckAgainst == this.value ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
+		}
+
+		/// <summary>
+		/// If the node is applicable in pattern matching against <paramref name="CheckAgainst"/>.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <returns>If the node is applicable for pattern matching.</returns>
+		public override bool IsApplicable(string CheckAgainst)
+		{
+			return CheckAgainst == this.value;
+		}
 	}
 }

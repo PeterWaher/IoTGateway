@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Script.Abstraction.Elements;
@@ -129,6 +128,30 @@ namespace Waher.Script.Xml.Model
 				return this.node.PatternMatch(ObjectValue.Null, AlreadyFound);
 			else
 				return PatternMatchResult.NoMatch;
+		}
+
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(string CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			if (CheckAgainst is null)
+				return this.node.PatternMatch(ObjectValue.Null, AlreadyFound);
+			else
+				return this.node.PatternMatch(new StringValue(CheckAgainst), AlreadyFound);
+		}
+
+		/// <summary>
+		/// If the node is applicable in pattern matching against <paramref name="CheckAgainst"/>.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <returns>If the node is applicable for pattern matching.</returns>
+		public override bool IsApplicable(string CheckAgainst)
+		{
+			return true;
 		}
 	}
 }

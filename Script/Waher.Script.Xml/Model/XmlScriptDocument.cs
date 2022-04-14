@@ -218,10 +218,10 @@ namespace Waher.Script.Xml.Model
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			if (!(CheckAgainst?.AssociatedObjectValue is XmlDocument Doc))
+			if (!(CheckAgainst?.AssociatedObjectValue is XmlNode Node))
 				return PatternMatchResult.NoMatch;
 
-			return this.PatternMatch(Doc, AlreadyFound);
+			return this.PatternMatch(Node, AlreadyFound);
 		}
 
 		/// <summary>
@@ -232,14 +232,20 @@ namespace Waher.Script.Xml.Model
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(XmlNode CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			if (!(CheckAgainst is XmlDocument Doc))
+			System.Collections.IEnumerable Nodes;
+
+			if (CheckAgainst is XmlDocument Doc)
+				Nodes = Doc.ChildNodes;
+			else if (CheckAgainst is XmlElement E)
+				Nodes = new XmlElement[] { E };
+			else
 				return PatternMatchResult.NoMatch;
 
 			int PiIndex = 0;
 			bool RootMatched = false;
 			PatternMatchResult Result;
 
-			foreach (XmlNode N in Doc.ChildNodes)
+			foreach (XmlNode N in Nodes)
 			{
 				if (N is XmlElement)
 				{

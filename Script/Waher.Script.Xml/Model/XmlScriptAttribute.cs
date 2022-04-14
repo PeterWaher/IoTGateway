@@ -1,6 +1,8 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Model;
 
 namespace Waher.Script.Xml.Model
 {
@@ -50,5 +52,20 @@ namespace Waher.Script.Xml.Model
 		{
 			return (CheckAgainst is XmlAttribute);
 		}
+
+		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public abstract PatternMatchResult PatternMatch(string CheckAgainst, Dictionary<string, IElement> AlreadyFound);
+
+		/// <summary>
+		/// If the node is applicable in pattern matching against <paramref name="CheckAgainst"/>.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <returns>If the node is applicable for pattern matching.</returns>
+		public abstract bool IsApplicable(string CheckAgainst);
 	}
 }

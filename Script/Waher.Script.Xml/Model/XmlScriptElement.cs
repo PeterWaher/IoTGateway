@@ -337,9 +337,7 @@ namespace Waher.Script.Xml.Model
 
 				if (!(this.xmlns is null))
 				{
-					XmlAttribute XmlNs = CheckAgainst.OwnerDocument.CreateAttribute("xmlns", CheckAgainst.NamespaceURI);
-
-					Result = this.xmlns.PatternMatch(XmlNs, AlreadyFound);
+					Result = this.xmlns.PatternMatch(CheckAgainst.NamespaceURI, AlreadyFound);
 					if (Result != PatternMatchResult.Match)
 						return Result;
 				}

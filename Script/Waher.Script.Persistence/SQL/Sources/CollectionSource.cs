@@ -75,8 +75,13 @@ namespace Waher.Script.Persistence.SQL.Sources
 			KeyValuePair<VariableReference, bool>[] Order, ScriptNode Node)
 		{
 			Filter Filter = await TypeSource.ConvertAsync(Where, Variables, this.Name);
-			
-			if (Lazy)
+
+			if (Filter is null && Offset == 0 && Top == int.MaxValue)
+			{
+				await Database.Clear(this.Name);
+				return null;	// TODO: Get number of objects in collection before clearing it.
+			}
+			else if (Lazy)
 			{
 				await Database.DeleteLazy(this.collectionName, Offset, Top, Filter, TypeSource.Convert(Order));
 				return null;

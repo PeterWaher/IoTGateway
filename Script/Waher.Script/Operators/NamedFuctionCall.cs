@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -30,7 +29,10 @@ namespace Waher.Script.Operators
 			: base(Start, Length, Expression)
 		{
 			this.functionName = FunctionName;
+
 			this.arguments = Arguments;
+			this.arguments?.SetParent(this);
+
 			this.nullCheck = NullCheck;
 			this.nrArguments = this.arguments.Length;
 		}
@@ -114,7 +116,7 @@ namespace Waher.Script.Operators
 
 			if (DepthFirst)
 			{
-				if (!ForAllChildNodes(Callback, this.arguments, State, DepthFirst))
+				if (!this.arguments.ForAllChildNodes(Callback, State, DepthFirst))
 					return false;
 			}
 
@@ -127,7 +129,10 @@ namespace Waher.Script.Operators
 				{
 					bool b = !Callback(Node, out ScriptNode NewNode, State);
 					if (!(NewNode is null))
+					{
 						this.arguments[i] = NewNode;
+						NewNode.SetParent(this);
+					}
 
 					if (b)
 						return false;
@@ -136,7 +141,7 @@ namespace Waher.Script.Operators
 
 			if (!DepthFirst)
 			{
-				if (!ForAllChildNodes(Callback, this.arguments, State, DepthFirst))
+				if (!this.arguments.ForAllChildNodes(Callback, State, DepthFirst))
 					return false;
 			}
 

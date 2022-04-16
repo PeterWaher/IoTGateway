@@ -9362,6 +9362,39 @@
         <member name="M:Waher.Script.Model.ConstantElement.GetHashCode">
             <inheritdoc/>
         </member>
+        <member name="T:Waher.Script.Model.Extensions">
+            <summary>
+            Extension methods.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Model.Extensions.SetParent(System.Collections.Generic.IEnumerable{Waher.Script.Model.ScriptNode},Waher.Script.Model.ScriptNode)">
+            <summary>
+            Sets the parent node on a set of nodes.
+            </summary>
+            <param name="Nodes">Set of nodes, possibly null or empty.</param>
+            <param name="Parent">Parent Node</param>
+            <exception cref="T:Waher.Script.Exceptions.ScriptException">If the parent is already set, and you try to set it to another parent node.</exception>
+        </member>
+        <member name="M:Waher.Script.Model.Extensions.ForAllChildNodes(Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+            <summary>
+            Calls the <see cref="M:Waher.Script.Model.ScriptNode.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)"/> method for all nodes in an array.
+            </summary>
+            <param name="Nodes">Script node array</param>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.Extensions.ForAll(Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNodeEventHandler,Waher.Script.Model.ScriptNode,System.Object)">
+            <summary>
+            Calls the callback method for all nodes in an array.
+            </summary>
+            <param name="Nodes">Script node array</param>
+            <param name="Callback">Callback method to call.</param>
+            <param name="Parent">Parent node.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <returns>If the process was completed.</returns>
+        </member>
         <member name="T:Waher.Script.Model.Function">
             <summary>
             Base class for all funcions.
@@ -10631,6 +10664,18 @@
             Length of expression covered by node.
             </summary>
         </member>
+        <member name="P:Waher.Script.Model.ScriptNode.Parent">
+            <summary>
+            Parent node.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Model.ScriptNode.SetParent(Waher.Script.Model.ScriptNode)">
+            <summary>
+            Sets the parent node.
+            </summary>
+            <param name="Parent">Parent Node</param>
+            <exception cref="T:Waher.Script.Exceptions.ScriptException">If the parent is already set, and you try to set it to another parent node.</exception>
+        </member>
         <member name="P:Waher.Script.Model.ScriptNode.IsAsynchronous">
             <summary>
             If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
@@ -10688,25 +10733,6 @@
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
             <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
-            <returns>If the process was completed.</returns>
-        </member>
-        <member name="M:Waher.Script.Model.ScriptNode.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,Waher.Script.Model.ScriptNode[],System.Object,System.Boolean)">
-            <summary>
-            Calls the <see cref="M:Waher.Script.Model.ScriptNode.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)"/> method for all nodes in an array.
-            </summary>
-            <param name="Callback">Callback method to call.</param>
-            <param name="Nodes">Script node array</param>
-            <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
-            <returns>If the process was completed.</returns>
-        </member>
-        <member name="M:Waher.Script.Model.ScriptNode.ForAll(Waher.Script.Model.ScriptNodeEventHandler,Waher.Script.Model.ScriptNode[],System.Object)">
-            <summary>
-            Calls the callback method for all nodes in an array.
-            </summary>
-            <param name="Callback">Callback method to call.</param>
-            <param name="Nodes">Script node array</param>
-            <param name="State">State object to pass on to the callback method.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Model.ScriptNode.Equals(System.Object)">
@@ -19572,6 +19598,15 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Sets.ImplicitSetDefinition.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <returns>If the process was completed.</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Sets.ImplicitSetDefinition.Equals(System.Object)">
             <inheritdoc/>
         </member>
@@ -19963,6 +19998,15 @@
             </summary>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Vectors.ImplicitVectorDefinition.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Operators.Vectors.ImplicitVectorDefinition.Equals(System.Object)">
             <inheritdoc/>

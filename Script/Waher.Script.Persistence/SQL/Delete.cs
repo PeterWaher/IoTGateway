@@ -28,7 +28,11 @@ namespace Waher.Script.Persistence.SQL
 			: base(Start, Length, Expression)
 		{
 			this.source = Source;
+			this.source?.SetParent(this);
+
 			this.where = Where;
+			this.where?.SetParent(this);
+
 			this.lazy = Lazy;
 		}
 
@@ -57,7 +61,7 @@ namespace Waher.Script.Persistence.SQL
 		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
 			IDataSource Source = await this.source.GetSource(Variables);
-			int? Count = await Source.FindDelete(this.lazy, 0, int.MaxValue, this.where, Variables, new	KeyValuePair<VariableReference, bool>[0], this);
+			int? Count = await Source.FindDelete(this.lazy, 0, int.MaxValue, this.where, Variables, new KeyValuePair<VariableReference, bool>[0], this);
 
 			if (Count.HasValue)
 				return new DoubleNumber(Count.Value);
@@ -90,7 +94,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				b = !Callback(this.source, out NewNode, State);
 				if (!(NewNode is null) && NewNode is SourceDefinition Source2)
+				{
 					this.source = Source2;
+					this.source.SetParent(this);
+				}
 
 				if (b)
 					return false;
@@ -100,7 +107,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				b = !Callback(this.where, out NewNode, State);
 				if (!(NewNode is null))
+				{
 					this.where = NewNode;
+					this.where.SetParent(this);
+				}
 
 				if (b)
 					return false;

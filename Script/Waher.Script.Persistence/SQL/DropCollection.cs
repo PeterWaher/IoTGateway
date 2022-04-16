@@ -24,6 +24,7 @@ namespace Waher.Script.Persistence.SQL
 			: base(Start, Length, Expression)
 		{
 			this.source = Source;
+			this.source?.SetParent(this);
 		}
 
 		/// <summary>
@@ -76,7 +77,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				b = !Callback(this.source, out ScriptNode NewNode, State);
 				if (!(NewNode is null) && NewNode is SourceDefinition Source2)
+				{
 					this.source = Source2;
+					this.source.SetParent(this);
+				}
 
 				if (b)
 					return false;

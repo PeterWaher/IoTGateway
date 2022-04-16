@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Script.Graphs;
 
@@ -26,6 +25,8 @@ namespace Waher.Script.Test
 
 			GraphSettings Settings = new GraphSettings();
 			Result.CreatePixels(Settings);
+
+			ScriptParsingTests.AssertParentNodes(Exp);
 		}
 
 		[TestMethod]

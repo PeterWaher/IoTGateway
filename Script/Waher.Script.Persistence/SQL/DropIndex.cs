@@ -27,7 +27,10 @@ namespace Waher.Script.Persistence.SQL
 			: base(Start, Length, Expression)
 		{
 			this.name = Name;
+			this.name?.SetParent(this);
+
 			this.source = Source;
+			this.source?.SetParent(this);
 		}
 
 		/// <summary>
@@ -54,7 +57,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
-			IDataSource Source = await this .source.GetSource(Variables);
+			IDataSource Source = await this.source.GetSource(Variables);
 			string Name = await InsertValues.GetNameAsync(this.name, Variables);
 
 			if (!await Source.DropIndex(Name))
@@ -88,7 +91,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				b = !Callback(this.name, out NewNode, State);
 				if (!(NewNode is null))
+				{
 					this.name = NewNode;
+					this.name.SetParent(this);
+				}
 
 				if (b)
 					return false;
@@ -98,7 +104,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				b = !Callback(this.source, out NewNode, State);
 				if (!(NewNode is null) && NewNode is SourceDefinition Source2)
+				{
 					this.source = Source2;
+					this.source.SetParent(this);
+				}
 
 				if (b)
 					return false;

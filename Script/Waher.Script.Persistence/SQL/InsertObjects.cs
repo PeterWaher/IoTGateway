@@ -34,7 +34,11 @@ namespace Waher.Script.Persistence.SQL
 			: base(Start, Length, Expression)
 		{
 			this.source = Source;
+			this.source?.SetParent(this);
+
 			this.objects = Objects;
+			this.objects?.SetParent(this);
+			
 			this.lazy = Lazy;
 		}
 
@@ -148,7 +152,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				b = !Callback(this.source, out NewNode, State);
 				if (!(NewNode is null) && NewNode is SourceDefinition Source2)
+				{
 					this.source = Source2;
+					this.source.SetParent(this);
+				}
 
 				if (b)
 					return false;
@@ -158,7 +165,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				b = !Callback(this.objects, out NewNode, State);
 				if (!(NewNode is null) && NewNode is ElementList NewObjects)
+				{
 					this.objects = NewObjects;
+					this.objects.SetParent(this);
+				}
 
 				if (b)
 					return false;

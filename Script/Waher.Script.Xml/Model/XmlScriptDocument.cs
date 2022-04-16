@@ -32,7 +32,11 @@ namespace Waher.Script.Xml.Model
 			: base(Start, Length, Expression)
 		{
 			this.root = Root;
+			this.root?.SetParent(this);
+		
 			this.processingInstructions = ProcessingInstructions;
+			this.processingInstructions?.SetParent(this);
+			
 			this.nrInstructions = ProcessingInstructions.Length;
 
 			this.CalcIsAsync();
@@ -99,6 +103,8 @@ namespace Waher.Script.Xml.Model
 				if (!(NewNode is null) && NewNode is XmlScriptProcessingInstruction Instruction)
 				{
 					this.processingInstructions[i] = Instruction;
+					Instruction.SetParent(this);
+
 					RecalcIsAsync = true;
 				}
 
@@ -117,6 +123,8 @@ namespace Waher.Script.Xml.Model
 				if (!(NewNode is null) && NewNode is XmlScriptElement NewRoot)
 				{
 					this.root = NewRoot;
+					this.root.SetParent(this);
+
 					RecalcIsAsync = true;
 				}
 

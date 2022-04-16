@@ -23,6 +23,8 @@ namespace Waher.Script.Model
 			: base(Start, Length, Expression)
 		{
 			this.argument = Argument;
+			this.argument?.SetParent(this);
+
 			this.isAsync = Argument?.IsAsynchronous ?? false;
 		}
 
@@ -107,6 +109,8 @@ namespace Waher.Script.Model
 				if (!(NewNode is null))
 				{
 					this.argument = NewNode;
+					this.argument.SetParent(this);
+					
 					this.isAsync = NewNode.IsAsynchronous;
 				}
 

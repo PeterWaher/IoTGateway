@@ -37,8 +37,14 @@ namespace Waher.Script.Persistence.SQL
 				throw new ArgumentException("Column and Value lists must have the same lengths.", nameof(Values));
 
 			this.source = Source;
+			this.source?.SetParent(this);
+
 			this.columns = Columns;
+			this.columns?.SetParent(this);
+
 			this.values = Values;
+			this.values?.SetParent(this);
+
 			this.lazy = Lazy;
 		}
 
@@ -66,7 +72,7 @@ namespace Waher.Script.Persistence.SQL
 		/// <returns>Result.</returns>
 		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
-			IDataSource Source = await this .source.GetSource(Variables);
+			IDataSource Source = await this.source.GetSource(Variables);
 			GenericObject Obj = new GenericObject(Source.CollectionName, Source.TypeName, Guid.Empty);
 			ScriptNode Node;
 			IElement E;
@@ -137,7 +143,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				b = !Callback(this.source, out NewNode, State);
 				if (!(NewNode is null) && NewNode is SourceDefinition Source2)
+				{
 					this.source = Source2;
+					this.source.SetParent(this);
+				}
 
 				if (b)
 					return false;
@@ -147,7 +156,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				b = !Callback(this.columns, out NewNode, State);
 				if (!(NewNode is null) && NewNode is ElementList NewColumns)
+				{
 					this.columns = NewColumns;
+					this.columns.SetParent(this);
+				}
 
 				if (b)
 					return false;
@@ -157,7 +169,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				b = !Callback(this.values, out NewNode, State);
 				if (!(NewNode is null) && NewNode is ElementList NewValues)
+				{
 					this.values = NewValues;
+					this.values.SetParent(this);
+				}
 
 				if (b)
 					return false;

@@ -20,6 +20,8 @@ namespace Waher.Script.Test
 				Assert.AreEqual(ExpectedOutput ?? Script, s);
 			else
 				Assert.Fail("XmlDocument or string expected.");
+	
+			ScriptParsingTests.AssertParentNodes(Exp);
 		}
 
 		[TestMethod]

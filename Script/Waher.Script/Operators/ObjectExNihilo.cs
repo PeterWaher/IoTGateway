@@ -26,6 +26,10 @@ namespace Waher.Script.Operators
 			: base(Start, Length, Expression)
 		{
 			this.members = Members;
+
+			foreach (KeyValuePair<string, ScriptNode> P in Members)
+				P.Value?.SetParent(this);
+
 			this.CalcIsAsync();
 		}
 
@@ -125,6 +129,8 @@ namespace Waher.Script.Operators
 					if (!(NewNode is null))
 					{
 						Loop.Value = new KeyValuePair<string, ScriptNode>(Loop.Value.Key, NewNode);
+						NewNode.SetParent(this);
+
 						RecalcIsAsync = true;
 					}
 

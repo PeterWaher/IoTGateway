@@ -32,7 +32,11 @@ namespace Waher.Script.Functions.Runtime
 			: base(Start, Length, Expression)
 		{
 			this.type = Type;
+			this.type?.SetParent(this);
+
 			this.parameters = Parameters;
+			this.parameters?.SetParent(this);
+
 			this.nrParameters = Parameters.Length;
 
 			this.CalcIsAsync();
@@ -617,7 +621,7 @@ namespace Waher.Script.Functions.Runtime
 				if (!(this.type?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
-				if (!ForAllChildNodes(Callback, this.parameters, State, DepthFirst))
+				if (!this.parameters.ForAllChildNodes(Callback, State, DepthFirst))
 					return false;
 			}
 
@@ -632,6 +636,8 @@ namespace Waher.Script.Functions.Runtime
 				if (!(NewNode is null))
 				{
 					this.type = NewNode;
+					NewNode.SetParent(this);
+
 					RecalcIsAsync = true;
 				}
 
@@ -653,6 +659,8 @@ namespace Waher.Script.Functions.Runtime
 					if (!(NewNode is null))
 					{
 						this.parameters[i] = NewNode;
+						NewNode.SetParent(this);
+
 						RecalcIsAsync = true;
 					}
 
@@ -674,7 +682,7 @@ namespace Waher.Script.Functions.Runtime
 				if (!(this.type?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
-				if (!ForAllChildNodes(Callback, this.parameters, State, DepthFirst))
+				if (!this.parameters.ForAllChildNodes(Callback, State, DepthFirst))
 					return false;
 			}
 

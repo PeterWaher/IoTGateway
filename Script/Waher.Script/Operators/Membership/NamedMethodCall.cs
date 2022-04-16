@@ -35,7 +35,10 @@ namespace Waher.Script.Operators.Membership
 			: base(Operand, NullCheck, Start, Length, Expression)
 		{
 			this.name = Name;
+
 			this.parameters = Parameters;
+			this.parameters?.SetParent(this);
+
 			this.nrParameters = Parameters.Length;
 			this.isAsync = true;
 		}
@@ -506,7 +509,7 @@ namespace Waher.Script.Operators.Membership
 
 			if (DepthFirst)
 			{
-				if (!ForAllChildNodes(Callback, this.parameters, State, DepthFirst))
+				if (!this.parameters.ForAllChildNodes(Callback, State, DepthFirst))
 					return false;
 			}
 
@@ -519,7 +522,10 @@ namespace Waher.Script.Operators.Membership
 				{
 					bool b = !Callback(Node, out ScriptNode NewNode, State);
 					if (!(NewNode is null))
+					{
 						this.parameters[i] = NewNode;
+						NewNode.SetParent(this);
+					}
 
 					if (b)
 						return false;
@@ -528,7 +534,7 @@ namespace Waher.Script.Operators.Membership
 
 			if (!DepthFirst)
 			{
-				if (!ForAllChildNodes(Callback, this.parameters, State, DepthFirst))
+				if (!this.parameters.ForAllChildNodes(Callback, State, DepthFirst))
 					return false;
 			}
 

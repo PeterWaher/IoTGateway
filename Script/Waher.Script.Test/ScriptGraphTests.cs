@@ -23,6 +23,8 @@ namespace Waher.Script.Test
 			PixelInformation Pixels = Result.CreatePixels(Settings);
 			
 			this.Save(Pixels, FileName);
+
+			ScriptParsingTests.AssertParentNodes(Exp);
 		}
 
 		private void Save(PixelInformation Pixels, string FileName)

@@ -32,6 +32,8 @@ namespace Waher.Script.Xml.Model
 			: base(Start, Length, Expression)
 		{
 			this.node = Node;
+			this.node?.SetParent(this);
+
 			this.isAsync = Node?.IsAsynchronous ?? false;
 		}
 
@@ -60,6 +62,8 @@ namespace Waher.Script.Xml.Model
 			if (!(NewNode is null))
 			{
 				this.node = NewNode;
+				this.node.SetParent(this);
+
 				this.isAsync = NewNode.IsAsynchronous;
 			}
 

@@ -118,6 +118,8 @@ namespace Waher.Script.Test
 				for (ColumnIndex = 0; ColumnIndex < NrColumns; ColumnIndex++)
 					Assert.AreEqual(ExpectedRow[ColumnIndex], Row.GetElement(ColumnIndex).AssociatedObjectValue);
 			}
+	
+			ScriptParsingTests.AssertParentNodes(Exp);
 		}
 
 		#region SELECT

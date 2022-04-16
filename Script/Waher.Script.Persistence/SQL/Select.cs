@@ -55,15 +55,39 @@ namespace Waher.Script.Persistence.SQL
 			: base(Start, Length, Expression)
 		{
 			this.columns = Columns;
+			this.columns?.SetParent(this);
+
 			this.columnNames = ColumnNames;
+			this.columnNames?.SetParent(this);
+
 			this.top = Top;
+			this.top?.SetParent(this);
+
 			this.source = Source;
+			this.source?.SetParent(this);
+
 			this.where = Where;
+			this.where?.SetParent(this);
+
 			this.groupBy = GroupBy;
+			this.groupBy?.SetParent(this);
+
 			this.groupByNames = GroupByNames;
+			this.groupByNames?.SetParent(this);
+
 			this.having = Having;
+			this.having?.SetParent(this);
+
 			this.orderBy = OrderBy;
+			if (!(this.orderBy is null))
+			{
+				foreach (KeyValuePair<ScriptNode, bool> P in this.orderBy)
+					P.Key?.SetParent(this);
+			}
+
 			this.offset = Offset;
+			this.offset?.SetParent(this);
+
 			this.distinct = Distinct;
 			this.generic = Generic;
 
@@ -441,10 +465,10 @@ namespace Waher.Script.Persistence.SQL
 
 			if (DepthFirst)
 			{
-				if (!ForAllChildNodes(Callback, this.columns, State, DepthFirst) ||
-					!ForAllChildNodes(Callback, this.columnNames, State, DepthFirst) ||
-					!ForAllChildNodes(Callback, this.groupBy, State, DepthFirst) ||
-					!ForAllChildNodes(Callback, this.groupByNames, State, DepthFirst) ||
+				if (!this.columns.ForAllChildNodes(Callback, State, DepthFirst) ||
+					!this.columnNames.ForAllChildNodes(Callback, State, DepthFirst) ||
+					!this.groupBy.ForAllChildNodes(Callback, State, DepthFirst) ||
+					!this.groupByNames.ForAllChildNodes(Callback, State, DepthFirst) ||
 					!(this.source?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
 					!(this.top?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
 					!(this.where?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
@@ -465,10 +489,10 @@ namespace Waher.Script.Persistence.SQL
 				}
 			}
 
-			if (!ForAllChildNodes(Callback, this.columns, State, DepthFirst) ||
-				!ForAllChildNodes(Callback, this.columnNames, State, DepthFirst) ||
-				!ForAllChildNodes(Callback, this.groupBy, State, DepthFirst) ||
-				!ForAllChildNodes(Callback, this.groupByNames, State, DepthFirst))
+			if (!this.columns.ForAll(Callback, this, State) ||
+				!this.columnNames.ForAll(Callback, this, State) ||
+				!this.groupBy.ForAll(Callback, this, State) ||
+				!this.groupByNames.ForAll(Callback, this, State))
 			{
 				return false;
 			}
@@ -480,7 +504,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				b = !Callback(this.source, out NewNode, State);
 				if (!(NewNode is null) && NewNode is SourceDefinition Source2)
+				{
 					this.source = Source2;
+					this.source.SetParent(this);
+				}
 
 				if (b)
 					return false;
@@ -490,7 +517,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				b = !Callback(this.top, out NewNode, State);
 				if (!(NewNode is null))
+				{
 					this.top = NewNode;
+					this.top.SetParent(this);
+				}
 
 				if (b)
 					return false;
@@ -500,7 +530,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				b = !Callback(this.where, out NewNode, State);
 				if (!(NewNode is null))
+				{
 					this.where = NewNode;
+					this.where.SetParent(this);
+				}
 
 				if (b)
 					return false;
@@ -510,7 +543,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				b = !Callback(this.having, out NewNode, State);
 				if (!(NewNode is null))
+				{
 					this.having = NewNode;
+					this.having.SetParent(this);
+				}
 
 				if (b)
 					return false;
@@ -520,7 +556,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				b = !Callback(this.offset, out NewNode, State);
 				if (!(NewNode is null))
+				{
 					this.offset = NewNode;
+					this.offset.SetParent(this);
+				}
 
 				if (b)
 					return false;
@@ -536,7 +575,10 @@ namespace Waher.Script.Persistence.SQL
 					{
 						b = !Callback(Node, out NewNode, State);
 						if (!(NewNode is null))
+						{
 							this.orderBy[i] = new KeyValuePair<ScriptNode, bool>(NewNode, this.orderBy[i].Value);
+							NewNode.SetParent(this);
+						}
 
 						if (b)
 							return false;
@@ -546,10 +588,10 @@ namespace Waher.Script.Persistence.SQL
 
 			if (!DepthFirst)
 			{
-				if (!ForAllChildNodes(Callback, this.columns, State, DepthFirst) ||
-					!ForAllChildNodes(Callback, this.columnNames, State, DepthFirst) ||
-					!ForAllChildNodes(Callback, this.groupBy, State, DepthFirst) ||
-					!ForAllChildNodes(Callback, this.groupByNames, State, DepthFirst) ||
+				if (!this.columns.ForAllChildNodes(Callback, State, DepthFirst) ||
+					!this.columnNames.ForAllChildNodes(Callback, State, DepthFirst) ||
+					!this.groupBy.ForAllChildNodes(Callback, State, DepthFirst) ||
+					!this.groupByNames.ForAllChildNodes(Callback, State, DepthFirst) ||
 					!(this.source?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
 					!(this.top?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
 					!(this.where?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||

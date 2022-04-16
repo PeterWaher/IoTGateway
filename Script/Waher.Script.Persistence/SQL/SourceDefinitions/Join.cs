@@ -25,8 +25,13 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 			: base(Start, Length, Expression)
 		{
 			this.left = Left;
+			this.left?.SetParent(this);
+
 			this.right = Right;
+			this.right?.SetParent(this);
+
 			this.conditions = Conditions;
+			this.conditions?.SetParent(this);
 		}
 
 		/// <summary>
@@ -70,7 +75,10 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 			{
 				b = !Callback(this.left, out NewNode, State);
 				if (!(NewNode is null) && NewNode is SourceDefinition Left2)
+				{
 					this.left = Left2;
+					this.left.SetParent(this);
+				}
 
 				if (b)
 					return false;
@@ -80,7 +88,10 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 			{
 				b = !Callback(this.right, out NewNode, State);
 				if (!(NewNode is null) && NewNode is SourceDefinition Right2)
+				{
 					this.right = Right2;
+					this.right.SetParent(this);
+				}
 
 				if (b)
 					return false;
@@ -90,7 +101,10 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 			{
 				b = !Callback(this.conditions, out NewNode, State);
 				if (!(NewNode is null))
+				{
 					this.conditions = NewNode;
+					this.conditions.SetParent(this);
+				}
 
 				if (b)
 					return false;

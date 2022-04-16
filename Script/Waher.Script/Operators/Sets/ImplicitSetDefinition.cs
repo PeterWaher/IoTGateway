@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
@@ -35,6 +34,8 @@ namespace Waher.Script.Operators.Sets
 		{
 			this.doubleColon = DoubleColon;
 
+			Conditions?.SetParent(this);
+
 			SeparateConditions(Conditions, out this.setConditions, out this.otherConditions);
 		}
 
@@ -53,6 +54,7 @@ namespace Waher.Script.Operators.Sets
 			for (i = 0; i < c; i++)
 			{
 				ScriptNode Condition = Conditions[i];
+
 				if (Condition is In In)
 				{
 					if (SetConditionList is null)
@@ -137,6 +139,152 @@ namespace Waher.Script.Operators.Sets
 
 			return new ImplicitSet(this.left, SuperSet, this.setConditions, this.otherConditions, Variables, this.doubleColon);
 		}
+
+		/// <summary>
+		/// Calls the callback method for all child nodes.
+		/// </summary>
+		/// <param name="Callback">Callback method to call.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+		/// <returns>If the process was completed.</returns>
+		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
+		{
+			if (DepthFirst)
+			{
+				if (!(this.left?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					return false;
+
+				if (!(this.right?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					return false;
+
+				if (!(this.setConditions?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					return false;
+
+				if (!(this.otherConditions?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					return false;
+			}
+
+			ScriptNode Node;
+			ScriptNode NewNode;
+			int i, c;
+			bool RecalcIsAsync = false;
+			bool b;
+
+			if (!(this.left is null))
+			{
+				b = !Callback(this.left, out NewNode, State);
+				if (!(NewNode is null))
+				{
+					this.left = NewNode;
+					this.left.SetParent(this);
+
+					RecalcIsAsync = true;
+				}
+
+				if (b)
+				{
+					if (RecalcIsAsync)
+						this.CalcIsAsync();
+
+					return false;
+				}
+			}
+
+			if (!(this.right is null))
+			{
+				b = !Callback(this.right, out NewNode, State);
+				if (!(NewNode is null))
+				{
+					this.right = NewNode;
+					this.right.SetParent(this);
+
+					RecalcIsAsync = true;
+				}
+
+				if (b)
+				{
+					if (RecalcIsAsync)
+						this.CalcIsAsync();
+
+					return false;
+				}
+			}
+
+			if (!(this.setConditions is null))
+			{
+				for (i = 0, c=this.setConditions.Length; i < c; i++)
+				{
+					Node = this.setConditions[i];
+					if (!(Node is null))
+					{
+						b = !Callback(Node, out NewNode, State);
+						if (!(NewNode is null) && NewNode is In NewIn)
+						{
+							this.setConditions[i] = NewIn;
+							NewIn.SetParent(this);
+
+							RecalcIsAsync = true;
+						}
+
+						if (b)
+						{
+							if (RecalcIsAsync)
+								this.CalcIsAsync();
+
+							return false;
+						}
+					}
+				}
+			}
+
+			if (!(this.otherConditions is null))
+			{
+				for (i = 0, c = this.otherConditions.Length; i < c; i++)
+				{
+					Node = this.otherConditions[i];
+					if (!(Node is null))
+					{
+						b = !Callback(Node, out NewNode, State);
+						if (!(NewNode is null))
+						{
+							this.otherConditions[i] = NewNode;
+							NewNode.SetParent(this);
+
+							RecalcIsAsync = true;
+						}
+
+						if (b)
+						{
+							if (RecalcIsAsync)
+								this.CalcIsAsync();
+
+							return false;
+						}
+					}
+				}
+			}
+
+			if (RecalcIsAsync)
+				this.CalcIsAsync();
+
+			if (!DepthFirst)
+			{
+				if (!(this.left?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					return false;
+
+				if (!(this.right?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					return false;
+
+				if (!(this.setConditions?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					return false;
+
+				if (!(this.otherConditions?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					return false;
+			}
+
+			return true;
+		}
+
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{

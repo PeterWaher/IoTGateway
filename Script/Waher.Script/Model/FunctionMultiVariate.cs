@@ -130,6 +130,8 @@ namespace Waher.Script.Model
 				throw new ArgumentException("Size of ArgumentTypes must match the size of Arguments.", nameof(ArgumentTypes));
 
 			this.arguments = Arguments;
+			this.arguments?.SetParent(this);
+
 			this.argumentTypes = ArgumentTypes;
 			this.nrArguments = this.arguments.Length;
 
@@ -475,7 +477,7 @@ namespace Waher.Script.Model
 
 			if (DepthFirst)
 			{
-				if (!ForAllChildNodes(Callback, this.arguments, State, DepthFirst))
+				if (!this.arguments.ForAllChildNodes(Callback, State, DepthFirst))
 					return false;
 			}
 
@@ -491,6 +493,8 @@ namespace Waher.Script.Model
 					if (!(NewNode is null))
 					{
 						this.arguments[i] = NewNode;
+						NewNode.SetParent(this);
+
 						RecalcIsAsync = true;
 					}
 
@@ -509,7 +513,7 @@ namespace Waher.Script.Model
 
 			if (!DepthFirst)
 			{
-				if (!ForAllChildNodes(Callback, this.arguments, State, DepthFirst))
+				if (!this.arguments.ForAllChildNodes(Callback, State, DepthFirst))
 					return false;
 			}
 

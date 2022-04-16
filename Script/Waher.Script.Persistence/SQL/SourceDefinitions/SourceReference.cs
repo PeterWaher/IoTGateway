@@ -43,7 +43,10 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 			: base(Start, Length, Expression)
 		{
 			this.source = Source;
+			this.source?.SetParent(this);
+
 			this.alias = Alias;
+			this.alias?.SetParent(this);
 		}
 
 		/// <summary>
@@ -145,7 +148,10 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 			{
 				b = !Callback(this.source, out NewNode, State);
 				if (!(NewNode is null))
+				{
 					this.source = NewNode;
+					this.source.SetParent(this);
+				}
 
 				if (b)
 					return false;
@@ -155,7 +161,10 @@ namespace Waher.Script.Persistence.SQL.SourceDefinitions
 			{
 				b = !Callback(this.alias, out NewNode, State);
 				if (!(NewNode is null))
+				{
 					this.alias = NewNode;
+					this.alias.SetParent(this);
+				}
 
 				if (b)
 					return false;

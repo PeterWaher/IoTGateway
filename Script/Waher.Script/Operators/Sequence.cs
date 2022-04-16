@@ -25,6 +25,7 @@ namespace Waher.Script.Operators
 			: base(Start, Length, Expression)
 		{
 			this.statements = Statements;
+			this.statements?.SetParent(this);
 
 			this.CalcIsAsync();
 		}
@@ -123,7 +124,9 @@ namespace Waher.Script.Operators
 					bool Result = Callback(Node, out ScriptNode NewNode, State);
 					if (!(NewNode is null))
 					{
-						Loop.Value = Node;
+						Loop.Value = NewNode;
+						NewNode.SetParent(this);
+
 						RecalcIsAsync = true;
 					}
 

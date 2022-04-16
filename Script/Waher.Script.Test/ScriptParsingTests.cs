@@ -1,5 +1,5 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Script.Model;
 
 namespace Waher.Script.Test
 {
@@ -13,6 +13,22 @@ namespace Waher.Script.Test
 
 			Assert.AreEqual(Exp1.Root, Exp2.Root, "Script nodes from equal scripts not equal.");
 			Assert.AreEqual(Exp1.Root.GetHashCode(), Exp2.Root.GetHashCode(), "Script nodes from equal scripts does not have equal hash values.");
+
+			AssertParentNodes(Exp1);
+		}
+
+		public static void AssertParentNodes(Expression Exp)
+		{
+			Assert.IsTrue(Exp.ForAll((ScriptNode Node, out ScriptNode NewNode, object State) =>
+			{
+				NewNode = null;
+
+				if (Node.Parent is null && Node != Exp.Root)
+					return false;
+				else
+					return true;
+
+			}, null, false), "Parent reference not set properly");
 		}
 
 		[TestMethod]

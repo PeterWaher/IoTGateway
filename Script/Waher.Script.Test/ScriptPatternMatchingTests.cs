@@ -70,11 +70,11 @@ namespace Waher.Script.Test
 				"</Connect>;\r\n";
 
 			s +=
-				"									<Connect>\r\n" +
-				"										<ApplicationName><[Required(Str(ApplicationName))]></ApplicationName>\r\n" +
-				"										<Purpose><[Required(Str(Purpose))]></Purpose>\r\n" +
-				"										<ClientSideToken><[Optional(Str(ClientSideToken))]></ClientSideToken>\r\n" +
-				"									</Connect>:=Posted;\r\n";
+				"<Connect>\r\n" +
+				"	<ApplicationName><[Required(Str(ApplicationName))]></ApplicationName>\r\n" +
+				"	<Purpose><[Required(Str(Purpose))]></Purpose>\r\n" +
+				"	<ClientSideToken><[Optional(Str(ClientSideToken))]></ClientSideToken>\r\n" +
+				"</Connect>:=Posted;\r\n";
 
 			s += "[ApplicationName,Purpose,ClientSideToken]";
 

@@ -33,8 +33,13 @@ namespace Waher.Script.Xml.Model
 			: base(Start, Length, Expression)
 		{
 			this.name = Name;
+
 			this.xmlns = Xmlns;
+			this.xmlns?.SetParent(this);
+
 			this.attributes = Attributes;
+			this.attributes?.SetParent(this);
+			
 			this.nrAttributes = Attributes.Length;
 
 			this.CalcIsAsync();
@@ -84,6 +89,8 @@ namespace Waher.Script.Xml.Model
 				this.children = new LinkedList<XmlScriptNode>();
 
 			this.children.AddLast(Node);
+			Node?.SetParent(this);
+
 			this.isAsync |= Node?.IsAsynchronous ?? false;
 		}
 
@@ -130,6 +137,8 @@ namespace Waher.Script.Xml.Model
 				if (!(NewNode is null) && NewNode is XmlScriptAttribute NewAttr)
 				{
 					this.xmlns = NewAttr;
+					this.xmlns.SetParent(this);
+
 					RecalcIsAsync = true;
 				}
 
@@ -148,6 +157,8 @@ namespace Waher.Script.Xml.Model
 				if (!(NewNode is null) && NewNode is XmlScriptAttribute Attr)
 				{
 					this.attributes[i] = Attr;
+					Attr.SetParent(this);
+
 					RecalcIsAsync = true;
 				}
 
@@ -167,6 +178,8 @@ namespace Waher.Script.Xml.Model
 				if (!(NewNode is null) && NewNode is XmlScriptNode Node2)
 				{
 					Loop.Value = Node2;
+					Node2.SetParent(this);
+
 					RecalcIsAsync = true;
 				}
 

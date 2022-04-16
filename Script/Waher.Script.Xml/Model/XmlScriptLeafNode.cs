@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Script.Model;
+﻿using Waher.Script.Model;
 
 namespace Waher.Script.Xml.Model
 {

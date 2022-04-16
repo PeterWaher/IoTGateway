@@ -36,8 +36,14 @@ namespace Waher.Script.Persistence.SQL
 				throw new ArgumentException("Number of columns does not match number of ascending argument values.", nameof(Ascending));
 
 			this.name = Name;
+			this.name?.SetParent(this);
+
 			this.source = Source;
+			this.source?.SetParent(this);
+
 			this.columns = Columns;
+			this.columns?.SetParent(this);
+
 			this.ascending = Ascending;
 		}
 
@@ -98,7 +104,7 @@ namespace Waher.Script.Persistence.SQL
 				if (!(this.source?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
-				if (!ForAllChildNodes(Callback, this.columns, State, DepthFirst))
+				if (!this.columns.ForAllChildNodes(Callback, State, DepthFirst))
 					return false;
 			}
 
@@ -109,7 +115,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				b = !Callback(this.name, out NewNode, State);
 				if (!(NewNode is null))
+				{
 					this.name = NewNode;
+					this.name.SetParent(this);
+				}
 
 				if (b)
 					return false;
@@ -119,7 +128,10 @@ namespace Waher.Script.Persistence.SQL
 			{
 				b = !Callback(this.source, out NewNode, State);
 				if (!(NewNode is null) && NewNode is SourceDefinition Source2)
+				{
 					this.source = Source2;
+					this.source.SetParent(this);
+				}
 
 				if (b)
 					return false;
@@ -134,7 +146,10 @@ namespace Waher.Script.Persistence.SQL
 				{
 					b = !Callback(Node, out NewNode, State);
 					if (!(NewNode is null))
+					{
 						this.columns[i] = NewNode;
+						NewNode.SetParent(this);
+					}
 
 					if (b)
 						return false;
@@ -149,7 +164,7 @@ namespace Waher.Script.Persistence.SQL
 				if (!(this.source?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
 					return false;
 
-				if (!ForAllChildNodes(Callback, this.columns, State, DepthFirst))
+				if (!this.columns.ForAllChildNodes(Callback, State, DepthFirst))
 					return false;
 			}
 

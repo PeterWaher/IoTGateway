@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -46,6 +45,7 @@ namespace Waher.Script.Model
 	public abstract class ScriptNode
 	{
 		private readonly Expression expression;
+		private ScriptNode parent;
 		private int start;
 		private readonly int length;
 
@@ -67,16 +67,28 @@ namespace Waher.Script.Model
 		/// </summary>
 		public int Start
 		{
-			get { return this.start; }
-			internal set { this.start = value; }
+			get => this.start;
+			internal set => this.start = value;
 		}
 
 		/// <summary>
 		/// Length of expression covered by node.
 		/// </summary>
-		public int Length
+		public int Length => this.length;
+
+		/// <summary>
+		/// Parent node.
+		/// </summary>
+		public ScriptNode Parent => this.parent;
+
+		/// <summary>
+		/// Sets the parent node.
+		/// </summary>
+		/// <param name="Parent">Parent Node</param>
+		/// <exception cref="ScriptException">If the parent is already set, and you try to set it to another parent node.</exception>
+		public void SetParent(ScriptNode Parent)
 		{
-			get { return this.length; }
+			this.parent = Parent;
 		}
 
 		/// <summary>
@@ -187,60 +199,6 @@ namespace Waher.Script.Model
 		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
 		/// <returns>If the process was completed.</returns>
 		public abstract bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst);
-
-		/// <summary>
-		/// Calls the <see cref="ScriptNode.ForAllChildNodes(ScriptNodeEventHandler, object, bool)"/> method for all nodes in an array.
-		/// </summary>
-		/// <param name="Callback">Callback method to call.</param>
-		/// <param name="Nodes">Script node array</param>
-		/// <param name="State">State object to pass on to the callback method.</param>
-		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
-		/// <returns>If the process was completed.</returns>
-		protected static bool ForAllChildNodes(ScriptNodeEventHandler Callback, ScriptNode[] Nodes, object State, bool DepthFirst)
-		{
-			if (!(Nodes is null))
-			{
-				int i, c = Nodes.Length;
-
-				for (i = 0; i < c; i++)
-				{
-					if (!(Nodes[i]?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
-						return false;
-				}
-			}
-
-			return true;
-		}
-
-		/// <summary>
-		/// Calls the callback method for all nodes in an array.
-		/// </summary>
-		/// <param name="Callback">Callback method to call.</param>
-		/// <param name="Nodes">Script node array</param>
-		/// <param name="State">State object to pass on to the callback method.</param>
-		/// <returns>If the process was completed.</returns>
-		protected static bool ForAll(ScriptNodeEventHandler Callback, ScriptNode[] Nodes, object State)
-		{
-			if (!(Nodes is null))
-			{
-				int i, c = Nodes.Length;
-				ScriptNode Node;
-
-				for (i = 0; i < c; i++)
-				{
-					Node = Nodes[i];
-					if (!(Node is null))
-					{
-						if (!Callback(Node, out ScriptNode NewNode, State))
-							return false;
-
-						Nodes[i] = NewNode ?? Node;
-					}
-				}
-			}
-
-			return true;
-		}
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)

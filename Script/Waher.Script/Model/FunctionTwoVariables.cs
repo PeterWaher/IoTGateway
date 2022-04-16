@@ -4,13 +4,13 @@ using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Script.Model
 {
-    /// <summary>
-    /// Base class for funcions of one variable.
-    /// </summary>
-    public abstract class FunctionTwoVariables : Function
+	/// <summary>
+	/// Base class for funcions of one variable.
+	/// </summary>
+	public abstract class FunctionTwoVariables : Function
 	{
-        private ScriptNode argument1;
-        private ScriptNode argument2;
+		private ScriptNode argument1;
+		private ScriptNode argument2;
 		private bool isAsync;
 
 		/// <summary>
@@ -24,16 +24,19 @@ namespace Waher.Script.Model
 		public FunctionTwoVariables(ScriptNode Argument1, ScriptNode Argument2, int Start, int Length, Expression Expression)
 			: base(Start, Length, Expression)
 		{
-            this.argument1 = Argument1;
-            this.argument2 = Argument2;
-			
+			this.argument1 = Argument1;
+			this.argument1?.SetParent(this);
+
+			this.argument2 = Argument2;
+			this.argument2?.SetParent(this);
+
 			this.CalcIsAsync();
 		}
 
 		private void CalcIsAsync()
 		{
-			this.isAsync = 
-				(this.argument1?.IsAsynchronous ?? false) || 
+			this.isAsync =
+				(this.argument1?.IsAsynchronous ?? false) ||
 				(this.argument2?.IsAsynchronous ?? false);
 		}
 
@@ -42,15 +45,15 @@ namespace Waher.Script.Model
 		/// </summary>
 		public ScriptNode Argument1 => this.argument1;
 
-        /// <summary>
-        /// Function argument 2.
-        /// </summary>
-        public ScriptNode Argument2 => this.argument2;
+		/// <summary>
+		/// Function argument 2.
+		/// </summary>
+		public ScriptNode Argument2 => this.argument2;
 
-        /// <summary>
-        /// Default Argument names
-        /// </summary>
-        public override string[] DefaultArgumentNames => new string[] { "x", "y" };
+		/// <summary>
+		/// Default Argument names
+		/// </summary>
+		public override string[] DefaultArgumentNames => new string[] { "x", "y" };
 
 		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
@@ -64,12 +67,12 @@ namespace Waher.Script.Model
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
-        {
-            IElement Arg1 = this.argument1.Evaluate(Variables);
-            IElement Arg2 = this.argument2.Evaluate(Variables);
+		{
+			IElement Arg1 = this.argument1.Evaluate(Variables);
+			IElement Arg2 = this.argument2.Evaluate(Variables);
 
-            return this.Evaluate(Arg1, Arg2, Variables);
-        }
+			return this.Evaluate(Arg1, Arg2, Variables);
+		}
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
@@ -136,6 +139,8 @@ namespace Waher.Script.Model
 				if (!(NewNode is null))
 				{
 					this.argument1 = NewNode;
+					this.argument1.SetParent(this);
+			
 					RecalcIsAsync = true;
 				}
 
@@ -154,6 +159,8 @@ namespace Waher.Script.Model
 				if (!(NewNode is null))
 				{
 					this.argument2 = NewNode;
+					this.argument2.SetParent(this);
+				
 					RecalcIsAsync = true;
 				}
 

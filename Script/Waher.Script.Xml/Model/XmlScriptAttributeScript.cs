@@ -10,7 +10,7 @@ namespace Waher.Script.Xml.Model
 	/// <summary>
 	/// XML Script attribute node, whose value is defined by script.
 	/// </summary>
-	public class XmlScriptAttributeScript : XmlScriptAttribute 
+	public class XmlScriptAttributeScript : XmlScriptAttribute
 	{
 		private ScriptNode node;
 		private bool isAsync;
@@ -27,6 +27,8 @@ namespace Waher.Script.Xml.Model
 			: base(Name, Start, Length, Expression)
 		{
 			this.node = Node;
+			this.node?.SetParent(this);
+
 			this.isAsync = Node?.IsAsynchronous ?? false;
 		}
 
@@ -55,6 +57,8 @@ namespace Waher.Script.Xml.Model
 			if (!(NewNode is null))
 			{
 				this.node = NewNode;
+				this.node.SetParent(this);
+
 				this.isAsync = NewNode.IsAsynchronous;
 			}
 

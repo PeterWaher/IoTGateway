@@ -28,6 +28,8 @@ namespace Waher.Script.Operators
 			: base(Function, NullCheck, Start, Length, Expression)
 		{
 			this.arguments = Arguments;
+			this.arguments?.SetParent(this);
+
 			this.nrArguments = this.arguments.Length;
 
 			this.CalcIsAsync();
@@ -139,7 +141,7 @@ namespace Waher.Script.Operators
 
 			if (DepthFirst)
 			{
-				if (!ForAllChildNodes(Callback, this.arguments, State, DepthFirst))
+				if (!this.arguments.ForAllChildNodes(Callback, State, DepthFirst))
 					return false;
 			}
 
@@ -155,6 +157,8 @@ namespace Waher.Script.Operators
 					if (!(NewNode is null))
 					{
 						this.arguments[i] = NewNode;
+						NewNode.SetParent(this);
+
 						RecalcIsAsync = true;
 					}
 
@@ -173,7 +177,7 @@ namespace Waher.Script.Operators
 
 			if (!DepthFirst)
 			{
-				if (!ForAllChildNodes(Callback, this.arguments, State, DepthFirst))
+				if (!this.arguments.ForAllChildNodes(Callback, State, DepthFirst))
 					return false;
 			}
 

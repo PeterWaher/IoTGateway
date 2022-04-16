@@ -26,6 +26,7 @@ namespace Waher.Script.Model
 			: base(Left, Middle1, Right, Start, Length, Expression)
 		{
 			this.middle2 = Middle2;
+			this.middle2?.SetParent(this);
 
 			this.CalcIsAsync();
 		}
@@ -81,6 +82,8 @@ namespace Waher.Script.Model
 				if (!(NewNode is null))
 				{
 					this.left = NewNode;
+					this.left.SetParent(this);
+				
 					RecalcIsAsync = true;
 				}
 
@@ -99,6 +102,8 @@ namespace Waher.Script.Model
 				if (!(NewNode is null))
 				{
 					this.middle = NewNode;
+					this.middle.SetParent(this);
+				
 					RecalcIsAsync = true;
 				}
 
@@ -117,6 +122,8 @@ namespace Waher.Script.Model
 				if (!(NewNode is null))
 				{
 					this.middle2 = NewNode;
+					this.middle2.SetParent(this);
+				
 					RecalcIsAsync = true;
 				}
 
@@ -135,6 +142,8 @@ namespace Waher.Script.Model
 				if (!(NewNode is null))
 				{
 					this.right = NewNode;
+					this.right.SetParent(this);
+				
 					RecalcIsAsync = true;
 				}
 

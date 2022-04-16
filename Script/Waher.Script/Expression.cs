@@ -475,7 +475,7 @@ namespace Waher.Script
 
 								Statement = this.AssertOperandNotNull(this.ParseStatement());
 
-								return new For(Assignment.VariableName, Assignment.Operand, To, Step, Statement, Assignment.Start, this.pos - Start, this);
+								return new For(Assignment.VariableName, Assignment.Operand, To, Step, Statement, Start, this.pos - Start, this);
 							}
 
 						default:

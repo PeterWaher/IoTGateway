@@ -120,6 +120,8 @@ namespace Waher.Script.Test
 			}
 	
 			ScriptParsingTests.AssertParentNodes(Exp);
+
+			Console.Out.WriteLine(Exp.ToXml());
 		}
 
 		#region SELECT

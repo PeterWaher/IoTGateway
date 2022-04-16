@@ -130,10 +130,7 @@ namespace Waher.Script.Model
 		/// <summary>
 		/// Expression of which the node is a part.
 		/// </summary>
-		public Expression Expression
-		{
-			get { return this.expression; }
-		}
+		public Expression Expression => this.expression;
 
 		/// <summary>
 		/// Sub-expression defining the node.

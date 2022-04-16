@@ -8,6 +8,7 @@ using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects.Sets;
 using Waher.Script.Units;
 using System.Threading.Tasks;
+using Waher.Script.Xml;
 
 namespace Waher.Script.Test
 {
@@ -68,6 +69,8 @@ namespace Waher.Script.Test
 				AssertEqual(ExpectedValue, Result, Script);
 
 			ScriptParsingTests.AssertParentNodes(Exp);
+
+			Console.Out.WriteLine(Exp.ToXml());
 		}
 
 		public static void AssertEqual(object Expected, object Result, string Script)

@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using Waher.Script.Model;
+using Waher.Script.Xml;
 
 namespace Waher.Script.Test
 {
@@ -15,6 +17,8 @@ namespace Waher.Script.Test
 			Assert.AreEqual(Exp1.Root.GetHashCode(), Exp2.Root.GetHashCode(), "Script nodes from equal scripts does not have equal hash values.");
 
 			AssertParentNodes(Exp1);
+
+			Console.Out.WriteLine(Exp1.ToXml());
 		}
 
 		public static void AssertParentNodes(Expression Exp)

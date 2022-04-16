@@ -1,6 +1,11 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
+using System.Xml;
 using Waher.Content.Xml;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Model;
 using Waher.Script.Objects.Matrices;
 
 namespace Waher.Script.Xml
@@ -74,6 +79,109 @@ namespace Waher.Script.Xml
 			Xml.Append("</");
 			Xml.Append(CollectionName);
 			Xml.Append('>');
+		}
+
+		/// <summary>
+		/// Exports the matrix to XML
+		/// </summary>
+		/// <param name="Expression">Expression to expirt.</param>
+		/// <returns>XML string.</returns>
+		public static string ToXml(this Expression Expression)
+		{
+			StringBuilder Xml = new StringBuilder();
+			Expression.ToXml(Xml);
+			return Xml.ToString();
+		}
+
+		/// <summary>
+		/// Exports the matrix to XML
+		/// </summary>
+		/// <param name="Expression">Expression to expirt.</param>
+		/// <param name="Xml">XML Output</param>
+		/// <returns>XML string.</returns>
+		public static void ToXml(this Expression Expression, StringBuilder Xml)
+		{
+			XmlWriterSettings Settings = new XmlWriterSettings()
+			{
+				Indent = true,
+				IndentChars = "\t",
+				CheckCharacters = false,
+				OmitXmlDeclaration = true
+			};
+
+			using (XmlWriter w = XmlWriter.Create(Xml, Settings))
+			{
+				Expression.ToXml(w);
+				w.Flush();
+			}
+		}
+
+		/// <summary>
+		/// Exports the matrix to XML
+		/// </summary>
+		/// <param name="Expression">Expression to expirt.</param>
+		/// <param name="Xml">XML Output</param>
+		/// <returns>XML string.</returns>
+		public static void ToXml(this Expression Expression, XmlWriter Xml)
+		{
+			Dictionary<ScriptNode, List<ScriptNode>> ChildrenByNode =
+				new Dictionary<ScriptNode, List<ScriptNode>>();
+
+			Expression.ForAll((ScriptNode Node, out ScriptNode NewNode, object Stata) =>
+			{
+				if (!(Node.Parent is null))
+				{
+					if (!ChildrenByNode.TryGetValue(Node.Parent, out List<ScriptNode> Children))
+					{
+						Children = new List<ScriptNode>();
+						ChildrenByNode[Node.Parent] = Children;
+					}
+					else if (Children.Contains(Node))
+						throw new Exception("Recursion.");	// TODO: Remove check
+
+					Children.Add(Node);
+				}
+
+				NewNode = null;
+				return true;
+
+			}, null, false);
+
+			void Export(ScriptNode Node)
+			{
+				Type T = Node.GetType();
+
+				Xml.WriteStartElement(T.FullName);
+
+				foreach (PropertyInfo PI in T.GetRuntimeProperties())
+				{
+					if (!PI.CanRead || !PI.GetMethod.IsPublic)
+						continue;
+
+					switch (PI.Name)
+					{
+						case "IsAsynchronous":
+						case "DefaultVariableName":
+						case "Start":
+						case "Length":
+						case "Parent":
+						case "Expression":
+							continue;
+					}
+
+					Xml.WriteAttributeString(PI.Name, PI.GetValue(Node)?.ToString());
+				}
+
+				if (ChildrenByNode.TryGetValue(Node, out List<ScriptNode> Children))
+				{
+					foreach (ScriptNode Child in Children)
+						Export(Child);
+				}
+
+				Xml.WriteEndElement();
+			}
+
+			Export(Expression.Root);
 		}
 
 	}

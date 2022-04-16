@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Script.Xml;
 
 namespace Waher.Script.Test
 {
@@ -22,6 +23,8 @@ namespace Waher.Script.Test
 				Assert.Fail("XmlDocument or string expected.");
 	
 			ScriptParsingTests.AssertParentNodes(Exp);
+
+			Console.Out.WriteLine(Exp.ToXml());
 		}
 
 		[TestMethod]

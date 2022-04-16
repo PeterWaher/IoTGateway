@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Script.Graphs;
+using Waher.Script.Xml;
 
 namespace Waher.Script.Test
 {
@@ -25,6 +26,8 @@ namespace Waher.Script.Test
 			this.Save(Pixels, FileName);
 
 			ScriptParsingTests.AssertParentNodes(Exp);
+
+			Console.Out.WriteLine(Exp.ToXml());
 		}
 
 		private void Save(PixelInformation Pixels, string FileName)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Script.Abstraction.Elements;
@@ -106,26 +107,69 @@ namespace Waher.Script.Persistence.Functions
 			else if (Obj is XmlNode N)
 			{
 				XmlNamespaceManager NamespaceManager;
+				XmlElement Root;
 
 				if (Obj is XmlDocument Doc)
 				{
 					NamespaceManager = new XmlNamespaceManager(Doc.NameTable);
-					if (!string.IsNullOrEmpty(Doc.DocumentElement.NamespaceURI) && string.IsNullOrEmpty(Doc.DocumentElement.Prefix))
-						NamespaceManager.AddNamespace("default", Doc.DocumentElement.NamespaceURI);
+					Root = Doc.DocumentElement;
 				}
-				else if (!(N.OwnerDocument is null))
+				else if (N is XmlElement E && !(N.OwnerDocument is null))
 				{
 					NamespaceManager = new XmlNamespaceManager(N.OwnerDocument.NameTable);
-					if (!string.IsNullOrEmpty(N.NamespaceURI) && string.IsNullOrEmpty(N.Prefix) && !NamespaceManager.HasNamespace(N.NamespaceURI))
-						NamespaceManager.AddNamespace("default", N.NamespaceURI);
+					Root = E;
 				}
 				else
+				{
 					NamespaceManager = null;
+					Root = null;
+				}
 
 				if (NamespaceManager is null)
 					Result = N.SelectNodes(Argument);
 				else
+				{
+					if (Argument.Contains("default:"))
+					{
+						string Namespace = null;
+
+						if (string.IsNullOrEmpty(Root.Prefix) && !string.IsNullOrEmpty(Root.NamespaceURI))
+							Namespace = Root.NamespaceURI;
+						else
+						{
+							LinkedList<XmlElement> ToProcess = new LinkedList<XmlElement>();
+
+							foreach (XmlNode N2 in Root.ChildNodes)
+							{
+								if (N2 is XmlElement E)
+									ToProcess.AddLast(E);
+							}
+
+							while (!(ToProcess.First is null))
+							{
+								Root = ToProcess.First.Value;
+								ToProcess.RemoveFirst();
+
+								if (string.IsNullOrEmpty(Root.Prefix) && !string.IsNullOrEmpty(Root.NamespaceURI))
+								{
+									Namespace = Root.NamespaceURI;
+									break;
+								}
+
+								foreach (XmlNode N2 in Root.ChildNodes)
+								{
+									if (N2 is XmlElement E)
+										ToProcess.AddLast(E);
+								}
+							}
+						}
+
+						if (!string.IsNullOrEmpty(Namespace) && !NamespaceManager.HasNamespace(Namespace))
+							NamespaceManager.AddNamespace("default", Namespace);
+					}
+
 					Result = N.SelectNodes(Argument, NamespaceManager);
+				}
 			}
 			else
 				throw new ScriptRuntimeException("XPath expression only operate on XML.", this);

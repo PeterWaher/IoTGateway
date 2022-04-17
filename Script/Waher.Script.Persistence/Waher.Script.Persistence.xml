@@ -622,13 +622,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.CreateIndex.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Persistence.SQL.CreateIndex.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.CreateIndex.Equals(System.Object)">
@@ -707,13 +707,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Delete.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Persistence.SQL.Delete.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Delete.Equals(System.Object)">
@@ -788,13 +788,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.DropCollection.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Persistence.SQL.DropCollection.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.DropCollection.Equals(System.Object)">
@@ -839,13 +839,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.DropIndex.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Persistence.SQL.DropIndex.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.DropIndex.Equals(System.Object)">
@@ -1087,13 +1087,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.InsertObjects.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Persistence.SQL.InsertObjects.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.InsertObjects.Equals(System.Object)">
@@ -1139,13 +1139,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.InsertSelect.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Persistence.SQL.InsertSelect.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.InsertSelect.Equals(System.Object)">
@@ -1201,13 +1201,13 @@
             <returns>Name</returns>
             <exception cref="T:Waher.Script.Exceptions.ScriptRuntimeException">If node is not a variable reference, or does not evaluate to a string value.</exception>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.InsertValues.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Persistence.SQL.InsertValues.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.InsertValues.Equals(System.Object)">
@@ -1698,13 +1698,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Select.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Persistence.SQL.Select.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Select.Equals(System.Object)">
@@ -1846,13 +1846,13 @@
             Conditions linking the two sources.
             </summary>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.Join.Equals(System.Object)">
@@ -1938,13 +1938,13 @@
             <param name="Variables">Current set of variables.</param>
             <returns>Data Source</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.SourceReference.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.SourceReference.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.SourceDefinitions.SourceReference.Equals(System.Object)">
@@ -2767,13 +2767,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Persistence.SQL.Update.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Persistence.SQL.Update.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Persistence.SQL.Update.Equals(System.Object)">

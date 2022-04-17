@@ -120,22 +120,22 @@ namespace Waher.Script.Operators.Vectors
 		/// </summary>
 		/// <param name="Callback">Callback method to call.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+		/// <param name="Order">Order to traverse the nodes.</param>
 		/// <returns>If the process was completed.</returns>
-		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
+		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, SearchMethod Order)
 		{
-			if (DepthFirst)
+			if (Order == SearchMethod.DepthFirst)
 			{
-				if (!(this.left?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!(this.left?.ForAllChildNodes(Callback, State, Order) ?? true))
 					return false;
 
-				if (!(this.right?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!(this.right?.ForAllChildNodes(Callback, State, Order) ?? true))
 					return false;
 
-				if (!(this.setConditions?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!(this.setConditions?.ForAllChildNodes(Callback, State, Order) ?? true))
 					return false;
 
-				if (!(this.otherConditions?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!(this.otherConditions?.ForAllChildNodes(Callback, State, Order) ?? true))
 					return false;
 			}
 
@@ -156,7 +156,7 @@ namespace Waher.Script.Operators.Vectors
 					RecalcIsAsync = true;
 				}
 
-				if (b)
+				if (b || (Order == SearchMethod.TreeOrder && !this.left.ForAllChildNodes(Callback, State, Order)))
 				{
 					if (RecalcIsAsync)
 						this.CalcIsAsync();
@@ -176,7 +176,7 @@ namespace Waher.Script.Operators.Vectors
 					RecalcIsAsync = true;
 				}
 
-				if (b)
+				if (b || (Order == SearchMethod.TreeOrder && !this.right.ForAllChildNodes(Callback, State, Order)))
 				{
 					if (RecalcIsAsync)
 						this.CalcIsAsync();
@@ -197,11 +197,12 @@ namespace Waher.Script.Operators.Vectors
 						{
 							this.setConditions[i] = NewIn;
 							NewIn.SetParent(this);
+							Node = NewNode;
 
 							RecalcIsAsync = true;
 						}
 
-						if (b)
+						if (b || (Order == SearchMethod.TreeOrder && !Node.ForAllChildNodes(Callback, State, Order)))
 						{
 							if (RecalcIsAsync)
 								this.CalcIsAsync();
@@ -224,11 +225,12 @@ namespace Waher.Script.Operators.Vectors
 						{
 							this.otherConditions[i] = NewNode;
 							NewNode.SetParent(this);
+							Node = NewNode;
 
 							RecalcIsAsync = true;
 						}
 
-						if (b)
+						if (b || (Order == SearchMethod.TreeOrder && !Node.ForAllChildNodes(Callback, State, Order)))
 						{
 							if (RecalcIsAsync)
 								this.CalcIsAsync();
@@ -242,18 +244,18 @@ namespace Waher.Script.Operators.Vectors
 			if (RecalcIsAsync)
 				this.CalcIsAsync();
 
-			if (!DepthFirst)
+			if (Order == SearchMethod.BreadthFirst)
 			{
-				if (!(this.left?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!(this.left?.ForAllChildNodes(Callback, State, Order) ?? true))
 					return false;
 
-				if (!(this.right?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!(this.right?.ForAllChildNodes(Callback, State, Order) ?? true))
 					return false;
 
-				if (!(this.setConditions?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!(this.setConditions?.ForAllChildNodes(Callback, State, Order) ?? true))
 					return false;
 
-				if (!(this.otherConditions?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!(this.otherConditions?.ForAllChildNodes(Callback, State, Order) ?? true))
 					return false;
 			}
 

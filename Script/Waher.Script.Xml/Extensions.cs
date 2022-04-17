@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml;
 using Waher.Content.Xml;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects.Matrices;
 
@@ -124,38 +125,37 @@ namespace Waher.Script.Xml
 		/// <returns>XML string.</returns>
 		public static void ToXml(this Expression Expression, XmlWriter Xml)
 		{
-			Dictionary<ScriptNode, List<ScriptNode>> ChildrenByNode =
-				new Dictionary<ScriptNode, List<ScriptNode>>();
+			LinkedList<ScriptNode> Stack = new LinkedList<ScriptNode>();
+			int c = 0;
 
-			Expression.ForAll((ScriptNode Node, out ScriptNode NewNode, object Stata) =>
+			Stack.AddLast((ScriptNode)null);
+
+			bool Consistent = Expression.ForAll((ScriptNode Node, out ScriptNode NewNode, object Stata) =>
 			{
-				if (!(Node.Parent is null))
-				{
-					if (!ChildrenByNode.TryGetValue(Node.Parent, out List<ScriptNode> Children))
-					{
-						Children = new List<ScriptNode>();
-						ChildrenByNode[Node.Parent] = Children;
-					}
-					else if (Children.Contains(Node))
-						throw new Exception("Recursion.");	// TODO: Remove check
+				NewNode = null;
 
-					Children.Add(Node);
+				while (Stack.Last?.Value != Node.Parent)
+				{
+					if (Stack.Last is null)
+						return false;
+
+					Xml.WriteEndElement();
+					c--;
+
+					Stack.RemoveLast();
 				}
 
-				NewNode = null;
-				return true;
-
-			}, null, false);
-
-			void Export(ScriptNode Node)
-			{
 				Type T = Node.GetType();
 
 				Xml.WriteStartElement(T.FullName);
+				c++;
 
 				foreach (PropertyInfo PI in T.GetRuntimeProperties())
 				{
 					if (!PI.CanRead || !PI.GetMethod.IsPublic)
+						continue;
+
+					if (PI.PropertyType.IsArray)
 						continue;
 
 					switch (PI.Name)
@@ -166,22 +166,29 @@ namespace Waher.Script.Xml
 						case "Length":
 						case "Parent":
 						case "Expression":
+						case "Statements":
 							continue;
 					}
 
-					Xml.WriteAttributeString(PI.Name, PI.GetValue(Node)?.ToString());
+					object Value = PI.GetValue(Node);
+
+					if (Value is string s)
+						Xml.WriteAttributeString(PI.Name, s);
+					else
+						Xml.WriteAttributeString(PI.Name, Expression.ToString(Value));
 				}
 
-				if (ChildrenByNode.TryGetValue(Node, out List<ScriptNode> Children))
-				{
-					foreach (ScriptNode Child in Children)
-						Export(Child);
-				}
+				Stack.AddLast(Node);
+				
+				return true;
 
+			}, null, SearchMethod.TreeOrder);
+
+			if (!Consistent)
+				throw new ScriptException("Script tree not consistent.");
+
+			while (c-- > 0)
 				Xml.WriteEndElement();
-			}
-
-			Export(Expression.Root);
 		}
 
 	}

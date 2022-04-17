@@ -29,9 +29,9 @@ namespace Waher.Script.Model
 		/// <param name="Nodes">Script node array</param>
 		/// <param name="Callback">Callback method to call.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+		/// <param name="Order">Order to traverse the nodes.</param>
 		/// <returns>If the process was completed.</returns>
-		public static bool ForAllChildNodes(this ScriptNode[] Nodes, ScriptNodeEventHandler Callback, object State, bool DepthFirst)
+		public static bool ForAllChildNodes(this ScriptNode[] Nodes, ScriptNodeEventHandler Callback, object State, SearchMethod Order)
 		{
 			if (!(Nodes is null))
 			{
@@ -39,7 +39,7 @@ namespace Waher.Script.Model
 
 				for (i = 0; i < c; i++)
 				{
-					if (!(Nodes[i]?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					if (!(Nodes[i]?.ForAllChildNodes(Callback, State, Order) ?? true))
 						return false;
 				}
 			}
@@ -54,8 +54,10 @@ namespace Waher.Script.Model
 		/// <param name="Callback">Callback method to call.</param>
 		/// <param name="Parent">Parent node.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="IncludeChildren">If children should also be included. Corresponds to 
+		/// <see cref="SearchMethod.TreeOrder"/>.</param>
 		/// <returns>If the process was completed.</returns>
-		public static bool ForAll(this ScriptNode[] Nodes, ScriptNodeEventHandler Callback, ScriptNode Parent, object State)
+		public static bool ForAll(this ScriptNode[] Nodes, ScriptNodeEventHandler Callback, ScriptNode Parent, object State, bool IncludeChildren)
 		{
 			if (!(Nodes is null))
 			{
@@ -74,7 +76,11 @@ namespace Waher.Script.Model
 						{
 							Nodes[i] = NewNode;
 							NewNode.SetParent(Parent);
+							Node = NewNode;
 						}
+
+						if (IncludeChildren && !Node.ForAllChildNodes(Callback, State, SearchMethod.TreeOrder))
+							return false;
 					}
 				}
 			}

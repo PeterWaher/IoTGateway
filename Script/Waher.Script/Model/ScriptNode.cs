@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -28,6 +29,28 @@ namespace Waher.Script.Model
 		/// Pattern match could not be evaluated.
 		/// </summary>
 		Unknown
+	}
+
+	/// <summary>
+	/// Method to traverse the expression structure
+	/// </summary>
+	public enum SearchMethod
+	{
+		/// <summary>
+		/// Children are processed before their corresponding parents.
+		/// </summary>
+		DepthFirst,
+
+		/// <summary>
+		/// Siblings are processed before their corresponding children.
+		/// </summary>
+		BreadthFirst,
+
+		/// <summary>
+		/// After each node is processed, their children are recursively processed,
+		/// before going on to the next sibling.
+		/// </summary>
+		TreeOrder
 	}
 
 	/// <summary>
@@ -195,18 +218,39 @@ namespace Waher.Script.Model
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
 		/// <returns>If the process was completed.</returns>
-		public abstract bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst);
+		[Obsolete("Use ForAllChildNodes(ScriptNodeEventHandler, object, SearchMethod) instead.")]
+		public bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
+		{
+			return this.ForAllChildNodes(Callback, State, DepthFirst ? SearchMethod.DepthFirst : SearchMethod.BreadthFirst);
+		}
+
+		/// <summary>
+		/// Calls the callback method for all child nodes.
+		/// </summary>
+		/// <param name="Callback">Callback method to call.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="Order">Order to traverse the nodes.</param>
+		/// <returns>If the process was completed.</returns>
+		public abstract bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, SearchMethod Order);
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
-			return this.GetType() == obj.GetType();
+			return obj is ScriptNode N &&
+				this.GetType() == N.GetType() &&
+				this.start == N.start &&
+				this.length == N.length;
 		}
 
 		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
-			return this.GetType().GetHashCode();
+			int Result = this.GetType().GetHashCode();
+			
+			Result ^= Result << 5 ^ this.start;
+			Result ^= Result << 5 ^ this.length;
+			
+			return Result;
 		}
 
 		/// <summary>

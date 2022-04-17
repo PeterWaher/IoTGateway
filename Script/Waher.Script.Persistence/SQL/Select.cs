@@ -457,23 +457,23 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		/// <param name="Callback">Callback method to call.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+		/// <param name="Order">Order to traverse the nodes.</param>
 		/// <returns>If the process was completed.</returns>
-		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
+		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, SearchMethod Order)
 		{
 			int i, c;
 
-			if (DepthFirst)
+			if (Order == SearchMethod.DepthFirst)
 			{
-				if (!this.columns.ForAllChildNodes(Callback, State, DepthFirst) ||
-					!this.columnNames.ForAllChildNodes(Callback, State, DepthFirst) ||
-					!this.groupBy.ForAllChildNodes(Callback, State, DepthFirst) ||
-					!this.groupByNames.ForAllChildNodes(Callback, State, DepthFirst) ||
-					!(this.source?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
-					!(this.top?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
-					!(this.where?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
-					!(this.having?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
-					!(this.offset?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!this.columns.ForAllChildNodes(Callback, State, Order) ||
+					!this.columnNames.ForAllChildNodes(Callback, State, Order) ||
+					!this.groupBy.ForAllChildNodes(Callback, State, Order) ||
+					!this.groupByNames.ForAllChildNodes(Callback, State, Order) ||
+					!(this.source?.ForAllChildNodes(Callback, State, Order) ?? true) ||
+					!(this.top?.ForAllChildNodes(Callback, State, Order) ?? true) ||
+					!(this.where?.ForAllChildNodes(Callback, State, Order) ?? true) ||
+					!(this.having?.ForAllChildNodes(Callback, State, Order) ?? true) ||
+					!(this.offset?.ForAllChildNodes(Callback, State, Order) ?? true))
 				{
 					return false;
 				}
@@ -483,16 +483,16 @@ namespace Waher.Script.Persistence.SQL
 					c = this.orderBy.Length;
 					for (i = 0; i < c; i++)
 					{
-						if (!(this.orderBy[i].Key?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+						if (!(this.orderBy[i].Key?.ForAllChildNodes(Callback, State, Order) ?? true))
 							return false;
 					}
 				}
 			}
 
-			if (!this.columns.ForAll(Callback, this, State) ||
-				!this.columnNames.ForAll(Callback, this, State) ||
-				!this.groupBy.ForAll(Callback, this, State) ||
-				!this.groupByNames.ForAll(Callback, this, State))
+			if (!this.columns.ForAll(Callback, this, State, Order == SearchMethod.TreeOrder) ||
+				!this.columnNames.ForAll(Callback, this, State, Order == SearchMethod.TreeOrder) ||
+				!this.groupBy.ForAll(Callback, this, State, Order == SearchMethod.TreeOrder) ||
+				!this.groupByNames.ForAll(Callback, this, State, Order == SearchMethod.TreeOrder))
 			{
 				return false;
 			}
@@ -509,7 +509,7 @@ namespace Waher.Script.Persistence.SQL
 					this.source.SetParent(this);
 				}
 
-				if (b)
+				if (b || (Order == SearchMethod.TreeOrder && !this.source.ForAllChildNodes(Callback, State, Order)))
 					return false;
 			}
 
@@ -522,7 +522,7 @@ namespace Waher.Script.Persistence.SQL
 					this.top.SetParent(this);
 				}
 
-				if (b)
+				if (b || (Order == SearchMethod.TreeOrder && !this.top.ForAllChildNodes(Callback, State, Order)))
 					return false;
 			}
 
@@ -535,7 +535,7 @@ namespace Waher.Script.Persistence.SQL
 					this.where.SetParent(this);
 				}
 
-				if (b)
+				if (b || (Order == SearchMethod.TreeOrder && !this.where.ForAllChildNodes(Callback, State, Order)))
 					return false;
 			}
 
@@ -548,7 +548,7 @@ namespace Waher.Script.Persistence.SQL
 					this.having.SetParent(this);
 				}
 
-				if (b)
+				if (b || (Order == SearchMethod.TreeOrder && !this.having.ForAllChildNodes(Callback, State, Order)))
 					return false;
 			}
 
@@ -561,7 +561,7 @@ namespace Waher.Script.Persistence.SQL
 					this.offset.SetParent(this);
 				}
 
-				if (b)
+				if (b || (Order == SearchMethod.TreeOrder && !this.offset.ForAllChildNodes(Callback, State, Order)))
 					return false;
 			}
 
@@ -578,25 +578,26 @@ namespace Waher.Script.Persistence.SQL
 						{
 							this.orderBy[i] = new KeyValuePair<ScriptNode, bool>(NewNode, this.orderBy[i].Value);
 							NewNode.SetParent(this);
+							Node = NewNode;
 						}
 
-						if (b)
+						if (b || (Order == SearchMethod.TreeOrder && !Node.ForAllChildNodes(Callback, State, Order)))
 							return false;
 					}
 				}
 			}
 
-			if (!DepthFirst)
+			if (Order == SearchMethod.BreadthFirst)
 			{
-				if (!this.columns.ForAllChildNodes(Callback, State, DepthFirst) ||
-					!this.columnNames.ForAllChildNodes(Callback, State, DepthFirst) ||
-					!this.groupBy.ForAllChildNodes(Callback, State, DepthFirst) ||
-					!this.groupByNames.ForAllChildNodes(Callback, State, DepthFirst) ||
-					!(this.source?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
-					!(this.top?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
-					!(this.where?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
-					!(this.having?.ForAllChildNodes(Callback, State, DepthFirst) ?? true) ||
-					!(this.offset?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!this.columns.ForAllChildNodes(Callback, State, Order) ||
+					!this.columnNames.ForAllChildNodes(Callback, State, Order) ||
+					!this.groupBy.ForAllChildNodes(Callback, State, Order) ||
+					!this.groupByNames.ForAllChildNodes(Callback, State, Order) ||
+					!(this.source?.ForAllChildNodes(Callback, State, Order) ?? true) ||
+					!(this.top?.ForAllChildNodes(Callback, State, Order) ?? true) ||
+					!(this.where?.ForAllChildNodes(Callback, State, Order) ?? true) ||
+					!(this.having?.ForAllChildNodes(Callback, State, Order) ?? true) ||
+					!(this.offset?.ForAllChildNodes(Callback, State, Order) ?? true))
 				{
 					return false;
 				}
@@ -606,7 +607,7 @@ namespace Waher.Script.Persistence.SQL
 					c = this.orderBy.Length;
 					for (i = 0; i < c; i++)
 					{
-						if (!(this.orderBy[i].Key?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+						if (!(this.orderBy[i].Key?.ForAllChildNodes(Callback, State, Order) ?? true))
 							return false;
 					}
 				}
@@ -633,6 +634,12 @@ namespace Waher.Script.Persistence.SQL
 			{
 				return false;
 			}
+
+			if ((this.orderBy is null) ^ (O.orderBy is null))
+				return false;
+
+			if (this.orderBy is null)
+				return true;
 
 			IEnumerator e1 = this.orderBy.GetEnumerator();
 			IEnumerator e2 = O.orderBy.GetEnumerator();
@@ -674,10 +681,13 @@ namespace Waher.Script.Persistence.SQL
 			Result ^= Result << 5 ^ GetHashCode(this.offset);
 			Result ^= Result << 5 ^ this.distinct.GetHashCode();
 
-			foreach (KeyValuePair<ScriptNode, bool> P in this.orderBy)
+			if (!(this.orderBy is null))
 			{
-				Result ^= Result << 5 ^ P.Key.GetHashCode();
-				Result ^= Result << 5 ^ P.Value.GetHashCode();
+				foreach (KeyValuePair<ScriptNode, bool> P in this.orderBy)
+				{
+					Result ^= Result << 5 ^ P.Key.GetHashCode();
+					Result ^= Result << 5 ^ P.Value.GetHashCode();
+				}
 			}
 
 			return Result;

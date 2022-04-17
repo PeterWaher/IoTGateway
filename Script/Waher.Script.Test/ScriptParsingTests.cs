@@ -32,7 +32,7 @@ namespace Waher.Script.Test
 				else
 					return true;
 
-			}, null, false), "Parent reference not set properly");
+			}, null, SearchMethod.TreeOrder), "Parent reference not set properly");
 		}
 
 		[TestMethod]

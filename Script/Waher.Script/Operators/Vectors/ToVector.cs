@@ -82,7 +82,7 @@ namespace Waher.Script.Operators.Vectors
 					}
 
 					return true;
-				}, null, true))
+				}, null, SearchMethod.TreeOrder))
 				{
 					return PatternMatchResult.Unknown;
 				}

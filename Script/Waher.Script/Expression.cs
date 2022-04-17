@@ -5056,11 +5056,24 @@ namespace Waher.Script
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
 		/// <returns>If the process was completed.</returns>
+		[Obsolete("Use ForAll(ScriptNodeEventHandler, object, SearchMethod) instead.")]
 		public bool ForAll(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
 		{
-			if (DepthFirst)
+			return this.ForAll(Callback, State, DepthFirst ? SearchMethod.DepthFirst : SearchMethod.BreadthFirst);
+		}
+
+		/// <summary>
+		/// Calls the callback method for all script nodes defined for the expression.
+		/// </summary>
+		/// <param name="Callback">Callback method to call.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="Order">Order to traverse the nodes.</param>
+		/// <returns>If the process was completed.</returns>
+		public bool ForAll(ScriptNodeEventHandler Callback, object State, SearchMethod Order)
+		{
+			if (Order == SearchMethod.DepthFirst)
 			{
-				if (!(this.root?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!(this.root?.ForAllChildNodes(Callback, State, Order) ?? true))
 					return false;
 			}
 
@@ -5070,9 +5083,9 @@ namespace Waher.Script
 			if (!(NewRoot is null))
 				this.root = NewRoot;
 
-			if (!DepthFirst)
+			if (Order != SearchMethod.DepthFirst)
 			{
-				if (!(this.root?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!(this.root?.ForAllChildNodes(Callback, State, Order) ?? true))
 					return false;
 			}
 

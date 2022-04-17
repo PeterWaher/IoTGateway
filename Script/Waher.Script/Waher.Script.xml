@@ -2667,6 +2667,15 @@
             <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
             <returns>If the process was completed.</returns>
         </member>
+        <member name="M:Waher.Script.Expression.ForAll(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
+            <summary>
+            Calls the callback method for all script nodes defined for the expression.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="Order">Order to traverse the nodes.</param>
+            <returns>If the process was completed.</returns>
+        </member>
         <member name="M:Waher.Script.Expression.TryConvert``1(System.Object,``0@)">
             <summary>
             Tries to convert an object <paramref name="Value"/> to an object of type <typeparamref name="T"/>.
@@ -5463,13 +5472,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Functions.Runtime.Create.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Functions.Runtime.Create.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Functions.Runtime.Create.Equals(System.Object)">
@@ -6062,13 +6071,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Functions.Runtime.Remove.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Functions.Runtime.Remove.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Functions.Runtime.Remove.Equals(System.Object)">
@@ -9119,13 +9128,13 @@
             <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
             </summary>
         </member>
-        <member name="M:Waher.Script.Model.BinaryOperator.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Model.BinaryOperator.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Model.BinaryOperator.Equals(System.Object)">
@@ -9375,17 +9384,17 @@
             <param name="Parent">Parent Node</param>
             <exception cref="T:Waher.Script.Exceptions.ScriptException">If the parent is already set, and you try to set it to another parent node.</exception>
         </member>
-        <member name="M:Waher.Script.Model.Extensions.ForAllChildNodes(Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Model.Extensions.ForAllChildNodes(Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the <see cref="M:Waher.Script.Model.ScriptNode.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)"/> method for all nodes in an array.
             </summary>
             <param name="Nodes">Script node array</param>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
-        <member name="M:Waher.Script.Model.Extensions.ForAll(Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNodeEventHandler,Waher.Script.Model.ScriptNode,System.Object)">
+        <member name="M:Waher.Script.Model.Extensions.ForAll(Waher.Script.Model.ScriptNode[],Waher.Script.Model.ScriptNodeEventHandler,Waher.Script.Model.ScriptNode,System.Object,System.Boolean)">
             <summary>
             Calls the callback method for all nodes in an array.
             </summary>
@@ -9393,6 +9402,8 @@
             <param name="Callback">Callback method to call.</param>
             <param name="Parent">Parent node.</param>
             <param name="State">State object to pass on to the callback method.</param>
+            <param name="IncludeChildren">If children should also be included. Corresponds to 
+            <see cref="F:Waher.Script.Model.SearchMethod.TreeOrder"/>.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="T:Waher.Script.Model.Function">
@@ -9584,13 +9595,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Model.FunctionMultiVariate.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Model.FunctionMultiVariate.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Model.FunctionMultiVariate.Equals(System.Object)">
@@ -9868,13 +9879,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Model.FunctionOneVariable.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Model.FunctionOneVariable.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Model.FunctionOneVariable.Equals(System.Object)">
@@ -10189,13 +10200,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.Model.FunctionTwoVariables.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Model.FunctionTwoVariables.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Model.FunctionTwoVariables.Equals(System.Object)">
@@ -10222,13 +10233,13 @@
             Default Argument names
             </summary>
         </member>
-        <member name="M:Waher.Script.Model.FunctionZeroVariables.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Model.FunctionZeroVariables.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="T:Waher.Script.Model.IConstant">
@@ -10545,13 +10556,13 @@
             Second middle operand.
             </summary>
         </member>
-        <member name="M:Waher.Script.Model.QuaternaryOperator.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Model.QuaternaryOperator.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Model.QuaternaryOperator.Equals(System.Object)">
@@ -10573,13 +10584,13 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Model.ScriptLeafNode.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Model.ScriptLeafNode.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="T:Waher.Script.Model.ScriptLeafNodeVariableReference">
@@ -10630,6 +10641,27 @@
         <member name="F:Waher.Script.Model.PatternMatchResult.Unknown">
             <summary>
             Pattern match could not be evaluated.
+            </summary>
+        </member>
+        <member name="T:Waher.Script.Model.SearchMethod">
+            <summary>
+            Method to traverse the expression structure
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Model.SearchMethod.DepthFirst">
+            <summary>
+            Children are processed before their corresponding parents.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Model.SearchMethod.BreadthFirst">
+            <summary>
+            Siblings are processed before their corresponding children.
+            </summary>
+        </member>
+        <member name="F:Waher.Script.Model.SearchMethod.TreeOrder">
+            <summary>
+            After each node is processed, their children are recursively processed,
+            before going on to the next sibling.
             </summary>
         </member>
         <member name="T:Waher.Script.Model.ScriptNodeEventHandler">
@@ -10733,6 +10765,15 @@
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
             <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <returns>If the process was completed.</returns>
+        </member>
+        <member name="M:Waher.Script.Model.ScriptNode.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
+            <summary>
+            Calls the callback method for all child nodes.
+            </summary>
+            <param name="Callback">Callback method to call.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Model.ScriptNode.Equals(System.Object)">
@@ -11073,13 +11114,13 @@
             Middle operand.
             </summary>
         </member>
-        <member name="M:Waher.Script.Model.TernaryOperator.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Model.TernaryOperator.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Model.TernaryOperator.Equals(System.Object)">
@@ -11274,13 +11315,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
-        <member name="M:Waher.Script.Model.UnaryOperator.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Model.UnaryOperator.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Model.UnaryOperator.Equals(System.Object)">
@@ -18188,13 +18229,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result</returns>
         </member>
-        <member name="M:Waher.Script.Operators.DynamicFunctionCall.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Operators.DynamicFunctionCall.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Operators.DynamicFunctionCall.Equals(System.Object)">
@@ -18281,13 +18322,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Operators.ElementList.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Operators.ElementList.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Operators.ElementList.Equals(System.Object)">
@@ -19298,13 +19339,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Operators.Membership.NamedMethodCall.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Operators.Membership.NamedMethodCall.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Operators.Membership.NamedMethodCall.Equals(System.Object)">
@@ -19390,13 +19431,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Operators.NamedFunctionCall.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Operators.NamedFunctionCall.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Operators.NamedFunctionCall.Equals(System.Object)">
@@ -19444,13 +19485,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Operators.ObjectExNihilo.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Operators.ObjectExNihilo.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Operators.ObjectExNihilo.Equals(System.Object)">
@@ -19544,13 +19585,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Operators.Sequence.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Operators.Sequence.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Operators.Sequence.Equals(System.Object)">
@@ -19598,13 +19639,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Operators.Sets.ImplicitSetDefinition.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Operators.Sets.ImplicitSetDefinition.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Operators.Sets.ImplicitSetDefinition.Equals(System.Object)">
@@ -19999,13 +20040,13 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
-        <member name="M:Waher.Script.Operators.Vectors.ImplicitVectorDefinition.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,System.Boolean)">
+        <member name="M:Waher.Script.Operators.Vectors.ImplicitVectorDefinition.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
             </summary>
             <param name="Callback">Callback method to call.</param>
             <param name="State">State object to pass on to the callback method.</param>
-            <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+            <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
         </member>
         <member name="M:Waher.Script.Operators.Vectors.ImplicitVectorDefinition.Equals(System.Object)">

@@ -120,19 +120,19 @@ namespace Waher.Script.Persistence.SQL
 		/// </summary>
 		/// <param name="Callback">Callback method to call.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+		/// <param name="Order">Order to traverse the nodes.</param>
 		/// <returns>If the process was completed.</returns>
-		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
+		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, SearchMethod Order)
 		{
-			if (DepthFirst)
+			if (Order == SearchMethod.DepthFirst)
 			{
-				if (!(this.source?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!(this.source?.ForAllChildNodes(Callback, State, Order) ?? true))
 					return false;
 
-				if (!(this.columns?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!(this.columns?.ForAllChildNodes(Callback, State, Order) ?? true))
 					return false;
 
-				if (!(this.values?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!(this.values?.ForAllChildNodes(Callback, State, Order) ?? true))
 					return false;
 			}
 
@@ -148,7 +148,7 @@ namespace Waher.Script.Persistence.SQL
 					this.source.SetParent(this);
 				}
 
-				if (b)
+				if (b || (Order == SearchMethod.TreeOrder && !this.source.ForAllChildNodes(Callback, State, Order)))
 					return false;
 			}
 
@@ -161,7 +161,7 @@ namespace Waher.Script.Persistence.SQL
 					this.columns.SetParent(this);
 				}
 
-				if (b)
+				if (b || (Order == SearchMethod.TreeOrder && !this.columns.ForAllChildNodes(Callback, State, Order)))
 					return false;
 			}
 
@@ -174,19 +174,19 @@ namespace Waher.Script.Persistence.SQL
 					this.values.SetParent(this);
 				}
 
-				if (b)
+				if (b || (Order == SearchMethod.TreeOrder && !this.values.ForAllChildNodes(Callback, State, Order)))
 					return false;
 			}
 
-			if (!DepthFirst)
+			if (Order == SearchMethod.BreadthFirst)
 			{
-				if (!(this.source?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!(this.source?.ForAllChildNodes(Callback, State, Order) ?? true))
 					return false;
 
-				if (!(this.columns?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!(this.columns?.ForAllChildNodes(Callback, State, Order) ?? true))
 					return false;
 
-				if (!(this.values?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+				if (!(this.values?.ForAllChildNodes(Callback, State, Order) ?? true))
 					return false;
 			}
 

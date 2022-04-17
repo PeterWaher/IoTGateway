@@ -505,7 +505,7 @@ namespace Waher.Script.Persistence.SQL.Parsers
 			if (!this.SearchForVectorFunction(Node, out _, null))
 				return true;
 
-			return !(Node?.ForAllChildNodes(this.SearchForVectorFunction, null, false) ?? true);
+			return !(Node?.ForAllChildNodes(this.SearchForVectorFunction, null, SearchMethod.TreeOrder) ?? true);
 		}
 
 		private bool SearchForVectorFunction(ScriptNode Node, out ScriptNode NewNode, object State)

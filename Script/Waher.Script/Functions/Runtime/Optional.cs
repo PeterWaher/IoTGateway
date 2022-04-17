@@ -103,7 +103,7 @@ namespace Waher.Script.Functions.Runtime
 					}
 
 					return true;
-				}, null, false) ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
+				}, null, SearchMethod.TreeOrder) ? PatternMatchResult.Match : PatternMatchResult.NoMatch;
 			}
 			else
 				return this.Argument.PatternMatch(CheckAgainst, AlreadyFound);

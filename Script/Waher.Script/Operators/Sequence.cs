@@ -94,19 +94,19 @@ namespace Waher.Script.Operators
 		/// </summary>
 		/// <param name="Callback">Callback method to call.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		/// <param name="DepthFirst">If calls are made depth first (true) or on each node and then its leaves (false).</param>
+		/// <param name="Order">Order to traverse the nodes.</param>
 		/// <returns>If the process was completed.</returns>
-		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, bool DepthFirst)
+		public override bool ForAllChildNodes(ScriptNodeEventHandler Callback, object State, SearchMethod Order)
 		{
 			LinkedListNode<ScriptNode> Loop;
 
-			if (DepthFirst)
+			if (Order == SearchMethod.DepthFirst)
 			{
 				Loop = this.statements.First;
 
 				while (!(Loop is null))
 				{
-					if (!(Loop.Value?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					if (!(Loop.Value?.ForAllChildNodes(Callback, State, Order) ?? true))
 						return false;
 
 					Loop = Loop.Next;
@@ -126,11 +126,12 @@ namespace Waher.Script.Operators
 					{
 						Loop.Value = NewNode;
 						NewNode.SetParent(this);
+						Node = NewNode;
 
 						RecalcIsAsync = true;
 					}
 
-					if (!Result)
+					if (!Result || (Order == SearchMethod.TreeOrder && !Node.ForAllChildNodes(Callback, State, Order)))
 					{
 						if (RecalcIsAsync)
 							this.CalcIsAsync();
@@ -145,13 +146,13 @@ namespace Waher.Script.Operators
 			if (RecalcIsAsync)
 				this.CalcIsAsync();
 
-			if (!DepthFirst)
+			if (Order == SearchMethod.BreadthFirst)
 			{
 				Loop = this.statements.First;
 
 				while (!(Loop is null))
 				{
-					if (!(Loop.Value?.ForAllChildNodes(Callback, State, DepthFirst) ?? true))
+					if (!(Loop.Value?.ForAllChildNodes(Callback, State, Order) ?? true))
 						return false;
 
 					Loop = Loop.Next;

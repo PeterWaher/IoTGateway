@@ -2041,14 +2041,15 @@ The following functions are available in the `Waher.Service.NeuroLedger` library
 | `ToBinary(Object)`                 | Alias for `Serialize`.                                                                                                                                                                               | `Base64Encode(ToBinary(Obj))` |
 | `ToBinary(Vector)`                 | Alias for `Serialize`.                                                                                                                                                                               | `Base64Encode(ToBinary([Obj1,Obj2,Obj3]))` |
 
-#### IP Localization Extensions (available in Waher.Service.IoTBroker)
+#### IoT Broker Extensions (available in Waher.Service.IoTBroker)
 
 The following functions are available in applications running on the IoT Broker (hosting the `Waher.Service.IoTBroker` library) 
 or the Neuron^TM.
 
-| Function        | Description                                      | Example               |
-|-----------------|--------------------------------------------------|-----------------------|
-| `IpLocale(IP)`  | Looks up locale information about an IP address. | `IpLocale("1.2.3.4")` |
+| Function                         | Description                                                                                              | Example               |
+|----------------------------------|----------------------------------------------------------------------------------------------------------|-----------------------|
+| `IpLocale(IP)`                   | Looks up locale information about an IP address.                                                         | `IpLocale("1.2.3.4")` |
+| `RosterName(LocalJid, RemoteJid) | Returns the name of a contact in a local users roster. If no name is returned, the Bare JID is returned. | `RosterName(To,From)` |
 
 #### Multi-User Chat Extensions (available in Waher.Service.LittleSister, Waher.Service.IoTBroker)
 

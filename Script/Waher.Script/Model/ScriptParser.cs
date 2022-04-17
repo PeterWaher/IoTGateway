@@ -10,27 +10,28 @@ namespace Waher.Script.Model
 	public class ScriptParser
 	{
 		private readonly Expression expression;
-		private readonly int pos;
+		private readonly int start;
 
 		/// <summary>
 		/// Script parser, for custom parsers.
 		/// </summary>
 		/// <param name="Expression">Expression being parsed.</param>
-		internal ScriptParser(Expression Expression)
+		/// <param name="Start">Start position of subexpression</param>
+		internal ScriptParser(Expression Expression, int Start)
 		{
-			this.pos = Expression.Position;
+			this.start = Start;
 			this.expression = Expression;
 		}
 
 		/// <summary>
 		/// Start position in expression
 		/// </summary>
-		public int Start => this.pos;
+		public int Start => this.start;
 
 		/// <summary>
 		/// Length of script parsed
 		/// </summary>
-		public int Length => this.expression.Position - this.pos;
+		public int Length => this.expression.Position - this.start;
 
 		/// <summary>
 		/// Current parsing position.

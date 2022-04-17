@@ -25,9 +25,11 @@ namespace Waher.Script.Test
 			
 			this.Save(Pixels, FileName);
 
-			ScriptParsingTests.AssertParentNodes(Exp);
+			ScriptParsingTests.AssertParentNodesAndSubsexpressions(Exp);
 
-			Console.Out.WriteLine(Exp.ToXml());
+			Console.Out.WriteLine();
+			Exp.ToXml(Console.Out);
+			Console.Out.WriteLine();
 		}
 
 		private void Save(PixelInformation Pixels, string FileName)

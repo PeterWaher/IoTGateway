@@ -119,9 +119,11 @@ namespace Waher.Script.Test
 					Assert.AreEqual(ExpectedRow[ColumnIndex], Row.GetElement(ColumnIndex).AssociatedObjectValue);
 			}
 	
-			ScriptParsingTests.AssertParentNodes(Exp);
+			ScriptParsingTests.AssertParentNodesAndSubsexpressions(Exp);
 
-			Console.Out.WriteLine(Exp.ToXml());
+			Console.Out.WriteLine();
+			Exp.ToXml(Console.Out);
+			Console.Out.WriteLine();
 		}
 
 		#region SELECT

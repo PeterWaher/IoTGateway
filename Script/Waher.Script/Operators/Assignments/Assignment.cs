@@ -28,10 +28,7 @@ namespace Waher.Script.Operators.Assignments
 		/// <summary>
 		/// Name of variable
 		/// </summary>
-		public string VariableName
-		{
-			get { return this.variableName; }
-		}
+		public string VariableName => this.variableName;
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.

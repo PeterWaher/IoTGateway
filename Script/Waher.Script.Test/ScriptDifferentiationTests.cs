@@ -20,6 +20,11 @@ namespace Waher.Script.Test
 				"sum([foreach xi in x0 do plot2dcurve(x,f'(xi)*(x-xi)+f(xi),\"Red\")])+" +
 				"scatter2d(x0,f(x0),\"Red\",5);" +
 				");" + Script);
+
+			Console.Out.WriteLine();
+			Exp.ToXml(Console.Out);
+			Console.Out.WriteLine();
+
 			Graph Result = await Exp.EvaluateAsync(v) as Graph;
 
 			if (Result is null)
@@ -28,9 +33,7 @@ namespace Waher.Script.Test
 			GraphSettings Settings = new GraphSettings();
 			Result.CreatePixels(Settings);
 
-			ScriptParsingTests.AssertParentNodes(Exp);
-
-			Console.Out.WriteLine(Exp.ToXml());
+			ScriptParsingTests.AssertParentNodesAndSubsexpressions(Exp);
 		}
 
 		[TestMethod]

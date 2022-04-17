@@ -68,9 +68,11 @@ namespace Waher.Script.Test
 			else
 				AssertEqual(ExpectedValue, Result, Script);
 
-			ScriptParsingTests.AssertParentNodes(Exp);
+			ScriptParsingTests.AssertParentNodesAndSubsexpressions(Exp);
 
-			Console.Out.WriteLine(Exp.ToXml());
+			Console.Out.WriteLine();
+			Exp.ToXml(Console.Out);
+			Console.Out.WriteLine();
 		}
 
 		public static void AssertEqual(object Expected, object Result, string Script)

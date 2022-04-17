@@ -10,29 +10,33 @@ namespace Waher.Script.Test
 	{
 		private void Test(string Script)
 		{
+			Console.Out.WriteLine();
+			Console.Out.WriteLine(Script);
+			Console.Out.WriteLine();
+
 			Expression Exp1 = new Expression(Script);
 			Expression Exp2 = new Expression(Script);
 
 			Assert.AreEqual(Exp1.Root, Exp2.Root, "Script nodes from equal scripts not equal.");
 			Assert.AreEqual(Exp1.Root.GetHashCode(), Exp2.Root.GetHashCode(), "Script nodes from equal scripts does not have equal hash values.");
 
-			AssertParentNodes(Exp1);
+			AssertParentNodesAndSubsexpressions(Exp1);
 
-			Console.Out.WriteLine(Exp1.ToXml());
+			Exp1.ToXml(Console.Out);
+			Console.Out.WriteLine();
 		}
 
-		public static void AssertParentNodes(Expression Exp)
+		public static void AssertParentNodesAndSubsexpressions(Expression Exp)
 		{
-			Assert.IsTrue(Exp.ForAll((ScriptNode Node, out ScriptNode NewNode, object State) =>
+			Exp.ForAll((ScriptNode Node, out ScriptNode NewNode, object State) =>
 			{
-				NewNode = null;
-
 				if (Node.Parent is null && Node != Exp.Root)
-					return false;
-				else
-					return true;
+					Assert.Fail("Parent reference not set properly");
 
-			}, null, SearchMethod.TreeOrder), "Parent reference not set properly");
+				NewNode = null;
+				return true;
+
+			}, null, SearchMethod.TreeOrder);
 		}
 
 		[TestMethod]

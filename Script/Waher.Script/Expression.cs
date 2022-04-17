@@ -3586,6 +3586,7 @@ namespace Waher.Script
 				else
 				{
 					Node.Start = Start;
+					Node.Length = this.pos - Start;
 					return Node;
 				}
 			}
@@ -4093,7 +4094,7 @@ namespace Waher.Script
 						return new ConstantElement(ObjectValue.Null, Start, this.pos - Start, this);
 
 					default:
-						Node = this.ParseCustomNode(s, false);
+						Node = this.ParseCustomNode(s, false, Start);
 						if (Node is null)
 							return new VariableReference(s, Start, this.pos - Start, this);
 						else
@@ -4118,18 +4119,18 @@ namespace Waher.Script
 						return new ConstantElement(BooleanValue.False, Start, this.pos - Start, this);
 				}
 
-				return this.ParseCustomNode(new string(ch, 1), true);
+				return this.ParseCustomNode(new string(ch, 1), true, Start);
 			}
 		}
 
-		private ScriptNode ParseCustomNode(string KeyWord, bool IncPosIfKeyword)
+		private ScriptNode ParseCustomNode(string KeyWord, bool IncPosIfKeyword, int Start)
 		{
 			if (customKeyWords is null)
 				Search();
 
 			if (customKeyWords.TryGetValue(KeyWord, out IKeyWord KeyWordParser))
 			{
-				ScriptParser Parser = new ScriptParser(this);
+				ScriptParser Parser = new ScriptParser(this, Start);
 				int PosBak = this.pos;
 
 				if (IncPosIfKeyword)

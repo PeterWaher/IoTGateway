@@ -22,9 +22,11 @@ namespace Waher.Script.Test
 			else
 				Assert.Fail("XmlDocument or string expected.");
 	
-			ScriptParsingTests.AssertParentNodes(Exp);
+			ScriptParsingTests.AssertParentNodesAndSubsexpressions(Exp);
 
-			Console.Out.WriteLine(Exp.ToXml());
+			Console.Out.WriteLine();
+			Exp.ToXml(Console.Out);
+			Console.Out.WriteLine();
 		}
 
 		[TestMethod]

@@ -70,7 +70,7 @@ namespace Waher.Script.Model
 		private readonly Expression expression;
 		private ScriptNode parent;
 		private int start;
-		private readonly int length;
+		private int length;
 
 		/// <summary>
 		/// Base class for all nodes in a parsed script tree.
@@ -97,7 +97,11 @@ namespace Waher.Script.Model
 		/// <summary>
 		/// Length of expression covered by node.
 		/// </summary>
-		public int Length => this.length;
+		public int Length
+		{
+			get => this.length;
+			internal set => this.length = value;
+		}
 
 		/// <summary>
 		/// Parent node.
@@ -105,13 +109,13 @@ namespace Waher.Script.Model
 		public ScriptNode Parent => this.parent;
 
 		/// <summary>
-		/// Sets the parent node.
+		/// Sets the parent node. Can only be used when expression is being parsed.
 		/// </summary>
 		/// <param name="Parent">Parent Node</param>
-		/// <exception cref="ScriptException">If the parent is already set, and you try to set it to another parent node.</exception>
 		public void SetParent(ScriptNode Parent)
 		{
-			this.parent = Parent;
+			if (this.expression?.Root is null)
+				this.parent = Parent;
 		}
 
 		/// <summary>
@@ -236,21 +240,13 @@ namespace Waher.Script.Model
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
-			return obj is ScriptNode N &&
-				this.GetType() == N.GetType() &&
-				this.start == N.start &&
-				this.length == N.length;
+			return this.GetType() == obj.GetType();
 		}
 
 		/// <inheritdoc/>
 		public override int GetHashCode()
 		{
-			int Result = this.GetType().GetHashCode();
-			
-			Result ^= Result << 5 ^ this.start;
-			Result ^= Result << 5 ^ this.length;
-			
-			return Result;
+			return this.GetType().GetHashCode();
 		}
 
 		/// <summary>

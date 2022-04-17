@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Xml;
+using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -102,6 +104,17 @@ namespace Waher.Script.Xml
 		/// <returns>XML string.</returns>
 		public static void ToXml(this Expression Expression, StringBuilder Xml)
 		{
+			ToXml(Expression, new StringWriter(Xml));
+		}
+
+		/// <summary>
+		/// Exports the matrix to XML
+		/// </summary>
+		/// <param name="Expression">Expression to expirt.</param>
+		/// <param name="Xml">XML Output</param>
+		/// <returns>XML string.</returns>
+		public static void ToXml(this Expression Expression, TextWriter Xml)
+		{
 			XmlWriterSettings Settings = new XmlWriterSettings()
 			{
 				Indent = true,
@@ -130,14 +143,17 @@ namespace Waher.Script.Xml
 
 			Stack.AddLast((ScriptNode)null);
 
-			bool Consistent = Expression.ForAll((ScriptNode Node, out ScriptNode NewNode, object Stata) =>
+			Expression.ForAll((ScriptNode Node, out ScriptNode NewNode, object Stata) =>
 			{
 				NewNode = null;
 
 				while (Stack.Last?.Value != Node.Parent)
 				{
-					if (Stack.Last is null)
-						return false;
+					if (Node.Parent is null)
+						throw new InvalidOperationException("Parent node reference not set correctly on node.");
+
+					if (c == 0)
+						throw new ScriptException("Script tree not consistent.");
 
 					Xml.WriteEndElement();
 					c--;
@@ -158,6 +174,12 @@ namespace Waher.Script.Xml
 					if (PI.PropertyType.IsArray)
 						continue;
 
+					if (PI.PropertyType == typeof(ScriptNode))
+						continue;
+
+					if (typeof(IEnumerable<ScriptNode>).GetTypeInfo().IsAssignableFrom(PI.PropertyType.GetTypeInfo()))
+						continue;
+
 					switch (PI.Name)
 					{
 						case "IsAsynchronous":
@@ -166,7 +188,10 @@ namespace Waher.Script.Xml
 						case "Length":
 						case "Parent":
 						case "Expression":
-						case "Statements":
+						case "AssociatedObjectValue":
+						case "AssociatedSet":
+						case "ChildElements":
+						case "IsScalar":
 							continue;
 					}
 
@@ -174,6 +199,8 @@ namespace Waher.Script.Xml
 
 					if (Value is string s)
 						Xml.WriteAttributeString(PI.Name, s);
+					else if (Value is bool b)
+						Xml.WriteAttributeString(PI.Name, CommonTypes.Encode(b));
 					else
 						Xml.WriteAttributeString(PI.Name, Expression.ToString(Value));
 				}
@@ -183,9 +210,6 @@ namespace Waher.Script.Xml
 				return true;
 
 			}, null, SearchMethod.TreeOrder);
-
-			if (!Consistent)
-				throw new ScriptException("Script tree not consistent.");
 
 			while (c-- > 0)
 				Xml.WriteEndElement();

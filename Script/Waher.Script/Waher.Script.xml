@@ -10703,10 +10703,9 @@
         </member>
         <member name="M:Waher.Script.Model.ScriptNode.SetParent(Waher.Script.Model.ScriptNode)">
             <summary>
-            Sets the parent node.
+            Sets the parent node. Can only be used when expression is being parsed.
             </summary>
             <param name="Parent">Parent Node</param>
-            <exception cref="T:Waher.Script.Exceptions.ScriptException">If the parent is already set, and you try to set it to another parent node.</exception>
         </member>
         <member name="P:Waher.Script.Model.ScriptNode.IsAsynchronous">
             <summary>
@@ -10842,11 +10841,12 @@
             Script parser, for custom parsers.
             </summary>
         </member>
-        <member name="M:Waher.Script.Model.ScriptParser.#ctor(Waher.Script.Expression)">
+        <member name="M:Waher.Script.Model.ScriptParser.#ctor(Waher.Script.Expression,System.Int32)">
             <summary>
             Script parser, for custom parsers.
             </summary>
             <param name="Expression">Expression being parsed.</param>
+            <param name="Start">Start position of subexpression</param>
         </member>
         <member name="P:Waher.Script.Model.ScriptParser.Start">
             <summary>
@@ -16739,20 +16739,6 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Assignments.WithSelf.BinaryAndWithSelf.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.WithSelf.BinaryAndWithSelf.EvaluateAsync(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
         <member name="T:Waher.Script.Operators.Assignments.WithSelf.BinaryOrWithSelf">
             <summary>
             Binary Or with self operator.
@@ -16767,20 +16753,6 @@
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.WithSelf.BinaryOrWithSelf.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.WithSelf.BinaryOrWithSelf.EvaluateAsync(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
         </member>
         <member name="T:Waher.Script.Operators.Assignments.WithSelf.DivideFromSelf">
             <summary>
@@ -16826,20 +16798,6 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Assignments.WithSelf.LogicalAndWithSelf.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.WithSelf.LogicalAndWithSelf.EvaluateAsync(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
         <member name="T:Waher.Script.Operators.Assignments.WithSelf.LogicalOrWithSelf">
             <summary>
             Logical Or with self operator.
@@ -16854,20 +16812,6 @@
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.WithSelf.LogicalOrWithSelf.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.WithSelf.LogicalOrWithSelf.EvaluateAsync(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
         </member>
         <member name="T:Waher.Script.Operators.Assignments.WithSelf.MultiplyWithSelf">
             <summary>
@@ -16971,20 +16915,6 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="M:Waher.Script.Operators.Assignments.WithSelf.ShiftSelfLeft.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.WithSelf.ShiftSelfLeft.EvaluateAsync(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
         <member name="T:Waher.Script.Operators.Assignments.WithSelf.ShiftSelfRight">
             <summary>
             Shift self right operator.
@@ -16999,20 +16929,6 @@
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.WithSelf.ShiftSelfRight.Evaluate(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
-        </member>
-        <member name="M:Waher.Script.Operators.Assignments.WithSelf.ShiftSelfRight.EvaluateAsync(Waher.Script.Variables)">
-            <summary>
-            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-            </summary>
-            <param name="Variables">Variables collection.</param>
-            <returns>Result.</returns>
         </member>
         <member name="T:Waher.Script.Operators.Assignments.WithSelf.SubtractFromSelf">
             <summary>

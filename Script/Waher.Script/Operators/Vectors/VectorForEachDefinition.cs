@@ -125,7 +125,7 @@ namespace Waher.Script.Operators.Vectors
         /// <returns>Encapsulated element.</returns>
         protected virtual IElement Encapsulate(LinkedList<IElement> Elements)
         {
-            return VectorDefinition.Encapsulate(Elements, false, this);
+            return VectorDefinition.Encapsulate(Elements, true, this);
         }
 
     }

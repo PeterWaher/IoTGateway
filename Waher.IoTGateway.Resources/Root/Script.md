@@ -1834,10 +1834,20 @@ The following functions are available in the `Waher.Script.Cryptography` library
 
 The following functions are available in the `Waher.Script.Xml` library.
 
-| Function                        | Description | Example |
-|---------------------------------|-------------|---------|
-| `PrettyXml(Xml)`                | Makes XML defined in `Xml` pretty, for display. | `PrettyXml("<a><b>Hello</b></a>")` |
-| `Xml(s)`                        | Converts the string `s` to an XML Document.     | `Xml("<a>Hello</a>")`              |
+| Function                        | Description                                                                                                             | Example                                   |
+|---------------------------------|-------------------------------------------------------------------------------------------------------------------------|-------------------------------------------|
+| `GetAttribute(Xml,Name)         | Extracts the value of XML attribute `Name` from the element `Xml`.                                                      | `GetAttribute(E,"name")`                  |
+| `GetElement(Xml,Name)           | Extracts the first child element to `Xml` with the given name `Name`.                                                   | `GetElement(E,"Name")`                    |
+| `InnerText(Xml)`                | Returns the Inner Text of the XML Node `Xml`.                                                                           | `InnerText(E)`                            |
+| `InnerXml(Xml)`                 | Returns the Inner XML of the XML Node `Xml`.                                                                            | `InnerXml(E)`                             |
+| `OuterXml(Xml)`                 | Returns the Outer XML of the XML Node `Xml`.                                                                            | `OuterXml(E)`                             |
+| `OwnerDocument(Xml)`            | Returns the XML Document owning the XML Node `Xml`.                                                                     | `OwnerDocument(E)`                        |
+| `PrettyXml(Xml)`                | Makes XML defined in `Xml` pretty, for display.                                                                         | `PrettyXml("<a><b>Hello</b></a>")`        |
+| `SelectXml(Xml,XPath)`          | Performs an XPATH selection into `Xml`. The `default` prefix can be used to reference any default namespace in the XML. | `SelectXml(<a><b>Hello</b></a>,"/a/b")`   |
+| `Xml(s)`                        | Converts the string `s` to an XML Document.                                                                             | `Xml("<a>Hello</a>")`                     |
+
+**Note**: The XML functions are made available so that access to elements and attributes in XML documents can be made accessible in
+environments where the period (`.`) operator is not available, for security reasons.
 
 #### XMLDSIG-related functions (Waher.Script.XmlDSig)
 

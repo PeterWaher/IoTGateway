@@ -6968,6 +6968,48 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Script.Functions.Strings.Concat">
+            <summary>
+            Concatenates the elements of a vector, optionally delimiting the elements with a Delimiter.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.Concat.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Concatenates the elements of a vector, optionally delimiting the elements with a Delimiter.
+            </summary>
+            <param name="Vector">Vector of elements to concatenate.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.Concat.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Concatenates the elements of a vector, optionally delimiting the elements with a Delimiter.
+            </summary>
+            <param name="Vector">Vector of elements to concatenate.</param>
+            <param name="Delimiter">Optional delimiter.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Functions.Strings.Concat.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Functions.Strings.Concat.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Functions.Strings.Concat.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Script.Functions.Strings.Evaluate">
             <summary>
             Evaluate(s)

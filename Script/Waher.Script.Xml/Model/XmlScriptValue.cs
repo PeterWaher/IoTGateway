@@ -87,9 +87,24 @@ namespace Waher.Script.Xml.Model
 		/// <param name="Variables">Current set of variables.</param>
 		internal override void Build(XmlDocument Document, XmlElement Parent, Variables Variables)
 		{
-			IElement Element = this.node.Evaluate(Variables);
-			this.AppendChild(Document, Parent, Element.AssociatedObjectValue);
+			IElement Bak = Variables.TryGetVariable(ParentNamespaceVariableName, out Variable v) ? v.ValueElement : null;
+			Variables[ParentNamespaceVariableName] = Parent.NamespaceURI;
+
+			try
+			{
+				IElement Element = this.node.Evaluate(Variables);
+				this.AppendChild(Document, Parent, Element.AssociatedObjectValue);
+			}
+			finally
+			{
+				if (Bak is null)
+					Variables.Remove(ParentNamespaceVariableName);
+				else
+					Variables[ParentNamespaceVariableName] = Bak;
+			}
 		}
+
+		internal const string ParentNamespaceVariableName = " Parent NS ";
 
 		/// <summary>
 		/// Builds an XML Document object
@@ -99,8 +114,21 @@ namespace Waher.Script.Xml.Model
 		/// <param name="Variables">Current set of variables.</param>
 		internal override async Task BuildAsync(XmlDocument Document, XmlElement Parent, Variables Variables)
 		{
-			IElement Element = await this.node.EvaluateAsync(Variables);
-			this.AppendChild(Document, Parent, Element.AssociatedObjectValue);
+			IElement Bak = Variables.TryGetVariable(ParentNamespaceVariableName, out Variable v) ? v.ValueElement : null;
+			Variables[ParentNamespaceVariableName] = Parent.NamespaceURI;
+
+			try
+			{
+				IElement Element = await this.node.EvaluateAsync(Variables);
+				this.AppendChild(Document, Parent, Element.AssociatedObjectValue);
+			}
+			finally
+			{
+				if (Bak is null)
+					Variables.Remove(ParentNamespaceVariableName);
+				else
+					Variables[ParentNamespaceVariableName] = Bak;
+			}
 		}
 
 		private void AppendChild(XmlDocument Document, XmlElement Parent, object Value)

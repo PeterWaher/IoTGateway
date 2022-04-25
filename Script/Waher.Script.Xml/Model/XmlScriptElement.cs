@@ -235,6 +235,12 @@ namespace Waher.Script.Xml.Model
 			if (ns is null)
 			{
 				if (Parent is null || string.IsNullOrEmpty(ns = Parent.NamespaceURI))
+				{
+					if (Variables.TryGetVariable(XmlScriptValue.ParentNamespaceVariableName, out Variable v) && v.ValueObject is string s)
+						ns = s;
+				}
+
+				if (string.IsNullOrEmpty(ns))
 					E = Document.CreateElement(this.name);
 				else
 					E = Document.CreateElement(this.name, ns);
@@ -282,6 +288,12 @@ namespace Waher.Script.Xml.Model
 			if (ns is null)
 			{
 				if (Parent is null || string.IsNullOrEmpty(ns = Parent.NamespaceURI))
+				{
+					if (Variables.TryGetVariable(XmlScriptValue.ParentNamespaceVariableName, out Variable v) && v.ValueObject is string s)
+						ns = s;
+				}
+
+				if (string.IsNullOrEmpty(ns))
 					E = Document.CreateElement(this.name);
 				else
 					E = Document.CreateElement(this.name, ns);

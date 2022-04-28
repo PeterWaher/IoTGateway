@@ -412,13 +412,29 @@ namespace Waher.IoTGateway.Setup
 		/// <returns>If Legal ID is referring to the gateway.</returns>
 		public static bool IsMe(CaseInsensitiveString LegalId)
 		{
+			return TryGetMyIdentity(LegalId, out _);
+		}
+
+		/// <summary>
+		/// Tries to get one of the legal identities belonging to the current instance.
+		/// </summary>
+		/// <param name="LegalId">ID of Legal Identity</param>
+		/// <param name="Identity">Legal Identity, if found.</param>
+		/// <returns>If a legal identity was found for the current instance, matching the ID.</returns>
+		public static bool TryGetMyIdentity(CaseInsensitiveString LegalId, out LegalIdentity Identity)
+		{
+			Identity = null;
+
 			if (allIdentities is null)
 				return false;
 
 			foreach (LegalIdentity ID in allIdentities)
 			{
 				if (LegalId == ID.Id)
+				{
+					Identity = ID;
 					return true;
+				}
 			}
 
 			return false;

@@ -5238,7 +5238,7 @@ namespace Waher.Script
 
 					if (converters.TryGetValue(C.To, out Dictionary<Type, ITypeConverter> Converters2) && !(Converters2 is null))
 					{
-						if (Converters2.TryGetValue(To, out ITypeConverter Converter2))
+						if (Converters2.TryGetValue(To, out ITypeConverter Converter2) && !(Converter2 is null))
 						{
 							ConversionSequence ConversionSequence;
 
@@ -5260,10 +5260,13 @@ namespace Waher.Script
 
 						foreach (ITypeConverter Converter3 in Converters2.Values)
 						{
-							if (!Explored.ContainsKey(Converter3.To))
+							if (!(Converter3 is null))
 							{
-								Search.AddLast(Converter3);
-								Explored[Converter3.To] = true;
+								if (!Explored.ContainsKey(Converter3.To))
+								{
+									Search.AddLast(Converter3);
+									Explored[Converter3.To] = true;
+								}
 							}
 						}
 					}

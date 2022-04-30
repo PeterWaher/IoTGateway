@@ -86,22 +86,26 @@ namespace Waher.Script.Operators.Arithmetics
 
 					if (!LeftSet.Equals(RightSet))
 					{
-						if (!Expression.UpgradeField(ref Left, ref LeftSet, ref Right, ref RightSet))
-							throw new ScriptRuntimeException("Incompatible operands.", Node);
-
-						LE = Left as IRingElement;
-						RE = Right as IRingElement;
-						if (!(LE is null) && !(RE is null))
+						if (Expression.UpgradeField(ref Left, ref LeftSet, ref Right, ref RightSet))
 						{
-							Result = LE.MultiplyRight(RE);
-							if (!(Result is null))
-								return Result;
+							LE = Left as IRingElement;
+							RE = Right as IRingElement;
+							if (!(LE is null) && !(RE is null))
+							{
+								Result = LE.MultiplyRight(RE);
+								if (!(Result is null))
+									return Result;
 
-							Result = RE.MultiplyLeft(LE);
-							if (!(Result is null))
-								return Result;
+								Result = RE.MultiplyLeft(LE);
+								if (!(Result is null))
+									return Result;
+							}
 						}
 					}
+
+					Result = EvaluateNamedOperator("op_Multiply", Left, Right, Node);
+					if (!(Result is null))
+						return Result;
 
 					throw new ScriptRuntimeException("Operands cannot be multiplied.", Node);
 				}

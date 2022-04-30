@@ -9185,6 +9185,18 @@
         <member name="M:Waher.Script.Model.BinaryOperator.GetHashCode">
             <inheritdoc/>
         </member>
+        <member name="M:Waher.Script.Model.BinaryOperator.EvaluateNamedOperator(System.String,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Evaluates a named operator available in code-behind.
+            </summary>
+            <param name="Name">Name of operator.
+            
+            Reference: https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/operator-overloads</param>
+            <param name="Left">Left operand.</param>
+            <param name="Right">Right operad.</param>
+            <param name="Node">Node performing the evaluation.</param>
+            <returns>Result</returns>
+        </member>
         <member name="T:Waher.Script.Model.UpgradeBehaviour">
             <summary>
             How operands are to be handled if not of the same type.
@@ -19296,6 +19308,16 @@
             <param name="Operand">Operand.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.NamedMethodCall.EvaluateAsync(System.Type,System.Object,Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Executes a code-behind method.
+            </summary>
+            <param name="T">Type</param>
+            <param name="Instance">Object instance, or null if static method.</param>
+            <param name="Arguments">Method arguments.</param>
+            <param name="Variables">Variables. If null, argument extensions will not be evaluated.</param>
+            <returns>Result, or null if no suitable method found.</returns>
         </member>
         <member name="M:Waher.Script.Operators.Membership.NamedMethodCall.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>

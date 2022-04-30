@@ -1185,5 +1185,21 @@ namespace Waher.Script.Test
 			await Test("(10 m +- 1cm) / (2 s +- 100ms)", new Measurement(5, new Unit(Prefix.None, new KeyValuePair<string, int>("m", 1), new KeyValuePair<string, int>("s", -1)), 0.255));
 		}
 
+		[TestMethod]
+		public async Task Evaluation_Test_59_NamedOperators()
+		{
+			await Test("DateTime(2000,1,2)+TimeSpan(1,2,3)", new DateTime(2000, 1, 2, 1, 2, 3));
+			await Test("DateTime(2000,1,2)+TimeSpan(1,2,3)", new DateTime(2000, 1, 2, 1, 2, 3));
+
+			await Test("DateTime(2000,1,2)+Duration.Parse('PT1H')", new DateTime(2000, 1, 2, 1, 0, 0));
+			await Test("DateTime(2000,1,2)+Duration.Parse('PT1H')", new DateTime(2000, 1, 2, 1, 0, 0));
+
+			await Test("DateTime(2000,1,2)-TimeSpan(1,2,3)", new DateTime(2000, 1, 1, 22, 57, 57));
+			await Test("DateTime(2000,1,2)-TimeSpan(1,2,3)", new DateTime(2000, 1, 1, 22, 57, 57));
+
+			await Test("DateTime(2000,1,2)-Duration.Parse('PT1H')", new DateTime(2000, 1, 1, 23, 0, 0));
+			await Test("DateTime(2000,1,2)-Duration.Parse('PT1H')", new DateTime(2000, 1, 1, 23, 0, 0));
+		}
+
 	}
 }

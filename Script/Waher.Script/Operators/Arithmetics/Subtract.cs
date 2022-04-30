@@ -91,26 +91,30 @@ namespace Waher.Script.Operators.Arithmetics
 
 					if (!LeftSet.Equals(RightSet))
 					{
-						if (!Expression.UpgradeField(ref Left, ref LeftSet, ref Right, ref RightSet))
-							throw new ScriptRuntimeException("Incompatible operands.", Node);
-
-						LE = Left as IGroupElement;
-						RE = Right as IGroupElement;
-						if (!(LE is null) && !(RE is null))
+						if (Expression.UpgradeField(ref Left, ref LeftSet, ref Right, ref RightSet))
 						{
-							Temp = RE.Negate();
-							if (!(Temp is null))
+							LE = Left as IGroupElement;
+							RE = Right as IGroupElement;
+							if (!(LE is null) && !(RE is null))
 							{
-								Result = LE.AddRight(Temp);
-								if (!(Result is null))
-									return Result;
+								Temp = RE.Negate();
+								if (!(Temp is null))
+								{
+									Result = LE.AddRight(Temp);
+									if (!(Result is null))
+										return Result;
 
-								Result = Temp.AddLeft(LE);
-								if (!(Result is null))
-									return Result;
+									Result = Temp.AddLeft(LE);
+									if (!(Result is null))
+										return Result;
+								}
 							}
 						}
 					}
+
+					Result = EvaluateNamedOperator("op_Subtraction", Left, Right, Node);
+					if (!(Result is null))
+						return Result;
 
 					throw new ScriptRuntimeException("Operands cannot be subtracted.", Node);
 				}

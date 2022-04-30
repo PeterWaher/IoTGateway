@@ -5,6 +5,8 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
+using Waher.Script.Operators.Membership;
 
 namespace Waher.Script.Operators.Arithmetics
 {
@@ -86,22 +88,26 @@ namespace Waher.Script.Operators.Arithmetics
 
 					if (!LeftSet.Equals(RightSet))
 					{
-						if (!Expression.UpgradeSemiGroup(ref Left, ref LeftSet, ref Right, ref RightSet))
-							throw new ScriptRuntimeException("Incompatible operands.", Node);
-
-						LE = Left as ISemiGroupElement;
-						RE = Right as ISemiGroupElement;
-						if (!(LE is null) && !(RE is null))
+						if (Expression.UpgradeSemiGroup(ref Left, ref LeftSet, ref Right, ref RightSet))
 						{
-							Result = LE.AddRight(RE);
-							if (!(Result is null))
-								return Result;
+							LE = Left as ISemiGroupElement;
+							RE = Right as ISemiGroupElement;
+							if (!(LE is null) && !(RE is null))
+							{
+								Result = LE.AddRight(RE);
+								if (!(Result is null))
+									return Result;
 
-							Result = RE.AddLeft(LE);
-							if (!(Result is null))
-								return Result;
+								Result = RE.AddLeft(LE);
+								if (!(Result is null))
+									return Result;
+							}
 						}
 					}
+
+					Result = EvaluateNamedOperator("op_Addition", Left, Right, Node);
+					if (!(Result is null))
+						return Result;
 
 					throw new ScriptRuntimeException("Operands cannot be added.", Node);
 				}

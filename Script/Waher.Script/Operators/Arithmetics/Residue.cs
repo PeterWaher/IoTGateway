@@ -90,15 +90,19 @@ namespace Waher.Script.Operators.Arithmetics
 
 					if (!LeftSet.Equals(RightSet))
 					{
-						if (!Expression.UpgradeField(ref Left, ref LeftSet, ref Right, ref RightSet))
-							throw new ScriptRuntimeException("Incompatible operands.", Node);
-
-						if (Left is IEuclidianDomainElement LE && Right is IEuclidianDomainElement RE)
+						if (Expression.UpgradeField(ref Left, ref LeftSet, ref Right, ref RightSet))
 						{
-							((IEuclidianDomain)LeftSet).Divide(LE, RE, out IEuclidianDomainElement Result);
-							return Result;
+							if (Left is IEuclidianDomainElement LE && Right is IEuclidianDomainElement RE)
+							{
+								((IEuclidianDomain)LeftSet).Divide(LE, RE, out IEuclidianDomainElement Result);
+								return Result;
+							}
 						}
 					}
+
+					IElement Result2 = EvaluateNamedOperator("op_Modulus", Left, Right, Node);
+					if (!(Result2 is null))
+						return Result2;
 
 					throw new ScriptRuntimeException("Residue could not be computed.", Node);
 				}

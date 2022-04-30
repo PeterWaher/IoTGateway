@@ -79,14 +79,10 @@ namespace Waher.Script.Operators.Membership
 		public override async Task<IElement> EvaluateAsync(IElement Operand, Variables Variables)
 		{
 			object Object = Operand.AssociatedObjectValue;
-			Type T, PT;
-			IElement[] Arguments = null;
-			object[] ParameterValues;
-			bool[] Extend;
-			object Value;
+			Type T;
+			IElement[] Arguments;
 			object Instance;
 			int i;
-			bool DoExtend = false;
 
 			if (Object is null && this.nullCheck)
 				return ObjectValue.Null;
@@ -100,6 +96,45 @@ namespace Waher.Script.Operators.Membership
 			else
 				Instance = null;
 
+			Arguments = new IElement[this.nrParameters];
+			for (i = 0; i < this.nrParameters; i++)
+				Arguments[i] = await this.parameters[i].EvaluateAsync(Variables);
+
+			IElement Result = await this.EvaluateAsync(T, Instance, Arguments, Variables);
+
+			if (Result is null)
+			{
+				if (Operand.IsScalar)
+					throw new ScriptRuntimeException("Invalid number or type of parameters.", this);
+
+				LinkedList<IElement> Elements = new LinkedList<IElement>();
+
+				foreach (IElement Item in Operand.ChildElements)
+					Elements.AddLast(await this.EvaluateAsync(Item, Variables));
+
+				return Operand.Encapsulate(Elements, this);
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Executes a code-behind method.
+		/// </summary>
+		/// <param name="T">Type</param>
+		/// <param name="Instance">Object instance, or null if static method.</param>
+		/// <param name="Arguments">Method arguments.</param>
+		/// <param name="Variables">Variables. If null, argument extensions will not be evaluated.</param>
+		/// <returns>Result, or null if no suitable method found.</returns>
+		public async Task<IElement> EvaluateAsync(Type T, object Instance, IElement[] Arguments, Variables Variables)
+		{
+			Type PT;
+			object[] ParameterValues;
+			bool[] Extend;
+			object Value;
+			bool DoExtend = false;
+			int i;
+
 			lock (this.synchObject)
 			{
 				if (this.lastType != T)
@@ -110,10 +145,6 @@ namespace Waher.Script.Operators.Membership
 					this.byReference = null;
 					this.lastType = T;
 				}
-
-				Arguments = new IElement[this.nrParameters];
-				for (i = 0; i < this.nrParameters; i++)
-					Arguments[i] = this.parameters[i].Evaluate(Variables);
 
 				if (!(this.method is null) && this.methodType == MethodType.Method)
 				{
@@ -142,7 +173,7 @@ namespace Waher.Script.Operators.Membership
 							}
 							else
 							{
-								if (Arguments[i].IsScalar)
+								if (Arguments[i].IsScalar || Variables is null)
 									break;
 
 								this.methodArgumentExtensions[i] = true;
@@ -223,7 +254,7 @@ namespace Waher.Script.Operators.Membership
 								}
 								else
 								{
-									if (Arguments[i].IsScalar)
+									if (Arguments[i].IsScalar || Variables is null)
 										break;
 
 									if (Extend is null)
@@ -260,17 +291,7 @@ namespace Waher.Script.Operators.Membership
 					}
 
 					if (this.method is null)
-					{
-						if (Operand.IsScalar)
-							throw new ScriptRuntimeException("Invalid number or type of parameters.", this);
-
-						LinkedList<IElement> Elements = new LinkedList<IElement>();
-
-						foreach (IElement Item in Operand.ChildElements)
-							Elements.AddLast(this.Evaluate(Item, Variables));
-
-						return Operand.Encapsulate(Elements, this);
-					}
+						return null;
 				}
 			}
 

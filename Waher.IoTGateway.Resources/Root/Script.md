@@ -2741,6 +2741,25 @@ If an object has the index property `Item` defined, it can be accessed using the
 `T`, the script engine will await for the task to complete, and return the finished result rather
 than the `Task` object.
 
+### Utilizing operators defined in underlying objects.
+
+If operators are defined in the underlying .NET code-behind, the script engine will utilize such
+operators, for certain operators.
+
+Examples, where a `DateTime` and a `TimeSpan` are operated upon:
+
+	Now + TimeSpan(1,0,0)
+	Now - TimeSpan(1,0,0)
+
+Examples, where a `DateTime` and a `Duration` (defined in `Waher.Content`) are operated upon:
+
+	Now + Duration.Parse("PT1H")
+	Now - Duration.Parse("PT1H")
+
+Code-behind operators are accessible as named static methods, in accordance with the following 
+article (operator name corresponds to the *Metadata Name* column):
+<https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/operator-overloads>
+
 =========================================================================================================================================================
 
 Physical Quantities

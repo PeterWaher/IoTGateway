@@ -1,4 +1,6 @@
 ﻿using System;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Operators.Membership;
 
 namespace Waher.Script.Model
 {
@@ -183,6 +185,41 @@ namespace Waher.Script.Model
 			int Result = base.GetHashCode();
 			Result ^= Result << 5 ^ GetHashCode(this.left);
 			Result ^= Result << 5 ^ GetHashCode(this.right);
+			return Result;
+		}
+
+		/// <summary>
+		/// Evaluates a named operator available in code-behind.
+		/// </summary>
+		/// <param name="Name">Name of operator.
+		/// 
+		/// Reference: https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/operator-overloads</param>
+		/// <param name="Left">Left operand.</param>
+		/// <param name="Right">Right operad.</param>
+		/// <param name="Node">Node performing the evaluation.</param>
+		/// <returns>Result</returns>
+		protected static IElement EvaluateNamedOperator(string Name, IElement Left, IElement Right, ScriptNode Node)
+		{
+			ScriptNode[] ArgumentNodes = new ScriptNode[] { Node, Node };
+			NamedMethodCall OperatorMethod = new NamedMethodCall(Node,
+				Name, ArgumentNodes, false, Node.Start, Node.Length, Node.Expression);
+
+			IElement[] Arguments = new IElement[] { Left, Right };
+
+			IElement Result = OperatorMethod.EvaluateAsync(
+				Left.AssociatedObjectValue?.GetType() ?? typeof(object),
+				null, Arguments, null).Result;
+
+			if (!(Result is null))
+				return Result;
+
+			OperatorMethod = new NamedMethodCall(Node, Name, ArgumentNodes, false,
+				Node.Start, Node.Length, Node.Expression);
+
+			Result = OperatorMethod.EvaluateAsync(
+				Right.AssociatedObjectValue?.GetType() ?? typeof(object),
+				null, Arguments, null).Result;
+
 			return Result;
 		}
 	}

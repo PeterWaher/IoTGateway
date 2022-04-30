@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Content;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
@@ -30,7 +31,8 @@ namespace Waher.Script.Test
 				typeof(ScriptSqlTests).Assembly,
 				typeof(Database).Assembly,
 				typeof(FilesProvider).Assembly,
-				typeof(ObjectSerializer).Assembly);
+				typeof(ObjectSerializer).Assembly,
+				typeof(Duration).Assembly);
 
 			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
 			Database.Register(filesProvider);

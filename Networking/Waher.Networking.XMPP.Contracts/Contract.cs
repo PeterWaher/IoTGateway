@@ -1006,6 +1006,8 @@ namespace Waher.Networking.XMPP.Contracts
 
 			Variables Variables = new Variables();
 
+			Variables["Duration"] = Result.duration;
+
 			foreach (Parameter Parameter in Parameters)
 				Parameter.Populate(Variables);
 

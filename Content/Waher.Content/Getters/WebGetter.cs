@@ -250,7 +250,14 @@ namespace Waher.Content.Getters
 					PrepareHeaders(Request, Headers);
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
-					Dictionary<string, object> Result = new Dictionary<string, object>();
+					Dictionary<string, object> Result = new Dictionary<string, object>()
+					{
+						{ "Status", Response.StatusCode },
+						{ "StatusCode", (int)Response.StatusCode },
+						{ "Message", Response.ReasonPhrase },
+						{ "IsSuccessStatusCode", Response.IsSuccessStatusCode },
+						{ "Version", Response.Version.ToString() }
+					};
 
 					foreach (KeyValuePair<string, IEnumerable<string>> Header in Response.Headers)
 					{

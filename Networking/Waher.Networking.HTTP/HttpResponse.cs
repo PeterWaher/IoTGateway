@@ -564,7 +564,7 @@ namespace Waher.Networking.HTTP
 						else
 						{
 							object ContentObject = await ex2.GetContentObjectAsync();
-							
+
 							if (ContentObject is string s)
 							{
 								Content = Encoding.UTF8.GetBytes(s);
@@ -1193,7 +1193,14 @@ namespace Waher.Networking.HTTP
 		/// <param name="value">Value</param>
 		public Task Write(object value)
 		{
-			return this.Write(value.ToString());
+			if (value is byte[] Bin)
+				return this.Write(Bin);
+			else if (value is string s)
+				return this.Write(s);
+			else if (value is char ch)
+				return this.Write(ch);
+			else
+				return this.Write(value.ToString());
 		}
 
 		/// <summary>

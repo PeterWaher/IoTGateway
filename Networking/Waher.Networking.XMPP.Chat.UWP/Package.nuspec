@@ -15,13 +15,13 @@
 		<copyright>Copyright © Waher Data AB 2015-2022. All rights reserved.</copyright>
 		<tags>networking communication xmpp iot chat</tags>
 		<dependencies>
-			<dependency id="Waher.Content" version="2.3.1"/>
+			<dependency id="Waher.Content" version="2.3.2"/>
 			<dependency id="Waher.Content.Emoji" version="2.0.0"/>
 			<dependency id="Waher.Content.Html" version="2.1.0"/>
 			<dependency id="Waher.Content.Markdown" version="2.1.6"/>
 			<dependency id="Waher.Content.Xml" version="2.0.1"/>
 			<dependency id="Waher.Networking.UWP" version="2.0.4"/>
-			<dependency id="Waher.Networking.XMPP.UWP" version="2.0.2"/>
+			<dependency id="Waher.Networking.XMPP.UWP" version="2.0.3"/>
 			<dependency id="Waher.Networking.XMPP.Concentrator.UWP" version="2.0.4"/>
 			<dependency id="Waher.Networking.XMPP.Control.UWP" version="2.0.2"/>
 			<dependency id="Waher.Networking.XMPP.Sensor.UWP" version="2.1.0"/>

@@ -732,7 +732,7 @@ namespace Waher.Networking.XMPP
 				this.fragment.Clear();
 				this.upgradeToTls = false;
 
-				lock (this.services)
+				lock (this.synchObject)
 				{
 					this.services.Clear();
 				}
@@ -2277,7 +2277,7 @@ namespace Waher.Networking.XMPP
 						}
 						else if (E.LocalName == "request" && E.NamespaceURI == NamespaceMessageDeliveryReceipts && !string.IsNullOrEmpty(e.Id))
 						{
-							RosterItem Item = this.GetRosterItem(GetBareJID(e.To));
+							RosterItem Item = this.GetRosterItemLocked(GetBareJID(e.To));
 							if (Item != null && (Item.State == SubscriptionState.Both || Item.State == SubscriptionState.From))
 							{
 								this.SendMessage(MessageType.Normal, e.From, "<received xmlns='" + NamespaceMessageDeliveryReceipts +
@@ -2543,7 +2543,7 @@ namespace Waher.Networking.XMPP
 							Callback = this.OnPresence;
 							e.UpdateLastPresence = true;
 
-							lock (this.roster)
+							lock (this.synchObject)
 							{
 								if (this.roster.TryGetValue(e.FromBareJID, out Item))
 									Item.PresenceReceived(this, e);
@@ -2554,7 +2554,7 @@ namespace Waher.Networking.XMPP
 							this.Information("OnPresence()");
 							Callback = this.OnPresence;
 
-							lock (this.roster)
+							lock (this.synchObject)
 							{
 								if (this.roster.TryGetValue(e.FromBareJID, out Item))
 									Item.PresenceReceived(this, e);
@@ -2569,7 +2569,7 @@ namespace Waher.Networking.XMPP
 							break;
 
 						case PresenceType.Subscribe:
-							lock (this.subscriptionRequests)
+							lock (this.synchObject)
 							{
 								this.subscriptionRequests[e.FromBareJID] = e;
 							}
@@ -4651,7 +4651,7 @@ namespace Waher.Networking.XMPP
 				{
 					if (N.LocalName == "query" && N.NamespaceURI == NamespaceRoster)
 					{
-						lock (this.roster)
+						lock (this.synchObject)
 						{
 							Dictionary<string, RosterItem> OldRoster = new Dictionary<string, RosterItem>();
 
@@ -4711,13 +4711,18 @@ namespace Waher.Networking.XMPP
 		/// <returns>Roster item, if found, or null, if not available.</returns>
 		public RosterItem GetRosterItem(string BareJID)
 		{
-			lock (this.roster)
+			lock (this.synchObject)
 			{
-				if (this.roster.TryGetValue(BareJID, out RosterItem RosterItem))
-					return RosterItem;
-				else
-					return null;
+				return this.GetRosterItemLocked(BareJID);
 			}
+		}
+
+		private RosterItem GetRosterItemLocked(string BareJID)
+		{
+			if (this.roster.TryGetValue(BareJID, out RosterItem RosterItem))
+				return RosterItem;
+			else
+				return null;
 		}
 
 		/// <summary>
@@ -4749,7 +4754,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void AddRosterItem(RosterItem Item, IqResultEventHandlerAsync Callback, object State)
 		{
-			lock (this.roster)
+			lock (this.synchObject)
 			{
 				if (this.roster.TryGetValue(BareJID, out RosterItem RosterItem))
 				{
@@ -4813,7 +4818,7 @@ namespace Waher.Networking.XMPP
 		{
 			RosterItem RosterItem;
 
-			lock (this.roster)
+			lock (this.synchObject)
 			{
 				if (!this.roster.TryGetValue(BareJID, out RosterItem))
 					throw new ArgumentException("A Roster Item with that bare JID was not found.", nameof(BareJID));
@@ -4867,7 +4872,7 @@ namespace Waher.Networking.XMPP
 		/// <exception cref="ArgumentException">If there is no roster item available with the corresponding bare JID.</exception>
 		public void RemoveRosterItem(string BareJID, IqResultEventHandlerAsync Callback, object State)
 		{
-			lock (this.roster)
+			lock (this.synchObject)
 			{
 				if (!this.roster.Remove(BareJID))
 					throw new ArgumentException("A Roster Item with that bare JID was not found.", nameof(BareJID));
@@ -4901,7 +4906,7 @@ namespace Waher.Networking.XMPP
 			{
 				RosterItem[] Result;
 
-				lock (this.roster)
+				lock (this.synchObject)
 				{
 					Result = new RosterItem[this.roster.Count];
 					this.roster.Values.CopyTo(Result, 0);
@@ -4920,7 +4925,7 @@ namespace Waher.Networking.XMPP
 			{
 				PresenceEventArgs[] Result;
 
-				lock (this.subscriptionRequests)
+				lock (this.synchObject)
 				{
 					Result = new PresenceEventArgs[this.subscriptionRequests.Count];
 					this.subscriptionRequests.Values.CopyTo(Result, 0);
@@ -4937,7 +4942,7 @@ namespace Waher.Networking.XMPP
 		/// <returns>Subscription request, if found, or null, if not available.</returns>
 		public PresenceEventArgs GetSubscriptionRequest(string BareJID)
 		{
-			lock (this.subscriptionRequests)
+			lock (this.synchObject)
 			{
 				if (this.subscriptionRequests.TryGetValue(BareJID, out PresenceEventArgs SubscriptionRequest))
 					return SubscriptionRequest;
@@ -5230,7 +5235,7 @@ namespace Waher.Networking.XMPP
 
 		internal void PresenceSubscriptionAccepted(string Id, string BareJid)
 		{
-			lock (this.subscriptionRequests)
+			lock (this.synchObject)
 			{
 				this.subscriptionRequests.Remove(BareJid);
 			}
@@ -5268,7 +5273,7 @@ namespace Waher.Networking.XMPP
 
 		internal void PresenceSubscriptionDeclined(string Id, string BareJid)
 		{
-			lock (this.subscriptionRequests)
+			lock (this.synchObject)
 			{
 				this.subscriptionRequests.Remove(BareJid);
 			}
@@ -5450,7 +5455,7 @@ namespace Waher.Networking.XMPP
 			{
 				if (N is XmlElement E && E.LocalName == "item" && E.NamespaceURI == NamespaceRoster)
 				{
-					lock (this.roster)
+					lock (this.synchObject)
 					{
 						Item = new RosterItem(E, this.roster);
 					}
@@ -5466,7 +5471,7 @@ namespace Waher.Networking.XMPP
 
 			this.SendIqResult(e.Id, e.From, string.Empty);
 
-			lock (this.roster)
+			lock (this.synchObject)
 			{
 				if (Item.State == SubscriptionState.Remove)
 				{
@@ -7154,7 +7159,7 @@ namespace Waher.Networking.XMPP
 						To = e.To
 					};
 
-					lock (this.roster)
+					lock (this.synchObject)
 					{
 						if (this.nrAssuredMessagesPending >= this.maxAssuredMessagesPendingTotal)
 						{
@@ -7271,7 +7276,7 @@ namespace Waher.Networking.XMPP
 			string From = GetBareJID(e.From);
 			string Key = From + " " + MsgId;
 
-			lock (this.roster)
+			lock (this.synchObject)
 			{
 				if (this.receivedMessages.TryGetValue(Key, out e2))
 				{
@@ -7525,7 +7530,7 @@ namespace Waher.Networking.XMPP
 		/// <returns>If a tag was found with the corresponding name.</returns>
 		public bool TryGetTag(string TagName, out object Tag)
 		{
-			lock (this.tags)
+			lock (this.synchObject)
 			{
 				if (this.tags.TryGetValue(TagName, out Tag))
 					return true;
@@ -7541,7 +7546,7 @@ namespace Waher.Networking.XMPP
 		/// <returns>If a tag was found with the corresponding name, and removed.</returns>
 		public bool RemoveTag(string TagName)
 		{
-			lock (this.tags)
+			lock (this.synchObject)
 			{
 				return this.tags.Remove(TagName);
 			}
@@ -7554,7 +7559,7 @@ namespace Waher.Networking.XMPP
 		/// <returns>If a tag with the corresponding name is found.</returns>
 		public bool ContainsTag(string TagName)
 		{
-			lock (this.tags)
+			lock (this.synchObject)
 			{
 				return this.tags.ContainsKey(TagName);
 			}
@@ -7567,7 +7572,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Tag">Tag value.</param>
 		public void SetTag(string TagName, object Tag)
 		{
-			lock (this.tags)
+			lock (this.synchObject)
 			{
 				this.tags[TagName] = Tag;
 			}
@@ -7597,7 +7602,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Extension">Extension</param>
 		public void RegisterExtension(IXmppExtension Extension)
 		{
-			lock (this.extensions)
+			lock (this.synchObject)
 			{
 				if (!this.extensions.Contains(Extension))
 					this.extensions.Add(Extension);
@@ -7611,7 +7616,7 @@ namespace Waher.Networking.XMPP
 		/// <returns>If the extension was found and unregistered.</returns>
 		public bool UnregisterExtension(IXmppExtension Extension)
 		{
-			lock (this.extensions)
+			lock (this.synchObject)
 			{
 				return this.extensions.Remove(Extension);
 			}
@@ -7624,7 +7629,7 @@ namespace Waher.Networking.XMPP
 		{
 			get
 			{
-				lock (this.extensions)
+				lock (this.synchObject)
 				{
 					return this.extensions.ToArray();
 				}
@@ -7639,7 +7644,7 @@ namespace Waher.Networking.XMPP
 		/// <returns>If a registered extension of the desired type was found.</returns>
 		public bool TryGetExtension(Type Type, out IXmppExtension Extension)
 		{
-			lock (this.extensions)
+			lock (this.synchObject)
 			{
 				foreach (IXmppExtension Extension2 in this.extensions)
 				{
@@ -7928,7 +7933,7 @@ namespace Waher.Networking.XMPP
 		{
 			string Key = Jid + " " + Feature;
 
-			lock (this.services)
+			lock (this.synchObject)
 			{
 				if (this.services.TryGetValue(Key, out string Service))
 					return Service;
@@ -7960,7 +7965,7 @@ namespace Waher.Networking.XMPP
 
 			if (!string.IsNullOrEmpty(Result))
 			{
-				lock (this.services)
+				lock (this.synchObject)
 				{
 					this.services[Key] = Result;
 				}

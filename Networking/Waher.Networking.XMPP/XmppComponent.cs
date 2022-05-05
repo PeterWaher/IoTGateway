@@ -42,7 +42,6 @@ namespace Waher.Networking.XMPP
 		private readonly Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
 		private readonly IqResponses responses = new IqResponses(TimeSpan.FromMinutes(1));
 		private Cache<string, uint> pendingPresenceRequests;
-		private readonly object rosterSyncObject = new object();
 		private TextTcpClient client = null;
 		private Timer secondTimer = null;
 		private DateTime nextPing = DateTime.MinValue;
@@ -327,7 +326,7 @@ namespace Waher.Networking.XMPP
 
 			if (!(this.outputQueue is null))
 			{
-				lock (this.outputQueue)
+				lock (this.synchObject)
 				{
 					this.outputQueue.Clear();
 				}
@@ -2600,7 +2599,7 @@ namespace Waher.Networking.XMPP
 						To = e.To
 					};
 
-					lock (this.rosterSyncObject)
+					lock (this.synchObject)
 					{
 						if (this.nrAssuredMessagesPending >= this.maxAssuredMessagesPendingTotal)
 						{
@@ -2657,7 +2656,7 @@ namespace Waher.Networking.XMPP
 			string From = XmppClient.GetBareJID(e.From);
 			string Key = From + " " + MsgId;
 
-			lock (this.rosterSyncObject)
+			lock (this.synchObject)
 			{
 				if (this.receivedMessages.TryGetValue(Key, out e2))
 				{

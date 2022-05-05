@@ -62,13 +62,17 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 			if (!(this.output is null))
 			{
-				lock (this.output)
-				{
-					foreach (OutgoingStream Output in this.output.Values)
-						Output.Dispose();
+				OutgoingStream[] ToDispose;
 
+				lock (this.synchObject)
+				{
+					ToDispose = new OutgoingStream[this.output.Count];
+					this.output.Values.CopyTo(ToDispose, 0);
 					this.output.Clear();
 				}
+
+				foreach (OutgoingStream Output in ToDispose)
+					Output.Dispose();
 
 				this.output = null;
 			}
@@ -122,7 +126,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				{
 					await Result.Opened(e);
 
-					lock (this.output)
+					lock (this.synchObject)
 					{
 						this.output[StreamId] = Result;
 					}
@@ -203,7 +207,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 			if (Input is null)
 			{
-				lock (this.output)
+				lock (this.synchObject)
 				{
 					if (!this.output.TryGetValue(StreamId, out Output))
 						throw new ItemNotFoundException("Stream not recognized.", e.Query);

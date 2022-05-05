@@ -351,7 +351,7 @@ namespace Waher.Networking.XMPP
 		private bool pingResponse = true;
 		private bool allowEncryption = true;
 		private bool sendFromAddress = false;
-		private bool checkConnection = false;
+		private bool? checkConnection = null;
 		private bool openBracketReceived = false;
 		private bool monitorContactResourcesAlive = true;
 		private bool upgradeToTls = false;
@@ -710,12 +710,17 @@ namespace Waher.Networking.XMPP
 		{
 			try
 			{
+				if (this.disposed)
+					throw new ObjectDisposedException("XMPP Client has been disposed.");
+
 				this.DisposeClient(false);
 
 				this.domain = Domain;
 				this.bareJid = this.fullJid = this.userName + "@" + Domain;
 
-				this.checkConnection = true;
+				if (!this.checkConnection.HasValue)
+					this.checkConnection = true;
+
 				this.openBracketReceived = false;
 
 				this.State = XmppState.Connecting;
@@ -984,7 +989,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// If the server certificate is valid.
 		/// </summary>
-		public bool ServerCertificateValid=> this.client.RemoteCertificateValid;
+		public bool ServerCertificateValid => this.client.RemoteCertificateValid;
 
 		/// <summary>
 		/// Name of the client in the XMPP network.
@@ -1024,6 +1029,17 @@ namespace Waher.Networking.XMPP
 		/// Last custom status set by the client when setting presence.
 		/// </summary>
 		public KeyValuePair<string, string>[] LastSetPresenceCustomStatus => this.customPresenceStatus;
+
+		/// <summary>
+		/// If the connection should be regularly checked, and automatic reconnection attempts should be made.
+		/// This feature is turned on by default, when connecting the client for the first time. If set to false,
+		/// it must be set to true again, for ping and other connection checks to be made regularly.
+		/// </summary>
+		public bool? CheckConnection
+		{
+			get => this.checkConnection;
+			set => this.checkConnection = value;
+		}
 
 		/// <summary>
 		/// Current state of connection.
@@ -1153,21 +1169,27 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public void Dispose()
 		{
-			this.disposed = true;
-
-			if (this.state == XmppState.Connected || this.state == XmppState.FetchingRoster || this.state == XmppState.SettingPresence)
+			if (!this.disposed)
 			{
-				try
+				this.disposed = true;
+
+				if (this.checkConnection.HasValue && this.checkConnection.Value)
+					this.checkConnection = null;
+
+				if (this.state == XmppState.Connected || this.state == XmppState.FetchingRoster || this.state == XmppState.SettingPresence)
 				{
-					this.BeginWrite(this.streamFooter, this.CleanUp);
+					try
+					{
+						this.BeginWrite(this.streamFooter, this.CleanUp);
+					}
+					catch (Exception)
+					{
+						this.CleanUp(this, EventArgs.Empty);
+					}
 				}
-				catch (Exception)
-				{
+				else
 					this.CleanUp(this, EventArgs.Empty);
-				}
 			}
-			else
-				this.CleanUp(this, EventArgs.Empty);
 		}
 
 		/// <summary>
@@ -1193,6 +1215,9 @@ namespace Waher.Networking.XMPP
 
 		private void CleanUp(bool RaiseEvent)
 		{
+			if (this.checkConnection.HasValue && this.checkConnection.Value)
+				this.checkConnection = null;
+
 			this.State = XmppState.Offline;
 
 			this.authenticationMechanisms?.Clear();
@@ -1261,6 +1286,9 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public void Reconnect()
 		{
+			if (this.disposed)
+				throw new ObjectDisposedException("XMPP Client has already been disposed.");
+
 			if (this.textTransportLayer != null && !(this.textTransportLayer is AlternativeTransport))
 				throw new Exception("Reconnections must be made in the underlying transport layer.");
 			else
@@ -1281,6 +1309,9 @@ namespace Waher.Networking.XMPP
 		/// <param name="Password">New password.</param>
 		public void Reconnect(string UserName, string Password)
 		{
+			if (this.disposed)
+				throw new ObjectDisposedException("XMPP Client has already been disposed.");
+
 			if (!(this.textTransportLayer is null))
 				throw new Exception("Reconnections must be made in the underlying transport layer.");
 
@@ -1299,6 +1330,9 @@ namespace Waher.Networking.XMPP
 		/// <param name="PasswordHashMethod">New password hash method.</param>
 		public void Reconnect(string UserName, string PasswordHash, string PasswordHashMethod)
 		{
+			if (this.disposed)
+				throw new ObjectDisposedException("XMPP Client has already been disposed.");
+
 			if (!(this.textTransportLayer is null))
 				throw new Exception("Reconnections must be made in the underlying transport layer.");
 
@@ -2125,9 +2159,12 @@ namespace Waher.Networking.XMPP
 								this.host = SeeOtherHostException.NewHost;
 								this.inputState = -1;
 
-								this.Information("Reconnecting to " + this.host);
+								if (!this.disposed)
+								{
+									this.Information("Reconnecting to " + this.host);
+									this.Connect(this.domain);
+								}
 
-								this.Connect(this.domain);
 								return false;
 							}
 							else
@@ -7264,7 +7301,7 @@ namespace Waher.Networking.XMPP
 
 		private void SecondTimerCallback(object State)
 		{
-			if (!this.checkConnection)
+			if (!this.checkConnection.HasValue || !this.checkConnection.Value || this.disposed)
 				return;
 
 			try
@@ -7415,7 +7452,7 @@ namespace Waher.Networking.XMPP
 		{
 			this.pingResponse = true;
 
-			if (!e.Ok)
+			if (!e.Ok && !this.disposed)
 			{
 				if (e.StanzaError is RecipientUnavailableException)
 				{

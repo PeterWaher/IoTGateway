@@ -23,33 +23,37 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Serializes the parameter, in normalized form.
 		/// </summary>
 		/// <param name="Xml">XML Output</param>
-		public override void Serialize(StringBuilder Xml)
+		/// <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
+		public override void Serialize(StringBuilder Xml, bool UsingTemplate)
 		{
-			Xml.Append("<calcParameter name=\"");
-			Xml.Append(XML.Encode(this.Name.Normalize(NormalizationForm.FormC)));
-
-			if (!string.IsNullOrEmpty(this.Guide))
+			if (!UsingTemplate)
 			{
-				Xml.Append("\" guide=\"");
-				Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
-			}
+				Xml.Append("<calcParameter name=\"");
+				Xml.Append(XML.Encode(this.Name.Normalize(NormalizationForm.FormC)));
 
-			if (!string.IsNullOrEmpty(this.Expression))
-			{
-				Xml.Append("\" exp=\"");
-				Xml.Append(XML.Encode(this.Expression.Normalize(NormalizationForm.FormC)));
-			}
+				if (!string.IsNullOrEmpty(this.Guide))
+				{
+					Xml.Append("\" guide=\"");
+					Xml.Append(XML.Encode(this.Guide.Normalize(NormalizationForm.FormC)));
+				}
 
-			if (this.Descriptions is null || this.Descriptions.Length == 0)
-				Xml.Append("\"/>");
-			else
-			{
-				Xml.Append("\">");
+				if (!string.IsNullOrEmpty(this.Expression))
+				{
+					Xml.Append("\" exp=\"");
+					Xml.Append(XML.Encode(this.Expression.Normalize(NormalizationForm.FormC)));
+				}
 
-				foreach (HumanReadableText Description in this.Descriptions)
-					Description.Serialize(Xml, "description", false);
+				if (this.Descriptions is null || this.Descriptions.Length == 0)
+					Xml.Append("\"/>");
+				else
+				{
+					Xml.Append("\">");
 
-				Xml.Append("</calcParameter>");
+					foreach (HumanReadableText Description in this.Descriptions)
+						Description.Serialize(Xml, "description", false);
+
+					Xml.Append("</calcParameter>");
+				}
 			}
 		}
 

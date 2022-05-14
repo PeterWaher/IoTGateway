@@ -1004,9 +1004,10 @@ namespace Waher.Networking.XMPP.Contracts
 			if (Content is null || ForHumans.Count == 0 || !PartsDefined)
 				return null;
 
-			Variables Variables = new Variables();
-
-			Variables["Duration"] = Result.duration;
+			Variables Variables = new Variables
+			{
+				["Duration"] = Result.duration
+			};
 
 			foreach (Parameter Parameter in Parameters)
 				Parameter.Populate(Variables);
@@ -1314,7 +1315,7 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append("<parameters>");
 
 				foreach (Parameter Parameter in this.parameters)
-					Parameter.Serialize(Xml);
+					Parameter.Serialize(Xml, false);
 
 				Xml.Append("</parameters>");
 			}

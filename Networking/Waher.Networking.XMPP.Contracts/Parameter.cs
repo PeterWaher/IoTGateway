@@ -58,7 +58,18 @@ namespace Waher.Networking.XMPP.Contracts
 		/// Serializes the parameter, in normalized form.
 		/// </summary>
 		/// <param name="Xml">XML Output</param>
-		public abstract void Serialize(StringBuilder Xml);
+		[Obsolete("Use the Serialize(StringBuilder, bool) overload.")]
+		public void Serialize(StringBuilder Xml)
+		{
+			this.Serialize(Xml, false);
+		}
+
+		/// <summary>
+		/// Serializes the parameter, in normalized form.
+		/// </summary>
+		/// <param name="Xml">XML Output</param>
+		/// <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
+		public abstract void Serialize(StringBuilder Xml, bool UsingTemplate);
 
 		/// <summary>
 		/// Checks if the parameter value is valid.

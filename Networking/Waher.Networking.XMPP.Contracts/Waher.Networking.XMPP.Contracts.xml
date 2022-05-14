@@ -65,11 +65,12 @@
             Parameter value.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.BooleanParameter.Serialize(System.Text.StringBuilder)">
+        <member name="M:Waher.Networking.XMPP.Contracts.BooleanParameter.Serialize(System.Text.StringBuilder,System.Boolean)">
             <summary>
             Serializes the parameter, in normalized form.
             </summary>
             <param name="Xml">XML Output</param>
+            <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.BooleanParameter.IsParameterValid(Waher.Script.Variables)">
             <summary>
@@ -101,11 +102,12 @@
             Parameter value.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.CalcParameter.Serialize(System.Text.StringBuilder)">
+        <member name="M:Waher.Networking.XMPP.Contracts.CalcParameter.Serialize(System.Text.StringBuilder,System.Boolean)">
             <summary>
             Serializes the parameter, in normalized form.
             </summary>
             <param name="Xml">XML Output</param>
+            <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.CalcParameter.IsParameterValid(Waher.Script.Variables)">
             <summary>
@@ -2357,11 +2359,12 @@
             Date contractual parameter
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.DateParameter.Serialize(System.Text.StringBuilder)">
+        <member name="M:Waher.Networking.XMPP.Contracts.DateParameter.Serialize(System.Text.StringBuilder,System.Boolean)">
             <summary>
             Serializes the parameter, in normalized form.
             </summary>
             <param name="Xml">XML Output</param>
+            <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.DateParameter.IsParameterValid(Waher.Script.Variables)">
             <summary>
@@ -2382,11 +2385,12 @@
             Date and Time contractual parameter
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.DateTimeParameter.Serialize(System.Text.StringBuilder)">
+        <member name="M:Waher.Networking.XMPP.Contracts.DateTimeParameter.Serialize(System.Text.StringBuilder,System.Boolean)">
             <summary>
             Serializes the parameter, in normalized form.
             </summary>
             <param name="Xml">XML Output</param>
+            <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.DateTimeParameter.SetValue(System.Object)">
             <summary>
@@ -2400,11 +2404,12 @@
             Duration contractual parameter
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.DurationParameter.Serialize(System.Text.StringBuilder)">
+        <member name="M:Waher.Networking.XMPP.Contracts.DurationParameter.Serialize(System.Text.StringBuilder,System.Boolean)">
             <summary>
             Serializes the parameter, in normalized form.
             </summary>
             <param name="Xml">XML Output</param>
+            <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.DurationParameter.SetValue(System.Object)">
             <summary>
@@ -4362,11 +4367,12 @@
             Numerical contractual parameter
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.NumericalParameter.Serialize(System.Text.StringBuilder)">
+        <member name="M:Waher.Networking.XMPP.Contracts.NumericalParameter.Serialize(System.Text.StringBuilder,System.Boolean)">
             <summary>
             Serializes the parameter, in normalized form.
             </summary>
             <param name="Xml">XML Output</param>
+            <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.NumericalParameter.SetValue(System.Object)">
             <summary>
@@ -4405,6 +4411,13 @@
             Serializes the parameter, in normalized form.
             </summary>
             <param name="Xml">XML Output</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.Parameter.Serialize(System.Text.StringBuilder,System.Boolean)">
+            <summary>
+            Serializes the parameter, in normalized form.
+            </summary>
+            <param name="Xml">XML Output</param>
+            <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.Parameter.IsParameterValid(Waher.Script.Variables)">
             <summary>
@@ -6049,11 +6062,12 @@
             Parameter value.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.StringParameter.Serialize(System.Text.StringBuilder)">
+        <member name="M:Waher.Networking.XMPP.Contracts.StringParameter.Serialize(System.Text.StringBuilder,System.Boolean)">
             <summary>
             Serializes the parameter, in normalized form.
             </summary>
             <param name="Xml">XML Output</param>
+            <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.StringParameter.IsParameterValid(Waher.Script.Variables)">
             <summary>
@@ -6080,11 +6094,12 @@
             Time contractual parameter
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.TimeParameter.Serialize(System.Text.StringBuilder)">
+        <member name="M:Waher.Networking.XMPP.Contracts.TimeParameter.Serialize(System.Text.StringBuilder,System.Boolean)">
             <summary>
             Serializes the parameter, in normalized form.
             </summary>
             <param name="Xml">XML Output</param>
+            <param name="UsingTemplate">If the XML is for creating a contract using a template.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Contracts.TimeParameter.SetValue(System.Object)">
             <summary>

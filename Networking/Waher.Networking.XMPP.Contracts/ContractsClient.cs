@@ -2399,7 +2399,7 @@ namespace Waher.Networking.XMPP.Contracts
 				Xml.Append("<parameters>");
 
 				foreach (Parameter Parameter in Parameters)
-					Parameter.Serialize(Xml);
+					Parameter.Serialize(Xml, true);
 
 				Xml.Append("</parameters>");
 			}

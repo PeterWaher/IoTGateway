@@ -379,7 +379,7 @@ namespace Waher.Script.Model
 				await Task;
 
 				PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
-				Result = PI.GetMethod.Invoke(Task, null);
+				Result = PI?.GetMethod?.Invoke(Task, null);
 			}
 
 			return Result;
@@ -395,8 +395,10 @@ namespace Waher.Script.Model
 		{
 			if (Result is Task Task)
 			{
+				Task.Wait();
+
 				PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
-				Result = PI.GetMethod.Invoke(Task, null);
+				Result = PI?.GetMethod?.Invoke(Task, null);
 			}
 
 			return Result;

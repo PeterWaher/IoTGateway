@@ -8,6 +8,7 @@ using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Runtime.Inventory;
 using System.Threading.Tasks;
+using Waher.Content.Binary;
 
 namespace Waher.Networking.HTTP
 {
@@ -797,22 +798,27 @@ namespace Waher.Networking.HTTP
 		/// <param name="Object">Object to return. Object will be encoded using Internet Content encoders, as defined in <see cref="Waher.Content"/>.</param>
 		public async Task Return(object Object)
 		{
-			EncodingResult Result = await this.TryEncode(Object);
-
-			if (Result is null)
-			{
-				this.statusCode = 406;  // Not acceptable
-				this.statusMessage = "Not Acceptable";
-			}
+			if (Object is FileReference Ref)
+				await this.Return(Ref);
 			else
 			{
-				this.ContentType = Result.ContentType;
-				this.ContentLength = Result.Data.Length;
+				EncodingResult Result = await this.TryEncode(Object);
 
-				await this.Write(Result.Data);
+				if (Result is null)
+				{
+					this.statusCode = 406;  // Not acceptable
+					this.statusMessage = "Not Acceptable";
+				}
+				else
+				{
+					this.ContentType = Result.ContentType;
+					this.ContentLength = Result.Data.Length;
+
+					await this.Write(Result.Data);
+				}
+
+				await this.SendResponse();
 			}
-
-			await this.SendResponse();
 		}
 
 		/// <summary>
@@ -826,6 +832,38 @@ namespace Waher.Networking.HTTP
 
 			await this.Write(Data);
 			await this.SendResponse();
+		}
+
+		/// <summary>
+		/// Returns a file.
+		/// </summary>
+		/// <param name="FileRef">File reference.</param>
+		public async Task Return(FileReference FileRef)
+		{
+			using (FileStream f = File.OpenRead(FileRef.FileName))
+			{
+				long Pos = 0;
+				long Len = f.Length;
+				int BufSize = (int)Math.Min(Len, 65536 * 4);
+				byte[] Buf = new byte[BufSize];
+				int c;
+
+				this.contentType = FileRef.ContentType;
+				this.ContentLength = Len;
+
+				while (Pos < Len)
+				{
+					c = (int)Math.Min(BufSize, Len - Pos);
+					
+					if (await f.ReadAsync(Buf, 0, c) != c)
+						throw new IOException("Unexpected end of file.");
+					
+					await this.Write(Buf, 0, c);
+					Pos += c;
+				}
+
+				await this.SendResponse();
+			}
 		}
 
 		private class EncodingResult

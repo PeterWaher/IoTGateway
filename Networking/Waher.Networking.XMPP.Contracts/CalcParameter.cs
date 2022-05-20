@@ -73,8 +73,13 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				try
 				{
-					this.value = await this.Parsed.EvaluateAsync(Variables);
-					Variables[this.Name] = this.value;
+					object Result = await this.Parsed.EvaluateAsync(Variables);
+					Variables[this.Name] = Result;
+
+					if (Result is double d)
+						this.value = (decimal)d;
+					else
+						this.value = Result;
 				}
 				catch (Exception)
 				{

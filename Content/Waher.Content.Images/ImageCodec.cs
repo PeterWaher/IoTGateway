@@ -221,6 +221,10 @@ namespace Waher.Content.Images
 					ContentType = "image/jpeg";
 					return true;
 
+				case "webp":
+					ContentType = "image/webp";
+					return true;
+
 				case "tif":
 				case "tiff":
 					ContentType = "image/tiff";
@@ -272,6 +276,10 @@ namespace Waher.Content.Images
 
 				case "image/jpeg":
 					FileExtension = "jpg";
+					return true;
+
+				case "image/webp":
+					FileExtension = "webp";
 					return true;
 
 				case "image/tiff":

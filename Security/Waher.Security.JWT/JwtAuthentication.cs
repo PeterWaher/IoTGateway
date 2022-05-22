@@ -39,6 +39,18 @@ namespace Waher.Security.JWT
 			return "Bearer realm=\"" + this.realm + "\"";
 		}
 
+		private string GetAccessToken(HttpRequest Request)
+		{
+			HttpFieldAuthorization Authorization = Request.Header.Authorization;
+			if (Authorization != null && Authorization.Value.StartsWith("Bearer ", StringComparison.CurrentCultureIgnoreCase))
+				return Authorization.Value.Substring(7).Trim();
+
+			if (Request.Header.TryGetQueryParameter("access_token", out string Token))      // RFC 6750, §2.3: https://www.rfc-editor.org/rfc/rfc6750#section-2.3
+				return Token;
+
+			return null;
+		}
+
 		/// <summary>
 		/// Checks if the request is authorized.
 		/// </summary>
@@ -46,37 +58,34 @@ namespace Waher.Security.JWT
 		/// <returns>User object, if authenticated, or null otherwise.</returns>
 		public override async Task<IUser> IsAuthenticated(HttpRequest Request)
 		{
-			HttpFieldAuthorization Authorization = Request.Header.Authorization;
-			if (Authorization != null && Authorization.Value.StartsWith("Bearer ", StringComparison.CurrentCultureIgnoreCase))
+			string TokenStr = this.GetAccessToken(Request);
+			if (string.IsNullOrEmpty(TokenStr))
+				return null;
+
+			try
 			{
-				try
-				{
-					string TokenStr = Authorization.Value.Substring(7).Trim();
-					JwtToken Token = new JwtToken(TokenStr);
-					string UserName = Token.Subject;
+				JwtToken Token = new JwtToken(TokenStr);
+				string UserName = Token.Subject;
 
-					if (!this.factory.IsValid(Token) || UserName is null)
-					{
-						LoginAuditor.Fail("Login attempt failed.", UserName ?? string.Empty, Request.RemoteEndPoint, "HTTP");
-						return null;
-					}
-
-					IUser User = await this.users.TryGetUser(UserName);
-					
-					if (User is null)
-						LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
-					else
-						LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
-				
-					return User;
-				}
-				catch (Exception)
+				if (!this.factory.IsValid(Token) || UserName is null)
 				{
+					LoginAuditor.Fail("Login attempt failed.", UserName ?? string.Empty, Request.RemoteEndPoint, "HTTP");
 					return null;
 				}
-			}
 
-			return null;
+				IUser User = await this.users.TryGetUser(UserName);
+
+				if (User is null)
+					LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
+				else
+					LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
+
+				return User;
+			}
+			catch (Exception)
+			{
+				return null;
+			}
 		}
 
 	}

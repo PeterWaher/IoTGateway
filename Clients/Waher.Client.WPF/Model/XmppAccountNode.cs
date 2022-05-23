@@ -145,7 +145,7 @@ namespace Waher.Client.WPF.Model
 		{
 			this.connections = Connections;
 			this.host = XML.Attribute(E, "host");
-			this.transport = (TransportMethod)XML.Attribute(E, "transport", TransportMethod.TraditionalSocket);
+			this.transport = XML.Attribute(E, "transport", TransportMethod.TraditionalSocket);
 			this.urlBindResource = XML.Attribute(E, "urlBindResource");
 			this.domain = XML.Attribute(E, "domain", this.host);
 			this.port = XML.Attribute(E, "port", XmppCredentials.DefaultPort);

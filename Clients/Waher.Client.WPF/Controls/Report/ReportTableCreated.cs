@@ -50,7 +50,7 @@ namespace Waher.Client.WPF.Controls.Report
 					string Partition = E.HasAttribute("partition") ? XML.Attribute(E, "partition") : null;
 					SKColor? FgColor = E.HasAttribute("fgColor") ? Graph.ToColor(XML.Attribute(E, "fgColor")) : (SKColor?)null;
 					SKColor? BgColor = E.HasAttribute("bgColor") ? Graph.ToColor(XML.Attribute(E, "bgColor")) : (SKColor?)null;
-					ColumnAlignment? Alignment = E.HasAttribute("alignment") ? (ColumnAlignment)XML.Attribute(E, "alignment", ColumnAlignment.Left) : (ColumnAlignment?)null;
+					ColumnAlignment? Alignment = E.HasAttribute("alignment") ? XML.Attribute(E, "alignment", ColumnAlignment.Left) : (ColumnAlignment?)null;
 					byte? NrDecimals = E.HasAttribute("nrDecimals") ? (byte)XML.Attribute(E, "nrDecimals", 0) : (byte?)null;
 
 					Columns.Add(new Column(ColumnId, Header, DataSourceId, Partition, FgColor, BgColor, Alignment, NrDecimals));

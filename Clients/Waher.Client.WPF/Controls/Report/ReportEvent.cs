@@ -33,8 +33,8 @@ namespace Waher.Client.WPF.Controls.Report
 		/// <param name="Xml">XML Definition</param>
 		public ReportEvent(XmlElement Xml)
 		{
-			this.type = (QueryEventType)XML.Attribute(Xml, "type", QueryEventType.Information);
-			this.level = (QueryEventLevel)XML.Attribute(Xml, "level", QueryEventLevel.Minor);
+			this.type = XML.Attribute(Xml, "type", QueryEventType.Information);
+			this.level = XML.Attribute(Xml, "level", QueryEventLevel.Minor);
 			this.eventMessage = Xml.InnerText;
 		}
 

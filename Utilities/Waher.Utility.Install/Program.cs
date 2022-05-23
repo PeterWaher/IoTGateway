@@ -330,7 +330,7 @@ namespace Waher.Utility.Install
 		private static AssemblyName GetAssemblyName(string ServerApplication)
 		{
 			if (ServerApplication.EndsWith(".exe", StringComparison.CurrentCultureIgnoreCase))
-				ServerApplication = ServerApplication.Substring(0, ServerApplication.Length - 4) + ".dll";
+				ServerApplication = ServerApplication[0..^4] + ".dll";
 
 			return AssemblyName.GetAssemblyName(ServerApplication);
 		}
@@ -415,7 +415,7 @@ namespace Waher.Utility.Install
 					{
 						if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 						{
-							string PdbFileName = FileName.Substring(0, FileName.Length - 4) + ".pdb";
+							string PdbFileName = FileName[0..^4] + ".pdb";
 							if (File.Exists(PdbFileName))
 								CopyFileIfNewer(Path.Combine(SourceFolder, PdbFileName), Path.Combine(AppFolder, PdbFileName), null, true);
 						}
@@ -567,7 +567,7 @@ namespace Waher.Utility.Install
 					{
 						case "Content":
 							(string FileName, string SourceFileName) = GetFileName(E, SourceFolder);
-							CopyOptions CopyOptions = (CopyOptions)XML.Attribute(E, "copy", CopyOptions.IfNewer);
+							CopyOptions CopyOptions = XML.Attribute(E, "copy", CopyOptions.IfNewer);
 
 							Log.Informational("Content file: " + FileName);
 
@@ -723,7 +723,7 @@ namespace Waher.Utility.Install
 						RemoveFile(AppFileName);
 						if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 						{
-							string PdbFileName = FileName.Substring(0, FileName.Length - 4) + ".pdb";
+							string PdbFileName = FileName[0..^4] + ".pdb";
 							RemoveFile(PdbFileName);
 						}
 					}
@@ -836,8 +836,8 @@ namespace Waher.Utility.Install
 
 							if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 							{
-								string PdbSourceFileName = SourceFileName.Substring(0, SourceFileName.Length - 4) + ".pdb";
-								string PdbFileName = FileName.Substring(0, FileName.Length - 4) + ".pdb";
+								string PdbSourceFileName = SourceFileName[0..^4] + ".pdb";
+								string PdbFileName = FileName[0..^4] + ".pdb";
 								if (File.Exists(PdbSourceFileName))
 									CopyFile(1, PdbSourceFileName, PdbFileName, Compressed);
 							}
@@ -874,11 +874,10 @@ namespace Waher.Utility.Install
 			WriteVarLenUInt((ulong)File.GetLastAccessTimeUtc(SourceFileName).Ticks, Output);
 			WriteVarLenUInt((ulong)File.GetLastWriteTimeUtc(SourceFileName).Ticks, Output);
 
-			using (FileStream f = File.OpenRead(SourceFileName))
-			{
-				WriteVarLenUInt((ulong)f.Length, Output);
-				f.CopyTo(Output);
-			}
+			using FileStream f = File.OpenRead(SourceFileName);
+
+			WriteVarLenUInt((ulong)f.Length, Output);
+			f.CopyTo(Output);
 		}
 
 		private static void WriteBin(byte[] Bin, Stream Output)
@@ -954,7 +953,7 @@ namespace Waher.Utility.Install
 					{
 						case "Content":
 							(string FileName, string SourceFileName) = GetFileName(E, SourceFolder);
-							CopyOptions CopyOptions = (CopyOptions)XML.Attribute(E, "copy", CopyOptions.IfNewer);
+							CopyOptions CopyOptions = XML.Attribute(E, "copy", CopyOptions.IfNewer);
 
 							Log.Informational("Content file: " + FileName);
 
@@ -1496,7 +1495,7 @@ namespace Waher.Utility.Install
 								RemoveFile(FileName);
 								if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 								{
-									string PdbFileName = FileName.Substring(0, FileName.Length - 4) + ".pdb";
+									string PdbFileName = FileName[0..^4] + ".pdb";
 									RemoveFile(PdbFileName);
 								}
 							}

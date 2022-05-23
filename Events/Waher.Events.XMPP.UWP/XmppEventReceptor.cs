@@ -49,8 +49,8 @@ namespace Waher.Events.XMPP
 			List<KeyValuePair<string, object>> Tags = new List<KeyValuePair<string, object>>();
 			DateTime Timestamp = XML.Attribute(E, "timestamp", DateTime.MinValue);
 			string EventId = XML.Attribute(E, "id");
-			EventType Type = (EventType)XML.Attribute(E, "type", EventType.Informational);
-			EventLevel Level = (EventLevel)XML.Attribute(E, "level", EventLevel.Minor);
+			EventType Type = XML.Attribute(E, "type", EventType.Informational);
+			EventLevel Level = XML.Attribute(E, "level", EventLevel.Minor);
 			string Object = XML.Attribute(E, "object");
 			string Actor = XML.Attribute(E, "subject");
 			string Facility = XML.Attribute(E, "facility");

@@ -419,8 +419,8 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 								break;
 
 							case "queryMessage":
-								QueryEventType Type = (QueryEventType)XML.Attribute(E, "type", QueryEventType.Information);
-								QueryEventLevel Level = (QueryEventLevel)XML.Attribute(E, "level", QueryEventLevel.Minor);
+								QueryEventType Type = XML.Attribute(E, "type", QueryEventType.Information);
+								QueryEventLevel Level = XML.Attribute(E, "level", QueryEventLevel.Minor);
 
 								await this.QueryMessage(Type, Level, E.InnerText, e);
 								break;

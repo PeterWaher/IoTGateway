@@ -278,7 +278,7 @@ namespace Waher.Client.WPF.Controls
 					continue;
 
 				DateTime Timestamp = XML.Attribute(E, "timestamp", DateTime.MinValue);
-				EventLevel Level = (EventLevel)XML.Attribute(E, "level", EventLevel.Minor);
+				EventLevel Level = XML.Attribute(E, "level", EventLevel.Minor);
 				string EventId = XML.Attribute(E, "id");
 				string Object = XML.Attribute(E, "object");
 				string Actor = XML.Attribute(E, "actor");

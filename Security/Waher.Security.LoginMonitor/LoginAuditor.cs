@@ -486,8 +486,8 @@ namespace Waher.Security.LoginMonitor
 		/// </summary>
 		/// <param name="RemoteEndpoint">Remote endpoint performing the attack.</param>
 		/// <param name="Message">Message to log.</param>
-		/// <param name="Protocoll">Protocol used.</param>
-		public static async Task ReportTlsHackAttempt(string RemoteEndpoint, string Message, string Protocoll)
+		/// <param name="Protocol">Protocol used.</param>
+		public static async Task ReportTlsHackAttempt(string RemoteEndpoint, string Message, string Protocol)
 		{
 			lock (tlsHackEndpoints)
 			{

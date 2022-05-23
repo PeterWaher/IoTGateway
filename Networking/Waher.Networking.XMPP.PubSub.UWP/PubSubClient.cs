@@ -887,7 +887,7 @@ namespace Waher.Networking.XMPP.PubSub
 										break;
 									}
 
-									Status = (NodeSubscriptionStatus)XML.Attribute(E2, "subscription", NodeSubscriptionStatus.none);
+									Status = XML.Attribute(E2, "subscription", NodeSubscriptionStatus.none);
 									Expires = XML.Attribute(E2, "expiry", DateTime.MaxValue);
 									SubscriptionId = XML.Attribute(E2, "subid");
 
@@ -1436,7 +1436,7 @@ namespace Waher.Networking.XMPP.PubSub
 										break;
 									}
 
-									Status = (NodeSubscriptionStatus)XML.Attribute(E2, "subscription", NodeSubscriptionStatus.none);
+									Status = XML.Attribute(E2, "subscription", NodeSubscriptionStatus.none);
 									Expires = XML.Attribute(E2, "expiry", DateTime.MaxValue);
 									SubscriptionId = XML.Attribute(E2, "subid");
 									break;
@@ -1723,7 +1723,7 @@ namespace Waher.Networking.XMPP.PubSub
 						case "subscription":
 							NodeName = XML.Attribute(E, "node");
 							string Jid = XML.Attribute(E, "jid");
-							NodeSubscriptionStatus Status = (NodeSubscriptionStatus)XML.Attribute(E, "subscription", NodeSubscriptionStatus.none);
+							NodeSubscriptionStatus Status = XML.Attribute(E, "subscription", NodeSubscriptionStatus.none);
 
 							SubscriptionNotificationEventHandler h3 = this.SubscriptionStatusChanged;
 							if (!(h3 is null))
@@ -2181,7 +2181,7 @@ namespace Waher.Networking.XMPP.PubSub
 								{
 									Subscriptions.Add(new Subscription(NodeName,
 										XML.Attribute(E3, "jid"),
-										(NodeSubscriptionStatus)XML.Attribute(E3, "subscription", NodeSubscriptionStatus.none),
+										XML.Attribute(E3, "subscription", NodeSubscriptionStatus.none),
 										XML.Attribute(E3, "subid")));
 								}
 							}
@@ -2445,7 +2445,7 @@ namespace Waher.Networking.XMPP.PubSub
 									Subscriptions.Add(new Subscription(
 										E3.HasAttribute("node") ? E3.GetAttribute("node") : NodeName,
 										XML.Attribute(E3, "jid"),
-										(NodeSubscriptionStatus)XML.Attribute(E3, "subscription", NodeSubscriptionStatus.none),
+										XML.Attribute(E3, "subscription", NodeSubscriptionStatus.none),
 										XML.Attribute(E3, "subid")));
 								}
 							}

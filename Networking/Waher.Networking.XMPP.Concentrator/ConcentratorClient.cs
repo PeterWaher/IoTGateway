@@ -473,7 +473,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			string Partition = XML.Attribute(E, "pt");
 			string NodeType = XML.Attribute(E, "nodeType");
 			string DisplayName = XML.Attribute(E, "displayName");
-			NodeState NodeState = (NodeState)XML.Attribute(E, "state", NodeState.None);
+			NodeState NodeState = XML.Attribute(E, "state", NodeState.None);
 			string LocalId = XML.Attribute(E, "localId");
 			string LogId = XML.Attribute(E, "logId");
 			bool HasChildren = XML.Attribute(E, "hasChildren", false);
@@ -588,7 +588,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						case "message":
 							DateTime Timestamp = XML.Attribute(E2, "timestamp", DateTime.MinValue);
 							string EventId = XML.Attribute(E2, "eventId");
-							Things.DisplayableParameters.MessageType Type = (Things.DisplayableParameters.MessageType)XML.Attribute(E2, "type",
+							Things.DisplayableParameters.MessageType Type = XML.Attribute(E2, "type", 
 								Things.DisplayableParameters.MessageType.Information);
 
 							if (!(MessageList is null))
@@ -1828,7 +1828,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						{
 							string Command = XML.Attribute(E2, "command");
 							string Name = XML.Attribute(E2, "name");
-							CommandType Type = (CommandType)XML.Attribute(E2, "type", CommandType.Simple);
+							CommandType Type = XML.Attribute(E2, "type", CommandType.Simple);
 							string SuccessString = XML.Attribute(E2, "successString");
 							string FailureString = XML.Attribute(E2, "failureString");
 							string ConfirmationString = XML.Attribute(E2, "confirmationString");
@@ -2580,7 +2580,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				ParentId = XML.Attribute(E, "parentId"),
 				ParentPartition = XML.Attribute(E, "parentPartition"),
 				Updated = XML.Attribute(E, "lastChanged", DateTime.MinValue),
-				State = (NodeState)XML.Attribute(E, "state", NodeState.None),
+				State = XML.Attribute(E, "state", NodeState.None),
 				NodeId = NodeId,
 				Partition = XML.Attribute(E, "pt"),
 				LogId = XML.Attribute(E, "logId", NodeId),
@@ -2611,7 +2611,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				ParentId = XML.Attribute(E, "parentId"),
 				ParentPartition = XML.Attribute(E, "parentPartition"),
 				Updated = XML.Attribute(E, "lastChanged", DateTime.MinValue),
-				State = (NodeState)XML.Attribute(E, "state", NodeState.None),
+				State = XML.Attribute(E, "state", NodeState.None),
 				NodeId = NodeId,
 				Partition = XML.Attribute(E, "pt"),
 				LogId = XML.Attribute(E, "logId", NodeId),
@@ -2649,7 +2649,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			return this.SourceEventReceived(new NodeStatusChanged()
 			{
-				State = (NodeState)XML.Attribute(E, "state", NodeState.None),
+				State = XML.Attribute(E, "state", NodeState.None),
 				NodeId = NodeId,
 				Partition = XML.Attribute(E, "pt"),
 				LogId = XML.Attribute(E, "logId", NodeId),

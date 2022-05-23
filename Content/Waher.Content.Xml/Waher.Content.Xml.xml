@@ -249,6 +249,15 @@
             <param name="DefaultValue">Default value.</param>
             <returns>Value of attribute, if found, or the default value, if not found.</returns>
         </member>
+        <member name="M:Waher.Content.Xml.XML.Attribute``1(System.Xml.XmlElement,System.String,``0)">
+            <summary>
+            Gets the value of an XML attribute.
+            </summary>
+            <param name="E">XML Element</param>
+            <param name="Name">Name of attribute</param>
+            <param name="DefaultValue">Default value.</param>
+            <returns>Value of attribute, if found, or the default value, if not found.</returns>
+        </member>
         <member name="M:Waher.Content.Xml.XML.Attribute(System.Xml.XmlElement,System.String,Waher.Content.Duration)">
             <summary>
             Gets the value of an XML attribute.

@@ -494,6 +494,7 @@ namespace Waher.Content.Xml
 		/// <param name="Name">Name of attribute</param>
 		/// <param name="DefaultValue">Default value.</param>
 		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
+		[Obsolete("Use generic overload of this method: Attribute<T>")]
 		public static Enum Attribute(XmlElement E, string Name, Enum DefaultValue)
 		{
 			if (E.HasAttribute(Name))
@@ -501,6 +502,31 @@ namespace Waher.Content.Xml
 				try
 				{
 					return (Enum)Enum.Parse(DefaultValue.GetType(), E.GetAttribute(Name));
+				}
+				catch (Exception)
+				{
+					return DefaultValue;
+				}
+			}
+			else
+				return DefaultValue;
+		}
+
+		/// <summary>
+		/// Gets the value of an XML attribute.
+		/// </summary>
+		/// <param name="E">XML Element</param>
+		/// <param name="Name">Name of attribute</param>
+		/// <param name="DefaultValue">Default value.</param>
+		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
+		public static T Attribute<T>(XmlElement E, string Name, T DefaultValue)
+			where T : Enum
+		{
+			if (E.HasAttribute(Name))
+			{
+				try
+				{
+					return (T)Enum.Parse(DefaultValue.GetType(), E.GetAttribute(Name));
 				}
 				catch (Exception)
 				{

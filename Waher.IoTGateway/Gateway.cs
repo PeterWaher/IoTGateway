@@ -345,7 +345,7 @@ namespace Waher.IoTGateway
 								break;
 
 							case "MutualTls":
-								ClientCertificates = (ClientCertificates)XML.Attribute(E, "clientCertificates", ClientCertificates.NotUsed);
+								ClientCertificates = XML.Attribute(E, "clientCertificates", ClientCertificates.NotUsed);
 								TrustClientCertificates = XML.Attribute(E, "trustCertificates", false);
 								break;
 
@@ -1277,7 +1277,7 @@ namespace Waher.IoTGateway
 
 						case "Content":
 							Name = XML.Attribute(E, "fileName");
-							CopyOptions CopyOptions = (CopyOptions)XML.Attribute(E, "copy", CopyOptions.IfNewer);
+							CopyOptions CopyOptions = XML.Attribute(E, "copy", CopyOptions.IfNewer);
 
 							string s = Path.Combine(RuntimeSubfolder, Name);
 							if (!File.Exists(s))
@@ -1347,7 +1347,7 @@ namespace Waher.IoTGateway
 							{
 								case "Assembly":
 									string Name = XML.Attribute(E, "fileName");
-									CopyOptions CopyOptions = (CopyOptions)XML.Attribute(E, "copy", CopyOptions.IfNewer);
+									CopyOptions CopyOptions = XML.Attribute(E, "copy", CopyOptions.IfNewer);
 
 									string s = Path.Combine(runtimeFolder, Name);
 									if (!File.Exists(s))

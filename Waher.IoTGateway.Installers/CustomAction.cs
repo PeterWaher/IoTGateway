@@ -1036,7 +1036,7 @@ namespace Waher.IoTGateway.Installers
 
                             string FileName = FileNames.Key;
                             string SourceFileName = FileNames.Value;
-                            CopyOptions CopyOptions = (CopyOptions)XML.Attribute(E, "copy", CopyOptions.IfNewer);
+                            CopyOptions CopyOptions = XML.Attribute(E, "copy", CopyOptions.IfNewer);
 
                             Session.Log("Content file: " + FileName);
 

@@ -879,6 +879,12 @@ namespace Waher.Script.Test
 			await Test("Nor([3,2,1])", unchecked((ulong)-4));
 			await Test("Xnor([true,false,true])", true);
 			await Test("Xnor([3,2,1])", 0xffffffffffffffff);
+			await Test("Contains(1..10,5)", true);
+			await Test("Contains(1..10,11)", false);
+			await Test("IndexOf(1..10,5)", 4);
+			await Test("IndexOf(1..10,11)", -1);
+			await Test("LastIndexOf(1..10,5)", 4);
+			await Test("LastIndexOf(1..10,11)", -1);
 		}
 
 		[TestMethod]
@@ -1039,6 +1045,24 @@ namespace Waher.Script.Test
 			await Test("Length('Hello')", 5);
 			await Test("Len('Hello')", 5);
 			await Test("Mid('Hello',2,2)", "ll");
+			await Test("StartsWith('Hello','He')", true);
+			await Test("StartsWith('World','He')", false);
+			await Test("EndsWith('Hello','lo')", true);
+			await Test("EndsWith('World','lo')", false);
+			await Test("Contains('Hello','el')", true);
+			await Test("Contains('World','el')", false);
+			await Test("IndexOf('Hello','el')", 1);
+			await Test("IndexOf('World','el')", -1);
+			await Test("LastIndexOf('Hello','el')", 1);
+			await Test("LastIndexOf('World','el')", -1);
+			await Test("Split('Hello World','l')", new string[] { "He", string.Empty, "o Wor", "d" });
+			await Test("UpperCase('Hello')", "HELLO");
+			await Test("LowerCase('Hello')", "hello");
+			await Test("Trim(' Hello ')", "Hello");
+			await Test("TrimStart(' Hello ')", "Hello ");
+			await Test("TrimEnd(' Hello ')", " Hello");
+			await Test("PadLeft('Hello',10)", "     Hello");
+			await Test("PadRight('Hello',10)", "Hello     ");
 		}
 
 		[TestMethod]

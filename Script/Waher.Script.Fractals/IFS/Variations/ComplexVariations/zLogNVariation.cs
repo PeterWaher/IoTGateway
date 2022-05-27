@@ -33,9 +33,6 @@ namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
             y = Math.Atan2(y, x) * d;
         }
 
-        public override string FunctionName
-        {
-            get { return "zLogNVariation"; }
-        }
+        public override string FunctionName => nameof(ZLogNVariation);
     }
 }

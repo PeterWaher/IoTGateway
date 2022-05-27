@@ -27,7 +27,7 @@ namespace Waher.Script.Functions.Matrices
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "Zeroes";
+		public override string FunctionName => nameof(Zeroes);
 
 		/// <summary>
 		/// Default Argument names

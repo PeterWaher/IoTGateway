@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Content.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -45,7 +44,7 @@ namespace Waher.Script.Content.Functions.Encoding
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "encode";
+		public override string FunctionName => nameof(Encode);
 
 		/// <summary>
 		/// Default Argument names

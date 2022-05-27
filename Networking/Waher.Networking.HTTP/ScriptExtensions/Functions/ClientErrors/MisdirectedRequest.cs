@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.ClientError
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "MisdirectedRequest";
+		public override string FunctionName => nameof(MisdirectedRequest);
 
 		/// <summary>
 		/// Evaluates the function.

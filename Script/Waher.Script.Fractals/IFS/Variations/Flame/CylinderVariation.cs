@@ -14,9 +14,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             x = Math.Sin(x);
         }
 
-        public override string FunctionName
-        {
-            get { return "CylinderVariation"; }
-        }
+        public override string FunctionName => nameof(CylinderVariation);
     }
 }

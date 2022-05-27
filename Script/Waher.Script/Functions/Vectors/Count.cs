@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Functions.Vectors
 {
@@ -42,10 +40,7 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "count"; }
-		}
+		public override string FunctionName => nameof(Count);
 
 		/// <summary>
 		/// Default Argument names

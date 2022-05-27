@@ -28,10 +28,7 @@ namespace Waher.Script.Cryptography.Functions.HashFunctions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "sha3_512"; }
-		}
+		public override string FunctionName => nameof(Sha3_512);
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

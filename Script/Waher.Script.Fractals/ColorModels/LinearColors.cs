@@ -183,10 +183,7 @@ namespace Waher.Script.Fractals.ColorModels
             return Result;
         }
 
-        public override string FunctionName
-        {
-            get { return "LinearColors"; }
-        }
+        public override string FunctionName => nameof(LinearColors);
 
     }
 }

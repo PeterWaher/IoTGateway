@@ -262,7 +262,7 @@ namespace Waher.Script.Functions.Runtime
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "create";
+		public override string FunctionName => nameof(Create);
 
 		/// <summary>
 		/// Optional aliases. If there are no aliases for the function, null is returned.

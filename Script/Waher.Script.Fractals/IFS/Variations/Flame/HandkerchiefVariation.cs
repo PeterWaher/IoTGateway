@@ -17,9 +17,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = r * Math.Cos(a - r);
         }
 
-        public override string FunctionName
-        {
-            get { return "HandkerchiefVariation"; }
-        }
+        public override string FunctionName => nameof(HandkerchiefVariation);
     }
 }

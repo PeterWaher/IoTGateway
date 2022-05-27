@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Script.Abstraction.Elements;
+﻿using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
@@ -25,10 +24,7 @@ namespace Waher.Script.Content.Functions.Encoding
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "urldecode"; }
-        }
+        public override string FunctionName => nameof(UrlDecode);
 
         /// <summary>
         /// Evaluates the function on a scalar argument.

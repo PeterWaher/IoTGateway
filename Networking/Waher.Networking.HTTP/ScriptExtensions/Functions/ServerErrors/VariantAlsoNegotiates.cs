@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.ServerErrors
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "VariantAlsoNegotiates";
+		public override string FunctionName => nameof(VariantAlsoNegotiates);
 
 		/// <summary>
 		/// Evaluates the function.

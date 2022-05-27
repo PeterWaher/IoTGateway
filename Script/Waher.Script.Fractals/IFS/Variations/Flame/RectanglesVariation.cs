@@ -48,9 +48,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = (2 * Math.Floor(y / this.y) + 1) * this.y - y;
         }
 
-        public override string FunctionName
-        {
-            get { return "RectanglesVariation"; }
-        }
+        public override string FunctionName => nameof(RectanglesVariation);
     }
 }

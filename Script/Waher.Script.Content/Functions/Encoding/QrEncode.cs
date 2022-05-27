@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
 using SkiaSharp;
 using Waher.Content.QR;
 using Waher.Script.Abstraction.Elements;
@@ -63,10 +61,7 @@ namespace Waher.Script.Content.Functions.Encoding
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "qrencode"; }
-		}
+		public override string FunctionName => nameof(QrEncode);
 
 		/// <summary>
 		/// Default Argument names

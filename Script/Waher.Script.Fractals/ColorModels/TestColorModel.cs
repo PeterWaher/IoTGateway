@@ -75,9 +75,6 @@ namespace Waher.Script.Fractals.ColorModels
 			}
 		}
 
-        public override string FunctionName
-        {
-            get { return "TestColorModel"; }
-        }
+        public override string FunctionName => nameof(TestColorModel);
     }
 }

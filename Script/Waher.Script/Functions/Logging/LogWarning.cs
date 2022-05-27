@@ -38,7 +38,7 @@ namespace Waher.Script.Functions.Logging
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "LogWarning";
+		public override string FunctionName => nameof(LogWarning);
 
 		/// <summary>
 		/// Logs warning to the event log.

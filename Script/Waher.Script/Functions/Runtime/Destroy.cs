@@ -35,7 +35,7 @@ namespace Waher.Script.Functions.Runtime
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName => "destroy";
+        public override string FunctionName => nameof(Destroy);
 
         /// <summary>
         /// Optional aliases. If there are no aliases for the function, null is returned.

@@ -30,7 +30,7 @@ namespace Waher.Content.Markdown.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "ScriptFile";
+		public override string FunctionName => nameof(ScriptFile);
 
 		/// <summary>
 		/// Default Argument names

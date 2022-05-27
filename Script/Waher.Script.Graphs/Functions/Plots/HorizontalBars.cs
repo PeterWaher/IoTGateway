@@ -46,10 +46,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "horizontalbars"; }
-		}
+		public override string FunctionName => nameof(HorizontalBars);
 
 		/// <summary>
 		/// Default Argument names

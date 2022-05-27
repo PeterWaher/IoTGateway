@@ -17,9 +17,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = -r * Math.Cos(r * a);
         }
 
-        public override string FunctionName
-        {
-            get { return "HeartVariation"; }
-        }
+        public override string FunctionName => nameof(HeartVariation);
     }
 }

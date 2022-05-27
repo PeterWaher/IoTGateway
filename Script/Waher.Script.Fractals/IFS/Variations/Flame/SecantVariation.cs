@@ -15,9 +15,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = 1 / (this.variationWeight * Math.Cos(this.variationWeight * r));
         }
 
-        public override string FunctionName
-        {
-            get { return "SecantVariation"; }
-        }
+        public override string FunctionName => nameof(SecantVariation);
     }
 }

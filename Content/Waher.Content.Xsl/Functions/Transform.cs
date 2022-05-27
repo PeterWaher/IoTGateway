@@ -29,13 +29,10 @@ namespace Waher.Content.Xsl.Functions
         {
         }
 
-        /// <summary>
-        /// Name of the function
-        /// </summary>
-        public override string FunctionName
-        {
-            get { return "transform"; }
-        }
+		/// <summary>
+		/// Name of the function
+		/// </summary>
+		public override string FunctionName => nameof(Transform);
 
 		/// <summary>
 		/// Evaluates the function on two scalar arguments.

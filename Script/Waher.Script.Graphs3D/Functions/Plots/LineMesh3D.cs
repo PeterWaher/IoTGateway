@@ -47,10 +47,7 @@ namespace Waher.Script.Graphs3D.Functions.Plots
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "linemesh3d"; }
-		}
+		public override string FunctionName => nameof(LineMesh3D);
 
 		/// <summary>
 		/// Default Argument names

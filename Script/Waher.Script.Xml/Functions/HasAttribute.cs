@@ -27,7 +27,7 @@ namespace Waher.Script.Xml.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "HasAttribute";
+		public override string FunctionName => nameof(HasAttribute);
 
 		/// <summary>
 		/// Default Argument names

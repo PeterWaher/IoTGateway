@@ -1,8 +1,6 @@
-﻿using System;
-using Waher.Script.Abstraction.Elements;
+﻿using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 
 namespace Waher.Script.Functions.Runtime
 {
@@ -26,7 +24,7 @@ namespace Waher.Script.Functions.Runtime
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName => "error";
+        public override string FunctionName => nameof(Error);
 
         /// <summary>
         /// Optional aliases. If there are no aliases for the function, null is returned.

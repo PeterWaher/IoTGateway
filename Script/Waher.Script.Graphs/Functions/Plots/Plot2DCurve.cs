@@ -65,10 +65,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "plot2dcurve"; }
-		}
+		public override string FunctionName => nameof(Plot2DCurve);
 
 		/// <summary>
 		/// Optional aliases. If there are no aliases for the function, null is returned.

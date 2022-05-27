@@ -57,7 +57,7 @@ namespace Waher.Script.Data.PostgreSQL.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "ConnectPostgreSql";
+		public override string FunctionName => nameof(ConnectPostgreSql);
 
 		/// <summary>
 		/// Default Argument names

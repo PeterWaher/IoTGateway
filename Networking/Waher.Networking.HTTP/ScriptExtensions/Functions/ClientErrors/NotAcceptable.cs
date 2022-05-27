@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.ClientError
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "NotAcceptable";
+		public override string FunctionName => nameof(NotAcceptable);
 
 		/// <summary>
 		/// Evaluates the function.

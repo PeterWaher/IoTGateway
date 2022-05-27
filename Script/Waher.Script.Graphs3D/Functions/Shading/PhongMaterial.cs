@@ -32,7 +32,7 @@ namespace Waher.Script.Graphs3D.Functions.Shading
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "PhongMaterial";
+		public override string FunctionName => nameof(PhongMaterial);
 
 		/// <summary>
 		/// Default Argument names

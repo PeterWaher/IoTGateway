@@ -24,7 +24,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Redirections
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "NotModified";
+		public override string FunctionName => nameof(NotModified);
 
 		/// <summary>
 		/// Evaluates the function.

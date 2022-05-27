@@ -42,7 +42,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "loadfile";
+		public override string FunctionName => nameof(LoadFile);
 
 		/// <summary>
 		/// Default Argument names

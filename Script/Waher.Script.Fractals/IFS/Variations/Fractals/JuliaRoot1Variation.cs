@@ -59,9 +59,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Fractals
             y = amp * Math.Sin(phi);
         }
 
-        public override string FunctionName
-        {
-            get { return "JuliaRoot1Variation"; }
-        }
+        public override string FunctionName => nameof(JuliaRoot1Variation);
     }
 }

@@ -17,9 +17,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = a * Math.Cos(r * Math.PI) / Math.PI;
         }
 
-        public override string FunctionName
-        {
-            get { return "DiscVariation"; }
-        }
+        public override string FunctionName => nameof(DiscVariation);
     }
 }

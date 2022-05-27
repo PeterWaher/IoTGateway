@@ -27,10 +27,7 @@ namespace Waher.Script.Functions.Analytic
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "log2"; }
-		}
+		public override string FunctionName => nameof(log2);
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

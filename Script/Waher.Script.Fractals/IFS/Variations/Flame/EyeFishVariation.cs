@@ -16,9 +16,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = r * y;
         }
 
-        public override string FunctionName
-        {
-            get { return "EyeFishVariation"; }
-        }
+        public override string FunctionName => nameof(EyeFishVariation);
     }
 }

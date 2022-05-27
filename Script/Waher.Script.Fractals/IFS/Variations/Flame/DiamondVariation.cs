@@ -17,9 +17,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = Math.Cos(a) * Math.Sin(r);
         }
 
-        public override string FunctionName
-        {
-            get { return "DiamondVariation"; }
-        }
+        public override string FunctionName => nameof(DiamondVariation);
     }
 }

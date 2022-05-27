@@ -37,7 +37,7 @@ namespace Waher.Script.Cryptography.Functions.Ecc
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "x448";
+		public override string FunctionName => nameof(X448);
 
 		/// <summary>
 		/// Default Argument names

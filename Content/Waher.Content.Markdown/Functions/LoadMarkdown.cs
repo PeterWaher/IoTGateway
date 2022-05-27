@@ -28,7 +28,7 @@ namespace Waher.Content.Markdown.Functions
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName => "loadmarkdown";
+        public override string FunctionName => nameof(LoadMarkdown);
 
 		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using

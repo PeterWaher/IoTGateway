@@ -73,9 +73,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         private const double pi2 = 2 * Math.PI;
 
-        public override string FunctionName
-        {
-            get { return "Disc2Variation"; }
-        }
+        public override string FunctionName => nameof(Disc2Variation);
     }
 }

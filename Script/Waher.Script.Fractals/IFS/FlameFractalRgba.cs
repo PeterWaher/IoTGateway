@@ -132,10 +132,7 @@ namespace Waher.Script.Fractals.IFS
 			}
 		}
 
-		public override string FunctionName
-        {
-            get { return "FlameFractalRgba"; }
-        }
+		public override string FunctionName => nameof(FlameFractalRgba);
 
 		public override string[] Aliases
         {

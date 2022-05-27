@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.ClientError
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "UnavailableForLegalReasons";
+		public override string FunctionName => nameof(UnavailableForLegalReasons);
 
 		/// <summary>
 		/// Evaluates the function.

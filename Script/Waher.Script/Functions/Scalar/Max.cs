@@ -29,10 +29,7 @@ namespace Waher.Script.Functions.Scalar
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "max"; }
-        }
+        public override string FunctionName => nameof(Max);
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

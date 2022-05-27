@@ -20,9 +20,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = r * Math.Sin(a);
         }
 
-        public override string FunctionName
-        {
-            get { return "RingsVariation"; }
-        }
+        public override string FunctionName => nameof(RingsVariation);
     }
 }

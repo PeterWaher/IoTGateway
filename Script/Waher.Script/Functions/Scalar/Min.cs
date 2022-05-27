@@ -29,10 +29,7 @@ namespace Waher.Script.Functions.Scalar
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "min"; }
-        }
+        public override string FunctionName => nameof(Min);
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

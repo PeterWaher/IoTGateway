@@ -60,7 +60,7 @@ namespace Waher.Script.Graphs3D.Functions.Shading
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "ConstantColor";
+		public override string FunctionName => nameof(ConstantColor);
 
 		/// <summary>
 		/// Default Argument names

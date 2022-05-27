@@ -25,7 +25,7 @@ namespace Waher.Script.Threading.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "Sleep";
+		public override string FunctionName => nameof(Sleep);
 
 		/// <summary>
 		/// Default Argument names

@@ -30,10 +30,7 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "left"; }
-		}
+		public override string FunctionName => nameof(Left);
 
 		/// <summary>
 		/// Default Argument names

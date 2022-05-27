@@ -52,9 +52,6 @@ namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
             y = amp * Math.Sin(phi);
         }
 
-        public override string FunctionName
-        {
-            get { return "zPowerExponentVariation"; }
-        }
+        public override string FunctionName => nameof(ZPowerExponentVariation);
     }
 }

@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.ClientError
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "FailedDependency";
+		public override string FunctionName => nameof(FailedDependency);
 
 		/// <summary>
 		/// Evaluates the function.

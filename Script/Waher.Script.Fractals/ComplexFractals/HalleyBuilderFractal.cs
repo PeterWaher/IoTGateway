@@ -238,9 +238,6 @@ namespace Waher.Script.Fractals.ComplexFractals
             return sb.ToString();
         }
 
-        public override string FunctionName
-        {
-            get { return "HalleyBuilderFractal"; }
-        }
+        public override string FunctionName => nameof(HalleyBuilderFractal);
     }
 }

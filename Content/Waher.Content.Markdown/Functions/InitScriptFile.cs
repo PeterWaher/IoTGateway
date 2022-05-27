@@ -36,7 +36,7 @@ namespace Waher.Content.Markdown.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "InitScriptFile";
+		public override string FunctionName => nameof(InitScriptFile);
 
 		/// <summary>
 		/// Default Argument names

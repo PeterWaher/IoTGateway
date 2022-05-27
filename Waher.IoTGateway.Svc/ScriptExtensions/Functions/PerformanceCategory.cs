@@ -28,10 +28,7 @@ namespace Waher.IoTGateway.Svc.ScriptExtensions.Functions
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "PerformanceCategory"; }
-        }
+        public override string FunctionName => nameof(PerformanceCategory);
 
         /// <summary>
         /// Evaluates the function on a scalar argument.

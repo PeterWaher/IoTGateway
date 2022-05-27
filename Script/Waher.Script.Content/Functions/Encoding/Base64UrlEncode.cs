@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -28,10 +27,7 @@ namespace Waher.Script.Content.Functions.Encoding
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "base64urlencode"; }
-		}
+		public override string FunctionName => nameof(Base64UrlEncode);
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

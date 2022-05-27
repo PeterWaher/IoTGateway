@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.ServerErrors
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "GatewayTimeout";
+		public override string FunctionName => nameof(GatewayTimeout);
 
 		/// <summary>
 		/// Evaluates the function.

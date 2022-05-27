@@ -48,9 +48,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y *= d * Math.Cos(this.angle);
         }
 
-        public override string FunctionName
-        {
-            get { return "PerspectiveVariation"; }
-        }
+        public override string FunctionName => nameof(PerspectiveVariation);
     }
 }

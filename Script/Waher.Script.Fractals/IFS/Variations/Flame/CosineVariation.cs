@@ -17,9 +17,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             x = x2;
         }
 
-        public override string FunctionName
-        {
-            get { return "CosineVariation"; }
-        }
+        public override string FunctionName => nameof(CosineVariation);
     }
 }

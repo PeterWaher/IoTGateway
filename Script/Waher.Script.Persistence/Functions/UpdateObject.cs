@@ -26,7 +26,7 @@ namespace Waher.Script.Persistence.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "UpdateObject";
+		public override string FunctionName => nameof(UpdateObject);
 
 		/// <summary>
 		/// Default Argument names

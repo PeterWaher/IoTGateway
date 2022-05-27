@@ -27,10 +27,7 @@ namespace Waher.Script.Functions.Vectors
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "product"; }
-        }
+        public override string FunctionName => nameof(Product);
 
         /// <summary>
         /// Optional aliases. If there are no aliases for the function, null is returned.

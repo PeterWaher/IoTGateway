@@ -30,7 +30,7 @@ namespace Waher.Script.Networking.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "rdap";
+		public override string FunctionName => nameof(Rdap);
 
 		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -72,10 +71,7 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "timespan"; }
-		}
+		public override string FunctionName => nameof(TimeSpan);
 
 		/// <summary>
 		/// Default Argument names

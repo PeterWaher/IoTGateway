@@ -56,7 +56,7 @@ namespace Waher.Script.Graphs.Functions.Canvas
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "Canvas";
+		public override string FunctionName => nameof(Canvas);
 
 		/// <summary>
 		/// Default Argument names

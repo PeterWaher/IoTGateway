@@ -26,7 +26,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "ClearCaches";
+		public override string FunctionName => nameof(ClearCaches);
 
 		/// <summary>
 		/// Default Argument names

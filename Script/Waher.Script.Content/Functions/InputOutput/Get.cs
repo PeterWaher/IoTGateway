@@ -5,7 +5,6 @@ using Waher.Content;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 
 namespace Waher.Script.Content.Functions.InputOutput
 {
@@ -42,10 +41,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "get"; }
-		}
+		public override string FunctionName => nameof(Get);
 
 		/// <summary>
 		/// Default Argument names

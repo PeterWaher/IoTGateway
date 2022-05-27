@@ -17,9 +17,6 @@ namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
             y = Mod * Math.Sin(y);
         }
 
-        public override string FunctionName
-        {
-            get { return "zExpVariation"; }
-        }
+        public override string FunctionName => nameof(ZExpVariation);
     }
 }

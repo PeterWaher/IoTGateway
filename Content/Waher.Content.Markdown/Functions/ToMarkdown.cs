@@ -32,7 +32,7 @@ namespace Waher.Content.Markdown.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "ToMarkdown";
+		public override string FunctionName => nameof(ToMarkdown);
 
 		/// <summary>
 		/// Evaluates the function.

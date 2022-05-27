@@ -28,10 +28,7 @@ namespace Waher.Script.Functions.Scalar
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "string"; }
-		}
+		public override string FunctionName => nameof(String);
 
 		/// <summary>
 		/// Optional aliases. If there are no aliases for the function, null is returned.

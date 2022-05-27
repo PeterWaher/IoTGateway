@@ -42,7 +42,7 @@ namespace Waher.Script.Data.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "ConnectOleDb";
+		public override string FunctionName => nameof(ConnectOleDb);
 
 		/// <summary>
 		/// Default Argument names

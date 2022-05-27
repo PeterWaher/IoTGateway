@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -27,10 +26,7 @@ namespace Waher.Script.Functions.ComplexNumbers
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "polar"; }
-        }
+        public override string FunctionName => nameof(Polar);
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

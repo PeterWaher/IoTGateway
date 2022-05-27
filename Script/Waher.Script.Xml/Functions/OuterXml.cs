@@ -26,7 +26,7 @@ namespace Waher.Script.Xml.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "OuterXml";
+		public override string FunctionName => nameof(OuterXml);
 
 		/// <summary>
 		/// Default Argument names

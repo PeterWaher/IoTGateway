@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.ClientError
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "UnsupportedMediaType";
+		public override string FunctionName => nameof(UnsupportedMediaType);
 
 		/// <summary>
 		/// Evaluates the function.

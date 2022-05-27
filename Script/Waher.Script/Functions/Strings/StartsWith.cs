@@ -25,7 +25,7 @@ namespace Waher.Script.Functions.Strings
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "StartsWith";
+		public override string FunctionName => nameof(StartsWith);
 
 		/// <summary>
 		/// Default Argument names

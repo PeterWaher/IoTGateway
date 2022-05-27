@@ -37,7 +37,7 @@ namespace Waher.Security.JWT.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "CreateJwt";
+		public override string FunctionName => nameof(CreateJwt);
 
 		/// <summary>
 		/// Default Argument names

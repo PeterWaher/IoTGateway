@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Script.Abstraction.Elements;
+﻿using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
@@ -49,10 +48,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "polygon2d"; }
-		}
+		public override string FunctionName => nameof(Polygon2D);
 
 		/// <summary>
 		/// Default Argument names

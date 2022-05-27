@@ -17,9 +17,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = (r - 1);
         }
 
-        public override string FunctionName
-        {
-            get { return "PolarVariation"; }
-        }
+        public override string FunctionName => nameof(PolarVariation);
     }
 }

@@ -29,10 +29,7 @@ namespace Waher.Script.Graphs3D.Functions.Matrices
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "columns"; }
-		}
+		public override string FunctionName => nameof(Columns);
 
 		/// <summary>
 		/// Evaluates the function on a vector argument.

@@ -58,7 +58,7 @@ namespace Waher.Script.Networking.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "dns";
+		public override string FunctionName => nameof(Dns);
 
 		/// <summary>
 		/// Default Argument names

@@ -49,10 +49,7 @@ namespace Waher.Script.XmlDSig.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "VerifyXml"; }
-		}
+		public override string FunctionName => nameof(VerifyXml);
 
 		/// <summary>
 		/// Default Argument names

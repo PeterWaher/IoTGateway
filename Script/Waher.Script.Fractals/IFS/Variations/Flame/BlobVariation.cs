@@ -56,9 +56,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			y = r * Math.Sin(a);
 		}
 
-		public override string FunctionName
-		{
-			get { return "BlobVariation"; }
-		}
+		public override string FunctionName => nameof(BlobVariation);
 	}
 }

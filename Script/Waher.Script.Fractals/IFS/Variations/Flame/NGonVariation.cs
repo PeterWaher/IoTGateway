@@ -71,9 +71,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y *= k;
         }
 
-        public override string FunctionName
-        {
-            get { return "NGonVariation"; }
-        }
+        public override string FunctionName => nameof(NGonVariation);
     }
 }

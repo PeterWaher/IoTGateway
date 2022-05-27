@@ -18,9 +18,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
                 y *= 0.5;
         }
 
-        public override string FunctionName
-        {
-            get { return "BentVariation"; }
-        }
+        public override string FunctionName => nameof(BentVariation);
     }
 }

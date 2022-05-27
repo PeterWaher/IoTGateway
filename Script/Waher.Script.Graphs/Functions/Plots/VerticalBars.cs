@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Script.Abstraction.Elements;
+﻿using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
@@ -46,10 +45,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "verticalbars"; }
-		}
+		public override string FunctionName => nameof(VerticalBars);
 
 		/// <summary>
 		/// Default Argument names

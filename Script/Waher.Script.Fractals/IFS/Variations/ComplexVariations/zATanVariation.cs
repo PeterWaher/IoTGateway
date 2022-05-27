@@ -23,9 +23,6 @@ namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
             y = (zi * zr2 - zr * zi2) * d;
         }
 
-        public override string FunctionName
-        {
-            get { return "zATanVariation"; }
-        }
+        public override string FunctionName => nameof(ZATanVariation);
     }
 }

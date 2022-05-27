@@ -29,7 +29,7 @@ namespace Waher.Script.Functions.Runtime
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "properties";
+		public override string FunctionName => nameof(Properties);
 
 		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using

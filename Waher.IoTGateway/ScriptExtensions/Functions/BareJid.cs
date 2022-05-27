@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Networking.XMPP;
+﻿using Waher.Networking.XMPP;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
@@ -27,7 +26,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "BareJID";
+		public override string FunctionName => nameof(BareJid);
 
         /// <summary>
         /// Default Argument names

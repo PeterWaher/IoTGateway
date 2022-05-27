@@ -17,9 +17,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = e * Math.Sin(y);
         }
 
-        public override string FunctionName
-        {
-            get { return "ExponentialVariation"; }
-        }
+        public override string FunctionName => nameof(ExponentialVariation);
     }
 }

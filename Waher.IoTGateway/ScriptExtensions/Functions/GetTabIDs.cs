@@ -53,7 +53,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "GetTabIDs";
+		public override string FunctionName => nameof(GetTabIDs);
 
 		/// <summary>
 		/// Default Argument names

@@ -34,10 +34,7 @@ namespace Waher.Script.Statistics.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "histogram"; }
-		}
+		public override string FunctionName => nameof(Histogram);
 
 		/// <summary>
 		/// Default Argument names

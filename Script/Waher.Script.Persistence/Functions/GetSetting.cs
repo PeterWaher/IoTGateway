@@ -29,7 +29,7 @@ namespace Waher.Script.Persistence.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "GetSetting";
+		public override string FunctionName => nameof(GetSetting);
 
 		/// <summary>
 		/// Default Argument names

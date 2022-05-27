@@ -27,10 +27,7 @@ namespace Waher.Script.Functions.Vectors
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "nand"; }
-        }
+        public override string FunctionName => nameof(Nand);
 
         /// <summary>
         /// Evaluates the function on a vector argument.

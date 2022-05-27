@@ -30,10 +30,7 @@ namespace Waher.Script.XmlDSig.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "RsaPublicKeyXml"; }
-		}
+		public override string FunctionName => nameof(RsaPublicKeyXml);
 
 		/// <summary>
 		/// Default Argument names

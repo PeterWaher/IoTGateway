@@ -194,9 +194,6 @@ namespace Waher.Script.Fractals.ColorModels
 
         private static readonly Random gen = new Random();
 
-        public override string FunctionName
-        {
-            get { return "RandomLinearAnalogousHSL"; }
-        }
+        public override string FunctionName => nameof(RandomLinearAnalogousHSL);
     }
 }

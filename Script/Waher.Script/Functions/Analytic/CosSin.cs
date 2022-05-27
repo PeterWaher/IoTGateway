@@ -26,7 +26,7 @@ namespace Waher.Script.Functions.Analytic
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "CosSin";
+		public override string FunctionName => nameof(CosSin);
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

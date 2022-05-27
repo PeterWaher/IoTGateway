@@ -27,10 +27,7 @@ namespace Waher.Security.JWT.Functions
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "ValidateJwt"; }
-        }
+        public override string FunctionName => nameof(ValidateJwt);
 
         /// <summary>
         /// Default Argument names

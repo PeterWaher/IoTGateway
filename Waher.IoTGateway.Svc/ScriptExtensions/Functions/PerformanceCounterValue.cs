@@ -41,10 +41,7 @@ namespace Waher.IoTGateway.Svc.ScriptExtensions.Functions
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "PerformanceCounterValue"; }
-        }
+        public override string FunctionName => nameof(PerformanceCounterValue);
 
         /// <summary>
         /// Default Argument names

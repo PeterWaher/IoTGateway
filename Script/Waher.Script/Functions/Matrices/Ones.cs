@@ -27,7 +27,7 @@ namespace Waher.Script.Functions.Matrices
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "Ones";
+		public override string FunctionName => nameof(Ones);
 
 		/// <summary>
 		/// Default Argument names

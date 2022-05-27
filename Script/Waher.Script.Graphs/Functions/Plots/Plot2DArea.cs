@@ -51,10 +51,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "plot2darea"; }
-		}
+		public override string FunctionName => nameof(Plot2DArea);
 
 		/// <summary>
 		/// Optional aliases. If there are no aliases for the function, null is returned.

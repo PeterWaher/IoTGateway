@@ -71,7 +71,7 @@ namespace Waher.Script.Data.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "ConnectMsSql";
+		public override string FunctionName => nameof(ConnectMsSql);
 
 		/// <summary>
 		/// Default Argument names

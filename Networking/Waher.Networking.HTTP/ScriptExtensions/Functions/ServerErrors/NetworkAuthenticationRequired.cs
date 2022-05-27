@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.ServerErrors
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "NetworkAuthenticationRequired";
+		public override string FunctionName => nameof(NetworkAuthenticationRequired);
 
 		/// <summary>
 		/// Evaluates the function.

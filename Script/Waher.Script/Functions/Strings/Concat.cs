@@ -38,7 +38,7 @@ namespace Waher.Script.Functions.Strings
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "Concat";
+		public override string FunctionName => nameof(Concat);
 
 		/// <summary>
 		/// Default Argument names

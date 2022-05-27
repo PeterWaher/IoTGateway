@@ -31,9 +31,6 @@ namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
             y = (sini * cosr - sinr * cosi) * d;
         }
 
-        public override string FunctionName
-        {
-            get { return "zTanHVariation"; }
-        }
+        public override string FunctionName => nameof(ZTanHVariation);
     }
 }

@@ -26,10 +26,7 @@ namespace Waher.Script.Functions.Vectors
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "reverse"; }
-        }
+        public override string FunctionName => nameof(Reverse);
 
 		/// <summary>
 		/// Evaluates the function on a non-vector. By default, the non-vector argument is converted to a vector of length 1.

@@ -27,10 +27,7 @@ namespace Waher.Script.Cryptography.Functions.HashFunctions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "md5"; }
-		}
+		public override string FunctionName => nameof(Md5);
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

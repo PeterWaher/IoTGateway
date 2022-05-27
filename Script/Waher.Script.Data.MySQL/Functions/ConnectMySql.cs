@@ -57,7 +57,7 @@ namespace Waher.Script.Data.MySQL.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "ConnectMySql";
+		public override string FunctionName => nameof(ConnectMySql);
 
 		/// <summary>
 		/// Default Argument names

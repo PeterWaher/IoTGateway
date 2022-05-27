@@ -17,9 +17,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = r * Math.Cos(a);
         }
 
-        public override string FunctionName
-        {
-            get { return "HyperbolicVariation"; }
-        }
+        public override string FunctionName => nameof(HyperbolicVariation);
     }
 }

@@ -29,7 +29,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "HttpError";
+		public override string FunctionName => nameof(HttpError);
 
 		/// <summary>
 		/// Default Argument names

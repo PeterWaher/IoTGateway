@@ -59,9 +59,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         private readonly Random gen = new Random();
 
-        public override string FunctionName
-        {
-            get { return "ParabolaVariation"; }
-        }
+        public override string FunctionName => nameof(ParabolaVariation);
     }
 }

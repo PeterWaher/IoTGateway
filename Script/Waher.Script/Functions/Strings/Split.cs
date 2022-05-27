@@ -26,7 +26,7 @@ namespace Waher.Script.Functions.Strings
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "Split";
+		public override string FunctionName => nameof(Split);
 
 		/// <summary>
 		/// Default Argument names

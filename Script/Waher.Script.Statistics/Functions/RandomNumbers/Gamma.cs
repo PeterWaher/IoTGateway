@@ -47,10 +47,7 @@ namespace Waher.Script.Statistics.Functions.RandomNumbers
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "gamma"; }
-		}
+		public override string FunctionName => nameof(Gamma);
 
 		/// <summary>
 		/// Default Argument names

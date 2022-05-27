@@ -30,7 +30,7 @@ namespace Waher.Script.Functions.Runtime
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "exists";
+		public override string FunctionName => nameof(Exists);
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.

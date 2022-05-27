@@ -28,10 +28,7 @@ namespace Waher.Script.Functions.Vectors
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "standarddeviation"; }
-        }
+        public override string FunctionName => nameof(StandardDeviation);
 
         /// <summary>
         /// Optional aliases. If there are no aliases for the function, null is returned.

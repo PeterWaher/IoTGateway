@@ -33,7 +33,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "savefile";
+		public override string FunctionName => nameof(SaveFile);
 
 		/// <summary>
 		/// Default Argument names

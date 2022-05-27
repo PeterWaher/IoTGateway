@@ -28,10 +28,7 @@ namespace Waher.Script.Content.Functions.Encoding
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "base64urldecode"; }
-		}
+		public override string FunctionName => nameof(Base64UrlDecode);
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

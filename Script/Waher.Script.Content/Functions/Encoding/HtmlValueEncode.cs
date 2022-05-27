@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Content.Xml;
+﻿using Waher.Content.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -26,10 +25,7 @@ namespace Waher.Script.Content.Functions.Encoding
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "htmlvalueencode"; }
-        }
+        public override string FunctionName => nameof(HtmlValueEncode);
 
         /// <summary>
         /// Evaluates the function on a scalar argument.

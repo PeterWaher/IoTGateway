@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -26,10 +25,7 @@ namespace Waher.Script.Functions.Strings
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "isempty"; }
-        }
+        public override string FunctionName => nameof(IsEmpty);
 
         /// <summary>
         /// Optional aliases. If there are no aliases for the function, null is returned.

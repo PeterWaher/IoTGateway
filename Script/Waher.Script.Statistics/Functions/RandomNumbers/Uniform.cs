@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -18,7 +17,7 @@ namespace Waher.Script.Statistics.Functions.RandomNumbers
         private static readonly ArgumentType[] argumentTypes2Parameters = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, };
         private static readonly ArgumentType[] argumentTypes1Parameters = new ArgumentType[] { ArgumentType.Scalar };
         private static readonly ArgumentType[] argumentTypes0Parameters = new ArgumentType[] { };
-		private static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+		private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 		private const double maxD = ((double)(1UL << 53));
 
         /// <summary>
@@ -74,10 +73,7 @@ namespace Waher.Script.Statistics.Functions.RandomNumbers
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "uniform"; }
-        }
+        public override string FunctionName => nameof(Uniform);
 
         /// <summary>
         /// Default Argument names

@@ -78,10 +78,7 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "datetime"; }
-		}
+		public override string FunctionName => nameof(DateTime);
 
 		/// <summary>
 		/// Default Argument names

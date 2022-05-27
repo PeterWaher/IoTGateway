@@ -180,9 +180,6 @@ namespace Waher.Script.Fractals.ColorModels
 
         private static readonly Random gen = new Random();
 
-        public override string FunctionName
-        {
-            get { return "RandomLinearComplementaryHSL"; }
-        }
+        public override string FunctionName => nameof(RandomLinearComplementaryHSL);
     }
 }

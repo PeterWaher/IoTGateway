@@ -28,7 +28,7 @@ namespace Waher.Script.Cryptography.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "RandomBytes";
+		public override string FunctionName => nameof(RandomBytes);
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

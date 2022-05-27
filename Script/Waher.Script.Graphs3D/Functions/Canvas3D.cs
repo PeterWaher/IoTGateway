@@ -31,7 +31,7 @@ namespace Waher.Script.Graphs3D.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "Canvas3D";
+		public override string FunctionName => nameof(Canvas3D);
 
 		/// <summary>
 		/// Default Argument names

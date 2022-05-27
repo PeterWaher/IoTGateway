@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Redirections
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "TemporaryRedirect";
+		public override string FunctionName => nameof(TemporaryRedirect);
 
 		/// <summary>
 		/// Evaluates the function.

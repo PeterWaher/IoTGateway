@@ -16,9 +16,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = r * y;
         }
 
-        public override string FunctionName
-        {
-            get { return "BubbleVariation"; }
-        }
+        public override string FunctionName => nameof(BubbleVariation);
     }
 }

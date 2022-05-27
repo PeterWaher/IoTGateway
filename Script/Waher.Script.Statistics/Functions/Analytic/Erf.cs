@@ -26,7 +26,7 @@ namespace Waher.Script.Statistics.Functions.Analytic
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "erf";
+		public override string FunctionName => nameof(Erf);
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

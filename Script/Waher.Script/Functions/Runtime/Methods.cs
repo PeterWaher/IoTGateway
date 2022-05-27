@@ -31,10 +31,7 @@ namespace Waher.Script.Functions.Runtime
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "methods"; }
-		}
+		public override string FunctionName => nameof(Methods);
 
 		/// <summary>
 		/// Evaluates the function.

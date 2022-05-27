@@ -163,7 +163,7 @@ namespace Waher.Script.Threading.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "Parallel";
+		public override string FunctionName => nameof(Parallel);
 
 		/// <summary>
 		/// Default Argument names

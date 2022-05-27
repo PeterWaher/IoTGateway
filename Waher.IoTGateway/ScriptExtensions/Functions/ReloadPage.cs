@@ -50,7 +50,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "ReloadPage";
+		public override string FunctionName => nameof(ReloadPage);
 
         /// <summary>
         /// Default Argument names

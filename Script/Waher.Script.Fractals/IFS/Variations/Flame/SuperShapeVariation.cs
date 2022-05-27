@@ -87,9 +87,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 
         private readonly Random gen = new Random();
 
-        public override string FunctionName
-        {
-            get { return "SuperShapeVariation"; }
-        }
+        public override string FunctionName => nameof(SuperShapeVariation);
     }
 }

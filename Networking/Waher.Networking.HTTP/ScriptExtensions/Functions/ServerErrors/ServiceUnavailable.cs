@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.ServerErrors
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "ServiceUnavailable";
+		public override string FunctionName => nameof(ServiceUnavailable);
 
 		/// <summary>
 		/// Evaluates the function.

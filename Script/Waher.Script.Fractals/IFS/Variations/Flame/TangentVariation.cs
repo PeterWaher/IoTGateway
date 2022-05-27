@@ -16,9 +16,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = Math.Sin(y) / cy;
         }
 
-        public override string FunctionName
-        {
-            get { return "TangentVariation"; }
-        }
+        public override string FunctionName => nameof(TangentVariation);
     }
 }

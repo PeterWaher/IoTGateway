@@ -57,7 +57,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "PushEvent";
+		public override string FunctionName => nameof(PushEvent);
 
 		/// <summary>
 		/// Default Argument names

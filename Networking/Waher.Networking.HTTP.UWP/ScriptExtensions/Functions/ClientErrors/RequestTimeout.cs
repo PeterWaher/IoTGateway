@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.ClientError
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "RequestTimeout";
+		public override string FunctionName => nameof(RequestTimeout);
 
 		/// <summary>
 		/// Evaluates the function.

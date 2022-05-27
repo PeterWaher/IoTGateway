@@ -29,7 +29,7 @@ namespace Waher.Script.Graphs3D.Functions.Vectors
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "Vector3";
+		public override string FunctionName => nameof(Vector3);
 
 		/// <summary>
 		/// Default Argument names

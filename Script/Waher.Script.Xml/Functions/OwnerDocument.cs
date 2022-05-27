@@ -26,7 +26,7 @@ namespace Waher.Script.Xml.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "OwnerDocument";
+		public override string FunctionName => nameof(OwnerDocument);
 
 		/// <summary>
 		/// Default Argument names

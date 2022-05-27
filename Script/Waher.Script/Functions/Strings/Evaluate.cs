@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -26,7 +25,7 @@ namespace Waher.Script.Functions.Strings
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName => "evaluate";
+        public override string FunctionName => nameof(Evaluate);
 
         /// <summary>
         /// Optional aliases. If there are no aliases for the function, null is returned.

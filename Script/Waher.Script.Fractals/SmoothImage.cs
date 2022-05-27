@@ -28,7 +28,7 @@ namespace Waher.Script.Fractals
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "SmoothImage";
+		public override string FunctionName => nameof(SmoothImage);
 
 		/// <summary>
 		/// Default Argument names

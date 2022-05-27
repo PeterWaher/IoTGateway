@@ -24,10 +24,7 @@ namespace Waher.Script.Functions.Strings
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "trimstart"; }
-        }
+        public override string FunctionName => nameof(TrimStart);
 
         /// <summary>
         /// Evaluates the function on a scalar argument.

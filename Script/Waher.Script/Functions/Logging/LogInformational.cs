@@ -38,7 +38,7 @@ namespace Waher.Script.Functions.Logging
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "LogInformational";
+		public override string FunctionName => nameof(LogInformational);
 
 		/// <summary>
 		/// Optional aliases. If there are no aliases for the function, null is returned.

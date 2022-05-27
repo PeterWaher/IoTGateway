@@ -25,10 +25,7 @@ namespace Waher.Script.Functions.Strings
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "Before"; }
-        }
+        public override string FunctionName => nameof(Before);
 
         /// <summary>
         /// Default Argument names

@@ -51,9 +51,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
 			y = (y * t1 - x * t2) / r;
 		}
 
-		public override string FunctionName
-		{
-			get { return "CurlVariation"; }
-		}
+		public override string FunctionName => nameof(CurlVariation);
 	}
 }

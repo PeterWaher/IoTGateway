@@ -27,10 +27,7 @@ namespace Waher.Script.Functions.Analytic
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "cot"; }
-		}
+		public override string FunctionName => nameof(Cot);
 
 		/// <summary>
 		/// Differentiates a script node, if possible.

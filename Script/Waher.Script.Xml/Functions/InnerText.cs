@@ -26,7 +26,7 @@ namespace Waher.Script.Xml.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "InnerText";
+		public override string FunctionName => nameof(InnerText);
 
 		/// <summary>
 		/// Default Argument names

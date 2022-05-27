@@ -57,10 +57,7 @@ namespace Waher.Script.Statistics.Functions.RandomNumbers
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-        {
-            get { return "exponential"; }
-        }
+		public override string FunctionName => nameof(Exponential);
 
         /// <summary>
         /// Default Argument names

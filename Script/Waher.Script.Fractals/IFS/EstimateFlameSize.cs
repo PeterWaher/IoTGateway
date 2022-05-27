@@ -55,10 +55,7 @@ namespace Waher.Script.Fractals.IFS
 			}
 		}
 
-		public override string FunctionName
-        {
-            get { return "EstimateFlameSize"; }
-        }
+		public override string FunctionName => nameof(EstimateFlameSize);
 
         public override IElement Evaluate(IElement[] Arguments, Variables Variables)
         {

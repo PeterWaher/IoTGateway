@@ -292,10 +292,7 @@ namespace Waher.Script.Fractals.IFS
 
 		private static readonly Random gen = new Random();
 
-		public override string FunctionName
-		{
-			get { return "IfsFractal"; }
-		}
+		public override string FunctionName => nameof(IfsFractal);
 
 		private string FractalZoomScript(double r, double i, double Size, object State)
 		{

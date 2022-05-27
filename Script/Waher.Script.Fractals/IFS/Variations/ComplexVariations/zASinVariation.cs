@@ -19,9 +19,6 @@ namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
             y = z.Imaginary;
         }
 
-        public override string FunctionName
-        {
-            get { return "zASinVariation"; }
-        }
+        public override string FunctionName => nameof(ZASinVariation);
     }
 }

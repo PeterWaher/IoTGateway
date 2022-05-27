@@ -51,7 +51,7 @@ namespace Waher.Script.Cryptography.Functions.Ecc
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "ed25519";
+		public override string FunctionName => nameof(Ed25519);
 
 		/// <summary>
 		/// Default Argument names

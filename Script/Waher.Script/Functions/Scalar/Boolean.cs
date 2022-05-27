@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Numerics;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
@@ -29,10 +28,7 @@ namespace Waher.Script.Functions.Scalar
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "boolean"; }
-        }
+        public override string FunctionName => nameof(Boolean);
 
         /// <summary>
         /// Optional aliases. If there are no aliases for the function, null is returned.

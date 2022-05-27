@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Redirections
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "UseProxy";
+		public override string FunctionName => nameof(UseProxy);
 
 		/// <summary>
 		/// Evaluates the function.

@@ -33,10 +33,7 @@ namespace Waher.Script.XmlDSig.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "SignXml"; }
-		}
+		public override string FunctionName => nameof(SignXml);
 
 		/// <summary>
 		/// Default Argument names

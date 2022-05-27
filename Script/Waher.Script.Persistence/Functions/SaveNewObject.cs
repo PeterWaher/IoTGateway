@@ -26,7 +26,7 @@ namespace Waher.Script.Persistence.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "SaveNewObject";
+		public override string FunctionName => nameof(SaveNewObject);
 
 		/// <summary>
 		/// Default Argument names

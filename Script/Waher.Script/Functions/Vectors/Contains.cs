@@ -30,10 +30,7 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "contains"; }
-		}
+		public override string FunctionName => nameof(Contains);
 
 		/// <summary>
 		/// Default Argument names

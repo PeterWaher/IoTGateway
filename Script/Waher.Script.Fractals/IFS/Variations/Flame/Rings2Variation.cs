@@ -34,9 +34,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = t * Math.Cos(a);
         }
 
-        public override string FunctionName
-        {
-            get { return "Rings2Variation"; }
-        }
+        public override string FunctionName => nameof(Rings2Variation);
     }
 }

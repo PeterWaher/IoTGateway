@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.ServerErrors
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "NotExtended";
+		public override string FunctionName => nameof(NotExtended);
 
 		/// <summary>
 		/// Evaluates the function.

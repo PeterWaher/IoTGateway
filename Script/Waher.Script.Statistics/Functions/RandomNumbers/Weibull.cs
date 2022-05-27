@@ -47,10 +47,7 @@ namespace Waher.Script.Statistics.Functions.RandomNumbers
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "weibull"; }
-		}
+		public override string FunctionName => nameof(Weibull);
 
 		/// <summary>
 		/// Default Argument names

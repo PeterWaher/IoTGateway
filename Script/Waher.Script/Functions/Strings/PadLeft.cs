@@ -25,10 +25,7 @@ namespace Waher.Script.Functions.Strings
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "PadLeft"; }
-		}
+		public override string FunctionName => nameof(PadLeft);
 
 		/// <summary>
 		/// Default Argument names

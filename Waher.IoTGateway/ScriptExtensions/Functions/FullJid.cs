@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Networking.XMPP;
+﻿using Waher.Networking.XMPP;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -28,7 +27,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "FullJID";
+		public override string FunctionName => nameof(FullJid);
 
 		/// <summary>
 		/// Default Argument names

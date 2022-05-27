@@ -27,10 +27,7 @@ namespace Waher.Script.Functions.Analytic
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "arcsec"; }
-		}
+		public override string FunctionName => nameof(ArcSec);
 
 		/// <summary>
 		/// Optional aliases. If there are no aliases for the function, null is returned.

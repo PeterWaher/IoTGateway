@@ -27,10 +27,7 @@ namespace Waher.Script.Functions.Scalar
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "floor"; }
-        }
+        public override string FunctionName => nameof(Floor);
 
         /// <summary>
         /// Evaluates the function on a scalar argument.

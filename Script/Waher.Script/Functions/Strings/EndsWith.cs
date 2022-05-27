@@ -25,7 +25,7 @@ namespace Waher.Script.Functions.Strings
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "EndsWith";
+		public override string FunctionName => nameof(EndsWith);
 
 		/// <summary>
 		/// Default Argument names

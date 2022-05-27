@@ -62,9 +62,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Flame
             y = Math.Sin(this.c * x) - Math.Cos(this.d * y);
         }
 
-        public override string FunctionName
-        {
-            get { return "PdjVariation"; }
-        }
+        public override string FunctionName => nameof(PdjVariation);
     }
 }

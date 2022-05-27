@@ -27,7 +27,7 @@ namespace Waher.Script.Content.Functions.Encoding
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "base64encode";
+		public override string FunctionName => nameof(Base64Encode);
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

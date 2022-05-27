@@ -26,7 +26,7 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "Ones";
+		public override string FunctionName => nameof(Ones);
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

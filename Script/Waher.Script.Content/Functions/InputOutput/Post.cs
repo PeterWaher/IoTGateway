@@ -44,10 +44,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "post"; }
-		}
+		public override string FunctionName => nameof(Post);
 
 		/// <summary>
 		/// Default Argument names

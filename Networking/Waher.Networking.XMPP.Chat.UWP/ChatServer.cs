@@ -1383,7 +1383,7 @@ namespace Waher.Networking.XMPP.Chat
 			{
 				if (!Variables.TryGetVariable(" User ", out Variable v) ||
 					!(v.ValueObject is IUser User) ||
-					!Exp.ForAll(this.IsAuthorized, User, false))
+					!Exp.ForAll(this.IsAuthorized, User, SearchMethod.TreeOrder))
 				{
 					throw new Exception("Unauthorized to execute expression.");
 				}

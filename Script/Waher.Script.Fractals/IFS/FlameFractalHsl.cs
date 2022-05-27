@@ -127,10 +127,7 @@ namespace Waher.Script.Fractals.IFS
 			}
 		}
 
-		public override string FunctionName
-        {
-            get { return "FlameFractalHsl"; }
-        }
+		public override string FunctionName => nameof(FlameFractalHsl);
 
         public override IElement Evaluate(IElement[] Arguments, Variables Variables)
         {

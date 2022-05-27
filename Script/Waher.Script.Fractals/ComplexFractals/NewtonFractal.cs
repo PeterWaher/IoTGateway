@@ -701,9 +701,6 @@ namespace Waher.Script.Fractals.ComplexFractals
 			return new FractalGraph(Pixels, r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
 		}
 
-		public override string FunctionName
-		{
-			get { return "NewtonFractal"; }
-		}
+		public override string FunctionName => nameof(NewtonFractal);
 	}
 }

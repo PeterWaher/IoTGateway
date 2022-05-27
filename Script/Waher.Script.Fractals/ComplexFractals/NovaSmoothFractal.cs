@@ -318,9 +318,6 @@ namespace Waher.Script.Fractals.ComplexFractals
                 r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
         }
 
-        public override string FunctionName
-        {
-            get { return "NovaSmoothFractal"; }
-        }
+        public override string FunctionName => nameof(NovaSmoothFractal);
     }
 }

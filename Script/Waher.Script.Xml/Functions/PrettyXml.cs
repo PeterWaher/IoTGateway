@@ -29,10 +29,7 @@ namespace Waher.Script.Xml.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName
-		{
-			get { return "prettyxml"; }
-		}
+		public override string FunctionName => nameof(PrettyXml);
 
 		/// <summary>
 		/// Evaluates the function on a scalar argument.

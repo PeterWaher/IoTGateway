@@ -28,7 +28,7 @@ namespace Waher.Script.Persistence.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "Pivot";
+		public override string FunctionName => nameof(Pivot);
 
 		/// <summary>
 		/// Default Argument names

@@ -60,7 +60,7 @@ namespace Waher.Script.Cryptography.Functions.Encryption
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "Aes256Decrypt";
+		public override string FunctionName => nameof(Aes256Decrypt);
 
 		/// <summary>
 		/// Default Argument names

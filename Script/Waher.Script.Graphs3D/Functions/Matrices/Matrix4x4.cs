@@ -56,7 +56,7 @@ namespace Waher.Script.Graphs3D.Functions.Matrices
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "Matrix4x4";
+		public override string FunctionName => nameof(Matrix4x4);
 
 		/// <summary>
 		/// Default Argument names

@@ -25,7 +25,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.ClientError
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => "Locked";
+		public override string FunctionName => nameof(Locked);
 
 		/// <summary>
 		/// Evaluates the function.

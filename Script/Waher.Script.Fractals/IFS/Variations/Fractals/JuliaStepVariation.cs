@@ -51,9 +51,6 @@ namespace Waher.Script.Fractals.IFS.Variations.Fractals
             x = x2;
         }
 
-        public override string FunctionName
-        {
-            get { return "JuliaStepVariation"; }
-        }
+        public override string FunctionName => nameof(JuliaStepVariation);
     }
 }

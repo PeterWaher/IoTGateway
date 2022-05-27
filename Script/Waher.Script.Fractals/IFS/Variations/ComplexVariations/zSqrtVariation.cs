@@ -20,9 +20,6 @@ namespace Waher.Script.Fractals.IFS.Variations.ComplexVariations
             y = amp * Math.Sin(phi);
         }
 
-        public override string FunctionName
-        {
-            get { return "zSqrtVariation"; }
-        }
+        public override string FunctionName => nameof(ZSqrtVariation);
     }
 }

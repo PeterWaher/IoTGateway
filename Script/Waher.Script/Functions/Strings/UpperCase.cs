@@ -24,10 +24,7 @@ namespace Waher.Script.Functions.Strings
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "uppercase"; }
-        }
+        public override string FunctionName => nameof(UpperCase);
 
         /// <summary>
         /// Evaluates the function on a scalar argument.

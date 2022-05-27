@@ -42,10 +42,7 @@ namespace Waher.IoTGateway.Svc.ScriptExtensions.Functions
         /// <summary>
         /// Name of the function
         /// </summary>
-        public override string FunctionName
-        {
-            get { return "DecPerformanceCounter"; }
-        }
+        public override string FunctionName => nameof(DecPerformanceCounter);
 
         /// <summary>
         /// Default Argument names

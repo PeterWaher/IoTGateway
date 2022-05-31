@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
@@ -139,6 +138,25 @@ namespace Waher.Runtime.Timing
 			{
 				lock (this.events)
 				{
+					this.RecalcTimerLocked();
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
+		/// Clears all pending events.
+		/// </summary>
+		public void Clear()
+		{
+			try
+			{
+				lock (this.events)
+				{
+					this.events.Clear();
 					this.RecalcTimerLocked();
 				}
 			}

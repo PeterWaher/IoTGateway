@@ -92,6 +92,11 @@
             <param name="State">State object bassed to <paramref name="Callback"/>.</param>
             <returns>Time when event was scheduled. May differ from <paramref name="When"/> by a few ticks, to make sure the timestamp is unique.</returns>
         </member>
+        <member name="M:Waher.Runtime.Timing.Scheduler.Clear">
+            <summary>
+            Clears all pending events.
+            </summary>
+        </member>
         <member name="M:Waher.Runtime.Timing.Scheduler.Remove(System.DateTime)">
             <summary>
             Removes an event scheduled for a given point in time.

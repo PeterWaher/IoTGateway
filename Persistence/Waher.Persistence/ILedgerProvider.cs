@@ -11,6 +11,20 @@ namespace Waher.Persistence
 	public interface ILedgerProvider
 	{
 		/// <summary>
+		/// Registers a recipient of external events.
+		/// </summary>
+		/// <param name="ExternalEvents">Interface for recipient of external events.</param>
+		/// <exception cref="Exception">If another recipient has been previously registered.</exception>
+		void Register(ILedgerExternalEvents ExternalEvents);
+
+		/// <summary>
+		/// Unregisters a recipient of external events.
+		/// </summary>
+		/// <param name="ExternalEvents">Interface for recipient of external events.</param>
+		/// <exception cref="Exception">If the recipient is not the currently registered recipient.</exception>
+		void Unregister(ILedgerExternalEvents ExternalEvents);
+
+		/// <summary>
 		/// Adds an entry to the ledger.
 		/// </summary>
 		/// <param name="Object">New object.</param>
@@ -27,6 +41,12 @@ namespace Waher.Persistence
 		/// </summary>
 		/// <param name="Object">Deleted object.</param>
 		Task DeletedEntry(object Object);
+
+		/// <summary>
+		/// Clears a collection in the ledger.
+		/// </summary>
+		/// <param name="Collection">Cleared collection.</param>
+		Task ClearedCollection(string Collection);
 
 		/// <summary>
 		/// Gets an eumerator for objects of type <typeparamref name="T"/>.

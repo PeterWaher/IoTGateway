@@ -36,6 +36,12 @@ namespace Waher.Persistence
 		public Task DeletedEntry(object Object) => Task.CompletedTask;
 
 		/// <summary>
+		/// Clears a collection in the ledger.
+		/// </summary>
+		/// <param name="Collection">Cleared collection.</param>
+		public Task ClearedCollection(string Collection) => Task.CompletedTask;
+
+		/// <summary>
 		/// Gets an eumerator for objects of type <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Type of object entries to enumerate.</typeparam>
@@ -86,5 +92,20 @@ namespace Waher.Persistence
 		/// <param name="Thread">Optional Profiler thread.</param>
 		/// <returns>Task object for synchronization purposes.</returns>
 		public Task Export(ILedgerExport Output, string[] CollectionNames, ProfilerThread Thread) => Task.CompletedTask;
+
+		/// <summary>
+		/// Registers a recipient of external events.
+		/// </summary>
+		/// <param name="ExternalEvents">Interface for recipient of external events.</param>
+		/// <exception cref="Exception">If another recipient has been previously registered.</exception>
+		public void Register(ILedgerExternalEvents ExternalEvents) { }
+
+		/// <summary>
+		/// Unregisters a recipient of external events.
+		/// </summary>
+		/// <param name="ExternalEvents">Interface for recipient of external events.</param>
+		/// <exception cref="Exception">If the recipient is not the currently registered recipient.</exception>
+		public void Unregister(ILedgerExternalEvents ExternalEvents) { }
+
 	}
 }

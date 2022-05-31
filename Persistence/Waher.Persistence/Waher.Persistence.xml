@@ -4732,10 +4732,53 @@
             </summary>
             <typeparam name="T">Type of objects being processed.</typeparam>
         </member>
+        <member name="T:Waher.Persistence.ILedgerExternalEvents">
+            <summary>
+            Interface for proxy for reporting changes to the ledger from external sources.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.ILedgerExternalEvents.RaiseEntryAdded(System.Object)">
+            <summary>
+            Raise <see cref="E:Waher.Persistence.Ledger.EntryAdded"/> event.
+            </summary>
+            <param name="Object">Object reference</param>
+        </member>
+        <member name="M:Waher.Persistence.ILedgerExternalEvents.RaiseEntryUpdated(System.Object)">
+            <summary>
+            Raise <see cref="E:Waher.Persistence.Ledger.EntryUpdated"/> event.
+            </summary>
+            <param name="Object">Object reference</param>
+        </member>
+        <member name="M:Waher.Persistence.ILedgerExternalEvents.RaiseEntryDeleted(System.Object)">
+            <summary>
+            Raise <see cref="E:Waher.Persistence.Ledger.EntryDeleted"/> event.
+            </summary>
+            <param name="Object">Object reference</param>
+        </member>
+        <member name="M:Waher.Persistence.ILedgerExternalEvents.RaiseCollectionCleared(System.String)">
+            <summary>
+            Raise <see cref="E:Waher.Persistence.Ledger.CollectionCleared"/> event.
+            </summary>
+            <param name="Collection">Collection name.</param>
+        </member>
         <member name="T:Waher.Persistence.ILedgerProvider">
             <summary>
             Interface for ledger providers that can be plugged into the static <see cref="T:Waher.Persistence.Ledger"/> class.
             </summary>
+        </member>
+        <member name="M:Waher.Persistence.ILedgerProvider.Register(Waher.Persistence.ILedgerExternalEvents)">
+            <summary>
+            Registers a recipient of external events.
+            </summary>
+            <param name="ExternalEvents">Interface for recipient of external events.</param>
+            <exception cref="T:System.Exception">If another recipient has been previously registered.</exception>
+        </member>
+        <member name="M:Waher.Persistence.ILedgerProvider.Unregister(Waher.Persistence.ILedgerExternalEvents)">
+            <summary>
+            Unregisters a recipient of external events.
+            </summary>
+            <param name="ExternalEvents">Interface for recipient of external events.</param>
+            <exception cref="T:System.Exception">If the recipient is not the currently registered recipient.</exception>
         </member>
         <member name="M:Waher.Persistence.ILedgerProvider.NewEntry(System.Object)">
             <summary>
@@ -4754,6 +4797,12 @@
             Deletes an entry in the ledger.
             </summary>
             <param name="Object">Deleted object.</param>
+        </member>
+        <member name="M:Waher.Persistence.ILedgerProvider.ClearedCollection(System.String)">
+            <summary>
+            Clears a collection in the ledger.
+            </summary>
+            <param name="Collection">Cleared collection.</param>
         </member>
         <member name="M:Waher.Persistence.ILedgerProvider.GetEnumerator``1">
             <summary>
@@ -4915,17 +4964,43 @@
             </summary>
             <param name="Object">New object.</param>
         </member>
+        <member name="E:Waher.Persistence.Ledger.EntryAdded">
+            <summary>
+            Event raised when an entry has been added to the ledger.
+            </summary>
+        </member>
         <member name="M:Waher.Persistence.Ledger.UpdatedEntry(System.Object)">
             <summary>
             Updates an entry in the ledger.
             </summary>
             <param name="Object">Updated object.</param>
         </member>
+        <member name="E:Waher.Persistence.Ledger.EntryUpdated">
+            <summary>
+            Event raised when an entry has been updated in the ledger.
+            </summary>
+        </member>
         <member name="M:Waher.Persistence.Ledger.DeletedEntry(System.Object)">
             <summary>
             Deletes an entry in the ledger.
             </summary>
             <param name="Object">Deleted object.</param>
+        </member>
+        <member name="E:Waher.Persistence.Ledger.EntryDeleted">
+            <summary>
+            Event raised when an entry has been deleted in the ledger.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Ledger.ClearedCollection(System.String)">
+            <summary>
+            Clears a collection in the ledger.
+            </summary>
+            <param name="Collection">Cleared collection.</param>
+        </member>
+        <member name="E:Waher.Persistence.Ledger.CollectionCleared">
+            <summary>
+            Event raised when a collection has been cleared.
+            </summary>
         </member>
         <member name="M:Waher.Persistence.Ledger.GetEnumerator``1">
             <summary>
@@ -5539,6 +5614,12 @@
             </summary>
             <param name="Object">Deleted object.</param>
         </member>
+        <member name="M:Waher.Persistence.NullLedgerProvider.ClearedCollection(System.String)">
+            <summary>
+            Clears a collection in the ledger.
+            </summary>
+            <param name="Collection">Cleared collection.</param>
+        </member>
         <member name="M:Waher.Persistence.NullLedgerProvider.GetEnumerator``1">
             <summary>
             Gets an eumerator for objects of type <typeparamref name="T"/>.
@@ -5590,6 +5671,20 @@
             <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
             <param name="Thread">Optional Profiler thread.</param>
             <returns>Task object for synchronization purposes.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullLedgerProvider.Register(Waher.Persistence.ILedgerExternalEvents)">
+            <summary>
+            Registers a recipient of external events.
+            </summary>
+            <param name="ExternalEvents">Interface for recipient of external events.</param>
+            <exception cref="T:System.Exception">If another recipient has been previously registered.</exception>
+        </member>
+        <member name="M:Waher.Persistence.NullLedgerProvider.Unregister(Waher.Persistence.ILedgerExternalEvents)">
+            <summary>
+            Unregisters a recipient of external events.
+            </summary>
+            <param name="ExternalEvents">Interface for recipient of external events.</param>
+            <exception cref="T:System.Exception">If the recipient is not the currently registered recipient.</exception>
         </member>
         <member name="T:Waher.Persistence.ObjectEventHandler">
             <summary>

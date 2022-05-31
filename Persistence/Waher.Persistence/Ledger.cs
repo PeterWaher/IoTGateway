@@ -36,11 +36,43 @@ namespace Waher.Persistence
 		/// <param name="Lock">If the ledger provider should be locked for the rest of the running time of the application.</param>
 		public static void Register(ILedgerProvider LedgerProvider, bool Lock)
 		{
-			if (provider != null && locked)
-				throw new Exception("A ledger provider is already registered.");
+			if (!(provider is null))
+			{
+				if (locked)
+					throw new Exception("A ledger provider is already registered.");
+
+				provider.Unregister(externalEvents);
+			}
 
 			provider = LedgerProvider;
 			locked = Lock;
+
+			provider.Register(externalEvents);
+		}
+
+		private static readonly ExternalEvents externalEvents = new ExternalEvents();
+
+		private class ExternalEvents : ILedgerExternalEvents
+		{
+			public void RaiseEntryAdded(object Object)
+			{
+				Ledger.RaiseEntryAdded(Object);
+			}
+
+			public void RaiseEntryDeleted(object Object)
+			{
+				Ledger.RaiseEntryDeleted(Object);
+			}
+
+			public void RaiseEntryUpdated(object Object)
+			{
+				Ledger.RaiseEntryUpdated(Object);
+			}
+
+			public void RaiseCollectionCleared(string Collection)
+			{
+				Ledger.RaiseCollectionCleared(Collection);
+			}
 		}
 
 		/// <summary>
@@ -76,37 +108,131 @@ namespace Waher.Persistence
 		/// <summary>
 		/// If the datbase provider has been locked for the rest of the run-time of the application.
 		/// </summary>
-		public static bool Locked
-		{
-			get { return locked; }
-		}
+		public static bool Locked => locked;
 
 		/// <summary>
 		/// Adds an entry to the ledger.
 		/// </summary>
 		/// <param name="Object">New object.</param>
-		public static Task NewEntry(object Object)
+		public static async Task NewEntry(object Object)
 		{
-			return Provider.NewEntry(Object);
+			await Provider.NewEntry(Object);
+			RaiseEntryAdded(Object);
 		}
+
+		private static void RaiseEntryAdded(object Object)
+		{
+			ObjectEventHandler h = EntryAdded;
+			if (!(h is null))
+			{
+				try
+				{
+					h(Provider, new ObjectEventArgs(Object));
+				}
+				catch (Exception)
+				{
+					// Ignore
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when an entry has been added to the ledger.
+		/// </summary>
+		public static event ObjectEventHandler EntryAdded = null;
 
 		/// <summary>
 		/// Updates an entry in the ledger.
 		/// </summary>
 		/// <param name="Object">Updated object.</param>
-		public static Task UpdatedEntry(object Object)
+		public static async Task UpdatedEntry(object Object)
 		{
-			return Provider.UpdatedEntry(Object);
+			await Provider.UpdatedEntry(Object);
+			RaiseEntryUpdated(Object);
 		}
+
+		private static void RaiseEntryUpdated(object Object)
+		{
+			ObjectEventHandler h = EntryUpdated;
+			if (!(h is null))
+			{
+				try
+				{
+					h(Provider, new ObjectEventArgs(Object));
+				}
+				catch (Exception)
+				{
+					// Ignore
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when an entry has been updated in the ledger.
+		/// </summary>
+		public static event ObjectEventHandler EntryUpdated = null;
 
 		/// <summary>
 		/// Deletes an entry in the ledger.
 		/// </summary>
 		/// <param name="Object">Deleted object.</param>
-		public static Task DeletedEntry(object Object)
+		public static async Task DeletedEntry(object Object)
 		{
-			return Provider.DeletedEntry(Object);
+			await Provider.DeletedEntry(Object);
+			RaiseEntryDeleted(Object);
 		}
+
+		private static void RaiseEntryDeleted(object Object)
+		{
+			ObjectEventHandler h = EntryDeleted;
+			if (!(h is null))
+			{
+				try
+				{
+					h(Provider, new ObjectEventArgs(Object));
+				}
+				catch (Exception)
+				{
+					// Ignore
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when an entry has been deleted in the ledger.
+		/// </summary>
+		public static event ObjectEventHandler EntryDeleted = null;
+
+		/// <summary>
+		/// Clears a collection in the ledger.
+		/// </summary>
+		/// <param name="Collection">Cleared collection.</param>
+		public static async Task ClearedCollection(string Collection)
+		{
+			await Provider.ClearedCollection(Collection);
+			RaiseCollectionCleared(Collection);
+		}
+
+		private static void RaiseCollectionCleared(string Collection)
+		{
+			CollectionEventHandler h = CollectionCleared;
+			if (!(h is null))
+			{
+				try
+				{
+					h(Provider, new CollectionEventArgs(Collection));
+				}
+				catch (Exception)
+				{
+					// Ignore
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when a collection has been cleared.
+		/// </summary>
+		public static event CollectionEventHandler CollectionCleared = null;
 
 		/// <summary>
 		/// Gets an eumerator for objects of type <typeparamref name="T"/>.

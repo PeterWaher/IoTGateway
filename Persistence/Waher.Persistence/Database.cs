@@ -43,7 +43,7 @@ namespace Waher.Persistence
 		/// <param name="Lock">If the database provider should be locked for the rest of the running time of the application.</param>
 		public static void Register(IDatabaseProvider DatabaseProvider, bool Lock)
 		{
-			if (provider != null && locked)
+			if (!(provider is null) && locked)
 				throw new Exception("A database provider is already registered.");
 
 			provider = DatabaseProvider;

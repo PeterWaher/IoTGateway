@@ -308,7 +308,7 @@ namespace Waher.Persistence.Serialization
 
 			if (Value is null)
 			{
-				if (item.Value != null)
+				if (!(item.Value is null))
 					return false;
 			}
 			else if (!Value.Equals(item.Value))

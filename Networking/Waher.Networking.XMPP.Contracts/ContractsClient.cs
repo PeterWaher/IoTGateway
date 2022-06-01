@@ -1418,9 +1418,12 @@ namespace Waher.Networking.XMPP.Contracts
 			if (ExceptionIfNone)
 			{
 				if (HaveStates)
-					throw new Exception("Private keys are not available on this device. Were they created on another device?");
+				{
+					throw new Exception("Private keys are not available on this device (" + this.client.BareJID + 
+						"). Were they created on another device?");
+				}
 				else
-					throw new Exception("No approved legal identity available.");
+					throw new Exception("No approved legal identity available on this device (" + this.client.BareJID + ").");
 			}
 
 			return null;
@@ -5332,7 +5335,10 @@ namespace Waher.Networking.XMPP.Contracts
 			}
 
 			if (!this.contentPerPid.TryGetValue(PetitionId, out KeyValuePair<byte[], bool> P))
+			{
+				this.client.Warning("Petition ID not recognized: " + PetitionId + ".  Response ignored.");
 				return;
+			}
 
 			SignaturePetitionResponseEventHandler h = P.Value ? this.PetitionedPeerReviewIDResponseReceived : this.PetitionedSignatureResponseReceived;
 
@@ -5340,18 +5346,38 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (Response)
 				{
-					if (Identity is null || Signature is null)
+					if (Identity is null)
+					{
+						this.client.Warning("Identity missing. Response ignored.");
 						return;
+					}
+
+					if (Signature is null)
+					{
+						this.client.Warning("Signature missing. Response ignored.");
+						return;
+					}
 
 					bool? Result = this.ValidateSignature(Identity, P.Key, Signature);
-					if (!Result.HasValue || !Result.Value)
+					if (!Result.HasValue)
+					{
+						this.client.Warning("Unable to validate signature. Response ignored.");
 						return;
+					}
+
+					if (!Result.Value)
+					{
+						this.client.Warning("Invalid signature. Response ignored.");
+						return;
+					}
 				}
 
 				if (!Response || string.Compare(e.FromBareJID, Identity?.Provider ?? string.Empty, true) == 0)
 				{
 					try
 					{
+						this.Client.Information(h.Method.Name);
+
 						await h(this, new SignaturePetitionResponseEventArgs(e, Identity, PetitionId, Signature, Response));
 					}
 					catch (Exception ex)
@@ -5362,6 +5388,11 @@ namespace Waher.Networking.XMPP.Contracts
 					{
 						this.contentPerPid.Remove(PetitionId);
 					}
+				}
+				else
+				{
+					this.client.Warning("Sender invalid. Response ignored.");
+					return;
 				}
 			}
 		}

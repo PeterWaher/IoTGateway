@@ -71,18 +71,12 @@ namespace Waher.Networking.XMPP.Software
 		/// <summary>
 		/// Component XMPP address.
 		/// </summary>
-		public string ComponentAddress
-		{
-			get { return this.componentAddress; }
-		}
+		public string ComponentAddress => this.componentAddress;
 
 		/// <summary>
 		/// Folder of downloaded packages.
 		/// </summary>
-		public string PackageFolder
-		{
-			get { return this.packageFolder; }
-		}
+		public string PackageFolder => this.packageFolder;
 
 		/// <summary>
 		/// Gets information about a software package.
@@ -386,7 +380,10 @@ namespace Waher.Networking.XMPP.Software
 		private async Task PackageNotificationHandler(object Sender, MessageEventArgs e)
 		{
 			if (string.Compare(e.From, this.componentAddress, true) != 0)
+			{
+				this.client.Warning("Discarding package notification. Expected source: " + this.componentAddress + ". Actual source: " + e.From);
 				return;
+			}
 
 			Package PackageInfo = Package.Parse(e.Content);
 			PackageUpdatedEventArgs e2 = new PackageUpdatedEventArgs(PackageInfo, e);

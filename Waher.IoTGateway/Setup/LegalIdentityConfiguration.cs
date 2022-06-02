@@ -27,30 +27,33 @@ namespace Waher.IoTGateway.Setup
 	/// </summary>
 	public class LegalIdentityConfiguration : SystemMultiStepConfiguration
 	{
-		internal static readonly Regex FromSaveUnsaved = new Regex(@"Waher[.]Persistence[.]Files[.]ObjectBTreeFile[.+]<SaveUnsaved>\w*[.]\w*",
+		internal static readonly Regex FromSaveUnsavedRegex = new Regex(@"Waher[.]Persistence[.]Files[.]ObjectBTreeFile[.+]((<SaveUnsaved>\w*[.]\w*)|(SaveUnsavedLocked))",
 			RegexOptions.Compiled | RegexOptions.Singleline);
-		internal static readonly Regex FromUpdateObject = new Regex(@"Waher[.]Persistence[.]Files[.]ObjectBTreeFile[.+]<UpdateObject>\w*[.]\w*",
+		internal static readonly Regex FromUpdateObjectRegex = new Regex(@"Waher[.]Persistence[.]Files[.]ObjectBTreeFile[.+]((<UpdateObject>\w*[.]\w*)|(UpdateObjectLocked))",
 			RegexOptions.Compiled | RegexOptions.Singleline);
-		internal static readonly Regex GatewayStartup = new Regex(@"Waher[.]IoTGateway[.]Gateway([.]Start|[.+]<Start>\w*[.]\w*)",
+		internal static readonly Regex GatewayStartupRegex = new Regex(@"Waher[.]IoTGateway[.]Gateway([.]Start|[.+]<Start>\w*[.]\w*)",
 			RegexOptions.Compiled | RegexOptions.Singleline);
-		internal static readonly Regex GetAttachment = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<GetAttachmentAsync>\w*[.]\w*",
+		internal static readonly Regex ApplyLegalIdentityRegex = new Regex(@"Waher[.]IoTGateway[.]Setup[.]LegalIdentityConfiguration([.]ApplyLegalIdentity|[.+]<ApplyLegalIdentity>\w*[.]\w*)",
+			RegexOptions.Compiled | RegexOptions.Singleline);
+		internal static readonly Regex GetAttachmentRegex = new Regex(@"Waher[.]Networking[.]XMPP[.]Contracts[.]ContractsClient[.+]<GetAttachmentAsync>\w*[.]\w*",
 			RegexOptions.Compiled | RegexOptions.Singleline);
 		private static readonly object[] approvedSources = new object[]
 		{
 			"Waher.Persistence.NeuroLedger.NeuroLedgerProvider",
 			typeof(Content.Markdown.Web.MarkdownToHtmlConverter),
 			"Waher.IoTGateway.Setup.LegalIdentityConfiguration.UpdateClients",
-			FromSaveUnsaved,
-			FromUpdateObject,
-			GatewayStartup
+			FromSaveUnsavedRegex,
+			FromUpdateObjectRegex,
+			GatewayStartupRegex
 		};
 		private static readonly object[] approvedContractClientSources = new object[]
 		{
 			"Waher.Service.IoTBroker.Legal.MFA.QuickLogin",
 			"Waher.Service.IoTBroker.Marketplace.MarketplaceProcessor",
 			"Waher.Service.Abc4Io.Model.Actions.Contract.SignContract",
+			ApplyLegalIdentityRegex,
 			typeof(LegalIdentityConfiguration),
-			GetAttachment
+			GetAttachmentRegex
 		};
 
 		private static LegalIdentityConfiguration instance = null;
@@ -390,6 +393,53 @@ namespace Waher.IoTGateway.Setup
 			{
 				Assert.CallFromSource(approvedSources);
 				return allIdentities;
+			}
+		}
+
+		/// <summary>
+		/// Public profile of all Legal Identities associated with account, as dictionaries.
+		/// </summary>
+		public static Dictionary<string, object>[] AllIdentitiesJSON
+		{
+			get
+			{
+				List<Dictionary<string, object>> Result = new List<Dictionary<string, object>>();
+
+				if (!(allIdentities is null))
+				{
+					foreach (LegalIdentity ID in allIdentities)
+					{
+						Dictionary<string, object> ID2 = new Dictionary<string, object>()
+						{
+							{ "Id", ID.Id },
+							{ "Created", ID.Created },
+							{ "Properties", ID.Properties },
+							{ "Attachments", ID.Attachments },
+							{ "From", ID.From },
+							{ "To", ID.To },
+							{ "State", ID.State },
+							{ "ADDR", string.Empty },
+							{ "ADDR2", string.Empty },
+							{ "ZIP", string.Empty },
+							{ "AREA", string.Empty },
+							{ "CITY", string.Empty },
+							{ "REGION", string.Empty },
+							{ "COUNTRY", string.Empty },
+							{ "FIRST", string.Empty },
+							{ "MIDDLE", string.Empty },
+							{ "LAST", string.Empty },
+							{ "PNR", string.Empty },
+							{ "", string.Empty }
+						};
+
+						foreach (Property P in ID.Properties)
+							ID2[P.Name] = P.Value;
+
+						Result.Add(ID2);
+					}
+				}
+
+				return Result.ToArray();
 			}
 		}
 

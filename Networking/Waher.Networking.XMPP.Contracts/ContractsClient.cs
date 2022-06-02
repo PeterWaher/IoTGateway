@@ -269,7 +269,7 @@ namespace Waher.Networking.XMPP.Contracts
 					Timestamp = DateTime.Now;
 					await RuntimeSettings.SetAsync(this.keySettingsPrefix + "Timestamp", Timestamp.Value);
 
-					Log.Notice("Private keys for contracts client created.");
+					Log.Notice("Private keys for contracts client created.", this.client.BareJID, string.Empty, "NewKeys");
 				}
 				else if (!Timestamp.HasValue)
 				{
@@ -368,6 +368,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <param name="Output">XML output.</param>
 		public async Task ExportKeys(XmlWriter Output)
 		{
+			this.AssertAllowed();
+
 			Output.WriteStartElement("LegalId", NamespaceOnboarding);
 
 			Dictionary<string, object> Settings = await RuntimeSettings.GetWhereKeyLikeAsync(this.keySettingsPrefix + "*", "*");
@@ -436,6 +438,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>If keys could be loaded into the client.</returns>
 		public async Task<bool> ImportKeys(XmlElement Xml)
 		{
+			this.AssertAllowed();
+
 			if (Xml is null || Xml.LocalName != "LegalId" || Xml.NamespaceURI != NamespaceOnboarding)
 				return false;
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.Sniffers;
 using Waher.Persistence;
@@ -77,13 +78,27 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 			}
 		}
 
+		internal static async Task<string> GetJSON(object Object)
+		{
+			GenericObject Obj = await Database.Generalize(Object);
+			Dictionary<string, object> Obj2 = new Dictionary<string, object>()
+			{
+				{ "ObjectId", Obj.ObjectId },
+				{ "TypeName", Obj.TypeName },
+				{ "CollectionName", Obj.CollectionName }
+			};
+
+			foreach (KeyValuePair<string, object> P in Obj)
+				Obj2[P.Key] = P.Value;
+
+			return JSON.Encode(Obj2, true);
+		}
+
 		private async void Database_ObjectInserted(object Sender, ObjectEventArgs e)
 		{
 			try
 			{
-				GenericObject Obj = await Database.Generalize(e.Object);
-				string s = JSON.Encode(Obj, true);
-				this.TransmitText(s);
+				this.TransmitText(await GetJSON(e.Object));
 			}
 			catch (Exception)
 			{
@@ -95,9 +110,7 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 		{
 			try
 			{
-				GenericObject Obj = await Database.Generalize(e.Object);
-				string s = JSON.Encode(Obj, true);
-				this.ReceiveText(s);
+				this.ReceiveText(await GetJSON(e.Object));
 			}
 			catch (Exception)
 			{
@@ -109,9 +122,7 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 		{
 			try
 			{
-				GenericObject Obj = await Database.Generalize(e.Object);
-				string s = JSON.Encode(Obj, true);
-				this.Error(s);
+				this.Error(await GetJSON(e.Object));
 			}
 			catch (Exception)
 			{

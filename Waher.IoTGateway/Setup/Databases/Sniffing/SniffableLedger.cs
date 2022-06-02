@@ -79,9 +79,7 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 		{
 			try
 			{
-				GenericObject Obj = await Database.Generalize(e.Object);
-				string s = JSON.Encode(Obj, true);
-				this.TransmitText(s);
+				this.TransmitText(await SniffableDatabase.GetJSON(e.Object));
 			}
 			catch (Exception)
 			{
@@ -93,9 +91,7 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 		{
 			try
 			{
-				GenericObject Obj = await Database.Generalize(e.Object);
-				string s = JSON.Encode(Obj, true);
-				this.ReceiveText(s);
+				this.ReceiveText(await SniffableDatabase.GetJSON(e.Object));
 			}
 			catch (Exception)
 			{
@@ -107,9 +103,7 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 		{
 			try
 			{
-				GenericObject Obj = await Database.Generalize(e.Object);
-				string s = JSON.Encode(Obj, true);
-				this.Error(s);
+				this.Error(await SniffableDatabase.GetJSON(e.Object));
 			}
 			catch (Exception)
 			{

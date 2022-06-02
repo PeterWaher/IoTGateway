@@ -320,6 +320,11 @@ namespace Waher.Networking.XMPP.Contracts
 			await RuntimeSettings.DeleteWhereKeyLikeAsync(this.keySettingsPrefix + "*", "*");
 			await this.LoadKeys(true);
 
+			lock (this.matchingKeys)
+			{
+				this.matchingKeys.Clear();
+			}
+
 			foreach (LegalIdentityState State in await Database.Find<LegalIdentityState>(
 				new FilterFieldEqualTo("BareJid", this.client.BareJID)))
 			{

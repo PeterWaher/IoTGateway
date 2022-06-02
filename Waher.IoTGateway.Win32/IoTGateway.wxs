@@ -1851,7 +1851,7 @@
 									<util:PermissionEx GenericAll='yes' User='NT AUTHORITY\LocalService'/>
 								</CreateFolder>
 								<RemoveFolder Id='RemoveSniffers' On='uninstall' />
-								<File Id='Database.md' Name='Database.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Sniffers\Database.md' KeyPath='yes'/>
+								<File Id='DatabaseSniffer.md' Name='Database.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Sniffers\Database.md' KeyPath='yes'/>
 								<File Id='EventLog.cssx' Name='EventLog.cssx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Sniffers\EventLog.cssx'/>
 								<File Id='EventLog.js' Name='EventLog.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Sniffers\EventLog.js'/>
 								<File Id='EventLog.md' Name='EventLog.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Sniffers\EventLog.md'/>
@@ -1859,7 +1859,7 @@
 								<File Id='Sniffer.js' Name='Sniffer.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Sniffers\Sniffer.js'/>
 								<File Id='Sniffer.md' Name='Sniffer.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Sniffers\Sniffer.md'/>
 								<File Id='XMPPSniffer.md' Name='XMPP.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\Sniffers\XMPP.md'/>
-								<RemoveFile Id='RemoveDatabase.md' Name='Database.md' On='uninstall'/>
+								<RemoveFile Id='RemoveDatabaseSniffer.md' Name='Database.md' On='uninstall'/>
 								<RemoveFile Id='RemoveEventLog.cssx' Name='EventLog.cssx' On='uninstall'/>
 								<RemoveFile Id='RemoveEventLog.js' Name='EventLog.js' On='uninstall'/>
 								<RemoveFile Id='RemoveEventLog.md' Name='EventLog.md' On='uninstall'/>

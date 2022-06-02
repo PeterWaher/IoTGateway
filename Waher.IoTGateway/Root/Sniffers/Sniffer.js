@@ -73,8 +73,17 @@ function AddRow(Type, Timestamp, Message)
     Td.setAttribute("class", Type);
     Tr.appendChild(Td);
 
+    Message = Message.replace(/&/g, "&amp;");
+    Message = Message.replace(/</g, "&lt;");
+    Message = Message.replace(/>/g, "&gt;");
+    Message = Message.replace(/"/g, "&quot;");
+    Message = Message.replace(/'/g, "&apos;");
+    Message = Message.replace(/\t/g, "&nbsp;&nbsp;&nbsp;");
+    Message = Message.replace(/ /g, "&nbsp;");
+    Message = Message.replace(/\r\n/g, "\r").replace(/\n/g, "\r").replace(/\r/g, "<br/>\r");
+
     Td = document.createElement("TD");
-    Td.innerText = Message;
+    Td.innerHTML = Message;
     Td.setAttribute("class", Type);
     Tr.appendChild(Td);
 }

@@ -11,6 +11,7 @@ using Waher.Persistence.Attributes;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.IoTGateway.Setup.Databases;
+using Waher.IoTGateway.Setup.Databases.Sniffing;
 
 namespace Waher.IoTGateway.Setup
 {
@@ -28,6 +29,9 @@ namespace Waher.IoTGateway.Setup
 		private IDatabasePlugin databasePlugin = null;
 		private string databasePluginName = null;
 		private DatabaseSettings databasePluginSettings = null;
+
+		private SniffableDatabase sniffableDatabase = null;
+		private SniffableLedger sniffableLedger = null;
 
 		/// <summary>
 		/// Full name of database plugin class.
@@ -67,6 +71,34 @@ namespace Waher.IoTGateway.Setup
 				}
 
 				return this.databasePlugin;
+			}
+		}
+
+		/// <summary>
+		/// Makes database activity sniffable.
+		/// </summary>
+		public SniffableDatabase SniffableDatabase
+		{
+			get
+			{
+				if (sniffableDatabase is null)
+					sniffableDatabase = new SniffableDatabase();
+
+				return sniffableDatabase;
+			}
+		}
+
+		/// <summary>
+		/// Makes ledger activity sniffable.
+		/// </summary>
+		public SniffableLedger SniffableLedger
+		{
+			get
+			{
+				if (sniffableLedger is null)
+					sniffableLedger = new SniffableLedger();
+
+				return sniffableLedger;
 			}
 		}
 

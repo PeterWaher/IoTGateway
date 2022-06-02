@@ -6,6 +6,7 @@ Copyright: /Copyright.md
 Master: /Master.md
 CSS: /Admin.cssx
 Javascript: /TargetBlank.js
+JavaScript: /Sniffers/Sniffer.js
 UserVariable: User
 Login: /Login.md
 
@@ -36,17 +37,27 @@ MenuItem(Text,Url,Privileges[]):=
 [[
 );
 
+SnifferItem(Text,Url,Privileges[]):=
+(
+	if And([foreach Privilege in Privileges do (User.HasPrivilege(Privilege)???false)]) then
+		]]<div class="menuItem" onclick="OpenSniffer('((Url))')"><div class="menuItemContent">((Text))</div></div>
+[[ else ]]<div class="menuItemDisabled"><div class="menuItemContent">((Text))</div></div>
+[[
+);
+
 MenuHeader("Communication");
 MenuItem("Blocked Endpoints","/RemoteEndpoints.md?BlockedOnly=1","Admin.Communication.Endpoints");
 MenuItem("Domain","/Settings/Domain.md","Admin.Communication.Domain");
 MenuItem("Notification","/Settings/Notification.md","Admin.Communication.Notification");
 MenuItem("Roster","/Settings/Roster.md","Admin.Communication.Roster");
 MenuItem("XMPP","/Settings/XMPP.md","Admin.Communication.XMPP");
+SnifferItem("XMPP Sniffer","/Sniffers/XMPP.md",["Admin.Communication.XMPP","Admin.Communication.Sniffer"]);
 MenuFooter();
 
 MenuHeader("Data");
 MenuItem("Backup","/Settings/Backup.md","Admin.Data.Backup");
 MenuItem("Database","/Settings/Database.md","Admin.Data.Database");
+SnifferItem("Database Sniffer","/Sniffers/Database.md",["Admin.Data.Database","Admin.Communication.Sniffer"]);
 MenuItem("Events","/Sniffers/EventLog.md","Admin.Data.Events");
 MenuItem("Restore","/Settings/Restore.md","Admin.Data.Restore");
 MenuFooter();

@@ -110,7 +110,7 @@ namespace Waher.Content.Html.Javascript
 		{
 			switch (ContentType.ToLower())
 			{
-				case "text/css":
+				case "application/javascript":
 					FileExtension = JavascriptFileExtensions[0];
 					return true;
 
@@ -154,25 +154,22 @@ namespace Waher.Content.Html.Javascript
 		{
 			if (InternetContent.IsAccepted(JavascriptContentTypes, out string ContentType, AcceptedContentTypes))
 			{
-				byte[] Bin;
+				string s;
 
 				if (Object is JavascriptDocument JavascriptDoc)
+					s = JavascriptDoc.Javascript;
+				else
+					s = Object.ToString();
+
+				if (Encoding is null)
 				{
-					if (Encoding is null)
-					{
-						ContentType += "; charset=utf-8";
-						Bin = Encoding.UTF8.GetBytes(JavascriptDoc.Javascript);
-					}
-					else
-					{
-						ContentType += "; charset=" + Encoding.WebName;
-						Bin = Encoding.GetBytes(JavascriptDoc.Javascript);
-					}
+					ContentType += "; charset=utf-8";
+					Encoding = Encoding.UTF8;
 				}
 				else
-					Bin = null;
+					ContentType += "; charset=" + Encoding.WebName;
 
-				return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Bin, ContentType));
+				return Task.FromResult(new KeyValuePair<byte[], string>(Encoding.GetBytes(s), ContentType));
 			}
 
 			throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));

@@ -23,6 +23,7 @@ namespace Waher.Networking.HTTP
 		private Dictionary<string, string> customHeaders = null;
 		private LinkedList<Cookie> cookies = null;
 		private readonly Encoding encoding = Encoding.UTF8;
+		private bool encodingUsed = false;
 		private DateTimeOffset date = DateTimeOffset.Now;
 		private DateTimeOffset? expires = null;
 		private DateTime lastPing = DateTime.Now;
@@ -400,18 +401,15 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Gets the System.Text.Encoding in which the output is written.
 		/// </summary>
-		public Encoding Encoding
-		{
-			get { return this.encoding; }
-		}
+		public Encoding Encoding => this.encoding;
 
 		/// <summary>
 		/// If the connection should be closed after the response has been sent.
 		/// </summary>
 		public bool CloseAfterResponse
 		{
-			get { return this.closeAfterResponse; }
-			set { this.closeAfterResponse = value; }
+			get => this.closeAfterResponse;
+			set => this.closeAfterResponse = value;
 		}
 
 		/// <summary>
@@ -707,7 +705,7 @@ namespace Waher.Networking.HTTP
 						Output.Append("\r\nContent-Type: ");
 						Output.Append(this.contentType);
 
-						if (this.contentType.StartsWith("text/") && !this.contentType.Contains("charset="))
+						if (this.encodingUsed && !this.contentType.Contains("charset="))
 						{
 							Output.Append("; charset=");
 							Output.Append(this.encoding.WebName);
@@ -854,10 +852,10 @@ namespace Waher.Networking.HTTP
 				while (Pos < Len)
 				{
 					c = (int)Math.Min(BufSize, Len - Pos);
-					
+
 					if (await f.ReadAsync(Buf, 0, c) != c)
 						throw new IOException("Unexpected end of file.");
-					
+
 					await this.Write(Buf, 0, c);
 					Pos += c;
 				}
@@ -879,6 +877,8 @@ namespace Waher.Networking.HTTP
 			if (Accept is null)
 			{
 				KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Object, this.encoding);
+				this.encodingUsed |= P.Value.StartsWith("text/");
+
 				return new EncodingResult()
 				{
 					Data = P.Key,
@@ -896,6 +896,7 @@ namespace Waher.Networking.HTTP
 					{
 						case 0: // Wildcard
 							KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Object, this.encoding);
+							this.encodingUsed |= P.Value.StartsWith("text/");
 							Data = P.Key;
 							ContentType = P.Value;
 							break;
@@ -924,6 +925,7 @@ namespace Waher.Networking.HTTP
 							if (!(Best is null))
 							{
 								P = await Best.EncodeAsync(Object, this.encoding, ContentType, BestContentType);
+								this.encodingUsed |= P.Value.StartsWith("text/");
 								Data = P.Key;
 								ContentType = P.Value;
 							}
@@ -934,6 +936,7 @@ namespace Waher.Networking.HTTP
 							if (InternetContent.Encodes(Object, out Grade Grade2, out IContentEncoder Encoder, Rec.Item))
 							{
 								P = await Encoder.EncodeAsync(Object, this.encoding, ContentType, Rec.Item);
+								this.encodingUsed |= P.Value.StartsWith("text/");
 								Data = P.Key;
 								ContentType = P.Value;
 							}
@@ -1025,6 +1028,7 @@ namespace Waher.Networking.HTTP
 		/// is at the end the stream.</exception>
 		public Task Write(char value)
 		{
+			this.encodingUsed = true;
 			return this.Write(this.encoding.GetBytes(new char[] { value }));
 		}
 
@@ -1040,6 +1044,7 @@ namespace Waher.Networking.HTTP
 		/// is at the end the stream.</exception>
 		public Task Write(char[] buffer)
 		{
+			this.encodingUsed = true;
 			return this.Write(this.encoding.GetBytes(buffer));
 		}
 
@@ -1055,6 +1060,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="System.IO.IOException">An I/O error occurs.</exception>
 		public Task Write(string value)
 		{
+			this.encodingUsed = true;
 			return this.Write(this.encoding.GetBytes(value));
 		}
 
@@ -1075,6 +1081,7 @@ namespace Waher.Networking.HTTP
 		/// is at the end the stream.</exception>
 		public Task Write(char[] buffer, int index, int count)
 		{
+			this.encodingUsed = true;
 			return this.Write(this.encoding.GetBytes(buffer, index, count));
 		}
 

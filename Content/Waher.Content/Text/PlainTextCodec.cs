@@ -222,20 +222,16 @@ namespace Waher.Content.Text
 			if (this.Encodes(Object, out Grade _, AcceptedContentTypes))
 			{
 				string ContentType;
-				byte[] Bin;
 
 				if (Encoding is null)
 				{
 					ContentType = "text/plain; charset=utf-8";
-					Bin = Encoding.UTF8.GetBytes(Object.ToString());
+					Encoding = Encoding.UTF8;
 				}
 				else
-				{
 					ContentType = "text/plain; charset=" + Encoding.WebName;
-					Bin = Encoding.GetBytes(Object.ToString());
-				}
-
-				return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Bin, ContentType));
+					
+				return Task.FromResult(new KeyValuePair<byte[], string>(Encoding.GetBytes(Object.ToString()), ContentType));
 			}
 			else
 				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));

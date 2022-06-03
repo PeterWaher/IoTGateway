@@ -154,25 +154,22 @@ namespace Waher.Content.Html.Css
 		{
 			if (InternetContent.IsAccepted(CssContentTypes, out string ContentType, AcceptedContentTypes))
 			{
-				byte[] Bin;
+				string s;
 
 				if (Object is CssDocument CssDoc)
+					s = CssDoc.Css;
+				else
+					s = Object.ToString();
+
+				if (Encoding is null)
 				{
-					if (Encoding is null)
-					{
-						ContentType += "; charset=utf-8";
-						Bin = Encoding.UTF8.GetBytes(CssDoc.Css);
-					}
-					else
-					{
-						ContentType += "; charset=" + Encoding.WebName;
-						Bin = Encoding.GetBytes(CssDoc.Css);
-					}
+					ContentType += "; charset=utf-8";
+					Encoding = Encoding.UTF8;
 				}
 				else
-					Bin = null;
-
-				return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Bin, ContentType));
+					ContentType += "; charset=" + Encoding.WebName;
+				
+				return Task.FromResult(new KeyValuePair<byte[], string>(Encoding.GetBytes(s), ContentType));
 			}
 
 			throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));

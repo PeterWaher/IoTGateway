@@ -310,8 +310,6 @@ namespace Waher.Content.Markdown.Web
 					if (Response.ResponseSent)
 						return Doc.IsDynamic;
 
-					Response.SetHeader("X-Content-Type-Options", "nosniff");
-
 					if (!this.CopyHttpHeader("Cache-Control", Doc, Response))
 					{
 						if (Doc.IsDynamic)

@@ -715,6 +715,8 @@ namespace Waher.Networking.HTTP
 							this.txText = HttpClientConnection.IsSniffableTextType(this.contentType);
 						else
 							this.txText = false;
+
+						Output.Append("\r\nX-Content-Type-Options: nosniff");
 					}
 
 					if ((ExpectContent || this.contentLength.HasValue) &&

@@ -160,7 +160,7 @@ namespace Waher.Content.Text
 			if (Encoding is null)
 				Encoding = Encoding.UTF8;
 
-			return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Encoding.GetBytes(Csv), "text/csv"));
+			return Task.FromResult(new KeyValuePair<byte[], string>(Encoding.GetBytes(Csv), "text/csv"));
 		}
 	}
 }

@@ -157,7 +157,7 @@ namespace Waher.Content.Markdown
 					Bin = Encoding.GetBytes(MarkdownDocument.MarkdownText);
 				}
 
-				return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Bin, ContentType));
+				return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
 			}
 
 			throw new ArgumentException("Object not a markdown document.", nameof(Object));

@@ -189,7 +189,7 @@ namespace Waher.Content.Multipart
 					Bin = Encoding.GetBytes(sb.ToString());
 				}
 
-				return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Bin, ContentType));
+				return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
 			}
 			else
 				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));

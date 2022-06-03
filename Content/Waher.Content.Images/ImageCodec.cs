@@ -191,7 +191,7 @@ namespace Waher.Content.Images
 			if (Dispose)
 				Image.Dispose();
 
-			return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Bin, ContentType));
+			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
 		}
 
 		/// <summary>

@@ -201,7 +201,7 @@ namespace Waher.Content.Text
 				else
 					ContentType += "; charset=" + Encoding.WebName;
 
-				return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Encoding.GetBytes(Json), ContentType));
+				return Task.FromResult(new KeyValuePair<byte[], string>(Encoding.GetBytes(Json), ContentType));
 			}
 			else
 				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));

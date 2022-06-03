@@ -69,7 +69,7 @@ namespace Waher.Script.Content
 					throw new ArgumentException("Object not PixelInformation or Graph.", nameof(Object));
 			}
 
-			return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Pixels.EncodeAsPng(), "image/png"));
+			return Task.FromResult(new KeyValuePair<byte[], string>(Pixels.EncodeAsPng(), "image/png"));
 		}
 
 		/// <summary>

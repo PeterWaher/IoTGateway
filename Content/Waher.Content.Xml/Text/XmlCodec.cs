@@ -239,7 +239,7 @@ namespace Waher.Content.Xml.Text
 					ms?.Dispose();
 				}
 
-				return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Result, ContentType));
+				return Task.FromResult(new KeyValuePair<byte[], string>(Result, ContentType));
 			}
 			else
 				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));

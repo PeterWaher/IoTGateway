@@ -105,7 +105,7 @@ namespace Waher.Networking.CoAP.ContentFormats
 			string ContentType = LinkFormatContentType + "; charset=" + Encoding.WebName;
 			byte[] Bin = Encoding.GetBytes(Doc.Text);
 
-			return Task.FromResult<KeyValuePair<byte[], string>>(new KeyValuePair<byte[], string>(Bin, ContentType));
+			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
 		}
 
 		/// <summary>

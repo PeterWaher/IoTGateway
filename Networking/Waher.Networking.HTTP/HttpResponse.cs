@@ -705,6 +705,9 @@ namespace Waher.Networking.HTTP
 						Output.Append("\r\nContent-Type: ");
 						Output.Append(this.contentType);
 
+						if (!this.encodingUsed && this.contentType.StartsWith("text/"))
+							this.encodingUsed = true;
+
 						if (this.encodingUsed && !this.contentType.Contains("charset="))
 						{
 							Output.Append("; charset=");

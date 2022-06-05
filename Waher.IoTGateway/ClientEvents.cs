@@ -11,6 +11,7 @@ using Waher.Persistence.Serialization;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Threading;
 using Waher.Script;
+using Waher.Script.Abstraction.Elements;
 using Waher.Security;
 
 namespace Waher.IoTGateway
@@ -272,7 +273,7 @@ namespace Waher.IoTGateway
 			Type UserType;
 			object UserObject;
 
-			if (!(Session is null) && 
+			if (!(Session is null) &&
 				Session.TryGetVariable(" User ", out Variable UserVariable) &&
 				!((UserObject = UserId(UserVariable.ValueObject)) is null))
 			{
@@ -332,7 +333,26 @@ namespace Waher.IoTGateway
 			if (User is IUser User2)
 				return User2.UserName;
 			else if (User is GenericObject GenObj)
-				return GenObj.ObjectId;
+			{
+				if (GenObj.TryGetFieldValue("UserName", out object UserName))
+					return UserName;
+				else
+					return GenObj.ObjectId;
+			}
+			else if (User is Dictionary<string, IElement> ScriptObj)
+			{
+				if (ScriptObj.TryGetValue("UserName", out IElement UserName))
+					return UserName.AssociatedObjectValue;
+				else
+					return User;
+			}
+			else if (User is Dictionary<string, object> JsonObj)
+			{
+				if (JsonObj.TryGetValue("UserName", out object UserName))
+					return UserName;
+				else
+					return User;
+			}
 			else
 				return User;
 		}

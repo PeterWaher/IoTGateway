@@ -82,7 +82,8 @@ namespace Waher.Script.Functions.Runtime
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			if (CheckAgainst is ObjectValue V && V.AssociatedObjectValue is null)
+			if ((CheckAgainst is ObjectValue V && V.AssociatedObjectValue is null) ||
+				(CheckAgainst is StringValue S && string.IsNullOrEmpty(S.Value)))
 			{
 				return this.ForAllChildNodes((ScriptNode Node, out ScriptNode NewNode, object State) =>
 				{

@@ -391,9 +391,26 @@
             <param name="Type">Type of profiler thread.</param>
             <returns>Profiler thread reference.</returns>
         </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.GetThread(System.String,Waher.Runtime.Profiling.ProfilerThreadType)">
+            <summary>
+            Gets a profiler thread. If none is available, a new is created.
+            </summary>
+            <param name="Name">Name of profiler thread.</param>
+            <param name="Type">Type of profiler thread.</param>
+            <returns>Profiler thread reference.</returns>
+        </member>
         <member name="M:Waher.Runtime.Profiling.Profiler.CreateThread(System.String,Waher.Runtime.Profiling.ProfilerThreadType,Waher.Runtime.Profiling.ProfilerThread)">
             <summary>
             Creates a new profiler thread.
+            </summary>
+            <param name="Name">Name of profiler thread.</param>
+            <param name="Type">Type of profiler thread.</param>
+            <param name="Parent">Parent thread.</param>
+            <returns>Profiler thread reference.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.GetThread(System.String,Waher.Runtime.Profiling.ProfilerThreadType,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Gets a profiler thread. If none is available, a new is created.
             </summary>
             <param name="Name">Name of profiler thread.</param>
             <param name="Type">Type of profiler thread.</param>

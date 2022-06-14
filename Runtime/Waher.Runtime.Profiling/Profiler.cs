@@ -68,6 +68,7 @@ namespace Waher.Runtime.Profiling
 		private readonly SortedDictionary<string, int> exceptionOrdinals = new SortedDictionary<string, int>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly SortedDictionary<string, int> eventOrdinals = new SortedDictionary<string, int>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly List<ProfilerThread> threads = new List<ProfilerThread>();
+		private readonly Dictionary<string, ProfilerThread> threadsByName = new Dictionary<string, ProfilerThread>();
 		private readonly ProfilerThread mainThread;
 		private readonly Stopwatch watch;
 		private double timeScale = 1;
@@ -123,9 +124,33 @@ namespace Waher.Runtime.Profiling
 		/// <returns>Profiler thread reference.</returns>
 		public ProfilerThread CreateThread(string Name, ProfilerThreadType Type)
 		{
-			ProfilerThread Result = new ProfilerThread(Name, ++this.threadOrder, Type, this);
-			this.threads.Add(Result);
-			return Result;
+			lock (this.threads)
+			{
+				ProfilerThread Result = new ProfilerThread(Name, ++this.threadOrder, Type, this);
+				this.threads.Add(Result);
+				this.threadsByName[Name] = Result;
+				return Result;
+			}
+		}
+
+		/// <summary>
+		/// Gets a profiler thread. If none is available, a new is created.
+		/// </summary>
+		/// <param name="Name">Name of profiler thread.</param>
+		/// <param name="Type">Type of profiler thread.</param>
+		/// <returns>Profiler thread reference.</returns>
+		public ProfilerThread GetThread(string Name, ProfilerThreadType Type)
+		{
+			lock (this.threads)
+			{
+				if (this.threadsByName.TryGetValue(Name, out ProfilerThread Result))
+					return Result;
+
+				Result = new ProfilerThread(Name, ++this.threadOrder, Type, this);
+				this.threads.Add(Result);
+				this.threadsByName[Name] = Result;
+				return Result;
+			}
 		}
 
 		/// <summary>
@@ -137,9 +162,34 @@ namespace Waher.Runtime.Profiling
 		/// <returns>Profiler thread reference.</returns>
 		internal ProfilerThread CreateThread(string Name, ProfilerThreadType Type, ProfilerThread Parent)
 		{
-			ProfilerThread Result = new ProfilerThread(Name, ++this.threadOrder, Type, Parent);
-			this.threads.Add(Result);
-			return Result;
+			lock (this.threads)
+			{
+				ProfilerThread Result = new ProfilerThread(Name, ++this.threadOrder, Type, Parent);
+				this.threads.Add(Result);
+				this.threadsByName[Name] = Result;
+				return Result;
+			}
+		}
+
+		/// <summary>
+		/// Gets a profiler thread. If none is available, a new is created.
+		/// </summary>
+		/// <param name="Name">Name of profiler thread.</param>
+		/// <param name="Type">Type of profiler thread.</param>
+		/// <param name="Parent">Parent thread.</param>
+		/// <returns>Profiler thread reference.</returns>
+		internal ProfilerThread GetThread(string Name, ProfilerThreadType Type, ProfilerThread Parent)
+		{
+			lock (this.threads)
+			{
+				if (this.threadsByName.TryGetValue(Name, out ProfilerThread Result))
+					return Result;
+
+				Result = new ProfilerThread(Name, ++this.threadOrder, Type, Parent);
+				this.threads.Add(Result);
+				this.threadsByName[Name] = Result;
+				return Result;
+			}
 		}
 
 		/// <summary>
@@ -344,7 +394,14 @@ namespace Waher.Runtime.Profiling
 			Output.WriteAttributeString("ticksPerSecond", Stopwatch.Frequency.ToString());
 			Output.WriteAttributeString("timePerTick", this.ToTimeStr(1, this.mainThread, TimeUnit.DynamicPerEvent, 7));
 
-			foreach (ProfilerThread Thread in this.threads)
+			ProfilerThread[] Threads;
+
+			lock (this.threads)
+			{
+				Threads = this.threads.ToArray();
+			}
+
+			foreach (ProfilerThread Thread in Threads)
 			{
 				if (Thread.Parent is null)
 					Thread.ExportXml(Output, TimeUnit);
@@ -392,7 +449,14 @@ namespace Waher.Runtime.Profiling
 
 			Output.AppendLine("@startuml");
 
-			foreach (ProfilerThread Thread in this.threads)
+			ProfilerThread[] Threads;
+
+			lock (this.threads)
+			{
+				Threads = this.threads.ToArray();
+			}
+
+			foreach (ProfilerThread Thread in Threads)
 			{
 				if (Thread.Parent is null)
 					Thread.ExportPlantUmlDescription(Output, TimeUnit);
@@ -427,7 +491,7 @@ namespace Waher.Runtime.Profiling
 			do
 			{
 				KeyValuePair<double, string> TotalTime = this.ToTime(this.mainThread.StoppedAt ?? this.ElapsedTicks, this.mainThread, TimeUnit);
-				
+
 				TimeSpan = TotalTime.Key;
 				StepSize = Math.Pow(10, Math.Round(Math.Log10(TimeSpan / 10)));
 				NrSteps = (int)Math.Floor(TimeSpan / StepSize);
@@ -448,11 +512,11 @@ namespace Waher.Runtime.Profiling
 				if (StepSize < 1)
 					this.timeScale *= 1e-3;
 			}
-			while (StepSize < 1);
+			while (StepSize < 1 && StepSize > 0);
 
 			StepSize = Math.Floor(StepSize);
 			NrSteps = (int)Math.Floor(TimeSpan / StepSize);
-			int PixelsPerStep = GoalWidth / NrSteps;
+			int PixelsPerStep = NrSteps > 0 ? GoalWidth / NrSteps : 0;
 
 			Output.Append("scale ");
 			Output.Append(StepSize.ToString("F0"));
@@ -462,7 +526,7 @@ namespace Waher.Runtime.Profiling
 
 			PlantUmlStates States = new PlantUmlStates(TimeUnit);
 
-			foreach (ProfilerThread Thread in this.threads)
+			foreach (ProfilerThread Thread in Threads)
 			{
 				if (Thread.Parent is null)
 					Thread.ExportPlantUmlEvents(States);

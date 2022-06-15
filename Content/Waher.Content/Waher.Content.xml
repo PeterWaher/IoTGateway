@@ -764,6 +764,22 @@
             <param name="D2">Duration 2</param>
             <returns>If <paramref name="D1"/>!=<paramref name="D2"/>.</returns>
         </member>
+        <member name="M:Waher.Content.Duration.op_Addition(Waher.Content.Duration,Waher.Content.Duration)">
+            <summary>
+            Adds two durations.
+            </summary>
+            <param name="D1">Duration 1</param>
+            <param name="D2">Duration 2</param>
+            <returns>If <paramref name="D1"/>+<paramref name="D2"/>.</returns>
+        </member>
+        <member name="M:Waher.Content.Duration.op_Subtraction(Waher.Content.Duration,Waher.Content.Duration)">
+            <summary>
+            Adds two durations.
+            </summary>
+            <param name="D1">Duration 1</param>
+            <param name="D2">Duration 2</param>
+            <returns>If <paramref name="D1"/>+<paramref name="D2"/>.</returns>
+        </member>
         <member name="M:Waher.Content.Duration.Equals(System.Object)">
             <inheritdoc/>
         </member>
@@ -832,6 +848,12 @@
             other in the sort order. Zero This instance occurs in the same position in the
             sort order as other. Greater than zero This instance follows other in the sort
             order.</returns>
+        </member>
+        <member name="M:Waher.Content.Duration.Negate">
+            <summary>
+            Negates the duration.
+            </summary>
+            <returns>Negated duration.</returns>
         </member>
         <member name="T:Waher.Content.Getters.WebException">
             <summary>

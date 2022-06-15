@@ -366,6 +366,70 @@ namespace Waher.Content
 			return DT1 != DT2;
 		}
 
+		/// <summary>
+		/// Adds two durations.
+		/// </summary>
+		/// <param name="D1">Duration 1</param>
+		/// <param name="D2">Duration 2</param>
+		/// <returns>If <paramref name="D1"/>+<paramref name="D2"/>.</returns>
+		public static Duration operator +(Duration D1, Duration D2)
+		{
+			if (D1.negation ^ D2.negation)
+			{
+				return new Duration(
+					D1.negation,
+					D1.years - D2.years,
+					D1.months - D2.months,
+					D1.days - D2.days,
+					D1.hours - D2.hours,
+					D1.minutes - D2.minutes,
+					D1.seconds - D2.seconds);
+			}
+			else
+			{
+				return new Duration(
+					D1.negation,
+					D1.years + D2.years,
+					D1.months + D2.months,
+					D1.days + D2.days,
+					D1.hours + D2.hours,
+					D1.minutes + D2.minutes,
+					D1.seconds + D2.seconds);
+			}
+		}
+
+		/// <summary>
+		/// Adds two durations.
+		/// </summary>
+		/// <param name="D1">Duration 1</param>
+		/// <param name="D2">Duration 2</param>
+		/// <returns>If <paramref name="D1"/>+<paramref name="D2"/>.</returns>
+		public static Duration operator -(Duration D1, Duration D2)
+		{
+			if (D1.negation ^ D2.negation)
+			{
+				return new Duration(
+					D1.negation,
+					D1.years + D2.years,
+					D1.months + D2.months,
+					D1.days + D2.days,
+					D1.hours + D2.hours,
+					D1.minutes + D2.minutes,
+					D1.seconds + D2.seconds);
+			}
+			else
+			{
+				return new Duration(
+					D1.negation,
+					D1.years - D2.years,
+					D1.months - D2.months,
+					D1.days - D2.days,
+					D1.hours - D2.hours,
+					D1.minutes - D2.minutes,
+					D1.seconds - D2.seconds);
+			}
+		}
+
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
@@ -494,7 +558,7 @@ namespace Waher.Content
 		/// <returns><see cref="Duration"/> object.</returns>
 		public static Duration FromMinutes(int Minutes)
 		{
-			return new Duration(Minutes < 0, 0, 0, 0, 0,Math.Abs(Minutes), 0);
+			return new Duration(Minutes < 0, 0, 0, 0, 0, Math.Abs(Minutes), 0);
 		}
 
 		/// <summary>
@@ -522,8 +586,24 @@ namespace Waher.Content
 		{
 			DateTime TP1 = JSON.UnixEpoch + this;
 			DateTime TP2 = JSON.UnixEpoch + other;
-			
+
 			return TP1.CompareTo(TP2);
+		}
+
+		/// <summary>
+		/// Negates the duration.
+		/// </summary>
+		/// <returns>Negated duration.</returns>
+		public Duration Negate()
+		{
+			return new Duration(
+				!this.negation,
+				this.years,
+				this.months,
+				this.days,
+				this.hours,
+				this.minutes,
+				this.seconds);
 		}
 	}
 }

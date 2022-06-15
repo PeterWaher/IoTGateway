@@ -16294,6 +16294,60 @@
             <param name="Node">Node performing the operation.</param>
             <returns>Result</returns>
         </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.Multiply.EvaluateScalarMultiplication(System.Int64,Waher.Script.Abstraction.Elements.IGroupElement,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Performs a scalar multiplication.
+            </summary>
+            <param name="N">Scalar.</param>
+            <param name="Element">Element to multiply <paramref name="N"/> times.</param>
+            <param name="Node">Node performing the operation.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.Multiply.EvaluateScalarMultiplication(System.Double,Waher.Script.Abstraction.Elements.IGroupElement,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Performs a scalar multiplication.
+            </summary>
+            <param name="N">Scalar.</param>
+            <param name="Element">Element to multiply <paramref name="N"/> times.</param>
+            <param name="Node">Node performing the operation.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.Multiply.EvaluateScalarMultiplication(System.Numerics.BigInteger,Waher.Script.Abstraction.Elements.IGroupElement,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Performs a scalar multiplication.
+            </summary>
+            <param name="N">Scalar.</param>
+            <param name="Element">Element to multiply <paramref name="N"/> times.</param>
+            <param name="Node">Node performing the operation.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.Multiply.EvaluateScalarMultiplication(System.Int64,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Performs a scalar multiplication.
+            </summary>
+            <param name="N">Scalar.</param>
+            <param name="Element">Element to multiply <paramref name="N"/> times.</param>
+            <param name="Node">Node performing the operation.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.Multiply.EvaluateScalarMultiplication(System.Double,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Performs a scalar multiplication.
+            </summary>
+            <param name="N">Scalar.</param>
+            <param name="Element">Element to multiply <paramref name="N"/> times.</param>
+            <param name="Node">Node performing the operation.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Arithmetics.Multiply.EvaluateScalarMultiplication(System.Numerics.BigInteger,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Performs a scalar multiplication.
+            </summary>
+            <param name="N">Scalar.</param>
+            <param name="Element">Element to multiply <paramref name="N"/> times.</param>
+            <param name="Node">Node performing the operation.</param>
+            <returns>Result</returns>
+        </member>
         <member name="M:Waher.Script.Operators.Arithmetics.Multiply.Differentiate(System.String,Waher.Script.Variables)">
             <summary>
             Differentiates a script node, if possible.

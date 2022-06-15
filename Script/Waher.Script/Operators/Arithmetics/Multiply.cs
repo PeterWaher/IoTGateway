@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
+using System.Reflection;
 using System.Threading.Tasks;
+using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Arithmetics
 {
@@ -107,6 +111,36 @@ namespace Waher.Script.Operators.Arithmetics
 					if (!(Result is null))
 						return Result;
 
+					if (Left is DoubleNumber D)
+					{
+						if (Right is GroupElement E)
+							return EvaluateScalarMultiplication(D.Value, E, Node);
+						else
+							return EvaluateScalarMultiplication(D.Value, Right, Node);
+					}
+					else if (Left is Integer I)
+					{
+						if (Right is GroupElement E)
+							return EvaluateScalarMultiplication(I.Value, E, Node);
+						else
+							return EvaluateScalarMultiplication(I.Value, Right, Node);
+					}
+
+					if (Right is DoubleNumber D2)
+					{
+						if (Left is GroupElement E2)
+							return EvaluateScalarMultiplication(D2.Value, E2, Node);
+						else
+							return EvaluateScalarMultiplication(D2.Value, Left, Node);
+					}
+					else if (Right is Integer I2)
+					{
+						if (Left is GroupElement E2)
+							return EvaluateScalarMultiplication(I2.Value, E2, Node);
+						else
+							return EvaluateScalarMultiplication(I2.Value, Left, Node);
+					}
+
 					throw new ScriptRuntimeException("Operands cannot be multiplied.", Node);
 				}
 				else
@@ -173,6 +207,258 @@ namespace Waher.Script.Operators.Arithmetics
 				}
 			}
 		}
+
+		/// <summary>
+		/// Performs a scalar multiplication.
+		/// </summary>
+		/// <param name="N">Scalar.</param>
+		/// <param name="Element">Element to multiply <paramref name="N"/> times.</param>
+		/// <param name="Node">Node performing the operation.</param>
+		/// <returns>Result</returns>
+		public static IElement EvaluateScalarMultiplication(long N, IGroupElement Element, ScriptNode Node)
+		{
+			bool Sign = N < 0;
+			if (Sign)
+				N = -N;
+
+			ISemiGroupElement Result = Element.AssociatedGroup.AdditiveIdentity;
+			ISemiGroupElement Power = Element;
+
+			while (N != 0)
+			{
+				if ((N & 1) != 0)
+					Result = Result.AddRight(Power);
+
+				N >>= 1;
+				Power = Power.AddRight(Power);
+			}
+
+			if (Sign)
+				return Negate(Result, Node);
+			else
+				return Result;
+		}
+
+		/// <summary>
+		/// Performs a scalar multiplication.
+		/// </summary>
+		/// <param name="N">Scalar.</param>
+		/// <param name="Element">Element to multiply <paramref name="N"/> times.</param>
+		/// <param name="Node">Node performing the operation.</param>
+		/// <returns>Result</returns>
+		public static IElement EvaluateScalarMultiplication(double N, IGroupElement Element, ScriptNode Node)
+		{
+			if (N != Math.Floor(N))
+				throw new ScriptRuntimeException("Only scalar multiplication of integers allowed.", Node);
+
+			if (N <= long.MaxValue && N >= long.MinValue)
+				return EvaluateScalarMultiplication((long)N, Element, Node);
+
+			bool Sign = N < 0;
+			if (Sign)
+				N = -N;
+
+			ISemiGroupElement Result = Element.AssociatedGroup.AdditiveIdentity;
+			ISemiGroupElement Power = Element;
+
+			while (N >= 1)
+			{
+				if (Math.IEEERemainder(N, 2) != 0)
+				{
+					Result = Result.AddRight(Power);
+					N -= 1;
+				}
+
+				N /= 2;
+				Power = Power.AddRight(Power);
+			}
+
+			if (Sign)
+				return Negate(Result, Node);
+			else
+				return Result;
+		}
+
+		/// <summary>
+		/// Performs a scalar multiplication.
+		/// </summary>
+		/// <param name="N">Scalar.</param>
+		/// <param name="Element">Element to multiply <paramref name="N"/> times.</param>
+		/// <param name="Node">Node performing the operation.</param>
+		/// <returns>Result</returns>
+		public static IElement EvaluateScalarMultiplication(BigInteger N, IGroupElement Element, ScriptNode Node)
+		{
+			bool Sign = N.Sign < 0;
+			if (Sign)
+				N = -N;
+
+			ISemiGroupElement Result = Element.AssociatedGroup.AdditiveIdentity;
+			ISemiGroupElement Power = Element;
+
+			while (!N.IsZero)
+			{
+				N = BigInteger.DivRem(N, two, out BigInteger Rem);
+				if (!Rem.IsZero)
+					Result = Result.AddRight(Power);
+
+				Power = Power.AddRight(Power);
+			}
+
+			if (Sign)
+				return Negate(Result, Node);
+			else
+				return Result;
+		}
+
+		/// <summary>
+		/// Performs a scalar multiplication.
+		/// </summary>
+		/// <param name="N">Scalar.</param>
+		/// <param name="Element">Element to multiply <paramref name="N"/> times.</param>
+		/// <param name="Node">Node performing the operation.</param>
+		/// <returns>Result</returns>
+		public static IElement EvaluateScalarMultiplication(long N, IElement Element, ScriptNode Node)
+		{
+			bool Sign = N < 0;
+			if (Sign)
+				N = -N;
+
+			IElement Result = null;
+			IElement Power = Element;
+
+			while (N != 0)
+			{
+				if ((N & 1) != 0)
+					Result = Result is null ? Power : Add.EvaluateAddition(Result, Power, Node);
+
+				N >>= 1;
+				Power = Add.EvaluateAddition(Power, Power, Node);
+			}
+
+			if (Result is null)
+				return GetZero(Element, Node);
+			else if (Sign)
+				return Negate(Result, Node);
+			else
+				return Result;
+		}
+
+		private static IElement Negate(IElement Element, ScriptNode Node)
+		{
+			if (Element is IAbelianGroupElement E)
+				return E.Negate();
+
+			object Value = Element.AssociatedObjectValue;
+			if (Value is null)
+				return Element;
+
+			Type T = Value.GetType();
+			MethodInfo MI = T.GetRuntimeMethod("Negate", Types.NoTypes);
+			if (!(MI is null))
+				return Expression.Encapsulate(MI.Invoke(Value, Types.NoParameters));
+
+			throw new ScriptRuntimeException("Not an abelian group element.", Node);
+		}
+
+		private static IElement GetZero(IElement Element, ScriptNode Node)
+		{
+			if (Element is IGroupElement E)
+				return E.AssociatedGroup.AdditiveIdentity;
+
+			object Value = Element.AssociatedObjectValue;
+			if (Value is null)
+				return Element;
+
+			Type T = Value.GetType();
+			PropertyInfo PI = T.GetRuntimeProperty("Zero");
+			if (!(PI is null))
+				return Expression.Encapsulate(PI.GetValue(Value));
+
+			FieldInfo FI = T.GetRuntimeField("Zero");
+			if (!(FI is null))
+				return Expression.Encapsulate(FI.GetValue(Value));
+
+			throw new ScriptRuntimeException("Zero not defined.", Node);
+		}
+
+		/// <summary>
+		/// Performs a scalar multiplication.
+		/// </summary>
+		/// <param name="N">Scalar.</param>
+		/// <param name="Element">Element to multiply <paramref name="N"/> times.</param>
+		/// <param name="Node">Node performing the operation.</param>
+		/// <returns>Result</returns>
+		public static IElement EvaluateScalarMultiplication(double N, IElement Element, ScriptNode Node)
+		{
+			if (N != Math.Floor(N))
+				throw new ScriptRuntimeException("Only scalar multiplication of integers allowed.", Node);
+
+			if (N <= long.MaxValue && N >= long.MinValue)
+				return EvaluateScalarMultiplication((long)N, Element, Node);
+
+			bool Sign = N < 0;
+			if (Sign)
+				N = -N;
+
+			IElement Result = null;
+			IElement Power = Element;
+
+			while (N >= 1)
+			{
+				if (Math.IEEERemainder(N, 2) != 0)
+				{
+					Result = Result is null ? Power : Add.EvaluateAddition(Result, Power, Node);
+					N -= 1;
+				}
+
+				N /= 2;
+				Power = Add.EvaluateAddition(Power, Power, Node);
+			}
+
+			if (Result is null)
+				return GetZero(Element, Node);
+			else if (Sign)
+				return Negate(Result, Node);
+			else
+				return Result;
+		}
+
+		/// <summary>
+		/// Performs a scalar multiplication.
+		/// </summary>
+		/// <param name="N">Scalar.</param>
+		/// <param name="Element">Element to multiply <paramref name="N"/> times.</param>
+		/// <param name="Node">Node performing the operation.</param>
+		/// <returns>Result</returns>
+		public static IElement EvaluateScalarMultiplication(BigInteger N, IElement Element, ScriptNode Node)
+		{
+			bool Sign = N.Sign < 0;
+			if (Sign)
+				N = -N;
+
+			IElement Result = null;
+			IElement Power = Element;
+
+			while (!N.IsZero)
+			{
+				N = BigInteger.DivRem(N, two, out BigInteger Rem);
+				if (!Rem.IsZero)
+					Result = Result is null ? Power : Add.EvaluateAddition(Result, Power, Node);
+
+				Power = Add.EvaluateAddition(Power, Power, Node);
+			}
+
+			if (Result is null)
+				return GetZero(Element, Node);
+			else if (Sign)
+				return Negate(Result, Node);
+			else
+				return Result;
+		}
+
+
+		private static readonly BigInteger two = new BigInteger(2);
+
 
 		/// <summary>
 		/// Differentiates a script node, if possible.

@@ -9,6 +9,7 @@ using Waher.Script.Objects.Sets;
 using Waher.Script.Units;
 using System.Threading.Tasks;
 using Waher.Script.Xml;
+using Waher.Content;
 
 namespace Waher.Script.Test
 {
@@ -1223,6 +1224,19 @@ namespace Waher.Script.Test
 
 			await Test("DateTime(2000,1,2)-Duration.Parse('PT1H')", new DateTime(2000, 1, 1, 23, 0, 0));
 			await Test("DateTime(2000,1,2)-Duration.Parse('PT1H')", new DateTime(2000, 1, 1, 23, 0, 0));
+		}
+
+		[TestMethod]
+		public async Task Evaluation_Test_60_ScalarMultiplication()
+		{
+			await Test("Duration.Parse('P1D')*1000", Duration.FromDays(1000));
+			await Test("1000*Duration.Parse('P1D')", Duration.FromDays(1000));
+			await Test("Duration.Parse('P1D')*-1000", Duration.FromDays(-1000));
+			await Test("(-1000)*Duration.Parse('P1D')", Duration.FromDays(-1000));
+			await Test("Duration.Parse('P1D')*#1000", Duration.FromDays(1000));
+			await Test("#1000*Duration.Parse('P1D')", Duration.FromDays(1000));
+			await Test("Duration.Parse('P1D')*-#1000", Duration.FromDays(-1000));
+			await Test("(-#1000)*Duration.Parse('P1D')", Duration.FromDays(-1000));
 		}
 
 	}

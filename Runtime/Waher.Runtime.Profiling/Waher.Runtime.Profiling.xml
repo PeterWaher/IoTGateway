@@ -91,6 +91,42 @@
         <member name="M:Waher.Runtime.Profiling.Events.Idle.Accumulate(Waher.Runtime.Profiling.Export.Accumulator)">
             <inheritdoc/>
         </member>
+        <member name="T:Waher.Runtime.Profiling.Events.Interval">
+            <summary>
+            Displays an interval
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Interval.#ctor(System.Int64,System.Int64,System.String,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Thread changes state.
+            </summary>
+            <param name="FromTicks">Elapsed ticks to start of interval.</param>
+            <param name="ToTicks">Elapsed ticks to end of interval.</param>
+            <param name="Label">Label to display with the interval.</param>
+            <param name="Thread">Profiler thread generating the event.</param>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Interval.State">
+            <summary>
+            String representation of the new state.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Interval.ToTicks">
+            <summary>
+            Elapsed ticks to end of interval.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Interval.EventType">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Interval.ExportXmlAttributes(System.Xml.XmlWriter,Waher.Runtime.Profiling.Events.ProfilerEvent,Waher.Runtime.Profiling.TimeUnit)">
+            <inheritdoc/>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Interval.PlantUmlState">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Interval.ExportPlantUml(Waher.Runtime.Profiling.Export.PlantUmlStates)">
+            <inheritdoc/>
+        </member>
         <member name="T:Waher.Runtime.Profiling.Events.NewState">
             <summary>
             Thread changes state.
@@ -432,6 +468,19 @@
             Elapsed ticks since start.
             </summary>
         </member>
+        <member name="P:Waher.Runtime.Profiling.Profiler.Started">
+            <summary>
+            When profiling was started.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.GetTicks(System.DateTime)">
+            <summary>
+            Converts a <see cref="T:System.DateTime"/> to number of ticks, since start
+            of profiling.
+            </summary>
+            <param name="Timepoint">Timepoint.</param>
+            <returns>Number of ticks, since start of profiling.</returns>
+        </member>
         <member name="M:Waher.Runtime.Profiling.Profiler.NewState(System.String)">
             <summary>
             Main Thread changes state.
@@ -442,6 +491,32 @@
             <summary>
             Main Thread goes idle.
             </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.High">
+            <summary>
+            Sets the (binary) state of the Main Thread to "high".
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.Low">
+            <summary>
+            Sets the (binary) state Main Thread to "low".
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.Interval(System.DateTime,System.DateTime,System.String)">
+            <summary>
+            Records an interval in the main thread.
+            </summary>
+            <param name="From">Starting timepoint.</param>
+            <param name="To">Ending timepoint.</param>
+            <param name="Label">Interval label.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.Interval(System.Int64,System.Int64,System.String)">
+            <summary>
+            Records an interval in the main thread.
+            </summary>
+            <param name="From">Starting timepoint, in ticks.</param>
+            <param name="To">Ending timepoint, in ticks.</param>
+            <param name="Label">Interval label.</param>
         </member>
         <member name="M:Waher.Runtime.Profiling.Profiler.Event(System.String)">
             <summary>
@@ -551,6 +626,11 @@
             Accumulates times in various sections during execution.
             </summary>
         </member>
+        <member name="F:Waher.Runtime.Profiling.ProfilerThreadType.Binary">
+            <summary>
+            Documents the changes between two binary states.
+            </summary>
+        </member>
         <member name="T:Waher.Runtime.Profiling.ProfilerThread">
             <summary>
             Class that keeps track of events and timing for one thread.
@@ -627,6 +707,32 @@
             <summary>
             Thread goes idle.
             </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.High">
+            <summary>
+            Sets the (binary) state to "high".
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.Low">
+            <summary>
+            Sets the (binary) state to "low".
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.Interval(System.DateTime,System.DateTime,System.String)">
+            <summary>
+            Records an interval in the profiler thread.
+            </summary>
+            <param name="From">Starting timepoint.</param>
+            <param name="To">Ending timepoint.</param>
+            <param name="Label">Interval label.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.Interval(System.Int64,System.Int64,System.String)">
+            <summary>
+            Records an interval in the profiler thread.
+            </summary>
+            <param name="From">Starting timepoint, in ticks.</param>
+            <param name="To">Ending timepoint, in ticks.</param>
+            <param name="Label">Interval label.</param>
         </member>
         <member name="M:Waher.Runtime.Profiling.ProfilerThread.Event(System.String)">
             <summary>

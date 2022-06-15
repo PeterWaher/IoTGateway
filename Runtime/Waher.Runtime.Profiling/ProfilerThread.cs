@@ -26,7 +26,12 @@ namespace Waher.Runtime.Profiling
 		/// <summary>
 		/// Accumulates times in various sections during execution.
 		/// </summary>
-		Accumulating
+		Accumulating,
+
+		/// <summary>
+		/// Documents the changes between two binary states.
+		/// </summary>
+		Binary
 	}
 
 	/// <summary>
@@ -142,6 +147,44 @@ namespace Waher.Runtime.Profiling
 		}
 
 		/// <summary>
+		/// Sets the (binary) state to "high".
+		/// </summary>
+		public void High()
+		{
+			this.NewState("high");
+		}
+
+		/// <summary>
+		/// Sets the (binary) state to "low".
+		/// </summary>
+		public void Low()
+		{
+			this.NewState("low");
+		}
+
+		/// <summary>
+		/// Records an interval in the profiler thread.
+		/// </summary>
+		/// <param name="From">Starting timepoint.</param>
+		/// <param name="To">Ending timepoint.</param>
+		/// <param name="Label">Interval label.</param>
+		public void Interval(DateTime From, DateTime To, string Label)
+		{
+			this.events.Add(new Interval(this.profiler.GetTicks(From), this.profiler.GetTicks(To), Label, this));
+		}
+
+		/// <summary>
+		/// Records an interval in the profiler thread.
+		/// </summary>
+		/// <param name="From">Starting timepoint, in ticks.</param>
+		/// <param name="To">Ending timepoint, in ticks.</param>
+		/// <param name="Label">Interval label.</param>
+		public void Interval(long From, long To, string Label)
+		{
+			this.events.Add(new Interval(From, To, Label, this));
+		}
+
+		/// <summary>
 		/// Event occurred
 		/// </summary>
 		/// <param name="Name">Name of event.</param>
@@ -219,6 +262,10 @@ namespace Waher.Runtime.Profiling
 			{
 				case ProfilerThreadType.StateMachine:
 					Output.Append("robust \"");
+					break;
+
+				case ProfilerThreadType.Binary:
+					Output.Append("binary \"");
 					break;
 
 				case ProfilerThreadType.Sequential:

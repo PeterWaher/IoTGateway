@@ -71,6 +71,7 @@ namespace Waher.Runtime.Profiling
 		private readonly Dictionary<string, ProfilerThread> threadsByName = new Dictionary<string, ProfilerThread>();
 		private readonly ProfilerThread mainThread;
 		private readonly Stopwatch watch;
+		private DateTime started = DateTime.MinValue;
 		private double timeScale = 1;
 		private int threadOrder = 0;
 
@@ -197,6 +198,7 @@ namespace Waher.Runtime.Profiling
 		/// </summary>
 		public void Start()
 		{
+			this.started = DateTime.Now;
 			this.watch.Start();
 			this.mainThread.Start();
 		}
@@ -216,6 +218,23 @@ namespace Waher.Runtime.Profiling
 		public long ElapsedTicks => this.watch.ElapsedTicks;
 
 		/// <summary>
+		/// When profiling was started.
+		/// </summary>
+		public DateTime Started => this.started;
+
+		/// <summary>
+		/// Converts a <see cref="System.DateTime"/> to number of ticks, since start
+		/// of profiling.
+		/// </summary>
+		/// <param name="Timepoint">Timepoint.</param>
+		/// <returns>Number of ticks, since start of profiling.</returns>
+		public long GetTicks(DateTime Timepoint)
+		{
+			double Seconds = (Timepoint - this.started).TotalSeconds;
+			return (long)(Seconds * Stopwatch.Frequency + 0.5);
+		}
+
+		/// <summary>
 		/// Main Thread changes state.
 		/// </summary>
 		/// <param name="State">String representation of the new state.</param>
@@ -230,6 +249,44 @@ namespace Waher.Runtime.Profiling
 		public void Idle()
 		{
 			this.mainThread.Idle();
+		}
+
+		/// <summary>
+		/// Sets the (binary) state of the Main Thread to "high".
+		/// </summary>
+		public void High()
+		{
+			this.mainThread.High();
+		}
+
+		/// <summary>
+		/// Sets the (binary) state Main Thread to "low".
+		/// </summary>
+		public void Low()
+		{
+			this.mainThread.Low();
+		}
+
+		/// <summary>
+		/// Records an interval in the main thread.
+		/// </summary>
+		/// <param name="From">Starting timepoint.</param>
+		/// <param name="To">Ending timepoint.</param>
+		/// <param name="Label">Interval label.</param>
+		public void Interval(DateTime From, DateTime To, string Label)
+		{
+			this.mainThread.Interval(this.GetTicks(From), this.GetTicks(To), Label);
+		}
+
+		/// <summary>
+		/// Records an interval in the main thread.
+		/// </summary>
+		/// <param name="From">Starting timepoint, in ticks.</param>
+		/// <param name="To">Ending timepoint, in ticks.</param>
+		/// <param name="Label">Interval label.</param>
+		public void Interval(long From, long To, string Label)
+		{
+			this.mainThread.Interval(From, To, Label);
 		}
 
 		/// <summary>

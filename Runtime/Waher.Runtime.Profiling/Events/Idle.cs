@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Runtime.Profiling.Export;
+﻿using Waher.Runtime.Profiling.Export;
 
 namespace Waher.Runtime.Profiling.Events
 {

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Waher.Runtime.Profiling.Events;
 
 namespace Waher.Runtime.Profiling.Export

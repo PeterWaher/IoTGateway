@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Runtime.Profiling.Events
+﻿namespace Waher.Runtime.Profiling.Events
 {
 	/// <summary>
 	/// Processing stops.

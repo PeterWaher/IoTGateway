@@ -16,7 +16,7 @@
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>2.3.2</AssemblyVersion>
     <FileVersion>2.3.2</FileVersion>
-    <Version>2.3.2</Version>
+    <Version>2.3.3</Version>
     <PackageIconUrl></PackageIconUrl>
     <FileUpgradeFlags>40</FileUpgradeFlags>
     <UpgradeBackupLocation>C:\My Projects\IoTGateway\Backup\Content\Waher.Content\</UpgradeBackupLocation>

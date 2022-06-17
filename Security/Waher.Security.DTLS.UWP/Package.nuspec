@@ -19,7 +19,7 @@
       <dependency id="Waher.Networking.UWP" version="2.0.4"/>
       <dependency id="Waher.Runtime.Cache" version="1.0.6"/>
       <dependency id="Waher.Runtime.Inventory" version="1.1.0"/>
-      <dependency id="Waher.Runtime.Timing" version="1.0.4"/>
+      <dependency id="Waher.Runtime.Timing" version="1.0.5"/>
       <dependency id="Waher.Security" version="1.0.8"/>
     </dependencies>
   </metadata>

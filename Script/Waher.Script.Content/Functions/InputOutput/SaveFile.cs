@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -8,7 +7,6 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Content.Functions.InputOutput
 {

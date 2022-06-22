@@ -5,7 +5,6 @@ using Waher.Content;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 
 namespace Waher.Script.Content.Functions.InputOutput
 {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Waher.Content;
-using Waher.Content.Xml;
+﻿using Waher.Content;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;

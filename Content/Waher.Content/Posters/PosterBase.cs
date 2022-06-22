@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Runtime.ExceptionServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Runtime.Inventory;
 
@@ -41,11 +39,12 @@ namespace Waher.Content.Posters
 		/// </summary>
 		/// <param name="Uri">URI</param>
 		/// <param name="Data">Data to post.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public virtual Task<object> PostAsync(Uri Uri, object Data, params KeyValuePair<string, string>[] Headers)
+		public virtual Task<object> PostAsync(Uri Uri, object Data, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
 		{
-			return this.PostAsync(Uri, Data, 60000, Headers);
+			return this.PostAsync(Uri, Data, Certificate, 60000, Headers);
 		}
 
 		/// <summary>
@@ -53,13 +52,14 @@ namespace Waher.Content.Posters
 		/// </summary>
 		/// <param name="Uri">URI</param>
 		/// <param name="Data">Data to post.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Decoded response.</returns>
-		public virtual async Task<object> PostAsync(Uri Uri, object Data, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public virtual async Task<object> PostAsync(Uri Uri, object Data, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Data, System.Text.Encoding.UTF8);
-			KeyValuePair<byte[], string> Result = await this.PostAsync(Uri, P.Key, P.Value, TimeoutMs, Headers);
+			KeyValuePair<byte[], string> Result = await this.PostAsync(Uri, P.Key, P.Value, Certificate, TimeoutMs, Headers);
 			return await InternetContent.DecodeAsync(Result.Value, Result.Key, Uri);
 		}
 
@@ -69,11 +69,12 @@ namespace Waher.Content.Posters
 		/// <param name="Uri">URI</param>
 		/// <param name="EncodedData">Encoded data to be posted.</param>
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public virtual Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, params KeyValuePair<string, string>[] Headers)
+		public virtual Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
 		{
-			return this.PostAsync(Uri, EncodedData, ContentType, 60000, Headers);
+			return this.PostAsync(Uri, EncodedData, ContentType, Certificate, 60000, Headers);
 		}
 
 		/// <summary>
@@ -82,10 +83,11 @@ namespace Waher.Content.Posters
 		/// <param name="Uri">URI</param>
 		/// <param name="EncodedData">Encoded data to be posted.</param>
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
-		public abstract Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, int TimeoutMs, params KeyValuePair<string, string>[] Headers);
+		public abstract Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers);
 
 	}
 }

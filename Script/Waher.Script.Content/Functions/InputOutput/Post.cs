@@ -40,6 +40,21 @@ namespace Waher.Script.Content.Functions.InputOutput
 		}
 
 		/// <summary>
+		/// Post(Url,Data,Headers,Certificate)
+		/// </summary>
+		/// <param name="Url">URL.</param>
+		/// <param name="Data">Data</param>
+		/// <param name="Headers">Request headers.</param>
+		/// <param name="Certificate">Client certificate to use in a Mutual TLS session.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
+		public Post(ScriptNode Url, ScriptNode Data, ScriptNode Headers, ScriptNode Certificate, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Url, Data, Headers, Certificate }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal }, Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
 		/// Name of the function
 		/// </summary>
 		public override string FunctionName => nameof(Post);
@@ -47,7 +62,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames => new string[] { "URL", "Data" };
+		public override string[] DefaultArgumentNames => new string[] { "URL", "Data", "Headers", "Certificate" };
 
 		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using

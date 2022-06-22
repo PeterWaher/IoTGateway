@@ -1743,29 +1743,29 @@ Parallel(f("A"),f("B"),f("C"))
 
 The following functions are available in the `Waher.Script.Content` library.
 
-| Function                               | Description | Example |
-|----------------------------------------|-------------|---------|
-| `Base64Decode(Data)`                   | Decodes binary data from a string using BASE64 encoding. | [Example][Base64DecodeExample] |
-| `Base64Encode(Data)`                   | Encodes binary data to a string using BASE64 encoding. | [Example][Base64EncodeExample] |
-| `Base64UrlDecode(Data)`                | Decodes binary data from a string using BASE64URL encoding. | [Example][Base64UrlDecodeExample] |
-| `Base64UrlEncode(Data)`                | Encodes binary data to a string using BASE64URL encoding. | [Example][Base64UrlEncodeExample] |
-| `Decode(Content,Type)`                 | Decodes `Content` using the available Internet Content Type decoder for Content Type `Type`. | [Example][DecodeExample] |
-| `Encode(Object[,Types])`               | Encodes `Object` using the available Internet Content Type encoders. If `Types` is provided, it is an array of acceptable content types that can be used. The result is a two-dimensional vector, containing the binary encoding as the first element, and the content type as the second element. | [Example][EncodeExample] |
-| `Get(Url[,Accept/Headers])`            | Retrieves a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes it, in accordance with its content type. If a second argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. | [Example][GetExample] |
-| `Head(Url[,Accept/Headers])`           | Retrieves the headers of a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`. If a second argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. | [Example][HeadExample] |
-| `HtmlAttributeEncode(s)`               | Encodes a string for inclusion in an HTML attribute. It transforms `<`, `>`, `&` and `"` to `&lt;`, `&gt;`, `&amp;` and `&quot;` correspondingly. | [Example][HtmlAttributeEncodeExample] |
-| `HtmlValueEncode(s)`                   | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. | [Example][HtmlValueEncodeExample] |
-| `LoadFile(FileName[,ContentType])`     | Loads a file and decodes it. By default, the content type defined by the file extension is used, if defined. You can also explicitly provide a content type. | [Example][LoadFileExample] |
-| `Post(Url,Data[,Accept/Headers])`      | Encodes data and posts it to a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes the response, in accordance with the content type returned. If a third argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. | [Example][PostExample] |
-| `QrEncode(Text,Level)                  | Encodes text in `Text` to a QR Code using Error Correction level defined by `Level`. Response is a text string where the QR Code is encoded using block characters. | [Example][QrExample] |
-| `QrEncode(Text,Level[,Width[,Height]]) | Encodes text in `Text` to a QR Code using Error Correction level defined by `Level`. Response is a bitmap with the specified dimensions. If only `Width` is specified, `Height` will be assued to be identical. | [Example][QrExample2] |
-| `SaveFile(Obj,FileName)`               | Encodes an object `Obj` in accordance with its type and file extension, and saves it as a file. | [Example][SaveFileExample] |
-| `UrlDecode(s)`                         | Decodes a string taken from an URL. | [Example][UrlDecodeExample] |
-| `UrlEncode(s)`                         | Encodes a string for inclusion in an URL. | [Example][UrlEncodeExample] |
-| `Utf8Decode(s)`                        | Gets a string from UTF-8 encoded data. | [Example][Utf8DecodeExample] |
-| `Utf8Encode(s)`                        | Encodes a string using UTF-8. | [Example][Utf8EncodeExample] |
-| `XmlDecode(s)`                         | Decodes a string taken from XML. It transforms `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` to `<`, `>`, `&`, `"` and `'`  correspondingly. | [Example][XmlDecodeExample] |
-| `XmlEncode(s)`                         | Encodes a string for inclusion in XML. It transforms `<`, `>`, `&`, `"` and `'` to `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` correspondingly. | [Example][XmlEncodeExample] |
+| Function                                        | Description | Example |
+|-------------------------------------------------|-------------|---------|
+| `Base64Decode(Data)`                            | Decodes binary data from a string using BASE64 encoding. | [Example][Base64DecodeExample] |
+| `Base64Encode(Data)`                            | Encodes binary data to a string using BASE64 encoding. | [Example][Base64EncodeExample] |
+| `Base64UrlDecode(Data)`                         | Decodes binary data from a string using BASE64URL encoding. | [Example][Base64UrlDecodeExample] |
+| `Base64UrlEncode(Data)`                         | Encodes binary data to a string using BASE64URL encoding. | [Example][Base64UrlEncodeExample] |
+| `Decode(Content,Type)`                          | Decodes `Content` using the available Internet Content Type decoder for Content Type `Type`. | [Example][DecodeExample] |
+| `Encode(Object[,Types])`                        | Encodes `Object` using the available Internet Content Type encoders. If `Types` is provided, it is an array of acceptable content types that can be used. The result is a two-dimensional vector, containing the binary encoding as the first element, and the content type as the second element. | [Example][EncodeExample] |
+| `Get(Url[,Accept/Headers[,Certificate]])`       | Retrieves a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes it, in accordance with its content type. If a second argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. If providing a `Certificate`, mutual TLS can be used. | [Example][GetExample] |
+| `Head(Url[,Accept/Headers[,Certificate]])`      | Retrieves the headers of a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`. If a second argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. If providing a `Certificate`, mutual TLS can be used. | [Example][HeadExample] |
+| `HtmlAttributeEncode(s)`                        | Encodes a string for inclusion in an HTML attribute. It transforms `<`, `>`, `&` and `"` to `&lt;`, `&gt;`, `&amp;` and `&quot;` correspondingly. | [Example][HtmlAttributeEncodeExample] |
+| `HtmlValueEncode(s)`                            | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. | [Example][HtmlValueEncodeExample] |
+| `LoadFile(FileName[,ContentType])`              | Loads a file and decodes it. By default, the content type defined by the file extension is used, if defined. You can also explicitly provide a content type. | [Example][LoadFileExample] |
+| `Post(Url,Data[,Accept/Headers,[Certificate]])` | Encodes data and posts it to a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes the response, in accordance with the content type returned. If a third argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. If providing a `Certificate`, mutual TLS can be used. | [Example][PostExample] |
+| `QrEncode(Text,Level)                           | Encodes text in `Text` to a QR Code using Error Correction level defined by `Level`. Response is a text string where the QR Code is encoded using block characters. | [Example][QrExample] |
+| `QrEncode(Text,Level[,Width[,Height]])          | Encodes text in `Text` to a QR Code using Error Correction level defined by `Level`. Response is a bitmap with the specified dimensions. If only `Width` is specified, `Height` will be assued to be identical. | [Example][QrExample2] |
+| `SaveFile(Obj,FileName)`                        | Encodes an object `Obj` in accordance with its type and file extension, and saves it as a file. | [Example][SaveFileExample] |
+| `UrlDecode(s)`                                  | Decodes a string taken from an URL. | [Example][UrlDecodeExample] |
+| `UrlEncode(s)`                                  | Encodes a string for inclusion in an URL. | [Example][UrlEncodeExample] |
+| `Utf8Decode(s)`                                 | Gets a string from UTF-8 encoded data. | [Example][Utf8DecodeExample] |
+| `Utf8Encode(s)`                                 | Encodes a string using UTF-8. | [Example][Utf8EncodeExample] |
+| `XmlDecode(s)`                                  | Decodes a string taken from XML. It transforms `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` to `<`, `>`, `&`, `"` and `'`  correspondingly. | [Example][XmlDecodeExample] |
+| `XmlEncode(s)`                                  | Encodes a string for inclusion in XML. It transforms `<`, `>`, `&`, `"` and `'` to `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` correspondingly. | [Example][XmlEncodeExample] |
 
 [Base64DecodeExample]: Prompt.md?Expression=Decode(Base64Decode("SGVsbG8="),"text/plain")
 [Base64EncodeExample]: Prompt.md?Expression=Base64Encode(Encode("Hello")[0])

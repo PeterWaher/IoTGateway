@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -64,6 +65,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Uri">URI</param>
 		/// <param name="EncodedData">Encoded data to be posted.</param>
 		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
 		/// <returns>Encoded response.</returns>
@@ -75,7 +77,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <exception cref="TimeoutException">If the request times out.</exception>
 		/// <exception cref="OutOfMemoryException">If resource too large to decode.</exception>
 		/// <exception cref="IOException">If unable to read from temporary file.</exception>
-		public override async Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		public override async Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
 			if (proxy is null)
 			{
@@ -135,6 +137,8 @@ namespace Waher.Networking.XMPP.HTTPX
 				{
 					State.Done.TrySetResult(false);
 				}, null, TimeoutMs, Timeout.Infinite);
+
+				// TODO: Transport public part of Client certificate, if provided.
 
 				Rec.HttpxClient.Request(Rec.FullJid, "POST", Rec.LocalUrl,
 					1.1, Headers2, Data, async (sender, e) =>

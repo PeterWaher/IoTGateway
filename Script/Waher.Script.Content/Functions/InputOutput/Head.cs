@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Content.Functions.InputOutput
@@ -38,6 +40,20 @@ namespace Waher.Script.Content.Functions.InputOutput
 		}
 
 		/// <summary>
+		/// Head(Url,Headers,Certificate)
+		/// </summary>
+		/// <param name="Url">URL.</param>
+		/// <param name="Headers">Request headers.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Certificate">Client certificate to use in a Mutual TLS session.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
+		public Head(ScriptNode Url, ScriptNode Headers, ScriptNode Certificate, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Url, Headers, Certificate }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Normal, ArgumentType.Normal }, Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
 		/// Name of the function
 		/// </summary>
 		public override string FunctionName => nameof(Head);
@@ -45,7 +61,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 		/// <summary>
 		/// Default Argument names
 		/// </summary>
-		public override string[] DefaultArgumentNames => new string[] { "URL" };
+		public override string[] DefaultArgumentNames => new string[] { "URL", "Headers", "Certificate" };
 
 		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
@@ -74,11 +90,23 @@ namespace Waher.Script.Content.Functions.InputOutput
 		{
 			Uri Url = new Uri(Arguments[0].AssociatedObjectValue?.ToString());
 			List<KeyValuePair<string, string>> HeaderList = null;
+			X509Certificate2 Certificate = null;
 
 			if (Arguments.Length > 1)
+			{
 				HeaderList = Get.GetHeaders(Arguments[1].AssociatedObjectValue, this);
 
-			object Result = await InternetContent.HeadAsync(Url, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
+				if (Arguments.Length > 2)
+				{
+					if (!(Arguments[2].AssociatedObjectValue is X509Certificate2 Cert))
+						throw new ScriptRuntimeException("Expected a certificate in the third argument.", this);
+
+					Certificate = Cert;
+				}
+			}
+
+
+			object Result = await InternetContent.HeadAsync(Url, Certificate, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
 
 			return Expression.Encapsulate(Result);
 		}

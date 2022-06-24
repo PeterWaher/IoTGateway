@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Events;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Content.Functions.InputOutput
@@ -92,11 +95,20 @@ namespace Waher.Script.Content.Functions.InputOutput
 			Uri Url = new Uri(Arguments[0].AssociatedObjectValue?.ToString());
 			object Data = Arguments[1].AssociatedObjectValue;
 			List<KeyValuePair<string, string>> HeaderList = null;
+			object Result;
 
 			if (Arguments.Length > 2)
 				HeaderList = Get.GetHeaders(Arguments[2].AssociatedObjectValue, this);
 
-			object Result = await InternetContent.PostAsync(Url, Data, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
+			if (Arguments.Length > 3)
+			{
+				if (!(Arguments[3].AssociatedObjectValue is X509Certificate Certificate))
+					throw new ScriptRuntimeException("Expected X.509 certificate in fourth argument.", this);
+
+				Result = await InternetContent.PostAsync(Url, Data, Certificate, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
+			}
+			else
+				Result = await InternetContent.PostAsync(Url, Data, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
 
 			return Expression.Encapsulate(Result);
 		}

@@ -101,7 +101,10 @@ namespace Waher.Content.Getters
 			};
 
 			if (!(Certificate is null))
+			{
+				Handler.ClientCertificateOptions = ClientCertificateOption.Manual;
 				Handler.ClientCertificates.Add(Certificate);
+			}
 
 			return Handler;
 		}

@@ -65,6 +65,8 @@ namespace Waher.Networking.HTTP.Authentication
 				return null;
 
 			string UserName = Certificate.Subject;
+			if (UserName.StartsWith("CN="))
+				UserName = UserName.Substring(3);
 
 			if (!Client.RemoteCertificateValid)
 			{

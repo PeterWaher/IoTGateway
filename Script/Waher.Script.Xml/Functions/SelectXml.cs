@@ -148,9 +148,9 @@ namespace Waher.Script.Xml.Functions
 		public static IElement ToElement(XmlNode Node)
 		{
 			if (Node is XmlText Text)
-				return new StringValue(Text.Value);
+				return ToElement(Text.Value);
 			else if (Node is XmlCDataSection CData)
-				return new StringValue(CData.Value);
+				return ToElement(CData.Value);
 			else if (Node is XmlAttribute Attr)
 				return ToElement(Attr.Value);
 			else

@@ -6071,6 +6071,30 @@
             <param name="Variables">Variables collection.</param>
             <returns>Result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.Runtime.Remove.EvaluateAsync(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            This method should be used for nodes whose <see cref="P:Waher.Script.Model.ScriptNode.IsAsynchronous"/> is true.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Runtime.Remove.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Functions.Runtime.Remove.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="M:Waher.Script.Functions.Runtime.Remove.ForAllChildNodes(Waher.Script.Model.ScriptNodeEventHandler,System.Object,Waher.Script.Model.SearchMethod)">
             <summary>
             Calls the callback method for all child nodes.
@@ -6079,12 +6103,6 @@
             <param name="State">State object to pass on to the callback method.</param>
             <param name="Order">Order to traverse the nodes.</param>
             <returns>If the process was completed.</returns>
-        </member>
-        <member name="M:Waher.Script.Functions.Runtime.Remove.Equals(System.Object)">
-            <inheritdoc/>
-        </member>
-        <member name="M:Waher.Script.Functions.Runtime.Remove.GetHashCode">
-            <inheritdoc/>
         </member>
         <member name="T:Waher.Script.Functions.Runtime.Required">
             <summary>

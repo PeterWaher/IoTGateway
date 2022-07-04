@@ -1239,5 +1239,20 @@ namespace Waher.Script.Test
 			await Test("(-#1000)*Duration.Parse('P1D')", Duration.FromDays(-1000));
 		}
 
+		[TestMethod]
+		public async Task Evaluation_Test_61_Remove()
+		{
+			Dictionary<string, IElement> Obj = new Dictionary<string, IElement>()
+			{
+				{ "Member1", new DoubleNumber(a) },
+				{ "Member3", new DoubleNumber(c) }
+			};
+
+			await Test("Obj:={Member1:a, Member2:b, Member3:c};Remove(Obj.Member2);Obj", Obj);
+			await Test("Obj:={Member1:a, Member2:b, Member3:c};Remove(Obj.Member2)", true);
+			await Test("Remove(a);exists(a)", false);
+			await Test("Remove(a)", a);
+		}
+
 	}
 }

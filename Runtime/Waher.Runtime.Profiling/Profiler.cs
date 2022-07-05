@@ -68,6 +68,7 @@ namespace Waher.Runtime.Profiling
 		private readonly SortedDictionary<string, int> exceptionOrdinals = new SortedDictionary<string, int>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly SortedDictionary<string, int> eventOrdinals = new SortedDictionary<string, int>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly List<ProfilerThread> threads = new List<ProfilerThread>();
+		private readonly SortedDictionary<int, object> notes = new SortedDictionary<int, object>();
 		private readonly Dictionary<string, ProfilerThread> threadsByName = new Dictionary<string, ProfilerThread>();
 		private readonly ProfilerThread mainThread;
 		private readonly Stopwatch watch;
@@ -635,5 +636,50 @@ namespace Waher.Runtime.Profiling
 			return GetOrdinal(this.exceptionOrdinals, Exception.GetType().FullName);
 		}
 
+		/// <summary>
+		/// Adds a note to the profile.
+		/// </summary>
+		/// <param name="Note">Note to add.</param>
+		/// <returns>Note index. First note added receives index 1.</returns>
+		public int AddNote(object Note)
+		{
+			int Result;
+
+			lock (this.notes)
+			{
+				Result = this.notes.Count + 1;
+				this.notes[Result] = Note;
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Number of notes added.
+		/// </summary>
+		public int NoteCount
+		{
+			get
+			{
+				lock (this.notes)
+				{
+					return this.notes.Count;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Tries to get a note from the profile.
+		/// </summary>
+		/// <param name="Index">1-based note index.</param>
+		/// <param name="Note">Note, if found.</param>
+		/// <returns>If a note was found with the corresponding index.</returns>
+		public bool TryGetNote(int Index, out object Note)
+		{
+			lock (this.notes)
+			{
+				return this.notes.TryGetValue(Index, out Note);
+			}
+		}
 	}
 }

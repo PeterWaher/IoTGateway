@@ -606,6 +606,26 @@
             <param name="Exception">Exception object.</param>
             <returns>Exception Type Ordinal</returns>
         </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.AddNote(System.Object)">
+            <summary>
+            Adds a note to the profile.
+            </summary>
+            <param name="Note">Note to add.</param>
+            <returns>Note index. First note added receives index 1.</returns>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Profiler.NoteCount">
+            <summary>
+            Number of notes added.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.TryGetNote(System.Int32,System.Object@)">
+            <summary>
+            Tries to get a note from the profile.
+            </summary>
+            <param name="Index">1-based note index.</param>
+            <param name="Note">Note, if found.</param>
+            <returns>If a note was found with the corresponding index.</returns>
+        </member>
         <member name="T:Waher.Runtime.Profiling.ProfilerThreadType">
             <summary>
             Type of profiler thread.

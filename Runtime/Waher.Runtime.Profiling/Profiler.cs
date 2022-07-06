@@ -302,10 +302,30 @@ namespace Waher.Runtime.Profiling
 		/// <summary>
 		/// Event occurred on main thread
 		/// </summary>
+		/// <param name="Name">Name of event.</param>
+		/// <param name="Label">Optional label.</param>
+		public void Event(string Name, string Label)
+		{
+			this.mainThread.Event(Name, Label);
+		}
+
+		/// <summary>
+		/// Event occurred on main thread
+		/// </summary>
 		/// <param name="Exception">Exception object.</param>
 		public void Exception(System.Exception Exception)
 		{
 			this.mainThread.Exception(Exception);
+		}
+
+		/// <summary>
+		/// Event occurred on main thread
+		/// </summary>
+		/// <param name="Exception">Exception object.</param>
+		/// <param name="Label">Optional label.</param>
+		public void Exception(System.Exception Exception, string Label)
+		{
+			this.mainThread.Exception(Exception, Label);
 		}
 
 		/// <summary>

@@ -10,8 +10,9 @@ namespace Waher.Runtime.Profiling.Events
 	public class Event : ProfilerEvent
 	{
 		private readonly string name;
+		private readonly string label;
 		private int ordinal;
-		
+
 		/// <summary>
 		/// Event occurred
 		/// </summary>
@@ -19,15 +20,33 @@ namespace Waher.Runtime.Profiling.Events
 		/// <param name="Name">Name of event.</param>
 		/// <param name="Thread">Profiler thread generating the event.</param>
 		public Event(long Ticks, string Name, ProfilerThread Thread)
+			: this(Ticks, Name, string.Empty, Thread)
+		{
+		}
+
+		/// <summary>
+		/// Event occurred
+		/// </summary>
+		/// <param name="Ticks">Elapsed ticks.</param>
+		/// <param name="Name">Name of event.</param>
+		/// <param name="Label">Optional label.</param>
+		/// <param name="Thread">Profiler thread generating the event.</param>
+		public Event(long Ticks, string Name, string Label, ProfilerThread Thread)
 			: base(Ticks, Thread)
 		{
 			this.name = Name;
+			this.label = Label;
 		}
 
 		/// <summary>
 		/// Name of event.
 		/// </summary>
 		public string Name => this.name;
+
+		/// <summary>
+		/// Name of event.
+		/// </summary>
+		public string Label => this.label;
 
 		/// <inheritdoc/>
 		public override string EventType => "Event";
@@ -36,6 +55,9 @@ namespace Waher.Runtime.Profiling.Events
 		public override void ExportXmlAttributes(XmlWriter Output, ProfilerEvent Previous, TimeUnit TimeUnit)
 		{
 			Output.WriteAttributeString("name", this.name);
+
+			if (!string.IsNullOrEmpty(this.label))
+				Output.WriteAttributeString("label", this.label);
 
 			base.ExportXmlAttributes(Output, Previous, TimeUnit);
 		}
@@ -48,7 +70,16 @@ namespace Waher.Runtime.Profiling.Events
 			Output.Append("E");
 			Output.Append(this.ordinal.ToString());
 			Output.Append(" -> ");
-			Output.AppendLine(this.Thread.Key);
+			Output.Append(this.Thread.Key);
+
+			if (!string.IsNullOrEmpty(this.label))
+			{
+				Output.Append(" : \"");
+				Output.Append(this.label.Replace('"', '\''));
+				Output.Append('"');
+			}
+
+			Output.AppendLine();
 		}
 
 		/// <inheritdoc/>

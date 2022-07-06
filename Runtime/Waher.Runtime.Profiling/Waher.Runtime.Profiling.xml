@@ -17,7 +17,21 @@
             <param name="Name">Name of event.</param>
             <param name="Thread">Profiler thread generating the event.</param>
         </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Event.#ctor(System.Int64,System.String,System.String,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Event occurred
+            </summary>
+            <param name="Ticks">Elapsed ticks.</param>
+            <param name="Name">Name of event.</param>
+            <param name="Label">Optional label.</param>
+            <param name="Thread">Profiler thread generating the event.</param>
+        </member>
         <member name="P:Waher.Runtime.Profiling.Events.Event.Name">
+            <summary>
+            Name of event.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Event.Label">
             <summary>
             Name of event.
             </summary>
@@ -50,9 +64,23 @@
             <param name="Exception">Exception object.</param>
             <param name="Thread">Profiler thread generating the event.</param>
         </member>
+        <member name="M:Waher.Runtime.Profiling.Events.Exception.#ctor(System.Int64,System.Exception,System.String,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Exception occurred
+            </summary>
+            <param name="Ticks">Elapsed ticks.</param>
+            <param name="Exception">Exception object.</param>
+            <param name="Label">Optional label.</param>
+            <param name="Thread">Profiler thread generating the event.</param>
+        </member>
         <member name="P:Waher.Runtime.Profiling.Events.Exception.ExceptionObject">
             <summary>
             Exception object.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.Exception.Label">
+            <summary>
+            Name of event.
             </summary>
         </member>
         <member name="P:Waher.Runtime.Profiling.Events.Exception.EventType">
@@ -524,11 +552,25 @@
             </summary>
             <param name="Name">Name of event.</param>
         </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.Event(System.String,System.String)">
+            <summary>
+            Event occurred on main thread
+            </summary>
+            <param name="Name">Name of event.</param>
+            <param name="Label">Optional label.</param>
+        </member>
         <member name="M:Waher.Runtime.Profiling.Profiler.Exception(System.Exception)">
             <summary>
             Event occurred on main thread
             </summary>
             <param name="Exception">Exception object.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.Exception(System.Exception,System.String)">
+            <summary>
+            Event occurred on main thread
+            </summary>
+            <param name="Exception">Exception object.</param>
+            <param name="Label">Optional label.</param>
         </member>
         <member name="M:Waher.Runtime.Profiling.Profiler.ToSeconds(System.Int64)">
             <summary>
@@ -760,11 +802,25 @@
             </summary>
             <param name="Name">Name of event.</param>
         </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.Event(System.String,System.String)">
+            <summary>
+            Event occurred
+            </summary>
+            <param name="Name">Name of event.</param>
+            <param name="Label">Optional label.</param>
+        </member>
         <member name="M:Waher.Runtime.Profiling.ProfilerThread.Exception(System.Exception)">
             <summary>
             Exception occurred
             </summary>
             <param name="Exception">Exception object.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.Exception(System.Exception,System.String)">
+            <summary>
+            Exception occurred
+            </summary>
+            <param name="Exception">Exception object.</param>
+            <param name="Label">Optional label.</param>
         </member>
         <member name="M:Waher.Runtime.Profiling.ProfilerThread.Start">
             <summary>

@@ -194,12 +194,32 @@ namespace Waher.Runtime.Profiling
 		}
 
 		/// <summary>
+		/// Event occurred
+		/// </summary>
+		/// <param name="Name">Name of event.</param>
+		/// <param name="Label">Optional label.</param>
+		public void Event(string Name, string Label)
+		{
+			this.events.Add(new Event(this.profiler.ElapsedTicks, Name, Label, this));
+		}
+
+		/// <summary>
 		/// Exception occurred
 		/// </summary>
 		/// <param name="Exception">Exception object.</param>
 		public void Exception(System.Exception Exception)
 		{
 			this.events.Add(new Events.Exception(this.profiler.ElapsedTicks, Exception, this));
+		}
+
+		/// <summary>
+		/// Exception occurred
+		/// </summary>
+		/// <param name="Exception">Exception object.</param>
+		/// <param name="Label">Optional label.</param>
+		public void Exception(System.Exception Exception, string Label)
+		{
+			this.events.Add(new Events.Exception(this.profiler.ElapsedTicks, Exception, Label, this));
 		}
 
 		/// <summary>

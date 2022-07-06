@@ -21160,6 +21160,13 @@
             <param name="Value">Value</param>
             <returns>Expression string.</returns>
         </member>
+        <member name="M:Waher.Script.Output.ObjectExNihiloOutput.CanBeVariable(System.String)">
+            <summary>
+            Checks if a label can be used as a variable directly or not.
+            </summary>
+            <param name="Label">Label string.</param>
+            <returns>If the label can act as a variable.</returns>
+        </member>
         <member name="T:Waher.Script.Output.StringOutput">
             <summary>
             Converts values of type String to expression strings.

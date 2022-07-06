@@ -57,7 +57,23 @@ namespace Waher.Script.Persistence.Output
 			else
 				sb.Append(", ");
 
-			sb.Append(Name);
+			if (ObjectExNihiloOutput.CanBeVariable(Name))
+				sb.Append(Name);
+			else
+			{
+				sb.Append('"');
+				sb.Append(Name.
+					Replace("\\", "\\\\").
+					Replace("\"", "\\\"").
+					Replace("\n", "\\n").
+					Replace("\r", "\\r").
+					Replace("\t", "\\t").
+					Replace("\b", "\\b").
+					Replace("\f", "\\f").
+					Replace("\a", "\\a"));
+				sb.Append('"');
+			}
+
 			sb.Append(": ");
 			sb.Append(Expression.ToString(Value));
 		}

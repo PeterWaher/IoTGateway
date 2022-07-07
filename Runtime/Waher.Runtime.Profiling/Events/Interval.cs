@@ -51,7 +51,16 @@ namespace Waher.Runtime.Profiling.Events
 		}
 
 		/// <inheritdoc/>
-		public override string PlantUmlState => this.label;
+		public override string PlantUmlState
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(this.label))
+					return "\"\"";
+				else
+					return this.label;
+			}
+		}
 
 		/// <inheritdoc/>
 		public override void ExportPlantUml(PlantUmlStates States)

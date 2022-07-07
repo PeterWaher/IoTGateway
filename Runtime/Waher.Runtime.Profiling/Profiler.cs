@@ -245,6 +245,15 @@ namespace Waher.Runtime.Profiling
 		}
 
 		/// <summary>
+		/// A new sample value has been recored
+		/// </summary>
+		/// <param name="Sample">New sample value.</param>
+		public void NewSample(double Sample)
+		{
+			this.mainThread.NewSample(Sample);
+		}
+
+		/// <summary>
 		/// Main Thread goes idle.
 		/// </summary>
 		public void Idle()

@@ -155,6 +155,33 @@
         <member name="M:Waher.Runtime.Profiling.Events.Interval.ExportPlantUml(Waher.Runtime.Profiling.Export.PlantUmlStates)">
             <inheritdoc/>
         </member>
+        <member name="T:Waher.Runtime.Profiling.Events.NewSample">
+            <summary>
+            Contains a new sample value.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.NewSample.#ctor(System.Int64,System.Double,Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Contains a new sample value.
+            </summary>
+            <param name="Ticks">Elapsed ticks.</param>
+            <param name="Sample">Sample value.</param>
+            <param name="Thread">Profiler thread generating the event.</param>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.NewSample.Sample">
+            <summary>
+            Sample value.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.NewSample.EventType">
+            <inheritdoc/>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.Events.NewSample.ExportXmlAttributes(System.Xml.XmlWriter,Waher.Runtime.Profiling.Events.ProfilerEvent,Waher.Runtime.Profiling.TimeUnit)">
+            <inheritdoc/>
+        </member>
+        <member name="P:Waher.Runtime.Profiling.Events.NewSample.PlantUmlState">
+            <inheritdoc/>
+        </member>
         <member name="T:Waher.Runtime.Profiling.Events.NewState">
             <summary>
             Thread changes state.
@@ -515,6 +542,12 @@
             </summary>
             <param name="State">String representation of the new state.</param>
         </member>
+        <member name="M:Waher.Runtime.Profiling.Profiler.NewSample(System.Double)">
+            <summary>
+            A new sample value has been recored
+            </summary>
+            <param name="Sample">New sample value.</param>
+        </member>
         <member name="M:Waher.Runtime.Profiling.Profiler.Idle">
             <summary>
             Main Thread goes idle.
@@ -693,6 +726,11 @@
             Documents the changes between two binary states.
             </summary>
         </member>
+        <member name="F:Waher.Runtime.Profiling.ProfilerThreadType.Analog">
+            <summary>
+            Documents the change of an analog input through sampled values.
+            </summary>
+        </member>
         <member name="T:Waher.Runtime.Profiling.ProfilerThread">
             <summary>
             Class that keeps track of events and timing for one thread.
@@ -764,6 +802,12 @@
             Thread changes state.
             </summary>
             <param name="State">String representation of the new state.</param>
+        </member>
+        <member name="M:Waher.Runtime.Profiling.ProfilerThread.NewSample(System.Double)">
+            <summary>
+            A new sample value has been recored
+            </summary>
+            <param name="Sample">New sample value.</param>
         </member>
         <member name="M:Waher.Runtime.Profiling.ProfilerThread.Idle">
             <summary>

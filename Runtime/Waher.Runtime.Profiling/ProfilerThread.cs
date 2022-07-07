@@ -31,7 +31,12 @@ namespace Waher.Runtime.Profiling
 		/// <summary>
 		/// Documents the changes between two binary states.
 		/// </summary>
-		Binary
+		Binary,
+
+		/// <summary>
+		/// Documents the change of an analog input through sampled values.
+		/// </summary>
+		Analog
 	}
 
 	/// <summary>
@@ -136,6 +141,15 @@ namespace Waher.Runtime.Profiling
 		public void NewState(string State)
 		{
 			this.events.Add(new NewState(this.profiler.ElapsedTicks, State, this));
+		}
+
+		/// <summary>
+		/// A new sample value has been recored
+		/// </summary>
+		/// <param name="Sample">New sample value.</param>
+		public void NewSample(double Sample)
+		{
+			this.events.Add(new NewSample(this.profiler.ElapsedTicks, Sample, this));
 		}
 
 		/// <summary>
@@ -286,6 +300,10 @@ namespace Waher.Runtime.Profiling
 
 				case ProfilerThreadType.Binary:
 					Output.Append("binary \"");
+					break;
+
+				case ProfilerThreadType.Analog:
+					Output.Append("analog \"");
 					break;
 
 				case ProfilerThreadType.Sequential:

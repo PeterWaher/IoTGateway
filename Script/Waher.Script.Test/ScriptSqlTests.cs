@@ -28,6 +28,7 @@ namespace Waher.Script.Test
 				typeof(XmlParser).Assembly,
 				typeof(System.Text.RegularExpressions.Regex).Assembly,
 				typeof(Persistence.SQL.Select).Assembly,
+				typeof(Content.Functions.Duration).Assembly,
 				typeof(ScriptSqlTests).Assembly,
 				typeof(Database).Assembly,
 				typeof(FilesProvider).Assembly,

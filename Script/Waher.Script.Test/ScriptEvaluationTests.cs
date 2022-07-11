@@ -1216,27 +1216,27 @@ namespace Waher.Script.Test
 			await Test("DateTime(2000,1,2)+TimeSpan(1,2,3)", new DateTime(2000, 1, 2, 1, 2, 3));
 			await Test("DateTime(2000,1,2)+TimeSpan(1,2,3)", new DateTime(2000, 1, 2, 1, 2, 3));
 
-			await Test("DateTime(2000,1,2)+Duration.Parse('PT1H')", new DateTime(2000, 1, 2, 1, 0, 0));
-			await Test("DateTime(2000,1,2)+Duration.Parse('PT1H')", new DateTime(2000, 1, 2, 1, 0, 0));
+			await Test("DateTime(2000,1,2)+Duration('PT1H')", new DateTime(2000, 1, 2, 1, 0, 0));
+			await Test("DateTime(2000,1,2)+Duration('PT1H')", new DateTime(2000, 1, 2, 1, 0, 0));
 
 			await Test("DateTime(2000,1,2)-TimeSpan(1,2,3)", new DateTime(2000, 1, 1, 22, 57, 57));
 			await Test("DateTime(2000,1,2)-TimeSpan(1,2,3)", new DateTime(2000, 1, 1, 22, 57, 57));
 
-			await Test("DateTime(2000,1,2)-Duration.Parse('PT1H')", new DateTime(2000, 1, 1, 23, 0, 0));
-			await Test("DateTime(2000,1,2)-Duration.Parse('PT1H')", new DateTime(2000, 1, 1, 23, 0, 0));
+			await Test("DateTime(2000,1,2)-Duration('PT1H')", new DateTime(2000, 1, 1, 23, 0, 0));
+			await Test("DateTime(2000,1,2)-Duration('PT1H')", new DateTime(2000, 1, 1, 23, 0, 0));
 		}
 
 		[TestMethod]
 		public async Task Evaluation_Test_60_ScalarMultiplication()
 		{
-			await Test("Duration.Parse('P1D')*1000", Duration.FromDays(1000));
-			await Test("1000*Duration.Parse('P1D')", Duration.FromDays(1000));
-			await Test("Duration.Parse('P1D')*-1000", Duration.FromDays(-1000));
-			await Test("(-1000)*Duration.Parse('P1D')", Duration.FromDays(-1000));
-			await Test("Duration.Parse('P1D')*#1000", Duration.FromDays(1000));
-			await Test("#1000*Duration.Parse('P1D')", Duration.FromDays(1000));
-			await Test("Duration.Parse('P1D')*-#1000", Duration.FromDays(-1000));
-			await Test("(-#1000)*Duration.Parse('P1D')", Duration.FromDays(-1000));
+			await Test("Duration('P1D')*1000", Duration.FromDays(1000));
+			await Test("1000*Duration('P1D')", Duration.FromDays(1000));
+			await Test("Duration('P1D')*-1000", Duration.FromDays(-1000));
+			await Test("(-1000)*Duration('P1D')", Duration.FromDays(-1000));
+			await Test("Duration('P1D')*#1000", Duration.FromDays(1000));
+			await Test("#1000*Duration('P1D')", Duration.FromDays(1000));
+			await Test("Duration('P1D')*-#1000", Duration.FromDays(-1000));
+			await Test("(-#1000)*Duration('P1D')", Duration.FromDays(-1000));
 		}
 
 		[TestMethod]
@@ -1252,6 +1252,15 @@ namespace Waher.Script.Test
 			await Test("Obj:={Member1:a, Member2:b, Member3:c};Remove(Obj.Member2)", true);
 			await Test("Remove(a);exists(a)", false);
 			await Test("Remove(a)", a);
+		}
+
+		[TestMethod]
+		public async Task Evaluation_Test_62_Duration()
+		{
+			await Test("Duration('PT10H30M')", new Duration(false, 0, 0, 0, 10, 30, 0));
+			await Test("Duration(1,2,3,4,5,6)", new Duration(false, 1, 2, 3, 4, 5, 6));
+			await Test("Duration(-1,-2,-3,-4,-5,-6)", new Duration(true, 1, 2, 3, 4, 5, 6));
+			await Test("{'Duration':Duration(x)}:={'Duration':'PT10H30M'};x", new Duration(false, 0, 0, 0, 10, 30, 0));
 		}
 
 	}

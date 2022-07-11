@@ -112,7 +112,7 @@ namespace Waher.Content.Markdown
 			return new MarkdownDocument(MarkdownText, IsDynamic, Settings, FileName, ResourceName, URL, TransparentExceptionTypes);
 		}
 
-		private MarkdownDocument(string MarkdownText, bool IsDynamic, MarkdownSettings Settings, string FileName, string ResourceName, string URL, 
+		private MarkdownDocument(string MarkdownText, bool IsDynamic, MarkdownSettings Settings, string FileName, string ResourceName, string URL,
 			params Type[] TransparentExceptionTypes)
 		{
 			this.markdownText = MarkdownText.Replace("\r\n", "\n").Replace('\r', '\n');
@@ -314,6 +314,13 @@ namespace Waher.Content.Markdown
 							try
 							{
 								Exp = new Expression(Script, FileName2);
+
+								if (!(Settings.AuthorizeExpression is null) &&
+									!await Settings.AuthorizeExpression(Exp))
+								{
+									throw new UnauthorizedAccessException("Expression not permitted: " + Script);
+								}
+
 								await Exp.EvaluateAsync(Variables);
 							}
 							catch (Exception ex)
@@ -340,6 +347,12 @@ namespace Waher.Content.Markdown
 				{
 					Exp = new Expression(Script, FileName);
 
+					if (!(Settings.AuthorizeExpression is null) &&
+						!await Settings.AuthorizeExpression(Exp))
+					{
+						throw new UnauthorizedAccessException("Expression not permitted: " + Script);
+					}
+
 					if (!IsDynamic)
 					{
 						IsDynamic = true;
@@ -363,8 +376,8 @@ namespace Waher.Content.Markdown
 						{
 							Variables.ConsoleOut.Flush();
 							Variables.ConsoleOut = Bak;
-						
-						if (!FromScript)
+
+							if (!FromScript)
 								Variables.Release();
 						}
 

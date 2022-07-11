@@ -1098,6 +1098,13 @@
             <param name="Variables">Current variables.</param>
             <returns>Transformed object (possibly the same if no XML Visualizer found).</returns>
         </member>
+        <member name="T:Waher.Content.Markdown.AuthorizeExpression">
+            <summary>
+            Delegate for expression authorization methods.
+            </summary>
+            <param name="Expression">Expression to be authorized.</param>
+            <returns>If the expression is authorized to execute.</returns>
+        </member>
         <member name="T:Waher.Content.Markdown.MarkdownSettings">
             <summary>
             Contains settings that the Markdown parser uses to customize its behavior.
@@ -1191,6 +1198,11 @@
         <member name="P:Waher.Content.Markdown.MarkdownSettings.AllowScriptTag">
             <summary>
             If the HTML SCRIPT tag should be allowed or not.s
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownSettings.AuthorizeExpression">
+            <summary>
+            Optional method to call to authorize execution of script expressions.
             </summary>
         </member>
         <member name="M:Waher.Content.Markdown.MarkdownSettings.GetFileName(System.String,System.String)">

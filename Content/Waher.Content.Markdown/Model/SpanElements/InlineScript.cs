@@ -24,6 +24,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		private readonly int startPosition;
 		private readonly int endPosition;
 		private readonly bool aloneInParagraph;
+		private bool authorized = false;
 
 		/// <summary>
 		/// Inline source code.
@@ -71,6 +72,16 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			try
 			{
 				this.variables.ContextVariables = this;
+
+				if (!this.authorized &&
+					!(this.Document.Settings.AuthorizeExpression is null) &&
+					!await this.Document.Settings.AuthorizeExpression(this.expression))
+				{
+					throw new UnauthorizedAccessException("Expression not permitted.");
+				}
+
+				this.authorized = true;
+
 				return await this.expression.EvaluateAsync(this.variables);
 			}
 			catch (Exception ex)

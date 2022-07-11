@@ -1,10 +1,17 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using System.Threading.Tasks;
 using Waher.Content.Emoji;
 using Waher.Script;
 
 namespace Waher.Content.Markdown
 {
+	/// <summary>
+	/// Delegate for expression authorization methods.
+	/// </summary>
+	/// <param name="Expression">Expression to be authorized.</param>
+	/// <returns>If the expression is authorized to execute.</returns>
+	public delegate Task<bool> AuthorizeExpression(Expression Expression);
+
     /// <summary>
     /// Contains settings that the Markdown parser uses to customize its behavior.
     /// </summary>
@@ -14,7 +21,8 @@ namespace Waher.Content.Markdown
 		private HtmlSettings htmlSettings = null;
         private IEmojiSource emojiSource;
 		private Variables variables;
-        private bool parseMetaData;
+		private AuthorizeExpression authorizeExpression;
+		private bool parseMetaData;
 		private string httpxProxy = null;
 		private string localHttpxResourcePath = null;
 		private string rootFolder = null;
@@ -175,6 +183,15 @@ namespace Waher.Content.Markdown
 		{
 			get { return this.allowScriptTag; }
 			set { this.allowScriptTag = value; }
+		}
+
+		/// <summary>
+		/// Optional method to call to authorize execution of script expressions.
+		/// </summary>
+		public AuthorizeExpression AuthorizeExpression
+		{
+			get { return this.authorizeExpression; }
+			set { this.authorizeExpression = value; }
 		}
 
 		/// <summary>

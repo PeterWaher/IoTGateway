@@ -2523,14 +2523,14 @@
           }
         }
       },
-      "Waher.Content/2.3.3": {
+      "Waher.Content/2.4.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.0",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.4.3"
+          "Waher.Script": "2.4.4"
         }
       },
       "Waher.Content.Xml/2.0.3": {
@@ -2539,9 +2539,9 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Runtime.Inventory": "1.1.0",
-          "Waher.Script": "2.4.3"
+          "Waher.Script": "2.4.4"
         }
       },
       "Waher.Events/1.1.1": {
@@ -2565,7 +2565,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
@@ -2596,7 +2596,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
@@ -2626,7 +2626,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.0",
-          "Waher.Runtime.Profiling": "1.0.4"
+          "Waher.Runtime.Profiling": "1.0.5"
         }
       },
       "Waher.Runtime.Cache/1.0.6": {
@@ -2654,7 +2654,7 @@
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
-      "Waher.Runtime.Profiling/1.0.4": {
+      "Waher.Runtime.Profiling/1.0.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2695,7 +2695,7 @@
           "Waher.Events": "1.1.1"
         }
       },
-      "Waher.Script/2.4.3": {
+      "Waher.Script/2.4.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2717,7 +2717,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.3",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Runtime.Inventory": "1.1.0",
@@ -5207,14 +5207,14 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/2.3.3": {
+      "Waher.Content/2.4.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.0",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.4.3"
+          "Waher.Script": "2.4.4"
         }
       },
       "Waher.Content.Xml/2.0.3": {
@@ -5223,9 +5223,9 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Runtime.Inventory": "1.1.0",
-          "Waher.Script": "2.4.3"
+          "Waher.Script": "2.4.4"
         }
       },
       "Waher.Events/1.1.1": {
@@ -5249,7 +5249,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
@@ -5280,7 +5280,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
@@ -5310,7 +5310,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.0",
-          "Waher.Runtime.Profiling": "1.0.4"
+          "Waher.Runtime.Profiling": "1.0.5"
         }
       },
       "Waher.Runtime.Cache/1.0.6": {
@@ -5338,7 +5338,7 @@
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
-      "Waher.Runtime.Profiling/1.0.4": {
+      "Waher.Runtime.Profiling/1.0.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5379,7 +5379,7 @@
           "Waher.Events": "1.1.1"
         }
       },
-      "Waher.Script/2.4.3": {
+      "Waher.Script/2.4.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5401,7 +5401,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.3",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Runtime.Inventory": "1.1.0",
@@ -7927,14 +7927,14 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/2.3.3": {
+      "Waher.Content/2.4.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.0",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.4.3"
+          "Waher.Script": "2.4.4"
         }
       },
       "Waher.Content.Xml/2.0.3": {
@@ -7943,9 +7943,9 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Runtime.Inventory": "1.1.0",
-          "Waher.Script": "2.4.3"
+          "Waher.Script": "2.4.4"
         }
       },
       "Waher.Events/1.1.1": {
@@ -7969,7 +7969,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
@@ -8000,7 +8000,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
@@ -8030,7 +8030,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.0",
-          "Waher.Runtime.Profiling": "1.0.4"
+          "Waher.Runtime.Profiling": "1.0.5"
         }
       },
       "Waher.Runtime.Cache/1.0.6": {
@@ -8058,7 +8058,7 @@
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
-      "Waher.Runtime.Profiling/1.0.4": {
+      "Waher.Runtime.Profiling/1.0.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8099,7 +8099,7 @@
           "Waher.Events": "1.1.1"
         }
       },
-      "Waher.Script/2.4.3": {
+      "Waher.Script/2.4.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8121,7 +8121,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.3",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Runtime.Inventory": "1.1.0",
@@ -10620,14 +10620,14 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/2.3.3": {
+      "Waher.Content/2.4.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.0",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.4.3"
+          "Waher.Script": "2.4.4"
         }
       },
       "Waher.Content.Xml/2.0.3": {
@@ -10636,9 +10636,9 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Runtime.Inventory": "1.1.0",
-          "Waher.Script": "2.4.3"
+          "Waher.Script": "2.4.4"
         }
       },
       "Waher.Events/1.1.1": {
@@ -10662,7 +10662,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
@@ -10693,7 +10693,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
@@ -10723,7 +10723,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.0",
-          "Waher.Runtime.Profiling": "1.0.4"
+          "Waher.Runtime.Profiling": "1.0.5"
         }
       },
       "Waher.Runtime.Cache/1.0.6": {
@@ -10751,7 +10751,7 @@
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
-      "Waher.Runtime.Profiling/1.0.4": {
+      "Waher.Runtime.Profiling/1.0.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10792,7 +10792,7 @@
           "Waher.Events": "1.1.1"
         }
       },
-      "Waher.Script/2.4.3": {
+      "Waher.Script/2.4.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10814,7 +10814,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.3",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Runtime.Inventory": "1.1.0",
@@ -13349,14 +13349,14 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/2.3.3": {
+      "Waher.Content/2.4.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.0",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.4.3"
+          "Waher.Script": "2.4.4"
         }
       },
       "Waher.Content.Xml/2.0.3": {
@@ -13365,9 +13365,9 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Runtime.Inventory": "1.1.0",
-          "Waher.Script": "2.4.3"
+          "Waher.Script": "2.4.4"
         }
       },
       "Waher.Events/1.1.1": {
@@ -13391,7 +13391,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
@@ -13422,7 +13422,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
@@ -13452,7 +13452,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.0",
-          "Waher.Runtime.Profiling": "1.0.4"
+          "Waher.Runtime.Profiling": "1.0.5"
         }
       },
       "Waher.Runtime.Cache/1.0.6": {
@@ -13480,7 +13480,7 @@
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
-      "Waher.Runtime.Profiling/1.0.4": {
+      "Waher.Runtime.Profiling/1.0.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13521,7 +13521,7 @@
           "Waher.Events": "1.1.1"
         }
       },
-      "Waher.Script/2.4.3": {
+      "Waher.Script/2.4.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13543,7 +13543,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.3",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Runtime.Inventory": "1.1.0",
@@ -16042,14 +16042,14 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/2.3.3": {
+      "Waher.Content/2.4.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.0",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.4.3"
+          "Waher.Script": "2.4.4"
         }
       },
       "Waher.Content.Xml/2.0.3": {
@@ -16058,9 +16058,9 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Runtime.Inventory": "1.1.0",
-          "Waher.Script": "2.4.3"
+          "Waher.Script": "2.4.4"
         }
       },
       "Waher.Events/1.1.1": {
@@ -16084,7 +16084,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
@@ -16115,7 +16115,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
@@ -16145,7 +16145,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.0",
-          "Waher.Runtime.Profiling": "1.0.4"
+          "Waher.Runtime.Profiling": "1.0.5"
         }
       },
       "Waher.Runtime.Cache/1.0.6": {
@@ -16173,7 +16173,7 @@
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
-      "Waher.Runtime.Profiling/1.0.4": {
+      "Waher.Runtime.Profiling/1.0.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16214,7 +16214,7 @@
           "Waher.Events": "1.1.1"
         }
       },
-      "Waher.Script/2.4.3": {
+      "Waher.Script/2.4.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16236,7 +16236,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.3",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Runtime.Inventory": "1.1.0",
@@ -18771,14 +18771,14 @@
           "runtimes/aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Waher.Content/2.3.3": {
+      "Waher.Content/2.4.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.0",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.4.3"
+          "Waher.Script": "2.4.4"
         }
       },
       "Waher.Content.Xml/2.0.3": {
@@ -18787,9 +18787,9 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "System.Xml.XmlDocument": "4.3.0",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Runtime.Inventory": "1.1.0",
-          "Waher.Script": "2.4.3"
+          "Waher.Script": "2.4.4"
         }
       },
       "Waher.Events/1.1.1": {
@@ -18813,7 +18813,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
@@ -18844,7 +18844,7 @@
         "dependencies": {
           "Microsoft.DependencyValidation.Analyzers": "0.11.0",
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Networking.UWP": "1.0.0",
@@ -18874,7 +18874,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.0",
-          "Waher.Runtime.Profiling": "1.0.4"
+          "Waher.Runtime.Profiling": "1.0.5"
         }
       },
       "Waher.Runtime.Cache/1.0.6": {
@@ -18902,7 +18902,7 @@
           "Waher.Runtime.Settings": "1.0.10"
         }
       },
-      "Waher.Runtime.Profiling/1.0.4": {
+      "Waher.Runtime.Profiling/1.0.5": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18943,7 +18943,7 @@
           "Waher.Events": "1.1.1"
         }
       },
-      "Waher.Script/2.4.3": {
+      "Waher.Script/2.4.4": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18965,7 +18965,7 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "SkiaSharp": "2.80.3",
-          "Waher.Content": "2.3.3",
+          "Waher.Content": "2.4.0",
           "Waher.Content.Xml": "2.0.3",
           "Waher.Events": "1.1.1",
           "Waher.Runtime.Inventory": "1.1.0",
@@ -28977,7 +28977,7 @@
         "system.xml.xmlserializer.nuspec"
       ]
     },
-    "Waher.Content/2.3.3": {
+    "Waher.Content/2.4.0": {
       "type": "project",
       "path": "../../Content/Waher.Content/Waher.Content.csproj",
       "msbuildProject": "../../Content/Waher.Content/Waher.Content.csproj"
@@ -29037,7 +29037,7 @@
       "path": "../../Runtime/Waher.Runtime.Language/Waher.Runtime.Language.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Language/Waher.Runtime.Language.csproj"
     },
-    "Waher.Runtime.Profiling/1.0.4": {
+    "Waher.Runtime.Profiling/1.0.5": {
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Profiling/Waher.Runtime.Profiling.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Profiling/Waher.Runtime.Profiling.csproj"
@@ -29062,7 +29062,7 @@
       "path": "../../Runtime/Waher.Runtime.Timing/Waher.Runtime.Timing.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Timing/Waher.Runtime.Timing.csproj"
     },
-    "Waher.Script/2.4.3": {
+    "Waher.Script/2.4.4": {
       "type": "project",
       "path": "../../Script/Waher.Script/Waher.Script.csproj",
       "msbuildProject": "../../Script/Waher.Script/Waher.Script.csproj"

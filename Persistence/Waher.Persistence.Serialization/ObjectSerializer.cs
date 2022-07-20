@@ -191,6 +191,8 @@ namespace Waher.Persistence.Serialization
 		private bool isNullable;
 		private bool normalized;
 		private bool hasByRef = false;
+		private bool backupCollection = true;
+		private string noBackupReason = null;
 
 		internal ObjectSerializer(ISerializerContext Context, Type Type)    // Note order.
 		{
@@ -298,6 +300,18 @@ namespace Waher.Persistence.Serialization
 				this.collectionName = null;
 			else
 				this.collectionName = CollectionNameAttribute.Name;
+
+			NoBackupAttribute NoBackupAttribute = this.typeInfo.GetCustomAttribute<NoBackupAttribute>(true);
+			if (NoBackupAttribute is null)
+			{
+				this.backupCollection = true;
+				this.noBackupReason = null;
+			}
+			else
+			{
+				this.backupCollection = false;
+				this.noBackupReason = NoBackupAttribute.Reason;
+			}
 
 			TypeNameAttribute TypeNameAttribute = this.typeInfo.GetCustomAttribute<TypeNameAttribute>(true);
 			if (TypeNameAttribute is null)
@@ -3185,6 +3199,11 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
+		/// Internal reference to constant collection name.
+		/// </summary>
+		internal string CollectionNameConstant => this.collectionName;
+
+		/// <summary>
 		/// Gets the type of the value.
 		/// </summary>
 		public Type ValueType => this.type;
@@ -3212,6 +3231,16 @@ namespace Waher.Persistence.Serialization
 			get => this.tag;
 			set => this.tag = value;
 		}
+
+		/// <summary>
+		/// If the corresponding collection should be backed up or not.
+		/// </summary>
+		public bool BackupCollection => this.backupCollection;
+
+		/// <summary>
+		/// A reason for not backing up the corresponding collection.
+		/// </summary>
+		public string NoBackupReason => this.noBackupReason;
 
 		/// <summary>
 		/// Number of days to archive objects of this type. If equal to <see cref="int.MaxValue"/>, no limit is defined.

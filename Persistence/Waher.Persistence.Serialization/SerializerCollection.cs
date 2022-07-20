@@ -99,23 +99,26 @@ namespace Waher.Persistence.Serialization
 		{
 			if (!(this.serializers is null))
 			{
-				foreach (IObjectSerializer Serializer in this.serializers.Values)
+				lock (this.synchObj)
 				{
-					if (Serializer is IDisposable d)
+					foreach (IObjectSerializer Serializer in this.serializers.Values)
 					{
-						try
+						if (Serializer is IDisposable d)
 						{
-							d.Dispose();
-						}
-						catch (Exception)
-						{
-							// Ignore
+							try
+							{
+								d.Dispose();
+							}
+							catch (Exception)
+							{
+								// Ignore
+							}
 						}
 					}
-				}
 
-				this.serializers.Clear();
-				this.serializers = null;
+					this.serializers.Clear();
+					this.serializers = null;
+				}
 			}
 
 			this.serializerAdded?.Dispose();
@@ -220,6 +223,29 @@ namespace Waher.Persistence.Serialization
 					}
 				}
 			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Gets an array of collections that should be excluded from backups.
+		/// </summary>
+		/// <returns>Array of excluded collections.</returns>
+		public string[] GetExcludedCollections()
+		{
+			SortedDictionary<string, bool> Sorted = new SortedDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+			lock (this.synchObj)
+			{
+				foreach (IObjectSerializer Serializer in this.serializers.Values)
+				{
+					if (Serializer is ObjectSerializer ObjectSerializer && !ObjectSerializer.BackupCollection)
+						Sorted[ObjectSerializer.CollectionNameConstant] = true;
+				}
+			}
+
+			string[] Result = new string[Sorted.Count];
+			Sorted.Keys.CopyTo(Result, 0);
 
 			return Result;
 		}

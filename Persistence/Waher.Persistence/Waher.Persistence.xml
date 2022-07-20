@@ -201,6 +201,22 @@
             to illustrate descending order.
             </summary>
         </member>
+        <member name="T:Waher.Persistence.Attributes.NoBackupAttribute">
+            <summary>
+            This attribute informs the database layer, that the corresponding collection should not be backed up.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Attributes.NoBackupAttribute.#ctor(System.String)">
+            <summary>
+            This attribute informs the database layer, that the corresponding collection should not be backed up.
+            </summary>
+            <param name="Reason">Reason for not making backups</param>
+        </member>
+        <member name="P:Waher.Persistence.Attributes.NoBackupAttribute.Reason">
+            <summary>
+            Reason for not making backups, if provided.
+            </summary>
+        </member>
         <member name="T:Waher.Persistence.Attributes.ObjectIdAttribute">
             <summary>
             This attribute defines the field as containing the Object ID of the object. When creating a new object, the value of the 
@@ -3327,6 +3343,12 @@
             <param name="Object">Object</param>
             <returns>Generalized representation.</returns>
         </member>
+        <member name="M:Waher.Persistence.Database.GetExcludedCollections">
+            <summary>
+            Gets an array of collections that should be excluded from backups.
+            </summary>
+            <returns>Array of excluded collections.</returns>
+        </member>
         <member name="T:Waher.Persistence.Exceptions.CollectionException">
             <summary>
             Exception related to a collection.
@@ -4658,6 +4680,7 @@
             <summary>
             Gets an array of available labels for a collection.
             </summary>
+            <param name="Collection">Name of collection.</param>
             <returns>Array of labels.</returns>
         </member>
         <member name="M:Waher.Persistence.IDatabaseProvider.TryGetObjectId(System.Object)">
@@ -4679,6 +4702,12 @@
             </summary>
             <param name="Object">Object</param>
             <returns>Generalized representation.</returns>
+        </member>
+        <member name="M:Waher.Persistence.IDatabaseProvider.GetExcludedCollections">
+            <summary>
+            Gets an array of collections that should be excluded from backups.
+            </summary>
+            <returns>Array of excluded collections.</returns>
         </member>
         <member name="T:Waher.Persistence.EntryType">
             <summary>
@@ -5585,6 +5614,12 @@
             </summary>
             <param name="Object">Object</param>
             <returns>Generalized representation.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.GetExcludedCollections">
+            <summary>
+            Gets an array of collections that should be excluded from backups.
+            </summary>
+            <returns>Array of excluded collections.</returns>
         </member>
         <member name="T:Waher.Persistence.NullLedgerProvider">
             <summary>

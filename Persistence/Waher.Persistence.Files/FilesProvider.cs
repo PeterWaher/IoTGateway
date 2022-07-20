@@ -2620,6 +2620,15 @@ namespace Waher.Persistence.Files
 				throw new InvalidOperationException("Unable to generalize object.");
 		}
 
+		/// <summary>
+		/// Gets an array of collections that should be excluded from backups.
+		/// </summary>
+		/// <returns>Array of excluded collections.</returns>
+		public string[] GetExcludedCollections()
+		{
+			return this.serializers.GetExcludedCollections();
+		}
+
 		#endregion
 
 		#region Export
@@ -2922,7 +2931,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Repair">If files should be repaired if corruptions are detected.</param>
 		/// <param name="Thread">Optional Profiler thread.</param>
 		/// <returns>Collections with errors.</returns>
-		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair, 
+		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair,
 			ProfilerThread Thread)
 		{
 			return this.Analyze(Output, XsltPath, ProgramDataFolder, ExportData, Repair, null, Thread);

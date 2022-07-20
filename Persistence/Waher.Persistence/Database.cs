@@ -1465,5 +1465,14 @@ namespace Waher.Persistence
 			return Provider.Generalize(Object);
 		}
 
+		/// <summary>
+		/// Gets an array of collections that should be excluded from backups.
+		/// </summary>
+		/// <returns>Array of excluded collections.</returns>
+		public static string[] GetExcludedCollections()
+		{
+			return Provider.GetExcludedCollections();
+		}
+
 	}
 }

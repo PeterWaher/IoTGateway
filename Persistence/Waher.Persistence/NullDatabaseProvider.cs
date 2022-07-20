@@ -611,5 +611,11 @@ namespace Waher.Persistence
 		/// <param name="Object">Object</param>
 		/// <returns>Generalized representation.</returns>
 		public Task<GenericObject> Generalize(object Object) => Task.FromResult<GenericObject>(null);
+
+		/// <summary>
+		/// Gets an array of collections that should be excluded from backups.
+		/// </summary>
+		/// <returns>Array of excluded collections.</returns>
+		public string[] GetExcludedCollections() => new string[0];
 	}
 }

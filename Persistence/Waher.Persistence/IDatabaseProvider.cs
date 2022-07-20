@@ -519,6 +519,7 @@ namespace Waher.Persistence
 		/// <summary>
 		/// Gets an array of available labels for a collection.
 		/// </summary>
+		/// <param name="Collection">Name of collection.</param>
 		/// <returns>Array of labels.</returns>
 		Task<string[]> GetLabels(string Collection);
 
@@ -541,5 +542,11 @@ namespace Waher.Persistence
 		/// <param name="Object">Object</param>
 		/// <returns>Generalized representation.</returns>
 		Task<GenericObject> Generalize(object Object);
+
+		/// <summary>
+		/// Gets an array of collections that should be excluded from backups.
+		/// </summary>
+		/// <returns>Array of excluded collections.</returns>
+		string[] GetExcludedCollections();
 	}
 }

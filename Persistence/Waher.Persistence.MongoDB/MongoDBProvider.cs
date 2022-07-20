@@ -1992,6 +1992,29 @@ namespace Waher.Persistence.MongoDB
 				throw new InvalidOperationException("Unable to generalize object.");
 		}
 
+		/// <summary>
+		/// Gets an array of collections that should be excluded from backups.
+		/// </summary>
+		/// <returns>Array of excluded collections.</returns>
+		public string[] GetExcludedCollections()
+		{
+			SortedDictionary<string, bool> Sorted = new SortedDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+
+			lock (this.collections)
+			{
+				foreach (IObjectSerializer Serializer in this.serializers.Values)
+				{
+					if (Serializer is ObjectSerializer ObjectSerializer && !ObjectSerializer.BackupCollection)
+						Sorted[ObjectSerializer.CollectionNameConstant] = true;
+				}
+			}
+
+			string[] Result = new string[Sorted.Count];
+			Sorted.Keys.CopyTo(Result, 0);
+
+			return Result;
+		}
+
 		// TODO:
 		//	* Created field
 		//	* Updated field

@@ -351,7 +351,26 @@ namespace Waher.IoTGateway.WebResources
 						await Resources.WriteAllTextAsync(ReportFileName, Xml);
 					}
 
-					await Persistence.Database.Export(ExportInfo.Exporter, ExportInfo.Exporter.CollectionNames,
+					SortedDictionary<string, bool> CollectionsToExport = new SortedDictionary<string, bool>();
+
+					if (ExportInfo.Exporter.CollectionNames is null)
+					{
+						foreach (string Collection in await Persistence.Database.GetCollections())
+							CollectionsToExport[Collection] = true;
+					}
+					else
+					{
+						foreach (string Collection in ExportInfo.Exporter.CollectionNames)
+							CollectionsToExport[Collection] = true;
+					}
+
+					foreach (string Collection in Persistence.Database.GetExcludedCollections())
+						CollectionsToExport.Remove(Collection);
+
+					string[] ToExport = new string[CollectionsToExport.Count];
+					CollectionsToExport.Keys.CopyTo(ToExport, 0);
+
+					await Persistence.Database.Export(ExportInfo.Exporter, ToExport, 
 						Profiler.CreateThread("Database", ProfilerThreadType.Sequential));
 				}
 

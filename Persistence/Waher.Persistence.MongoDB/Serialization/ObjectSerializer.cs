@@ -41,6 +41,8 @@ namespace Waher.Persistence.MongoDB.Serialization
 		private readonly bool isNullable;
 		private readonly Type type;
 		private readonly System.Reflection.TypeInfo typeInfo;
+		private readonly bool backupCollection = true;
+		private readonly string noBackupReason = null;
 
 		/// <summary>
 		/// Database provider.
@@ -75,6 +77,18 @@ namespace Waher.Persistence.MongoDB.Serialization
 				this.collectionName = null;
 			else
 				this.collectionName = CollectionNameAttribute.Name;
+
+			NoBackupAttribute NoBackupAttribute = this.typeInfo.GetCustomAttribute<NoBackupAttribute>(true);
+			if (NoBackupAttribute is null)
+			{
+				this.backupCollection = true;
+				this.noBackupReason = null;
+			}
+			else
+			{
+				this.backupCollection = false;
+				this.noBackupReason = NoBackupAttribute.Reason;
+			}
 
 			TypeNameAttribute TypeNameAttribute = this.typeInfo.GetCustomAttribute<TypeNameAttribute>(true);
 			if (TypeNameAttribute is null)
@@ -2600,6 +2614,11 @@ namespace Waher.Persistence.MongoDB.Serialization
 		}
 
 		/// <summary>
+		/// Internal reference to constant collection name.
+		/// </summary>
+		internal string CollectionNameConstant => this.collectionName;
+
+		/// <summary>
 		/// Tries to get the serialization info for a member.
 		/// </summary>
 		/// <param name="memberName">Name of the member.</param>
@@ -2660,5 +2679,16 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 			return Type.FullName;
 		}
+
+		/// <summary>
+		/// If the corresponding collection should be backed up or not.
+		/// </summary>
+		public bool BackupCollection => this.backupCollection;
+
+		/// <summary>
+		/// A reason for not backing up the corresponding collection.
+		/// </summary>
+		public string NoBackupReason => this.noBackupReason;
+
 	}
 }

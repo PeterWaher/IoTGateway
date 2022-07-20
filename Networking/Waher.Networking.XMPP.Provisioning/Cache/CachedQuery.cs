@@ -7,6 +7,7 @@ namespace Waher.Networking.XMPP.Provisioning.Cache
 	/// Information about a query to the provisioning server.
 	/// </summary>
 	[CollectionName("CachedProvisioningQueries")]
+	[NoBackup("State of rules is unsure at time of restoration. By not including these cached items, it is assured the current state is mirrored after a restoration.")]
 	[TypeName(TypeNameSerialization.None)]
 	[Index("Xml", "Method")]
 	[Index("LastUsed")]

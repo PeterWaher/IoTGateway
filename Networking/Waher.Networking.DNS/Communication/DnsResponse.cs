@@ -10,6 +10,7 @@ namespace Waher.Networking.DNS.Communication
 	/// Stored DNS Query
 	/// </summary>
 	[CollectionName("DnsCache")]
+	[NoBackup("High probability DNS records are not up-to-date at time of restoration. By not including these records, new ones will be fetched, if requested.")]
 	[Index("Name", "Type", "Class")]
 	public class DnsResponse
 	{

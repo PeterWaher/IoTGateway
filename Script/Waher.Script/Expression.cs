@@ -114,6 +114,7 @@ namespace Waher.Script
 				{ "FOREACH", true },
 				{ "IF", true },
 				{ "IN", true },
+				{ "INHERITS", true },
 				{ "INTERSECT", true },
 				{ "INTERSECTION", true },
 				{ "IS", true },
@@ -1511,6 +1512,12 @@ namespace Waher.Script
 								this.pos += 2;
 								Right = this.AssertRightOperandNotNull(this.ParseComparison());
 								Left = new Is(Left, Right, Start, this.pos - Start, this);
+								continue;
+
+							case "INHERITS":
+								this.pos += 8;
+								Right = this.AssertRightOperandNotNull(this.ParseComparison());
+								Left = new Inherits(Left, Right, Start, this.pos - Start, this);
 								continue;
 
 							case "AS":

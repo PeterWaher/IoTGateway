@@ -560,6 +560,7 @@ There are various different membership operators. All have the same [order of pr
 |:----------:|:----------------------------------|:------------------:|
 | `AS`       | The `AS` operator makes sure the left operand is of the same type as the right operand. The result is **null** if they are not, or the same value as the left operand if they are.           | `Value as Type`           |
 | `IS`       | The `IS` operator checks if the left operand is of the same type as the right operand. | `Value is Type` |
+| `INHERITS` | The `INHERITS` operator checks if the left operand inherits the type defined by the right operand. | `Value inherits Type` |
 | `IN`       | The `IN` operator checks if the left operand is a member of the right operand. | `Value in Set` |
 | `NOT IN`   | The `NOT IN` or `NOTIN` operator checks if the left operand is not a member of the right operand. | `Value not in Set` |
 | `NOTIN`    | The `NOT IN` or `NOTIN` operator checks if the left operand is not a member of the right operand. | `Value notin Set` |

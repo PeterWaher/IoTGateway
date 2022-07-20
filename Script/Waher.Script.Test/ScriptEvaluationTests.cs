@@ -416,6 +416,11 @@ namespace Waher.Script.Test
 			await Test("[a,b] NOT IN R", true);
 			await Test("a NOTIN {a,b,c}", false);
 			await Test("a NOTIN [a,b,c]", false);
+
+			await Test("System.Double INHERITS System.Double", true);
+			await Test("a INHERITS System.Double", true);
+			await Test("Waher.Runtime.Inventory.Grade INHERITS System.Enum", true);
+			await Test("Waher.Runtime.Inventory.Grade.Ok INHERITS System.Enum", true);
 		}
 
 		[TestMethod]

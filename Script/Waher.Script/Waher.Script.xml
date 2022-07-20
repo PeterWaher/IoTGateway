@@ -19627,6 +19627,62 @@
             <param name="Right">Right value.</param>
             <returns>Result</returns>
         </member>
+        <member name="T:Waher.Script.Operators.Membership.Inherits">
+            <summary>
+            Inherits operator
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.Inherits.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Inherits operator.
+            </summary>
+            <param name="Left">Left operand.</param>
+            <param name="Right">Right operand.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.Inherits.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.Inherits.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.Inherits.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator on scalar operands.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:Waher.Script.Operators.Membership.Inherits.EvaluateScalarAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the operator on scalar operands.
+            </summary>
+            <param name="Left">Left value.</param>
+            <param name="Right">Right value.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result</returns>
+        </member>
+        <member name="P:Waher.Script.Operators.Membership.Inherits.ScalarUpgradeBehaviour">
+            <summary>
+            How scalar operands of different types are to be treated. By default, scalar operands are required to be of the same type.
+            </summary>
+        </member>
         <member name="T:Waher.Script.Operators.Membership.Is">
             <summary>
             Is operator

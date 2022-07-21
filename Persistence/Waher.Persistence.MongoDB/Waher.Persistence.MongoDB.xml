@@ -681,6 +681,12 @@
             <param name="Object">Object</param>
             <returns>Generalized representation.</returns>
         </member>
+        <member name="M:Waher.Persistence.MongoDB.MongoDBProvider.GetExcludedCollections">
+            <summary>
+            Gets an array of collections that should be excluded from backups.
+            </summary>
+            <returns>Array of excluded collections.</returns>
+        </member>
         <member name="T:Waher.Persistence.MongoDB.Serialization.GeneratedObjectSerializerBase">
             <summary>
             Abstract base class for generated object serializers.
@@ -2064,6 +2070,11 @@
             </summary>
             <param name="Object">Object in the current context. If null, the default collection name is requested.</param>
         </member>
+        <member name="P:Waher.Persistence.MongoDB.Serialization.ObjectSerializer.CollectionNameConstant">
+            <summary>
+            Internal reference to constant collection name.
+            </summary>
+        </member>
         <member name="M:Waher.Persistence.MongoDB.Serialization.ObjectSerializer.TryGetMemberSerializationInfo(System.String,MongoDB.Bson.Serialization.BsonSerializationInfo@)">
             <summary>
             Tries to get the serialization info for a member.
@@ -2089,6 +2100,16 @@
             <param name="Object">Object.</param>
             <param name="FieldType">Corresponding field or property type, if found, or null otherwise.</param>
             <returns>If the corresponding field or property was found.</returns>
+        </member>
+        <member name="P:Waher.Persistence.MongoDB.Serialization.ObjectSerializer.BackupCollection">
+            <summary>
+            If the corresponding collection should be backed up or not.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.MongoDB.Serialization.ObjectSerializer.NoBackupReason">
+            <summary>
+            A reason for not backing up the corresponding collection.
+            </summary>
         </member>
         <member name="T:Waher.Persistence.MongoDB.Serialization.ReferenceTypes.ArraySerializer`1">
             <summary>

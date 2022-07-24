@@ -1428,7 +1428,7 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				if (HaveStates)
 				{
-					throw new Exception("Private keys are not available on this device (" + this.client.BareJID + 
+					throw new Exception("Private keys are not available on this device (" + this.client.BareJID +
 						"). Were they created on another device?");
 				}
 				else
@@ -6235,6 +6235,164 @@ namespace Waher.Networking.XMPP.Contracts
 			Array.Copy(Decrypted, i, Message, 0, c);
 
 			return Message;
+		}
+
+		#endregion
+
+		#region Explicit authorization of access to Legal IDs
+
+		/// <summary>
+		/// Authorizes access to (or revokes access to) a Legal ID of the caller.
+		/// </summary>
+		/// <param name="LegalId">ID of Legal ID</param>
+		/// <param name="RemoteId">ID of Legal ID of remote party</param>
+		/// <param name="Authorized">If the remote party is authorized access to the referenced Legal ID or not. (Setting false, revokes earlier authorization.)</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void AuthorizeAccessToId(string LegalId, string RemoteId, bool Authorized, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.AuthorizeAccessToId(this.GetTrustProvider(LegalId), LegalId, RemoteId, Authorized, Callback, State);
+		}
+
+		/// <summary>
+		/// Authorizes access to (or revokes access to) a Legal ID of the caller.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="LegalId">ID of Legal ID</param>
+		/// <param name="RemoteId">ID of Legal ID of remote party</param>
+		/// <param name="Authorized">If the remote party is authorized access to the referenced Legal ID or not. (Setting false, revokes earlier authorization.)</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void AuthorizeAccessToId(string Address, string LegalId, string RemoteId, bool Authorized, IqResultEventHandlerAsync Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<authorizeAccess xmlns='");
+			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append("' id='");
+			Xml.Append(XML.Encode(LegalId));
+			Xml.Append("' remoteId='");
+			Xml.Append(XML.Encode(RemoteId));
+			Xml.Append("' auth='");
+			Xml.Append(CommonTypes.Encode(Authorized));
+			Xml.Append("'/>");
+
+			this.client.SendIqSet(Address, Xml.ToString(), Callback, State);
+		}
+
+		/// <summary>
+		/// Authorizes access to (or revokes access to) a Legal ID of the caller.
+		/// </summary>
+		/// <param name="LegalId">ID of Legal ID</param>
+		/// <param name="RemoteId">ID of Legal ID of remote party</param>
+		/// <param name="Authorized">If the remote party is authorized access to the referenced Legal ID or not. (Setting false, revokes earlier authorization.)</param>
+		public Task AuthorizeAccessToIdAsync(string LegalId, string RemoteId, bool Authorized)
+		{
+			return this.AuthorizeAccessToIdAsync(this.GetTrustProvider(LegalId), LegalId, RemoteId, Authorized);
+		}
+
+		/// <summary>
+		/// Authorizes access to (or revokes access to) a Legal ID of the caller.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="LegalId">ID of Legal ID</param>
+		/// <param name="RemoteId">ID of Legal ID of remote party</param>
+		/// <param name="Authorized">If the remote party is authorized access to the referenced Legal ID or not. (Setting false, revokes earlier authorization.)</param>
+		public async Task AuthorizeAccessToIdAsync(string Address, string LegalId, string RemoteId, bool Authorized)
+		{
+			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
+
+			this.AuthorizeAccessToId(Address, LegalId, RemoteId, Authorized, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(true);
+				else
+					Result.SetException(e.StanzaError ?? new Exception("Unable to authorize access to legal identity."));
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			await Result.Task;
+		}
+
+		#endregion
+
+		#region Explicit authorization of access to Contracts
+
+		/// <summary>
+		/// Authorizes access to (or revokes access to) a Contract of which the caller is part and can access.
+		/// </summary>
+		/// <param name="ContractId">ID of Contract</param>
+		/// <param name="RemoteId">ID of Legal ID of remote party</param>
+		/// <param name="Authorized">If the remote party is authorized access to the referenced Contract or not. (Setting false, revokes earlier authorization.)</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void AuthorizeAccessToContract(string ContractId, string RemoteId, bool Authorized, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.AuthorizeAccessToContract(this.GetTrustProvider(ContractId), ContractId, RemoteId, Authorized, Callback, State);
+		}
+
+		/// <summary>
+		/// Authorizes access to (or revokes access to) a Contract of which the caller is part and can access.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractId">ID of Contract</param>
+		/// <param name="RemoteId">ID of Legal ID of remote party</param>
+		/// <param name="Authorized">If the remote party is authorized access to the referenced Contract or not. (Setting false, revokes earlier authorization.)</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void AuthorizeAccessToContract(string Address, string ContractId, string RemoteId, bool Authorized, IqResultEventHandlerAsync Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<authorizeAccess xmlns='");
+			Xml.Append(NamespaceSmartContracts);
+			Xml.Append("' id='");
+			Xml.Append(XML.Encode(ContractId));
+			Xml.Append("' remoteId='");
+			Xml.Append(XML.Encode(RemoteId));
+			Xml.Append("' auth='");
+			Xml.Append(CommonTypes.Encode(Authorized));
+			Xml.Append("'/>");
+
+			this.client.SendIqSet(Address, Xml.ToString(), Callback, State);
+		}
+
+		/// <summary>
+		/// Authorizes access to (or revokes access to) a Contract of which the caller is part and can access.
+		/// </summary>
+		/// <param name="ContractId">ID of Contract</param>
+		/// <param name="RemoteId">ID of Legal ID of remote party</param>
+		/// <param name="Authorized">If the remote party is authorized access to the referenced Contract or not. (Setting false, revokes earlier authorization.)</param>
+		public Task AuthorizeAccessToContractAsync(string ContractId, string RemoteId, bool Authorized)
+		{
+			return this.AuthorizeAccessToContractAsync(this.GetTrustProvider(ContractId), ContractId, RemoteId, Authorized);
+		}
+
+		/// <summary>
+		/// Authorizes access to (or revokes access to) a Contract of which the caller is part and can access.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="ContractId">ID of Contract</param>
+		/// <param name="RemoteId">ID of Legal ID of remote party</param>
+		/// <param name="Authorized">If the remote party is authorized access to the referenced Contract or not. (Setting false, revokes earlier authorization.)</param>
+		public async Task AuthorizeAccessToContractAsync(string Address, string ContractId, string RemoteId, bool Authorized)
+		{
+			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
+
+			this.AuthorizeAccessToContract(Address, ContractId, RemoteId, Authorized, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(true);
+				else
+					Result.SetException(e.StanzaError ?? new Exception("Unable to authorize access to legal identity."));
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			await Result.Task;
 		}
 
 		#endregion

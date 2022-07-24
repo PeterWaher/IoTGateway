@@ -2354,6 +2354,82 @@
             as the one used during encryption.</param>
             <returns>Decrypted message.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.AuthorizeAccessToId(System.String,System.String,System.Boolean,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Authorizes access to (or revokes access to) a Legal ID of the caller.
+            </summary>
+            <param name="LegalId">ID of Legal ID</param>
+            <param name="RemoteId">ID of Legal ID of remote party</param>
+            <param name="Authorized">If the remote party is authorized access to the referenced Legal ID or not. (Setting false, revokes earlier authorization.)</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.AuthorizeAccessToId(System.String,System.String,System.String,System.Boolean,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Authorizes access to (or revokes access to) a Legal ID of the caller.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="LegalId">ID of Legal ID</param>
+            <param name="RemoteId">ID of Legal ID of remote party</param>
+            <param name="Authorized">If the remote party is authorized access to the referenced Legal ID or not. (Setting false, revokes earlier authorization.)</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.AuthorizeAccessToIdAsync(System.String,System.String,System.Boolean)">
+            <summary>
+            Authorizes access to (or revokes access to) a Legal ID of the caller.
+            </summary>
+            <param name="LegalId">ID of Legal ID</param>
+            <param name="RemoteId">ID of Legal ID of remote party</param>
+            <param name="Authorized">If the remote party is authorized access to the referenced Legal ID or not. (Setting false, revokes earlier authorization.)</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.AuthorizeAccessToIdAsync(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Authorizes access to (or revokes access to) a Legal ID of the caller.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="LegalId">ID of Legal ID</param>
+            <param name="RemoteId">ID of Legal ID of remote party</param>
+            <param name="Authorized">If the remote party is authorized access to the referenced Legal ID or not. (Setting false, revokes earlier authorization.)</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.AuthorizeAccessToContract(System.String,System.String,System.Boolean,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Authorizes access to (or revokes access to) a Contract of which the caller is part and can access.
+            </summary>
+            <param name="ContractId">ID of Contract</param>
+            <param name="RemoteId">ID of Legal ID of remote party</param>
+            <param name="Authorized">If the remote party is authorized access to the referenced Contract or not. (Setting false, revokes earlier authorization.)</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.AuthorizeAccessToContract(System.String,System.String,System.String,System.Boolean,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Authorizes access to (or revokes access to) a Contract of which the caller is part and can access.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ContractId">ID of Contract</param>
+            <param name="RemoteId">ID of Legal ID of remote party</param>
+            <param name="Authorized">If the remote party is authorized access to the referenced Contract or not. (Setting false, revokes earlier authorization.)</param>
+            <param name="Callback">Method to call when response is returned.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.AuthorizeAccessToContractAsync(System.String,System.String,System.Boolean)">
+            <summary>
+            Authorizes access to (or revokes access to) a Contract of which the caller is part and can access.
+            </summary>
+            <param name="ContractId">ID of Contract</param>
+            <param name="RemoteId">ID of Legal ID of remote party</param>
+            <param name="Authorized">If the remote party is authorized access to the referenced Contract or not. (Setting false, revokes earlier authorization.)</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.AuthorizeAccessToContractAsync(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Authorizes access to (or revokes access to) a Contract of which the caller is part and can access.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="ContractId">ID of Contract</param>
+            <param name="RemoteId">ID of Legal ID of remote party</param>
+            <param name="Authorized">If the remote party is authorized access to the referenced Contract or not. (Setting false, revokes earlier authorization.)</param>
+        </member>
         <member name="T:Waher.Networking.XMPP.Contracts.DateParameter">
             <summary>
             Date contractual parameter

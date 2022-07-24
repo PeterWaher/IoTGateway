@@ -2078,10 +2078,11 @@ The following functions are available in the `Waher.Service.NeuroLedger` library
 The following functions are available in applications running on the IoT Broker (hosting the `Waher.Service.IoTBroker` library) 
 or the Neuron^TM.
 
-| Function                         | Description                                                                                              | Example               |
-|----------------------------------|----------------------------------------------------------------------------------------------------------|-----------------------|
-| `IpLocale(IP)`                   | Looks up locale information about an IP address.                                                         | `IpLocale("1.2.3.4")` |
-| `RosterName(LocalJid, RemoteJid) | Returns the name of a contact in a local users roster. If no name is returned, the Bare JID is returned. | `RosterName(To,From)` |
+| Function                                                   | Description                                                                                                                                                                             | Example                     |
+|------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------|
+| `IpLocale(IP)`                                             | Looks up locale information about an IP address.                                                                                                                                        | `IpLocale("1.2.3.4")`       |
+| `RosterName(LocalJid, RemoteJid)                           | Returns the name of a contact in a local users roster. If no name is returned, the Bare JID is returned.                                                                                | `RosterName(To,From)`       |
+| `SendMail([[Host,Port,User,Pwd,]From,]To,Subject,Markdown) | Sends an formatted e-mail to a recipient. If SMTP details are not provided, SMTP Relay settings are used by default. If such are not provided, broker will act as an SMTP relay itself. | `SendMail(To,Subject,Body)` |
 
 #### Multi-User Chat Extensions (available in Waher.Service.LittleSister, Waher.Service.IoTBroker)
 

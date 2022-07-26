@@ -5484,11 +5484,8 @@ namespace Waher.Networking.XMPP.Contracts
 		public async Task<LegalIdentity> AddPeerReviewIDAttachment(LegalIdentity Identity,
 			LegalIdentity ReviewerLegalIdentity, byte[] PeerSignature)
 		{
-			if (!this.client.TryGetExtension(typeof(HttpFileUploadClient), out IXmppExtension Extension) ||
-				!(Extension is HttpFileUploadClient HttpFileUploadClient))
-			{
+			if (!this.client.TryGetExtension(out HttpFileUploadClient HttpFileUploadClient))
 				throw new InvalidOperationException("No HTTP File Upload extension added to the XMPP Client.");
-			}
 
 			StringBuilder Xml = new StringBuilder();
 

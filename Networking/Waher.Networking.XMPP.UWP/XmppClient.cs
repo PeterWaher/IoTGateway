@@ -7662,6 +7662,32 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// Tries to get a registered extension of a specific type from the client.
+		/// </summary>
+		/// <typeparam name="T">Extension type.</typeparam>
+		/// <param name="Extension">Registered extension, if found.</param>
+		/// <returns>If a registered extension of the desired type was found.</returns>
+		public bool TryGetExtension<T>(out T Extension)
+			where T : IXmppExtension
+		{
+			lock (this.synchObject)
+			{
+				foreach (IXmppExtension Extension2 in this.extensions)
+				{
+					if (Extension2 is T Result)
+					{
+						Extension = Result;
+						return true;
+					}
+				}
+			}
+
+			Extension = default;
+
+			return false;
+		}
+
+		/// <summary>
 		/// Gets an array of random bytes.
 		/// </summary>
 		/// <param name="NrBytes">Number of random bytes to get.</param>

@@ -262,8 +262,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						IsPublic = XML.Attribute(E, "public", false);
 
 						if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(Partition) &&
-							this.client.TryGetExtension(typeof(ProvisioningClient), out IXmppExtension Extension) &&
-							Extension is ProvisioningClient ProvisioningClient)
+							this.client.TryGetExtension(out ProvisioningClient ProvisioningClient))
 						{
 							ProvisioningClient.OwnerJid = OwnerJid;
 						}
@@ -413,11 +412,8 @@ namespace Waher.Networking.XMPP.Provisioning
 			{
 				Node = ThingReference.Empty;
 
-				if (this.client.TryGetExtension(typeof(ProvisioningClient), out IXmppExtension Extension) &&
-					Extension is ProvisioningClient ProvisioningClient)
-				{
+				if (this.client.TryGetExtension(out ProvisioningClient ProvisioningClient))
 					ProvisioningClient.OwnerJid = OwnerJid;
-				}
 			}
 			else
 				Node = new ThingReference(NodeId, SourceId, Partition);
@@ -688,8 +684,7 @@ namespace Waher.Networking.XMPP.Provisioning
 						Disowned = true;
 
 						if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(Partition) &&
-							this.client.TryGetExtension(typeof(ProvisioningClient), out IXmppExtension Extension) &&
-							Extension is ProvisioningClient ProvisioningClient)
+							this.client.TryGetExtension(out ProvisioningClient ProvisioningClient))
 						{
 							ProvisioningClient.OwnerJid = string.Empty;
 						}
@@ -893,11 +888,8 @@ namespace Waher.Networking.XMPP.Provisioning
 			{
 				Node = ThingReference.Empty;
 
-				if (this.client.TryGetExtension(typeof(ProvisioningClient), out IXmppExtension Extension) &&
-					Extension is ProvisioningClient ProvisioningClient)
-				{
+				if (this.client.TryGetExtension(out ProvisioningClient ProvisioningClient))
 					ProvisioningClient.OwnerJid = string.Empty;
-				}
 			}
 			else
 				Node = new ThingReference(NodeId, SourceId, Partition);

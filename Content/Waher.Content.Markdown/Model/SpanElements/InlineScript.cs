@@ -117,8 +117,6 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override async Task GenerateHTML(StringBuilder Output)
 		{
 			object Result = await this.EvaluateExpression();
-			if (Result is null)
-				return;
 
 			await GenerateHTML(Result, Output, this.aloneInParagraph, this.variables);
 		}
@@ -132,6 +130,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Variables">Current variables.</param>
 		public static async Task GenerateHTML(object Result, StringBuilder Output, bool AloneInParagraph, Variables Variables)
 		{
+			if (Result is null)
+				return;
+
 			if (Result is XmlDocument Xml)
 				Result = await MarkdownDocument.TransformXml(Xml, Variables);
 
@@ -294,9 +295,6 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override async Task GeneratePlainText(StringBuilder Output)
 		{
 			object Result = await this.EvaluateExpression();
-			if (Result is null)
-				return;
-
 			await GeneratePlainText(Result, Output, this.aloneInParagraph);
 		}
 
@@ -308,6 +306,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
 		public static Task GeneratePlainText(object Result, StringBuilder Output, bool AloneInParagraph)
 		{
+			if (Result is null)
+				return Task.CompletedTask;
+
 			Output.Append(Result.ToString());
 
 			if (AloneInParagraph)
@@ -327,9 +328,6 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override async Task GenerateXAML(XmlWriter Output, TextAlignment TextAlignment)
 		{
 			object Result = await this.EvaluateExpression();
-			if (Result is null)
-				return;
-
 			await GenerateXAML(Result, Output, TextAlignment, this.aloneInParagraph, this.variables, this.Document.Settings.XamlSettings);
 		}
 
@@ -345,6 +343,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public static async Task GenerateXAML(object Result, XmlWriter Output, TextAlignment TextAlignment, bool AloneInParagraph,
 			Variables Variables, XamlSettings XamlSettings)
 		{
+			if (Result is null)
+				return;
+
 			string s;
 
 			if (Result is Graph G)
@@ -441,9 +442,6 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override async Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State)
 		{
 			object Result = await this.EvaluateExpression();
-			if (Result is null)
-				return;
-
 			await GenerateXamarinForms(Result, Output, State, this.aloneInParagraph, this.variables, this.Document.Settings.XamlSettings);
 		}
 
@@ -459,6 +457,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public static async Task GenerateXamarinForms(object Result, XmlWriter Output, XamarinRenderingState State, bool AloneInParagraph,
 			Variables Variables, XamlSettings XamlSettings)
 		{
+			if (Result is null)
+				return;
+
 			string s;
 			
 			if (State.InLabel)

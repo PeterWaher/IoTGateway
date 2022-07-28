@@ -4596,6 +4596,9 @@ namespace Waher.Script
 		/// <returns>Expression representation of string.</returns>
 		public static string ToString(string s)
 		{
+			if (s is null)
+				return "null";
+
 			StringBuilder sb = new StringBuilder();
 			int i = s.IndexOfAny(stringCharactersToEscape);
 			int j = 0;

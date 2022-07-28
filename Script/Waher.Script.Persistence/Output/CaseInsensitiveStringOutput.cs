@@ -24,7 +24,9 @@ namespace Waher.Script.Persistence.Output
 		/// <returns>Expression string.</returns>
 		public string GetString(object Value)
 		{
-			if (Value is CaseInsensitiveString cs)
+			if (Value is null)
+				return "null";
+			else if (Value is CaseInsensitiveString cs)
 				return Expression.ToString(cs.Value);
 			else
 				return Value.ToString();

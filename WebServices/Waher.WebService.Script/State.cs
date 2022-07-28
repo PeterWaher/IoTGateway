@@ -12,6 +12,7 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.IoTGateway.ScriptExtensions.Constants;
 using Waher.Networking.HTTP;
+using Waher.Persistence;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -462,10 +463,19 @@ namespace Waher.WebService.Script
 							Html.Append("<td>");
 
 							object Item = M.GetElement(x, y).AssociatedObjectValue;
-							if (!(Item is null))
+							if (Item is null)
+								Html.Append("<code>null</code>");
+							else
 							{
 								if (Item is string s3)
 									Html.Append(this.FormatText(XML.HtmlValueEncode(s3)));
+								else if (Item is CaseInsensitiveString cis)
+								{
+									if (cis.Value is null)
+										Html.Append("<code>null</code>");
+									else
+										Html.Append(this.FormatText(XML.HtmlValueEncode(cis.Value)));
+								}
 								else if (Item is MarkdownElement Element)
 									await Element.GenerateHTML(Html);
 								else

@@ -206,7 +206,7 @@ namespace Waher.Script.Objects.Matrices
 					else
 						sb.Append(", ");
 
-					sb.Append(v[y, x].ToString());
+					sb.Append(Expression.ToString(v[y, x]));
 				}
 
 				sb.Append(']');

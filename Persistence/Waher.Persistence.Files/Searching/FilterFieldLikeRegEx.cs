@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using F = Waher.Persistence.Filters;
@@ -44,21 +43,27 @@ namespace Waher.Persistence.Files.Searching
 			if (Value is null)
 			{
 				Type T = Object.GetType();
-				if (Serializer.ValueType == T)
-					return false;
-
-				if (T == this.prevType)
-					Serializer = this.prevSerializer;
-				else
+				if (Serializer.ValueType != T)
 				{
-					Serializer = this.prevSerializer = await Provider.GetObjectSerializer(T);
-					this.prevType = T;
-				}
+					if (T == this.prevType)
+						Serializer = this.prevSerializer;
+					else
+					{
+						Serializer = this.prevSerializer = await Provider.GetObjectSerializer(T);
+						this.prevType = T;
+					}
 
-				Value = await Serializer.TryGetFieldValue(this.FieldName, Object);
-				if (Value is null)
-					return false;
+					Value = await Serializer.TryGetFieldValue(this.FieldName, Object);
+				}
 			}
+
+			bool IsNull1 = Value is null;
+			bool IsNull2 = this.RegularExpression is null;
+
+			if (IsNull1 ^ IsNull2)
+				return false;
+			else if (IsNull1)
+				return true;
 
 			Match M;
 

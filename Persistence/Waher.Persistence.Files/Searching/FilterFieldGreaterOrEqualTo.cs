@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using F = Waher.Persistence.Filters;
 using Waher.Persistence.Serialization;
@@ -37,24 +35,22 @@ namespace Waher.Persistence.Files.Searching
 		public async Task<bool> AppliesTo(object Object, IObjectSerializer Serializer, FilesProvider Provider)
 		{
 			object Value = await Serializer.TryGetFieldValue(this.FieldName, Object);
-			
+
 			if (Value is null)
 			{
 				Type T = Object.GetType();
-				if (Serializer.ValueType == T)
-					return false;
-
-				if (T == this.prevType)
-					Serializer = this.prevSerializer;
-				else
+				if (Serializer.ValueType != T)
 				{
-					Serializer = this.prevSerializer = await Provider.GetObjectSerializer(T);
-					this.prevType = T;
-				}
+					if (T == this.prevType)
+						Serializer = this.prevSerializer;
+					else
+					{
+						Serializer = this.prevSerializer = await Provider.GetObjectSerializer(T);
+						this.prevType = T;
+					}
 
-				Value = await Serializer.TryGetFieldValue(this.FieldName, Object);
-				if (Value is null)
-					return false;
+					Value = await Serializer.TryGetFieldValue(this.FieldName, Object);
+				}
 			}
 
 			int? ComparisonResult = Comparison.Compare(Value, this.Value);

@@ -2764,5 +2764,7 @@ namespace Waher.Persistence.FilesLW.Test
 			foreach (Simple Obj2 in Objects.Values)
 				Assert.IsTrue(Sum(Obj2.ObjectId) < 0x80);
 		}
+
+		// TODO: Tests on searchon on null values (null arguments, and/or null property values)
 	}
 }

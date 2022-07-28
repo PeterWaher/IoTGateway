@@ -58,10 +58,10 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 			{
 				case ObjectSerializer.TYPE_ENUM:
 				case ObjectSerializer.TYPE_STRING: 
-				case ObjectSerializer.TYPE_CI_STRING: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadString()));
+				case ObjectSerializer.TYPE_CI_STRING: return Task.FromResult<object>(Reader.ReadCaseInsensitiveString());
 				case ObjectSerializer.TYPE_CHAR: return Task.FromResult<object>(new CaseInsensitiveString(new string(Reader.ReadChar(), 1)));
 				case ObjectSerializer.TYPE_BOOLEAN: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadBoolean().ToString()));
-				case ObjectSerializer.TYPE_BYTE: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadString().ToString()));
+				case ObjectSerializer.TYPE_BYTE: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadByte().ToString()));
 				case ObjectSerializer.TYPE_INT16: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadInt16().ToString()));
 				case ObjectSerializer.TYPE_INT32: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadInt32().ToString()));
 				case ObjectSerializer.TYPE_INT64: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadInt64().ToString()));
@@ -97,6 +97,23 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 				else
 					throw new NullReferenceException("Value cannot be null.");
+			}
+			else if (Value is CaseInsensitiveString cis)
+			{
+				if (cis.Value is null)
+				{
+					if (WriteTypeCode)
+						Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+					else
+						throw new NullReferenceException("Value cannot be null.");
+				}
+				else
+				{
+					if (WriteTypeCode)
+						Writer.WriteBits(ObjectSerializer.TYPE_CI_STRING, 6);
+
+					Writer.Write(cis.Value);
+				}
 			}
 			else
 			{

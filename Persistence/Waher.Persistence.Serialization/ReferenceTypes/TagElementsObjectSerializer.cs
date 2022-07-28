@@ -124,7 +124,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 					return Reader.ReadString();
 
 				case ObjectSerializer.TYPE_CI_STRING:
-					return new CaseInsensitiveString(Reader.ReadString());
+					return Reader.ReadCaseInsensitiveString();
 
 				case ObjectSerializer.TYPE_ENUM:
 					return Reader.ReadString();

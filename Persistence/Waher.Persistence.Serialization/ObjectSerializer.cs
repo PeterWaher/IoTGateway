@@ -3539,7 +3539,7 @@ namespace Waher.Persistence.Serialization
 								break;
 
 							case TYPE_CI_STRING:
-								FieldValue = GeneratedObjectSerializerBase.ReadString(Reader, FieldDataType);
+								FieldValue = GeneratedObjectSerializerBase.ReadCaseInsensitiveString(Reader, FieldDataType);
 								break;
 
 							case TYPE_BYTEARRAY:
@@ -3677,7 +3677,7 @@ namespace Waher.Persistence.Serialization
 								break;
 
 							case TYPE_CI_STRING:
-								Member.Set(Result, new CaseInsensitiveString(GeneratedObjectSerializerBase.ReadString(Reader, FieldDataType)));
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadCaseInsensitiveString(Reader, FieldDataType));
 								break;
 
 							case TYPE_UINT16:
@@ -3920,7 +3920,7 @@ namespace Waher.Persistence.Serialization
 											break;
 
 										case TYPE_CI_STRING:
-											Member.Set(Result, new CaseInsensitiveString(Reader.ReadString()));
+											Member.Set(Result, Reader.ReadCaseInsensitiveString());
 											break;
 
 										case TYPE_BYTEARRAY:
@@ -5003,7 +5003,7 @@ namespace Waher.Persistence.Serialization
 						break;
 
 					case ObjectSerializer.TYPE_CI_STRING:
-						Elements.Add(new CaseInsensitiveString(Reader.ReadString()));
+						Elements.Add(Reader.ReadCaseInsensitiveString());
 						break;
 
 					case ObjectSerializer.TYPE_BYTEARRAY:

@@ -879,6 +879,22 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
+		/// Reads a case insensitive string value.
+		/// </summary>
+		/// <param name="Reader">Deserializer.</param>
+		/// <param name="FieldDataType">Field data type.</param>
+		/// <returns>String value.</returns>
+		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
+		public static CaseInsensitiveString ReadCaseInsensitiveString(IDeserializer Reader, uint FieldDataType)
+		{
+			string s = ReadString(Reader, FieldDataType);
+			if (s is null)
+				return null;
+			else
+				return new CaseInsensitiveString(s);
+		}
+
+		/// <summary>
 		/// Reads a string value.
 		/// </summary>
 		/// <param name="Reader">Deserializer.</param>

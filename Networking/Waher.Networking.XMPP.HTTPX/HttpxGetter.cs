@@ -199,7 +199,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				// TODO: Transport public part of Client certificate, if provided.
 
-				Rec.HttpxClient.Request(Rec.FullJid, "GET", Rec.LocalUrl, async (sender, e) =>
+				Rec.HttpxClient?.Request(Rec.FullJid, "GET", Rec.LocalUrl, async (sender, e) =>
 				{
 					if (e.Ok)
 					{

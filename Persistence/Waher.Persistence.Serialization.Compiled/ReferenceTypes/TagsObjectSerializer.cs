@@ -122,7 +122,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 					return Reader.ReadString();
 
 				case ObjectSerializer.TYPE_CI_STRING:
-					return new CaseInsensitiveString(Reader.ReadString());
+					return Reader.ReadCaseInsensitiveString();
 
 				case ObjectSerializer.TYPE_ENUM:
 					return Reader.ReadString();
@@ -298,7 +298,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 						break;
 
 					case ObjectSerializer.TYPE_CI_STRING:
-						Properties.Add(new KeyValuePair<string, object>(FieldName, new CaseInsensitiveString(Reader.ReadString())));
+						Properties.Add(new KeyValuePair<string, object>(FieldName, Reader.ReadCaseInsensitiveString()));
 						break;
 
 					case ObjectSerializer.TYPE_BYTEARRAY:

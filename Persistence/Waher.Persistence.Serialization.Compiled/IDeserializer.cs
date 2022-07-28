@@ -147,6 +147,12 @@ namespace Waher.Persistence.Serialization
 		/// Deserializes a value.
 		/// </summary>
 		/// <returns>Deserialized value.</returns>
+		CaseInsensitiveString ReadCaseInsensitiveString();
+
+		/// <summary>
+		/// Deserializes a value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
 		Guid ReadGuid();
 
 		/// <summary>

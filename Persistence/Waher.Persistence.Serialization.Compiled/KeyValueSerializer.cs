@@ -179,7 +179,7 @@ namespace Waher.Persistence.Serialization
 					break;
 
 				case ObjectSerializer.TYPE_CI_STRING:
-					Value = new CaseInsensitiveString(Reader.ReadString());
+					Value = Reader.ReadCaseInsensitiveString();
 					break;
 
 				case ObjectSerializer.TYPE_ENUM:

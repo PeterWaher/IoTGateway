@@ -396,6 +396,20 @@ namespace Waher.Persistence.Serialization
 		/// Deserializes a value.
 		/// </summary>
 		/// <returns>Deserialized value.</returns>
+		public CaseInsensitiveString ReadCaseInsensitiveString()
+		{
+			string s = this.ReadString();
+
+			if (s is null)
+				return null;
+			else
+				return new CaseInsensitiveString(s);
+		}
+
+		/// <summary>
+		/// Deserializes a value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
 		public Guid ReadGuid()
 		{
 			if (this.bitOffset > 0)

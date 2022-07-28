@@ -61,6 +61,8 @@ namespace Waher.Persistence
 				return this.lowerCase?.Equals(S.lowerCase) ?? (S.lowerCase is null);
 			else if (obj is string S2)
 				return this.lowerCase?.Equals(S2?.ToLower()) ?? (S2 is null);
+			else if (obj is null)
+				return this.lowerCase is null;
 			else
 				return false;
 		}
@@ -80,7 +82,7 @@ namespace Waher.Persistence
 		/// </returns>
 		public int CompareTo(CaseInsensitiveString other)
 		{
-			return this.lowerCase.CompareTo(other.lowerCase);
+			return this.lowerCase?.CompareTo(other.lowerCase) ?? (other.lowerCase is null ? 0 : -1);
 		}
 
 		/// <summary>
@@ -99,9 +101,11 @@ namespace Waher.Persistence
 		public int CompareTo(object obj)
 		{
 			if (obj is CaseInsensitiveString S)
-				return this.lowerCase.CompareTo(S.lowerCase);
+				return this.lowerCase?.CompareTo(S.lowerCase) ?? (S.lowerCase is null ? 0 : -1);
 			else if (obj is string S2)
-				return this.lowerCase.CompareTo(S2?.ToLower());
+				return this.lowerCase?.CompareTo(S2?.ToLower()) ?? (S2 is null ? 0 : -1);
+			else if (obj is null)
+				return this.lowerCase is null ? 0 : 1;
 			else
 				return -1;
 		}
@@ -123,7 +127,7 @@ namespace Waher.Persistence
 		/// <returns>Case-insensitive string.</returns>
 		public static implicit operator CaseInsensitiveString(string S)
 		{
-			return new CaseInsensitiveString(S);
+			return S is null ? null : new CaseInsensitiveString(S);
 		}
 
 		/// <summary>

@@ -264,6 +264,17 @@ namespace Waher.Persistence.Serialization
 		/// Deserializes a value.
 		/// </summary>
 		/// <returns>Deserialized value.</returns>
+		public CaseInsensitiveString ReadCaseInsensitiveString()
+		{
+			CaseInsensitiveString Result = this.deserializer.ReadCaseInsensitiveString();
+			this.output.WriteLine("CIString: " + Result);
+			return Result;
+		}
+
+		/// <summary>
+		/// Deserializes a value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
 		public Guid ReadGuid()
 		{
 			Guid Result = this.deserializer.ReadGuid();

@@ -112,7 +112,7 @@ namespace Waher.Persistence.Files.Searching
 			else if (TypeCode == ObjectSerializer.TYPE_BYTEARRAY)
 				return Convert.ToBase64String((byte[])Value);
 			else
-				return Value.ToString();
+				return Value?.ToString() ?? string.Empty;
 		}
 
 		private static void Upgrade(ref object Value, ref uint TypeCode)

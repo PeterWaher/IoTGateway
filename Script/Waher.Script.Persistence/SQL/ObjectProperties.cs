@@ -433,17 +433,34 @@ namespace Waher.Script.Persistence.SQL
 					Value = Element.AssociatedObjectValue;
 
 				if (Rec.Item1 is null)
+				{
+					Type ValueType = Value?.GetType() ?? typeof(object);
+					Type FieldType = Rec.Item2.FieldType;
+
+					if (!FieldType.GetTypeInfo().IsAssignableFrom(ValueType.GetTypeInfo()))
+						Value = Expression.ConvertTo(Value, FieldType, null);
+
 					Rec.Item2.SetValue(this.obj, Value);
+				}
 				else
 				{
 					if (!Rec.Item1.CanWrite)
 						throw new InvalidOperationException("Property cannot be set.");
 					else if (!Rec.Item1.SetMethod.IsPublic)
 						throw new InvalidOperationException("Property not accessible.");
-					else if (Rec.Item3)
-						Rec.Item1.SetValue(this.obj, Value, new object[] { Name });
 					else
-						Rec.Item1.SetValue(this.obj, Value);
+					{
+						Type ValueType = Value?.GetType() ?? typeof(object);
+						Type PropertyType = Rec.Item1.PropertyType;
+
+						if (!PropertyType.GetTypeInfo().IsAssignableFrom(ValueType.GetTypeInfo()))
+							Value = Expression.ConvertTo(Value, PropertyType, null);
+
+						if (Rec.Item3)
+							Rec.Item1.SetValue(this.obj, Value, new object[] { Name });
+						else
+							Rec.Item1.SetValue(this.obj, Value);
+					}
 				}
 
 				return;

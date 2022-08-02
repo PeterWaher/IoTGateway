@@ -144,7 +144,17 @@ namespace Waher.Networking.HTTP
 			get { return this.remoteEndPoint; }
 		}
 
-#if !WINDOWS_UWP
+#if WINDOWS_UWP
+		/// <summary>
+		/// If the connection is encrypted or not.
+		/// </summary>
+		public bool Encrypted => false;
+
+		/// <summary>
+		/// Cipher strength
+		/// </summary>
+		public int CipherStrength => 0;
+#else
 		/// <summary>
 		/// Remote client certificate, if any, associated with the request.
 		/// </summary>
@@ -167,6 +177,18 @@ namespace Waher.Networking.HTTP
 		public bool Encrypted
 		{
 			get { return this.clientConnection?.Encrypted ?? false; }
+		}
+
+		/// <summary>
+		/// Cipher strength
+		/// </summary>
+		public int CipherStrength
+		{
+			get
+			{
+				BinaryTcpClient Client = this.clientConnection.Client;
+				return Client is null ? 0 : Math.Min(Math.Min(Client.CipherStrength, Client.HashStrength), Client.KeyExchangeStrength);
+			}
 		}
 #endif
 

@@ -31,6 +31,21 @@ namespace Waher.Security.JWT
 		}
 
 		/// <summary>
+		/// Collection of users to authenticate against.
+		/// </summary>
+		public IUserSource Users => this.users;
+
+		/// <summary>
+		/// Realm for authentication
+		/// </summary>
+		public string Realm => this.realm;
+
+		/// <summary>
+		/// JWT Factory
+		/// </summary>
+		public JwtFactory Factory => this.factory;
+
+		/// <summary>
 		/// Gets a challenge for the authenticating client to respond to.
 		/// </summary>
 		/// <returns>Challenge string.</returns>

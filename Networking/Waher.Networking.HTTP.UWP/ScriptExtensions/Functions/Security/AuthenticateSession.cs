@@ -83,10 +83,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 					if (!Request.Encrypted)
 						throw new ForbiddenException("Access to resource requires encryption.");
 
-					BinaryTcpClient Client = Request.clientConnection.Client;
-					int Strength = Client is null ? 0 : Math.Min(Math.Min(Client.CipherStrength, Client.HashStrength), Client.KeyExchangeStrength);
-
-					if (Strength < MinStrength)
+					if (Request.CipherStrength < MinStrength)
 						throw new ForbiddenException("Access to resource requires encryption of minimum strength " + Expression.ToString(MinStrength) + ".");
 				}
 			}

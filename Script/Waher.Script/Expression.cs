@@ -3284,7 +3284,7 @@ namespace Waher.Script
 				int i, c = ArgumentNames.Length;
 				ArgumentType[] ArgumentTypes = new ArgumentType[c];
 				object[] Arguments = new object[c + 3];
-
+				
 				Arguments[c] = Start;
 				Arguments[c + 1] = Length;
 				Arguments[c + 2] = Expression;
@@ -3293,6 +3293,12 @@ namespace Waher.Script
 				{
 					Arguments[i] = new VariableReference(ArgumentNames[i], Start, Length, Expression);
 					ArgumentTypes[i] = ArgumentType.Normal;
+				}
+
+				if (Ref.Constructor.GetParameters().Length != c + 3)
+				{
+					if (!F.TryGetValue(FunctionName + " " + c.ToString(), out Ref))
+						return null;
 				}
 
 				ScriptNode FunctionCall = (ScriptNode)Ref.Constructor.Invoke(Arguments);

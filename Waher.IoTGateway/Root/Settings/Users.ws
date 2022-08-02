@@ -1,5 +1,5 @@
-﻿if !exists(User) or !User.HasPrivilege("Admin.Security.Users") then
-	Forbidden("Access denied.");
+﻿AuthenticateSession(Request,"User");
+Authorize(User,"Admin.Security.Users");
 
 if Posted.data.method="Delete" then
 (

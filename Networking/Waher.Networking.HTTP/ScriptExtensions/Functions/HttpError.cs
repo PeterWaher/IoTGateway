@@ -20,9 +20,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
 		public HttpError(ScriptNode Code, ScriptNode Message, ScriptNode Content, int Start, int Length, Expression Expression)
-			: base(new ScriptNode[] { Code, Message, Content }, 
-				  new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal },
-				  Start, Length, Expression)
+			: base(new ScriptNode[] { Code, Message, Content }, argumentTypes3Normal, Start, Length, Expression)
 		{
 		}
 

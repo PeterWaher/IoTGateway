@@ -37,6 +37,11 @@ namespace Waher.Networking.HTTP.Authentication
 		}
 
 		/// <summary>
+		/// Collection of users to authenticate against.
+		/// </summary>
+		public IUserSource Users => this.users;
+
+		/// <summary>
 		/// Gets a challenge for the authenticating client to respond to.
 		/// </summary>
 		/// <returns>Challenge string.</returns>

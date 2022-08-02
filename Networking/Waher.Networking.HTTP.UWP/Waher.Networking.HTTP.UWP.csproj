@@ -238,6 +238,12 @@
     <Compile Include="ScriptExtensions\Functions\Redirections\SeeOther.cs" />
     <Compile Include="ScriptExtensions\Functions\Redirections\TemporaryRedirect.cs" />
     <Compile Include="ScriptExtensions\Functions\Redirections\UseProxy.cs" />
+    <Compile Include="ScriptExtensions\Functions\Security\AuthenticateBasic.cs" />
+    <Compile Include="ScriptExtensions\Functions\Security\AuthenticateDigestMd5.cs" />
+    <Compile Include="ScriptExtensions\Functions\Security\AuthenticateDigestSha256.cs" />
+    <Compile Include="ScriptExtensions\Functions\Security\AuthenticateMutualTls.cs" />
+    <Compile Include="ScriptExtensions\Functions\Security\AuthenticateSession.cs" />
+    <Compile Include="ScriptExtensions\Functions\Security\Authorize.cs" />
     <Compile Include="ScriptExtensions\Functions\ServerErrors\BadGateway.cs" />
     <Compile Include="ScriptExtensions\Functions\ServerErrors\GatewayTimeout.cs" />
     <Compile Include="ScriptExtensions\Functions\ServerErrors\InsufficientStorage.cs" />
@@ -324,6 +330,7 @@ xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\*.cs" "$(
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions\*.cs" "$(ProjectDir)ScriptExtensions\Functions" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions\ClientErrors\*.cs" "$(ProjectDir)ScriptExtensions\Functions\ClientErrors" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions\Redirections\*.cs" "$(ProjectDir)ScriptExtensions\Functions\Redirections" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions\Security\*.cs" "$(ProjectDir)ScriptExtensions\Functions\Security" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\ScriptExtensions\Functions\ServerErrors\*.cs" "$(ProjectDir)ScriptExtensions\Functions\ServerErrors" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\TransferEncodings\*.cs" "$(ProjectDir)TransferEncodings" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Vanity\*.cs" "$(ProjectDir)Vanity" /Y

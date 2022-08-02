@@ -60,6 +60,16 @@ namespace Waher.Networking.HTTP.Authentication
 		}
 
 		/// <summary>
+		/// Collection of users to authenticate against.
+		/// </summary>
+		public IUserSource Users => this.users;
+
+		/// <summary>
+		/// Realm for authentication
+		/// </summary>
+		public string Realm => this.realm;
+
+		/// <summary>
 		/// Gets a challenge for the authenticating client to respond to.
 		/// </summary>
 		/// <returns>Challenge string.</returns>

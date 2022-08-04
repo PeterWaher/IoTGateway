@@ -104,6 +104,8 @@ namespace Waher.Networking.HTTP.Authentication
 						return null;
 					}
 
+					string ExpectedHash = User.PasswordHash;
+
 					switch (User.PasswordHashType)
 					{
 						case "":
@@ -111,17 +113,24 @@ namespace Waher.Networking.HTTP.Authentication
 
 						case "DIGEST-MD5":
 							Password = DigestAuthentication.ToHex(DigestAuthentication.H_MD5(UserName + ":" + this.realm + ":" + Password));
+							ExpectedHash = DigestAuthentication.AssureHex(ExpectedHash, 16);
 							break;
 
 						case "DIGEST-SHA-256":
 							Password = DigestAuthentication.ToHex(DigestAuthentication.H_SHA256(UserName + ":" + this.realm + ":" + Password));
+							ExpectedHash = DigestAuthentication.AssureHex(ExpectedHash, 32);
+							break;
+
+						case "DIGEST-SHA3-256":
+							Password = DigestAuthentication.ToHex(DigestAuthentication.H_SHA3_256(UserName + ":" + this.realm + ":" + Password));
+							ExpectedHash = DigestAuthentication.AssureHex(ExpectedHash, 32);
 							break;
 
 						default:
 							return null;
 					}
 
-					if (Password == User.PasswordHash)
+					if (Password == ExpectedHash)
 					{
 						LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
 						return User;

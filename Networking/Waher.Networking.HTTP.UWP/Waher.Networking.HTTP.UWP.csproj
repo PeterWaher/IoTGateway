@@ -305,6 +305,10 @@
       <Project>{8024d9a2-2ec9-404c-8506-d34fc861e6b4}</Project>
       <Name>Waher.Security.LoginMonitor.UWP</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Security\Waher.Security.SHA3\Waher.Security.SHA3.csproj">
+      <Project>{f264c147-82eb-45ab-991b-e1fe784d78d9}</Project>
+      <Name>Waher.Security.SHA3</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
       <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
       <Name>Waher.Security</Name>

@@ -2606,7 +2606,8 @@
           "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Script": "1.0.0",
           "Waher.Security": "1.0.0",
-          "Waher.Security.LoginMonitor.UWP": "1.0.0"
+          "Waher.Security.LoginMonitor.UWP": "1.0.0",
+          "Waher.Security.SHA3": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -2709,6 +2710,13 @@
           "Waher.Persistence": "1.8.1",
           "Waher.Runtime.Inventory": "1.1.0",
           "Waher.Security": "1.0.8"
+        }
+      },
+      "Waher.Security.SHA3/1.0.3": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       }
     },
@@ -5277,7 +5285,8 @@
           "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Script": "1.0.0",
           "Waher.Security": "1.0.0",
-          "Waher.Security.LoginMonitor.UWP": "1.0.0"
+          "Waher.Security.LoginMonitor.UWP": "1.0.0",
+          "Waher.Security.SHA3": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -5380,6 +5389,13 @@
           "Waher.Persistence": "1.8.1",
           "Waher.Runtime.Inventory": "1.1.0",
           "Waher.Security": "1.0.8"
+        }
+      },
+      "Waher.Security.SHA3/1.0.3": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       }
     },
@@ -7984,7 +8000,8 @@
           "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Script": "1.0.0",
           "Waher.Security": "1.0.0",
-          "Waher.Security.LoginMonitor.UWP": "1.0.0"
+          "Waher.Security.LoginMonitor.UWP": "1.0.0",
+          "Waher.Security.SHA3": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -8087,6 +8104,13 @@
           "Waher.Persistence": "1.8.1",
           "Waher.Runtime.Inventory": "1.1.0",
           "Waher.Security": "1.0.8"
+        }
+      },
+      "Waher.Security.SHA3/1.0.3": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       }
     },
@@ -10664,7 +10688,8 @@
           "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Script": "1.0.0",
           "Waher.Security": "1.0.0",
-          "Waher.Security.LoginMonitor.UWP": "1.0.0"
+          "Waher.Security.LoginMonitor.UWP": "1.0.0",
+          "Waher.Security.SHA3": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -10767,6 +10792,13 @@
           "Waher.Persistence": "1.8.1",
           "Waher.Runtime.Inventory": "1.1.0",
           "Waher.Security": "1.0.8"
+        }
+      },
+      "Waher.Security.SHA3/1.0.3": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       }
     },
@@ -13380,7 +13412,8 @@
           "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Script": "1.0.0",
           "Waher.Security": "1.0.0",
-          "Waher.Security.LoginMonitor.UWP": "1.0.0"
+          "Waher.Security.LoginMonitor.UWP": "1.0.0",
+          "Waher.Security.SHA3": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -13483,6 +13516,13 @@
           "Waher.Persistence": "1.8.1",
           "Waher.Runtime.Inventory": "1.1.0",
           "Waher.Security": "1.0.8"
+        }
+      },
+      "Waher.Security.SHA3/1.0.3": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       }
     },
@@ -16060,7 +16100,8 @@
           "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Script": "1.0.0",
           "Waher.Security": "1.0.0",
-          "Waher.Security.LoginMonitor.UWP": "1.0.0"
+          "Waher.Security.LoginMonitor.UWP": "1.0.0",
+          "Waher.Security.SHA3": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -16163,6 +16204,13 @@
           "Waher.Persistence": "1.8.1",
           "Waher.Runtime.Inventory": "1.1.0",
           "Waher.Security": "1.0.8"
+        }
+      },
+      "Waher.Security.SHA3/1.0.3": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       }
     },
@@ -18776,7 +18824,8 @@
           "Waher.Runtime.Temporary": "1.0.0",
           "Waher.Script": "1.0.0",
           "Waher.Security": "1.0.0",
-          "Waher.Security.LoginMonitor.UWP": "1.0.0"
+          "Waher.Security.LoginMonitor.UWP": "1.0.0",
+          "Waher.Security.SHA3": "1.0.0"
         }
       },
       "Waher.Networking.UWP/1.0.0": {
@@ -18879,6 +18928,13 @@
           "Waher.Persistence": "1.8.1",
           "Waher.Runtime.Inventory": "1.1.0",
           "Waher.Security": "1.0.8"
+        }
+      },
+      "Waher.Security.SHA3/1.0.3": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1"
         }
       }
     }
@@ -28985,6 +29041,11 @@
       "type": "project",
       "path": "../../Security/Waher.Security.LoginMonitor.UWP/Waher.Security.LoginMonitor.UWP.csproj",
       "msbuildProject": "../../Security/Waher.Security.LoginMonitor.UWP/Waher.Security.LoginMonitor.UWP.csproj"
+    },
+    "Waher.Security.SHA3/1.0.3": {
+      "type": "project",
+      "path": "../../Security/Waher.Security.SHA3/Waher.Security.SHA3.csproj",
+      "msbuildProject": "../../Security/Waher.Security.SHA3/Waher.Security.SHA3.csproj"
     }
   },
   "projectFileDependencyGroups": {

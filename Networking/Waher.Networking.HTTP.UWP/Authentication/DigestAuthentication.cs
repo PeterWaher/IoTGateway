@@ -7,6 +7,7 @@ using Waher.Content;
 using Waher.Security;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Security.LoginMonitor;
+using Waher.Security.SHA3;
 
 namespace Waher.Networking.HTTP.Authentication
 {
@@ -30,7 +31,12 @@ namespace Waher.Networking.HTTP.Authentication
 		/// <summary>
 		/// SHA-256
 		/// </summary>
-		SHA256
+		SHA256,
+
+		/// <summary>
+		/// SHA3-256
+		/// </summary>
+		SHA3_256
 	}
 
 	/// <summary>
@@ -99,6 +105,7 @@ namespace Waher.Networking.HTTP.Authentication
 					break;
 
 				case DigestAlgorithm.SHA256:
+				case DigestAlgorithm.SHA3_256:
 				default:
 					this.digestBytes = 32;
 					break;
@@ -175,6 +182,10 @@ namespace Waher.Networking.HTTP.Authentication
 
 				case DigestAlgorithm.SHA256:
 					sb.Append("SHA-256");
+					break;
+
+				case DigestAlgorithm.SHA3_256:
+					sb.Append("SHA3-256");
 					break;
 			}
 
@@ -268,6 +279,11 @@ namespace Waher.Networking.HTTP.Authentication
 									Algorithm = DigestAlgorithm.SHA256;
 									break;
 
+								case "SHA3-256":
+									H = H_SHA3_256;
+									Algorithm = DigestAlgorithm.SHA3_256;
+									break;
+
 								default:
 									return null;
 							}
@@ -275,8 +291,15 @@ namespace Waher.Networking.HTTP.Authentication
 					}
 				}
 
-				if (this.realm != Realm || Qop is null || Nonce is null || Cnonce is null || Nc is null ||
-					Uri is null || Response is null || UserName is null || (!Auth && !AuthInt))
+				if (this.realm != Realm || 
+					Qop is null || 
+					Nonce is null || 
+					Cnonce is null || 
+					Nc is null ||
+					Uri is null || 
+					Response is null || 
+					UserName is null || 
+					(!Auth && !AuthInt))
 				{
 					return null;
 				}
@@ -348,14 +371,21 @@ namespace Waher.Networking.HTTP.Authentication
 
 					case "DIGEST-MD5":
 						if (Algorithm == DigestAlgorithm.MD5)
-							HA1 = User.PasswordHash;
+							HA1 = AssureHex(User.PasswordHash, 16);
 						else
 							return null;
 						break;
 
 					case "DIGEST-SHA-256":
 						if (Algorithm == DigestAlgorithm.SHA256)
-							HA1 = User.PasswordHash;
+							HA1 = AssureHex(User.PasswordHash, 32);
+						else
+							return null;
+						break;
+
+					case "DIGEST-SHA3-256":
+						if (Algorithm == DigestAlgorithm.SHA3_256)
+							HA1 = AssureHex(User.PasswordHash, 32);
 						else
 							return null;
 						break;
@@ -397,6 +427,19 @@ namespace Waher.Networking.HTTP.Authentication
 			return Hashes.ComputeSHA256Hash(InternetContent.ISO_8859_1.GetBytes(s));
 		}
 
+		internal static byte[] H_SHA3_256(string s)
+		{
+			SHA3_256 SHA3_256 = new SHA3_256();
+			byte[] Result = SHA3_256.ComputeVariable(Encoding.UTF8.GetBytes(s));
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Converts an array of bytes to a hexadecimal string.
+		/// </summary>
+		/// <param name="Hash">Array of bytes</param>
+		/// <returns>Hexadecimal string</returns>
 		internal static string ToHex(byte[] Hash)
 		{
 			StringBuilder Result = new StringBuilder();
@@ -407,5 +450,55 @@ namespace Waher.Networking.HTTP.Authentication
 			return Result.ToString();
 		}
 
+		/// <summary>
+		/// Checks if a string is a hexa-decimal string of a specific size.
+		/// </summary>
+		/// <param name="s">String to check.</param>
+		/// <param name="NrBytes">Expected number of bytes</param>
+		/// <returns>If the string is a hexadecimal string of the specified size.</returns>
+		internal static bool IsHex(string s, byte NrBytes)
+		{
+			if (s.Length != (NrBytes << 1))
+				return false;
+
+			foreach (char ch in s)
+			{
+				if (ch >= '0' && ch <= '9')
+					continue;
+
+				if (ch >= 'a' && ch <= 'f')
+					continue;
+
+				if (ch >= 'A' && ch <= 'F')
+					continue;
+
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Tries to make sure <paramref name="s"/> is a hexadecimal string. If it is a base64-encoded string, it is converted to a 
+		/// hexadecimal string.
+		/// </summary>
+		/// <param name="s">String to check.</param>
+		/// <param name="NrBytes">Number of bytes expected.</param>
+		/// <returns>Hexadecimal string.</returns>
+		internal static string AssureHex(string s, byte NrBytes)
+		{
+			if (IsHex(s, NrBytes))
+				return s;
+
+			try
+			{
+				byte[] Bin = Convert.FromBase64String(s);
+				return ToHex(Bin);
+			}
+			catch (Exception)
+			{
+				return s;
+			}
+		}
 	}
 }

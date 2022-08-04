@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Security
+﻿namespace Waher.Security
 {
 	/// <summary>
 	/// Basic interface for a user.

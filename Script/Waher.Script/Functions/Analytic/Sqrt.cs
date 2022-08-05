@@ -68,7 +68,10 @@ namespace Waher.Script.Functions.Analytic
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(double Argument, Variables Variables)
 		{
-			return new DoubleNumber(Math.Sqrt(Argument));
+			if (Argument < 0)
+				return new ComplexNumber(0, Math.Sqrt(-Argument));
+			else
+				return new DoubleNumber(Math.Sqrt(Argument));
 		}
 
 		/// <summary>

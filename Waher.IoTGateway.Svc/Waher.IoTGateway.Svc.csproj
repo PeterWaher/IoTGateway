@@ -42,10 +42,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MySqlConnector" Version="2.1.2" />
-    <PackageReference Include="Npgsql" Version="6.0.2" />
-    <PackageReference Include="SkiaSharp" Version="2.80.3" />
-    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="6.0.0" />
+    <PackageReference Include="MySqlConnector" Version="2.1.11" />
+    <PackageReference Include="Npgsql" Version="6.0.6" />
+    <PackageReference Include="SkiaSharp" Version="2.88.0" />
+    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="6.0.1" />
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="6.0.0" />
   </ItemGroup>
   <ItemGroup>

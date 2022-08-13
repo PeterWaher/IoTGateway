@@ -156,11 +156,13 @@ purposes.
 						<xs:documentation>Note: Legal identities are updated by the client regularly. Check with the server to get the most recent legal identity, if needed.</xs:documentation>
 					</xs:annotation>
 					<xs:complexType>
-						<xs:attribute name="s" type="xs:base64Binary" use="optional">
-							<xs:annotation>
-								<xs:documentation>Digital signature created using the corresponding client public-key algorithm.</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>
+						<xs:simpleContent>
+							<xs:extension base='xs:base64Binary'>
+								<xs:annotation>
+									<xs:documentation>Digital signature created using the corresponding client public-key algorithm.</xs:documentation>
+								</xs:annotation>
+							</xs:extension>
+						</xs:simpleContent>
 					</xs:complexType>
 				</xs:element>
 				<xs:element ref='attachment' minOccurs='0' maxOccurs='unbounded'>
@@ -218,11 +220,13 @@ purposes.
 						<xs:documentation>Note: Server keys may change over time. If a signature does not validate, make sure to get the most recent public key from the server and check signature again.</xs:documentation>
 					</xs:annotation>
 					<xs:complexType>
-						<xs:attribute name="s" type="xs:base64Binary" use="optional">
-							<xs:annotation>
-								<xs:documentation>Digital signature created using the corresponding server public-key algorithm.</xs:documentation>
-							</xs:annotation>
-						</xs:attribute>
+						<xs:simpleContent>
+							<xs:extension base='xs:base64Binary'>
+								<xs:annotation>
+									<xs:documentation>Digital signature created using the corresponding server public-key algorithm.</xs:documentation>
+								</xs:annotation>
+							</xs:extension>
+						</xs:simpleContent>
 					</xs:complexType>
 				</xs:element>
 				<xs:element ref='attachmentRef' minOccurs='0' maxOccurs='unbounded'>

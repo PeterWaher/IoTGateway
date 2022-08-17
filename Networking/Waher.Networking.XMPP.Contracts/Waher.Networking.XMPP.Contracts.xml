@@ -2781,14 +2781,22 @@
             Event arguments for contract signature events
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Contracts.ContractSignedEventArgs.#ctor(System.String,System.String)">
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractSignedEventArgs.#ctor(System.String,System.String,System.String)">
             <summary>
             Event arguments for contract signature events
             </summary>
+            <param name="ContractId">Contract ID</param>
+            <param name="LegalId">Legal ID</param>
+            <param name="Role">Role</param>
         </member>
         <member name="P:Waher.Networking.XMPP.Contracts.ContractSignedEventArgs.LegalId">
             <summary>
             ID of legal identity signing the contract.
+            </summary>
+        </member>
+        <member name="P:Waher.Networking.XMPP.Contracts.ContractSignedEventArgs.Role">
+            <summary>
+            Role the legal identity has signed.
             </summary>
         </member>
         <member name="P:Waher.Networking.XMPP.Contracts.ContractSignedEventArgs.LegalIdUri">

@@ -567,7 +567,7 @@ namespace Waher.IoTGateway.Setup
 
 		private Task ContractsClient_ContractSigned(object Sender, ContractSignedEventArgs e)
 		{
-			Log.Notice("Smart contract signed.", e.ContractId, e.LegalId);
+			Log.Notice("Smart contract signed.", e.ContractId, e.LegalId, new KeyValuePair<string, object>("Role", e.Role));
 			return Task.CompletedTask;
 		}
 

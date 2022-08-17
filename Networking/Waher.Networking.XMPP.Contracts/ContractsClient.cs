@@ -3145,8 +3145,9 @@ namespace Waher.Networking.XMPP.Contracts
 			{
 				string ContractId = XML.Attribute(e.Content, "contractId");
 				string LegalId = XML.Attribute(e.Content, "legalId");
+				string Role = XML.Attribute(e.Content, "role");
 
-				await h(this, new ContractSignedEventArgs(ContractId, LegalId));
+				await h(this, new ContractSignedEventArgs(ContractId, LegalId, Role));
 			}
 		}
 
@@ -5124,8 +5125,13 @@ namespace Waher.Networking.XMPP.Contracts
 		private async Task PetitionSignatureAsync(string Address, string LegalId, byte[] Content, string PetitionId,
 			string Purpose, bool PeerReview)
 		{
-			if (this.contentPerPid.ContainsKey(PetitionId))
+			if (this.contentPerPid.TryGetValue(PetitionId, out KeyValuePair<byte[], bool> Rec))
+			{
+				if (Convert.ToBase64String(Content) == Convert.ToBase64String(Rec.Key) && PeerReview == Rec.Value)
+					return;
+
 				throw new InvalidOperationException("Petition ID must be unique for outstanding petitions.");
+			}
 
 			this.contentPerPid[PetitionId] = new KeyValuePair<byte[], bool>(Content, PeerReview);
 

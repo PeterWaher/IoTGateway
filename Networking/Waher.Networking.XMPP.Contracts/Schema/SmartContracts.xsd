@@ -1093,6 +1093,11 @@ purposes.
 					<xs:documentation>The legal identity that has signed the contract.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
+			<xs:attribute name='role' type='xs:string' use='required'>
+				<xs:annotation>
+					<xs:documentation>The role for which the legal identity has signed the contract.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
 

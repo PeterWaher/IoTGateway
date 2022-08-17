@@ -115,7 +115,16 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 			DigestAuthentication Mechanism = this.last;
 
 			if (Mechanism is null || this.last.Realm != Realm || this.last.Users != Users)
-				Mechanism = this.last = new DigestAuthentication(false, 0, DigestAlgorithm.SHA3_256, Realm, Users);
+			{
+				Mechanism = this.last = new DigestAuthentication(
+					false,
+#if !WINDOWS_UWP
+					0,
+#endif
+					DigestAlgorithm.SHA3_256, 
+					Realm, 
+					Users);
+			}
 
 			if (Request.Header.Authorization is null)
 				throw new UnauthorizedException("Unauthorized access prohibited.", new string[] { Mechanism.GetChallenge() });

@@ -137,6 +137,7 @@
     <Compile Include="Exceptions\ClientErrors\RangeNotSatisfiableException.cs" />
     <Compile Include="Exceptions\ClientErrors\RequestTimeoutException.cs" />
     <Compile Include="Exceptions\ClientErrors\TooManyRequestsException.cs" />
+    <Compile Include="Exceptions\ClientErrors\UnauthorizedException.cs" />
     <Compile Include="Exceptions\ClientErrors\UnavailableForLegalReasonsException.cs" />
     <Compile Include="Exceptions\ClientErrors\UnprocessableEntityException.cs" />
     <Compile Include="Exceptions\ClientErrors\UnsupportedMediaTypeException.cs" />
@@ -241,6 +242,7 @@
     <Compile Include="ScriptExtensions\Functions\Security\AuthenticateBasic.cs" />
     <Compile Include="ScriptExtensions\Functions\Security\AuthenticateDigestMd5.cs" />
     <Compile Include="ScriptExtensions\Functions\Security\AuthenticateDigestSha256.cs" />
+    <Compile Include="ScriptExtensions\Functions\Security\AuthenticateDigestSha3_256.cs" />
     <Compile Include="ScriptExtensions\Functions\Security\AuthenticateMutualTls.cs" />
     <Compile Include="ScriptExtensions\Functions\Security\AuthenticateSession.cs" />
     <Compile Include="ScriptExtensions\Functions\Security\Authorize.cs" />

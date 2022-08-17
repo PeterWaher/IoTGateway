@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Security.LoginMonitor.UWP</id>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
     <title>Waher.Security.LoginMonitor.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
@@ -16,8 +16,8 @@
     <tags>Security Login Monitor UWP</tags>
     <dependencies>
       <dependency id="Waher.Events" version="1.1.1"/>
-      <dependency id="Waher.Networking.UWP" version="2.0.4"/>
-      <dependency id="Waher.Networking.WHOIS.UWP" version="2.0.1"/>
+      <dependency id="Waher.Networking.UWP" version="2.0.5"/>
+      <dependency id="Waher.Networking.WHOIS.UWP" version="2.0.2"/>
       <dependency id="Waher.Persistence" version="1.8.1"/>
       <dependency id="Waher.Runtime.Inventory" version="1.1.0"/>
       <dependency id="Waher.Security" version="1.0.8"/>

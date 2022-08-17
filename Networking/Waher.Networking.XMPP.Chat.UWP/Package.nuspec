@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata minClientVersion="3.2">
 		<id>Waher.Networking.XMPP.Chat.UWP</id>
-		<version>2.0.2</version>
+		<version>2.0.3</version>
 		<title>Waher.Networking.XMPP.Chat.UWP</title>
 		<authors>Peter Waher</authors>
 		<owners>Waher Data AB</owners>
@@ -18,19 +18,19 @@
 			<dependency id="Waher.Content" version="2.4.0"/>
 			<dependency id="Waher.Content.Emoji" version="2.0.0"/>
 			<dependency id="Waher.Content.Html" version="2.1.1"/>
-			<dependency id="Waher.Content.Markdown" version="2.1.9"/>
+			<dependency id="Waher.Content.Markdown" version="2.1.10"/>
 			<dependency id="Waher.Content.Xml" version="2.0.3"/>
-			<dependency id="Waher.Networking.UWP" version="2.0.4"/>
-			<dependency id="Waher.Networking.XMPP.UWP" version="2.0.4"/>
-			<dependency id="Waher.Networking.XMPP.Concentrator.UWP" version="2.0.5"/>
-			<dependency id="Waher.Networking.XMPP.Control.UWP" version="2.0.2"/>
-			<dependency id="Waher.Networking.XMPP.Sensor.UWP" version="2.1.0"/>
+			<dependency id="Waher.Networking.UWP" version="2.0.5"/>
+			<dependency id="Waher.Networking.XMPP.UWP" version="2.0.5"/>
+			<dependency id="Waher.Networking.XMPP.Concentrator.UWP" version="2.0.6"/>
+			<dependency id="Waher.Networking.XMPP.Control.UWP" version="2.0.3"/>
+			<dependency id="Waher.Networking.XMPP.Sensor.UWP" version="2.1.1"/>
 			<dependency id="Waher.Runtime.Cache" version="1.0.6"/>
 			<dependency id="Waher.Runtime.Inventory" version="1.1.0"/>
-			<dependency id="Waher.Script" version="2.4.6"/>
-			<dependency id="Waher.Script.Graphs" version="2.0.7"/>
+			<dependency id="Waher.Script" version="2.4.7"/>
+			<dependency id="Waher.Script.Graphs" version="2.0.8"/>
 			<dependency id="Waher.Security" version="1.0.8"/>
-			<dependency id="Waher.Things" version="1.2.0"/>
+			<dependency id="Waher.Things" version="1.2.1"/>
 		</dependencies>
 	</metadata>
 	<files>

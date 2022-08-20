@@ -3284,7 +3284,7 @@ namespace Waher.Script
 				int i, c = ArgumentNames.Length;
 				ArgumentType[] ArgumentTypes = new ArgumentType[c];
 				object[] Arguments = new object[c + 3];
-				
+
 				Arguments[c] = Start;
 				Arguments[c + 1] = Length;
 				Arguments[c + 2] = Expression;
@@ -4522,7 +4522,12 @@ namespace Waher.Script
 		{
 			StringBuilder Output = new StringBuilder();
 
-			Output.Append("DateTime(");
+			Output.Append("DateTime");
+
+			if (Value.Kind == DateTimeKind.Utc)
+				Output.Append("Utc");
+
+			Output.Append('(');
 			Output.Append(Value.Year.ToString("D4"));
 			Output.Append(',');
 			Output.Append(Value.Month.ToString("D2"));

@@ -74,10 +74,10 @@ namespace Waher.IoTGateway.WebResources
 			{
 				From = v.ValueObject as string;
 				if (string.IsNullOrEmpty(From))
-					From = "/Index.md";
+					From = "/";
 			}
 			else
-				From = "/Index.md";
+				From = "/";
 
 			LoginResult Result = await Users.Login(UserName, Password, Request.RemoteEndPoint, "Web");
 

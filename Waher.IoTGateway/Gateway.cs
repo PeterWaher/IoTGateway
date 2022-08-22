@@ -2284,7 +2284,7 @@ namespace Waher.IoTGateway
 			}
 
 			if (!Request.Session.TryGetVariable("from", out Variable v) || string.IsNullOrEmpty(From = v.ValueObject as string))
-				From = string.Empty;
+				From = "/";
 
 			if (!loopbackIntefaceAvailable && (XmppConfiguration.Instance is null || !XmppConfiguration.Instance.Complete || configuring))
 			{

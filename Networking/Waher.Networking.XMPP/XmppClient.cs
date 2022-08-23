@@ -1287,7 +1287,7 @@ namespace Waher.Networking.XMPP
 		public void Reconnect()
 		{
 			if (this.disposed)
-				throw new ObjectDisposedException("XMPP Client has already been disposed.");
+				throw new ObjectDisposedException(nameof(XmppClient), "XMPP Client has already been disposed.");
 
 			if (this.textTransportLayer != null && !(this.textTransportLayer is AlternativeTransport))
 				throw new Exception("Reconnections must be made in the underlying transport layer.");

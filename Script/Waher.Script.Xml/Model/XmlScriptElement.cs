@@ -447,9 +447,7 @@ namespace Waher.Script.Xml.Model
 			if (this.xmlns is null)
 				return true;
 
-			XmlAttribute XmlNs = CheckAgainst.OwnerDocument.CreateAttribute("xmlns", CheckAgainst.NamespaceURI);
-
-			return this.xmlns.IsApplicable(XmlNs);
+			return this.xmlns.IsApplicable(CheckAgainst.NamespaceURI);
 		}
 	}
 }

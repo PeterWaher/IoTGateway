@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.ExceptionServices;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -1311,7 +1312,21 @@ namespace Waher.Persistence.Files
 		/// <param name="FieldNames">Field names to build the index on. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
 		/// <returns>Index file.</returns>
-		public async Task<IndexBTreeFile> GetIndexFile(ObjectBTreeFile File, RegenerationOptions RegenerationOptions, params string[] FieldNames)
+		public Task<IndexBTreeFile> GetIndexFile(ObjectBTreeFile File, RegenerationOptions RegenerationOptions, params string[] FieldNames)
+		{
+			return this.GetIndexFile(File, true, RegenerationOptions, FieldNames);
+		}
+
+		/// <summary>
+		/// Gets an index file.
+		/// </summary>
+		/// <param name="File">Object file.</param>
+		/// <param name="CanRetry">If a retry to access index file can be made.</param>
+		/// <param name="RegenerationOptions">Index regeneration options.</param>
+		/// <param name="FieldNames">Field names to build the index on. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
+		/// <returns>Index file.</returns>
+		private async Task<IndexBTreeFile> GetIndexFile(ObjectBTreeFile File, bool CanRetry, RegenerationOptions RegenerationOptions, params string[] FieldNames)
 		{
 			IndexBTreeFile IndexFile;
 			IndexBTreeFile[] Indices = File.Indices;
@@ -1366,6 +1381,13 @@ namespace Waher.Persistence.Files
 				IndexFile = await IndexBTreeFile.Create(s, File, this, FieldNames);
 
 				await File.AddIndexLocked(IndexFile, Regenerate);
+			}
+			catch (IOException ex)
+			{
+				if (!CanRetry)
+					ExceptionDispatchInfo.Capture(ex).Throw();
+				
+				return await GetIndexFile(File, false, RegenerationOptions, FieldNames);
 			}
 			finally
 			{

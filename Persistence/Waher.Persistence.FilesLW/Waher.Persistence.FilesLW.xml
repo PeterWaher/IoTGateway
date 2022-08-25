@@ -520,6 +520,17 @@
             If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
             <returns>Index file.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.GetIndexFile(Waher.Persistence.Files.ObjectBTreeFile,System.Boolean,Waher.Persistence.Files.RegenerationOptions,System.String[])">
+            <summary>
+            Gets an index file.
+            </summary>
+            <param name="File">Object file.</param>
+            <param name="CanRetry">If a retry to access index file can be made.</param>
+            <param name="RegenerationOptions">Index regeneration options.</param>
+            <param name="FieldNames">Field names to build the index on. By default, sort order is ascending.
+            If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
+            <returns>Index file.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.GetIndexFileName(Waher.Persistence.Files.ObjectBTreeFile,System.String[])">
             <summary>
             Gets an index file name.

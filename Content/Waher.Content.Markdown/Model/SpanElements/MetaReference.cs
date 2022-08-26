@@ -38,10 +38,26 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">Markdown will be output here.</param>
 		public override Task GenerateMarkdown(StringBuilder Output)
 		{
-			Output.Append("[%");
-			Output.Append(this.key);
-			Output.Append(']');
-	
+			bool FirstOnRow = true;
+
+			if (this.TryGetMetaData(out KeyValuePair<string, bool>[] Values))
+			{
+				foreach (KeyValuePair<string, bool> P in Values)
+				{
+					if (FirstOnRow)
+						FirstOnRow = false;
+					else
+						Output.Append(' ');
+
+					Output.Append(MarkdownDocument.Encode(P.Key));
+					if (P.Value)
+					{
+						Output.AppendLine("  ");
+						FirstOnRow = true;
+					}
+				}
+			}
+
 			return Task.CompletedTask;
 		}
 

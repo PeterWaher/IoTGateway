@@ -43,7 +43,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			int Code = (int)Expression.ToDouble(Arguments[0].AssociatedObjectValue);
-			string Message = Arguments[1].AssociatedObjectValue?.ToString();
+			string Message = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
 			object Content = Arguments[2].AssociatedObjectValue;
 
 			throw new HttpException(Code, Message, Content);

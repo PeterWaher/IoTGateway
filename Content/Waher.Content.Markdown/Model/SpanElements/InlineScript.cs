@@ -101,13 +101,172 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override Task GenerateMarkdown(StringBuilder Output)
+		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
-			Output.Append("{");
-			Output.Append(this.expression.Script);
-			Output.Append("}");
+			object Result = await this.EvaluateExpression();
 
-			return Task.CompletedTask;
+			await GenerateMarkdown(Result, Output, this.aloneInParagraph, this.variables);
+		}
+
+		/// <summary>
+		/// Generates Markdown from Script output.
+		/// </summary>
+		/// <param name="Result">Script output.</param>
+		/// <param name="Output">Markdown output.</param>
+		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
+		/// <param name="Variables">Current variables.</param>
+		public static async Task GenerateMarkdown(object Result, StringBuilder Output, bool AloneInParagraph, Variables Variables)
+		{
+			if (Result is null)
+				return;
+
+			if (Result is XmlDocument Xml)
+				Result = await MarkdownDocument.TransformXml(Xml, Variables);
+
+			if (Result is Graph G)
+			{
+				PixelInformation Pixels = G.CreatePixels(Variables, out GraphSettings GraphSettings);
+				byte[] Bin = Pixels.EncodeAsPng();
+
+				if (AloneInParagraph)
+					Output.Append("<figure>");
+
+				Output.Append("<img border=\"2\" width=\"");
+				Output.Append(GraphSettings.Width.ToString());
+				Output.Append("\" height=\"");
+				Output.Append(GraphSettings.Height.ToString());
+				Output.Append("\" src=\"data:image/png;base64,");
+				Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
+				Output.Append("\" />");
+
+				if (AloneInParagraph)
+					Output.Append("</figure>");
+			}
+			else if (Result is PixelInformation Pixels)
+			{
+				byte[] Bin = Pixels.EncodeAsPng();
+
+				if (AloneInParagraph)
+					Output.Append("<figure>");
+
+				Output.Append("<img border=\"2\" width=\"");
+				Output.Append(Pixels.Width.ToString());
+				Output.Append("\" height=\"");
+				Output.Append(Pixels.Height.ToString());
+				Output.Append("\" src=\"data:image/png;base64,");
+				Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
+				Output.Append("\" />");
+
+				if (AloneInParagraph)
+					Output.Append("</figure>");
+			}
+			else if (Result is SKImage Img)
+			{
+				using (SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100))
+				{
+					byte[] Bin = Data.ToArray();
+
+					if (AloneInParagraph)
+						Output.Append("<figure>");
+
+					Output.Append("<img border=\"2\" width=\"");
+					Output.Append(Img.Width.ToString());
+					Output.Append("\" height=\"");
+					Output.Append(Img.Height.ToString());
+					Output.Append("\" src=\"data:image/png;base64,");
+					Output.Append(Convert.ToBase64String(Bin, 0, Bin.Length));
+					Output.Append("\" />");
+
+					if (AloneInParagraph)
+						Output.Append("</figure>");
+				}
+			}
+			else if (Result is Exception ex)
+			{
+				ex = Log.UnnestException(ex);
+
+				if (ex is AggregateException ex2)
+				{
+					foreach (Exception ex3 in ex2.InnerExceptions)
+					{
+						Output.Append("<p><font class=\"error\">");
+						Output.Append(MarkdownDocument.Encode(ex3.Message));
+						Output.AppendLine("</font></p>");
+					}
+				}
+				else
+				{
+					if (AloneInParagraph)
+						Output.Append("<p>");
+
+					Output.Append("<font class=\"error\">");
+					Output.Append(MarkdownDocument.Encode(ex.Message));
+					Output.Append("</font>");
+
+					if (AloneInParagraph)
+						Output.Append("</p>");
+				}
+			}
+			else if (Result is ObjectMatrix M && !(M.ColumnNames is null))
+			{
+				Output.Append("<table><thead><tr>");
+
+				foreach (string s2 in M.ColumnNames)
+				{
+					Output.Append("<th>");
+					Output.Append(MarkdownDocument.Encode(s2));
+					Output.Append("</th>");
+				}
+
+				Output.Append("</tr></thead><tbody>");
+
+				int x, y;
+
+				for (y = 0; y < M.Rows; y++)
+				{
+					Output.Append("<tr>");
+
+					for (x = 0; x < M.Columns; x++)
+					{
+						Output.Append("<td>");
+
+						object Item = M.GetElement(x, y).AssociatedObjectValue;
+						if (!(Item is null))
+						{
+							if (Item is string s2)
+								Output.Append(FormatText(MarkdownDocument.Encode(s2)));
+							else if (Item is MarkdownElement Element)
+								await Element.GenerateMarkdown(Output);
+							else
+								Output.Append(MarkdownDocument.Encode(Expression.ToString(Item)));
+						}
+
+						Output.Append("</td>");
+					}
+
+					Output.Append("</tr>");
+				}
+
+				Output.Append("</tbody></table>");
+			}
+			else if (Result is Array A)
+			{
+				foreach (object Item in A)
+					await GenerateMarkdown(Item, Output, false, Variables);
+			}
+			else
+			{
+				if (AloneInParagraph)
+					Output.Append("<p>");
+
+				Output.Append(MarkdownDocument.Encode(Result?.ToString() ?? string.Empty));
+
+				if (AloneInParagraph)
+					Output.Append("</p>");
+			}
+
+			if (AloneInParagraph)
+				Output.AppendLine();
 		}
 
 		/// <summary>

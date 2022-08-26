@@ -89,6 +89,11 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.Append(')');
 			}
 
+			if (this.aloneInParagraph)
+			{
+				Output.AppendLine();
+				Output.AppendLine();
+			}
 		}
 
 		/// <summary>

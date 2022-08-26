@@ -609,6 +609,25 @@
             any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
             <returns>Preprocessed markdown, and if the markdown contains script, making the markdown dynamic.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateMarkdown">
+            <summary>
+            Generates Markdown from the markdown text.
+            </summary>
+            <returns>Markdown</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateMarkdown(System.Text.StringBuilder)">
+            <summary>
+            Generates Markdown from the markdown text.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateMarkdown(System.Text.StringBuilder,System.Boolean)">
+            <summary>
+            Generates Markdown from the markdown text.
+            </summary>
+            <param name="Output">Markdown will be output here.</param>
+            <param name="Inclusion">If the Markdown is to be included in another document (true), or if it is a standalone document (false).</param>
+        </member>
         <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateHTML">
             <summary>
             Generates HTML from the markdown text.
@@ -5730,6 +5749,15 @@
             Generates Markdown for the markdown element.
             </summary>
             <param name="Output">Markdown will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineScript.GenerateMarkdown(System.Object,System.Text.StringBuilder,System.Boolean,Waher.Script.Variables)">
+            <summary>
+            Generates Markdown from Script output.
+            </summary>
+            <param name="Result">Script output.</param>
+            <param name="Output">Markdown output.</param>
+            <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
+            <param name="Variables">Current variables.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineScript.GenerateHTML(System.Text.StringBuilder)">
             <summary>

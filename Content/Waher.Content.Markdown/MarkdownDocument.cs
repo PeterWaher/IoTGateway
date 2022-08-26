@@ -4464,6 +4464,61 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
+		/// Generates Markdown from the markdown text.
+		/// </summary>
+		/// <returns>Markdown</returns>
+		public async Task<string> GenerateMarkdown()
+		{
+			StringBuilder Output = new StringBuilder();
+			await this.GenerateMarkdown(Output);
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Generates Markdown from the markdown text.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		public async Task GenerateMarkdown(StringBuilder Output)
+		{
+			if (!string.IsNullOrEmpty(this.fileName) && this.metaData.TryGetValue("MASTER", out KeyValuePair<string, bool>[] Master) && Master.Length == 1)
+			{
+				await this.LoadMasterIfNotLoaded(Master[0].Key);
+				await this.master.GenerateMarkdown(Output, false);
+			}
+			else
+				await this.GenerateMarkdown(Output, false);
+		}
+
+		/// <summary>
+		/// Generates Markdown from the markdown text.
+		/// </summary>
+		/// <param name="Output">Markdown will be output here.</param>
+		/// <param name="Inclusion">If the Markdown is to be included in another document (true), or if it is a standalone document (false).</param>
+		internal async Task GenerateMarkdown(StringBuilder Output, bool Inclusion)
+		{
+			foreach (MarkdownElement E in this.elements)
+				await E.GenerateMarkdown(Output);
+
+			if (!(this.footnoteOrder is null) && this.footnoteOrder.Count > 0)
+			{
+				Footnote Footnote;
+				int Nr;
+
+				foreach (string Key in this.footnoteOrder)
+				{
+					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && this.footnotes.TryGetValue(Key, out Footnote))
+					{
+						Output.AppendLine();
+						Output.AppendLine();
+						Output.Append(Nr.ToString());
+						Output.Append(".\t");
+						await Footnote.GenerateMarkdown(Output);
+					}
+				}
+			}
+		}
+
+		/// <summary>
 		/// Generates HTML from the markdown text.
 		/// </summary>
 		/// <returns>HTML</returns>

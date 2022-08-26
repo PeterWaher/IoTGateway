@@ -13,18 +13,18 @@
 		</Paragraph>
 		<HtmlBlock>
 			<Html><![CDATA[<table>]]></Html>
-			<InlineText>&#xD;
+			<InlineText>
     </InlineText>
 			<Html><![CDATA[<tr>]]></Html>
-			<InlineText>&#xD;
+			<InlineText>
         </InlineText>
 			<Html><![CDATA[<td>]]></Html>
 			<InlineText>Foo</InlineText>
 			<Html><![CDATA[</td>]]></Html>
-			<InlineText>&#xD;
+			<InlineText>
     </InlineText>
 			<Html><![CDATA[</tr>]]></Html>
-			<InlineText>&#xD;
+			<InlineText>
 </InlineText>
 			<Html><![CDATA[</table>]]></Html>
 		</HtmlBlock>

@@ -2633,7 +2633,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "Waher.Networking.UWP": "1.0.0"
         }
       },
@@ -5324,7 +5324,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "Waher.Networking.UWP": "1.0.0"
         }
       },
@@ -8051,7 +8051,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "Waher.Networking.UWP": "1.0.0"
         }
       },
@@ -10751,7 +10751,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "Waher.Networking.UWP": "1.0.0"
         }
       },
@@ -13487,7 +13487,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "Waher.Networking.UWP": "1.0.0"
         }
       },
@@ -16187,7 +16187,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "Waher.Networking.UWP": "1.0.0"
         }
       },
@@ -18923,7 +18923,7 @@
         "type": "project",
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.13",
+          "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
           "Waher.Networking.UWP": "1.0.0"
         }
       },

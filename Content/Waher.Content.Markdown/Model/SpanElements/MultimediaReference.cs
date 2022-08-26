@@ -35,10 +35,16 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override Task GenerateMarkdown(StringBuilder Output)
+		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
 			Output.Append('!');
-			return base.GenerateMarkdown(Output);
+			await base.GenerateMarkdown(Output);
+
+			if (this.aloneInParagraph)
+			{
+				Output.AppendLine();
+				Output.AppendLine();
+			}
 		}
 
 		/// <summary>

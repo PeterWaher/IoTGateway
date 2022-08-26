@@ -12,6 +12,7 @@ namespace Waher.Content.Markdown.Consolidation
 		private readonly List<DocumentInformation> documents = new List<DocumentInformation>();
 		private readonly string source;
 		private DocumentType type = DocumentType.Empty;
+		private string firstText = null;
 		private int nrDocuments = 0;
 		private readonly bool isDefault;
 
@@ -39,7 +40,19 @@ namespace Waher.Content.Markdown.Consolidation
 		/// <summary>
 		/// First document text.
 		/// </summary>
-		public string FirstText => this.FirstDocument?.Markdown?.MarkdownText ?? string.Empty;
+		public async Task<string> GetFirstText()
+		{
+			if (!(this.firstText is null))
+				return this.firstText;
+
+			MarkdownDocument Doc = this.FirstDocument?.Markdown;
+			if (Doc is null)
+				return string.Empty;
+
+			this.firstText = await Doc.GenerateMarkdown();
+
+			return this.firstText;
+		}
 
 		/// <summary>
 		/// First document.

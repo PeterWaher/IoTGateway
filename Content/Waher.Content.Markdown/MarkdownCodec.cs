@@ -139,25 +139,26 @@ namespace Waher.Content.Markdown
 		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
-		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		public async Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (allowEncoding && Object is MarkdownDocument MarkdownDocument)
 			{
+				string Markdown = await MarkdownDocument.GenerateMarkdown();
 				string ContentType;
 				byte[] Bin;
 
 				if (Encoding is null)
 				{
 					ContentType = "text/markdown; charset=utf-8";
-					Bin = Encoding.UTF8.GetBytes(MarkdownDocument.MarkdownText);
+					Bin = Encoding.UTF8.GetBytes(Markdown);
 				}
 				else
 				{
 					ContentType = "text/markdown; charset=" + Encoding.WebName;
-					Bin = Encoding.GetBytes(MarkdownDocument.MarkdownText);
+					Bin = Encoding.GetBytes(Markdown);
 				}
 
-				return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
+				return new KeyValuePair<byte[], string>(Bin, ContentType);
 			}
 
 			throw new ArgumentException("Object not a markdown document.", nameof(Object));

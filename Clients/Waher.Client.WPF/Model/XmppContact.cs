@@ -314,7 +314,7 @@ namespace Waher.Client.WPF.Model
 			sb.Append(HTML);
 			sb.Append("</body></html>");
 			sb.Append("<content xmlns='urn:xmpp:content' type='text/markdown'>");
-			sb.Append(XML.HtmlValueEncode(Markdown.MarkdownText));
+			sb.Append(XML.HtmlValueEncode(await Markdown.GenerateMarkdown()));
 			sb.Append("</content>");
 
 			return sb.ToString();

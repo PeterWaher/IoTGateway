@@ -205,25 +205,12 @@ namespace Waher.Content.Markdown
 		/// <summary>
 		/// Markdown text. This text might differ slightly from the original text passed to the document.
 		/// </summary>
+		[Obsolete("Use GenerateMarkdown() instead.")]
 		public string MarkdownText
 		{
 			get
 			{
-				if (this.markdownText is null)
-				{
-					StringBuilder Output = new StringBuilder();
-
-					// TODO: Meta-data
-
-					foreach (MarkdownElement E in this.elements)
-						E.GenerateMarkdown(Output);
-
-					// TODO: Footnotes
-
-					this.markdownText = Output.ToString();
-				}
-
-				return this.markdownText;
+				return this.GenerateMarkdown().Result;
 			}
 		}
 
@@ -4501,17 +4488,17 @@ namespace Waher.Content.Markdown
 
 			if (!(this.footnoteOrder is null) && this.footnoteOrder.Count > 0)
 			{
-				Footnote Footnote;
-				int Nr;
-
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && this.footnotes.TryGetValue(Key, out Footnote))
+					if (!Guid.TryParse(Key, out _) &&
+						this.footnotes.TryGetValue(Key, out Footnote Footnote))
 					{
 						Output.AppendLine();
 						Output.AppendLine();
-						Output.Append(Nr.ToString());
-						Output.Append(".\t");
+						Output.Append("[^");
+						Output.Append(Key);
+						Output.Append("]:\t");
+
 						await Footnote.GenerateMarkdown(Output);
 					}
 				}
@@ -6250,7 +6237,7 @@ namespace Waher.Content.Markdown
 			MarkdownDocument NewDoc = await MarkdownDocument.CreateAsync(New, Settings, TransparentExceptionTypes);
 			MarkdownDocument DiffDoc = await Compare(OldDoc, NewDoc, KeepUnchanged);
 
-			return DiffDoc.MarkdownText;
+			return await DiffDoc.GenerateMarkdown();
 		}
 
 		/// <summary>

@@ -33,13 +33,21 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates Markdown for the markdown element.
 		/// </summary>
 		/// <param name="Output">Markdown will be output here.</param>
-		public override Task GenerateMarkdown(StringBuilder Output)
+		public override async Task GenerateMarkdown(StringBuilder Output)
 		{
 			Output.Append("[^");
-			Output.Append(this.key);
-			Output.Append(']');
 
-			return Task.CompletedTask;
+			if (Guid.TryParse(this.key, out _) &&
+				this.Document.TryGetFootnote(this.key, out Footnote Footnote))
+			{
+				StringBuilder sb = new StringBuilder();
+				await Footnote.GenerateMarkdown(sb);
+				Output.Append(sb.ToString().TrimEnd());
+			}
+			else
+				Output.Append(this.key);
+
+			Output.Append(']');
 		}
 
 		/// <summary>

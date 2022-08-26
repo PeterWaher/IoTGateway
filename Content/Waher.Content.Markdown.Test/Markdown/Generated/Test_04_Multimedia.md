@@ -28,7 +28,7 @@
 
 ![MultiImage1](img1.svg)
 	(img2.png)
-	
+
 ![MultiImage2](img1.svg 320 200)
 	(img2.png 320 200)
 
@@ -50,7 +50,7 @@
 	(video3.ogv 320 200)
 	(video4.3gp 320 200)
 	(video5.flv 320 200)
-	
+
 ![MultiImage1][mid1]
 
 ![MultiImage2][mid2]

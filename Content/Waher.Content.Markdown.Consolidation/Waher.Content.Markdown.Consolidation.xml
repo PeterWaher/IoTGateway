@@ -435,7 +435,7 @@
             If the content is default content (true), or reported content (false).
             </summary>
         </member>
-        <member name="P:Waher.Content.Markdown.Consolidation.SourceState.FirstText">
+        <member name="M:Waher.Content.Markdown.Consolidation.SourceState.GetFirstText">
             <summary>
             First document text.
             </summary>

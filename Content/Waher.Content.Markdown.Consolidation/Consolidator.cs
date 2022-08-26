@@ -349,11 +349,12 @@ namespace Waher.Content.Markdown.Consolidation
 		/// Generates consolidated markdown from all sources.
 		/// </summary>
 		/// <returns>Consolidated markdown.</returns>
-		public string GenerateMarkdown()
+		public async Task<string> GenerateMarkdown()
 		{
 			StringBuilder Markdown = new StringBuilder();
 
-			lock (this.sources)
+			await this.synchObject.WaitAsync();
+			try
 			{
 				switch (this.type)
 				{
@@ -379,7 +380,7 @@ namespace Waher.Content.Markdown.Consolidation
 							Markdown.Append(" | `");
 							Markdown.Append(P.Key);
 							Markdown.Append("` | ");
-							Markdown.Append(P.Value.FirstText);
+							Markdown.Append(await P.Value.GetFirstText());
 							Markdown.AppendLine(" |");
 						}
 						break;
@@ -565,6 +566,10 @@ namespace Waher.Content.Markdown.Consolidation
 						this.GenerateComplexLocked(Markdown);
 						break;
 				}
+			}
+			finally
+			{
+				this.synchObject.Release();
 			}
 
 			return Markdown.ToString();

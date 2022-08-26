@@ -194,6 +194,12 @@
             </summary>
             <returns>Consolidated markdown.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.GenerateMarkdownAsync">
+            <summary>
+            Generates consolidated markdown from all sources.
+            </summary>
+            <returns>Consolidated markdown.</returns>
+        </member>
         <member name="M:Waher.Content.Markdown.Consolidation.Consolidator.CreatePalette(System.Int32)">
             <summary>
             Creates a palette for graphs.

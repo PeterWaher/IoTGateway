@@ -349,7 +349,17 @@ namespace Waher.Content.Markdown.Consolidation
 		/// Generates consolidated markdown from all sources.
 		/// </summary>
 		/// <returns>Consolidated markdown.</returns>
-		public async Task<string> GenerateMarkdown()
+		[Obsolete("Use GenerateMarkdownAsync() instead.")]
+		public string GenerateMarkdown()
+		{
+			return this.GenerateMarkdownAsync().Result;
+		}
+
+		/// <summary>
+		/// Generates consolidated markdown from all sources.
+		/// </summary>
+		/// <returns>Consolidated markdown.</returns>
+		public async Task<string> GenerateMarkdownAsync()
 		{
 			StringBuilder Markdown = new StringBuilder();
 

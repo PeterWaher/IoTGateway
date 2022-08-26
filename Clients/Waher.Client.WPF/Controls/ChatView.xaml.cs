@@ -275,7 +275,7 @@ namespace Waher.Client.WPF.Controls
 								StringBuilder sb = new StringBuilder();
 								bool First = true;
 
-								Message = await Consolidation.GenerateMarkdown();
+								Message = await Consolidation.GenerateMarkdownAsync();
 								Markdown = await MarkdownDocument.CreateAsync(Message, Markdown.Settings, Markdown.TransparentExceptionTypes);
 
 								foreach (string Source in await Consolidation.GetSources())

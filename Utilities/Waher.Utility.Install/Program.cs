@@ -278,7 +278,7 @@ namespace Waher.Utility.Install
 						if (ManifestFiles.Count == 0)
 						{
 							if (UninstallService)
-								UninstallPackage(Packages, ServerApplication, ProgramDataFolder, RemoveFiles);
+								UninstallPackage(Packages, ServerApplication, ProgramDataFolder, RemoveFiles, ContentOnly);
 							else
 								InstallPackage(Packages, ServerApplication, ProgramDataFolder, ContentOnly);
 						}

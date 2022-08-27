@@ -626,6 +626,7 @@
 							<File Id='Waher.Persistence.MongoDB.dll' Name='Waher.Persistence.MongoDB.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.MongoDB.dll' Vital='yes'/>
 							<File Id='Waher.Persistence.Serialization.Compiled.dll' Name='Waher.Persistence.Serialization.Compiled.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.Serialization.Compiled.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Cache.dll' Vital='yes'/>
+							<File Id='Waher.Runtime.Counters.dll' Name='Waher.Runtime.Counters.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Counters.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Inventory.dll' Name='Waher.Runtime.Inventory.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Inventory.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Inventory.Loader.dll' Name='Waher.Runtime.Inventory.Loader.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Inventory.Loader.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Language.dll' Name='Waher.Runtime.Language.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Language.dll' Vital='yes'/>
@@ -739,6 +740,7 @@
 							<RemoveFile Id='RemoveWaher.Persistence.MongoDB.dll' Name='Waher.Persistence.MongoDB.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.Serialization.Compiled.dll' Name='Waher.Persistence.Serialization.Compiled.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Counters.dll' Name='Waher.Runtime.Counters.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Inventory.dll' Name='Waher.Runtime.Inventory.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Inventory.Loader.dll' Name='Waher.Runtime.Inventory.Loader.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Language.dll' Name='Waher.Runtime.Language.dll' On='uninstall'/>
@@ -846,6 +848,7 @@
 							<File Id='Waher.Persistence.MongoDB.pdb' Name='Waher.Persistence.MongoDB.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.MongoDB.pdb' Vital='yes'/>
 							<File Id='Waher.Persistence.Serialization.Compiled.pdb' Name='Waher.Persistence.Serialization.Compiled.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Persistence.Serialization.Compiled.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Cache.pdb' Vital='yes'/>
+							<File Id='Waher.Runtime.Counters.pdb' Name='Waher.Runtime.Counters.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Counters.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Inventory.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Inventory.Loader.pdb' Name='Waher.Runtime.Inventory.Loader.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Inventory.Loader.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Language.pdb' Name='Waher.Runtime.Language.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Waher.Runtime.Language.pdb' Vital='yes'/>
@@ -936,6 +939,7 @@
 							<RemoveFile Id='RemoveWaher.Persistence.MongoDB.pdb' Name='Waher.Persistence.MongoDB.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.Serialization.Compiled.pdb' Name='Waher.Persistence.Serialization.Compiled.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Counters.pdb' Name='Waher.Runtime.Counters.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Inventory.Loader.pdb' Name='Waher.Runtime.Inventory.Loader.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Language.pdb' Name='Waher.Runtime.Language.pdb' On='uninstall'/>

@@ -71,6 +71,7 @@ using Waher.Things.Metering;
 using Waher.Things.SensorData;
 using Waher.Script.Graphs;
 using Waher.Runtime.ServiceRegistration;
+using Waher.Runtime.Counters;
 
 namespace Waher.IoTGateway
 {
@@ -1944,6 +1945,7 @@ namespace Waher.IoTGateway
 			}
 			finally
 			{
+				await RuntimeCounters.FlushAsync();
 				Persistence.LifeCycle.DatabaseModule.Flush().Wait(60000);
 
 				if (StopInternalProvider)

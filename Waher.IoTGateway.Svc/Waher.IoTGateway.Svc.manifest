@@ -377,6 +377,8 @@
 	<Assembly fileName='Waher.Persistence.Serialization.Compiled.pdb'/>
 	<Assembly fileName='Waher.Runtime.Cache.dll'/>
 	<Assembly fileName='Waher.Runtime.Cache.pdb'/>
+	<Assembly fileName='Waher.Runtime.Counters.dll'/>
+	<Assembly fileName='Waher.Runtime.Counters.pdb'/>
 	<Assembly fileName='Waher.Runtime.Inventory.dll'/>
 	<Assembly fileName='Waher.Runtime.Inventory.pdb'/>
 	<Assembly fileName='Waher.Runtime.Inventory.Loader.dll'/>

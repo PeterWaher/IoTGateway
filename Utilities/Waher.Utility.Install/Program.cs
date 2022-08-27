@@ -48,6 +48,7 @@ namespace Waher.Utility.Install
 	/// -w MILLISECONDS      Waits for the Gateway to stop executing before performing the
 	///                      operation. If the gateway does not stop within this period of
 	///                      time, the operation fails. (Default=60000)
+	/// -co                  If only content (content only) should be installed.
 	/// -?                   Help.
 	/// 
 	/// Note: Alternating -p and -k attributes can be used to process multiple packages in
@@ -84,6 +85,7 @@ namespace Waher.Utility.Install
 				bool Verbose = false;
 				bool UninstallService = false;
 				bool RemoveFiles = false;
+				bool ContentOnly = false;
 
 				while (i < c)
 				{
@@ -171,6 +173,10 @@ namespace Waher.Utility.Install
 								Timeout = j;
 							break;
 
+						case "-co":
+							ContentOnly = true;
+							break;
+
 						case "-i":
 							UninstallService = false;
 							break;
@@ -228,6 +234,7 @@ namespace Waher.Utility.Install
 					Console.Out.WriteLine("-w MILLISECONDS      Waits for the Gateway to stop executing before performing the");
 					Console.Out.WriteLine("                     operation. If the gateway does not stop within this period of");
 					Console.Out.WriteLine("                     time, the operation fails. (Default=60000)");
+					Console.Out.WriteLine("-co                  If only content (content only) should be installed.");
 					Console.Out.WriteLine("-?                   Help.");
 					Console.Out.WriteLine();
 					Console.Out.WriteLine("Note: Alternating -p and -k attributes can be used to process multiple packages in");
@@ -245,7 +252,7 @@ namespace Waher.Utility.Install
 
 				try
 				{
-					if (Timeout.HasValue)
+					if (Timeout.HasValue && !ContentOnly)
 					{
 						if (Verbose)
 							Console.Out.WriteLine("Making sure server is closed...");
@@ -273,7 +280,7 @@ namespace Waher.Utility.Install
 							if (UninstallService)
 								UninstallPackage(Packages, ServerApplication, ProgramDataFolder, RemoveFiles);
 							else
-								InstallPackage(Packages, ServerApplication, ProgramDataFolder);
+								InstallPackage(Packages, ServerApplication, ProgramDataFolder, ContentOnly);
 						}
 						else if (Packages.Count == 1)
 							GeneratePackage(ManifestFiles.ToArray(), Packages.First.Value.Key, Packages.First.Value.Value);
@@ -285,9 +292,9 @@ namespace Waher.Utility.Install
 						foreach (string ManifestFile in ManifestFiles)
 						{
 							if (UninstallService)
-								Uninstall(ManifestFile, ServerApplication, ProgramDataFolder, RemoveFiles);
+								Uninstall(ManifestFile, ServerApplication, ProgramDataFolder, RemoveFiles, ContentOnly);
 							else
-								Install(ManifestFile, ServerApplication, ProgramDataFolder);
+								Install(ManifestFile, ServerApplication, ProgramDataFolder, ContentOnly);
 						}
 					}
 				}
@@ -335,15 +342,12 @@ namespace Waher.Utility.Install
 			return AssemblyName.GetAssemblyName(ServerApplication);
 		}
 
-		private static void Install(string ManifestFile, string ServerApplication, string ProgramDataFolder)
+		private static void Install(string ManifestFile, string ServerApplication, string ProgramDataFolder, bool ContentOnly)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
 
 			if (string.IsNullOrEmpty(ManifestFile))
 				throw new Exception("Missing manifest file.");
-
-			if (string.IsNullOrEmpty(ServerApplication))
-				throw new Exception("Missing server application.");
 
 			if (string.IsNullOrEmpty(ProgramDataFolder))
 			{
@@ -351,36 +355,51 @@ namespace Waher.Utility.Install
 				Log.Informational("Using default program data folder: " + ProgramDataFolder);
 			}
 
+			if (string.IsNullOrEmpty(ServerApplication))
+				throw new Exception("Missing server application.");
+
 			if (!File.Exists(ServerApplication))
 				throw new Exception("Server application not found: " + ServerApplication);
 
-			Log.Informational("Getting assembly name of server.");
-			AssemblyName ServerName = GetAssemblyName(ServerApplication);
-			Log.Informational("Server assembly name: " + ServerName.ToString());
-
+			Dictionary<string, object> Deps;
+			AssemblyName ServerName;
 			string DepsJsonFileName;
 
-			int i = ServerApplication.LastIndexOf('.');
-			if (i < 0)
-				DepsJsonFileName = ServerApplication;
+			if (ContentOnly)
+			{
+				Deps = null;
+				ServerName = null;
+				DepsJsonFileName = null;
+			}
 			else
-				DepsJsonFileName = ServerApplication.Substring(0, i);
+			{
+				Log.Informational("Getting assembly name of server.");
+				ServerName = GetAssemblyName(ServerApplication);
+				Log.Informational("Server assembly name: " + ServerName.ToString());
 
-			DepsJsonFileName += ".deps.json";
+				int i = ServerApplication.LastIndexOf('.');
+				if (i < 0)
+					DepsJsonFileName = ServerApplication;
+				else
+					DepsJsonFileName = ServerApplication.Substring(0, i);
 
-			Log.Informational("deps.json file name: " + DepsJsonFileName);
+				DepsJsonFileName += ".deps.json";
 
-			if (!File.Exists(DepsJsonFileName))
-				throw new Exception("Invalid server executable. No corresponding deps.json file found.");
+				Log.Informational("deps.json file name: " + DepsJsonFileName);
 
-			Log.Informational("Opening " + DepsJsonFileName);
+				if (!File.Exists(DepsJsonFileName))
+					throw new Exception("Invalid server executable. No corresponding deps.json file found.");
 
-			string s = File.ReadAllText(DepsJsonFileName);
+				Log.Informational("Opening " + DepsJsonFileName);
 
-			Log.Informational("Parsing " + DepsJsonFileName);
+				string s = File.ReadAllText(DepsJsonFileName);
 
-			if (!(JSON.Parse(s) is Dictionary<string, object> Deps))
-				throw new Exception("Invalid deps.json file. Unable to install.");
+				Log.Informational("Parsing " + DepsJsonFileName);
+
+				Deps = JSON.Parse(s) as Dictionary<string, object>;
+				if (Deps is null)
+					throw new Exception("Invalid deps.json file. Unable to install.");
+			}
 
 			Log.Informational("Loading manifest file.");
 
@@ -409,87 +428,92 @@ namespace Waher.Utility.Install
 			{
 				if (N is XmlElement E && E.LocalName == "Assembly")
 				{
-					(string FileName, string SourceFileName) = GetFileName(E, SourceFolder);
-
-					if (CopyFileIfNewer(SourceFileName, Path.Combine(AppFolder, FileName), null, true))
+					if (!ContentOnly)
 					{
-						if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
-						{
-							string PdbFileName = FileName[0..^4] + ".pdb";
-							if (File.Exists(PdbFileName))
-								CopyFileIfNewer(Path.Combine(SourceFolder, PdbFileName), Path.Combine(AppFolder, PdbFileName), null, true);
-						}
-					}
+						(string FileName, string SourceFileName) = GetFileName(E, SourceFolder);
 
-					Assembly A = Assembly.LoadFrom(SourceFileName);
-					AssemblyName AN = A.GetName();
-
-					if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
-					{
-						foreach (KeyValuePair<string, object> P in Targets)
+						if (CopyFileIfNewer(SourceFileName, Path.Combine(AppFolder, FileName), null, true))
 						{
-							if (P.Value is Dictionary<string, object> Target)
+							if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 							{
-								foreach (KeyValuePair<string, object> P2 in Target)
+								string PdbFileName = FileName[0..^4] + ".pdb";
+								if (File.Exists(PdbFileName))
+									CopyFileIfNewer(Path.Combine(SourceFolder, PdbFileName), Path.Combine(AppFolder, PdbFileName), null, true);
+							}
+						}
+
+						Assembly A = Assembly.LoadFrom(SourceFileName);
+						AssemblyName AN = A.GetName();
+
+						if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+						{
+							foreach (KeyValuePair<string, object> P in Targets)
+							{
+								if (P.Value is Dictionary<string, object> Target)
 								{
-									if (P2.Key.StartsWith(ServerName.Name + "/") &&
-										P2.Value is Dictionary<string, object> App &&
-										App.TryGetValue("dependencies", out object Obj2) &&
-										Obj2 is Dictionary<string, object> Dependencies)
+									foreach (KeyValuePair<string, object> P2 in Target)
 									{
-										Dependencies[AN.Name] = AN.Version.ToString();
-										break;
+										if (P2.Key.StartsWith(ServerName.Name + "/") &&
+											P2.Value is Dictionary<string, object> App &&
+											App.TryGetValue("dependencies", out object Obj2) &&
+											Obj2 is Dictionary<string, object> Dependencies)
+										{
+											Dependencies[AN.Name] = AN.Version.ToString();
+											break;
+										}
 									}
-								}
 
-								Dictionary<string, object> Dependencies2 = new Dictionary<string, object>();
+									Dictionary<string, object> Dependencies2 = new Dictionary<string, object>();
 
-								foreach (AssemblyName Dependency in A.GetReferencedAssemblies())
-									Dependencies2[Dependency.Name] = Dependency.Version.ToString();
+									foreach (AssemblyName Dependency in A.GetReferencedAssemblies())
+										Dependencies2[Dependency.Name] = Dependency.Version.ToString();
 
-								Dictionary<string, object> Runtime = new Dictionary<string, object>()
+									Dictionary<string, object> Runtime = new Dictionary<string, object>()
 									{
 										{ Path.GetFileName(SourceFileName), new Dictionary<string,object>() }
 									};
 
-								Target[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
+									Target[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
 									{
 										{ "dependencies", Dependencies2 },
 										{ "runtime", Runtime }
 									};
+								}
 							}
 						}
-					}
 
-					if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
-					{
-						foreach (KeyValuePair<string, object> P in Libraries)
+						if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
 						{
-							if (P.Key.StartsWith(AN.Name + "/"))
+							foreach (KeyValuePair<string, object> P in Libraries)
 							{
-								Libraries.Remove(P.Key);
-								break;
+								if (P.Key.StartsWith(AN.Name + "/"))
+								{
+									Libraries.Remove(P.Key);
+									break;
+								}
 							}
-						}
 
-						Libraries[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
+							Libraries[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
 							{
 								{ "type", "project" },
 								{ "serviceable", false },
 								{ "sha512", string.Empty }
 							};
+						}
 					}
-
 				}
 			}
 
 			CopyContent(SourceFolder, AppFolder, ProgramDataFolder, Module);
 
-			Log.Informational("Encoding JSON");
-			s = JSON.Encode(Deps, true);
+			if (!ContentOnly)
+			{
+				Log.Informational("Encoding JSON");
+				string s = JSON.Encode(Deps, true);
 
-			Log.Informational("Writing " + DepsJsonFileName);
-			File.WriteAllText(DepsJsonFileName, s, Encoding.UTF8);
+				Log.Informational("Writing " + DepsJsonFileName);
+				File.WriteAllText(DepsJsonFileName, s, Encoding.UTF8);
+			}
 		}
 
 		private static bool CopyFileIfNewer(string From, string To, string To2, bool OnlyIfNewer)
@@ -608,7 +632,7 @@ namespace Waher.Utility.Install
 			}
 		}
 
-		private static void Uninstall(string ManifestFile, string ServerApplication, string ProgramDataFolder, bool Remove)
+		private static void Uninstall(string ManifestFile, string ServerApplication, string ProgramDataFolder, bool Remove, bool ContentOnly)
 		{
 			// Same code as for custom action UninstallManifest in Waher.IoTGateway.Installers
 
@@ -627,33 +651,45 @@ namespace Waher.Utility.Install
 			if (!File.Exists(ServerApplication))
 				throw new Exception("Server application not found: " + ServerApplication);
 
-			Log.Informational("Getting assembly name of server.");
-			AssemblyName ServerName = GetAssemblyName(ServerApplication);
-			Log.Informational("Server assembly name: " + ServerName.ToString());
-
+			Dictionary<string, object> Deps;
+			AssemblyName ServerName;
 			string DepsJsonFileName;
 
-			int i = ServerApplication.LastIndexOf('.');
-			if (i < 0)
-				DepsJsonFileName = ServerApplication;
+			if (ContentOnly)
+			{
+				Deps = null;
+				DepsJsonFileName = null;
+				ServerName = null;
+			}
 			else
-				DepsJsonFileName = ServerApplication.Substring(0, i);
+			{
+				Log.Informational("Getting assembly name of server.");
+				ServerName = GetAssemblyName(ServerApplication);
+				Log.Informational("Server assembly name: " + ServerName.ToString());
 
-			DepsJsonFileName += ".deps.json";
+				int i = ServerApplication.LastIndexOf('.');
+				if (i < 0)
+					DepsJsonFileName = ServerApplication;
+				else
+					DepsJsonFileName = ServerApplication.Substring(0, i);
 
-			Log.Informational("deps.json file name: " + DepsJsonFileName);
+				DepsJsonFileName += ".deps.json";
 
-			if (!File.Exists(DepsJsonFileName))
-				throw new Exception("Invalid server executable. No corresponding deps.json file found.");
+				Log.Informational("deps.json file name: " + DepsJsonFileName);
 
-			Log.Informational("Opening " + DepsJsonFileName);
+				if (!File.Exists(DepsJsonFileName))
+					throw new Exception("Invalid server executable. No corresponding deps.json file found.");
 
-			string s = File.ReadAllText(DepsJsonFileName);
+				Log.Informational("Opening " + DepsJsonFileName);
 
-			Log.Informational("Parsing " + DepsJsonFileName);
+				string s = File.ReadAllText(DepsJsonFileName);
 
-			if (!(JSON.Parse(s) is Dictionary<string, object> Deps))
-				throw new Exception("Invalid deps.json file. Unable to install.");
+				Log.Informational("Parsing " + DepsJsonFileName);
+
+				Deps = JSON.Parse(s) as Dictionary<string, object>;
+				if (Deps is null)
+					throw new Exception("Invalid deps.json file. Unable to install.");
+			}
 
 			Log.Informational("Loading manifest file.");
 
@@ -677,67 +713,73 @@ namespace Waher.Utility.Install
 			{
 				if (N is XmlElement E && E.LocalName == "Assembly")
 				{
-					(string FileName, string AppFileName) = GetFileName(E, AppFolder);
-
-					Assembly A = Assembly.LoadFrom(AppFileName);
-					AssemblyName AN = A.GetName();
-					string Key = AN.Name + "/" + AN.Version.ToString();
-
-					if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+					if (!ContentOnly)
 					{
-						Targets.Remove(Key);
+						(string FileName, string AppFileName) = GetFileName(E, AppFolder);
 
-						foreach (KeyValuePair<string, object> P in Targets)
+						Assembly A = Assembly.LoadFrom(AppFileName);
+						AssemblyName AN = A.GetName();
+						string Key = AN.Name + "/" + AN.Version.ToString();
+
+						if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
 						{
-							if (P.Value is Dictionary<string, object> Target)
+							Targets.Remove(Key);
+
+							foreach (KeyValuePair<string, object> P in Targets)
 							{
-								foreach (KeyValuePair<string, object> P2 in Target)
+								if (P.Value is Dictionary<string, object> Target)
 								{
-									if (P2.Key.StartsWith(ServerName.Name + "/") &&
-										P2.Value is Dictionary<string, object> App &&
-										App.TryGetValue("dependencies", out object Obj2) &&
-										Obj2 is Dictionary<string, object> Dependencies)
+									foreach (KeyValuePair<string, object> P2 in Target)
 									{
-										Dependencies.Remove(AN.Name);
-										break;
+										if (P2.Key.StartsWith(ServerName.Name + "/") &&
+											P2.Value is Dictionary<string, object> App &&
+											App.TryGetValue("dependencies", out object Obj2) &&
+											Obj2 is Dictionary<string, object> Dependencies)
+										{
+											Dependencies.Remove(AN.Name);
+											break;
+										}
 									}
 								}
 							}
 						}
-					}
 
-					if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
-					{
-						foreach (KeyValuePair<string, object> P in Libraries)
+						if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
 						{
-							if (P.Key.StartsWith(AN.Name + "/"))
+							foreach (KeyValuePair<string, object> P in Libraries)
 							{
-								Libraries.Remove(P.Key);
-								break;
+								if (P.Key.StartsWith(AN.Name + "/"))
+								{
+									Libraries.Remove(P.Key);
+									break;
+								}
 							}
 						}
-					}
 
-					if (Remove)
-					{
-						RemoveFile(AppFileName);
-						if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
+						if (Remove)
 						{
-							string PdbFileName = FileName[0..^4] + ".pdb";
-							RemoveFile(PdbFileName);
+							RemoveFile(AppFileName);
+							if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
+							{
+								string PdbFileName = FileName[0..^4] + ".pdb";
+								RemoveFile(PdbFileName);
+							}
 						}
 					}
 				}
 			}
 
-			Log.Informational("Encoding JSON");
-			s = JSON.Encode(Deps, true);
+			if (!ContentOnly)
+			{
+				Log.Informational("Encoding JSON");
+				string s = JSON.Encode(Deps, true);
 
-			Log.Informational("Writing " + DepsJsonFileName);
-			File.WriteAllText(DepsJsonFileName, s, Encoding.UTF8);
+				Log.Informational("Writing " + DepsJsonFileName);
+				File.WriteAllText(DepsJsonFileName, s, Encoding.UTF8);
 
-			if (Path.GetDirectoryName(ManifestFile) == AppFolder)
-				RemoveFile(ManifestFile);
+				if (Path.GetDirectoryName(ManifestFile) == AppFolder)
+					RemoveFile(ManifestFile);
+			}
 		}
 
 		private static bool RemoveFile(string FileName)
@@ -1000,13 +1042,14 @@ namespace Waher.Utility.Install
 			throw new FileNotFoundException("File not found: " + AbsFileName);
 		}
 
-		private static void InstallPackage(LinkedList<KeyValuePair<string, string>> Packages, string ServerApplication, string ProgramDataFolder)
+		private static void InstallPackage(LinkedList<KeyValuePair<string, string>> Packages, string ServerApplication, 
+			string ProgramDataFolder, bool ContentOnly)
 		{
 			foreach (KeyValuePair<string, string> Package in Packages)
-				InstallPackage(Package.Key, Package.Value, ServerApplication, ProgramDataFolder);
+				InstallPackage(Package.Key, Package.Value, ServerApplication, ProgramDataFolder, ContentOnly);
 		}
 
-		private static void InstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder)
+		private static void InstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder, bool ContentOnly)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
 
@@ -1025,33 +1068,45 @@ namespace Waher.Utility.Install
 			if (!File.Exists(ServerApplication))
 				throw new Exception("Server application not found: " + ServerApplication);
 
-			Log.Informational("Getting assembly name of server.");
-			AssemblyName ServerName = GetAssemblyName(ServerApplication);
-			Log.Informational("Server assembly name: " + ServerName.ToString());
-
+			Dictionary<string, object> Deps;
 			string DepsJsonFileName;
+			AssemblyName ServerName;
 
-			int i = ServerApplication.LastIndexOf('.');
-			if (i < 0)
-				DepsJsonFileName = ServerApplication;
+			if (ContentOnly)
+			{
+				ServerName = null;
+				Deps = null;
+				DepsJsonFileName = null;
+			}
 			else
-				DepsJsonFileName = ServerApplication.Substring(0, i);
+			{
+				Log.Informational("Getting assembly name of server.");
+				ServerName = GetAssemblyName(ServerApplication);
+				Log.Informational("Server assembly name: " + ServerName.ToString());
 
-			DepsJsonFileName += ".deps.json";
+				int i = ServerApplication.LastIndexOf('.');
+				if (i < 0)
+					DepsJsonFileName = ServerApplication;
+				else
+					DepsJsonFileName = ServerApplication.Substring(0, i);
 
-			Log.Informational("deps.json file name: " + DepsJsonFileName);
+				DepsJsonFileName += ".deps.json";
 
-			if (!File.Exists(DepsJsonFileName))
-				throw new Exception("Invalid server executable. No corresponding deps.json file found.");
+				Log.Informational("deps.json file name: " + DepsJsonFileName);
 
-			Log.Informational("Opening " + DepsJsonFileName);
+				if (!File.Exists(DepsJsonFileName))
+					throw new Exception("Invalid server executable. No corresponding deps.json file found.");
 
-			string s = File.ReadAllText(DepsJsonFileName);
+				Log.Informational("Opening " + DepsJsonFileName);
 
-			Log.Informational("Parsing " + DepsJsonFileName);
+				string s = File.ReadAllText(DepsJsonFileName);
 
-			if (!(JSON.Parse(s) is Dictionary<string, object> Deps))
-				throw new Exception("Invalid deps.json file. Unable to install.");
+				Log.Informational("Parsing " + DepsJsonFileName);
+
+				Deps = JSON.Parse(s) as Dictionary<string, object>;
+				if (Deps is null)
+					throw new Exception("Invalid deps.json file. Unable to install.");
+			}
 
 			Log.Informational("Loading package file.");
 
@@ -1115,88 +1170,91 @@ namespace Waher.Utility.Install
 					{
 						case 1: // Program file in installation folder, not assembly file
 						case 2: // Assembly file
-							FileName = Path.Combine(AppFolder, RelativeName);
-
-							if (b == 1)
-								Log.Informational("Application file: " + FileName);
-							else
-								Log.Informational("Assembly file: " + FileName);
-
-							CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
-
-							if (b == 2)
+							if (!ContentOnly)
 							{
-								Assembly A;
+								FileName = Path.Combine(AppFolder, RelativeName);
 
-								try
-								{
-									A = Assembly.LoadFrom(FileName);
-								}
-								catch (Exception)
-								{
-									break;  // Ignore. Not a valid assembly that needs to be registered in the deps.json file.
-								}
+								if (b == 1)
+									Log.Informational("Application file: " + FileName);
+								else
+									Log.Informational("Assembly file: " + FileName);
 
-								AssemblyName AN = A.GetName();
+								CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
 
-								if (Deps != null &&
-									Deps.TryGetValue("targets", out object Obj) &&
-									Obj is Dictionary<string, object> Targets)
+								if (b == 2)
 								{
-									foreach (KeyValuePair<string, object> P in Targets)
+									Assembly A;
+
+									try
 									{
-										if (P.Value is Dictionary<string, object> Target)
+										A = Assembly.LoadFrom(FileName);
+									}
+									catch (Exception)
+									{
+										break;  // Ignore. Not a valid assembly that needs to be registered in the deps.json file.
+									}
+
+									AssemblyName AN = A.GetName();
+
+									if (Deps != null &&
+										Deps.TryGetValue("targets", out object Obj) &&
+										Obj is Dictionary<string, object> Targets)
+									{
+										foreach (KeyValuePair<string, object> P in Targets)
 										{
-											foreach (KeyValuePair<string, object> P2 in Target)
+											if (P.Value is Dictionary<string, object> Target)
 											{
-												if (P2.Key.StartsWith(ServerName.Name + "/") &&
-													P2.Value is Dictionary<string, object> App &&
-													App.TryGetValue("dependencies", out object Obj2) &&
-													Obj2 is Dictionary<string, object> Dependencies)
+												foreach (KeyValuePair<string, object> P2 in Target)
 												{
-													Dependencies[AN.Name] = AN.Version.ToString();
-													break;
+													if (P2.Key.StartsWith(ServerName.Name + "/") &&
+														P2.Value is Dictionary<string, object> App &&
+														App.TryGetValue("dependencies", out object Obj2) &&
+														Obj2 is Dictionary<string, object> Dependencies)
+													{
+														Dependencies[AN.Name] = AN.Version.ToString();
+														break;
+													}
 												}
+
+												Dictionary<string, object> Dependencies2 = new Dictionary<string, object>();
+
+												foreach (AssemblyName Dependency in A.GetReferencedAssemblies())
+													Dependencies2[Dependency.Name] = Dependency.Version.ToString();
+
+												Dictionary<string, object> Runtime = new Dictionary<string, object>()
+												{
+													{ Path.GetFileName(FileName), new Dictionary<string,object>() }
+												};
+
+												Target[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
+												{
+													{ "dependencies", Dependencies2 },
+													{ "runtime", Runtime }
+												};
 											}
-
-											Dictionary<string, object> Dependencies2 = new Dictionary<string, object>();
-
-											foreach (AssemblyName Dependency in A.GetReferencedAssemblies())
-												Dependencies2[Dependency.Name] = Dependency.Version.ToString();
-
-											Dictionary<string, object> Runtime = new Dictionary<string, object>()
-											{
-												{ Path.GetFileName(FileName), new Dictionary<string,object>() }
-											};
-
-											Target[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
-											{
-												{ "dependencies", Dependencies2 },
-												{ "runtime", Runtime }
-											};
 										}
 									}
-								}
 
-								if (Deps != null &&
-									Deps.TryGetValue("libraries", out object Obj3) &&
-									Obj3 is Dictionary<string, object> Libraries)
-								{
-									foreach (KeyValuePair<string, object> P in Libraries)
+									if (Deps != null &&
+										Deps.TryGetValue("libraries", out object Obj3) &&
+										Obj3 is Dictionary<string, object> Libraries)
 									{
-										if (P.Key.StartsWith(AN.Name + "/"))
+										foreach (KeyValuePair<string, object> P in Libraries)
 										{
-											Libraries.Remove(P.Key);
-											break;
+											if (P.Key.StartsWith(AN.Name + "/"))
+											{
+												Libraries.Remove(P.Key);
+												break;
+											}
 										}
-									}
 
-									Libraries[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
-									{
-										{ "type", "project" },
-										{ "serviceable", false },
-										{ "sha512", string.Empty }
-									};
+										Libraries[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
+										{
+											{ "type", "project" },
+											{ "serviceable", false },
+											{ "sha512", string.Empty }
+										};
+									}
 								}
 							}
 							break;
@@ -1224,11 +1282,14 @@ namespace Waher.Utility.Install
 					}
 				}
 
-				Log.Informational("Encoding JSON");
-				s = JSON.Encode(Deps, true);
+				if (!ContentOnly)
+				{
+					Log.Informational("Encoding JSON");
+					string s = JSON.Encode(Deps, true);
 
-				Log.Informational("Writing " + DepsJsonFileName);
-				File.WriteAllText(DepsJsonFileName, s, Encoding.UTF8);
+					Log.Informational("Writing " + DepsJsonFileName);
+					File.WriteAllText(DepsJsonFileName, s, Encoding.UTF8);
+				}
 			}
 			finally
 			{
@@ -1323,13 +1384,15 @@ namespace Waher.Utility.Install
 			}
 		}
 
-		private static void UninstallPackage(LinkedList<KeyValuePair<string, string>> Packages, string ServerApplication, string ProgramDataFolder, bool Remove)
+		private static void UninstallPackage(LinkedList<KeyValuePair<string, string>> Packages, string ServerApplication, 
+			string ProgramDataFolder, bool Remove, bool ContentOnly)
 		{
 			foreach (KeyValuePair<string, string> Package in Packages)
-				UninstallPackage(Package.Key, Package.Value, ServerApplication, ProgramDataFolder, Remove);
+				UninstallPackage(Package.Key, Package.Value, ServerApplication, ProgramDataFolder, Remove, ContentOnly);
 		}
 
-		private static void UninstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder, bool Remove)
+		private static void UninstallPackage(string PackageFile, string Key, string ServerApplication, string ProgramDataFolder,
+			bool Remove, bool ContentOnly)
 		{
 			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
 
@@ -1348,33 +1411,45 @@ namespace Waher.Utility.Install
 			if (!File.Exists(ServerApplication))
 				throw new Exception("Server application not found: " + ServerApplication);
 
-			Log.Informational("Getting assembly name of server.");
-			AssemblyName ServerName = GetAssemblyName(ServerApplication);
-			Log.Informational("Server assembly name: " + ServerName.ToString());
-
+			Dictionary<string, object> Deps;
 			string DepsJsonFileName;
+			AssemblyName ServerName;
 
-			int i = ServerApplication.LastIndexOf('.');
-			if (i < 0)
-				DepsJsonFileName = ServerApplication;
+			if (ContentOnly)
+			{
+				ServerName = null;
+				Deps = null;
+				DepsJsonFileName = null;
+			}
 			else
-				DepsJsonFileName = ServerApplication.Substring(0, i);
+			{
+				Log.Informational("Getting assembly name of server.");
+				ServerName = GetAssemblyName(ServerApplication);
+				Log.Informational("Server assembly name: " + ServerName.ToString());
 
-			DepsJsonFileName += ".deps.json";
+				int i = ServerApplication.LastIndexOf('.');
+				if (i < 0)
+					DepsJsonFileName = ServerApplication;
+				else
+					DepsJsonFileName = ServerApplication.Substring(0, i);
 
-			Log.Informational("deps.json file name: " + DepsJsonFileName);
+				DepsJsonFileName += ".deps.json";
 
-			if (!File.Exists(DepsJsonFileName))
-				throw new Exception("Invalid server executable. No corresponding deps.json file found.");
+				Log.Informational("deps.json file name: " + DepsJsonFileName);
 
-			Log.Informational("Opening " + DepsJsonFileName);
+				if (!File.Exists(DepsJsonFileName))
+					throw new Exception("Invalid server executable. No corresponding deps.json file found.");
 
-			string s = File.ReadAllText(DepsJsonFileName);
+				Log.Informational("Opening " + DepsJsonFileName);
 
-			Log.Informational("Parsing " + DepsJsonFileName);
+				string s = File.ReadAllText(DepsJsonFileName);
 
-			if (!(JSON.Parse(s) is Dictionary<string, object> Deps))
-				throw new Exception("Invalid deps.json file. Unable to install.");
+				Log.Informational("Parsing " + DepsJsonFileName);
+
+				Deps = JSON.Parse(s) as Dictionary<string, object>;
+				if (Deps is null)
+					throw new Exception("Invalid deps.json file. Unable to install.");
+			}
 
 			Log.Informational("Loading package file.");
 
@@ -1422,7 +1497,6 @@ namespace Waher.Utility.Install
 
 				Log.Informational("App folder: " + AppFolder);
 
-
 				while ((b = ReadByte(Decompressed)) != 0)
 				{
 					string RelativeName = Encoding.UTF8.GetString(ReadBin(Decompressed));
@@ -1446,57 +1520,60 @@ namespace Waher.Utility.Install
 					{
 						case 1: // Program file in installation folder, not assembly file
 						case 2: // Assembly file
-							FileName = Path.Combine(AppFolder, RelativeName);
-
-							if (b == 2)
+							if (!ContentOnly)
 							{
-								Assembly A = Assembly.LoadFrom(FileName);
-								AssemblyName AN = A.GetName();
-								Key = AN.Name + "/" + AN.Version.ToString();
+								FileName = Path.Combine(AppFolder, RelativeName);
 
-								if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+								if (b == 2)
 								{
-									Targets.Remove(Key);
+									Assembly A = Assembly.LoadFrom(FileName);
+									AssemblyName AN = A.GetName();
+									Key = AN.Name + "/" + AN.Version.ToString();
 
-									foreach (KeyValuePair<string, object> P in Targets)
+									if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
 									{
-										if (P.Value is Dictionary<string, object> Target)
+										Targets.Remove(Key);
+
+										foreach (KeyValuePair<string, object> P in Targets)
 										{
-											foreach (KeyValuePair<string, object> P2 in Target)
+											if (P.Value is Dictionary<string, object> Target)
 											{
-												if (P2.Key.StartsWith(ServerName.Name + "/") &&
-													P2.Value is Dictionary<string, object> App &&
-													App.TryGetValue("dependencies", out object Obj2) &&
-													Obj2 is Dictionary<string, object> Dependencies)
+												foreach (KeyValuePair<string, object> P2 in Target)
 												{
-													Dependencies.Remove(AN.Name);
-													break;
+													if (P2.Key.StartsWith(ServerName.Name + "/") &&
+														P2.Value is Dictionary<string, object> App &&
+														App.TryGetValue("dependencies", out object Obj2) &&
+														Obj2 is Dictionary<string, object> Dependencies)
+													{
+														Dependencies.Remove(AN.Name);
+														break;
+													}
 												}
+											}
+										}
+									}
+
+									if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+									{
+										foreach (KeyValuePair<string, object> P in Libraries)
+										{
+											if (P.Key.StartsWith(AN.Name + "/"))
+											{
+												Libraries.Remove(P.Key);
+												break;
 											}
 										}
 									}
 								}
 
-								if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+								if (Remove)
 								{
-									foreach (KeyValuePair<string, object> P in Libraries)
+									RemoveFile(FileName);
+									if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 									{
-										if (P.Key.StartsWith(AN.Name + "/"))
-										{
-											Libraries.Remove(P.Key);
-											break;
-										}
+										string PdbFileName = FileName[0..^4] + ".pdb";
+										RemoveFile(PdbFileName);
 									}
-								}
-							}
-
-							if (Remove)
-							{
-								RemoveFile(FileName);
-								if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
-								{
-									string PdbFileName = FileName[0..^4] + ".pdb";
-									RemoveFile(PdbFileName);
 								}
 							}
 							break;
@@ -1509,6 +1586,15 @@ namespace Waher.Utility.Install
 							throw new Exception("Invalid package file.");
 					}
 				}
+
+				if (!ContentOnly)
+				{
+					Log.Informational("Encoding JSON");
+					string s = JSON.Encode(Deps, true);
+
+					Log.Informational("Writing " + DepsJsonFileName);
+					File.WriteAllText(DepsJsonFileName, s, Encoding.UTF8);
+				}
 			}
 			finally
 			{
@@ -1518,12 +1604,6 @@ namespace Waher.Utility.Install
 				Aes?.Dispose();
 				fs?.Dispose();
 			}
-
-			Log.Informational("Encoding JSON");
-			s = JSON.Encode(Deps, true);
-
-			Log.Informational("Writing " + DepsJsonFileName);
-			File.WriteAllText(DepsJsonFileName, s, Encoding.UTF8);
 		}
 
 	}

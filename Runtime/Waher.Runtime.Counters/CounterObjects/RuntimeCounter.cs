@@ -8,6 +8,7 @@ namespace Waher.Runtime.Counters.CounterObjects
 	/// </summary>
 	[CollectionName("RuntimeCounters")]
 	[TypeName(TypeNameSerialization.None)]
+	[Index("Key")]
 	public class RuntimeCounter
 	{
 		/// <summary>

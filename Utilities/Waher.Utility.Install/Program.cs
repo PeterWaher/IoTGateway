@@ -1115,6 +1115,7 @@ namespace Waher.Utility.Install
 			byte[] Digest = H.ComputeVariable(Encoding.UTF8.GetBytes(LocalName + ":" + Key + ":" + typeof(Program).Namespace));
 			byte[] AesKey = new byte[32];
 			byte[] IV = new byte[16];
+			byte[] Buffer = new byte[65536];
 			Aes Aes = null;
 			FileStream fs = null;
 			ICryptoTransform AesTransform = null;
@@ -1170,7 +1171,9 @@ namespace Waher.Utility.Install
 					{
 						case 1: // Program file in installation folder, not assembly file
 						case 2: // Assembly file
-							if (!ContentOnly)
+							if (ContentOnly || b == 1)
+							SkipBytes(Decompressed, Bytes, Buffer);
+							else
 							{
 								FileName = Path.Combine(AppFolder, RelativeName);
 
@@ -1179,7 +1182,7 @@ namespace Waher.Utility.Install
 								else
 									Log.Informational("Assembly file: " + FileName);
 
-								CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
+								CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
 
 								if (b == 2)
 								{
@@ -1266,14 +1269,14 @@ namespace Waher.Utility.Install
 							FileName = Path.Combine(AppFolder, RelativeName);
 							Log.Informational("Content file: " + FileName);
 
-							CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
+							CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
 
 							using (FileStream TempFile = File.OpenRead(FileName))
 							{
 								FileName = Path.Combine(ProgramDataFolder, RelativeName);
 								Log.Informational("Content file: " + FileName);
 
-								CopyFile(TempFile, FileName, OnlyIfNewer, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc);
+								CopyFile(TempFile, FileName, OnlyIfNewer, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
 							}
 							break;
 
@@ -1302,7 +1305,7 @@ namespace Waher.Utility.Install
 		}
 
 		private static void CopyFile(Stream Input, string OutputFileName, bool OnlyIfNewer, ulong Bytes, FileAttributes Attr,
-			DateTime CreationTimeUtc, DateTime LastAccessTimeUtc, DateTime LastWriteTimeUtc)
+			DateTime CreationTimeUtc, DateTime LastAccessTimeUtc, DateTime LastWriteTimeUtc, byte[] Buffer)
 		{
 			try
 			{
@@ -1313,9 +1316,6 @@ namespace Waher.Utility.Install
 					Log.Informational("Creating folder " + Folder + ".");
 					Directory.CreateDirectory(Folder);
 				}
-
-				int c = Math.Min(65536, Bytes > int.MaxValue ? int.MaxValue : (int)Bytes);
-				byte[] Buffer = new byte[c];
 
 				if (OnlyIfNewer && File.Exists(OutputFileName))
 				{
@@ -1342,9 +1342,11 @@ namespace Waher.Utility.Install
 
 				try
 				{
+					ulong c = (ulong)Buffer.Length;
+
 					while (Bytes > 0)
 					{
-						int d = (int)Math.Min(Bytes, (ulong)c);
+						int d = (int)Math.Min(Bytes, c);
 
 						if (Input.Read(Buffer, 0, d) != d)
 							throw new EndOfStreamException("Reading past end-of-file.");
@@ -1458,6 +1460,7 @@ namespace Waher.Utility.Install
 			byte[] Digest = H.ComputeVariable(Encoding.UTF8.GetBytes(LocalName + ":" + Key + ":" + typeof(Program).Namespace));
 			byte[] AesKey = new byte[32];
 			byte[] IV = new byte[16];
+			byte[] Buffer = new byte[65536];
 			Aes Aes = null;
 			FileStream fs = null;
 			ICryptoTransform AesTransform = null;
@@ -1507,20 +1510,13 @@ namespace Waher.Utility.Install
 					ulong Bytes = ReadVarLenUInt(Decompressed);
 					string FileName;
 
-					int c = Math.Min(65536, Bytes > int.MaxValue ? int.MaxValue : (int)Bytes);
-					byte[] Buffer = new byte[c];
-
-					while (Bytes > 0)
-					{
-						Decompressed.Read(Buffer, 0, c);
-						Bytes -= (uint)c;
-					}
+					SkipBytes(Decompressed, Bytes, Buffer);
 
 					switch (b)
 					{
 						case 1: // Program file in installation folder, not assembly file
 						case 2: // Assembly file
-							if (!ContentOnly)
+							if (!ContentOnly || b == 1)
 							{
 								FileName = Path.Combine(AppFolder, RelativeName);
 

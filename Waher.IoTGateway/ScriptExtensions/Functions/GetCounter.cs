@@ -45,6 +45,17 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 		/// <param name="Argument">Function argument.</param>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(string Argument, Variables Variables)
+		{
+			return this.EvaluateScalarAsync(Argument, Variables).Result;
+		}
+
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
 		public override async Task<IElement> EvaluateScalarAsync(string Argument, Variables Variables)
 		{
 			long Count = await Runtime.Counters.RuntimeCounters.GetCount(Argument);

@@ -211,7 +211,7 @@ namespace Waher.Script.Model
 		/// <returns>Result.</returns>
 		public override async Task<IElement> EvaluateAsync(Variables Variables)
 		{
-			if (!this.isAsync)
+			if (!this.IsAsynchronous)
 				return this.Evaluate(Variables);
 
 			IElement[] Arg = new IElement[this.nrArguments];

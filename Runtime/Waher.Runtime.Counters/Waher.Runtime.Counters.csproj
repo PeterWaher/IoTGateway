@@ -39,6 +39,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
     <ProjectReference Include="..\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
+    <ProjectReference Include="..\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
   </ItemGroup>
 
 </Project>

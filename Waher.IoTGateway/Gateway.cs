@@ -1945,7 +1945,6 @@ namespace Waher.IoTGateway
 			}
 			finally
 			{
-				await RuntimeCounters.FlushAsync();
 				Persistence.LifeCycle.DatabaseModule.Flush().Wait(60000);
 
 				if (StopInternalProvider)

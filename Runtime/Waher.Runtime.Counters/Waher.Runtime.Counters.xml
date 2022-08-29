@@ -4,6 +4,26 @@
         <name>Waher.Runtime.Counters</name>
     </assembly>
     <members>
+        <member name="T:Waher.Runtime.Counters.CounterModule">
+            <summary>
+            Module controling the life-cycle of counters.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Counters.CounterModule.Running">
+            <summary>
+            If the module is running or not.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Counters.CounterModule.Start">
+            <summary>
+            Starts the module.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Counters.CounterModule.Stop">
+            <summary>
+            Stops the module.
+            </summary>
+        </member>
         <member name="T:Waher.Runtime.Counters.CounterObjects.RuntimeCounter">
             <summary>
             Contains a runtime counter.

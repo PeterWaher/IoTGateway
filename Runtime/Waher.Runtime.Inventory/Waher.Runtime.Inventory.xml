@@ -523,6 +523,29 @@
             <param name="Interfaces">Array of types (of <typeparamref name="InterfaceType"/>) to search.</param>
             <returns>Best interface, if found, null otherwise.</returns>
         </member>
+        <member name="M:Waher.Runtime.Inventory.Types.FindSupport``2(``1,Waher.Runtime.Inventory.Grade)">
+            <summary>
+            Finds the best interface for a certain task.
+            </summary>
+            <typeparam name="InterfaceType">Check interfaces of this type.</typeparam>
+            <typeparam name="ObjectType">Return interfaces supporting processing of this type 
+            (i.e. implementing <see cref="T:Waher.Runtime.Inventory.IProcessingSupport`1"/>).</typeparam>
+            <param name="Object">Object with features to process.</param>
+            <param name="MinSupport">Minimum support required.</param>
+            <returns>Best interface, if found, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Inventory.Types.FindSupport``2(``1,Waher.Runtime.Inventory.Grade,System.Type[])">
+            <summary>
+            Finds the best interface for a certain task.
+            </summary>
+            <typeparam name="InterfaceType">Check interfaces of this type.</typeparam>
+            <typeparam name="ObjectType">Return interfaces supporting processing of this type 
+            (i.e. implementing <see cref="T:Waher.Runtime.Inventory.IProcessingSupport`1"/>).</typeparam>
+            <param name="Object">Object with features to process.</param>
+            <param name="MinSupport">Minimum support required.</param>
+            <param name="Interfaces">Array of types (of <typeparamref name="InterfaceType"/>) to search.</param>
+            <returns>Best interface, if found, null otherwise.</returns>
+        </member>
         <member name="M:Waher.Runtime.Inventory.Types.TryParseEnum(System.String,System.String,System.Enum@)">
             <summary>
             Tries to parse an enumeration value in string form, given the full name of the enumeration type.

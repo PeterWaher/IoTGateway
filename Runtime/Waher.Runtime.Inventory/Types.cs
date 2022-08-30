@@ -975,7 +975,6 @@ namespace Waher.Runtime.Inventory
 			return FindBest<InterfaceType, ObjectType>(Object, Types.GetTypesImplementingInterface(typeof(InterfaceType)));
 		}
 
-
 		/// <summary>
 		/// Finds the best interface for a certain task.
 		/// </summary>
@@ -1010,6 +1009,53 @@ namespace Waher.Runtime.Inventory
 			}
 
 			return Best;
+		}
+
+		/// <summary>
+		/// Finds the best interface for a certain task.
+		/// </summary>
+		/// <typeparam name="InterfaceType">Check interfaces of this type.</typeparam>
+		/// <typeparam name="ObjectType">Return interfaces supporting processing of this type 
+		/// (i.e. implementing <see cref="IProcessingSupport{ObjectType}"/>).</typeparam>
+		/// <param name="Object">Object with features to process.</param>
+		/// <param name="MinSupport">Minimum support required.</param>
+		/// <returns>Best interface, if found, null otherwise.</returns>
+		public static InterfaceType[] FindSupport<InterfaceType, ObjectType>(ObjectType Object, Grade MinSupport)
+			where InterfaceType : IProcessingSupport<ObjectType>
+		{
+			return FindSupport<InterfaceType, ObjectType>(Object, MinSupport, Types.GetTypesImplementingInterface(typeof(InterfaceType)));
+		}
+
+		/// <summary>
+		/// Finds the best interface for a certain task.
+		/// </summary>
+		/// <typeparam name="InterfaceType">Check interfaces of this type.</typeparam>
+		/// <typeparam name="ObjectType">Return interfaces supporting processing of this type 
+		/// (i.e. implementing <see cref="IProcessingSupport{ObjectType}"/>).</typeparam>
+		/// <param name="Object">Object with features to process.</param>
+		/// <param name="MinSupport">Minimum support required.</param>
+		/// <param name="Interfaces">Array of types (of <typeparamref name="InterfaceType"/>) to search.</param>
+		/// <returns>Best interface, if found, null otherwise.</returns>
+		public static InterfaceType[] FindSupport<InterfaceType, ObjectType>(ObjectType Object, Grade MinSupport, Type[] Interfaces)
+			where InterfaceType : IProcessingSupport<ObjectType>
+		{
+			List<InterfaceType> Result = new List<InterfaceType>();
+
+			foreach (Type T2 in Interfaces)
+			{
+				try
+				{
+					InterfaceType Enumerator = (InterfaceType)Types.Instantiate(T2);
+					if (Enumerator.Supports(Object) >= MinSupport)
+						Result.Add(Enumerator);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			return Result.ToArray();
 		}
 
 		/// <summary>

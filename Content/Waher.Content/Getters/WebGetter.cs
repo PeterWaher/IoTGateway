@@ -138,8 +138,12 @@ namespace Waher.Content.Getters
 			{
 				if (!(Decoded is string Message))
 				{
-					if (Decoded is null || (Decoded is byte[] Bin2 && Bin2.Length == 0))
+					if (Decoded is null ||
+						(Decoded is byte[] Bin2 && Bin2.Length == 0) ||
+						Decoded is Dictionary<string, object>)
+					{
 						Message = Response.ReasonPhrase;
+					}
 					else
 						Message = Decoded.ToString();
 				}

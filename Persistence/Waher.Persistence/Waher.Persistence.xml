@@ -5797,6 +5797,16 @@
             <see cref="M:System.Collections.IEnumerable.GetEnumerator"/>
             </summary>
         </member>
+        <member name="P:Waher.Persistence.Serialization.GenericObject.Keys">
+            <summary>
+            Gets an enumeration of available key names.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.Serialization.GenericObject.Values">
+            <summary>
+            Gets an enumeration of available values.
+            </summary>
+        </member>
         <member name="P:Waher.Persistence.Serialization.GenericObject.Item(System.String)">
             <summary>
             Access to property values through the use of their property names.

@@ -113,6 +113,34 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
+		/// Gets an enumeration of available key names.
+		/// </summary>
+		public Dictionary<string,object>.KeyCollection Keys
+		{
+			get
+			{
+				if (this.propertiesByName is null)
+					this.BuildDictionary();
+
+				return this.propertiesByName.Keys;
+			}
+		}
+
+		/// <summary>
+		/// Gets an enumeration of available values.
+		/// </summary>
+		public Dictionary<string, object>.ValueCollection Values
+		{
+			get
+			{
+				if (this.propertiesByName is null)
+					this.BuildDictionary();
+
+				return this.propertiesByName.Values;
+			}
+		}
+
+		/// <summary>
 		/// Access to property values through the use of their property names.
 		/// </summary>
 		/// <param name="PropertyName">Property name.</param>

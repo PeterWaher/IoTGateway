@@ -1139,7 +1139,6 @@ namespace Waher.Content.Markdown
 			LinkedList<MarkdownElement> ChildElements;
 			StringBuilder Text = new StringBuilder();
 			string Url, Title;
-			int NrTerminationCharacters = 0;
 			char ch, ch2, ch3;
 			char PrevChar = ' ';
 			int? Width;
@@ -1150,18 +1149,10 @@ namespace Waher.Content.Markdown
 			{
 				if (ch == TerminationCharacter)
 				{
-					NrTerminationCharacters++;
-					if (NrTerminationCharacters >= TerminationCharacterCount)
-						break;
-					else
-						continue;
-				}
-				else
-				{
-					while (NrTerminationCharacters > 0)
+					if (TerminationCharacterCount == 1 ||
+						State.CheckRestOfTermination(TerminationCharacter, TerminationCharacterCount - 1))
 					{
-						Text.Append(TerminationCharacter);
-						NrTerminationCharacters--;
+						break;
 					}
 				}
 

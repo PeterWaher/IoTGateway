@@ -1,0 +1,19 @@
+﻿<parsedMakdown isDynamic="false" xmlns="http://waher.se/Schema/Markdown.xsd">
+	<metaData>
+		<tag xmlns="TITLE">
+			<value lineBreak="false" xmlns="Test_28_Nesting.md" />
+		</tag>
+	</metaData>
+	<elements>
+		<Paragraph>
+			<InlineText>Some </InlineText>
+			<Strong>
+				<InlineText>bold text with </InlineText>
+				<Emphasize>
+					<InlineText>italics</InlineText>
+				</Emphasize>
+			</Strong>
+		</Paragraph>
+	</elements>
+	<references />
+</parsedMakdown>

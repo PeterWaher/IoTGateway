@@ -200,5 +200,11 @@ namespace Waher.Content.Markdown.Test
 		{
 			await this.DoTest("Test_27_Contract.md", "Test_27_Contract.xml");
 		}
+
+		[TestMethod]
+		public async Task Test_28_Nesting()
+		{
+			await this.DoTest("Test_28_Nesting.md", "Test_28_Nesting.xml");
+		}
 	}
 }

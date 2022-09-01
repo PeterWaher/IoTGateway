@@ -27,7 +27,7 @@ namespace Waher.Content.Markdown.Model
 			this.currentRow = this.rows[this.current];
 			this.lineBreakAfter = this.currentRow.EndsWith("  ");
 			this.pos = 0;
-			this.len = this.currentRow.Length;	// >= 1
+			this.len = this.currentRow.Length;  // >= 1
 			this.preserveCrLf = PreserveCrLf;
 
 			if (this.lineBreakAfter)
@@ -275,6 +275,24 @@ namespace Waher.Content.Markdown.Model
 				ch = this.currentRow[this.pos++];
 
 			return this.lastChar = ch;
+		}
+
+		public bool CheckRestOfTermination(char ch, int Count)
+		{
+			if (this.pos + Count > this.len)
+				return false;
+
+			int i;
+
+			for (i = 0; i < Count; i++)
+			{
+				if (this.currentRow[this.pos + i] != ch)
+					return false;
+			}
+
+			this.pos += Count;
+
+			return true;
 		}
 
 		public int CurrentPosition

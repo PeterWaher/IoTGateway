@@ -1,0 +1,9 @@
+﻿<paragraph>
+	<text>Some </text>
+	<bold>
+		<text>bold text with </text>
+		<italic>
+			<text>italics</text>
+		</italic>
+	</bold>
+</paragraph>

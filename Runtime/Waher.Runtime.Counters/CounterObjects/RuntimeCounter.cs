@@ -16,9 +16,6 @@ namespace Waher.Runtime.Counters.CounterObjects
 		/// </summary>
 		public RuntimeCounter()
 		{
-			/// <summary>
-			/// Contains a runtime counter.
-			/// </summary>
 		}
 
 		/// <summary>

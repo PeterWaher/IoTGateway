@@ -44,8 +44,11 @@ namespace Waher.Networking.HTTP
 			{
 				if (First)
 				{
-					First = false;
-					this.ParseFirstRow(Row, VanityResources);
+					if (!string.IsNullOrEmpty(Row))
+					{
+						First = false;
+						this.ParseFirstRow(Row, VanityResources);
+					}
 				}
 				else
 				{

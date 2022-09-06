@@ -55,8 +55,6 @@
     <Compile Include=".bak\Waher.Content\Binary\FileEncoder.cs" />
     <Compile Include=".bak\Waher.Content\Binary\FileReference.cs" />
     <Compile Include=".bak\Waher.Content\ConversionState.cs" />
-    <Compile Include=".bak\Waher.Content\Getters\WebException.cs" />
-    <Compile Include=".bak\Waher.Content\Getters\WebGetter.cs" />
     <Compile Include=".bak\Waher.Content\IContentGetter.cs" />
     <Compile Include=".bak\Waher.Content\IContentHeader.cs" />
     <Compile Include=".bak\Waher.Content\IContentPoster.cs" />
@@ -71,8 +69,6 @@
     <Compile Include=".bak\Waher.Content\Multipart\RelatedCodec.cs" />
     <Compile Include=".bak\Waher.Content\Multipart\RelatedContent.cs" />
     <Compile Include=".bak\Waher.Content\Multipart\WwwFormCodec.cs" />
-    <Compile Include=".bak\Waher.Content\Posters\PosterBase.cs" />
-    <Compile Include=".bak\Waher.Content\Posters\WebPoster.cs" />
     <Compile Include=".bak\Waher.Content\Text\CsvCodec.cs" />
     <Compile Include=".bak\Waher.Content\Text\JsonCodec.cs" />
     <Compile Include=".bak\Waher.Content\Text\JsonOutput.cs" />
@@ -204,6 +200,7 @@
     <Compile Include=".bak\Waher.Script\Operators\Comparisons\Range.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Conditional\NullCheck.cs" />
     <Compile Include=".bak\Waher.Script\Operators\CreateMeasurement.cs" />
+    <Compile Include=".bak\Waher.Script\Operators\Membership\Inherits.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Sets\ImplicitSetDefinition.cs" />
     <Compile Include=".bak\Waher.Script\Operators\Vectors\ImplicitVectorDefinition.cs" />
     <Compile Include=".bak\Waher.Script\Order\CompoundOrder.cs" />
@@ -646,7 +643,6 @@
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.DependencyValidation.Analyzers.0.11.0\analyzers\dotnet\cs\Microsoft.DependencyValidation.Analyzers.resources.dll" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(WixCATargetsPath)" />
   <PropertyGroup>

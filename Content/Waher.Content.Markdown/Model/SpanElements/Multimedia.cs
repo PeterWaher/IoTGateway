@@ -323,10 +323,58 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			h1 = ((h1 << 5) + h1) ^ h2;
 			h2 = GetHashCode(this.items);
-			
+
 			h1 = ((h1 << 5) + h1) ^ h2;
 
 			return h1;
+		}
+
+		/// <summary>
+		/// Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+		/// </summary>
+		/// <param name="Statistics">Contains statistics about the Markdown document.</param>
+		public override void IncrementStatistics(MarkdownStatistics Statistics)
+		{
+			IncrementStatistics(Statistics, this.items);
+		}
+
+		internal static void IncrementStatistics(MarkdownStatistics Statistics, MultimediaItem[] Items)
+		{
+			if (!(Items is null))
+			{
+				Statistics.NrMultimedia++;
+
+				if (Items.Length > 1)
+					Statistics.NrMultiformatMultimedia++;
+
+				foreach (MultimediaItem Item in Items)
+				{
+					if (Statistics.NrMultimediaPerContentType is null)
+					{
+						Statistics.NrMultimediaPerContentType = new Dictionary<string, int>();
+						Statistics.NrMultimediaPerContentCategory = new Dictionary<string, int>();
+						Statistics.NrMultimediaPerExtension = new Dictionary<string, int>();
+					}
+
+					IncItem(Item.ContentType, Statistics.NrMultimediaPerContentType);
+					IncItem(Item.Extension, Statistics.NrMultimediaPerExtension);
+
+					string s = Item.ContentType;
+					int i = s.IndexOf('/');
+					if (i > 0)
+						s = s.Substring(0, i);
+
+					IncItem(s, Statistics.NrMultimediaPerContentCategory);
+				}
+			}
+		}
+
+		private static void IncItem(string Key, Dictionary<string, int> Dictionary)
+		{
+			if (Dictionary.TryGetValue(Key, out int i))
+				Dictionary[Key] = i + 1;
+			else
+				Dictionary[Key] = 1;
 		}
 
 	}

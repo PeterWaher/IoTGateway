@@ -158,5 +158,15 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			return new DefinitionTerms(Document, Children);
 		}
 
+		/// <summary>
+		/// Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+		/// </summary>
+		/// <param name="Statistics">Contains statistics about the Markdown document.</param>
+		public override void IncrementStatistics(MarkdownStatistics Statistics)
+		{
+			Statistics.NrDefinitionTerms++;
+			Statistics.NrListItems++;
+		}
+
 	}
 }

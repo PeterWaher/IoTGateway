@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Markdown.Model.BlockElements;
@@ -186,6 +185,16 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			h1 = ((h1 << 5) + h1) ^ h2;
 
 			return h1;
+		}
+
+		/// <summary>
+		/// Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+		/// </summary>
+		/// <param name="Statistics">Contains statistics about the Markdown document.</param>
+		public override void IncrementStatistics(MarkdownStatistics Statistics)
+		{
+			Statistics.NrHtmlEntities++;
+			Statistics.NrHtmlEntitiesTotal++;
 		}
 
 	}

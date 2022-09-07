@@ -37,6 +37,15 @@ namespace Waher.Content.Markdown.Test
 			Console.Out.WriteLine();
 
 			MarkdownHtmlTests.AssertEqual(ExpectedText, GeneratedXml, "Generated XML does not match expected XML.");
+
+			MarkdownStatistics Statistics = Doc.GetStatistics();
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+			Console.Out.WriteLine(JSON.Encode(Statistics, true));
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
 		}
 
 		[TestMethod]
@@ -153,11 +162,11 @@ namespace Waher.Content.Markdown.Test
 			await this.DoTest("Test_19_Sections.md", "Test_19_Sections.xml");
 		}
 
-        [TestMethod]
-        public async Task Test_20_Script()
-        {
-            await this.DoTest("Test_20_Script.md", "Test_20_Script.xml");
-        }
+		[TestMethod]
+		public async Task Test_20_Script()
+		{
+			await this.DoTest("Test_20_Script.md", "Test_20_Script.xml");
+		}
 
 		[TestMethod]
 		public async Task Test_21_Httpx()

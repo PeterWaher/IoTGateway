@@ -1117,6 +1117,12 @@
             <param name="Variables">Current variables.</param>
             <returns>Transformed object (possibly the same if no XML Visualizer found).</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GetStatistics">
+            <summary>
+            Returns some basic statistics about the contents of the Markdown object.
+            </summary>
+            <returns>Markdown statistics.</returns>
+        </member>
         <member name="T:Waher.Content.Markdown.AuthorizeExpression">
             <summary>
             Delegate for expression authorization methods.
@@ -1242,6 +1248,286 @@
             HTML Settings used for HTML rendering.
             </summary>
         </member>
+        <member name="T:Waher.Content.Markdown.MarkdownStatistics">
+            <summary>
+            Contains some basic statistical information about a Markdown document.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrElements">
+            <summary>
+            Number of elements in Markdown document (total).
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrAbbreviations">
+            <summary>
+            Number of abbreviations.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrMailHyperLinks">
+            <summary>
+            Number of mail hyperlinks.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrUrlHyperLinks">
+            <summary>
+            Number of URL hyperlinks.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrHyperLinks">
+            <summary>
+            Number of hyperlinks (total).
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrDelete">
+            <summary>
+            Number of deletes (span+block).
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrDetailsReference">
+            <summary>
+            Number of details references.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrEmojiReference">
+            <summary>
+            Number of emoji references.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrEmphasize">
+            <summary>
+            Number of emphasizes.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrFootnoteReference">
+            <summary>
+            Number of footnote references
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrHashTags">
+            <summary>
+            Number of hash-tags.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrHtmlEntities">
+            <summary>
+            Number of HTML entities.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrHtmlUnicodeEntities">
+            <summary>
+            Number of unicode HTML entities.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrHtmlEntitiesTotal">
+            <summary>
+            Number of HTML entities (total).
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrInlineCode">
+            <summary>
+            Number of code inlines.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrInlineHtml">
+            <summary>
+            Number of HTML inlines.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrInlineScript">
+            <summary>
+            Number of script inlines.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrInlineText">
+            <summary>
+            Number of text inlines.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrInsert">
+            <summary>
+            Number of insert (span+block).
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrLineBreak">
+            <summary>
+            Number of line breaks.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrMetaReference">
+            <summary>
+            Number of meta references.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrMultimedia">
+            <summary>
+            Number of multimedia (total).
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrMultiformatMultimedia">
+            <summary>
+            Number of multi-formatted multimedia.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrMultimediaPerExtension">
+            <summary>
+            Number of multimedia, per file extension.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrMultimediaPerContentType">
+            <summary>
+            Number of multimedia, per Content-Type
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrMultimediaPerContentCategory">
+            <summary>
+            Number of multimedia, per Content Category (top part of Content-Type)
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrStrikeThrough">
+            <summary>
+            Number of strike throughs.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrStrong">
+            <summary>
+            Number of strong.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrSubscript">
+            <summary>
+            Number of subscripts.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrSuperScript">
+            <summary>
+            Number of superscripts.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrUnderline">
+            <summary>
+            Number of underlines.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrBlockQuotes">
+            <summary>
+            Number of block quotes.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrBulletLists">
+            <summary>
+            Number of bullet lists.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrCodeBlocks">
+            <summary>
+            Number of code blocks.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrComments">
+            <summary>
+            Number of comments.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrDefinitionDescriptions">
+            <summary>
+            Number of definition descriptions.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrDefinitionLists">
+            <summary>
+            Number of definition lists.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrDefinitionTerms">
+            <summary>
+            Number of definition terms.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrFootnotes">
+            <summary>
+            Number of footnotes.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrHeaders">
+            <summary>
+            Number of headers.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrHorizontalRules">
+            <summary>
+            Number of horizontal rules.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrHtmlBlocks">
+            <summary>
+            Number of HTML blocks.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrInvisibleBreaks">
+            <summary>
+            Number of invisible breaks.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrNumberedItems">
+            <summary>
+            Number of numbered items.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrNumberedLists">
+            <summary>
+            Number of numbered lists.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrParagraph">
+            <summary>
+            Number of paragraphs.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrSections">
+            <summary>
+            Number of sections.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrSectionSeparators">
+            <summary>
+            Number of section separators.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrTables">
+            <summary>
+            Number of tables.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrTaskItems">
+            <summary>
+            Number of task items.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrTaskLists">
+            <summary>
+            Number of task lists.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrUnnumberedItems">
+            <summary>
+            Number of unnumbered items.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrListItems">
+            <summary>
+            Number of list items (total).
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrLists">
+            <summary>
+            Number of lists (total).
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrNestedBlocks">
+            <summary>
+            Number of nested blocks.
+            </summary>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.Atoms.Atom">
             <summary>
             Represents an atom of editable text (i.e. typed character).
@@ -1336,6 +1622,12 @@
             Represents a character in inline code.
             </summary>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.Atoms.InlineCodeCharacter.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.Atoms.InlineHtmlCharacter">
             <summary>
             Represents a character in inline HTML.
@@ -1346,6 +1638,12 @@
             Represents a character in inline HTML.
             </summary>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.Atoms.InlineHtmlCharacter.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.Atoms.InlineTextCharacter">
             <summary>
             Represents a character in inline text.
@@ -1355,6 +1653,12 @@
             <summary>
             Represents a character in inline text.
             </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.Atoms.InlineTextCharacter.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.BlockElement">
             <summary>
@@ -1477,6 +1781,12 @@
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.BlockQuote.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.BulletList">
             <summary>
             Represents a bullet list in a markdown document.
@@ -1555,6 +1865,12 @@
             <param name="Children">New content.</param>
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.BulletList.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.CodeBlock">
             <summary>
@@ -1666,6 +1982,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CodeBlock.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.CommentBlock">
             <summary>
             Represents a comment block in a markdown document.
@@ -1742,6 +2064,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CommentBlock.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.DefinitionDescriptions">
             <summary>
             Definition descriptions
@@ -1812,6 +2140,12 @@
             <param name="Children">New content.</param>
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.DefinitionDescriptions.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.DefinitionList">
             <summary>
@@ -1900,6 +2234,12 @@
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.DefinitionList.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.DefinitionTerms">
             <summary>
             Definition terms
@@ -1971,6 +2311,12 @@
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.DefinitionTerms.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.DeleteBlocks">
             <summary>
             Represents inserted blocks in a markdown document.
@@ -2034,6 +2380,12 @@
             <param name="Children">New content.</param>
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.DeleteBlocks.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.Footnote">
             <summary>
@@ -2136,6 +2488,12 @@
             Serves as the default hash function.
             </summary>
             <returns>A hash code for the current object.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Footnote.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.Header">
             <summary>
@@ -2243,6 +2601,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Header.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.HorizontalRule">
             <summary>
             Horizontal rule
@@ -2319,6 +2683,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.HorizontalRule.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.HtmlBlock">
             <summary>
             Represents a block of HTML in a markdown document.
@@ -2383,6 +2753,12 @@
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.HtmlBlock.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.InsertBlocks">
             <summary>
             Represents inserted blocks in a markdown document.
@@ -2446,6 +2822,12 @@
             <param name="Children">New content.</param>
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.InsertBlocks.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.InvisibleBreak">
             <summary>
@@ -2523,6 +2905,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.InvisibleBreak.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.NestedBlock">
             <summary>
             Represents a nested block with no special formatting rules in a markdown document.
@@ -2594,6 +2982,12 @@
             <param name="Children">New content.</param>
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.NestedBlock.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.NumberedItem">
             <summary>
@@ -2701,6 +3095,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.NumberedItem.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.NumberedList">
             <summary>
             Represents a numbered list in a markdown document.
@@ -2780,6 +3180,12 @@
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.NumberedList.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.Paragraph">
             <summary>
             Represents a paragraph in a markdown document.
@@ -2851,6 +3257,12 @@
             <param name="Children">New content.</param>
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Paragraph.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.Sections">
             <summary>
@@ -2944,6 +3356,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Sections.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.SectionSeparator">
             <summary>
             Section Separator
@@ -3031,6 +3449,12 @@
             Serves as the default hash function.
             </summary>
             <returns>A hash code for the current object.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.SectionSeparator.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.Table">
             <summary>
@@ -3157,6 +3581,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Table.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.TaskItem">
             <summary>
             Represents a task item in a task list.
@@ -3261,6 +3691,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.TaskItem.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.TaskList">
             <summary>
             Represents a task list in a markdown document.
@@ -3331,6 +3767,12 @@
             <param name="Children">New content.</param>
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.TaskList.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.BlockElements.UnnumberedItem">
             <summary>
@@ -3437,6 +3879,12 @@
             Serves as the default hash function.
             </summary>
             <returns>A hash code for the current object.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.UnnumberedItem.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.CodeContent.GraphContent">
             <summary>
@@ -3904,6 +4352,12 @@
         </member>
         <member name="M:Waher.Content.Markdown.Model.MarkdownElement.ToString">
             <inheritdoc/>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.MarkdownElement.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.MarkdownElementChildren">
             <summary>
@@ -4739,6 +5193,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Abbreviation.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.AutomaticLinkMail">
             <summary>
             Automatic Link (e-Mail)
@@ -4822,6 +5282,12 @@
             </summary>
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.AutomaticLinkMail.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.AutomaticLinkUrl">
             <summary>
@@ -4907,6 +5373,12 @@
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.AutomaticLinkUrl.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.Delete">
             <summary>
             Deleted text
@@ -4965,6 +5437,12 @@
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Delete.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.DetailsReference">
             <summary>
             Details reference
@@ -5018,6 +5496,12 @@
             <summary>
             If element, parsed as a span element, can stand outside of a paragraph if alone in it.
             </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.DetailsReference.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.EmojiReference">
             <summary>
@@ -5121,6 +5605,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.EmojiReference.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.Emphasize">
             <summary>
             Emphasized text
@@ -5186,6 +5676,12 @@
             <param name="Children">New content.</param>
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Emphasize.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.FootnoteReference">
             <summary>
@@ -5271,6 +5767,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.FootnoteReference.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.HashTag">
             <summary>
             Represents a hashtag.
@@ -5354,6 +5856,12 @@
             Serves as the default hash function.
             </summary>
             <returns>A hash code for the current object.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.HashTag.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.HtmlEntity">
             <summary>
@@ -5439,6 +5947,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.HtmlEntity.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.HtmlEntityUnicode">
             <summary>
             Represents an HTML entity in Unicode format.
@@ -5522,6 +6036,12 @@
             Serves as the default hash function.
             </summary>
             <returns>A hash code for the current object.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.HtmlEntityUnicode.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.InlineCode">
             <summary>
@@ -5618,6 +6138,12 @@
             <param name="Text">Assembled text.</param>
             <returns>Assembled markdown element.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineCode.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.InlineHTML">
             <summary>
             Inline HTML.
@@ -5707,6 +6233,12 @@
             <param name="Document">Document that will contain the new element.</param>
             <param name="Text">Assembled text.</param>
             <returns>Assembled markdown element.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineHTML.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.InlineScript">
             <summary>
@@ -5888,6 +6420,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineScript.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.InlineText">
             <summary>
             Unformatted text.
@@ -5986,6 +6524,12 @@
             <param name="Text">Assembled text.</param>
             <returns>Assembled markdown element.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineText.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.Insert">
             <summary>
             Inserted text
@@ -6044,6 +6588,12 @@
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Insert.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.LineBreak">
             <summary>
             Line break
@@ -6097,6 +6647,12 @@
             Exports the element to XML.
             </summary>
             <param name="Output">XML Output.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.LineBreak.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.Link">
             <summary>
@@ -6213,6 +6769,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Link.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.LinkReference">
             <summary>
             Link reference
@@ -6301,6 +6863,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.LinkReference.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.MetaReference">
             <summary>
             Meta-data reference
@@ -6384,6 +6952,12 @@
             Serves as the default hash function.
             </summary>
             <returns>A hash code for the current object.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.MetaReference.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.Multimedia">
             <summary>
@@ -6511,6 +7085,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Multimedia.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.MultimediaReference">
             <summary>
             Multimedia reference
@@ -6585,6 +7165,12 @@
             </summary>
             <returns>A hash code for the current object.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.MultimediaReference.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.StrikeThrough">
             <summary>
             Strike Through text
@@ -6651,6 +7237,12 @@
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.StrikeThrough.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.Strong">
             <summary>
             Strong text
@@ -6716,6 +7308,12 @@
             <param name="Children">New content.</param>
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Strong.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.SubScript">
             <summary>
@@ -6803,6 +7401,12 @@
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.SubScript.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.SuperScript">
             <summary>
             Super-script text
@@ -6889,6 +7493,12 @@
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.SuperScript.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.SpanElements.Underline">
             <summary>
             Underlined text
@@ -6954,6 +7564,12 @@
             <param name="Children">New content.</param>
             <param name="Document">Document that will contain the element.</param>
             <returns>Object of same type and meta-data, but with new content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Underline.IncrementStatistics(Waher.Content.Markdown.MarkdownStatistics)">
+            <summary>
+            Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+            </summary>
+            <param name="Statistics">Contains statistics about the Markdown document.</param>
         </member>
         <member name="T:Waher.Content.Markdown.Model.TextAlignment">
             <summary>

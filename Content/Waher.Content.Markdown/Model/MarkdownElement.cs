@@ -278,5 +278,11 @@ namespace Waher.Content.Markdown.Model
 			return Result.ToString();
 		}
 
+		/// <summary>
+		/// Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+		/// </summary>
+		/// <param name="Statistics">Contains statistics about the Markdown document.</param>
+		public abstract void IncrementStatistics(MarkdownStatistics Statistics);
+
 	}
 }

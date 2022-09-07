@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -85,7 +84,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			if (!(Multimedia is null))
 			{
-				await Multimedia.MultimediaHandler.GenerateXAML(Output, TextAlignment, Multimedia.Items, this.Children, 
+				await Multimedia.MultimediaHandler.GenerateXAML(Output, TextAlignment, Multimedia.Items, this.Children,
 					this.aloneInParagraph, this.Document);
 			}
 		}
@@ -140,6 +139,16 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			h1 = ((h1 << 5) + h1) ^ h2;
 
 			return h1;
+		}
+
+		/// <summary>
+		/// Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+		/// </summary>
+		/// <param name="Statistics">Contains statistics about the Markdown document.</param>
+		public override void IncrementStatistics(MarkdownStatistics Statistics)
+		{
+			Multimedia Multimedia = this.Document.GetReference(this.Label);
+			Multimedia.IncrementStatistics(Statistics, Multimedia?.Items);
 		}
 
 	}

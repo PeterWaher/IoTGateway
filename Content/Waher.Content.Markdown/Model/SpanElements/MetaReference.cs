@@ -261,5 +261,14 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			return h1;
 		}
 
+		/// <summary>
+		/// Increments the property or properties in <paramref name="Statistics"/> corresponding to the element.
+		/// </summary>
+		/// <param name="Statistics">Contains statistics about the Markdown document.</param>
+		public override void IncrementStatistics(MarkdownStatistics Statistics)
+		{
+			Statistics.NrMetaReference++;
+		}
+
 	}
 }

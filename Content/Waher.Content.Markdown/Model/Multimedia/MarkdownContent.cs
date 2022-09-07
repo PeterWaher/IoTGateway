@@ -1,12 +1,10 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using System.Threading.Tasks;
-using Waher.Content.Markdown.Functions;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {

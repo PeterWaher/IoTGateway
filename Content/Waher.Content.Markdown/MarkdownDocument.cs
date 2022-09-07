@@ -6557,6 +6557,24 @@ namespace Waher.Content.Markdown
 			}
 		}
 
+		/// <summary>
+		/// Returns some basic statistics about the contents of the Markdown object.
+		/// </summary>
+		/// <returns>Markdown statistics.</returns>
+		public MarkdownStatistics GetStatistics()
+		{
+			MarkdownStatistics Result = new MarkdownStatistics();
+
+			this.ForEach((Element, _) =>
+			{
+				Result.NrElements++;
+				Element.IncrementStatistics(Result);
+				return true;
+			}, null);
+
+			return Result;
+		}
+
 		// TODO: Footnotes in included markdown files.
 	}
 }

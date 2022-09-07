@@ -794,6 +794,15 @@ namespace Waher.Content
 
 					Json.Append(']');
 				}
+				else if (Object is IDictionary Dictionary)
+				{
+					LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();
+
+					foreach (object Key in Dictionary.Keys)
+						Properties.AddLast(new KeyValuePair<string, object>(Key.ToString(), Dictionary[Key]));
+
+					Encode(Properties, Indent, Json);
+				}
 				else if (Object is IEnumerable E)
 				{
 					IEnumerator e = E.GetEnumerator();
@@ -831,9 +840,21 @@ namespace Waher.Content
 				}
 				else
 				{
-					Json.Append('"');
-					Json.Append(Encode(Object.ToString()));
-					Json.Append('"');
+					LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();
+
+					foreach (FieldInfo FI in T.GetRuntimeFields())
+					{
+						if (FI.IsPublic && !FI.IsStatic)
+							Properties.AddLast(new KeyValuePair<string, object>(FI.Name, FI.GetValue(Object)));
+					}
+
+					foreach (PropertyInfo PI in T.GetRuntimeProperties())
+					{
+						if (PI.CanRead && PI.GetMethod.IsPublic && PI.GetIndexParameters().Length == 0)
+							Properties.AddLast(new KeyValuePair<string, object>(PI.Name, PI.GetValue(Object, null)));
+					}
+
+					Encode(Properties, Indent, Json);
 				}
 			}
 		}

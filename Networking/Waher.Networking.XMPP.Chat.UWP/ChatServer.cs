@@ -1884,32 +1884,18 @@ namespace Waher.Networking.XMPP.Chat
 
 			if (Field is Int32Field I32)
 				return new DoubleNumber(I32.Value);
-
-			if (Field is Int64Field I64)
+			else if (Field is Int64Field I64)
 				return new DoubleNumber(I64.Value);
-
-			if (Field is StringField S)
+			else if (Field is StringField S)
 				return new StringValue(S.Value);
-
-			if (Field is BooleanField B)
+			else if (Field is BooleanField B)
 				return new BooleanValue(B.Value);
-
-			if (Field is DateTimeField DT)
+			else if (Field is DateTimeField DT)
 				return new DateTimeValue(DT.Value);
-
-			if (Field is DateField D)
+			else if (Field is DateField D)
 				return new DateTimeValue(D.Value);
-
-			if (Field is DurationField DU)
-				return new ObjectValue(DU.Value);
-
-			if (Field is EnumField E)
-				return new ObjectValue(E.Value);
-
-			if (Field is TimeField T)
-				return new ObjectValue(T.Value);
-
-			return new StringValue(Field.ValueString);
+			else
+				return new ObjectValue(Field.ObjectValue);
 		}
 
 		private string PascalCasing(string Name)

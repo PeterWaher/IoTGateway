@@ -3070,6 +3070,11 @@
             Field Value
             </summary>
         </member>
+        <member name="P:Waher.Things.SensorData.BooleanField.ObjectValue">
+            <summary>
+            Field value, boxed as an object reference.
+            </summary>
+        </member>
         <member name="P:Waher.Things.SensorData.BooleanField.ValueString">
             <summary>
             String representation of field value.
@@ -3181,6 +3186,11 @@
             Field Value
             </summary>
         </member>
+        <member name="P:Waher.Things.SensorData.DateField.ObjectValue">
+            <summary>
+            Field value, boxed as an object reference.
+            </summary>
+        </member>
         <member name="P:Waher.Things.SensorData.DateField.ValueString">
             <summary>
             String representation of field value.
@@ -3290,6 +3300,11 @@
         <member name="P:Waher.Things.SensorData.DateTimeField.Value">
             <summary>
             Field Value
+            </summary>
+        </member>
+        <member name="P:Waher.Things.SensorData.DateTimeField.ObjectValue">
+            <summary>
+            Field value, boxed as an object reference.
             </summary>
         </member>
         <member name="P:Waher.Things.SensorData.DateTimeField.ValueString">
@@ -3433,6 +3448,11 @@
         <member name="P:Waher.Things.SensorData.DurationField.Value">
             <summary>
             Field Value
+            </summary>
+        </member>
+        <member name="P:Waher.Things.SensorData.DurationField.ObjectValue">
+            <summary>
+            Field value, boxed as an object reference.
             </summary>
         </member>
         <member name="P:Waher.Things.SensorData.DurationField.ValueString">
@@ -3635,6 +3655,11 @@
             Enumeration Type.
             </summary>
         </member>
+        <member name="P:Waher.Things.SensorData.EnumField.ObjectValue">
+            <summary>
+            Field value, boxed as an object reference.
+            </summary>
+        </member>
         <member name="P:Waher.Things.SensorData.EnumField.ValueString">
             <summary>
             String representation of field value.
@@ -3800,6 +3825,11 @@
             <summary>
             Provides a string identifying the data type of the field. Should conform to field value data types specified in the IEEE XMPP IoT extensions, if possible:
             http://xmpp.org/extensions/xep-0323.html#fieldvaluetypes
+            </summary>
+        </member>
+        <member name="P:Waher.Things.SensorData.Field.ObjectValue">
+            <summary>
+            Field value, boxed as an object reference.
             </summary>
         </member>
         <member name="P:Waher.Things.SensorData.Field.ReferenceValue">
@@ -4026,6 +4056,11 @@
             Field Value
             </summary>
         </member>
+        <member name="P:Waher.Things.SensorData.Int32Field.ObjectValue">
+            <summary>
+            Field value, boxed as an object reference.
+            </summary>
+        </member>
         <member name="P:Waher.Things.SensorData.Int32Field.ValueString">
             <summary>
             String representation of field value.
@@ -4135,6 +4170,11 @@
         <member name="P:Waher.Things.SensorData.Int64Field.Value">
             <summary>
             Field Value
+            </summary>
+        </member>
+        <member name="P:Waher.Things.SensorData.Int64Field.ObjectValue">
+            <summary>
+            Field value, boxed as an object reference.
             </summary>
         </member>
         <member name="P:Waher.Things.SensorData.Int64Field.ValueString">
@@ -4345,6 +4385,11 @@
             Physical Quantity
             </summary>
         </member>
+        <member name="P:Waher.Things.SensorData.QuantityField.ObjectValue">
+            <summary>
+            Field value, boxed as an object reference.
+            </summary>
+        </member>
         <member name="T:Waher.Things.SensorData.StringField">
             <summary>
             Represents a string value.
@@ -4435,6 +4480,11 @@
         <member name="P:Waher.Things.SensorData.StringField.Value">
             <summary>
             Field Value
+            </summary>
+        </member>
+        <member name="P:Waher.Things.SensorData.StringField.ObjectValue">
+            <summary>
+            Field value, boxed as an object reference.
             </summary>
         </member>
         <member name="P:Waher.Things.SensorData.StringField.ValueString">
@@ -4578,6 +4628,11 @@
         <member name="P:Waher.Things.SensorData.TimeField.Value">
             <summary>
             Field Value
+            </summary>
+        </member>
+        <member name="P:Waher.Things.SensorData.TimeField.ObjectValue">
+            <summary>
+            Field value, boxed as an object reference.
             </summary>
         </member>
         <member name="P:Waher.Things.SensorData.TimeField.ValueString">

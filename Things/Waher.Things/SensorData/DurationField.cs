@@ -166,6 +166,11 @@ namespace Waher.Things.SensorData
 		}
 
 		/// <summary>
+		/// Field value, boxed as an object reference.
+		/// </summary>
+		public override object ObjectValue => this.value;
+
+		/// <summary>
 		/// String representation of field value.
 		/// </summary>
 		public override string ValueString

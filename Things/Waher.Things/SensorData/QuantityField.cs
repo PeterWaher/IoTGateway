@@ -41,7 +41,7 @@ namespace Waher.Things.SensorData
 		/// <param name="Writable">If the field is writable, i.e. corresponds to a control parameter.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
 		/// <param name="StringIdSteps">String ID steps.</param>
-		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit, 
+		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit,
 			FieldType Type, FieldQoS QoS, bool Writable, string Module, params LocalizationStep[] StringIdSteps)
 			: base(Thing, Timestamp, Name, Type, QoS, Writable, Module, StringIdSteps)
 		{
@@ -64,7 +64,7 @@ namespace Waher.Things.SensorData
 		/// <param name="Writable">If the field is writable, i.e. corresponds to a control parameter.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
 		/// <param name="StringIds">String IDs.</param>
-		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit, 
+		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit,
 			FieldType Type, FieldQoS QoS, bool Writable, string Module, params int[] StringIds)
 			: base(Thing, Timestamp, Name, Type, QoS, Writable, Module, StringIds)
 		{
@@ -86,7 +86,7 @@ namespace Waher.Things.SensorData
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
 		/// <param name="StringIdSteps">String ID steps.</param>
-		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit, 
+		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit,
 			FieldType Type, FieldQoS QoS, string Module, params LocalizationStep[] StringIdSteps)
 			: base(Thing, Timestamp, Name, Type, QoS, Module, StringIdSteps)
 		{
@@ -108,7 +108,7 @@ namespace Waher.Things.SensorData
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
 		/// <param name="StringIds">String IDs.</param>
-		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit, 
+		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit,
 			FieldType Type, FieldQoS QoS, string Module, params int[] StringIds)
 			: base(Thing, Timestamp, Name, Type, QoS, Module, StringIds)
 		{
@@ -129,7 +129,7 @@ namespace Waher.Things.SensorData
 		/// <param name="Type">Field Type flags.</param>
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Writable">If the field is writable, i.e. corresponds to a control parameter.</param>
-		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit, 
+		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit,
 			FieldType Type, FieldQoS QoS, bool Writable)
 			: base(Thing, Timestamp, Name, Type, QoS, Writable)
 		{
@@ -161,10 +161,10 @@ namespace Waher.Things.SensorData
 		/// Field Value
 		/// </summary>
 		[ShortName("v")]
-		public double Value 
+		public double Value
 		{
 			get { return this.value; }
-			set { this.value = value; } 
+			set { this.value = value; }
 		}
 
 		/// <summary>
@@ -172,10 +172,10 @@ namespace Waher.Things.SensorData
 		/// </summary>
 		[ShortName("d")]
 		[DefaultValue(0)]
-		public byte NrDecimals 
+		public byte NrDecimals
 		{
 			get { return this.nrDecimals; }
-			set { this.nrDecimals = value; } 
+			set { this.nrDecimals = value; }
 		}
 
 		/// <summary>
@@ -183,10 +183,10 @@ namespace Waher.Things.SensorData
 		/// </summary>
 		[ShortName("u")]
 		[DefaultValueStringEmpty]
-		public string Unit 
+		public string Unit
 		{
 			get { return this.unit; }
-			set { this.unit = value; } 
+			set { this.unit = value; }
 		}
 
 		/// <summary>
@@ -241,6 +241,20 @@ namespace Waher.Things.SensorData
 			get
 			{
 				return new PhysicalQuantity(this.value, new Unit(this.unit));
+			}
+		}
+
+		/// <summary>
+		/// Field value, boxed as an object reference.
+		/// </summary>
+		public override object ObjectValue
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(this.unit))
+					return this.value;
+				else
+					return this.Quantity;
 			}
 		}
 

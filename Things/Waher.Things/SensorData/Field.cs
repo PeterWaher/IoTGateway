@@ -410,6 +410,14 @@ namespace Waher.Things.SensorData
 		}
 
 		/// <summary>
+		/// Field value, boxed as an object reference.
+		/// </summary>
+		public abstract object ObjectValue
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Reference value. Can be used for change calculations, as outlined in 
 		/// http://www.xmpp.org/extensions/inbox/iot-events.html#changeconditions.
 		/// 

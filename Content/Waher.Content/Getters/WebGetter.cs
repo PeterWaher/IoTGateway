@@ -96,9 +96,17 @@ namespace Waher.Content.Getters
 			{
 				AllowAutoRedirect = true,
 				CheckCertificateRevocationList = true,
-				ClientCertificateOptions = ClientCertificateOption.Automatic,
-				SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12
+				ClientCertificateOptions = ClientCertificateOption.Automatic
 			};
+
+			try
+			{
+				Handler.SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12;
+			}
+			catch (PlatformNotSupportedException)
+			{
+				// Ignore
+			}
 
 			if (!(Certificate is null))
 			{

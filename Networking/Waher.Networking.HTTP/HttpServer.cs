@@ -987,7 +987,7 @@ namespace Waher.Networking.HTTP
 				{
 					this.Information("Switching to TLS.");
 
-					await Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls12,
+					await Client.UpgradeToTlsAsServer(this.serverCertificate, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12,
 					this.clientCertificates, null, this.trustClientCertificates);
 
 					if (this.HasSniffers)

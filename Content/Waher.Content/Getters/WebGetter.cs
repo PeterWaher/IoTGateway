@@ -97,7 +97,7 @@ namespace Waher.Content.Getters
 				AllowAutoRedirect = true,
 				CheckCertificateRevocationList = true,
 				ClientCertificateOptions = ClientCertificateOption.Automatic,
-				SslProtocols = SslProtocols.Tls12
+				SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12
 			};
 
 			if (!(Certificate is null))

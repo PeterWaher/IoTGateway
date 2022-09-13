@@ -1629,7 +1629,7 @@ namespace Waher.Networking.XMPP.Chat
 			}
 		}
 
-		private async Task<KeyValuePair<string, string>[]> UpdateReadoutVariables(string Address, InternalReadoutFieldsEventArgs e, string _, string Field)
+		private KeyValuePair<string, string>[] UpdateReadoutVariables(string Address, InternalReadoutFieldsEventArgs e, string _, string Field)
 		{
 			Variables Variables = this.GetVariables(Address);
 			List<KeyValuePair<string, string>> Exp = null;
@@ -1675,7 +1675,7 @@ namespace Waher.Networking.XMPP.Chat
 
 							foreach (KeyValuePair<DateTime, Field> P2 in P.Value)
 							{
-								E = await this.FieldElement(P2.Value);
+								E = this.FieldElement(P2.Value);
 								Values.Add(new ObjectVector(new DateTimeValue(P2.Key),
 									Expression.Encapsulate(E),
 									new ObjectValue(P2.Value.Type), new ObjectValue(P2.Value.QoS)));
@@ -1854,32 +1854,21 @@ namespace Waher.Networking.XMPP.Chat
 			return true;
 		}
 
-		private async Task<IElement> FieldElement(Field Field)
+		private IElement FieldElement(Field Field)
 		{
 			if (Field is QuantityField Q)
 			{
 				if (string.IsNullOrEmpty(Q.Unit))
 					return new DoubleNumber(Q.Value);
 
-				if (Q.Unit == "%")
-					return new PhysicalQuantity(Q.Value, new Script.Units.Unit("%"));
-
 				try
 				{
-					Expression Exp = new Expression(Expression.ToString(Q.Value) + " " + Q.Unit);
-					object Result = await Exp.EvaluateAsync(null);
-
-					if (Result is PhysicalQuantity Q2)
-						return Q2;
-					else if (Result is double d)
-						return new DoubleNumber(d);
+					return Q.Quantity;
 				}
 				catch (Exception)
 				{
-					// Ignore
+					return new StringValue(Q.ValueString);
 				}
-
-				return new StringValue(Q.ValueString);
 			}
 
 			if (Field is Int32Field I32)
@@ -1935,7 +1924,7 @@ namespace Waher.Networking.XMPP.Chat
 			StringBuilder sb = new StringBuilder();
 			QuantityField QF;
 
-			KeyValuePair<string, string>[] Exp = await this.UpdateReadoutVariables(From, e, From, Field);
+			KeyValuePair<string, string>[] Exp = this.UpdateReadoutVariables(From, e, From, Field);
 
 			foreach (Field F in e.Fields)
 			{
@@ -2059,7 +2048,7 @@ namespace Waher.Networking.XMPP.Chat
 			DateTime TP;
 			string s;
 
-			KeyValuePair<string, string>[] Exp = await this .UpdateReadoutVariables(From, e, From, Field);
+			KeyValuePair<string, string>[] Exp = this .UpdateReadoutVariables(From, e, From, Field);
 
 			foreach (Field F in e.Fields)
 			{

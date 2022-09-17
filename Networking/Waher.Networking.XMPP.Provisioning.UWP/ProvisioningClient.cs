@@ -392,9 +392,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// Gets a token for a certicate. This token can be used to identify services, devices or users. The provisioning server will 
-		/// challenge the request, and may choose to challenge it further when it is used, to make sure the sender is the correct holder
-		/// of the private certificate.
+		/// Gets the certificate the corresponds to a token. This certificate can be used to identify services, devices or users.
+		/// Tokens are challenged to make sure they correspond to the holder of the private part of the corresponding certificate.
 		/// </summary>
 		/// <param name="Token">Token corresponding to the requested certificate.</param>
 		/// <param name="Callback">Callback method called, when certificate is available.</param>

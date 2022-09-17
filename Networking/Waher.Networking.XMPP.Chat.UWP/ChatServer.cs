@@ -1107,7 +1107,7 @@ namespace Waher.Networking.XMPP.Chat
 											}
 
 											if (P0 is null)
-												await this.Execute(s, e.From, Support, e.Subject, Row, Last);
+												await this.Execute(s, e.From, Support, e.Subject, Row, Last, true);
 											else if (!(this.provisioningClient is null))
 											{
 												this.provisioningClient.CanControl(e.FromBareJID, new IThingReference[] { ThingRef ?? ThingReference.Empty },
@@ -1142,7 +1142,7 @@ namespace Waher.Networking.XMPP.Chat
 								}
 							}
 
-							await this.Execute(s, e.From, Support, e.Subject, Row, Last);
+							await this.Execute(s, e.From, Support, e.Subject, Row, Last, true);
 						}
 						break;
 				}
@@ -1359,7 +1359,7 @@ namespace Waher.Networking.XMPP.Chat
 			public bool Mail = false;
 		}
 
-		private async Task Execute(string s, string From, RemoteXmppSupport Support, string OrgSubject, string OrgCommand, bool Last)
+		private async Task Execute(string s, string From, RemoteXmppSupport Support, string OrgSubject, string OrgCommand, bool Last, bool CheckAuthorization)
 		{
 			Expression Exp;
 
@@ -1381,9 +1381,10 @@ namespace Waher.Networking.XMPP.Chat
 			Variables.ConsoleOut = new StringWriter(sb);
 			try
 			{
-				if (!Variables.TryGetVariable(" User ", out Variable v) ||
+				if (CheckAuthorization && 
+					(!Variables.TryGetVariable(" User ", out Variable v) ||
 					!(v.ValueObject is IUser User) ||
-					!Exp.ForAll(this.IsAuthorized, User, SearchMethod.TreeOrder))
+					!Exp.ForAll(this.IsAuthorized, User, SearchMethod.TreeOrder)))
 				{
 					throw new Exception("Unauthorized to execute expression.");
 				}
@@ -1962,7 +1963,7 @@ namespace Waher.Networking.XMPP.Chat
 			}
 
 			await this.Send(From, sb, Support, OrgSubject, false);
-			await this.SendExpressionResults(Exp, From, Support, OrgSubject, false);
+			await this.SendExpressionResults(Exp, From, Support, OrgSubject, false, false);
 
 			if (e.Done)
 				await this.SendChatMessage(From, OrgSubject, string.Empty, "Readout complete.", Support, NrRows == 1);
@@ -1977,14 +1978,14 @@ namespace Waher.Networking.XMPP.Chat
 		}
 
 		private async Task SendExpressionResults(KeyValuePair<string, string>[] Exp, string From, RemoteXmppSupport Support,
-			string OrgSubject, bool Last)
+			string OrgSubject, bool Last, bool CheckAuthorization)
 		{
 			if (!(Exp is null))
 			{
 				foreach (KeyValuePair<string, string> Expression in Exp)
 				{
 					await this.SendChatMessage(From, OrgSubject, string.Empty, "## " + MarkdownDocument.Encode(Expression.Key), Support, false);
-					await this.Execute(Expression.Value, From, Support, OrgSubject, string.Empty, Last);
+					await this.Execute(Expression.Value, From, Support, OrgSubject, string.Empty, Last, CheckAuthorization);
 				}
 			}
 		}
@@ -2108,7 +2109,7 @@ namespace Waher.Networking.XMPP.Chat
 			}
 
 			await this.Send(From, sb, Support, OrgSubject, false);
-			await this.SendExpressionResults(Exp, From, Support, OrgSubject, false);
+			await this.SendExpressionResults(Exp, From, Support, OrgSubject, false, false);
 
 			if (e.Done)
 				await this.SendChatMessage(From, OrgSubject, string.Empty, "Readout complete.", Support, NrRows == 1);

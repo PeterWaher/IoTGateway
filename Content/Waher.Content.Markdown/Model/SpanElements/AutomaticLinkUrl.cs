@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Markdown.Model.BlockElements;
@@ -171,6 +172,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Statistics">Contains statistics about the Markdown document.</param>
 		public override void IncrementStatistics(MarkdownStatistics Statistics)
 		{
+			if (Statistics.IntUrlHyperlinks is null)
+				Statistics.IntUrlHyperlinks = new List<string>();
+
+			if (!Statistics.IntUrlHyperlinks.Contains(this.url))
+				Statistics.IntUrlHyperlinks.Add(this.url);
+
 			Statistics.NrUrlHyperLinks++;
 			Statistics.NrHyperLinks++;
 		}

@@ -6572,7 +6572,44 @@ namespace Waher.Content.Markdown
 				return true;
 			}, null);
 
+			Result.MailHyperlinks = Result.IntMailHyperlinks?.ToArray();
+			Result.UrlHyperlinks = Result.IntUrlHyperlinks?.ToArray();
+
+			Dictionary<string, string[]> AsArrays;
+			Dictionary<string, int> AsCounts;
+
+			this.GenerateStatDictionary(Result.IntMultimediaPerContentCategory, out AsArrays, out AsCounts);
+			Result.MultimediaPerContentCategory = AsArrays;
+			Result.NrMultimediaPerContentCategory = AsCounts;
+
+			this.GenerateStatDictionary(Result.IntMultimediaPerContentType, out AsArrays, out AsCounts);
+			Result.MultimediaPerContentType = AsArrays;
+			Result.NrMultimediaPerContentType = AsCounts;
+
+			this.GenerateStatDictionary(Result.IntMultimediaPerExtension, out AsArrays, out AsCounts);
+			Result.MultimediaPerExtension = AsArrays;
+			Result.NrMultimediaPerExtension = AsCounts;
+
 			return Result;
+		}
+
+		private void GenerateStatDictionary(Dictionary<string, List<string>> Temp, out Dictionary<string, string[]> AsArrays, out Dictionary<string, int> AsCounts)
+		{
+			if (Temp is null)
+			{
+				AsArrays = null;
+				AsCounts = null;
+				return;
+			}
+
+			AsArrays = new Dictionary<string, string[]>();
+			AsCounts = new Dictionary<string, int>();
+
+			foreach (KeyValuePair<string, List<string>> P in Temp)
+			{
+				AsArrays[P.Key] = P.Value.ToArray();
+				AsCounts[P.Key] = P.Value.Count;
+			}
 		}
 
 		// TODO: Footnotes in included markdown files.

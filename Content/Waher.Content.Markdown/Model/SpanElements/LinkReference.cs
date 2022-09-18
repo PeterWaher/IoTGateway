@@ -180,6 +180,19 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Statistics">Contains statistics about the Markdown document.</param>
 		public override void IncrementStatistics(MarkdownStatistics Statistics)
 		{
+			Multimedia Multimedia = this.Document.GetReference(this.label);
+
+			if (!(Multimedia is null))
+			{
+				if (Statistics.IntUrlHyperlinks is null)
+					Statistics.IntUrlHyperlinks = new List<string>();
+
+				string Url = Multimedia.Items[0].Url;
+
+				if (!Statistics.IntUrlHyperlinks.Contains(Url))
+					Statistics.IntUrlHyperlinks.Add(Url);
+			}
+
 			Statistics.NrHyperLinks++;
 			Statistics.NrUrlHyperLinks++;
 		}

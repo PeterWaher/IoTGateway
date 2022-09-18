@@ -1360,6 +1360,26 @@
             Number of hyperlinks (total).
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.IntMailHyperlinks">
+            <summary>
+            Internal (during computation of statistics) Mail hyperlinks.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.IntUrlHyperlinks">
+            <summary>
+            Internal (during computation of statistics) URL hyperlinks.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.MailHyperlinks">
+            <summary>
+            Mail hyperlinks.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.UrlHyperlinks">
+            <summary>
+            URL hyperlinks.
+            </summary>
+        </member>
         <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrDelete">
             <summary>
             Number of deletes (span+block).
@@ -1448,6 +1468,36 @@
         <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrMultiformatMultimedia">
             <summary>
             Number of multi-formatted multimedia.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.IntMultimediaPerExtension">
+            <summary>
+            Internal (during computation of statistics) Multimedia links, per file extension.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.IntMultimediaPerContentType">
+            <summary>
+            Internal (during computation of statistics) Multimedia links, per Content-Type
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.IntMultimediaPerContentCategory">
+            <summary>
+            Internal (during computation of statistics) Multimedia links, per Content Category (top part of Content-Type)
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.MultimediaPerExtension">
+            <summary>
+            Multimedia links, per file extension.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.MultimediaPerContentType">
+            <summary>
+            Multimedia links, per Content-Type
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownStatistics.MultimediaPerContentCategory">
+            <summary>
+            Multimedia links, per Content Category (top part of Content-Type)
             </summary>
         </member>
         <member name="P:Waher.Content.Markdown.MarkdownStatistics.NrMultimediaPerExtension">

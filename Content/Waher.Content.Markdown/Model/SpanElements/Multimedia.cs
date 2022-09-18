@@ -349,32 +349,35 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 				foreach (MultimediaItem Item in Items)
 				{
-					if (Statistics.NrMultimediaPerContentType is null)
+					if (Statistics.IntMultimediaPerContentType is null)
 					{
-						Statistics.NrMultimediaPerContentType = new Dictionary<string, int>();
-						Statistics.NrMultimediaPerContentCategory = new Dictionary<string, int>();
-						Statistics.NrMultimediaPerExtension = new Dictionary<string, int>();
+						Statistics.IntMultimediaPerContentType = new Dictionary<string, List<string>>();
+						Statistics.IntMultimediaPerContentCategory = new Dictionary<string, List<string>>();
+						Statistics.IntMultimediaPerExtension = new Dictionary<string, List<string>>();
 					}
 
-					IncItem(Item.ContentType, Statistics.NrMultimediaPerContentType);
-					IncItem(Item.Extension, Statistics.NrMultimediaPerExtension);
+					IncItem(Item.ContentType, Item.Url, Statistics.IntMultimediaPerContentType);
+					IncItem(Item.Extension, Item.Url, Statistics.IntMultimediaPerExtension);
 
 					string s = Item.ContentType;
 					int i = s.IndexOf('/');
 					if (i > 0)
 						s = s.Substring(0, i);
 
-					IncItem(s, Statistics.NrMultimediaPerContentCategory);
+					IncItem(s, Item.Url, Statistics.IntMultimediaPerContentCategory);
 				}
 			}
 		}
 
-		private static void IncItem(string Key, Dictionary<string, int> Dictionary)
+		private static void IncItem(string Key, string Url, Dictionary<string, List<string>> Dictionary)
 		{
-			if (Dictionary.TryGetValue(Key, out int i))
-				Dictionary[Key] = i + 1;
-			else
-				Dictionary[Key] = 1;
+			if (!Dictionary.TryGetValue(Key, out List<string> List))
+			{
+				List = new List<string>();
+				Dictionary[Key] = List;
+			}
+
+			List.Add(Url);
 		}
 
 	}

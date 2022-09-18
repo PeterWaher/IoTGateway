@@ -33,6 +33,26 @@ namespace Waher.Content.Markdown
 		public int NrHyperLinks { get; set; }
 
 		/// <summary>
+		/// Internal (during computation of statistics) Mail hyperlinks.
+		/// </summary>
+		internal List<string> IntMailHyperlinks { get; set; }
+
+		/// <summary>
+		/// Internal (during computation of statistics) URL hyperlinks.
+		/// </summary>
+		internal List<string> IntUrlHyperlinks { get; set; }
+
+		/// <summary>
+		/// Mail hyperlinks.
+		/// </summary>
+		public string[] MailHyperlinks { get; set; }
+
+		/// <summary>
+		/// URL hyperlinks.
+		/// </summary>
+		public string[] UrlHyperlinks { get; set; }
+
+		/// <summary>
 		/// Number of deletes (span+block).
 		/// </summary>
 		public int NrDelete { get; set; }
@@ -121,6 +141,36 @@ namespace Waher.Content.Markdown
 		/// Number of multi-formatted multimedia.
 		/// </summary>
 		public int NrMultiformatMultimedia { get; set; }
+
+		/// <summary>
+		/// Internal (during computation of statistics) Multimedia links, per file extension.
+		/// </summary>
+		internal Dictionary<string, List<string>> IntMultimediaPerExtension { get; set; }
+
+		/// <summary>
+		/// Internal (during computation of statistics) Multimedia links, per Content-Type
+		/// </summary>
+		internal Dictionary<string, List<string>> IntMultimediaPerContentType { get; set; }
+
+		/// <summary>
+		/// Internal (during computation of statistics) Multimedia links, per Content Category (top part of Content-Type)
+		/// </summary>
+		internal Dictionary<string, List<string>> IntMultimediaPerContentCategory { get; set; }
+
+		/// <summary>
+		/// Multimedia links, per file extension.
+		/// </summary>
+		public Dictionary<string, string[]> MultimediaPerExtension { get; set; }
+
+		/// <summary>
+		/// Multimedia links, per Content-Type
+		/// </summary>
+		public Dictionary<string, string[]> MultimediaPerContentType { get; set; }
+
+		/// <summary>
+		/// Multimedia links, per Content Category (top part of Content-Type)
+		/// </summary>
+		public Dictionary<string, string[]> MultimediaPerContentCategory { get; set; }
 
 		/// <summary>
 		/// Number of multimedia, per file extension.

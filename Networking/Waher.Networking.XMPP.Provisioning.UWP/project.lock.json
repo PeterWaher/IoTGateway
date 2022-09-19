@@ -2541,7 +2541,7 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.1",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.4.8"
+          "Waher.Script": "2.4.9"
         }
       },
       "Waher.Content.Xml/2.0.3": {
@@ -2552,7 +2552,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.4.4",
           "Waher.Runtime.Inventory": "1.1.1",
-          "Waher.Script": "2.4.8"
+          "Waher.Script": "2.4.9"
         }
       },
       "Waher.Events/1.1.1": {
@@ -2654,7 +2654,7 @@
           "Waher.Runtime.Cache": "1.0.6"
         }
       },
-      "Waher.Script/2.4.8": {
+      "Waher.Script/2.4.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5185,7 +5185,7 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.1",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.4.8"
+          "Waher.Script": "2.4.9"
         }
       },
       "Waher.Content.Xml/2.0.3": {
@@ -5196,7 +5196,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.4.4",
           "Waher.Runtime.Inventory": "1.1.1",
-          "Waher.Script": "2.4.8"
+          "Waher.Script": "2.4.9"
         }
       },
       "Waher.Events/1.1.1": {
@@ -5298,7 +5298,7 @@
           "Waher.Runtime.Cache": "1.0.6"
         }
       },
-      "Waher.Script/2.4.8": {
+      "Waher.Script/2.4.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7865,7 +7865,7 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.1",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.4.8"
+          "Waher.Script": "2.4.9"
         }
       },
       "Waher.Content.Xml/2.0.3": {
@@ -7876,7 +7876,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.4.4",
           "Waher.Runtime.Inventory": "1.1.1",
-          "Waher.Script": "2.4.8"
+          "Waher.Script": "2.4.9"
         }
       },
       "Waher.Events/1.1.1": {
@@ -7978,7 +7978,7 @@
           "Waher.Runtime.Cache": "1.0.6"
         }
       },
-      "Waher.Script/2.4.8": {
+      "Waher.Script/2.4.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10518,7 +10518,7 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.1",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.4.8"
+          "Waher.Script": "2.4.9"
         }
       },
       "Waher.Content.Xml/2.0.3": {
@@ -10529,7 +10529,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.4.4",
           "Waher.Runtime.Inventory": "1.1.1",
-          "Waher.Script": "2.4.8"
+          "Waher.Script": "2.4.9"
         }
       },
       "Waher.Events/1.1.1": {
@@ -10631,7 +10631,7 @@
           "Waher.Runtime.Cache": "1.0.6"
         }
       },
-      "Waher.Script/2.4.8": {
+      "Waher.Script/2.4.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13207,7 +13207,7 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.1",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.4.8"
+          "Waher.Script": "2.4.9"
         }
       },
       "Waher.Content.Xml/2.0.3": {
@@ -13218,7 +13218,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.4.4",
           "Waher.Runtime.Inventory": "1.1.1",
-          "Waher.Script": "2.4.8"
+          "Waher.Script": "2.4.9"
         }
       },
       "Waher.Events/1.1.1": {
@@ -13320,7 +13320,7 @@
           "Waher.Runtime.Cache": "1.0.6"
         }
       },
-      "Waher.Script/2.4.8": {
+      "Waher.Script/2.4.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15860,7 +15860,7 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.1",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.4.8"
+          "Waher.Script": "2.4.9"
         }
       },
       "Waher.Content.Xml/2.0.3": {
@@ -15871,7 +15871,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.4.4",
           "Waher.Runtime.Inventory": "1.1.1",
-          "Waher.Script": "2.4.8"
+          "Waher.Script": "2.4.9"
         }
       },
       "Waher.Events/1.1.1": {
@@ -15973,7 +15973,7 @@
           "Waher.Runtime.Cache": "1.0.6"
         }
       },
-      "Waher.Script/2.4.8": {
+      "Waher.Script/2.4.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18549,7 +18549,7 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Runtime.Inventory": "1.1.1",
           "Waher.Runtime.Temporary": "1.0.0",
-          "Waher.Script": "2.4.8"
+          "Waher.Script": "2.4.9"
         }
       },
       "Waher.Content.Xml/2.0.3": {
@@ -18560,7 +18560,7 @@
           "System.Xml.XmlDocument": "4.3.0",
           "Waher.Content": "2.4.4",
           "Waher.Runtime.Inventory": "1.1.1",
-          "Waher.Script": "2.4.8"
+          "Waher.Script": "2.4.9"
         }
       },
       "Waher.Events/1.1.1": {
@@ -18662,7 +18662,7 @@
           "Waher.Runtime.Cache": "1.0.6"
         }
       },
-      "Waher.Script/2.4.8": {
+      "Waher.Script/2.4.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -28769,7 +28769,7 @@
       "path": "../../Runtime/Waher.Runtime.Threading/Waher.Runtime.Threading.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Threading/Waher.Runtime.Threading.csproj"
     },
-    "Waher.Script/2.4.8": {
+    "Waher.Script/2.4.9": {
       "type": "project",
       "path": "../../Script/Waher.Script/Waher.Script.csproj",
       "msbuildProject": "../../Script/Waher.Script/Waher.Script.csproj"

@@ -404,5 +404,10 @@ namespace Waher.Script.Model
 			return Result;
 		}
 
+		/// <summary>
+		/// Empty Script Node
+		/// </summary>
+		public static readonly ScriptNode EmptyNode = new ConstantElement(ObjectValue.Null, 0, 0, new Expression("null"));
+
 	}
 }

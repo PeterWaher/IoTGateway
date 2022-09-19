@@ -11339,6 +11339,11 @@
             <param name="Result">Result</param>
             <returns>Finished result.</returns>
         </member>
+        <member name="F:Waher.Script.Model.ScriptNode.EmptyNode">
+            <summary>
+            Empty Script Node
+            </summary>
+        </member>
         <member name="T:Waher.Script.Model.ScriptParser">
             <summary>
             Script parser, for custom parsers.

@@ -1,6 +1,7 @@
 ﻿using System;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Model;
 
 namespace Waher.Script.Objects
 {
@@ -48,11 +49,23 @@ namespace Waher.Script.Objects
 		/// <returns>Result</returns>
 		public int Compare(IElement x, IElement y)
 		{
-			IComparable c1 = x.AssociatedObjectValue as IComparable;
-			IComparable c2 = y.AssociatedObjectValue as IComparable;
+			object o1 = x.AssociatedObjectValue;
+			object o2 = y.AssociatedObjectValue;
+			IComparable c1 = o1 as IComparable;
+			IComparable c2 = o2 as IComparable;
 
 			if (c1 is null || c2 is null)
 			{
+				if (!(o1 is null || o2 is null))
+				{
+					if (o1.Equals(o2))
+						return 0;
+
+					IElement E = BinaryOperator.EvaluateNamedOperator("op_LessThan", x, y, ScriptNode.EmptyNode);
+					if (E is BooleanValue B)
+						return B.Value ? -1 : 1;
+				}
+
 				if (c1 is null && c2 is null)
 					return 0;
 				else if (c1 is null)

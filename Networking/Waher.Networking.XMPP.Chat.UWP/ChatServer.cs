@@ -465,9 +465,9 @@ namespace Waher.Networking.XMPP.Chat
 				}
 
 				List<string> Features = new List<string>()
-					{
-						"Plain text"
-					};
+				{
+					"Plain text"
+				};
 
 				if (Support.Markdown)
 					Features.Add("Markdown");
@@ -540,23 +540,26 @@ namespace Waher.Networking.XMPP.Chat
 
 			string Message = e.Body;
 
-			foreach (XmlNode N in e.Message.ChildNodes)
+			if (string.IsNullOrWhiteSpace(Message))
 			{
-				if (N is XmlElement E)
+				foreach (XmlNode N in e.Message.ChildNodes)
 				{
-					switch (E.LocalName)
+					if (N is XmlElement E)
 					{
-						case "content":
-							if (E.NamespaceURI == "urn:xmpp:content" && XML.Attribute(E, "type") == MarkdownCodec.ContentType)
-							{
-								Support.Markdown = true;
+						switch (E.LocalName)
+						{
+							case "content":
+								if (E.NamespaceURI == "urn:xmpp:content" && XML.Attribute(E, "type") == MarkdownCodec.ContentType)
+								{
+									Support.Markdown = true;
 
-								string s2 = E.InnerText;
+									string s2 = E.InnerText;
 
-								if (!string.IsNullOrEmpty(s2))
-									Message = s2;
-							}
-							break;
+									if (!string.IsNullOrEmpty(s2))
+										Message = s2;
+								}
+								break;
+						}
 					}
 				}
 			}

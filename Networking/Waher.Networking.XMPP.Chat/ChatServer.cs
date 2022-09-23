@@ -564,7 +564,7 @@ namespace Waher.Networking.XMPP.Chat
 				}
 			}
 
-			if (Message is null || string.IsNullOrEmpty(Message = Message.Trim()))
+			if (string.IsNullOrEmpty(Message = Message?.Trim()))
 				return;
 
 			string[] Rows = Message.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries);

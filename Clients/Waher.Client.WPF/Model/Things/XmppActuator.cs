@@ -84,6 +84,13 @@ namespace Waher.Client.WPF.Model.Things
 
 		public override bool CanConfigure => true;
 
+		public override void Configure()
+		{
+			base.Configure();
+		}
+
+		protected override bool UseActuatorControl => true;
+
 		public override void GetConfigurationForm(DataFormResultEventHandler Callback, object State)
 		{
 			XmppAccountNode XmppAccountNode = this.XmppAccountNode;

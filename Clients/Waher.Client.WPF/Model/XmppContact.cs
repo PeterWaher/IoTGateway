@@ -421,8 +421,19 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
+		/// <summary>
+		/// If actuator control should be used (instead of RDP control)
+		/// </summary>
+		protected virtual bool UseActuatorControl => false;
+
 		public override async void Configure()
 		{
+			if (UseActuatorControl)
+			{
+				base.Configure();
+				return;
+			}
+
 			string FullJid = this.LastOnlineFullJid;
 			if (string.IsNullOrEmpty(FullJid))
 				return;

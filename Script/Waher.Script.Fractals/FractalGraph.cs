@@ -200,8 +200,8 @@ namespace Waher.Script.Fractals
 			Variables.Status(Node.Expression, string.Empty);
 		}
 
-		public static void Smooth(double[] R, double[] G, double[] B, double[] A, 
-			double[] BoundaryR, double[] BoundaryG, double[] BoundaryB, double[] BoundaryA, 
+		public static void Smooth(double[] R, double[] G, double[] B, double[] A,
+			double[] BoundaryR, double[] BoundaryG, double[] BoundaryB, double[] BoundaryA,
 			int Width, int Height, ScriptNode Node, Variables Variables)
 		{
 			// Passing color components through the heat equation of 2 spatial dimensions, 
@@ -1240,6 +1240,74 @@ namespace Waher.Script.Fractals
 			}
 
 			return PixelInformation.FromRaw(SKColorType.Bgra8888, rgb, Width, Height, Width << 2);
+		}
+
+		public static void Diff(double[] ColorIndex, int Width, int Height, out double[] dx, out double[] dy)
+		{
+			int Size = Width * Height;
+			int Widthm1 = Width - 1;
+			int Heightm1 = Height - 1;
+			int i, x, y;
+
+			dx = new double[Size];
+			dy = new double[Size];
+
+			dx[0] = ColorIndex[1] - ColorIndex[0];
+			dy[0] = ColorIndex[Height] - ColorIndex[0];
+
+			for (i = x = 1; x < Widthm1; x++, i++)
+			{
+				dx[i] = (ColorIndex[i + 1] - ColorIndex[i - 1]) * 0.5;
+				dy[i] = ColorIndex[i + Width] - ColorIndex[i];
+			}
+
+			dx[i] = ColorIndex[i] - ColorIndex[i - 1];
+			dy[i] = ColorIndex[i + Width] - ColorIndex[i];
+			i++;
+
+			for (y = 1; y < Heightm1; y++)
+			{
+				dx[i] = ColorIndex[i + 1] - ColorIndex[i];
+				dy[i] = (ColorIndex[i + Width] - ColorIndex[i - Width]) * 0.5;
+				i++;
+
+				for (x = 1; x < Widthm1; x++, i++)
+				{
+					dx[i] = (ColorIndex[i + 1] - ColorIndex[i - 1]) * 0.5;
+					dy[i] = (ColorIndex[i + Width] - ColorIndex[i - Width]) * 0.5;
+				}
+
+				dx[i] = ColorIndex[i] - ColorIndex[i - 1];
+				dy[i] = (ColorIndex[i + Width] - ColorIndex[i - Width]) * 0.5;
+				i++;
+			}
+
+			dx[i] = ColorIndex[i + 1] - ColorIndex[i];
+			dy[i] = ColorIndex[i] - ColorIndex[i - Width];
+			i++;
+
+			for (x = 1; x < Widthm1; x++, i++)
+			{
+				dx[i] = (ColorIndex[i + 1] - ColorIndex[i - 1]) * 0.5;
+				dy[i] = ColorIndex[i] - ColorIndex[i - Width];
+			}
+
+			dx[i] = ColorIndex[i] - ColorIndex[i - 1];
+			dy[i] = ColorIndex[i] - ColorIndex[i - Width];
+		}
+
+		public static void Abs(double[] ColorIndex, int Width, int Height, double[] dx, double[] dy)
+		{
+			int i, c = Width * Height;
+			double x, y;
+
+			for (i = 0; i < c; i++)
+			{
+				x = dx[i];
+				y = dy[i];
+
+				ColorIndex[i] = Math.Sqrt(x * x + y * y);
+			}
 		}
 
 	}

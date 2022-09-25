@@ -8,19 +8,19 @@ using Waher.Script.Objects;
 namespace Waher.Script.Xml.Functions
 {
 	/// <summary>
-	/// Performs an XML slection using XPATH.
+	/// Performs a literal string XML slection using XPATH.
 	/// </summary>
-	public class SelectXml : FunctionTwoScalarVariables
+	public class SelectXmlStr : FunctionTwoScalarVariables
 	{
 		/// <summary>
-		/// Performs an XML slection using XPATH.
+		/// Performs a literal string XML slection using XPATH.
 		/// </summary>
 		/// <param name="Xml">XML.</param>
 		/// <param name="Name">Name of child element.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public SelectXml(ScriptNode Xml, ScriptNode Name, int Start, int Length, Expression Expression)
+		public SelectXmlStr(ScriptNode Xml, ScriptNode Name, int Start, int Length, Expression Expression)
 			: base(Xml, Name, Start, Length, Expression)
 		{
 		}
@@ -28,7 +28,7 @@ namespace Waher.Script.Xml.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => nameof(SelectXml);
+		public override string FunctionName => nameof(SelectXmlStr);
 
 		/// <summary>
 		/// Default Argument names
@@ -50,7 +50,7 @@ namespace Waher.Script.Xml.Functions
 			if (Obj is null)
 				return ObjectValue.Null;
 			else if (Obj is XmlNode N)
-				Result = Evaluate(N, Argument2.AssociatedObjectValue?.ToString() ?? string.Empty);
+				Result = SelectXml.Evaluate(N, Argument2.AssociatedObjectValue?.ToString() ?? string.Empty);
 			else
 				throw new ScriptRuntimeException("XPath expression only operate on XML.", this);
 
@@ -74,77 +74,6 @@ namespace Waher.Script.Xml.Functions
 			}
 		}
 
-		internal static XmlNodeList Evaluate(XmlNode N, string XPath)
-		{
-			XmlNamespaceManager NamespaceManager;
-			XmlNodeList Result;
-			XmlElement Root;
-
-			if (N is XmlDocument Doc)
-			{
-				NamespaceManager = new XmlNamespaceManager(Doc.NameTable);
-				Root = Doc.DocumentElement;
-			}
-			else if (N is XmlElement E && !(N.OwnerDocument is null))
-			{
-				NamespaceManager = new XmlNamespaceManager(N.OwnerDocument.NameTable);
-				Root = E;
-			}
-			else
-			{
-				NamespaceManager = null;
-				Root = null;
-			}
-
-			if (NamespaceManager is null)
-				Result = N.SelectNodes(XPath);
-			else
-			{
-				if (XPath.Contains("default:"))
-				{
-					string Namespace = null;
-
-					if (string.IsNullOrEmpty(Root.Prefix) && !string.IsNullOrEmpty(Root.NamespaceURI))
-						Namespace = Root.NamespaceURI;
-					else
-					{
-						LinkedList<XmlElement> ToProcess = new LinkedList<XmlElement>();
-
-						foreach (XmlNode N2 in Root.ChildNodes)
-						{
-							if (N2 is XmlElement E)
-								ToProcess.AddLast(E);
-						}
-
-						while (!(ToProcess.First is null))
-						{
-							Root = ToProcess.First.Value;
-							ToProcess.RemoveFirst();
-
-							if (string.IsNullOrEmpty(Root.Prefix) && !string.IsNullOrEmpty(Root.NamespaceURI))
-							{
-								Namespace = Root.NamespaceURI;
-								break;
-							}
-
-							foreach (XmlNode N2 in Root.ChildNodes)
-							{
-								if (N2 is XmlElement E)
-									ToProcess.AddLast(E);
-							}
-						}
-					}
-
-					if (!string.IsNullOrEmpty(Namespace) && !NamespaceManager.HasNamespace(Namespace))
-						NamespaceManager.AddNamespace("default", Namespace);
-				}
-
-				Result = N.SelectNodes(XPath, NamespaceManager);
-			}
-
-			return Result;
-		}
-
 		/// <summary>
 		/// Encapsulates an XML Node for use in script.
 		/// </summary>
@@ -153,26 +82,18 @@ namespace Waher.Script.Xml.Functions
 		public static IElement ToElement(XmlNode Node)
 		{
 			if (Node is XmlText Text)
-				return ToElement(Text.Value);
+				return new StringValue(Text.Value);
 			else if (Node is XmlCDataSection CData)
-				return ToElement(CData.Value);
+				return new StringValue(CData.Value);
 			else if (Node is XmlAttribute Attr)
-				return ToElement(Attr.Value);
+				return new StringValue(Attr.Value);
 			else
 			{
 				if (Node.HasChildNodes && Node.FirstChild == Node.LastChild && Node.FirstChild is XmlText Text2)
-					return ToElement(Text2.Value);
+					return new StringValue(Text2.Value);
 				else
 					return new ObjectValue(Node);
 			}
-		}
-
-		private static IElement ToElement(string s)
-		{
-			if (Expression.TryParse(s, out double d))
-				return new DoubleNumber(d);
-			else
-				return new StringValue(s);
 		}
 
 	}

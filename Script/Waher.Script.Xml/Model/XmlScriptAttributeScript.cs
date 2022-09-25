@@ -103,6 +103,8 @@ namespace Waher.Script.Xml.Model
 			{
 				if (Variables.TryGetVariable(this.variableReference, out Variable v))
 					Parent.SetAttribute(this.Name, EvaluateString(v.ValueElement));
+				else if (Expression.TryGetConstant(this.variableReference, Variables, out IElement ValueElement))
+					Parent.SetAttribute(this.Name, EvaluateString(ValueElement));
 			}
 		}
 
@@ -114,9 +116,19 @@ namespace Waher.Script.Xml.Model
 		/// <param name="Variables">Current set of variables.</param>
 		internal override async Task BuildAsync(XmlDocument Document, XmlElement Parent, Variables Variables)
 		{
-			string s = await EvaluateStringAsync(this.node, Variables);
-			if (!(s is null))
-				Parent.SetAttribute(this.Name, s);
+			if (string.IsNullOrEmpty(this.variableReference))
+			{
+				string s = await EvaluateStringAsync(this.node, Variables);
+				if (!(s is null))
+					Parent.SetAttribute(this.Name, s);
+			}
+			else
+			{
+				if (Variables.TryGetVariable(this.variableReference, out Variable v))
+					Parent.SetAttribute(this.Name, EvaluateString(v.ValueElement));
+				else if (Expression.TryGetConstant(this.variableReference, Variables, out IElement ValueElement))
+					Parent.SetAttribute(this.Name, EvaluateString(ValueElement));
+			}
 		}
 
 		/// <summary>

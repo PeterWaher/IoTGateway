@@ -187,17 +187,16 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					{
 						List<IMultimediaContent> Handlers = new List<IMultimediaContent>();
 						IMultimediaContent Handler;
-						TypeInfo TI;
 
 						foreach (Type Type in Types.GetTypesImplementingInterface(typeof(IMultimediaContent)))
 						{
-							TI = Type.GetTypeInfo();
-							if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+							ConstructorInfo CI = Types.GetDefaultConstructor(Type);
+							if (CI is null)
 								continue;
 
 							try
 							{
-								Handler = (IMultimediaContent)Types.Instantiate(Type);
+								Handler = (IMultimediaContent)CI.Invoke(Types.NoParameters);
 							}
 							catch (Exception ex)
 							{

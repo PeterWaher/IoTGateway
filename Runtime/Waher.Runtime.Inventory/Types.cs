@@ -20,6 +20,7 @@ namespace Waher.Runtime.Inventory
 		private static readonly SortedDictionary<string, object> qualifiedNames = new SortedDictionary<string, object>();
 		private static readonly Dictionary<string, object> moduleParameters = new Dictionary<string, object>();
 		private static readonly Dictionary<string, MethodInfo> tryParseMethods = new Dictionary<string, MethodInfo>();
+		private static readonly Dictionary<Type, ConstructorInfo> defaultConstructors = new Dictionary<Type, ConstructorInfo>();
 		private static Assembly[] assemblies = null;
 		private static IModule[] modules = null;
 		private static readonly Type[] noTypes = new Type[0];
@@ -408,7 +409,7 @@ namespace Waher.Runtime.Inventory
 			foreach (Type T in GetTypesImplementingInterface(typeof(IModule)))
 			{
 				TI = T.GetTypeInfo();
-				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+				if (TI.IsAbstract || TI.IsInterface || TI.IsGenericTypeDefinition)
 					continue;
 
 				try
@@ -1261,7 +1262,7 @@ namespace Waher.Runtime.Inventory
 
 			TypeInfo TI = Type.GetTypeInfo();
 
-			if (TI.IsInterface || TI.IsAbstract)
+			if (TI.IsInterface || TI.IsAbstract || TI.IsGenericTypeDefinition)
 			{
 				if (DefaultImplementationAttribute.TryGetDefaultImplementation(Type, out Type DefaultImplementation))
 				{
@@ -1503,6 +1504,50 @@ namespace Waher.Runtime.Inventory
 		public static void UnregisterDefaultImplementation(Type From, Type To)
 		{
 			DefaultImplementationAttribute.UnregisterDefaultImplementation(From, To);
+		}
+
+		/// <summary>
+		/// Gets the default constructor of a type, if one exists.
+		/// </summary>
+		/// <param name="Type">Type to instantiate.</param>
+		/// <returns>Default constructor, if one exists, null otherwise.</returns>
+		public static ConstructorInfo GetDefaultConstructor(Type Type)
+		{
+			ConstructorInfo Result;
+
+			lock (defaultConstructors)
+			{
+				if (defaultConstructors.TryGetValue(Type, out Result))
+					return Result;
+			}
+
+			TypeInfo TI = Type.GetTypeInfo();
+			if (TI.IsAbstract || TI.IsInterface || TI.IsGenericTypeDefinition)
+				Result = null;
+			else
+			{
+				Result = null;
+
+				foreach (ConstructorInfo CI in TI.DeclaredConstructors)
+				{
+					if (!CI.IsPublic)
+						continue;
+
+					ParameterInfo[] Parameters = CI.GetParameters();
+					if (Parameters.Length == 0)
+					{
+						Result = CI;
+						break;
+					}
+				}
+			}
+
+			lock (defaultConstructors)
+			{
+				defaultConstructors[Type] = Result;
+			}
+
+			return Result;
 		}
 	}
 }

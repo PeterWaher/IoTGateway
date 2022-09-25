@@ -48,27 +48,12 @@ namespace Waher.Persistence.Serialization
 
 			ConstructorInfo DefaultConstructor;
 			IObjectSerializer S;
-			TypeInfo TI;
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IObjectSerializer)))
 			{
-				TI = T.GetTypeInfo();
-				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
-					continue;
-
-				DefaultConstructor = null;
-
 				try
 				{
-					foreach (ConstructorInfo CI in TI.DeclaredConstructors)
-					{
-						if (CI.IsPublic && CI.GetParameters().Length == 0)
-						{
-							DefaultConstructor = CI;
-							break;
-						}
-					}
-
+					DefaultConstructor = Types.GetDefaultConstructor(T);
 					if (DefaultConstructor is null)
 						continue;
 

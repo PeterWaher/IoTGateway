@@ -14,6 +14,7 @@ namespace Waher.Script.Xml.Model
 	{
 		private ScriptNode node;
 		private bool isAsync;
+		private string variableReference;
 
 		/// <summary>
 		/// XML Script attribute node, whose value is defined by script.
@@ -30,6 +31,11 @@ namespace Waher.Script.Xml.Model
 			this.node?.SetParent(this);
 
 			this.isAsync = Node?.IsAsynchronous ?? false;
+
+			if (Node is VariableReference Ref)
+				this.variableReference = Ref.VariableName;
+			else
+				this.variableReference = null;
 		}
 
 		/// <summary>
@@ -60,6 +66,11 @@ namespace Waher.Script.Xml.Model
 				this.node.SetParent(this);
 
 				this.isAsync = NewNode.IsAsynchronous;
+
+				if (NewNode is VariableReference Ref)
+					this.variableReference = Ref.VariableName;
+				else
+					this.variableReference = null;
 			}
 
 			if (b || (Order == SearchMethod.TreeOrder && !this.node.ForAllChildNodes(Callback, State, Order)))
@@ -82,9 +93,17 @@ namespace Waher.Script.Xml.Model
 		/// <param name="Variables">Current set of variables.</param>
 		internal override void Build(XmlDocument Document, XmlElement Parent, Variables Variables)
 		{
-			string s = EvaluateString(this.node, Variables);
-			if (!(s is null))
-				Parent.SetAttribute(this.Name, s);
+			if (string.IsNullOrEmpty(this.variableReference))
+			{
+				string s = EvaluateString(this.node, Variables);
+				if (!(s is null))
+					Parent.SetAttribute(this.Name, s);
+			}
+			else
+			{
+				if (Variables.TryGetVariable(this.variableReference, out Variable v))
+					Parent.SetAttribute(this.Name, EvaluateString(v.ValueElement));
+			}
 		}
 
 		/// <summary>

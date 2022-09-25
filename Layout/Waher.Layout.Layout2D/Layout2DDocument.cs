@@ -256,7 +256,7 @@ namespace Waher.Layout.Layout2D
 					foreach (Type T in LayoutElementTypes)
 					{
 						TypeInfo TI = T.GetTypeInfo();
-						if (TI.IsAbstract)
+						if (TI.IsAbstract || TI.IsInterface || TI.IsGenericTypeDefinition)
 							continue;
 
 						try
@@ -408,7 +408,7 @@ namespace Waher.Layout.Layout2D
 						break;
 				}
 
-				if(!(this.root is null))
+				if (!(this.root is null))
 					await this.root.Draw(State);
 
 				return new KeyValuePair<SKImage, Map[]>(Surface.Snapshot(), Maps);
@@ -556,7 +556,7 @@ namespace Waher.Layout.Layout2D
 				if (Layout2D.WidthAttribute.Defined || Layout2D.HeightAttribute.Defined)
 				{
 					DrawingState State = new DrawingState(null, Result, Session);
-					
+
 					EvaluationResult<Length> Width = await Attribute<Length>.TryEvaluate(Layout2D.WidthAttribute, Session);
 					if (Width.Ok)
 					{

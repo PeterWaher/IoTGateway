@@ -161,17 +161,16 @@ namespace Waher.Content
 					List<IContentEncoder> Encoders = new List<IContentEncoder>();
 					IContentEncoder Encoder;
 					Type[] EncoderTypes = Types.GetTypesImplementingInterface(typeof(IContentEncoder));
-					TypeInfo TI;
 
 					foreach (Type T in EncoderTypes)
 					{
-						TI = T.GetTypeInfo();
-						if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+						ConstructorInfo CI = Types.GetDefaultConstructor(T);
+						if (CI is null)
 							continue;
 
 						try
 						{
-							Encoder = (IContentEncoder)Types.Instantiate(T);
+							Encoder = (IContentEncoder)CI.Invoke(Types.NoParameters);
 						}
 						catch (Exception)
 						{
@@ -403,17 +402,16 @@ namespace Waher.Content
 					List<IContentDecoder> Decoders = new List<IContentDecoder>();
 					IContentDecoder Decoder;
 					Type[] DecoderTypes = Types.GetTypesImplementingInterface(typeof(IContentDecoder));
-					TypeInfo TI;
 
 					foreach (Type T in DecoderTypes)
 					{
-						TI = T.GetTypeInfo();
-						if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+						ConstructorInfo CI = Types.GetDefaultConstructor(T);
+						if (CI is null)
 							continue;
 
 						try
 						{
-							Decoder = (IContentDecoder)Types.Instantiate(T);
+							Decoder = (IContentDecoder)CI.Invoke(Types.NoParameters);
 						}
 						catch (Exception)
 						{
@@ -875,7 +873,6 @@ namespace Waher.Content
 			List<IContentConverter> Converters = new List<IContentConverter>();
 			IContentConverter Converter;
 			Type[] ConverterTypes = Types.GetTypesImplementingInterface(typeof(IContentConverter));
-			TypeInfo TI;
 
 			convertersByStep.Clear();
 			convertersByFrom.Clear();
@@ -884,13 +881,13 @@ namespace Waher.Content
 			{
 				foreach (Type T in ConverterTypes)
 				{
-					TI = T.GetTypeInfo();
-					if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+					ConstructorInfo CI = Types.GetDefaultConstructor(T);
+					if (CI is null)
 						continue;
 
 					try
 					{
-						Converter = (IContentConverter)Types.Instantiate(T);
+						Converter = (IContentConverter)CI.Invoke(Types.NoParameters);
 					}
 					catch (Exception)
 					{
@@ -990,17 +987,16 @@ namespace Waher.Content
 			Type[] GetterTypes = Types.GetTypesImplementingInterface(typeof(IContentGetter));
 			Dictionary<string, List<IContentGetter>> ByScheme = new Dictionary<string, List<IContentGetter>>();
 			IContentGetter Getter;
-			TypeInfo TI;
 
 			foreach (Type T in GetterTypes)
 			{
-				TI = T.GetTypeInfo();
-				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+				ConstructorInfo CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
 					continue;
 
 				try
 				{
-					Getter = (IContentGetter)Types.Instantiate(T);
+					Getter = (IContentGetter)CI.Invoke(Types.NoParameters);
 				}
 				catch (Exception)
 				{
@@ -1231,17 +1227,16 @@ namespace Waher.Content
 			Type[] PosterTypes = Types.GetTypesImplementingInterface(typeof(IContentPoster));
 			Dictionary<string, List<IContentPoster>> ByScheme = new Dictionary<string, List<IContentPoster>>();
 			IContentPoster Poster;
-			TypeInfo TI;
 
 			foreach (Type T in PosterTypes)
 			{
-				TI = T.GetTypeInfo();
-				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+				ConstructorInfo CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
 					continue;
 
 				try
 				{
-					Poster = (IContentPoster)Types.Instantiate(T);
+					Poster = (IContentPoster)CI.Invoke(Types.NoParameters);
 				}
 				catch (Exception)
 				{
@@ -1484,17 +1479,16 @@ namespace Waher.Content
 			Type[] HeaderTypes = Types.GetTypesImplementingInterface(typeof(IContentHeader));
 			Dictionary<string, List<IContentHeader>> ByScheme = new Dictionary<string, List<IContentHeader>>();
 			IContentHeader Header;
-			TypeInfo TI;
 
 			foreach (Type T in HeaderTypes)
 			{
-				TI = T.GetTypeInfo();
-				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+				ConstructorInfo CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
 					continue;
 
 				try
 				{
-					Header = (IContentHeader)Types.Instantiate(T);
+					Header = (IContentHeader)CI.Invoke(Types.NoParameters);
 				}
 				catch (Exception)
 				{

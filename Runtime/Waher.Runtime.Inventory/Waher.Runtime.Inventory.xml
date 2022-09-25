@@ -766,5 +766,12 @@
             <param name="From">Type of interface.</param>
             <param name="To">Default implementation.</param>
         </member>
+        <member name="M:Waher.Runtime.Inventory.Types.GetDefaultConstructor(System.Type)">
+            <summary>
+            Gets the default constructor of a type, if one exists.
+            </summary>
+            <param name="Type">Type to instantiate.</param>
+            <returns>Default constructor, if one exists, null otherwise.</returns>
+        </member>
     </members>
 </doc>

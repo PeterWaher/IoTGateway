@@ -118,7 +118,7 @@ namespace Waher.IoTGateway.Setup
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IProcessingActivity)))
 			{
-				if (T.IsAbstract)
+				if (T.IsAbstract || T.IsInterface || T.IsGenericTypeDefinition)
 					continue;
 
 				try

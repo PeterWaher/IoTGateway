@@ -536,7 +536,7 @@ namespace Waher.IoTGateway
 
 				foreach (Type SystemConfigurationType in Types.GetTypesImplementingInterface(typeof(ISystemConfiguration)))
 				{
-					if (SystemConfigurationType.IsAbstract)
+					if (SystemConfigurationType.IsAbstract || SystemConfigurationType.IsInterface || SystemConfigurationType.IsGenericTypeDefinition)
 						continue;
 
 					SystemConfigurationTypes[SystemConfigurationType.FullName] = SystemConfigurationType;

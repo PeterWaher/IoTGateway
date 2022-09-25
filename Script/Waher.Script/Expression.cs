@@ -3329,7 +3329,7 @@ namespace Waher.Script
 					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IFunction)))
 					{
 						TI = T.GetTypeInfo();
-						if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+						if (TI.IsAbstract || TI.IsInterface || TI.IsGenericTypeDefinition)
 							continue;
 
 						foreach (ConstructorInfo CI in TI.DeclaredConstructors)
@@ -3450,17 +3450,16 @@ namespace Waher.Script
 					Dictionary<string, IConstant> Found = new Dictionary<string, IConstant>(StringComparer.CurrentCultureIgnoreCase);
 					string[] Aliases;
 					string s;
-					TypeInfo TI;
 
 					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IConstant)))
 					{
-						TI = T.GetTypeInfo();
-						if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+						ConstructorInfo CI = Types.GetDefaultConstructor(T);
+						if (CI is null)
 							continue;
 
 						try
 						{
-							IConstant Constant = (IConstant)Types.Instantiate(T);
+							IConstant Constant = (IConstant)CI.Invoke(Types.NoParameters);
 
 							s = Constant.ConstantName;
 							if (Found.ContainsKey(s))
@@ -3500,17 +3499,16 @@ namespace Waher.Script
 					Dictionary<string, IKeyWord> Found = new Dictionary<string, IKeyWord>(StringComparer.CurrentCultureIgnoreCase);
 					string[] Aliases;
 					string s;
-					TypeInfo TI;
 
 					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IKeyWord)))
 					{
-						TI = T.GetTypeInfo();
-						if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+						ConstructorInfo CI = Types.GetDefaultConstructor(T);
+						if (CI is null)
 							continue;
 
 						try
 						{
-							IKeyWord KeyWord = (IKeyWord)Types.Instantiate(T);
+							IKeyWord KeyWord = (IKeyWord)CI.Invoke(Types.NoParameters);
 
 							s = KeyWord.KeyWord;
 							if (Found.ContainsKey(s))
@@ -5305,21 +5303,7 @@ namespace Waher.Script
 
 			foreach (Type T2 in Types.GetTypesImplementingInterface(typeof(ITypeConverter)))
 			{
-				TypeInfo TI2 = T2.GetTypeInfo();
-				if (TI2.IsAbstract)
-					continue;
-
-				ConstructorInfo DefaultConstructor = null;
-
-				foreach (ConstructorInfo CI in TI2.DeclaredConstructors)
-				{
-					if (CI.GetParameters().Length == 0)
-					{
-						DefaultConstructor = CI;
-						break;
-					}
-				}
-
+				ConstructorInfo DefaultConstructor = Types.GetDefaultConstructor(T2);
 				if (DefaultConstructor is null)
 					continue;
 

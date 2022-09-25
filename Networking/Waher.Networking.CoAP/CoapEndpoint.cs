@@ -86,17 +86,16 @@ namespace Waher.Networking.CoAP
 		{
 			Dictionary<int, CoapOption> Options = new Dictionary<int, CoapOption>();
 			CoapOption Option;
-			TypeInfo TI;
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICoapOption)))
 			{
-				TI = T.GetTypeInfo();
-				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+				ConstructorInfo CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
 					continue;
 
 				try
 				{
-					Option = (CoapOption)Types.Instantiate(T);
+					Option = (CoapOption)CI.Invoke(Types.NoParameters);
 					if (Options.ContainsKey(Option.OptionNumber))
 						throw new Exception("Option number " + Option.OptionNumber + " already defined.");
 
@@ -116,13 +115,13 @@ namespace Waher.Networking.CoAP
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICoapContentFormat)))
 			{
-				TI = T.GetTypeInfo();
-				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+				ConstructorInfo CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
 					continue;
 
 				try
 				{
-					ContentFormat = (ICoapContentFormat)Types.Instantiate(T);
+					ContentFormat = (ICoapContentFormat)CI.Invoke(Types.NoParameters);
 					if (ByCode.ContainsKey(ContentFormat.ContentFormat))
 						throw new Exception("Content format number " + ContentFormat.ContentFormat + " already defined.");
 
@@ -1950,7 +1949,7 @@ namespace Waher.Networking.CoAP
 		public static async Task<KeyValuePair<byte[], int>> EncodeAsync(object Payload)
 		{
 			KeyValuePair<byte[], string> P = await InternetContent.EncodeAsync(Payload, Encoding.UTF8);
-			
+
 			if (contentFormatsByContentType.TryGetValue(P.Value, out ICoapContentFormat Format))
 				return new KeyValuePair<byte[], int>(P.Key, Format.ContentFormat);
 			else

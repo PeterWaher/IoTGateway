@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using Waher.Events;
 using Waher.Runtime.Inventory;
@@ -977,9 +978,13 @@ namespace Waher.Script.Units
 
 			foreach (Type Type in Types.GetTypesImplementingInterface(typeof(IBaseQuantity)))
 			{
+				ConstructorInfo CI = Types.GetDefaultConstructor(Type);
+				if (CI is null)
+					continue;
+
 				try
 				{
-					BaseQuantity = (IBaseQuantity)Types.Instantiate(Type);
+					BaseQuantity = (IBaseQuantity)CI.Invoke(Types.NoParameters);
 				}
 				catch (Exception ex)
 				{
@@ -995,9 +1000,13 @@ namespace Waher.Script.Units
 
 			foreach (Type Type in Types.GetTypesImplementingInterface(typeof(ICompoundQuantity)))
 			{
+				ConstructorInfo CI = Types.GetDefaultConstructor(Type);
+				if (CI is null)
+					continue;
+
 				try
 				{
-					CompoundQuantity = (ICompoundQuantity)Types.Instantiate(Type);
+					CompoundQuantity = (ICompoundQuantity)CI.Invoke(Types.NoParameters);
 				}
 				catch (Exception ex)
 				{
@@ -1011,9 +1020,13 @@ namespace Waher.Script.Units
 
 			foreach (Type Type in Types.GetTypesImplementingInterface(typeof(IDerivedQuantity)))
 			{
+				ConstructorInfo CI = Types.GetDefaultConstructor(Type);
+				if (CI is null)
+					continue;
+
 				try
 				{
-					DerivedQuantity = (IDerivedQuantity)Types.Instantiate(Type);
+					DerivedQuantity = (IDerivedQuantity)CI.Invoke(Types.NoParameters);
 				}
 				catch (Exception ex)
 				{

@@ -124,12 +124,13 @@ namespace Waher.Security.JWS
 				{
 					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IJwsAlgorithm)))
 					{
-						if (T.GetTypeInfo().IsAbstract)
+						ConstructorInfo CI = Types.GetDefaultConstructor(T);
+						if (CI is null)
 							continue;
 
 						try
 						{
-							Algorithm = (IJwsAlgorithm)Types.Instantiate(T);
+							Algorithm = (IJwsAlgorithm)CI.Invoke(Types.NoParameters);
 
 							if (algorithms.ContainsKey(Algorithm.Name))
 								Log.Warning("JWS algorithm with name " + Algorithm.Name + " already registered.");

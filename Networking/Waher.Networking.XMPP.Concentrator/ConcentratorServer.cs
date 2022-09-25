@@ -1949,9 +1949,13 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(INode)))
 			{
+				ConstructorInfo CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
+					continue;
+
 				try
 				{
-					PresumptiveChild = (INode)Types.Instantiate(T);
+					PresumptiveChild = (INode)CI.Invoke(Types.NoParameters);
 
 					if (await Node.AcceptsChildAsync(PresumptiveChild) && await PresumptiveChild.AcceptsParentAsync(Node))
 					{
@@ -2017,11 +2021,18 @@ namespace Waher.Networking.XMPP.Concentrator
 				return;
 			}
 
+			ConstructorInfo CI = Types.GetDefaultConstructor(Type);
+			if (CI is null)
+			{
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
+				return;
+			}
+
 			INode PresumptiveChild;
 
 			try
 			{
-				PresumptiveChild = (INode)Types.Instantiate(Type);
+				PresumptiveChild = (INode)CI.Invoke(Types.NoParameters);
 			}
 			catch (Exception)
 			{
@@ -2084,11 +2095,18 @@ namespace Waher.Networking.XMPP.Concentrator
 				return;
 			}
 
+			ConstructorInfo CI = Types.GetDefaultConstructor(Type);
+			if (CI is null)
+			{
+				e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
+				return;
+			}
+
 			INode PresumptiveChild;
 
 			try
 			{
-				PresumptiveChild = (INode)Types.Instantiate(Type);
+				PresumptiveChild = (INode)CI.Invoke(Types.NoParameters);
 			}
 			catch (Exception)
 			{
@@ -2939,7 +2957,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -2955,7 +2973,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -3037,7 +3055,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -3209,7 +3227,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -3225,7 +3243,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -3241,7 +3259,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -3261,7 +3279,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -3277,7 +3295,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
-		
+
 			return Task.CompletedTask;
 		}
 

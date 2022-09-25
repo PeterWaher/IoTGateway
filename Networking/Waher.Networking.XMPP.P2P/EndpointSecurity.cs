@@ -189,18 +189,19 @@ namespace Waher.Networking.XMPP.P2P
 								continue;
 
 							TypeInfo TI = T.GetTypeInfo();
-							if (TI.IsAbstract)
-								continue;
-
 							if (!(e2eTypes is null) && !E2eTypeInfo.IsAssignableFrom(TI))
 								continue;
 
 							if (!(OnlyIfDerivedFromType?.IsAssignableFrom(TI) ?? true))
 								continue;
 
+							ConstructorInfo CI = Types.GetDefaultConstructor(T);
+							if (CI is null)
+								continue;
+
 							try
 							{
-								IE2eEndpoint Endpoint = (IE2eEndpoint)Types.Instantiate(T);
+								IE2eEndpoint Endpoint = (IE2eEndpoint)CI.Invoke(Types.NoParameters);
 								E2eTypes[Endpoint.Namespace + "#" + Endpoint.LocalName] = Endpoint;
 							}
 							catch (Exception ex)

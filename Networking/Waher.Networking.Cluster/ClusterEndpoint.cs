@@ -432,21 +432,7 @@ namespace Waher.Networking.Cluster
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IProperty)))
 			{
-				TypeInfo TI = T.GetTypeInfo();
-				if (TI.IsAbstract)
-					continue;
-
-				ConstructorInfo DefaultConstructor = null;
-
-				foreach (ConstructorInfo CI in TI.DeclaredConstructors)
-				{
-					if (CI.GetParameters().Length == 0)
-					{
-						DefaultConstructor = CI;
-						break;
-					}
-				}
-
+				ConstructorInfo DefaultConstructor = Types.GetDefaultConstructor(T);
 				if (DefaultConstructor is null)
 					continue;
 

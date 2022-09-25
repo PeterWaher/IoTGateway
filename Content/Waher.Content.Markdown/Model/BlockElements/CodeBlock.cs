@@ -86,17 +86,16 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			List<ICodeContent> CodeContents = new List<ICodeContent>();
 			List<IXmlVisualizer> XmlVisualizers = new List<IXmlVisualizer>();
-			TypeInfo TI;
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICodeContent)))
 			{
-				TI = T.GetTypeInfo();
-				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+				ConstructorInfo CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
 					continue;
 
 				try
 				{
-					ICodeContent CodeContent = (ICodeContent)Types.Instantiate(T);
+					ICodeContent CodeContent = (ICodeContent)CI.Invoke(Types.NoParameters);
 					CodeContents.Add(CodeContent);
 				}
 				catch (Exception ex)
@@ -107,13 +106,13 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IXmlVisualizer)))
 			{
-				TI = T.GetTypeInfo();
-				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+				ConstructorInfo CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
 					continue;
 
 				try
 				{
-					IXmlVisualizer XmlVisualizer = (IXmlVisualizer)Types.Instantiate(T);
+					IXmlVisualizer XmlVisualizer = (IXmlVisualizer)CI.Invoke(Types.NoParameters);
 					XmlVisualizers.Add(XmlVisualizer);
 				}
 				catch (Exception ex)

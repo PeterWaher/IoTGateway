@@ -17,6 +17,7 @@ using Waher.Persistence.MongoDB.Serialization.ReferenceTypes;
 using Waher.Persistence.MongoDB.Serialization.ValueTypes;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Profiling;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.MongoDB
 {
@@ -102,31 +103,16 @@ namespace Waher.Persistence.MongoDB
 
 			ConstructorInfo DefaultConstructor;
 			IObjectSerializer S;
-			TypeInfo TI;
 
 			foreach (Type T in Waher.Runtime.Inventory.Types.GetTypesImplementingInterface(typeof(IObjectSerializer)))
 			{
-				TI = T.GetTypeInfo();
-				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
-					continue;
-
-				DefaultConstructor = null;
-
 				try
 				{
-					foreach (ConstructorInfo CI in TI.DeclaredConstructors)
-					{
-						if (CI.IsPublic && CI.GetParameters().Length == 0)
-						{
-							DefaultConstructor = CI;
-							break;
-						}
-					}
-
+					DefaultConstructor = Types.GetDefaultConstructor(T);
 					if (DefaultConstructor is null)
 						continue;
 
-					S = DefaultConstructor.Invoke(Waher.Runtime.Inventory.Types.NoParameters) as IObjectSerializer;
+					S = DefaultConstructor.Invoke(Types.NoParameters) as IObjectSerializer;
 					if (S is null)
 						continue;
 				}

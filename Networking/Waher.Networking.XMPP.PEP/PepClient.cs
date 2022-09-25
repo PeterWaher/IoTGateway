@@ -334,12 +334,13 @@ namespace Waher.Networking.XMPP.PEP
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IPersonalEvent)))
 			{
-				if (T.GetTypeInfo().IsAbstract)
+				ConstructorInfo CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
 					continue;
 
 				try
 				{
-					IPersonalEvent PersonalEvent = (IPersonalEvent)Types.Instantiate(T);
+					IPersonalEvent PersonalEvent = (IPersonalEvent)CI.Invoke(Types.NoParameters);
 					Result[PersonalEvent.LocalName + " " + PersonalEvent.Namespace] = PersonalEvent;
 				}
 				catch (Exception ex)

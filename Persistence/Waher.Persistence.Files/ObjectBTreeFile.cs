@@ -5458,7 +5458,7 @@ namespace Waher.Persistence.Files
 			}
 			else
 			{
-				Result = await this.ConvertFilterToCursorLocked<T>(Filter.Normalize(), SortOrder);
+				Result = await this.ConvertFilterToCursorLocked<T>(Filter.Normalize(), SortOrder, MaxCount == int.MaxValue);
 
 				if (!(SortOrder is null) && SortOrder.Length > 0)
 					Result = await this.SortLocked<T>(Result, this.ConvertFilter(Filter)?.ConstantFields, SortOrder, true, true);
@@ -5530,7 +5530,7 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		internal async Task<ICursor<T>> ConvertFilterToCursorLocked<T>(Filter Filter, string[] SortOrder)
+		internal async Task<ICursor<T>> ConvertFilterToCursorLocked<T>(Filter Filter, string[] SortOrder, bool IsFull)
 		{
 			Searching.IApplicableFilter ApplicableFilter;
 
@@ -5639,13 +5639,16 @@ namespace Waher.Persistence.Files
 							}
 						}
 
-						this.nrFullFileScans++;
-						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
-							this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
-							string.Empty, Log.CleanStackTrace(Environment.StackTrace),
-							new KeyValuePair<string, object>("Collection", this.collectionName),
-							new KeyValuePair<string, object>("Filter", Filter?.ToString()),
-							new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+						if (IsFull)
+						{
+							this.nrFullFileScans++;
+							Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
+								this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
+								string.Empty, Log.CleanStackTrace(Environment.StackTrace),
+								new KeyValuePair<string, object>("Collection", this.collectionName),
+								new KeyValuePair<string, object>("Filter", Filter?.ToString()),
+								new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+						}
 
 						ApplicableFilter = this.ConvertFilter(Filter);
 						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsyncLocked<T>(),
@@ -5777,13 +5780,16 @@ namespace Waher.Persistence.Files
 
 					if (DoFullScan)
 					{
-						this.nrFullFileScans++;
-						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
-							this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
-							string.Empty, Log.CleanStackTrace(Environment.StackTrace),
-							new KeyValuePair<string, object>("Collection", this.collectionName),
-							new KeyValuePair<string, object>("Filter", Filter?.ToString()),
-							new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+						if (IsFull)
+						{
+							this.nrFullFileScans++;
+							Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
+								this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
+								string.Empty, Log.CleanStackTrace(Environment.StackTrace),
+								new KeyValuePair<string, object>("Collection", this.collectionName),
+								new KeyValuePair<string, object>("Filter", Filter?.ToString()),
+								new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+						}
 
 						ApplicableFilter = this.ConvertFilter(Filter);
 						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsyncLocked<T>(),
@@ -5803,20 +5809,23 @@ namespace Waher.Persistence.Files
 
 					if (NegatedFilter is FilterNot)
 					{
-						this.nrFullFileScans++;
-						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
-							this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
-							string.Empty, Log.CleanStackTrace(Environment.StackTrace),
-							new KeyValuePair<string, object>("Collection", this.collectionName),
-							new KeyValuePair<string, object>("Filter", Filter?.ToString()),
-							new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+						if (IsFull)
+						{
+							this.nrFullFileScans++;
+							Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
+								this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
+								string.Empty, Log.CleanStackTrace(Environment.StackTrace),
+								new KeyValuePair<string, object>("Collection", this.collectionName),
+								new KeyValuePair<string, object>("Filter", Filter?.ToString()),
+								new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+						}
 
 						ApplicableFilter = this.ConvertFilter(Filter);
 						return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsyncLocked<T>(),
 							ApplicableFilter, false, true, this.provider);
 					}
 					else
-						return await this.ConvertFilterToCursorLocked<T>(NegatedFilter, SortOrder);
+						return await this.ConvertFilterToCursorLocked<T>(NegatedFilter, SortOrder, IsFull);
 				}
 				else
 					throw this.UnknownFilterType(Filter);
@@ -5839,13 +5848,16 @@ namespace Waher.Persistence.Files
 							return Cursor;
 					}
 
-					this.nrFullFileScans++;
-					Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
-						this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
-						string.Empty, Log.CleanStackTrace(Environment.StackTrace),
-						new KeyValuePair<string, object>("Collection", this.collectionName),
-						new KeyValuePair<string, object>("Filter", Filter?.ToString()),
-						new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+					if (IsFull)
+					{
+						this.nrFullFileScans++;
+						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
+							this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
+							string.Empty, Log.CleanStackTrace(Environment.StackTrace),
+							new KeyValuePair<string, object>("Collection", this.collectionName),
+							new KeyValuePair<string, object>("Filter", Filter?.ToString()),
+							new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+					}
 
 					ApplicableFilter = this.ConvertFilter(Filter);
 					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsyncLocked<T>(),
@@ -5885,13 +5897,16 @@ namespace Waher.Persistence.Files
 				}
 				else if (Filter is FilterFieldNotEqualTo)
 				{
-					this.nrFullFileScans++;
-					Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
-						this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
-						string.Empty, Log.CleanStackTrace(Environment.StackTrace),
-						new KeyValuePair<string, object>("Collection", this.collectionName),
-						new KeyValuePair<string, object>("Filter", Filter?.ToString()),
-						new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+					if (IsFull)
+					{
+						this.nrFullFileScans++;
+						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
+							this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
+							string.Empty, Log.CleanStackTrace(Environment.StackTrace),
+							new KeyValuePair<string, object>("Collection", this.collectionName),
+							new KeyValuePair<string, object>("Filter", Filter?.ToString()),
+							new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+					}
 
 					ApplicableFilter = this.ConvertFilter(Filter);
 					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsyncLocked<T>(),
@@ -5976,13 +5991,16 @@ namespace Waher.Persistence.Files
 
 				if (string.IsNullOrEmpty(ConstantPrefix))
 				{
-					this.nrFullFileScans++;
-					Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
-						this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
-						string.Empty, Log.CleanStackTrace(Environment.StackTrace),
-						new KeyValuePair<string, object>("Collection", this.collectionName),
-						new KeyValuePair<string, object>("Filter", Filter?.ToString()),
-						new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+					if (IsFull)
+					{
+						this.nrFullFileScans++;
+						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
+							this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
+							string.Empty, Log.CleanStackTrace(Environment.StackTrace),
+							new KeyValuePair<string, object>("Collection", this.collectionName),
+							new KeyValuePair<string, object>("Filter", Filter?.ToString()),
+							new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+					}
 
 					return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsyncLocked<T>(), FilterFieldLikeRegEx2,
 						false, true, this.provider);
@@ -6009,13 +6027,16 @@ namespace Waher.Persistence.Files
 			}
 			else if (Filter is ICustomFilter CustomFilter)
 			{
-				this.nrFullFileScans++;
-				Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
-					this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
-					string.Empty, Log.CleanStackTrace(Environment.StackTrace),
-					new KeyValuePair<string, object>("Collection", this.collectionName),
-					new KeyValuePair<string, object>("Filter", Filter?.ToString()),
-					new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+				if (IsFull)
+				{
+					this.nrFullFileScans++;
+					Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.",
+						this.fileName, string.Empty, "DBOpt", EventLevel.Minor, string.Empty,
+						string.Empty, Log.CleanStackTrace(Environment.StackTrace),
+						new KeyValuePair<string, object>("Collection", this.collectionName),
+						new KeyValuePair<string, object>("Filter", Filter?.ToString()),
+						new KeyValuePair<string, object>("SortOrder", ToString(SortOrder)));
+				}
 
 				return new Searching.FilteredCursor<T>(await this.GetTypedEnumeratorAsyncLocked<T>(), new Searching.FilterCustom(CustomFilter),
 					false, true, this.provider);

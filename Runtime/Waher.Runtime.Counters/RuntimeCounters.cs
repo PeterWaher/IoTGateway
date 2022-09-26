@@ -19,6 +19,7 @@ namespace Waher.Runtime.Counters
 		{
 			public TaskCompletionSource<bool> Stored = new TaskCompletionSource<bool>();
 			public RuntimeCounter Counter;
+			public bool Changed;
 		}
 
 		static RuntimeCounters()
@@ -32,7 +33,20 @@ namespace Waher.Runtime.Counters
 		{
 			try
 			{
-				await Database.Update(e.Value.Counter);
+				lock (synchObject)
+				{
+					if (!e.Value.Changed)
+					{
+						e.Value.Stored.TrySetResult(true);
+						return;
+					}
+				}
+
+				if (string.IsNullOrEmpty(e.Value.Counter.ObjectId))
+					await Database.Insert(e.Value.Counter);
+				else
+					await Database.Update(e.Value.Counter);
+
 				e.Value.Stored.TrySetResult(true);
 			}
 			catch (Exception)
@@ -76,6 +90,8 @@ namespace Waher.Runtime.Counters
 				if (counters.TryGetValue(Key, out CounterRec Rec))
 				{
 					Rec.Counter.Counter += Delta;
+					Rec.Changed = true;
+
 					return Rec.Counter.Counter;
 				}
 			}
@@ -87,6 +103,8 @@ namespace Waher.Runtime.Counters
 				if (counters.TryGetValue(Key, out CounterRec Rec))
 				{
 					Rec.Counter.Counter += Delta;
+					Rec.Changed = true;
+
 					return Rec.Counter.Counter;
 				}
 				else
@@ -101,7 +119,8 @@ namespace Waher.Runtime.Counters
 
 						counters[Key] = new CounterRec()
 						{
-							Counter = Counter
+							Counter = Counter,
+							Changed = true
 						};
 					}
 					else
@@ -109,15 +128,14 @@ namespace Waher.Runtime.Counters
 						Counter.Counter += Delta;
 						counters[Key] = new CounterRec()
 						{
-							Counter = Counter
+							Counter = Counter,
+							Changed = true
 						};
 
 						return Counter.Counter;
 					}
 				}
 			}
-
-			await Database.InsertLazy(Counter);
 
 			return Counter.Counter;
 		}
@@ -174,22 +192,20 @@ namespace Waher.Runtime.Counters
 
 						counters[Key] = new CounterRec()
 						{
-							Counter = Counter
+							Counter = Counter,
+							Changed = false
 						};
 					}
 					else
 					{
 						counters[Key] = new CounterRec()
 						{
-							Counter = Counter
+							Counter = Counter,
+							Changed = false
 						};
-
-						return Counter.Counter;
 					}
 				}
 			}
-
-			await Database.InsertLazy(Counter);
 
 			return Counter.Counter;
 		}

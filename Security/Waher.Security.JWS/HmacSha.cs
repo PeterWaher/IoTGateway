@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Security.JWS
+﻿namespace Waher.Security.JWS
 {
 	/// <summary>
 	/// Abstract base class for HMAC SHA JWS algorithms.

@@ -2032,13 +2032,13 @@ The following functions are available in web pages hosted by the IoT Gateway:
 |-------------------------------------|-------------|
 | `BareJID(JID)`                      | Returns the Bare JID of `JID` |
 | `ClearCaches()`                     | Clears internal caches. |
-| `DecCounter(CounterName)            | Decrements a counter, given its name, and returns the decremented count. | `DecCounter("My Counter")` |
+| `DecCounter(CounterName)            | Decrements a counter, given its name, and returns the decremented count. |
 | `FullJID(JID)`                      | Returns the Full JID of `JID`. If `JID` is a Bare JID, the Full JID of the last online presence is returned. |
-| `GetCounter(CounterName)            | Gets the current count of a counter, given its name. | `GetCounter("My Counter")` |
+| `GetCounter(CounterName)            | Gets the current count of a counter, given its name. |
 | `GetTabIDs([Page[,QueryFilter]])`   | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Pages can be optionally restricted to a given `Page`, and optionally further restricted by a query filter, as an [object ex-nihilo](#objectExNihilo) specifying query parameters and values. |
 | `GetTabIDs(Pages)`                  | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Tabs returned must be showing any of the pages provied in the vector `Pages`. |
 | `GetTabIDs(User)`                   | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Tabs returned must be viewed by the user identitied by the user object `User`. |
-| `IncCounter(CounterName)            | Increments a counter, given its name, and returns the incremented count. | `IncCounter("My Counter")` |
+| `IncCounter(CounterName)            | Increments a counter, given its name, and returns the incremented count. |
 | `ReloadPage(...)`                   | Reloads all open pages (tabs), defined by its arguments. The same types of arguments as for the `GetTabIDs` function can be used. |
 | `PushEvent(..., Event, Data)`       | Pushes an event to all open pages (tabs), defined by the arguments defined by `...` (same types of arguments as for the `GetTabIDs` function). Data can be a string, or any object that can be encoded as JSON. The `Event` translates to a Javascript function, with one argument, that will be called. The `Data` will be passed on as the argument. |
 

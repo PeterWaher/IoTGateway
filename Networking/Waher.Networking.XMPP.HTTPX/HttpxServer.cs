@@ -86,7 +86,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			if (this.requiresE2e && !e.UsesE2eEncryption)
 			{
-				e.IqError(new Networking.XMPP.StanzaErrors.ForbiddenException("End-to-end encryption required.", e.IQ));
+				e.IqError(new StanzaErrors.ForbiddenException("End-to-end encryption required.", e.IQ));
 				return;
 			}
 			

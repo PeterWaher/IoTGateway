@@ -54,10 +54,15 @@ namespace Waher.Security.JWT
 			return "Bearer realm=\"" + this.realm + "\"";
 		}
 
-		private string GetAccessToken(HttpRequest Request)
+		/// <summary>
+		/// Gets the access token from an HTTP request.
+		/// </summary>
+		/// <param name="Request">HTTP Request object.</param>
+		/// <returns>Access token, or null if none.</returns>
+		public static string GetAccessToken(HttpRequest Request)
 		{
 			HttpFieldAuthorization Authorization = Request.Header.Authorization;
-			if (Authorization != null && Authorization.Value.StartsWith("Bearer ", StringComparison.CurrentCultureIgnoreCase))
+			if (!(Authorization is null) && Authorization.Value.StartsWith("Bearer ", StringComparison.CurrentCultureIgnoreCase))
 				return Authorization.Value.Substring(7).Trim();
 
 			if (Request.Header.TryGetQueryParameter("access_token", out string Token))      // RFC 6750, §2.3: https://www.rfc-editor.org/rfc/rfc6750#section-2.3
@@ -73,7 +78,7 @@ namespace Waher.Security.JWT
 		/// <returns>User object, if authenticated, or null otherwise.</returns>
 		public override async Task<IUser> IsAuthenticated(HttpRequest Request)
 		{
-			string TokenStr = this.GetAccessToken(Request);
+			string TokenStr = GetAccessToken(Request);
 			if (string.IsNullOrEmpty(TokenStr))
 				return null;
 
@@ -81,10 +86,16 @@ namespace Waher.Security.JWT
 			{
 				JwtToken Token = new JwtToken(TokenStr);
 				string UserName = Token.Subject;
-
-				if (!this.factory.IsValid(Token) || UserName is null)
+				
+				if (UserName is null)
 				{
-					LoginAuditor.Fail("Login attempt failed.", UserName ?? string.Empty, Request.RemoteEndPoint, "HTTP");
+					LoginAuditor.Fail("Login attempt failed. No user defined.", UserName ?? string.Empty, Request.RemoteEndPoint, "HTTP");
+					return null;
+				}
+
+				if (!this.factory.IsValid(Token, out Reason Reason))
+				{
+					LoginAuditor.Fail("Login attempt failed. Reason: " + Reason.ToString(), UserName ?? string.Empty, Request.RemoteEndPoint, "HTTP");
 					return null;
 				}
 

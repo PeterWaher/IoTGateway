@@ -42,42 +42,26 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <summary>
 		/// HTTPX Response.
 		/// </summary>
-		public HttpxResponseEventArgs HttpxResponse
-		{
-			get { return this.response; }
-		}
+		public HttpxResponseEventArgs HttpxResponse => this.response;
 
 		/// <summary>
 		/// Data response, possibly partial.
 		/// </summary>
-		public byte[] Data
-		{
-			get { return this.data; }
-		}
+		public byte[] Data => this.data;
 
 		/// <summary>
 		/// Stream ID.
 		/// </summary>
-		public string StreamId
-		{
-			get { return this.streamId; }
-		}
+		public string StreamId => this.streamId;
 
 		/// <summary>
 		/// If it is the last data block.
 		/// </summary>
-		public bool Last
-		{
-			get { return this.last; }
-		}
+		public bool Last => this.last;
 
 		/// <summary>
 		/// State object passed to the original request.
 		/// </summary>
-		public object State
-		{
-			get { return this.state; }
-		}
-
+		public object State => this.state;
 	}
 }

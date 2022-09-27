@@ -27,6 +27,11 @@ namespace Waher.Networking.XMPP.HTTPX
 		public const string Namespace = "urn:xmpp:http";
 
 		/// <summary>
+		/// urn:xmpp:http
+		/// </summary>
+		public const string NamespaceJwt = "urn:xmpp:jwt:0";
+
+		/// <summary>
 		/// http://jabber.org/protocol/shim
 		/// </summary>
 		public const string NamespaceHeaders = "http://jabber.org/protocol/shim";
@@ -191,7 +196,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Headers">HTTP headers of the request.</param>
 		public void POST(string To, string Resource, Stream DataStream, string ContentType,
-			HttpxResponseEventHandler Callback, HttpxResponseDataEventHandler DataCallback, 
+			HttpxResponseEventHandler Callback, HttpxResponseDataEventHandler DataCallback,
 			object State, params HttpField[] Headers)
 		{
 			List<HttpField> Headers2 = new List<HttpField>()
@@ -1008,5 +1013,94 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
+		/// <summary>
+		/// Gets a JWT token from the server to which the client is connceted. The JWT token encodes the
+		/// current XMPP connection, and can be used in distributed transactions over other protocols
+		/// (such as HTTP) to refer back to the current connection.
+		/// </summary>
+		/// <param name="Seconds">Requested number of seconds for which the token will be valid.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetJwtToken(int Seconds, TokenResponseEventHandler Callback, object State)
+		{
+			this.GetJwtToken(this.client.Domain, Seconds, Callback, State);
+		}
+
+		/// <summary>
+		/// Gets a JWT token from a token factory addressed by <paramref name="Address"/>.
+		/// </summary>
+		/// <param name="Address">Address to token factory.</param>
+		/// <param name="Seconds">Requested number of seconds for which the token will be valid.</param>
+		/// <param name="Callback">Method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void GetJwtToken(string Address, int Seconds, TokenResponseEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<jwt xmlns='");
+			Xml.Append(NamespaceJwt);
+			Xml.Append("' seconds='");
+			Xml.Append(Seconds.ToString());
+			Xml.Append("'/>");
+
+			this.client.SendIqGet(Address, Xml.ToString(), async (sender, e) =>
+			{
+				string Token = null;
+
+				if (e.Ok && !(e.FirstElement is null) && e.FirstElement.LocalName == "token" && e.FirstElement.NamespaceURI == NamespaceJwt)
+					Token = e.FirstElement.InnerText;
+				else
+					e.Ok = false;
+
+				if (!(Callback is null))
+				{
+					try
+					{
+						await Callback(this, new TokenResponseEventArgs(e, Token));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+			}, State);
+		}
+
+		/// <summary>
+		/// Gets a JWT token from the server to which the client is connceted. The JWT token encodes the
+		/// current XMPP connection, and can be used in distributed transactions over other protocols
+		/// (such as HTTP) to refer back to the current connection.
+		/// </summary>
+		/// <param name="Seconds">Requested number of seconds for which the token will be valid.</param>
+		/// <returns>Generated token</returns>
+		/// <exception cref="Exception">If unable to create token.</exception>
+		public Task<string> GetJwtTokenAsync(int Seconds)
+		{
+			return this.GetJwtTokenAsync(this.client.Domain, Seconds);
+		}
+
+		/// <summary>
+		/// Gets a JWT token from a token factory addressed by <paramref name="Address"/>.
+		/// </summary>
+		/// <param name="Address">Address to token factory.</param>
+		/// <param name="Seconds">Requested number of seconds for which the token will be valid.</param>
+		/// <returns>Generated token</returns>
+		/// <exception cref="Exception">If unable to create token.</exception>
+		public Task<string> GetJwtTokenAsync(string Address, int Seconds)
+		{
+			TaskCompletionSource<string> Result = new TaskCompletionSource<string>();
+
+			this.GetJwtToken(Address, Seconds, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.TrySetResult(e.Token);
+				else
+					Result.TrySetException(e.StanzaError ?? new Exception("Unable to get token."));
+
+				return Task.CompletedTask;
+			}, null);
+
+			return Result.Task;
+		}
 	}
 }

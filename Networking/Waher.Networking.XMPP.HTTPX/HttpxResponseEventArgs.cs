@@ -49,50 +49,32 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <summary>
 		/// HTTP Response.
 		/// </summary>
-		public HttpResponse HttpResponse
-		{
-			get { return this.response; }
-		}
+		public HttpResponse HttpResponse => this.response;
 
 		/// <summary>
 		/// HTTP version.
 		/// </summary>
-		public double Version
-		{
-			get { return this.version; }
-		}
+		public double Version => this.version;
 
 		/// <summary>
 		/// HTTP status code.
 		/// </summary>
-		public int StatusCode
-		{
-			get { return this.statusCode; }
-		}
+		public int StatusCode => this.statusCode;
 
 		/// <summary>
 		/// HTTP status message.
 		/// </summary>
-		public string StatusMessage
-		{
-			get { return this.statusMessage; }
-		}
+		public string StatusMessage => this.statusMessage;
 
 		/// <summary>
 		/// If the response has data.
 		/// </summary>
-		public bool HasData
-		{
-			get { return this.hasData; }
-		}
+		public bool HasData => this.hasData;
 
 		/// <summary>
 		/// Any binary data directly available in the response. If <see cref="HasData"/>=true and <see cref="Data"/>=null,
 		/// binary data will be received in chunks.
 		/// </summary>
-		public byte[] Data
-		{
-			get { return this.data; }
-		}
+		public byte[] Data => this.data;
 	}
 }

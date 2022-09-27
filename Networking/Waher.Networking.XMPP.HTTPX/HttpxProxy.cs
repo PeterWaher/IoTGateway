@@ -22,6 +22,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private IPostResource postResource = null;
 		private InBandBytestreams.IbbClient ibbClient = null;
 		private P2P.SOCKS5.Socks5Proxy socks5Proxy = null;
+		private bool disposed = false;
 
 		/// <summary>
 		/// Implements a Proxy resource that allows Web clients to fetch HTTP-based resources over HTTPX.
@@ -74,7 +75,13 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			this.httpxClient?.Dispose();
 			this.httpxClient = null;
+			this.disposed = true;
 		}
+
+		/// <summary>
+		/// If the proxy has been disposed.
+		/// </summary>
+		public bool Disposed => this.disposed;
 
 		/// <summary>
 		/// Post resource for responses.
@@ -299,6 +306,17 @@ namespace Waher.Networking.XMPP.HTTPX
 			RosterItem Item = this.defaultXmppClient.GetRosterItem(BareJID);
 			if (Item is null)
 			{
+				if (BareJID.IndexOf('@') < 0)	// Server or component hosts HTTPX interface
+				{
+					return new GetClientResponse()
+					{
+						BareJid = BareJID,
+						FullJid = BareJID,
+						HttpxClient = this.DefaultHttpxClient,
+						LocalUrl = LocalUrl
+					};
+				}
+
 				if (!XmppClient.BareJidRegEx.IsMatch(BareJID))
 					throw new BadRequestException("Invalid Bare JID.");
 

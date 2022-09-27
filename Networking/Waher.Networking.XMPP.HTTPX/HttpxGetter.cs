@@ -19,8 +19,6 @@ namespace Waher.Networking.XMPP.HTTPX
 	/// </summary>
 	public class HttpxGetter : IContentGetter
 	{
-		private static HttpxProxy proxy = null;
-
 		/// <summary>
 		/// Content Getter, retrieving content using the HTTPX URI Scheme.
 		/// 
@@ -145,21 +143,54 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
 		public async Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
-			if (proxy is null)
-			{
-				if (!Types.TryGetModuleParameter("HTTPX", out object Obj) ||
-					!(Obj is HttpxProxy Proxy))
-				{
-					throw new InvalidOperationException("A HTTPX Proxy object has not been registered.");
-				}
+			HttpxClient HttpxClient;
+			string BareJid;
+			string FullJid;
+			string LocalUrl;
 
+			if (Types.TryGetModuleParameter("HTTPX", out object Obj) && Obj is HttpxProxy Proxy)
+			{
 				if (Proxy.DefaultXmppClient.Disposed || Proxy.ServerlessMessaging.Disposed)
 					throw new InvalidOperationException("Service is being shut down.");
 
-				proxy = Proxy;
-			}
+				GetClientResponse Rec = await Proxy.GetClientAsync(Uri);
 
-			GetClientResponse Rec = await proxy.GetClientAsync(Uri);
+				BareJid = Rec.BareJid;
+				FullJid = Rec.FullJid;
+				HttpxClient = Rec.HttpxClient;
+				LocalUrl = Rec.LocalUrl;
+			}
+			else if (Types.TryGetModuleParameter("XMPP", out Obj) && Obj is XmppClient XmppClient)
+			{
+				if (XmppClient.Disposed)
+					throw new InvalidOperationException("Service is being shut down.");
+
+				if (!XmppClient.TryGetExtension(out HttpxClient HttpxClient2))
+					throw new InvalidOperationException("No HTTPX Extesion has been registered on the XMPP Client.");
+
+				HttpxClient = HttpxClient2;
+
+				if (string.IsNullOrEmpty(Uri.UserInfo))
+					FullJid = BareJid = Uri.Authority;
+				else
+				{
+					BareJid = Uri.UserInfo + "@" + Uri.Authority;
+
+					RosterItem Item = XmppClient.GetRosterItem(BareJid);
+
+					if (Item is null)
+						throw new ConflictException("No approved presence subscription with " + BareJid + ".");
+					else if (!Item.HasLastPresence || !Item.LastPresence.IsOnline)
+						throw new ServiceUnavailableException(BareJid + " is not online.");
+					else
+						FullJid = Item.LastPresenceFullJid;
+				}
+
+				LocalUrl = Uri.PathAndQuery + Uri.Fragment;
+			}
+			else
+				throw new InvalidOperationException("An HTTPX Proxy or XMPP Client Module Parameter has not been registered.");
+
 			List<HttpField> Headers2 = new List<HttpField>();
 			bool HasHost = false;
 
@@ -168,7 +199,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				switch (Header.Key.ToLower())
 				{
 					case "host":
-						Headers2.Add(new HttpField("Host", Rec.BareJid));
+						Headers2.Add(new HttpField("Host", BareJid));
 						HasHost = true;
 						break;
 
@@ -199,7 +230,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				// TODO: Transport public part of Client certificate, if provided.
 
-				Rec.HttpxClient?.Request(Rec.FullJid, "GET", Rec.LocalUrl, async (sender, e) =>
+				HttpxClient?.Request(FullJid, "GET", LocalUrl, async (sender, e) =>
 				{
 					if (e.Ok)
 					{
@@ -261,7 +292,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						await State.File.ReadAsync(Data, 0, Len);
 					}
 
-					throw GetExceptionObject(State.StatusCode, State.StatusMessage, 
+					throw GetExceptionObject(State.StatusCode, State.StatusMessage,
 						State.HttpResponse, Data, ContentType);
 				}
 			}
@@ -283,41 +314,50 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			switch (StatusCode)
 			{
-				case MovedPermanentlyException.Code: throw new MovedPermanentlyException(Response.GetFirstHeader("Location"), Data, ContentType);
-				case FoundException.Code: throw new FoundException(Response.GetFirstHeader("Location"), Data, ContentType);
-				case SeeOtherException.Code: throw new SeeOtherException(Response.GetFirstHeader("Location"), Data, ContentType);
-				case NotModifiedException.Code: throw new NotModifiedException();
-				case UseProxyException.Code: throw new UseProxyException(Response.GetFirstHeader("Location"), Data, ContentType);
-				case TemporaryRedirectException.Code: throw new TemporaryRedirectException(Response.GetFirstHeader("Location"), Data, ContentType);
+				// Client Errors
 				case BadRequestException.Code: throw new BadRequestException(Data, ContentType);
-				case ForbiddenException.Code: throw new ForbiddenException(Data, ContentType);
-				case NotFoundException.Code: throw new NotFoundException(Data, ContentType);
-				case MethodNotAllowedException.Code: throw new MethodNotAllowedException(GetMethods(Response.GetFirstHeader("Allow")), Data, ContentType);
-				case RequestTimeoutException.Code: throw new RequestTimeoutException(Data, ContentType);
 				case ConflictException.Code: throw new ConflictException(Data, ContentType);
-				case GoneException.Code: throw new GoneException(Data, ContentType);
-				case PreconditionFailedException.Code: throw new PreconditionFailedException(Data, ContentType);
-				case UnsupportedMediaTypeException.Code: throw new UnsupportedMediaTypeException(Data, ContentType);
-				case RangeNotSatisfiableException.Code: throw new RangeNotSatisfiableException(Data, ContentType);
-				case MisdirectedRequestException.Code: throw new MisdirectedRequestException(Data, ContentType);
-				case UnprocessableEntityException.Code: throw new UnprocessableEntityException(Data, ContentType);
-				case LockedException.Code: throw new LockedException(Data, ContentType);
 				case FailedDependencyException.Code: throw new FailedDependencyException(Data, ContentType);
-				case UpgradeRequiredException.Code: throw new UpgradeRequiredException(Response.GetFirstHeader("Upgrade"), Data, ContentType);
-				case TooManyRequestsException.Code: throw new TooManyRequestsException(Data, ContentType);
+				case ForbiddenException.Code: throw new ForbiddenException(Data, ContentType);
+				case GoneException.Code: throw new GoneException(Data, ContentType);
+				case LockedException.Code: throw new LockedException(Data, ContentType);
+				case MethodNotAllowedException.Code: throw new MethodNotAllowedException(GetMethods(Response.GetFirstHeader("Allow")), Data, ContentType);
+				case MisdirectedRequestException.Code: throw new MisdirectedRequestException(Data, ContentType);
+				case NotAcceptableException.Code: throw new NotAcceptableException(Data, ContentType);
+				case NotFoundException.Code: throw new NotFoundException(Data, ContentType);
+				case PreconditionFailedException.Code: throw new PreconditionFailedException(Data, ContentType);
 				case PreconditionRequiredException.Code: throw new PreconditionRequiredException(Data, ContentType);
+				case RangeNotSatisfiableException.Code: throw new RangeNotSatisfiableException(Data, ContentType);
+				case RequestTimeoutException.Code: throw new RequestTimeoutException(Data, ContentType);
+				case TooManyRequestsException.Code: throw new TooManyRequestsException(Data, ContentType);
+				case UnauthorizedException.Code: throw new UnauthorizedException(Data, ContentType, Response.GetChallenges());
 				case UnavailableForLegalReasonsException.Code: throw new UnavailableForLegalReasonsException(Data, ContentType);
-				case InternalServerErrorException.Code: throw new InternalServerErrorException(Data, ContentType);
-				case HTTP.NotImplementedException.Code: throw new HTTP.NotImplementedException(Data, ContentType);
+				case UnprocessableEntityException.Code: throw new UnprocessableEntityException(Data, ContentType);
+				case UnsupportedMediaTypeException.Code: throw new UnsupportedMediaTypeException(Data, ContentType);
+				case UpgradeRequiredException.Code: throw new UpgradeRequiredException(Response.GetFirstHeader("Upgrade"), Data, ContentType);
+
+				// Redirections
+				case FoundException.Code: throw new FoundException(Response.GetFirstHeader("Location"), Data, ContentType);
+				case MovedPermanentlyException.Code: throw new MovedPermanentlyException(Response.GetFirstHeader("Location"), Data, ContentType);
+				case NotModifiedException.Code: throw new NotModifiedException();
+				case SeeOtherException.Code: throw new SeeOtherException(Response.GetFirstHeader("Location"), Data, ContentType);
+				case TemporaryRedirectException.Code: throw new TemporaryRedirectException(Response.GetFirstHeader("Location"), Data, ContentType);
+				case UseProxyException.Code: throw new UseProxyException(Response.GetFirstHeader("Location"), Data, ContentType);
+
+				// Server Errors
 				case BadGatewayException.Code: throw new BadGatewayException(Data, ContentType);
-				case ServiceUnavailableException.Code: throw new ServiceUnavailableException(Data, ContentType);
 				case GatewayTimeoutException.Code: throw new GatewayTimeoutException(Data, ContentType);
-				case VariantAlsoNegotiatesException.Code: throw new VariantAlsoNegotiatesException(Data, ContentType);
 				case InsufficientStorageException.Code: throw new InsufficientStorageException(Data, ContentType);
+				case InternalServerErrorException.Code: throw new InternalServerErrorException(Data, ContentType);
 				case LoopDetectedException.Code: throw new LoopDetectedException(Data, ContentType);
-				case NotExtendedException.Code: throw new NotExtendedException(Data, ContentType);
 				case NetworkAuthenticationRequiredException.Code: throw new NetworkAuthenticationRequiredException(Data, ContentType);
-				default: throw new HttpException(StatusCode, StatusMessage, Data, ContentType);
+				case NotExtendedException.Code: throw new NotExtendedException(Data, ContentType);
+				case HTTP.NotImplementedException.Code: throw new HTTP.NotImplementedException(Data, ContentType);
+				case ServiceUnavailableException.Code: throw new ServiceUnavailableException(Data, ContentType);
+				case VariantAlsoNegotiatesException.Code: throw new VariantAlsoNegotiatesException(Data, ContentType);
+
+				default:
+					throw new HttpException(StatusCode, StatusMessage, Data, ContentType);
 			}
 		}
 

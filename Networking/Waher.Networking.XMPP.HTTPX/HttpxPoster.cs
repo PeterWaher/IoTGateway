@@ -18,8 +18,6 @@ namespace Waher.Networking.XMPP.HTTPX
 	/// </summary>
 	public class HttpxPoster : PosterBase
 	{
-		private static HttpxProxy proxy = null;
-
 		/// <summary>
 		/// Content Poster, posting content using the HTTPX URI Scheme.
 		/// 
@@ -75,18 +73,54 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <exception cref="IOException">If unable to read from temporary file.</exception>
 		public override async Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
-			if (proxy is null)
+			HttpxClient HttpxClient;
+			string BareJid;
+			string FullJid;
+			string LocalUrl;
+
+			if (Types.TryGetModuleParameter("HTTPX", out object Obj) && Obj is HttpxProxy Proxy)
 			{
-				if (!Types.TryGetModuleParameter("HTTPX", out object Obj) ||
-					!(Obj is HttpxProxy Proxy))
+				if (Proxy.DefaultXmppClient.Disposed || Proxy.ServerlessMessaging.Disposed)
+					throw new InvalidOperationException("Service is being shut down.");
+
+				GetClientResponse Rec = await Proxy.GetClientAsync(Uri);
+
+				BareJid = Rec.BareJid;
+				FullJid = Rec.FullJid;
+				HttpxClient = Rec.HttpxClient;
+				LocalUrl = Rec.LocalUrl;
+			}
+			else if (Types.TryGetModuleParameter("XMPP", out Obj) && Obj is XmppClient XmppClient)
+			{
+				if (XmppClient.Disposed)
+					throw new InvalidOperationException("Service is being shut down.");
+
+				if (!XmppClient.TryGetExtension(out HttpxClient HttpxClient2))
+					throw new InvalidOperationException("No HTTPX Extesion has been registered on the XMPP Client.");
+
+				HttpxClient = HttpxClient2;
+
+				if (string.IsNullOrEmpty(Uri.UserInfo))
+					FullJid = BareJid = Uri.Authority;
+				else
 				{
-					throw new InvalidOperationException("A HTTPX Proxy object has not been registered.");
+					BareJid = Uri.UserInfo + "@" + Uri.Authority;
+
+					RosterItem Item = XmppClient.GetRosterItem(BareJid);
+
+					if (Item is null)
+						throw new ConflictException("No approved presence subscription with " + BareJid + ".");
+					else if (!Item.HasLastPresence || !Item.LastPresence.IsOnline)
+						throw new ServiceUnavailableException(BareJid + " is not online.");
+					else
+						FullJid = Item.LastPresenceFullJid;
 				}
 
-				proxy = Proxy;
+				LocalUrl = Uri.PathAndQuery + Uri.Fragment;
 			}
+			else
+				throw new InvalidOperationException("An HTTPX Proxy or XMPP Client Module Parameter has not been registered.");
 
-			GetClientResponse Rec = await proxy.GetClientAsync(Uri);
 			List<HttpField> Headers2 = new List<HttpField>();
 			bool HasContentType = false;
 			bool HasHost = false;
@@ -96,7 +130,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				switch (Header.Key.ToLower())
 				{
 					case "host":
-						Headers2.Add(new HttpField("Host", Rec.BareJid));
+						Headers2.Add(new HttpField("Host", BareJid));
 						HasHost = true;
 						break;
 
@@ -136,8 +170,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				// TODO: Transport public part of Client certificate, if provided.
 
-				Rec.HttpxClient.Request(Rec.FullJid, "POST", Rec.LocalUrl,
-					1.1, Headers2, Data, async (sender, e) =>
+				HttpxClient.Request(FullJid, "POST", LocalUrl, 1.1, Headers2, Data, async (sender, e) =>
 					{
 						if (e.Ok)
 						{

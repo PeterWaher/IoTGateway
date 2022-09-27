@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.Vanity;
 

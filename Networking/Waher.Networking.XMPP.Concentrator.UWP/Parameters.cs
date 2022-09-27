@@ -808,7 +808,12 @@ namespace Waher.Networking.XMPP.Concentrator
 								if (DataType is null)
 								{
 									ValueToSet = Field.ValueString;
-									ValueToSet2 = Types.Instantiate(PropertyType, ValueToSet);
+									ValueToSet2 = Types.Instantiate(true, PropertyType, ValueToSet);
+									if (ValueToSet2 is null)
+									{
+										AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(6, "Invalid value."));
+										continue;
+									}
 								}
 								else
 								{

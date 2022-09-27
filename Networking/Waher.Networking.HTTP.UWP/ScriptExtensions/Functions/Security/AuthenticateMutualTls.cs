@@ -1,6 +1,5 @@
 ﻿#if !WINDOWS_UWP
 
-using System;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Script;

@@ -44,8 +44,8 @@ namespace Waher.Security.JWT.Functions
         {
             JwtToken Token = new JwtToken(Argument);
 
-            if (!CreateJwt.Factory.IsValid(Token))
-                throw new ScriptRuntimeException("Token not valid.", this);
+            if (!CreateJwt.Factory.IsValid(Token, out Reason Reason))
+                throw new ScriptRuntimeException("Token not valid. Reason: " + Reason.ToString(), this);
 
             return new ObjectValue(Token);
         }

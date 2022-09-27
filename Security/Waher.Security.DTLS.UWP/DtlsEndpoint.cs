@@ -41,17 +41,16 @@ namespace Waher.Security.DTLS
 		{
 			List<ICipher> Ciphers = new List<ICipher>();
 			Dictionary<ushort, ICipher> PerCode = new Dictionary<ushort, ICipher>();
-			TypeInfo TI;
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICipher)))
 			{
-				TI = T.GetTypeInfo();
-				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
+				ConstructorInfo CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
 					continue;
 
 				try
 				{
-					ICipher Cipher = (ICipher)Types.Instantiate(T);
+					ICipher Cipher = (ICipher)CI.Invoke(Types.NoParameters);
 					Ciphers.Add(Cipher);
 					PerCode[Cipher.IanaCipherSuite] = Cipher;
 				}
@@ -753,7 +752,7 @@ namespace Waher.Security.DTLS
 
 								try
 								{
-									this.OnIncomingHandshakeStarted?.Invoke(this, 
+									this.OnIncomingHandshakeStarted?.Invoke(this,
 										new RemoteEndpointEventArgs(State.remoteEndpoint));
 								}
 								catch (Exception ex)
@@ -822,7 +821,7 @@ namespace Waher.Security.DTLS
 										State.currentSeqNr = State.previousSeqNr;
 										State.currentEpoch--;
 
-										this.SendRecord(ContentType.change_cipher_spec, 
+										this.SendRecord(ContentType.change_cipher_spec,
 											new byte[] { 1 }, true, false, State);
 									}
 									finally
@@ -984,7 +983,7 @@ namespace Waher.Security.DTLS
 
 			try
 			{
-				this.OnHandshakeSuccessful?.Invoke(this, 
+				this.OnHandshakeSuccessful?.Invoke(this,
 					new RemoteEndpointEventArgs(State.remoteEndpoint));
 			}
 			catch (Exception ex)

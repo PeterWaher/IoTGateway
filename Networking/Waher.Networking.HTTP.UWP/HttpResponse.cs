@@ -22,6 +22,7 @@ namespace Waher.Networking.HTTP
 		private HttpClientConnection clientConnection;
 		private Dictionary<string, string> customHeaders = null;
 		private LinkedList<Cookie> cookies = null;
+		private List<string> challenges = null;
 		private readonly Encoding encoding = Encoding.UTF8;
 		private bool encodingUsed = false;
 		private DateTimeOffset date = DateTimeOffset.Now;
@@ -70,10 +71,15 @@ namespace Waher.Networking.HTTP
 			this.httpServer = HttpServer;
 			this.httpRequest = Request;
 
-			if (!(Request is null) && Request.Header.TryGetHeaderField("Connection", out HttpField Field) && Field.Value == "close")
+			if (!(Request is null))
 			{
-				this.closeAfterResponse = true;
-				this.SetHeader("Connection", "close");
+				Request.Response = this;
+
+				if (Request.Header.TryGetHeaderField("Connection", out HttpField Field) && Field.Value == "close")
+				{
+					this.closeAfterResponse = true;
+					this.SetHeader("Connection", "close");
+				}
 			}
 		}
 
@@ -90,6 +96,9 @@ namespace Waher.Networking.HTTP
 			this.clientConnection = ClientConnection;
 			this.httpServer = HttpServer;
 			this.httpRequest = Request;
+			
+			if (!(Request is null))
+				Request.Response = this;
 		}
 
 		private void AssertHeaderOpen()
@@ -103,11 +112,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public DateTimeOffset Date
 		{
-			get
-			{
-				return this.date;
-			}
-
+			get => this.date;
 			set
 			{
 				this.AssertHeaderOpen();
@@ -120,11 +125,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public DateTimeOffset? Expires
 		{
-			get
-			{
-				return this.expires;
-			}
-
+			get => this.expires;
 			set
 			{
 				this.AssertHeaderOpen();
@@ -137,11 +138,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public string Server
 		{
-			get
-			{
-				return this.server;
-			}
-
+			get => this.server;
 			set
 			{
 				this.AssertHeaderOpen();
@@ -154,11 +151,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public string ContentLanguage
 		{
-			get
-			{
-				return this.contentLanguage;
-			}
-
+			get => this.contentLanguage;
 			set
 			{
 				this.AssertHeaderOpen();
@@ -172,11 +165,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public string ContentType
 		{
-			get
-			{
-				return this.contentType;
-			}
-
+			get => this.contentType;
 			set
 			{
 				this.AssertHeaderOpen();
@@ -194,11 +183,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public long? ContentLength
 		{
-			get
-			{
-				return this.contentLength;
-			}
-
+			get => this.contentLength;
 			set
 			{
 				this.AssertHeaderOpen();
@@ -211,11 +196,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public int StatusCode
 		{
-			get
-			{
-				return this.statusCode;
-			}
-
+			get => this.statusCode;
 			set
 			{
 				this.AssertHeaderOpen();
@@ -228,11 +209,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public string StatusMessage
 		{
-			get
-			{
-				return this.statusMessage;
-			}
-
+			get => this.statusMessage;
 			set
 			{
 				this.AssertHeaderOpen();
@@ -245,11 +222,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public bool OnlyHeader
 		{
-			get
-			{
-				return this.onlyHeader;
-			}
-
+			get => this.onlyHeader;
 			internal set
 			{
 				this.AssertHeaderOpen();
@@ -262,10 +235,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public HttpRequest Request => this.httpRequest;
 
-		internal LinkedList<Cookie> Cookies
-		{
-			get { return this.cookies; }
-		}
+		internal LinkedList<Cookie> Cookies => this.cookies;
 
 		/// <summary>
 		/// Sets a custom header field value.
@@ -309,6 +279,13 @@ namespace Waher.Networking.HTTP
 					this.contentLength = long.Parse(Value);
 					break;
 
+				case "www-authenticate":
+					if (this.challenges is null)
+						this.challenges = new List<string>();
+
+					this.challenges.Add(Value);
+					break;
+
 				default:
 					if (this.customHeaders is null)
 						this.customHeaders = new Dictionary<string, string>();
@@ -343,6 +320,12 @@ namespace Waher.Networking.HTTP
 
 			if (this.contentLength.HasValue)
 				Headers.Add(new KeyValuePair<string, string>("Content-Length", this.contentLength.Value.ToString()));
+
+			if (!(this.challenges is null))
+			{
+				foreach (string Challenge in this.challenges)
+					Headers.Add(new KeyValuePair<string, string>("WWW-Authenticate", Challenge));
+			}
 
 			if (!(this.customHeaders is null))
 			{
@@ -383,6 +366,9 @@ namespace Waher.Networking.HTTP
 					}
 
 					return null;
+
+				case "WWW-AUTHENTICATE":
+					return this.challenges is null ? null : this.challenges[0];
 
 				default:
 					if (!(this.customHeaders is null))
@@ -469,34 +455,41 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// If the header has been sent.
 		/// </summary>
-		public bool HeaderSent
-		{
-			get { return !(this.transferEncoding is null); }
-		}
+		public bool HeaderSent => !(this.transferEncoding is null);
 
 		/// <summary>
 		/// If the response has been sent.
 		/// </summary>
-		public bool ResponseSent
-		{
-			get { return this.responseSent; }
-		}
+		public bool ResponseSent => this.responseSent;
 
 		/// <summary>
 		/// If the response has been disposed.
 		/// </summary>
-		public bool Disposed
-		{
-			get { return this.disposed; }
-		}
+		public bool Disposed => this.disposed;
 
 		/// <summary>
 		/// Current client connection
 		/// </summary>
-		public BinaryTcpClient ClientConnection
+		public BinaryTcpClient ClientConnection => this.clientConnection?.Client;
+
+		/// <summary>
+		/// If the response contains any WWW-Authenticate challenges.
+		/// </summary>
+		public bool HasChallenges => !(this.challenges is null);
+
+		/// <summary>
+		/// Gets available WWW-Authenticate challenges returned in the response.
+		/// </summary>
+		/// <returns>Challenges</returns>
+		public string[] GetChallenges()
 		{
-			get { return this.clientConnection?.Client; }
+			return this.challenges?.ToArray() ?? new string[0];
 		}
+
+		/// <summary>
+		/// Transfer encoding in response.
+		/// </summary>
+		public TransferEncoding TransferEncoding => this.transferEncoding ?? this.desiredTransferEncoding;
 
 		/// <summary>
 		/// Sends the response back to the client. If the resource is synchronous, there's no need to call this method. Only asynchronous
@@ -754,6 +747,15 @@ namespace Waher.Networking.HTTP
 							this.clientConnection, this.txText, this.encoding);
 					}
 
+					if (!(this.challenges is null))
+					{
+						foreach (string Challenge in this.challenges)
+						{
+							Output.Append("\r\nWWW-Authenticate: ");
+							Output.Append(Challenge);
+						}
+					}
+
 					if (!(this.customHeaders is null))
 					{
 						foreach (KeyValuePair<string, string> P in this.customHeaders)
@@ -809,8 +811,8 @@ namespace Waher.Networking.HTTP
 
 				if (Result is null)
 				{
-					this.statusCode = 406;  // Not acceptable
-					this.statusMessage = "Not Acceptable";
+					this.statusCode = NotAcceptableException.Code;
+					this.statusMessage = NotAcceptableException.StatusMessage;
 				}
 				else
 				{

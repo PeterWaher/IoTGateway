@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.HTTP
+﻿namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// The server, while acting as a gateway or proxy, did not receive a timely response from the upstream server specified by the URI 

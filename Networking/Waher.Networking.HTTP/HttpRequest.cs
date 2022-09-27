@@ -23,6 +23,7 @@ namespace Waher.Networking.HTTP
 		private Variables session = null;
 		private string subPath = string.Empty;
 		private HttpResource resource = null;
+		private HttpResponse response = null;
 		internal HttpClientConnection clientConnection = null;
 		internal bool tempSession = false;
 
@@ -86,18 +87,12 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Request header.
 		/// </summary>
-		public HttpRequestHeader Header
-		{
-			get { return this.header; }
-		}
+		public HttpRequestHeader Header => this.header;
 
 		/// <summary>
 		/// Data stream, if data is available, or null if data is not available.
 		/// </summary>
-		public Stream DataStream
-		{
-			get { return this.dataStream; }
-		}
+		public Stream DataStream => this.dataStream;
 
 		/// <summary>
 		/// Sub-path. If a resource is found handling the request, this property contains the trailing sub-path of the full path,
@@ -105,8 +100,8 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public string SubPath
 		{
-			get { return this.subPath; }
-			set { this.subPath = value; }
+			get => this.subPath;
+			set => this.subPath = value;
 		}
 
 		/// <summary>
@@ -114,8 +109,8 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public IUser User
 		{
-			get { return this.user; }
-			set { this.user = value; }
+			get => this.user;
+			set => this.user = value;
 		}
 
 		/// <summary>
@@ -123,8 +118,8 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public Variables Session
 		{
-			get { return this.session; }
-			set { this.session = value; }
+			get => this.session;
+			set => this.session = value;
 		}
 
 		/// <summary>
@@ -132,16 +127,22 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public HttpResource Resource
 		{
-			get { return this.resource; }
-			set { this.resource = value; }
+			get => this.resource;
+			set => this.resource = value;
 		}
 
 		/// <summary>
 		/// Remote end-point.
 		/// </summary>
-		public string RemoteEndPoint
+		public string RemoteEndPoint => this.remoteEndPoint;
+
+		/// <summary>
+		/// HTTP Response object, if one has been assigned to the request.
+		/// </summary>
+		public HttpResponse Response
 		{
-			get { return this.remoteEndPoint; }
+			get => this.response;
+			internal set => this.response = value;
 		}
 
 #if WINDOWS_UWP
@@ -158,26 +159,17 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Remote client certificate, if any, associated with the request.
 		/// </summary>
-		public X509Certificate RemoteCertificate
-		{
-			get { return this.clientConnection?.Client?.RemoteCertificate; }
-		}
+		public X509Certificate RemoteCertificate => this.clientConnection?.Client?.RemoteCertificate;
 
 		/// <summary>
 		/// If the Remote client certificate, if any, is valid.
 		/// </summary>
-		public bool RemoteCertificateValid
-		{
-			get { return this.clientConnection?.Client?.RemoteCertificateValid ?? false; }
-		}
+		public bool RemoteCertificateValid => this.clientConnection?.Client?.RemoteCertificateValid ?? false;
 
 		/// <summary>
 		/// If the connection is encrypted or not.
 		/// </summary>
-		public bool Encrypted
-		{
-			get { return this.clientConnection?.Encrypted ?? false; }
-		}
+		public bool Encrypted => this.clientConnection?.Encrypted ?? false;
 
 		/// <summary>
 		/// Cipher strength

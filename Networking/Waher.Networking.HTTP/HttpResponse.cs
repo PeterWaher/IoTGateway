@@ -71,10 +71,15 @@ namespace Waher.Networking.HTTP
 			this.httpServer = HttpServer;
 			this.httpRequest = Request;
 
-			if (!(Request is null) && Request.Header.TryGetHeaderField("Connection", out HttpField Field) && Field.Value == "close")
+			if (!(Request is null))
 			{
-				this.closeAfterResponse = true;
-				this.SetHeader("Connection", "close");
+				Request.Response = this;
+
+				if (Request.Header.TryGetHeaderField("Connection", out HttpField Field) && Field.Value == "close")
+				{
+					this.closeAfterResponse = true;
+					this.SetHeader("Connection", "close");
+				}
 			}
 		}
 
@@ -91,6 +96,9 @@ namespace Waher.Networking.HTTP
 			this.clientConnection = ClientConnection;
 			this.httpServer = HttpServer;
 			this.httpRequest = Request;
+			
+			if (!(Request is null))
+				Request.Response = this;
 		}
 
 		private void AssertHeaderOpen()
@@ -359,7 +367,7 @@ namespace Waher.Networking.HTTP
 
 					return null;
 
-				case "WWW-AUTHENTICATE": 
+				case "WWW-AUTHENTICATE":
 					return this.challenges is null ? null : this.challenges[0];
 
 				default:
@@ -477,6 +485,11 @@ namespace Waher.Networking.HTTP
 		{
 			return this.challenges?.ToArray() ?? new string[0];
 		}
+
+		/// <summary>
+		/// Transfer encoding in response.
+		/// </summary>
+		public TransferEncoding TransferEncoding => this.transferEncoding ?? this.desiredTransferEncoding;
 
 		/// <summary>
 		/// Sends the response back to the client. If the resource is synchronous, there's no need to call this method. Only asynchronous

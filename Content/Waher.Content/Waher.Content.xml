@@ -91,37 +91,37 @@
             <param name="Data">Data to encode.</param>
             <returns>Base64URL-encoded string.</returns>
         </member>
-        <member name="T:Waher.Content.Binary.BinaryDecoder">
+        <member name="T:Waher.Content.Binary.BinaryCodec">
+            <summary>
+            Binary codec.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Binary.BinaryCodec.#ctor">
             <summary>
             Binary decoder.
             </summary>
         </member>
-        <member name="M:Waher.Content.Binary.BinaryDecoder.#ctor">
-            <summary>
-            Binary decoder.
-            </summary>
-        </member>
-        <member name="F:Waher.Content.Binary.BinaryDecoder.BinaryContentTypes">
+        <member name="F:Waher.Content.Binary.BinaryCodec.BinaryContentTypes">
             <summary>
             Binary content types.
             </summary>
         </member>
-        <member name="F:Waher.Content.Binary.BinaryDecoder.BinaryFileExtensions">
+        <member name="F:Waher.Content.Binary.BinaryCodec.BinaryFileExtensions">
             <summary>
             Binary content types.
             </summary>
         </member>
-        <member name="P:Waher.Content.Binary.BinaryDecoder.ContentTypes">
+        <member name="P:Waher.Content.Binary.BinaryCodec.ContentTypes">
             <summary>
             Supported content types.
             </summary>
         </member>
-        <member name="P:Waher.Content.Binary.BinaryDecoder.FileExtensions">
+        <member name="P:Waher.Content.Binary.BinaryCodec.FileExtensions">
             <summary>
             Supported file extensions.
             </summary>
         </member>
-        <member name="M:Waher.Content.Binary.BinaryDecoder.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+        <member name="M:Waher.Content.Binary.BinaryCodec.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
             <summary>
             If the decoder decodes an object with a given content type.
             </summary>
@@ -129,7 +129,7 @@
             <param name="Grade">How well the decoder decodes the object.</param>
             <returns>If the decoder can decode an object with the given type.</returns>
         </member>
-        <member name="M:Waher.Content.Binary.BinaryDecoder.DecodeAsync(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+        <member name="M:Waher.Content.Binary.BinaryCodec.DecodeAsync(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
             <summary>
             Decodes an object.
             </summary>
@@ -141,7 +141,7 @@
             <returns>Decoded object.</returns>
             <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
         </member>
-        <member name="M:Waher.Content.Binary.BinaryDecoder.TryGetContentType(System.String,System.String@)">
+        <member name="M:Waher.Content.Binary.BinaryCodec.TryGetContentType(System.String,System.String@)">
             <summary>
             Tries to get the content type of an item, given its file extension.
             </summary>
@@ -149,13 +149,32 @@
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
         </member>
-        <member name="M:Waher.Content.Binary.BinaryDecoder.TryGetFileExtension(System.String,System.String@)">
+        <member name="M:Waher.Content.Binary.BinaryCodec.TryGetFileExtension(System.String,System.String@)">
             <summary>
             Tries to get the file extension of an item, given its Content-Type.
             </summary>
             <param name="ContentType">Content type.</param>
             <param name="FileExtension">File extension.</param>
             <returns>If the Content-Type was recognized.</returns>
+        </member>
+        <member name="M:Waher.Content.Binary.BinaryCodec.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
+            <summary>
+            If the encoder encodes a given object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Grade">How well the encoder encodes the object.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>If the encoder can encode the given object.</returns>
+        </member>
+        <member name="M:Waher.Content.Binary.BinaryCodec.EncodeAsync(System.Object,System.Text.Encoding,System.String[])">
+            <summary>
+            Encodes an object.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+            <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+            <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
+            <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
         </member>
         <member name="T:Waher.Content.Binary.FileEncoder">
             <summary>
@@ -1801,7 +1820,7 @@
         </member>
         <member name="T:Waher.Content.Multipart.AlternativeCodec">
             <summary>
-            Decoder of alternative data.
+            Codec of alternative data.
             
             http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
             </summary>
@@ -1813,7 +1832,7 @@
         </member>
         <member name="M:Waher.Content.Multipart.AlternativeCodec.#ctor">
             <summary>
-            Decoder of alternative data.
+            Codec of alternative data.
             
             http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
             </summary>
@@ -2086,7 +2105,7 @@
         </member>
         <member name="T:Waher.Content.Multipart.MixedCodec">
             <summary>
-            Decoder of mixed data.
+            Codec of mixed data.
             
             http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
             </summary>
@@ -2098,7 +2117,7 @@
         </member>
         <member name="M:Waher.Content.Multipart.MixedCodec.#ctor">
             <summary>
-            Decoder of mixed data.
+            Codec of mixed data.
             
             http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
             </summary>
@@ -2197,7 +2216,7 @@
         </member>
         <member name="T:Waher.Content.Multipart.RelatedCodec">
             <summary>
-            Decoder of related data.
+            Codec of related data.
             
             https://tools.ietf.org/html/rfc2387
             </summary>
@@ -2209,7 +2228,7 @@
         </member>
         <member name="M:Waher.Content.Multipart.RelatedCodec.#ctor">
             <summary>
-            Decoder of related data.
+            Codec of related data.
             
             https://tools.ietf.org/html/rfc2387
             </summary>
@@ -2298,7 +2317,7 @@
         </member>
         <member name="T:Waher.Content.Multipart.WwwFormCodec">
             <summary>
-            Decoder of URL encoded web forms.
+            Codec of URL encoded web forms.
             </summary>
         </member>
         <member name="F:Waher.Content.Multipart.WwwFormCodec.ContentType">
@@ -2308,7 +2327,7 @@
         </member>
         <member name="M:Waher.Content.Multipart.WwwFormCodec.#ctor">
             <summary>
-            Decoder of URL encoded web forms.
+            Codec of URL encoded web forms.
             </summary>
         </member>
         <member name="P:Waher.Content.Multipart.WwwFormCodec.ContentTypes">
@@ -2675,37 +2694,37 @@
             <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
             <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
         </member>
-        <member name="T:Waher.Content.Text.JsonDecoder">
+        <member name="T:Waher.Content.Text.JsonCodec">
             <summary>
-            JSON decoder.
+            JSON codec.
             </summary>
         </member>
-        <member name="M:Waher.Content.Text.JsonDecoder.#ctor">
+        <member name="M:Waher.Content.Text.JsonCodec.#ctor">
             <summary>
-            JSON decoder.
+            JSON codec.
             </summary>
         </member>
-        <member name="F:Waher.Content.Text.JsonDecoder.JsonContentTypes">
+        <member name="F:Waher.Content.Text.JsonCodec.JsonContentTypes">
             <summary>
             JSON content types.
             </summary>
         </member>
-        <member name="F:Waher.Content.Text.JsonDecoder.JsonFileExtensions">
+        <member name="F:Waher.Content.Text.JsonCodec.JsonFileExtensions">
             <summary>
             JSON file extensions.
             </summary>
         </member>
-        <member name="P:Waher.Content.Text.JsonDecoder.ContentTypes">
+        <member name="P:Waher.Content.Text.JsonCodec.ContentTypes">
             <summary>
             Supported content types.
             </summary>
         </member>
-        <member name="P:Waher.Content.Text.JsonDecoder.FileExtensions">
+        <member name="P:Waher.Content.Text.JsonCodec.FileExtensions">
             <summary>
             Supported file extensions.
             </summary>
         </member>
-        <member name="M:Waher.Content.Text.JsonDecoder.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
+        <member name="M:Waher.Content.Text.JsonCodec.Decodes(System.String,Waher.Runtime.Inventory.Grade@)">
             <summary>
             If the decoder decodes an object with a given content type.
             </summary>
@@ -2713,7 +2732,7 @@
             <param name="Grade">How well the decoder decodes the object.</param>
             <returns>If the decoder can decode an object with the given type.</returns>
         </member>
-        <member name="M:Waher.Content.Text.JsonDecoder.DecodeAsync(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
+        <member name="M:Waher.Content.Text.JsonCodec.DecodeAsync(System.String,System.Byte[],System.Text.Encoding,System.Collections.Generic.KeyValuePair{System.String,System.String}[],System.Uri)">
             <summary>
             Decodes an object.
             </summary>
@@ -2725,7 +2744,7 @@
             <returns>Decoded object.</returns>
             <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
         </member>
-        <member name="M:Waher.Content.Text.JsonDecoder.TryGetContentType(System.String,System.String@)">
+        <member name="M:Waher.Content.Text.JsonCodec.TryGetContentType(System.String,System.String@)">
             <summary>
             Tries to get the content type of an item, given its file extension.
             </summary>
@@ -2733,7 +2752,7 @@
             <param name="ContentType">Content type.</param>
             <returns>If the extension was recognized.</returns>
         </member>
-        <member name="M:Waher.Content.Text.JsonDecoder.TryGetFileExtension(System.String,System.String@)">
+        <member name="M:Waher.Content.Text.JsonCodec.TryGetFileExtension(System.String,System.String@)">
             <summary>
             Tries to get the file extension of an item, given its Content-Type.
             </summary>
@@ -2741,7 +2760,7 @@
             <param name="FileExtension">File extension.</param>
             <returns>If the Content-Type was recognized.</returns>
         </member>
-        <member name="M:Waher.Content.Text.JsonDecoder.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
+        <member name="M:Waher.Content.Text.JsonCodec.Encodes(System.Object,Waher.Runtime.Inventory.Grade@,System.String[])">
             <summary>
             If the encoder encodes a given object.
             </summary>
@@ -2750,7 +2769,7 @@
             <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
             <returns>If the encoder can encode the given object.</returns>
         </member>
-        <member name="M:Waher.Content.Text.JsonDecoder.EncodeAsync(System.Object,System.Text.Encoding,System.String[])">
+        <member name="M:Waher.Content.Text.JsonCodec.EncodeAsync(System.Object,System.Text.Encoding,System.String[])">
             <summary>
             Encodes an object.
             </summary>

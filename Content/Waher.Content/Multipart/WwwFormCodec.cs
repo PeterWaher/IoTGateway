@@ -7,7 +7,7 @@ using Waher.Runtime.Inventory;
 namespace Waher.Content.Multipart
 {
 	/// <summary>
-	/// Decoder of URL encoded web forms.
+	/// Codec of URL encoded web forms.
 	/// </summary>
 	public class WwwFormCodec : IContentDecoder, IContentEncoder
 	{
@@ -17,7 +17,7 @@ namespace Waher.Content.Multipart
 		public const string ContentType = "application/x-www-form-urlencoded";
 
 		/// <summary>
-		/// Decoder of URL encoded web forms.
+		/// Codec of URL encoded web forms.
 		/// </summary>
 		public WwwFormCodec()
 		{

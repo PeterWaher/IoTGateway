@@ -7,14 +7,14 @@ using Waher.Runtime.Inventory;
 namespace Waher.Content.Binary
 {
 	/// <summary>
-	/// Binary decoder.
+	/// Binary codec.
 	/// </summary>
-	public class BinaryDecoder : IContentDecoder
+	public class BinaryCodec : IContentDecoder, IContentEncoder
 	{
 		/// <summary>
 		/// Binary decoder.
 		/// </summary>
-		public BinaryDecoder()
+		public BinaryCodec()
 		{
 		}
 
@@ -121,5 +121,42 @@ namespace Waher.Content.Binary
 			}
 		}
 
+		/// <summary>
+		/// If the encoder encodes a given object.
+		/// </summary>
+		/// <param name="Object">Object to encode.</param>
+		/// <param name="Grade">How well the encoder encodes the object.</param>
+		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+		/// <returns>If the encoder can encode the given object.</returns>
+		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
+		{
+			if (InternetContent.IsAccepted(BinaryContentTypes, AcceptedContentTypes) &&
+				(Object is byte[]))
+			{
+				Grade = Grade.Ok;
+				return true;
+			}
+			else
+			{
+				Grade = Grade.NotAtAll;
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Encodes an object.
+		/// </summary>
+		/// <param name="Object">Object to encode.</param>
+		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
+		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
+		/// <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
+		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
+		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
+		{
+			if (!(Object is byte[] Bin))
+				throw new ArgumentException("Unable to encode as binary.", nameof(Object));
+
+			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, "application/octet-stream"));
+		}
 	}
 }

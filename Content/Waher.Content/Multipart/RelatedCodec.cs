@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Multipart
 {
 	/// <summary>
-	/// Decoder of related data.
+	/// Codec of related data.
 	/// 
 	/// https://tools.ietf.org/html/rfc2387
 	/// </summary>
@@ -21,7 +19,7 @@ namespace Waher.Content.Multipart
 		public const string ContentType = "multipart/related";
 
 		/// <summary>
-		/// Decoder of related data.
+		/// Codec of related data.
 		/// 
 		/// https://tools.ietf.org/html/rfc2387
 		/// </summary>

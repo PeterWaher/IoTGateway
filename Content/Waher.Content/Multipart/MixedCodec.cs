@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Multipart
 {
 	/// <summary>
-	/// Decoder of mixed data.
+	/// Codec of mixed data.
 	/// 
 	/// http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
 	/// </summary>
@@ -21,7 +19,7 @@ namespace Waher.Content.Multipart
 		public const string ContentType = "multipart/mixed";
 
 		/// <summary>
-		/// Decoder of mixed data.
+		/// Codec of mixed data.
 		/// 
 		/// http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
 		/// </summary>

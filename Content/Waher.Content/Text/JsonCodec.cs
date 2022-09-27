@@ -9,14 +9,14 @@ using Waher.Script.Abstraction.Elements;
 namespace Waher.Content.Text
 {
 	/// <summary>
-	/// JSON decoder.
+	/// JSON codec.
 	/// </summary>
-	public class JsonDecoder : IContentDecoder, IContentEncoder
+	public class JsonCodec : IContentDecoder, IContentEncoder
 	{
 		/// <summary>
-		/// JSON decoder.
+		/// JSON codec.
 		/// </summary>
-		public JsonDecoder()
+		public JsonCodec()
 		{
 		}
 

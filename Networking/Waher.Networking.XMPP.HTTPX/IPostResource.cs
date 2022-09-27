@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.XMPP.HTTPX
+﻿namespace Waher.Networking.XMPP.HTTPX
 {
 	/// <summary>
 	/// Interface for HTTP(S) Post-back resources. These can be used to allow HTTPX servers to HTTP POST back responses

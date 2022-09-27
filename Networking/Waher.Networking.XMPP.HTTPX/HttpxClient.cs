@@ -13,7 +13,6 @@ using Waher.Runtime.Temporary;
 using Waher.Runtime.Threading;
 using Waher.Security;
 using Waher.Events;
-using Waher.Networking.XMPP.P2P;
 
 namespace Waher.Networking.XMPP.HTTPX
 {

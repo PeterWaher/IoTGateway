@@ -4,13 +4,9 @@ using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Content.Posters;
 using Waher.Networking.HTTP;
-using Waher.Networking.HTTP.HeaderFields;
-using Waher.Networking.HTTP.ScriptExtensions.Functions.Redirections;
 using Waher.Runtime.Inventory;
-using Waher.Script.Functions.ComplexNumbers;
 
 namespace Waher.Networking.XMPP.HTTPX
 {

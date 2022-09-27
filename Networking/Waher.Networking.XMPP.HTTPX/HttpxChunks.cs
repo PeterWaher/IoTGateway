@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Content.Xml;
-using Waher.Networking.Sniffers;
 using Waher.Runtime.Cache;
 
 namespace Waher.Networking.XMPP.HTTPX

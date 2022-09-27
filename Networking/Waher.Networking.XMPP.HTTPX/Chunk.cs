@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Waher.Networking.XMPP.HTTPX
+﻿namespace Waher.Networking.XMPP.HTTPX
 {
 	internal class Chunk
 	{

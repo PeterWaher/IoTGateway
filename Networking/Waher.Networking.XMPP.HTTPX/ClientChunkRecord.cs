@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Waher.Content;
 using Waher.Events;
 using Waher.Networking.HTTP;
-using Waher.Networking.HTTP.ScriptExtensions.Functions.ServerErrors;
 
 namespace Waher.Networking.XMPP.HTTPX
 {

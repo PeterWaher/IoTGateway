@@ -37,7 +37,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			HttpxChunks.RegisterChunkReceiver(this.client);
 
-			this.client.RegisterIqSetHandler("req", HttpxClient.Namespace, this.ReqReceived, false);
+			this.client.RegisterIqSetHandler("req", HttpxClient.Namespace, this.ReqReceived, true);
 			this.client.RegisterIqGetHandler("req", HttpxClient.Namespace, this.ReqReceived, false);
 			this.client.RegisterMessageHandler("cancel", HttpxClient.Namespace, this.CancelReceived, false);
 		}
@@ -77,7 +77,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			HttpxChunks.UnregisterChunkReceiver(this.client);
 
-			this.client.UnregisterIqSetHandler("req", HttpxClient.Namespace, this.ReqReceived, false);
+			this.client.UnregisterIqSetHandler("req", HttpxClient.Namespace, this.ReqReceived, true);
 			this.client.UnregisterIqGetHandler("req", HttpxClient.Namespace, this.ReqReceived, false);
 			this.client.UnregisterMessageHandler("cancel", HttpxClient.Namespace, this.CancelReceived, false);
 		}

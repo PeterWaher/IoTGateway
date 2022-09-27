@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.HTTP
+﻿namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// The request was directed at a server that is not able to produce a response (for example because a connection reuse).

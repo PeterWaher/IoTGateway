@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Networking.HTTP.HeaderFields
+﻿namespace Waher.Networking.HTTP.HeaderFields
 {
 	/// <summary>
 	/// If-None-Match HTTP Field header. (RFC 2616, §14.26)

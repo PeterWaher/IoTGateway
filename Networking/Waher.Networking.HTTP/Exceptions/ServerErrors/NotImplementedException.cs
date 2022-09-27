@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.HTTP
+﻿namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// The server does not support the functionality required to fulfill the request. This is the appropriate response when the server does not 

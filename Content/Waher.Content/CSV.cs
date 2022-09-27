@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
 using System.Text;
-using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
-using Waher.Script.Objects.VectorSpaces;
-using Waher.Script.Operators.Comparisons;
 
 namespace Waher.Content
 {

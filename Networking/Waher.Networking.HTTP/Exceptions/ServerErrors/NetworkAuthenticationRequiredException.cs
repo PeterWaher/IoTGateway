@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.HTTP
+﻿namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// The client needs to authenticate to gain network access. Intended for use by intercepting proxies used to control access to the network.

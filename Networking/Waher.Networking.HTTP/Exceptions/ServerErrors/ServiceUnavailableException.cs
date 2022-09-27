@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.HTTP
+﻿namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// The server is currently unable to handle the request due to a temporary overloading or maintenance of the server. The implication is that 

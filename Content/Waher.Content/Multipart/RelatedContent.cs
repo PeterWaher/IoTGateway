@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Multipart
+﻿namespace Waher.Content.Multipart
 {
 	/// <summary>
 	/// Represents related content, encoded with multipart/related

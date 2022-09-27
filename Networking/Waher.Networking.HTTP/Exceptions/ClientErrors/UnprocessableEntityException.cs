@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.HTTP
+﻿namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// The request was well-formed but was unable to be followed due to semantic errors.

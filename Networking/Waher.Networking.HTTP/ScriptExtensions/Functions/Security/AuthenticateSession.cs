@@ -1,5 +1,4 @@
-﻿using System;
-using Waher.Script;
+﻿using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;

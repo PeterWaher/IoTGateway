@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.HTTP
+﻿namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// The server has not found anything matching the Request-URI. No indication is given of whether the condition is temporary or permanent.

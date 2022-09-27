@@ -1,9 +1,7 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
-using Waher.Script;
 using System.Threading.Tasks;
 
 namespace Waher.Content

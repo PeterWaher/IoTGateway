@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.HTTP
+﻿namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// If the client has performed a conditional GET request and access is allowed, but the document has not been modified, the server SHOULD respond 

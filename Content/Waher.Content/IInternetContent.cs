@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Content
+﻿namespace Waher.Content
 {
 	/// <summary>
 	/// Base interface for Internet content encoders or decoders.

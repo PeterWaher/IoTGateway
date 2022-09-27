@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Waher.Content;
 
 namespace Waher.Networking.HTTP.HeaderFields
 {

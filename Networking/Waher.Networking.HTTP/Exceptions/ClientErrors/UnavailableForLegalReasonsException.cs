@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.HTTP
+﻿namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// Defined in the internet draft "A New HTTP Status Code for Legally-restricted Resources". Intended to be used when resource access is 

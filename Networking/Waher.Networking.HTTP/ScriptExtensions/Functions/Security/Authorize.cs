@@ -1,11 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using Waher.Script;
+﻿using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
-using Waher.Script.Objects;
-using Waher.Script.Objects.VectorSpaces;
 using Waher.Security;
 
 namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security

@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using Waher.Runtime.Inventory;
-using Waher.Script;
+﻿using Waher.Runtime.Inventory;
 using System.Threading.Tasks;
 
 namespace Waher.Content

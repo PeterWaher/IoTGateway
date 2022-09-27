@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.HTTP
+﻿namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// The precondition given in one or more of the request-header fields evaluated to false when it was tested on the server. This response code 

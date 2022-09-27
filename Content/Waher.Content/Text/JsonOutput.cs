@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Waher.Runtime.Inventory;
-using Waher.Script.Abstraction.Elements;
 using Waher.Script.Output;
 
 namespace Waher.Content.Text

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking.HTTP
+﻿namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// A server SHOULD return a response with this status code if a request included a Range request-header field (section 14.35), and none of the 

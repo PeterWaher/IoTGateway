@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Multipart
+﻿namespace Waher.Content.Multipart
 {
 	/// <summary>
 	/// Abstract base class for multipart content

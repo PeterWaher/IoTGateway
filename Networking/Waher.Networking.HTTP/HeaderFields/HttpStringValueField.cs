@@ -1,9 +1,4 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Networking.HTTP.HeaderFields
+﻿namespace Waher.Networking.HTTP.HeaderFields
 {
 	/// <summary>
 	/// Base class for HTTP fields that take a single string value.

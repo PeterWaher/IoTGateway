@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Content.Multipart
+﻿namespace Waher.Content.Multipart
 {
 	/// <summary>
 	/// Represents alternative versions of the same content, encoded with 

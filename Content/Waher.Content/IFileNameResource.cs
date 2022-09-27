@@ -1,10 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Text;
-using Waher.Runtime.Inventory;
-
-namespace Waher.Content
+﻿namespace Waher.Content
 {
 	/// <summary>
 	/// Basic interface for resources having a FileName property.

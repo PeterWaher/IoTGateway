@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Waher.Networking.HTTP.HeaderFields
+﻿namespace Waher.Networking.HTTP.HeaderFields
 {
 	/// <summary>
 	/// Upgrade-Insecure-Requests HTTP Field header.

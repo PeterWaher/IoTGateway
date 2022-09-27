@@ -1730,7 +1730,9 @@ namespace Waher.Networking.HTTP
 				this.nrCalls++;
 
 				this.IncLocked(Request.Header.Method, this.callsPerMethod);
-				this.IncLocked(Resource.ResourceName, this.callsPerResource);
+
+				if (!(Resource is null))
+					this.IncLocked(Resource.ResourceName, this.callsPerResource);
 
 				if (!((UserAgent = Request.Header.UserAgent) is null))
 					this.IncLocked(UserAgent.Value, this.callsPerUserAgent);

@@ -536,12 +536,22 @@ namespace Waher.Runtime.Inventory
 		/// <param name="Name">Parameter name.</param>
 		/// <param name="Value">Parameter value.</param>
 		/// <exception cref="ArgumentException">If a module parameter with the same name is already defined.</exception>
+		/// <remarks>A module parameter that is disposed will still be available, but it can be reset by
+		/// another module parameter instance using the same name. The method to check if a parameter is
+		/// disposed, is if the object instance has a public property named "Disposeed" returning a bool
+		/// value indicating if the object has been disposed or not.</remarks>
 		public static void SetModuleParameter(string Name, object Value)
 		{
 			lock (moduleParameters)
 			{
 				if (moduleParameters.TryGetValue(Name, out object Value2) && !Value.Equals(Value2))
-					throw new ArgumentException("Module parameter already defined: " + Name, nameof(Name));
+				{
+					Type T = Value2.GetType();
+					PropertyInfo PI = T.GetRuntimeProperty("Disposed");
+
+					if (PI is null || PI.PropertyType != typeof(bool) || !(bool)PI.GetValue(Value2))
+						throw new ArgumentException("Module parameter already defined: " + Name, nameof(Name));
+				}
 
 				moduleParameters[Name] = Value;
 			}

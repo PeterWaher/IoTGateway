@@ -428,6 +428,10 @@
             <param name="Name">Parameter name.</param>
             <param name="Value">Parameter value.</param>
             <exception cref="T:System.ArgumentException">If a module parameter with the same name is already defined.</exception>
+            <remarks>A module parameter that is disposed will still be available, but it can be reset by
+            another module parameter instance using the same name. The method to check if a parameter is
+            disposed, is if the object instance has a public property named "Disposeed" returning a bool
+            value indicating if the object has been disposed or not.</remarks>
         </member>
         <member name="M:Waher.Runtime.Inventory.Types.TryGetModuleParameter(System.String,System.Object@)">
             <summary>

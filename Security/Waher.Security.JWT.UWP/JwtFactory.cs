@@ -100,6 +100,11 @@ namespace Waher.Security.JWT
 		}
 
 		/// <summary>
+		/// If the factory has been disposed.
+		/// </summary>
+		public bool Disposed => this.algorithm is null;
+
+		/// <summary>
 		/// Checks if a token is valid and signed by the factory.
 		/// </summary>
 		/// <param name="Token">JWT token.</param>

@@ -45,7 +45,7 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 			{
 				foreach (string s in Strings)
 				{
-					if (Array.FindIndex<KeyValuePair<string, string>>(Options, P => P.Value == s) < 0)
+					if (Array.FindIndex(Options, P => P.Value == s) < 0)
 					{
 						Field.Error = "Value not in allowed set of options.";
 						return;

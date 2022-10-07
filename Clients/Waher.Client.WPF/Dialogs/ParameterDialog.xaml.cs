@@ -508,7 +508,7 @@ namespace Waher.Client.WPF.Dialogs
 				ComboBox.SelectionChanged += this.ComboBox_SelectionChanged;
 
 				if (!(Field.Options is null))
-					ComboBox.SelectedIndex = Array.FindIndex<KeyValuePair<string, string>>(Field.Options, (P) => P.Value.Equals(s));
+					ComboBox.SelectedIndex = Array.FindIndex(Field.Options, (P) => P.Value.Equals(s));
 			}
 
 			Container.Children.Add(ComboBox);

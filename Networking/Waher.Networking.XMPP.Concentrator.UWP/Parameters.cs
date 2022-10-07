@@ -156,11 +156,12 @@ namespace Waher.Networking.XMPP.Concentrator
 							StringId = OptionAttribute.StringId;
 							if (StringId > 0)
 							{
-								Options.Add(new KeyValuePair<string, string>(OptionAttribute.Option.ToString(),
-									await Namespace.GetStringAsync(StringId, OptionAttribute.Label)));
+								Options.Add(new KeyValuePair<string, string>(
+									await Namespace.GetStringAsync(StringId, OptionAttribute.Label),
+									OptionAttribute.Option.ToString()));
 							}
 							else
-								Options.Add(new KeyValuePair<string, string>(OptionAttribute.Option.ToString(), OptionAttribute.Label));
+								Options.Add(new KeyValuePair<string, string>(OptionAttribute.Label, OptionAttribute.Option.ToString()));
 						}
 						else if (Attr is RegularExpressionAttribute RegularExpressionAttribute)
 							ValidationMethod = new RegexValidation(RegularExpressionAttribute.Pattern);

@@ -236,8 +236,8 @@ namespace Waher.Networking.Sniffers
 		{
 			if (!this.disposed)
 			{
-				this.semaphore.Dispose();
 				this.disposed = true;
+				this.semaphore.Dispose();
 			}
 		}
 	}

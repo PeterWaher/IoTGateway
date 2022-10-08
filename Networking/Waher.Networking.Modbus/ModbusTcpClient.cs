@@ -385,5 +385,38 @@ namespace Waher.Networking.Modbus
 			return Words;
 		}
 
+		/// <summary>
+		/// Writes multiple registers to a Modbus unit.
+		/// </summary>
+		/// <param name="UnitAddress">Unit Address</param>
+		/// <param name="ReferenceNumber">Reference Number</param>
+		/// <param name="Words">Words to write.</param>
+		public async Task WriteMultipleRegisters(byte UnitAddress, ushort ReferenceNumber, params ushort[] Words)
+		{
+			int WordCount = Words.Length;
+			if (WordCount <= 0 || WordCount > 100)
+				throw new ArgumentOutOfRangeException(nameof(Words), "Can only write 1-100 words at a time.");
+
+			MemoryStream Data = new MemoryStream();
+			int i;
+
+			Data.WriteByte((byte)(ReferenceNumber >> 8));
+			Data.WriteByte((byte)ReferenceNumber);
+			Data.WriteByte((byte)(WordCount >> 8));
+			Data.WriteByte((byte)WordCount);
+			Data.WriteByte((byte)(WordCount << 1));
+
+			for (i = 0; i < WordCount; i++)
+			{
+				Data.WriteByte((byte)(Words[i] >> 8));
+				Data.WriteByte((byte)Words[i]);
+			}
+
+			ModbusResponse Response = await this.Request(UnitAddress, 0x10, Data.ToArray());
+
+			if (Response.FunctionCode != 0x10)
+				throw this.GetException(Response);
+		}
+
 	}
 }

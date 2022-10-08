@@ -71,7 +71,6 @@ using Waher.Things.Metering;
 using Waher.Things.SensorData;
 using Waher.Script.Graphs;
 using Waher.Runtime.ServiceRegistration;
-using Waher.Runtime.Counters;
 
 namespace Waher.IoTGateway
 {

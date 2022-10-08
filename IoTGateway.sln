@@ -507,6 +507,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.Modbus", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.Modbus.UWP", "Networking\Waher.Networking.Modbus.UWP\Waher.Networking.Modbus.UWP.csproj", "{8797F906-F5F8-4C85-BE61-9C7E8955D512}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.Modbus.Test", "Networking\Waher.Networking.Modbus.Test\Waher.Networking.Modbus.Test.csproj", "{91280528-04B9-4FD5-8BBF-600F450068CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -5732,6 +5734,30 @@ Global
 		{8797F906-F5F8-4C85-BE61-9C7E8955D512}.Release|x64.Build.0 = Release|x64
 		{8797F906-F5F8-4C85-BE61-9C7E8955D512}.Release|x86.ActiveCfg = Release|x86
 		{8797F906-F5F8-4C85-BE61-9C7E8955D512}.Release|x86.Build.0 = Release|x86
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Debug|ARM.Build.0 = Debug|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Debug|x64.Build.0 = Debug|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Debug|x86.Build.0 = Debug|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Release|ARM.ActiveCfg = Release|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Release|ARM.Build.0 = Release|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Release|ARM64.Build.0 = Release|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Release|x64.ActiveCfg = Release|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Release|x64.Build.0 = Release|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Release|x86.ActiveCfg = Release|Any CPU
+		{91280528-04B9-4FD5-8BBF-600F450068CB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -5946,6 +5972,7 @@ Global
 		{382E87AB-2D4D-4461-9B19-4CBFC51FDFA8} = {F3F09E8E-51C5-4F8B-A4F4-E17F8FC204C1}
 		{42141178-C4DD-4953-8BDF-A973B94BEF8B} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
 		{8797F906-F5F8-4C85-BE61-9C7E8955D512} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
+		{91280528-04B9-4FD5-8BBF-600F450068CB} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}

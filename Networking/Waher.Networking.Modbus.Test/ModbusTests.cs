@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Events.Console;
+using Waher.Networking.Sniffers;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Persistence.Serialization;
@@ -17,6 +18,7 @@ namespace Waher.Networking.Modbus.Test
 	{
 		private static ConsoleEventSink consoleEventSink = null;
 		private static FilesProvider filesProvider = null;
+		private static ConsoleOutSniffer sniffer = null;
 		private static string host;
 		private static int port;
 
@@ -33,6 +35,8 @@ namespace Waher.Networking.Modbus.Test
 
 			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
 			Database.Register(filesProvider);
+
+			sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal, LineEnding.NewLine);
 		}
 
 		[AssemblyCleanup]
@@ -46,6 +50,9 @@ namespace Waher.Networking.Modbus.Test
 				Log.Unregister(consoleEventSink);
 				consoleEventSink = null;
 			}
+
+			sniffer?.Dispose();
+			sniffer = null;
 		}
 
 		[ClassInitialize]
@@ -63,8 +70,21 @@ namespace Waher.Networking.Modbus.Test
 		[TestMethod]
 		public async Task Test_01_Connect()
 		{
-			using ModbusTcpClient Client = await ModbusTcpClient.Connect(host, port);
+			using ModbusTcpClient Client = await ModbusTcpClient.Connect(host, port, sniffer);
 			Assert.IsTrue(Client.Connected);
+		}
+
+		[TestMethod]
+		public async Task Test_02_ReadRegisters()
+		{
+			using ModbusTcpClient Client = await ModbusTcpClient.Connect(host, port, sniffer);
+			Assert.IsTrue(Client.Connected);
+
+			ushort[] Words = await Client.ReadMultipleRegisters(1, 0, 16);
+			int i = 0;
+
+			foreach (ushort Word in Words)
+				Console.Out.WriteLine((i++).ToString("X2") + ": " + Word.ToString("X4"));
 		}
 	}
 }

@@ -13,6 +13,8 @@ using Waher.Events;
 using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
+using Waher.Security.LoginMonitor;
+using Waher.Security.Users;
 
 namespace Waher.Things.Ip.Model
 {
@@ -20,17 +22,20 @@ namespace Waher.Things.Ip.Model
 	{
 		private readonly LinkedList<TcpListener> tcpListeners = new LinkedList<TcpListener>();
 		private readonly Dictionary<Guid, ProxyClientConncetion> connections = new Dictionary<Guid, ProxyClientConncetion>();
+		private readonly IpCidr[] remoteIps;
 		private readonly IpHostPortProxy node;
 		private readonly string host;
 		private readonly int port;
 		private readonly int listeningPort;
 		private readonly bool tls;
 		private readonly bool trustServer;
+		private readonly bool authorizedAccess;
 		private long nrBytesDownlink = 0;
 		private long nrBytesUplink = 0;
 		private bool closed = false;
 
-		private ProxyPort(IpHostPortProxy Node, string Host, int Port, bool Tls, bool TrustServer, int ListeningPort)
+		private ProxyPort(IpHostPortProxy Node, string Host, int Port, bool Tls, bool TrustServer, int ListeningPort, bool AuthorizedAccess,
+			IpCidr[] RemoteIps)
 		{
 			this.node = Node;
 			this.host = Host;
@@ -38,11 +43,14 @@ namespace Waher.Things.Ip.Model
 			this.tls = Tls;
 			this.trustServer = TrustServer;
 			this.listeningPort = ListeningPort;
+			this.authorizedAccess = AuthorizedAccess;
+			this.remoteIps = RemoteIps;
 		}
 
-		public static async Task<ProxyPort> Create(IpHostPortProxy Node, string Host, int Port, bool Tls, bool TrustServer, int ListeningPort)
+		public static async Task<ProxyPort> Create(IpHostPortProxy Node, string Host, int Port, bool Tls, bool TrustServer, int ListeningPort,
+			bool AuthorizedAccess, IpCidr[] RemoteIps)
 		{
-			ProxyPort Result = new ProxyPort(Node, Host, Port, Tls, TrustServer, ListeningPort);
+			ProxyPort Result = new ProxyPort(Node, Host, Port, Tls, TrustServer, ListeningPort, AuthorizedAccess, RemoteIps);
 			await Result.Open();
 			return Result;
 		}
@@ -129,10 +137,34 @@ namespace Waher.Things.Ip.Model
 
 						if (!(Client is null))
 						{
+							if (!(this.remoteIps is null))
+							{
+								bool Match = false;
+
+								if (Client.Client.RemoteEndPoint is IPEndPoint IPEndPoint)
+								{
+									foreach (IpCidr Range in this.remoteIps)
+									{
+										if (Range.Matches(IPEndPoint.Address))
+										{
+											Match = true;
+											break;
+										}
+									}
+								}
+
+								if (!Match)
+								{
+									this.Error("Remote IP not approved. Conncetion reused.");
+									Client.Dispose();
+									continue;
+								}
+							}
+
 							this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
 
 							BinaryTcpClient Incoming = new BinaryTcpClient(Client);
-							BinaryTcpClient Outgoing;
+							BinaryTcpClient Outgoing = null;
 
 							Incoming.Bind(true);
 
@@ -144,24 +176,30 @@ namespace Waher.Things.Ip.Model
 								Outgoing = new BinaryTcpClient();
 								if (!await Outgoing.ConnectAsync(this.host, this.port, true))
 								{
+									await this.node.LogErrorAsync("UnableToConnect", "Unable to connect to remote endpoint.");
 									Incoming.DisposeWhenDone();
-									return;
+									continue;
 								}
 
 								if (this.tls)
 									await Outgoing.UpgradeToTlsAsClient(Certificate, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, this.trustServer);
 							}
-							catch (Exception)
+							catch (Exception ex)
 							{
+								await this.node.LogErrorAsync("UnableToConnect", "Unable to connect to remote endpoint: " + ex.Message);
+								this.Exception(ex);
 								Incoming.DisposeWhenDone();
-								return;
+								Outgoing?.Dispose();
+								continue;
 							}
 
-							if (this.tls && !(Certificate is null))
+							await this.node.RemoveErrorAsync("UnableToConnect");
+
+							if ((this.tls || this.authorizedAccess) && !(Certificate is null))
 							{
 								await this.node.RemoveWarningAsync("NoCertificate");
 
-								Task T = this.SwitchToTls(Incoming, Outgoing, Certificate);
+								Task _ = this.SwitchToTls(Incoming, Outgoing, Certificate);
 							}
 							else
 							{
@@ -233,13 +271,59 @@ namespace Waher.Things.Ip.Model
 			else
 				RemoteIpEndpoint = EP.ToString();
 
-			if (Security.LoginMonitor.LoginAuditor.CanStartTls(RemoteIpEndpoint))
+			if (LoginAuditor.CanStartTls(RemoteIpEndpoint))
 			{
 				try
 				{
 					this.Information("Switching to TLS.");
 
-					await Incoming.UpgradeToTlsAsServer(Certificate, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12);
+					await Incoming.UpgradeToTlsAsServer(Certificate, SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, ClientCertificates.Optional);
+
+					if (this.authorizedAccess)
+					{
+						if (Incoming.RemoteCertificate is null)
+						{
+							this.Error("No remote certificate found. mTLS is required.");
+							Incoming.Dispose();
+							Outgoing.Dispose();
+							return;
+						}
+
+						if (!Incoming.RemoteCertificateValid)
+						{
+							this.Error("Remote certificate not valid.");
+							Incoming.Dispose();
+							Outgoing.Dispose();
+							return;
+						}
+
+						string[] Identities = IpHostPortProxy.GetCertificateIdentities(Incoming.RemoteCertificate);
+						User User = null;
+
+						foreach (string Identity in IpHostPortProxy.GetCertificateIdentities(Certificate))
+						{
+							User = await Users.GetUser(Identity, false);
+							if (!(User is null))
+								break;
+						}
+
+						string RemoteEndpoint = Incoming.Client.Client.RemoteEndPoint.ToString();
+						int i = RemoteEndpoint.LastIndexOf(':');
+						if (i > 0 && int.TryParse(RemoteEndpoint.Substring(i + 1), out int _))
+							RemoteEndpoint = RemoteEndpoint.Substring(0, i);
+
+						if (User is null)
+						{
+							string Msg = "Invalid login: No user found matching certificate subject.";
+							LoginAuditor.Fail(Msg, User.UserName, RemoteEndpoint, "PROXY");
+							this.Error(Msg);
+							Incoming.Dispose();
+							Outgoing.Dispose();
+							return;
+						}
+						else
+							LoginAuditor.Success("Successful login using remote certificate.", User.UserName, RemoteEndpoint, "PROXY");
+					}
 
 					if (this.HasSniffers)
 					{
@@ -278,35 +362,44 @@ namespace Waher.Things.Ip.Model
 				}
 				catch (AuthenticationException ex)
 				{
-					await this.LoginFailure(ex, Incoming, RemoteIpEndpoint);
+					await this.LoginFailure(ex, Incoming, Outgoing, RemoteIpEndpoint);
 				}
 				catch (Win32Exception ex)
 				{
 					if (ex is SocketException)
+					{
 						Incoming.Dispose();
+						Outgoing.Dispose();
+					}
 					else
-						await this.LoginFailure(ex, Incoming, RemoteIpEndpoint);
+						await this.LoginFailure(ex, Incoming, Outgoing, RemoteIpEndpoint);
 				}
 				catch (IOException)
 				{
 					Incoming.Dispose();
+					Outgoing.Dispose();
 				}
 				catch (Exception ex)
 				{
 					Incoming.Dispose();
+					Outgoing.Dispose();
 					Log.Critical(ex);
 				}
 			}
 			else
+			{
 				Incoming.Dispose();
+				Outgoing.Dispose();
+			}
 		}
 
-		private async Task LoginFailure(Exception ex, BinaryTcpClient Client, string RemoteIpEndpoint)
+		private async Task LoginFailure(Exception ex, BinaryTcpClient Incoming, BinaryTcpClient Outgoing, string RemoteIpEndpoint)
 		{
 			Exception ex2 = Log.UnnestException(ex);
-			await Security.LoginMonitor.LoginAuditor.ReportTlsHackAttempt(RemoteIpEndpoint, "TLS handshake failed: " + ex2.Message, "PROXY");
+			await LoginAuditor.ReportTlsHackAttempt(RemoteIpEndpoint, "TLS handshake failed: " + ex2.Message, "PROXY");
 
-			Client.Dispose();
+			Incoming.Dispose();
+			Outgoing.Dispose();
 		}
 
 		private void Close()

@@ -372,6 +372,10 @@
       <Project>{47d09596-eb38-40a6-b233-e465e3152e44}</Project>
       <Name>Waher.Things.Metering</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Things\Waher.Things.Modbus\Waher.Things.Modbus.csproj">
+      <Project>{382e87ab-2d4d-4461-9b19-4cbfc51fdfa8}</Project>
+      <Name>Waher.Things.Modbus</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Things\Waher.Things.Mqtt\Waher.Things.Mqtt.csproj">
       <Project>{9e87e210-c942-4c80-b9c4-7a02c9bd3866}</Project>
       <Name>Waher.Things.Mqtt</Name>

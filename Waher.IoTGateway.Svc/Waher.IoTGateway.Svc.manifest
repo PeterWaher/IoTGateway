@@ -475,6 +475,8 @@
 	<Assembly fileName='Waher.Things.IP.pdb'/>
 	<Assembly fileName='Waher.Things.Metering.dll'/>
 	<Assembly fileName='Waher.Things.Metering.pdb'/>
+	<Assembly fileName='Waher.Things.Modbus.dll'/>
+	<Assembly fileName='Waher.Things.Modbus.pdb'/>
 	<Assembly fileName='Waher.Things.Mqtt.dll'/>
 	<Assembly fileName='Waher.Things.Mqtt.pdb'/>
 	<Assembly fileName='Waher.Things.Snmp.dll'/>
@@ -888,6 +890,7 @@
 		<Content fileName='Waher.Networking.XMPP.Concentrator.en.lng'/>
 		<Content fileName='Waher.Things.IP.en.lng'/>
 		<Content fileName='Waher.Things.Metering.en.lng'/>
+		<Content fileName='Waher.Things.Modbus.en.lng'/>
 		<Content fileName='Waher.Things.Mqtt.en.lng'/>
 		<Content fileName='Waher.Things.Snmp.en.lng'/>
 	</Folder>

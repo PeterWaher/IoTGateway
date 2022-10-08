@@ -447,15 +447,16 @@ The [Things](Things) folder contains libraries that define a hardware and data a
 sensor data, control parameters, attributes, displayable parameters, commands, queries and data sources. It also includes embedding things dynamically,
 to form more complex devices, such as concentrators or bridges.
 
-| Project                   | Type         | Link                                                           | Project description |
-|---------------------------|--------------|----------------------------------------------------------------|---------------------|
-| **Waher.Things**          | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Things/)          | The [Waher.Things](Things/Waher.Things) project is a class library that provides basic abstraction of things, errors, sensor data and control operations. |
-| **Waher.Things.Arduino**  | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Things.Arduino/)  | The [Waher.Things.Arduino](Things/Waher.Things.Arduino) project is a class library that publishes nodes for interaction with Arduinos and connected modules via Firmata. |
-| **Waher.Things.Gpio**     | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Things.Gpio/)     | The [Waher.Things.Gpio](Things/Waher.Things.Gpio) project is a class library that publishes nodes for interaction with onboard General Purpose Input/Output (GPIO) modules. |
-| **Waher.Things.Ip**       | .NET Std 2.0 | [NuGet](https://www.nuget.org/packages/Waher.Things.Ip/)       | The [Waher.Things.Ip](Things/Waher.Things.Ip) project is a class library that publishes nodes representing nodes on an IP network. |
-| **Waher.Things.Metering** | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Things.Metering/) | The [Waher.Things.Metering](Things/Waher.Things.Metering) project is a class library that defines a basic metering infrastructure. |
-| **Waher.Things.Mqtt**     | .NET Std 2.0 | [NuGet](https://www.nuget.org/packages/Waher.Things.Mqtt/)     | The [Waher.Things.Mqtt](Things/Waher.Things.Mqtt) project is a class library that publishes nodes representing devices connected to MQTT brokers. |
-| **Waher.Things.Snmp**     | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Things.Snmp/)     | The [Waher.Things.Snmp](Things/Waher.Things.Snmp) project is a class library that publishes nodes representing SNMP devices on the local area network. |
+| Project                   | Type          | Link                                                           | Project description |
+|---------------------------|---------------|----------------------------------------------------------------|---------------------|
+| **Waher.Things**          | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Things/)          | The [Waher.Things](Things/Waher.Things) project is a class library that provides basic abstraction of things, errors, sensor data and control operations. |
+| **Waher.Things.Arduino**  | UWP           | [NuGet](https://www.nuget.org/packages/Waher.Things.Arduino/)  | The [Waher.Things.Arduino](Things/Waher.Things.Arduino) project is a class library that publishes nodes for interaction with Arduinos and connected modules via Firmata. |
+| **Waher.Things.Gpio**     | UWP           | [NuGet](https://www.nuget.org/packages/Waher.Things.Gpio/)     | The [Waher.Things.Gpio](Things/Waher.Things.Gpio) project is a class library that publishes nodes for interaction with onboard General Purpose Input/Output (GPIO) modules. |
+| **Waher.Things.Ip**       | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Things.Ip/)       | The [Waher.Things.Ip](Things/Waher.Things.Ip) project is a class library that publishes nodes representing nodes on an IP network. |
+| **Waher.Things.Metering** | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Things.Metering/) | The [Waher.Things.Metering](Things/Waher.Things.Metering) project is a class library that defines a basic metering infrastructure. |
+| **Waher.Things.Mqtt**     | .NET Std 2.0  | [NuGet](https://www.nuget.org/packages/Waher.Things.Mqtt/)     | The [Waher.Things.Mqtt](Things/Waher.Things.Mqtt) project is a class library that publishes nodes representing devices connected to MQTT brokers. |
+| **Waher.Things.Snmp**     | .NET Std 1.3  | [NuGet](https://www.nuget.org/packages/Waher.Things.Snmp/)     | The [Waher.Things.Snmp](Things/Waher.Things.Snmp) project is a class library that publishes nodes representing SNMP devices on the local area network. |
+| **Waher.Things.Test**     | .NET Core 3.1 |                                                                | The [Waher.Things.Test](Things/Waher.Things.Test) project contains unit tests related to the thing libraries. |
 
 Utilities
 ----------------------

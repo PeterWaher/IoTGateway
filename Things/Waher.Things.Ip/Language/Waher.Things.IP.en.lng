@@ -13,7 +13,7 @@
 			<String id="9">Host</String>
 			<String id="10">Port</String>
 			<String id="11">Encrypted (TLS)</String>
-			<String id="12">Check if Transpotrt Layer Encryption (TLS) should be used.</String>
+			<String id="12">Check if Transport Layer Encryption (TLS) should be used.</String>
 			<String id="13">Connect</String>
 			<String id="14">Certificate Valid</String>
 			<String id="15">Subject</String>
@@ -25,6 +25,15 @@
 			<String id="21">Algorithm</String>
 			<String id="22">Public Key</String>
 			<String id="23">Port on IP Host</String>
+			<String id="24">Proxy Port</String>
+			<String id="25">Listening Port Number:</String>
+			<String id="26">Port number to listen on for incoming conncetions.</String>
+			<String id="27">Listening Port</String>
+			<String id="28">Trust Server</String>
+			<String id="29">Check if Server Certificate should be trusted.</String>
+			<String id="30">#Bytes Up</String>
+			<String id="31">#Bytes Down</String>
+			<String id="32">#Connections</String>
 		</Namespace>
 	</Language>
 </Translation>

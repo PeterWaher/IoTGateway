@@ -808,6 +808,7 @@ namespace Waher.IoTGateway
 				webServer.ConfigureMutualTls(ClientCertificates, TrustClientCertificates, true);
 
 				Types.SetModuleParameter("HTTP", webServer);
+				Types.SetModuleParameter("X509", certificate);
 
 				await WriteWebServerOpenPorts();
 				webServer.OnNetworkChanged += async (sender, e) =>

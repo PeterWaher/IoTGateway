@@ -42,6 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Security\Waher.Security.LoginMonitor\Waher.Security.LoginMonitor.csproj" />
     <ProjectReference Include="..\Waher.Things.Metering\Waher.Things.Metering.csproj" />
     <ProjectReference Include="..\Waher.Things\Waher.Things.csproj" />
   </ItemGroup>

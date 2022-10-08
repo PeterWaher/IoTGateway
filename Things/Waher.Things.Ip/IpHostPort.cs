@@ -54,11 +54,11 @@ namespace Waher.Things.Ip
 		}
 
 		/// <summary>
-		/// Port number.
+		/// If connection is encrypted using TLS or not.
 		/// </summary>
 		[Page(1, "IP")]
 		[Header(11, "Encrypted (TLS)", 70)]
-		[ToolTip(12, "Check if Transpotrt Layer Encryption (TLS) should be used.")]
+		[ToolTip(12, "Check if Transport Layer Encryption (TLS) should be used.")]
 		public bool Tls
 		{
 			get { return this.tls; }

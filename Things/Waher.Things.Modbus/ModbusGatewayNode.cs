@@ -25,7 +25,7 @@ namespace Waher.Things.Modbus
 
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult<bool>(Child is MqttUnitNode);
+			return Task.FromResult<bool>(Child is ModbusUnitNode);
 		}
 
 		#region ISniffable

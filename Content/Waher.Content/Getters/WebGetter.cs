@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Runtime.ExceptionServices;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
@@ -173,6 +174,14 @@ namespace Waher.Content.Getters
 						case "Accept":
 							if (!Request.Headers.Accept.TryParseAdd(Header.Value))
 								throw new InvalidOperationException("Invalid Accept header value: " + Header.Value);
+							break;
+
+						case "Authorization":
+							int i = Header.Value.IndexOf(' ');
+							if (i < 0)
+								Request.Headers.Authorization = new AuthenticationHeaderValue(Header.Value);
+							else
+								Request.Headers.Authorization = new AuthenticationHeaderValue(Header.Value.Substring(0, i), Header.Value.Substring(i + 1).TrimStart());
 							break;
 
 						default:

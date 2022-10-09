@@ -17,7 +17,7 @@ namespace Waher.Networking.Modbus
 		/// </summary>
 		public const int DefaultPort = 502;
 
-		private Dictionary<ushort, Transaction> transactions = new Dictionary<ushort, Transaction>();
+		private readonly Dictionary<ushort, Transaction> transactions = new Dictionary<ushort, Transaction>();
 		private readonly BinaryTcpClient tcpClient;
 		private ushort transactionId = 0;
 		private int timeoutMs = 10000;
@@ -103,6 +103,8 @@ namespace Waher.Networking.Modbus
 			{
 				if (value <= 0)
 					throw new ArgumentException("Timeout must be positive.", nameof(this.TimeoutMs));
+
+				this.timeoutMs = value;
 			}
 		}
 
@@ -235,7 +237,7 @@ namespace Waher.Networking.Modbus
 		private byte rxUnitAddress = 0;
 		private byte rxFunctionCode = 0;
 		private Transaction lastTransaction = null;
-		private List<byte> rx = new List<byte>();
+		private readonly List<byte> rx = new List<byte>();
 
 		private Transaction PrepareRequest(byte UnitAddress, byte FunctionCode, params byte[] Data)
 		{

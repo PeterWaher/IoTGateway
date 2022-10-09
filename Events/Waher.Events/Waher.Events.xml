@@ -2212,6 +2212,15 @@
             <param name="Exception">Exception Object.</param>
             <param name="Tags">Variable set of tags providing event-specific information.</param>
         </member>
+        <member name="M:Waher.Events.Log.Join``1(``0[],``0[])">
+            <summary>
+            Joins two arrays
+            </summary>
+            <typeparam name="T">Element type.</typeparam>
+            <param name="Array">Original array</param>
+            <param name="NewElements">New elements to join.</param>
+            <returns>Joined array.</returns>
+        </member>
         <member name="T:Waher.Events.LogObject">
             <summary>
             Base class for objects that can log events.

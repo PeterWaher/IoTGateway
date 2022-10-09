@@ -13,7 +13,7 @@ namespace Waher.Events
 	{
 		private static IEventSink[] staticSinks = new IEventSink[0];
 		private readonly static List<IEventSink> dynamicSinks = new List<IEventSink>();
-		private static Type[] nestedExceptionTypes = new Type[] 
+		private static Type[] nestedExceptionTypes = new Type[]
 		{
 			typeof(TargetInvocationException),
 			typeof(TypeInitializationException)
@@ -151,7 +151,7 @@ namespace Waher.Events
 							hasReportedErrors = true;
 						}
 
-						Event Event2 = new Event(DateTime.Now, EventType.Critical, ex.Message, EventSink.ObjectID, string.Empty, string.Empty, 
+						Event Event2 = new Event(DateTime.Now, EventType.Critical, ex.Message, EventSink.ObjectID, string.Empty, string.Empty,
 							EventLevel.Major, string.Empty, ex.Source, CleanStackTrace(ex.StackTrace));
 
 						if (!(Event.ToAvoid is null))
@@ -1625,5 +1625,39 @@ namespace Waher.Events
 
 		#endregion
 
+		#region Extensions
+
+		/// <summary>
+		/// Joins two arrays
+		/// </summary>
+		/// <typeparam name="T">Element type.</typeparam>
+		/// <param name="Array">Original array</param>
+		/// <param name="NewElements">New elements to join.</param>
+		/// <returns>Joined array.</returns>
+		public static T[] Join<T>(this T[] Array, params T[] NewElements)
+		{
+			if (Array is null)
+				return NewElements;
+
+			int c = Array.Length;
+			if (c == 0)
+				return NewElements;
+
+			if (NewElements is null)
+				return Array;
+
+			int d = NewElements.Length;
+			if (d == 0)
+				return Array;
+
+			T[] Result = new T[c + d];
+
+			System.Array.Copy(Array, 0, Result, 0, c);
+			System.Array.Copy(NewElements, 0, Result, c, d);
+
+			return Result;
+		}
+
+		#endregion
 	}
 }

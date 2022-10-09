@@ -4,14 +4,14 @@
 		<Namespace name="Waher.Things.Modbus">
 			<String id="1">Modbus Gateway</String>
 			<String id="2">Modbus Unit</String>
-			<String id="3"></String>
-			<String id="4"></String>
-			<String id="5"></String>
-			<String id="6"></String>
-			<String id="7"></String>
-			<String id="8"></String>
-			<String id="9"></String>
-			<String id="10"></String>
+			<String id="3">Coil</String>
+			<String id="4">Modbus</String>
+			<String id="5">Unit Address:</String>
+			<String id="6">Unit ID on the Modbus network.</String>
+			<String id="7">Address</String>
+			<String id="8">Coil Number:</String>
+			<String id="9">Coil number on the Modbus unit.</String>
+			<String id="10">Nr</String>
 			<String id="11"></String>
 			<String id="12"></String>
 			<String id="13"></String>
@@ -21,6 +21,16 @@
 			<String id="17"></String>
 			<String id="18"></String>
 			<String id="19"></String>
+			<String id="20"></String>
+			<String id="21"></String>
+			<String id="22"></String>
+			<String id="23"></String>
+			<String id="24"></String>
+			<String id="25"></String>
+			<String id="26"></String>
+			<String id="27"></String>
+			<String id="28"></String>
+			<String id="29"></String>
 		</Namespace>
 	</Language>
 </Translation>

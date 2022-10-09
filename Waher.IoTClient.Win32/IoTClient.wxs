@@ -261,6 +261,7 @@
 							<File Id='Waher.Layout.Layout2D.dll' Name='Waher.Layout.Layout2D.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Layout.Layout2D.dll' Vital='yes'/>
 							<File Id='Waher.Networking.dll' Name='Waher.Networking.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.dll' Vital='yes'/>
 							<File Id='Waher.Networking.DNS.dll' Name='Waher.Networking.DNS.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.DNS.dll' Vital='yes'/>
+							<File Id='Waher.Networking.Modbus.dll' Name='Waher.Networking.Modbus.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.Modbus.dll' Vital='yes'/>
 							<File Id='Waher.Networking.MQTT.dll' Name='Waher.Networking.MQTT.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.MQTT.dll' Vital='yes'/>
 							<File Id='Waher.Networking.PeerToPeer.dll' Name='Waher.Networking.PeerToPeer.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.PeerToPeer.dll' Vital='yes'/>
 							<File Id='Waher.Networking.UPnP.dll' Name='Waher.Networking.UPnP.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.UPnP.dll' Vital='yes'/>
@@ -330,6 +331,7 @@
 							<RemoveFile Id='RemoveWaher.Layout.Layout2D.dll' Name='Waher.Layout.Layout2D.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.dll' Name='Waher.Networking.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.DNS.dll' Name='Waher.Networking.DNS.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.Modbus.dll' Name='Waher.Networking.Modbus.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.MQTT.dll' Name='Waher.Networking.MQTT.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.PeerToPeer.dll' Name='Waher.Networking.PeerToPeer.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.UPnP.dll' Name='Waher.Networking.UPnP.dll' On='uninstall'/>

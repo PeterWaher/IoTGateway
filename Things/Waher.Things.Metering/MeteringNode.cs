@@ -641,7 +641,7 @@ namespace Waher.Things.Metering
 		/// Parent Node, or null if a root node.
 		/// </summary>
 		[IgnoreMember]
-		public IThingReference Parent
+		public INode Parent
 		{
 			get
 			{

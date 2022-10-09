@@ -45,7 +45,7 @@ namespace Waher.Things.Mqtt.Model
 					Broker = null;
 			}
 
-			if (Broker != null)
+			if (!(Broker is null))
 			{
 				Broker.SetWill(WillTopic, WillData, WillRetain, WillQoS);
 				return Broker;

@@ -46,7 +46,7 @@ namespace Waher.Things.Mqtt
 				string Result = this.localTopic;
 
 				MqttTopicNode Loop = this.Parent as MqttTopicNode;
-				while (Loop != null)
+				while (!(Loop is null))
 				{
 					Result = Loop.localTopic + "/" + Result;
 					Loop = Loop.Parent as MqttTopicNode;
@@ -61,14 +61,14 @@ namespace Waher.Things.Mqtt
 		{
 			get
 			{
-				INode Parent = this.Parent as INode;
+				INode Parent = this.Parent;
 
-				while (Parent != null)
+				while (!(Parent is null))
 				{
 					if (Parent is MqttBrokerNode Broker)
 						return Broker;
 
-					Parent = Parent.Parent as INode;
+					Parent = Parent.Parent;
 				}
 
 				return null;
@@ -101,7 +101,7 @@ namespace Waher.Things.Mqtt
 			LinkedList<Parameter> Parameters = (LinkedList<Parameter>)await base.GetDisplayableParametersAsync(Language, Caller);
 			MqttTopic Topic = await this.GetTopic();
 
-			if (Topic != null)
+			if (!(Topic is null))
 				await Topic.GetDisplayableParametersAsync(Parameters, Language, Caller);
 
 			return Parameters;

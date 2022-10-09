@@ -2,7 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.ExceptionServices;
+using System.Security.Authentication;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Networking.Modbus.Exceptions;
 using Waher.Networking.Sniffers;
@@ -25,10 +28,12 @@ namespace Waher.Networking.Modbus
 
 		private readonly Dictionary<ushort, Transaction> transactions = new Dictionary<ushort, Transaction>();
 		private readonly BinaryTcpClient tcpClient;
+		private readonly SemaphoreSlim synchObject = new SemaphoreSlim(1);
 		private ushort transactionId = 0;
 		private int timeoutMs = 10000;
 		private bool connected = false;
 		private int state = 0;
+
 
 		/// <summary>
 		/// Modbus over TCP client
@@ -50,6 +55,22 @@ namespace Waher.Networking.Modbus
 		/// <exception cref="Exception">If conncetion could not be established.</exception>
 		public static async Task<ModbusTcpClient> Connect(string Host, int Port, params ISniffer[] Sniffers)
 		{
+#if !WINDOWS_UWP
+			return await Connect(Host, Port, false, Sniffers);
+		}
+
+		/// <summary>
+		/// Connects to an Modbus TCP/IP Gateway
+		/// </summary>
+		/// <param name="Host">Host name or IP Address of gateway.</param>
+		/// <param name="Port">Port number to connect to.</param>
+		/// <param name="Tls">If connction is protected by TLS.</param>
+		/// <param name="Sniffers">Sniffers</param>
+		/// <returns>Connection objcet</returns>
+		/// <exception cref="Exception">If conncetion could not be established.</exception>
+		public static async Task<ModbusTcpClient> Connect(string Host, int Port, bool Tls, params ISniffer[] Sniffers)
+		{
+#endif
 			ModbusTcpClient Result = new ModbusTcpClient(Sniffers);
 
 			Result.tcpClient.OnDisconnected += Result.TcpClient_OnDisconnected;
@@ -60,6 +81,21 @@ namespace Waher.Networking.Modbus
 
 			if (!await Result.tcpClient.ConnectAsync(Host, Port))
 				throw new IOException("Unable to connect to " + Host + ":" + Port);
+
+#if !WINDOWS_UWP
+			if (Tls)
+			{
+				try
+				{
+					await Result.tcpClient.UpgradeToTlsAsClient(SslProtocols.Tls12);
+				}
+				catch (Exception ex)
+				{
+					Result.Dispose();
+					ExceptionDispatchInfo.Capture(ex).Throw();
+				}
+			}
+#endif
 
 			Result.connected = true;
 
@@ -72,6 +108,7 @@ namespace Waher.Networking.Modbus
 		public void Dispose()
 		{
 			this.tcpClient?.DisposeWhenDone();
+			this.synchObject?.Dispose();
 
 			Transaction[] ToClose;
 
@@ -619,6 +656,22 @@ namespace Waher.Networking.Modbus
 			Value |= Response.Data[3];
 
 			return Value;
+		}
+
+		/// <summary>
+		/// Enters unique access to the TCP client. Must be followed by exactly one <see cref="Leave"/> call.
+		/// </summary>
+		public Task Enter()
+		{
+			return this.synchObject.WaitAsync();
+		}
+
+		/// <summary>
+		/// Leaves unique access to the TCP client. Must be called exactly one for each call to <see cref="Enter"/>.
+		/// </summary>
+		public void Leave()
+		{
+			this.synchObject.Release();
 		}
 
 	}

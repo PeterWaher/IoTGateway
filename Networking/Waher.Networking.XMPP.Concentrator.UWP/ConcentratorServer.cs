@@ -779,7 +779,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			if (Node is ISniffable)
 				Xml.Append("' sniffable='true");
 
-			IThingReference Parent = Node.Parent;
+			INode Parent = Node.Parent;
 			if (!(Parent is null))
 			{
 				Xml.Append("' parentId='");

@@ -61,7 +61,7 @@ namespace Waher.Things.Mqtt.Model
 
 		private void Close()
 		{
-			if (this.mqttClient != null)
+			if (!(this.mqttClient is null))
 			{
 				Scheduler.Remove(this.nextCheck);
 
@@ -83,7 +83,7 @@ namespace Waher.Things.Mqtt.Model
 		{
 			try
 			{
-				if (this.mqttClient != null)
+				if (!(this.mqttClient is null))
 				{
 					MqttState State = this.mqttClient.State;
 					if (State == MqttState.Offline || State == MqttState.Error)
@@ -273,7 +273,7 @@ namespace Waher.Things.Mqtt.Model
 						this.topics[Parts[0]] = Topic;
 				}
 
-				if (Node != null)
+				if (!(Node is null))
 				{
 					if (Node != Topic.Node)
 						await Node.DestroyAsync();
@@ -290,7 +290,7 @@ namespace Waher.Things.Mqtt.Model
 
 		public bool Remove(string LocalTopic)
 		{
-			if (LocalTopic != null)
+			if (!(LocalTopic is null))
 			{
 				lock (this.topics)
 				{

@@ -53,7 +53,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		{
 			List<Field> Fields = new List<Field>();
 
-			if (this.value.DocumentElement != null)
+			if (!(this.value.DocumentElement is null))
 				this.AppendFields(ThingReference, Fields, Request, this.value.DocumentElement, Prefix);
 
 			Request.ReportFields(Last, Fields.ToArray());

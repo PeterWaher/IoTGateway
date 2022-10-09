@@ -120,6 +120,17 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Exceptions\AcknowledgeException.cs" />
+    <Compile Include="Exceptions\GatewayPathUnavailableException.cs" />
+    <Compile Include="Exceptions\GatewayTargetDeviceFailedToRespondException.cs" />
+    <Compile Include="Exceptions\IllegalDataAddressException.cs" />
+    <Compile Include="Exceptions\IllegalDataValueException.cs" />
+    <Compile Include="Exceptions\IllegalFunctionException.cs" />
+    <Compile Include="Exceptions\IllegalResponseLengthException.cs" />
+    <Compile Include="Exceptions\MemoryParityException.cs" />
+    <Compile Include="Exceptions\ModbusException.cs" />
+    <Compile Include="Exceptions\NegativeAcknowledgeException.cs" />
+    <Compile Include="Exceptions\SlaveDeviceBusyException.cs" />
     <Compile Include="ModbusTcpClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.Modbus.UWP.rd.xml" />
@@ -138,12 +149,14 @@
   <ItemGroup>
     <None Include="Package.nuspec" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.Modbus\*.cs" "$(ProjectDir)" /Y</PreBuildEvent>
+    <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.Modbus\*.cs" "$(ProjectDir)" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.Modbus\Exceptions\*.cs" "$(ProjectDir)Exceptions" /Y</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>cd "$(ProjectDir)bin"

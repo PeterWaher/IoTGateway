@@ -65,7 +65,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 				throw new BadRequestException("Missing data.");
 
 			string ContentType = Request.Header.ContentType?.Value;
-			if (string.IsNullOrEmpty(ContentType) || Array.IndexOf(Content.Binary.BinaryDecoder.BinaryContentTypes, ContentType) < 0)
+			if (string.IsNullOrEmpty(ContentType) || Array.IndexOf(Content.Binary.BinaryCodec.BinaryContentTypes, ContentType) < 0)
 				throw new BadRequestException("Expected Binary data.");
 
 			string From = Request.Header.From?.Value;
@@ -84,7 +84,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 			if (!string.IsNullOrEmpty(Referer) && (i = Referer.IndexOf(':')) >= 0)
 			{
 				EndpointReference = Referer.Substring(0, i);
-				SymmetricCipherReference = Referer.Substring(i + 1);
+				SymmetricCipherReference = Referer[(i + 1)..];
 			}
 			else
 			{
@@ -96,7 +96,7 @@ namespace Waher.Networking.XMPP.Test.E2eTests.HttpxTests
 			if (string.IsNullOrEmpty(Key))
 				throw new BadRequestException("No sub-path provided.");
 
-			Key = Key.Substring(1);
+			Key = Key[1..];
 
 			KeyValuePair<PostBackEventHandler, object> Rec;
 

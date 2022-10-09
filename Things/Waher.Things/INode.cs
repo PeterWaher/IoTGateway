@@ -112,7 +112,7 @@ namespace Waher.Things
 		/// <summary>
 		/// Parent Node, or null if a root node.
 		/// </summary>
-		IThingReference Parent
+		INode Parent
 		{
 			get;
 		}

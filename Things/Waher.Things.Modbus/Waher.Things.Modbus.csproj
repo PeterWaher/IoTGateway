@@ -40,6 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Networking\Waher.Networking.Modbus\Waher.Networking.Modbus.csproj" />
     <ProjectReference Include="..\..\Networking\Waher.Networking\Waher.Networking.csproj" />
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj" />
     <ProjectReference Include="..\Waher.Things.Ip\Waher.Things.Ip.csproj" />

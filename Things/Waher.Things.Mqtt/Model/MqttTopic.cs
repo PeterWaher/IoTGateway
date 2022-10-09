@@ -126,7 +126,7 @@ namespace Waher.Things.Mqtt.Model
 						this.topics[Parts[Index]] = Topic;
 				}
 
-				if (Node != null)
+				if (!(Node is null))
 				{
 					if (Node != Topic.Node)
 						await Node.DestroyAsync();
@@ -191,7 +191,7 @@ namespace Waher.Things.Mqtt.Model
 							MqttTopic Current = this;
 							MqttTopic Parent = this.parent;
 
-							while (Parent != null)
+							while (!(Parent is null))
 							{
 								foreach (Field F in e.Fields)
 								{
@@ -401,7 +401,7 @@ namespace Waher.Things.Mqtt.Model
 			{
 				MqttTopic[] ChildNodes = this.GetChildNodes();
 
-				if (ChildNodes != null && ChildNodes.Length > 0)
+				if (!(ChildNodes is null) && ChildNodes.Length > 0)
 				{
 					foreach (MqttTopic ChildTopic in ChildNodes)
 					{
@@ -410,7 +410,7 @@ namespace Waher.Things.Mqtt.Model
 					}
 				}
 
-				if (this.ex != null)
+				if (!(this.ex is null))
 					Request.ReportErrors(Last, new ThingError(ThingReference, this.exTP, this.ex.Message));
 				else if (this.data is null)
 				{
@@ -440,7 +440,7 @@ namespace Waher.Things.Mqtt.Model
 		public async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(LinkedList<Parameter> Parameters,
 			Language Language, RequestOrigin _)
 		{
-			if (this.data != null)
+			if (!(this.data is null))
 			{
 				Parameters.AddLast(new StringParameter("Type", await Language.GetStringAsync(typeof(MqttTopicNode), 25, "Type"),
 					await this.data.GetTypeName(Language)));

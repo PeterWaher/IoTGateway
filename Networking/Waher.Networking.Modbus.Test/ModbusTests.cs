@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
@@ -85,6 +86,20 @@ namespace Waher.Networking.Modbus.Test
 
 			foreach (ushort Word in Words)
 				Console.Out.WriteLine((i++).ToString("X2") + ": " + Word.ToString("X4"));
+		}
+
+		[TestMethod]
+		public async Task Test_03_ReadCoils()
+		{
+			using ModbusTcpClient Client = await ModbusTcpClient.Connect(host, port, sniffer);
+			Assert.IsTrue(Client.Connected);
+
+			BitArray Coils = await Client.ReadCoils(1, 0, 100);
+			int i = 0;
+			int c = Coils.Length;
+
+			for (i = 0; i < c; i++)
+				Console.Out.WriteLine(i.ToString() + ": " + Coils[i].ToString());
 		}
 	}
 }

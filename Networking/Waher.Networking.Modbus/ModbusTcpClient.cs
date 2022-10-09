@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -418,6 +419,43 @@ namespace Waher.Networking.Modbus
 
 			if (Response.FunctionCode != 0x10)
 				throw this.GetException(Response);
+		}
+
+		/// <summary>
+		/// Reads coils from a Modbus unit.
+		/// </summary>
+		/// <param name="UnitAddress">Unit Address</param>
+		/// <param name="ReferenceNumber">Reference Number</param>
+		/// <param name="NrBits">Number of bits.</param>
+		/// <returns>Words read.</returns>
+		public async Task<BitArray> ReadCoils(byte UnitAddress, ushort ReferenceNumber, ushort NrBits)
+		{
+			if (NrBits < 1 || NrBits > 2000)
+				throw new ArgumentOutOfRangeException(nameof(NrBits), "1 <= NrBits <= 2000");
+
+			ModbusResponse Response = await this.Request(UnitAddress, 0x01,
+				(byte)(ReferenceNumber >> 8), (byte)ReferenceNumber,
+				(byte)(NrBits >> 8), (byte)NrBits);
+
+			if (Response.FunctionCode != 0x01)
+				throw this.GetException(Response);
+
+			int i = 0;
+			int c = Response.Data.Length;
+
+			if (c == 0)
+				throw new IOException("Unexpected end of response.");
+
+			byte ByteCount = Response.Data[i++];
+
+			if (i + ByteCount > c)
+				throw new IOException("Unexpected end of response.");
+
+			byte[] Bytes = new byte[ByteCount];
+
+			Array.Copy(Response.Data, i, Bytes, 0, ByteCount);
+
+			return new BitArray(Bytes);
 		}
 
 	}

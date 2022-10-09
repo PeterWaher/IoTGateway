@@ -12,8 +12,9 @@ namespace Waher.Networking.Modbus
 	/// <summary>
 	/// Modbus over TCP client
 	/// 
-	/// Reference:
+	/// References:
 	/// https://waher.se/Downloads/modbus_tcp_specification.pdf
+	/// https://modbus.org/docs/Modbus_Application_Protocol_V1_1b3.pdf
 	/// </summary>
 	public class ModbusTcpClient : Sniffable, IDisposable
 	{

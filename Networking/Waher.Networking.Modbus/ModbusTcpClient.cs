@@ -4,12 +4,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Networking.Modbus.Exceptions;
 using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.Modbus
 {
 	/// <summary>
 	/// Modbus over TCP client
+	/// 
+	/// Reference:
+	/// https://waher.se/Downloads/modbus_tcp_specification.pdf
 	/// </summary>
 	public class ModbusTcpClient : Sniffable, IDisposable
 	{
@@ -327,6 +331,23 @@ namespace Waher.Networking.Modbus
 
 		private Exception GetException(ModbusResponse Response)
 		{
+			if ((Response.FunctionCode & 0x80) != 0 && Response.Data.Length > 0)
+			{
+				switch (Response.Data[0])
+				{
+					case 0x01: return new IllegalFunctionException(Response.FunctionCode, Response.Data);
+					case 0x02: return new IllegalDataAddressException(Response.FunctionCode, Response.Data);
+					case 0x03: return new IllegalDataValueException(Response.FunctionCode, Response.Data);
+					case 0x04: return new IllegalResponseLengthException(Response.FunctionCode, Response.Data);
+					case 0x05: return new AcknowledgeException(Response.FunctionCode, Response.Data);
+					case 0x06: return new SlaveDeviceBusyException(Response.FunctionCode, Response.Data);
+					case 0x07: return new NegativeAcknowledgeException(Response.FunctionCode, Response.Data);
+					case 0x08: return new MemoryParityException(Response.FunctionCode, Response.Data);
+					case 0x0a: return new GatewayPathUnavailableException(Response.FunctionCode, Response.Data);
+					case 0x0b: return new GatewayTargetDeviceFailedToRespondException(Response.FunctionCode, Response.Data);
+				}
+			}
+
 			StringBuilder sb = new StringBuilder();
 
 			sb.Append("Modbus Exception: ");
@@ -364,12 +385,12 @@ namespace Waher.Networking.Modbus
 			int c = Response.Data.Length;
 
 			if (c == 0)
-				throw new IOException("Unexpected end of response.");
+				throw UnexpectedEndOfResponse();
 
 			byte ByteCount = Response.Data[i++];
 
 			if (i + ByteCount > c)
-				throw new IOException("Unexpected end of response.");
+				throw UnexpectedEndOfResponse();
 
 			int j = 0;
 			int d = ByteCount / 2;
@@ -386,6 +407,11 @@ namespace Waher.Networking.Modbus
 			}
 
 			return Words;
+		}
+
+		private static Exception UnexpectedEndOfResponse()
+		{
+			return new IOException("Unexpected end of response.");
 		}
 
 		/// <summary>
@@ -427,7 +453,7 @@ namespace Waher.Networking.Modbus
 		/// <param name="UnitAddress">Unit Address</param>
 		/// <param name="ReferenceNumber">Reference Number</param>
 		/// <param name="NrBits">Number of bits.</param>
-		/// <returns>Words read.</returns>
+		/// <returns>Coils read.</returns>
 		public async Task<BitArray> ReadCoils(byte UnitAddress, ushort ReferenceNumber, ushort NrBits)
 		{
 			if (NrBits < 1 || NrBits > 2000)
@@ -444,18 +470,154 @@ namespace Waher.Networking.Modbus
 			int c = Response.Data.Length;
 
 			if (c == 0)
-				throw new IOException("Unexpected end of response.");
+				throw UnexpectedEndOfResponse();
 
 			byte ByteCount = Response.Data[i++];
 
 			if (i + ByteCount > c)
-				throw new IOException("Unexpected end of response.");
+				throw UnexpectedEndOfResponse();
 
 			byte[] Bytes = new byte[ByteCount];
 
 			Array.Copy(Response.Data, i, Bytes, 0, ByteCount);
 
 			return new BitArray(Bytes);
+		}
+
+		/// <summary>
+		/// Reads input discretes from a Modbus unit.
+		/// </summary>
+		/// <param name="UnitAddress">Unit Address</param>
+		/// <param name="ReferenceNumber">Reference Number</param>
+		/// <param name="NrBits">Number of bits.</param>
+		/// <returns>Input discretes read.</returns>
+		public async Task<BitArray> ReadInputDiscretes(byte UnitAddress, ushort ReferenceNumber, ushort NrBits)
+		{
+			if (NrBits < 1 || NrBits > 2000)
+				throw new ArgumentOutOfRangeException(nameof(NrBits), "1 <= NrBits <= 2000");
+
+			ModbusResponse Response = await this.Request(UnitAddress, 0x02,
+				(byte)(ReferenceNumber >> 8), (byte)ReferenceNumber,
+				(byte)(NrBits >> 8), (byte)NrBits);
+
+			if (Response.FunctionCode != 0x02)
+				throw this.GetException(Response);
+
+			int i = 0;
+			int c = Response.Data.Length;
+
+			if (c == 0)
+				throw UnexpectedEndOfResponse();
+
+			byte ByteCount = Response.Data[i++];
+
+			if (i + ByteCount > c)
+				throw UnexpectedEndOfResponse();
+
+			byte[] Bytes = new byte[ByteCount];
+
+			Array.Copy(Response.Data, i, Bytes, 0, ByteCount);
+
+			return new BitArray(Bytes);
+		}
+
+		/// <summary>
+		/// Reads input registers from a Modbus unit.
+		/// </summary>
+		/// <param name="UnitAddress">Unit Address</param>
+		/// <param name="ReferenceNumber">Reference Number</param>
+		/// <param name="NrWords">Number of words.</param>
+		/// <returns>Words read.</returns>
+		public async Task<ushort[]> ReadInputRegisters(byte UnitAddress, ushort ReferenceNumber, ushort NrWords)
+		{
+			if (NrWords < 1 || NrWords > 125)
+				throw new ArgumentOutOfRangeException(nameof(NrWords), "1 <= NrWords <= 125");
+
+			ModbusResponse Response = await this.Request(UnitAddress, 0x04,
+				(byte)(ReferenceNumber >> 8), (byte)ReferenceNumber,
+				(byte)(NrWords >> 8), (byte)NrWords);
+
+			if (Response.FunctionCode != 0x04)
+				throw this.GetException(Response);
+
+			int i = 0;
+			int c = Response.Data.Length;
+
+			if (c == 0)
+				throw UnexpectedEndOfResponse();
+
+			byte ByteCount = Response.Data[i++];
+
+			if (i + ByteCount > c)
+				throw UnexpectedEndOfResponse();
+
+			int j = 0;
+			int d = ByteCount / 2;
+			ushort[] Words = new ushort[d];
+			ushort w;
+
+			while (j < d)
+			{
+				w = Response.Data[i++];
+				w <<= 8;
+				w |= Response.Data[i++];
+
+				Words[j++] = w;
+			}
+
+			return Words;
+		}
+
+		/// <summary>
+		/// Write to a single coil
+		/// </summary>
+		/// <param name="UnitAddress">Unit Address</param>
+		/// <param name="ReferenceNumber">Reference Number</param>
+		/// <param name="Value">Value to write.</param>
+		/// <returns>Coil output.</returns>
+		public async Task<bool> WriteCoil(byte UnitAddress, ushort ReferenceNumber, bool Value)
+		{
+			ModbusResponse Response = await this.Request(UnitAddress, 0x05,
+				(byte)(ReferenceNumber >> 8), (byte)ReferenceNumber,
+				(byte)(Value ? 0xff : 0x00), 0x00);
+
+			if (Response.FunctionCode != 0x05)
+				throw this.GetException(Response);
+
+			int c = Response.Data.Length;
+
+			if (c < 3)
+				throw UnexpectedEndOfResponse();
+
+			return Response.Data[2] != 0;
+		}
+
+		/// <summary>
+		/// Write to a single register
+		/// </summary>
+		/// <param name="UnitAddress">Unit Address</param>
+		/// <param name="ReferenceNumber">Reference Number</param>
+		/// <param name="Value">Value to write.</param>
+		/// <returns>Register value.</returns>
+		public async Task<ushort> WriteRegister(byte UnitAddress, ushort ReferenceNumber, ushort Value)
+		{
+			ModbusResponse Response = await this.Request(UnitAddress, 0x06,
+				(byte)(ReferenceNumber >> 8), (byte)ReferenceNumber,
+				(byte)(Value >> 8), (byte)Value);
+
+			if (Response.FunctionCode != 0x06)
+				throw this.GetException(Response);
+
+			int c = Response.Data.Length;
+
+			if (c < 4)
+				throw UnexpectedEndOfResponse();
+
+			Value = Response.Data[2];
+			Value <<= 8;
+			Value |= Response.Data[3];
+
+			return Value;
 		}
 
 	}

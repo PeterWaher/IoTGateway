@@ -101,5 +101,33 @@ namespace Waher.Networking.Modbus.Test
 			for (i = 0; i < c; i++)
 				Console.Out.WriteLine(i.ToString() + ": " + Coils[i].ToString());
 		}
+
+		[TestMethod]
+		public async Task Test_04_ReadInputDiscretes()
+		{
+			using ModbusTcpClient Client = await ModbusTcpClient.Connect(host, port, sniffer);
+			Assert.IsTrue(Client.Connected);
+
+			BitArray Coils = await Client.ReadInputDiscretes(1, 0, 100);
+			int i = 0;
+			int c = Coils.Length;
+
+			for (i = 0; i < c; i++)
+				Console.Out.WriteLine(i.ToString() + ": " + Coils[i].ToString());
+		}
+
+		[TestMethod]
+		public async Task Test_05_ReadInputRegisters()
+		{
+			using ModbusTcpClient Client = await ModbusTcpClient.Connect(host, port, sniffer);
+			Assert.IsTrue(Client.Connected);
+
+			ushort[] Words = await Client.ReadInputRegisters(1, 0, 16);
+			int i = 0;
+
+			foreach (ushort Word in Words)
+				Console.Out.WriteLine((i++).ToString("X2") + ": " + Word.ToString("X4"));
+		}
+
 	}
 }

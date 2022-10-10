@@ -53,6 +53,7 @@ namespace Waher.Things.Modbus
 		[Header(18, "Multiplier:")]
 		[ToolTip(19, "Multiplier will be multiplied to the register before reporting value.")]
 		[DefaultValue(1.0)]
+		[Text(TextPosition.BeforeField, 24, "Raw value will be transformed as follows: Value = ((Raw * Multiplier) / Divisor) + Offset. To this transformed value, the unit will be added.")]
 		public double Multiplier { get; set; }
 
 		/// <summary>

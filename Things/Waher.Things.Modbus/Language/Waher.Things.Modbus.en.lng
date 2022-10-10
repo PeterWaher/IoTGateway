@@ -25,7 +25,7 @@
 			<String id="21">Divisor will be divided from the register (after multiplication) before reporting value.</String>
 			<String id="22">Offset:</String>
 			<String id="23">Offset will be addded to the register (after division) before reporting value.</String>
-			<String id="24"></String>
+			<String id="24">Raw value will be transformed as follows: Value = ((Raw * Multiplier) / Divisor) + Offset. To this transformed value, the unit will be added.</String>
 			<String id="25"></String>
 			<String id="26"></String>
 			<String id="27"></String>

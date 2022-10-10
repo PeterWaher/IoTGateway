@@ -54,6 +54,7 @@ namespace Waher.Things.Ip
 		[Header(2, "Host Name:", 50)]
 		[ToolTip(3, "Host Name or IP Address of device.")]
 		[DefaultValueStringEmpty]
+		[Required]
 		public string Host
 		{
 			get { return this.host; }

@@ -47,6 +47,7 @@ namespace Waher.Things.Ip
 		[ToolTip(5, "Port number to use when communicating with device.")]
 		[DefaultValue(0)]
 		[Range(0, 65535)]
+		[Required]
 		public int Port
 		{
 			get { return this.port; }

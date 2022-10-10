@@ -971,6 +971,85 @@ namespace Waher.Networking.XMPP.Contracts
 
 		#endregion
 
+		#region Mark Identity as Ready for Approval
+
+		/// <summary>
+		/// Marks an Identity as Ready for Approval. Call this after necessary attachments have been
+		/// added. If automatic KYC modules exist on the server, they may at this point process
+		/// available information, and choose to automatically approve or reject the application.
+		/// </summary>
+		/// <param name="LegalIdentityId">ID of Legal Identity that is ready for approval.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void ReadyForApproval(string LegalIdentityId, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.ReadyForApproval(this.componentAddress, LegalIdentityId, Callback, State);
+		}
+
+		/// <summary>
+		/// Marks an Identity as Ready for Approval. Call this after necessary attachments have been
+		/// added. If automatic KYC modules exist on the server, they may at this point process
+		/// available information, and choose to automatically approve or reject the application.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="LegalIdentityId">ID of Legal Identity that is ready for approval.</param>
+		/// <param name="Callback">Method to call when registration response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void ReadyForApproval(string Address, string LegalIdentityId, IqResultEventHandlerAsync Callback, object State)
+		{
+			this.AssertAllowed();
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<readyForApproval xmlns=\"");
+			Xml.Append(NamespaceLegalIdentities);
+			Xml.Append("\" id=\"");
+			Xml.Append(XML.Encode(LegalIdentityId));
+			Xml.Append("\"/>");
+
+			this.client.SendIqSet(Address, Xml.ToString(), Callback, State);
+		}
+
+		/// <summary>
+		/// Marks an Identity as Ready for Approval. Call this after necessary attachments have been
+		/// added. If automatic KYC modules exist on the server, they may at this point process
+		/// available information, and choose to automatically approve or reject the application.
+		/// </summary>
+		/// <param name="LegalIdentityId">ID of Legal Identity that is ready for approval.</param>
+		/// <returns>Identity object representing the application.</returns>
+		public Task ReadyForApprovalAsync(string LegalIdentityId)
+		{
+			return this.ReadyForApprovalAsync(this.componentAddress, LegalIdentityId);
+		}
+
+		/// <summary>
+		/// Marks an Identity as Ready for Approval. Call this after necessary attachments have been
+		/// added. If automatic KYC modules exist on the server, they may at this point process
+		/// available information, and choose to automatically approve or reject the application.
+		/// </summary>
+		/// <param name="Address">Address of server (component).</param>
+		/// <param name="LegalIdentityId">ID of Legal Identity that is ready for approval.</param>
+		/// <returns>Identity object representing the application.</returns>
+		public Task ReadyForApprovalAsync(string Address, string LegalIdentityId)
+		{
+			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
+
+			this.ReadyForApproval(Address, LegalIdentityId, (sender, e) =>
+			{
+				if (e.Ok)
+					Result.SetResult(true);
+				else
+					Result.SetException(e.StanzaError ?? new Exception("Unable to flag identity as ready for approval."));
+
+				return Task.CompletedTask;
+
+			}, null);
+
+			return Result.Task;
+		}
+
+		#endregion
+
 		#region Validate Legal Identity
 
 		/// <summary>

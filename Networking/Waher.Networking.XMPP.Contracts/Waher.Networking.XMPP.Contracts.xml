@@ -708,6 +708,46 @@
             <param name="Properties">Properties of the legal identity.</param>
             <returns>Identity object representing the application.</returns>
         </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ReadyForApproval(System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Marks an Identity as Ready for Approval. Call this after necessary attachments have been
+            added. If automatic KYC modules exist on the server, they may at this point process
+            available information, and choose to automatically approve or reject the application.
+            </summary>
+            <param name="LegalIdentityId">ID of Legal Identity that is ready for approval.</param>
+            <param name="Callback">Method to call when registration response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ReadyForApproval(System.String,System.String,Waher.Networking.XMPP.IqResultEventHandlerAsync,System.Object)">
+            <summary>
+            Marks an Identity as Ready for Approval. Call this after necessary attachments have been
+            added. If automatic KYC modules exist on the server, they may at this point process
+            available information, and choose to automatically approve or reject the application.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="LegalIdentityId">ID of Legal Identity that is ready for approval.</param>
+            <param name="Callback">Method to call when registration response is returned.</param>
+            <param name="State">State object to pass on to the callback method.</param>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ReadyForApprovalAsync(System.String)">
+            <summary>
+            Marks an Identity as Ready for Approval. Call this after necessary attachments have been
+            added. If automatic KYC modules exist on the server, they may at this point process
+            available information, and choose to automatically approve or reject the application.
+            </summary>
+            <param name="LegalIdentityId">ID of Legal Identity that is ready for approval.</param>
+            <returns>Identity object representing the application.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.ReadyForApprovalAsync(System.String,System.String)">
+            <summary>
+            Marks an Identity as Ready for Approval. Call this after necessary attachments have been
+            added. If automatic KYC modules exist on the server, they may at this point process
+            available information, and choose to automatically approve or reject the application.
+            </summary>
+            <param name="Address">Address of server (component).</param>
+            <param name="LegalIdentityId">ID of Legal Identity that is ready for approval.</param>
+            <returns>Identity object representing the application.</returns>
+        </member>
         <member name="M:Waher.Networking.XMPP.Contracts.ContractsClient.Validate(Waher.Networking.XMPP.Contracts.LegalIdentity,Waher.Networking.XMPP.Contracts.IdentityValidationEventHandler,System.Object)">
             <summary>
             Validates a legal identity.

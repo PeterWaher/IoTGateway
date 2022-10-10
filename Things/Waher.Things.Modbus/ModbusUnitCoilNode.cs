@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Networking.Modbus;
+using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
 using Waher.Things.ControlParameters;
@@ -16,8 +17,6 @@ namespace Waher.Things.Modbus
 	/// </summary>
 	public class ModbusUnitCoilNode : ModbusUnitChildNode, ISensor, IActuator
 	{
-		private int coilNr;
-
 		/// <summary>
 		/// Represents a coil on a Modbus unit node.
 		/// </summary>
@@ -27,17 +26,23 @@ namespace Waher.Things.Modbus
 		}
 
 		/// <summary>
-		/// If the node is provisioned is not. Property is editable.
+		/// Coil number.
 		/// </summary>
 		[Page(4, "Modbus", 100)]
 		[Header(8, "Coil Number:")]
 		[ToolTip(9, "Coil number on the Modbus unit.")]
 		[Range(0, 65535)]
-		public int CoilNr
-		{
-			get => this.coilNr;
-			set => this.coilNr = value;
-		}
+		[Required]
+		public int CoilNr { get; set; }
+
+		/// <summary>
+		/// Custom field name
+		/// </summary>
+		[Page(4, "Modbus", 100)]
+		[Header(11, "Field Name:")]
+		[ToolTip(12, "Custom field name for value.")]
+		[DefaultValueStringEmpty]
+		public string FieldName { get; set; }
 
 		/// <summary>
 		/// Gets the type name of the node.
@@ -59,7 +64,7 @@ namespace Waher.Things.Modbus
 		{
 			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;
 
-			Result.AddLast(new Int32Parameter("Nr", await Language.GetStringAsync(typeof(ModbusGatewayNode), 10, "Nr"), this.coilNr));
+			Result.AddLast(new Int32Parameter("Nr", await Language.GetStringAsync(typeof(ModbusGatewayNode), 10, "Nr"), this.CoilNr));
 
 			return Result;
 		}
@@ -74,9 +79,9 @@ namespace Waher.Things.Modbus
 			await Client.Enter();
 			try
 			{
-				BitArray Bits = await Client.ReadCoils((byte)this.UnitNode.UnitId, (ushort)this.coilNr, 1);
+				BitArray Bits = await Client.ReadCoils((byte)this.UnitNode.UnitId, (ushort)this.CoilNr, 1);
 
-				Request.ReportFields(true, new BooleanField(this, DateTime.UtcNow, "Value", Bits[0], FieldType.Momentary, FieldQoS.AutomaticReadout, true));
+				Request.ReportFields(true, new BooleanField(this, DateTime.UtcNow, this.GetFieldName(), Bits[0], FieldType.Momentary, FieldQoS.AutomaticReadout, true));
 			}
 			catch (Exception ex)
 			{
@@ -88,6 +93,14 @@ namespace Waher.Things.Modbus
 			}
 		}
 
+		public string GetFieldName()
+		{
+			if (string.IsNullOrEmpty(this.FieldName))
+				return "Value";
+			else
+				return this.FieldName;
+		}
+
 		/// <summary>
 		/// Get control parameters for the actuator.
 		/// </summary>
@@ -96,14 +109,14 @@ namespace Waher.Things.Modbus
 		{
 			return Task.FromResult(new ControlParameter[]
 			{
-				new BooleanControlParameter("Value", "Modbus", "Value","Coil output",
+				new BooleanControlParameter("Value", "Modbus", this.GetFieldName(), "Coil output",
 					async (Node) =>
 					{
 						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
 						await Client.Enter();
 						try
 						{
-							BitArray Bits = await Client.ReadCoils((byte)this.UnitNode.UnitId, (ushort)this.coilNr, 1);
+							BitArray Bits = await Client.ReadCoils((byte)this.UnitNode.UnitId, (ushort)this.CoilNr, 1);
 							return Bits[0];
 						}
 						finally
@@ -117,9 +130,9 @@ namespace Waher.Things.Modbus
 						await Client.Enter();
 						try
 						{
-							bool WritenValue = await Client.WriteCoil((byte)this.UnitNode.UnitId, (ushort)this.coilNr, Value);
+							bool WritenValue = await Client.WriteCoil((byte)this.UnitNode.UnitId, (ushort)this.CoilNr, Value);
 
-							if (WritenValue!=Value)
+							if (WritenValue != Value)
 								throw new Exception("Coil value not changed.");
 						}
 						finally

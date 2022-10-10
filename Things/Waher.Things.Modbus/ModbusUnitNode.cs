@@ -12,8 +12,6 @@ namespace Waher.Things.Modbus
 	/// </summary>
 	public class ModbusUnitNode : ProvisionedMeteringNode
 	{
-		private int unitId;
-
 		/// <summary>
 		/// Represents a Unit Device on a Modbus network.
 		/// </summary>
@@ -29,11 +27,8 @@ namespace Waher.Things.Modbus
 		[Header(5, "Unit Address:")]
 		[ToolTip(6, "Unit ID on the Modbus network.")]
 		[Range(0, 255)]
-		public int UnitId
-		{
-			get => this.unitId;
-			set => this.unitId = value;
-		}
+		[Required]
+		public int UnitId { get; set; }
 
 		/// <summary>
 		/// Gets the type name of the node.
@@ -55,7 +50,7 @@ namespace Waher.Things.Modbus
 		{
 			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;
 
-			Result.AddLast(new Int32Parameter("Address", await Language.GetStringAsync(typeof(ModbusGatewayNode), 7, "Address"), this.unitId));
+			Result.AddLast(new Int32Parameter("Address", await Language.GetStringAsync(typeof(ModbusGatewayNode), 7, "Address"), this.UnitId));
 
 			return Result;
 		}

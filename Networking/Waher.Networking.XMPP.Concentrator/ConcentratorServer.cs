@@ -1977,6 +1977,37 @@ namespace Waher.Networking.XMPP.Concentrator
 			e.IqResult(Xml.ToString());
 		}
 
+		/// <summary>
+		/// Gets an array of type names of nodes that can be added to <paramref name="Node"/>.
+		/// </summary>
+		/// <param name="Node">Reference node.</param>
+		/// <returns>Array of names of types of nodes that can be added to <paramref name="Node"/>.</returns>
+		public static async Task<Type[]> GetAddableTypes(INode Node)
+		{
+			List<Type> Result = new List<Type>();
+
+			foreach (Type T in Types.GetTypesImplementingInterface(typeof(INode)))
+			{
+				ConstructorInfo CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
+					continue;
+
+				try
+				{
+					INode PresumptiveChild = (INode)CI.Invoke(Types.NoParameters);
+
+					if (await Node.AcceptsChildAsync(PresumptiveChild) && await PresumptiveChild.AcceptsParentAsync(Node))
+						Result.Add(T);
+				}
+				catch (Exception)
+				{
+					continue;
+				}
+			}
+
+			return Result.ToArray();
+		}
+
 		private async Task GetParametersForNewNodeHandler(object Sender, IqEventArgs e)
 		{
 			RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);

@@ -83,6 +83,7 @@
     <ProjectReference Include="..\Things\Waher.Things.Modbus\Waher.Things.Modbus.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Mqtt\Waher.Things.Mqtt.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Snmp\Waher.Things.Snmp.csproj" />
+    <ProjectReference Include="..\Things\Waher.Things.Virtual\Waher.Things.Virtual.csproj" />
     <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj" />
     <ProjectReference Include="..\Waher.IoTGateway.Resources\Waher.IoTGateway.Resources.csproj" />
     <ProjectReference Include="..\Waher.IoTGateway\Waher.IoTGateway.csproj" />

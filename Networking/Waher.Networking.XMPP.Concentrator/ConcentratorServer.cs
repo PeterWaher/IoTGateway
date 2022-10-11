@@ -2176,7 +2176,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				{
 					Result.Errors = new KeyValuePair<string, string>[]
 					{
-							new KeyValuePair<string, string>("NodeId", "Identity already exists.")
+						new KeyValuePair<string, string>("NodeId", "Identity already exists.")
 					};
 				}
 			}

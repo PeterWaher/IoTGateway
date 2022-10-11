@@ -1,26 +1,24 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Networking.Modbus;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
-using Waher.Things.ControlParameters;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 
 namespace Waher.Things.Modbus
 {
 	/// <summary>
-	/// Represents a register on a Modbus unit node.
+	/// Represents an input register on a Modbus unit node.
 	/// </summary>
-	public class ModbusUnitRegisterNode : ModbusUnitChildNode, ISensor, IActuator
+	public class ModbusUnitInputRegisterNode : ModbusUnitChildNode, ISensor
 	{
 		/// <summary>
 		/// Represents a register on a Modbus unit node.
 		/// </summary>
-		public ModbusUnitRegisterNode()
+		public ModbusUnitInputRegisterNode()
 			: base()
 		{
 			this.Multiplier = 1.0;
@@ -36,6 +34,15 @@ namespace Waher.Things.Modbus
 		[Range(0, 65535)]
 		[Required]
 		public int RegisterNr { get; set; }
+
+		/// <summary>
+		/// Custom field name
+		/// </summary>
+		[Page(4, "Modbus", 100)]
+		[Header(25, "Raw Name:")]
+		[ToolTip(26, "Custom field name for raw value.")]
+		[DefaultValueStringEmpty]
+		public string RawName { get; set; }
 
 		/// <summary>
 		/// Custom field name
@@ -90,7 +97,7 @@ namespace Waher.Things.Modbus
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(ModbusGatewayNode), 15, "Register");
+			return Language.GetStringAsync(typeof(ModbusGatewayNode), 15, "Input Register (3x)");
 		}
 
 		/// <summary>
@@ -124,9 +131,11 @@ namespace Waher.Things.Modbus
 				int NrDec = Math.Min(255, Math.Max(0, (int)Math.Ceiling(-Math.Log10(this.Multiplier / this.Divisor))));
 				DateTime TP = DateTime.UtcNow;
 
+				ThingReference This = this.ReportAs;
+
 				Request.ReportFields(true,
-					new Int32Field(this, TP, "Raw", Raw, FieldType.Momentary, FieldQoS.AutomaticReadout, true),
-					new QuantityField(this, TP, this.GetFieldName(), Value, (byte)NrDec, this.Unit, FieldType.Momentary, FieldQoS.AutomaticReadout, true));
+					new Int32Field(This, TP, this.GetRawName(), Raw, FieldType.Momentary, FieldQoS.AutomaticReadout, true),
+					new QuantityField(This, TP, this.GetFieldName(), Value, (byte)NrDec, this.Unit, FieldType.Momentary, FieldQoS.AutomaticReadout, true));
 			}
 			catch (Exception ex)
 			{
@@ -138,87 +147,20 @@ namespace Waher.Things.Modbus
 			}
 		}
 
+		public string GetRawName()
+		{
+			if (string.IsNullOrEmpty(this.RawName))
+				return "Raw";
+			else
+				return this.RawName;
+		}
+
 		public string GetFieldName()
 		{
 			if (string.IsNullOrEmpty(this.FieldName))
 				return "Value";
 			else
 				return this.FieldName;
-		}
-
-		/// <summary>
-		/// Get control parameters for the actuator.
-		/// </summary>
-		/// <returns>Collection of control parameters for actuator.</returns>
-		public Task<ControlParameter[]> GetControlParameters()
-		{
-			return Task.FromResult(new ControlParameter[]
-			{
-				new Int32ControlParameter("Value", "Modbus", "Raw", "Raw register output", 0, 65535,
-					async (Node) =>
-					{
-						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
-						await Client.Enter();
-						try
-						{
-							ushort[] Values = await Client.ReadInputRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 1);
-							return Values[0];
-						}
-						finally
-						{
-							Client.Leave();
-						}
-					},
-					async (Node, Value) =>
-					{
-						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
-						await Client.Enter();
-						try
-						{
-							ushort WritenValue = await Client.WriteRegister((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, (ushort)Value);
-
-							if (WritenValue != Value)
-								throw new Exception("Register value not changed correctly.");
-						}
-						finally
-						{
-							Client.Leave();
-						}
-					}),
-				new DoubleControlParameter("Value", "Modbus", this.GetFieldName(), "Coil output",
-					this.Offset, ((65535 * this.Multiplier) / this.Divisor) + this.Offset,
-					async (Node) =>
-					{
-						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
-						await Client.Enter();
-						try
-						{
-							ushort[] Values = await Client.ReadInputRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 1);
-							return ((Values[0] * this.Multiplier) / this.Divisor) + this.Offset;
-						}
-						finally
-						{
-							Client.Leave();
-						}
-					},
-					async (Node, Value) =>
-					{
-						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
-						await Client.Enter();
-						try
-						{
-							ushort Raw = (ushort)Math.Min(65535, Math.Max(0, ((Value - this.Offset) * this.Divisor) / this.Multiplier));
-							ushort WritenValue = await Client.WriteRegister((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, Raw);
-
-							if (WritenValue != Value)
-								throw new Exception("Register value not changed correctly.");
-						}
-						finally
-						{
-							Client.Leave();
-						}
-					})
-			});
 		}
 	}
 }

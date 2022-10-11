@@ -24,7 +24,7 @@ namespace Waher.Things.Modbus
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult<bool>(Parent is ModbusUnitNode);
+			return Task.FromResult<bool>(Parent is ModbusUnitNode || Parent is ModbusCompositeChildNode);
 		}
 
 		/// <summary>
@@ -35,6 +35,20 @@ namespace Waher.Things.Modbus
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
 			return Task.FromResult<bool>(false);
+		}
+
+		/// <summary>
+		/// Under what node fields are to be reported.
+		/// </summary>
+		public ThingReference ReportAs
+		{
+			get
+			{
+				if (this.Parent is ModbusCompositeChildNode Composite)
+					return Composite;
+				else
+					return this;
+			}
 		}
 
 		/// <summary>
@@ -64,10 +78,16 @@ namespace Waher.Things.Modbus
 		{
 			get
 			{
-				if (this.Parent is ModbusUnitNode UnitNode)
-					return UnitNode;
-				else
-					throw new Exception("Modbus Unit node not found.");
+				INode Loop = this.Parent;
+				while (!(Loop is null))
+				{
+					if (Loop is ModbusUnitNode UnitNode)
+						return UnitNode;
+					else
+						Loop = Loop.Parent;
+				}
+
+				throw new Exception("Modbus Unit node not found.");
 			}
 		}
 

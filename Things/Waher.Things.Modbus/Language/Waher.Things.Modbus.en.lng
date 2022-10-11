@@ -4,7 +4,7 @@
 		<Namespace name="Waher.Things.Modbus">
 			<String id="1">Modbus Gateway</String>
 			<String id="2">Modbus Unit</String>
-			<String id="3">Coil</String>
+			<String id="3">Coil (0x)</String>
 			<String id="4">Modbus</String>
 			<String id="5">Unit Address:</String>
 			<String id="6">Unit ID on the Modbus network.</String>
@@ -16,7 +16,7 @@
 			<String id="12">Custom field name for value.</String>
 			<String id="13">Register Number:</String>
 			<String id="14">Register number on the Modbus unit.</String>
-			<String id="15">Register</String>
+			<String id="15">Input Register (3x)</String>
 			<String id="16">Unit:</String>
 			<String id="17">Unit of register value (after scaling and offset).</String>
 			<String id="18">Multiplier:</String>
@@ -26,21 +26,41 @@
 			<String id="22">Offset:</String>
 			<String id="23">Offset will be addded to the register (after division) before reporting value.</String>
 			<String id="24">Raw value will be transformed as follows: Value = ((Raw * Multiplier) / Divisor) + Offset. To this transformed value, the unit will be added.</String>
-			<String id="25"></String>
-			<String id="26"></String>
-			<String id="27"></String>
-			<String id="28"></String>
-			<String id="29"></String>
-			<String id="30"></String>
-			<String id="31"></String>
-			<String id="32"></String>
-			<String id="33"></String>
-			<String id="34"></String>
-			<String id="35"></String>
-			<String id="36"></String>
-			<String id="37"></String>
-			<String id="38"></String>
-			<String id="39"></String>
+			<String id="25">Raw Name:</String>
+			<String id="26">Custom field name for raw value.</String>
+			<String id="27">Holding Register (4x)</String>
+			<String id="28">Composite Node</String>
+			<String id="29">Discrete Input (1x)</String>
+			<String id="30">Minimum coil number:</String>
+			<String id="31">Smallest coil number accepted by the device.</String>
+			<String id="32">Maximum coil number:</String>
+			<String id="33">Largest coil number accepted by the device.</String>
+			<String id="34">Minimum discrete input number:</String>
+			<String id="35">Smallest discrete input number accepted by the device.</String>
+			<String id="36">Maximum discrete input number:</String>
+			<String id="37">Largest discrete input number accepted by the device.</String>
+			<String id="38">Minimum input register number:</String>
+			<String id="39">Smallest input register number accepted by the device.</String>
+			<String id="40">Maximum input register number:</String>
+			<String id="41">Largest input register number accepted by the device.</String>
+			<String id="42">Minimum holding register number:</String>
+			<String id="43">Smallest holding register number accepted by the device.</String>
+			<String id="44">Maximum holding register number:</String>
+			<String id="45">Largest holding register number accepted by the device.</String>
+			<String id="46"></String>
+			<String id="47"></String>
+			<String id="48"></String>
+			<String id="49"></String>
+			<String id="50"></String>
+			<String id="51"></String>
+			<String id="52"></String>
+			<String id="53"></String>
+			<String id="54"></String>
+			<String id="55"></String>
+			<String id="56"></String>
+			<String id="57"></String>
+			<String id="58"></String>
+			<String id="59"></String>
 		</Namespace>
 	</Language>
 </Translation>

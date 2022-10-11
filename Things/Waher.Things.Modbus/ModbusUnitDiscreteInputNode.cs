@@ -6,34 +6,33 @@ using Waher.Networking.Modbus;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
-using Waher.Things.ControlParameters;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 
 namespace Waher.Things.Modbus
 {
 	/// <summary>
-	/// Represents a coil on a Modbus unit node.
+	/// Represents a deiscrete input register on a Modbus unit node.
 	/// </summary>
-	public class ModbusUnitCoilNode : ModbusUnitChildNode, ISensor, IActuator
+	public class ModbusUnitDiscreteInputNode : ModbusUnitChildNode, ISensor
 	{
 		/// <summary>
-		/// Represents a coil on a Modbus unit node.
+		/// Represents a deiscrete input register on a Modbus unit node.
 		/// </summary>
-		public ModbusUnitCoilNode()
+		public ModbusUnitDiscreteInputNode()
 			: base()
 		{
 		}
 
 		/// <summary>
-		/// Coil number.
+		/// Register number
 		/// </summary>
 		[Page(4, "Modbus", 100)]
-		[Header(8, "Coil Number:")]
-		[ToolTip(9, "Coil number on the Modbus unit.")]
+		[Header(13, "Register Number:")]
+		[ToolTip(14, "Register number on the Modbus unit.")]
 		[Range(0, 65535)]
 		[Required]
-		public int CoilNr { get; set; }
+		public int RegisterNr { get; set; }
 
 		/// <summary>
 		/// Custom field name
@@ -51,7 +50,7 @@ namespace Waher.Things.Modbus
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(ModbusGatewayNode), 3, "Coil (0x)");
+			return Language.GetStringAsync(typeof(ModbusGatewayNode), 29, "Discrete Input (1x)");
 		}
 
 		/// <summary>
@@ -64,7 +63,7 @@ namespace Waher.Things.Modbus
 		{
 			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;
 
-			Result.AddLast(new Int32Parameter("Nr", await Language.GetStringAsync(typeof(ModbusGatewayNode), 10, "Nr"), this.CoilNr));
+			Result.AddLast(new Int32Parameter("Nr", await Language.GetStringAsync(typeof(ModbusGatewayNode), 10, "Nr"), this.RegisterNr));
 
 			return Result;
 		}
@@ -79,9 +78,13 @@ namespace Waher.Things.Modbus
 			await Client.Enter();
 			try
 			{
-				BitArray Bits = await Client.ReadCoils((byte)this.UnitNode.UnitId, (ushort)this.CoilNr, 1);
+				BitArray Values = await Client.ReadInputDiscretes((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 1);
+				DateTime TP = DateTime.UtcNow;
 
-				Request.ReportFields(true, new BooleanField(this.ReportAs, DateTime.UtcNow, this.GetFieldName(), Bits[0], FieldType.Momentary, FieldQoS.AutomaticReadout, true));
+				ThingReference This = this.ReportAs;
+
+				Request.ReportFields(true,
+					new BooleanField(This, TP, this.GetFieldName(), Values[0], FieldType.Momentary, FieldQoS.AutomaticReadout));
 			}
 			catch (Exception ex)
 			{
@@ -99,48 +102,6 @@ namespace Waher.Things.Modbus
 				return "Value";
 			else
 				return this.FieldName;
-		}
-
-		/// <summary>
-		/// Get control parameters for the actuator.
-		/// </summary>
-		/// <returns>Collection of control parameters for actuator.</returns>
-		public Task<ControlParameter[]> GetControlParameters()
-		{
-			return Task.FromResult(new ControlParameter[]
-			{
-				new BooleanControlParameter("Value", "Modbus", this.GetFieldName(), "Coil output",
-					async (Node) =>
-					{
-						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
-						await Client.Enter();
-						try
-						{
-							BitArray Bits = await Client.ReadCoils((byte)this.UnitNode.UnitId, (ushort)this.CoilNr, 1);
-							return Bits[0];
-						}
-						finally
-						{
-							Client.Leave();
-						}
-					},
-					async (Node, Value) =>
-					{
-						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
-						await Client.Enter();
-						try
-						{
-							bool WritenValue = await Client.WriteCoil((byte)this.UnitNode.UnitId, (ushort)this.CoilNr, Value);
-
-							if (WritenValue != Value)
-								throw new Exception("Coil value not changed.");
-						}
-						finally
-						{
-							Client.Leave();
-						}
-					})
-			});
 		}
 	}
 }

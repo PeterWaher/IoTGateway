@@ -167,8 +167,6 @@ namespace Waher.Things.ScriptExtensions.SensorData
 
 					if (i < c)
 					{
-						Obj = Arguments[i++].AssociatedObjectValue;
-
 						bool? b = ToBoolean(Arguments[i++]);
 						if (b.HasValue)
 							Writable = b.Value;

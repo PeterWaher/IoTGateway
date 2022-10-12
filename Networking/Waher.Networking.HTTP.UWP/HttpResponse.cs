@@ -368,7 +368,7 @@ namespace Waher.Networking.HTTP
 					return null;
 
 				case "WWW-AUTHENTICATE":
-					return this.challenges is null ? null : this.challenges[0];
+					return this.challenges?[0];
 
 				default:
 					if (!(this.customHeaders is null))
@@ -530,6 +530,8 @@ namespace Waher.Networking.HTTP
 		/// <param name="ex">Exception</param>
 		public async Task SendResponse(Exception ex)
 		{
+			ex = Log.UnnestException(ex);
+
 			if (this.HeaderSent)
 				this.clientConnection?.Error(ex.Message);
 			else

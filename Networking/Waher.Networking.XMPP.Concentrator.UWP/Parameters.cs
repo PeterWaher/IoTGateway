@@ -582,7 +582,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				FieldInfo FieldInfo;
 				Namespace Namespace = null;
 				Namespace ConcentratorNamespace = await Language.GetNamespaceAsync(typeof(ConcentratorServer).Namespace);
-				LinkedList<Tuple<PropertyInfo, FieldInfo, object>> ToSet = null;
+				LinkedList<SetRec> ToSet = null;
 				ValidationMethod ValidationMethod;
 				DataType DataType;
 				Type PropertyType;
@@ -612,6 +612,27 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (PropertyInfo is null && FieldInfo is null)
 					{
+						if (EditableObject is ICustomFormProperties CustomFormProperties)
+						{
+							await CustomFormProperties.ValidateCustomProperty(Field);
+							if (Field.HasError)
+							{
+								AddError(ref Errors, Field.Var, Field.Error);
+								continue;
+							}
+
+							if (ToSet is null)
+								ToSet = new LinkedList<SetRec>();
+
+							ToSet.AddLast(new SetRec()
+							{
+								Field = Field,
+								CustomFormProperties = CustomFormProperties,
+								Value = Field.ValueStrings
+							});
+							continue;
+						}
+
 						AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(1, "Property not found."));
 						continue;
 					}
@@ -845,9 +866,15 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 
 					if (ToSet is null)
-						ToSet = new LinkedList<Tuple<PropertyInfo, FieldInfo, object>>();
+						ToSet = new LinkedList<SetRec>();
 
-					ToSet.AddLast(new Tuple<PropertyInfo, FieldInfo, object>(PropertyInfo, FieldInfo, ValueToSet2));
+					ToSet.AddLast(new SetRec()
+					{
+						Field = Field,
+						PInfo = PropertyInfo,
+						FInfo = FieldInfo,
+						Value = ValueToSet2
+					});
 				}
 
 				if (Errors is null)
@@ -860,37 +887,42 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (!(ToSet is null))
 					{
-						foreach (Tuple<PropertyInfo, FieldInfo, object> P in ToSet)
+						foreach (SetRec Rec in ToSet)
 						{
 							try
 							{
 								if (OnlySetChanged)
 								{
-									object Current = P.Item1?.GetValue(EditableObject) ?? P.Item2?.GetValue(EditableObject);
+									object Current = Rec.PInfo?.GetValue(EditableObject) ?? Rec.FInfo?.GetValue(EditableObject);
 
 									if (Current is null)
 									{
-										if (P.Item3 is null)
+										if (Rec.Value is null)
 											continue;
 									}
-									else if (P.Item3 != null && Current.Equals(P.Item3))
+									else if (!(Rec.Value is null) && Current.Equals(Rec.Value))
 										continue;
 								}
 
-								if (P.Item1 != null)
+								if (!(Rec.PInfo is null))
 								{
-									P.Item1.SetValue(EditableObject, P.Item3);
-									Result.Tags.Add(new KeyValuePair<string, object>(P.Item1.Name, P.Item3));
+									Rec.PInfo.SetValue(EditableObject, Rec.Value);
+									Result.Tags.Add(new KeyValuePair<string, object>(Rec.PInfo.Name, Rec.Value));
+								}
+								else if (!(Rec.FInfo is null))
+								{
+									Rec.FInfo.SetValue(EditableObject, Rec.Value);
+									Result.Tags.Add(new KeyValuePair<string, object>(Rec.FInfo.Name, Rec.Value));
 								}
 								else
 								{
-									P.Item2.SetValue(EditableObject, P.Item3);
-									Result.Tags.Add(new KeyValuePair<string, object>(P.Item2.Name, P.Item3));
+									await Rec.CustomFormProperties.SetCustomProperty(Rec.Field);
+									Result.Tags.Add(new KeyValuePair<string, object>(Rec.Field.Var, Rec.Value));
 								}
 							}
 							catch (Exception ex)
 							{
-								AddError(ref Errors, P.Item1?.Name ?? P.Item2.Name, ex.Message);
+								AddError(ref Errors, Rec.Field.Var, ex.Message);
 							}
 						}
 					}
@@ -906,6 +938,15 @@ namespace Waher.Networking.XMPP.Concentrator
 					};
 				}
 			}
+		}
+
+		private class SetRec
+		{
+			public PropertyInfo PInfo;
+			public FieldInfo FInfo;
+			public Field Field;
+			public ICustomFormProperties CustomFormProperties;
+			public object Value;
 		}
 
 		/// <summary>

@@ -368,7 +368,7 @@ namespace Waher.Networking.HTTP
 					return null;
 
 				case "WWW-AUTHENTICATE":
-					return this.challenges is null ? null : this.challenges[0];
+					return this.challenges?[0];
 
 				default:
 					if (!(this.customHeaders is null))

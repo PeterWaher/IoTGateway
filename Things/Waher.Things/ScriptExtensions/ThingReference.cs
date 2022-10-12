@@ -3,7 +3,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.IoTGateway.ScriptExtensions.Functions.Things
+namespace Waher.Things.ScriptExtensions
 {
 	/// <summary>
 	/// Creates a reference object to a thing.

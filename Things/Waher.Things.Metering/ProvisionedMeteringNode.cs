@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
 using Waher.Persistence.Attributes;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Runtime.Settings;
 using Waher.Things.Attributes;
@@ -169,6 +171,57 @@ namespace Waher.Things.Metering
 		}
 
 		/// <summary>
+		/// Gets a discovery URI for the thing.
+		/// </summary>
+		/// <returns>Discovery URI</returns>
+		public Task<string> GetDiscoUri()
+		{
+			return this.GetDiscoUri(false);
+		}
+
+		/// <summary>
+		/// Gets a discovery URI for the thing.
+		/// </summary>
+		/// <param name="OnlyClaim">If empty string should be returned, if thing has been claimed.</param>
+		/// <returns>Discovery URI</returns>
+		public async Task<string> GetDiscoUri(bool OnlyClaim)
+		{
+			string s = await RuntimeSettings.GetAsync("IoTDisco.KEY." + this.NodeId + "." + this.SourceId + "." + this.Partition, string.Empty);
+			if (!string.IsNullOrEmpty(s))
+				return s;
+
+			if (OnlyClaim)
+				return string.Empty;
+
+			if (!Types.TryGetModuleParameter("XMPP", out object Obj))
+				return string.Empty;
+
+			Type T = Obj.GetType();
+			PropertyInfo PI = T.GetRuntimeProperty("BareJID");
+			string BareJid = PI?.GetValue(Obj) as string;
+
+			if (string.IsNullOrEmpty(BareJid))
+				return string.Empty;
+			
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("iotdisco:JID=");
+			sb.Append(Uri.EscapeDataString(BareJid));
+			sb.Append(";NID=");
+			sb.Append(Uri.EscapeDataString(this.NodeId));
+			sb.Append(";SID=");
+			sb.Append(Uri.EscapeDataString(this.SourceId));
+
+			if (!string.IsNullOrEmpty(this.Partition))
+			{
+				sb.Append(";PT=");
+				sb.Append(Uri.EscapeDataString(this.Partition));
+			}
+
+			return sb.ToString();
+		}
+
+		/// <summary>
 		/// Annotates the property form.
 		/// </summary>
 		/// <param name="Form">Form being built.</param>
@@ -176,7 +229,7 @@ namespace Waher.Things.Metering
 		{
 			if (this.provisioned && string.IsNullOrEmpty(this.owner))
 			{
-				string Uri = await RuntimeSettings.GetAsync("IoTDisco.KEY." + this.NodeId + "." + this.SourceId + "." + this.Partition, string.Empty);
+				string Uri = await this.GetDiscoUri(true);
 				if (!string.IsNullOrEmpty(Uri))
 				{
 					Language Language = await Translator.GetLanguageAsync(Form.LanguageCode);

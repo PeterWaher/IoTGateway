@@ -916,34 +916,34 @@ The following table lists available scalar functions:
 
 The following table lists available string-related functions:
 
-| Function                   | Description | Example |
-|----------------------------|-------------|---------|
-| `After(s,Delimiter)        | Returns the part of the string that occurs after the last occurrence of the Delimiter string. | `Port:=Num(After(EP,":"))` |
-| `Before(s,Delimiter)       | Returns the part of the string that occurs before the first occurrence of the Delimiter string. | `IP:=Before(EP,":")` |
-| `Concat(v[,Delimiter})`    | Concatenates the elements of a vector, optionally delimiting the elements with `Delimiter`. If `v` is not a vector, it is returned, as-is. | `Concat(Elements,",")` |
-| `Contains(s,Substring)`    | Returns `true` if `s` contains `Substring` somewhere, `false` otherwise. | `Contains(s,"Hello")` |
-| `Empty(s)`                 | Alias for `IsEmpty(s)`. | `Empty(s)` |
-| `EndsWith(s,Substring)`    | Returns `true` if `s` ends with `Substring`, `false` otherwise. | `EndsWith(s,"Hello")` |
-| `Eval(s)`                  | Alias for `Evaluate(s)`. | `Evaluate("a+b")` |
-| `Evaluate(s)`              | Parses the string and evaluates it. | `Evaluate("a+b")` |
-| `IndexOf(s,Substring)`     | Returns the zero-based index of `Substring` in `s`. If `Substring` is not found in `s`, `-1` is returned. | `IndexOf("Hello","el")` |
-| `IsEmpty(s)`               | Returns a boolean value showing if the string `s` is empty or not. | `IsEmpty(s)` |
-| `LastIndexOf(s,Substring)` | Returns the last zero-based index of `Substring` in `s`. If `Substring` is not found in `s`, `-1` is returned. | `LastIndexOf("Hello","el")` |
-| `Left(s,N)`                | Returns a string with the left-most `N` characters. If the string `s` is shorter, the entire string is returned. | `Left(s,3)` |
-| `Len(s)`                   | Alias for `Length(s)`. | `Len(s)` |
-| `Length(s)`                | Returns the length of the string. | `Length(s)` |
-| `LowerCase(s)`             | Returns the lower-case version of `s`. | `LowerCase("Hello")` |
-| `Mid(s,Pos,Len)`           | Returns a substring of `s`, starting a character `Pos` and continuing `Len` characters. The `Pos` index is zero-based. If the requested substring goes beyond the scope of `s`, the substring gets truncated accordingly. | `Mid(s,5,2)` |
-| `PadLeft(s,N)`             | Returns the string `s` padded to the left with space characters, until it contains `N` characters. | `PadLeft("Hello",10)` |
-| `PadRight(s,N)`            | Returns the string `s` padded to the right with space characters, until it contains `N` characters. | `PadRight("Hello",10)` |
-| `Parse(s)`                 | Parses the string as an expression, and returns the parsed expression. | `Parse("a+b")` |
-| `Right(s,N)`               | Returns a string with the right-most `N` characters. If the string `s` is shorter, the entire string is returned. | `Right(s,3)` |
-| `Split(s,Substring)`       | Returns an array of substrings of `s`, delimited by `Substring`. | `Split("Hello World","l")` |
-| `StartsWith(s,Substring)`  | Returns `true` if `s` starts with `Substring`, `false` otherwise. | `StartsWith(s,"Hello")` |
-| `Trim(s)`                  | Returns a trimmed version of `s`. | `Trim(" Hello ")` |
-| `TrimEnd(s)`               | Returns a version of `s` with its end trimmed. | `TrimEnd(" Hello ")` |
-| `TrimStart(s)`             | Returns a version of `s` with its start trimmed. | `TrimStart(" Hello ")` |
-| `UpperCase(s)`             | Returns the upper-case version of `s`. | `UpperCase("Hello")` |
+| Function                    | Description | Example |
+|-----------------------------|-------------|---------|
+| `After(s,Delimiter)`        | Returns the part of the string that occurs after the last occurrence of the Delimiter string. | `Port:=Num(After(EP,":"))` |
+| `Before(s,Delimiter)`       | Returns the part of the string that occurs before the first occurrence of the Delimiter string. | `IP:=Before(EP,":")` |
+| `Concat(v[,Delimiter})`     | Concatenates the elements of a vector, optionally delimiting the elements with `Delimiter`. If `v` is not a vector, it is returned, as-is. | `Concat(Elements,",")` |
+| `Contains(s,Substring)`     | Returns `true` if `s` contains `Substring` somewhere, `false` otherwise. | `Contains(s,"Hello")` |
+| `Empty(s)`                  | Alias for `IsEmpty(s)`. | `Empty(s)` |
+| `EndsWith(s,Substring)`     | Returns `true` if `s` ends with `Substring`, `false` otherwise. | `EndsWith(s,"Hello")` |
+| `Eval(s)`                   | Alias for `Evaluate(s)`. | `Evaluate("a+b")` |
+| `Evaluate(s)`               | Parses the string and evaluates it. | `Evaluate("a+b")` |
+| `IndexOf(s,Substring)`      | Returns the zero-based index of `Substring` in `s`. If `Substring` is not found in `s`, `-1` is returned. | `IndexOf("Hello","el")` |
+| `IsEmpty(s)`                | Returns a boolean value showing if the string `s` is empty or not. | `IsEmpty(s)` |
+| `LastIndexOf(s,Substring)`  | Returns the last zero-based index of `Substring` in `s`. If `Substring` is not found in `s`, `-1` is returned. | `LastIndexOf("Hello","el")` |
+| `Left(s,N)`                 | Returns a string with the left-most `N` characters. If the string `s` is shorter, the entire string is returned. | `Left(s,3)` |
+| `Len(s)`                    | Alias for `Length(s)`. | `Len(s)` |
+| `Length(s)`                 | Returns the length of the string. | `Length(s)` |
+| `LowerCase(s)`              | Returns the lower-case version of `s`. | `LowerCase("Hello")` |
+| `Mid(s,Pos,Len)`            | Returns a substring of `s`, starting a character `Pos` and continuing `Len` characters. The `Pos` index is zero-based. If the requested substring goes beyond the scope of `s`, the substring gets truncated accordingly. | `Mid(s,5,2)` |
+| `PadLeft(s,N)`              | Returns the string `s` padded to the left with space characters, until it contains `N` characters. | `PadLeft("Hello",10)` |
+| `PadRight(s,N)`             | Returns the string `s` padded to the right with space characters, until it contains `N` characters. | `PadRight("Hello",10)` |
+| `Parse(s)`                  | Parses the string as an expression, and returns the parsed expression. | `Parse("a+b")` |
+| `Right(s,N)`                | Returns a string with the right-most `N` characters. If the string `s` is shorter, the entire string is returned. | `Right(s,3)` |
+| `Split(s,Substring)`        | Returns an array of substrings of `s`, delimited by `Substring`. | `Split("Hello World","l")` |
+| `StartsWith(s,Substring)`   | Returns `true` if `s` starts with `Substring`, `false` otherwise. | `StartsWith(s,"Hello")` |
+| `Trim(s)`                   | Returns a trimmed version of `s`. | `Trim(" Hello ")` |
+| `TrimEnd(s)`                | Returns a version of `s` with its end trimmed. | `TrimEnd(" Hello ")` |
+| `TrimStart(s)`              | Returns a version of `s` with its start trimmed. | `TrimStart(" Hello ")` |
+| `UpperCase(s)`              | Returns the upper-case version of `s`. | `UpperCase("Hello")` |
 
 ### Date and Time Functions
 
@@ -1291,12 +1291,12 @@ G
 
 The following graph functions are available in the `Waher.Script.Graphs3D` library.
 
-| Function                                  | Description                                           | Example                                   |
-|-------------------------------------------|-------------------------------------------------------|-------------------------------------------|
-| `LineMesh3D(X,Y,Z[,Color])                | Draws a three dimensional line mesh from coordinates in three equally sized matrices `X`, `Y`, `Z`.    | [Example][LineMesh3DExample] |
-| `PolygonMesh3D(X,Y,Z[,Shader[,TwoSided]]) | Draws a three dimensional polygon mesh from coordinates in three equally sized matrices `X`, `Y`, `Z`. | [Example][PolygonMesh3DExample] |
-| `Surface3D(X,Y,Z[,Shader[,TwoSided]])     | Draws a three dimensional surface from coordinates in three equally sized matrices `X`, `Y`, `Z`.      | [Example][Surface3DExample] |
-| `VerticalBars3D(X,Y,Z[,Shader])           | Draws a three dimensional vertical bar chart from information available in three equally sized matrices `X`, `Y`, `Z`. `X` and `Z` are assumed to be labels. `Y` contains the corresponding bar value. | [Example][VerticalBars3DExample] |
+| Function                                   | Description                                           | Example                                   |
+|--------------------------------------------|-------------------------------------------------------|-------------------------------------------|
+| `LineMesh3D(X,Y,Z[,Color])`                | Draws a three dimensional line mesh from coordinates in three equally sized matrices `X`, `Y`, `Z`.    | [Example][LineMesh3DExample] |
+| `PolygonMesh3D(X,Y,Z[,Shader[,TwoSided]])` | Draws a three dimensional polygon mesh from coordinates in three equally sized matrices `X`, `Y`, `Z`. | [Example][PolygonMesh3DExample] |
+| `Surface3D(X,Y,Z[,Shader[,TwoSided]])`     | Draws a three dimensional surface from coordinates in three equally sized matrices `X`, `Y`, `Z`.      | [Example][Surface3DExample] |
+| `VerticalBars3D(X,Y,Z[,Shader])`           | Draws a three dimensional vertical bar chart from information available in three equally sized matrices `X`, `Y`, `Z`. `X` and `Z` are assumed to be labels. `Y` contains the corresponding bar value. | [Example][VerticalBars3DExample] |
 
 [LineMesh3DExample]: Prompt.md?Expression=x%3A%3DColumns%28-10..10%7C0.5%29%3Bz%3A%3DRows%28-10..10%7C0.5%29%3Br%3A%3Dsqrt%28x.%5E2%2Bz.%5E2%29%3By%3A%3Dsin%28r%2A2%29.%2Aexp%28-r%2F3%29%3Blinemesh3d%28x%2Cy%2Cz%2C%27Blue%27%29
 [PolygonMesh3DExample]: Prompt.md?Expression=x%3A%3DColumns%28-10..10%7C0.5%29%3Bz%3A%3DRows%28-10..10%7C0.5%29%3Br%3A%3Dsqrt%28x.%5E2%2Bz.%5E2%29%3By%3A%3Dsin%28r%2A2%29.%2Aexp%28-r%2F3%29%3Bpolygonmesh3d%28x%2Cy%2Cz%2C%27Blue%27%29
@@ -1748,31 +1748,31 @@ Parallel(f("A"),f("B"),f("C"))
 
 The following functions are available in the `Waher.Script.Content` library.
 
-| Function                                          | Description | Example |
-|---------------------------------------------------|-------------|---------|
-| `Base64Decode(Data)`                              | Decodes binary data from a string using BASE64 encoding. | [Example][Base64DecodeExample] |
-| `Base64Encode(Data)`                              | Encodes binary data to a string using BASE64 encoding. | [Example][Base64EncodeExample] |
-| `Base64UrlDecode(Data)`                           | Decodes binary data from a string using BASE64URL encoding. | [Example][Base64UrlDecodeExample] |
-| `Base64UrlEncode(Data)`                           | Encodes binary data to a string using BASE64URL encoding. | [Example][Base64UrlEncodeExample] |
-| `Decode(Content,Type)`                            | Decodes `Content` using the available Internet Content Type decoder for Content Type `Type`. | [Example][DecodeExample] |
-| `Duration(s)                                      | Parses a string `s` into a Duration value. | `Duration("PT10H30M")` |
-| `Duration(Years,Month,Dats,Hours,Minutes,Seconds) | Creates a Duration value. | `Duration(0,0,0,10,30,0)` |
-| `Encode(Object[,Types])`                          | Encodes `Object` using the available Internet Content Type encoders. If `Types` is provided, it is an array of acceptable content types that can be used. The result is a two-dimensional vector, containing the binary encoding as the first element, and the content type as the second element. | [Example][EncodeExample] |
-| `Get(Url[,Accept/Headers[,Certificate]])`         | Retrieves a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes it, in accordance with its content type. If a second argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. If providing a `Certificate`, mutual TLS can be used. | [Example][GetExample] |
-| `Head(Url[,Accept/Headers[,Certificate]])`        | Retrieves the headers of a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`. If a second argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. If providing a `Certificate`, mutual TLS can be used. | [Example][HeadExample] |
-| `HtmlAttributeEncode(s)`                          | Encodes a string for inclusion in an HTML attribute. It transforms `<`, `>`, `&` and `"` to `&lt;`, `&gt;`, `&amp;` and `&quot;` correspondingly. | [Example][HtmlAttributeEncodeExample] |
-| `HtmlValueEncode(s)`                              | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. | [Example][HtmlValueEncodeExample] |
-| `LoadFile(FileName[,ContentType])`                | Loads a file and decodes it. By default, the content type defined by the file extension is used, if defined. You can also explicitly provide a content type. | [Example][LoadFileExample] |
-| `Post(Url,Data[,Accept/Headers,[Certificate]])`   | Encodes data and posts it to a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes the response, in accordance with the content type returned. If a third argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. If providing a `Certificate`, mutual TLS can be used. | [Example][PostExample] |
-| `QrEncode(Text,Level)                             | Encodes text in `Text` to a QR Code using Error Correction level defined by `Level`. Response is a text string where the QR Code is encoded using block characters. | [Example][QrExample] |
-| `QrEncode(Text,Level[,Width[,Height]])            | Encodes text in `Text` to a QR Code using Error Correction level defined by `Level`. Response is a bitmap with the specified dimensions. If only `Width` is specified, `Height` will be assued to be identical. | [Example][QrExample2] |
-| `SaveFile(Obj,FileName)`                          | Encodes an object `Obj` in accordance with its type and file extension, and saves it as a file. | [Example][SaveFileExample] |
-| `UrlDecode(s)`                                    | Decodes a string taken from an URL. | [Example][UrlDecodeExample] |
-| `UrlEncode(s)`                                    | Encodes a string for inclusion in an URL. | [Example][UrlEncodeExample] |
-| `Utf8Decode(s)`                                   | Gets a string from UTF-8 encoded data. | [Example][Utf8DecodeExample] |
-| `Utf8Encode(s)`                                   | Encodes a string using UTF-8. | [Example][Utf8EncodeExample] |
-| `XmlDecode(s)`                                    | Decodes a string taken from XML. It transforms `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` to `<`, `>`, `&`, `"` and `'`  correspondingly. | [Example][XmlDecodeExample] |
-| `XmlEncode(s)`                                    | Encodes a string for inclusion in XML. It transforms `<`, `>`, `&`, `"` and `'` to `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` correspondingly. | [Example][XmlEncodeExample] |
+| Function                                           | Description | Example |
+|----------------------------------------------------|-------------|---------|
+| `Base64Decode(Data)`                               | Decodes binary data from a string using BASE64 encoding. | [Example][Base64DecodeExample] |
+| `Base64Encode(Data)`                               | Encodes binary data to a string using BASE64 encoding. | [Example][Base64EncodeExample] |
+| `Base64UrlDecode(Data)`                            | Decodes binary data from a string using BASE64URL encoding. | [Example][Base64UrlDecodeExample] |
+| `Base64UrlEncode(Data)`                            | Encodes binary data to a string using BASE64URL encoding. | [Example][Base64UrlEncodeExample] |
+| `Decode(Content,Type)`                             | Decodes `Content` using the available Internet Content Type decoder for Content Type `Type`. | [Example][DecodeExample] |
+| `Duration(s)`                                      | Parses a string `s` into a Duration value. | `Duration("PT10H30M")` |
+| `Duration(Years,Month,Dats,Hours,Minutes,Seconds)` | Creates a Duration value. | `Duration(0,0,0,10,30,0)` |
+| `Encode(Object[,Types])`                           | Encodes `Object` using the available Internet Content Type encoders. If `Types` is provided, it is an array of acceptable content types that can be used. The result is a two-dimensional vector, containing the binary encoding as the first element, and the content type as the second element. | [Example][EncodeExample] |
+| `Get(Url[,Accept/Headers[,Certificate]])`          | Retrieves a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes it, in accordance with its content type. If a second argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. If providing a `Certificate`, mutual TLS can be used. | [Example][GetExample] |
+| `Head(Url[,Accept/Headers[,Certificate]])`         | Retrieves the headers of a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`. If a second argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. If providing a `Certificate`, mutual TLS can be used. | [Example][HeadExample] |
+| `HtmlAttributeEncode(s)`                           | Encodes a string for inclusion in an HTML attribute. It transforms `<`, `>`, `&` and `"` to `&lt;`, `&gt;`, `&amp;` and `&quot;` correspondingly. | [Example][HtmlAttributeEncodeExample] |
+| `HtmlValueEncode(s)`                               | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. | [Example][HtmlValueEncodeExample] |
+| `LoadFile(FileName[,ContentType])`                 | Loads a file and decodes it. By default, the content type defined by the file extension is used, if defined. You can also explicitly provide a content type. | [Example][LoadFileExample] |
+| `Post(Url,Data[,Accept/Headers,[Certificate]])`    | Encodes data and posts it to a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes the response, in accordance with the content type returned. If a third argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. If providing a `Certificate`, mutual TLS can be used. | [Example][PostExample] |
+| `QrEncode(Text,Level)`                             | Encodes text in `Text` to a QR Code using Error Correction level defined by `Level`. Response is a text string where the QR Code is encoded using block characters. | [Example][QrExample] |
+| `QrEncode(Text,Level[,Width[,Height]])`            | Encodes text in `Text` to a QR Code using Error Correction level defined by `Level`. Response is a bitmap with the specified dimensions. If only `Width` is specified, `Height` will be assued to be identical. | [Example][QrExample2] |
+| `SaveFile(Obj,FileName)`                           | Encodes an object `Obj` in accordance with its type and file extension, and saves it as a file. | [Example][SaveFileExample] |
+| `UrlDecode(s)`                                     | Decodes a string taken from an URL. | [Example][UrlDecodeExample] |
+| `UrlEncode(s)`                                     | Encodes a string for inclusion in an URL. | [Example][UrlEncodeExample] |
+| `Utf8Decode(s)`                                    | Gets a string from UTF-8 encoded data. | [Example][Utf8DecodeExample] |
+| `Utf8Encode(s)`                                    | Encodes a string using UTF-8. | [Example][Utf8EncodeExample] |
+| `XmlDecode(s)`                                     | Decodes a string taken from XML. It transforms `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` to `<`, `>`, `&`, `"` and `'`  correspondingly. | [Example][XmlDecodeExample] |
+| `XmlEncode(s)`                                     | Encodes a string for inclusion in XML. It transforms `<`, `>`, `&`, `"` and `'` to `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` correspondingly. | [Example][XmlEncodeExample] |
 
 [Base64DecodeExample]: Prompt.md?Expression=Decode(Base64Decode("SGVsbG8="),"text/plain")
 [Base64EncodeExample]: Prompt.md?Expression=Base64Encode(Encode("Hello")[0])
@@ -1800,33 +1800,33 @@ The following functions are available in the `Waher.Script.Content` library.
 
 The following functions are available in the `Waher.Script.Cryptography` library.
 
-| Function                                                  | Description | Example |
-|-----------------------------------------------------------|-------------|---------|
-| `Aes256Decrypt(Content,Key,IV[,CipherMode[,PaddingMode]]) | Decrypts `Content` using AES 256, with the key `Key` and Initiation Vector `IV`. `CipherMode` is by default `CBC` and Padding is by default `PKCS7`. | [Example][Aes256DecryptExample] |
-| `Aes256Encrypt(Content,Key,IV[,CipherMode[,PaddingMode]]) | Encrypts `Content` using AES 256, with the key `Key` and Initiation Vector `IV`. `CipherMode` is by default `CBC` and Padding is by default `PKCS7`. | [Example][Aes256EncryptExample] |
-| `Ed25519([PrivKey[,HashKey]])                             | Creates an Edwards25519 curve, with optional private key (`PrivKey`) and option to pre-hash key (`HashKey`). | [Example][Ed25519Example] |
-| `Ed448([PrivKey[,HashKey]])                               | Creates an Edwards448 curve, with optional private key (`PrivKey`) and option to pre-hash key (`HashKey`). | [Example][Ed448Example] |
-| `Md5(Data)`                                               | Calculates a MD5 Hash Digest of `Data`.  | [Example][Md5Example] |
-| `P192([PrivKey])                                          | Creates a NIST-P192 curve, with optional private key (`PrivKey`). | [Example][P192Example] |
-| `P224([PrivKey])                                          | Creates a NIST-P224 curve, with optional private key (`PrivKey`). | [Example][P224Example] |
-| `P256([PrivKey])                                          | Creates a NIST-P256 curve, with optional private key (`PrivKey`). | [Example][P256Example] |
-| `P384([PrivKey])                                          | Creates a NIST-P384 curve, with optional private key (`PrivKey`). | [Example][P384Example] |
-| `P521([PrivKey])                                          | Creates a NIST-P521 curve, with optional private key (`PrivKey`). | [Example][P521Example] |
-| `RandomBytes(NrBytes)`                                    | Generates an array of `N` random bytes. | [Example][RandomBytesExample] |
-| `Sha1(Data)`                                              | Calculates a SHA-1 Hash Digest of `Data`.  | [Example][Sha1Example] |
-| `Sha1HMac(Data,Key)`                                      | Calculates a SHA-1 HMAC Hash Digest of `Data` using the key `Key`.  | [Example][Sha1HmacExample] |
-| `Sha2_256(Data)`                                          | Calculates a 256-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2256Example] |
-| `Sha2_256HMac(Data,Key)`                                  | Calculates a 256-bit SHA-2 HMAC Hash Digest of `Data` using the key `Key`.  | [Example][Sha2256HmacExample] |
-| `Sha2_384(Data)`                                          | Calculates a 384-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2384Example] |
-| `Sha2_384HMac(Data,Key)`                                  | Calculates a 384-bit SHA-2 HMAC Hash Digest of `Data` using the key `Key`.  | [Example][Sha2384HmacExample] |
-| `Sha2_512(Data)`                                          | Calculates a 512-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2512Example] |
-| `Sha2_512HMac(Data,Key)`                                  | Calculates a 512-bit SHA-2 HMAC Hash Digest of `Data` using the key `Key`.  | [Example][Sha2512HmacExample] |
-| `Sha3_224(Data)`                                          | Calculates a 224-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3224Example] |
-| `Sha3_256(Data)`                                          | Calculates a 256-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3256Example] |
-| `Sha3_384(Data)`                                          | Calculates a 384-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3384Example] |
-| `Sha3_512(Data)`                                          | Calculates a 512-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3512Example] |
-| `X25519([PrivKey])                                        | Creates a Curve25519 curve, with optional private key (`PrivKey`). | [Example][X25519Example] |
-| `X448([PrivKey])                                          | Creates a Curve448 curve, with optional private key (`PrivKey`). | [Example][X448Example] |
+| Function                                                   | Description | Example |
+|------------------------------------------------------------|-------------|---------|
+| `Aes256Decrypt(Content,Key,IV[,CipherMode[,PaddingMode]])` | Decrypts `Content` using AES 256, with the key `Key` and Initiation Vector `IV`. `CipherMode` is by default `CBC` and Padding is by default `PKCS7`. | [Example][Aes256DecryptExample] |
+| `Aes256Encrypt(Content,Key,IV[,CipherMode[,PaddingMode]])` | Encrypts `Content` using AES 256, with the key `Key` and Initiation Vector `IV`. `CipherMode` is by default `CBC` and Padding is by default `PKCS7`. | [Example][Aes256EncryptExample] |
+| `Ed25519([PrivKey[,HashKey]])`                             | Creates an Edwards25519 curve, with optional private key (`PrivKey`) and option to pre-hash key (`HashKey`). | [Example][Ed25519Example] |
+| `Ed448([PrivKey[,HashKey]])`                               | Creates an Edwards448 curve, with optional private key (`PrivKey`) and option to pre-hash key (`HashKey`). | [Example][Ed448Example] |
+| `Md5(Data)`                                                | Calculates a MD5 Hash Digest of `Data`.  | [Example][Md5Example] |
+| `P192([PrivKey])`                                          | Creates a NIST-P192 curve, with optional private key (`PrivKey`). | [Example][P192Example] |
+| `P224([PrivKey])`                                          | Creates a NIST-P224 curve, with optional private key (`PrivKey`). | [Example][P224Example] |
+| `P256([PrivKey])`                                          | Creates a NIST-P256 curve, with optional private key (`PrivKey`). | [Example][P256Example] |
+| `P384([PrivKey])`                                          | Creates a NIST-P384 curve, with optional private key (`PrivKey`). | [Example][P384Example] |
+| `P521([PrivKey])`                                          | Creates a NIST-P521 curve, with optional private key (`PrivKey`). | [Example][P521Example] |
+| `RandomBytes(NrBytes)`                                     | Generates an array of `N` random bytes. | [Example][RandomBytesExample] |
+| `Sha1(Data)`                                               | Calculates a SHA-1 Hash Digest of `Data`.  | [Example][Sha1Example] |
+| `Sha1HMac(Data,Key)`                                       | Calculates a SHA-1 HMAC Hash Digest of `Data` using the key `Key`.  | [Example][Sha1HmacExample] |
+| `Sha2_256(Data)`                                           | Calculates a 256-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2256Example] |
+| `Sha2_256HMac(Data,Key)`                                   | Calculates a 256-bit SHA-2 HMAC Hash Digest of `Data` using the key `Key`.  | [Example][Sha2256HmacExample] |
+| `Sha2_384(Data)`                                           | Calculates a 384-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2384Example] |
+| `Sha2_384HMac(Data,Key)`                                   | Calculates a 384-bit SHA-2 HMAC Hash Digest of `Data` using the key `Key`.  | [Example][Sha2384HmacExample] |
+| `Sha2_512(Data)`                                           | Calculates a 512-bit SHA-2 Hash Digest of `Data`.  | [Example][Sha2512Example] |
+| `Sha2_512HMac(Data,Key)`                                   | Calculates a 512-bit SHA-2 HMAC Hash Digest of `Data` using the key `Key`.  | [Example][Sha2512HmacExample] |
+| `Sha3_224(Data)`                                           | Calculates a 224-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3224Example] |
+| `Sha3_256(Data)`                                           | Calculates a 256-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3256Example] |
+| `Sha3_384(Data)`                                           | Calculates a 384-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3384Example] |
+| `Sha3_512(Data)`                                           | Calculates a 512-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3512Example] |
+| `X25519([PrivKey])`                                        | Creates a Curve25519 curve, with optional private key (`PrivKey`). | [Example][X25519Example] |
+| `X448([PrivKey])`                                          | Creates a Curve448 curve, with optional private key (`PrivKey`). | [Example][X448Example] |
 
 [Aes256EncryptExample]: Prompt.md?Expression=Data%3A%3DUtf8Encode%28%22Hello%20World%22%29%3BKey%3A%3DRandomBytes%2816%29%3BIV%3A%3DRandomBytes%2816%29%3BEncrypted%3A%3DAes256Encrypt%28Data%2CKey%2CIV%2C%22CBC%22%2C%22PKCS7%22%29
 [Aes256DecryptExample]: Prompt.md?Expression=Decrypted%3A%3DAes256Decrypt%28Encrypted%2CKey%2CIV%2C%22CBC%22%2C%22PKCS7%22%29%3BUtf8Decode%28Decrypted%29
@@ -1858,18 +1858,18 @@ The following functions are available in the `Waher.Script.Cryptography` library
 
 The following functions are available in the `Waher.Script.Xml` library.
 
-| Function                        | Description                                                                                                                                                          | Example                                    |
-|---------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------|
-| `GetAttribute(Xml,Name)         | Extracts the value of XML attribute `Name` from the element `Xml`.                                                                                                   | `GetAttribute(E,"name")`                   |
-| `GetElement(Xml,Name)           | Extracts the first child element to `Xml` with the given name `Name`.                                                                                                | `GetElement(E,"Name")`                     |
-| `InnerText(Xml)`                | Returns the Inner Text of the XML Node `Xml`.                                                                                                                        | `InnerText(E)`                             |
-| `InnerXml(Xml)`                 | Returns the Inner XML of the XML Node `Xml`.                                                                                                                         | `InnerXml(E)`                              |
-| `OuterXml(Xml)`                 | Returns the Outer XML of the XML Node `Xml`.                                                                                                                         | `OuterXml(E)`                              |
-| `OwnerDocument(Xml)`            | Returns the XML Document owning the XML Node `Xml`.                                                                                                                  | `OwnerDocument(E)`                         |
-| `PrettyXml(Xml)`                | Makes XML defined in `Xml` pretty, for display.                                                                                                                      | `PrettyXml("<a><b>Hello</b></a>")`         |
-| `SelectXml(Xml,XPath)`          | Performs an XPATH selection into `Xml`. The `default` prefix can be used to reference any default namespace in the XML. Results are returned as numbers if possible. | `SelectXml(<a><b>Hello</b></a>,"/a/b")`    |
-| `SelectXmlStr(Xml,XPath)`       | Performs an XPATH selection into `Xml` and returns the result as a literal string. The `default` prefix can be used to reference any default namespace in the XML.   | `SelectXmlStr(<a><b>Hello</b></a>,"/a/b")` |
-| `Xml(s)`                        | Converts the string `s` to an XML Document.                                                                                                                          | `Xml("<a>Hello</a>")`                      |
+| Function                         | Description                                                                                                                                                          | Example                                    |
+|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------|
+| `GetAttribute(Xml,Name)`         | Extracts the value of XML attribute `Name` from the element `Xml`.                                                                                                   | `GetAttribute(E,"name")`                   |
+| `GetElement(Xml,Name)`           | Extracts the first child element to `Xml` with the given name `Name`.                                                                                                | `GetElement(E,"Name")`                     |
+| `InnerText(Xml)`                 | Returns the Inner Text of the XML Node `Xml`.                                                                                                                        | `InnerText(E)`                             |
+| `InnerXml(Xml)`                  | Returns the Inner XML of the XML Node `Xml`.                                                                                                                         | `InnerXml(E)`                              |
+| `OuterXml(Xml)`                  | Returns the Outer XML of the XML Node `Xml`.                                                                                                                         | `OuterXml(E)`                              |
+| `OwnerDocument(Xml)`             | Returns the XML Document owning the XML Node `Xml`.                                                                                                                  | `OwnerDocument(E)`                         |
+| `PrettyXml(Xml)`                 | Makes XML defined in `Xml` pretty, for display.                                                                                                                      | `PrettyXml("<a><b>Hello</b></a>")`         |
+| `SelectXml(Xml,XPath)`           | Performs an XPATH selection into `Xml`. The `default` prefix can be used to reference any default namespace in the XML. Results are returned as numbers if possible. | `SelectXml(<a><b>Hello</b></a>,"/a/b")`    |
+| `SelectXmlStr(Xml,XPath)`        | Performs an XPATH selection into `Xml` and returns the result as a literal string. The `default` prefix can be used to reference any default namespace in the XML.   | `SelectXmlStr(<a><b>Hello</b></a>,"/a/b")` |
+| `Xml(s)`                         | Converts the string `s` to an XML Document.                                                                                                                          | `Xml("<a>Hello</a>")`                      |
 
 **Note**: The XML functions are made available so that access to elements and attributes in XML documents can be made accessible in
 environments where the period (`.`) operator is not available, for security reasons.
@@ -2024,28 +2024,35 @@ The following functions are available in the `Waher.Security.JWT` and `Waher.Sec
 | `CreateJwt(Claims)`                                  | Returns a Java Web Token (JWT) generated from a set of claims. Claims must be expressed as an object ex-nihilo, where claim names are property names, and values are the corresponding values. | `Token:=CreateJwt({"iss":"www.example.com","name":"Jon Doe"})` |
 | `ValidateJwt(Token)`                                 | Validates a Java Web Token (JWT) generated by `CreateJwt`. If not valid, an exception is thrown. If valid, the parsed token is returned. Claims are available through its `Claims` property. | `ValidateJwt(Token)` |
 
+#### Thing-related Extensions (Waher.Things)
+
+The following functions are available in web pages hosted by the IoT Gateway:
+
+| Function                                          | Description |
+|---------------------------------------------------|-------------|
+| `AddableTypes(Node)`                              | Gets an array of types of nodes that can be added to an existing node. |
+| `GetNode(NodeId[,SourceId[,Partition]])`          | Gets the node object of a node in the gateway. If the node is not found, null is returned. (If no Source ID is provided, the Metering Topology is assumed.) |
+| `GetNode(ThingReference)`                         | Gets the node object of a node in the gateway. If the node is not found, null is returned. |
+| `GetSources()`                                    | Gets available sources of things. |
+| `ThingReference([NodeId[,SourceId[,Partition]]])` | Creates a reference object pointing to a node on the gateway. |
+
 #### Gateway Extensions (Waher.IoTGateway)
 
 The following functions are available in web pages hosted by the IoT Gateway:
 
-| Function                                         | Description |
-|--------------------------------------------------|-------------|
-| `AddableTypes(Node)`                             | Gets an array of types of nodes that can be added to an existing node. |
-| `BareJID(JID)`                                   | Returns the Bare JID of `JID` |
-| `ClearCaches()`                                  | Clears internal caches. |
-| `DecCounter(CounterName[,Amount])                | Decrements a counter, given its name, and returns the decremented count. |
-| `FullJID(JID)`                                   | Returns the Full JID of `JID`. If `JID` is a Bare JID, the Full JID of the last online presence is returned. |
-| `GetCounter(CounterName)                         | Gets the current count of a counter, given its name. |
-| `GetNode(NodeId[,SourceId[,Partition]])          | Gets the node object of a node in the gateway. If the node is not found, null is returned. (If no Source ID is provided, the Metering Topology is assumed.) |
-| `GetNode(ThingReference)                         | Gets the node object of a node in the gateway. If the node is not found, null is returned. |
-| `GetSources()`                                   | Gets available sources of things. |
-| `GetTabIDs([Page[,QueryFilter]])`                | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Pages can be optionally restricted to a given `Page`, and optionally further restricted by a query filter, as an [object ex-nihilo](#objectExNihilo) specifying query parameters and values. |
-| `GetTabIDs(Pages)`                               | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Tabs returned must be showing any of the pages provied in the vector `Pages`. |
-| `GetTabIDs(User)`                                | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Tabs returned must be viewed by the user identitied by the user object `User`. |
-| `IncCounter(CounterName[,Amount])                | Increments a counter, given its name, and returns the incremented count. |
-| `ReloadPage(...)`                                | Reloads all open pages (tabs), defined by its arguments. The same types of arguments as for the `GetTabIDs` function can be used. |
-| `PushEvent(..., Event, Data)`                    | Pushes an event to all open pages (tabs), defined by the arguments defined by `...` (same types of arguments as for the `GetTabIDs` function). Data can be a string, or any object that can be encoded as JSON. The `Event` translates to a Javascript function, with one argument, that will be called. The `Data` will be passed on as the argument. |
-| `ThingReference([NodeId[,SourceId[,Partition]]]) | Creates a reference object pointing to a node on the gateway. |
+| Function                           | Description |
+|------------------------------------|-------------|
+| `BareJID(JID)`                     | Returns the Bare JID of `JID` |
+| `ClearCaches()`                    | Clears internal caches. |
+| `DecCounter(CounterName[,Amount])` | Decrements a counter, given its name, and returns the decremented count. |
+| `FullJID(JID)`                     | Returns the Full JID of `JID`. If `JID` is a Bare JID, the Full JID of the last online presence is returned. |
+| `GetCounter(CounterName)`          | Gets the current count of a counter, given its name. |
+| `GetTabIDs([Page[,QueryFilter]])`  | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Pages can be optionally restricted to a given `Page`, and optionally further restricted by a query filter, as an [object ex-nihilo](#objectExNihilo) specifying query parameters and values. |
+| `GetTabIDs(Pages)`                 | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Tabs returned must be showing any of the pages provied in the vector `Pages`. |
+| `GetTabIDs(User)`                  | Gets an array of open tabs (as string TabIDs) loading the `Events.js` javascript file. Tabs returned must be viewed by the user identitied by the user object `User`. |
+| `IncCounter(CounterName[,Amount])` | Increments a counter, given its name, and returns the incremented count. |
+| `ReloadPage(...)`                  | Reloads all open pages (tabs), defined by its arguments. The same types of arguments as for the `GetTabIDs` function can be used. |
+| `PushEvent(..., Event, Data)`      | Pushes an event to all open pages (tabs), defined by the arguments defined by `...` (same types of arguments as for the `GetTabIDs` function). Data can be a string, or any object that can be encoded as JSON. The `Event` translates to a Javascript function, with one argument, that will be called. The `Data` will be passed on as the argument. |
 
 The following predefined variables are available in web pages hosted by the IoT Gateway:
 
@@ -2062,16 +2069,16 @@ The following predefined variables are available in web pages hosted by the IoT 
 The following functions are available in the `Waher.IoTGateway.Svc` Windows Service host application library. Running the IoT Gateway
 as a Windows Service, adds these functions to the script engine.
 
-| Function                                                      | Description                                                                                                                                                                | Example |
-|---------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-| `DecPerformanceCounter(CategoryName[,Instance],CounterName)   | Decrements a performance counter, given a performance category name, optional instance name, as well as a counter name.                                                    | `DecPerformanceCounter("My Counters","My Instance","My Counter")` |
-| `IncPerformanceCounter(CategoryName[,Instance],CounterName)   | Increments a performance counter, given a performance category name, optional instance name, as well as a counter name.                                                    | `IncPerformanceCounter("My Counters","My Instance","My Counter")` |
-| `PerformanceCategory(CategoryName)                            | Returns a `System.Diagnostics.PerformanceCounterCategory` object, given the category name.                                                                                 | `properties(PerformanceCategory("Processor"))` |
-| `PerformanceCounter(CategoryName[,Instance],CounterName)      | Returns a `System.Diagnostics.PerformanceCounter` object, given a performance category name and optional performance instance name, as well as a performance counter name. | `PerformanceCounter("Processor","_Total","% Processor Time")` |
-| `PerformanceCounterValue(CategoryName[,Instance],CounterName) | Returns a performance counter value, given a performance category name, optional instance name, as well as a counter name.                                                 | `PerformanceCounterValue("Processor","_Total","% Processor Time")` |
-| `PerformanceCounters(CategoryName[,Instance])                 | Returns an array of `System.Diagnostics.PerformanceCounter` objects within a given performance category, and optional performance instance.                                | `PerformanceCounters("Processor","_Total")` |
-| `PerformanceCounterNames(CategoryName[,Instance])             | Returns an array of names of performance counters within a given performance category, and optional performance instance.                                                  | `PerformanceCounterNames("Processor","_Total")` |
-| `PerformanceInstances(CategoryName)                           | Returns an array of performance counter instance names, given a performance category.                                                                                      | `PerformanceInstances("Processor")` |
+| Function                                                       | Description                                                                                                                                                                | Example |
+|----------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+| `DecPerformanceCounter(CategoryName[,Instance],CounterName)`   | Decrements a performance counter, given a performance category name, optional instance name, as well as a counter name.                                                    | `DecPerformanceCounter("My Counters","My Instance","My Counter")` |
+| `IncPerformanceCounter(CategoryName[,Instance],CounterName)`   | Increments a performance counter, given a performance category name, optional instance name, as well as a counter name.                                                    | `IncPerformanceCounter("My Counters","My Instance","My Counter")` |
+| `PerformanceCategory(CategoryName)`                            | Returns a `System.Diagnostics.PerformanceCounterCategory` object, given the category name.                                                                                 | `properties(PerformanceCategory("Processor"))` |
+| `PerformanceCounter(CategoryName[,Instance],CounterName)`      | Returns a `System.Diagnostics.PerformanceCounter` object, given a performance category name and optional performance instance name, as well as a performance counter name. | `PerformanceCounter("Processor","_Total","% Processor Time")` |
+| `PerformanceCounterValue(CategoryName[,Instance],CounterName)` | Returns a performance counter value, given a performance category name, optional instance name, as well as a counter name.                                                 | `PerformanceCounterValue("Processor","_Total","% Processor Time")` |
+| `PerformanceCounters(CategoryName[,Instance])`                 | Returns an array of `System.Diagnostics.PerformanceCounter` objects within a given performance category, and optional performance instance.                                | `PerformanceCounters("Processor","_Total")` |
+| `PerformanceCounterNames(CategoryName[,Instance])`             | Returns an array of names of performance counters within a given performance category, and optional performance instance.                                                  | `PerformanceCounterNames("Processor","_Total")` |
+| `PerformanceInstances(CategoryName)`                           | Returns an array of performance counter instance names, given a performance category.                                                                                      | `PerformanceInstances("Processor")` |
 
 The following predefined constants are also available:
 
@@ -2084,17 +2091,17 @@ The following predefined constants are also available:
 
 The following functions are available in the `Waher.Service.NeuroLedger` library, which is part of the Neuro-Ledger^TM.
 
-| Function                           | Description                                                                                                                                                                                          | Example |
-|------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-| `Deserialize(Bin[,BaseType])       | Deserializes a byte array into an object, or vector of objects. If serialization does not include type information, a base type can be provided. If not, a generic deserializer will be used.        | `Deserialize(Base64Decode(s))` |
-| `FromBinary(Bin[,BaseType])        | Alias for `Deserialize`.                                                                                                                                                                             | `FromBinary(Base64Decode(s))` |
-| `Serialize(Object)`                | Serializes an object to a byte array.                                                                                                                                                                | `Base64Encode(Serialize(Obj))` |
-| `Serialize(Vector)`                | Serializes a vector of objects to a byte array.                                                                                                                                                      | `Base64Encode(Serialize([Obj1,Obj2,Obj3]))` |
-| `PrintDeserialize(Bin[,BaseType])` | Works as `Deserialize(Bin[,BaseType])`, except that individual elements are printed to the standard output. This can be used for debugging purposes when transporting serializations across systems. | `PrintDeserialize(Base64Decode(s))` |
-| `PrintSerialize(Object)`           | Works as `Serialize(Object)`, except that individual elements are printed to the standard output. This can be used for debugging purposes when transporting serializations across systems.           | `Base64Encode(PrintSerialize(Obj))` |
-| `PrintSerialize(Vector)`           | Works as `Serialize(Vector)`, except that individual elements are printed to the standard output. This can be used for debugging purposes when transporting serializations across systems.           | `Base64Encode(PrintSerialize([Obj1,Obj2,Obj3]))` |
-| `ToBinary(Object)`                 | Alias for `Serialize`.                                                                                                                                                                               | `Base64Encode(ToBinary(Obj))` |
-| `ToBinary(Vector)`                 | Alias for `Serialize`.                                                                                                                                                                               | `Base64Encode(ToBinary([Obj1,Obj2,Obj3]))` |
+| Function                            | Description                                                                                                                                                                                          | Example |
+|-------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+| `Deserialize(Bin[,BaseType])`       | Deserializes a byte array into an object, or vector of objects. If serialization does not include type information, a base type can be provided. If not, a generic deserializer will be used.        | `Deserialize(Base64Decode(s))` |
+| `FromBinary(Bin[,BaseType])`        | Alias for `Deserialize`.                                                                                                                                                                             | `FromBinary(Base64Decode(s))` |
+| `Serialize(Object)`                 | Serializes an object to a byte array.                                                                                                                                                                | `Base64Encode(Serialize(Obj))` |
+| `Serialize(Vector)`                 | Serializes a vector of objects to a byte array.                                                                                                                                                      | `Base64Encode(Serialize([Obj1,Obj2,Obj3]))` |
+| `PrintDeserialize(Bin[,BaseType])`  | Works as `Deserialize(Bin[,BaseType])`, except that individual elements are printed to the standard output. This can be used for debugging purposes when transporting serializations across systems. | `PrintDeserialize(Base64Decode(s))` |
+| `PrintSerialize(Object)`            | Works as `Serialize(Object)`, except that individual elements are printed to the standard output. This can be used for debugging purposes when transporting serializations across systems.           | `Base64Encode(PrintSerialize(Obj))` |
+| `PrintSerialize(Vector)`            | Works as `Serialize(Vector)`, except that individual elements are printed to the standard output. This can be used for debugging purposes when transporting serializations across systems.           | `Base64Encode(PrintSerialize([Obj1,Obj2,Obj3]))` |
+| `ToBinary(Object)`                  | Alias for `Serialize`.                                                                                                                                                                               | `Base64Encode(ToBinary(Obj))` |
+| `ToBinary(Vector)`                  | Alias for `Serialize`.                                                                                                                                                                               | `Base64Encode(ToBinary([Obj1,Obj2,Obj3]))` |
 
 #### IoT Broker Extensions (available in Waher.Service.IoTBroker)
 
@@ -2106,19 +2113,19 @@ or the Neuron^TM.
 | `AuthenticateXmppToken(Request[,Users][,EncStrength])`                 | Performs Bearer and JWT authentication of a token generate for a connected XMPP client. If authentication is performed, authenticated user object is returned referring to the corresponding client connection. This funcion also authenticates the sender of an HTTPX (HTTP over XMPP) client requesting resources on the server, without the use of Bearer token. `EncStrength` can be a boolean (for if encryption is required yes/no) or a positive integer value, mening the minimum cipher strength requried for the mechanism. | `AuthenticateXmppToken(Request,128)`                              |
 | `CreateContract(Account,TemplateId[,Visibility[,Parts[,Properties]]])` | Creates a contract for an account on the broker, based on an existing contract template. `Visibility`, `Parts` and `Properties` can be set to new values. `Parts` and `Properties` are assumed to be object ex-nihilo.                                                                                                                                                                                                                                                                                                                | `CreateContract(Account,Template,"Public",null,{A:10,B:20,C:30})` |
 | `IpLocale(IP)`                                                         | Looks up locale information about an IP address.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | `IpLocale("1.2.3.4")`                                             |
-| `RosterName(LocalJid, RemoteJid)                                       | Returns the name of a contact in a local users roster. If no name is returned, the Bare JID is returned.                                                                                                                                                                                                                                                                                                                                                                                                                              | `RosterName(To,From)`                                             |
-| `SendMail([[Host,Port,User,Pwd,]From,]To,Subject,Markdown)             | Sends an formatted e-mail to a recipient. If SMTP details are not provided, SMTP Relay settings are used by default. If such are not provided, broker will act as an SMTP relay itself.                                                                                                                                                                                                                                                                                                                                               | `SendMail(To,Subject,Body)`                                       |
-| `SendProposal(ContractId,Jid,Role,Proposal)                            | Sends a contract proposal with ID `ContractId` to an XMPP client using address `JID`, for signing as `Role`. Message inclues a `Proposal` text.                                                                                                                                                                                                                                                                                                                                                                                       | `SendProposal(ContractId,ContactJid,"Creator","Please sign.")`    |
+| `RosterName(LocalJid, RemoteJid)`                                      | Returns the name of a contact in a local users roster. If no name is returned, the Bare JID is returned.                                                                                                                                                                                                                                                                                                                                                                                                                              | `RosterName(To,From)`                                             |
+| `SendMail([[Host,Port,User,Pwd,]From,]To,Subject,Markdown)`            | Sends an formatted e-mail to a recipient. If SMTP details are not provided, SMTP Relay settings are used by default. If such are not provided, broker will act as an SMTP relay itself.                                                                                                                                                                                                                                                                                                                                               | `SendMail(To,Subject,Body)`                                       |
+| `SendProposal(ContractId,Jid,Role,Proposal)`                           | Sends a contract proposal with ID `ContractId` to an XMPP client using address `JID`, for signing as `Role`. Message inclues a `Proposal` text.                                                                                                                                                                                                                                                                                                                                                                                       | `SendProposal(ContractId,ContactJid,"Creator","Please sign.")`    |
 
 #### Multi-User Chat Extensions (available in Waher.Service.LittleSister, Waher.Service.IoTBroker)
 
 The following functions are available in applications using Multi-User Chat, such as the `Waher.Service.LittleSister` library,
 part of Lil'Sis'^TM, and the `Waher.Service.IoTBroker` library, part of the Neuron^TM.
 
-| Function                                                         | Description                                                                                                                                                                | Example |
-|------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-| `Consolidate(RoomId,Domain,Command[Preview[,Config[,Variable]]]) | Sends a command `Command` to a MUC room identified by `RoomId` and `Domain`, and consolidates responses into one. `Preview` is a Boolean value, specifying if intermediate results should be previewed or not. `Config` can be one of three things: If a positive integer, it defines the number of expected responses, before consolidation is returned. If an array of strings, represents the nick-names of the sources that are expected to return responses. If an object ex-nihilo, it defining default responses from the expected sources. These default responses will be displayed until proper responses are returned. If no `Config` is provided, the function returns when all online occupants of the room have responded. `Variable` may contain a string containing the name of an optional variable that will contain the consolidator of the operation. It can be used to derive further information about the consolidated result after the function completes.  | `Consolidate("Room","example.com","select Type, Count(*) Nr from PersistedEvent where Timestamp>Now.AddDays(-1) group by Type")` |
-| `Occupants(RoomId,Domain)`                                       | Returns an array of nick-names corresponding to occupants in a Multi-User Chat Room. | `Occupants("Room","example.com"` |
+| Function                                                          | Description                                                                                                                                                                | Example |
+|-------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
+| `Consolidate(RoomId,Domain,Command[Preview[,Config[,Variable]]])` | Sends a command `Command` to a MUC room identified by `RoomId` and `Domain`, and consolidates responses into one. `Preview` is a Boolean value, specifying if intermediate results should be previewed or not. `Config` can be one of three things: If a positive integer, it defines the number of expected responses, before consolidation is returned. If an array of strings, represents the nick-names of the sources that are expected to return responses. If an object ex-nihilo, it defining default responses from the expected sources. These default responses will be displayed until proper responses are returned. If no `Config` is provided, the function returns when all online occupants of the room have responded. `Variable` may contain a string containing the name of an optional variable that will contain the consolidator of the operation. It can be used to derive further information about the consolidated result after the function completes.  | `Consolidate("Room","example.com","select Type, Count(*) Nr from PersistedEvent where Timestamp>Now.AddDays(-1) group by Type")` |
+| `Occupants(RoomId,Domain)`                                        | Returns an array of nick-names corresponding to occupants in a Multi-User Chat Room. | `Occupants("Room","example.com"` |
 
 The following predefined constants are also available:
 

@@ -530,6 +530,8 @@ namespace Waher.Networking.HTTP
 		/// <param name="ex">Exception</param>
 		public async Task SendResponse(Exception ex)
 		{
+			ex = Log.UnnestException(ex);
+
 			if (this.HeaderSent)
 				this.clientConnection?.Error(ex.Message);
 			else

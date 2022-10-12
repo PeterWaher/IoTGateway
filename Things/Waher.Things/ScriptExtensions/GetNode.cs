@@ -1,12 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using Waher.Things;
-using Waher.Things.Metering;
 
-namespace Waher.IoTGateway.ScriptExtensions.Functions.Things
+namespace Waher.Things.ScriptExtensions
 {
 	/// <summary>
 	/// Gets a node object on the gateway.
@@ -94,39 +94,41 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions.Things
 			{
 				case 1:
 					IDataSource Source;
+					string SourceId;
 
 					if (Arguments[0] is IThingReference ThingReference)
 					{
-						if (!Gateway.ConcentratorServer.TryGetDataSource(ThingReference.SourceId, out Source))
+						if (!TryGetDataSource(ThingReference.SourceId, out Source))
 							return ObjectValue.Null;
 
 						Result = await Source.GetNodeAsync(ThingReference);
 					}
 					else
 					{
-						if (!Gateway.ConcentratorServer.TryGetDataSource(MeteringTopology.SourceID, out Source))
+						SourceId = DefaultSource;
+						if (!TryGetDataSource(SourceId, out Source))
 							return ObjectValue.Null;
 
-						Result = await Source.GetNodeAsync(new Waher.Things.ThingReference(Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty, MeteringTopology.SourceID));
+						Result = await Source.GetNodeAsync(new Things.ThingReference(Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty, SourceId));
 					}
 					break;
 
 				case 2:
-					string SourceId = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
-					if (!Gateway.ConcentratorServer.TryGetDataSource(SourceId, out Source))
+					SourceId = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
+					if (!TryGetDataSource(SourceId, out Source))
 						return ObjectValue.Null;
 
-					Result = await Source.GetNodeAsync(new Waher.Things.ThingReference(
+					Result = await Source.GetNodeAsync(new Things.ThingReference(
 						Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty, SourceId));
 					break;
 
 				case 3:
 				default:
 					SourceId = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
-					if (!Gateway.ConcentratorServer.TryGetDataSource(SourceId, out Source))
+					if (!TryGetDataSource(SourceId, out Source))
 						return ObjectValue.Null;
 
-					Result = await Source.GetNodeAsync(new Waher.Things.ThingReference(
+					Result = await Source.GetNodeAsync(new Things.ThingReference(
 						Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty, SourceId,
 						Arguments[2].AssociatedObjectValue?.ToString() ?? string.Empty));
 					break;
@@ -137,5 +139,58 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions.Things
 			else
 				return new ObjectValue(Result);
 		}
+
+		/// <summary>
+		/// Default source of nodes, if no source is explicitly provided.
+		/// </summary>
+		public static string DefaultSource
+		{
+			get
+			{
+				if (Types.TryGetModuleParameter("DefaultSource", out object Obj) && Obj is string Source)
+					return Source;
+				else
+					return string.Empty;
+			}
+		}
+
+		/// <summary>
+		/// Tries to get a data source, from its data source ID.
+		/// </summary>
+		/// <param name="SourceId">Data Source ID</param>
+		/// <param name="Source">Source, if found, null otherwise.</param>
+		/// <returns>If a source with the given ID was found.</returns>
+		public static bool TryGetDataSource(string SourceId, out IDataSource Source)
+		{
+			if (!Types.TryGetModuleParameter("Sources", out object Obj) || !(Obj is IDataSource[] Sources))
+			{
+				Source = null;
+				return false;
+			}
+
+			if (Sources != sources)
+			{
+				Dictionary<string, IDataSource> SourceById = new Dictionary<string, IDataSource>();
+				Add(SourceById, Sources);
+				sourceById = SourceById;
+				sources = Sources;
+			}
+
+			return sourceById.TryGetValue(SourceId, out Source);
+		}
+
+		private static void Add(Dictionary<string, IDataSource> SourceById, IEnumerable<IDataSource> Sources)
+		{
+			foreach (IDataSource Source in Sources)
+			{
+				SourceById[Source.SourceID] = Source;
+
+				if (Source.HasChildren)
+					Add(SourceById, Source.ChildSources);
+			}
+		}
+
+		private static IDataSource[] sources = null;
+		private static Dictionary<string, IDataSource> sourceById = null;
 	}
 }

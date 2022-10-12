@@ -1,9 +1,10 @@
-﻿using Waher.Script;
+﻿using Waher.Runtime.Inventory;
+using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.IoTGateway.ScriptExtensions.Functions.Things
+namespace Waher.Things.ScriptExtensions
 {
 	/// <summary>
 	/// Gets available sources of things.
@@ -35,7 +36,10 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions.Things
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			return new ObjectValue(Gateway.ConcentratorServer.DataSources);
+			if (Types.TryGetModuleParameter("Sources", out object Obj) && Obj is IDataSource[] Sources)
+				return new ObjectValue(Sources);
+			else
+				return ObjectValue.Null;
 		}
 	}
 }

@@ -2978,6 +2978,222 @@
             User tokens, or null.
             </summary>
         </member>
+        <member name="T:Waher.Things.ScriptExtensions.AddableTypes">
+            <summary>
+            Gets an array of types of nodes that can be added to an existing node.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.AddableTypes.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Gets an array of types of nodes that can be added to an existing node.
+            </summary>
+            <param name="Node">Node.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Things.ScriptExtensions.AddableTypes.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Things.ScriptExtensions.AddableTypes.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.AddableTypes.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.AddableTypes.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.AddableTypes.GetAddableTypes(Waher.Things.INode)">
+            <summary>
+            Gets an array of type names of nodes that can be added to <paramref name="Node"/>.
+            </summary>
+            <param name="Node">Reference node.</param>
+            <returns>Array of names of types of nodes that can be added to <paramref name="Node"/>.</returns>
+        </member>
+        <member name="T:Waher.Things.ScriptExtensions.GetNode">
+            <summary>
+            Gets a node object on the gateway.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.GetNode.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Gets a node object on the gateway.
+            Gets a node object on the gateway.
+            </summary>
+            <param name="NodeId">Node ID</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.GetNode.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Gets a node object on the gateway.
+            </summary>
+            <param name="NodeId">Node ID</param>
+            <param name="SourceId">Source ID</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.GetNode.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Gets a node object on the gateway.
+            </summary>
+            <param name="NodeId">Node ID</param>
+            <param name="SourceId">Source ID</param>
+            <param name="Partition">Partition</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Things.ScriptExtensions.GetNode.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Things.ScriptExtensions.GetNode.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Things.ScriptExtensions.GetNode.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.GetNode.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.GetNode.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="P:Waher.Things.ScriptExtensions.GetNode.DefaultSource">
+            <summary>
+            Default source of nodes, if no source is explicitly provided.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.GetNode.TryGetDataSource(System.String,Waher.Things.IDataSource@)">
+            <summary>
+            Tries to get a data source, from its data source ID.
+            </summary>
+            <param name="SourceId">Data Source ID</param>
+            <param name="Source">Source, if found, null otherwise.</param>
+            <returns>If a source with the given ID was found.</returns>
+        </member>
+        <member name="T:Waher.Things.ScriptExtensions.GetSources">
+            <summary>
+            Gets available sources of things.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.GetSources.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Gets available sources of things.
+            </summary>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Things.ScriptExtensions.GetSources.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.GetSources.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            This method should be used for nodes whose <see cref="P:Waher.Script.Model.ScriptNode.IsAsynchronous"/> is false.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="T:Waher.Things.ScriptExtensions.ThingReference">
+            <summary>
+            Creates a reference object to a thing.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.ThingReference.#ctor(System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a reference object to a thing.
+            </summary>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.ThingReference.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a reference object to a thing.
+            </summary>
+            <param name="NodeId">Node ID</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.ThingReference.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a reference object to a thing.
+            </summary>
+            <param name="NodeId">Node ID</param>
+            <param name="SourceId">Source ID</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.ThingReference.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a reference object to a thing.
+            </summary>
+            <param name="NodeId">Node ID</param>
+            <param name="SourceId">Source ID</param>
+            <param name="Partition">Partition</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Things.ScriptExtensions.ThingReference.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Things.ScriptExtensions.ThingReference.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.ThingReference.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Things.SensorData.BooleanField">
             <summary>
             Represents a boolean value that can be either true or false.

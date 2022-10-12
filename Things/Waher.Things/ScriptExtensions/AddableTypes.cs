@@ -1,13 +1,15 @@
-﻿using System.Threading.Tasks;
-using Waher.Networking.XMPP.Concentrator;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading.Tasks;
+using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects.VectorSpaces;
-using Waher.Things;
 
-namespace Waher.IoTGateway.ScriptExtensions.Functions.Things
+namespace Waher.Things.ScriptExtensions
 {
 	/// <summary>
 	/// Gets an array of types of nodes that can be added to an existing node.
@@ -59,7 +61,39 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions.Things
 			if (!(Argument.AssociatedObjectValue is INode Node))
 				throw new ScriptRuntimeException("Expected a node as argument.", this);
 
-			return new ObjectVector(await ConcentratorServer.GetAddableTypes(Node));
+			return new ObjectVector(await GetAddableTypes(Node));
 		}
+
+		/// <summary>
+		/// Gets an array of type names of nodes that can be added to <paramref name="Node"/>.
+		/// </summary>
+		/// <param name="Node">Reference node.</param>
+		/// <returns>Array of names of types of nodes that can be added to <paramref name="Node"/>.</returns>
+		public static async Task<Type[]> GetAddableTypes(INode Node)
+		{
+			List<Type> Result = new List<Type>();
+
+			foreach (Type T in Types.GetTypesImplementingInterface(typeof(INode)))
+			{
+				ConstructorInfo CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
+					continue;
+
+				try
+				{
+					INode PresumptiveChild = (INode)CI.Invoke(Types.NoParameters);
+
+					if (await Node.AcceptsChildAsync(PresumptiveChild) && await PresumptiveChild.AcceptsParentAsync(Node))
+						Result.Add(T);
+				}
+				catch (Exception)
+				{
+					continue;
+				}
+			}
+
+			return Result.ToArray();
+		}
+
 	}
 }

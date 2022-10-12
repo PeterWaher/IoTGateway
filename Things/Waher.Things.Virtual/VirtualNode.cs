@@ -1,5 +1,16 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Waher.Content;
+using Waher.Content.Xml;
+using Waher.Events;
+using Waher.Networking.XMPP.DataForms;
+using Waher.Networking.XMPP.DataForms.DataTypes;
+using Waher.Networking.XMPP.DataForms.FieldTypes;
+using Waher.Networking.XMPP.DataForms.Layout;
+using Waher.Persistence;
 using Waher.Runtime.Language;
+using Waher.Things.DisplayableParameters;
 using Waher.Things.Metering;
 using Waher.Things.Metering.NodeTypes;
 
@@ -8,7 +19,7 @@ namespace Waher.Things.Virtual
 	/// <summary>
 	/// Node representing a TCP/IP connection to a Modbus Gateway
 	/// </summary>
-	public class VirtualNode : MeteringNode
+	public class VirtualNode : ProvisionedMeteringNode, ICustomFormProperties
 	{
 		/// <summary>
 		/// Node representing a TCP/IP connection to a Modbus Gateway
@@ -17,6 +28,11 @@ namespace Waher.Things.Virtual
 			: base()
 		{
 		}
+
+		/// <summary>
+		/// Meta-data attached to virtual node.
+		/// </summary>
+		public MetaDataValue[] MetaData { get; set; }
 
 		/// <summary>
 		/// Gets the type name of the node.
@@ -46,6 +62,391 @@ namespace Waher.Things.Virtual
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
 			return Task.FromResult<bool>(Parent is Root || Parent is VirtualNode);
+		}
+
+		/// <summary>
+		/// Annotates the property form.
+		/// </summary>
+		/// <param name="Form">Form being built.</param>
+		public override async Task AnnotatePropertyForm(FormState Form)
+		{
+			await base.AnnotatePropertyForm(Form);
+
+			if ((this.MetaData?.Length ?? 0) > 0)
+			{
+				Language Language = await Translator.GetLanguageAsync(Form.LanguageCode);
+				Namespace Namespace = await Language.GetNamespaceAsync(typeof(VirtualNode).Namespace);
+				string PageLabel = await Namespace.GetStringAsync(2, "Meta-data");
+				string ExternalDescription = await Namespace.GetStringAsync(3, "Meta-data value is defined by external source.");
+				Page MetaDataPage = new Page(Form.Form, PageLabel)
+				{
+					Ordinal = Form.PageOrdinal++
+				};
+				Field Field;
+
+				Form.Pages.Add(MetaDataPage);
+				Form.PageByLabel[PageLabel] = MetaDataPage;
+
+				foreach (MetaDataValue Tag in this.MetaData)
+				{
+					if (Tag.Value is string s)
+					{
+						Field = new TextSingleField(Form.Form, Tag.Name, Tag.Name, false,
+							new string[] { s }, null, ExternalDescription, new StringDataType(),
+							null, null, false, false, false);
+					}
+					else if (Tag.Value is int i)
+					{
+						Field = new TextSingleField(Form.Form, Tag.Name, Tag.Name, false,
+							new string[] { i.ToString() }, null, ExternalDescription, new IntegerDataType(),
+							null, null, false, false, false);
+					}
+					else if (Tag.Value is long l)
+					{
+						Field = new TextSingleField(Form.Form, Tag.Name, Tag.Name, false,
+							new string[] { l.ToString() }, null, ExternalDescription, new LongDataType(),
+							null, null, false, false, false);
+					}
+					else if (Tag.Value is short sh)
+					{
+						Field = new TextSingleField(Form.Form, Tag.Name, Tag.Name, false,
+							new string[] { sh.ToString() }, null, ExternalDescription, new ShortDataType(),
+							null, null, false, false, false);
+					}
+					else if (Tag.Value is byte b2)
+					{
+						Field = new TextSingleField(Form.Form, Tag.Name, Tag.Name, false,
+							new string[] { b2.ToString() }, null, ExternalDescription, new ByteDataType(),
+							null, null, false, false, false);
+					}
+					else if (Tag.Value is double d)
+					{
+						Field = new TextSingleField(Form.Form, Tag.Name, Tag.Name, false,
+							new string[] { CommonTypes.Encode(d) }, null, ExternalDescription, new DoubleDataType(),
+							null, null, false, false, false);
+					}
+					else if (Tag.Value is decimal d2)
+					{
+						Field = new TextSingleField(Form.Form, Tag.Name, Tag.Name, false,
+							new string[] { CommonTypes.Encode(d2) }, null, ExternalDescription, new DecimalDataType(),
+							null, null, false, false, false);
+					}
+					else if (Tag.Value is bool b)
+					{
+						Field = new TextSingleField(Form.Form, Tag.Name, Tag.Name, false,
+							new string[] { CommonTypes.Encode(b) }, null, ExternalDescription, new BooleanDataType(),
+							null, null, false, false, false);
+					}
+					else if (Tag.Value is TimeSpan TS)
+					{
+						Field = new TextSingleField(Form.Form, Tag.Name, Tag.Name, false,
+							new string[] { TS.ToString() }, null, ExternalDescription, new TimeDataType(),
+							null, null, false, false, false);
+					}
+					else if (Tag.Value is DateTime TP)
+					{
+						Field = new TextSingleField(Form.Form, Tag.Name, Tag.Name, false,
+							new string[] { XML.Encode(TP) }, null, ExternalDescription, new DateTimeDataType(),
+							null, null, false, false, false);
+					}
+					else if (Tag.Value is Uri Uri)
+					{
+						Field = new TextSingleField(Form.Form, Tag.Name, Tag.Name, false,
+							new string[] { Uri.ToString() }, null, ExternalDescription, new AnyUriDataType(),
+							null, null, false, false, false);
+					}
+					else if (Tag.Value is string[] Rows)
+					{
+						Field = new TextMultiField(Form.Form, Tag.Name, Tag.Name, false,
+							Rows, null, ExternalDescription, null, null, null, false, false, false);
+					}
+					else
+					{
+						Field = new TextSingleField(Form.Form, Tag.Name, Tag.Name, false,
+							new string[] { Tag.Value?.ToString() ?? string.Empty }, null, ExternalDescription, null,
+							null, null, false, false, false);
+					}
+
+					Field.Ordinal = Form.FieldOrdinal++;
+					Form.Fields.Add(Field);
+					MetaDataPage.Add(new FieldReference(Form.Form, Field.Var));
+				}
+			}
+		}
+
+		public bool TryGetMetaDataValue(string Name, out object Value)
+		{
+			if (this.metaDataByName is null)
+				this.BuildDictionary();
+
+			if (this.metaDataByName.TryGetValue(Name, out MetaDataValue Tag))
+			{
+				Value = Tag.Value;
+				return true;
+			}
+			else
+			{
+				Value = null;
+				return false;
+			}
+		}
+
+		private void BuildDictionary()
+		{
+			SortedDictionary<string, MetaDataValue> ByName = new SortedDictionary<string, MetaDataValue>();
+
+			if (!(this.MetaData is null))
+			{
+				foreach (MetaDataValue P in this.MetaData)
+					ByName[P.Name] = P;
+			}
+
+			this.metaDataByName = ByName;
+		}
+
+		private SortedDictionary<string, MetaDataValue> metaDataByName = null;
+
+		/// <summary>
+		/// Performs custom validation of a property.
+		/// </summary>
+		/// <param name="Field">Property field.</param>
+		public Task ValidateCustomProperty(Field Field)
+		{
+			if (this.TryGetMetaDataValue(Field.Var, out object Prev))
+			{
+				try
+				{
+					if (Prev is string)
+						return Task.CompletedTask;
+					else if (Prev is int)
+					{
+						if (!int.TryParse(Field.ValueString, out _))
+							Field.Error = "Value must be a valid integer.";
+					}
+					else if (Prev is long)
+					{
+						if (!long.TryParse(Field.ValueString, out _))
+							Field.Error = "Value must be a valid long integer.";
+					}
+					else if (Prev is short)
+					{
+						if (!short.TryParse(Field.ValueString, out _))
+							Field.Error = "Value must be a valid short integer.";
+					}
+					else if (Prev is byte)
+					{
+						if (!byte.TryParse(Field.ValueString, out _))
+							Field.Error = "Value must be a valid byte.";
+					}
+					else if (Prev is double)
+					{
+						if (!CommonTypes.TryParse(Field.ValueString, out double _))
+							Field.Error = "Value must be a valid double-precision floating-point value.";
+					}
+					else if (Prev is decimal)
+					{
+						if (!CommonTypes.TryParse(Field.ValueString, out decimal _))
+							Field.Error = "Value must be a valid decimal-precision floating-point value.";
+					}
+					else if (Prev is bool)
+					{
+						if (!CommonTypes.TryParse(Field.ValueString, out bool _))
+							Field.Error = "Value must be a valid boolean value.";
+					}
+					else if (Prev is TimeSpan)
+					{
+						if (!TimeSpan.TryParse(Field.ValueString, out _))
+							Field.Error = "Value must be a valid TimeSpan value.";
+					}
+					else if (Prev is DateTime)
+					{
+						if (!XML.TryParse(Field.ValueString, out DateTime _))
+							Field.Error = "Value must be a valid DateTime value.";
+					}
+					else if (Prev is Uri)
+					{
+						if (!Uri.TryCreate(Field.ValueString, UriKind.Absolute, out _))
+							Field.Error = "Value must be a valid URI value.";
+					}
+					else if (Prev is string[])
+					{
+						return Task.CompletedTask;
+					}
+					else
+					{
+						return Task.CompletedTask;
+					}
+				}
+				catch (Exception ex)
+				{
+					ex = Log.UnnestException(ex);
+					Field.Error = ex.Message;
+				}
+			}
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Sets the custom parameter to the value(s) provided in the field.
+		/// </summary>
+		/// <param name="Field">Field</param>
+		public Task SetCustomProperty(Field Field)
+		{
+			if (this.metaDataByName is null)
+				this.BuildDictionary();
+
+			if (this.metaDataByName.TryGetValue(Field.Var, out MetaDataValue Prev))
+			{
+				try
+				{
+					if (Prev.Value is string)
+						Prev.Value = Field.ValueString;
+					else if (Prev.Value is int)
+					{
+						if (int.TryParse(Field.ValueString, out int i))
+							Prev.Value = i;
+					}
+					else if (Prev.Value is long)
+					{
+						if (long.TryParse(Field.ValueString, out long l))
+							Prev.Value = l;
+					}
+					else if (Prev.Value is short)
+					{
+						if (short.TryParse(Field.ValueString, out short sh))
+							Field.Error = "Value must be a valid short integer.";
+					}
+					else if (Prev.Value is byte)
+					{
+						if (byte.TryParse(Field.ValueString, out byte b))
+							Prev.Value = b;
+					}
+					else if (Prev.Value is double)
+					{
+						if (CommonTypes.TryParse(Field.ValueString, out double d))
+							Prev.Value = d;
+					}
+					else if (Prev.Value is decimal)
+					{
+						if (CommonTypes.TryParse(Field.ValueString, out decimal d))
+							Prev.Value = d;
+					}
+					else if (Prev.Value is bool)
+					{
+						if (CommonTypes.TryParse(Field.ValueString, out bool b))
+							Prev.Value = b;
+					}
+					else if (Prev.Value is TimeSpan)
+					{
+						if (TimeSpan.TryParse(Field.ValueString, out TimeSpan TS))
+							Prev.Value = TS;
+					}
+					else if (Prev.Value is DateTime)
+					{
+						if (XML.TryParse(Field.ValueString, out DateTime TP))
+							Prev.Value = TP;
+					}
+					else if (Prev.Value is Uri)
+					{
+						if (Uri.TryCreate(Field.ValueString, UriKind.Absolute, out Uri Url))
+							Prev.Value = Url;
+					}
+					else if (Prev.Value is string[])
+						Prev.Value = Field.ValueStrings;
+					else
+						Prev.Value = Field.ValueString;
+				}
+				catch (Exception ex)
+				{
+					ex = Log.UnnestException(ex);
+					Field.Error = ex.Message;
+				}
+			}
+			else
+				this.SetMetaDataPriv(Field.Var, Field.ValueString);
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Gets a meta-data value, if available.
+		/// </summary>
+		/// <param name="Name">Name of meta-data tag.</param>
+		/// <returns>Meta-data value, if found, or null otherwise.</returns>
+		public object GetMetaData(string Name)
+		{
+			if (this.TryGetMetaDataValue(Name, out object Value))
+				return Value;
+			else
+				return null;
+		}
+
+		/// <summary>
+		/// Sets a meta-data value.
+		/// </summary>
+		/// <param name="Name">Name of meta-data tag.</param>
+		/// <param name="Value">Value of meta-data tag.</param>
+		public async Task SetMetaData(string Name, object Value)
+		{
+			if (this.metaDataByName is null)
+				this.BuildDictionary();
+
+			if (this.metaDataByName.TryGetValue(Name, out MetaDataValue Tag))
+				Tag.Value = Value;
+			else
+				this.SetMetaDataPriv(Name, Value);
+
+			await Database.Update(this);
+		}
+
+		private void SetMetaDataPriv(string Name, object Value)
+		{
+			this.metaDataByName[Name] = new MetaDataValue()
+			{
+				Name = Name,
+				Value = Value
+			};
+
+			MetaDataValue[] Values = new MetaDataValue[this.metaDataByName.Count];
+			this.metaDataByName.Values.CopyTo(Values, 0);
+			this.MetaData = Values;
+		}
+
+		public override async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
+		{
+			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;
+
+			if (!(this.MetaData is null))
+			{
+				foreach (MetaDataValue Tag in this.MetaData)
+				{
+					if (Tag.Value is string s)
+						Result.AddLast(new StringParameter(Tag.Name, Tag.Name, s));
+					else if (Tag.Value is int i)
+						Result.AddLast(new Int32Parameter(Tag.Name, Tag.Name, i));
+					else if (Tag.Value is long l)
+						Result.AddLast(new Int64Parameter(Tag.Name, Tag.Name, l));
+					else if (Tag.Value is short sh)
+						Result.AddLast(new Int32Parameter(Tag.Name, Tag.Name, sh));
+					else if (Tag.Value is byte b)
+						Result.AddLast(new Int32Parameter(Tag.Name, Tag.Name, b));
+					else if (Tag.Value is double d)
+						Result.AddLast(new DoubleParameter(Tag.Name, Tag.Name, d));
+					else if (Tag.Value is decimal d2)
+						Result.AddLast(new DoubleParameter(Tag.Name, Tag.Name, (double)d2));
+					else if (Tag.Value is bool b2)
+						Result.AddLast(new BooleanParameter(Tag.Name, Tag.Name, b2));
+					else if (Tag.Value is TimeSpan TS)
+						Result.AddLast(new TimeSpanParameter(Tag.Name, Tag.Name, TS));
+					else if (Tag.Value is DateTime TP)
+						Result.AddLast(new DateTimeParameter(Tag.Name, Tag.Name, TP));
+					else if (Tag.Value is Uri Uri)
+						Result.AddLast(new StringParameter(Tag.Name, Tag.Name, Uri.ToString()));
+				}
+			}
+
+			return Result;
 		}
 	}
 }

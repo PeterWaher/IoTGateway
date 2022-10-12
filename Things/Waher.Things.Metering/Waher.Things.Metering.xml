@@ -1029,6 +1029,19 @@
             Called when node has been removed from the registry.
             </summary>
         </member>
+        <member name="M:Waher.Things.Metering.ProvisionedMeteringNode.GetDiscoUri">
+            <summary>
+            Gets a discovery URI for the thing.
+            </summary>
+            <returns>Discovery URI</returns>
+        </member>
+        <member name="M:Waher.Things.Metering.ProvisionedMeteringNode.GetDiscoUri(System.Boolean)">
+            <summary>
+            Gets a discovery URI for the thing.
+            </summary>
+            <param name="OnlyClaim">If empty string should be returned, if thing has been claimed.</param>
+            <returns>Discovery URI</returns>
+        </member>
         <member name="M:Waher.Things.Metering.ProvisionedMeteringNode.AnnotatePropertyForm(Waher.Networking.XMPP.DataForms.FormState)">
             <summary>
             Annotates the property form.

@@ -3,8 +3,8 @@
 	<Language code="en" name="English">
 		<Namespace name="Waher.Things.Virtual">
 			<String id="1">Virtual Node</String>
-			<String id="2"></String>
-			<String id="3"></String>
+			<String id="2">Meta-data</String>
+			<String id="3">Meta-data value is defined by external source.</String>
 			<String id="4"></String>
 			<String id="5"></String>
 			<String id="6"></String>

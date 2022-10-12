@@ -948,6 +948,8 @@ namespace Waher.IoTGateway
 				avatarClient = new Networking.XMPP.Avatar.AvatarClient(xmppClient, pepClient);
 
 				Types.SetModuleParameter("Concentrator", concentratorServer);
+				Types.SetModuleParameter("Sources", concentratorServer.DataSources);
+				Types.SetModuleParameter("DefaultSource", MeteringTopology.SourceID);
 				Types.SetModuleParameter("Sensor", concentratorServer.SensorServer);
 				Types.SetModuleParameter("Control", concentratorServer.ControlServer);
 				Types.SetModuleParameter("Registry", thingRegistryClient);

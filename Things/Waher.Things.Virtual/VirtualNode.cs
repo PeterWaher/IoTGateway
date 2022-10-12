@@ -8,7 +8,9 @@ using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.Layout;
+using Waher.Networking.XMPP.Sensor;
 using Waher.Persistence;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Metering;
@@ -19,8 +21,10 @@ namespace Waher.Things.Virtual
 	/// <summary>
 	/// Node representing a TCP/IP connection to a Modbus Gateway
 	/// </summary>
-	public class VirtualNode : ProvisionedMeteringNode, ICustomFormProperties
+	public class VirtualNode : ProvisionedMeteringNode, ICustomFormProperties, ISensor
 	{
+		private Dictionary<string, SensorData.Field> fields = new Dictionary<string, SensorData.Field>();
+
 		/// <summary>
 		/// Node representing a TCP/IP connection to a Modbus Gateway
 		/// </summary>
@@ -448,5 +452,68 @@ namespace Waher.Things.Virtual
 
 			return Result;
 		}
+
+		/// <summary>
+		/// Reports sensor data on the node.
+		/// </summary>
+		/// <param name="Field">Parsed field.</param>
+		public void ReportSensorData(SensorData.Field Field)
+		{
+			this.ReportSensorData(new SensorData.Field[] { Field });
+		}
+
+		/// <summary>
+		/// Reports sensor data on the node.
+		/// </summary>
+		/// <param name="Fields">Parsed fields.</param>
+		public void ReportSensorData(params SensorData.Field[] Fields)
+		{
+			if (!Types.TryGetModuleParameter("Sensor", out object Obj) || !(Obj is SensorServer SensorServer))
+				return;
+
+			List<SensorData.Field> Momentary = null;
+
+			lock (this.fields)
+			{
+				foreach (SensorData.Field Field in Fields)
+				{
+					this.fields[Field.Name] = Field;
+
+					if (Field.Type.HasFlag(SensorData.FieldType.Momentary))
+					{
+						if (Momentary is null)
+							Momentary = new List<SensorData.Field>();
+
+						Momentary.Add(Field);
+					}
+				}
+			}
+
+			if (!(Momentary is null))
+				SensorServer.NewMomentaryValues(this, Momentary.ToArray());
+		}
+
+		/// <summary>
+		/// Starts the readout of the sensor.
+		/// </summary>
+		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
+		public Task StartReadout(ISensorReadout Request)
+		{
+			List<SensorData.Field> ToReport = new List<SensorData.Field>();
+
+			lock (this.fields)
+			{
+				foreach (SensorData.Field Field in this.fields.Values)
+				{
+					if (Request.IsIncluded(Field.Name, Field.Timestamp, Field.Type))
+						ToReport.Add(Field);
+				}
+			}
+
+			Request.ReportFields(true, ToReport.ToArray());
+
+			return Task.CompletedTask;
+		}
+
 	}
 }

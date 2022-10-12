@@ -2028,13 +2028,15 @@ The following functions are available in the `Waher.Security.JWT` and `Waher.Sec
 
 The following functions are available in web pages hosted by the IoT Gateway:
 
-| Function                                          | Description |
-|---------------------------------------------------|-------------|
-| `AddableTypes(Node)`                              | Gets an array of types of nodes that can be added to an existing node. |
-| `GetNode(NodeId[,SourceId[,Partition]])`          | Gets the node object of a node in the gateway. If the node is not found, null is returned. (If no Source ID is provided, the Metering Topology is assumed.) |
-| `GetNode(ThingReference)`                         | Gets the node object of a node in the gateway. If the node is not found, null is returned. |
-| `GetSources()`                                    | Gets available sources of things. |
-| `ThingReference([NodeId[,SourceId[,Partition]]])` | Creates a reference object pointing to a node on the gateway. |
+| Function                                                    | Description |
+|-------------------------------------------------------------|-------------|
+| `AddableTypes(Node)`                                        | Gets an array of types of nodes that can be added to an existing node. |
+| `Field(Thing,Name,Value)`                                   | Creates a field object depending on the type of the value (Momentary Value, Automatic Readout, not writable) using the current time. |
+| `Field(Thing,Timestamp,Name,Value[,Type[,QoS[,Writable]]])` | Creates a field object depending on the type of the value. If Type is omitted, it is assumed the field is a Momentary Value. If QoS is omitted, it is assumed it's a Momentary Readout. If is also assumed the field is not writable, unless declared otherwise. |
+| `GetNode(NodeId[,SourceId[,Partition]])`                    | Gets the node object of a node in the gateway. If the node is not found, null is returned. (If no Source ID is provided, the Metering Topology is assumed.) |
+| `GetNode(ThingReference)`                                   | Gets the node object of a node in the gateway. If the node is not found, null is returned. |
+| `GetSources()`                                              | Gets available sources of things. |
+| `ThingReference([NodeId[,SourceId[,Partition]]])`           | Creates a reference object pointing to a node on the gateway. |
 
 #### Gateway Extensions (Waher.IoTGateway)
 

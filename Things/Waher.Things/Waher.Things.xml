@@ -3026,6 +3026,94 @@
             <param name="Node">Reference node.</param>
             <returns>Array of names of types of nodes that can be added to <paramref name="Node"/>.</returns>
         </member>
+        <member name="T:Waher.Things.ScriptExtensions.SensorData.Field">
+            <summary>
+            Creates a Boolean field.
+            </summary>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.SensorData.Field.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a Boolean field.
+            </summary>
+            <param name="Thing">Thing reference</param>
+            <param name="Name">Field name.</param>
+            <param name="Value">Field value.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.SensorData.Field.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a Boolean field.
+            </summary>
+            <param name="Thing">Thing reference</param>
+            <param name="Timestamp">Timestamp of value.</param>
+            <param name="Name">Field name.</param>
+            <param name="Value">Field value.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.SensorData.Field.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a Boolean field.
+            </summary>
+            <param name="Thing">Thing reference</param>
+            <param name="Timestamp">Timestamp of value.</param>
+            <param name="Name">Field name.</param>
+            <param name="Value">Field value.</param>
+            <param name="Type">Field Type</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.SensorData.Field.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a Boolean field.
+            </summary>
+            <param name="Thing">Thing reference</param>
+            <param name="Timestamp">Timestamp of value.</param>
+            <param name="Name">Field name.</param>
+            <param name="Value">Field value.</param>
+            <param name="Type">Field Type</param>
+            <param name="QoS">Quality of Service</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.SensorData.Field.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Creates a Boolean field.
+            </summary>
+            <param name="Thing">Thing reference</param>
+            <param name="Timestamp">Timestamp of value.</param>
+            <param name="Name">Field name.</param>
+            <param name="Value">Field value.</param>
+            <param name="Type">Field Type</param>
+            <param name="QoS">Quality of Service</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+            <param name="Writable">If field is writable</param>
+        </member>
+        <member name="P:Waher.Things.ScriptExtensions.SensorData.Field.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Things.ScriptExtensions.SensorData.Field.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Things.ScriptExtensions.SensorData.Field.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Things.ScriptExtensions.GetNode">
             <summary>
             Gets a node object on the gateway.

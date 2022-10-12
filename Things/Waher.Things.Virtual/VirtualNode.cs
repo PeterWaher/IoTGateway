@@ -12,6 +12,7 @@ using Waher.Networking.XMPP.Sensor;
 using Waher.Persistence;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
+using Waher.Runtime.Timing;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Metering;
 using Waher.Things.Metering.NodeTypes;
@@ -23,7 +24,12 @@ namespace Waher.Things.Virtual
 	/// </summary>
 	public class VirtualNode : ProvisionedMeteringNode, ICustomFormProperties, ISensor
 	{
-		private Dictionary<string, SensorData.Field> fields = new Dictionary<string, SensorData.Field>();
+		private static Scheduler scheduler = null;
+
+		private readonly Dictionary<string, SensorData.Field> fields = new Dictionary<string, SensorData.Field>();
+		private List<SensorData.Field> toReport = null;
+		private DateTime nextReport = DateTime.MinValue;
+		private bool hasReport = false;
 
 		/// <summary>
 		/// Node representing a TCP/IP connection to a Modbus Gateway
@@ -471,7 +477,8 @@ namespace Waher.Things.Virtual
 			if (!Types.TryGetModuleParameter("Sensor", out object Obj) || !(Obj is SensorServer SensorServer))
 				return;
 
-			List<SensorData.Field> Momentary = null;
+			if (scheduler is null && Types.TryGetModuleParameter("Scheduler", out Obj) && Obj is Scheduler Scheduler)
+				scheduler = Scheduler;
 
 			lock (this.fields)
 			{
@@ -481,17 +488,46 @@ namespace Waher.Things.Virtual
 
 					if (Field.Type.HasFlag(SensorData.FieldType.Momentary))
 					{
-						if (Momentary is null)
-							Momentary = new List<SensorData.Field>();
+						if (this.toReport is null)
+							this.toReport = new List<SensorData.Field>();
 
-						Momentary.Add(Field);
+						this.toReport.Add(Field);
+						this.hasReport = true;
+					}
+				}
+
+				if (this.hasReport)
+				{
+					if (scheduler is null)
+					{
+						SensorServer.NewMomentaryValues(this, this.toReport.ToArray());
+						this.toReport.Clear();
+						this.hasReport = false;
+					}
+					else
+					{
+						if (this.nextReport != DateTime.MinValue)
+							scheduler.Remove(this.nextReport);
+
+						this.nextReport = scheduler.Add(DateTime.Now.AddMilliseconds(250), this.DoReport, null);
 					}
 				}
 			}
-
-			if (!(Momentary is null))
-				SensorServer.NewMomentaryValues(this, Momentary.ToArray());
 		}
+
+		private void DoReport(object _)
+		{
+			if (!Types.TryGetModuleParameter("Sensor", out object Obj) || !(Obj is SensorServer SensorServer))
+				return;
+
+			lock (this.fields)
+			{
+				SensorServer.NewMomentaryValues(this, this.toReport.ToArray());
+				this.toReport.Clear();
+				this.hasReport = false;
+			}
+		}
+
 
 		/// <summary>
 		/// Starts the readout of the sensor.

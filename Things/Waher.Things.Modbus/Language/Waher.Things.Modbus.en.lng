@@ -47,8 +47,8 @@
 			<String id="43">Smallest holding register number accepted by the device.</String>
 			<String id="44">Maximum holding register number:</String>
 			<String id="45">Largest holding register number accepted by the device.</String>
-			<String id="46"></String>
-			<String id="47"></String>
+			<String id="46">Switch byte order.</String>
+			<String id="47">If checked, byte order in registers will be reversed.</String>
 			<String id="48"></String>
 			<String id="49"></String>
 			<String id="50"></String>

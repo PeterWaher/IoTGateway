@@ -92,6 +92,15 @@ namespace Waher.Things.Modbus
 		public string Unit { get; set; }
 
 		/// <summary>
+		/// If the byte order in words should be switched.
+		/// </summary>
+		[Page(4, "Modbus", 100)]
+		[Header(46, "Switch byte order.")]
+		[ToolTip(47, "If checked, byte order in registers will be reversed.")]
+		[DefaultValue(false)]
+		public bool SwitchByteOrder { get; set; }
+
+		/// <summary>
 		/// Gets the type name of the node.
 		/// </summary>
 		/// <param name="Language">Language to use.</param>
@@ -127,7 +136,7 @@ namespace Waher.Things.Modbus
 			try
 			{
 				ushort[] Values = await Client.ReadMultipleRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 1);
-				ushort Raw = Values[0];
+				ushort Raw = this.CheckOrder(Values[0]);
 				double Value = ((Raw * this.Multiplier) / this.Divisor) + this.Offset;
 				int NrDec = Math.Min(255, Math.Max(0, (int)Math.Ceiling(-Math.Log10(this.Multiplier / this.Divisor))));
 				DateTime TP = DateTime.UtcNow;
@@ -180,7 +189,7 @@ namespace Waher.Things.Modbus
 						try
 						{
 							ushort[] Values = await Client.ReadMultipleRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 1);
-							return Values[0];
+							return this.CheckOrder(Values[0]);
 						}
 						finally
 						{
@@ -193,7 +202,7 @@ namespace Waher.Things.Modbus
 						await Client.Enter();
 						try
 						{
-							ushort WritenValue = await Client.WriteRegister((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, (ushort)Value);
+							ushort WritenValue = await Client.WriteRegister((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, this.CheckOrder((ushort)Value));
 
 							if (WritenValue != Value)
 								throw new Exception("Register value not changed correctly.");
@@ -212,7 +221,7 @@ namespace Waher.Things.Modbus
 						try
 						{
 							ushort[] Values = await Client.ReadMultipleRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 1);
-							return ((Values[0] * this.Multiplier) / this.Divisor) + this.Offset;
+							return ((this.CheckOrder(Values[0]) * this.Multiplier) / this.Divisor) + this.Offset;
 						}
 						finally
 						{
@@ -226,7 +235,7 @@ namespace Waher.Things.Modbus
 						try
 						{
 							ushort Raw = (ushort)Math.Min(65535, Math.Max(0, ((Value - this.Offset) * this.Divisor) / this.Multiplier));
-							ushort WritenValue = await Client.WriteRegister((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, Raw);
+							ushort WritenValue = await Client.WriteRegister((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, this.CheckOrder(Raw));
 
 							if (WritenValue != Value)
 								throw new Exception("Register value not changed correctly.");
@@ -237,6 +246,20 @@ namespace Waher.Things.Modbus
 						}
 					})
 			});
+		}
+
+		private ushort CheckOrder(ushort Value)
+		{
+			if (this.SwitchByteOrder)
+			{
+				ushort Value2 = (ushort)(Value & 0xff);
+				Value2 <<= 8;
+				Value2 |= (ushort)(Value >> 8);
+
+				return Value2;
+			}
+			else
+				return Value;
 		}
 	}
 }

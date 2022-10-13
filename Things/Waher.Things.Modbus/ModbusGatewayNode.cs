@@ -105,7 +105,10 @@ namespace Waher.Things.Modbus
 			if (clients.TryGetValue(Key, out ModbusTcpClient Client))
 			{
 				if (Client.Connected)
+				{
+					this.CheckSniffers(Client);
 					return Client;
+				}
 				else
 					clients.Remove(Key);
 			}
@@ -126,6 +129,46 @@ namespace Waher.Things.Modbus
 			}
 
 			return Client;
+		}
+
+		private void CheckSniffers(ModbusTcpClient Client)
+		{
+			if (!Client.HasSniffers && !this.sniffers.HasSniffers)
+				return;
+
+			foreach (ISniffer Sniffer in Client.Sniffers)
+			{
+				bool Found = false;
+
+				foreach (ISniffer Sniffer2 in this.sniffers.Sniffers)
+				{
+					if (Sniffer == Sniffer2)
+					{
+						Found = true;
+						break;
+					}
+				}
+
+				if (!Found)
+					Client.Remove(Sniffer);
+			}
+
+			foreach (ISniffer Sniffer in this.sniffers.Sniffers)
+			{
+				bool Found = false;
+
+				foreach (ISniffer Sniffer2 in Client.Sniffers)
+				{
+					if (Sniffer == Sniffer2)
+					{
+						Found = true;
+						break;
+					}
+				}
+
+				if (!Found)
+					Client.Add(Sniffer);
+			}
 		}
 
 		#endregion

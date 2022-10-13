@@ -121,6 +121,15 @@ namespace Waher.Things.Modbus
 		public int MaxHoldingRegisterNr { get; set; }
 
 		/// <summary>
+		/// If the byte order in words should be switched.
+		/// </summary>
+		[Page(4, "Modbus", 100)]
+		[Header(46, "Switch byte order.")]
+		[ToolTip(47, "If checked, byte order in registers will be reversed.")]
+		[DefaultValue(false)]
+		public bool SwitchByteOrder { get; set; }
+
+		/// <summary>
 		/// Gets the type name of the node.
 		/// </summary>
 		/// <param name="Language">Language to use.</param>
@@ -203,7 +212,7 @@ namespace Waher.Things.Modbus
 						StepSize = Math.Min(StepSize, Values.Length);
 
 						for (i = 0; i < StepSize; i++)
-							Fields.AddLast(new Int32Field(this, TP, "Input Register 3" + (Offset + i).ToString("D5"), Values[i], FieldType.Momentary, FieldQoS.AutomaticReadout));
+							Fields.AddLast(new Int32Field(this, TP, "Input Register 3" + (Offset + i).ToString("D5"), this.CheckOrder(Values[i]), FieldType.Momentary, FieldQoS.AutomaticReadout));
 
 						Request.ReportFields(false, Fields);
 						Fields.Clear();
@@ -226,7 +235,7 @@ namespace Waher.Things.Modbus
 						StepSize = Math.Min(StepSize, Values.Length);
 
 						for (i = 0; i < StepSize; i++)
-							Fields.AddLast(new Int32Field(this, TP, "Holding Register 4" + (Offset + i).ToString("D5"), Values[i], FieldType.Momentary, FieldQoS.AutomaticReadout));
+							Fields.AddLast(new Int32Field(this, TP, "Holding Register 4" + (Offset + i).ToString("D5"), this.CheckOrder(Values[i]), FieldType.Momentary, FieldQoS.AutomaticReadout));
 
 						Request.ReportFields(false, Fields);
 						Fields.Clear();
@@ -294,6 +303,20 @@ namespace Waher.Things.Modbus
 			{
 				Client.Leave();
 			}
+		}
+
+		private ushort CheckOrder(ushort Value)
+		{
+			if (this.SwitchByteOrder)
+			{
+				ushort Value2 = (ushort)(Value & 0xff);
+				Value2 <<= 8;
+				Value2 |= (ushort)(Value >> 8);
+
+				return Value2;
+			}
+			else
+				return Value;
 		}
 
 	}

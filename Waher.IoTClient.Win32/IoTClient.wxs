@@ -299,6 +299,7 @@
 							<File Id='Waher.Script.Graphs3D.dll' Name='Waher.Script.Graphs3D.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Graphs3D.dll' Vital='yes'/>
 							<File Id='Waher.Script.Networking.dll' Name='Waher.Script.Networking.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Networking.dll' Vital='yes'/>
 							<File Id='Waher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Persistence.dll' Vital='yes'/>
+							<File Id='Waher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Statistics.dll' Vital='yes'/>
 							<File Id='Waher.Script.Threading.dll' Name='Waher.Script.Threading.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Threading.dll' Vital='yes'/>
 							<File Id='Waher.Script.Xml.dll' Name='Waher.Script.Xml.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Xml.dll' Vital='yes'/>
 							<File Id='Waher.Script.XmlDSig.dll' Name='Waher.Script.XmlDSig.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.XmlDSig.dll' Vital='yes'/>
@@ -387,17 +388,28 @@
 							<File Id='Waher.Content.Html.pdb' Name='Waher.Content.Html.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Html.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Images.pdb' Name='Waher.Content.Images.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Images.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Consolidation.pdb' Name='Waher.Content.Markdown.Consolidation.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.Consolidation.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Consolidation.xml' Name='Waher.Content.Markdown.Consolidation.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.Consolidation.xml' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.GraphViz.pdb' Name='Waher.Content.Markdown.GraphViz.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.GraphViz.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.GraphViz.xml' Name='Waher.Content.Markdown.GraphViz.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.GraphViz.xml' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.Layout2D.pdb' Name='Waher.Content.Markdown.Layout2D.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.Layout2D.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.Layout2D.xml' Name='Waher.Content.Markdown.Layout2D.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.Layout2D.xml' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.PlantUml.pdb' Name='Waher.Content.Markdown.PlantUml.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.PlantUml.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.PlantUml.xml' Name='Waher.Content.Markdown.PlantUml.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Markdown.PlantUml.xml' Vital='yes'/>
 							<File Id='Waher.Content.QR.pdb' Name='Waher.Content.QR.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.QR.pdb' Vital='yes'/>
+							<File Id='Waher.Content.QR.xml' Name='Waher.Content.QR.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.QR.xml' Vital='yes'/>
 							<File Id='Waher.Content.SystemFiles.pdb' Name='Waher.Content.SystemFiles.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.SystemFiles.pdb' Vital='yes'/>
+							<File Id='Waher.Content.SystemFiles.xml' Name='Waher.Content.SystemFiles.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.SystemFiles.xml' Vital='yes'/>
 							<File Id='Waher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xml.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Xsl.pdb' Name='Waher.Content.Xsl.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Content.Xsl.pdb' Vital='yes'/>
 							<File Id='Waher.Events.pdb' Name='Waher.Events.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Events.pdb' Vital='yes'/>
 							<File Id='Waher.Layout.Layout2D.pdb' Name='Waher.Layout.Layout2D.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Layout.Layout2D.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.pdb' Name='Waher.Networking.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.DNS.pdb' Name='Waher.Networking.DNS.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.DNS.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.MQTT.pdb' Name='Waher.Networking.MQTT.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.MQTT.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.MQTT.xml' Name='Waher.Networking.MQTT.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.MQTT.xml' Vital='yes'/>
+							<File Id='Waher.Networking.PeerToPeer.pdb' Name='Waher.Networking.PeerToPeer.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.PeerToPeer.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.UPnP.pdb' Name='Waher.Networking.UPnP.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.UPnP.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.WHOIS.pdb' Name='Waher.Networking.WHOIS.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.WHOIS.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.pdb' Name='Waher.Networking.XMPP.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.xml' Name='Waher.Networking.XMPP.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.xml' Vital='yes'/>
@@ -406,6 +418,7 @@
 							<File Id='Waher.Networking.XMPP.Concentrator.pdb' Name='Waher.Networking.XMPP.Concentrator.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Concentrator.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Concentrator.xml' Name='Waher.Networking.XMPP.Concentrator.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Concentrator.xml' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Contracts.pdb' Name='Waher.Networking.XMPP.Contracts.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Contracts.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Contracts.xml' Name='Waher.Networking.XMPP.Contracts.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Contracts.xml' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Control.pdb' Name='Waher.Networking.XMPP.Control.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Control.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.MUC.pdb' Name='Waher.Networking.XMPP.MUC.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.MUC.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.MUC.xml' Name='Waher.Networking.XMPP.MUC.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.MUC.xml' Vital='yes'/>
@@ -417,6 +430,8 @@
 							<File Id='Waher.Networking.XMPP.Provisioning.xml' Name='Waher.Networking.XMPP.Provisioning.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Provisioning.xml' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.PubSub.pdb' Name='Waher.Networking.XMPP.PubSub.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.PubSub.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.PubSub.xml' Name='Waher.Networking.XMPP.PubSub.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.PubSub.xml' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.RDP.pdb' Name='Waher.Networking.XMPP.RDP.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.RDP.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.RDP.xml' Name='Waher.Networking.XMPP.RDP.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.RDP.xml' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Sensor.pdb' Name='Waher.Networking.XMPP.Sensor.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Sensor.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Sensor.xml' Name='Waher.Networking.XMPP.Sensor.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Sensor.xml' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Synchronization.pdb' Name='Waher.Networking.XMPP.Synchronization.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.Synchronization.pdb' Vital='yes'/>
@@ -425,26 +440,40 @@
 							<File Id='Waher.Networking.XMPP.WebSocket.xml' Name='Waher.Networking.XMPP.WebSocket.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Networking.XMPP.WebSocket.xml' Vital='yes'/>
 							<File Id='Waher.Persistence.pdb' Name='Waher.Persistence.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.pdb' Vital='yes'/>
 							<File Id='Waher.Persistence.FilesLW.pdb' Name='Waher.Persistence.FilesLW.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.FilesLW.pdb' Vital='yes'/>
+							<File Id='Waher.Persistence.FilesLW.xml' Name='Waher.Persistence.FilesLW.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.FilesLW.xml' Vital='yes'/>
 							<File Id='Waher.Persistence.Serialization.pdb' Name='Waher.Persistence.Serialization.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Persistence.Serialization.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Cache.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Inventory.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Language.pdb' Name='Waher.Runtime.Language.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Language.pdb' Vital='yes'/>
+							<File Id='Waher.Runtime.Profiling.pdb' Name='Waher.Runtime.Profiling.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Profiling.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Settings.pdb' Name='Waher.Runtime.Settings.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Settings.pdb' Vital='yes'/>
+							<File Id='Waher.Runtime.Temporary.pdb' Name='Waher.Runtime.Temporary.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Temporary.pdb' Vital='yes'/>
+							<File Id='Waher.Runtime.Text.pdb' Name='Waher.Runtime.Text.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Text.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Threading.pdb' Name='Waher.Runtime.Threading.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Threading.pdb' Vital='yes'/>
+							<File Id='Waher.Runtime.Threading.xml' Name='Waher.Runtime.Threading.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Threading.xml' Vital='yes'/>
 							<File Id='Waher.Runtime.Timing.pdb' Name='Waher.Runtime.Timing.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Timing.pdb' Vital='yes'/>
+							<File Id='Waher.Runtime.Timing.xml' Name='Waher.Runtime.Timing.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Runtime.Timing.xml' Vital='yes'/>
 							<File Id='Waher.Script.pdb' Name='Waher.Script.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Content.pdb' Name='Waher.Script.Content.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Content.pdb' Vital='yes'/>
+							<File Id='Waher.Script.Cryptography.pdb' Name='Waher.Script.Cryptography.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Cryptography.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Fractals.pdb' Name='Waher.Script.Fractals.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Fractals.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Graphs.pdb' Name='Waher.Script.Graphs.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Graphs.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Graphs3D.pdb' Name='Waher.Script.Graphs3D.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Graphs3D.pdb' Vital='yes'/>
+							<File Id='Waher.Script.Graphs3D.xml' Name='Waher.Script.Graphs3D.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Graphs3D.xml' Vital='yes'/>
 							<File Id='Waher.Script.Networking.pdb' Name='Waher.Script.Networking.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Networking.pdb' Vital='yes'/>
+							<File Id='Waher.Script.Networking.xml' Name='Waher.Script.Networking.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Networking.xml' Vital='yes'/>
 							<File Id='Waher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Persistence.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Statistics.pdb' Name='Waher.Script.Statistics.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Statistics.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Threading.pdb' Name='Waher.Script.Threading.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Threading.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Xml.pdb' Name='Waher.Script.Xml.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Xml.pdb' Vital='yes'/>
 							<File Id='Waher.Script.XmlDSig.pdb' Name='Waher.Script.XmlDSig.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.XmlDSig.pdb' Vital='yes'/>
+							<File Id='Waher.Script.XmlDSig.xml' Name='Waher.Script.XmlDSig.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.XmlDSig.xml' Vital='yes'/>
 							<File Id='Waher.Security.pdb' Name='Waher.Security.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.pdb' Vital='yes'/>
+							<File Id='Waher.Security.CallStack.pdb' Name='Waher.Security.CallStack.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.CallStack.pdb' Vital='yes'/>
+							<File Id='Waher.Security.CallStack.xml' Name='Waher.Security.CallStack.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.CallStack.xml' Vital='yes'/>
+							<File Id='Waher.Security.ChaChaPoly.pdb' Name='Waher.Security.ChaChaPoly.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.ChaChaPoly.pdb' Vital='yes'/>
 							<File Id='Waher.Security.EllipticCurves.pdb' Name='Waher.Security.EllipticCurves.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.EllipticCurves.pdb' Vital='yes'/>
+							<File Id='Waher.Security.EllipticCurves.xml' Name='Waher.Security.EllipticCurves.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.EllipticCurves.xml' Vital='yes'/>
 							<File Id='Waher.Security.SHA3.pdb' Name='Waher.Security.SHA3.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Security.SHA3.pdb' Vital='yes'/>
 							<File Id='Waher.Things.pdb' Name='Waher.Things.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Things.pdb' Vital='yes'/>
 							<RemoveFile Id='RemoveWaher.Client.WPF.pdb' Name='Waher.Client.WPF.pdb' On='uninstall'/>
@@ -454,17 +483,28 @@
 							<RemoveFile Id='RemoveWaher.Content.Html.pdb' Name='Waher.Content.Html.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Images.pdb' Name='Waher.Content.Images.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Consolidation.pdb' Name='Waher.Content.Markdown.Consolidation.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Consolidation.xml' Name='Waher.Content.Markdown.Consolidation.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.GraphViz.pdb' Name='Waher.Content.Markdown.GraphViz.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.GraphViz.xml' Name='Waher.Content.Markdown.GraphViz.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.Layout2D.pdb' Name='Waher.Content.Markdown.Layout2D.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.Layout2D.xml' Name='Waher.Content.Markdown.Layout2D.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.PlantUml.pdb' Name='Waher.Content.Markdown.PlantUml.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Markdown.PlantUml.xml' Name='Waher.Content.Markdown.PlantUml.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.QR.pdb' Name='Waher.Content.QR.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.QR.xml' Name='Waher.Content.QR.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.SystemFiles.pdb' Name='Waher.Content.SystemFiles.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.SystemFiles.xml' Name='Waher.Content.SystemFiles.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Xsl.pdb' Name='Waher.Content.Xsl.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.pdb' Name='Waher.Events.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Layout.Layout2D.pdb' Name='Waher.Layout.Layout2D.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.pdb' Name='Waher.Networking.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.DNS.pdb' Name='Waher.Networking.DNS.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.MQTT.pdb' Name='Waher.Networking.MQTT.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.MQTT.xml' Name='Waher.Networking.MQTT.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.PeerToPeer.pdb' Name='Waher.Networking.PeerToPeer.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.UPnP.pdb' Name='Waher.Networking.UPnP.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.WHOIS.pdb' Name='Waher.Networking.WHOIS.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.pdb' Name='Waher.Networking.XMPP.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.xml' Name='Waher.Networking.XMPP.xml' On='uninstall'/>
@@ -473,6 +513,7 @@
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.pdb' Name='Waher.Networking.XMPP.Concentrator.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.xml' Name='Waher.Networking.XMPP.Concentrator.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Contracts.pdb' Name='Waher.Networking.XMPP.Contracts.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Contracts.xml' Name='Waher.Networking.XMPP.Contracts.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Control.pdb' Name='Waher.Networking.XMPP.Control.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.MUC.pdb' Name='Waher.Networking.XMPP.MUC.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.MUC.xml' Name='Waher.Networking.XMPP.MUC.xml' On='uninstall'/>
@@ -484,6 +525,8 @@
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Provisioning.xml' Name='Waher.Networking.XMPP.Provisioning.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.PubSub.pdb' Name='Waher.Networking.XMPP.PubSub.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.PubSub.xml' Name='Waher.Networking.XMPP.PubSub.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.RDP.pdb' Name='Waher.Networking.XMPP.RDP.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.RDP.xml' Name='Waher.Networking.XMPP.RDP.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Sensor.pdb' Name='Waher.Networking.XMPP.Sensor.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Sensor.xml' Name='Waher.Networking.XMPP.Sensor.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Synchronization.pdb' Name='Waher.Networking.XMPP.Synchronization.pdb' On='uninstall'/>
@@ -492,26 +535,40 @@
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.WebSocket.xml' Name='Waher.Networking.XMPP.WebSocket.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.pdb' Name='Waher.Persistence.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.FilesLW.pdb' Name='Waher.Persistence.FilesLW.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Persistence.FilesLW.xml' Name='Waher.Persistence.FilesLW.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.Serialization.pdb' Name='Waher.Persistence.Serialization.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Inventory.pdb' Name='Waher.Runtime.Inventory.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Language.pdb' Name='Waher.Runtime.Language.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Profiling.pdb' Name='Waher.Runtime.Profiling.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Settings.pdb' Name='Waher.Runtime.Settings.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Temporary.pdb' Name='Waher.Runtime.Temporary.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Text.pdb' Name='Waher.Runtime.Text.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Threading.pdb' Name='Waher.Runtime.Threading.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Threading.xml' Name='Waher.Runtime.Threading.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Timing.pdb' Name='Waher.Runtime.Timing.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Runtime.Timing.xml' Name='Waher.Runtime.Timing.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.pdb' Name='Waher.Script.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Content.pdb' Name='Waher.Script.Content.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Cryptography.pdb' Name='Waher.Script.Cryptography.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Fractals.pdb' Name='Waher.Script.Fractals.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Graphs.pdb' Name='Waher.Script.Graphs.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Graphs3D.pdb' Name='Waher.Script.Graphs3D.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Graphs3D.xml' Name='Waher.Script.Graphs3D.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Networking.pdb' Name='Waher.Script.Networking.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Networking.xml' Name='Waher.Script.Networking.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Statistics.pdb' Name='Waher.Script.Statistics.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Threading.pdb' Name='Waher.Script.Threading.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Xml.pdb' Name='Waher.Script.Xml.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.XmlDSig.pdb' Name='Waher.Script.XmlDSig.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.XmlDSig.xml' Name='Waher.Script.XmlDSig.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.pdb' Name='Waher.Security.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.CallStack.pdb' Name='Waher.Security.CallStack.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.CallStack.xml' Name='Waher.Security.CallStack.xml' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.ChaChaPoly.pdb' Name='Waher.Security.ChaChaPoly.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.EllipticCurves.pdb' Name='Waher.Security.EllipticCurves.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Security.EllipticCurves.xml' Name='Waher.Security.EllipticCurves.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.SHA3.pdb' Name='Waher.Security.SHA3.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.pdb' Name='Waher.Things.pdb' On='uninstall'/>
 						</Component>

@@ -5,6 +5,7 @@ using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Things.Metering;
 
 namespace Waher.Things.ScriptExtensions
 {
@@ -14,7 +15,6 @@ namespace Waher.Things.ScriptExtensions
 	public class GetNode : FunctionMultiVariate
 	{
 		/// <summary>
-		/// Gets a node object on the gateway.
 		/// Gets a node object on the gateway.
 		/// </summary>
 		/// <param name="NodeId">Node ID</param>
@@ -105,7 +105,7 @@ namespace Waher.Things.ScriptExtensions
 					}
 					else
 					{
-						SourceId = DefaultSource;
+						SourceId = MeteringTopology.SourceID;
 						if (!TryGetDataSource(SourceId, out Source))
 							return ObjectValue.Null;
 
@@ -138,20 +138,6 @@ namespace Waher.Things.ScriptExtensions
 				return ObjectValue.Null;
 			else
 				return new ObjectValue(Result);
-		}
-
-		/// <summary>
-		/// Default source of nodes, if no source is explicitly provided.
-		/// </summary>
-		public static string DefaultSource
-		{
-			get
-			{
-				if (Types.TryGetModuleParameter("DefaultSource", out object Obj) && Obj is string Source)
-					return Source;
-				else
-					return string.Empty;
-			}
 		}
 
 		/// <summary>

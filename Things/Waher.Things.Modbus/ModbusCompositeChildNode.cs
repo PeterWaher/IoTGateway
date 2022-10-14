@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Language;
 using Waher.Things.ControlParameters;
+using Waher.Things.SensorData;
 
 namespace Waher.Things.Modbus
 {
@@ -65,7 +66,10 @@ namespace Waher.Things.Modbus
 						Request.From, Request.To,
 						(sender, e) =>
 						{
-							Request.ReportFields(false, e.Fields);
+							foreach (Field F in e.Fields)
+								F.Thing = this;
+
+							Request.ReportFields(e.Done, e.Fields);
 
 							if (e.Done)
 								ReadoutCompleted.TrySetResult(true);
@@ -74,17 +78,12 @@ namespace Waher.Things.Modbus
 						},
 						(sender, e) =>
 						{
-							if (!(e.Errors is ThingError[] Errors))
-							{
-								List<ThingError> List = new List<ThingError>();
+							List<ThingError> Errors2 = new List<ThingError>();
 
-								foreach (ThingError Error in e.Errors)
-									List.Add(Error);
+							foreach (ThingError Error in e.Errors)
+								Errors2.Add(new ThingError(this, Error.ErrorMessage));
 
-								Errors = List.ToArray();
-							}
-
-							Request.ReportErrors(false, Errors);
+							Request.ReportErrors(e.Done, Errors2.ToArray());
 
 							if (e.Done)
 								ReadoutCompleted.TrySetResult(true);
@@ -98,9 +97,7 @@ namespace Waher.Things.Modbus
 
 					Task T = await Task.WhenAny(ReadoutCompleted.Task, Timeout);
 
-					if (ReadoutCompleted.Task.IsCompleted)
-						Request.ReportFields(true);
-					else
+					if (!ReadoutCompleted.Task.IsCompleted)
 						Request.ReportErrors(true, new ThingError(this, "Timeout."));
 				}
 			}

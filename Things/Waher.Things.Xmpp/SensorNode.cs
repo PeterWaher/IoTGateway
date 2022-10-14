@@ -4,6 +4,7 @@ using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
+using Waher.Things.SensorData;
 
 namespace Waher.Things.Xmpp
 {
@@ -80,6 +81,9 @@ namespace Waher.Things.Xmpp
 
 				Request2.OnFieldsReceived += (sender, Fields) =>
 				{
+					foreach (Field F in Fields)
+						F.Thing = this;
+
 					Request.ReportFields(false, Fields);
 					return Task.CompletedTask;
 				};
@@ -87,7 +91,10 @@ namespace Waher.Things.Xmpp
 				Request2.OnErrorsReceived += (sender, Errors) =>
 				{
 					List<ThingError> Errors2 = new List<ThingError>();
-					Errors2.AddRange(Errors);
+
+					foreach (ThingError E in Errors)
+						Errors2.Add(new ThingError(this, E.ErrorMessage));
+
 					Request.ReportErrors(false, Errors2.ToArray());
 					return Task.CompletedTask;
 				};

@@ -71,6 +71,8 @@ using Waher.Things.Metering;
 using Waher.Things.SensorData;
 using Waher.Script.Graphs;
 using Waher.Runtime.ServiceRegistration;
+using Waher.Networking.XMPP.Sensor;
+using Waher.Networking.XMPP.Control;
 
 namespace Waher.IoTGateway
 {
@@ -123,6 +125,8 @@ namespace Waher.IoTGateway
 		private static Networking.XMPP.InBandBytestreams.IbbClient ibbClient = null;
 		private static Socks5Proxy socksProxy = null;
 		private static ConcentratorServer concentratorServer = null;
+		private static SensorClient sensorClient = null;
+		private static ControlClient controlClient = null;
 		private static SynchronizationClient synchronizationClient = null;
 		private static PepClient pepClient = null;
 		private static MultiUserChatClient mucClient = null;
@@ -1435,9 +1439,11 @@ namespace Waher.IoTGateway
 			ibbClient = new Networking.XMPP.InBandBytestreams.IbbClient(xmppClient, MaxChunkSize);
 			Types.SetModuleParameter("IBB", ibbClient);
 
-			socksProxy = new Networking.XMPP.P2P.SOCKS5.Socks5Proxy(xmppClient);
+			socksProxy = new Socks5Proxy(xmppClient);
 			Types.SetModuleParameter("SOCKS5", socksProxy);
 
+			sensorClient = new SensorClient(xmppClient);
+			controlClient = new ControlClient(xmppClient);
 			synchronizationClient = new SynchronizationClient(xmppClient);
 			pepClient = new PepClient(xmppClient, XmppConfiguration.Instance.PubSub);
 
@@ -1870,6 +1876,12 @@ namespace Waher.IoTGateway
 
 				avatarClient?.Dispose();
 				avatarClient = null;
+
+				sensorClient?.Dispose();
+				sensorClient = null;
+
+				controlClient?.Dispose();
+				controlClient = null;
 
 				synchronizationClient?.Dispose();
 				synchronizationClient = null;
@@ -2649,6 +2661,22 @@ namespace Waher.IoTGateway
 		public static Networking.XMPP.Avatar.AvatarClient AvatarClient
 		{
 			get { return avatarClient; }
+		}
+
+		/// <summary>
+		/// XMPP Sensor Client.
+		/// </summary>
+		public static SensorClient SensorClient
+		{
+			get { return sensorClient; }
+		}
+
+		/// <summary>
+		/// XMPP Control Client.
+		/// </summary>
+		public static ControlClient ControlClient
+		{
+			get { return controlClient; }
 		}
 
 		/// <summary>

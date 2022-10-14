@@ -37,14 +37,14 @@ namespace Waher.Things.Xmpp
 		public Task StartReadout(ISensorReadout Request)
 		{
 			if (Types.TryGetModuleParameter("XMPP", out object Obj) && Obj is XmppClient Client &&
-				Client.TryGetExtension<SensorClient>(out SensorClient SensorClient))
+				Client.TryGetExtension(out SensorClient SensorClient))
 			{
 				string JID = string.Empty;
 				string NID = this.RemoteNodeID;
 				string SID = string.Empty;
 				string PID = string.Empty;
 
-				IThingReference Loop = this.Parent;
+				INode Loop = this.Parent;
 				while (!(Loop is null))
 				{
 					if (Loop is SourceNode SourceNode)
@@ -56,6 +56,8 @@ namespace Waher.Things.Xmpp
 						JID = ConcentratorDevice.JID;
 						break;
 					}
+
+					Loop = Loop.Parent;
 				}
 
 				RosterItem Item = Client.GetRosterItem(JID);

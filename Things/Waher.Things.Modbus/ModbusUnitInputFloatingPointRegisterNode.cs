@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Networking.Modbus;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
@@ -11,18 +12,19 @@ using Waher.Things.SensorData;
 namespace Waher.Things.Modbus
 {
 	/// <summary>
-	/// Represents an input register on a Modbus unit node.
+	/// Represents a floating-point input register on a Modbus unit node.
 	/// </summary>
-	public class ModbusUnitInputRegisterNode : ModbusUnitChildNode, ISensor
+	public class ModbusUnitInputFloatingPointRegisterNode : ModbusUnitChildNode, ISensor
 	{
 		/// <summary>
-		/// Represents a register on a Modbus unit node.
+		/// Represents a floating-point input register on a Modbus unit node.
 		/// </summary>
-		public ModbusUnitInputRegisterNode()
+		public ModbusUnitInputFloatingPointRegisterNode()
 			: base()
 		{
 			this.Multiplier = 1.0;
 			this.Divisor = 1.0;
+			this.ByteOrder = FloatByteOrder.NetworkOrder;
 		}
 
 		/// <summary>
@@ -94,10 +96,32 @@ namespace Waher.Things.Modbus
 		/// If the byte order in words should be switched.
 		/// </summary>
 		[Page(4, "Modbus", 100)]
-		[Header(46, "Switch byte order.")]
-		[ToolTip(47, "If checked, byte order in registers will be reversed.")]
+		[Header(48, "Floating-point byte order:")]
+		[ToolTip(49, "Select in which order the bytes in the floating-point value are interpreted.")]
+		[DefaultValue(FloatByteOrder.NetworkOrder)]
+		[Option(FloatByteOrder.NetworkOrder, 50, "Network Order (A B C D)")]
+		[Option(FloatByteOrder.ByteSwap, 51, "Byte Swap Order (B A D C)")]
+		[Option(FloatByteOrder.WordSwap, 52, "Word Swap Order (C D A B)")]
+		[Option(FloatByteOrder.ByteAndWordSwap, 53, "Byte and Word Swap Order (D C B A)")]
+		public FloatByteOrder ByteOrder { get; set; }
+
+		/// <summary>
+		/// If the number of decimals should be fixed.
+		/// </summary>
+		[Page(4, "Modbus", 100)]
+		[Header(56, "Fix number of decimals.")]
+		[ToolTip(57, "If checked, the number of decimals of the value fieldd will be fixed.")]
 		[DefaultValue(false)]
-		public bool SwitchByteOrder { get; set; }
+		public bool FixNrDecimals { get; set; }
+
+		/// <summary>
+		/// If the number of decimals should be fixed.
+		/// </summary>
+		[Page(4, "Modbus", 100)]
+		[Header(58, "Number of decimals:")]
+		[ToolTip(59, "If number of decimals is fixed, this field determines the number of decimals to fix values to.")]
+		[DefaultValue((byte)0)]
+		public byte NrDecimals { get; set; }
 
 		/// <summary>
 		/// Gets the type name of the node.
@@ -106,7 +130,7 @@ namespace Waher.Things.Modbus
 		/// <returns>Localized type node.</returns>
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
-			return Language.GetStringAsync(typeof(ModbusGatewayNode), 15, "Input Register (3x)");
+			return Language.GetStringAsync(typeof(ModbusGatewayNode), 55, "Input Floatig-point Register (3x)");
 		}
 
 		/// <summary>
@@ -134,11 +158,12 @@ namespace Waher.Things.Modbus
 			await Client.Enter();
 			try
 			{
-				ushort[] Values = await Client.ReadInputRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 1);
-				ushort Raw = ModbusUnitHoldingRegisterNode.CheckOrder(this.SwitchByteOrder, Values[0]);
+				ushort[] Values = await Client.ReadInputRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 2);
+				float Raw = ModbusUnitHoldingFloatingPointRegisterNode.CheckOrder(this.ByteOrder, Values[0], Values[1]);
 				double Value = ((Raw * this.Multiplier) / this.Divisor) + this.Offset;
-				int NrDec = Math.Min(255, Math.Max(0, (int)Math.Ceiling(-Math.Log10(this.Multiplier / this.Divisor))));
+				int NrDec = this.FixNrDecimals ? this.NrDecimals : Math.Min(255, Math.Max(0, (int)Math.Ceiling(-Math.Log10(this.Multiplier / this.Divisor)))) + CommonTypes.GetNrDecimals(Value);
 				DateTime TP = DateTime.UtcNow;
+
 				ThingReference This = this.ReportAs;
 				List<Field> Fields = new List<Field>
 				{
@@ -146,7 +171,7 @@ namespace Waher.Things.Modbus
 				};
 
 				if (!string.IsNullOrEmpty(this.RawName))
-					Fields.Add(new Int32Field(This, TP, this.RawName, Raw, FieldType.Momentary, FieldQoS.AutomaticReadout, true));
+					Fields.Add(new QuantityField(This, TP, this.RawName, Raw, CommonTypes.GetNrDecimals(Raw), string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout, true));
 
 				Request.ReportFields(true, Fields.ToArray());
 			}
@@ -167,6 +192,5 @@ namespace Waher.Things.Modbus
 			else
 				return this.FieldName;
 		}
-
 	}
 }

@@ -136,16 +136,21 @@ namespace Waher.Things.Modbus
 			try
 			{
 				ushort[] Values = await Client.ReadMultipleRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 1);
-				ushort Raw = this.CheckOrder(Values[0]);
+				ushort Raw = CheckOrder(this.SwitchByteOrder, Values[0]);
 				double Value = ((Raw * this.Multiplier) / this.Divisor) + this.Offset;
 				int NrDec = Math.Min(255, Math.Max(0, (int)Math.Ceiling(-Math.Log10(this.Multiplier / this.Divisor))));
 				DateTime TP = DateTime.UtcNow;
 
 				ThingReference This = this.ReportAs;
+				List<Field> Fields = new List<Field>
+				{
+					new QuantityField(This, TP, this.GetFieldName(), Value, (byte)NrDec, this.Unit, FieldType.Momentary, FieldQoS.AutomaticReadout, true)
+				};
 
-				Request.ReportFields(true,
-					new Int32Field(This, TP, this.GetRawName(), Raw, FieldType.Momentary, FieldQoS.AutomaticReadout, true),
-					new QuantityField(This, TP, this.GetFieldName(), Value, (byte)NrDec, this.Unit, FieldType.Momentary, FieldQoS.AutomaticReadout, true));
+				if (!string.IsNullOrEmpty(this.RawName))
+					Fields.Add(new Int32Field(This, TP, this.RawName, Raw, FieldType.Momentary, FieldQoS.AutomaticReadout, true));
+
+				Request.ReportFields(true, Fields.ToArray());
 			}
 			catch (Exception ex)
 			{
@@ -155,14 +160,6 @@ namespace Waher.Things.Modbus
 			{
 				Client.Leave();
 			}
-		}
-
-		public string GetRawName()
-		{
-			if (string.IsNullOrEmpty(this.RawName))
-				return "Raw";
-			else
-				return this.RawName;
 		}
 
 		public string GetFieldName()
@@ -179,39 +176,8 @@ namespace Waher.Things.Modbus
 		/// <returns>Collection of control parameters for actuator.</returns>
 		public Task<ControlParameter[]> GetControlParameters()
 		{
-			return Task.FromResult(new ControlParameter[]
+			List<ControlParameter> Parameters = new List<ControlParameter>()
 			{
-				new Int32ControlParameter("Value", "Modbus", this.GetRawName(), "Raw register output", 0, 65535,
-					async (Node) =>
-					{
-						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
-						await Client.Enter();
-						try
-						{
-							ushort[] Values = await Client.ReadMultipleRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 1);
-							return this.CheckOrder(Values[0]);
-						}
-						finally
-						{
-							Client.Leave();
-						}
-					},
-					async (Node, Value) =>
-					{
-						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
-						await Client.Enter();
-						try
-						{
-							ushort WritenValue = await Client.WriteRegister((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, this.CheckOrder((ushort)Value));
-
-							if (WritenValue != Value)
-								throw new Exception("Register value not changed correctly.");
-						}
-						finally
-						{
-							Client.Leave();
-						}
-					}),
 				new DoubleControlParameter("Value", "Modbus", this.GetFieldName(), "Register output",
 					this.Offset, ((65535 * this.Multiplier) / this.Divisor) + this.Offset,
 					async (Node) =>
@@ -221,7 +187,7 @@ namespace Waher.Things.Modbus
 						try
 						{
 							ushort[] Values = await Client.ReadMultipleRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 1);
-							return ((this.CheckOrder(Values[0]) * this.Multiplier) / this.Divisor) + this.Offset;
+							return ((CheckOrder(this.SwitchByteOrder, Values[0]) * this.Multiplier) / this.Divisor) + this.Offset;
 						}
 						finally
 						{
@@ -235,7 +201,8 @@ namespace Waher.Things.Modbus
 						try
 						{
 							ushort Raw = (ushort)Math.Min(65535, Math.Max(0, ((Value - this.Offset) * this.Divisor) / this.Multiplier));
-							ushort WritenValue = await Client.WriteRegister((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, this.CheckOrder(Raw));
+							ushort WritenValue = await Client.WriteRegister((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr,
+								CheckOrder(this.SwitchByteOrder, Raw));
 
 							if (WritenValue != Value)
 								throw new Exception("Register value not changed correctly.");
@@ -245,12 +212,50 @@ namespace Waher.Things.Modbus
 							Client.Leave();
 						}
 					})
-			});
+			};
+
+			if (!string.IsNullOrEmpty(this.RawName))
+			{
+				Parameters.Add(new Int32ControlParameter("Value", "Modbus", this.RawName, "Raw register output", 0, 65535,
+					async (Node) =>
+					{
+						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
+						await Client.Enter();
+						try
+						{
+							ushort[] Values = await Client.ReadMultipleRegisters((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr, 1);
+							return CheckOrder(this.SwitchByteOrder, Values[0]);
+						}
+						finally
+						{
+							Client.Leave();
+						}
+					},
+					async (Node, Value) =>
+					{
+						ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
+						await Client.Enter();
+						try
+						{
+							ushort WritenValue = await Client.WriteRegister((byte)this.UnitNode.UnitId, (ushort)this.RegisterNr,
+								CheckOrder(this.SwitchByteOrder, (ushort)Value));
+
+							if (WritenValue != Value)
+								throw new Exception("Register value not changed correctly.");
+						}
+						finally
+						{
+							Client.Leave();
+						}
+					}));
+			}
+
+			return Task.FromResult(Parameters.ToArray());
 		}
 
-		private ushort CheckOrder(ushort Value)
+		internal static ushort CheckOrder(bool SwitchByteOrder, ushort Value)
 		{
-			if (this.SwitchByteOrder)
+			if (SwitchByteOrder)
 			{
 				ushort Value2 = (ushort)(Value & 0xff);
 				Value2 <<= 8;

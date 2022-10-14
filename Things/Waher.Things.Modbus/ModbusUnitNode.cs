@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Networking.Modbus;
 using Waher.Networking.Modbus.Exceptions;
+using Waher.Networking.XMPP.Sensor;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
@@ -13,6 +14,22 @@ using Waher.Things.SensorData;
 
 namespace Waher.Things.Modbus
 {
+	/// <summary>
+	/// How the unit should handle sensor-data requests
+	/// </summary>
+	public enum UnitReadMode
+	{
+		/// <summary>
+		/// Read and report Modbus registers raw.
+		/// </summary>
+		ReadRegisters,
+
+		/// <summary>
+		/// Read child nodes
+		/// </summary>
+		ReadChildren
+	}
+
 	/// <summary>
 	/// Represents a Unit Device on a Modbus network.
 	/// </summary>
@@ -28,6 +45,7 @@ namespace Waher.Things.Modbus
 			this.MaxDiscreteInputNr = 65535;
 			this.MaxHoldingRegisterNr = 65535;
 			this.MaxInputRegisterNr = 65535;
+			this.ReadMode = UnitReadMode.ReadRegisters;
 		}
 
 		/// <summary>
@@ -130,6 +148,17 @@ namespace Waher.Things.Modbus
 		public bool SwitchByteOrder { get; set; }
 
 		/// <summary>
+		/// How the unit should handle sensor-data requests.
+		/// </summary>
+		[Page(4, "Modbus", 100)]
+		[Header(60, "Sensor-Data Read Mode:")]
+		[ToolTip(61, "How the unit should handle sensor-data requests.")]
+		[DefaultValue(UnitReadMode.ReadRegisters)]
+		[Option(UnitReadMode.ReadRegisters, 62, "Read and report Modbus registers raw.")]
+		[Option(UnitReadMode.ReadChildren, 63, "Read child nodes.")]
+		public UnitReadMode ReadMode { get; set; }
+
+		/// <summary>
 		/// Gets the type name of the node.
 		/// </summary>
 		/// <param name="Language">Language to use.</param>
@@ -192,7 +221,23 @@ namespace Waher.Things.Modbus
 		/// Starts the readout of the sensor.
 		/// </summary>
 		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
-		public async Task StartReadout(ISensorReadout Request)
+		public Task StartReadout(ISensorReadout Request)
+		{
+			switch (this.ReadMode)
+			{
+				case UnitReadMode.ReadRegisters:
+					return this.StartReadoutOfRegisters(Request);
+
+				case UnitReadMode.ReadChildren:
+					return this.StartReadoutOfChildren(Request);
+
+				default:
+					Request.ReportErrors(true, new ThingError(this, "Unrecognized read mode."));
+					return Task.CompletedTask;
+			}
+		}
+
+		private async Task StartReadoutOfRegisters(ISensorReadout Request)
 		{
 			ModbusTcpClient Client = await this.Gateway.GetTcpIpConnection();
 			await Client.Enter();
@@ -212,7 +257,8 @@ namespace Waher.Things.Modbus
 						StepSize = Math.Min(StepSize, Values.Length);
 
 						for (i = 0; i < StepSize; i++)
-							Fields.AddLast(new Int32Field(this, TP, "Input Register 3" + (Offset + i).ToString("D5"), this.CheckOrder(Values[i]), FieldType.Momentary, FieldQoS.AutomaticReadout));
+							Fields.AddLast(new Int32Field(this, TP, "Input Register 3" + (Offset + i).ToString("D5"),
+								ModbusUnitHoldingRegisterNode.CheckOrder(this.SwitchByteOrder, Values[i]), FieldType.Momentary, FieldQoS.AutomaticReadout));
 
 						Request.ReportFields(false, Fields);
 						Fields.Clear();
@@ -235,7 +281,10 @@ namespace Waher.Things.Modbus
 						StepSize = Math.Min(StepSize, Values.Length);
 
 						for (i = 0; i < StepSize; i++)
-							Fields.AddLast(new Int32Field(this, TP, "Holding Register 4" + (Offset + i).ToString("D5"), this.CheckOrder(Values[i]), FieldType.Momentary, FieldQoS.AutomaticReadout));
+						{
+							Fields.AddLast(new Int32Field(this, TP, "Holding Register 4" + (Offset + i).ToString("D5"),
+								ModbusUnitHoldingRegisterNode.CheckOrder(this.SwitchByteOrder, Values[i]), FieldType.Momentary, FieldQoS.AutomaticReadout));
+						}
 
 						Request.ReportFields(false, Fields);
 						Fields.Clear();
@@ -305,18 +354,57 @@ namespace Waher.Things.Modbus
 			}
 		}
 
-		private ushort CheckOrder(ushort Value)
+		private async Task StartReadoutOfChildren(ISensorReadout Request)
 		{
-			if (this.SwitchByteOrder)
+			foreach (INode Child in await this.ChildNodes)
 			{
-				ushort Value2 = (ushort)(Value & 0xff);
-				Value2 <<= 8;
-				Value2 |= (ushort)(Value >> 8);
+				if (Child is ISensor Sensor)
+				{
+					TaskCompletionSource<bool> ReadoutCompleted = new TaskCompletionSource<bool>();
 
-				return Value2;
+					InternalReadoutRequest InternalReadout = new InternalReadoutRequest(this.LogId, null, Request.Types, Request.FieldNames,
+						Request.From, Request.To,
+						(sender, e) =>
+						{
+							Request.ReportFields(false, e.Fields);
+
+							if (e.Done)
+								ReadoutCompleted.TrySetResult(true);
+
+							return Task.CompletedTask;
+						},
+						(sender, e) =>
+						{
+							if (!(e.Errors is ThingError[] Errors))
+							{
+								List<ThingError> List = new List<ThingError>();
+
+								foreach (ThingError Error in e.Errors)
+									List.Add(Error);
+
+								Errors = List.ToArray();
+							}
+
+							Request.ReportErrors(false, Errors);
+
+							if (e.Done)
+								ReadoutCompleted.TrySetResult(true);
+
+							return Task.CompletedTask;
+						}, null);
+
+					await Sensor.StartReadout(InternalReadout);
+
+					Task Timeout = Task.Delay(60000);
+
+					Task T = await Task.WhenAny(ReadoutCompleted.Task, Timeout);
+
+					if (ReadoutCompleted.Task.IsCompleted)
+						Request.ReportFields(true);
+					else
+						Request.ReportErrors(true, new ThingError(this, "Timeout."));
+				}
 			}
-			else
-				return Value;
 		}
 
 	}

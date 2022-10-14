@@ -485,6 +485,8 @@
 	<Assembly fileName='Waher.Things.Snmp.pdb'/>
 	<Assembly fileName='Waher.Things.Virtual.dll'/>
 	<Assembly fileName='Waher.Things.Virtual.pdb'/>
+	<Assembly fileName='Waher.Things.Xmpp.dll'/>
+	<Assembly fileName='Waher.Things.Xmpp.pdb'/>
 	<Assembly fileName='Waher.WebService.Script.dll'/>
 	<Assembly fileName='Waher.WebService.Script.pdb'/>
 	<Assembly fileName='Gateway.config'/>
@@ -898,5 +900,6 @@
 		<Content fileName='Waher.Things.Mqtt.en.lng'/>
 		<Content fileName='Waher.Things.Snmp.en.lng'/>
 		<Content fileName='Waher.Things.Virtual.en.lng'/>
+		<Content fileName='Waher.Things.Xmpp.en.lng'/>
 	</Folder>
 </Module>

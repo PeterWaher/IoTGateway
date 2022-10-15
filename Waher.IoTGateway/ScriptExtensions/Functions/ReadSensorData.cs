@@ -184,7 +184,7 @@ namespace Waher.Things.ScriptExtensions
 					throw new ScriptRuntimeException("Expected a Date & Time as fifth argument.", this);
 			}
 			else
-				To = DateTime.MinValue;
+				To = DateTime.MaxValue;
 
 			TaskCompletionSource<bool> ReadoutCompleted = new TaskCompletionSource<bool>();
 			Dictionary<string, List<Field>> Fields = new Dictionary<string, List<Field>>();

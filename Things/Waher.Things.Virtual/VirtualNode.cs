@@ -13,6 +13,8 @@ using Waher.Persistence;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Runtime.Timing;
+using Waher.Script;
+using Waher.Things.ControlParameters;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Metering;
 using Waher.Things.Metering.NodeTypes;
@@ -22,7 +24,7 @@ namespace Waher.Things.Virtual
 	/// <summary>
 	/// Node representing a TCP/IP connection to a Modbus Gateway
 	/// </summary>
-	public class VirtualNode : ProvisionedMeteringNode, ICustomFormProperties, ISensor
+	public class VirtualNode : ProvisionedMeteringNode, ICustomFormProperties, ISensor, IActuator
 	{
 		private static Scheduler scheduler = null;
 
@@ -549,6 +551,185 @@ namespace Waher.Things.Virtual
 			Request.ReportFields(true, ToReport.ToArray());
 
 			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Get control parameters for the actuator.
+		/// </summary>
+		/// <returns>Collection of control parameters for actuator.</returns>
+		public Task<ControlParameter[]> GetControlParameters()
+		{
+			List<ControlParameter> Parameters = new List<ControlParameter>();
+
+			if (this.TryGetMetaDataValue("Callback", out object Obj) && Obj is string CallbackUrl &&
+				this.TryGetMetaDataValue("Payload", out Obj) && Obj is string PayloadScript &&
+				this.TryGetMetaDataValue("FieldName", out Obj) && Obj is string FieldName &&
+				this.TryGetMetaDataValue("FieldValue", out object FieldValue))
+			{
+				if (FieldValue is double d)
+				{
+					Parameters.Add(new DoubleControlParameter(FieldName, "Control", FieldName + ":", "Value to set.",
+						_ => Task.FromResult<double?>(d),
+						async (_, Value) =>
+						{
+							d = Value;
+							await this.DoCallback(CallbackUrl, PayloadScript, d);
+						}));
+				}
+				else if (FieldValue is string s)
+				{
+					Parameters.Add(new StringControlParameter(FieldName, "Control", FieldName + ":", "Value to set.",
+						_ => Task.FromResult<string>(s),
+						async (_, Value) =>
+						{
+							s = Value;
+							await this.DoCallback(CallbackUrl, PayloadScript, s);
+						}));
+				}
+				else if (FieldValue is bool b)
+				{
+					Parameters.Add(new BooleanControlParameter(FieldName, "Control", FieldName + ":", "Value to set.",
+						_ => Task.FromResult<bool?>(b),
+						async (_, Value) =>
+						{
+							b = Value;
+							await this.DoCallback(CallbackUrl, PayloadScript, b);
+						}));
+				}
+				else if (FieldValue is Enum e)
+				{
+					Parameters.Add(new EnumControlParameter(FieldName, "Control", FieldName + ":", "Value to set.", e.GetType(),
+						_ => Task.FromResult<Enum>(e),
+						async (_, Value) =>
+						{
+							e = Value;
+							await this.DoCallback(CallbackUrl, PayloadScript, e);
+						}));
+				}
+				else if (FieldValue is DateTime DT)
+				{
+					Parameters.Add(new DateTimeControlParameter(FieldName, "Control", FieldName + ":", "Value to set.", null, null,
+						_ => Task.FromResult<DateTime?>(DT),
+						async (_, Value) =>
+						{
+							DT = Value;
+							await this.DoCallback(CallbackUrl, PayloadScript, DT);
+						}));
+				}
+				else if (FieldValue is TimeSpan TS)
+				{
+					Parameters.Add(new TimeControlParameter(FieldName, "Control", FieldName + ":", "Value to set.",
+						_ => Task.FromResult<TimeSpan?>(TS),
+						async (_, Value) =>
+						{
+							TS = Value;
+							await this.DoCallback(CallbackUrl, PayloadScript, TS);
+						}));
+				}
+				else if (FieldValue is Duration D)
+				{
+					Parameters.Add(new DurationControlParameter(FieldName, "Control", FieldName + ":", "Value to set.",
+						_ => Task.FromResult<Duration>(D),
+						async (_, Value) =>
+						{
+							D = Value;
+							await this.DoCallback(CallbackUrl, PayloadScript, D);
+						}));
+				}
+				else if (FieldValue is sbyte i8)
+				{
+					Parameters.Add(new Int32ControlParameter(FieldName, "Control", FieldName + ":", "Value to set.", sbyte.MinValue, sbyte.MaxValue,
+						_ => Task.FromResult<int?>(i8),
+						async (_, Value) =>
+						{
+							i8 = (sbyte)Value;
+							await this.DoCallback<int>(CallbackUrl, PayloadScript, i8);
+						}));
+				}
+				else if (FieldValue is short i16)
+				{
+					Parameters.Add(new Int32ControlParameter(FieldName, "Control", FieldName + ":", "Value to set.", short.MinValue, short.MaxValue,
+						_ => Task.FromResult<int?>(i16),
+						async (_, Value) =>
+						{
+							i16 = (short)Value;
+							await this.DoCallback<int>(CallbackUrl, PayloadScript, i16);
+						}));
+				}
+				else if (FieldValue is int i32)
+				{
+					Parameters.Add(new Int32ControlParameter(FieldName, "Control", FieldName + ":", "Value to set.", null, null,
+						_ => Task.FromResult<int?>(i32),
+						async (_, Value) =>
+						{
+							i32 = Value;
+							await this.DoCallback<int>(CallbackUrl, PayloadScript, i32);
+						}));
+				}
+				else if (FieldValue is long i64)
+				{
+					Parameters.Add(new Int64ControlParameter(FieldName, "Control", FieldName + ":", "Value to set.", null, null,
+						_ => Task.FromResult<long?>(i64),
+						async (_, Value) =>
+						{
+							i64 = Value;
+							await this.DoCallback<long>(CallbackUrl, PayloadScript, i64);
+						}));
+				}
+				else if (FieldValue is byte ui8)
+				{
+					Parameters.Add(new Int32ControlParameter(FieldName, "Control", FieldName + ":", "Value to set.", byte.MinValue, byte.MaxValue,
+						_ => Task.FromResult<int?>(ui8),
+						async (_, Value) =>
+						{
+							ui8 = (byte)Value;
+							await this.DoCallback<int>(CallbackUrl, PayloadScript, ui8);
+						}));
+				}
+				else if (FieldValue is ushort ui16)
+				{
+					Parameters.Add(new Int32ControlParameter(FieldName, "Control", FieldName + ":", "Value to set.", ushort.MinValue, ushort.MaxValue,
+						_ => Task.FromResult<int?>(ui16),
+						async (_, Value) =>
+						{
+							ui16 = (ushort)Value;
+							await this.DoCallback<int>(CallbackUrl, PayloadScript, ui16);
+						}));
+				}
+				else if (FieldValue is uint ui32)
+				{
+					Parameters.Add(new Int64ControlParameter(FieldName, "Control", FieldName + ":", "Value to set.", uint.MinValue, uint.MaxValue,
+						_ => Task.FromResult<long?>(ui32),
+						async (_, Value) =>
+						{
+							ui32 = (uint)Value;
+							await this.DoCallback<long>(CallbackUrl, PayloadScript, ui32);
+						}));
+				}
+				else if (FieldValue is ulong ui64)
+				{
+					Parameters.Add(new DoubleControlParameter(FieldName, "Control", FieldName + ":", "Value to set.", ulong.MinValue, ulong.MaxValue,
+						_ => Task.FromResult<double?>(ui64),
+						async (_, Value) =>
+						{
+							ui64 = (ulong)Value;
+							await this.DoCallback<double>(CallbackUrl, PayloadScript, ui64);
+						}));
+				}
+			}
+
+			return Task.FromResult(Parameters.ToArray());
+		}
+
+		private async Task DoCallback<T>(string CallbackUrl, string PayloadScript, T Value)
+		{
+			Variables v = new Variables
+			{
+				{ "Value", Value }
+			};
+
+			object Payload = await Expression.EvalAsync(PayloadScript, v);
+			object Response = await InternetContent.PostAsync(new Uri(CallbackUrl), Payload);
 		}
 
 	}

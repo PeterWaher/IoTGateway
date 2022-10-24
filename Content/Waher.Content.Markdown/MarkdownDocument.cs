@@ -6575,10 +6575,9 @@ namespace Waher.Content.Markdown
 			Result.MailHyperlinks = Result.IntMailHyperlinks?.ToArray();
 			Result.UrlHyperlinks = Result.IntUrlHyperlinks?.ToArray();
 
-			Dictionary<string, string[]> AsArrays;
-			Dictionary<string, int> AsCounts;
+			this.GenerateStatDictionary(Result.IntMultimediaPerContentCategory, 
+				out Dictionary<string, string[]> AsArrays, out Dictionary<string, int> AsCounts);
 
-			this.GenerateStatDictionary(Result.IntMultimediaPerContentCategory, out AsArrays, out AsCounts);
 			Result.MultimediaPerContentCategory = AsArrays;
 			Result.NrMultimediaPerContentCategory = AsCounts;
 

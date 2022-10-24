@@ -165,7 +165,7 @@ namespace Waher.Content.Markdown.Model
 
 					if (s.StartsWith("|"))
 					{
-						if (s.EndsWith("|"))
+						if (s.EndsWith("|") && s != "|")
 							s = s.Substring(1, s.Length - 2);
 						else
 							s = s.Substring(1);

@@ -197,9 +197,9 @@ namespace Waher.Networking.HTTP
 			this.serverCertificate = ServerCertificate;
 #endif
 			this.sessions = new Cache<string, Variables>(int.MaxValue, TimeSpan.MaxValue, this.sessionTimeout, true);
-			this.sessions.Removed += Sessions_Removed;
+			this.sessions.Removed += this.Sessions_Removed;
 			this.currentRequests = new Cache<HttpRequest, RequestInfo>(int.MaxValue, TimeSpan.MaxValue, this.requestTimeout, true);
-			this.currentRequests.Removed += CurrentRequests_Removed;
+			this.currentRequests.Removed += this.CurrentRequests_Removed;
 			this.lastStat = DateTime.Now;
 			this.adaptToNetworkChanges = AdaptToNetworkChanges;
 
@@ -1928,6 +1928,35 @@ namespace Waher.Networking.HTTP
 			}
 			else
 				return new Tuple<int, string, byte[]>(NotFoundException.Code, NotFoundException.StatusMessage, null);
+		}
+
+		/// <summary>
+		/// Tries to get the full path of a file-based resource.
+		/// </summary>
+		/// <param name="LocalUrl">Local URL</param>
+		/// <param name="FileName">File name, if found.</param>
+		/// <returns>If the resource points to a file.</returns>
+		public bool TryGetFileName(string LocalUrl, out string FileName)
+		{
+			string ResourceName = LocalUrl;
+			int i = ResourceName.IndexOf('?');
+			if (i >= 0)
+				ResourceName = ResourceName.Substring(0, i);
+
+			if (this.TryGetResource(ResourceName, out HttpResource Resource, out string SubPath) &&
+				Resource is HttpFolderResource Folder)
+			{
+				this.vanityResources.CheckVanityResource(ref SubPath);
+
+				FileName = Folder.GetFullPath(SubPath, null, false, out bool Exists);
+
+				return Exists;
+			}
+			else 
+			{
+				FileName = null;
+				return false;
+			}
 		}
 
 		#endregion

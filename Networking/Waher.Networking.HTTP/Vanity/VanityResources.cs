@@ -107,7 +107,7 @@ namespace Waher.Networking.HTTP.Vanity
 						this.vanityResources.Values.CopyTo(Expressions, 0);
 					}
 
-					Step = vanityStep0 = VanityStep.CalcStep((char)0, Expressions);
+					Step = this.vanityStep0 = VanityStep.CalcStep((char)0, Expressions);
 				}
 
 				foreach (char ch in ResourceName)

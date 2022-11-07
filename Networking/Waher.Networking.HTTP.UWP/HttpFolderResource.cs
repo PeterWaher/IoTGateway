@@ -211,7 +211,7 @@ namespace Waher.Networking.HTTP
 
 			if (Header.IfMatch is null && !(Header.IfUnmodifiedSince is null) && (Limit = Header.IfUnmodifiedSince.Timestamp).HasValue)
 			{
-				string FullPath = this.GetFullPath(Request, out bool Exists);
+				string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, out bool Exists);
 				if (Exists)
 				{
 					DateTime LastModified = File.GetLastWriteTime(FullPath);
@@ -237,29 +237,58 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private string GetFullPath(HttpRequest Request, out bool Exists)
+		/// <summary>
+		/// Gets the full path of a resource in the folder.
+		/// </summary>
+		/// <param name="SubPath">Sub-path or resource.</param>
+		/// <param name="Host">Optional host.</param>
+		/// <param name="ForbiddenExceptions">If forbidden exceptions can be thrown, if irregularities are found.</param>
+		/// <param name="Exists">If file exists.</param>
+		/// <returns>Full path, if found.</returns>
+		internal string GetFullPath(string SubPath, string Host, bool ForbiddenExceptions, out bool Exists)
 		{
-			string s = WebUtility.UrlDecode(Request.SubPath).Replace('/', Path.DirectorySeparatorChar);
+			string s = WebUtility.UrlDecode(SubPath).Replace('/', Path.DirectorySeparatorChar);
 			string s2;
 
 			if (s.Contains("..") || s.Contains(doubleBackslash) || s.Contains(":"))
-				throw new ForbiddenException("Path control characters not permitted.");
+			{
+				if (ForbiddenExceptions)
+					throw new ForbiddenException("Path control characters not permitted.");
+				else
+				{
+					Exists = false;
+					return null;
+				}
+			}
 
 			if (this.domainOptions != HostDomainOptions.SameForAllDomains)
 			{
-				string Host = Request.Header.Host?.Value ?? string.Empty;
 				string Folder;
-				int i = Host.IndexOf(':');
 
-				if (i > 0)
-					Host = Host.Substring(0, i);
+				if (Host is null)
+					Host = string.Empty;
+				else
+				{
+					int i = Host.IndexOf(':');
+
+					if (i > 0)
+						Host = Host.Substring(0, i);
+				}
 
 				if (this.domainOptions == HostDomainOptions.OnlySpecifiedDomains)
 				{
 					lock (this.definedDomains)
 					{
 						if (!this.definedDomains.ContainsKey(Host))
-							throw new ForbiddenException("Access to this folder is not permitted on this domain.");
+						{
+							if (ForbiddenExceptions)
+								throw new ForbiddenException("Access to this folder is not permitted on this domain.");
+							else
+							{
+								Exists = false;
+								return null;
+							}
+						}
 					}
 
 					Folder = this.folderPath;
@@ -313,7 +342,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
-			string FullPath = this.GetFullPath(Request, out bool Exists);
+			string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, out bool Exists);
 			if (Exists)
 			{
 				DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
@@ -322,7 +351,7 @@ namespace Waher.Networking.HTTP
 				Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
 
 				string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
-				AcceptableResponse AcceptableResponse = await CheckAcceptable(Request, Response, ContentType, FullPath, Request.Header.Resource);
+				AcceptableResponse AcceptableResponse = await this.CheckAcceptable(Request, Response, ContentType, FullPath, Request.Header.Resource);
 				ContentType = AcceptableResponse.ContentType;
 				Rec.IsDynamic = AcceptableResponse.Dynamic;
 
@@ -783,11 +812,11 @@ namespace Waher.Networking.HTTP
 							this.f.Position = First;
 							this.BytesLeft = this.Next.GetIntervalLength(this.TotalLength);
 
-							await Response.WriteLine();
-							await Response.WriteLine("--" + this.Boundary);
-							await Response.WriteLine("Content-Type: " + this.ContentType);
-							await Response.WriteLine("Content-Range: " + ContentByteRangeInterval.ContentRangeToString(First, First + this.BytesLeft - 1, this.TotalLength));
-							await Response.WriteLine();
+							await this.Response.WriteLine();
+							await this.Response.WriteLine("--" + this.Boundary);
+							await this.Response.WriteLine("Content-Type: " + this.ContentType);
+							await this.Response.WriteLine("Content-Range: " + ContentByteRangeInterval.ContentRangeToString(First, First + this.BytesLeft - 1, this.TotalLength));
+							await this.Response.WriteLine();
 
 							this.Next = this.Next.Next;
 						}
@@ -796,8 +825,8 @@ namespace Waher.Networking.HTTP
 
 					if (!string.IsNullOrEmpty(this.Boundary))
 					{
-						await Response.WriteLine();
-						await Response.WriteLine("--" + this.Boundary + "--");
+						await this.Response.WriteLine();
+						await this.Response.WriteLine("--" + this.Boundary + "--");
 					}
 
 					Variables Session;
@@ -862,7 +891,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response, ByteRangeInterval FirstInterval)
 		{
-			string FullPath = this.GetFullPath(Request, out bool Exists);
+			string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, out bool Exists);
 			if (Exists)
 			{
 				HttpRequestHeader Header = Request.Header;
@@ -881,7 +910,7 @@ namespace Waher.Networking.HTTP
 				Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
 
 				string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
-				AcceptableResponse AcceptableResponse = await CheckAcceptable(Request, Response, ContentType, FullPath, Request.Header.Resource);
+				AcceptableResponse AcceptableResponse = await this.CheckAcceptable(Request, Response, ContentType, FullPath, Request.Header.Resource);
 				ContentType = AcceptableResponse.ContentType;
 				Rec.IsDynamic = AcceptableResponse.Dynamic;
 
@@ -978,7 +1007,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task PUT(HttpRequest Request, HttpResponse Response)
 		{
-			string FullPath = this.GetFullPath(Request, out bool _);
+			string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, out bool _);
 
 			if (!Request.HasData)
 				throw new BadRequestException("No data in PUT request.");
@@ -1006,7 +1035,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task PUT(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
 		{
-			string FullPath = this.GetFullPath(Request, out bool Exists);
+			string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, out bool Exists);
 
 			if (!Request.HasData)
 				throw new BadRequestException("No data in PUT request.");
@@ -1056,7 +1085,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task DELETE(HttpRequest Request, HttpResponse Response)
 		{
-			string FullPath = this.GetFullPath(Request, out bool Exists);
+			string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, out bool Exists);
 
 			if (Exists)
 				File.Delete(FullPath);
@@ -1098,7 +1127,7 @@ namespace Waher.Networking.HTTP
 		{
 			base.AddReference(Server);
 
-			Server.ETagSaltChanged += Server_ETagSaltChanged;
+			Server.ETagSaltChanged += this.Server_ETagSaltChanged;
 		}
 
 		/// <summary>
@@ -1107,7 +1136,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Server">Server</param>
 		public override bool RemoveReference(HttpServer Server)
 		{
-			Server.ETagSaltChanged -= Server_ETagSaltChanged;
+			Server.ETagSaltChanged -= this.Server_ETagSaltChanged;
 
 			return base.RemoveReference(Server);
 		}

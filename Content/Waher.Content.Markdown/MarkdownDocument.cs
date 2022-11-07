@@ -4958,7 +4958,7 @@ namespace Waher.Content.Markdown
 						Output.Append(Nr.ToString());
 						Output.Append("\">");
 
-						if (!footnoteBacklinksAdded)
+						if (!this.footnoteBacklinksAdded)
 						{
 							InlineHTML Backlink = new InlineHTML(this, "<a href=\"#fnref-" + Nr.ToString() + "\" class=\"footnote-backref\">&#8617;</a>");
 
@@ -5139,9 +5139,10 @@ namespace Waher.Content.Markdown
 			{
 				Footnote Footnote;
 				string FootnoteMargin = "0," + this.settings.XamlSettings.ParagraphMarginTop.ToString() + "," +
-					settings.XamlSettings.FootnoteSeparator.ToString() + "," + settings.XamlSettings.ParagraphMarginBottom.ToString();
-				string Scale = CommonTypes.Encode(settings.XamlSettings.SuperscriptScale);
-				string Offset = settings.XamlSettings.SuperscriptOffset.ToString();
+					this.settings.XamlSettings.FootnoteSeparator.ToString() + "," + 
+					this.settings.XamlSettings.ParagraphMarginBottom.ToString();
+				string Scale = CommonTypes.Encode(this.settings.XamlSettings.SuperscriptScale);
+				string Offset = this.settings.XamlSettings.SuperscriptOffset.ToString();
 				int Nr;
 				int Row = 0;
 
@@ -5305,9 +5306,10 @@ namespace Waher.Content.Markdown
 			{
 				Footnote Footnote;
 				string FootnoteMargin = "0," + this.settings.XamlSettings.ParagraphMarginTop.ToString() + "," +
-					settings.XamlSettings.FootnoteSeparator.ToString() + "," + settings.XamlSettings.ParagraphMarginBottom.ToString();
-				string Scale = CommonTypes.Encode(settings.XamlSettings.SuperscriptScale);
-				string Offset = settings.XamlSettings.SuperscriptOffset.ToString();
+					this.settings.XamlSettings.FootnoteSeparator.ToString() + "," +
+					this.settings.XamlSettings.ParagraphMarginBottom.ToString();
+				string Scale = CommonTypes.Encode(this.settings.XamlSettings.SuperscriptScale);
+				string Offset = this.settings.XamlSettings.SuperscriptOffset.ToString();
 				int Nr;
 				int Row = 0;
 

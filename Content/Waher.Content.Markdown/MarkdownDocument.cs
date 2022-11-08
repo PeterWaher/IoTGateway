@@ -1921,15 +1921,7 @@ namespace Waher.Content.Markdown
 						Text.Append(ch2);
 						Url = Text.ToString();
 
-						if (!this.allowScriptTag.HasValue)
-						{
-							this.allowScriptTag = this.metaData.TryGetValue("ALLOWSCRIPTTAG", out KeyValuePair<string, bool>[] Value) &&
-								Value.Length > 0 &&
-								CommonTypes.TryParse(Value[0].Key, out bool b) &&
-								b;
-						}
-
-						if ((!this.settings.AllowScriptTag || !this.allowScriptTag.Value) &&
+						if ((!this.AllowScriptTag || !this.settings.AllowScriptTag) &&
 							(Url.StartsWith("<script", StringComparison.CurrentCultureIgnoreCase) ||
 							Url.StartsWith("</script", StringComparison.CurrentCultureIgnoreCase)))
 						{
@@ -6065,6 +6057,25 @@ namespace Waher.Content.Markdown
 		{
 			get => this.tag;
 			set => this.tag = value;
+		}
+
+		/// <summary>
+		/// If client-side script tags are allowed in the document.
+		/// </summary>
+		public bool AllowScriptTag
+		{
+			get
+			{
+				if (!this.allowScriptTag.HasValue)
+				{
+					this.allowScriptTag = this.metaData.TryGetValue("ALLOWSCRIPTTAG", out KeyValuePair<string, bool>[] Value) &&
+						Value.Length > 0 &&
+						CommonTypes.TryParse(Value[0].Key, out bool b) &&
+						b;
+				}
+
+				return this.allowScriptTag.Value;
+			}
 		}
 
 		/// <summary>

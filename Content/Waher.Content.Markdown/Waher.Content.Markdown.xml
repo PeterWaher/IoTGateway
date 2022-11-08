@@ -1117,6 +1117,11 @@
             Property can be used to tag document with client-specific information.
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.MarkdownDocument.AllowScriptTag">
+            <summary>
+            If client-side script tags are allowed in the document.
+            </summary>
+        </member>
         <member name="M:Waher.Content.Markdown.MarkdownDocument.ForEach(Waher.Content.Markdown.MarkdownElementHandler,System.Object)">
             <summary>
             Loops through all elements in the document.

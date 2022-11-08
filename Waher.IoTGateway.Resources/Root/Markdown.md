@@ -2096,7 +2096,7 @@ inserted instead.
 The following subsections list the different metadata keys that have special meaning to the **IoT Gateway** Markdown parser. You're not limited to these
 metadata keys, and can freely add your own.
 
-### AllowSciptTag
+### AllowScriptTag
 
 If the `<SCRIPT>` tag should be allowed or not. Value is a boolean value. Strings representing `true`, include `1`, `true`, `yes` and `on`.
 Strings representing `false`, include `0`, `false`, `no` and `off`.

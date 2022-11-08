@@ -211,7 +211,7 @@ namespace Waher.Networking.HTTP
 
 			if (Header.IfMatch is null && !(Header.IfUnmodifiedSince is null) && (Limit = Header.IfUnmodifiedSince.Timestamp).HasValue)
 			{
-				string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, out bool Exists);
+				string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, true, out bool Exists);
 				if (Exists)
 				{
 					DateTime LastModified = File.GetLastWriteTime(FullPath);
@@ -243,9 +243,10 @@ namespace Waher.Networking.HTTP
 		/// <param name="SubPath">Sub-path or resource.</param>
 		/// <param name="Host">Optional host.</param>
 		/// <param name="ForbiddenExceptions">If forbidden exceptions can be thrown, if irregularities are found.</param>
-		/// <param name="Exists">If file exists.</param>
+		/// <param name="MustExist">If file must exist.</param>
+		/// <param name="Found">If file name is found.</param>
 		/// <returns>Full path, if found.</returns>
-		internal string GetFullPath(string SubPath, string Host, bool ForbiddenExceptions, out bool Exists)
+		internal string GetFullPath(string SubPath, string Host, bool ForbiddenExceptions, bool MustExist, out bool Found)
 		{
 			string s = WebUtility.UrlDecode(SubPath).Replace('/', Path.DirectorySeparatorChar);
 			string s2;
@@ -256,7 +257,7 @@ namespace Waher.Networking.HTTP
 					throw new ForbiddenException("Path control characters not permitted.");
 				else
 				{
-					Exists = false;
+					Found = false;
 					return null;
 				}
 			}
@@ -285,7 +286,7 @@ namespace Waher.Networking.HTTP
 								throw new ForbiddenException("Access to this folder is not permitted on this domain.");
 							else
 							{
-								Exists = false;
+								Found = false;
 								return null;
 							}
 						}
@@ -317,11 +318,12 @@ namespace Waher.Networking.HTTP
 					}
 				}
 
-				if (Exists = File.Exists(s2 = Folder + s))
+				if (Found = File.Exists(s2 = Folder + s))
 					return s2;
 			}
 
-			Exists = File.Exists(s2 = this.folderPath + s);
+			s2 = this.folderPath + s;
+			Found = !MustExist || File.Exists(s2);
 			return s2;
 		}
 
@@ -342,7 +344,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response)
 		{
-			string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, out bool Exists);
+			string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, true, out bool Exists);
 			if (Exists)
 			{
 				DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
@@ -891,7 +893,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task GET(HttpRequest Request, HttpResponse Response, ByteRangeInterval FirstInterval)
 		{
-			string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, out bool Exists);
+			string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, true, out bool Exists);
 			if (Exists)
 			{
 				HttpRequestHeader Header = Request.Header;
@@ -1007,7 +1009,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task PUT(HttpRequest Request, HttpResponse Response)
 		{
-			string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, out bool _);
+			string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, false, out bool _);
 
 			if (!Request.HasData)
 				throw new BadRequestException("No data in PUT request.");
@@ -1035,7 +1037,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task PUT(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
 		{
-			string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, out bool Exists);
+			string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, false, out bool Exists);
 
 			if (!Request.HasData)
 				throw new BadRequestException("No data in PUT request.");
@@ -1085,7 +1087,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task DELETE(HttpRequest Request, HttpResponse Response)
 		{
-			string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, out bool Exists);
+			string FullPath = this.GetFullPath(Request.SubPath, Request.Header.Host?.Value, true, true, out bool Exists);
 
 			if (Exists)
 				File.Delete(FullPath);

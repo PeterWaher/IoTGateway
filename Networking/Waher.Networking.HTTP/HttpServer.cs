@@ -1938,6 +1938,18 @@ namespace Waher.Networking.HTTP
 		/// <returns>If the resource points to a file.</returns>
 		public bool TryGetFileName(string LocalUrl, out string FileName)
 		{
+			return this.TryGetFileName(LocalUrl, true, out FileName);
+		}
+
+		/// <summary>
+		/// Tries to get the full path of a file-based resource.
+		/// </summary>
+		/// <param name="LocalUrl">Local URL</param>
+		/// <param name="MustExist">If file must exist.</param>
+		/// <param name="FileName">File name, if found.</param>
+		/// <returns>If the resource points to a file.</returns>
+		public bool TryGetFileName(string LocalUrl, bool MustExist, out string FileName)
+		{
 			string ResourceName = LocalUrl;
 			int i = ResourceName.IndexOf('?');
 			if (i >= 0)
@@ -1948,7 +1960,7 @@ namespace Waher.Networking.HTTP
 			{
 				this.vanityResources.CheckVanityResource(ref SubPath);
 
-				FileName = Folder.GetFullPath(SubPath, null, false, out bool Exists);
+				FileName = Folder.GetFullPath(SubPath, null, false, MustExist, out bool Exists);
 
 				return Exists;
 			}

@@ -28,8 +28,8 @@ namespace Waher.Content.Markdown.Model
 
 		public int Indent
 		{
-			get { return this.indent; }
-			set { this.indent = value; }
+			get => this.indent;
+			set => this.indent = value;
 		}
 
 		public string[] Rows => this.rows;

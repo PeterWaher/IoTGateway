@@ -18,6 +18,7 @@ namespace Waher.Networking.HTTP
 	{
 		private readonly HttpRequestHeader header;
 		private Stream dataStream;
+		private readonly HttpServer server;
 		private readonly string remoteEndPoint;
 		private IUser user = null;
 		private Variables session = null;
@@ -30,11 +31,13 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Represents an HTTP request.
 		/// </summary>
+		/// <param name="Server">HTTP Server receiving the request.</param>
 		/// <param name="Header">HTTP Request header.</param>
 		/// <param name="Data">Stream to data content, if available, or null, if request does not have a message body.</param>
 		/// <param name="RemoteEndPoint">Remote end-point.</param>
-		public HttpRequest(HttpRequestHeader Header, Stream Data, string RemoteEndPoint)
+		public HttpRequest(HttpServer Server, HttpRequestHeader Header, Stream Data, string RemoteEndPoint)
 		{
+			this.server = Server;
 			this.header = Header;
 			this.dataStream = Data;
 			this.remoteEndPoint = RemoteEndPoint;
@@ -47,6 +50,11 @@ namespace Waher.Networking.HTTP
 		/// If the request has data.
 		/// </summary>
 		public bool HasData => !(this.dataStream is null);
+
+		/// <summary>
+		/// HTTP Server receiving the request.
+		/// </summary>
+		public HttpServer Server => this.server;
 
 		/// <summary>
 		/// Decodes data sent in request.

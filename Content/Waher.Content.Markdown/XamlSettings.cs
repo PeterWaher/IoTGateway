@@ -77,7 +77,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public string ParagraphMargins
 		{
-			get { return this.paragraphMargins; }
+			get => this.paragraphMargins;
 			set
 			{
 				this.Parse(value, out this.paragraphMarginLeft, out this.paragraphMarginTop, out this.paragraphMarginRight, out this.paragraphMarginBottom);
@@ -105,7 +105,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int ParagraphMarginLeft
 		{
-			get { return this.paragraphMarginLeft; }
+			get => this.paragraphMarginLeft;
 			set
 			{
 				this.paragraphMarginLeft = value;
@@ -118,7 +118,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int ParagraphMarginTop
 		{
-			get { return this.paragraphMarginTop; }
+			get => this.paragraphMarginTop;
 			set
 			{
 				this.paragraphMarginTop = value;
@@ -131,7 +131,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int ParagraphMarginRight
 		{
-			get { return this.paragraphMarginRight; }
+			get => this.paragraphMarginRight;
 			set
 			{
 				this.paragraphMarginRight = value;
@@ -144,7 +144,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int ParagraphMarginBottom
 		{
-			get { return this.paragraphMarginBottom; }
+			get => this.paragraphMarginBottom;
 			set
 			{
 				this.paragraphMarginBottom = value;
@@ -159,8 +159,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public string BlockQuoteBorderColor
 		{
-			get { return this.blockQuoteBorderColor; }
-			set { this.blockQuoteBorderColor = value; }
+			get => this.blockQuoteBorderColor;
+			set => this.blockQuoteBorderColor = value;
 		}
 
 		/// <summary>
@@ -168,8 +168,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int BlockQuoteBorderThickness
 		{
-			get { return this.blockQuoteBorderThickness; }
-			set { this.blockQuoteBorderThickness = value; }
+			get => this.blockQuoteBorderThickness;
+			set => this.blockQuoteBorderThickness = value;
 		}
 
 		/// <summary>
@@ -177,8 +177,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int BlockQuoteMargin
 		{
-			get { return this.blockQuoteMargin; }
-			set { this.blockQuoteMargin = value; }
+			get => this.blockQuoteMargin;
+			set => this.blockQuoteMargin = value;
 		}
 
 		/// <summary>
@@ -186,8 +186,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int BlockQuotePadding
 		{
-			get { return this.blockQuotePadding; }
-			set { this.blockQuotePadding = value; }
+			get => this.blockQuotePadding;
+			set => this.blockQuotePadding = value;
 		}
 
 		/// <summary>
@@ -197,8 +197,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public string InsertedBlockQuoteBorderColor
 		{
-			get { return this.insertedBlockQuoteBorderColor; }
-			set { this.insertedBlockQuoteBorderColor = value; }
+			get => this.insertedBlockQuoteBorderColor;
+			set => this.insertedBlockQuoteBorderColor = value;
 		}
 
 		/// <summary>
@@ -208,8 +208,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public string DeletedBlockQuoteBorderColor
 		{
-			get { return this.deletedBlockQuoteBorderColor; }
-			set { this.deletedBlockQuoteBorderColor = value; }
+			get => this.deletedBlockQuoteBorderColor;
+			set => this.deletedBlockQuoteBorderColor = value;
 		}
 
 		/// <summary>
@@ -217,7 +217,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int[] HeaderFontSize
 		{
-			get { return this.headerFontSize; }
+			get => this.headerFontSize;
 		}
 
 		/// <summary>
@@ -227,7 +227,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public string[] HeaderForegroundColor
 		{
-			get { return this.headerForegroundColor; }
+			get => this.headerForegroundColor;
 		}
 
 		/// <summary>
@@ -235,8 +235,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int ListContentMargin
 		{
-			get { return this.listContentMargin; }
-			set { this.listContentMargin = value; }
+			get => this.listContentMargin;
+			set => this.listContentMargin = value;
 		}
 
 		/// <summary>
@@ -244,7 +244,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public string TableCellPadding
 		{
-			get { return this.tableCellPadding; }
+			get => this.tableCellPadding;
 			set
 			{
 				this.Parse(value, out this.tableCellPaddingLeft, out this.tableCellPaddingTop, out this.tableCellPaddingRight, out this.tableCellPaddingBottom);
@@ -272,7 +272,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int TableCellPaddingLeft
 		{
-			get { return this.tableCellPaddingLeft; }
+			get => this.tableCellPaddingLeft;
 			set
 			{
 				this.tableCellPaddingLeft = value;
@@ -285,7 +285,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int TableCellPaddingTop
 		{
-			get { return this.tableCellPaddingTop; }
+			get => this.tableCellPaddingTop;
 			set
 			{
 				this.tableCellPaddingTop = value;
@@ -298,7 +298,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int TableCellPaddingRight
 		{
-			get { return this.tableCellPaddingRight; }
+			get => this.tableCellPaddingRight;
 			set
 			{
 				this.tableCellPaddingRight = value;
@@ -311,7 +311,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int TableCellPaddingBottom
 		{
-			get { return this.tableCellPaddingBottom; }
+			get => this.tableCellPaddingBottom;
 			set
 			{
 				this.tableCellPaddingBottom = value;
@@ -324,8 +324,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public string TableCellBorderColor
 		{
-			get { return this.tableCellBorderColor; }
-			set { this.tableCellBorderColor = value; }
+			get => this.tableCellBorderColor;
+			set => this.tableCellBorderColor = value;
 		}
 
 		/// <summary>
@@ -333,8 +333,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public double TableCellBorderThickness
 		{
-			get { return this.tableCellBorderThickness; }
-			set { this.tableCellBorderThickness = value; }
+			get => this.tableCellBorderThickness;
+			set => this.tableCellBorderThickness = value;
 		}
 
 		/// <summary>
@@ -342,8 +342,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public string TableCellRowBackgroundColor1
 		{
-			get { return this.tableCellRowBackgroundColor1; }
-			set { this.tableCellRowBackgroundColor1 = value; }
+			get => this.tableCellRowBackgroundColor1;
+			set => this.tableCellRowBackgroundColor1 = value;
 		}
 
 		/// <summary>
@@ -351,8 +351,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public string TableCellRowBackgroundColor2
 		{
-			get { return this.tableCellRowBackgroundColor2; }
-			set { this.tableCellRowBackgroundColor2 = value; }
+			get => this.tableCellRowBackgroundColor2;
+			set => this.tableCellRowBackgroundColor2 = value;
 		}
 
 		/// <summary>
@@ -360,8 +360,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int DefinitionSeparator
 		{
-			get { return this.definitionSeparator; }
-			set { this.definitionSeparator = value; }
+			get => this.definitionSeparator;
+			set => this.definitionSeparator = value;
 		}
 
 		/// <summary>
@@ -369,8 +369,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int DefinitionMargin
 		{
-			get { return this.definitionMargin; }
-			set { this.definitionMargin = value; }
+			get => this.definitionMargin;
+			set => this.definitionMargin = value;
 		}
 
 		/// <summary>
@@ -378,8 +378,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public double SuperscriptScale
 		{
-			get { return this.superscriptScale; }
-			set { this.superscriptScale = value; }
+			get => this.superscriptScale;
+			set => this.superscriptScale = value;
 		}
 
 		/// <summary>
@@ -387,8 +387,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int SuperscriptOffset
 		{
-			get { return this.superscriptOffset; }
-			set { this.superscriptOffset = value; }
+			get => this.superscriptOffset;
+			set => this.superscriptOffset = value;
 		}
 
 		/// <summary>
@@ -396,8 +396,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int FootnoteSeparator
 		{
-			get { return this.footnoteSeparator; }
-			set { this.footnoteSeparator = value; }
+			get => this.footnoteSeparator;
+			set => this.footnoteSeparator = value;
 		}
 
 		/// <summary>
@@ -405,8 +405,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int DefaultGraphWidth
 		{
-			get { return this.defaultGraphWidth; }
-			set { this.defaultGraphWidth = value; }
+			get => this.defaultGraphWidth;
+			set => this.defaultGraphWidth = value;
 		}
 
 		/// <summary>
@@ -414,8 +414,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public int DefaultGraphHeight
 		{
-			get { return this.defaultGraphHeight; }
-			set { this.defaultGraphHeight = value; }
+			get => this.defaultGraphHeight;
+			set => this.defaultGraphHeight = value;
 		}
 
 	}

@@ -59,8 +59,8 @@ namespace Waher.Content.Markdown.Web
 		/// </summary>
 		public static string BareJID
 		{
-			get { return bareJid; }
-			set { bareJid = value; }
+			get => bareJid;
+			set => bareJid = value;
 		}
 
 		/// <summary>
@@ -68,8 +68,8 @@ namespace Waher.Content.Markdown.Web
 		/// </summary>
 		public static string RootFolder
 		{
-			get { return rootFolder; }
-			set { rootFolder = value; }
+			get => rootFolder;
+			set => rootFolder = value;
 		}
 
 		/// <summary>
@@ -77,8 +77,8 @@ namespace Waher.Content.Markdown.Web
 		/// </summary>
 		public static IEmojiSource EmojiSource
 		{
-			get { return emojiSource; }
-			set { emojiSource = value; }
+			get => emojiSource;
+			set => emojiSource = value;
 		}
 
 		/// <summary>
@@ -142,7 +142,8 @@ namespace Waher.Content.Markdown.Web
 			MarkdownSettings Settings = new MarkdownSettings(emojiSource, true, State.Session)
 			{
 				RootFolder = rootFolder,
-				HtmlSettings = htmlSettings
+				HtmlSettings = htmlSettings,
+				ResourceMap = Request.Server
 			};
 
 			if (!string.IsNullOrEmpty(bareJid))

@@ -56,9 +56,9 @@ namespace Waher.Networking.HTTP
 			this.client = Client;
 			this.encrypted = Encrypted;
 
-			this.client.OnDisconnected += Client_OnDisconnected;
-			this.client.OnError += Client_OnError;
-			this.client.OnReceived += Client_OnReceived;
+			this.client.OnDisconnected += this.Client_OnDisconnected;
+			this.client.OnError += this.Client_OnError;
+			this.client.OnReceived += this.Client_OnReceived;
 		}
 
 		private Task<bool> Client_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)
@@ -435,10 +435,10 @@ namespace Waher.Networking.HTTP
 		private async Task<bool> RequestReceived()
 		{
 #if WINDOWS_UWP
-			HttpRequest Request = new HttpRequest(this.header, this.dataStream, 
+			HttpRequest Request = new HttpRequest(this.server, this.header, this.dataStream, 
 				this.client.Client.Information.RemoteAddress.ToString() + ":" + this.client.Client.Information.RemotePort);
 #else
-			HttpRequest Request = new HttpRequest(this.header, this.dataStream, this.client.Client.Client.RemoteEndPoint.ToString());
+			HttpRequest Request = new HttpRequest(this.server, this.header, this.dataStream, this.client.Client.Client.RemoteEndPoint.ToString());
 #endif
 			Request.clientConnection = this;
 

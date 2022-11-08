@@ -39,32 +39,32 @@ namespace Waher.Content.Markdown.Model
 
 		public string[] Rows
 		{
-			get { return this.rows; }
+			get => this.rows;
 		}
 
 		public int[] Positions
 		{
-			get { return this.positions; }
+			get => this.positions;
 		}
 
 		public int Start
 		{
-			get { return this.start; }
+			get => this.start;
 		}
 
 		public int End
 		{
-			get { return this.end; }
+			get => this.end;
 		}
 
 		public int Current
 		{
-			get { return this.current; }
+			get => this.current;
 		}
 
 		public bool PreserveCrLf
 		{
-			get { return this.preserveCrLf; }
+			get => this.preserveCrLf;
 		}
 
 		public char NextNonWhitespaceChar()
@@ -368,12 +368,12 @@ namespace Waher.Content.Markdown.Model
 
 		public string CurrentRow
 		{
-			get { return this.currentRow; }
+			get => this.currentRow;
 		}
 
 		public char LastCharacter
 		{
-			get { return this.lastChar; }
+			get => this.lastChar;
 		}
 
 		public string UntilToken(string Token)

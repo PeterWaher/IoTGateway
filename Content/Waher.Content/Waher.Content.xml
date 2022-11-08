@@ -1752,6 +1752,35 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Object.</returns>
         </member>
+        <member name="T:Waher.Content.IResourceMap">
+            <summary>
+            Basic interface for Resource maps.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.IResourceMap.CheckResource(System.String@)">
+            <summary>
+            Checks if a resource name needs to be mapped to an alternative resource.
+            </summary>
+            <param name="ResourceName">Resource name.</param>
+            <returns>If resource is mapped, and has been updated to reflect the true resource name.</returns>
+        </member>
+        <member name="M:Waher.Content.IResourceMap.TryGetFileName(System.String,System.String@)">
+            <summary>
+            Tries to get the full path of a file-based resource.
+            </summary>
+            <param name="LocalUrl">Local URL</param>
+            <param name="FileName">File name, if found.</param>
+            <returns>If the resource points to a file.</returns>
+        </member>
+        <member name="M:Waher.Content.IResourceMap.TryGetFileName(System.String,System.Boolean,System.String@)">
+            <summary>
+            Tries to get the full path of a file-based resource.
+            </summary>
+            <param name="LocalUrl">Local URL</param>
+            <param name="MustExist">If file must exist.</param>
+            <param name="FileName">File name, if found.</param>
+            <returns>If the resource points to a file.</returns>
+        </member>
         <member name="T:Waher.Content.JSON">
             <summary>
             Helps with common JSON-related tasks.

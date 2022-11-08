@@ -5981,8 +5981,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public string FileName
 		{
-			get { return this.fileName; }
-			set { this.fileName = value; }
+			get => this.fileName;
+			set => this.fileName = value;
 		}
 
 		/// <summary>
@@ -5991,8 +5991,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public string ResourceName
 		{
-			get { return this.resourceName; }
-			set { this.resourceName = value; }
+			get => this.resourceName;
+			set => this.resourceName = value;
 		}
 
 		/// <summary>
@@ -6000,8 +6000,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public string URL
 		{
-			get { return this.url; }
-			set { this.url = value; }
+			get => this.url;
+			set => this.url = value;
 		}
 
 		/// <summary>
@@ -6009,8 +6009,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public MarkdownDocument Master
 		{
-			get { return this.master; }
-			set { this.master = value; }
+			get => this.master;
+			set => this.master = value;
 		}
 
 		/// <summary>
@@ -6032,7 +6032,7 @@ namespace Waher.Content.Markdown
 
 				return null;
 			}
-			set { this.detail = value; }
+			set => this.detail = value;
 		}
 
 		/// <summary>

@@ -16,6 +16,7 @@ using System.Security.Authentication;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography.X509Certificates;
 #endif
+using Waher.Content;
 using Waher.Events;
 using Waher.Events.Statistics;
 using Waher.Networking.HTTP.HeaderFields;
@@ -31,7 +32,7 @@ namespace Waher.Networking.HTTP
 	/// <summary>
 	/// Implements an HTTP server.
 	/// </summary>
-	public class HttpServer : Sniffable, IDisposable
+	public class HttpServer : Sniffable, IDisposable, IResourceMap
 	{
 		/// <summary>
 		/// Default HTTP Port (80).
@@ -1907,7 +1908,7 @@ namespace Waher.Networking.HTTP
 			{
 				using (MemoryStream ms = new MemoryStream())
 				{
-					HttpRequest Request = new HttpRequest(
+					HttpRequest Request = new HttpRequest(this,
 						new HttpRequestHeader("GET " + LocalUrl + " HTTP/1.1", this.vanityResources, "http"), null, "Internal")
 					{
 						Session = Session,
@@ -2010,6 +2011,16 @@ namespace Waher.Networking.HTTP
 		/// Vanity resources.
 		/// </summary>
 		public VanityResources VanityResources => this.vanityResources;
+
+		/// <summary>
+		/// Checks if a resource name needs to be mapped to an alternative resource.
+		/// </summary>
+		/// <param name="ResourceName">Resource name.</param>
+		/// <returns>If resource is mapped, and has been updated to reflect the true resource name.</returns>
+		public bool CheckResource(ref string ResourceName)
+		{
+			return this.vanityResources.CheckVanityResource(ref ResourceName);
+		}
 
 		#endregion
 

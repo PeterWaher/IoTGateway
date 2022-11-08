@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Waher.Content.Emoji;
 using Waher.Script;
@@ -12,16 +13,17 @@ namespace Waher.Content.Markdown
 	/// <returns>If the expression is authorized to execute.</returns>
 	public delegate Task<bool> AuthorizeExpression(Expression Expression);
 
-    /// <summary>
-    /// Contains settings that the Markdown parser uses to customize its behavior.
-    /// </summary>
-    public class MarkdownSettings
-    {
+	/// <summary>
+	/// Contains settings that the Markdown parser uses to customize its behavior.
+	/// </summary>
+	public class MarkdownSettings
+	{
 		private XamlSettings xamlSettings = null;
 		private HtmlSettings htmlSettings = null;
-        private IEmojiSource emojiSource;
+		private IEmojiSource emojiSource;
 		private Variables variables;
 		private AuthorizeExpression authorizeExpression;
+		private IResourceMap resourceMap = null;
 		private bool parseMetaData;
 		private string httpxProxy = null;
 		private string localHttpxResourcePath = null;
@@ -37,71 +39,71 @@ namespace Waher.Content.Markdown
 		/// Contains settings that the Markdown parser uses to customize its behavior.
 		/// </summary>
 		public MarkdownSettings()
-            : this(null, true, null)
-        {
-        }
+			: this(null, true, null)
+		{
+		}
 
-        /// <summary>
-        /// Contains settings that the Markdown parser uses to customize its behavior.
-        /// </summary>
-        /// <param name="EmojiSource">Optional Emoji source. Emojis and smileys are only available if an emoji source is provided.</param>
-        public MarkdownSettings(IEmojiSource EmojiSource)
-            : this(EmojiSource, false, null)
-        {
-        }
+		/// <summary>
+		/// Contains settings that the Markdown parser uses to customize its behavior.
+		/// </summary>
+		/// <param name="EmojiSource">Optional Emoji source. Emojis and smileys are only available if an emoji source is provided.</param>
+		public MarkdownSettings(IEmojiSource EmojiSource)
+			: this(EmojiSource, false, null)
+		{
+		}
 
-        /// <summary>
-        /// Contains settings that the Markdown parser uses to customize its behavior.
-        /// </summary>
-        /// <param name="EmojiSource">Optional Emoji source. Emojis and smileys are only available if an emoji source is provided.</param>
-        /// <param name="ParseMetaData">If meta-data should be parsed or not. By default, this value is true, if no emoji source is provided, 
-        /// and false, if an emoji source is not provided.</param>
-        public MarkdownSettings(IEmojiSource EmojiSource, bool ParseMetaData)
-            : this(EmojiSource, ParseMetaData, null)
-        {
-        }
+		/// <summary>
+		/// Contains settings that the Markdown parser uses to customize its behavior.
+		/// </summary>
+		/// <param name="EmojiSource">Optional Emoji source. Emojis and smileys are only available if an emoji source is provided.</param>
+		/// <param name="ParseMetaData">If meta-data should be parsed or not. By default, this value is true, if no emoji source is provided, 
+		/// and false, if an emoji source is not provided.</param>
+		public MarkdownSettings(IEmojiSource EmojiSource, bool ParseMetaData)
+			: this(EmojiSource, ParseMetaData, null)
+		{
+		}
 
-        /// <summary>
-        /// Contains settings that the Markdown parser uses to customize its behavior.
-        /// </summary>
-        /// <param name="EmojiSource">Optional Emoji source. Emojis and smileys are only available if an emoji source is provided.</param>
-        /// <param name="ParseMetaData">If meta-data should be parsed or not. By default, this value is true, if no emoji source is provided, 
-        /// and false, if an emoji source is not provided.</param>
-        /// <param name="Variables">Collection of variables. Providing such a collection enables script execution inside markdown
-        /// documents.</param>
-        public MarkdownSettings(IEmojiSource EmojiSource, bool ParseMetaData, Variables Variables)
-        {
-            this.emojiSource = EmojiSource;
-            this.parseMetaData = ParseMetaData;
-            this.variables = Variables;
-        }
+		/// <summary>
+		/// Contains settings that the Markdown parser uses to customize its behavior.
+		/// </summary>
+		/// <param name="EmojiSource">Optional Emoji source. Emojis and smileys are only available if an emoji source is provided.</param>
+		/// <param name="ParseMetaData">If meta-data should be parsed or not. By default, this value is true, if no emoji source is provided, 
+		/// and false, if an emoji source is not provided.</param>
+		/// <param name="Variables">Collection of variables. Providing such a collection enables script execution inside markdown
+		/// documents.</param>
+		public MarkdownSettings(IEmojiSource EmojiSource, bool ParseMetaData, Variables Variables)
+		{
+			this.emojiSource = EmojiSource;
+			this.parseMetaData = ParseMetaData;
+			this.variables = Variables;
+		}
 
-        /// <summary>
-        /// Optional Emoji source. Emojis and smileys are only available if an emoji source is provided.
-        /// </summary>
-        public IEmojiSource EmojiSource
-        {
-            get { return this.emojiSource; }
-            set { this.emojiSource = value; }
-        }
+		/// <summary>
+		/// Optional Emoji source. Emojis and smileys are only available if an emoji source is provided.
+		/// </summary>
+		public IEmojiSource EmojiSource
+		{
+			get => this.emojiSource;
+			set => this.emojiSource = value;
+		}
 
-        /// <summary>
-        /// If meta-data should be parsed or not.
-        /// </summary>
-        public bool ParseMetaData
-        {
-            get { return this.parseMetaData; }
-            set { this.parseMetaData = value; }
-        }
+		/// <summary>
+		/// If meta-data should be parsed or not.
+		/// </summary>
+		public bool ParseMetaData
+		{
+			get => this.parseMetaData;
+			set => this.parseMetaData = value;
+		}
 
-        /// <summary>
-        /// Collection of variables. Providing such a collection enables script execution inside markdown documents.
-        /// </summary>
-        public Variables Variables
-        {
-            get { return this.variables; }
-            set { this.variables = value; }
-        }
+		/// <summary>
+		/// Collection of variables. Providing such a collection enables script execution inside markdown documents.
+		/// </summary>
+		public Variables Variables
+		{
+			get => this.variables;
+			set => this.variables = value;
+		}
 
 		/// <summary>
 		/// Modifies URLS using the HTTPX URI scheme, so that they point to an HTTPX proxy. The string %URL% is replaced with
@@ -109,8 +111,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public string HttpxProxy
 		{
-			get { return this.httpxProxy; }
-			set { this.httpxProxy = value; }
+			get => this.httpxProxy;
+			set => this.httpxProxy = value;
 		}
 
 		/// <summary>
@@ -118,8 +120,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public string LocalHttpxResourcePath
 		{
-			get { return this.localHttpxResourcePath; }
-			set { this.localHttpxResourcePath = value; }
+			get => this.localHttpxResourcePath;
+			set => this.localHttpxResourcePath = value;
 		}
 
 		/// <summary>
@@ -127,8 +129,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public bool AudioAutoplay
 		{
-			get { return this.audioAutoplay; }
-			set { this.audioAutoplay = value; }
+			get => this.audioAutoplay;
+			set => this.audioAutoplay = value;
 		}
 
 		/// <summary>
@@ -136,8 +138,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public bool AudioControls
 		{
-			get { return this.audioControls; }
-			set { this.audioControls = value; }
+			get => this.audioControls;
+			set => this.audioControls = value;
 		}
 
 		/// <summary>
@@ -145,8 +147,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public bool VideoAutoplay
 		{
-			get { return this.videoAutoplay; }
-			set { this.videoAutoplay = value; }
+			get => this.videoAutoplay;
+			set => this.videoAutoplay = value;
 		}
 
 		/// <summary>
@@ -154,8 +156,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public bool VideoControls
 		{
-			get { return this.videoControls; }
-			set { this.videoControls = value; }
+			get => this.videoControls;
+			set => this.videoControls = value;
 		}
 
 		/// <summary>
@@ -163,8 +165,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public bool EmbedEmojis
 		{
-			get { return this.embedEmojis; }
-			set { this.embedEmojis = value; }
+			get => this.embedEmojis;
+			set => this.embedEmojis = value;
 		}
 
 		/// <summary>
@@ -172,8 +174,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public string RootFolder
 		{
-			get { return this.rootFolder; }
-			set { this.rootFolder = value; }
+			get => this.rootFolder;
+			set => this.rootFolder = value;
 		}
 
 		/// <summary>
@@ -181,8 +183,8 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public bool AllowScriptTag
 		{
-			get { return this.allowScriptTag; }
-			set { this.allowScriptTag = value; }
+			get => this.allowScriptTag;
+			set => this.allowScriptTag = value;
 		}
 
 		/// <summary>
@@ -190,8 +192,17 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public AuthorizeExpression AuthorizeExpression
 		{
-			get { return this.authorizeExpression; }
-			set { this.authorizeExpression = value; }
+			get => this.authorizeExpression;
+			set => this.authorizeExpression = value;
+		}
+
+		/// <summary>
+		/// Optional resource map to apply to resources referred to in document.
+		/// </summary>
+		public IResourceMap ResourceMap
+		{
+			get => this.resourceMap;
+			set => this.resourceMap = value;
 		}
 
 		/// <summary>
@@ -202,16 +213,20 @@ namespace Waher.Content.Markdown
 		/// <returns>Physical filename.</returns>
 		public string GetFileName(string DocumentFileName, string FileNameReference)
 		{
+			string FileName;
 			char ch;
 
-			if (!string.IsNullOrEmpty(FileNameReference) && 
+			if (!string.IsNullOrEmpty(FileNameReference) &&
 				((ch = FileNameReference[0]) == Path.DirectorySeparatorChar || ch == '/') &&
 				!string.IsNullOrEmpty(this.rootFolder))
 			{
-				return Path.Combine(this.rootFolder, FileNameReference.Substring(1));
+				if (this.resourceMap is null || !this.resourceMap.TryGetFileName(FileNameReference, true, out FileName))
+					FileName = Path.Combine(this.rootFolder, FileNameReference.Substring(1));
 			}
 			else
-				return Path.Combine(Path.GetDirectoryName(DocumentFileName), FileNameReference);
+				FileName = Path.Combine(Path.GetDirectoryName(DocumentFileName), FileNameReference);
+
+			return FileName;
 		}
 
 		/// <summary>

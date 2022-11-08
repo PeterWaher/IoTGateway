@@ -1317,6 +1317,11 @@
             Optional method to call to authorize execution of script expressions.
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.MarkdownSettings.ResourceMap">
+            <summary>
+            Optional resource map to apply to resources referred to in document.
+            </summary>
+        </member>
         <member name="M:Waher.Content.Markdown.MarkdownSettings.GetFileName(System.String,System.String)">
             <summary>
             Evaluates a file name from a file reference.

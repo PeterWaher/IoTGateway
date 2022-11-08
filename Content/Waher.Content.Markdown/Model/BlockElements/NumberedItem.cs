@@ -28,7 +28,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		public int Number
 		{
-			get { return this.number; }
+			get => this.number;
 		}
 
 		/// <summary>

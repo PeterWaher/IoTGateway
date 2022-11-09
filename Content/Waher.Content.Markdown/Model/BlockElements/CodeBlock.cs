@@ -237,13 +237,38 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">Markdown will be output here.</param>
 		public override Task GenerateMarkdown(StringBuilder Output)
 		{
-			Output.Append("```");
+			int Max = 2;
+
+			foreach (string Row in this.rows)
+			{
+				int i = 0;
+
+				foreach (char ch in Row)
+				{
+					if (ch == '`')
+						i++;
+					else
+					{
+						if (i > Max)
+							Max = i;
+
+						i = 0;
+					}
+				}
+
+				if (i > Max)
+					Max = i;
+			}
+
+			string s = new string('`', Max + 1);
+
+			Output.Append(s);
 			Output.AppendLine(this.language);
 
 			foreach (string Row in this.rows)
 				Output.AppendLine(Row);
 
-			Output.AppendLine("```");
+			Output.AppendLine(s);
 			Output.AppendLine();
 
 			return Task.CompletedTask;

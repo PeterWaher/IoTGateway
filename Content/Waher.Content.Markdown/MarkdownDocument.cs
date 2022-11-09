@@ -507,8 +507,20 @@ namespace Waher.Content.Markdown
 				}
 				else if (Block.IsPrefixedBy("```", false))
 				{
+					s = Block.Rows[Block.Start];
+					i = 0;
+					foreach (char ch in s)
+					{
+						if (ch == '`')
+							i++;
+						else
+							break;
+					}
+
+					s = s.Substring(0, i);
+
 					i = BlockIndex;
-					while (i <= EndBlock && (!(Block = Blocks[i]).Rows[Block.End].StartsWith("```") || (i == BlockIndex && Block.Start == Block.End)))
+					while (i <= EndBlock && (!(Block = Blocks[i]).Rows[Block.End].StartsWith(s) || (i == BlockIndex && Block.Start == Block.End)))
 						i++;
 
 					if (i <= EndBlock)
@@ -5131,7 +5143,7 @@ namespace Waher.Content.Markdown
 			{
 				Footnote Footnote;
 				string FootnoteMargin = "0," + this.settings.XamlSettings.ParagraphMarginTop.ToString() + "," +
-					this.settings.XamlSettings.FootnoteSeparator.ToString() + "," + 
+					this.settings.XamlSettings.FootnoteSeparator.ToString() + "," +
 					this.settings.XamlSettings.ParagraphMarginBottom.ToString();
 				string Scale = CommonTypes.Encode(this.settings.XamlSettings.SuperscriptScale);
 				string Offset = this.settings.XamlSettings.SuperscriptOffset.ToString();
@@ -6588,7 +6600,7 @@ namespace Waher.Content.Markdown
 			Result.MailHyperlinks = Result.IntMailHyperlinks?.ToArray();
 			Result.UrlHyperlinks = Result.IntUrlHyperlinks?.ToArray();
 
-			this.GenerateStatDictionary(Result.IntMultimediaPerContentCategory, 
+			this.GenerateStatDictionary(Result.IntMultimediaPerContentCategory,
 				out Dictionary<string, string[]> AsArrays, out Dictionary<string, int> AsCounts);
 
 			Result.MultimediaPerContentCategory = AsArrays;

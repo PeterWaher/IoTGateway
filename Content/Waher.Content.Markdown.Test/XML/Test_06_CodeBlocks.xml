@@ -53,6 +53,13 @@
 			<Row />
 			<Row>...</Row>
 		</CodeBlock>
+		<CodeBlock language="" start="0" end="4" indent="0" indentString="">
+			<Row>```</Row>
+			<Row>&lt;div class="footer"&gt;</Row>
+			<Row>    &amp;copy; 2004 Foo Corporation</Row>
+			<Row>&lt;/div&gt;</Row>
+			<Row>```</Row>
+		</CodeBlock>
 	</elements>
 	<references />
 </parsedMakdown>

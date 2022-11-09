@@ -44,3 +44,11 @@ Headers can also be written on a single line, prefixing them with hash signs \(`
 ...
 ```
 
+````
+```
+<div class="footer">
+    &copy; 2004 Foo Corporation
+</div>
+```
+````
+

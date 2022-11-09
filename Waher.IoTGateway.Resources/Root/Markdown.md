@@ -714,7 +714,7 @@ You can choose to either indent each line of the code with 1-4 spaces or one tab
 
 		20 GOTO 10
 
-Or, you can write the code without special indentation, but beginning and ending the the block with rows consisting of three back ticks 
+Or, you can write the code without special indentation, but beginning and ending the the block with rows consisting of three or more back ticks 
 (<code>\`\`\`</code>), as follows:
 
 	```
@@ -723,7 +723,8 @@ Or, you can write the code without special indentation, but beginning and ending
 	20 GOTO 10
 	```
 
-Note that you can insert blank rows in code. The indentation in the first case, or the three back ticks in the second case, tell the parser when the code
+Note that you can insert blank rows in code. Note also that you need to terminate the code block with the same amount of back ticks.
+The indentation in the first case, or the three (or more) back ticks in the second case, tell the parser when the code
 block ends. In both cases, you get the following result:
 
 ```

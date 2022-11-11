@@ -74,3 +74,10 @@
 	</super>
 	<text>)</text>
 </paragraph>
+<paragraph>
+	<text>It is important that super</text>
+	<super>
+		<text>indices</text>
+	</super>
+	<text> are displayed correctly in flowing text.</text>
+</paragraph>

@@ -14,3 +14,10 @@
 		<text>i,j</text>
 	</sub>
 </paragraph>
+<paragraph>
+	<text>It is important that sub</text>
+	<sub>
+		<text>indices</text>
+	</sub>
+	<text> are displayed correctly in flowing text.</text>
+</paragraph>

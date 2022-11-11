@@ -10,3 +10,5 @@ a^[\(b\+c\)/2]\=sqrt\(a^[b]a^[c]\)
 
 a^[\(b\+c\)/2]\=sqrt\(a^[b]a^[c]\)
 
+It is important that super^[indices] are displayed correctly in flowing text\.
+

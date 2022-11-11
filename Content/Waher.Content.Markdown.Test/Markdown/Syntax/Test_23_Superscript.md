@@ -11,3 +11,5 @@ a^n+b^n<>c^n, n>=3
 a^[(b+c)/2]=sqrt(a^ba^c)
 
 a^(\(b+c\)/2)=sqrt(a^ba^c)
+
+It is important that super^(indices) are displayed correctly in flowing text.

@@ -21,6 +21,13 @@
 				<InlineText>i,j</InlineText>
 			</SubScript>
 		</Paragraph>
+		<Paragraph>
+			<InlineText>It is important that sub</InlineText>
+			<SubScript>
+				<InlineText>indices</InlineText>
+			</SubScript>
+			<InlineText> are displayed correctly in flowing text.</InlineText>
+		</Paragraph>
 	</elements>
 	<references />
 </parsedMakdown>

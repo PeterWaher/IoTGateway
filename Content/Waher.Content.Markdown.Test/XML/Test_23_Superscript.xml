@@ -81,6 +81,13 @@
 			</SuperScript>
 			<InlineText>)</InlineText>
 		</Paragraph>
+		<Paragraph>
+			<InlineText>It is important that super</InlineText>
+			<SuperScript>
+				<InlineText>indices</InlineText>
+			</SuperScript>
+			<InlineText> are displayed correctly in flowing text.</InlineText>
+		</Paragraph>
 	</elements>
 	<references />
 </parsedMakdown>

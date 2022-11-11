@@ -95,27 +95,83 @@ namespace Waher.Content.Markdown.Model
 				return this.lastChar = this.currentRow[this.pos++];
 		}
 
-		public char PeekNextNonWhitespaceCharSameRow()
+		public char PeekNextNonWhitespaceCharSameRow(bool SkipWhitespace)
 		{
 			char ch = this.PeekNextCharSameRow();
 
-			while (ch > 0 && (ch <= ' ' || ch == 160))
+			if (ch > 0 && (ch <= ' ' || ch == 160))
 			{
-				this.NextCharSameRow();
-				ch = this.PeekNextCharSameRow();
+				if (SkipWhitespace)
+				{
+					do
+					{
+						this.NextCharSameRow();
+						ch = this.PeekNextCharSameRow();
+					}
+					while (ch > 0 && (ch <= ' ' || ch == 160));
+				}
+				else
+				{
+					int PosBak = this.pos;
+					int LenBak = this.len;
+					int CurrentBak = this.current;
+					string CurrentRowBak = this.currentRow;
+					bool LineBreakAfterBak = this.lineBreakAfter;
+
+					do
+					{
+						this.NextCharSameRow();
+						ch = this.PeekNextCharSameRow();
+					}
+					while (ch > 0 && (ch <= ' ' || ch == 160));
+
+					this.pos = PosBak;
+					this.len = LenBak;
+					this.current = CurrentBak;
+					this.currentRow = CurrentRowBak;
+					this.lineBreakAfter = LineBreakAfterBak;
+				}
 			}
 
 			return ch;
 		}
 
-		public char PeekNextNonWhitespaceChar()
+		public char PeekNextNonWhitespaceChar(bool SkipWhitespace)
 		{
 			char ch = this.PeekNextChar();
 
-			while (ch > 0 && (ch <= ' ' || ch == 160))
+			if (ch > 0 && (ch <= ' ' || ch == 160))
 			{
-				this.NextChar();
-				ch = this.PeekNextChar();
+				if (SkipWhitespace)
+				{
+					do
+					{
+						this.NextChar();
+						ch = this.PeekNextChar();
+					}
+					while (ch > 0 && (ch <= ' ' || ch == 160));
+				}
+				else
+				{
+					int PosBak = this.pos;
+					int LenBak = this.len;
+					int CurrentBak = this.current;
+					string CurrentRowBak = this.currentRow;
+					bool LineBreakAfterBak = this.lineBreakAfter;
+
+					do
+					{
+						this.NextChar();
+						ch = this.PeekNextChar();
+					}
+					while (ch > 0 && (ch <= ' ' || ch == 160));
+
+					this.pos = PosBak;
+					this.len = LenBak;
+					this.current = CurrentBak;
+					this.currentRow = CurrentRowBak;
+					this.lineBreakAfter = LineBreakAfterBak;
+				}
 			}
 
 			return ch;

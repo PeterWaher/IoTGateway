@@ -5,4 +5,5 @@
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">a<Run Typography.Variants="Superscript">n</Run>+b<Run Typography.Variants="Superscript">n</Run>≠c<Run Typography.Variants="Superscript">n</Run>, n≥3</TextBlock>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">a<Run Typography.Variants="Superscript">(b+c)/2</Run>=sqrt(a<Run Typography.Variants="Superscript">b</Run>a<Run Typography.Variants="Superscript">c</Run>)</TextBlock>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">a<Run Typography.Variants="Superscript">(b+c)/2</Run>=sqrt(a<Run Typography.Variants="Superscript">b</Run>a<Run Typography.Variants="Superscript">c</Run>)</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">It is important that super<Run Typography.Variants="Superscript">indices</Run> are displayed correctly in flowing text.</TextBlock>
 </StackPanel>

@@ -10,3 +10,5 @@ a⁽ᵇ⁺ᶜ⁾/²=sqrt(aᵇaᶜ)
 
 a⁽ᵇ⁺ᶜ⁾/²=sqrt(aᵇaᶜ)
 
+It is important that superⁱⁿᵈⁱᶜᵉˢ are displayed correctly in flowing text.
+

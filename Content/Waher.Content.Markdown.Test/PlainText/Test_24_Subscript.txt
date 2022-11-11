@@ -2,3 +2,5 @@
 
 aᵢ=Aᵢ,ⱼ
 
+It is important that subᵢₙdᵢcₑₛ are displayed correctly in flowing text.
+

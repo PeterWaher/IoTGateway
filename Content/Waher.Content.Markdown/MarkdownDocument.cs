@@ -1587,7 +1587,7 @@ namespace Waher.Content.Markdown
 
 						if (this.ParseBlock(State, ']', 1, ChildElements))
 						{
-							ch2 = State.PeekNextNonWhitespaceChar();
+							ch2 = State.PeekNextNonWhitespaceChar(false);
 							if (ch2 == '(')
 							{
 								State.NextNonWhitespaceChar();
@@ -1621,7 +1621,7 @@ namespace Waher.Content.Markdown
 
 									if (ch2 <= ' ' || ch2 == 160)
 									{
-										ch2 = State.PeekNextNonWhitespaceChar();
+										ch2 = State.PeekNextNonWhitespaceChar(true);
 
 										if (ch2 == '"' || ch2 == '\'')
 										{
@@ -1673,11 +1673,11 @@ namespace Waher.Content.Markdown
 
 											if (ch2 <= ' ' || ch2 == 160)
 											{
-												ch2 = State.PeekNextNonWhitespaceChar();
+												ch2 = State.PeekNextNonWhitespaceChar(true);
 
 												if (ch2 == '"' || ch2 == '\'')
 												{
-													State.NextChar();
+													State.NextNonWhitespaceChar();
 													while ((ch3 = State.NextCharSameRow()) != 0 && ch3 != ch2)
 														Text.Append(ch3);
 
@@ -1724,8 +1724,12 @@ namespace Waher.Content.Markdown
 
 									while (ch2 > ' ' && ch2 != 160 && ch2 != '[')
 									{
-										while ((ch2 = State.NextCharSameRow()) != 0 && ch2 > ' ' && ch2 != 160)
+										ch2 = State.NextNonWhitespaceChar();
+										while (ch2 != 0 && ch2 > ' ' && ch2 != 160)
+										{
 											Text.Append(ch2);
+											ch2 = State.NextCharSameRow();
+										}
 
 										Url = Text.ToString();
 										Text.Clear();
@@ -1733,11 +1737,11 @@ namespace Waher.Content.Markdown
 										if (Url.StartsWith("<") && Url.EndsWith(">"))
 											Url = Url.Substring(1, Url.Length - 2);
 
-										ch2 = State.PeekNextNonWhitespaceChar();
+										ch2 = State.PeekNextNonWhitespaceChar(true);
 
 										if (ch2 == '"' || ch2 == '\'' || ch2 == '(')
 										{
-											State.NextChar();
+											State.NextNonWhitespaceChar();
 											if (ch2 == '(')
 												ch2 = ')';
 
@@ -1756,7 +1760,7 @@ namespace Waher.Content.Markdown
 										if (!this.includesTableOfContents && string.Compare(Url, "ToC", true) == 0)
 											this.includesTableOfContents = true;
 
-										ch2 = State.PeekNextNonWhitespaceChar();
+										ch2 = State.PeekNextNonWhitespaceChar(true);
 									}
 
 									foreach (MarkdownElement E in ChildElements)
@@ -4062,7 +4066,7 @@ namespace Waher.Content.Markdown
 								Url = Text.ToString();
 								Text.Clear();
 
-								if (FirstCharOnLine && State.PeekNextNonWhitespaceCharSameRow() == 0)
+								if (FirstCharOnLine && State.PeekNextNonWhitespaceCharSameRow(false) == 0)
 								{
 									IMultimediaContent Handler = Multimedia.GetMultimediaHandler(Url);
 									if (!(Handler is null) && Handler.EmbedInlineLink(Url))
@@ -4189,13 +4193,13 @@ namespace Waher.Content.Markdown
 			Width = null;
 			Height = null;
 
-			char ch = State.PeekNextNonWhitespaceCharSameRow();
+			char ch = State.PeekNextNonWhitespaceCharSameRow(true);
 			if (ch >= '0' && ch <= '9')
 			{
 				StringBuilder Text = new StringBuilder();
 
 				Text.Append(ch);
-				State.NextCharSameRow();
+				State.NextNonWhitespaceCharSameRow();
 
 				ch = State.PeekNextCharSameRow();
 				while (ch >= '0' && ch <= '9')
@@ -4210,11 +4214,11 @@ namespace Waher.Content.Markdown
 					Width = i;
 					Text.Clear();
 
-					ch = State.PeekNextNonWhitespaceCharSameRow();
+					ch = State.PeekNextNonWhitespaceCharSameRow(true);
 					if (ch >= '0' && ch <= '9')
 					{
 						Text.Append(ch);
-						State.NextCharSameRow();
+						State.NextNonWhitespaceCharSameRow();
 
 						ch = State.PeekNextCharSameRow();
 						while (ch >= '0' && ch <= '9')

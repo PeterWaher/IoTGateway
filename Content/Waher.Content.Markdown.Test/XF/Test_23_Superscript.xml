@@ -17,4 +17,7 @@
 	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
 		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[a<sup>(b+c)/2</sup>=sqrt(a<sup>b</sup>a<sup>c</sup>)]]></Label>
 	</ContentView>
+	<ContentView Padding="0,5,0,5" HorizontalOptions="Start">
+		<Label LineBreakMode="WordWrap" TextType="Html"><![CDATA[It is important that super<sup>indices</sup> are displayed correctly in flowing text.]]></Label>
+	</ContentView>
 </StackLayout>

@@ -373,11 +373,12 @@ namespace Waher.Content.Markdown.PlantUml
 					ResultSource.TrySetResult(null);
 				};
 
-				P.Exited += (sender, e) =>
+				P.Exited += async (sender, e) =>
 				{
 					if (P.ExitCode != 0)
 					{
-						Log.Error("Unable to generate graph. Exit code: " + P.ExitCode.ToString());
+						string ErrorText = await P.StandardError.ReadToEndAsync();
+						Log.Error("Unable to generate graph. Exit code: " + P.ExitCode.ToString() + "\r\n\r\n" + ErrorText);
 						ResultSource.TrySetResult(null);
 					}
 					else

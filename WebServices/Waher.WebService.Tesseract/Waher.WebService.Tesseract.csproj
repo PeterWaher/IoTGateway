@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <DocumentationFile>C:\My Projects\IoTGateway\WebServices\Waher.WebServices.Tesseract\Waher.WebServices.Tesseract.xml</DocumentationFile>
+    <DocumentationFile>C:\My Projects\IoTGateway\WebServices\Waher.WebService.Tesseract\Waher.WebService.Tesseract.xml</DocumentationFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageId>Waher.WebService.Tesseract</PackageId>
     <Version>1.0.0</Version>

@@ -27,6 +27,7 @@ namespace Waher.WebService.Tesseract
 		private static bool disposeScheduler = false;
 		private static string tesseractExe = null;
 		private static string tesseractFolder = null;
+		private static string tesseractDataFolder = null;
 		private static string imagesFolder = null;
 		private static bool hasImagesFolder = false;
 
@@ -98,6 +99,16 @@ namespace Waher.WebService.Tesseract
 		}
 
 		/// <summary>
+		/// Path of executable file.
+		/// </summary>
+		public string ExecutablePath => tesseractExe;
+
+		/// <summary>
+		/// Path to folder with images.
+		/// </summary>
+		public string ImagesPath = imagesFolder;
+
+		/// <summary>
 		/// Sets the installation folder of Tesseract.
 		/// </summary>
 		/// <param name="ExePath">Path to executable file.</param>
@@ -110,6 +121,7 @@ namespace Waher.WebService.Tesseract
 
 			tesseractExe = ExePath;
 			tesseractFolder = Path.GetDirectoryName(ExePath);
+			tesseractDataFolder = Path.Combine(tesseractFolder, "tessdata");
 			imagesFolder = ImagesFolder;
 			hasImagesFolder = !string.IsNullOrEmpty(imagesFolder);
 
@@ -210,7 +222,7 @@ namespace Waher.WebService.Tesseract
 				return null; // Folder not defined for the operating system.
 			}
 
-			if (String.IsNullOrEmpty(Folder))
+			if (string.IsNullOrEmpty(Folder))
 				return null;
 
 			if (!Directory.Exists(Folder))
@@ -239,7 +251,7 @@ namespace Waher.WebService.Tesseract
 				if (!FolderName.StartsWith(FolderPrefix, StringComparison.CurrentCultureIgnoreCase))
 					continue;
 
-				string ExePath = Path.Combine(FolderName, ExecutableName);
+				string ExePath = Path.Combine(SubFolder, ExecutableName);
 				if (File.Exists(ExePath))
 					return ExePath;
 			}
@@ -247,7 +259,15 @@ namespace Waher.WebService.Tesseract
 			return null;
 		}
 
-		private async Task<object> PerformOcr(byte[] Image, string ContentType, PageSegmentationMode? PageSegmentationMode,
+		/// <summary>
+		/// Performs OCR on an image.
+		/// </summary>
+		/// <param name="Image">Binary representation of image.</param>
+		/// <param name="ContentType">Content-Type of image representation.</param>
+		/// <param name="PageSegmentationMode">Optional Page segmentation mode.</param>
+		/// <param name="Language">Optional language.</param>
+		/// <returns>Decoded text.</returns>
+		public async Task<string> PerformOcr(byte[] Image, string ContentType, PageSegmentationMode? PageSegmentationMode,
 			string Language)
 		{
 			string Extension = InternetContent.GetFileExtension(ContentType);
@@ -264,13 +284,13 @@ namespace Waher.WebService.Tesseract
 				}
 				else
 				{
-					TempFile = new TemporaryFile(Extension);
+					TempFile = new TemporaryFile(Path.ChangeExtension(Path.GetTempFileName(), Extension));
 					await TempFile.WriteAsync(Image, 0, Image.Length);
 
 					FileName = TempFile.FileName;
 				}
 
-				ResultFileName = Path.ChangeExtension(FileName, "txt");
+				ResultFileName = FileName + ".txt";
 
 				if (!(imagesFolder is null) && File.Exists(ResultFileName))
 					return await Resources.ReadAllTextAsync(ResultFileName);
@@ -284,7 +304,7 @@ namespace Waher.WebService.Tesseract
 					Arguments.Append('"');
 					Arguments.Append(FileName);
 					Arguments.Append("\" \"");
-					Arguments.Append(ResultFileName);
+					Arguments.Append(FileName);
 					Arguments.Append('"');
 
 					if (!string.IsNullOrEmpty(Language))
@@ -295,8 +315,15 @@ namespace Waher.WebService.Tesseract
 
 					if (PageSegmentationMode.HasValue)
 					{
-						Arguments.Append(" -psm ");
+						Arguments.Append(" --psm ");
 						Arguments.Append(((int)PageSegmentationMode.Value).ToString());
+					}
+
+					if (!string.IsNullOrEmpty(tesseractDataFolder))
+					{
+						Arguments.Append(" --tessdata-dir \"");
+						Arguments.Append(tesseractDataFolder);
+						Arguments.Append('"');
 					}
 
 					ProcessStartInfo ProcessInformation = new ProcessStartInfo()
@@ -326,7 +353,8 @@ namespace Waher.WebService.Tesseract
 						{
 							if (P.ExitCode != 0)
 							{
-								Log.Error("Unable to perform OCR. Exit code: " + P.ExitCode.ToString());
+								string ErrorText = await P.StandardError.ReadToEndAsync();
+								Log.Error("Unable to perform OCR. Exit code: " + P.ExitCode.ToString() + "\r\n\r\n" + ErrorText);
 								ResultSource.TrySetResult(null);
 							}
 							else

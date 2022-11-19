@@ -64,6 +64,22 @@
             Treat the image as a single character.
             </summary>
         </member>
+        <member name="F:Waher.WebService.Tesseract.PageSegmentationMode.SparseText">
+            <summary>
+            Sparse text. Find as much text as possible in no particular order.
+            </summary>
+        </member>
+        <member name="F:Waher.WebService.Tesseract.PageSegmentationMode.SparseTextWithOsd">
+            <summary>
+            Sparse text with OSD.
+            </summary>
+        </member>
+        <member name="F:Waher.WebService.Tesseract.PageSegmentationMode.RawLine">
+            <summary>
+            Raw line. Treat the image as a single text line,
+            bypassing hacks that are Tesseract-specific.
+            </summary>
+        </member>
         <member name="T:Waher.WebService.Tesseract.TesseractApi">
             <summary>
             Class providing a web API for OCR using Tesseract, installed on the server.
@@ -82,6 +98,16 @@
         <member name="M:Waher.WebService.Tesseract.TesseractApi.Stop">
             <summary>
             Stops the module.
+            </summary>
+        </member>
+        <member name="P:Waher.WebService.Tesseract.TesseractApi.ExecutablePath">
+            <summary>
+            Path of executable file.
+            </summary>
+        </member>
+        <member name="F:Waher.WebService.Tesseract.TesseractApi.ImagesPath">
+            <summary>
+            Path to folder with images.
             </summary>
         </member>
         <member name="M:Waher.WebService.Tesseract.TesseractApi.SetInstallationPaths(System.String,System.String)">
@@ -104,6 +130,16 @@
             Searches for the installation folder on the local machine.
             </summary>
             <returns>Installation folder, if found, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.WebService.Tesseract.TesseractApi.PerformOcr(System.Byte[],System.String,System.Nullable{Waher.WebService.Tesseract.PageSegmentationMode},System.String)">
+            <summary>
+            Performs OCR on an image.
+            </summary>
+            <param name="Image">Binary representation of image.</param>
+            <param name="ContentType">Content-Type of image representation.</param>
+            <param name="PageSegmentationMode">Optional Page segmentation mode.</param>
+            <param name="Language">Optional language.</param>
+            <returns>Decoded text.</returns>
         </member>
     </members>
 </doc>

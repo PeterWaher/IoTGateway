@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Data\100_pass2-uto.jpg" />
+    <None Remove="Data\MRZ.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Data\MRZ.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\100_pass2-uto.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.1.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.1.0" />
+    <PackageReference Include="coverlet.collector" Version="1.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Images\Waher.Content.Images.csproj" />
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
+    <ProjectReference Include="..\..\Events\Waher.Events.Console\Waher.Events.Console.csproj" />
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\Waher.WebService.Tesseract\Waher.WebService.Tesseract.csproj" />
+  </ItemGroup>
+
+</Project>

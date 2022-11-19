@@ -58,6 +58,22 @@
 		/// <summary>
 		/// Treat the image as a single character.
 		/// </summary>
-		SingleCharacter = 10
+		SingleCharacter = 10,
+
+		/// <summary>
+		/// Sparse text. Find as much text as possible in no particular order.
+		/// </summary>
+		SparseText = 11,
+
+		/// <summary>
+		/// Sparse text with OSD.
+		/// </summary>
+		SparseTextWithOsd = 12,
+
+		/// <summary>
+		/// Raw line. Treat the image as a single text line,
+		/// bypassing hacks that are Tesseract-specific.
+		/// </summary>
+		RawLine = 13
 	}
 }

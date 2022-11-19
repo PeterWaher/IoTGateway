@@ -496,3 +496,9 @@ The [WebServices](WebServices) folder contains modules that add web service capa
 |--------------------------------|--------------|-------|---------------------|
 | **Waher.WebService.Script**    | .NET Std 2.0 |       | The [Waher.WebService.Script](WebServices/Waher.WebService.Script) project provides a web service that can be used to execute script on the server, from the client. |
 | **Waher.WebService.Tesseract** | .NET Std 2.0 |       | The [Waher.WebService.Tesseract](WebServices/Waher.WebService.Tesseract) project provides a web service that can act as a gateway to [Tesseract](https://tesseract-ocr.github.io/tessdoc/Downloads.html), installed on the server. |
+
+The folder also contains the following unit test projects:
+
+| Project                             | Type          | Project description |
+|-------------------------------------|---------------|---------------------|
+| **Waher.Webservice.Tesseract.Test** | .NET Core 3.1 | The [Waher.Security.SPF.Test](Security/Waher.Security.SPF.Test) project contains unit tests for the  [Waher.Security.SPF](Security/Waher.Security.SPF) project. |

@@ -208,7 +208,7 @@ namespace Waher.Content.Markdown.GraphViz
 				return null; // Folder not defined for the operating system.
 			}
 
-			if (String.IsNullOrEmpty(Folder))
+			if (string.IsNullOrEmpty(Folder))
 				return null;
 
 			if (!Directory.Exists(Folder))

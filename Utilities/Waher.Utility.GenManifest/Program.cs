@@ -181,7 +181,7 @@ namespace Waher.Utility.GenManifest
 					return 0;
 				}
 
-				if (AssemblyFolderNames.Count == 0)
+				if (AssemblyFolderNames.Count + ContentFolderNames.Count + ProgramFolders.Count == 0)
 					throw new Exception("No file folders provided.");
 
 				if (string.IsNullOrEmpty(OutputFileName))

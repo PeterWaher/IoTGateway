@@ -112,6 +112,7 @@ namespace Waher.WebService.Tesseract
 		/// Sets the installation folder of Tesseract.
 		/// </summary>
 		/// <param name="ExePath">Path to executable file.</param>
+		/// <param name="ImagesFolder">Optional path to folder hosting images.</param>
 		/// <exception cref="Exception">If trying to set the installation folder to a different folder than the one set previously.
 		/// The folder can only be set once, for security reasons.</exception>
 		public static void SetInstallationPaths(string ExePath, string ImagesFolder)

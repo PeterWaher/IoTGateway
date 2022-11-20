@@ -510,15 +510,19 @@
 	<Assembly fileName='Waher.Utility.DeleteDB.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.DeleteDB\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.DeleteDB.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.DeleteDB\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.DeleteDB.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.DeleteDB\bin\Release\PublishOutput\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Transform.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutput\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Transform.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutput\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Transform.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutput\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Transform.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.ExStat.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.ExStat.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.ExStat.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.ExStat.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.ExStat\bin\Release\PublishOutput\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Install.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Extract.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Extract\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Extract.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Extract\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Extract.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Extract\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Extract.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Extract\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.GenManifest.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.GenManifest\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.GenManifest.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.GenManifest\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.GenManifest.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.GenManifest\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.GenManifest.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.GenManifest\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Install.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.Install.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.Install.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.Install.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Install\bin\Release\PublishOutput\win-x86\'/>
@@ -526,12 +530,24 @@
 	<Assembly fileName='Waher.Utility.RegEx.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.RegEx.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.RegEx.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.RegEx\bin\Release\PublishOutput\win-x86\'/>
-	<Assembly fileName='Waher.Utility.Sign.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.RunScript.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.RunScript\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.RunScript.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.RunScript\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.RunScript.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.RunScript\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.RunScript.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.RunScript\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Sign.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.Sign.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.Sign.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutput\win-x86\'/>
 	<Assembly fileName='Waher.Utility.Sign.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Sign\bin\Release\PublishOutput\win-x86\'/>
-	<!-- Content files merged from Waher.IoTGateway and Waher.IoTGateway.Resources, as well as built-in themes and module language files. -->
-	<Folder name="Default">
+  <Assembly fileName='Waher.Utility.Transform.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Transform.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Transform.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Transform.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Transform\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Translate.exe' altFolder='..\..\..\..\Utilities\Waher.Utility.Translate\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Translate.dll' altFolder='..\..\..\..\Utilities\Waher.Utility.Translate\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Translate.deps.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Translate\bin\Release\PublishOutput\win-x86\'/>
+  <Assembly fileName='Waher.Utility.Translate.runtimeconfig.json' altFolder='..\..\..\..\Utilities\Waher.Utility.Translate\bin\Release\PublishOutput\win-x86\'/>
+  <!-- Content files merged from Waher.IoTGateway and Waher.IoTGateway.Resources, as well as built-in themes and module language files. -->
+  <Folder name="Default">
 		<Content fileName="400.md"/>
 		<Content fileName="401.md"/>
 		<Content fileName="403.md"/>

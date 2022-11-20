@@ -24,6 +24,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Root\Tesseract\Api.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Root\Tesseract\Api.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\..\Images\Icon_64x64.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

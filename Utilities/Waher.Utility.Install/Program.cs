@@ -13,6 +13,7 @@ using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Security.SHA3;
+using static System.Environment;
 
 namespace Waher.Utility.Install
 {
@@ -381,7 +382,7 @@ namespace Waher.Utility.Install
 				if (i < 0)
 					DepsJsonFileName = ServerApplication;
 				else
-					DepsJsonFileName = ServerApplication.Substring(0, i);
+					DepsJsonFileName = ServerApplication[..i];
 
 				DepsJsonFileName += ".deps.json";
 
@@ -411,7 +412,7 @@ namespace Waher.Utility.Install
 
 			Log.Informational("Validating manifest file.");
 
-			XmlSchema Schema = XSL.LoadSchema(typeof(Program).Namespace + ".Schema.Manifest.xsd", Assembly.GetExecutingAssembly());
+			XmlSchema Schema = XSL.LoadSchema(typeof(Program).Namespace + ".Schema.ModuleManifest.xsd", Assembly.GetExecutingAssembly());
 			XSL.Validate(ManifestFile, Manifest, "Module", "http://waher.se/Schema/ModuleManifest.xsd", Schema);
 
 			XmlElement Module = Manifest["Module"];
@@ -627,6 +628,36 @@ namespace Waher.Utility.Install
 
 							CopyContent(SourceFolder2, AppFolder2, DataFolder2, E);
 							break;
+
+						case "File":
+							(FileName, SourceFileName) = GetFileName(E, SourceFolder);
+
+							Log.Informational("External program file: " + FileName);
+
+							if (!string.IsNullOrEmpty(AppFolder) && !Directory.Exists(AppFolder))
+							{
+								Log.Informational("Creating folder " + AppFolder + ".");
+								Directory.CreateDirectory(AppFolder);
+							}
+
+							CopyFileIfNewer(SourceFileName, Path.Combine(AppFolder, FileName), null, false);
+							break;
+
+						case "External":
+							SpecialFolder SpecialFolder = XML.Attribute(E, "folder", SpecialFolder.ProgramFiles);
+							Name = XML.Attribute(E, "name");
+							
+							SourceFolder2 = Path.Combine(SourceFolder, Name);
+							AppFolder2 = Path.Combine(Environment.GetFolderPath(SpecialFolder), Name);
+							DataFolder2 = Path.Combine(DataFolder, Name);
+
+							Log.Informational("Folder: " + Name,
+								new KeyValuePair<string, object>("Source", SourceFolder2),
+								new KeyValuePair<string, object>("App", AppFolder2),
+								new KeyValuePair<string, object>("Data", DataFolder2));
+
+							CopyContent(SourceFolder2, AppFolder2, DataFolder2, E);
+							break;
 					}
 				}
 			}
@@ -671,7 +702,7 @@ namespace Waher.Utility.Install
 				if (i < 0)
 					DepsJsonFileName = ServerApplication;
 				else
-					DepsJsonFileName = ServerApplication.Substring(0, i);
+					DepsJsonFileName = ServerApplication[..i];
 
 				DepsJsonFileName += ".deps.json";
 
@@ -701,7 +732,7 @@ namespace Waher.Utility.Install
 
 			Log.Informational("Validating manifest file.");
 
-			XmlSchema Schema = XSL.LoadSchema(typeof(Program).Namespace + ".Schema.Manifest.xsd", Assembly.GetExecutingAssembly());
+			XmlSchema Schema = XSL.LoadSchema(typeof(Program).Namespace + ".Schema.ModuleManifest.xsd", Assembly.GetExecutingAssembly());
 			XSL.Validate(ManifestFile, Manifest, "Module", "http://waher.se/Schema/ModuleManifest.xsd", Schema);
 
 			XmlElement Module = Manifest["Module"];
@@ -801,10 +832,6 @@ namespace Waher.Utility.Install
 				throw new Exception("Missing package file.");
 
 			string LocalName = Path.GetFileName(PackageFile);
-			string PackageFolder = Path.GetDirectoryName(PackageFile);
-			if (string.IsNullOrEmpty(PackageFolder))
-				PackageFolder = Directory.GetCurrentDirectory();
-
 			SHAKE256 H = new SHAKE256(384);
 			byte[] Digest = H.ComputeVariable(Encoding.UTF8.GetBytes(LocalName + ":" + Key + ":" + typeof(Program).Namespace));
 			byte[] AesKey = new byte[32];
@@ -858,7 +885,7 @@ namespace Waher.Utility.Install
 
 					Log.Informational("Validating manifest file.");
 
-					XmlSchema Schema = XSL.LoadSchema(typeof(Program).Namespace + ".Schema.Manifest.xsd", Assembly.GetExecutingAssembly());
+					XmlSchema Schema = XSL.LoadSchema(typeof(Program).Namespace + ".Schema.ModuleManifest.xsd", Assembly.GetExecutingAssembly());
 					XSL.Validate(ManifestFile, Manifest, "Module", "http://waher.se/Schema/ModuleManifest.xsd", Schema);
 
 					XmlElement Module = Manifest["Module"];
@@ -886,7 +913,7 @@ namespace Waher.Utility.Install
 						}
 					}
 
-					CopyContent(SourceFolder, Compressed, PackageFolder, string.Empty, Module);
+					CopyContent(SourceFolder, Compressed, string.Empty, Module);
 				}
 
 				Compressed.WriteByte(0);
@@ -985,7 +1012,7 @@ namespace Waher.Utility.Install
 			return (byte)i;
 		}
 
-		private static void CopyContent(string SourceFolder, Stream Output, string PackageFolder, string RelativeFolder, XmlElement Parent)
+		private static void CopyContent(string SourceFolder, Stream Output, string RelativeFolder, XmlElement Parent)
 		{
 			foreach (XmlNode N in Parent.ChildNodes)
 			{
@@ -1013,7 +1040,34 @@ namespace Waher.Utility.Install
 								new KeyValuePair<string, object>("Source", SourceFolder2),
 								new KeyValuePair<string, object>("Relative", RelativeFolder2));
 
-							CopyContent(SourceFolder2, Output, PackageFolder, RelativeFolder2, E);
+							CopyContent(SourceFolder2, Output, RelativeFolder2, E);
+							break;
+
+						case "File":
+							(FileName, SourceFileName) = GetFileName(E, SourceFolder);
+
+							Log.Informational("External program file: " + FileName);
+
+							RelativePath = Path.Combine(RelativeFolder, FileName);
+							CopyFile(5, SourceFileName, RelativePath, Output);
+							break;
+
+						case "External":
+							SpecialFolder SpecialFolder = XML.Attribute(E, "folder", SpecialFolder.ProgramFiles);
+							Name = XML.Attribute(E, "name");
+
+							Output.WriteByte(6);
+							WriteBin(Encoding.UTF8.GetBytes(SpecialFolder.ToString()), Output);
+							WriteBin(Encoding.UTF8.GetBytes(Name), Output);
+
+							SourceFolder2 = Path.Combine(Environment.GetFolderPath(SpecialFolder), Name);
+							RelativeFolder2 = string.IsNullOrEmpty(RelativeFolder) ? Name : RelativeFolder + Path.DirectorySeparatorChar + Name;
+
+							Log.Informational("Folder: " + Name,
+								new KeyValuePair<string, object>("Source", SourceFolder2),
+								new KeyValuePair<string, object>("Relative", RelativeFolder2));
+
+							CopyContent(SourceFolder2, Output, RelativeFolder2, E);
 							break;
 					}
 				}
@@ -1088,7 +1142,7 @@ namespace Waher.Utility.Install
 				if (i < 0)
 					DepsJsonFileName = ServerApplication;
 				else
-					DepsJsonFileName = ServerApplication.Substring(0, i);
+					DepsJsonFileName = ServerApplication[..i];
 
 				DepsJsonFileName += ".deps.json";
 
@@ -1153,135 +1207,157 @@ namespace Waher.Utility.Install
 
 				string SourceFolder = Path.GetDirectoryName(PackageFile);
 				string AppFolder = Path.GetDirectoryName(ServerApplication);
+				string ExternalFolder = AppFolder;
 
 				Log.Informational("Source folder: " + SourceFolder);
 				Log.Informational("App folder: " + AppFolder);
 
 				while ((b = ReadByte(Decompressed)) != 0)
 				{
-					string RelativeName = Encoding.UTF8.GetString(ReadBin(Decompressed));
-					FileAttributes Attr = (FileAttributes)ReadVarLenUInt(Decompressed);
-					DateTime CreationTimeUtc = new DateTime((long)ReadVarLenUInt(Decompressed));
-					DateTime LastAccessTimeUtc = new DateTime((long)ReadVarLenUInt(Decompressed));
-					DateTime LastWriteTimeUtc = new DateTime((long)ReadVarLenUInt(Decompressed));
-					ulong Bytes = ReadVarLenUInt(Decompressed);
-					string FileName;
-
-					switch (b)
+					if (b == 6) // External application
 					{
-						case 1: // Program file in installation folder, not assembly file
-						case 2: // Assembly file
-							if (ContentOnly || b == 1)
-							SkipBytes(Decompressed, Bytes, Buffer);
-							else
-							{
-								FileName = Path.Combine(AppFolder, RelativeName);
+						string SpecialFolderName = Encoding.UTF8.GetString(ReadBin(Decompressed));
+						string FolderName = Encoding.UTF8.GetString(ReadBin(Decompressed));
 
-								if (b == 1)
-									Log.Informational("Application file: " + FileName);
+						ExternalFolder = Path.Combine(Environment.GetFolderPath(
+							Enum.Parse<SpecialFolder>(SpecialFolderName)), FolderName);
+
+						if (!Directory.Exists(ExternalFolder))
+							Directory.CreateDirectory(ExternalFolder);
+					}
+					else
+					{
+						string RelativeName = Encoding.UTF8.GetString(ReadBin(Decompressed));
+						FileAttributes Attr = (FileAttributes)ReadVarLenUInt(Decompressed);
+						DateTime CreationTimeUtc = new DateTime((long)ReadVarLenUInt(Decompressed));
+						DateTime LastAccessTimeUtc = new DateTime((long)ReadVarLenUInt(Decompressed));
+						DateTime LastWriteTimeUtc = new DateTime((long)ReadVarLenUInt(Decompressed));
+						ulong Bytes = ReadVarLenUInt(Decompressed);
+						string FileName;
+
+						switch (b)
+						{
+							case 1: // Program file in installation folder, not assembly file
+							case 2: // Assembly file
+								if (ContentOnly || b == 1)
+									SkipBytes(Decompressed, Bytes, Buffer);
 								else
-									Log.Informational("Assembly file: " + FileName);
-
-								CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
-
-								if (b == 2)
 								{
-									Assembly A;
+									FileName = Path.Combine(AppFolder, RelativeName);
 
-									try
-									{
-										A = Assembly.LoadFrom(FileName);
-									}
-									catch (Exception)
-									{
-										break;  // Ignore. Not a valid assembly that needs to be registered in the deps.json file.
-									}
+									if (b == 1)
+										Log.Informational("Application file: " + FileName);
+									else
+										Log.Informational("Assembly file: " + FileName);
 
-									AssemblyName AN = A.GetName();
+									CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
 
-									if (Deps != null &&
-										Deps.TryGetValue("targets", out object Obj) &&
-										Obj is Dictionary<string, object> Targets)
+									if (b == 2)
 									{
-										foreach (KeyValuePair<string, object> P in Targets)
+										Assembly A;
+
+										try
 										{
-											if (P.Value is Dictionary<string, object> Target)
+											A = Assembly.LoadFrom(FileName);
+										}
+										catch (Exception)
+										{
+											break;  // Ignore. Not a valid assembly that needs to be registered in the deps.json file.
+										}
+
+										AssemblyName AN = A.GetName();
+
+										if (Deps != null &&
+											Deps.TryGetValue("targets", out object Obj) &&
+											Obj is Dictionary<string, object> Targets)
+										{
+											foreach (KeyValuePair<string, object> P in Targets)
 											{
-												foreach (KeyValuePair<string, object> P2 in Target)
+												if (P.Value is Dictionary<string, object> Target)
 												{
-													if (P2.Key.StartsWith(ServerName.Name + "/") &&
-														P2.Value is Dictionary<string, object> App &&
-														App.TryGetValue("dependencies", out object Obj2) &&
-														Obj2 is Dictionary<string, object> Dependencies)
+													foreach (KeyValuePair<string, object> P2 in Target)
 													{
-														Dependencies[AN.Name] = AN.Version.ToString();
-														break;
+														if (P2.Key.StartsWith(ServerName.Name + "/") &&
+															P2.Value is Dictionary<string, object> App &&
+															App.TryGetValue("dependencies", out object Obj2) &&
+															Obj2 is Dictionary<string, object> Dependencies)
+														{
+															Dependencies[AN.Name] = AN.Version.ToString();
+															break;
+														}
 													}
-												}
 
-												Dictionary<string, object> Dependencies2 = new Dictionary<string, object>();
+													Dictionary<string, object> Dependencies2 = new Dictionary<string, object>();
 
-												foreach (AssemblyName Dependency in A.GetReferencedAssemblies())
-													Dependencies2[Dependency.Name] = Dependency.Version.ToString();
+													foreach (AssemblyName Dependency in A.GetReferencedAssemblies())
+														Dependencies2[Dependency.Name] = Dependency.Version.ToString();
 
-												Dictionary<string, object> Runtime = new Dictionary<string, object>()
+													Dictionary<string, object> Runtime = new Dictionary<string, object>()
 												{
 													{ Path.GetFileName(FileName), new Dictionary<string,object>() }
 												};
 
-												Target[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
+													Target[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
 												{
 													{ "dependencies", Dependencies2 },
 													{ "runtime", Runtime }
 												};
+												}
 											}
 										}
-									}
 
-									if (Deps != null &&
-										Deps.TryGetValue("libraries", out object Obj3) &&
-										Obj3 is Dictionary<string, object> Libraries)
-									{
-										foreach (KeyValuePair<string, object> P in Libraries)
+										if (Deps != null &&
+											Deps.TryGetValue("libraries", out object Obj3) &&
+											Obj3 is Dictionary<string, object> Libraries)
 										{
-											if (P.Key.StartsWith(AN.Name + "/"))
+											foreach (KeyValuePair<string, object> P in Libraries)
 											{
-												Libraries.Remove(P.Key);
-												break;
+												if (P.Key.StartsWith(AN.Name + "/"))
+												{
+													Libraries.Remove(P.Key);
+													break;
+												}
 											}
-										}
 
-										Libraries[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
+											Libraries[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
 										{
 											{ "type", "project" },
 											{ "serviceable", false },
 											{ "sha512", string.Empty }
 										};
+										}
 									}
 								}
-							}
-							break;
+								break;
 
-						case 3: // Content file (copy if newer)
-						case 4: // Content file (always copy)
-							bool OnlyIfNewer = b == 3;
+							case 3: // Content file (copy if newer)
+							case 4: // Content file (always copy)
+								bool OnlyIfNewer = b == 3;
 
-							FileName = Path.Combine(AppFolder, RelativeName);
-							Log.Informational("Content file: " + FileName);
-
-							CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
-
-							using (FileStream TempFile = File.OpenRead(FileName))
-							{
-								FileName = Path.Combine(ProgramDataFolder, RelativeName);
+								FileName = Path.Combine(AppFolder, RelativeName);
 								Log.Informational("Content file: " + FileName);
 
-								CopyFile(TempFile, FileName, OnlyIfNewer, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
-							}
-							break;
+								CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
 
-						default:
-							throw new Exception("Invalid package file.");
+								using (FileStream TempFile = File.OpenRead(FileName))
+								{
+									FileName = Path.Combine(ProgramDataFolder, RelativeName);
+									Log.Informational("Content file: " + FileName);
+
+									CopyFile(TempFile, FileName, OnlyIfNewer, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
+								}
+								break;
+
+							case 5: // External application file
+								FileName = Path.Combine(ExternalFolder, RelativeName);
+								Log.Informational("External file: " + FileName);
+
+								CopyFile(Decompressed, FileName, false, Bytes, Attr, CreationTimeUtc, LastAccessTimeUtc, LastWriteTimeUtc, Buffer);
+								break;
+
+							default:
+								throw new Exception("Invalid package file.");
+						}
 					}
 				}
 
@@ -1433,7 +1509,7 @@ namespace Waher.Utility.Install
 				if (i < 0)
 					DepsJsonFileName = ServerApplication;
 				else
-					DepsJsonFileName = ServerApplication.Substring(0, i);
+					DepsJsonFileName = ServerApplication[..i];
 
 				DepsJsonFileName += ".deps.json";
 
@@ -1502,84 +1578,93 @@ namespace Waher.Utility.Install
 
 				while ((b = ReadByte(Decompressed)) != 0)
 				{
-					string RelativeName = Encoding.UTF8.GetString(ReadBin(Decompressed));
-					ReadVarLenUInt(Decompressed);
-					ReadVarLenUInt(Decompressed);
-					ReadVarLenUInt(Decompressed);
-					ReadVarLenUInt(Decompressed);
-					ulong Bytes = ReadVarLenUInt(Decompressed);
-					string FileName;
-
-					SkipBytes(Decompressed, Bytes, Buffer);
-
-					switch (b)
+					if (b == 6)
 					{
-						case 1: // Program file in installation folder, not assembly file
-						case 2: // Assembly file
-							if (!ContentOnly || b == 1)
-							{
-								FileName = Path.Combine(AppFolder, RelativeName);
+						ReadBin(Decompressed);
+						ReadBin(Decompressed);
+					}
+					else
+					{
+						string RelativeName = Encoding.UTF8.GetString(ReadBin(Decompressed));
+						ReadVarLenUInt(Decompressed);
+						ReadVarLenUInt(Decompressed);
+						ReadVarLenUInt(Decompressed);
+						ReadVarLenUInt(Decompressed);
+						ulong Bytes = ReadVarLenUInt(Decompressed);
+						string FileName;
 
-								if (b == 2)
+						SkipBytes(Decompressed, Bytes, Buffer);
+
+						switch (b)
+						{
+							case 1: // Program file in installation folder, not assembly file
+							case 2: // Assembly file
+								if (!ContentOnly || b == 1)
 								{
-									Assembly A = Assembly.LoadFrom(FileName);
-									AssemblyName AN = A.GetName();
-									Key = AN.Name + "/" + AN.Version.ToString();
+									FileName = Path.Combine(AppFolder, RelativeName);
 
-									if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+									if (b == 2)
 									{
-										Targets.Remove(Key);
+										Assembly A = Assembly.LoadFrom(FileName);
+										AssemblyName AN = A.GetName();
+										Key = AN.Name + "/" + AN.Version.ToString();
 
-										foreach (KeyValuePair<string, object> P in Targets)
+										if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
 										{
-											if (P.Value is Dictionary<string, object> Target)
+											Targets.Remove(Key);
+
+											foreach (KeyValuePair<string, object> P in Targets)
 											{
-												foreach (KeyValuePair<string, object> P2 in Target)
+												if (P.Value is Dictionary<string, object> Target)
 												{
-													if (P2.Key.StartsWith(ServerName.Name + "/") &&
-														P2.Value is Dictionary<string, object> App &&
-														App.TryGetValue("dependencies", out object Obj2) &&
-														Obj2 is Dictionary<string, object> Dependencies)
+													foreach (KeyValuePair<string, object> P2 in Target)
 													{
-														Dependencies.Remove(AN.Name);
-														break;
+														if (P2.Key.StartsWith(ServerName.Name + "/") &&
+															P2.Value is Dictionary<string, object> App &&
+															App.TryGetValue("dependencies", out object Obj2) &&
+															Obj2 is Dictionary<string, object> Dependencies)
+														{
+															Dependencies.Remove(AN.Name);
+															break;
+														}
 													}
+												}
+											}
+										}
+
+										if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+										{
+											foreach (KeyValuePair<string, object> P in Libraries)
+											{
+												if (P.Key.StartsWith(AN.Name + "/"))
+												{
+													Libraries.Remove(P.Key);
+													break;
 												}
 											}
 										}
 									}
 
-									if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+									if (Remove)
 									{
-										foreach (KeyValuePair<string, object> P in Libraries)
+										RemoveFile(FileName);
+										if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
 										{
-											if (P.Key.StartsWith(AN.Name + "/"))
-											{
-												Libraries.Remove(P.Key);
-												break;
-											}
+											string PdbFileName = FileName[0..^4] + ".pdb";
+											RemoveFile(PdbFileName);
 										}
 									}
 								}
+								break;
 
-								if (Remove)
-								{
-									RemoveFile(FileName);
-									if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
-									{
-										string PdbFileName = FileName[0..^4] + ".pdb";
-										RemoveFile(PdbFileName);
-									}
-								}
-							}
-							break;
+							case 3: // Content file (copy if newer)
+							case 4: // Content file (always copy)
+							case 5:	// External file
+								break;
 
-						case 3: // Content file (copy if newer)
-						case 4: // Content file (always copy)
-							break;
-
-						default:
-							throw new Exception("Invalid package file.");
+							default:
+								throw new Exception("Invalid package file.");
+						}
 					}
 				}
 

@@ -808,6 +808,9 @@ namespace Waher.IoTGateway.Installers
         {
             // Same code as for custom action InstallManifest in Waher.IoTGateway.Installers, except:
             // * Content files can already be installed in the corresponding application data folder.
+            // * Content-Only installations not supported.
+            // * No Schema validation of manifest files performed.
+            // * Logging is done to session, instead of event log.
 
             if (string.IsNullOrEmpty(ManifestFile))
                 throw new Exception("Missing manifest file.");
@@ -854,7 +857,10 @@ namespace Waher.IoTGateway.Installers
 
             Session.Log("Loading manifest file.");
 
-            XmlDocument Manifest = new XmlDocument();
+            XmlDocument Manifest = new XmlDocument()
+			{
+				PreserveWhitespace = true
+			};
             Manifest.Load(ManifestFile);
 
             XmlElement Module = Manifest["Module"];
@@ -1009,8 +1015,8 @@ namespace Waher.IoTGateway.Installers
 
         private enum CopyOptions
         {
-            IfNewer = 2,
-            Always = 3
+            IfNewer,
+            Always
         }
 
         private static void CopyContent(Session Session, string SourceFolder, string AppFolder, string DataFolder, XmlElement Parent)
@@ -1079,8 +1085,56 @@ namespace Waher.IoTGateway.Installers
 
                             CopyContent(Session, SourceFolder2, AppFolder2, DataFolder2, E);
                             break;
-                    }
-                }
+
+						case "File":
+							try
+							{
+								FileNames = GetFileName(E, SourceFolder);
+							}
+							catch (FileNotFoundException)
+							{
+								// Already installed.
+								break;
+							}
+
+							FileName = FileNames.Key;
+							SourceFileName = FileNames.Value;
+
+							Session.Log("External program file: " + FileName);
+
+							if (!string.IsNullOrEmpty(AppFolder) && !Directory.Exists(AppFolder))
+							{
+								Session.Log("Creating folder " + AppFolder + ".");
+								Directory.CreateDirectory(AppFolder);
+							}
+
+							try
+							{
+                                CopyFileIfNewer(Session, SourceFileName, Path.Combine(AppFolder, FileName), null, false);
+							}
+							catch (FileNotFoundException)
+							{
+								// Already installed by installer.
+							}
+							break;
+
+						case "External":
+							Environment.SpecialFolder SpecialFolder = XML.Attribute(E, "folder", Environment.SpecialFolder.ProgramFiles);
+							Name = XML.Attribute(E, "name");
+
+							SourceFolder2 = Path.Combine(SourceFolder, Name);
+							AppFolder2 = Path.Combine(Environment.GetFolderPath(SpecialFolder), Name);
+							DataFolder2 = Path.Combine(DataFolder, Name);
+
+							Session.Log("Folder: " + Name,
+								new KeyValuePair<string, object>("Source", SourceFolder2),
+								new KeyValuePair<string, object>("App", AppFolder2),
+								new KeyValuePair<string, object>("Data", DataFolder2));
+
+							CopyContent(Session, SourceFolder2, AppFolder2, DataFolder2, E);
+							break;
+					}
+				}
             }
         }
 

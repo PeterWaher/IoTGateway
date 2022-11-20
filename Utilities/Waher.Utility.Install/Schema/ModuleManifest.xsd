@@ -1,0 +1,346 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ModuleManifest"
+           targetNamespace="http://waher.se/Schema/ModuleManifest.xsd"
+           elementFormDefault="qualified"
+           xmlns="http://waher.se/Schema/ModuleManifest.xsd"
+           xmlns:mstns="http://waher.se/Schema/ModuleManifest.xsd"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="Module">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Assembly" type="Assembly" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="Content" type="Content" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="Folder" type="Folder" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="External" type="External" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="File" abstract="true">
+    <xs:annotation>
+      <xs:documentation>Defines an assembly to be registered.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="fileName" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>File name in current folder.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="altFolder" type="xs:string" use="optional">
+      <xs:annotation>
+        <xs:documentation>If the file can be retrieved from an alternative folder.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="Assembly">
+    <xs:annotation>
+      <xs:documentation>Defines an assembly to be registered.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="File"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="Content">
+    <xs:annotation>
+      <xs:documentation>Defines content to be placed in the application data folder.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="File">
+        <xs:attribute name="copy" type="CopyOptions" use="optional" default="IfNewer"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="CopyOptions">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="IfNewer"/>
+      <xs:enumeration value="Always"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="Folder">
+    <xs:annotation>
+      <xs:documentation>Defines a folder.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Content" type="Content" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="Folder" type="Folder" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="External">
+    <xs:annotation>
+      <xs:documentation>Defines an external application</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="File" type="ExternalFile" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="Folder" type="ExternalFolder" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="folder" type="SpecialFolder" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:simpleType name="SpecialFolder">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Desktop">
+        <xs:annotation>
+          <xs:documentation>The logical Desktop rather than the physical file system location.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Programs">
+        <xs:annotation>
+          <xs:documentation>The directory that contains the user's program groups.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MyDocuments">
+        <xs:annotation>
+          <xs:documentation>The My Documents folder.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Personal">
+        <xs:annotation>
+          <xs:documentation>The directory that serves as a common repository for documents.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Favorites">
+        <xs:annotation>
+          <xs:documentation>The directory that serves as a common repository for the user's favorite items.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Startup">
+        <xs:annotation>
+          <xs:documentation>The directory that corresponds to the user's Startup program group.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Recent">
+        <xs:annotation>
+          <xs:documentation>The directory that contains the user's most recently used documents.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SendTo">
+        <xs:annotation>
+          <xs:documentation>The directory that contains the Send To menu items.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="StartMenu">
+        <xs:annotation>
+          <xs:documentation>The directory that contains the Start menu items.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MyMusic">
+        <xs:annotation>
+          <xs:documentation>The My Music folder.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MyVideos">
+        <xs:annotation>
+          <xs:documentation>The file system directory that serves as a repository for videos that belong to a user. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="DesktopDirectory">
+        <xs:annotation>
+          <xs:documentation>The directory used to physically store file objects on the desktop.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MyComputer">
+        <xs:annotation>
+          <xs:documentation>The My Computer folder.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="NetworkShortcuts">
+        <xs:annotation>
+          <xs:documentation>A file system directory that contains the link objects that may exist in the My Network Places virtual folder. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Fonts">
+        <xs:annotation>
+          <xs:documentation>A virtual folder that contains fonts. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Templates">
+        <xs:annotation>
+          <xs:documentation>The directory that serves as a common repository for document templates.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommonStartMenu">
+        <xs:annotation>
+          <xs:documentation>The file system directory that contains the programs and folders that appear on the Start menu for all users. This special folder is valid only for Windows NT systems. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommonPrograms">
+        <xs:annotation>
+          <xs:documentation>A folder for components that are shared across applications. This special folder is valid only for Windows NT, Windows 2000, and Windows XP systems. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommonStartup">
+        <xs:annotation>
+          <xs:documentation>The file system directory that contains the programs that appear in the Startup folder for all users. This special folder is valid only for Windows NT systems. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommonDesktopDirectory">
+        <xs:annotation>
+          <xs:documentation>The file system directory that contains files and folders that appear on the desktop for all users. This special folder is valid only for Windows NT systems. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ApplicationData">
+        <xs:annotation>
+          <xs:documentation>The directory that serves as a common repository for application-specific data for the current roaming user.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="PrinterShortcuts">
+        <xs:annotation>
+          <xs:documentation>The file system directory that contains the link objects that can exist in the Printers virtual folder. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="LocalApplicationData">
+        <xs:annotation>
+          <xs:documentation>The directory that serves as a common repository for application-specific data that is used by the current, non-roaming user.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="InternetCache">
+        <xs:annotation>
+          <xs:documentation>The directory that serves as a common repository for temporary Internet files.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Cookies">
+        <xs:annotation>
+          <xs:documentation>The directory that serves as a common repository for Internet cookies.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="History">
+        <xs:annotation>
+          <xs:documentation>The directory that serves as a common repository for Internet history items.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommonApplicationData">
+        <xs:annotation>
+          <xs:documentation>The directory that serves as a common repository for application-specific data that is used by all users.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Windows">
+        <xs:annotation>
+          <xs:documentation>The Windows directory or SYSROOT. This corresponds to the %windir% or %SYSTEMROOT% environment variables. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="System">
+        <xs:annotation>
+          <xs:documentation>The System directory.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ProgramFiles">
+        <xs:annotation>
+          <xs:documentation>The program files directory. On a non-x86 system, ProgramFiles returns the path for non-x86 programs. To get the x86 program files directory on a non-x86 system, use the ProgramFilesX86</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="MyPictures">
+        <xs:annotation>
+          <xs:documentation>The My Pictures folder.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="UserProfile">
+        <xs:annotation>
+          <xs:documentation>The user's profile folder. Applications should not create files or folders at this level; they should put their data under the locations referred to by ApplicationData. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="SystemX86">
+        <xs:annotation>
+          <xs:documentation>The Windows System folder. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ProgramFilesX86">
+        <xs:annotation>
+          <xs:documentation>The x86 Program Files folder. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommonProgramFiles">
+        <xs:annotation>
+          <xs:documentation>The directory for components that are shared across applications. To get the x86 common program files directory on a non-x86 system, use the ProgramFilesX86 member.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommonProgramFilesX86">
+        <xs:annotation>
+          <xs:documentation>The Program Files folder. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommonTemplates">
+        <xs:annotation>
+          <xs:documentation>The file system directory that contains the templates that are available to all users. This special folder is valid only for Windows NT systems. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommonDocuments">
+        <xs:annotation>
+          <xs:documentation>The file system directory that contains documents that are common to all users. This special folder is valid for Windows NT systems, Windows 95, and Windows 98 systems with Shfolder.dll installed. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommonAdminTools">
+        <xs:annotation>
+          <xs:documentation>The file system directory that contains administrative tools for all users of the computer. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="AdminTools">
+        <xs:annotation>
+          <xs:documentation>The file system directory that is used to store administrative tools for an individual user. The Microsoft Management Console (MMC) will save customized consoles to this directory, and it will roam with the user. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommonMusic">
+        <xs:annotation>
+          <xs:documentation>The file system directory that serves as a repository for music files common to all users. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommonPictures">
+        <xs:annotation>
+          <xs:documentation>The file system directory that serves as a repository for image files common to all users. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommonVideos">
+        <xs:annotation>
+          <xs:documentation>The file system directory that serves as a repository for video files common to all users. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="Resources">
+        <xs:annotation>
+          <xs:documentation>The file system directory that contains resource data. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="LocalizedResources">
+        <xs:annotation>
+          <xs:documentation>The file system directory that contains localized resource data. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CommonOemLinks">
+        <xs:annotation>
+          <xs:documentation>This value is recognized in Windows Vista for backward compatibility, but the special folder itself is no longer used. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="CDBurning">
+        <xs:annotation>
+          <xs:documentation>The file system directory that acts as a staging area for files waiting to be written to a CD. Added in the .NET Framework 4.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="ExternalFile">
+    <xs:annotation>
+      <xs:documentation>Defines a file in an external application.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="File"/>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ExternalFolder">
+    <xs:annotation>
+      <xs:documentation>Defines an external folder.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="File" type="ExternalFile" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="Folder" type="ExternalFolder" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+</xs:schema>

@@ -27,7 +27,7 @@
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Schema\Manifest.xsd" />
+    <None Remove="Schema\ModuleManifest.xsd" />
     <None Remove="Waher.Utility.Install.manifest" />
     <Content Include="Waher.Utility.Install.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -42,7 +42,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Schema\Manifest.xsd" />
+    <EmbeddedResource Include="Schema\ModuleManifest.xsd" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />

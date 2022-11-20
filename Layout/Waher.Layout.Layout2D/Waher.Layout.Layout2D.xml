@@ -67,7 +67,7 @@
         </member>
         <member name="F:Waher.Layout.Layout2D.Layout2DDocument.Namespace">
             <summary>
-            http://waher.se/Layout/Layout2D.xsd
+            http://waher.se/Schema/Layout2D.xsd
             </summary>
         </member>
         <member name="F:Waher.Layout.Layout2D.Layout2DDocument.SchemaResourceName">

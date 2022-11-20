@@ -520,7 +520,7 @@ namespace Waher.Content.Markdown.Consolidation
 							{
 								Markdown.AppendLine();
 								Markdown.AppendLine("```layout");
-								Markdown.AppendLine("<Layout2D xmlns=\"http://waher.se/Layout/Layout2D.xsd\"");
+								Markdown.AppendLine("<Layout2D xmlns=\"http://waher.se/Schema/Layout2D.xsd\"");
 								Markdown.AppendLine("background=\"WhiteBackground\" pen=\"BlackPen\"");
 								Markdown.AppendLine("font=\"Text\" textColor=\"Black\">");
 								Markdown.AppendLine("<SolidPen id=\"BlackPen\" color=\"Black\" width=\"1px\"/>");

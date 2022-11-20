@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema id="Layout2D"
-           targetNamespace="http://waher.se/Layout/Layout2D.xsd"
+           targetNamespace="http://waher.se/Schema/Layout2D.xsd"
            elementFormDefault="qualified"
-           xmlns="http://waher.se/Layout/Layout2D.xsd"
-           xmlns:mstns="http://waher.se/Layout/Layout2D.xsd"
+           xmlns="http://waher.se/Schema/Layout2D.xsd"
+           xmlns:mstns="http://waher.se/Schema/Layout2D.xsd"
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<xs:element name="Layout2D">

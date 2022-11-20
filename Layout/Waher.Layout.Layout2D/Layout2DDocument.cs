@@ -29,9 +29,9 @@ namespace Waher.Layout.Layout2D
 		public const string LocalName = "Layout2D";
 
 		/// <summary>
-		/// http://waher.se/Layout/Layout2D.xsd
+		/// http://waher.se/Schema/Layout2D.xsd
 		/// </summary>
-		public const string Namespace = "http://waher.se/Layout/Layout2D.xsd";
+		public const string Namespace = "http://waher.se/Schema/Layout2D.xsd";
 
 		/// <summary>
 		/// Schema resource name.

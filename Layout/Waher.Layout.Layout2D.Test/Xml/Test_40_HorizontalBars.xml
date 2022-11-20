@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+<Layout2D xmlns="http://waher.se/Schema/Layout2D.xsd"
           background="WhiteBackground" pen="BlackPen"
           font="WhiteText" textColor="Black">
 	<SolidPen id="BlackPen" color="Black" width="1px"/>

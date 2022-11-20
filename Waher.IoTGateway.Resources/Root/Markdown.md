@@ -757,13 +757,13 @@ different ways. The following subsections illustrate such renderings.
 
 #### 2D Layout diagrams
 
-You can make the Markdown engine transform XML that conforms to the `http://waher.se/Layout/Layout2D.xsd` namespace directly to images,
+You can make the Markdown engine transform XML that conforms to the `http://waher.se/Schema/Layout2D.xsd` namespace directly to images,
 by placing it in a code block with language **layout**. The layout namespace is defined in the `Waher.Layout.Layout2D` library. 
 
 Example of a **layout** diagram (some parts have been removed for splicity; full example here: [GitHub](https://github.com/PeterWaher/IoTGateway/blob/master/Layout/Waher.Layout.Layout2D.Test/Xml/Test_39_Stack.xml)):
 
 	```layout: Neuron architecture
-    <Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+    <Layout2D xmlns="http://waher.se/Schema/Layout2D.xsd"
               background="ThemeBackground" font="Text" textColor="Black">
       <SolidBackground id="ThemeBackground" color="{Theme.BackgroundColor}"/>
       <SolidBackground id="Core" color="{Alpha('Red',128)}"/>
@@ -815,7 +815,7 @@ Example of a **layout** diagram (some parts have been removed for splicity; full
     ```
 
 ```layout: Neuron architecture
-<Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+<Layout2D xmlns="http://waher.se/Schema/Layout2D.xsd"
           background="ThemeBackground" font="Text" textColor="Black">
     <SolidBackground id="ThemeBackground" color="{Theme.BackgroundColor}"/>
     <SolidBackground id="Core" color="{Alpha('Red',128)}"/>
@@ -1940,7 +1940,7 @@ foreach x in 1..60 do
 a 2D Layout XML document, that is then used to generate a visual image, as shown in the following example:
 
     ```async:Some statistics
-    <Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+    <Layout2D xmlns="http://waher.se/Schema/Layout2D.xsd"
               background="ThemeBackground" pen="BlackPen"
               font="Text" textColor="Black">
 	    <SolidPen id="BlackPen" color="Black" width="1px"/>
@@ -1966,7 +1966,7 @@ a 2D Layout XML document, that is then used to generate a visual image, as shown
 Is shown as
 
 ```async:Some statistics
-<Layout2D xmlns="http://waher.se/Layout/Layout2D.xsd"
+<Layout2D xmlns="http://waher.se/Schema/Layout2D.xsd"
           background="ThemeBackground" pen="BlackPen"
           font="Text" textColor="Black">
 	<SolidPen id="BlackPen" color="Black" width="1px"/>

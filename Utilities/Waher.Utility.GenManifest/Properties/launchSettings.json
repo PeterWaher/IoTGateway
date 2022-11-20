@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Waher.Utility.GenManifest": {
+      "commandName": "Project",
+      "commandLineArgs": "-p ProgramFiles Tesseract-OCR \"C:\\Program Files\\Tesseract-OCR\" -o Waher.WebService.Tesseract.manifest",
+      "workingDirectory": "C:\\My Projects\\IoTGateway\\WebServices\\Waher.WebService.Tesseract"
+    }
+  }
+}

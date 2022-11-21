@@ -352,7 +352,7 @@ namespace Waher.Utility.Install
 
 			if (string.IsNullOrEmpty(ProgramDataFolder))
 			{
-				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "IoT Gateway");
+				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder.CommonApplicationData), "IoT Gateway");
 				Log.Informational("Using default program data folder: " + ProgramDataFolder);
 			}
 
@@ -646,21 +646,42 @@ namespace Waher.Utility.Install
 						case "External":
 							SpecialFolder SpecialFolder = XML.Attribute(E, "folder", SpecialFolder.ProgramFiles);
 							Name = XML.Attribute(E, "name");
-							
-							SourceFolder2 = Path.Combine(SourceFolder, Name);
-							AppFolder2 = Path.Combine(Environment.GetFolderPath(SpecialFolder), Name);
+
+							SourceFolder2 = GetFolderPath(SpecialFolder, Name);
+							AppFolder2 = SourceFolder2;
 							DataFolder2 = Path.Combine(DataFolder, Name);
 
-							Log.Informational("Folder: " + Name,
+							Log.Informational("External Folder: " + Name,
 								new KeyValuePair<string, object>("Source", SourceFolder2),
 								new KeyValuePair<string, object>("App", AppFolder2),
-								new KeyValuePair<string, object>("Data", DataFolder2));
+								new KeyValuePair<string, object>("Data", DataFolder2),
+								new KeyValuePair<string, object>("SpecialFolder", SpecialFolder));
 
 							CopyContent(SourceFolder2, AppFolder2, DataFolder2, E);
 							break;
 					}
 				}
 			}
+		}
+
+		private static string GetFolderPath(SpecialFolder SpecialFolder, string Name)
+		{
+			string s = Environment.GetFolderPath(SpecialFolder);
+			string Result = Path.Combine(s, Name);
+
+			if (Directory.Exists(Result))
+				return Result;
+
+			if (s.EndsWith("(x86)"))
+			{
+				s = s[..^5].TrimEnd();
+				string Result2 = Path.Combine(s, Name);
+
+				if (Directory.Exists(Result2))
+					return Result2;
+			}
+
+			return Result;
 		}
 
 		private static void Uninstall(string ManifestFile, string ServerApplication, string ProgramDataFolder, bool Remove, bool ContentOnly)
@@ -1060,12 +1081,13 @@ namespace Waher.Utility.Install
 							WriteBin(Encoding.UTF8.GetBytes(SpecialFolder.ToString()), Output);
 							WriteBin(Encoding.UTF8.GetBytes(Name), Output);
 
-							SourceFolder2 = Path.Combine(Environment.GetFolderPath(SpecialFolder), Name);
+							SourceFolder2 = GetFolderPath(SpecialFolder, Name);
 							RelativeFolder2 = string.IsNullOrEmpty(RelativeFolder) ? Name : RelativeFolder + Path.DirectorySeparatorChar + Name;
 
-							Log.Informational("Folder: " + Name,
+							Log.Informational("External Folder: " + Name,
 								new KeyValuePair<string, object>("Source", SourceFolder2),
-								new KeyValuePair<string, object>("Relative", RelativeFolder2));
+								new KeyValuePair<string, object>("Relative", RelativeFolder2),
+								new KeyValuePair<string, object>("SpecialFolder", SpecialFolder));
 
 							CopyContent(SourceFolder2, Output, RelativeFolder2, E);
 							break;
@@ -1096,7 +1118,7 @@ namespace Waher.Utility.Install
 			throw new FileNotFoundException("File not found: " + AbsFileName);
 		}
 
-		private static void InstallPackage(LinkedList<KeyValuePair<string, string>> Packages, string ServerApplication, 
+		private static void InstallPackage(LinkedList<KeyValuePair<string, string>> Packages, string ServerApplication,
 			string ProgramDataFolder, bool ContentOnly)
 		{
 			foreach (KeyValuePair<string, string> Package in Packages)
@@ -1462,7 +1484,7 @@ namespace Waher.Utility.Install
 			}
 		}
 
-		private static void UninstallPackage(LinkedList<KeyValuePair<string, string>> Packages, string ServerApplication, 
+		private static void UninstallPackage(LinkedList<KeyValuePair<string, string>> Packages, string ServerApplication,
 			string ProgramDataFolder, bool Remove, bool ContentOnly)
 		{
 			foreach (KeyValuePair<string, string> Package in Packages)
@@ -1482,7 +1504,7 @@ namespace Waher.Utility.Install
 
 			if (string.IsNullOrEmpty(ProgramDataFolder))
 			{
-				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "IoT Gateway");
+				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder.CommonApplicationData), "IoT Gateway");
 				Log.Informational("Using default program data folder: " + ProgramDataFolder);
 			}
 
@@ -1659,7 +1681,7 @@ namespace Waher.Utility.Install
 
 							case 3: // Content file (copy if newer)
 							case 4: // Content file (always copy)
-							case 5:	// External file
+							case 5: // External file
 								break;
 
 							default:

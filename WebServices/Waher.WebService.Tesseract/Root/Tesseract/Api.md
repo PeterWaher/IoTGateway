@@ -33,6 +33,12 @@ Personal Data
 Any images send to the API for OCR will be stored on the gateway for up to 7 days, for troubleshooting and security
 purposes. They are automatically deleted when the time interval elapses.
 
+Free Package
+--------------
+
+The Tesseract API can be installed from the free package `Tesseract.package` with the following key:
+`AjJrr5WaqpfJoykYUQBy7jq7n/GGVHx0L8pPtl4HJzb+Fi37VN8Rh1+Oo8jhz4kA96+DhxHb7gOA72865450fe7caf4d3ebff9b91e3f7073`.
+
 
 Reference links
 ------------------

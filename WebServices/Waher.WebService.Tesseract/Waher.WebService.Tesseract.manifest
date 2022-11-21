@@ -179,6 +179,7 @@
 			<File fileName="mlt.traineddata" />
 			<File fileName="mon.traineddata" />
 			<File fileName="mri.traineddata" />
+			<File fileName="mrz.traineddata" />
 			<File fileName="msa.traineddata" />
 			<File fileName="mya.traineddata" />
 			<File fileName="nep.traineddata" />

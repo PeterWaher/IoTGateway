@@ -4,6 +4,54 @@
         <name>Waher.WebService.Tesseract</name>
     </assembly>
     <members>
+        <member name="T:Waher.WebService.Tesseract.ApiResource">
+            <summary>
+            Tesseract API Resource.
+            </summary>
+        </member>
+        <member name="M:Waher.WebService.Tesseract.ApiResource.#ctor(Waher.WebService.Tesseract.TesseractApi,System.String,Waher.Networking.HTTP.HttpAuthenticationScheme[])">
+            <summary>
+            Tesseract API Resource.
+            </summary>
+            <param name="Api">API Class.</param>
+            <param name="ResourceName">Resource name on the web server.</param>
+            <param name="AuthenticationSchemes">Authentication schemes.</param>
+        </member>
+        <member name="P:Waher.WebService.Tesseract.ApiResource.Synchronous">
+            <summary>
+            If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
+            (i.e. sends the response from another thread).
+            </summary>
+        </member>
+        <member name="P:Waher.WebService.Tesseract.ApiResource.HandlesSubPaths">
+            <summary>
+            If the resource handles sub-paths.
+            </summary>
+        </member>
+        <member name="P:Waher.WebService.Tesseract.ApiResource.UserSessions">
+            <summary>
+            If the resource uses user sessions.
+            </summary>
+        </member>
+        <member name="M:Waher.WebService.Tesseract.ApiResource.GetAuthenticationSchemes(Waher.Networking.HTTP.HttpRequest)">
+            <summary>
+            Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
+            </summary>
+            <param name="Request">Current request</param>
+        </member>
+        <member name="P:Waher.WebService.Tesseract.ApiResource.AllowsPOST">
+            <summary>
+            If the POST method is allowed.
+            </summary>
+        </member>
+        <member name="M:Waher.WebService.Tesseract.ApiResource.POST(Waher.Networking.HTTP.HttpRequest,Waher.Networking.HTTP.HttpResponse)">
+            <summary>
+            Executes the POST method on the resource.
+            </summary>
+            <param name="Request">HTTP Request</param>
+            <param name="Response">HTTP Response</param>
+            <exception cref="T:Waher.Networking.HTTP.HttpException">If an error occurred when processing the method.</exception>
+        </member>
         <member name="T:Waher.WebService.Tesseract.PageSegmentationMode">
             <summary>
             Page Segmentation Mode
@@ -110,6 +158,11 @@
             Path to folder with images.
             </summary>
         </member>
+        <member name="P:Waher.WebService.Tesseract.TesseractApi.ExeFound">
+            <summary>
+            If the Tesseract executable application was found.
+            </summary>
+        </member>
         <member name="M:Waher.WebService.Tesseract.TesseractApi.SetInstallationPaths(System.String,System.String)">
             <summary>
             Sets the installation folder of Tesseract.
@@ -131,6 +184,16 @@
             Searches for the installation folder on the local machine.
             </summary>
             <returns>Installation folder, if found, null otherwise.</returns>
+        </member>
+        <member name="M:Waher.WebService.Tesseract.TesseractApi.PerformOcr(System.Byte[],System.String,System.String,System.String)">
+            <summary>
+            Performs OCR on an image.
+            </summary>
+            <param name="Image">Binary representation of image.</param>
+            <param name="ContentType">Content-Type of image representation.</param>
+            <param name="PageSegmentationMode">Optional Page segmentation mode.</param>
+            <param name="Language">Optional language.</param>
+            <returns>Decoded text.</returns>
         </member>
         <member name="M:Waher.WebService.Tesseract.TesseractApi.PerformOcr(System.Byte[],System.String,System.Nullable{Waher.WebService.Tesseract.PageSegmentationMode},System.String)">
             <summary>

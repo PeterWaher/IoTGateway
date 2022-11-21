@@ -25,7 +25,13 @@ Performing OCR
 ----------------
 
 OCR is performed, by sending a `POST` request to `/Tesseract/Apí` with an image as content. The image will be sent to
-the Tesseract application, and the text result will be returned as plain text.
+the Tesseract application, and the text result will be returned as plain text. You can affect how OCR is performed by
+adding the following optional HTTP headers to the request:
+
+| HTTP Header | Description |
+|:------------|:------------|
+| X-LANGUAGE  | Language to expect in image. |
+| X-PSM       | Page Segmentation mode. Possible values: `DetectOrientationAndScript`, `AutomaticPageSegmentationWithOsd`, `AutomaticPageSegmentationNoOsdOrOsr`, `FullyAutomaticPageSegmentationd`, `SingleColumnOf`, `SingleUniBlockOfVerticallyAlignedText`, `SingliformBlockOfText`, `SingleLineOfText`, `SingleWord`, `SingleWordInCircle`, `SingleCharacter`, `SparseText`, `SparseTextWithOsd`, `RawLine` |
 
 Personal Data
 ----------------

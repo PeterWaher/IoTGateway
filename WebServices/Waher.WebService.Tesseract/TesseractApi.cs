@@ -2,14 +2,21 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
+using Waher.IoTGateway;
+using Waher.Networking;
+using Waher.Networking.HTTP;
+using Waher.Networking.HTTP.Authentication;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
 using Waher.Runtime.Timing;
 using Waher.Security;
+using Waher.Security.JWT;
+using Waher.Security.Users;
 
 namespace Waher.WebService.Tesseract
 {
@@ -23,12 +30,14 @@ namespace Waher.WebService.Tesseract
 
 		private static readonly Random rnd = new Random();
 		private static Scheduler scheduler = null;
+		private static ApiResource apiResource;
 		private static bool disposeScheduler = false;
 		private static string tesseractExe = null;
 		private static string tesseractFolder = null;
 		private static string tesseractDataFolder = null;
 		private static string imagesFolder = null;
 		private static bool hasImagesFolder = false;
+		private static bool exeFound = false;
 
 		/// <summary>
 		/// Class providing a web API for OCR using Tesseract, installed on the server.
@@ -47,12 +56,32 @@ namespace Waher.WebService.Tesseract
 				string ExeFolder = SearchForInstallationFolder();
 				string ImagesFolder = null;
 
-				if (Types.TryGetModuleParameter("AppData", out object Obj) && Obj is string AppDataFolder)
-					ImagesFolder = Path.Combine(AppDataFolder, FolderPrefix);
+				if (!string.IsNullOrEmpty(Gateway.AppDataFolder))
+					ImagesFolder = Path.Combine(Gateway.AppDataFolder, FolderPrefix);
+
+				if (!(Gateway.HttpServer is null))
+				{
+					List<HttpAuthenticationScheme> Schemes = new List<HttpAuthenticationScheme>();
+
+					if (Gateway.HttpServer.ClientCertificates != ClientCertificates.NotUsed)
+						Schemes.Add(new MutualTlsAuthentication(Users.Source));
+
+					if (Types.TryGetModuleParameter("JWT", out object Obj) && Obj is JwtFactory JwtFactory)
+						Schemes.Add(new JwtAuthentication(Gateway.Domain, Users.Source, JwtFactory));
+
+					Schemes.Add(new BasicAuthentication(true, 128, Gateway.Domain, Users.Source));
+					Schemes.Add(new DigestAuthentication(true, 128, DigestAlgorithm.MD5, Gateway.Domain, Users.Source));
+					Schemes.Add(new DigestAuthentication(true, 128, DigestAlgorithm.SHA256, Gateway.Domain, Users.Source));
+					Schemes.Add(new DigestAuthentication(true, 128, DigestAlgorithm.SHA3_256, Gateway.Domain, Users.Source));
+
+					apiResource = new ApiResource(this, "/Tesseract/Api", Schemes.ToArray());
+
+					Gateway.HttpServer.Register(apiResource);
+				}
 
 				if (scheduler is null)
 				{
-					if (Types.TryGetModuleParameter("Scheduler", out Obj) && Obj is Scheduler Scheduler)
+					if (Types.TryGetModuleParameter("Scheduler", out object Obj) && Obj is Scheduler Scheduler)
 					{
 						scheduler = Scheduler;
 						disposeScheduler = false;
@@ -94,6 +123,14 @@ namespace Waher.WebService.Tesseract
 				disposeScheduler = false;
 			}
 
+			if (!(apiResource is null))
+			{
+				Gateway.HttpServer.Unregister(apiResource);
+				apiResource = null;
+			}
+
+			exeFound = false;
+
 			return Task.CompletedTask;
 		}
 
@@ -106,6 +143,11 @@ namespace Waher.WebService.Tesseract
 		/// Path to folder with images.
 		/// </summary>
 		public string ImagesPath = imagesFolder;
+
+		/// <summary>
+		/// If the Tesseract executable application was found.
+		/// </summary>
+		public bool ExeFound => exeFound;
 
 		/// <summary>
 		/// Sets the installation folder of Tesseract.
@@ -124,6 +166,7 @@ namespace Waher.WebService.Tesseract
 			tesseractDataFolder = Path.Combine(tesseractFolder, "tessdata");
 			imagesFolder = ImagesFolder;
 			hasImagesFolder = !string.IsNullOrEmpty(imagesFolder);
+			exeFound = true;
 
 			if (hasImagesFolder)
 			{
@@ -257,6 +300,22 @@ namespace Waher.WebService.Tesseract
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// Performs OCR on an image.
+		/// </summary>
+		/// <param name="Image">Binary representation of image.</param>
+		/// <param name="ContentType">Content-Type of image representation.</param>
+		/// <param name="PageSegmentationMode">Optional Page segmentation mode.</param>
+		/// <param name="Language">Optional language.</param>
+		/// <returns>Decoded text.</returns>
+		public Task<string> PerformOcr(byte[] Image, string ContentType, string PageSegmentationMode, string Language)
+		{
+			if (Enum.TryParse(PageSegmentationMode, out PageSegmentationMode ParsedPageSegmentationMode))
+				return PerformOcr(Image, ContentType, ParsedPageSegmentationMode, Language);
+			else
+				return PerformOcr(Image, ContentType, (PageSegmentationMode?)null, Language);
 		}
 
 		/// <summary>

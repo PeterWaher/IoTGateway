@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
 using Waher.Content;
 using Waher.Events;
 using Waher.Runtime.Inventory;

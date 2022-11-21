@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.SymbolStore;
 using System.IO;
 using System.Reflection.Metadata;
 using System.Xml;
@@ -46,6 +47,8 @@ namespace Waher.Utility.GenManifest
 		///                       Resources, LocalizedResources, CommonOemLinks, 
 		///                       CDBurning.
 		/// -o FILENAME           File name of output manifest file.
+		/// -ef FOLDER            Exclude folders with the given name.
+		/// -ex EXTENSION         Exclude files with the given extension.
 		/// -l                    Lists available special folders, and to what
 		///                       folders on the computer they are mapped to.
 		/// -?                    Help.
@@ -60,6 +63,8 @@ namespace Waher.Utility.GenManifest
 			List<string> AssemblyFolderNames = new List<string>();
 			List<string> ContentFolderNames = new List<string>();
 			List<ProgramRec> ProgramFolders = new List<ProgramRec>();
+			Dictionary<string, bool> ExtensionsToIgnore = null;
+			Dictionary<string, bool> FoldersToIgnore = null;
 			string OutputFileName = null;
 			string s;
 			int i = 0;
@@ -134,6 +139,33 @@ namespace Waher.Utility.GenManifest
 								throw new Exception("Output file name already provided.");
 
 							OutputFileName = args[i++];
+							break;
+
+						case "-ef":
+							if (i >= c)
+								throw new Exception("Missing folder.");
+
+							if (FoldersToIgnore is null)
+								FoldersToIgnore = new Dictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
+
+							s = args[i++];
+							FoldersToIgnore[s] = true;
+							break;
+
+						case "-ex":
+							if (i >= c)
+								throw new Exception("Missing extension.");
+
+							if (ExtensionsToIgnore is null)
+								ExtensionsToIgnore = new Dictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
+
+							s = args[i++];
+							ExtensionsToIgnore[s] = true;
+
+							if (s.StartsWith("."))
+								ExtensionsToIgnore[s[1..]] = true;
+							else
+								ExtensionsToIgnore["." + s] = true;
 							break;
 
 						case "-l":
@@ -213,6 +245,8 @@ namespace Waher.Utility.GenManifest
 					Console.Out.WriteLine("                      Resources, LocalizedResources, CommonOemLinks, ");
 					Console.Out.WriteLine("                      CDBurning.");
 					Console.Out.WriteLine("-o FILENAME           File name of output manifest file.");
+					Console.Out.WriteLine("-ef FOLDER            Exclude folders with the given name.");
+					Console.Out.WriteLine("-ex EXTENSION         Exclude files with the given extension.");
 					Console.Out.WriteLine("-l                    Lists available special folders, and to what");
 					Console.Out.WriteLine("                      folders on the computer they are mapped to.");
 					Console.Out.WriteLine("-?                    Help.");
@@ -232,6 +266,9 @@ namespace Waher.Utility.GenManifest
 
 					foreach (string FileName in FileNames)
 					{
+						if (IgnoreFile(ExtensionsToIgnore, FoldersToIgnore, FileName))
+							continue;
+
 						string RelativeFileName = Path.GetRelativePath(AbsolutePath, FileName);
 						if (RelativeFileName.Contains(Path.DirectorySeparatorChar))
 							throw new Exception("Directory separators not permitted in assembly files.");
@@ -241,7 +278,7 @@ namespace Waher.Utility.GenManifest
 				}
 
 				foreach (string FolderName in ContentFolderNames)
-					OrderFiles(FolderName, ContentFiles.Folders);
+					OrderFiles(ExtensionsToIgnore, FoldersToIgnore, FolderName, ContentFiles.Folders);
 
 				XmlWriterSettings Settings = XML.WriterSettings(true, false);
 
@@ -270,7 +307,7 @@ namespace Waher.Utility.GenManifest
 							Folders = new SortedDictionary<string, FolderRec>(StringComparer.InvariantCultureIgnoreCase)
 						};
 
-						OrderFiles(Rec.Folder, ExternalFiles.Folders);
+						OrderFiles(ExtensionsToIgnore, FoldersToIgnore, Rec.Folder, ExternalFiles.Folders);
 						ExportFolder(Output, ExternalFiles.Folders, "File");
 
 						Output.WriteEndElement();
@@ -289,13 +326,56 @@ namespace Waher.Utility.GenManifest
 			}
 		}
 
-		private static void OrderFiles(string FolderName, SortedDictionary<string, FolderRec> Files)
+		private static bool IgnoreFile(Dictionary<string, bool> ExtensionsToIgnore, Dictionary<string, bool> FoldersToIgnore,
+			string FileName)
+		{
+			if (!(ExtensionsToIgnore is null))
+			{
+				string Extension = Path.GetExtension(FileName);
+
+				if (ExtensionsToIgnore.ContainsKey(Extension))
+					return true;
+			}
+
+			if (!(FoldersToIgnore is null))
+			{
+				string Directory = Path.GetDirectoryName(FileName);
+
+				if (FoldersToIgnore.ContainsKey(Directory))
+					return true;
+
+				if (Directory.EndsWith(Path.DirectorySeparatorChar))
+				{
+					Directory = Directory[..^1];
+
+					if (FoldersToIgnore.ContainsKey(Directory))
+						return true;
+				}
+
+				string[] Parts = Directory.Split(Path.DirectorySeparatorChar);
+
+				foreach (string Part in Parts)
+				{
+					if (FoldersToIgnore.ContainsKey(Part))
+						return true;
+				}
+			}
+
+			return false;
+		}
+
+		private static void OrderFiles(Dictionary<string, bool> ExtensionsToIgnore,
+			Dictionary<string, bool> FoldersToIgnore, string FolderName,
+			SortedDictionary<string, FolderRec> Files)
 		{
 			string AbsolutePath = Path.GetFullPath(FolderName);
 			string[] FileNames = Directory.GetFiles(AbsolutePath, "*.*", SearchOption.AllDirectories);
 
 			foreach (string FileName in FileNames)
 			{
+				if (IgnoreFile(ExtensionsToIgnore, FoldersToIgnore, FileName))
+					continue;
+
 				string RelativeFileName = Path.GetRelativePath(AbsolutePath, FileName);
 				string[] Parts = RelativeFileName.Split(Path.DirectorySeparatorChar);
 				FolderRec Rec = null;

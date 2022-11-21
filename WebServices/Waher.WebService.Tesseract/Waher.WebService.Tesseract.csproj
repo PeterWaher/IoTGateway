@@ -25,10 +25,14 @@
 
   <ItemGroup>
     <None Remove="Root\Tesseract\Api.md" />
+    <None Remove="Waher.WebService.Tesseract.manifest" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="Root\Tesseract\Api.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Waher.WebService.Tesseract.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

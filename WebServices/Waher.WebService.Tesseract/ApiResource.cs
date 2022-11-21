@@ -18,10 +18,9 @@ namespace Waher.WebService.Tesseract
 		/// Tesseract API Resource.
 		/// </summary>
 		/// <param name="Api">API Class.</param>
-		/// <param name="ResourceName">Resource name on the web server.</param>
 		/// <param name="AuthenticationSchemes">Authentication schemes.</param>
-		public ApiResource(TesseractApi Api, string ResourceName, params HttpAuthenticationScheme[] AuthenticationSchemes)
-			: base(ResourceName)
+		public ApiResource(TesseractApi Api, params HttpAuthenticationScheme[] AuthenticationSchemes)
+			: base("/Tesseract/Api")
 		{
 			this.api = Api;
 			this.authenticationSchemes = AuthenticationSchemes;

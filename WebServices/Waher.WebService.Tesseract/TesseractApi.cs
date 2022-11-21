@@ -74,7 +74,7 @@ namespace Waher.WebService.Tesseract
 					Schemes.Add(new DigestAuthentication(true, 128, DigestAlgorithm.SHA256, Gateway.Domain, Users.Source));
 					Schemes.Add(new DigestAuthentication(true, 128, DigestAlgorithm.SHA3_256, Gateway.Domain, Users.Source));
 
-					apiResource = new ApiResource(this, "/Tesseract/Api", Schemes.ToArray());
+					apiResource = new ApiResource(this, Schemes.ToArray());
 
 					Gateway.HttpServer.Register(apiResource);
 				}

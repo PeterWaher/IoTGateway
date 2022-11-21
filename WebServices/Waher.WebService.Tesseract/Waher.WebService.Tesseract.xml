@@ -9,12 +9,11 @@
             Tesseract API Resource.
             </summary>
         </member>
-        <member name="M:Waher.WebService.Tesseract.ApiResource.#ctor(Waher.WebService.Tesseract.TesseractApi,System.String,Waher.Networking.HTTP.HttpAuthenticationScheme[])">
+        <member name="M:Waher.WebService.Tesseract.ApiResource.#ctor(Waher.WebService.Tesseract.TesseractApi,Waher.Networking.HTTP.HttpAuthenticationScheme[])">
             <summary>
             Tesseract API Resource.
             </summary>
             <param name="Api">API Class.</param>
-            <param name="ResourceName">Resource name on the web server.</param>
             <param name="AuthenticationSchemes">Authentication schemes.</param>
         </member>
         <member name="P:Waher.WebService.Tesseract.ApiResource.Synchronous">

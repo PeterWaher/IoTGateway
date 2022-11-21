@@ -46,7 +46,10 @@
     <MSBuild Projects="..\Utilities\Waher.Utility.Translate\Waher.Utility.Translate.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
     <Exec Command="dotnet publish -o:&quot;..\Utilities\Waher.Utility.Translate\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\Utilities\Waher.Utility.Translate\Waher.Utility.Translate.csproj&quot;"/>
 
-    <MSBuild Projects="..\Waher.IoTGateway.Win32\Waher.IoTGateway.Win32.wixproj" Targets="Build" Properties="Configuration=$(Configuration);DefineSolutionProperties=false;SolutionDir=$(MSBuildThisFileDirectory)..\"/>
+		<MSBuild Projects="..\WebServices\Waher.WebService.Tesseract\Waher.WebService.Tesseract.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>
+		<Exec Command="dotnet publish -o:&quot;..\WebServices\Waher.WebService.Tesseract\bin\$(Configuration)\PublishOutput\win-x86&quot; -r win-x86 -c:$(Configuration) --self-contained:true &quot;..\WebServices\Waher.WebService.Tesseract\Waher.WebService.Tesseract.csproj&quot;"/>
+
+		<MSBuild Projects="..\Waher.IoTGateway.Win32\Waher.IoTGateway.Win32.wixproj" Targets="Build" Properties="Configuration=$(Configuration);DefineSolutionProperties=false;SolutionDir=$(MSBuildThisFileDirectory)..\"/>
     <MSBuild Projects="..\Waher.IoTGateway.Setup\Waher.IoTGateway.Setup.wixproj" Targets="Build" Properties="Configuration=$(Configuration);DefineSolutionProperties=false;SolutionDir=$(MSBuildThisFileDirectory)..\"/>
     
     <MSBuild Projects="..\Clients\Waher.Client.WPF\Waher.Client.WPF.csproj" Targets="Build" Properties="Configuration=$(Configuration)"/>

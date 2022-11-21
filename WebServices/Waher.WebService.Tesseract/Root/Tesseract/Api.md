@@ -10,7 +10,9 @@ Tesseract API
 =============================
 
 The Tesseract API allows connected clients to perform OCR operations using Tesseract on the gateway. For this to work,
-the Tesseract OCR application must be installed on the same machine as the IoT Gateway.
+the Tesseract OCR application must be installed on the same machine as the IoT Gateway. If installing the API via the
+Tesseract package, the Tesseract program application will be installed with package. Otherwise, the application can be
+downloaded via the links below, and installed manually.
 
 Authentication
 ----------------

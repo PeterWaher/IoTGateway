@@ -46,6 +46,8 @@ namespace Waher.Utility.GenManifest
 		///                       Resources, LocalizedResources, CommonOemLinks, 
 		///                       CDBurning.
 		/// -o FILENAME           File name of output manifest file.
+		/// -l                    Lists available special folders, and to what
+		///                       folders on the computer they are mapped to.
 		/// -?                    Help.
 		/// </summary>
 		static int Main(string[] args)
@@ -63,6 +65,7 @@ namespace Waher.Utility.GenManifest
 			int i = 0;
 			int c = args.Length;
 			bool Help = false;
+			bool ListSpecialFolders = false;
 
 			try
 			{
@@ -133,12 +136,45 @@ namespace Waher.Utility.GenManifest
 							OutputFileName = args[i++];
 							break;
 
+						case "-l":
+							ListSpecialFolders = true;
+							break;
+
 						case "-?":
 							Help = true;
 							break;
 
 						default:
 							throw new Exception("Unrecognized switch: " + s);
+					}
+				}
+
+				if (ListSpecialFolders)
+				{
+					SortedDictionary<string, string> Mappings = new SortedDictionary<string, string>();
+					int MaxLen = 0;
+					int Len;
+
+					foreach (Environment.SpecialFolder SpecialFolder in Enum.GetValues(typeof(Environment.SpecialFolder)))
+					{
+						string Folder = Environment.GetFolderPath(SpecialFolder);
+						string Name = SpecialFolder.ToString();
+
+						Len = Name.Length;
+						if (Len > MaxLen)
+							MaxLen = Len;
+
+						Mappings[Name] = Folder;
+					}
+
+					MaxLen += 2;
+
+					foreach (KeyValuePair<string, string> P in Mappings)
+					{
+						Console.Out.Write(P.Key);
+						Console.Out.Write(':');
+						Console.Out.Write(new string(' ', MaxLen - P.Key.Length));
+						Console.Out.WriteLine(P.Value);
 					}
 				}
 
@@ -177,6 +213,8 @@ namespace Waher.Utility.GenManifest
 					Console.Out.WriteLine("                      Resources, LocalizedResources, CommonOemLinks, ");
 					Console.Out.WriteLine("                      CDBurning.");
 					Console.Out.WriteLine("-o FILENAME           File name of output manifest file.");
+					Console.Out.WriteLine("-l                    Lists available special folders, and to what");
+					Console.Out.WriteLine("                      folders on the computer they are mapped to.");
 					Console.Out.WriteLine("-?                    Help.");
 					return 0;
 				}

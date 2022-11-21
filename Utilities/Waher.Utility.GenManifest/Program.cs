@@ -194,7 +194,7 @@ namespace Waher.Utility.GenManifest
 
 					foreach (string FileName in FileNames)
 					{
-						string RelativeFileName = Path.GetRelativePath(FileName, AbsolutePath);
+						string RelativeFileName = Path.GetRelativePath(AbsolutePath, FileName);
 						if (RelativeFileName.Contains(Path.DirectorySeparatorChar))
 							throw new Exception("Directory separators not permitted in assembly files.");
 
@@ -258,8 +258,8 @@ namespace Waher.Utility.GenManifest
 
 			foreach (string FileName in FileNames)
 			{
-				string RelativeFileName = Path.GetRelativePath(FileName, AbsolutePath);
-				string[] Parts = RelativeFileName.Split(Path.PathSeparator);
+				string RelativeFileName = Path.GetRelativePath(AbsolutePath, FileName);
+				string[] Parts = RelativeFileName.Split(Path.DirectorySeparatorChar);
 				FolderRec Rec = null;
 
 				foreach (string Part in Parts)
@@ -296,7 +296,7 @@ namespace Waher.Utility.GenManifest
 		{
 			foreach (KeyValuePair<string, FolderRec> P in Rec)
 			{
-				if (P.Value is null)
+				if (P.Value?.Folders is null)
 				{
 					Output.WriteStartElement(FileElementName, Namespace);
 					Output.WriteAttributeString("fileName", P.Key);
@@ -306,7 +306,7 @@ namespace Waher.Utility.GenManifest
 
 			foreach (KeyValuePair<string, FolderRec> P in Rec)
 			{
-				if (!(P.Value is null))
+				if (!(P.Value?.Folders is null))
 				{
 					Output.WriteStartElement("Folder", Namespace);
 					Output.WriteAttributeString("name", P.Key);

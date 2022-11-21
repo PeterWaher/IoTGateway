@@ -72,6 +72,25 @@ namespace Waher.Networking.HTTP
 		/// <returns>Decoded data.</returns>
 		public async Task<object> DecodeDataAsync()
 		{
+			byte[] Data = await this.ReadDataAsync();
+			if (Data is null)
+				return null;
+
+			HttpFieldContentType ContentType = this.header.ContentType;
+			if (ContentType is null)
+				return Data;
+
+			return await InternetContent.DecodeAsync(ContentType.Type, Data, ContentType.Encoding, ContentType.Fields,
+				new Uri(this.header.GetURL(false, false)));
+		}
+		
+		/// <summary>
+		/// Reads posted binary data
+		/// </summary>
+		/// <returns>Binary data, undecoded.</returns>
+		/// <exception cref="OutOfMemoryException">If posted object is too large for in-memory processing.</exception>
+		public async Task<byte[]> ReadDataAsync()
+		{
 			if (this.dataStream is null)
 				return null;
 
@@ -82,14 +101,9 @@ namespace Waher.Networking.HTTP
 			int Len = (int)l;
 			byte[] Data = new byte[Len];
 			this.dataStream.Position = 0;
-			this.dataStream.Read(Data, 0, Len);
+			await this.dataStream.ReadAsync(Data, 0, Len);
 
-			HttpFieldContentType ContentType = this.header.ContentType;
-			if (ContentType is null)
-				return Data;
-
-			return await InternetContent.DecodeAsync(ContentType.Type, Data, ContentType.Encoding, ContentType.Fields,
-				new Uri(this.header.GetURL(false, false)));
+			return Data;
 		}
 
 		/// <summary>

@@ -12,8 +12,10 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Timing;
+using Waher.Script.Functions.Strings;
 using Waher.Script.Graphs;
 using Waher.Security;
+using static System.Environment;
 
 namespace Waher.Content.Markdown.PlantUml
 {
@@ -159,14 +161,25 @@ namespace Waher.Content.Markdown.PlantUml
 		/// <param name="JavaPath">Path to Java VM.</param>
 		public static void SearchForInstallationFolder(out string JarPath, out string JavaPath)
 		{
-			string[] Folders = FileSystem.GetFolders(new Environment.SpecialFolder[]
-				{
-					Environment.SpecialFolder.ProgramFiles,
-					Environment.SpecialFolder.ProgramFilesX86
-				});
+			List<string> Folders = new List<string>();
 
-			JarPath = FileSystem.FindLatestFile(Folders, "plantuml.jar", 1);
-			JavaPath = FileSystem.FindLatestFile(Folders, "java.exe", 3);
+			Folders.AddRange(FileSystem.GetFolders(new Environment.SpecialFolder[]
+			{
+				Environment.SpecialFolder.ProgramFiles,
+				Environment.SpecialFolder.ProgramFilesX86
+			}));
+
+
+			if (Types.TryGetModuleParameter("AppData", out object Obj) && Obj is string AppDataFolder)
+			{
+				Folders.Add(Path.Combine(AppDataFolder, SpecialFolder.ProgramFiles.ToString()));
+				Folders.Add(Path.Combine(AppDataFolder, SpecialFolder.ProgramFilesX86.ToString()));
+			}
+
+			string[] Folders2 = Folders.ToArray();
+
+			JarPath = FileSystem.FindLatestFile(Folders2, "plantuml.jar", 1);
+			JavaPath = FileSystem.FindLatestFile(Folders2, "java.exe", 3);
 		}
 
 		/// <summary>

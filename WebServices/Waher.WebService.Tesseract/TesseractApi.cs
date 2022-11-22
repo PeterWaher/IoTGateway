@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -265,6 +264,16 @@ namespace Waher.WebService.Tesseract
 				return null; // Folder not defined for the operating system.
 			}
 
+			string Result = SearchForInstallationFolder(Folder);
+
+			if (string.IsNullOrEmpty(Result))
+				Result = SearchForInstallationFolder(Path.Combine(Gateway.AppDataFolder, SpecialFolder.ToString()));
+
+			return Result;
+		}
+
+		private static string SearchForInstallationFolder(string Folder)
+		{
 			if (string.IsNullOrEmpty(Folder))
 				return null;
 

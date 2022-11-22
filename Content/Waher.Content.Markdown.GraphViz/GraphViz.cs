@@ -208,6 +208,16 @@ namespace Waher.Content.Markdown.GraphViz
 				return null; // Folder not defined for the operating system.
 			}
 
+			string Result = SearchForInstallationFolder(Folder);
+
+			if (string.IsNullOrEmpty(Result) && Types.TryGetModuleParameter("AppData",out object Obj) && Obj is string AppDataFolder)
+				Result = SearchForInstallationFolder(Path.Combine(AppDataFolder, SpecialFolder.ToString()));
+
+			return Result;
+		}
+
+		private static string SearchForInstallationFolder(string Folder)
+		{
 			if (string.IsNullOrEmpty(Folder))
 				return null;
 

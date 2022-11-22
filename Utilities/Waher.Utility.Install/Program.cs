@@ -1241,11 +1241,23 @@ namespace Waher.Utility.Install
 						string SpecialFolderName = Encoding.UTF8.GetString(ReadBin(Decompressed));
 						string FolderName = Encoding.UTF8.GetString(ReadBin(Decompressed));
 
-						ExternalFolder = Path.Combine(Environment.GetFolderPath(
-							Enum.Parse<SpecialFolder>(SpecialFolderName)), FolderName);
+						SpecialFolder SpecialFolder = Enum.Parse<SpecialFolder>(SpecialFolderName);
+						ExternalFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder), FolderName);
 
 						if (!Directory.Exists(ExternalFolder))
-							Directory.CreateDirectory(ExternalFolder);
+						{
+							try
+							{
+								Directory.CreateDirectory(ExternalFolder);
+							}
+							catch (UnauthorizedAccessException)
+							{
+								ExternalFolder = Path.Combine(AppFolder, SpecialFolderName.ToString(), FolderName);
+
+								if (!Directory.Exists(ExternalFolder))
+									Directory.CreateDirectory(ExternalFolder);
+							}
+						}
 					}
 					else
 					{

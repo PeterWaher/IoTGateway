@@ -37,7 +37,7 @@ namespace Waher.Content.Markdown.Web
 		/// <summary>
 		/// Converts content to these content types. 
 		/// </summary>
-		public string[] ToContentTypes
+		public virtual string[] ToContentTypes
 		{
 			get
 			{
@@ -52,7 +52,7 @@ namespace Waher.Content.Markdown.Web
 		/// <summary>
 		/// How well the content is converted.
 		/// </summary>
-		public Grade ConversionGrade => Grade.Excellent;
+		public virtual Grade ConversionGrade => Grade.Excellent;
 
 		/// <summary>
 		/// Bare JID used, if the HTTPX URI scheme is supported.
@@ -328,12 +328,22 @@ namespace Waher.Content.Markdown.Web
 				}
 			}
 
-			string HTML = await Doc.GenerateHTML();
-			byte[] Data = Utf8WithBOM.GetBytes(HTML);
-			
+			string s = await this.DoConversion(Doc);
+			byte[] Data = Utf8WithBOM.GetBytes(s);
+
 			await State.To.WriteAsync(Data, 0, Data.Length);
 
 			return Doc.IsDynamic;
+		}
+
+		/// <summary>
+		/// Performs the actual conversion
+		/// </summary>
+		/// <param name="Doc">Markdown document prepared for conversion.</param>
+		/// <returns>Conversion result.</returns>
+		protected virtual Task<string> DoConversion(MarkdownDocument Doc)
+		{
+			return Doc.GenerateHTML();
 		}
 
 		private bool CopyHttpHeader(string Name, MarkdownDocument Doc, HttpResponse Response)

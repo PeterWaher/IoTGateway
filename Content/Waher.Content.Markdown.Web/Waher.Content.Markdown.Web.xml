@@ -51,10 +51,152 @@
             <param name="State">State of the current conversion.</param>
             <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToHtmlConverter.DoConversion(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Performs the actual conversion
+            </summary>
+            <param name="Doc">Markdown document prepared for conversion.</param>
+            <returns>Conversion result.</returns>
+        </member>
         <member name="P:Waher.Content.Markdown.Web.MarkdownToHtmlConverter.HtmlSettings">
             <summary>
             HTML settings for automatically converted content.
             </summary>
+        </member>
+        <member name="T:Waher.Content.Markdown.Web.MarkdownToSmartContractConverter">
+            <summary>
+            Converts Markdown documents to IEEE 1451.99 Smart Contract XML documents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToSmartContractConverter.#ctor">
+            <summary>
+            Converts Markdown documents to IEEE 1451.99 Smart Contract XML documents.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToSmartContractConverter.ToContentTypes">
+            <summary>
+            Converts content to these content types. 
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToSmartContractConverter.ConversionGrade">
+            <summary>
+            How well the content is converted.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToSmartContractConverter.DoConversion(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Performs the actual conversion
+            </summary>
+            <param name="Doc">Markdown document prepared for conversion.</param>
+            <returns>Conversion result.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Web.MarkdownToTextConverter">
+            <summary>
+            Converts Markdown documents to plain text documents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToTextConverter.#ctor">
+            <summary>
+            Converts Markdown documents to plain text documents.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToTextConverter.ToContentTypes">
+            <summary>
+            Converts content to these content types. 
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToTextConverter.ConversionGrade">
+            <summary>
+            How well the content is converted.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToTextConverter.DoConversion(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Performs the actual conversion
+            </summary>
+            <param name="Doc">Markdown document prepared for conversion.</param>
+            <returns>Conversion result.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Web.MarkdownToXamarinConverter">
+            <summary>
+            Converts Markdown documents to Xamarin Forms XML documents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToXamarinConverter.#ctor">
+            <summary>
+            Converts Markdown documents to Xamarin Forms XML documents.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToXamarinConverter.ToContentTypes">
+            <summary>
+            Converts content to these content types. 
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToXamarinConverter.ConversionGrade">
+            <summary>
+            How well the content is converted.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToXamarinConverter.DoConversion(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Performs the actual conversion
+            </summary>
+            <param name="Doc">Markdown document prepared for conversion.</param>
+            <returns>Conversion result.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Web.MarkdownToXamlConverter">
+            <summary>
+            Converts Markdown documents to XAML documents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToXamlConverter.#ctor">
+            <summary>
+            Converts Markdown documents to XAML documents.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToXamlConverter.ToContentTypes">
+            <summary>
+            Converts content to these content types. 
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToXamlConverter.ConversionGrade">
+            <summary>
+            How well the content is converted.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToXamlConverter.DoConversion(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Performs the actual conversion
+            </summary>
+            <param name="Doc">Markdown document prepared for conversion.</param>
+            <returns>Conversion result.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Web.MarkdownToXmlConverter">
+            <summary>
+            Converts Markdown documents to XML documents.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToXmlConverter.#ctor">
+            <summary>
+            Converts Markdown documents to XML documents.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToXmlConverter.ToContentTypes">
+            <summary>
+            Converts content to these content types. 
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Web.MarkdownToXmlConverter.ConversionGrade">
+            <summary>
+            How well the content is converted.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Web.MarkdownToXmlConverter.DoConversion(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Performs the actual conversion
+            </summary>
+            <param name="Doc">Markdown document prepared for conversion.</param>
+            <returns>Conversion result.</returns>
         </member>
         <member name="T:Waher.Content.Markdown.Web.WebScript.WsCodec">
             <summary>

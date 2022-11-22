@@ -30,8 +30,8 @@ adding the following optional HTTP headers to the request:
 
 | HTTP Header | Description |
 |:------------|:------------|
-| X-LANGUAGE  | Language to expect in image. |
-| X-PSM       | Page Segmentation mode. Possible values: `DetectOrientationAndScript`, `AutomaticPageSegmentationWithOsd`, `AutomaticPageSegmentationNoOsdOrOsr`, `FullyAutomaticPageSegmentationd`, `SingleColumnOf`, `SingleUniBlockOfVerticallyAlignedText`, `SingliformBlockOfText`, `SingleLineOfText`, `SingleWord`, `SingleWordInCircle`, `SingleCharacter`, `SparseText`, `SparseTextWithOsd`, `RawLine` |
+| X\-LANGUAGE | Language to expect in image. |
+| X\-PSM      | Page Segmentation mode. Possible values: `DetectOrientationAndScript`, `AutomaticPageSegmentationWithOsd`, `AutomaticPageSegmentationNoOsdOrOsr`, `FullyAutomaticPageSegmentationd`, `SingleColumnOf`, `SingleUniBlockOfVerticallyAlignedText`, `SingliformBlockOfText`, `SingleLineOfText`, `SingleWord`, `SingleWordInCircle`, `SingleCharacter`, `SparseText`, `SparseTextWithOsd`, `RawLine` |
 
 Personal Data
 ----------------

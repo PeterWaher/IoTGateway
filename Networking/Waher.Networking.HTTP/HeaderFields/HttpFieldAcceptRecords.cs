@@ -446,7 +446,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 		{
 			int i = Rec1.Quality.CompareTo(Rec2.Quality);
 			if (i != 0)
-				return i;
+				return -i;
 
 			i = Rec2.Detail - Rec1.Detail;
 			if (i != 0)

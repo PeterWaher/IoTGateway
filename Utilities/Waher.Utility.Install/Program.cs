@@ -1082,14 +1082,12 @@ namespace Waher.Utility.Install
 							WriteBin(Encoding.UTF8.GetBytes(Name), Output);
 
 							SourceFolder2 = GetFolderPath(SpecialFolder, Name);
-							RelativeFolder2 = string.IsNullOrEmpty(RelativeFolder) ? Name : RelativeFolder + Path.DirectorySeparatorChar + Name;
 
 							Log.Informational("External Folder: " + Name,
 								new KeyValuePair<string, object>("Source", SourceFolder2),
-								new KeyValuePair<string, object>("Relative", RelativeFolder2),
 								new KeyValuePair<string, object>("SpecialFolder", SpecialFolder));
 
-							CopyContent(SourceFolder2, Output, RelativeFolder2, E);
+							CopyContent(SourceFolder2, Output, string.Empty, E);
 							break;
 					}
 				}

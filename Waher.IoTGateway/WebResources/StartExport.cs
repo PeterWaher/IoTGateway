@@ -338,9 +338,9 @@ namespace Waher.IoTGateway.WebResources
 
 					using (XmlWriter w = XmlWriter.Create(Temp, XML.WriterSettings(true, true)))
 					{
-						RepairedCollections = await Persistence.Database.Analyze(w, Path.Combine(Gateway.AppDataFolder, 
-							"Transforms", "DbStatXmlToHtml.xslt"), Path.Combine(Gateway.RootFolder, "Data"), false, true, 
-							Profiler.CreateThread("Analyze",ProfilerThreadType.Sequential));
+						RepairedCollections = await Persistence.Database.Analyze(w, Path.Combine(Gateway.AppDataFolder,
+							"Transforms", "DbStatXmlToHtml.xslt"), Path.Combine(Gateway.RootFolder, "Data"), false, true,
+							Profiler.CreateThread("Analyze", ProfilerThreadType.Sequential));
 					}
 
 					if (RepairedCollections.Length > 0)
@@ -370,7 +370,7 @@ namespace Waher.IoTGateway.WebResources
 					string[] ToExport = new string[CollectionsToExport.Count];
 					CollectionsToExport.Keys.CopyTo(ToExport, 0);
 
-					await Persistence.Database.Export(ExportInfo.Exporter, ToExport, 
+					await Persistence.Database.Export(ExportInfo.Exporter, ToExport,
 						Profiler.CreateThread("Database", ProfilerThreadType.Sequential));
 				}
 
@@ -648,6 +648,8 @@ namespace Waher.IoTGateway.WebResources
 							BackupInfo.Thread?.Exception(ex);
 							Log.Critical(ex);
 							Reschedule = true;
+
+							await Gateway.SendNotification("Unable to upload backup to " + Recipient + ".\r\n\r\n" + ex.Message);
 						}
 					}
 				}

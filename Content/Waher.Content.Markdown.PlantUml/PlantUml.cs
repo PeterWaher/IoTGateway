@@ -170,10 +170,10 @@ namespace Waher.Content.Markdown.PlantUml
 			}));
 
 
-			if (Types.TryGetModuleParameter("AppData", out object Obj) && Obj is string AppDataFolder)
+			if (Types.TryGetModuleParameter("Runtime", out object Obj) && Obj is string RuntimeFolder)
 			{
-				Folders.Add(Path.Combine(AppDataFolder, SpecialFolder.ProgramFiles.ToString()));
-				Folders.Add(Path.Combine(AppDataFolder, SpecialFolder.ProgramFilesX86.ToString()));
+				Folders.Add(Path.Combine(RuntimeFolder, SpecialFolder.ProgramFiles.ToString()));
+				Folders.Add(Path.Combine(RuntimeFolder, SpecialFolder.ProgramFilesX86.ToString()));
 			}
 
 			string[] Folders2 = Folders.ToArray();

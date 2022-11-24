@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "IoT Gateway Console": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Program Files\\dotnet\\dotnet.exe",
+      "commandLineArgs": "Waher.IoTGateway.Console.dll -instance Dev",
+      "workingDirectory": "C:\\My Projects\\IoTGateway\\Waher.IoTGateway.Console\\bin\\$(ConfigurationName)\\netcoreapp3.1\\"
+    }
+  }
+}

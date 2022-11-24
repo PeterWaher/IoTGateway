@@ -267,7 +267,7 @@ namespace Waher.WebService.Tesseract
 			string Result = SearchForInstallationFolder(Folder);
 
 			if (string.IsNullOrEmpty(Result))
-				Result = SearchForInstallationFolder(Path.Combine(Gateway.AppDataFolder, SpecialFolder.ToString()));
+				Result = SearchForInstallationFolder(Path.Combine(Gateway.RuntimeFolder, SpecialFolder.ToString()));
 
 			return Result;
 		}

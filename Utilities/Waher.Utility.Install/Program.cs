@@ -630,34 +630,34 @@ namespace Waher.Utility.Install
 							break;
 
 						case "File":
-							(FileName, SourceFileName) = GetFileName(E, SourceFolder);
-
-							Log.Informational("External program file: " + FileName);
-
-							if (!string.IsNullOrEmpty(AppFolder) && !Directory.Exists(AppFolder))
-							{
-								Log.Informational("Creating folder " + AppFolder + ".");
-								Directory.CreateDirectory(AppFolder);
-							}
-
-							CopyFileIfNewer(SourceFileName, Path.Combine(AppFolder, FileName), null, false);
+							//(FileName, SourceFileName) = GetFileName(E, SourceFolder);
+							//
+							//Log.Informational("External program file: " + FileName);
+							//
+							//if (!string.IsNullOrEmpty(AppFolder) && !Directory.Exists(AppFolder))
+							//{
+							//	Log.Informational("Creating folder " + AppFolder + ".");
+							//	Directory.CreateDirectory(AppFolder);
+							//}
+							//
+							//CopyFileIfNewer(SourceFileName, Path.Combine(AppFolder, FileName), null, false);
 							break;
 
 						case "External":
-							SpecialFolder SpecialFolder = XML.Attribute(E, "folder", SpecialFolder.ProgramFiles);
-							Name = XML.Attribute(E, "name");
-
-							SourceFolder2 = GetFolderPath(SpecialFolder, Name);
-							AppFolder2 = SourceFolder2;
-							DataFolder2 = Path.Combine(DataFolder, Name);
-
-							Log.Informational("External Folder: " + Name,
-								new KeyValuePair<string, object>("Source", SourceFolder2),
-								new KeyValuePair<string, object>("App", AppFolder2),
-								new KeyValuePair<string, object>("Data", DataFolder2),
-								new KeyValuePair<string, object>("SpecialFolder", SpecialFolder));
-
-							CopyContent(SourceFolder2, AppFolder2, DataFolder2, E);
+							//SpecialFolder SpecialFolder = XML.Attribute(E, "folder", SpecialFolder.ProgramFiles);
+							//Name = XML.Attribute(E, "name");
+							//
+							//SourceFolder2 = GetFolderPath(SpecialFolder, Name);
+							//AppFolder2 = SourceFolder2;
+							//DataFolder2 = Path.Combine(DataFolder, Name);
+							//
+							//Log.Informational("External Folder: " + Name,
+							//	new KeyValuePair<string, object>("Source", SourceFolder2),
+							//	new KeyValuePair<string, object>("App", AppFolder2),
+							//	new KeyValuePair<string, object>("Data", DataFolder2),
+							//	new KeyValuePair<string, object>("SpecialFolder", SpecialFolder));
+							//
+							//CopyContent(SourceFolder2, AppFolder2, DataFolder2, E);
 							break;
 					}
 				}

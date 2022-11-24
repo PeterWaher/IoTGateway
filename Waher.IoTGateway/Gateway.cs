@@ -300,6 +300,7 @@ namespace Waher.IoTGateway
 				}
 
 				Types.SetModuleParameter("AppData", appDataFolder);
+				Types.SetModuleParameter("Runtime", runtimeFolder);
 				Types.SetModuleParameter("Root", rootFolder);
 
 				scheduler = new Scheduler();

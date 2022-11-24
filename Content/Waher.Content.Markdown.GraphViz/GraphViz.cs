@@ -210,8 +210,8 @@ namespace Waher.Content.Markdown.GraphViz
 
 			string Result = SearchForInstallationFolder(Folder);
 
-			if (string.IsNullOrEmpty(Result) && Types.TryGetModuleParameter("AppData",out object Obj) && Obj is string AppDataFolder)
-				Result = SearchForInstallationFolder(Path.Combine(AppDataFolder, SpecialFolder.ToString()));
+			if (string.IsNullOrEmpty(Result) && Types.TryGetModuleParameter("Runtime", out object Obj) && Obj is string RuntimeFolder)
+				Result = SearchForInstallationFolder(Path.Combine(RuntimeFolder, SpecialFolder.ToString()));
 
 			return Result;
 		}

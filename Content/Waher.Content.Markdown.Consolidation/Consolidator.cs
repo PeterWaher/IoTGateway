@@ -390,7 +390,7 @@ namespace Waher.Content.Markdown.Consolidation
 							Markdown.Append(" | `");
 							Markdown.Append(P.Key);
 							Markdown.Append("` | ");
-							Markdown.Append(await P.Value.GetFirstText());
+							Markdown.Append((await P.Value.GetFirstText()).Trim());
 							Markdown.AppendLine(" |");
 						}
 						break;

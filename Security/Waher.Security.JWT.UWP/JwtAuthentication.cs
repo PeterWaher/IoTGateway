@@ -21,7 +21,20 @@ namespace Waher.Security.JWT
 		/// https://tools.ietf.org/html/rfc6750
 		/// </summary>
 		/// <param name="Realm">Realm.</param>
-		/// <param name="Users">Collection of users to authenticate against.</param>
+		/// <param name="Factory">JWT token factory.</param>
+		public JwtAuthentication(string Realm, JwtFactory Factory)
+			: this(Realm, null, Factory)
+		{
+		}
+
+		/// <summary>
+		/// Use JWT tokens for authentication. The Bearer scheme defined in RFC 6750 is used:
+		/// https://tools.ietf.org/html/rfc6750
+		/// </summary>
+		/// <param name="Realm">Realm.</param>
+		/// <param name="Users">Optional Collection of users to authenticate against.
+		/// If no collection is provided, any JWT token created by the factory will
+		/// be accepted.</param>
 		/// <param name="Factory">JWT token factory.</param>
 		public JwtAuthentication(string Realm, IUserSource Users, JwtFactory Factory)
 		{
@@ -86,12 +99,6 @@ namespace Waher.Security.JWT
 			{
 				JwtToken Token = new JwtToken(TokenStr);
 				string UserName = Token.Subject;
-				
-				if (UserName is null)
-				{
-					LoginAuditor.Fail("Login attempt failed. No user defined.", UserName ?? string.Empty, Request.RemoteEndPoint, "HTTP");
-					return null;
-				}
 
 				if (!this.factory.IsValid(Token, out Reason Reason))
 				{
@@ -99,14 +106,30 @@ namespace Waher.Security.JWT
 					return null;
 				}
 
-				IUser User = await this.users.TryGetUser(UserName);
+				if (this.users is null)
+				{
+					if (string.IsNullOrEmpty(UserName))
+						UserName = Request.RemoteEndPoint;
 
-				if (User is null)
-					LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
+					return new ExternalUser(UserName, Token);
+				}
 				else
-					LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
+				{
+					if (UserName is null)
+					{
+						LoginAuditor.Fail("Login attempt failed. No user defined.", UserName ?? string.Empty, Request.RemoteEndPoint, "HTTP");
+						return null;
+					}
 
-				return User;
+					IUser User = await this.users.TryGetUser(UserName);
+
+					if (User is null)
+						LoginAuditor.Fail("Login attempt failed.", UserName, Request.RemoteEndPoint, "HTTP");
+					else
+						LoginAuditor.Success("Login successful.", UserName, Request.RemoteEndPoint, "HTTP");
+			
+					return User;
+				}
 			}
 			catch (Exception)
 			{

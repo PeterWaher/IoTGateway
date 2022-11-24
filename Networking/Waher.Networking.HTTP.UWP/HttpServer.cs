@@ -830,6 +830,16 @@ namespace Waher.Networking.HTTP
 			this.trustClientCertificates = TrustClientCertificates;
 			this.clientCertificateSettingsLocked = LockSettings;
 		}
+
+		/// <summary>
+		/// If client certificates are not used, optional or required.
+		/// </summary>
+		public ClientCertificates ClientCertificates => this.clientCertificates;
+
+		/// <summary>
+		/// If client certificates should be trusted, even if they do not validate.
+		/// </summary>
+		public bool TrustClientCertificates => this.trustClientCertificates;
 #endif
 
 		#endregion

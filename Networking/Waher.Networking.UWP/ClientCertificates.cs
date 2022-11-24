@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Networking
+﻿namespace Waher.Networking
 {
 	/// <summary>
 	/// Client Certificate Options

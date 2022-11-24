@@ -22,6 +22,7 @@ namespace Waher.WebService.Tesseract
 	/// <summary>
 	/// Class providing a web API for OCR using Tesseract, installed on the server.
 	/// </summary>
+	[ModuleDependency("Waher.Service.IoTBroker.XmppServerModule")]
 	public class TesseractApi : IModule
 	{
 		private const string FolderPrefix = "Tesseract";

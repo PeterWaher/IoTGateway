@@ -63,12 +63,14 @@ namespace Waher.Client.MqttEventViewer
 			}
 		}
 
-		private async Task Mqtt_OnStateChanged(object Sender, MqttState NewState)
+		private Task Mqtt_OnStateChanged(object Sender, MqttState NewState)
 		{
 			this.Dispatcher.Invoke(new Action(() => this.ConnectionState.Content = NewState.ToString()));
 
 			if (NewState == MqttState.Connected)
-				await this.mqtt.SUBSCRIBE(this.Topic.Text);
+				this.Dispatcher.Invoke(new Action(async () => await this.mqtt.SUBSCRIBE(this.Topic.Text)));
+
+			return Task.CompletedTask;
 		}
 
 		private Task Mqtt_OnError(object Sender, Exception Exception)

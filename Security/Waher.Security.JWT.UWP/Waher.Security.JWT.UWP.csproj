@@ -112,6 +112,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExternalUser.cs" />
     <Compile Include="Functions\AuthenticateJwt.cs" />
     <Compile Include="Functions\CreateJwt.cs" />
     <Compile Include="Functions\ValidateJwt.cs" />

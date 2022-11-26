@@ -34,9 +34,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MySqlConnector" Version="2.1.12" />
-    <PackageReference Include="Npgsql" Version="6.0.6" />
-    <PackageReference Include="SkiaSharp" Version="2.88.0" />
+    <PackageReference Include="MySqlConnector" Version="2.2.1" />
+    <PackageReference Include="Npgsql" Version="7.0.0" />
+    <PackageReference Include="SkiaSharp" Version="2.88.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj" />

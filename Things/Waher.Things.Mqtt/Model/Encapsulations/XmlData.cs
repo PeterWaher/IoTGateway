@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
+using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Language;
-using Waher.Things;
 using Waher.Things.ControlParameters;
 using Waher.Things.SensorData;
 
@@ -35,7 +35,7 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 		{
 			this.value = new XmlDocument()
 			{
-				PreserveWhitespace = true
+				PreserveWhitespace = false
 			};
 			this.xml = CommonTypes.GetString(Content.Data, Encoding.UTF8);
 			this.value.LoadXml(this.xml);
@@ -61,61 +61,70 @@ namespace Waher.Things.Mqtt.Model.Encapsulations
 
 		private void AppendFields(ThingReference ThingReference, List<Field> Fields, ISensorReadout Request, XmlElement Value, string Prefix)
 		{
-			foreach (XmlAttribute Attribute in Value.Attributes)
+			if (Value.NamespaceURI == SensorClient.NamespaceSensorData)
 			{
-				if (string.IsNullOrEmpty(Prefix))
-					this.Add(ThingReference, Fields, Attribute.Name, Attribute.Value, Request);
-				else
-					this.Add(ThingReference, Fields, this.Append(Prefix, Attribute.Name), Attribute.Value, Request);
+				Networking.XMPP.Sensor.SensorData SensorData = SensorClient.ParseFields(Value);
+				if (!(SensorData.Fields is null))
+					Fields.AddRange(SensorData.Fields);
 			}
-
-			Dictionary<string, int> Repetitions = null;
-			string s;
-
-			foreach (XmlNode N in Value)
+			else
 			{
-				if (N is XmlElement ChildElement)
+				foreach (XmlAttribute Attribute in Value.Attributes)
 				{
-					s = ChildElement.LocalName;
-
-					if (Repetitions is null)
-						Repetitions = new Dictionary<string, int>();
-
-					if (Repetitions.TryGetValue(s, out int i))
-						Repetitions[s] = i - 1;
+					if (string.IsNullOrEmpty(Prefix))
+						this.Add(ThingReference, Fields, Attribute.Name, Attribute.Value, Request);
 					else
-						Repetitions[s] = 0;
+						this.Add(ThingReference, Fields, this.Append(Prefix, Attribute.Name), Attribute.Value, Request);
 				}
-			}
 
-			foreach (XmlNode N in Value)
-			{
-				if (N is XmlElement ChildElement)
+				Dictionary<string, int> Repetitions = null;
+				string s;
+
+				foreach (XmlNode N in Value)
 				{
-					s = ChildElement.LocalName;
-
-					if (Repetitions.TryGetValue(s, out int i))
+					if (N is XmlElement ChildElement)
 					{
-						if (i < 0)
-							Repetitions[s] = i = 1;
-						else if (i > 0)
-							Repetitions[s] = ++i;
+						s = ChildElement.LocalName;
 
-						if (i != 0)
-							s += ", #" + i.ToString();
+						if (Repetitions is null)
+							Repetitions = new Dictionary<string, int>();
+
+						if (Repetitions.TryGetValue(s, out int i))
+							Repetitions[s] = i - 1;
+						else
+							Repetitions[s] = 0;
 					}
-
-					if (string.IsNullOrEmpty(Prefix))
-						this.AppendFields(ThingReference, Fields, Request, ChildElement, s);
-					else
-						this.AppendFields(ThingReference, Fields, Request, ChildElement, Prefix + ", " + s);
 				}
-				else if (N is XmlText XmlText)
+
+				foreach (XmlNode N in Value)
 				{
-					if (string.IsNullOrEmpty(Prefix))
-						this.Add(ThingReference, Fields, "Value", XmlText.InnerText, Request);
-					else
-						this.Add(ThingReference, Fields, Prefix, XmlText.InnerText, Request);
+					if (N is XmlElement ChildElement)
+					{
+						s = ChildElement.LocalName;
+
+						if (Repetitions.TryGetValue(s, out int i))
+						{
+							if (i < 0)
+								Repetitions[s] = i = 1;
+							else if (i > 0)
+								Repetitions[s] = ++i;
+
+							if (i != 0)
+								s += ", #" + i.ToString();
+						}
+
+						if (string.IsNullOrEmpty(Prefix))
+							this.AppendFields(ThingReference, Fields, Request, ChildElement, s);
+						else
+							this.AppendFields(ThingReference, Fields, Request, ChildElement, Prefix + ", " + s);
+					}
+					else if (N is XmlText XmlText)
+					{
+						if (string.IsNullOrEmpty(Prefix))
+							this.Add(ThingReference, Fields, "Value", XmlText.InnerText, Request);
+						else
+							this.Add(ThingReference, Fields, Prefix, XmlText.InnerText, Request);
+					}
 				}
 			}
 		}

@@ -269,7 +269,7 @@ namespace Waher.Content.Xml
 
 				if (Year < 1 || Year > 9999 || Month < 1 || Month > 12 || Day < 1 || Day > DateTime.DaysInMonth(Year, Month))
 				{
-					Value = DateTime.MinValue;
+					Value = DateTimeOffset.MinValue;
 					return false;
 				}
 

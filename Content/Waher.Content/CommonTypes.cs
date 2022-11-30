@@ -167,6 +167,12 @@ namespace Waher.Content
 			string TimeZoneStr = M.Groups["TimeZone"].Value;
 			TimeSpan TimeZone;
 
+			if (Year < 1 || Year > 9999 || Month < 1 || Month > 12 || Day < 1 || Day > DateTime.DaysInMonth(Year, Month))
+			{
+				Value = DateTimeOffset.MinValue;
+				return false;
+			}
+
 			switch (TimeZoneStr)
 			{
 				case "UT":

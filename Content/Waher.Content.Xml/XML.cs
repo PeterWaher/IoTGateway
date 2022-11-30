@@ -194,6 +194,12 @@ namespace Waher.Content.Xml
 					return false;
 				}
 
+				if (Year < 1 || Year > 9999 || Month < 1 || Month > 12 || Day < 1 || Day > DateTime.DaysInMonth(Year, Month))
+				{
+					Value = DateTime.MinValue;
+					return false;
+				}
+
 				if (i == 10)
 				{
 					char ch;
@@ -256,6 +262,12 @@ namespace Waher.Content.Xml
 				if (!int.TryParse(s.Substring(0, 4), out int Year) ||
 					!int.TryParse(s.Substring(5, 2), out int Month) ||
 					!int.TryParse(s.Substring(8, 2), out int Day))
+				{
+					Value = DateTime.MinValue;
+					return false;
+				}
+
+				if (Year < 1 || Year > 9999 || Month < 1 || Month > 12 || Day < 1 || Day > DateTime.DaysInMonth(Year, Month))
 				{
 					Value = DateTime.MinValue;
 					return false;

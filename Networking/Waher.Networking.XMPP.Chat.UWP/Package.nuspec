@@ -19,7 +19,7 @@
 			<dependency id="Waher.Content.Emoji" version="2.0.0"/>
 			<dependency id="Waher.Content.Html" version="2.1.1"/>
 			<dependency id="Waher.Content.Markdown" version="2.2.4"/>
-			<dependency id="Waher.Content.Xml" version="2.0.3"/>
+			<dependency id="Waher.Content.Xml" version="2.0.4"/>
 			<dependency id="Waher.Networking.UWP" version="2.0.6"/>
 			<dependency id="Waher.Networking.XMPP.UWP" version="2.0.7"/>
 			<dependency id="Waher.Networking.XMPP.Concentrator.UWP" version="2.0.9"/>

@@ -86,7 +86,7 @@ namespace Waher.Things.Mqtt.Model
 				if (!(this.mqttClient is null))
 				{
 					MqttState State = this.mqttClient.State;
-					if (State == MqttState.Offline || State == MqttState.Error)
+					if (State == MqttState.Offline || State == MqttState.Error || State == MqttState.Authenticating)
 						await this.mqttClient.Reconnect();
 				}
 			}

@@ -31,8 +31,7 @@ namespace Waher.Things.Mqtt
 
 		public Task ExecuteCommandAsync()
 		{
-			this.client.Reconnect();
-			return Task.CompletedTask;
+			return this.client.Reconnect();
 		}
 
 		public Task<string> GetConfirmationStringAsync(Language Language)

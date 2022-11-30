@@ -27,7 +27,7 @@ namespace Waher.Events.MQTT
 		private bool connected;
 		private uint eventsLost = 0;
 		private readonly object synchObj = new object();
-		private readonly Timer timer = null;
+		private Timer timer = null;
 
 		/// <summary>
 		/// Event sink sending events to a topic on an MQTT server. Events are sent as XML fragments.
@@ -57,7 +57,9 @@ namespace Waher.Events.MQTT
 		{
 			try
 			{
-				if (this.client.State == MqttState.Offline || this.client.State == MqttState.Error || this.client.State == MqttState.Authenticating)
+				if (this.client.State == MqttState.Offline || 
+					this.client.State == MqttState.Error || 
+					this.client.State == MqttState.Authenticating)
 				{
 					await this.client.Reconnect();
 				}
@@ -68,7 +70,7 @@ namespace Waher.Events.MQTT
 			}
 		}
 
-		private async Task Client_OnStateChanged(object Sender, MqttState NewState)
+		private Task Client_OnStateChanged(object Sender, MqttState NewState)
 		{
 			switch (NewState)
 			{
@@ -99,26 +101,25 @@ namespace Waher.Events.MQTT
 					}
 
 					if (ImmediateReconnect && this.timer != null)
-						await this.client.Reconnect();
+					{
+						this.timer.Dispose();
+						this.timer = new Timer(this.CheckConnection, null, 100, 60000);
+					}
 					break;
 			}
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>
 		/// MQTT Client
 		/// </summary>
-		public MqttClient Client
-		{
-			get { return this.client; }
-		}
+		public MqttClient Client => this.client;
 
 		/// <summary>
 		/// Destination topic of event messages.
 		/// </summary>
-		public string Topic
-		{
-			get { return this.topic; }
-		}
+		public string Topic => this.topic;
 
 		/// <inheritdoc/>
 		public override Task Queue(Event Event)

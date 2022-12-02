@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Xml;
-using Waher.Content;
-using Waher.Events;
-using Waher.Networking.MQTT;
 using Waher.Runtime.Language;
 using Waher.Persistence.Attributes;
 using Waher.Things.Attributes;

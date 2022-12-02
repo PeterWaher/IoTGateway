@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
-using Waher.Events;
 using Waher.Networking.MQTT;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Language;

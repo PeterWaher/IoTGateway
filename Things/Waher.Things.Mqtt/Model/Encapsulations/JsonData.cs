@@ -7,7 +7,6 @@ using Waher.Content;
 using Waher.Networking.MQTT;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Language;
-using Waher.Things;
 using Waher.Things.ControlParameters;
 using Waher.Things.SensorData;
 

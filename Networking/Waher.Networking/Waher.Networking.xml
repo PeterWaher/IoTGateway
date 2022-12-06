@@ -65,6 +65,11 @@
             Asynchronous version of <see cref="T:System.EventArgs"/>.
             </summary>
         </member>
+        <member name="T:Waher.Networking.EventHandlerAsync`1">
+            <summary>
+            Asynchronous version of <see cref="T:System.EventArgs"/> with a typed event arguments.
+            </summary>
+        </member>
         <member name="T:Waher.Networking.ExceptionEventHandler">
             <summary>
             Connection error event handler delegate.

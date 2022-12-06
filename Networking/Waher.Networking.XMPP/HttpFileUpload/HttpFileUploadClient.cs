@@ -7,7 +7,6 @@ using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.ServiceDiscovery;
-using Waher.Script.Operators.Arithmetics;
 
 namespace Waher.Networking.XMPP.HttpFileUpload
 {

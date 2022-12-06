@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.Sniffers.Model
 {
@@ -30,7 +31,7 @@ namespace Waher.Networking.Sniffers.Model
 		/// Replays the event to a given sniffer.
 		/// </summary>
 		/// <param name="Sniffer">Sniffer.</param>
-		public abstract void Replay(ISniffer Sniffer);
+		public abstract Task Replay(ISniffer Sniffer);
 
 		/// <summary>
 		/// Converts the sniffer event to a string.

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.Sniffers.Model
 {
@@ -21,9 +22,9 @@ namespace Waher.Networking.Sniffers.Model
 		/// Replays the event to a given sniffer.
 		/// </summary>
 		/// <param name="Sniffer">Sniffer.</param>
-		public override void Replay(ISniffer Sniffer)
+		public override Task Replay(ISniffer Sniffer)
 		{
-			Sniffer.Exception(this.Timestamp, this.Text);
+			return Sniffer.Exception(this.Timestamp, this.Text);
 		}
 
 		/// <inheritdoc/>

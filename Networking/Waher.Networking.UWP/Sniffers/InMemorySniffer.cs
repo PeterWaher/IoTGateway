@@ -191,7 +191,7 @@ namespace Waher.Networking.Sniffers
 			foreach (SnifferEvent Event in await this.ToArrayAsync())
 			{
 				foreach (ISniffer Sniffer in Sniffers)
-					Event.Replay(Sniffer);
+					await Event.Replay(Sniffer);
 			}
 		}
 

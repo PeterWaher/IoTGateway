@@ -1690,7 +1690,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			return Result;
 		}
 
-		private Task SniffMessageHandler(object Sender, MessageEventArgs e)
+		private async Task SniffMessageHandler(object Sender, MessageEventArgs e)
 		{
 			string SnifferId = XML.Attribute(e.Content, "snifferId");
 			DateTime Timestamp = XML.Attribute(e.Content, "timestamp", DateTime.Now);
@@ -1699,7 +1699,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			lock (this.sniffers)
 			{
 				if (!this.sniffers.TryGetValue(SnifferId, out Sniffer))
-					return Task.CompletedTask;
+					return;
 			}
 
 			foreach (XmlNode N in e.Content.ChildNodes)
@@ -1712,42 +1712,42 @@ namespace Waher.Networking.XMPP.Concentrator
 						{
 							case "rxBin":
 								byte[] Bin = Convert.FromBase64String(E.InnerText);
-								Sniffer.ReceiveBinary(Timestamp, Bin);
+								await Sniffer.ReceiveBinary(Timestamp, Bin);
 								break;
 
 							case "txBin":
 								Bin = Convert.FromBase64String(E.InnerText);
-								Sniffer.TransmitBinary(Timestamp, Bin);
+								await Sniffer.TransmitBinary(Timestamp, Bin);
 								break;
 
 							case "rx":
 								string s = E.InnerText;
-								Sniffer.ReceiveText(Timestamp, s);
+								await Sniffer.ReceiveText(Timestamp, s);
 								break;
 
 							case "tx":
 								s = E.InnerText;
-								Sniffer.TransmitText(Timestamp, s);
+								await Sniffer.TransmitText(Timestamp, s);
 								break;
 
 							case "info":
 								s = E.InnerText;
-								Sniffer.Information(Timestamp, s);
+								await Sniffer.Information(Timestamp, s);
 								break;
 
 							case "warning":
 								s = E.InnerText;
-								Sniffer.Warning(Timestamp, s);
+								await Sniffer.Warning(Timestamp, s);
 								break;
 
 							case "error":
 								s = E.InnerText;
-								Sniffer.Error(Timestamp, s);
+								await Sniffer.Error(Timestamp, s);
 								break;
 
 							case "exception":
 								s = E.InnerText;
-								Sniffer.Exception(Timestamp, s);
+								await Sniffer.Exception(Timestamp, s);
 								break;
 
 							case "expired":
@@ -1756,22 +1756,20 @@ namespace Waher.Networking.XMPP.Concentrator
 									this.sniffers.Remove(SnifferId);
 								}
 
-								Sniffer.Information(Timestamp, "Remote sniffer expired.");
+								await Sniffer.Information(Timestamp, "Remote sniffer expired.");
 								break;
 
 							default:
-								Sniffer.Error("Unrecognized sniffer event received: " + E.OuterXml);
+								await Sniffer.Error("Unrecognized sniffer event received: " + E.OuterXml);
 								break;
 						}
 					}
 					catch (Exception)
 					{
-						Sniffer.Error(Timestamp, "Badly encoded sniffer data was received: " + E.OuterXml);
+						await Sniffer.Error(Timestamp, "Badly encoded sniffer data was received: " + E.OuterXml);
 					}
 				}
 			}
-
-			return Task.CompletedTask;
 		}
 
 		/// <summary>

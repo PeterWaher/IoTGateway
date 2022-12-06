@@ -420,12 +420,7 @@ namespace Waher.Content.Markdown.GraphViz
 		private async Task<GraphInfo> GetFileName(string Language, string[] Rows, ResultType Type)
 		{
 			GraphInfo Result = new GraphInfo();
-			StringBuilder sb = new StringBuilder();
-
-			foreach (string Row in Rows)
-				sb.AppendLine(Row);
-
-			string Graph = sb.ToString();
+			string Graph = MarkdownDocument.AppendRows(Rows);
 			int i = Language.IndexOf(':');
 
 			if (i > 0)
@@ -436,9 +431,7 @@ namespace Waher.Content.Markdown.GraphViz
 			else
 				Result.Title = string.Empty;
 
-			sb.Append(Language);
-
-			Result.Hash = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(sb.ToString()));
+			Result.Hash = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(Graph + Language));
 
 			string GraphVizFolder = Path.Combine(contentRootFolder, "GraphViz");
 			string FileName = Path.Combine(GraphVizFolder, Result.Hash);

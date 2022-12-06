@@ -125,12 +125,7 @@ namespace Waher.IoTGateway.CodeContent
 
 		private Expression BuildExpression(string[] Rows)
 		{
-			StringBuilder sb = new StringBuilder();
-
-			foreach (string Row in Rows)
-				sb.AppendLine(Row);
-
-			return new Expression(sb.ToString(), this.document?.FileName);
+			return new Expression(MarkdownDocument.AppendRows(Rows), this.document?.FileName);
 		}
 
 		private async Task<object> Evaluate(Expression Script, Variables Variables)

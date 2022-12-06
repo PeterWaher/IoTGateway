@@ -1,24 +1,24 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content.Emoji;
 using Waher.Content.Xml;
-using Waher.Events;
 using Waher.Runtime.Inventory;
-using Waher.Script;
 using Waher.Script.Graphs;
 
 namespace Waher.Content.Markdown.Model.CodeContent
 {
 	/// <summary>
-	/// Script graph content.
+	/// Base64-encoded image content.
 	/// </summary>
-	public class GraphContent : IImageCodeContent
+	public class ImageContent : IImageCodeContent
 	{
 		/// <summary>
-		/// Script graph content.
+		/// Base64-encoded image content.
 		/// </summary>
-		public GraphContent()
+		public ImageContent()
 		{
 		}
 
@@ -29,7 +29,10 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		/// <returns>How well the handler supports the content.</returns>
 		public Grade Supports(string Language)
 		{
-			return string.Compare(Language, "graph", true) == 0 ? Grade.Ok : Grade.NotAtAll;
+			if (Language.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+				return InternetContent.TryGetFileExtension(Language, out _) ? Grade.Ok : Grade.Barely;
+			else
+				return Grade.NotAtAll;
 		}
 
 		/// <summary>
@@ -48,7 +51,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		/// <summary>
 		/// If Plain Text is handled.
 		/// </summary>
-		public bool HandlesPlainText => false;
+		public bool HandlesPlainText => true;
 
 		/// <summary>
 		/// If XAML is handled.
@@ -64,57 +67,61 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public Task<bool> GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			try
+			Output.Append("<figure>");
+			Output.Append("<img class=\"aloneUnsized\" src=\"");
+			Output.Append(GenerateUrl(Language, Rows, out string ContentType, out string Title));
+			Output.Append('"');
+
+			if (!string.IsNullOrEmpty(Title))
 			{
-				Graph G = await GetGraph(Rows);
-				await SpanElements.InlineScript.GenerateHTML(G, Output, true, Document.Settings.Variables ?? new Variables());
-				return true;
+				Output.Append(" alt=\"");
+				Output.Append(XML.HtmlAttributeEncode(Title));
+				Output.Append(" title=\"");
+				Output.Append(XML.HtmlAttributeEncode(Title));
+				Output.Append("\"/><figcaption>");
+				Output.Append(XML.HtmlValueEncode(Title));
+				Output.AppendLine("</figcaption></figure>");
 			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-				return false;
-			}
+			else
+				Output.AppendLine("/></figure>");
+
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
-		/// Gets a graph object from its XML Code Block representation.
+		/// Generates a data URL of the encoded image.
+		/// </summary>
+		/// <param name="Language">Language</param>
+		/// <param name="Rows">Rows</param>
+		/// <param name="ContentType">Content-Type of image.</param>
+		/// <param name="Title">Optional associated title.</param>
+		/// <returns>Data URL.</returns>
+		public static string GenerateUrl(string Language, string[] Rows, out string ContentType, out string Title)
+		{
+			int i = Language.IndexOf(':');
+			ContentType = i < 0 ? Language : Language.Substring(0, i);
+			Title = i < 0 ? string.Empty : Language.Substring(i + 1);
+
+			StringBuilder Output = new StringBuilder();
+
+			Output.Append("data:");
+			Output.Append(ContentType);
+			Output.Append(";base64,");
+			Output.Append(GetImageBase64(Rows));
+
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Gets the binary image from the encoded rows.
 		/// </summary>
 		/// <param name="Rows">Rows</param>
-		/// <returns>Graph object</returns>
-		public static async Task<Graph> GetGraph(string[] Rows)
+		/// <returns>Base64-encoded image.</returns>
+		public static string GetImageBase64(string[] Rows)
 		{
-			XmlDocument Xml = new XmlDocument();
-			Xml.LoadXml(MarkdownDocument.AppendRows(Rows));
-
-			if (Xml.DocumentElement is null ||
-				Xml.DocumentElement.LocalName != Graph.GraphLocalName ||
-				Xml.DocumentElement.NamespaceURI != Graph.GraphNamespace)
-			{
-				throw new Exception("Invalid Graph XML");
-			}
-
-			string TypeName = XML.Attribute(Xml.DocumentElement, "type");
-			Type T = Types.GetType(TypeName);
-
-			if (T is null)
-				throw new Exception("Type not recognized: " + TypeName);
-
-			Graph G = (Graph)Activator.CreateInstance(T);
-			G.SameScale = XML.Attribute(Xml.DocumentElement, "sameScale", false);
-
-			foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
-			{
-				if (N is XmlElement E)
-				{
-					await G.ImportGraphAsync(E);
-					break;
-				}
-			}
-
-			return G;
+			return MarkdownDocument.AppendRows(Rows, true);
 		}
 
 		/// <summary>
@@ -126,19 +133,17 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		/// <param name="Indent">Additional indenting.</param>
 		/// <param name="Document">Markdown document containing element.</param>
 		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
-		public async Task<bool> GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
+		public Task<bool> GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			try
-			{
-				Graph G = await GetGraph(Rows);
-				await SpanElements.InlineScript.GeneratePlainText(G, Output, true);
-				return true;
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-				return false;
-			}
+			int i = Language.IndexOf(':');
+			if (i < 0)
+				Output.AppendLine(Language);
+			else
+				Output.AppendLine(Language.Substring(i + 1));
+
+			Output.AppendLine();
+
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -154,18 +159,12 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		public async Task<bool> GenerateXAML(XmlWriter Output, TextAlignment TextAlignment, string[] Rows, string Language, int Indent,
 			MarkdownDocument Document)
 		{
-			try
+			await Multimedia.ImageContent.OutputWpf(Output, new ImageSource()
 			{
-				Graph G = await GetGraph(Rows);
-				await SpanElements.InlineScript.GenerateXAML(G, Output, TextAlignment, true, Document.Settings.Variables ?? new Variables(), 
-					Document.Settings.XamlSettings);
-				return true;
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-				return false;
-			}
+				Url = GenerateUrl(Language, Rows, out _, out string Title)
+			}, Title);
+
+			return true;
 		}
 
 		/// <summary>
@@ -181,20 +180,12 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		public async Task<bool> GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State, string[] Rows, string Language, int Indent,
 			MarkdownDocument Document)
 		{
-			try
+			await Multimedia.ImageContent.OutputXamarinForms(Output, new ImageSource()
 			{
-				Graph G = await GetGraph(Rows);
+				Url = GenerateUrl(Language, Rows, out _, out _)
+			});
 
-				await SpanElements.InlineScript.GenerateXamarinForms(G, Output, State, true, 
-					Document.Settings.Variables ?? new Variables(), Document.Settings.XamlSettings);
-				
-				return true;
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-				return false;
-			}
+			return true;
 		}
 
 		/// <summary>
@@ -206,8 +197,11 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		/// <returns>Image, if successful, null otherwise.</returns>
 		public async Task<PixelInformation> GenerateImage(string[] Rows, string Language, MarkdownDocument Document)
 		{
-			Graph G = await GetGraph(Rows);
-			return G.CreatePixels(Document.Settings.Variables ?? new Variables());
+			object Obj = await InternetContent.DecodeAsync(Language, Convert.FromBase64String(GetImageBase64(Rows)), null);
+			if (!(Obj is SKImage Image))
+				throw new Exception("Unable to decode raw data as an image.");
+
+			return PixelInformation.FromImage(Image);
 		}
 
 	}

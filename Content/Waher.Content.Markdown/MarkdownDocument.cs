@@ -552,9 +552,10 @@ namespace Waher.Content.Markdown
 
 						Block = Blocks[BlockIndex];
 						s = Block.Rows[Block.Start].Substring(3).Trim('`', ' ', '\t');
-						Elements.AddLast(new CodeBlock(this, Code.ToArray(), 0, Code.Count - 1, 0, s));
+						CodeBlock CodeBlock = new CodeBlock(this, Code.ToArray(), 0, Code.Count - 1, 0, s);
+						Elements.AddLast(CodeBlock);
 
-						if (!string.IsNullOrEmpty(s))
+						if (!string.IsNullOrEmpty(s) && !CodeBlock.HasHandler)
 							this.syntaxHighlighting = true;
 
 						BlockIndex = i;
@@ -6638,6 +6639,39 @@ namespace Waher.Content.Markdown
 				AsArrays[P.Key] = P.Value.ToArray();
 				AsCounts[P.Key] = P.Value.Count;
 			}
+		}
+
+		/// <summary>
+		/// Appends a set of rows into a single string with newlines between rows.
+		/// </summary>
+		/// <param name="Rows">Rows</param>
+		/// <returns>Appended rows.</returns>
+		public static string AppendRows(string[] Rows)
+		{
+			return AppendRows(Rows, false);
+		}
+
+		/// <summary>
+		/// Appends a set of rows into a single string with newlines between rows.
+		/// </summary>
+		/// <param name="Rows">Rows</param>
+		/// <returns>Appended rows.</returns>
+		public static string AppendRows(string[] Rows, bool SingleRow)
+		{
+			if (SingleRow && Rows.Length == 1)
+				return Rows[0].Trim();
+			
+			StringBuilder sb = new StringBuilder();
+
+			foreach (string Row in Rows)
+			{
+				if (SingleRow)
+					sb.Append(Row.Trim());
+				else
+					sb.AppendLine(Row);
+			}
+
+			return sb.ToString();
 		}
 
 		// TODO: Footnotes in included markdown files.

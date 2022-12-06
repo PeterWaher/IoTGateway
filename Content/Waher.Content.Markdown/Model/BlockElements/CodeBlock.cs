@@ -67,6 +67,11 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public string[] Rows => this.rows;
 
 		/// <summary>
+		/// If code block has an assignated handler.
+		/// </summary>
+		public bool HasHandler => !(this.handler is null);
+
+		/// <summary>
 		/// Code block handler.
 		/// </summary>
 		public ICodeContent Handler => this.handler;

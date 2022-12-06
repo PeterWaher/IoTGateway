@@ -1362,6 +1362,65 @@ PlantUML is installed in the program data folder.
 
 For more information about PlantUML syntax, see the [PlantUML Language Reference Guide](http://plantuml.com/PlantUML_Language_Reference_Guide.pdf).
 
+#### Embed inline images
+
+You can embed an image directly into the Markdown by placing the BASE64-encoded version of the image, together with its
+image Content-Type, in side a code block.
+
+Example:
+
+    ```image/png:PNG as a code block
+    iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAAwFBMVEUAAADtTFztTFztTFz5+fkq
+    X57tTFztTFztTFztTFz5+fkqX57tTFz5+fkqX57tTFztTFztTFztTFz5+fn5+fkqX54qX575+fn5
+    +fkqX54qX575+fkqX54qX57tTFz5+fn5+fkqX575+fkqX575+fntTFztTFwqX575+fn5+fn5+fkq
+    X54qX54qX57tTFz5+fkqX56Fosa4yd2ettE3aaTF0+Ls7/NEcqnS3Ojf5u5RfK94mcBehrWSrMxr
+    j7qrv9fPtihIAAAALnRSTlMA74AQ7+9Aj89gEBCfgIAgv1DfQGBAz4/PYI+fIJ+vIN+/v99QcDBQ
+    cK8wMK9wikih8QAAA3lJREFUeAHslwVi61AMBD+8MjNjyrQyh3P/U5UhsIZaKncuoMmTtVL+/FKK
+    X5Yup/f2huQO3OH296dOFt6n9uba1rJ0gS5WNxZ33rb68XpF+kAfuysHb1X9fH1IBsEgbuXMvvrE
+    2rJQQFldHLctPz0kKSAFNzVuX54BvLkCL08EiILFyFckE2Syqw2HiQvJATmcjqvmfki0AnDlc2Fi
+    XfJBPislH2FzWWwEsFoqoJeGxEoArsS3uCbFQDEWXz38YiuAV0bCllgLYONt6gvMDXj9RkMtgA1N
+    /31fL4Cp8t9/CIT5AjazsCSEBuAZCKBAHmwOCSECqhYCLjcTJ2j+JgCQGAhgNW8v8P3jAUBgIYCV
+    nP0rlCoA1EwEkLmdJ4aEkeCepomAy2rChVAC3NMxEcBpsQn0Wi/UcE/cesEjAvpZrHQ/e4QMokQh
+    sFswgj2k4mlaAEwV/ALrVVCqddEJuPGiO6gFQku6gdkT0BFs1tBHrW8YYfYE08IIA/QQhGIggCn6
+    AJwXAxrHsHqCNUnBRxe+hQC/DJaFk6CHxEhgtb/+uRBIGnhGAjjjazhlEQJx/JgBegG+loeyO+CH
+    oc97gJI4fgfwDsRtuaUdsx6gLAfFOlAD4IePmeCTswQ2PagIp/748+94fIQ6F9DtxE1JIUAQ9gVj
+    YCSAnSIpFDWlj2ZkJbCY/2eUYyWwQWJQIaALQ/kIAdBjVCGgOE4vP0bghN0iCgHFVbL3MQL7n0dg
+    6GMEnMUUChT8Cnwagc2PEnj+c3D1Qfx54lfgV+Cm3brAkSSGoQD6HSskRUUHKGGX+N//eCvqcQ/0
+    QEG89A4QMkXoQnA30cX0+xwg0EXA3Y0ubrhLdJHwgi5gCh0UmEYHDabSQYUZ6WAEzMLuFjzK7C7j
+    0czuZrwiPqPQZJ8ImI2dbXij+LRBU326kFFhR6J4J/j8RYyKzwOY4PMARsXnAUxweQCHmbjgmcQu
+    Ep5a2cGK51R8MtDM3f8B6D2WMz6nhZcqii+MwgvJiC8lpwo0tecvoG9LDvimxks0fFtz2t80p/1N
+    cIq/qS75/ygJTyMJO4yFJykjdtHMU2TFXrPwMJlxgK48aFUckxYesCQcF4Q7ScApNMi+7RVn0SA+
+    2xuthT9QquJ0WxZ+i+QNF5nzwi8secalxtoKnyitjugi3cI0CV/INIVbwh7//fcL7aUSs7ldhxUA
+    AAAASUVORK5CYII=
+    ```
+
+Result:
+
+```image/png:PNG as a code block
+iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAAwFBMVEUAAADtTFztTFztTFz5+fkq
+X57tTFztTFztTFztTFz5+fkqX57tTFz5+fkqX57tTFztTFztTFztTFz5+fn5+fkqX54qX575+fn5
++fkqX54qX575+fkqX54qX57tTFz5+fn5+fkqX575+fkqX575+fntTFztTFwqX575+fn5+fn5+fkq
+X54qX54qX57tTFz5+fkqX56Fosa4yd2ettE3aaTF0+Ls7/NEcqnS3Ojf5u5RfK94mcBehrWSrMxr
+j7qrv9fPtihIAAAALnRSTlMA74AQ7+9Aj89gEBCfgIAgv1DfQGBAz4/PYI+fIJ+vIN+/v99QcDBQ
+cK8wMK9wikih8QAAA3lJREFUeAHslwVi61AMBD+8MjNjyrQyh3P/U5UhsIZaKncuoMmTtVL+/FKK
+X5Yup/f2huQO3OH296dOFt6n9uba1rJ0gS5WNxZ33rb68XpF+kAfuysHb1X9fH1IBsEgbuXMvvrE
+2rJQQFldHLctPz0kKSAFNzVuX54BvLkCL08EiILFyFckE2Syqw2HiQvJATmcjqvmfki0AnDlc2Fi
+XfJBPislH2FzWWwEsFoqoJeGxEoArsS3uCbFQDEWXz38YiuAV0bCllgLYONt6gvMDXj9RkMtgA1N
+/31fL4Cp8t9/CIT5AjazsCSEBuAZCKBAHmwOCSECqhYCLjcTJ2j+JgCQGAhgNW8v8P3jAUBgIYCV
+nP0rlCoA1EwEkLmdJ4aEkeCepomAy2rChVAC3NMxEcBpsQn0Wi/UcE/cesEjAvpZrHQ/e4QMokQh
+sFswgj2k4mlaAEwV/ALrVVCqddEJuPGiO6gFQku6gdkT0BFs1tBHrW8YYfYE08IIA/QQhGIggCn6
+AJwXAxrHsHqCNUnBRxe+hQC/DJaFk6CHxEhgtb/+uRBIGnhGAjjjazhlEQJx/JgBegG+loeyO+CH
+oc97gJI4fgfwDsRtuaUdsx6gLAfFOlAD4IePmeCTswQ2PagIp/748+94fIQ6F9DtxE1JIUAQ9gVj
+YCSAnSIpFDWlj2ZkJbCY/2eUYyWwQWJQIaALQ/kIAdBjVCGgOE4vP0bghN0iCgHFVbL3MQL7n0dg
+6GMEnMUUChT8Cnwagc2PEnj+c3D1Qfx54lfgV+Cm3brAkSSGoQD6HSskRUUHKGGX+N//eCvqcQ/0
+QEG89A4QMkXoQnA30cX0+xwg0EXA3Y0ubrhLdJHwgi5gCh0UmEYHDabSQYUZ6WAEzMLuFjzK7C7j
+0czuZrwiPqPQZJ8ImI2dbXij+LRBU326kFFhR6J4J/j8RYyKzwOY4PMARsXnAUxweQCHmbjgmcQu
+Ep5a2cGK51R8MtDM3f8B6D2WMz6nhZcqii+MwgvJiC8lpwo0tecvoG9LDvimxks0fFtz2t80p/1N
+cIq/qS75/ygJTyMJO4yFJykjdtHMU2TFXrPwMJlxgK48aFUckxYesCQcF4Q7ScApNMi+7RVn0SA+
+2xuthT9QquJ0WxZ+i+QNF5nzwi8secalxtoKnyitjugi3cI0CV/INIVbwh7//fcL7aUSs7ldhxUA
+AAAASUVORK5CYII=
+```
+
 ### Comments
 
 You can add comments to Markdown documents. Comments are not exported when rendering output. Comments are put in separate blocks, each row

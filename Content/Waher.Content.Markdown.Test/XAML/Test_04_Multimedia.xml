@@ -26,4 +26,5 @@
 	<MediaElement Source="video1.mp4" />
 	<MediaElement Source="video1.mp4" Width="320" Height="200" />
 	<WebBrowser Source="http://google.com/" Width="1200" Height="300" />
+	<Image Source="C:\Users\peter\AppData\Local\Temp\tmp51NK-WrMQ8yqmWVwT0w-4mqxzKJ1hi4OP-sVg1B-e6c.tmp" Width="128" Height="128" ToolTip="PNG as a code block" />
 </StackPanel>

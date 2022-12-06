@@ -215,13 +215,8 @@ namespace Waher.Content.Markdown.Layout2D
 		/// <returns>File name</returns>
 		private static async Task<GraphInfo> GetFileName(string Language, string[] Rows, Variables Session)
 		{
-			StringBuilder sb = new StringBuilder();
 			GraphInfo Result = new GraphInfo();
-
-			foreach (string Row in Rows)
-				sb.AppendLine(Row);
-
-			string Xml = sb.ToString();
+			string Xml = MarkdownDocument.AppendRows(Rows);
 			int i = Language.IndexOf(':');
 
 			if (i > 0)
@@ -232,9 +227,7 @@ namespace Waher.Content.Markdown.Layout2D
 			else
 				Result.Title = string.Empty;
 
-			sb.Append(Language);
-
-			string Hash = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(sb.ToString()));
+			string Hash = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(Xml + Language));
 
 			string LayoutFolder = Path.Combine(contentRootFolder, "Layout");
 			string FileName = Path.Combine(LayoutFolder, Hash);

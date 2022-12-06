@@ -28,4 +28,5 @@
 	<MediaElement Source="video1.mp4" />
 	<MediaElement Source="video1.mp4" WidthRequest="320" HeightRequest="200" />
 	<WebView Source="http://google.com/" WidthRequest="1200" HeightRequest="300" />
+	<Image Source="C:\Users\peter\AppData\Local\Temp\tmp51NK-WrMQ8yqmWVwT0w-4mqxzKJ1hi4OP-sVg1B-e6c.tmp" WidthRequest="128" HeightRequest="128" />
 </StackLayout>

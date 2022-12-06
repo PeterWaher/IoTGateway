@@ -1210,6 +1210,20 @@
             </summary>
             <returns>Markdown statistics.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.AppendRows(System.String[])">
+            <summary>
+            Appends a set of rows into a single string with newlines between rows.
+            </summary>
+            <param name="Rows">Rows</param>
+            <returns>Appended rows.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.AppendRows(System.String[],System.Boolean)">
+            <summary>
+            Appends a set of rows into a single string with newlines between rows.
+            </summary>
+            <param name="Rows">Rows</param>
+            <returns>Appended rows.</returns>
+        </member>
         <member name="T:Waher.Content.Markdown.AuthorizeExpression">
             <summary>
             Delegate for expression authorization methods.
@@ -2048,6 +2062,11 @@
         <member name="P:Waher.Content.Markdown.Model.BlockElements.CodeBlock.Rows">
             <summary>
             Rows in code block
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Model.BlockElements.CodeBlock.HasHandler">
+            <summary>
+            If code block has an assignated handler.
             </summary>
         </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.CodeBlock.Handler">
@@ -4120,6 +4139,116 @@
             <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
         </member>
         <member name="M:Waher.Content.Markdown.Model.CodeContent.GraphContent.GenerateImage(System.String[],System.String,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates an image of the contents.
+            </summary>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>Image, if successful, null otherwise.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.Model.CodeContent.ImageContent">
+            <summary>
+            Base64-encoded image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.#ctor">
+            <summary>
+            Base64-encoded image content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.Supports(System.String)">
+            <summary>
+            Checks how well the handler supports multimedia content of a given type.
+            </summary>
+            <param name="Language">Language.</param>
+            <returns>How well the handler supports the content.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.Register(Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Is called on the object when an instance of the element has been created in a document.
+            </summary>
+            <param name="Document">Document containing the instance.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Model.CodeContent.ImageContent.HandlesHTML">
+            <summary>
+            If HTML is handled.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Model.CodeContent.ImageContent.HandlesPlainText">
+            <summary>
+            If Plain Text is handled.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Model.CodeContent.ImageContent.HandlesXAML">
+            <summary>
+            If XAML is handled.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GenerateHTML(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates HTML for the markdown element.
+            </summary>
+            <param name="Output">HTML will be output here.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GenerateUrl(System.String,System.String[],System.String@,System.String@)">
+            <summary>
+            Generates a data URL of the encoded image.
+            </summary>
+            <param name="Language">Language</param>
+            <param name="Rows">Rows</param>
+            <param name="ContentType">Content-Type of image.</param>
+            <param name="Title">Optional associated title.</param>
+            <returns>Data URL.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GetImageBase64(System.String[])">
+            <summary>
+            Gets the binary image from the encoded rows.
+            </summary>
+            <param name="Rows">Rows</param>
+            <returns>Base64-encoded image.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GeneratePlainText(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Plain Text for the markdown element.
+            </summary>
+            <param name="Output">HTML will be output here.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GenerateXAML(System.Xml.XmlWriter,Waher.Content.Markdown.Model.TextAlignment,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates WPF XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="TextAlignment">Alignment of text in element.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GenerateXamarinForms(System.Xml.XmlWriter,Waher.Content.Markdown.Model.XamarinRenderingState,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates Xamarin.Forms XAML for the markdown element.
+            </summary>
+            <param name="Output">XAML will be output here.</param>
+            <param name="State">Xamarin Forms XAML Rendering State.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GenerateImage(System.String[],System.String,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates an image of the contents.
             </summary>

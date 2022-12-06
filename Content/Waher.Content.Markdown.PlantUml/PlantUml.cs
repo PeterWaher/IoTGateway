@@ -290,12 +290,7 @@ namespace Waher.Content.Markdown.PlantUml
 		private async Task<GraphInfo> GetFileName(string Language, string[] Rows, ResultType Type)
 		{
 			GraphInfo Result = new GraphInfo();
-			StringBuilder sb = new StringBuilder();
-
-			foreach (string Row in Rows)
-				sb.AppendLine(Row);
-
-			string Graph = sb.ToString();
+			string Graph = MarkdownDocument.AppendRows(Rows);
 			int i = Language.IndexOf(':');
 
 			if (i > 0)
@@ -306,9 +301,7 @@ namespace Waher.Content.Markdown.PlantUml
 			else
 				Result.Title = string.Empty;
 
-			sb.Append(Language);
-
-			Result.FileName = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(sb.ToString()));
+			Result.FileName = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(Graph + Language));
 			string PlantUmlFolder = Path.Combine(contentRootFolder, "PlantUML");
 			string ResultFileName = Path.Combine(PlantUmlFolder, Result.FileName);
 

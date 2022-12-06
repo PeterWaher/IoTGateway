@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Networking;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
@@ -474,8 +475,30 @@ namespace Waher.IoTGateway.Setup
 
 		internal async Task<bool> CheckDynamicIp(string TabID, string DomainName)
 		{
+			string Msg = await this.CheckDynamicIp(DomainName, async (_, Status) =>
+			{
+				await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", Status, false, "User");
+			});
+
+			if (!string.IsNullOrEmpty(Msg))
+			{
+				await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", Msg, false, "User");
+				return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Checks if Dynamic IP configuration is correct
+		/// </summary>
+		/// <param name="DomainName">Domain Name</param>
+		/// <param name="Status">Status callback method.</param>
+		/// <returns>null if successful, error message if failed.</returns>
+		public async Task<string> CheckDynamicIp(string DomainName, EventHandlerAsync<string> Status)
+		{
 			if (!this.dynamicDns)
-				return true;
+				return null;
 
 			Expression CheckIpScript;
 			Expression UpdateIpScript;
@@ -486,8 +509,7 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to parse script checking current IP Address: " + ex.Message, false, "User");
-				return false;
+				return "Unable to parse script checking current IP Address: " + ex.Message;
 			}
 
 			try
@@ -496,11 +518,10 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to parse script updating the dynamic DNS server: " + ex.Message, false, "User");
-				return false;
+				return "Unable to parse script updating the dynamic DNS server: " + ex.Message;
 			}
 
-			await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Checking current IP Address.", false, "User");
+			await Status.Invoke(this, "Checking current IP Address.");
 
 			Variables Variables = new Variables();
 			object Result;
@@ -511,27 +532,23 @@ namespace Waher.IoTGateway.Setup
 			}
 			catch (Exception ex)
 			{
-				await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to get current IP Address: " + ex.Message, false, "User");
-				return false;
+				return "Unable to get current IP Address: " + ex.Message;
 			}
 
 			if (!(Result is string CurrentIP) || !IPAddress.TryParse(CurrentIP, out IPAddress _))
-			{
-				await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to get current IP Address. Unexpected response.", false, "User");
-				return false;
-			}
+				return "Unable to get current IP Address. Unexpected response.";
 
-			await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Current IP Address: " + CurrentIP, false, "User");
+			await Status.Invoke(this, "Current IP Address: " + CurrentIP);
 
 			string LastIP = await RuntimeSettings.GetAsync("Last.IP." + DomainName, string.Empty);
 
 			if (LastIP == CurrentIP)
-				await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "IP Address has not changed for " + DomainName + ".", false, "User");
+				await Status.Invoke(this, "IP Address has not changed for " + DomainName + ".");
 			else
 			{
 				try
 				{
-					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Updating IP address for " + DomainName + " to " + CurrentIP + ".", false, "User");
+					await Status.Invoke(this, "Updating IP address for " + DomainName + " to " + CurrentIP + ".");
 
 					Variables["Account"] = this.dynDnsAccount;
 					Variables["Password"] = this.dynDnsPassword;
@@ -544,20 +561,42 @@ namespace Waher.IoTGateway.Setup
 				}
 				catch (Exception ex)
 				{
-					await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to register new dynamic IP Address: " + ex.Message, false, "User");
-					return false;
+					return "Unable to register new dynamic IP Address: " + ex.Message;
 				}
+			}
+
+			return null;
+		}
+
+		private async Task<bool> Test(string TabID, string DomainName)
+		{
+			string Msg = await this.Test(DomainName, async (_, Status) =>
+			{
+				await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", Status, false, "User");
+			});
+
+			if (!string.IsNullOrEmpty(Msg))
+			{
+				await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", Msg, false, "User");
+				return false;
 			}
 
 			return true;
 		}
 
-		private async Task<bool> Test(string TabID, string DomainName)
+		/// <summary>
+		/// Checks if the domain points to the server.
+		/// </summary>
+		/// <param name="DomainName">Domain Name</param>
+		/// <param name="Status">Status callback method.</param>
+		/// <returns>null if successful, error message if failed.</returns>
+		public async Task<string> Test(string DomainName, EventHandlerAsync<string> Status)
 		{
-			await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Testing " + DomainName + "...", false, "User");
+			await Status.Invoke(this, "Testing " + DomainName + "...");
 
-			if (!await this.CheckDynamicIp(TabID, DomainName))
-				return false;
+			string Msg = await this.CheckDynamicIp(DomainName, Status);
+			if (!string.IsNullOrEmpty(Msg))
+				return Msg;
 
 			this.token = Hashes.BinaryToString(Gateway.NextBytes(32));
 
@@ -585,34 +624,28 @@ namespace Waher.IoTGateway.Setup
 					HttpResponseMessage Response = await HttpClient.GetAsync("http://" + DomainName + "/Settings/TestDomainName");
 					if (!Response.IsSuccessStatusCode)
 					{
-						await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Domain name does not point to this machine.", false, "User");
-						return false;
+						return "Domain name does not point to this machine.";
 					}
 
 					byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
 					string Token = Encoding.ASCII.GetString(Bin);
 
 					if (Token != this.token)
-					{
-						await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unexpected response returned. Domain name does not point to this machine.", false, "User");
-						return false;
-					}
+						return "Unexpected response returned. Domain name does not point to this machine.";
 				}
 				catch (TimeoutException)
 				{
-					await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Time-out. Check that the domain name points to this machine.", false, "User");
-					return false;
+					return "Time-out. Check that the domain name points to this machine.";
 				}
 				catch (Exception ex)
 				{
-					await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to validate domain name: " + ex.Message, false, "User");
-					return false;
+					return "Unable to validate domain name: " + ex.Message;
 				}
 			}
 
-			await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Domain name valid.", false, "User");
+			await Status.Invoke(this, "Domain name valid.");
 
-			return true;
+			return null;
 		}
 
 		private async Task TestCA(HttpRequest Request, HttpResponse Response)
@@ -688,18 +721,217 @@ namespace Waher.IoTGateway.Setup
 			if (!this.inProgress)
 			{
 				this.inProgress = true;
-				Task _ = this.CreateCertificate(TabID);
+				Task _ = Task.Run(async () =>
+				{
+					try
+					{
+						await this.CreateCertificate(TabID);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				});
 			}
 		}
 
 		private bool inProgress = false;
 
+		/// <summary>
+		/// Adds a domain to the list of domains supported by the gateway.
+		/// </summary>
+		/// <param name="Name">Domain name.</param>
+		/// <param name="Status">Status is reported to this event handler.</param>
+		/// <returns>Null, if domain could be added, otherwise contains an error message.</returns>
+		public async Task<string> AddDomain(string Name, EventHandlerAsync<string> Status)
+		{
+			if (this.IsDomainRegistered(Name))
+				return "Domain already registered.";
+
+			string Msg = await this.Test(Name, Status);
+			if (!string.IsNullOrEmpty(Msg))
+				return Msg;
+
+			string DomainBak = this.domain;
+			bool UseDomainBak = this.useDomainName;
+			string[] AlternativeBak = this.alternativeDomains;
+
+			if (string.IsNullOrEmpty(this.domain))
+			{
+				this.domain = Name;
+				this.useDomainName = true;
+			}
+			else if (this.alternativeDomains is null)
+				this.alternativeDomains = new string[] { Name };
+			else
+			{
+				int c = this.alternativeDomains.Length;
+				string[] NewArray = new string[c + 1];
+				this.alternativeDomains.CopyTo(NewArray, 0);
+				NewArray[c] = Name;
+				this.alternativeDomains = NewArray;
+			}
+
+			Msg = await this.CreateCertificate(Status, (_, __) => Task.CompletedTask);
+			if (!string.IsNullOrEmpty(Msg))
+			{
+				this.domain = DomainBak;
+				this.useDomainName = UseDomainBak;
+				this.alternativeDomains = AlternativeBak;
+
+				return Msg;
+			}
+
+			await Database.Update(this);
+
+			return null;
+		}
+
+		/// <summary>
+		/// Removes a domain from the list of domains supported by the gateway.
+		/// </summary>
+		/// <param name="Name">Domain name.</param>
+		/// <param name="Status">Status is reported to this event handler.</param>
+		/// <returns>Null, if domain could be removed, otherwise contains an error message.</returns>
+		public async Task<string> RemoveDomain(string Name, EventHandlerAsync<string> Status)
+		{
+			if (!this.IsDomainRegistered(Name))
+				return "Domain not registered.";
+
+			string DomainBak = this.domain;
+			bool UseDomainBak = this.useDomainName;
+			string[] AlternativeBak = this.alternativeDomains;
+			string[] NewArray;
+
+			if (string.Compare(this.domain, Name, true) == 0)
+			{
+				if ((this.alternativeDomains?.Length ?? 0) == 0)
+				{
+					this.domain = string.Empty;
+					this.useDomainName = false;
+				}
+				else
+				{
+					this.domain = this.alternativeDomains[0];
+
+					int c = this.alternativeDomains.Length;
+
+					if (c == 1)
+						this.alternativeDomains = null;
+					else
+					{
+						NewArray = new string[c - 1];
+						Array.Copy(this.alternativeDomains, 1, NewArray, 0, c - 1);
+						this.alternativeDomains = NewArray;
+					}
+				}
+			}
+			else if (!(this.alternativeDomains is null))
+			{
+				int c = this.alternativeDomains.Length;
+				if (c == 1)
+					this.alternativeDomains = null;
+				else
+				{
+					int i = Array.IndexOf(this.alternativeDomains, Name);
+
+					NewArray = new string[c - 1];
+
+					if (i > 0)
+						Array.Copy(this.alternativeDomains, 0, NewArray, 0, i);
+
+					if (i < c - 1)
+						Array.Copy(this.alternativeDomains, i + 1, NewArray, i, c - i - 1);
+
+					this.alternativeDomains = NewArray;
+				}
+			}
+
+			if (this.useDomainName)
+			{
+				string Msg = await this.CreateCertificate(Status, (_, __) => Task.CompletedTask);
+				if (!string.IsNullOrEmpty(Msg))
+				{
+					this.domain = DomainBak;
+					this.useDomainName = UseDomainBak;
+					this.alternativeDomains = AlternativeBak;
+
+					return Msg;
+				}
+			}
+
+			await Database.Update(this);
+
+			return null;
+		}
+
+		/// <summary>
+		/// Checks if a domain name is registered.
+		/// </summary>
+		/// <param name="Name">Domain name to check.</param>
+		/// <returns>If the name is already registered.</returns>
+		public bool IsDomainRegistered(string Name)
+		{
+			if (string.Compare(Name, this.domain, true) == 0)
+				return true;
+
+			if (this.alternativeDomains is null)
+				return false;
+
+			foreach (string Alternative in this.alternativeDomains)
+			{
+				if (string.Compare(Name, Alternative, true) == 0)
+					return true;
+			}
+
+			return false;
+		}
+
 		internal Task<bool> CreateCertificate()
 		{
-			return CreateCertificate(null);
+			return CreateCertificate((string)null);
 		}
 
 		internal async Task<bool> CreateCertificate(string TabID)
+		{
+			try
+			{
+				string Msg = await this.CreateCertificate(
+					async (_, Status) =>
+					{
+						if (!string.IsNullOrEmpty(TabID))
+							await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", Status, false, "User");
+					},
+					async (_, URL) =>
+					{
+						await ClientEvents.PushEvent(new string[] { TabID }, "TermsOfService", URL, false, "User");
+					});
+
+				if (string.IsNullOrEmpty(Msg))
+				{
+					if (!string.IsNullOrEmpty(TabID))
+						await ClientEvents.PushEvent(new string[] { TabID }, "CertificateOk", string.Empty, false, "User");
+
+					return true;
+				}
+				else
+				{
+					if (!string.IsNullOrEmpty(TabID))
+						await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", Msg, false, "User");
+
+					return false;
+				}
+			}
+			catch (Exception ex)
+			{
+				if (!string.IsNullOrEmpty(TabID))
+					await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", ex.Message, false, "User");
+
+				return false;
+			}
+		}
+
+		internal async Task<string> CreateCertificate(EventHandlerAsync<string> Status, EventHandlerAsync<string> TermsOfService)
 		{
 			try
 			{
@@ -745,32 +977,29 @@ namespace Waher.IoTGateway.Setup
 
 				using (AcmeClient Client = new AcmeClient(new Uri(URL), Parameters))
 				{
-					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Connecting to directory.", false, "User");
+					await Status.Invoke(this, "Connecting to directory.");
 
 					AcmeDirectory AcmeDirectory = await Client.GetDirectory();
 
 					if (AcmeDirectory.ExternalAccountRequired)
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "An external account is required.", false, "User");
+						await Status.Invoke(this, "An external account is required.");
 
 					if (AcmeDirectory.TermsOfService != null)
 					{
 						URL = AcmeDirectory.TermsOfService.ToString();
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Terms of service available on: " + URL, false, "User");
-						await ClientEvents.PushEvent(new string[] { TabID }, "TermsOfService", URL, false, "User");
+						await Status.Invoke(this, "Terms of service available on: " + URL);
+						await TermsOfService.Invoke(this, URL);
 
 						this.urlToS = URL;
 
 						if (!this.acceptToS)
-						{
-							await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "You need to accept the terms of service.", false, "User");
-							return false;
-						}
+							return "You need to accept the terms of service.";
 					}
 
 					if (AcmeDirectory.Website != null)
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Web site available on: " + AcmeDirectory.Website.ToString(), false, "User");
+						await Status.Invoke(this, "Web site available on: " + AcmeDirectory.Website.ToString());
 
-					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Getting account.", false, "User");
+					await Status.Invoke(this, "Getting account.");
 
 					List<string> Names = new List<string>();
 
@@ -793,43 +1022,43 @@ namespace Waher.IoTGateway.Setup
 					{
 						Account = await Client.GetAccount();
 
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Account found.", false, "User");
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Created: " + Account.CreatedAt.ToString(), false, "User");
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Initial IP: " + Account.InitialIp, false, "User");
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Status: " + Account.Status.ToString(), false, "User");
+						await Status.Invoke(this, "Account found.");
+						await Status.Invoke(this, "Created: " + Account.CreatedAt.ToString());
+						await Status.Invoke(this, "Initial IP: " + Account.InitialIp);
+						await Status.Invoke(this, "Status: " + Account.Status.ToString());
 
 						if (string.IsNullOrEmpty(this.contactEMail))
 						{
 							if (Account.Contact != null && Account.Contact.Length != 0)
 							{
-								await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Updating contact URIs in account.", false, "User");
+								await Status.Invoke(this, "Updating contact URIs in account.");
 								Account = await Account.Update(new string[0]);
-								await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Account updated.", false, "User");
+								await Status.Invoke(this, "Account updated.");
 							}
 						}
 						else
 						{
 							if (Account.Contact is null || Account.Contact.Length != 1 || Account.Contact[0] != "mailto:" + this.contactEMail)
 							{
-								await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Updating contact URIs in account.", false, "User");
+								await Status.Invoke(this, "Updating contact URIs in account.");
 								Account = await Account.Update(new string[] { "mailto:" + this.contactEMail });
-								await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Account updated.", false, "User");
+								await Status.Invoke(this, "Account updated.");
 							}
 						}
 					}
 					catch (AcmeAccountDoesNotExistException)
 					{
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Account not found.", false, "User");
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Creating account.", false, "User");
+						await Status.Invoke(this, "Account not found.");
+						await Status.Invoke(this, "Creating account.");
 
 						Account = await Client.CreateAccount(string.IsNullOrEmpty(this.contactEMail) ? new string[0] : new string[] { "mailto:" + this.contactEMail },
 							this.acceptToS);
 
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Account created.", false, "User");
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Status: " + Account.Status.ToString(), false, "User");
+						await Status.Invoke(this, "Account created.");
+						await Status.Invoke(this, "Status: " + Account.Status.ToString());
 					}
 
-					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Generating new key.", false, "User");
+					await Status.Invoke(this, "Generating new key.");
 					await Account.NewKey();
 
 					using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096, CspParams))
@@ -837,9 +1066,9 @@ namespace Waher.IoTGateway.Setup
 						RSA.ImportParameters(Client.ExportAccountKey(true));
 					}
 
-					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "New key generated.", false, "User");
+					await Status.Invoke(this, "New key generated.");
 
-					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Creating order.", false, "User");
+					await Status.Invoke(this, "Creating order.");
 					AcmeOrder Order;
 
 					try
@@ -849,15 +1078,15 @@ namespace Waher.IoTGateway.Setup
 					catch (AcmeMalformedException)  // Not sure why this is necessary. Perhaps because it takes time to propagate the keys correctly on the remote end?
 					{
 						await Task.Delay(5000);
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Retrying.", false, "User");
+						await Status.Invoke(this, "Retrying.");
 						Order = await Account.OrderCertificate(DomainNames, null, null);
 					}
 
-					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Order created.", false, "User");
+					await Status.Invoke(this, "Order created.");
 
 					AcmeAuthorization[] Authorizations;
 
-					await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Getting authorizations.", false, "User");
+					await Status.Invoke(this, "Getting authorizations.");
 					try
 					{
 						Authorizations = await Order.GetAuthorizations();
@@ -865,13 +1094,13 @@ namespace Waher.IoTGateway.Setup
 					catch (AcmeMalformedException)  // Not sure why this is necessary. Perhaps because it takes time to propagate the keys correctly on the remote end?
 					{
 						await Task.Delay(5000);
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Retrying.", false, "User");
+						await Status.Invoke(this, "Retrying.");
 						Authorizations = await Order.GetAuthorizations();
 					}
 
 					foreach (AcmeAuthorization Authorization in Authorizations)
 					{
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Processing authorization for " + Authorization.Value, false, "User");
+						await Status.Invoke(this, "Processing authorization for " + Authorization.Value);
 
 						AcmeChallenge Challenge;
 						bool Acknowledged = false;
@@ -887,34 +1116,35 @@ namespace Waher.IoTGateway.Setup
 								this.challenge = "/" + HttpChallenge.Token;
 								this.token = HttpChallenge.KeyAuthorization;
 
-								await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Acknowleding challenge.", false, "User");
-								if (await this.CheckDynamicIp(TabID, Authorization.Value))
+								await Status.Invoke(this, "Acknowleding challenge.");
+
+								string Msg = await this.CheckDynamicIp(Authorization.Value, Status);
+								if (string.IsNullOrEmpty(Msg))
 								{
 									Challenge = await HttpChallenge.AcknowledgeChallenge();
-									await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Challenge acknowledged: " + Challenge.Status.ToString(), false, "User");
+									await Status.Invoke(this, "Challenge acknowledged: " + Challenge.Status.ToString());
 
 									Acknowledged = true;
 								}
+								else
+									return Msg;
 							}
 						}
 
 						if (!Acknowledged)
-						{
-							await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "No automated method found to respond to any of the authorization challenges.", false, "User");
-							return false;
-						}
+							return "No automated method found to respond to any of the authorization challenges.";
 
 						AcmeAuthorization Authorization2 = Authorization;
 
 						do
 						{
-							await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Waiting to poll authorization status.", false, "User");
+							await Status.Invoke(this, "Waiting to poll authorization status.");
 							await Task.Delay(5000);
 
-							await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Polling authorization.", false, "User");
+							await Status.Invoke(this, "Polling authorization.");
 							Authorization2 = await Authorization2.Poll();
 
-							await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Authorization polled: " + Authorization2.Status.ToString(), false, "User");
+							await Status.Invoke(this, "Authorization polled: " + Authorization2.Status.ToString());
 						}
 						while (Authorization2.Status == AcmeAuthorizationStatus.pending);
 
@@ -942,7 +1172,7 @@ namespace Waher.IoTGateway.Setup
 
 					using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider(4096))   // TODO: Make configurable
 					{
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Finalizing order.", false, "User");
+						await Status.Invoke(this, "Finalizing order.");
 
 						SignatureAlgorithm SignAlg = new RsaSha256(RSA);
 
@@ -953,7 +1183,7 @@ namespace Waher.IoTGateway.Setup
 							EMailAddress = this.contactEMail
 						});
 
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Order finalized: " + Order.Status.ToString(), false, "User");
+						await Status.Invoke(this, "Order finalized: " + Order.Status.ToString());
 
 						if (Order.Status != AcmeOrderStatus.valid)
 						{
@@ -970,19 +1200,19 @@ namespace Waher.IoTGateway.Setup
 						if (Order.Certificate is null)
 							throw new Exception("No certificate URI provided.");
 
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Downloading certificate.", false, "User");
+						await Status.Invoke(this, "Downloading certificate.");
 
 						X509Certificate2[] Certificates = await Order.DownloadCertificate();
 						X509Certificate2 Certificate = Certificates[0];
 
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Exporting certificate.", false, "User");
+						await Status.Invoke(this, "Exporting certificate.");
 
 						this.certificate = Certificate.Export(X509ContentType.Cert);
 						this.privateKey = RSA.ExportCspBlob(true);
 						this.pfx = null;
 						this.password = string.Empty;
 
-						await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Adding private key.", false, "User");
+						await Status.Invoke(this, "Adding private key.");
 
 						try
 						{
@@ -990,8 +1220,8 @@ namespace Waher.IoTGateway.Setup
 						}
 						catch (PlatformNotSupportedException)
 						{
-							await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Platform does not support adding of private key.", false, "User");
-							await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Searching for OpenSSL on machine.", false, "User");
+							await Status.Invoke(this, "Platform does not support adding of private key.");
+							await Status.Invoke(this, "Searching for OpenSSL on machine.");
 
 							string[] Files;
 							string Password = Hashes.BinaryToString(Gateway.NextBytes(32));
@@ -1008,7 +1238,7 @@ namespace Waher.IoTGateway.Setup
 									},
 									Path.DirectorySeparatorChar + "OpenSSL-Win32",
 									Path.DirectorySeparatorChar + "OpenSSL-Win64");
-								
+
 								Files = Gateway.FindFiles(Folders, "openssl.exe", 2, int.MaxValue);
 							}
 							else
@@ -1017,17 +1247,14 @@ namespace Waher.IoTGateway.Setup
 							try
 							{
 								if (Files.Length == 0)
-								{
-									await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to join certificate with private key. Try installing <a target=\"_blank\" href=\"https://wiki.openssl.org/index.php/Binaries\">OpenSSL</a> and try again.", false, "User");
-									return false;
-								}
+									return "Unable to join certificate with private key. Try installing <a target=\"_blank\" href=\"https://wiki.openssl.org/index.php/Binaries\">OpenSSL</a> and try again.";
 								else
 								{
 									foreach (string OpenSslFile in Files)
 									{
 										if (CertFileName is null)
 										{
-											await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Generating temporary certificate file.", false, "User");
+											await Status.Invoke(this, "Generating temporary certificate file.");
 
 											StringBuilder PemOutput = new StringBuilder();
 											byte[] Bin = Certificate.Export(X509ContentType.Cert);
@@ -1039,7 +1266,7 @@ namespace Waher.IoTGateway.Setup
 											CertFileName = Path.Combine(Gateway.AppDataFolder, "Certificate.pem");
 											await Resources.WriteAllTextAsync(CertFileName, PemOutput.ToString(), Encoding.ASCII);
 
-											await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Generating temporary key file.", false, "User");
+											await Status.Invoke(this, "Generating temporary key file.");
 
 											DerEncoder KeyOutput = new DerEncoder();
 											SignAlg.ExportPrivateKey(KeyOutput);
@@ -1054,7 +1281,7 @@ namespace Waher.IoTGateway.Setup
 											await Resources.WriteAllTextAsync(KeyFileName, PemOutput.ToString(), Encoding.ASCII);
 										}
 
-										await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Converting to PFX using " + OpenSslFile, false, "User");
+										await Status.Invoke(this, "Converting to PFX using " + OpenSslFile);
 
 										Process P = new Process()
 										{
@@ -1076,30 +1303,29 @@ namespace Waher.IoTGateway.Setup
 										if (!P.WaitForExit(60000) || P.ExitCode != 0)
 										{
 											if (!P.StandardOutput.EndOfStream)
-												await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Output: " + P.StandardOutput.ReadToEnd(), false, "User");
+												await Status.Invoke(this, "Output: " + P.StandardOutput.ReadToEnd());
 
 											if (!P.StandardError.EndOfStream)
-												await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Error: " + P.StandardError.ReadToEnd(), false, "User");
+												await Status.Invoke(this, "Error: " + P.StandardError.ReadToEnd());
 
 											continue;
 										}
 
-										await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Loading PFX.", false, "User");
+										await Status.Invoke(this, "Loading PFX.");
 
 										CertFileName2 = Path.Combine(Gateway.AppDataFolder, "Certificate.pfx");
 										this.pfx = await Resources.ReadAllBytesAsync(CertFileName2);
 										this.password = Password;
 										this.openSslPath = OpenSslFile;
 
-										await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "PFX successfully generated using OpenSSL.", false, "User");
+										await Status.Invoke(this, "PFX successfully generated using OpenSSL.");
 										break;
 									}
 
 									if (this.pfx is null)
 									{
 										this.openSslPath = string.Empty;
-										await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to convert to PFX using OpenSSL.", false, "User");
-										return false;
+										return "Unable to convert to PFX using OpenSSL.";
 									}
 								}
 							}
@@ -1107,19 +1333,19 @@ namespace Waher.IoTGateway.Setup
 							{
 								if (CertFileName != null && File.Exists(CertFileName))
 								{
-									await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Deleting temporary certificate file.", false, "User");
+									await Status.Invoke(this, "Deleting temporary certificate file.");
 									File.Delete(CertFileName);
 								}
 
 								if (KeyFileName != null && File.Exists(KeyFileName))
 								{
-									await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Deleting temporary key file.", false, "User");
+									await Status.Invoke(this, "Deleting temporary key file.");
 									File.Delete(KeyFileName);
 								}
 
 								if (CertFileName2 != null && File.Exists(CertFileName2))
 								{
-									await ClientEvents.PushEvent(new string[] { TabID }, "ShowStatus", "Deleting temporary pfx file.", false, "User");
+									await Status.Invoke(this, "Deleting temporary pfx file.");
 									File.Delete(CertFileName2);
 								}
 							}
@@ -1132,19 +1358,16 @@ namespace Waher.IoTGateway.Setup
 						this.Updated = DateTime.Now;
 						await Database.Update(this);
 
-						await ClientEvents.PushEvent(new string[] { TabID }, "CertificateOk", string.Empty, false, "User");
-
 						Gateway.UpdateCertificate(this);
 
-						return true;
+						return null;
 					}
 				}
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
-				await ClientEvents.PushEvent(new string[] { TabID }, "CertificateError", "Unable to create certificate: " + XML.HtmlValueEncode(ex.Message), false, "User");
-				return false;
+				return "Unable to create certificate: " + XML.HtmlValueEncode(ex.Message);
 			}
 			finally
 			{

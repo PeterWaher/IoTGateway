@@ -29,6 +29,11 @@ namespace Waher.Networking
 	public delegate Task EventHandlerAsync(object Sender, EventArgs e);
 
 	/// <summary>
+	/// Asynchronous version of <see cref="EventArgs"/> with a typed event arguments.
+	/// </summary>
+	public delegate Task EventHandlerAsync<T>(object Sender, T e);
+
+	/// <summary>
 	/// Connection error event handler delegate.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>

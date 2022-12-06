@@ -298,7 +298,14 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 				{
 					try
 					{
-						await Callback(this, new HttpFileUploadEventArgs(e, GetUrl, PutUrl, PutHeaders));
+						HttpFileUploadEventArgs e2;
+
+						if (this.maxFileSize.HasValue)
+							e2 = new HttpFileUploadEventArgs(e, GetUrl, PutUrl, PutHeaders, (int)Math.Min(this.maxFileSize.Value, HttpFileUploadEventArgs.DefaultMaxChunkSize), this.client.Sniffers);
+						else
+							e2 = new HttpFileUploadEventArgs(e, GetUrl, PutUrl, PutHeaders, this.client.Sniffers);
+
+						await Callback(this, e2);
 					}
 					catch (Exception ex)
 					{
@@ -337,7 +344,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		/// <param name="ContentType">Internet content type.</param>
 		/// <param name="ContentSize">Size of content.</param>
 		/// <param name="CheckFileSize">If the size of the file should be checked before the slot is requested.</param>
-		public async Task<HttpFileUploadEventArgs> RequestUploadSlotAsync(string FileName, string ContentType, long ContentSize, 
+		public async Task<HttpFileUploadEventArgs> RequestUploadSlotAsync(string FileName, string ContentType, long ContentSize,
 			bool CheckFileSize)
 		{
 			TaskCompletionSource<HttpFileUploadEventArgs> Result = new TaskCompletionSource<HttpFileUploadEventArgs>();

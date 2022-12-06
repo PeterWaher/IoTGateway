@@ -141,7 +141,7 @@ namespace Waher.Things.Mqtt.Model
 				return await Topic.GetTopic(Parts, Index, CreateNew, Broker);
 		}
 
-		public void DataReported(MqttContent Content)
+		public async Task DataReported(MqttContent Content)
 		{
 			int Len = Content.Data.Length;
 			if (Len == 0)
@@ -155,21 +155,21 @@ namespace Waher.Things.Mqtt.Model
 			try
 			{
 				if (this.data is null)
-					this.data = this.FindDataType(Content);
+					this.data = await this.FindDataType(Content);
 				else
 					this.data.DataReported(Content);
 
-				this.SetOk();
+				await this.SetOk();
 			}
 			catch (Exception)
 			{
 				try
 				{
-					this.data = this.FindDataType(Content);
+					this.data = await this.FindDataType(Content);
 				}
 				catch (Exception ex2)
 				{
-					this.Exception(ex2);
+					await this.Exception(ex2);
 					return;
 				}
 			}
@@ -217,12 +217,12 @@ namespace Waher.Things.Mqtt.Model
 				}
 				catch (Exception ex)
 				{
-					this.Exception(ex);
+					await this.Exception(ex);
 				}
 			}
 		}
 
-		private Data FindDataType(MqttContent Content)
+		private async Task<Data> FindDataType(MqttContent Content)
 		{
 			try
 			{
@@ -230,49 +230,49 @@ namespace Waher.Things.Mqtt.Model
 
 				if (long.TryParse(s, out long i))
 				{
-					this.RemoveWarning();
+					await this.RemoveWarning();
 					return new IntegerData(this, i);
 				}
 
 				if (CommonTypes.TryParse(s, out double x, out byte NrDecimals))
 				{
-					this.RemoveWarning();
+					await this.RemoveWarning();
 					return new FloatingPointData(this, x, NrDecimals);
 				}
 
 				if (CommonTypes.TryParse(s, out bool b))
 				{
-					this.RemoveWarning();
+					await this.RemoveWarning();
 					return new BooleanData(this, b);
 				}
 
 				if (System.Guid.TryParse(s, out Guid Guid))
 				{
-					this.RemoveWarning();
+					await this.RemoveWarning();
 					return new GuidData(this, Guid);
 				}
 
 				if (System.TimeSpan.TryParse(s, out TimeSpan TimeSpan))
 				{
-					this.RemoveWarning();
+					await this.RemoveWarning();
 					return new TimeSpanData(this, TimeSpan);
 				}
 
 				if (System.DateTime.TryParse(s, out DateTime DateTime))
 				{
-					this.RemoveWarning();
+					await this.RemoveWarning();
 					return new DateTimeData(this, DateTime);
 				}
 
 				if (CommonTypes.TryParseRfc822(s, out DateTimeOffset DateTimeOffset))
 				{
-					this.RemoveWarning();
+					await this.RemoveWarning();
 					return new DateTimeOffsetData(this, DateTimeOffset);
 				}
 
 				if (Waher.Content.Duration.TryParse(s, out Duration Duration))
 				{
-					this.RemoveWarning();
+					await this.RemoveWarning();
 					return new DurationData(this, Duration);
 				}
 
@@ -285,7 +285,7 @@ namespace Waher.Things.Mqtt.Model
 							PreserveWhitespace = true
 						};
 						Doc.LoadXml(s);
-						this.RemoveWarning();
+						await this.RemoveWarning();
 						return new XmlData(this, s, Doc);
 					}
 					catch (Exception)
@@ -299,7 +299,7 @@ namespace Waher.Things.Mqtt.Model
 					try
 					{
 						object Obj = JSON.Parse(s);
-						this.RemoveWarning();
+						await this.RemoveWarning();
 						return new JsonData(this, s, Obj);
 					}
 					catch (Exception)
@@ -310,13 +310,13 @@ namespace Waher.Things.Mqtt.Model
 
 				if (s.IndexOfAny(controlCharacters) >= 0)
 				{
-					this.RemoveWarning();
+					await this.RemoveWarning();
 					return new BinaryData(this, Content.Data);
 				}
 
 				if (Base64Data.RegEx.IsMatch(s))
 				{
-					this.RemoveWarning();
+					await this.RemoveWarning();
 					byte[] Data = Convert.FromBase64String(s.Trim());
 					if (Data.Length > 0)
 						return new Base64Data(this, Data);
@@ -324,7 +324,7 @@ namespace Waher.Things.Mqtt.Model
 
 				if (HexStringData.RegEx.IsMatch(s))
 				{
-					this.RemoveWarning();
+					await this.RemoveWarning();
 					byte[] Data = Security.Hashes.StringToBinary(s.Trim());
 					if (Data.Length > 0)
 						return new HexStringData(this, Data);
@@ -333,13 +333,15 @@ namespace Waher.Things.Mqtt.Model
 				Match M = QuantityData.RegEx.Match(s);
 				if (M.Success && CommonTypes.TryParse(M.Groups["Magnitude"].Value, out x, out NrDecimals))
 				{
-					this.RemoveWarning();
+					await this.RemoveWarning();
 					return new QuantityData(this, x, NrDecimals, M.Groups["Unit"].Value);
 				}
 
 				if (!this.hasWarning.HasValue || !this.hasWarning.Value)
 				{
-					this.node?.LogWarningAsync("Format", "Unrecognized string format: " + s);
+					if (!(this.node is null))
+						await this.node.LogWarningAsync("Format", "Unrecognized string format: " + s);
+
 					this.hasWarning = true;
 				}
 
@@ -351,12 +353,14 @@ namespace Waher.Things.Mqtt.Model
 			}
 		}
 
-		private void RemoveWarning()
+		private async Task RemoveWarning()
 		{
 			if (!this.hasWarning.HasValue || this.hasWarning.Value)
 			{
 				this.hasWarning = false;
-				this.node?.RemoveWarningAsync("Format");
+
+				if (!(this.node is null))
+					await this.node.RemoveWarningAsync("Format");
 			}
 		}
 
@@ -368,20 +372,20 @@ namespace Waher.Things.Mqtt.Model
 			'\x10', '\x11', '\x12', '\x13', '\x14', '\x15', '\x16', '\x17', '\x18', '\x19', '\x1a', '\x1b', '\x1c', '\x1d', '\x1e', '\x1f'
 		};
 
-		private void SetOk()
+		private Task SetOk()
 		{
 			this.ex = null;
 			this.exTP = DateTime.MinValue;
 
-			this.node.RemoveErrorAsync("Eror");
+			return this.node.RemoveErrorAsync("Eror");
 		}
 
-		private void Exception(Exception ex)
+		private Task Exception(Exception ex)
 		{
 			this.ex = ex;
 			this.exTP = DateTime.Now;
 
-			this.node.LogErrorAsync("Error", ex.Message);
+			return this.node.LogErrorAsync("Error", ex.Message);
 		}
 
 		public override string ToString()

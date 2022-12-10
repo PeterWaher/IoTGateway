@@ -170,7 +170,10 @@ namespace Waher.Client.WPF.Dialogs
 			if (this.TrustServerCertificate.IsChecked.HasValue && this.TrustServerCertificate.IsChecked.Value)
 				Credentials.TrustServer = true;
 
-			this.client = new XmppClient(Credentials, "en", typeof(App).Assembly);
+			this.client = new XmppClient(Credentials, "en", typeof(App).Assembly)
+			{
+				AllowQuickLogin = true
+			};
 
 			if (Create)
 			{

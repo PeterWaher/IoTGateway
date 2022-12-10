@@ -189,7 +189,10 @@ namespace Waher.Client.WPF.Model
 			else
 				Credentials.Password = this.password;
 
-			this.client = new XmppClient(Credentials, "en", typeof(App).Assembly);
+			this.client = new XmppClient(Credentials, "en", typeof(App).Assembly)
+			{
+				AllowQuickLogin = true,
+			};
 
 			if (Sniffers != null)
 				this.client.AddRange(Sniffers);

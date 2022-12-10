@@ -247,6 +247,11 @@ namespace Waher.Networking.XMPP
 		public const string NamespacePrivateXmlStorage = "jabber:iq:private";
 
 		/// <summary>
+		/// http://waher.se/Schema/QL.xsd
+		/// </summary>
+		public const string NamespaceQuickLogin = "http://waher.se/Schema/QL.xsd";
+
+		/// <summary>
 		/// Regular expression for Full JIDs
 		/// </summary>
 		public static readonly Regex FullJidRegEx = new Regex("^(?:([^@/<>'\\\"\\s]+)@)([^@/<>'\\\"\\s]+)(?:/([^<>'\\\"\\s]*))?$", RegexOptions.Singleline | RegexOptions.Compiled);
@@ -338,7 +343,7 @@ namespace Waher.Networking.XMPP
 		private bool createSession = false;
 		private bool hasRegistered = false;
 		private bool hasRoster = false;
-		private bool setPresence = false;
+		private bool presenceSent = false;
 		private bool requestRosterOnStartup = true;
 		private bool allowedToRegister = false;
 		private bool allowCramMD5 = true;
@@ -346,6 +351,7 @@ namespace Waher.Networking.XMPP
 		private bool allowScramSHA1 = true;
 		private bool allowScramSHA256 = true;
 		private bool allowPlain = false;
+		private bool allowQuickLogin = false;
 		private readonly bool sendHeartbeats = true;
 		private bool supportsPing = true;
 		private bool pingResponse = true;
@@ -356,6 +362,7 @@ namespace Waher.Networking.XMPP
 		private bool monitorContactResourcesAlive = true;
 		private bool upgradeToTls = false;
 		private bool legacyTls = false;
+		private bool performingQuickLogin = false;
 		private bool disposed = false;
 
 #if WINDOWS_UWP
@@ -656,7 +663,7 @@ namespace Waher.Networking.XMPP
 			this.streamHeader = StreamHeader;
 			this.streamFooter = StreamFooter;
 			this.bareJid = this.fullJid = BareJid;
-			this.ResetState(false);
+			this.ResetState(false, true);
 
 			this.textTransportLayer.OnReceived += TextTransportLayer_OnReceived;
 			this.textTransportLayer.OnSent += TextTransportLayer_OnSent;
@@ -731,6 +738,7 @@ namespace Waher.Networking.XMPP
 				this.fragmentLength = 0;
 				this.fragment.Clear();
 				this.upgradeToTls = false;
+				this.performingQuickLogin = false;
 
 				lock (this.synchObject)
 				{
@@ -778,7 +786,7 @@ namespace Waher.Networking.XMPP
 					AlternativeTransport.CreateSession();
 				}
 
-				this.ResetState(false);
+				this.ResetState(false, true);
 			}
 			catch (Exception ex)
 			{
@@ -835,20 +843,29 @@ namespace Waher.Networking.XMPP
 			this.entityCapabilitiesVersion = null;
 		}
 
-		private void ResetState(bool Authenticated)
+		private void ResetState(bool Authenticated, bool ExpectStream)
 		{
-			this.inputState = 0;
-			this.inputDepth = 0;
-			this.canRegister = false;
-			this.setPresence = false;
-
-			if (!Authenticated)
+			if (ExpectStream)
 			{
-				this.authenticationMethod = null;
-				this.authenticationMechanisms.Clear();
-			}
+				this.inputState = 0;
+				this.inputDepth = 0;
+				this.performingQuickLogin = false;
+				this.canRegister = false;
+				this.presenceSent = false;
 
-			this.compressionMethods.Clear();
+				if (!Authenticated)
+				{
+					this.authenticationMethod = null;
+					this.authenticationMechanisms.Clear();
+				}
+
+				this.compressionMethods.Clear();
+			}
+			else
+			{
+				this.inputState = 5;
+				this.inputDepth = 1;
+			}
 
 			lock (this.synchObject)
 			{
@@ -2010,7 +2027,20 @@ namespace Waher.Networking.XMPP
 							break;
 
 						case "presence":
-							this.ProcessPresence(new PresenceEventArgs(this, E));
+							PresenceEventArgs pe = new PresenceEventArgs(this, E);
+
+							if (!this.performingQuickLogin && this.state == XmppState.SettingPresence)
+							{
+								int i = pe.From.LastIndexOf('/');
+								if (i > 0)
+								{
+									this.resource = pe.From.Substring(i + 1);
+									this.state = XmppState.Connected;
+									this.performingQuickLogin = false;
+								}
+							}
+
+							this.ProcessPresence(pe);
 							break;
 
 						case "features":
@@ -2021,6 +2051,7 @@ namespace Waher.Networking.XMPP
 								bool StartTls = false;
 								bool Auth = false;
 								bool Bind = false;
+								bool QuickLogin = false;
 
 								this.createSession = false;
 
@@ -2028,6 +2059,11 @@ namespace Waher.Networking.XMPP
 								{
 									switch (N2.LocalName)
 									{
+										case "ql":
+											QuickLogin = true;
+											this.authenticationMethod = null;
+											break;
+
 										case "starttls":
 											StartTls = true;
 											break;
@@ -2069,7 +2105,16 @@ namespace Waher.Networking.XMPP
 									}
 								}
 
-								if (StartTls && this.allowEncryption)
+								if (QuickLogin &&
+									this.allowEncryption &&
+									this.allowQuickLogin &&
+									this.StartQuickLogin())
+								{
+									this.upgradeToTls = true;
+									this.performingQuickLogin = true;
+									return false;
+								}
+								else if (StartTls && this.allowEncryption)
 								{
 									this.BeginWrite("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>", null);
 									return true;
@@ -2147,6 +2192,9 @@ namespace Waher.Networking.XMPP
 								throw new XmppException("No authentication method selected.", E);
 							else
 							{
+								if (this.State != XmppState.Authenticating)
+									this.State = XmppState.Authenticating;
+
 								string Response = this.authenticationMethod.Challenge(E.InnerText, this);
 								this.BeginWrite("<response xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>" + Response + "</response>", null);
 							}
@@ -2177,10 +2225,24 @@ namespace Waher.Networking.XMPP
 							{
 								if (this.authenticationMethod.CheckSuccess(E.InnerText, this))
 								{
-									this.ResetState(true);
-									this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) +
-										"' version='1.0' xml:lang='" + XML.Encode(this.language) +
-										"' xmlns='" + NamespaceClient + "' xmlns:stream='" + NamespaceStream + "'>", null);
+									if (this.performingQuickLogin)
+									{
+										this.State = XmppState.Binding;
+
+										this.State = XmppState.RequestingSession;
+										this.createSession = false;
+
+										this.presenceSent = false;
+										await this.AdvanceUntilConnected();
+									}
+									else
+									{
+										this.ResetState(true, true);
+
+										this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) +
+											"' version='1.0' xml:lang='" + XML.Encode(this.language) +
+											"' xmlns='" + NamespaceClient + "' xmlns:stream='" + NamespaceStream + "'>", null);
+									}
 								}
 								else
 									throw new XmppException("Server authentication rejected by client.", E);
@@ -3347,6 +3409,68 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public event MessageEventHandlerAsync OnNormalMessage = null;
 
+		private bool StartQuickLogin()
+		{
+			if (!(this.authenticationMethod is null))
+				return false;
+
+			string Challenge;
+
+			switch (this.passwordHashMethod)
+			{
+				case "SCRAM-SHA-256":
+					if (!this.allowScramSHA256)
+						return false;
+
+					string Nonce = Convert.ToBase64String(XmppClient.GetRandomBytes(32));
+					string s = "n,,n=" + this.userName + ",r=" + Nonce;
+					byte[] Data = Encoding.UTF8.GetBytes(s);
+
+					this.authenticationMethod = new ScramSha256(Nonce);
+
+					Challenge = Convert.ToBase64String(Data);
+					break;
+
+				case "SCRAM-SHA-1":
+					if (!this.allowScramSHA1)
+						return false;
+
+					Nonce = Convert.ToBase64String(XmppClient.GetRandomBytes(20));
+					s = "n,,n=" + this.userName + ",r=" + Nonce;
+					Data = Encoding.UTF8.GetBytes(s);
+
+					this.authenticationMethod = new ScramSha1(Nonce);
+
+					Challenge = Convert.ToBase64String(Data);
+					break;
+
+				default:
+					return false;
+			}
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<ql xmlns='");
+			Xml.Append(NamespaceQuickLogin);
+			Xml.Append("' m='");
+			Xml.Append(this.passwordHashMethod);
+			Xml.Append("' c='");
+			Xml.Append(XML.Encode(Challenge));
+
+			if (!string.IsNullOrEmpty(this.resource))
+			{
+				Xml.Append("' r='");
+				Xml.Append(XML.Encode(this.resource));
+			}
+
+			Xml.Append("'/>");
+
+			this.State = XmppState.StartingEncryption;
+			this.BeginWrite(Xml.ToString(), null);
+
+			return true;
+		}
+
 		private void StartAuthentication()
 		{
 			if (this.authenticationMethod is null)
@@ -3537,12 +3661,17 @@ namespace Waher.Networking.XMPP
 #else
 					await this.client.UpgradeToTlsAsClient(this.clientCertificate, SslProtocols.Tls12, this.trustServer);
 #endif
-					this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
-						"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='" + NamespaceClient + "' xmlns:stream='" +
-						NamespaceStream + "'>", null);
+					bool SendStream = !this.performingQuickLogin;
 
-					this.ResetState(false);
+					this.ResetState(false, SendStream);
 					this.client?.Continue();
+
+					if (SendStream)
+					{
+						this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
+							"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='" + NamespaceClient + "' xmlns:stream='" +
+							NamespaceStream + "'>", null);
+					}
 				}
 				catch (Exception ex)
 				{
@@ -3554,23 +3683,17 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// User name.
 		/// </summary>
-		public string UserName
-		{
-			get { return this.userName; }
-		}
+		public string UserName => this.userName;
 
-		internal string Password
-		{
-			get { return this.password; }
-		}
+		internal string Password => this.password;
 
 		/// <summary>
 		/// Hash value of password. Depends on method used to authenticate user.
 		/// </summary>
 		public string PasswordHash
 		{
-			get { return this.passwordHash; }
-			internal set { this.passwordHash = value; }
+			get => this.passwordHash;
+			internal set => this.passwordHash = value;
 		}
 
 		/// <summary>
@@ -3578,57 +3701,42 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public string PasswordHashMethod
 		{
-			get { return this.passwordHashMethod; }
-			internal set { this.passwordHashMethod = value; }
+			get => this.passwordHashMethod;
+			internal set => this.passwordHashMethod = value;
 		}
 
 		/// <summary>
 		/// Current Domain.
 		/// </summary>
-		public string Domain
-		{
-			get { return this.domain; }
-		}
+		public string Domain => this.domain;
 
 		/// <summary>
 		/// Current Stream ID
 		/// </summary>
-		public string StreamId
-		{
-			get { return this.streamId; }
-		}
+		public string StreamId => this.streamId;
 
 		/// <summary>
 		/// Bare JID
 		/// </summary>
-		public string BareJID
-		{
-			get { return this.bareJid; }
-		}
+		public string BareJID => this.bareJid;
 
 		/// <summary>
 		/// Full JID.
 		/// </summary>
-		public string FullJID
-		{
-			get { return this.fullJid; }
-		}
+		public string FullJID => this.fullJid;
 
 		/// <summary>
 		/// Resource part of the <see cref="FullJID"/>. Will be available after successfully binding the connection.
 		/// </summary>
-		public string Resource
-		{
-			get { return this.resource; }
-		}
+		public string Resource => this.resource;
 
 		/// <summary>
 		/// If the CRAM-MD5 authentication method is allowed or not. Default is true.
 		/// </summary>
 		public bool AllowCramMD5
 		{
-			get { return this.allowCramMD5; }
-			set { this.allowCramMD5 = value; }
+			get => this.allowCramMD5;
+			set => this.allowCramMD5 = value;
 		}
 
 		/// <summary>
@@ -3636,8 +3744,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool AllowDigestMD5
 		{
-			get { return this.allowDigestMD5; }
-			set { this.allowDigestMD5 = value; }
+			get => this.allowDigestMD5;
+			set => this.allowDigestMD5 = value;
 		}
 
 		/// <summary>
@@ -3645,8 +3753,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool AllowScramSHA1
 		{
-			get { return this.allowScramSHA1; }
-			set { this.allowScramSHA1 = value; }
+			get => this.allowScramSHA1;
+			set => this.allowScramSHA1 = value;
 		}
 
 		/// <summary>
@@ -3654,8 +3762,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool AllowScramSHA256
 		{
-			get { return this.allowScramSHA256; }
-			set { this.allowScramSHA256 = value; }
+			get => this.allowScramSHA256;
+			set => this.allowScramSHA256 = value;
 		}
 
 		/// <summary>
@@ -3663,8 +3771,17 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool AllowPlain
 		{
-			get { return this.allowPlain; }
-			set { this.allowPlain = value; }
+			get => this.allowPlain;
+			set => this.allowPlain = value;
+		}
+
+		/// <summary>
+		/// If Quick Login is permitted and supported by the broker.
+		/// </summary>
+		public bool AllowQuickLogin
+		{
+			get => this.allowQuickLogin;
+			set => this.allowQuickLogin = value;
 		}
 
 		/// <summary>
@@ -4243,12 +4360,10 @@ namespace Waher.Networking.XMPP
 									};
 
 									Field Field = Form["username"];
-									if (!(Field is null))
-										Field.SetValue(this.userName);
+									Field?.SetValue(this.userName);
 
 									Field = Form["password"];
-									if (!(Field is null))
-										Field.SetValue(this.password);
+									Field?.SetValue(this.password);
 									break;
 							}
 						}
@@ -4484,16 +4599,13 @@ namespace Waher.Networking.XMPP
 									};
 
 									Field Field = Form["username"];
-									if (!(Field is null))
-										Field.SetValue(this.userName);
+									Field?.SetValue(this.userName);
 
 									Field = Form["old_password"];
-									if (!(Field is null))
-										Field.SetValue(this.password);
+									Field?.SetValue(this.password);
 
 									Field = Form["password"];
-									if (!(Field is null))
-										Field.SetValue(NewPassword);
+									Field?.SetValue(NewPassword);
 
 									this.Information("OnChangePasswordForm()");
 									DataFormEventHandler h = this.OnChangePasswordForm;
@@ -4601,7 +4713,7 @@ namespace Waher.Networking.XMPP
 				this.State = XmppState.FetchingRoster;
 				this.SendIqGet(string.Empty, "<query xmlns='" + NamespaceRoster + "'/>", this.RosterResult, null);
 			}
-			else if (!this.setPresence)
+			else if (!this.presenceSent)
 			{
 				EventHandlerAsync h = this.OnConnectionPresence;
 
@@ -4610,7 +4722,7 @@ namespace Waher.Networking.XMPP
 					this.SetPresence(this.currentAvailability, this.customPresenceStatus);
 				else
 				{
-					this.setPresence = true;
+					this.presenceSent = true;
 
 					try
 					{
@@ -4628,6 +4740,9 @@ namespace Waher.Networking.XMPP
 			{
 				this.State = XmppState.Connected;
 				this.supportsPing = true;
+
+				this.secondTimer?.Dispose();
+				this.secondTimer = null;
 
 				this.secondTimer = new Timer(this.SecondTimerCallback, null, 1000, 1000);
 			}
@@ -5113,12 +5228,19 @@ namespace Waher.Networking.XMPP
 			return Result.Task;
 		}
 
-		private void PresenceSent(object Sender, EventArgs e)
+		private async void PresenceSent(object Sender, EventArgs e)
 		{
-			if (!this.setPresence)
+			try
 			{
-				this.setPresence = true;
-				Task _ = this.AdvanceUntilConnected();
+				if (!this.presenceSent)
+				{
+					this.presenceSent = true;
+					await this.AdvanceUntilConnected();
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
 			}
 		}
 

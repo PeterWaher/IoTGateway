@@ -17,8 +17,8 @@
     <PackageTags>Markdown PlantUML</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>2.2.1</AssemblyVersion>
-    <FileVersion>2.2.1</FileVersion>
-    <Version>2.2.1</Version>
+    <FileVersion>2.2.2</FileVersion>
+    <Version>2.2.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

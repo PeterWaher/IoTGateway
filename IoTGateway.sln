@@ -515,9 +515,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Things.Xmpp", "Things
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.WebService.Tesseract", "WebServices\Waher.WebService.Tesseract\Waher.WebService.Tesseract.csproj", "{0F500FA9-2E10-4CFB-8B59-D94F5C3C5F25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.WebService.Tesseract.Test", "WebServices\Waher.WebService.Tesseract.Test\Waher.WebService.Tesseract.Test.csproj", "{8298B60C-D22A-4955-BA78-EA1824AAA05A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.WebService.Tesseract.Test", "WebServices\Waher.WebService.Tesseract.Test\Waher.WebService.Tesseract.Test.csproj", "{8298B60C-D22A-4955-BA78-EA1824AAA05A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Utility.GenManifest", "Utilities\Waher.Utility.GenManifest\Waher.Utility.GenManifest.csproj", "{EDA61A5A-CDA5-4E16-AAE8-C4BF70653196}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Utility.GenManifest", "Utilities\Waher.Utility.GenManifest\Waher.Utility.GenManifest.csproj", "{EDA61A5A-CDA5-4E16-AAE8-C4BF70653196}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -2607,7 +2607,6 @@ Global
 		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|ARM.ActiveCfg = Release|x86
 		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|ARM64.ActiveCfg = Release|x86
 		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|Mixed Platforms.Build.0 = Release|x86
 		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|x64.ActiveCfg = Release|x86
 		{A1800A82-2C75-459A-9FF8-32A0C33EE8E4}.Release|x86.ActiveCfg = Release|x86
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Debug|Any CPU.ActiveCfg = Debug|x86
@@ -2620,7 +2619,6 @@ Global
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|ARM.ActiveCfg = Release|x86
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|ARM64.ActiveCfg = Release|x86
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|Mixed Platforms.Build.0 = Release|x86
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|x64.ActiveCfg = Release|x86
 		{8925180A-CE67-4DAC-99C1-F74DA4B9EE2B}.Release|x86.ActiveCfg = Release|x86
 		{AEE6DB4E-55C2-4B36-B723-7164E1ABA723}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -2666,8 +2664,6 @@ Global
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|ARM.Deploy.0 = Release|ARM
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|ARM64.ActiveCfg = Release|x86
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|Mixed Platforms.Build.0 = Release|x86
-		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|Mixed Platforms.Deploy.0 = Release|x86
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|x64.ActiveCfg = Release|x64
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|x64.Build.0 = Release|x64
 		{142C3903-C822-4081-AC2D-DCA8A06F094E}.Release|x64.Deploy.0 = Release|x64

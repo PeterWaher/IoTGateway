@@ -414,19 +414,15 @@ namespace Waher.Client.WPF.Controls
 			else
 				Parent.RemoveChild(ChildNode);
 
-			MainWindow.UpdateGui(() =>
-			{
-				this.ConnectionTree.Items.Refresh();
-				return Task.CompletedTask;
-			});
+			this.Node_Updated(this, EventArgs.Empty);
 		}
 
 		private void Node_Updated(object sender, EventArgs e)
 		{
 			lock (this.syncObj)
 			{
-				if (this.refreshTimer is null)
-					this.refreshTimer = new Timer(RefreshTree, null, 100, Timeout.Infinite);
+				this.refreshTimer?.Dispose();
+				this.refreshTimer = new Timer(RefreshTree, null, 250, Timeout.Infinite);
 			}
 		}
 
@@ -438,8 +434,9 @@ namespace Waher.Client.WPF.Controls
 					return;
 
 				this.status = Message;
-				if (this.statusTimer is null)
-					this.statusTimer = new Timer(SetStatus, null, 100, Timeout.Infinite);
+
+				this.statusTimer?.Dispose();
+				this.statusTimer = new Timer(SetStatus, null, 250, Timeout.Infinite);
 			}
 		}
 

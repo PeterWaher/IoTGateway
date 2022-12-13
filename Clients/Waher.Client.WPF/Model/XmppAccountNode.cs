@@ -39,6 +39,7 @@ using Waher.Client.WPF.Model.Muc;
 using Waher.Client.WPF.Model.Provisioning;
 using Waher.Client.WPF.Model.PubSub;
 using Waher.Client.WPF.Model.Things;
+using Waher.Networking.XMPP.P2P.E2E;
 
 namespace Waher.Client.WPF.Model
 {
@@ -224,7 +225,8 @@ namespace Waher.Client.WPF.Model
 			//this.p2pNetwork.OnNewXmppClient += ServerlessMessaging_OnNewXmppClient;
 			//this.p2pNetwork.OnResynch += ServerlessMessaging_OnResynch;
 
-			this.e2eEncryption = new EndpointSecurity(this.client, /*this.p2pNetwork,*/ 128);
+			this.e2eEncryption = new EndpointSecurity(this.client, /*this.p2pNetwork,*/ 128,
+				new Edwards25519Endpoint(), new Edwards448Endpoint());
 			this.client.SetTag("E2E", this.e2eEncryption);
 
 			this.socks5Proxy = new Socks5Proxy(this.client);  //, this.XmppAccountNode.E2E);		TODO

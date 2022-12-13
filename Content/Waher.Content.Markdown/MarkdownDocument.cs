@@ -649,8 +649,7 @@ namespace Waher.Content.Markdown
 						}
 					}
 
-					if (!(Segments is null))
-						Segments.AddLast(new Block(Block.Rows, Block.Positions, 0, i, c));
+					Segments?.AddLast(new Block(Block.Rows, Block.Positions, 0, i, c));
 
 					if (Segments is null)
 					{
@@ -716,8 +715,7 @@ namespace Waher.Content.Markdown
 						}
 					}
 
-					if (!(Segments is null))
-						Segments.AddLast(new Block(Block.Rows, Block.Positions, 0, i, c));
+					Segments?.AddLast(new Block(Block.Rows, Block.Positions, 0, i, c));
 
 					if (Segments is null)
 					{
@@ -787,8 +785,7 @@ namespace Waher.Content.Markdown
 						}
 					}
 
-					if (!(Segments is null))
-						Segments.AddLast(new Tuple<Block, string, int>(new Block(Block.Rows, Block.Positions, 0, i, c), s2, CheckPosition));
+					Segments?.AddLast(new Tuple<Block, string, int>(new Block(Block.Rows, Block.Positions, 0, i, c), s2, CheckPosition));
 
 					if (Segments is null)
 					{
@@ -855,8 +852,7 @@ namespace Waher.Content.Markdown
 						}
 					}
 
-					if (!(Segments is null))
-						Segments.AddLast(new KeyValuePair<int, Block>(Index, new Block(Block.Rows, Block.Positions, 0, i, c)));
+					Segments?.AddLast(new KeyValuePair<int, Block>(Index, new Block(Block.Rows, Block.Positions, 0, i, c)));
 
 					if (Segments is null)
 					{
@@ -6655,6 +6651,7 @@ namespace Waher.Content.Markdown
 		/// Appends a set of rows into a single string with newlines between rows.
 		/// </summary>
 		/// <param name="Rows">Rows</param>
+		/// <param name="SingleRow">If rows should be concatenated into a single row.</param>
 		/// <returns>Appended rows.</returns>
 		public static string AppendRows(string[] Rows, bool SingleRow)
 		{

@@ -1222,6 +1222,7 @@
             Appends a set of rows into a single string with newlines between rows.
             </summary>
             <param name="Rows">Rows</param>
+            <param name="SingleRow">If rows should be concatenated into a single row.</param>
             <returns>Appended rows.</returns>
         </member>
         <member name="T:Waher.Content.Markdown.AuthorizeExpression">

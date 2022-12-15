@@ -1310,5 +1310,22 @@ namespace Waher.Script.Fractals
 			}
 		}
 
+		public static void Angle(double[] ColorIndex, int Width, int Height, int N, double[] dx, double[] dy)
+		{
+			int i, c = Width * Height;
+			double x, y, Scale = N / (2.0 * Math.PI);
+
+			for (i = 0; i < c; i++)
+			{
+				x = dx[i];
+				y = dy[i];
+
+				if (x == 0 && y == 0)
+					ColorIndex[i] = 0;
+				else
+					ColorIndex[i] = (Math.Atan2(y, x) + Math.PI) * Scale;
+			}
+		}
+
 	}
 }

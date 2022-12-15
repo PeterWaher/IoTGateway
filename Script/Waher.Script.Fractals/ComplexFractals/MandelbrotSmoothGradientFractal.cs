@@ -4,28 +4,28 @@ using System.Text;
 using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
+using Waher.Script.Fractals.ColorModels;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Fractals.ComplexFractals
 {
-    /// <summary>
-    /// Calculates a Mandelbrot Smooth Fractal Image
-    /// </summary>
-    /// <example>
-    /// MandelbrotSmoothDiff2Fractal(-0.797597887030777,-0.179388176437736,1.70530256582425E-13,randomlinearrgb(10240,16,1),640,480)
-    /// MandelbrotSmoothDiff2Fractal((-1,0),,3,RandomLinearRgb(1024,16,1),800,600)
-    /// MandelbrotSmoothDiff2Fractal((-0.65,-0.4125),,0.001,RandomLinearRGB(4096,128))
-    /// MandelbrotSmoothDiff2Fractal((-0.728474426269531,-0.240391845703126),,0.000732421875,RandomLinearRGB(4096,128,1325528060),640,480)
-    /// MandelbrotSmoothDiff2Fractal((-0.797603011131287,-0.179388891220092),,1.1444091796875E-05,randomlinearrgb(10240,16,1),320,200)
-    /// 
-    /// General version:
-    /// MandelbrotSmoothDiff2Fractal((0,0),(z,c)->z^3+c,4,RandomLinearAnalogousHsl(1024,16,21),400,400)
-    /// </example>
-    public class MandelbrotSmoothDiff2Fractal : FunctionMultiVariate
+	/// <summary>
+	/// Calculates a Mandelbrot Smooth Fractal Image, where coloring is done in accordance with the ange of the gradient.
+	/// </summary>
+	/// <example>
+	/// MandelbrotSmoothGradientFractal(-0.5,0,3,RandomLinearAnalogousHSL(1024,16,1551638751),640,480)
+	/// MandelbrotSmoothGradientFractal(-0.5,0,3, RandomLinearAnalogousHSL(1024,32,1551638751),640,480)
+	/// MandelbrotSmoothGradientFractal(-0.5,0,3, RandomLinearAnalogousHSL(1024,64,1551638751),640,480)
+	/// MandelbrotSmoothGradientFractal(-0.5,0,3, RandomLinearAnalogousHSL(1024,128,1551638751),640,480)
+	/// MandelbrotSmoothGradientFractal(-0.5,0,3, RandomLinearAnalogousHSL(1024,256,1551638751),640,480)
+	/// MandelbrotSmoothGradientFractal(-0.5,0,3, RandomLinearAnalogousHSL(1024,512,1551638751),640,480)
+	/// MandelbrotSmoothGradientFractal(-0.5,0,3, RandomLinearAnalogousHSL(1024,1024,1551638751),640,480)
+	/// </example>
+	public class MandelbrotSmoothGradientFractal : FunctionMultiVariate
     {
-		public MandelbrotSmoothDiff2Fractal(ScriptNode z, ScriptNode f, ScriptNode dr, ScriptNode Palette,
+		public MandelbrotSmoothGradientFractal(ScriptNode z, ScriptNode f, ScriptNode dr, ScriptNode Palette,
 			ScriptNode DimX, ScriptNode DimY, int Start, int Length, Expression Expression)
             : base(new ScriptNode[] { z, f, dr, Palette, DimX, DimY }, 
 				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar,
@@ -33,7 +33,7 @@ namespace Waher.Script.Fractals.ComplexFractals
         {
 		}
 
-		public MandelbrotSmoothDiff2Fractal(ScriptNode z, ScriptNode f, ScriptNode dr, ScriptNode Palette,
+		public MandelbrotSmoothGradientFractal(ScriptNode z, ScriptNode f, ScriptNode dr, ScriptNode Palette,
 			ScriptNode DimX, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, f, dr, Palette, DimX },
 				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar,
@@ -41,14 +41,14 @@ namespace Waher.Script.Fractals.ComplexFractals
 		{
 		}
 
-		public MandelbrotSmoothDiff2Fractal(ScriptNode z, ScriptNode f, ScriptNode dr, ScriptNode Palette, int Start, int Length, Expression Expression)
+		public MandelbrotSmoothGradientFractal(ScriptNode z, ScriptNode f, ScriptNode dr, ScriptNode Palette, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, f, dr, Palette },
 				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar,
 				  ArgumentType.Vector}, Start, Length, Expression)
 		{
 		}
 
-		public MandelbrotSmoothDiff2Fractal(ScriptNode z, ScriptNode f, ScriptNode dr, int Start, int Length, Expression Expression)
+		public MandelbrotSmoothGradientFractal(ScriptNode z, ScriptNode f, ScriptNode dr, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { z, f, dr },
 				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar }, Start, Length, Expression)
 		{
@@ -135,7 +135,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             if (i < c)
             {
-                throw new ScriptRuntimeException("Parameter mismatch in call to MandelbrotSmoothDiff2Fractal(r,c,dr[,Palette][,dimx[,dimy]]).",
+                throw new ScriptRuntimeException("Parameter mismatch in call to MandelbrotSmoothGradientFractal(r,c,dr[,Palette][,dimx[,dimy]]).",
                     this);
             }
 
@@ -164,7 +164,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
             StringBuilder sb = new StringBuilder();
 
-            sb.Append("MandelbrotSmoothDiff2Fractal(");
+            sb.Append("MandelbrotSmoothGradientFractal(");
             sb.Append(Expression.ToString(r));
             sb.Append(",");
             sb.Append(Expression.ToString(i));
@@ -257,9 +257,7 @@ namespace Waher.Script.Fractals.ComplexFractals
             double[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
             FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
             FractalGraph.Diff(ColorIndex, Width, Height, out double[] dx, out double[] dy);
-            FractalGraph.Abs(ColorIndex, Width, Height, dx, dy);
-            FractalGraph.Diff(ColorIndex, Width, Height, out dx, out dy);
-            FractalGraph.Abs(ColorIndex, Width, Height, dx, dy);
+            FractalGraph.Angle(ColorIndex, Width, Height, N, dx, dy);
 
             return new FractalGraph(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
                 r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
@@ -388,15 +386,13 @@ namespace Waher.Script.Fractals.ComplexFractals
             double[] Boundary = FractalGraph.FindBoundaries(ColorIndex, Width, Height);
             FractalGraph.Smooth(ColorIndex, Boundary, Width, Height, N, Palette, Node, Variables);
             FractalGraph.Diff(ColorIndex, Width, Height, out double[] dx, out double[] dy);
-            FractalGraph.Abs(ColorIndex, Width, Height, dx, dy);
-            FractalGraph.Diff(ColorIndex, Width, Height, out dx, out dy);
-            FractalGraph.Abs(ColorIndex, Width, Height, dx, dy);
+            FractalGraph.Angle(ColorIndex, Width, Height, N, dx, dy);
 
             return new FractalGraph(FractalGraph.ToPixels(ColorIndex, Width, Height, Palette),
                 r0, i0, r1, i1, rDelta * 2, true, Node, FractalZoomScript, State);
         }
 
-        public override string FunctionName => nameof(MandelbrotSmoothDiff2Fractal);
+        public override string FunctionName => nameof(MandelbrotSmoothGradientFractal);
 
     }
 }

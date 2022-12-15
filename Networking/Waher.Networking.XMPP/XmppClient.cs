@@ -5072,6 +5072,52 @@ namespace Waher.Networking.XMPP
 		public event CustomPresenceEventHandler CustomPresenceXml = null;
 
 		/// <summary>
+		/// Adds custom presence XML to a presence stanza being built.
+		/// </summary>
+		/// <param name="Availability">Client availability</param>
+		/// <param name="Xml">XML of stanza being built.</param>
+		public void AddCustomPresenceXml(Availability Availability, StringBuilder Xml)
+		{
+			this.CustomPresenceXml?.Invoke(this, new CustomPresenceEventArgs(Availability, Xml));
+
+			lock (this.synchObject)
+			{
+				Xml.Append("<c xmlns='");
+				Xml.Append(NamespaceEntityCapabilities);
+				Xml.Append("' hash='");
+
+				switch (this.entityHashFunction)
+				{
+					case HashFunction.MD5:
+						Xml.Append("md5");
+						break;
+
+					case HashFunction.SHA1:
+						Xml.Append("sha-1");
+						break;
+
+					case HashFunction.SHA256:
+						Xml.Append("sha-256");
+						break;
+
+					case HashFunction.SHA384:
+						Xml.Append("sha-384");
+						break;
+
+					case HashFunction.SHA512:
+						Xml.Append("sha-512");
+						break;
+				}
+
+				Xml.Append("' node='");
+				Xml.Append(XML.Encode(this.entityNode));
+				Xml.Append("' ver='");
+				Xml.Append(XML.Encode(this.EntityCapabilitiesVersion));
+				Xml.Append("'/>");
+			}
+		}
+
+		/// <summary>
 		/// Sets the presence of the connection.
 		/// Add a <see cref="CustomPresenceXml"/> event handler to add custom presence XML to the stanza.
 		/// </summary>
@@ -5165,43 +5211,7 @@ namespace Waher.Networking.XMPP
 					}
 				}
 
-				this.CustomPresenceXml?.Invoke(this, new CustomPresenceEventArgs(Availability, Xml));
-
-				lock (this.synchObject)
-				{
-					Xml.Append("<c xmlns='");
-					Xml.Append(NamespaceEntityCapabilities);
-					Xml.Append("' hash='");
-
-					switch (this.entityHashFunction)
-					{
-						case HashFunction.MD5:
-							Xml.Append("md5");
-							break;
-
-						case HashFunction.SHA1:
-							Xml.Append("sha-1");
-							break;
-
-						case HashFunction.SHA256:
-							Xml.Append("sha-256");
-							break;
-
-						case HashFunction.SHA384:
-							Xml.Append("sha-384");
-							break;
-
-						case HashFunction.SHA512:
-							Xml.Append("sha-512");
-							break;
-					}
-
-					Xml.Append("' node='");
-					Xml.Append(XML.Encode(this.entityNode));
-					Xml.Append("' ver='");
-					Xml.Append(XML.Encode(this.EntityCapabilitiesVersion));
-					Xml.Append("'/>");
-				}
+				this.AddCustomPresenceXml(Availability, Xml);
 
 				Xml.Append("</presence>");
 

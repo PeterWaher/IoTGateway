@@ -1407,6 +1407,18 @@
             <param name="Callback">Method to call when stanza has been sent.</param>
             <param name="State">State object to pass on to callback method.</param>
         </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SetPresence(System.String,System.String,System.String,Waher.Networking.XMPP.Availability,System.Collections.Generic.KeyValuePair{System.String,System.String}[],Waher.Networking.XMPP.PresenceEventHandlerAsync,System.Object)">
+            <summary>
+            Sets the presence of the occupant in a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="NickName">Nickname of the occupant.</param>
+            <param name="Availability">Occupant availability.</param>
+            <param name="Status">Custom status</param>
+            <param name="Callback">Method to call when stanza has been sent.</param>
+            <param name="State">State object to pass on to callback method.</param>
+        </member>
         <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SetPresenceAsync(System.String,System.String,System.String,Waher.Networking.XMPP.Availability)">
             <summary>
             Sets the presence of the occupant in a room.
@@ -1415,6 +1427,17 @@
             <param name="Domain">Domain of service hosting the room.</param>
             <param name="NickName">Nickname of the occupant.</param>
             <param name="Availability">Occupant availability.</param>
+            <returns>Task object that finishes when stanza has been sent.</returns>
+        </member>
+        <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.SetPresenceAsync(System.String,System.String,System.String,Waher.Networking.XMPP.Availability,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Sets the presence of the occupant in a room.
+            </summary>
+            <param name="RoomId">Room ID.</param>
+            <param name="Domain">Domain of service hosting the room.</param>
+            <param name="NickName">Nickname of the occupant.</param>
+            <param name="Availability">Occupant availability.</param>
+            <param name="Status">Custom status</param>
             <returns>Task object that finishes when stanza has been sent.</returns>
         </member>
         <member name="M:Waher.Networking.XMPP.MUC.MultiUserChatClient.GetRoomRegistrationForm(System.String,System.String,Waher.Networking.XMPP.MUC.RoomRegistrationEventHandler,System.Object)">

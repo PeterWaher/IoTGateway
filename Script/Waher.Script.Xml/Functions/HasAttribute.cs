@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Threading.Tasks;
+using System.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -47,8 +48,22 @@ namespace Waher.Script.Xml.Functions
 
 			if (Argument1.AssociatedObjectValue is XmlElement E)
 				return E.HasAttribute(Name) ? BooleanValue.True : BooleanValue.False;
+			else if (Argument1.AssociatedObjectValue is XmlDocument Doc)
+				return Doc.DocumentElement.HasAttribute(Name) ? BooleanValue.True : BooleanValue.False;
 			else
 				throw new ScriptRuntimeException("XML element expected.", this);
+		}
+
+		/// <summary>
+		/// Evaluates the function on two scalar arguments.
+		/// </summary>
+		/// <param name="Argument1">Function argument 1.</param>
+		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override Task<IElement> EvaluateScalarAsync(IElement Argument1, IElement Argument2, Variables Variables)
+		{
+			return Task.FromResult(this.EvaluateScalar(Argument1, Argument2, Variables));
 		}
 	}
 }

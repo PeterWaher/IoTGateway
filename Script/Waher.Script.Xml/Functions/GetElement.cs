@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Threading.Tasks;
+using System.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -49,7 +50,7 @@ namespace Waher.Script.Xml.Functions
 			if (Argument1.AssociatedObjectValue is XmlElement E)
 				Response = E[Name];
 			else if (Argument1.AssociatedObjectValue is XmlDocument Doc)
-				Response = Doc[Name];
+				Response = Doc.DocumentElement[Name];
 			else
 				throw new ScriptRuntimeException("XML expected.", this);
 
@@ -57,6 +58,18 @@ namespace Waher.Script.Xml.Functions
 				throw new ScriptRuntimeException("Child element not found.", this);
 			else
 				return new ObjectValue(Response);
+		}
+
+		/// <summary>
+		/// Evaluates the function on two scalar arguments.
+		/// </summary>
+		/// <param name="Argument1">Function argument 1.</param>
+		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override Task<IElement> EvaluateScalarAsync(IElement Argument1, IElement Argument2, Variables Variables)
+		{
+			return Task.FromResult(this.EvaluateScalar(Argument1, Argument2, Variables));
 		}
 	}
 }

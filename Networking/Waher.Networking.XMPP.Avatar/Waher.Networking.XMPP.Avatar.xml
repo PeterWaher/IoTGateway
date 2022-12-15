@@ -135,6 +135,21 @@
             should be thrown.
             </summary>
         </member>
+        <member name="F:Waher.Networking.XMPP.Avatar.AvatarClient.AvatarType.None">
+            <summary>
+            No avatar
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Avatar.AvatarClient.AvatarType.Xep0008">
+            <summary>
+            IQ-based avatars (XEP-0008)
+            </summary>
+        </member>
+        <member name="F:Waher.Networking.XMPP.Avatar.AvatarClient.AvatarType.Xep0153">
+            <summary>
+            vCard avatar (XEP-0153)
+            </summary>
+        </member>
         <member name="E:Waher.Networking.XMPP.Avatar.AvatarClient.AvatarRemoved">
             <summary>
             Event raised when an avatar has been removed.
@@ -178,11 +193,12 @@
             Event raised when a vCard has been received. vCards can be requested to get access to embedded Avatars.
             </summary>
         </member>
-        <member name="M:Waher.Networking.XMPP.Avatar.AvatarClient.ParseVCard(Waher.Networking.XMPP.IqResultEventArgs)">
+        <member name="M:Waher.Networking.XMPP.Avatar.AvatarClient.ParseVCard(Waher.Networking.XMPP.IqResultEventArgs,System.Boolean)">
             <summary>
             Parses a vCard for Avatar information.
             </summary>
             <param name="e">vCard response.</param>
+            <param name="InMuc">If avatar relates to an occupant in a Multi-user chat room.</param>
         </member>
         <member name="M:Waher.Networking.XMPP.Avatar.AvatarClient.ContainsAvatar(System.String)">
             <summary>

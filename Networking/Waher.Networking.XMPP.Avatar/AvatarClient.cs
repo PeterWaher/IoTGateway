@@ -192,16 +192,13 @@ namespace Waher.Networking.XMPP.Avatar
 					this.client.SendIqSet(this.client.BareJID, Request.ToString(), null, null);
 				}
 
-				if (!(this.pep is null))
+				this.pep?.Publish(new UserAvatarImage()
 				{
-					this.pep.Publish(new UserAvatarImage()
-					{
-						ContentType = ContentType,
-						Data = Binary,
-						Width = Width,
-						Height = Height
-					});
-				}
+					ContentType = ContentType,
+					Data = Binary,
+					Width = Width,
+					Height = Height
+				});
 			}
 		}
 
@@ -244,22 +241,70 @@ namespace Waher.Networking.XMPP.Avatar
 			}
 		}
 
+		private enum AvatarType
+		{
+			/// <summary>
+			/// No avatar
+			/// </summary>
+			None,
+
+			/// <summary>
+			/// IQ-based avatars (XEP-0008)
+			/// </summary>
+			Xep0008,
+
+			/// <summary>
+			/// vCard avatar (XEP-0153)
+			/// </summary>
+			Xep0153
+		}
+
 		private async Task Client_OnPresence(object Sender, PresenceEventArgs e)
 		{
 			if (e.Type == PresenceType.Available && e.Presence.HasChildNodes)
 			{
+				AvatarType Type = AvatarType.None;
 				string Hash = null;
+				bool InMuc = false;
 
 				foreach (XmlNode N in e.Presence.ChildNodes)
 				{
-					if (N.LocalName == "x" && N.NamespaceURI == "jabber:x:avatar")
+					if (!(N is XmlElement E))
+						continue;
+
+					switch (E.LocalName)
 					{
-						Hash = N.InnerText;
-						break;
+						case "x":
+							switch (E.NamespaceURI)
+							{
+								case "jabber:x:avatar":
+									Hash = E.InnerText;
+									Type = AvatarType.Xep0008;
+									break;
+
+								case "vcard-temp:x:update":
+									XmlElement E2 = E["photo"];
+									if (!(E2 is null))
+									{
+										Hash = E2.InnerText;
+										Type = AvatarType.Xep0153;
+									}
+									break;
+
+								default:
+									if (E.NamespaceURI.StartsWith("http://jabber.org/protocol/muc"))
+										InMuc = true;
+									break;
+							}
+							break;
+
+						case "occupant-id":
+							InMuc = true;
+							break;
 					}
 				}
 
-				if (!(Hash is null))
+				if (Type != AvatarType.None)
 				{
 					Avatar Avatar;
 					string FullJID = e.From;
@@ -322,16 +367,26 @@ namespace Waher.Networking.XMPP.Avatar
 
 							if (LoadAvatar)
 							{
-								if (this.e2e is null)
+								switch(Type)
 								{
-									this.client.SendIqGet(FullJID, "<query xmlns='jabber:iq:avatar'/>", this.AvatarResponse,
-										new object[] { BareJID, Hash });
-								}
-								else
-								{
-									this.e2e.SendIqGet(this.client, E2ETransmission.NormalIfNotE2E,
-										FullJID, "<query xmlns='jabber:iq:avatar'/>", this.AvatarResponse,
-										new object[] { BareJID, Hash });
+									case AvatarType.Xep0008:
+										if (this.e2e is null)
+										{
+											this.client.SendIqGet(FullJID, "<query xmlns='jabber:iq:avatar'/>", this.AvatarResponse,
+												new object[] { BareJID, Hash });
+										}
+										else
+										{
+											this.e2e.SendIqGet(this.client, E2ETransmission.NormalIfNotE2E,
+												FullJID, "<query xmlns='jabber:iq:avatar'/>", this.AvatarResponse,
+												new object[] { BareJID, Hash });
+										}
+										break;
+
+									case AvatarType.Xep0153:
+										this.client.SendIqGet(InMuc ? FullJID : BareJID, "<vCard xmlns='vcard-temp'/>",
+											(Sender2, e2) => Task.Run(() => this.ParseVCard(e2, InMuc)), null);
+										break;
 								}
 							}
 						}
@@ -597,7 +652,7 @@ namespace Waher.Networking.XMPP.Avatar
 			else
 			{
 				this.client.SendIqGet(Item.BareJid, "<vCard xmlns='vcard-temp'/>",
-					(Sender2, e2) => Task.Run(() => this.ParseVCard(e2)), null);
+					(Sender2, e2) => Task.Run(() => this.ParseVCard(e2, false)), null);
 			}
 		}
 
@@ -605,12 +660,13 @@ namespace Waher.Networking.XMPP.Avatar
 		/// Parses a vCard for Avatar information.
 		/// </summary>
 		/// <param name="e">vCard response.</param>
-		public Task ParseVCard(IqResultEventArgs e)
+		/// <param name="InMuc">If avatar relates to an occupant in a Multi-user chat room.</param>
+		public Task ParseVCard(IqResultEventArgs e, bool InMuc)
 		{
-			return this.ParseVCard(e, false);
+			return this.ParseVCard(e, false, InMuc);
 		}
 
-		private async Task ParseVCard(IqResultEventArgs e, bool RaiseEvent)
+		private async Task ParseVCard(IqResultEventArgs e, bool RaiseEvent, bool InMuc)
 		{
 			XmlElement E;
 
@@ -643,17 +699,17 @@ namespace Waher.Networking.XMPP.Avatar
 
 							if (!string.IsNullOrEmpty(ContentType) && Data != null)
 							{
-								string BareJid = XmppClient.GetBareJID(e.From).ToLower();
-								Avatar = new Avatar(BareJid, ContentType, Data, 0, 0);
+								string Jid = InMuc ? e.From : XmppClient.GetBareJID(e.From).ToLower();
+								Avatar = new Avatar(Jid, ContentType, Data, 0, 0);
 
 								lock (this.contactAvatars)
 								{
-									this.contactAvatars[BareJid] = Avatar;
+									this.contactAvatars[Jid] = Avatar;
 								}
 
 								await Database.Insert(Avatar);
 
-								this.AvatarAdded?.Invoke(this, new AvatarEventArgs(BareJid, Avatar));
+								this.AvatarAdded?.Invoke(this, new AvatarEventArgs(Jid, Avatar));
 							}
 						}
 					}
@@ -661,7 +717,7 @@ namespace Waher.Networking.XMPP.Avatar
 					if (RaiseEvent)
 					{
 						IqResultEventHandlerAsync h = this.VCardReceived;
-						
+
 						if (!(h is null))
 							await h(this, e);
 					}

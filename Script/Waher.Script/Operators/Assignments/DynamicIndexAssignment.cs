@@ -28,10 +28,7 @@ namespace Waher.Script.Operators.Assignments
 		/// <summary>
 		/// Dynamic Index.
 		/// </summary>
-		public DynamicIndex DynamicIndex
-		{
-			get { return this.dynamicIndex; }
-		}
+		public DynamicIndex DynamicIndex => this.dynamicIndex;
 
 		/// <summary>
 		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.

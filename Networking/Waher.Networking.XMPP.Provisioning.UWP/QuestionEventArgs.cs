@@ -30,26 +30,20 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Provisioning Client used.
 		/// </summary>
-		public ProvisioningClient Client
-		{
-			get { return this.client; }
-		}
+		public ProvisioningClient Client => this.client;
 
 		/// <summary>
 		/// JID.
 		/// </summary>
-		public string JID
-		{
-			get { return this.jid; }
-		}
+		public string JID => this.jid;
 
 		/// <summary>
 		/// JID of device requesting presence subscription of the device.
 		/// </summary>
 		public string RemoteJID
 		{
-			get { return this.remoteJid; }
-			set { this.remoteJid = value; }
+			get => this.remoteJid;
+			set => this.remoteJid = value;
 		}
 
 		/// <summary>
@@ -57,8 +51,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		public string Key
 		{
-			get { return this.key; }
-			set { this.key = value; }
+			get => this.key;
+			set => this.key = value;
 		}
 
 	}

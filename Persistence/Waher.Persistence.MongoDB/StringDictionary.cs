@@ -340,7 +340,7 @@ namespace Waher.Persistence.MongoDB
 		/// <summary>
 		/// Name of corresponding collection name.
 		/// </summary>
-		public string CollectionName { get { return this.collectionName; } }
+		public string CollectionName => this.collectionName;
 
 		/// <summary>
 		/// <see cref="IDictionary{TKey, TValue}.Keys"/>

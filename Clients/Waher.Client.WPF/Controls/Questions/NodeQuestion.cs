@@ -28,43 +28,43 @@ namespace Waher.Client.WPF.Controls.Questions
 		[DefaultValueNull]
 		public string[] ServiceTokens
 		{
-			get { return this.serviceTokens; }
-			set { this.serviceTokens = value; }
+			get => this.serviceTokens;
+			set => this.serviceTokens = value;
 		}
 
 		[DefaultValueNull]
 		public string[] DeviceTokens
 		{
-			get { return this.deviceTokens; }
-			set { this.deviceTokens = value; }
+			get => this.deviceTokens;
+			set => this.deviceTokens = value;
 		}
 
 		[DefaultValueNull]
 		public string[] UserTokens
 		{
-			get { return this.userTokens; }
-			set { this.userTokens = value; }
+			get => this.userTokens;
+			set => this.userTokens = value;
 		}
 
 		[DefaultValueStringEmpty]
 		public string NodeId
 		{
-			get { return this.nodeId; }
-			set { this.nodeId = value; }
+			get => this.nodeId;
+			set => this.nodeId = value;
 		}
 
 		[DefaultValueStringEmpty]
 		public string SourceId
 		{
-			get { return this.sourceId; }
-			set { this.sourceId = value; }
+			get => this.sourceId;
+			set => this.sourceId = value;
 		}
 
 		[DefaultValueStringEmpty]
 		public string Partition
 		{
-			get { return this.partition; }
-			set { this.partition = value; }
+			get => this.partition;
+			set => this.partition = value;
 		}
 
 		[IgnoreMember]

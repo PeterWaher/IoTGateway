@@ -35,17 +35,11 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// Reason for failing.
 		/// </summary>
-		public string Reason
-		{
-			get { return this.reason; }
-		}
+		public string Reason => this.reason;
 
 		/// <summary>
 		/// Alert description.
 		/// </summary>
-		public AlertDescription Description
-		{
-			get { return this.descripton; }
-		}
+		public AlertDescription Description => this.descripton;
 	}
 }

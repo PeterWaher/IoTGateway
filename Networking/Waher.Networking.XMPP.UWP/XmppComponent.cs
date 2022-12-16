@@ -244,25 +244,19 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Host or IP address of XMPP server.
 		/// </summary>
-		public string Host
-		{
-			get { return this.host; }
-		}
+		public string Host => this.host;
 
 		/// <summary>
 		/// Port number to connect to.
 		/// </summary>
-		public int Port
-		{
-			get { return this.port; }
-		}
+		public int Port => this.port;
 
 		/// <summary>
 		/// Current state of connection.
 		/// </summary>
 		public XmppState State
 		{
-			get { return this.state; }
+			get => this.state;
 			internal set
 			{
 				if (this.state != value)
@@ -1508,15 +1502,9 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Component sub-domain on server.
 		/// </summary>
-		public string ComponentSubDomain
-		{
-			get { return this.componentSubDomain; }
-		}
+		public string ComponentSubDomain => this.componentSubDomain;
 
-		internal string SharedSecret
-		{
-			get { return this.sharedSecret; }
-		}
+		internal string SharedSecret => this.sharedSecret;
 
 		/// <summary>
 		/// Sends an IQ Get request.
@@ -2437,7 +2425,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public int KeepAliveSeconds
 		{
-			get { return this.keepAliveSeconds; }
+			get => this.keepAliveSeconds;
 			set
 			{
 				if (value <= 0)
@@ -2474,7 +2462,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public int MaxAssuredMessagesPendingFromSource
 		{
-			get { return this.maxAssuredMessagesPendingFromSource; }
+			get => this.maxAssuredMessagesPendingFromSource;
 			set
 			{
 				if (value <= 0)
@@ -2489,7 +2477,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public int MaxAssuredMessagesPendingTotal
 		{
-			get { return this.maxAssuredMessagesPendingTotal; }
+			get => this.maxAssuredMessagesPendingTotal;
 			set
 			{
 				if (value <= 0)
@@ -2505,7 +2493,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public int DefaultRetryTimeout
 		{
-			get { return this.defaultRetryTimeout; }
+			get => this.defaultRetryTimeout;
 			set
 			{
 				if (value <= 0)
@@ -2521,7 +2509,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public int DefaultNrRetries
 		{
-			get { return this.defaultNrRetries; }
+			get => this.defaultNrRetries;
 			set
 			{
 				if (value <= 0)
@@ -2537,7 +2525,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public int DefaultMaxRetryTimeout
 		{
-			get { return this.defaultMaxRetryTimeout; }
+			get => this.defaultMaxRetryTimeout;
 			set
 			{
 				if (value <= 0)
@@ -2553,8 +2541,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool DefaultDropOff
 		{
-			get { return this.defaultDropOff; }
-			set { this.defaultDropOff = value; }
+			get => this.defaultDropOff;
+			set => this.defaultDropOff = value;
 		}
 
 		/// <summary>
@@ -2893,26 +2881,17 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Identity category, as defined in XEP-0030.
 		/// </summary>
-		public string IdentityCategory
-		{
-			get { return this.identityCategory; }
-		}
+		public string IdentityCategory => this.identityCategory;
 
 		/// <summary>
 		/// Identity type, as defined in XEP-0030.
 		/// </summary>
-		public string IdentityType
-		{
-			get { return this.identityType; }
-		}
+		public string IdentityType => this.identityType;
 
 		/// <summary>
 		/// Identity name, as defined in XEP-0030.
 		/// </summary>
-		public string IdentityName
-		{
-			get { return this.identityName; }
-		}
+		public string IdentityName => this.identityName;
 
 		/// <summary>
 		/// Performs a presence probe against a bare JID, to learn its latest presence.

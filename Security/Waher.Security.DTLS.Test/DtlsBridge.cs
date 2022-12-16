@@ -14,8 +14,8 @@ namespace Waher.Security.DTLS.Test
 
 		public DtlsBridge RemoteBridge
 		{
-			get { return this.remoteBridge; }
-			internal set { this.remoteBridge = value; }
+			get => this.remoteBridge;
+			internal set => this.remoteBridge = value;
 		}
 
 		public event DataReceivedEventHandler PacketReceived;

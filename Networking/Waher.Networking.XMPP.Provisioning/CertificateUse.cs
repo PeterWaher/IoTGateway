@@ -39,30 +39,24 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Token
 		/// </summary>
-		public string Token
-		{
-			get { return this.token; }
-		}
+		public string Token => this.token;
 
 		/// <summary>
 		/// Local certificate, or null if token received from another entity.
 		/// </summary>
 #if WINDOWS_UWP
-		public Certificate LocalCertificate
+		public Certificate LocalCertificate => this.localCertificate;
 #else
-		public X509Certificate2 LocalCertificate
+		public X509Certificate2 LocalCertificate => this.localCertificate;
 #endif
-		{
-			get { return this.localCertificate; }
-		}
 
 		/// <summary>
 		/// JID of remote entity sending the token, if certificate is used on another device.
 		/// </summary>
 		public string RemoteCertificateJid
 		{
-			get { return this.remoteCertificateJid; }
-			internal set { this.remoteCertificateJid = value; }
+			get => this.remoteCertificateJid;
+			internal set => this.remoteCertificateJid = value;
 		}
 
 		/// <summary>
@@ -70,8 +64,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		public DateTime LastUse
 		{
-			get { return this.lastUse; }
-			internal set { this.lastUse = value; }
+			get => this.lastUse;
+			internal set => this.lastUse = value;
 		}
 	}
 }

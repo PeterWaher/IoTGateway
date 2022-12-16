@@ -76,25 +76,16 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Event Type.
 		/// </summary>
-		public QueryEventType Type
-		{
-			get { return this.type; }
-		}
+		public QueryEventType Type => this.type;
 
 		/// <summary>
 		/// Event Level.
 		/// </summary>
-		public QueryEventLevel Level
-		{
-			get { return this.level; }
-		}
+		public QueryEventLevel Level => this.level;
 
 		/// <summary>
 		/// Event message body.
 		/// </summary>
-		public string Body
-		{
-			get { return this.body; }
-		}
+		public string Body => this.body;
 	}
 }

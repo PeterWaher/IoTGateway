@@ -86,50 +86,47 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// Underlying XML definition.
 		/// </summary>
-		public XmlElement Xml
-		{
-			get { return this.xml; }
-		}
+		public XmlElement Xml => this.xml;
 
 		/// <summary>
 		/// Service Type
 		/// </summary>
-		public string ServiceType { get { return this.serviceType; } }
+		public string ServiceType => this.serviceType;
 
 		/// <summary>
 		/// Service ID
 		/// </summary>
-		public string ServiceId { get { return this.serviceId; } }
+		public string ServiceId => this.serviceId;
 
 		/// <summary>
 		/// URL to service description
 		/// </summary>
-		public string SCPDURL { get { return this.scpdURL; } }
+		public string SCPDURL => this.scpdURL;
 
 		/// <summary>
 		/// URL for control
 		/// </summary>
-		public string ControlURL { get { return this.controlURL; } }
+		public string ControlURL => this.controlURL;
 
 		/// <summary>
 		/// URL for eventing
 		/// </summary>
-		public string EventSubURL { get { return this.eventSubURL; } }
+		public string EventSubURL => this.eventSubURL;
 
 		/// <summary>
 		/// URI to service description
 		/// </summary>
-		public Uri SCPDURI { get { return this.scpdURI; } }
+		public Uri SCPDURI => this.scpdURI;
 
 		/// <summary>
 		/// URI for control
 		/// </summary>
-		public Uri ControlURI { get { return this.controlURI; } }
+		public Uri ControlURI => this.controlURI;
 
 		/// <summary>
 		/// URI for eventing
 		/// </summary>
-		public Uri EventSubURI { get { return this.eventSubURI; } }
+		public Uri EventSubURI => this.eventSubURI;
 
 		/// <inheritdoc/>
 		public override string ToString()

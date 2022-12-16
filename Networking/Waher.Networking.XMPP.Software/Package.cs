@@ -29,8 +29,8 @@ namespace Waher.Networking.XMPP.Software
         /// </summary>
         public string FileName
         {
-            get { return this.fileName; }
-            set { this.fileName = value; }
+            get => this.fileName;
+            set => this.fileName = value;
         }
 
         /// <summary>
@@ -39,8 +39,8 @@ namespace Waher.Networking.XMPP.Software
         /// </summary>
         public byte[] Signature
         {
-            get { return this.signature; }
-            set { this.signature = value; }
+            get => this.signature;
+            set => this.signature = value;
         }
 
         /// <summary>
@@ -48,8 +48,8 @@ namespace Waher.Networking.XMPP.Software
         /// </summary>
         public string Url
         {
-            get { return this.url; }
-            set { this.url = value; }
+            get => this.url;
+            set => this.url = value;
         }
 
         /// <summary>
@@ -57,8 +57,8 @@ namespace Waher.Networking.XMPP.Software
         /// </summary>
         public DateTime Published
         {
-            get { return this.published; }
-            set { this.published = value; }
+            get => this.published;
+            set => this.published = value;
         }
 
         /// <summary>
@@ -67,8 +67,8 @@ namespace Waher.Networking.XMPP.Software
         /// </summary>
         public DateTime Supersedes
         {
-            get { return this.supersedes; }
-            set { this.supersedes = value; }
+            get => this.supersedes;
+            set => this.supersedes = value;
         }
 
         /// <summary>
@@ -76,8 +76,8 @@ namespace Waher.Networking.XMPP.Software
         /// </summary>
         public DateTime Created
         {
-            get { return this.created; }
-            set { this.created = value; }
+            get => this.created;
+            set => this.created = value;
         }
 
         /// <summary>
@@ -85,8 +85,8 @@ namespace Waher.Networking.XMPP.Software
         /// </summary>
         public long Bytes
         {
-            get { return this.bytes; }
-            set { this.bytes = value; }
+            get => this.bytes;
+            set => this.bytes = value;
         }
 
         /// <summary>

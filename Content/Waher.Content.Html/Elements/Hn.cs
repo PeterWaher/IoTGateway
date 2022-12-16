@@ -27,9 +27,6 @@ namespace Waher.Content.Html.Elements
 		/// <summary>
 		/// Header level.
 		/// </summary>
-		public int Level
-		{
-			get { return this.level; }
-		}
+		public int Level => this.level;
     }
 }

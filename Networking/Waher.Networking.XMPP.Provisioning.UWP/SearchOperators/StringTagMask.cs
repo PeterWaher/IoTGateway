@@ -26,10 +26,7 @@ namespace Waher.Networking.XMPP.Provisioning.SearchOperators
 		/// <summary>
 		/// Wildcard string used.
 		/// </summary>
-		public string Wildcard
-		{
-			get { return this.wildcard; }
-		}
+		public string Wildcard => this.wildcard;
 
 		internal override void SerializeValue(StringBuilder Request)
 		{

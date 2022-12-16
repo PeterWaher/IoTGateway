@@ -30,18 +30,12 @@ namespace Waher.Networking.XMPP.Control.ControlOperations
 		/// <summary>
 		/// Control parameter
 		/// </summary>
-		public Int32ControlParameter Parameter
-		{
-			get { return this.parameter; }
-		}
+		public Int32ControlParameter Parameter => this.parameter;
 
 		/// <summary>
 		/// Value to set.
 		/// </summary>
-		public int Value
-		{
-			get { return this.value; }
-		}
+		public int Value => this.value;
 
 		/// <summary>
 		/// Performs the control operation.

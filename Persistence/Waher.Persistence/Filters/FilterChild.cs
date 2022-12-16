@@ -22,10 +22,7 @@ namespace Waher.Persistence.Filters
 		/// <summary>
 		/// Child filter.
 		/// </summary>
-		public Filter ChildFilter
-		{
-			get { return this.filter; }
-		}
+		public Filter ChildFilter => this.filter;
 
 		/// <summary>
 		/// Iterates through all nodes in the filter.

@@ -108,8 +108,8 @@ namespace Waher.Things.SourceEvents
 		[DefaultValueStringEmpty]
 		public string OldId
 		{
-			get { return this.oldId; }
-			set { this.oldId = value; }
+			get => this.oldId;
+			set => this.oldId = value;
 		}
 
 		/// <summary>

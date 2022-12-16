@@ -38,26 +38,17 @@ namespace Waher.Networking.HTTP
 		/// If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
 		/// (i.e. sends the response from another thread).
 		/// </summary>
-		public override bool Synchronous
-		{
-			get { return this.synchronous; }
-		}
+		public override bool Synchronous => this.synchronous;
 
 		/// <summary>
 		/// If the resource handles sub-paths.
 		/// </summary>
-		public override bool HandlesSubPaths
-		{
-			get { return this.handlesSubPaths; }
-		}
+		public override bool HandlesSubPaths => this.handlesSubPaths;
 
 		/// <summary>
 		/// If the resource uses user sessions.
 		/// </summary>
-		public override bool UserSessions
-		{
-			get { return this.userSessions; }
-		}
+		public override bool UserSessions => this.userSessions;
 
 		/// <summary>
 		/// If the GET method is allowed.

@@ -95,20 +95,14 @@ namespace Waher.Networking.LWM2M
 		/// 
 		/// Use <see cref="Set(ushort?, ushort?)"/> to change the value.
 		/// </summary>
-		public ushort? ReferenceId
-		{
-			get { return this.refId; }
-		}
+		public ushort? ReferenceId => this.refId;
 
 		/// <summary>
 		/// Referenced object instance id.
 		/// 
 		/// Use <see cref="Set(ushort?, ushort?)"/> to change the value.
 		/// </summary>
-		public ushort? ReferenceInstanceId
-		{
-			get { return this.refInstanceId; }
-		}
+		public ushort? ReferenceInstanceId => this.refInstanceId;
 
 		/// <summary>
 		/// Sets the value of the resource.

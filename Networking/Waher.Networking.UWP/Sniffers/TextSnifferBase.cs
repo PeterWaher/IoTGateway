@@ -26,8 +26,8 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public bool IncludeTimestamp
 		{
-			get { return this.includeTimestamp; }
-			set { this.includeTimestamp = value; }
+			get => this.includeTimestamp;
+			set => this.includeTimestamp = value;
 		}
 
 		/// <summary>

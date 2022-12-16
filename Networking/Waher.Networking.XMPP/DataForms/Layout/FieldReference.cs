@@ -32,7 +32,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		/// <summary>
 		/// Variable name
 		/// </summary>
-		public string Var { get { return this.var; } }
+		public string Var => this.var;
 
 		internal override bool RemoveExcluded()
 		{

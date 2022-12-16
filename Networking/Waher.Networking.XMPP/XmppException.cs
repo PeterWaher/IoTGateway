@@ -34,9 +34,6 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Stanza causing exception.
 		/// </summary>
-		public XmlElement Stanza
-		{
-			get { return this.stanza; }
-		}
+		public XmlElement Stanza => this.stanza;
 	}
 }

@@ -19,10 +19,7 @@ namespace Waher.Script.Abstraction.Sets
 		/// <summary>
 		/// Scalar ring.
 		/// </summary>
-		public override IRing ScalarRing
-		{
-			get { return this.ScalarField; }
-		}
+		public override IRing ScalarRing => this.ScalarField;
 
 		/// <summary>
 		/// Scalar field.

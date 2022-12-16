@@ -185,74 +185,50 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// X-axis series.
 		/// </summary>
-		public LinkedList<IVector> X
-		{
-			get { return this.x; }
-		}
+		public LinkedList<IVector> X => this.x;
 
 		/// <summary>
 		/// Y-axis series.
 		/// </summary>
-		public LinkedList<IVector> Y
-		{
-			get { return this.y; }
-		}
+		public LinkedList<IVector> Y => this.y;
 
 		/// <summary>
 		/// Parameters.
 		/// </summary>
-		public LinkedList<object[]> Parameters
-		{
-			get { return this.parameters; }
-		}
+		public LinkedList<object[]> Parameters => this.parameters;
 
 		/// <summary>
 		/// Smallest X-value.
 		/// </summary>
-		public IElement MinX
-		{
-			get { return this.minX; }
-		}
+		public IElement MinX => this.minX;
 
 		/// <summary>
 		/// Largest X-value.
 		/// </summary>
-		public IElement MaxX
-		{
-			get { return this.maxX; }
-		}
+		public IElement MaxX => this.maxX;
 
 		/// <summary>
 		/// Smallest Y-value.
 		/// </summary>
-		public IElement MinY
-		{
-			get { return this.minY; }
-		}
+		public IElement MinY => this.minY;
 
 		/// <summary>
 		/// Largest Y-value.
 		/// </summary>
-		public IElement MaxY
-		{
-			get { return this.maxY; }
-		}
+		public IElement MaxY => this.maxY;
 
 		/// <summary>
 		/// If graph was generated using element-wise addition operations.
 		/// </summary>
-		public bool Elementwise
-		{
-			get { return this.elementwise; }
-		}
+		public bool Elementwise => this.elementwise;
 
 		/// <summary>
 		/// Title for graph.
 		/// </summary>
 		public string Title
 		{
-			get { return this.title; }
-			set { this.title = value; }
+			get => this.title;
+			set => this.title = value;
 		}
 
 		/// <summary>
@@ -260,8 +236,8 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public string LabelX
 		{
-			get { return this.labelX; }
-			set { this.labelX = value; }
+			get => this.labelX;
+			set => this.labelX = value;
 		}
 
 		/// <summary>
@@ -269,8 +245,8 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public string LabelY
 		{
-			get { return this.labelY; }
-			set { this.labelY = value; }
+			get => this.labelY;
+			set => this.labelY = value;
 		}
 
 		/// <summary>
@@ -278,8 +254,8 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public bool ShowXAxis
 		{
-			get { return this.showXAxis; }
-			set { this.showXAxis = value; }
+			get => this.showXAxis;
+			set => this.showXAxis = value;
 		}
 
 		/// <summary>
@@ -287,8 +263,8 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public bool ShowYAxis
 		{
-			get { return this.showYAxis; }
-			set { this.showYAxis = value; }
+			get => this.showYAxis;
+			set => this.showYAxis = value;
 		}
 
 		/// <summary>
@@ -296,8 +272,8 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public bool ShowGrid
 		{
-			get { return this.showGrid; }
-			set { this.showGrid = value; }
+			get => this.showGrid;
+			set => this.showGrid = value;
 		}
 
 		/// <summary>

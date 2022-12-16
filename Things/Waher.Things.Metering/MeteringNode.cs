@@ -88,8 +88,8 @@ namespace Waher.Things.Metering
 		[ObjectId]
 		public Guid ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -97,8 +97,8 @@ namespace Waher.Things.Metering
 		/// </summary>
 		public Guid ParentId
 		{
-			get { return this.parentId; }
-			set { this.parentId = value; }
+			get => this.parentId;
+			set => this.parentId = value;
 		}
 
 		/// <summary>
@@ -106,8 +106,8 @@ namespace Waher.Things.Metering
 		/// </summary>
 		public DateTime Created
 		{
-			get { return this.created; }
-			set { this.created = value; }
+			get => this.created;
+			set => this.created = value;
 		}
 
 		/// <summary>
@@ -116,8 +116,8 @@ namespace Waher.Things.Metering
 		[DefaultValueDateTimeMinValue]
 		public DateTime Updated
 		{
-			get { return this.updated; }
-			set { this.updated = value; }
+			get => this.updated;
+			set => this.updated = value;
 		}
 
 		/// <summary>
@@ -129,7 +129,7 @@ namespace Waher.Things.Metering
 		[Required]
 		public string NodeId
 		{
-			get { return this.nodeId; }
+			get => this.nodeId;
 			set
 			{
 				this.nodeId = value;
@@ -560,19 +560,13 @@ namespace Waher.Things.Metering
 		/// If provided, an ID for the node, but unique locally between siblings. Can be null, if Local ID equal to Node ID.
 		/// </summary>
 		[IgnoreMember]
-		public virtual string LocalId
-		{
-			get { return this.NodeId; }
-		}
+		public virtual string LocalId => this.NodeId;
 
 		/// <summary>
 		/// If provided, an ID for the node, as it would appear or be used in system logs. Can be null, if Log ID equal to Node ID.
 		/// </summary>
 		[IgnoreMember]
-		public virtual string LogId
-		{
-			get { return this.NodeId; }
-		}
+		public virtual string LogId => this.NodeId;
 
 		/// <summary>
 		/// Gets the type name of the node.
@@ -680,8 +674,8 @@ namespace Waher.Things.Metering
 		[DefaultValue(NodeState.None)]
 		public NodeState State
 		{
-			get { return this.state; }
-			set { this.state = value; }
+			get => this.state;
+			set => this.state = value;
 		}
 
 		/// <summary>

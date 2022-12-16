@@ -175,26 +175,20 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// Underlying TCP connection
 		/// </summary>
-		public BinaryTcpClient Tcp
-		{
-			get { return this.tcpConnection; }
-		}
+		public BinaryTcpClient Tcp => this.tcpConnection;
 
 		/// <summary>
 		/// Peer-to-peer network.
 		/// </summary>
-		public PeerToPeerNetwork Network
-		{
-			get { return this.network; }
-		}
+		public PeerToPeerNetwork Network => this.network;
 
 		/// <summary>
 		/// Remote endpoint.
 		/// </summary>
 		public IPEndPoint RemoteEndpoint
 		{
-			get { return this.remoteEndpoint; }
-			internal set { this.remoteEndpoint = value; }
+			get => this.remoteEndpoint;
+			internal set => this.remoteEndpoint = value;
 		}
 
 		/// <summary>
@@ -421,8 +415,8 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		public object StateObject
 		{
-			get { return this.stateObject; }
-			set { this.stateObject = value; }
+			get => this.stateObject;
+			set => this.stateObject = value;
 		}
 
 		internal async Task UdpDatagramReceived(object _, UdpDatagramEventArgs e)

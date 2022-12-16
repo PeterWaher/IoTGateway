@@ -36,41 +36,26 @@ namespace Waher.Networking.XMPP.P2P
 		/// <summary>
 		/// XMPP Address (Bare JID).
 		/// </summary>
-		public string XmppAddress
-		{
-			get { return this.xmppAddress; }
-		}
+		public string XmppAddress => this.xmppAddress;
 
 		/// <summary>
 		/// External IP Address.
 		/// </summary>
-		public string ExternalIp
-		{
-			get { return this.externalIp; }
-		}
+		public string ExternalIp => this.externalIp;
 
 		/// <summary>
 		/// External Port Number.
 		/// </summary>
-		public int ExternalPort
-		{
-			get { return this.externalPort; }
-		}
+		public int ExternalPort => this.externalPort;
 
 		/// <summary>
 		/// Local IP Address.
 		/// </summary>
-		public string LocalIp
-		{
-			get { return this.localIp; }
-		}
+		public string LocalIp => this.localIp;
 
 		/// <summary>
 		/// Local Port Number.
 		/// </summary>
-		public int LocalPort
-		{
-			get { return this.localPort; }
-		}
+		public int LocalPort => this.localPort;
 	}
 }

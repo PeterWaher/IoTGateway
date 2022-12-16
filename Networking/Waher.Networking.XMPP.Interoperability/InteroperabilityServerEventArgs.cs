@@ -48,32 +48,32 @@ namespace Waher.Networking.XMPP.Interoperability
 		/// <summary>
 		/// Node ID
 		/// </summary>
-		public string NodeId { get { return this.nodeId; } }
+		public string NodeId => this.nodeId;
 
 		/// <summary>
 		/// Source ID
 		/// </summary>
-		public string SourceId { get { return this.sourceId; } }
+		public string SourceId => this.sourceId;
 
 		/// <summary>
 		/// Partition
 		/// </summary>
-		public string Partition { get { return this.partition; } }
+		public string Partition => this.partition;
 
 		/// <summary>
 		/// Service Token
 		/// </summary>
-		public string ServiceToken { get { return this.serviceToken; } }
+		public string ServiceToken => this.serviceToken;
 
 		/// <summary>
 		/// Device Token
 		/// </summary>
-		public string DeviceToken { get { return this.deviceToken; } }
+		public string DeviceToken => this.deviceToken;
 
 		/// <summary>
 		/// User Token
 		/// </summary>
-		public string UserToken { get { return this.userToken; } }
+		public string UserToken => this.userToken;
 
 		/// <summary>
 		/// Thing reference.

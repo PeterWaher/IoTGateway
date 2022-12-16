@@ -46,7 +46,7 @@ namespace Waher.Mock
 		/// </summary>
 		public bool IsSelected
 		{
-			get { return this.selected; }
+			get => this.selected;
 			set
 			{
 				if (this.selected != value)

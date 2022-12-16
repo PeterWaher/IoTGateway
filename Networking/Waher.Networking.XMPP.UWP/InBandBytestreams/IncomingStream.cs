@@ -71,20 +71,17 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 		internal int BaseSeq
 		{
-			get { return this.baseSeq; }
-			set { this.baseSeq = value; }
+			get => this.baseSeq;
+			set => this.baseSeq = value;
 		}
 
 		internal bool UpperEnd
 		{
-			get { return this.upperEnd; }
-			set { this.upperEnd = value; }
+			get => this.upperEnd;
+			set => this.upperEnd = value;
 		}
 
-		internal int BlockSize
-		{
-			get { return this.blockSize; }
-		}
+		internal int BlockSize => this.blockSize;
 
 		internal bool BlocksMissing
 		{

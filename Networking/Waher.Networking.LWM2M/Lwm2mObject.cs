@@ -43,8 +43,8 @@ namespace Waher.Networking.LWM2M
 		[ObjectId]
 		public string ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -97,8 +97,8 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public Lwm2mClient Client
 		{
-			get { return this.client; }
-			internal set { this.client = value; }
+			get => this.client;
+			internal set => this.client = value;
 		}
 
 		/// <summary>
@@ -106,7 +106,7 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public ushort Id
 		{
-			get { return this.id; }
+			get => this.id;
 			set
 			{
 				if (this.id != value)

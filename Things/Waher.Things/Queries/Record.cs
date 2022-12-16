@@ -20,9 +20,6 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Record elements.
 		/// </summary>
-		public object[] Elements
-		{
-			get { return this.elements; }
-		}
+		public object[] Elements => this.elements;
 	}
 }

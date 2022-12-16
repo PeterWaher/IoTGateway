@@ -136,26 +136,17 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// File Name.
 		/// </summary>
-		public string FileName
-		{
-			get { return this.fileName; }
-		}
+		public string FileName => this.fileName;
 
 		/// <summary>
 		/// Transform to use.
 		/// </summary>
-		public string Transform
-		{
-			get { return this.transform; }
-		}
+		public string Transform => this.transform;
 
 		/// <summary>
 		/// Timestamp of Last event
 		/// </summary>
-		public DateTime LastEvent
-		{
-			get { return this.lastEvent; }
-		}
+		public DateTime LastEvent => this.lastEvent;
 
 		/// <summary>
 		/// Gets the name of a file, given a file name template.

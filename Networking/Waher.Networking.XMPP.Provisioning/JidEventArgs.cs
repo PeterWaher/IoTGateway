@@ -19,9 +19,6 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// JID.
 		/// </summary>
-		public string JID
-		{
-			get { return this.jid; }
-		}
+		public string JID => this.jid;
 	}
 }

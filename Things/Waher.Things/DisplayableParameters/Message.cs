@@ -66,8 +66,8 @@ namespace Waher.Things.DisplayableParameters
 		/// </summary>
 		public DateTime Timestamp
 		{
-			get { return this.timestamp; }
-			set { this.timestamp = value; }
+			get => this.timestamp;
+			set => this.timestamp = value;
 		}
 
 		/// <summary>
@@ -75,8 +75,8 @@ namespace Waher.Things.DisplayableParameters
 		/// </summary>
 		public MessageType Type
 		{
-			get { return this.type; }
-			set { this.type = value; }
+			get => this.type;
+			set => this.type = value;
 		}
 
 		/// <summary>
@@ -84,8 +84,8 @@ namespace Waher.Things.DisplayableParameters
 		/// </summary>
 		public string EventId
 		{
-			get { return this.eventId; }
-			set { this.eventId = value; }
+			get => this.eventId;
+			set => this.eventId = value;
 		}
 
 		/// <summary>
@@ -93,8 +93,8 @@ namespace Waher.Things.DisplayableParameters
 		/// </summary>
 		public string Body
 		{
-			get { return this.body; }
-			set { this.body = value; }
+			get => this.body;
+			set => this.body = value;
 		}
 
 		/// <summary>

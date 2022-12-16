@@ -277,10 +277,7 @@ namespace Waher.Events.Persistence
 		/// <summary>
 		/// Number of days to store events in the database.
 		/// </summary>
-		public int EventLifetimeDays
-		{
-			get { return this.eventLifetimeDays; }
-		}
+		public int EventLifetimeDays => this.eventLifetimeDays;
 
 		/// <summary>
 		/// Queues an event to be output.

@@ -23,9 +23,6 @@ namespace Waher.Persistence.Attributes
 		/// <summary>
 		/// Short name.
 		/// </summary>
-		public string Name
-		{
-			get { return this.name; }
-		}
+		public string Name => this.name;
 	}
 }

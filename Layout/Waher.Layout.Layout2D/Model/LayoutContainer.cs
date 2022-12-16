@@ -245,10 +245,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// If children dimensions are to be measured.
 		/// </summary>
-		protected virtual bool MeasureChildrenDimensions
-		{
-			get => true;
-		}
+		protected virtual bool MeasureChildrenDimensions => true;
 
 		/// <summary>
 		/// Measures layout entities and defines unassigned properties, related to positions.
@@ -268,10 +265,7 @@ namespace Waher.Layout.Layout2D.Model
 		/// <summary>
 		/// If children positions are to be measured.
 		/// </summary>
-		protected virtual bool MeasureChildrenPositions
-		{
-			get => true;
-		}
+		protected virtual bool MeasureChildrenPositions => true;
 
 		/// <summary>
 		/// Includes a point in the area measurement.

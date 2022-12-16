@@ -66,9 +66,6 @@ namespace Waher.Networking.CoAP.Options
 		/// <summary>
 		/// Integer value.
 		/// </summary>
-		public ulong Value
-		{
-			get { return this.value; }
-		}
+		public ulong Value => this.value;
 	}
 }

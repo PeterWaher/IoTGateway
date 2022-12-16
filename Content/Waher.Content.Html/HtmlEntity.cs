@@ -29,10 +29,7 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// Entity Name
 		/// </summary>
-		public string EntityName
-		{
-			get { return this.entityName; }
-		}
+		public string EntityName => this.entityName;
 
 		/// <inheritdoc/>
 		public override string ToString()

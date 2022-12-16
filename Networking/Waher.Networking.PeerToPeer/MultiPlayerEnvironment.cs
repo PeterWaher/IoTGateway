@@ -938,10 +938,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// Current state of the multi-player environment.
 		/// </summary>
-		public MultiPlayerState State
-		{
-			get { return this.state; }
-		}
+		public MultiPlayerState State => this.state;
 
 		internal async Task SetState(MultiPlayerState NewState)
 		{
@@ -983,10 +980,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// Application Name
 		/// </summary>
-		public string ApplicationName
-		{
-			get { return this.applicationName; }
-		}
+		public string ApplicationName => this.applicationName;
 
 		/// <summary>
 		/// External IP Address.
@@ -1023,10 +1017,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// In case <see cref="State"/>=<see cref="MultiPlayerState.Error"/>, this exception object contains details about the error.
 		/// </summary>
-		public Exception Exception
-		{
-			get { return this.exception; }
-		}
+		public Exception Exception => this.exception;
 
 		/// <summary>
 		/// Waits for the multi-player environment object to be ready to play.
@@ -1140,10 +1131,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// Number of players
 		/// </summary>
-		public int PlayerCount
-		{
-			get { return this.playerCount; }
-		}
+		public int PlayerCount => this.playerCount;
 
 		/// <summary>
 		/// If the local player is the first player in the list of players. Can be used to determine which machine controls game logic.

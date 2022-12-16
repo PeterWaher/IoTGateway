@@ -29,8 +29,8 @@ namespace Waher.Things.Arduino
 		[DefaultValue(0)]
 		public byte PinNr
 		{
-			get { return this.pinNr; }
-			set { this.pinNr = value; }
+			get => this.pinNr;
+			set => this.pinNr = value;
 		}
 
 		public abstract string PinNrStr

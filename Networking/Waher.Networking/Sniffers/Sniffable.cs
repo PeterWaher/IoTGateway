@@ -87,10 +87,7 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// If there are sniffers registered on the object.
 		/// </summary>
-		public bool HasSniffers
-		{
-			get { return this.hasSniffers; }
-		}
+		public bool HasSniffers => this.hasSniffers;
 
 		/// <summary>
 		/// Gets a typed enumerator.

@@ -27,9 +27,6 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Source Event
 		/// </summary>
-		public SourceEvent Event
-		{
-			get { return this.sourceEvent; }
-		}
+		public SourceEvent Event => this.sourceEvent;
 	}
 }

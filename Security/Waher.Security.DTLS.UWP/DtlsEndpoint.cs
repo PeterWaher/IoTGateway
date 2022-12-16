@@ -133,18 +133,12 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// User data source, if pre-shared keys should be allowed by a DTLS server endpoint.
 		/// </summary>
-		public IUserSource Users
-		{
-			get { return this.users; }
-		}
+		public IUserSource Users => this.users;
 
 		/// <summary>
 		/// Required privilege, for the user to be acceptable in PSK handshakes.
 		/// </summary>
-		public string RequiredPrivilege
-		{
-			get { return this.requiredPrivilege; }
-		}
+		public string RequiredPrivilege => this.requiredPrivilege;
 
 		/// <summary>
 		/// Probability of packet loss. Is by default 0.

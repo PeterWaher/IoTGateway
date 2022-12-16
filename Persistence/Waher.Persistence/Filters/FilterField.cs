@@ -23,10 +23,7 @@ namespace Waher.Persistence.Filters
 		/// <summary>
 		/// FIeld Name.
 		/// </summary>
-		public string FieldName
-		{
-			get { return this.fieldName; }
-		}
+		public string FieldName => this.fieldName;
 
 		/// <summary>
 		/// Checks if an object passes the test or not.

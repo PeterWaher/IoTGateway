@@ -45,26 +45,17 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 		/// <summary>
 		/// Identities
 		/// </summary>
-		public Identity[] Identities
-		{
-			get { return this.identities; }
-		}
+		public Identity[] Identities => this.identities;
 
 		/// <summary>
 		/// Features
 		/// </summary>
-		public Dictionary<string, bool> Features
-		{
-			get { return this.features; }
-		}
+		public Dictionary<string, bool> Features => this.features;
 
 		/// <summary>
 		/// Extended information, as defined in XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
 		/// </summary>
-		public Dictionary<string, DataForm> ExtendedInformation
-		{
-			get { return this.extendedInformation; }
-		}
+		public Dictionary<string, DataForm> ExtendedInformation => this.extendedInformation;
 
 		/// <summary>
 		/// Checks if the remote entity supports a specific feature.

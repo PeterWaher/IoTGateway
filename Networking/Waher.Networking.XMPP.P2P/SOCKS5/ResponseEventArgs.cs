@@ -70,25 +70,16 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <summary>
 		/// IP Address, or null if destination address is a domain name.
 		/// </summary>
-		public IPAddress IpAddress
-		{
-			get { return this.ipAddress; }
-		}
+		public IPAddress IpAddress => this.ipAddress;
 
 		/// <summary>
 		/// Domain Name, or null if destiation address is an IP address.
 		/// </summary>
-		public string DomainName
-		{
-			get { return this.domainName; }
-		}
+		public string DomainName => this.domainName;
 
 		/// <summary>
 		/// Port Number.
 		/// </summary>
-		public int PortNumber
-		{
-			get { return this.port; }
-		}
+		public int PortNumber => this.port;
 	}
 }

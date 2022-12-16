@@ -27,17 +27,11 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Form embedded in message.
 		/// </summary>
-		public DataForm Form
-		{
-			get { return this.form; }
-		}
+		public DataForm Form => this.form;
 
 		/// <summary>
 		/// Type of form, as defined by the FORM_TYPE field (if available in the form).
 		/// </summary>
-		public string FormType
-		{
-			get { return this.formType; }
-		}
+		public string FormType => this.formType;
 	}
 }

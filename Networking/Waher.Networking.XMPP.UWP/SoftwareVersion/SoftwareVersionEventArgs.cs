@@ -30,16 +30,16 @@ namespace Waher.Networking.XMPP.SoftwareVersion
 		/// <summary>
 		/// Name
 		/// </summary>
-		public string Name { get { return this.name; } }
+		public string Name => this.name;
 
 		/// <summary>
 		/// Version
 		/// </summary>
-		public string Version { get { return this.version; } }
+		public string Version => this.version;
 
 		/// <summary>
 		/// OS
 		/// </summary>
-		public string OS { get { return this.os; } }
+		public string OS => this.os;
 	}
 }

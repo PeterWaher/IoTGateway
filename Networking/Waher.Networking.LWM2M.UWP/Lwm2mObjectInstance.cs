@@ -46,8 +46,8 @@ namespace Waher.Networking.LWM2M
 		[ObjectId]
 		public string ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -55,8 +55,8 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public Lwm2mObject Object
 		{
-			get { return this.obj; }
-			internal set { this.obj = value; }
+			get => this.obj;
+			internal set => this.obj = value;
 		}
 
 		/// <summary>
@@ -64,7 +64,7 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public ushort Id
 		{
-			get { return this.id; }
+			get => this.id;
 			set
 			{
 				if (this.id != value)
@@ -80,7 +80,7 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public ushort InstanceId
 		{
-			get { return this.instanceId; }
+			get => this.instanceId;
 			set
 			{
 				if (this.instanceId != value)

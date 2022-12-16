@@ -30,10 +30,7 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// Inline text.
 		/// </summary>
-		public string InlineText
-		{
-			get { return this.text; }
-		}
+		public string InlineText => this.text;
 
 		/// <summary>
 		/// If the text consists only of white-space.

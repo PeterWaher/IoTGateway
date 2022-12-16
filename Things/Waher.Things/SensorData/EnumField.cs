@@ -280,7 +280,7 @@ namespace Waher.Things.SensorData
 		[ShortName("v")]
 		public Enum Value
 		{
-			get { return this.value; }
+			get => this.value;
 			set
 			{
 				this.value = value;
@@ -294,8 +294,8 @@ namespace Waher.Things.SensorData
 		[ShortName("et")]
 		public string EnumerationType 
 		{
-			get { return this.type; }
-			set { this.type = value; }
+			get => this.type;
+			set => this.type = value;
 		}
 
 		/// <summary>
@@ -306,10 +306,7 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// String representation of field value.
 		/// </summary>
-		public override string ValueString
-		{
-			get { return this.valueString; }
-		}
+		public override string ValueString => this.valueString;
 
 		/// <summary>
 		/// Provides a string identifying the data type of the field. Should conform to field value data types specified in the IEEE XMPP IoT extensions, if possible:

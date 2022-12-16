@@ -98,7 +98,7 @@ namespace Waher.Client.MqttEventViewer
 		/// </summary>
 		public bool IsSelected
 		{
-			get { return this.selected; }
+			get => this.selected;
 			set
 			{
 				if (this.selected != value)
@@ -144,8 +144,8 @@ namespace Waher.Client.MqttEventViewer
 		/// </summary>
 		public Color ForegroundColor
 		{
-			get { return this.foregroundColor; }
-			set { this.foregroundColor = value; }
+			get => this.foregroundColor;
+			set => this.foregroundColor = value;
 		}
 
 		/// <summary>
@@ -161,8 +161,8 @@ namespace Waher.Client.MqttEventViewer
 		/// </summary>
 		public Color BackgroundColor
 		{
-			get { return this.backgroundColor; }
-			set { this.backgroundColor = value; }
+			get => this.backgroundColor;
+			set => this.backgroundColor = value;
 		}
 
 		/// <summary>

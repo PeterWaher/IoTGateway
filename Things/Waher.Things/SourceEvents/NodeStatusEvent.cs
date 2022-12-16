@@ -24,8 +24,8 @@ namespace Waher.Things.SourceEvents
 		[DefaultValue(NodeState.None)]
 		public NodeState State
 		{
-			get { return this.state; }
-			set { this.state = value; }
+			get => this.state;
+			set => this.state = value;
 		}
 	}
 }

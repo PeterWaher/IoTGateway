@@ -33,20 +33,14 @@ namespace Waher.Client.WPF.Model
 			this.supportsRdp = SupportsRdp;
 		}
 
-		public override string Header
-		{
-			get { return this.bareJid; }
-		}
+		public override string Header => this.bareJid;
 
 		public override string TypeName
 		{
 			get { return "Unknown"; }
 		}
 
-		public string BareJID
-		{
-			get { return this.bareJid; }
-		}
+		public string BareJID => this.bareJid;
 
 		public override string FullJID
 		{
@@ -247,10 +241,7 @@ namespace Waher.Client.WPF.Model
 			get { return false; }
 		}
 
-		public override string Key
-		{
-			get { return this.bareJid; }
-		}
+		public override string Key => this.bareJid;
 
 		public override bool CanChat
 		{

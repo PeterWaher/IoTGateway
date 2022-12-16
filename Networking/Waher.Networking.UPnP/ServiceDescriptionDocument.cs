@@ -85,50 +85,32 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// Underlying XML Document.
 		/// </summary>
-		public XmlDocument Xml
-		{
-			get { return this.xml; }
-		}
+		public XmlDocument Xml => this.xml;
 
 		/// <summary>
 		/// Major version
 		/// </summary>
-		public int MajorVersion
-		{
-			get { return this.majorVersion; }
-		}
+		public int MajorVersion => this.majorVersion;
 
 		/// <summary>
 		/// Minor version
 		/// </summary>
-		public int MinorVersion
-		{
-			get { return this.minorVersion; }
-		}
+		public int MinorVersion => this.minorVersion;
 
 		/// <summary>
 		/// Service Actions.
 		/// </summary>
-		public UPnPAction[] Actions
-		{
-			get { return this.actions; }
-		}
+		public UPnPAction[] Actions => this.actions;
 
 		/// <summary>
 		/// State variables.
 		/// </summary>
-		public UPnPStateVariable[] Variables
-		{
-			get { return this.variables; }
-		}
+		public UPnPStateVariable[] Variables => this.variables;
 
 		/// <summary>
 		/// Parent service object.
 		/// </summary>
-		public UPnPService Service
-		{
-			get { return this.service; }
-		}
+		public UPnPService Service => this.service;
 
 		/// <summary>
 		/// Gets an action, given its name. If not found, null is returned.

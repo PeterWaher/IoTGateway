@@ -25,34 +25,22 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Offset used in search.
 		/// </summary>
-		public int Offset
-		{
-			get { return this.offset; }
-		}
+		public int Offset => this.offset;
 
 		/// <summary>
 		/// Max count used in search.
 		/// </summary>
-		public int MaxCount
-		{
-			get { return this.maxCount; }
-		}
+		public int MaxCount => this.maxCount;
 
 		/// <summary>
 		/// If there are more results available on the server.
 		/// </summary>
-		public bool More
-		{
-			get { return this.more; }
-		}
+		public bool More => this.more;
 
 		/// <summary>
 		/// Things returned in the search result.
 		/// </summary>
-		public SearchResultThing[] Things
-		{
-			get { return this.things; }
-		}
+		public SearchResultThing[] Things => this.things;
 
 	}
 }

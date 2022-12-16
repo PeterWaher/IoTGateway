@@ -32,8 +32,8 @@ namespace Waher.Networking.XMPP.Software
         /// </summary>
         public bool Download
         {
-            get { return this.download; }
-            set { this.download = value; }
+            get => this.download;
+            set => this.download = value;
         }
 
     }

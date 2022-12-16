@@ -76,18 +76,12 @@ namespace Waher.Script
 		/// <summary>
 		/// Name of variable.
 		/// </summary>
-		public string Name
-		{
-			get { return this.name; }
-		}
+		public string Name => this.name;
 
 		/// <summary>
 		/// Value element of variable.
 		/// </summary>
-		public IElement ValueElement
-		{
-			get { return this.value; }
-		}
+		public IElement ValueElement => this.value;
 
 		/// <summary>
 		/// Object Value of variable.

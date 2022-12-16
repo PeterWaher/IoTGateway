@@ -27,9 +27,6 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Table
 		/// </summary>
-		public QueryTable Table
-		{
-			get { return this.table; }
-		}
+		public QueryTable Table => this.table;
 	}
 }

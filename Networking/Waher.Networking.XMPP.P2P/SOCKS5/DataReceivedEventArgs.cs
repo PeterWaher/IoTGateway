@@ -44,42 +44,27 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <summary>
 		/// Buffer holding received data.
 		/// </summary>
-		public byte[] Buffer
-		{
-			get { return this.buffer; }
-		}
+		public byte[] Buffer => this.buffer;
 
 		/// <summary>
 		/// Start index of first byte received.
 		/// </summary>
-		public int Offset
-		{
-			get { return this.offset; }
-		}
+		public int Offset => this.offset;
 
 		/// <summary>
 		/// Number of bytes received.
 		/// </summary>
-		public int Count
-		{
-			get { return this.count; }
-		}
+		public int Count => this.count;
 
 		/// <summary>
 		/// SOCKS5 client stream.
 		/// </summary>
-		public Socks5Client Stream
-		{
-			get { return this.stream; }
-		}
+		public Socks5Client Stream => this.stream;
 
 		/// <summary>
 		/// State object.
 		/// </summary>
-		public object State
-		{
-			get { return this.state; }
-		}
+		public object State => this.state;
 
 	}
 }

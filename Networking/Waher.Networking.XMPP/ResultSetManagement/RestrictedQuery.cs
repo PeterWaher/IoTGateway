@@ -81,8 +81,8 @@ namespace Waher.Networking.XMPP.ResultSetManagement
 		/// </summary>
 		public string After
 		{
-			get { return this.after; }
-			set { this.after = value; }
+			get => this.after;
+			set => this.after = value;
 		}
 
 		/// <summary>
@@ -90,8 +90,8 @@ namespace Waher.Networking.XMPP.ResultSetManagement
 		/// </summary>
 		public string Before
 		{
-			get { return this.before; }
-			set { this.before = value; }
+			get => this.before;
+			set => this.before = value;
 		}
 
 		/// <summary>
@@ -99,8 +99,8 @@ namespace Waher.Networking.XMPP.ResultSetManagement
 		/// </summary>
 		public int? Index
 		{
-			get { return this.index; }
-			set { this.index = value; }
+			get => this.index;
+			set => this.index = value;
 		}
 
 		/// <summary>
@@ -108,8 +108,8 @@ namespace Waher.Networking.XMPP.ResultSetManagement
 		/// </summary>
 		public int? Max
 		{
-			get { return this.max; }
-			set { this.max = value; }
+			get => this.max;
+			set => this.max = value;
 		}
 
 		/// <summary>

@@ -258,7 +258,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// The message stanza.
 		/// </summary>
-		public XmlElement Message { get { return this.message; } }
+		public XmlElement Message => this.message;
 
 		/// <summary>
 		/// Content of the message. For messages that are processed by registered message handlers, this value points to the element inside
@@ -267,21 +267,21 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public XmlElement Content
 		{
-			get { return this.content; }
-			internal set { this.content = value; }
+			get => this.content;
+			internal set => this.content = value;
 		}
 
 		/// <summary>
 		/// Type of message received.
 		/// </summary>
-		public MessageType Type { get { return this.type; } }
+		public MessageType Type => this.type;
 
 		/// <summary>
 		/// From where the message was received.
 		/// </summary>
 		public string From
 		{
-			get { return this.from; }
+			get => this.from;
 			set
 			{
 				this.from = value;
@@ -292,18 +292,15 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Bare JID of resource sending the message.
 		/// </summary>
-		public string FromBareJID
-		{
-			get { return this.fromBareJid; }
-		}
+		public string FromBareJID => this.fromBareJid;
 
 		/// <summary>
 		/// To whom the message was sent.
 		/// </summary>
 		public string To
 		{
-			get { return this.to; }
-			set { this.to = value; }
+			get => this.to;
+			set => this.to = value;
 		}
 
 		/// <summary>
@@ -311,69 +308,69 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public string Id
 		{
-			get { return this.id; }
-			set { this.id = value; }
+			get => this.id;
+			set => this.id = value;
 		}
 
 		/// <summary>
 		/// Human readable subject.
 		/// </summary>
-		public string Subject { get { return this.subject; } }
+		public string Subject => this.subject;
 
 		/// <summary>
 		/// Human readable body.
 		/// </summary>
-		public string Body { get { return this.body; } }
+		public string Body => this.body;
 
 		/// <summary>
 		/// Thread ID.
 		/// </summary>
-		public string ThreadID { get { return this.threadId; } }
+		public string ThreadID => this.threadId;
 
 		/// <summary>
 		/// Parent Thraed ID.
 		/// </summary>
-		public string ParentThreadID { get { return this.parentThreadId; } }
+		public string ParentThreadID => this.parentThreadId;
 
 		/// <summary>
 		/// If the response is an OK result response (true), or an error response (false).
 		/// </summary>
-		public bool Ok { get { return this.ok; } }
+		public bool Ok => this.ok;
 
 		/// <summary>
 		/// Error Code
 		/// </summary>
-		public int ErrorCode { get { return this.errorCode; } }
+		public int ErrorCode => this.errorCode;
 
 		/// <summary>
 		/// Error Type
 		/// </summary>
-		public ErrorType ErrorType { get { return this.errorType; } }
+		public ErrorType ErrorType => this.errorType;
 
 		/// <summary>
 		/// Error element.
 		/// </summary>
-		public XmlElement ErrorElement { get { return this.errorElement; } }
+		public XmlElement ErrorElement => this.errorElement;
 
 		/// <summary>
 		/// Any error specific text.
 		/// </summary>
-		public string ErrorText { get { return this.errorText; } }
+		public string ErrorText => this.errorText;
 
 		/// <summary>
 		/// Any stanza error returned.
 		/// </summary>
-		public XmppException StanzaError { get { return this.stanzaError; } }
+		public XmppException StanzaError => this.stanzaError;
 
 		/// <summary>
 		/// Available set of (language,body) pairs.
 		/// </summary>
-		public KeyValuePair<string, string>[] Bodies { get { return this.bodies; } }
+		public KeyValuePair<string, string>[] Bodies => this.bodies;
 
 		/// <summary>
 		/// Available set of (language,subject) pairs.
 		/// </summary>
-		public KeyValuePair<string, string>[] Subjects { get { return this.subjects; } }
+		public KeyValuePair<string, string>[] Subjects => this.subjects;
 
 		/// <summary>
 		/// If end-to-end encryption was used in the request.
@@ -388,8 +385,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public IEndToEndEncryption E2eEncryption
 		{
-			get { return this.e2eEncryption; }
-			set { this.e2eEncryption = value; }
+			get => this.e2eEncryption;
+			set => this.e2eEncryption = value;
 		}
 
         /// <summary>
@@ -397,8 +394,8 @@ namespace Waher.Networking.XMPP
         /// </summary>
         public string E2eReference
         {
-            get { return this.e2eReference; }
-            set { this.e2eReference = value; }
+            get => this.e2eReference;
+            set => this.e2eReference = value;
         }
 
     }

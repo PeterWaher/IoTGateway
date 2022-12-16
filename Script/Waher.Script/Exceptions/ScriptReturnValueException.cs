@@ -23,10 +23,7 @@ namespace Waher.Script.Exceptions
 		/// <summary>
 		/// Return value.
 		/// </summary>
-		public IElement ReturnValue
-		{
-			get { return this.returnValue; }
-		}
+		public IElement ReturnValue => this.returnValue;
 
 	}
 }

@@ -265,8 +265,8 @@ namespace Waher.Content.Html
 		/// </summary>
 		public ImageInformation[] Images
 		{
-			get { return this.images; }
-			set { this.images = value; }
+			get => this.images;
+			set => this.images = value;
 		}
 
 		/// <summary>
@@ -274,8 +274,8 @@ namespace Waher.Content.Html
 		/// </summary>
 		public AudioInformation[] Audio
 		{
-			get { return this.audio; }
-			set { this.audio = value; }
+			get => this.audio;
+			set => this.audio = value;
 		}
 
 		/// <summary>
@@ -283,8 +283,8 @@ namespace Waher.Content.Html
 		/// </summary>
 		public VideoInformation[] Video
 		{
-			get { return this.video; }
-			set { this.video = value; }
+			get => this.video;
+			set => this.video = value;
 		}
 
 		/// <summary>
@@ -292,8 +292,8 @@ namespace Waher.Content.Html
 		/// </summary>
 		public string[] LocaleAlternate
 		{
-			get { return this.localeAlternate; }
-			set { this.localeAlternate = value; }
+			get => this.localeAlternate;
+			set => this.localeAlternate = value;
 		}
 
 		/// <summary>
@@ -301,8 +301,8 @@ namespace Waher.Content.Html
 		/// </summary>
 		public string Title
 		{
-			get { return this.title; }
-			set { this.title = value; }
+			get => this.title;
+			set => this.title = value;
 		}
 
 		/// <summary>
@@ -310,8 +310,8 @@ namespace Waher.Content.Html
 		/// </summary>
 		public string Type
 		{
-			get { return this.type; }
-			set { this.type = value; }
+			get => this.type;
+			set => this.type = value;
 		}
 
 		/// <summary>
@@ -319,8 +319,8 @@ namespace Waher.Content.Html
 		/// </summary>
 		public string Url
 		{
-			get { return this.url; }
-			set { this.url = value; }
+			get => this.url;
+			set => this.url = value;
 		}
 
 		/// <summary>
@@ -328,8 +328,8 @@ namespace Waher.Content.Html
 		/// </summary>
 		public string Description
 		{
-			get { return this.description; }
-			set { this.description = value; }
+			get => this.description;
+			set => this.description = value;
 		}
 
 		/// <summary>
@@ -337,8 +337,8 @@ namespace Waher.Content.Html
 		/// </summary>
 		public string Determiner
 		{
-			get { return this.determiner; }
-			set { this.determiner = value; }
+			get => this.determiner;
+			set => this.determiner = value;
 		}
 
 		/// <summary>
@@ -346,8 +346,8 @@ namespace Waher.Content.Html
 		/// </summary>
 		public string Locale
 		{
-			get { return this.locale; }
-			set { this.locale = value; }
+			get => this.locale;
+			set => this.locale = value;
 		}
 
 		/// <summary>
@@ -355,8 +355,8 @@ namespace Waher.Content.Html
 		/// </summary>
 		public string SiteName
 		{
-			get { return this.siteName; }
-			set { this.siteName = value; }
+			get => this.siteName;
+			set => this.siteName = value;
 		}
 
 		/// <inheritdoc/>

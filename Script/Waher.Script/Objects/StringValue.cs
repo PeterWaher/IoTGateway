@@ -44,8 +44,8 @@ namespace Waher.Script.Objects
         /// </summary>
         public string Value
         {
-			get { return this.value; }
-			set { this.value = value; }
+			get => this.value;
+			set => this.value = value;
 		}
 
         /// <summary>
@@ -53,8 +53,8 @@ namespace Waher.Script.Objects
         /// </summary>
         public bool CaseInsensitive
         {
-            get { return this.caseInsensitive; }
-            set { this.caseInsensitive = value; }
+            get => this.caseInsensitive;
+            set => this.caseInsensitive = value;
         }
 
         /// <inheritdoc/>
@@ -80,10 +80,7 @@ namespace Waher.Script.Objects
         /// <summary>
         /// Associated object value.
         /// </summary>
-        public override object AssociatedObjectValue
-        {
-            get { return this.value; }
-        }
+        public override object AssociatedObjectValue => this.value;
 
         /// <summary>
         /// Tries to add an element to the current element, from the left.

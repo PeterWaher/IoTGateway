@@ -58,8 +58,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public string ContractId
 		{
-			get { return this.contractId; }
-			set { this.contractId = value; }
+			get => this.contractId;
+			set => this.contractId = value;
 		}
 
 		/// <summary>
@@ -77,8 +77,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public string Provider
 		{
-			get { return this.provider; }
-			set { this.provider = value; }
+			get => this.provider;
+			set => this.provider = value;
 		}
 
 		/// <summary>
@@ -86,8 +86,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public string TemplateId
 		{
-			get { return this.templateId; }
-			set { this.templateId = value; }
+			get => this.templateId;
+			set => this.templateId = value;
 		}
 
 		/// <summary>
@@ -105,8 +105,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public ContractState State
 		{
-			get { return this.state; }
-			set { this.state = value; }
+			get => this.state;
+			set => this.state = value;
 		}
 
 		/// <summary>
@@ -114,8 +114,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public DateTime Created
 		{
-			get { return this.created; }
-			set { this.created = value; }
+			get => this.created;
+			set => this.created = value;
 		}
 
 		/// <summary>
@@ -123,8 +123,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public DateTime Updated
 		{
-			get { return this.updated; }
-			set { this.updated = value; }
+			get => this.updated;
+			set => this.updated = value;
 		}
 
 		/// <summary>
@@ -132,8 +132,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public DateTime From
 		{
-			get { return this.from; }
-			set { this.from = value; }
+			get => this.from;
+			set => this.from = value;
 		}
 
 		/// <summary>
@@ -141,8 +141,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public DateTime To
 		{
-			get { return this.to; }
-			set { this.to = value; }
+			get => this.to;
+			set => this.to = value;
 		}
 
 		/// <summary>
@@ -150,8 +150,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public DateTime? SignAfter
 		{
-			get { return this.signAfter; }
-			set { this.signAfter = value; }
+			get => this.signAfter;
+			set => this.signAfter = value;
 		}
 
 		/// <summary>
@@ -159,8 +159,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public DateTime? SignBefore
 		{
-			get { return this.signBefore; }
-			set { this.signBefore = value; }
+			get => this.signBefore;
+			set => this.signBefore = value;
 		}
 
 		/// <summary>
@@ -168,8 +168,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public ContractVisibility Visibility
 		{
-			get { return this.visibility; }
-			set { this.visibility = value; }
+			get => this.visibility;
+			set => this.visibility = value;
 		}
 
 		/// <summary>
@@ -177,8 +177,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public Duration? Duration
 		{
-			get { return this.duration; }
-			set { this.duration = value; }
+			get => this.duration;
+			set => this.duration = value;
 		}
 
 		/// <summary>
@@ -186,8 +186,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public Duration? ArchiveRequired
 		{
-			get { return this.archiveReq; }
-			set { this.archiveReq = value; }
+			get => this.archiveReq;
+			set => this.archiveReq = value;
 		}
 
 		/// <summary>
@@ -195,8 +195,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public Duration? ArchiveOptional
 		{
-			get { return this.archiveOpt; }
-			set { this.archiveOpt = value; }
+			get => this.archiveOpt;
+			set => this.archiveOpt = value;
 		}
 
 		/// <summary>
@@ -205,8 +205,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public byte[] ContentSchemaDigest
 		{
-			get { return this.contentSchemaDigest; }
-			set { this.contentSchemaDigest = value; }
+			get => this.contentSchemaDigest;
+			set => this.contentSchemaDigest = value;
 		}
 
 		/// <summary>
@@ -215,8 +215,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public Security.HashFunction ContentSchemaHashFunction
 		{
-			get { return this.contentSchemaHashFunction; }
-			set { this.contentSchemaHashFunction = value; }
+			get => this.contentSchemaHashFunction;
+			set => this.contentSchemaHashFunction = value;
 		}
 
 		/// <summary>
@@ -224,8 +224,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public Role[] Roles
 		{
-			get { return this.roles; }
-			set { this.roles = value; }
+			get => this.roles;
+			set => this.roles = value;
 		}
 
 		/// <summary>
@@ -233,8 +233,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public ContractParts PartsMode
 		{
-			get { return this.partsMode; }
-			set { this.partsMode = value; }
+			get => this.partsMode;
+			set => this.partsMode = value;
 		}
 
 		/// <summary>
@@ -242,8 +242,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public Part[] Parts
 		{
-			get { return this.parts; }
-			set { this.parts = value; }
+			get => this.parts;
+			set => this.parts = value;
 		}
 
 		/// <summary>
@@ -251,8 +251,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public Parameter[] Parameters
 		{
-			get { return this.parameters; }
-			set { this.parameters = value; }
+			get => this.parameters;
+			set => this.parameters = value;
 		}
 
 		/// <summary>
@@ -260,7 +260,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public XmlElement ForMachines
 		{
-			get { return this.forMachines; }
+			get => this.forMachines;
 			set
 			{
 				this.forMachines = value;
@@ -272,26 +272,20 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <summary>
 		/// Namespace used by the root node of the machine-readable contents of the contract (<see cref="ForMachines"/>).
 		/// </summary>
-		public string ForMachinesNamespace
-		{
-			get { return this.forMachinesNamespace; }
-		}
+		public string ForMachinesNamespace => this.forMachinesNamespace;
 
 		/// <summary>
 		/// Local name used by the root node of the machine-readable contents of the contract (<see cref="ForMachines"/>).
 		/// </summary>
-		public string ForMachinesLocalName
-		{
-			get { return this.forMachinesLocalName; }
-		}
+		public string ForMachinesLocalName => this.forMachinesLocalName;
 
 		/// <summary>
 		/// Human-readable contents of the contract.
 		/// </summary>
 		public HumanReadableText[] ForHumans
 		{
-			get { return this.forHumans; }
-			set { this.forHumans = value; }
+			get => this.forHumans;
+			set => this.forHumans = value;
 		}
 
 		/// <summary>
@@ -299,8 +293,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public ClientSignature[] ClientSignatures
 		{
-			get { return this.clientSignatures; }
-			set { this.clientSignatures = value; }
+			get => this.clientSignatures;
+			set => this.clientSignatures = value;
 		}
 
 		/// <summary>
@@ -308,8 +302,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public Attachment[] Attachments
 		{
-			get { return this.attachments; }
-			set { this.attachments = value; }
+			get => this.attachments;
+			set => this.attachments = value;
 		}
 
 		/// <summary>
@@ -317,8 +311,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public ServerSignature ServerSignature
 		{
-			get { return this.serverSignature; }
-			set { this.serverSignature = value; }
+			get => this.serverSignature;
+			set => this.serverSignature = value;
 		}
 
 		/// <summary>
@@ -326,8 +320,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public bool CanActAsTemplate
 		{
-			get { return this.canActAsTemplate; }
-			set { this.canActAsTemplate = value; }
+			get => this.canActAsTemplate;
+			set => this.canActAsTemplate = value;
 		}
 
 		/// <summary>

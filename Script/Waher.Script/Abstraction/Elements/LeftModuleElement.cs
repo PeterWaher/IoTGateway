@@ -25,34 +25,22 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Set.
 		/// </summary>
-		public override ISet AssociatedSet
-		{
-			get { return this.AssociatedLeftModule; }
-		}
+		public override ISet AssociatedSet => this.AssociatedLeftModule;
 
 		/// <summary>
 		/// Associated Semi-Group.
 		/// </summary>
-		public override ISemiGroup AssociatedSemiGroup
-		{
-			get { return this.AssociatedLeftModule; }
-		}
+		public override ISemiGroup AssociatedSemiGroup => this.AssociatedLeftModule;
 
 		/// <summary>
 		/// Associated Group.
 		/// </summary>
-		public override IGroup AssociatedGroup
-		{
-			get { return this.AssociatedLeftModule; }
-		}
+		public override IGroup AssociatedGroup => this.AssociatedLeftModule;
 
 		/// <summary>
 		/// Associated Abelian Group.
 		/// </summary>
-		public override IAbelianGroup AssociatedAbelianGroup
-		{
-			get { return this.AssociatedLeftModule; }
-		}
+		public override IAbelianGroup AssociatedAbelianGroup => this.AssociatedLeftModule;
 
 		/// <summary>
 		/// Associated Left-Module.

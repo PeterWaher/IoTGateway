@@ -28,26 +28,20 @@ namespace Waher.Networking.HTTP
 		/// First byte of interval, if provided. If not provided, the interval represents the last <see cref="Last"/>
 		/// number of bytes of the resource.
 		/// </summary>
-		public long? First
-		{
-			get { return this.first; }
-		}
+		public long? First => this.first;
 
 		/// <summary>
 		/// Last byte of interval, inclusive, if provided. If not provided, the interval ends at the end of the resource.
 		/// </summary>
-		public long? Last
-		{
-			get { return this.last; }
-		}
+		public long? Last => this.last;
 
 		/// <summary>
 		/// Next segment.
 		/// </summary>
 		public ByteRangeInterval Next
 		{
-			get { return this.next; }
-			internal set { this.next = value; }
+			get => this.next;
+			internal set => this.next = value;
 		}
 
 		/// <summary>

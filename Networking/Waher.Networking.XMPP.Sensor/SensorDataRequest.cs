@@ -62,25 +62,22 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Requesst identity.
 		/// </summary>
-		public string Id { get { return this.id; } }
+		public string Id => this.id;
 
 		/// <summary>
 		/// JID of the other side of the conversation in the sensor data readout.
 		/// </summary>
-		public string RemoteJID { get { return this.remoteJid; } }
+		public string RemoteJID => this.remoteJid;
 
 		/// <summary>
 		/// Actor causing the request to be made.
 		/// </summary>
-		public string Actor { get { return this.actor; } }
+		public string Actor => this.actor;
 
 		/// <summary>
 		/// Nodes left before readout is complete.
 		/// </summary>
-		public int NodesLeft
-		{
-			get { return this.nodesLeft; }
-		}
+		public int NodesLeft => this.nodesLeft;
 
 		/// <summary>
 		/// Decreases the number of nodes left.
@@ -99,8 +96,8 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public IThingReference[] Nodes
 		{
-			get { return this.nodes; }
-			internal set { this.nodes = value; }
+			get => this.nodes;
+			internal set => this.nodes = value;
 		}
 
 		/// <summary>
@@ -108,8 +105,8 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public FieldType Types
 		{
-			get { return this.types; }
-			internal set { this.types = value; }
+			get => this.types;
+			internal set => this.types = value;
 		}
 
 		/// <summary>
@@ -117,51 +114,51 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public string[] FieldNames
 		{
-			get { return this.fieldsNames; }
-			internal set { this.fieldsNames = value; }
+			get => this.fieldsNames;
+			internal set => this.fieldsNames = value;
 		}
 
 		/// <summary>
 		/// From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.
 		/// </summary>
-		public DateTime From { get { return this.from; } }
+		public DateTime From => this.from;
 
 		/// <summary>
 		/// To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.
 		/// </summary>
-		public DateTime To { get { return this.to; } }
+		public DateTime To => this.to;
 
 		/// <summary>
 		/// When the readout is to be made. Use <see cref="DateTime.MinValue"/> to start the readout immediately.
 		/// </summary>
 		public DateTime When 
 		{
-			get { return this.when; }
-			internal set { this.when = value; } 
+			get => this.when;
+			internal set => this.when = value; 
 		}
 
 		/// <summary>
 		/// Optional service token.
 		/// </summary>
-		public string ServiceToken { get { return this.serviceToken; } }
+		public string ServiceToken => this.serviceToken;
 
 		/// <summary>
 		/// Optional device token.
 		/// </summary>
-		public string DeviceToken { get { return this.deviceToken; } }
+		public string DeviceToken => this.deviceToken;
 
 		/// <summary>
 		/// Optional user token.
 		/// </summary>
-		public string UserToken { get { return this.userToken; } }
+		public string UserToken => this.userToken;
 
 		/// <summary>
 		/// Tags the request object with another object.
 		/// </summary>
 		public object Tag
 		{
-			get { return this.tag; }
-			set { this.tag = value; }
+			get => this.tag;
+			set => this.tag = value;
 		}
 
 		/// <summary>

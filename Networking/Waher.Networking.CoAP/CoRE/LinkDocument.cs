@@ -35,18 +35,12 @@ namespace Waher.Networking.CoAP.CoRE
 		/// <summary>
 		/// Links in link document.
 		/// </summary>
-		public Link[] Links
-		{
-			get { return this.links; }
-		}
+		public Link[] Links => this.links;
 
 		/// <summary>
 		/// Base URI
 		/// </summary>
-		public Uri BaseUri
-		{
-			get { return this.baseUri; }
-		}
+		public Uri BaseUri => this.baseUri;
 
 		private char NextChar()
 		{
@@ -236,10 +230,7 @@ namespace Waher.Networking.CoAP.CoRE
 		/// <summary>
 		/// Text representation of document.
 		/// </summary>
-		public string Text
-		{
-			get { return this.text; }
-		}
+		public string Text => this.text;
 
 		/// <inheritdoc/>
 		public override string ToString()

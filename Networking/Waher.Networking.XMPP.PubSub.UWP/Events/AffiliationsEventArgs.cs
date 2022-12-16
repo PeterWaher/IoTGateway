@@ -32,9 +32,6 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// Available affiliations.
 		/// </summary>
-		public Affiliation[] Affiliations
-		{
-			get { return this.affiliations; }
-		}
+		public Affiliation[] Affiliations => this.affiliations;
     }
 }

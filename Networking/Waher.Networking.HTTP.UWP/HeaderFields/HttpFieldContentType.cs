@@ -48,18 +48,12 @@ namespace Waher.Networking.HTTP.HeaderFields
 		/// <summary>
 		/// Content Type
 		/// </summary>
-		public string Type
-		{
-			get { return this.type; }
-		}
+		public string Type => this.type;
 
 		/// <summary>
 		/// Character set name.
 		/// </summary>
-		public string CharacterSet
-		{
-			get { return this.charset; }
-		}
+		public string CharacterSet => this.charset;
 
 		/// <summary>
 		/// Text encoding.
@@ -78,9 +72,6 @@ namespace Waher.Networking.HTTP.HeaderFields
 		/// <summary>
 		/// Any content-type related fields and their corresponding values.
 		/// </summary>
-		public KeyValuePair<string, string>[] Fields
-		{
-			get { return this.fields; }
-		}
+		public KeyValuePair<string, string>[] Fields => this.fields;
 	}
 }

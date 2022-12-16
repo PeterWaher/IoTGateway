@@ -30,8 +30,8 @@ namespace Waher.Things.Arduino
 		[DefaultValueStringEmpty]
 		public string PortName
 		{
-			get { return this.portName; }
-			set { this.portName = value; }
+			get => this.portName;
+			set => this.portName = value;
 		}
 
 		public RemoteDevice Device

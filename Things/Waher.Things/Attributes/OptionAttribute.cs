@@ -47,25 +47,16 @@ namespace Waher.Things.Attributes
 		/// <summary>
 		/// Option.
 		/// </summary>
-		public object Option
-		{
-			get { return this.option; }
-		}
+		public object Option => this.option;
 
 		/// <summary>
 		/// String ID in the namespace of the current class, in the default language defined for the class.
 		/// </summary>
-		public int StringId
-		{
-			get { return this.stringId; }
-		}
+		public int StringId => this.stringId;
 
 		/// <summary>
 		/// Default label string, in the default language defined for the class.
 		/// </summary>
-		public string Label
-		{
-			get { return this.label; }
-		}
+		public string Label => this.label;
 	}
 }

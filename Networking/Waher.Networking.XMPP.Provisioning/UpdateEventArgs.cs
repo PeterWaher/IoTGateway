@@ -20,9 +20,6 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// If the thing has been disowned by the owner. In that case, meta-data was not updated. An unclaimed device can re-register
 		/// with the registry, if it wants to update its meta-data.
 		/// </summary>
-		public bool Disowned
-		{
-			get { return this.disowned; }
-		}
+		public bool Disowned => this.disowned;
 	}
 }

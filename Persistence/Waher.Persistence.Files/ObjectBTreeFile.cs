@@ -264,35 +264,32 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Identifier of the file.
 		/// </summary>
-		public int Id
-		{
-			get { return this.id; }
-		}
+		public int Id => this.id;
 
 		/// <summary>
 		/// Reference to files provider.
 		/// </summary>
-		public FilesProvider Provider { get { return this.provider; } }
+		public FilesProvider Provider => this.provider;
 
 		/// <summary>
 		/// Name of binary file.
 		/// </summary>
-		public string FileName { get { return this.fileName; } }
+		public string FileName => this.fileName;
 
 		/// <summary>
 		/// Name of corresponding collection name.
 		/// </summary>
-		public string CollectionName { get { return this.collectionName; } }
+		public string CollectionName => this.collectionName;
 
 		/// <summary>
 		/// Name of file in which BLOBs are stored.
 		/// </summary>
-		public string BlobFileName { get { return this.blobFileName; } }
+		public string BlobFileName => this.blobFileName;
 
 		/// <summary>
 		/// Encoding to use for text properties.
 		/// </summary>
-		public Encoding Encoding { get { return this.encoding; } }
+		public Encoding Encoding => this.encoding;
 
 		/// <summary>
 		/// Size of a block in the B-tree. The size must be a power of two, and should be at least the same
@@ -302,39 +299,30 @@ namespace Waher.Persistence.Files
 		/// <see cref="InlineObjectSizeLimit"/> will be persisted as BLOBs, with the bulk of the object stored as separate files. 
 		/// Smallest block size = 1024, largest block size = 65536.
 		/// </summary>
-		public int BlockSize { get { return this.blockSize; } }
+		public int BlockSize => this.blockSize;
 
 		/// <summary>
 		/// Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
 		/// of a doubly linked list of blocks of this size.
 		/// </summary>
-		public int BlobBlockSize { get { return this.blobBlockSize; } }
+		public int BlobBlockSize => this.blobBlockSize;
 
 		/// <summary>
 		/// Maximum size of objects that are stored in-line. Larger objects will be stored as BLOBs.
 		/// </summary>
-		public int InlineObjectSizeLimit { get { return this.inlineObjectSizeLimit; } }
+		public int InlineObjectSizeLimit => this.inlineObjectSizeLimit;
 
 		/// <summary>
 		/// Timeout, in milliseconds, for database operations.
 		/// </summary>
-		public int TimeoutMilliseconds
-		{
-			get { return this.timeoutMilliseconds; }
-		}
+		public int TimeoutMilliseconds => this.timeoutMilliseconds;
 
 		/// <summary>
 		/// If the files should be encrypted or not.
 		/// </summary>
-		public bool Encrypted
-		{
-			get { return this.encrypted; }
-		}
+		public bool Encrypted => this.encrypted;
 
-		internal GenericObjectSerializer GenericObjectSerializer
-		{
-			get { return this.genericSerializer; }
-		}
+		internal GenericObjectSerializer GenericObjectSerializer => this.genericSerializer;
 
 		/// <summary>
 		/// Block limit
@@ -804,10 +792,7 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// This counter gets updated each time a block is updated in the file.
 		/// </summary>
-		internal ulong BlockUpdateCounter
-		{
-			get { return this.blockUpdateCounter; }
-		}
+		internal ulong BlockUpdateCounter => this.blockUpdateCounter;
 
 		internal async Task DoSaveBlockLocked(uint BlockIndex, byte[] Block)
 		{

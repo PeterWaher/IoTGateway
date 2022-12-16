@@ -32,9 +32,6 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// Available subscriptions.
 		/// </summary>
-		public Subscription[] Subscriptions
-		{
-			get { return this.subscriptions; }
-		}
+		public Subscription[] Subscriptions => this.subscriptions;
     }
 }

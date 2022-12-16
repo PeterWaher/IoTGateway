@@ -23,8 +23,8 @@ namespace Waher.Events.Statistics
 		/// </summary>
 		public Dictionary<string, Statistic> PerActor
 		{
-			get { return this.perActor; }
-			internal set { this.perActor = value; }
+			get => this.perActor;
+			internal set => this.perActor = value;
 		}
 
 		/// <summary>
@@ -32,8 +32,8 @@ namespace Waher.Events.Statistics
 		/// </summary>
 		public Dictionary<string, Statistic> PerEventId
 		{
-			get { return this.perEventId; }
-			internal set { this.perEventId = value; }
+			get => this.perEventId;
+			internal set => this.perEventId = value;
 		}
 
 		/// <summary>
@@ -41,8 +41,8 @@ namespace Waher.Events.Statistics
 		/// </summary>
 		public Dictionary<string, Statistic> PerFacility
 		{
-			get { return this.perFacility; }
-			internal set { this.perFacility = value; }
+			get => this.perFacility;
+			internal set => this.perFacility = value;
 		}
 
 		/// <summary>
@@ -50,8 +50,8 @@ namespace Waher.Events.Statistics
 		/// </summary>
 		public Dictionary<string, Statistic> PerModule
 		{
-			get { return this.perModule; }
-			internal set { this.perModule = value; }
+			get => this.perModule;
+			internal set => this.perModule = value;
 		}
 
 		/// <summary>
@@ -59,8 +59,8 @@ namespace Waher.Events.Statistics
 		/// </summary>
 		public Dictionary<string, Statistic> PerLevel
 		{
-			get { return this.perLevel; }
-			internal set { this.perLevel = value; }
+			get => this.perLevel;
+			internal set => this.perLevel = value;
 		}
 
 		/// <summary>
@@ -68,8 +68,8 @@ namespace Waher.Events.Statistics
 		/// </summary>
 		public Dictionary<string, Statistic> PerType
 		{
-			get { return this.perType; }
-			internal set { this.perType = value; }
+			get => this.perType;
+			internal set => this.perType = value;
 		}
 
 		/// <summary>
@@ -77,8 +77,8 @@ namespace Waher.Events.Statistics
 		/// </summary>
 		public Dictionary<string, Statistic> PerStackTrace
 		{
-			get { return this.perStackTrace; }
-			internal set { this.perStackTrace = value; }
+			get => this.perStackTrace;
+			internal set => this.perStackTrace = value;
 		}
 
 		/// <summary>
@@ -86,8 +86,8 @@ namespace Waher.Events.Statistics
 		/// </summary>
 		public DateTime LastStat
 		{
-			get { return this.lastStat; }
-			internal set { this.lastStat = value; }
+			get => this.lastStat;
+			internal set => this.lastStat = value;
 		}
 
 		/// <summary>
@@ -95,8 +95,8 @@ namespace Waher.Events.Statistics
 		/// </summary>
 		public DateTime CurrentStat
 		{
-			get { return this.currentStat; }
-			internal set { this.currentStat = value; }
+			get => this.currentStat;
+			internal set => this.currentStat = value;
 		}
 	}
 }

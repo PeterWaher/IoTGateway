@@ -37,17 +37,14 @@ namespace Waher.Things.DisplayableParameters
 		/// </summary>
 		public Duration Value
 		{
-			get { return this.value; }
-			set { this.value = value; }
+			get => this.value;
+			set => this.value = value;
 		}
 
 		/// <summary>
 		/// Untyped parameter value
 		/// </summary>
-		public override object UntypedValue
-		{
-			get { return this.value; }
-		}
+		public override object UntypedValue => this.value;
 
 		/// <summary>
 		/// Exports the parameters to XML.

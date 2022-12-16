@@ -36,8 +36,8 @@ namespace Waher.Runtime.ServiceRegistration
 		[ObjectId]
 		public string ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -46,8 +46,8 @@ namespace Waher.Runtime.ServiceRegistration
 		[DefaultValueNull]
 		public string[] Features
 		{
-			get { return this.features; }
-			set { this.features = value; }
+			get => this.features;
+			set => this.features = value;
 		}
 
 		/// <summary>
@@ -56,8 +56,8 @@ namespace Waher.Runtime.ServiceRegistration
 		[DefaultValueNull]
 		public string[] Assemblies
 		{
-			get { return this.assemblies; }
-			set { this.assemblies = value; }
+			get => this.assemblies;
+			set => this.assemblies = value;
 		}
 
 		/// <summary>
@@ -66,8 +66,8 @@ namespace Waher.Runtime.ServiceRegistration
 		[DefaultValueStringEmpty]
 		public string BareJid
 		{
-			get { return this.bareJid; }
-			set { this.bareJid = value; }
+			get => this.bareJid;
+			set => this.bareJid = value;
 		}
 
 		/// <summary>
@@ -76,8 +76,8 @@ namespace Waher.Runtime.ServiceRegistration
 		[DefaultValueStringEmpty]
 		public string ClientName
 		{
-			get { return this.clientName; }
-			set { this.clientName = value; }
+			get => this.clientName;
+			set => this.clientName = value;
 		}
 
 		/// <summary>
@@ -86,8 +86,8 @@ namespace Waher.Runtime.ServiceRegistration
 		[DefaultValueStringEmpty]
 		public string ClientVersion
 		{
-			get { return this.clientVersion; }
-			set { this.clientVersion = value; }
+			get => this.clientVersion;
+			set => this.clientVersion = value;
 		}
 
 		/// <summary>
@@ -96,8 +96,8 @@ namespace Waher.Runtime.ServiceRegistration
 		[DefaultValueStringEmpty]
 		public string ClientOS
 		{
-			get { return this.clientOS; }
-			set { this.clientOS = value; }
+			get => this.clientOS;
+			set => this.clientOS = value;
 		}
 
 		/// <summary>
@@ -106,8 +106,8 @@ namespace Waher.Runtime.ServiceRegistration
 		[DefaultValueStringEmpty]
 		public string Language
 		{
-			get { return this.language; }
-			set { this.language = value; }
+			get => this.language;
+			set => this.language = value;
 		}
 
 		/// <summary>
@@ -116,8 +116,8 @@ namespace Waher.Runtime.ServiceRegistration
 		[DefaultValueStringEmpty]
 		public string Host
 		{
-			get { return this.host; }
-			set { this.host = value; }
+			get => this.host;
+			set => this.host = value;
 		}
 
 		/// <summary>
@@ -126,8 +126,8 @@ namespace Waher.Runtime.ServiceRegistration
 		[DefaultValueStringEmpty]
 		public string Domain
 		{
-			get { return this.domain; }
-			set { this.domain = value; }
+			get => this.domain;
+			set => this.domain = value;
 		}
 
 		/// <summary>
@@ -135,8 +135,8 @@ namespace Waher.Runtime.ServiceRegistration
 		/// </summary>
 		public DateTime Created
 		{
-			get { return this.created; }
-			set { this.created = value; }
+			get => this.created;
+			set => this.created = value;
 		}
 
 		/// <summary>
@@ -145,8 +145,8 @@ namespace Waher.Runtime.ServiceRegistration
 		[DefaultValueDateTimeMinValue]
 		public DateTime Updated
 		{
-			get { return this.updated; }
-			set { this.updated = value; }
+			get => this.updated;
+			set => this.updated = value;
 		}
 
 		/// <summary>

@@ -51,8 +51,8 @@ namespace Waher.Runtime.Language
 		[ObjectId]
 		public Guid ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -60,8 +60,8 @@ namespace Waher.Runtime.Language
 		/// </summary>
 		public Guid NamespaceId
 		{
-			get { return this.namespaceId; }
-			set { this.namespaceId = value; }
+			get => this.namespaceId;
+			set => this.namespaceId = value;
 		}
 
 		/// <summary>
@@ -69,8 +69,8 @@ namespace Waher.Runtime.Language
 		/// </summary>
 		public string Id
 		{
-			get { return this.id; }
-			set { this.id = value; }
+			get => this.id;
+			set => this.id = value;
 		}
 
 		/// <summary>
@@ -79,8 +79,8 @@ namespace Waher.Runtime.Language
 		[DefaultValueStringEmpty]
 		public string Value
 		{
-			get { return this.value; }
-			set { this.value = value; }
+			get => this.value;
+			set => this.value = value;
 		}
 
 		/// <summary>
@@ -89,8 +89,8 @@ namespace Waher.Runtime.Language
 		[DefaultValue(TranslationLevel.HumanTranslated)]
 		public TranslationLevel Level
 		{
-			get { return this.level; }
-			set { this.level = value; }
+			get => this.level;
+			set => this.level = value;
 		}
 
 		/// <summary>

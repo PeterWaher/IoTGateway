@@ -63,10 +63,7 @@ namespace Waher.Client.WPF.Controls
 			this.DataContext = this;
 		}
 
-		public bool Muc
-		{
-			get => this.muc;
-		}
+		public bool Muc => this.muc;
 
 		public bool Consolidate
 		{
@@ -102,10 +99,7 @@ namespace Waher.Client.WPF.Controls
 			this.Node?.ViewClosed();
 		}
 
-		public TreeNode Node
-		{
-			get { return this.node; }
-		}
+		public TreeNode Node => this.node;
 
 		private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
 		{

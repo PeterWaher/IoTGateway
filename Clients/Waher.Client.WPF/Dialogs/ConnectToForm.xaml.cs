@@ -28,8 +28,8 @@ namespace Waher.Client.WPF.Dialogs
 		/// </summary>
 		public string PasswordHash
 		{
-			get { return this.passwordHash; }
-			set { this.passwordHash = value; }
+			get => this.passwordHash;
+			set => this.passwordHash = value;
 		}
 
 		/// <summary>
@@ -37,8 +37,8 @@ namespace Waher.Client.WPF.Dialogs
 		/// </summary>
 		public string PasswordHashMethod
 		{
-			get { return this.passwordHashMethod; }
-			set { this.passwordHashMethod = value; }
+			get => this.passwordHashMethod;
+			set => this.passwordHashMethod = value;
 		}
 
 		private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -317,10 +317,7 @@ namespace Waher.Client.WPF.Dialogs
 			return Task.CompletedTask;
 		}
 
-		public XmppClient Client
-		{
-			get { return this.client; }
-		}
+		public XmppClient Client => this.client;
 
 		private void CreateAccount_Click(object sender, RoutedEventArgs e)
 		{

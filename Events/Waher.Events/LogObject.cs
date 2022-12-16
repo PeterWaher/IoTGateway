@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Waher.Events
 {
@@ -23,10 +22,7 @@ namespace Waher.Events
 		/// <summary>
 		/// Object ID, used when logging events.
 		/// </summary>
-		public virtual string ObjectID
-		{
-			get { return this.objectId; }
-		}
+		public virtual string ObjectID => this.objectId;
 
 		#region Debug
 

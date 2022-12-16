@@ -93,10 +93,7 @@ namespace Waher.Client.WPF.Model.Muc
 			}
 		}
 
-		public MultiUserChatClient MucClient
-		{
-			get { return this.mucClient; }
-		}
+		public MultiUserChatClient MucClient => this.mucClient;
 
 		public override ImageSource ImageResource => XmppAccountNode.chatBubble;
 		public override bool CanRecycle => true;

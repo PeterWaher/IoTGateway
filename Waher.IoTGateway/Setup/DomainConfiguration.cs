@@ -72,8 +72,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string Domain
 		{
-			get { return this.domain; }
-			set { this.domain = value; }
+			get => this.domain;
+			set => this.domain = value;
 		}
 
 		/// <summary>
@@ -82,8 +82,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueNull]
 		public string[] AlternativeDomains
 		{
-			get { return this.alternativeDomains; }
-			set { this.alternativeDomains = value; }
+			get => this.alternativeDomains;
+			set => this.alternativeDomains = value;
 		}
 
 		/// <summary>
@@ -92,8 +92,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool UseDomainName
 		{
-			get { return this.useDomainName; }
-			set { this.useDomainName = value; }
+			get => this.useDomainName;
+			set => this.useDomainName = value;
 		}
 
 		/// <summary>
@@ -102,8 +102,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool DynamicDns
 		{
-			get { return this.dynamicDns; }
-			set { this.dynamicDns = value; }
+			get => this.dynamicDns;
+			set => this.dynamicDns = value;
 		}
 
 		/// <summary>
@@ -112,8 +112,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(true)]
 		public bool UseEncryption
 		{
-			get { return this.useEncryption; }
-			set { this.useEncryption = value; }
+			get => this.useEncryption;
+			set => this.useEncryption = value;
 		}
 
 		/// <summary>
@@ -122,8 +122,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool CustomCA
 		{
-			get { return this.customCA; }
-			set { this.customCA = value; }
+			get => this.customCA;
+			set => this.customCA = value;
 		}
 
 		/// <summary>
@@ -132,8 +132,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string AcmeDirectory
 		{
-			get { return this.acmeDirectory; }
-			set { this.acmeDirectory = value; }
+			get => this.acmeDirectory;
+			set => this.acmeDirectory = value;
 		}
 
 		/// <summary>
@@ -142,8 +142,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string ContactEMail
 		{
-			get { return this.contactEMail; }
-			set { this.contactEMail = value; }
+			get => this.contactEMail;
+			set => this.contactEMail = value;
 		}
 
 		/// <summary>
@@ -152,8 +152,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string UrlToS
 		{
-			get { return this.urlToS; }
-			set { this.urlToS = value; }
+			get => this.urlToS;
+			set => this.urlToS = value;
 		}
 
 		/// <summary>
@@ -162,8 +162,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool AcceptToS
 		{
-			get { return this.acceptToS; }
-			set { this.acceptToS = value; }
+			get => this.acceptToS;
+			set => this.acceptToS = value;
 		}
 
 		/// <summary>
@@ -172,8 +172,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueNull]
 		public byte[] Certificate
 		{
-			get { return this.certificate; }
-			set { this.certificate = value; }
+			get => this.certificate;
+			set => this.certificate = value;
 		}
 
 		/// <summary>
@@ -182,8 +182,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueNull]
 		public byte[] PrivateKey
 		{
-			get { return this.privateKey; }
-			set { this.privateKey = value; }
+			get => this.privateKey;
+			set => this.privateKey = value;
 		}
 
 		/// <summary>
@@ -192,8 +192,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueNull]
 		public byte[] PFX
 		{
-			get { return this.pfx; }
-			set { this.pfx = value; }
+			get => this.pfx;
+			set => this.pfx = value;
 		}
 
 		/// <summary>
@@ -202,8 +202,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string Password
 		{
-			get { return this.password; }
-			set { this.password = value; }
+			get => this.password;
+			set => this.password = value;
 		}
 
 		/// <summary>
@@ -212,8 +212,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string OpenSslPath
 		{
-			get { return this.openSslPath; }
-			set { this.openSslPath = value; }
+			get => this.openSslPath;
+			set => this.openSslPath = value;
 		}
 
 		/// <summary>
@@ -222,8 +222,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string DynDnsTemplate
 		{
-			get { return this.dynDnsTemplate; }
-			set { this.dynDnsTemplate = value; }
+			get => this.dynDnsTemplate;
+			set => this.dynDnsTemplate = value;
 		}
 
 		/// <summary>
@@ -232,8 +232,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string CheckIpScript
 		{
-			get { return this.checkIpScript; }
-			set { this.checkIpScript = value; }
+			get => this.checkIpScript;
+			set => this.checkIpScript = value;
 		}
 
 		/// <summary>
@@ -242,8 +242,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string UpdateIpScript
 		{
-			get { return this.updateIpScript; }
-			set { this.updateIpScript = value; }
+			get => this.updateIpScript;
+			set => this.updateIpScript = value;
 		}
 
 		/// <summary>
@@ -252,8 +252,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string DynDnsAccount
 		{
-			get { return this.dynDnsAccount; }
-			set { this.dynDnsAccount = value; }
+			get => this.dynDnsAccount;
+			set => this.dynDnsAccount = value;
 		}
 
 		/// <summary>
@@ -262,8 +262,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(300)]
 		public int DynDnsInterval
 		{
-			get { return this.dynDnsInterval; }
-			set { this.dynDnsInterval = value; }
+			get => this.dynDnsInterval;
+			set => this.dynDnsInterval = value;
 		}
 
 		/// <summary>
@@ -272,8 +272,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string DynDnsPassword
 		{
-			get { return this.dynDnsPassword; }
-			set { this.dynDnsPassword = value; }
+			get => this.dynDnsPassword;
+			set => this.dynDnsPassword = value;
 		}
 
 		/// <summary>

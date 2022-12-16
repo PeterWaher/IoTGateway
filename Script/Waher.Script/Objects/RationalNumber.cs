@@ -45,8 +45,8 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public BigInteger Numerator
 		{
-			get { return this.numerator; }
-			set { this.numerator = value; }
+			get => this.numerator;
+			set => this.numerator = value;
 		}
 
 		/// <summary>
@@ -54,8 +54,8 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public BigInteger Denominator
 		{
-			get { return this.denominator; }
-			set { this.denominator = value; }
+			get => this.denominator;
+			set => this.denominator = value;
 		}
 
 		/// <inheritdoc/>

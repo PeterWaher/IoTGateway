@@ -30,17 +30,11 @@ namespace Waher.Networking.XMPP.Search
 		/// <summary>
 		/// Result records.
 		/// </summary>
-		public Dictionary<string, string>[] Records
-		{
-			get { return this.records; }
-		}
+		public Dictionary<string, string>[] Records => this.records;
 
 		/// <summary>
 		/// Headers
 		/// </summary>
-		public Field[] Headers
-		{
-			get { return this.headers; }
-		}
+		public Field[] Headers => this.headers;
 	}
 }

@@ -77,8 +77,8 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		public IEndToEndEncryption E2e
 		{
-			get { return this.e2e; }
-			set { this.e2e = value; }
+			get => this.e2e;
+			set => this.e2e = value;
 		}
 
 		/// <summary>
@@ -86,7 +86,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		public InBandBytestreams.IbbClient IbbClient
 		{
-			get { return this.ibbClient; }
+			get => this.ibbClient;
 			set
 			{
 				if (!(this.ibbClient is null))
@@ -102,7 +102,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		public P2P.SOCKS5.Socks5Proxy Socks5Proxy
 		{
-			get { return this.socks5Proxy; }
+			get => this.socks5Proxy;
 			set
 			{
 				if (!(this.socks5Proxy is null))

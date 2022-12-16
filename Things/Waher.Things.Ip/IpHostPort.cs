@@ -50,8 +50,8 @@ namespace Waher.Things.Ip
 		[Required]
 		public int Port
 		{
-			get { return this.port; }
-			set { this.port = value; }
+			get => this.port;
+			set => this.port = value;
 		}
 
 		/// <summary>
@@ -62,8 +62,8 @@ namespace Waher.Things.Ip
 		[ToolTip(12, "Check if Transport Layer Encryption (TLS) should be used.")]
 		public bool Tls
 		{
-			get { return this.tls; }
-			set { this.tls = value; }
+			get => this.tls;
+			set => this.tls = value;
 		}
 
 		/// <summary>

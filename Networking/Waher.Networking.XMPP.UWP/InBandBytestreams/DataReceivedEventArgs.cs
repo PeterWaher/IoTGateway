@@ -32,17 +32,11 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// <summary>
 		/// Binary data received.
 		/// </summary>
-		public byte[] Data
-		{
-			get { return this.data; }
-		}
+		public byte[] Data => this.data;
 
 		/// <summary>
 		/// State object.
 		/// </summary>
-		public object State
-		{
-			get { return this.state; }
-		}
+		public object State => this.state;
 	}
 }

@@ -58,17 +58,17 @@ namespace Waher.Runtime.Timing
 		/// <summary>
 		/// When an event is to be executed.
 		/// </summary>
-		public DateTime When { get { return this.when; } }
+		public DateTime When => this.when;
 
 		/// <summary>
 		/// Method to call when event is executed.
 		/// </summary>
-		public ScheduledEventCallback EventMethod { get { return this.eventMethod; } }
+		public ScheduledEventCallback EventMethod => this.eventMethod;
 
 		/// <summary>
 		/// State object passed on to <see cref="EventMethod"/>.
 		/// </summary>
-		public object State { get { return this.state; } }
+		public object State => this.state;
 
 		/// <summary>
 		/// Executes the event.

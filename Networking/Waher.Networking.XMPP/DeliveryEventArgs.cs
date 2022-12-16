@@ -27,11 +27,11 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Oritinal state object.
 		/// </summary>
-		public object State { get { return this.state; } }
+		public object State => this.state;
 
 		/// <summary>
 		/// If the delivery was successful (true) or failed (false).
 		/// </summary>
-		public bool Ok { get { return this.ok; } }
+		public bool Ok => this.ok;
 	}
 }

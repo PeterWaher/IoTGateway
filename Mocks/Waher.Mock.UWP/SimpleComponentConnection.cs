@@ -126,8 +126,8 @@ namespace Waher.Mock
 		/// </summary>
 		public string Host
 		{
-			get { return this.host; }
-			set { this.host = value; }
+			get => this.host;
+			set => this.host = value;
 		}
 
 		/// <summary>
@@ -135,8 +135,8 @@ namespace Waher.Mock
 		/// </summary>
 		public string Component
 		{
-			get { return this.component; }
-			set { this.component = value; }
+			get => this.component;
+			set => this.component = value;
 		}
 
 		/// <summary>
@@ -144,8 +144,8 @@ namespace Waher.Mock
 		/// </summary>
 		public string Secret
 		{
-			get { return this.secret; }
-			set { this.secret = value; }
+			get => this.secret;
+			set => this.secret = value;
 		}
 
 		/// <summary>
@@ -153,8 +153,8 @@ namespace Waher.Mock
 		/// </summary>
 		public bool Sniffer
 		{
-			get { return this.sniffer; }
-			set { this.sniffer = value; }
+			get => this.sniffer;
+			set => this.sniffer = value;
 		}
 
 		/// <summary>
@@ -162,8 +162,8 @@ namespace Waher.Mock
 		/// </summary>
 		public int Port
 		{
-			get { return this.port; }
-			set { this.port = value; }
+			get => this.port;
+			set => this.port = value;
 		}
 
 		/// <summary>

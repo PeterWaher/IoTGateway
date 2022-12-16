@@ -30,34 +30,22 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// Client on which the request was received.
 		/// </summary>
-		internal ClientBase Client
-		{
-			get { return this.client; }
-		}
+		internal ClientBase Client => this.client;
 
 		/// <summary>
 		/// CoAP Endpoint managing the resource.
 		/// </summary>
-		public CoapEndpoint Endpoint
-		{
-			get { return this.endpoint; }
-		}
+		public CoapEndpoint Endpoint => this.endpoint;
 
 		/// <summary>
 		/// Request message.
 		/// </summary>
-		public CoapMessage Request
-		{
-			get { return this.request; }
-		}
+		public CoapMessage Request => this.request;
 
 		/// <summary>
 		/// Sequence number.
 		/// </summary>
-		public uint SequenceNumber
-		{
-			get { return this.seqNr; }
-		}
+		public uint SequenceNumber => this.seqNr;
 
 		/// <summary>
 		/// Increases the sequence number.

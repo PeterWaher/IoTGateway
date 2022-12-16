@@ -32,10 +32,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Set.
 		/// </summary>
-		public override ISet AssociatedSet
-		{
-			get { return this.AssociatedSemiGroup; }
-		}
+		public override ISet AssociatedSet => this.AssociatedSemiGroup;
 
 		/// <summary>
 		/// Associated Semi-Group.

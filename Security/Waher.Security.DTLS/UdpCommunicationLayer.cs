@@ -33,10 +33,7 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// UDP Client.
 		/// </summary>
-		public UdpClient Client
-		{
-			get { return this.client; }
-		}
+		public UdpClient Client => this.client;
 
 		private async void BeginReceive()
 		{

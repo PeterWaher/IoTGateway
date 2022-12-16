@@ -82,8 +82,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public SubscriptionType? Type
 		{
-			get { return this.type; }
-			set { this.type = value; }
+			get => this.type;
+			set => this.type = value;
 		}
 
 		/// <summary>
@@ -91,8 +91,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public SubscriptonDepth? Depth
 		{
-			get { return this.depth; }
-			set { this.depth = value; }
+			get => this.depth;
+			set => this.depth = value;
 		}
 
 		/// <summary>
@@ -100,8 +100,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public bool? Deliver
 		{
-			get { return this.deliver; }
-			set { this.deliver = value; }
+			get => this.deliver;
+			set => this.deliver = value;
 		}
 
 		/// <summary>
@@ -109,8 +109,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public bool? Digest
 		{
-			get { return this.digest; }
-			set { this.digest = value; }
+			get => this.digest;
+			set => this.digest = value;
 		}
 
 		/// <summary>
@@ -118,8 +118,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public bool? IncludeBody
 		{
-			get { return this.includeBody; }
-			set { this.includeBody = value; }
+			get => this.includeBody;
+			set => this.includeBody = value;
 		}
 
 		/// <summary>
@@ -127,8 +127,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public int? DigestFrequencyMilliseconds
 		{
-			get { return this.digestFrequencyMilliseconds; }
-			set { this.digestFrequencyMilliseconds = value; }
+			get => this.digestFrequencyMilliseconds;
+			set => this.digestFrequencyMilliseconds = value;
 		}
 
 		/// <summary>
@@ -136,8 +136,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public DateTime? Expires
 		{
-			get { return this.expires; }
-			set { this.expires = value; }
+			get => this.expires;
+			set => this.expires = value;
 		}
 
 		/// <summary>

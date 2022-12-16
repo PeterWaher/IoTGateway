@@ -97,18 +97,12 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// If encoding of data was invalid.
 		/// </summary>
-		public bool InvalidEncoding
-		{
-			get { return this.invalidEncoding; }
-		}
+		public bool InvalidEncoding => this.invalidEncoding;
 
 		/// <summary>
 		/// If the transfer failed.
 		/// </summary>
-		public bool TransferError
-		{
-			get { return this.transferError; }
-		}
+		public bool TransferError => this.transferError;
 
 	}
 }

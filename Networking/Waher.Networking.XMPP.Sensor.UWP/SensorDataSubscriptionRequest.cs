@@ -64,34 +64,22 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Smallest interval for reporting events. Events are not reported more often than this limit.
 		/// </summary>
-		public Duration? MinInterval
-		{
-			get { return this.minInterval; }
-		}
+		public Duration? MinInterval => this.minInterval;
 
 		/// <summary>
 		/// Largest interval for reporting events. Events are not reported less often than this limit.
 		/// </summary>
-		public Duration? MaxInterval
-		{
-			get { return this.maxInterval; }
-		}
+		public Duration? MaxInterval => this.maxInterval;
 
 		/// <summary>
 		/// Maximum age of historical data.
 		/// </summary>
-		public Duration? MaxAge
-		{
-			get { return this.maxAge; }
-		}
+		public Duration? MaxAge => this.maxAge;
 
 		/// <summary>
 		/// Field subscription rules.
 		/// </summary>
-		public FieldSubscriptionRule[] FieldRules
-		{
-			get { return this.fieldRules; }
-		}
+		public FieldSubscriptionRule[] FieldRules => this.fieldRules;
 
 		/// <summary>
 		/// Removes the subscription.

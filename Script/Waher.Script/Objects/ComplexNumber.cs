@@ -39,8 +39,8 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public Complex Value
 		{
-			get { return this.value; }
-			set { this.value = value; }
+			get => this.value;
+			set => this.value = value;
 		}
 
 		/// <inheritdoc/>
@@ -60,10 +60,7 @@ namespace Waher.Script.Objects
 		/// <summary>
 		/// Associated object value.
 		/// </summary>
-		public override object AssociatedObjectValue
-		{
-			get { return this.value; }
-		}
+		public override object AssociatedObjectValue => this.value;
 
 		/// <summary>
 		/// Tries to multiply an element to the current element.

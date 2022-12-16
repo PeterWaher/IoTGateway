@@ -54,8 +54,8 @@ namespace Waher.Things.Metering
 		[ObjectId]
 		public Guid ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -63,8 +63,8 @@ namespace Waher.Things.Metering
 		/// </summary>
 		public Guid NodeId
 		{
-			get { return this.nodeId; }
-			set { this.nodeId = value; }
+			get => this.nodeId;
+			set => this.nodeId = value;
 		}
 
 		/// <summary>
@@ -72,8 +72,8 @@ namespace Waher.Things.Metering
 		/// </summary>
 		public DateTime Created
 		{
-			get { return this.created; }
-			set { this.created = value; }
+			get => this.created;
+			set => this.created = value;
 		}
 
 		/// <summary>
@@ -82,8 +82,8 @@ namespace Waher.Things.Metering
 		[DefaultValueDateTimeMinValue]
 		public DateTime Updated
 		{
-			get { return this.updated; }
-			set { this.updated = value; }
+			get => this.updated;
+			set => this.updated = value;
 		}
 
 		/// <summary>
@@ -91,8 +91,8 @@ namespace Waher.Things.Metering
 		/// </summary>
 		public int Count
 		{
-			get { return this.count; }
-			set { this.count = value; }
+			get => this.count;
+			set => this.count = value;
 		}
 
 		/// <summary>
@@ -101,8 +101,8 @@ namespace Waher.Things.Metering
 		[DefaultValue(MessageType.Information)]
 		public MessageType Type
 		{
-			get { return this.type; }
-			set { this.type = value; }
+			get => this.type;
+			set => this.type = value;
 		}
 
 		/// <summary>
@@ -111,8 +111,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string EventId
 		{
-			get { return this.eventId; }
-			set { this.eventId = value; }
+			get => this.eventId;
+			set => this.eventId = value;
 		}
 
 		/// <summary>
@@ -121,8 +121,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string Body
 		{
-			get { return this.body; }
-			set { this.body = value; }
+			get => this.body;
+			set => this.body = value;
 		}
 	}
 }

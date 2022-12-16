@@ -51,10 +51,7 @@ namespace Waher.Client.WPF.Controls.Report
 		/// <summary>
 		/// Event Message
 		/// </summary>
-		public string EventMessage
-		{
-			get { return this.eventMessage; }
-		}
+		public string EventMessage=> this.eventMessage;
 
 		/// <summary>
 		/// Exports element to XML

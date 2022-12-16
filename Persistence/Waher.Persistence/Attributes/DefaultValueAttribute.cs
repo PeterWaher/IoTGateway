@@ -25,9 +25,6 @@ namespace Waher.Persistence.Attributes
 		/// <summary>
 		/// Default value of member.
 		/// </summary>
-		public object Value
-		{
-			get { return this.value; }
-		}
+		public object Value => this.value;
 	}
 }

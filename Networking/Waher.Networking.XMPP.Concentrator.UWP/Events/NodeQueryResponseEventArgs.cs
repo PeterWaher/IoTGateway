@@ -28,9 +28,6 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Node query
 		/// </summary>
-		public NodeQuery Query
-		{
-			get { return this.query; }
-		}
+		public NodeQuery Query => this.query;
 	}
 }

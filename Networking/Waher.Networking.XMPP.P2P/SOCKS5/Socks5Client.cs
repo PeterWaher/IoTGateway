@@ -185,10 +185,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <summary>
 		/// Current state.
 		/// </summary>
-		public Socks5State State
-		{
-			get { return this.state; }
-		}
+		public Socks5State State => this.state;
 
 		internal async Task SetState(Socks5State NewState)
 		{
@@ -214,8 +211,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		internal object CallbackState
 		{
-			get { return this.callbackState; }
-			set { this.callbackState = value; }
+			get => this.callbackState;
+			set => this.callbackState = value;
 		}
 
 		/// <summary>
@@ -223,8 +220,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// </summary>
 		public object Tag
 		{
-			get { return this.tag; }
-			set { this.tag = value; }
+			get => this.tag;
+			set => this.tag = value;
 		}
 
 		/// <summary>
@@ -235,26 +232,17 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <summary>
 		/// Host of SOCKS5 stream host.
 		/// </summary>
-		public string Host
-		{
-			get { return this.host; }
-		}
+		public string Host => this.host;
 
 		/// <summary>
 		/// Port of SOCKS5 stream host.
 		/// </summary>
-		public int Port
-		{
-			get { return this.port; }
-		}
+		public int Port => this.port;
 
 		/// <summary>
 		/// JID of SOCKS5 stream host.
 		/// </summary>
-		public string JID
-		{
-			get { return this.jid; }
-		}
+		public string JID => this.jid;
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>

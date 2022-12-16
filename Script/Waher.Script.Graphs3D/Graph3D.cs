@@ -143,98 +143,65 @@ namespace Waher.Script.Graphs3D
 		/// <summary>
 		/// X-axis series.
 		/// </summary>
-		public LinkedList<IMatrix> X
-		{
-			get { return this.x; }
-		}
+		public LinkedList<IMatrix> X => this.x;
 
 		/// <summary>
 		/// Y-axis series.
 		/// </summary>
-		public LinkedList<IMatrix> Y
-		{
-			get { return this.y; }
-		}
+		public LinkedList<IMatrix> Y => this.y;
 
 		/// <summary>
 		/// Z-axis series.
 		/// </summary>
-		public LinkedList<IMatrix> Z
-		{
-			get { return this.z; }
-		}
+		public LinkedList<IMatrix> Z => this.z;
 
 		/// <summary>
 		/// Optional normals.
 		/// </summary>
-		public LinkedList<Vector4[,]> Normals
-		{
-			get { return this.normals; }
-		}
+		public LinkedList<Vector4[,]> Normals => this.normals;
 
 		/// <summary>
 		/// Parameters.
 		/// </summary>
-		public LinkedList<object[]> Parameters
-		{
-			get { return this.parameters; }
-		}
+		public LinkedList<object[]> Parameters => this.parameters;
 
 		/// <summary>
 		/// Smallest X-value.
 		/// </summary>
-		public IElement MinX
-		{
-			get { return this.minX; }
-		}
+		public IElement MinX => this.minX;
 
 		/// <summary>
 		/// Largest X-value.
 		/// </summary>
-		public IElement MaxX
-		{
-			get { return this.maxX; }
-		}
+		public IElement MaxX => this.maxX;
 
 		/// <summary>
 		/// Smallest Y-value.
 		/// </summary>
-		public IElement MinY
-		{
-			get { return this.minY; }
-		}
+		public IElement MinY => this.minY;
 
 		/// <summary>
 		/// Largest Y-value.
 		/// </summary>
-		public IElement MaxY
-		{
-			get { return this.maxY; }
-		}
+		public IElement MaxY => this.maxY;
 
 		/// <summary>
 		/// Smallest Z-value.
 		/// </summary>
-		public IElement MinZ
-		{
-			get { return this.minZ; }
-		}
+		public IElement MinZ => this.minZ;
 
 		/// <summary>
 		/// Largest Z-value.
 		/// </summary>
-		public IElement MaxZ
-		{
-			get { return this.maxZ; }
-		}
+		public IElement MaxZ => this.maxZ;
 
 		/// <summary>
 		/// Title for graph.
 		/// </summary>
 		public string Title
 		{
-			get { return this.title; }
-			set { this.title = value; }
+			get => this.title;
+			set => this.title = value;
 		}
 
 		/// <summary>
@@ -242,8 +209,8 @@ namespace Waher.Script.Graphs3D
 		/// </summary>
 		public string LabelX
 		{
-			get { return this.labelX; }
-			set { this.labelX = value; }
+			get => this.labelX;
+			set => this.labelX = value;
 		}
 
 		/// <summary>
@@ -251,8 +218,8 @@ namespace Waher.Script.Graphs3D
 		/// </summary>
 		public string LabelY
 		{
-			get { return this.labelY; }
-			set { this.labelY = value; }
+			get => this.labelY;
+			set => this.labelY = value;
 		}
 
 		/// <summary>
@@ -260,8 +227,8 @@ namespace Waher.Script.Graphs3D
 		/// </summary>
 		public string LabelZ
 		{
-			get { return this.labelZ; }
-			set { this.labelZ = value; }
+			get => this.labelZ;
+			set => this.labelZ = value;
 		}
 
 		/// <summary>
@@ -269,8 +236,8 @@ namespace Waher.Script.Graphs3D
 		/// </summary>
 		public bool ShowXAxis
 		{
-			get { return this.showXAxis; }
-			set { this.showXAxis = value; }
+			get => this.showXAxis;
+			set => this.showXAxis = value;
 		}
 
 		/// <summary>
@@ -278,8 +245,8 @@ namespace Waher.Script.Graphs3D
 		/// </summary>
 		public bool ShowYAxis
 		{
-			get { return this.showYAxis; }
-			set { this.showYAxis = value; }
+			get => this.showYAxis;
+			set => this.showYAxis = value;
 		}
 
 		/// <summary>
@@ -287,8 +254,8 @@ namespace Waher.Script.Graphs3D
 		/// </summary>
 		public bool ShowZAxis
 		{
-			get { return this.showZAxis; }
-			set { this.showZAxis = value; }
+			get => this.showZAxis;
+			set => this.showZAxis = value;
 		}
 
 		/// <summary>
@@ -296,8 +263,8 @@ namespace Waher.Script.Graphs3D
 		/// </summary>
 		public bool ShowGrid
 		{
-			get { return this.showGrid; }
-			set { this.showGrid = value; }
+			get => this.showGrid;
+			set => this.showGrid = value;
 		}
 
 		/// <summary>
@@ -305,8 +272,8 @@ namespace Waher.Script.Graphs3D
 		/// </summary>
 		public double Angle
 		{
-			get { return this.angle; }
-			set { this.angle = value; }
+			get => this.angle;
+			set => this.angle = value;
 		}
 
 		/// <summary>
@@ -314,8 +281,8 @@ namespace Waher.Script.Graphs3D
 		/// </summary>
 		public double Inclination
 		{
-			get { return this.inclination; }
-			set { this.inclination = value; }
+			get => this.inclination;
+			set => this.inclination = value;
 		}
 
 		/// <summary>
@@ -323,7 +290,7 @@ namespace Waher.Script.Graphs3D
 		/// </summary>
 		public int Oversampling
 		{
-			get { return this.overSampling; }
+			get => this.overSampling;
 			set
 			{
 				if (value < 1)

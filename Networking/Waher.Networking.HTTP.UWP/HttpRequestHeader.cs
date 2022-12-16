@@ -131,37 +131,37 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// HTTP Method
 		/// </summary>
-		public string Method { get { return this.method; } }
+		public string Method => this.method;
 
 		/// <summary>
 		/// Resource
 		/// </summary>
-		public string Resource { get { return this.resource; } }
+		public string Resource => this.resource;
 
 		/// <summary>
 		/// Contains original resource part of request.
 		/// </summary>
-		public string ResourcePart { get { return this.resourcePart; } }
+		public string ResourcePart => this.resourcePart;
 
 		/// <summary>
 		/// HTTP Version.
 		/// </summary>
-		public double HttpVersion { get { return this.httpVersion; } }
+		public double HttpVersion => this.httpVersion;
 
 		/// <summary>
 		/// Query string. To get the values of individual query parameters, use the <see cref="TryGetQueryParameter"/> method.
 		/// </summary>
-		public string QueryString { get { return this.queryString; } }
+		public string QueryString => this.queryString;
 
 		/// <summary>
 		/// Fragment.
 		/// </summary>
-		public string Fragment { get { return this.fragment; } }
+		public string Fragment => this.fragment;
 
 		/// <summary>
 		/// URI scheme.
 		/// </summary>
-		public string UriScheme { get { return this.uriScheme; } }
+		public string UriScheme => this.uriScheme;
 
 		/// <summary>
 		/// Tries to get the value of an individual query parameter, if available.
@@ -245,93 +245,93 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Accept HTTP Field header. (RFC 2616, §14.1)
 		/// </summary>
-		public HttpFieldAccept Accept { get { return this.accept; } }
+		public HttpFieldAccept Accept => this.accept;
 
 		/// <summary>
 		/// Accept-Charset HTTP Field header. (RFC 2616, §14.2)
 		/// </summary>
-		public HttpFieldAcceptCharset AcceptCharset { get { return this.acceptCharset; } }
+		public HttpFieldAcceptCharset AcceptCharset => this.acceptCharset;
 
 		/// <summary>
 		/// Accept-Encoding HTTP Field header. (RFC 2616, §14.3)
 		/// </summary>
-		public HttpFieldAcceptEncoding AcceptEncoding { get { return this.acceptEncoding; } }
+		public HttpFieldAcceptEncoding AcceptEncoding => this.acceptEncoding;
 
 		/// <summary>
 		/// Accept-Language HTTP Field header. (RFC 2616, §14.4)
 		/// </summary>
-		public HttpFieldAcceptLanguage AcceptLanguage { get { return this.acceptLanguage; } }
+		public HttpFieldAcceptLanguage AcceptLanguage => this.acceptLanguage;
 
 		/// <summary>
 		/// Authorization HTTP Field header. (RFC 2616, §14.8)
 		/// </summary>
-		public HttpFieldAuthorization Authorization { get { return this.authorization; } }
+		public HttpFieldAuthorization Authorization => this.authorization;
 
 		/// <summary>
 		/// Cookie HTTP Field header. (RFC 6265, §5.2)
 		/// </summary>
-		public HttpFieldCookie Cookie { get { return this.cookie; } }
+		public HttpFieldCookie Cookie => this.cookie;
 
 		/// <summary>
 		/// Expect HTTP Field header. (RFC 2616, §14.20)
 		/// </summary>
-		public HttpFieldExpect Expect { get { return this.expect; } }
+		public HttpFieldExpect Expect => this.expect;
 
 		/// <summary>
 		/// From HTTP Field header. (RFC 2616, §14.22)
 		/// </summary>
-		public HttpFieldFrom From { get { return this.from; } }
+		public HttpFieldFrom From => this.from;
 
 		/// <summary>
 		/// Host HTTP Field header. (RFC 2616, §14.23)
 		/// </summary>
-		public HttpFieldHost Host { get { return this.host; } }
+		public HttpFieldHost Host => this.host;
 
 		/// <summary>
 		/// If-Match HTTP Field header. (RFC 2616, §14.24)
 		/// </summary>
-		public HttpFieldIfMatch IfMatch { get { return this.ifMatch; } }
+		public HttpFieldIfMatch IfMatch => this.ifMatch;
 
 		/// <summary>
 		/// If-Modified-Since HTTP Field header. (RFC 2616, §14.25)
 		/// </summary>
-		public HttpFieldIfModifiedSince IfModifiedSince { get { return this.ifModifiedSince; } }
+		public HttpFieldIfModifiedSince IfModifiedSince => this.ifModifiedSince;
 
 		/// <summary>
 		/// If-None-Match HTTP Field header. (RFC 2616, §14.26)
 		/// </summary>
-		public HttpFieldIfNoneMatch IfNoneMatch { get { return this.ifNoneMatch; } }
+		public HttpFieldIfNoneMatch IfNoneMatch => this.ifNoneMatch;
 
 		/// <summary>
 		/// If-Range HTTP Field header. (RFC 2616, §14.27)
 		/// </summary>
-		public HttpFieldIfRange IfRange { get { return this.ifRange; } }
+		public HttpFieldIfRange IfRange => this.ifRange;
 
 		/// <summary>
 		/// If-Unmodified-Since HTTP Field header. (RFC 2616, §14.28)
 		/// </summary>
-		public HttpFieldIfUnmodifiedSince IfUnmodifiedSince { get { return this.ifUnmodifiedSince; } }
+		public HttpFieldIfUnmodifiedSince IfUnmodifiedSince => this.ifUnmodifiedSince;
 
 		/// <summary>
 		/// Referer HTTP Field header. (RFC 2616, §14.36)
 		/// </summary>
-		public HttpFieldReferer Referer { get { return this.referer; } }
+		public HttpFieldReferer Referer => this.referer;
 
 		/// <summary>
 		/// Range HTTP Field header. (RFC 2616, §14.35)
 		/// </summary>
-		public HttpFieldRange Range { get { return this.range; } }
+		public HttpFieldRange Range => this.range;
 
 		/// <summary>
 		/// UserAgent HTTP Field header. (RFC 2616, §14.43)
 		/// </summary>
-		public HttpFieldUserAgent UserAgent { get { return this.userAgent; } }
+		public HttpFieldUserAgent UserAgent => this.userAgent;
 
 		/// <summary>
 		/// Upgrade-Insecure-Requests HTTP Field header.
 		/// https://www.w3.org/TR/upgrade-insecure-requests/
 		/// </summary>
-		public HttpFieldUpgradeInsecureRequests UpgradeInsecureRequests { get { return this.upgradeInsequreRequests; } }
+		public HttpFieldUpgradeInsecureRequests UpgradeInsecureRequests => this.upgradeInsequreRequests;
 
 		/// <summary>
 		/// If the method is safe, according to §9.1.1, RFC 2616, and the HTTP Method registry at IANA:

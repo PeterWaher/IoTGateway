@@ -146,65 +146,44 @@ namespace Waher.Persistence.Serialization.Model
 		/// <summary>
 		/// Member name.
 		/// </summary>
-		public string Name
-		{
-			get { return this.name; }
-		}
+		public string Name => this.name;
 
 		/// <summary>
 		/// Member type.
 		/// </summary>
-		public Type MemberType
-		{
-			get { return this.memberType; }
-		}
+		public Type MemberType => this.memberType;
 
 		/// <summary>
 		/// Member type information.
 		/// </summary>
-		public TypeInfo MemberTypeInfo
-		{
-			get { return this.memberTypeInfo; }
-		}
+		public TypeInfo MemberTypeInfo => this.memberTypeInfo;
 
 		/// <summary>
 		/// Member type code.
 		/// </summary>
-		public TypeCode MemberTypeCode
-		{
-			get { return this.memberTypeCode; }
-		}
+		public TypeCode MemberTypeCode => this.memberTypeCode;
 
 		/// <summary>
 		/// Member field data type code.
 		/// </summary>
-		public uint MemberFieldDataTypeCode
-		{
-			get { return this.memberFieldDataTypeCode; }
-		}
+		public uint MemberFieldDataTypeCode => this.memberFieldDataTypeCode;
 
 		/// <summary>
 		/// Field Code.
 		/// </summary>
-		public ulong FieldCode
-		{
-			get { return this.fieldCode; }
-		}
+		public ulong FieldCode => this.fieldCode;
 
 		/// <summary>
 		/// If the member type represents a nested object.
 		/// </summary>
-		public bool IsNestedObject
-		{
-			get { return this.isNestedObject; }
-		}
+		public bool IsNestedObject => this.isNestedObject;
 
 		/// <summary>
 		/// Default value.
 		/// </summary>
 		public object DefaultValue
 		{
-			get { return this.defaultValue; }
+			get => this.defaultValue;
 			internal set
 			{
 				this.defaultValue = value;
@@ -215,52 +194,40 @@ namespace Waher.Persistence.Serialization.Model
 		/// <summary>
 		/// If a default value is defined for the member.
 		/// </summary>
-		public bool IsDefaultValueDefined
-		{
-			get { return this.isDefaultValueDefined; }
-		}
+		public bool IsDefaultValueDefined => this.isDefaultValueDefined;
 
 		/// <summary>
 		/// If value is stored by reference.
 		/// </summary>
 		public bool ByReference
 		{
-			get { return this.byReference; }
-			internal set { this.byReference = value; }
+			get => this.byReference;
+			internal set => this.byReference = value;
 		}
 
 		/// <summary>
 		/// If value is stored by reference.
 		/// </summary>
-		public bool Nullable
-		{
-			get { return this.nullable; }
-		}
+		public bool Nullable => this.nullable;
 
 		/// <summary>
 		/// Nested serializer.
 		/// </summary>
 		public IObjectSerializer NestedSerializer
 		{
-			get { return this.nestedSerializer; }
-			internal set { this.nestedSerializer = value; }
+			get => this.nestedSerializer;
+			internal set => this.nestedSerializer = value;
 		}
 
 		/// <summary>
 		/// If the member is an enumeration.
 		/// </summary>
-		public bool IsEnum
-		{
-			get { return this.isEnum; }
-		}
+		public bool IsEnum => this.isEnum;
 
 		/// <summary>
 		/// If the member is an enumeration using flag values.
 		/// </summary>
-		public bool HasFlags
-		{
-			get { return this.hasFlags; }
-		}
+		public bool HasFlags => this.hasFlags;
 
 		/// <summary>
 		/// Gets the member value.

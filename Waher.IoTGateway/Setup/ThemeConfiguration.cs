@@ -45,8 +45,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string ThemeId
 		{
-			get { return this.themeId; }
-			set { this.themeId = value; }
+			get => this.themeId;
+			set => this.themeId = value;
 		}
 
 		/// <summary>

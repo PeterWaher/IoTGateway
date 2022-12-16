@@ -30,17 +30,11 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// If the control operation can be performed.
 		/// </summary>
-		public bool CanControl
-		{
-			get { return this.canControl; }
-		}
+		public bool CanControl => this.canControl;
 
 		/// <summary>
 		/// Parameter names allowed to be processed. If null, no parameter restrictions exist.
 		/// </summary>
-		public string[] ParameterNames
-		{
-			get { return this.parameterNames; }
-		}
+		public string[] ParameterNames => this.parameterNames;
 	}
 }

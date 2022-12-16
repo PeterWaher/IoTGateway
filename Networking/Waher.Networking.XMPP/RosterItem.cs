@@ -183,8 +183,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public string[] Groups
 		{
-			get { return this.groups; }
-			internal set { this.groups = value; }
+			get => this.groups;
+			internal set => this.groups = value;
 		}
 
 		/// <summary>
@@ -265,25 +265,22 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public SubscriptionState State
 		{
-			get { return this.state; }
-			internal set { this.state = value; }
+			get => this.state;
+			internal set => this.state = value;
 		}
 
 		/// <summary>
 		/// Bare JID of the roster item.
 		/// </summary>
-		public string BareJid
-		{
-			get { return this.bareJid; }
-		}
+		public string BareJid => this.bareJid;
 
 		/// <summary>
 		/// Name of the roster item.
 		/// </summary>
 		public string Name
 		{
-			get { return this.name; }
-			internal set { this.name = value; }
+			get => this.name;
+			internal set => this.name = value;
 		}
 
 		/// <summary>
@@ -291,8 +288,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public PendingSubscription PendingSubscription
 		{
-			get { return this.pendingSubscription; }
-			internal set { this.pendingSubscription = value; }
+			get => this.pendingSubscription;
+			internal set => this.pendingSubscription = value;
 		}
 
 		/// <summary>
@@ -355,10 +352,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Last presence received from a resource having this bare JID.
 		/// </summary>
-		public PresenceEventArgs LastPresence
-		{
-			get { return this.lastPresence; }
-		}
+		public PresenceEventArgs LastPresence => this.lastPresence;
 
 		internal void PresenceReceived(XmppClient Client, PresenceEventArgs e)
 		{

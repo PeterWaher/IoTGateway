@@ -29,9 +29,6 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// Server reference.
 		/// </summary>
-		public Lwm2mServerReference Server
-		{
-			get { return this.server; }
-		}
+		public Lwm2mServerReference Server => this.server;
 	}
 }

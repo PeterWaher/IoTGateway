@@ -34,8 +34,8 @@ namespace Waher.Things.SourceEvents
 		[ShortName("dp")]
 		public Parameter[] Parameters
 		{
-			get { return this.parameters; }
-			set { this.parameters = value; }
+			get => this.parameters;
+			set => this.parameters = value;
 		}
 
 		/// <summary>
@@ -44,8 +44,8 @@ namespace Waher.Things.SourceEvents
 		[DefaultValueDateTimeMinValue]
 		public DateTime Updated
 		{
-			get { return this.updated; }
-			set { this.updated = value; }
+			get => this.updated;
+			set => this.updated = value;
 		}
 
 		/// <summary>
@@ -54,8 +54,8 @@ namespace Waher.Things.SourceEvents
 		[DefaultValueStringEmpty]
 		public string ParentId
 		{
-			get { return this.parentId; }
-			set { this.parentId = value; }
+			get => this.parentId;
+			set => this.parentId = value;
 		}
 
 		/// <summary>
@@ -64,8 +64,8 @@ namespace Waher.Things.SourceEvents
 		[DefaultValueStringEmpty]
 		public string ParentPartition
 		{
-			get { return this.parentPartition; }
-			set { this.parentPartition = value; }
+			get => this.parentPartition;
+			set => this.parentPartition = value;
 		}
 
 		/// <summary>
@@ -74,8 +74,8 @@ namespace Waher.Things.SourceEvents
 		[DefaultValue(false)]
 		public bool HasChildren
 		{
-			get { return this.hasChildren; }
-			set { this.hasChildren = value; }
+			get => this.hasChildren;
+			set => this.hasChildren = value;
 		}
 
 		/// <summary>
@@ -84,8 +84,8 @@ namespace Waher.Things.SourceEvents
 		[DefaultValue(false)]
 		public bool IsReadable
 		{
-			get { return this.isReadable; }
-			set { this.isReadable = value; }
+			get => this.isReadable;
+			set => this.isReadable = value;
 		}
 
 		/// <summary>
@@ -94,8 +94,8 @@ namespace Waher.Things.SourceEvents
 		[DefaultValue(false)]
 		public bool IsControllable
 		{
-			get { return this.isControllable; }
-			set { this.isControllable = value; }
+			get => this.isControllable;
+			set => this.isControllable = value;
 		}
 
 		/// <summary>
@@ -104,8 +104,8 @@ namespace Waher.Things.SourceEvents
 		[DefaultValue(false)]
 		public bool HasCommands
 		{
-			get { return this.hasCommands; }
-			set { this.hasCommands = value; }
+			get => this.hasCommands;
+			set => this.hasCommands = value;
 		}
 
 		/// <summary>
@@ -114,8 +114,8 @@ namespace Waher.Things.SourceEvents
 		[DefaultValue(false)]
 		public bool ChildrenOrdered
 		{
-			get { return this.childrenOrdered; }
-			set { this.childrenOrdered = value; }
+			get => this.childrenOrdered;
+			set => this.childrenOrdered = value;
 		}
 	}
 }

@@ -48,18 +48,15 @@ namespace Waher.Security.PKCS
 		/// <summary>
 		/// Signature algorithm.
 		/// </summary>
-		public SignatureAlgorithm SignatureAlgorithm
-		{
-			get { return this.signatureAlgorithm; }
-		}
+		public SignatureAlgorithm SignatureAlgorithm => this.signatureAlgorithm;
 
 		/// <summary>
 		/// Common Name (OID 2.5.4.3)
 		/// </summary>
 		public string CommonName
 		{
-			get { return this.commonName; }
-			set { this.commonName = value; }
+			get => this.commonName;
+			set => this.commonName = value;
 		}
 
 		/// <summary>
@@ -67,8 +64,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string Surname
 		{
-			get { return this.surname; }
-			set { this.surname = value; }
+			get => this.surname;
+			set => this.surname = value;
 		}
 
 		/// <summary>
@@ -76,8 +73,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string SerialNumber
 		{
-			get { return this.serialNumber; }
-			set { this.serialNumber = value; }
+			get => this.serialNumber;
+			set => this.serialNumber = value;
 		}
 
 		/// <summary>
@@ -85,8 +82,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string Country
 		{
-			get { return this.country; }
-			set { this.country = value; }
+			get => this.country;
+			set => this.country = value;
 		}
 
 		/// <summary>
@@ -94,8 +91,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string Locality
 		{
-			get { return this.locality; }
-			set { this.locality = value; }
+			get => this.locality;
+			set => this.locality = value;
 		}
 
 		/// <summary>
@@ -103,8 +100,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string StateOrProvince
 		{
-			get { return this.stateOrProvince; }
-			set { this.stateOrProvince = value; }
+			get => this.stateOrProvince;
+			set => this.stateOrProvince = value;
 		}
 
 		/// <summary>
@@ -112,8 +109,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string StreetAddress
 		{
-			get { return this.streetAddress; }
-			set { this.streetAddress = value; }
+			get => this.streetAddress;
+			set => this.streetAddress = value;
 		}
 
 		/// <summary>
@@ -121,8 +118,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string Organization
 		{
-			get { return this.organization; }
-			set { this.organization = value; }
+			get => this.organization;
+			set => this.organization = value;
 		}
 
 		/// <summary>
@@ -130,8 +127,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string OrganizationalUnit
 		{
-			get { return this.organizationalUnit; }
-			set { this.organizationalUnit = value; }
+			get => this.organizationalUnit;
+			set => this.organizationalUnit = value;
 		}
 
 		/// <summary>
@@ -139,8 +136,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string Title
 		{
-			get { return this.title; }
-			set { this.title = value; }
+			get => this.title;
+			set => this.title = value;
 		}
 
 		/// <summary>
@@ -148,8 +145,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string Description
 		{
-			get { return this.description; }
-			set { this.description = value; }
+			get => this.description;
+			set => this.description = value;
 		}
 
 		/// <summary>
@@ -157,8 +154,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string PostalAddress
 		{
-			get { return this.postalAddress; }
-			set { this.postalAddress = value; }
+			get => this.postalAddress;
+			set => this.postalAddress = value;
 		}
 
 		/// <summary>
@@ -166,8 +163,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string PostalCode
 		{
-			get { return this.postalCode; }
-			set { this.postalCode = value; }
+			get => this.postalCode;
+			set => this.postalCode = value;
 		}
 
 		/// <summary>
@@ -175,8 +172,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string PostOfficeBox
 		{
-			get { return this.postOfficeBox; }
-			set { this.postOfficeBox = value; }
+			get => this.postOfficeBox;
+			set => this.postOfficeBox = value;
 		}
 
 		/// <summary>
@@ -184,8 +181,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string PhysicalDeliveryOfficeName
 		{
-			get { return this.physicalDeliveryOfficeName; }
-			set { this.physicalDeliveryOfficeName = value; }
+			get => this.physicalDeliveryOfficeName;
+			set => this.physicalDeliveryOfficeName = value;
 		}
 
 		/// <summary>
@@ -193,8 +190,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string TelephoneNumber
 		{
-			get { return this.telephoneNumber; }
-			set { this.telephoneNumber = value; }
+			get => this.telephoneNumber;
+			set => this.telephoneNumber = value;
 		}
 
 		/// <summary>
@@ -202,8 +199,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string RegisteredAddress
 		{
-			get { return this.registeredAddress; }
-			set { this.registeredAddress = value; }
+			get => this.registeredAddress;
+			set => this.registeredAddress = value;
 		}
 
 		/// <summary>
@@ -211,8 +208,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string PresentationAddress
 		{
-			get { return this.presentationAddress; }
-			set { this.presentationAddress = value; }
+			get => this.presentationAddress;
+			set => this.presentationAddress = value;
 		}
 
 		/// <summary>
@@ -220,8 +217,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string Name
 		{
-			get { return this.name; }
-			set { this.name = value; }
+			get => this.name;
+			set => this.name = value;
 		}
 
 		/// <summary>
@@ -229,8 +226,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string GivenName
 		{
-			get { return this.givenName; }
-			set { this.givenName = value; }
+			get => this.givenName;
+			set => this.givenName = value;
 		}
 
 		/// <summary>
@@ -238,8 +235,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string Initials
 		{
-			get { return this.initials; }
-			set { this.initials = value; }
+			get => this.initials;
+			set => this.initials = value;
 		}
 
 		/// <summary>
@@ -247,8 +244,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string DistinguishedName
 		{
-			get { return this.distinguishedName; }
-			set { this.distinguishedName = value; }
+			get => this.distinguishedName;
+			set => this.distinguishedName = value;
 		}
 
 		/// <summary>
@@ -256,8 +253,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string HouseIdentifier
 		{
-			get { return this.houseIdentifier; }
-			set { this.houseIdentifier = value; }
+			get => this.houseIdentifier;
+			set => this.houseIdentifier = value;
 		}
 
 		/// <summary>
@@ -265,8 +262,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string[] SubjectAlternativeNames
 		{
-			get { return this.subjectAlternativeNames; }
-			set { this.subjectAlternativeNames = value; }
+			get => this.subjectAlternativeNames;
+			set => this.subjectAlternativeNames = value;
 		}
 
 		/// <summary>
@@ -274,8 +271,8 @@ namespace Waher.Security.PKCS
 		/// </summary>
 		public string EMailAddress
 		{
-			get { return this.emailAddress; }
-			set { this.emailAddress = value; }
+			get => this.emailAddress;
+			set => this.emailAddress = value;
 		}
 
 		/// <summary>

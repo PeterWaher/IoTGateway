@@ -47,10 +47,7 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Name of current collection.
 		/// </summary>
-		public string CollectionName
-		{
-			get { return this.collectionName; }
-		}
+		public string CollectionName => this.collectionName;
 
 		/// <summary>
 		/// Deserializes a value.
@@ -518,7 +515,7 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		public int Position
 		{
-			get { return this.pos; }
+			get => this.pos;
 
 			set
 			{
@@ -535,10 +532,7 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Binary data being parsed.
 		/// </summary>
-		public byte[] Data
-		{
-			get { return this.data; }
-		}
+		public byte[] Data => this.data;
 
 		/// <summary>
 		/// Number of bytes left to read.

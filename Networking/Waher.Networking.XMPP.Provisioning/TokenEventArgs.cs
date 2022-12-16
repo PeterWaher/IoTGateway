@@ -27,9 +27,6 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Token corresponding to a given certificate.
 		/// </summary>
-		public string Token
-		{
-			get { return this.token; }
-		}
+		public string Token => this.token;
 	}
 }

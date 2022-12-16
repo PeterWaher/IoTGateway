@@ -30,9 +30,6 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// Remote endpoint.
 		/// </summary>
-		public object RemoteEndpoint
-		{
-			get { return this.remoteEndpoint; }
-		}
+		public object RemoteEndpoint => this.remoteEndpoint;
 	}
 }

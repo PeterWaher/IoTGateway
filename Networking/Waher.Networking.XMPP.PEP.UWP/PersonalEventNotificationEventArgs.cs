@@ -46,17 +46,11 @@ namespace Waher.Networking.XMPP.PEP
 		/// <summary>
 		/// Parsed personal event, if appropriate type was found.
 		/// </summary>
-		public IPersonalEvent PersonalEvent
-		{
-			get { return this.personalEvent; }
-		}
+		public IPersonalEvent PersonalEvent => this.personalEvent;
 
 		/// <summary>
 		/// Personal Eventing Protocol (PEP) Client.
 		/// </summary>
-		public PepClient PepClient
-		{
-			get { return this.pepClient; }
-		}
+		public PepClient PepClient => this.pepClient;
 	}
 }

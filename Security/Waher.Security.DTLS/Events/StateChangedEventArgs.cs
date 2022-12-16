@@ -32,9 +32,6 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// Endpoint state.
 		/// </summary>
-		public DtlsState State
-		{
-			get { return this.state; }
-		}
+		public DtlsState State => this.state;
 	}
 }

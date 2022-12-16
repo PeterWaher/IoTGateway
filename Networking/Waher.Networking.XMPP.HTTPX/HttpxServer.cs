@@ -48,8 +48,8 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		public bool RequiresE2e
 		{
-			get { return this.requiresE2e; }
-			set { this.requiresE2e = value; }
+			get => this.requiresE2e;
+			set => this.requiresE2e = value;
 		}
 
 		/// <summary>
@@ -57,8 +57,8 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		public InBandBytestreams.IbbClient IbbClient
 		{
-			get { return this.ibbClient; }
-			set { this.ibbClient = value; }
+			get => this.ibbClient;
+			set => this.ibbClient = value;
 		}
 
 		/// <summary>
@@ -66,8 +66,8 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		public P2P.SOCKS5.Socks5Proxy Socks5Proxy
 		{
-			get { return this.socks5Proxy; }
-			set { this.socks5Proxy = value; }
+			get => this.socks5Proxy;
+			set => this.socks5Proxy = value;
 		}
 
 		/// <summary>

@@ -161,8 +161,8 @@ namespace Waher.Things.SensorData
 		[ShortName("v")]
 		public Duration Value 
 		{
-			get { return this.value; }
-			set { this.value = value; } 
+			get => this.value;
+			set => this.value = value; 
 		}
 
 		/// <summary>

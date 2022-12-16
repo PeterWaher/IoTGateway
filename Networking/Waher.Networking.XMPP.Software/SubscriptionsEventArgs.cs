@@ -26,9 +26,6 @@ namespace Waher.Networking.XMPP.Software
         /// <summary>
         /// Array of file names.
         /// </summary>
-        public string[] FileNames
-        {
-            get { return this.fileNames; }
-        }
+        public string[] FileNames => this.fileNames;
     }
 }

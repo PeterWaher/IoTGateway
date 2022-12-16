@@ -37,7 +37,7 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		public bool IsSelected
 		{
-			get { return this.selected; }
+			get => this.selected;
 			set
 			{
 				if (this.selected != value)

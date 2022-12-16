@@ -108,26 +108,17 @@ namespace Waher.Networking.CoAP.Options
 		/// <summary>
 		/// Block number.
 		/// </summary>
-		public int Number
-		{
-			get { return this.number; }
-		}
+		public int Number => this.number;
 
 		/// <summary>
 		/// If more blocks are available.
 		/// </summary>
-		public bool More
-		{
-			get { return this.more; }
-		}
+		public bool More => this.more;
 
 		/// <summary>
 		/// Block size.
 		/// </summary>
-		public int Size
-		{
-			get { return this.size; }
-		}
+		public int Size => this.size;
 
 		/// <inheritdoc/>
 		public override string ToString()

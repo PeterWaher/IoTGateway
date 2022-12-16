@@ -52,22 +52,22 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 		/// <summary>
 		/// Category
 		/// </summary>
-		public string Category { get { return this.category; } }
+		public string Category => this.category;
 
 		/// <summary>
 		/// Type
 		/// </summary>
-		public string Type { get { return this.type; } }
+		public string Type => this.type;
 
 		/// <summary>
 		/// Name
 		/// </summary>
-		public string Name { get { return this.name; } }
+		public string Name => this.name;
 
 		/// <summary>
 		/// Language
 		/// </summary>
-		public string Language { get { return this.language; } }
+		public string Language => this.language;
 
 		/// <inheritdoc/>
 		public override string ToString()

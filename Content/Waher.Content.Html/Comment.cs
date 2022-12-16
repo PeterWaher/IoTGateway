@@ -30,10 +30,7 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// Comment
 		/// </summary>
-		public string CommentText
-		{
-			get { return this.comment; }
-		}
+		public string CommentText => this.comment;
 
 		/// <summary>
 		/// Exports the HTML document to XML.

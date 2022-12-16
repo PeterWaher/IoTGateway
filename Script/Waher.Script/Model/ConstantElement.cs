@@ -28,10 +28,7 @@ namespace Waher.Script.Model
         /// <summary>
         /// Constant value.
         /// </summary>
-        public IElement Constant
-        {
-            get { return this.constant; }
-        }
+        public IElement Constant => this.constant;
 
 		/// <summary>
 		/// If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using

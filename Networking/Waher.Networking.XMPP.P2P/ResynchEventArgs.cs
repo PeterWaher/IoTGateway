@@ -37,18 +37,12 @@ namespace Waher.Networking.XMPP.P2P
 		/// <summary>
 		/// JID of the remote end-point.
 		/// </summary>
-		public string RemoteFullJid
-		{
-			get { return this.remoteFullJid; }
-		}
+		public string RemoteFullJid => this.remoteFullJid;
 
 		/// <summary>
 		/// If the synchronization method succeeded (true) or failed (false).
 		/// </summary>
-		public bool Ok
-		{
-			get { return this.ok; }
-		}
+		public bool Ok => this.ok;
 
 		/// <summary>
 		/// Method called by callback, to report that the synchronization succeeded (<paramref name="Ok"/>=true), or

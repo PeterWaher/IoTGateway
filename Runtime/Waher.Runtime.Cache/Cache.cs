@@ -180,18 +180,15 @@ namespace Waher.Runtime.Cache
 		/// <summary>
 		/// Maximum number of items in cache.
 		/// </summary>
-		public int MaxItems
-		{
-			get { return this.maxItems; }
-		}
+		public int MaxItems => this.maxItems;
 
 		/// <summary>
 		/// Maximum time to keep items that are being used.
 		/// </summary>
 		public TimeSpan MaxTimeUsed
 		{
-			get { return this.maxTimeUsed; }
-			set { this.maxTimeUsed = value; }
+			get => this.maxTimeUsed;
+			set => this.maxTimeUsed = value;
 		}
 
 		/// <summary>
@@ -199,8 +196,8 @@ namespace Waher.Runtime.Cache
 		/// </summary>
 		public TimeSpan MaxTimeUnused
 		{
-			get { return this.maxTimeUnused; }
-			set { this.maxTimeUnused = value; }
+			get => this.maxTimeUnused;
+			set => this.maxTimeUnused = value;
 		}
 
 		/// <summary>

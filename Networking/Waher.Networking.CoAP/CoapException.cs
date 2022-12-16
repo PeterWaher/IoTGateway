@@ -22,9 +22,6 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// CoAP error code.
 		/// </summary>
-		public CoapCode ErrorCode
-		{
-			get { return this.errorCode; }
-		}
+		public CoapCode ErrorCode => this.errorCode;
     }
 }

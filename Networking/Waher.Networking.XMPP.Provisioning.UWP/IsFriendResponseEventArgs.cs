@@ -26,9 +26,6 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// If the two are friends.
 		/// </summary>
-		public bool Friend
-		{
-			get { return this.friend; }
-		}
+		public bool Friend => this.friend;
 	}
 }

@@ -91,18 +91,12 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// Host name of IP address of Remote endpoint.
 		/// </summary>
-		public string RemoteEndpoint
-		{
-			get { return this.remoteEndpoint; }
-		}
+		public string RemoteEndpoint => this.remoteEndpoint;
 
 		/// <summary>
 		/// Optional DTLS Credentials.
 		/// </summary>
-		public IDtlsCredentials Credentials
-		{
-			get { return this.credentials; }
-		}
+		public IDtlsCredentials Credentials => this.credentials;
 
 		/// <summary>
 		/// If encryption is expected, i.e. if credentials is not null.
@@ -115,18 +109,15 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// URI to server.
 		/// </summary>
-		public string Uri
-		{
-			get { return this.uri; }
-		}
+		public string Uri => this.uri;
 
 		/// <summary>
 		/// CoRE Link Document, if available.
 		/// </summary>
 		public LinkDocument LinkDocument
 		{
-			get { return this.linkDoc; }
-			internal set { this.linkDoc = value; }
+			get => this.linkDoc;
+			internal set => this.linkDoc = value;
 		}
 
 		/// <summary>
@@ -134,8 +125,8 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public bool Registered
 		{
-			get { return this.registered; }
-			internal set { this.registered = value; }
+			get => this.registered;
+			internal set => this.registered = value;
 		}
 
 		/// <summary>
@@ -143,8 +134,8 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public string LocationPath
 		{
-			get { return this.locationPath; }
-			internal set { this.locationPath = value; }
+			get => this.locationPath;
+			internal set => this.locationPath = value;
 		}
 	}
 }

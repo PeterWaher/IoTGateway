@@ -22,10 +22,7 @@ namespace Waher.Networking.Sniffers.Model
 		/// <summary>
 		/// Timestamp of event.
 		/// </summary>
-		public DateTime Timestamp
-		{
-			get { return this.timestamp; }
-		}
+		public DateTime Timestamp => this.timestamp;
 
 		/// <summary>
 		/// Replays the event to a given sniffer.

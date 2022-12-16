@@ -22,11 +22,11 @@
 		/// <summary>
 		/// If the readout is done.
 		/// </summary>
-		public bool Done { get { return this.done; } }
+		public bool Done => this.done;
 
 		/// <summary>
 		/// State object used in original request.
 		/// </summary>
-		public object State { get { return this.state; } }
+		public object State => this.state;
 	}
 }

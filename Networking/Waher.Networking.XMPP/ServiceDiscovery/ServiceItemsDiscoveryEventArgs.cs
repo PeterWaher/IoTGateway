@@ -26,6 +26,6 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 		/// <summary>
 		/// Items
 		/// </summary>
-		public Item[] Items { get { return this.items; } }
+		public Item[] Items => this.items;
 	}
 }

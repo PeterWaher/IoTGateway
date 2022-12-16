@@ -35,8 +35,8 @@ namespace Waher.Persistence.MongoDB
 		[ObjectId]
 		public string ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -45,8 +45,8 @@ namespace Waher.Persistence.MongoDB
 		[ShortName("c")]
 		public string Collection
 		{
-			get { return this.collection; }
-			set { this.collection = value; }
+			get => this.collection;
+			set => this.collection = value;
 		}
 
 		/// <summary>
@@ -55,8 +55,8 @@ namespace Waher.Persistence.MongoDB
 		[ShortName("k")]
 		public string Key
 		{
-			get { return this.key; }
-			set { this.key = value; }
+			get => this.key;
+			set => this.key = value;
 		}
 
 		/// <summary>
@@ -66,8 +66,8 @@ namespace Waher.Persistence.MongoDB
 		[ShortName("v")]
 		public object Value
 		{
-			get { return this.value; }
-			set { this.value = value; }
+			get => this.value;
+			set => this.value = value;
 		}
 	}
 }

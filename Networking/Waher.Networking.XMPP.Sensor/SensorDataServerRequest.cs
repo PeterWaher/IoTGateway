@@ -53,7 +53,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Sensor Data Server.
 		/// </summary>
-		public SensorServer SensorServer { get { return this.sensorServer; } }
+		public SensorServer SensorServer => this.sensorServer;
 
 		internal string Key
 		{
@@ -65,8 +65,8 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public bool Started
 		{
-			get { return this.started; }
-			internal set { this.started = value; }
+			get => this.started;
+			internal set => this.started = value;
 		}
 
 		/// <summary>

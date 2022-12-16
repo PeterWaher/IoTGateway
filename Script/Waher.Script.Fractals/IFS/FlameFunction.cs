@@ -163,7 +163,7 @@ namespace Waher.Script.Fractals.IFS
                 this.variations[i].Initialize(this.homogeneousTransform, this.variationWeights[i]);
         }
 
-        public double Weight { get { return this.weight; } }
+        public double Weight => this.weight;
 
         internal bool Operate(FlameState point, Variables Variables)
         {

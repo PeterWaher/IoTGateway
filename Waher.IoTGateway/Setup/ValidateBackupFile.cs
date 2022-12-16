@@ -135,10 +135,7 @@ namespace Waher.IoTGateway.Setup
 		/// <summary>
 		/// Optional array of collection nmes to export. If null, all collections will be exported.
 		/// </summary>
-		public string[] CollectionNames
-		{
-			get => null;
-		}
+		public string[] CollectionNames => null;
 
 		/// <summary>
 		/// Starts export

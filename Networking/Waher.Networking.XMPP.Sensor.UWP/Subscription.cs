@@ -129,40 +129,40 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Field types involved in subscription.
 		/// </summary>
-		public FieldType FieldTypes { get { return this.fieldTypes; } }
+		public FieldType FieldTypes => this.fieldTypes;
 
 		/// <summary>
 		/// Maximum age of historical data.
 		/// </summary>
-		public Duration? MaxAge { get { return this.maxAge; } }
+		public Duration? MaxAge => this.maxAge;
 
 		/// <summary>
 		/// Smallest interval for reporting events. Events are not reported more often than this limit.
 		/// </summary>
-		public Duration? MinInterval { get { return this.minInterval; } }
+		public Duration? MinInterval => this.minInterval;
 
 		/// <summary>
 		/// Largest interval for reporting events. Events are not reported less often than this limit.
 		/// </summary>
-		public Duration? MaxInterval { get { return this.maxInterval; } }
+		public Duration? MaxInterval => this.maxInterval;
 
 		/// <summary>
 		/// Subscription made by this JID.
 		/// </summary>
-		public string From { get { return this.from; } }
+		public string From => this.from;
 
 		/// <summary>
 		/// Request identity.
 		/// </summary>
-		public string Id { get { return this.id; } }
+		public string Id => this.id;
 
 		/// <summary>
 		/// If the subscription is still active.
 		/// </summary>
 		public bool Active
 		{
-			get { return this.active; }
-			internal set { this.active = value; }
+			get => this.active;
+			internal set => this.active = value;
 		}
 
 		/// <summary>
@@ -170,8 +170,8 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public DateTime LastTrigger
 		{
-			get { return this.lastTrigger; }
-			internal set { this.lastTrigger = value; }
+			get => this.lastTrigger;
+			internal set => this.lastTrigger = value;
 		}
 
 		/// <summary>
@@ -179,24 +179,24 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public Availability Availability
 		{
-			get { return this.availability; }
-			internal set { this.availability = value; }
+			get => this.availability;
+			internal set => this.availability = value;
 		}
 
 		/// <summary>
 		/// Service Token.
 		/// </summary>
-		public string ServiceToken { get { return this.serviceToken; } }
+		public string ServiceToken => this.serviceToken;
 
 		/// <summary>
 		/// Device Token.
 		/// </summary>
-		public string DeviceToken { get { return this.deviceToken; } }
+		public string DeviceToken => this.deviceToken;
 
 		/// <summary>
 		/// User Token.
 		/// </summary>
-		public string UserToken { get { return this.userToken; } }
+		public string UserToken => this.userToken;
 
 		/// <summary>
 		/// If the subscription has a supressed trigger event, that has not been sent, due to limitations defined by the smallest allowed
@@ -204,8 +204,8 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public bool SupressedTrigger
 		{
-			get { return this.supressedTrigger; }
-			internal set { this.supressedTrigger = value; }
+			get => this.supressedTrigger;
+			internal set => this.supressedTrigger = value;
 		}
 
 		/// <summary>

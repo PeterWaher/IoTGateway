@@ -83,10 +83,7 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// Attribute name.
 		/// </summary>
-		public string Name
-		{
-			get { return this.name; }
-		}
+		public string Name => this.name;
 
 		internal void Add(HtmlNode Segment)
 		{

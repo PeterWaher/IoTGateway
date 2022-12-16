@@ -41,7 +41,7 @@ namespace Waher.Things.Metering
 		[DefaultValue(false)]
 		public bool Provisioned
 		{
-			get { return this.provisioned; }
+			get => this.provisioned;
 			set
 			{
 				if (this.provisioned && !value && !string.IsNullOrEmpty(this.owner))
@@ -61,7 +61,7 @@ namespace Waher.Things.Metering
 		[ReadOnly]
 		public string OwnerAddress
 		{
-			get { return this.owner; }
+			get => this.owner;
 			set
 			{
 				if (this.provisioned && !string.IsNullOrEmpty(this.owner) && this.owner != value)
@@ -81,7 +81,7 @@ namespace Waher.Things.Metering
 		[ReadOnly]
 		public bool Public
 		{
-			get { return this.isPublic; }
+			get => this.isPublic;
 			set
 			{
 				if (this.provisioned && !value && this.isPublic && !string.IsNullOrEmpty(this.owner))

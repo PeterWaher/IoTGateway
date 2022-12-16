@@ -20,8 +20,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(0)]
 		public int Step
 		{
-			get { return this.step; }
-			set { this.step = value; }
+			get => this.step;
+			set => this.step = value;
 		}
 	}
 }

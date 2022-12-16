@@ -35,8 +35,8 @@ namespace Waher.Security.ACME
 		/// </summary>
 		public Uri Location
 		{
-			get { return this.location; }
-			protected set { this.location = value; }
+			get => this.location;
+			protected set => this.location = value;
 		}
 	}
 }

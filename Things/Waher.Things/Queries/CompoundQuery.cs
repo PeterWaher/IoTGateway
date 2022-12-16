@@ -105,10 +105,7 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Queries
 		/// </summary>
-		public IEnumerable<Query> Queries
-		{
-			get { return this.queries; }
-		}
+		public IEnumerable<Query> Queries => this.queries;
 
 		/// <summary>
 		/// Aborts the query.

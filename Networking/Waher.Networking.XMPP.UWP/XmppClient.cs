@@ -999,9 +999,7 @@ namespace Waher.Networking.XMPP
 #else
 		public X509Certificate ServerCertificate
 #endif
-		{
-			get => this.client.RemoteCertificate;
-		}
+			=> this.client.RemoteCertificate;
 
 		/// <summary>
 		/// If the server certificate is valid.
@@ -1033,8 +1031,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool MonitorContactResourcesAlive
 		{
-			get { return this.monitorContactResourcesAlive; }
-			set { this.monitorContactResourcesAlive = value; }
+			get => this.monitorContactResourcesAlive;
+			set => this.monitorContactResourcesAlive = value;
 		}
 
 		/// <summary>
@@ -1063,7 +1061,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public XmppState State
 		{
-			get { return this.state; }
+			get => this.state;
 			internal set
 			{
 				if (this.state != value)
@@ -4696,8 +4694,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool RequestRosterOnStartup
 		{
-			get { return this.requestRosterOnStartup; }
-			set { this.requestRosterOnStartup = value; }
+			get => this.requestRosterOnStartup;
+			set => this.requestRosterOnStartup = value;
 		}
 
 		private async Task AdvanceUntilConnected()
@@ -5007,10 +5005,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// If the roster has been fetched.
 		/// </summary>
-		public bool HasRoster
-		{
-			get { return this.hasRoster; }
-		}
+		public bool HasRoster => this.hasRoster;
 
 		/// <summary>
 		/// Items in the roster.
@@ -5070,6 +5065,52 @@ namespace Waher.Networking.XMPP
 		/// Event raised when presence is set. Allows custom presence XML to be inserted into presence stanza.
 		/// </summary>
 		public event CustomPresenceEventHandler CustomPresenceXml = null;
+
+		/// <summary>
+		/// Adds custom presence XML to a presence stanza being built.
+		/// </summary>
+		/// <param name="Availability">Client availability</param>
+		/// <param name="Xml">XML of stanza being built.</param>
+		public void AddCustomPresenceXml(Availability Availability, StringBuilder Xml)
+		{
+			this.CustomPresenceXml?.Invoke(this, new CustomPresenceEventArgs(Availability, Xml));
+
+			lock (this.synchObject)
+			{
+				Xml.Append("<c xmlns='");
+				Xml.Append(NamespaceEntityCapabilities);
+				Xml.Append("' hash='");
+
+				switch (this.entityHashFunction)
+				{
+					case HashFunction.MD5:
+						Xml.Append("md5");
+						break;
+
+					case HashFunction.SHA1:
+						Xml.Append("sha-1");
+						break;
+
+					case HashFunction.SHA256:
+						Xml.Append("sha-256");
+						break;
+
+					case HashFunction.SHA384:
+						Xml.Append("sha-384");
+						break;
+
+					case HashFunction.SHA512:
+						Xml.Append("sha-512");
+						break;
+				}
+
+				Xml.Append("' node='");
+				Xml.Append(XML.Encode(this.entityNode));
+				Xml.Append("' ver='");
+				Xml.Append(XML.Encode(this.EntityCapabilitiesVersion));
+				Xml.Append("'/>");
+			}
+		}
 
 		/// <summary>
 		/// Sets the presence of the connection.
@@ -5165,43 +5206,7 @@ namespace Waher.Networking.XMPP
 					}
 				}
 
-				this.CustomPresenceXml?.Invoke(this, new CustomPresenceEventArgs(Availability, Xml));
-
-				lock (this.synchObject)
-				{
-					Xml.Append("<c xmlns='");
-					Xml.Append(NamespaceEntityCapabilities);
-					Xml.Append("' hash='");
-
-					switch (this.entityHashFunction)
-					{
-						case HashFunction.MD5:
-							Xml.Append("md5");
-							break;
-
-						case HashFunction.SHA1:
-							Xml.Append("sha-1");
-							break;
-
-						case HashFunction.SHA256:
-							Xml.Append("sha-256");
-							break;
-
-						case HashFunction.SHA384:
-							Xml.Append("sha-384");
-							break;
-
-						case HashFunction.SHA512:
-							Xml.Append("sha-512");
-							break;
-					}
-
-					Xml.Append("' node='");
-					Xml.Append(XML.Encode(this.entityNode));
-					Xml.Append("' ver='");
-					Xml.Append(XML.Encode(this.EntityCapabilitiesVersion));
-					Xml.Append("'/>");
-				}
+				this.AddCustomPresenceXml(Availability, Xml);
 
 				Xml.Append("</presence>");
 
@@ -6108,7 +6113,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public HashFunction EntityHashFunction
 		{
-			get { return this.entityHashFunction; }
+			get => this.entityHashFunction;
 			set
 			{
 				if (this.entityHashFunction != value)
@@ -6128,8 +6133,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public string EntityNode
 		{
-			get { return this.entityNode; }
-			set { this.entityNode = value; }
+			get => this.entityNode;
+			set => this.entityNode = value;
 		}
 
 		/// <summary>
@@ -7146,7 +7151,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public int KeepAliveSeconds
 		{
-			get { return this.keepAliveSeconds; }
+			get => this.keepAliveSeconds;
 			set
 			{
 				if (value <= 0)
@@ -7182,7 +7187,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public int MaxAssuredMessagesPendingFromSource
 		{
-			get { return this.maxAssuredMessagesPendingFromSource; }
+			get => this.maxAssuredMessagesPendingFromSource;
 			set
 			{
 				if (value <= 0)
@@ -7197,7 +7202,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public int MaxAssuredMessagesPendingTotal
 		{
-			get { return this.maxAssuredMessagesPendingTotal; }
+			get => this.maxAssuredMessagesPendingTotal;
 			set
 			{
 				if (value <= 0)
@@ -7213,7 +7218,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public int DefaultRetryTimeout
 		{
-			get { return this.defaultRetryTimeout; }
+			get => this.defaultRetryTimeout;
 			set
 			{
 				if (value <= 0)
@@ -7230,7 +7235,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public int DefaultNrRetries
 		{
-			get { return this.defaultNrRetries; }
+			get => this.defaultNrRetries;
 			set
 			{
 				if (value < 0)
@@ -7246,7 +7251,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public int DefaultMaxRetryTimeout
 		{
-			get { return this.defaultMaxRetryTimeout; }
+			get => this.defaultMaxRetryTimeout;
 			set
 			{
 				if (value <= 0)
@@ -7262,8 +7267,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool DefaultDropOff
 		{
-			get { return this.defaultDropOff; }
-			set { this.defaultDropOff = value; }
+			get => this.defaultDropOff;
+			set => this.defaultDropOff = value;
 		}
 
 		private Task AssuredQoSMessageHandler(object Sender, IqEventArgs e)
@@ -7640,8 +7645,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool AllowEncryption
 		{
-			get { return this.allowEncryption; }
-			set { this.allowEncryption = value; }
+			get => this.allowEncryption;
+			set => this.allowEncryption = value;
 		}
 
 		/// <summary>
@@ -7706,17 +7711,14 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool SendFromAddress
 		{
-			get { return this.sendFromAddress; }
-			set { this.sendFromAddress = value; }
+			get => this.sendFromAddress;
+			set => this.sendFromAddress = value;
 		}
 
 		/// <summary>
 		/// If new accounts can be registered.
 		/// </summary>
-		public bool CanRegister
-		{
-			get { return this.canRegister; }
-		}
+		public bool CanRegister => this.canRegister;
 
 		/// <summary>
 		/// Registers an extension with the client.

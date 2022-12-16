@@ -24,17 +24,11 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Position.
 		/// </summary>
-		public int Position
-		{
-			get { return this.pos; }
-		}
+		public int Position => this.pos;
 
 		/// <summary>
 		/// Bit offset
 		/// </summary>
-		public byte BitOffset
-		{
-			get { return this.bitOffset; }
-		}
+		public byte BitOffset => this.bitOffset;
 	}
 }

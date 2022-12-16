@@ -58,8 +58,8 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		public string CollectionName
 		{
-			get { return this.collectionName; }
-			internal set { this.collectionName = value; }
+			get => this.collectionName;
+			internal set => this.collectionName = value;
 		}
 
 		/// <summary>
@@ -67,8 +67,8 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		public string TypeName
 		{
-			get { return this.typeName; }
-			set { this.typeName = value; }
+			get => this.typeName;
+			set => this.typeName = value;
 		}
 
 		/// <summary>
@@ -76,8 +76,8 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		public Guid ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -86,8 +86,8 @@ namespace Waher.Persistence.Serialization
 		[DefaultValue(0)]
 		public int ArchivingTime
 		{
-			get { return this.archivingTime; }
-			set { this.archivingTime = value; }
+			get => this.archivingTime;
+			set => this.archivingTime = value;
 		}
 
 		/// <summary>

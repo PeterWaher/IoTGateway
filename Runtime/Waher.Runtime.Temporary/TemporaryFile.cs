@@ -48,18 +48,15 @@ namespace Waher.Runtime.Temporary
 		/// <summary>
 		/// File Name.
 		/// </summary>
-		public string FileName
-		{
-			get { return this.fileName; }
-		}
+		public string FileName => this.fileName;
 
 		/// <summary>
 		/// Delete file when object is disposed.
 		/// </summary>
 		public bool DeleteWhenDisposed
 		{
-			get { return this.deleteWhenDisposed; }
-			set { this.deleteWhenDisposed = value; }
+			get => this.deleteWhenDisposed;
+			set => this.deleteWhenDisposed = value;
 		}
 
 		/// <summary>

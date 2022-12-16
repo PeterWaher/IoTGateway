@@ -38,42 +38,27 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// SSDP Search Target
 		/// </summary>
-		public string SearchTarget
-		{ 
-			get { return this.searchTarget; } 
-		}
+		public string SearchTarget => this.searchTarget;
 
 		/// <summary>
 		/// Server
 		/// </summary>
-		public string Server
-		{
-			get { return this.server; }
-		}
+		public string Server => this.server;
 
 		/// <summary>
 		/// Location of device information
 		/// </summary>
-		public string Location
-		{
-			get { return this.location; }
-		}
+		public string Location => this.location;
 
 		/// <summary>
 		/// Unique Service Name (USN)
 		/// </summary>
-		public string UniqueServiceName
-		{
-			get { return this.uniqueServiceName; }
-		}
+		public string UniqueServiceName => this.uniqueServiceName;
 
 		/// <summary>
 		/// UPnP Headers
 		/// </summary>
-		public UPnPHeaders Headers
-		{
-			get { return this.headers; }
-		}
+		public UPnPHeaders Headers => this.headers;
 
 		/// <summary>
 		/// Gets the device description document from a device in the network. 

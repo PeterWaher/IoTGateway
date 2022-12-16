@@ -33,25 +33,16 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// If the readout can be performed.
 		/// </summary>
-		public bool CanRead
-		{
-			get { return this.canRead; }
-		}
+		public bool CanRead => this.canRead;
 
 		/// <summary>
 		/// Field types allowed to read, if <see cref="CanRead"/> is true.
 		/// </summary>
-		public FieldType FieldTypes
-		{
-			get { return this.fieldTypes; }
-		}
+		public FieldType FieldTypes => this.fieldTypes;
 
 		/// <summary>
 		/// Fields allowed to read, as long as <see cref="CanRead"/> is true. If null, no field restrictions exist.
 		/// </summary>
-		public string[] FieldsNames
-		{
-			get { return this.fieldNames; }
-		}
+		public string[] FieldsNames => this.fieldNames;
 	}
 }

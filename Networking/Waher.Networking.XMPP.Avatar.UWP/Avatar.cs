@@ -69,8 +69,8 @@ namespace Waher.Networking.XMPP.Avatar
 		[ObjectId]
 		public string ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -78,8 +78,8 @@ namespace Waher.Networking.XMPP.Avatar
 		/// </summary>
 		public string BareJid
 		{
-			get { return this.bareJid; }
-			set { this.bareJid = value; }
+			get => this.bareJid;
+			set => this.bareJid = value;
 		}
 
 		/// <summary>
@@ -88,8 +88,8 @@ namespace Waher.Networking.XMPP.Avatar
 		[DefaultValueStringEmpty]
 		public string Hash
 		{
-			get { return this.hash; }
-			set { this.hash = value; }
+			get => this.hash;
+			set => this.hash = value;
 		}
 
 		/// <summary>
@@ -98,8 +98,8 @@ namespace Waher.Networking.XMPP.Avatar
 		[DefaultValueStringEmpty]
 		public string ContentType
 		{
-			get { return this.contentType; }
-			set { this.contentType = value; }
+			get => this.contentType;
+			set => this.contentType = value;
 		}
 
 		/// <summary>
@@ -108,8 +108,8 @@ namespace Waher.Networking.XMPP.Avatar
 		[DefaultValueNull]
 		public byte[] Binary
 		{
-			get { return this.binary; }
-			set { this.binary = value; }
+			get => this.binary;
+			set => this.binary = value;
 		}
 
 		/// <summary>
@@ -118,8 +118,8 @@ namespace Waher.Networking.XMPP.Avatar
 		[DefaultValue(0)]
 		public int Width
 		{
-			get { return this.width; }
-			set { this.width = value; }
+			get => this.width;
+			set => this.width = value;
 		}
 
 		/// <summary>
@@ -128,8 +128,8 @@ namespace Waher.Networking.XMPP.Avatar
 		[DefaultValue(0)]
 		public int Height
 		{
-			get { return this.height; }
-			set { this.height = value; }
+			get => this.height;
+			set => this.height = value;
 		}
 	}
 }

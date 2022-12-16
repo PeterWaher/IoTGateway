@@ -28,25 +28,16 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// JID of thing.
 		/// </summary>
-		public string Jid
-		{
-			get { return this.jid; }
-		}
+		public string Jid => this.jid;
 
 		/// <summary>
 		/// Node reference. Can be equal to <see cref="ThingReference.Empty"/> if not behind a concentrator.
 		/// </summary>
-		public ThingReference Node
-		{
-			get { return this.node; }
-		}
+		public ThingReference Node => this.node;
 
 		/// <summary>
 		/// Meta-data tags.
 		/// </summary>
-		public MetaDataTag[] Tags
-		{
-			get { return this.tags; }
-		}
+		public MetaDataTag[] Tags => this.tags;
 	}
 }

@@ -45,18 +45,12 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// Name of node.
 		/// </summary>
-		public string NodeName
-		{
-			get { return this.nodeName; }
-		}
+		public string NodeName => this.nodeName;
 
 		/// <summary>
 		/// Subscription identity, if provided in event notification.
 		/// </summary>
-		public string SubscriptionId
-		{
-			get { return this.subscriptionId; }
-		}
+		public string SubscriptionId => this.subscriptionId;
 
 	}
 }

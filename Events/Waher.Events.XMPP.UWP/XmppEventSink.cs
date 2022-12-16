@@ -110,18 +110,12 @@ namespace Waher.Events.XMPP
 		/// <summary>
 		/// XMPP Client
 		/// </summary>
-		public XmppClient Client
-		{
-			get { return this.client; }
-		}
+		public XmppClient Client => this.client;
 
 		/// <summary>
 		/// Destination of event messages.
 		/// </summary>
-		public string Destination
-		{
-			get { return this.destination; }
-		}
+		public string Destination => this.destination;
 
 		/// <inheritdoc/>
 		public override Task Queue(Event Event)

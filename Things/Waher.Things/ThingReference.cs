@@ -65,8 +65,8 @@ namespace Waher.Things
 		[ObjectId]
 		public string ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -75,8 +75,8 @@ namespace Waher.Things
 		[ShortName("n")]
 		public string NodeId
 		{
-			get { return this.nodeId; }
-			set { this.nodeId = value; }
+			get => this.nodeId;
+			set => this.nodeId = value;
 		}
 
 		/// <summary>
@@ -85,8 +85,8 @@ namespace Waher.Things
 		[ShortName("s")]
 		public string SourceId
 		{
-			get { return this.sourceId; }
-			set { this.sourceId = value; }
+			get => this.sourceId;
+			set => this.sourceId = value;
 		}
 
 		/// <summary>
@@ -95,8 +95,8 @@ namespace Waher.Things
 		[ShortName("p")]
 		public string Partition
 		{
-			get { return this.partition; }
-			set { this.partition = value; }
+			get => this.partition;
+			set => this.partition = value;
 		}
 
 		/// <summary>

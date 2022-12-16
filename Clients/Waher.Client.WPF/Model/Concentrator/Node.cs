@@ -60,8 +60,8 @@ namespace Waher.Client.WPF.Model.Concentrator
 
 		public NodeInformation NodeInformation
 		{
-			get { return this.nodeInfo; }
-			internal set { this.nodeInfo = value; }
+			get => this.nodeInfo;
+			internal set => this.nodeInfo = value;
 		}
 
 		public override string TypeName

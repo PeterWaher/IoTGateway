@@ -121,10 +121,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <summary>
 		/// Name of corresponding collection.
 		/// </summary>
-		public string CollectionName
-		{
-			get { return this.collectionName; }
-		}
+		public string CollectionName => this.collectionName;
 
 		/// <summary>
 		/// Name of corresponding type.

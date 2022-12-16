@@ -36,7 +36,7 @@ namespace Waher.Things.Gpio
 		[Option(InputPinMode.Input, 11, "Input with Pull/Down")]
 		public InputPinMode Mode
 		{
-			get { return this.mode; }
+			get => this.mode;
 			set
 			{
 				this.SetDriveMode(value);

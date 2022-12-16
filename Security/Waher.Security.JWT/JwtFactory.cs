@@ -80,7 +80,7 @@ namespace Waher.Security.JWT
 		/// </summary>
 		public TimeSpan TimeMargin
 		{
-			get { return this.timeMargin; }
+			get => this.timeMargin;
 			set
 			{
 				if (value < TimeSpan.Zero)

@@ -65,30 +65,27 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// Underlying XML definition.
 		/// </summary>
-		public XmlElement Xml
-		{
-			get { return this.xml; }
-		}
+		public XmlElement Xml => this.xml;
 
 		/// <summary>
 		/// Argument Name
 		/// </summary>
-		public string Name { get { return this.name; } }
+		public string Name => this.name;
 
 		/// <summary>
 		/// Argument Direction
 		/// </summary>
-		public ArgumentDirection Direction { get { return this.direction; } }
+		public ArgumentDirection Direction => this.direction;
 
 		/// <summary>
 		/// If the argument is the return value
 		/// </summary>
-		public bool ReturnValue { get { return this.returnValue; } }
+		public bool ReturnValue => this.returnValue;
 
 		/// <summary>
 		/// Related State Variable
 		/// </summary>
-		public string RelatedStateVariable { get { return this.relatedStateVariable; } }
+		public string RelatedStateVariable => this.relatedStateVariable;
 
 	}
 }

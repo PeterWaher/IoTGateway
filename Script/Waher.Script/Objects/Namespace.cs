@@ -27,10 +27,7 @@ namespace Waher.Script.Objects
         /// <summary>
         /// Namespace.
         /// </summary>
-        public string Value
-        {
-            get { return this.value; }
-        }
+        public string Value => this.value;
 
         /// <inheritdoc/>
         public override string ToString()

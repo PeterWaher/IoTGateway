@@ -45,42 +45,30 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// <summary>
 		/// Recipient of stream.
 		/// </summary>
-		public string To
-		{
-			get { return this.to; }
-		}
+		public string To => this.to;
 
 		/// <summary>
 		/// Stream ID
 		/// </summary>
-		public string StreamId
-		{
-			get { return this.streamId; }
-		}
+		public string StreamId => this.streamId;
 
 		/// <summary>
 		/// Block Size
 		/// </summary>
-		public int BlockSize
-		{
-			get { return this.blockSize; }
-		}
+		public int BlockSize => this.blockSize;
 
 		/// <summary>
 		/// If the stream has been aborted.
 		/// </summary>
-		public bool Aborted
-		{
-			get { return this.aborted; }
-		}
+		public bool Aborted => this.aborted;
 
 		/// <summary>
 		/// State object.
 		/// </summary>
 		public object State
 		{
-			get { return this.state; }
-			set { this.state = value; }
+			get => this.state;
+			set => this.state = value;
 		}
 
 		/// <summary>

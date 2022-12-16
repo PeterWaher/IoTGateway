@@ -26,9 +26,6 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Nodes information.
 		/// </summary>
-		public NodeInformation[] NodesInformation
-		{
-			get { return this.nodesInformation; }
-		}
+		public NodeInformation[] NodesInformation => this.nodesInformation;
 	}
 }

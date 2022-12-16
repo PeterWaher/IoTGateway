@@ -39,8 +39,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public string ItemId
 		{
-			get { return this.itemId; }
-			set { this.itemId = value; }
+			get => this.itemId;
+			set => this.itemId = value;
 		}
 
 		/// <summary>
@@ -48,8 +48,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public string Node
 		{
-			get { return this.node; }
-			set { this.node = value; }
+			get => this.node;
+			set => this.node = value;
 		}
 
 		/// <summary>
@@ -57,8 +57,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public string ServiceAddress
 		{
-			get { return this.serviceAddress; }
-			set { this.serviceAddress = value; }
+			get => this.serviceAddress;
+			set => this.serviceAddress = value;
 		}
 
 		/// <summary>
@@ -66,8 +66,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public string Publisher
 		{
-			get { return this.publisher; }
-			set { this.publisher = value; }
+			get => this.publisher;
+			set => this.publisher = value;
 		}
 
 		/// <summary>
@@ -75,8 +75,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public string Payload
 		{
-			get { return this.payload; }
-			set { this.payload = value; }
+			get => this.payload;
+			set => this.payload = value;
 		}
 
 		/// <summary>
@@ -84,8 +84,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public XmlElement Item
 		{
-			get { return this.item; }
-			set { this.item = value; }
+			get => this.item;
+			set => this.item = value;
 		}
 
 		/// <summary>
@@ -93,8 +93,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public object Tag
 		{
-			get { return this.tag; }
-			set { this.tag = value; }
+			get => this.tag;
+			set => this.tag = value;
 		}
 
 	}

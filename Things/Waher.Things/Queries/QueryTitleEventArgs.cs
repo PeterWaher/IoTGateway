@@ -23,9 +23,6 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Title.
 		/// </summary>
-		public string Title
-		{
-			get { return this.title; }
-		}
+		public string Title => this.title;
 	}
 }

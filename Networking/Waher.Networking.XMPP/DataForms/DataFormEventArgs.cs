@@ -23,6 +23,6 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <summary>
 		/// Form result, if available.
 		/// </summary>
-		public DataForm Form { get { return this.form; } }
+		public DataForm Form => this.form;
 	}
 }

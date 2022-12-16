@@ -62,18 +62,12 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <summary>
 		/// File name
 		/// </summary>
-		public string FileName
-		{
-			get { return this.fileName; }
-		}
+		public string FileName => this.fileName;
 
 		/// <summary>
 		/// When file was created
 		/// </summary>
-		public DateTime Created
-		{
-			get { return this.created; }
-		}
+		public DateTime Created => this.created;
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>

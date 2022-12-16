@@ -35,34 +35,22 @@ namespace Waher.Networking.XMPP.Provisioning.SearchOperators
 		/// <summary>
 		/// Minimum value.
 		/// </summary>
-		public string Min
-		{
-			get { return this.min; }
-		}
+		public string Min => this.min;
 
 		/// <summary>
 		/// If the minimum value is included in the range.
 		/// </summary>
-		public bool MinIncluded
-		{
-			get { return this.minIncluded; }
-		}
+		public bool MinIncluded => this.minIncluded;
 
 		/// <summary>
 		/// Maximum value.
 		/// </summary>
-		public string Max
-		{
-			get { return this.max; }
-		}
+		public string Max => this.max;
 
 		/// <summary>
 		/// If the maximum value is included in the range.
 		/// </summary>
-		public bool MaxIncluded
-		{
-			get { return this.maxIncluded; }
-		}
+		public bool MaxIncluded => this.maxIncluded;
 
 		internal override void SerializeValue(StringBuilder Request)
 		{

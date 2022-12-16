@@ -22,16 +22,16 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <summary>
 		/// New updated form. This form has to be joined to the previous form using the <see cref="DataForm.Join"/> method.
 		/// </summary>
-		public DataForm Form { get { return this.form; } }
+		public DataForm Form => this.form;
 
 		/// <summary>
 		/// Session Variable used to identify the form that has been updated.
 		/// </summary>
-		public string SessionVariable { get { return this.sessionVariable; } }
+		public string SessionVariable => this.sessionVariable;
 
 		/// <summary>
 		/// Optional language of form.
 		/// </summary>
-		public string Language { get { return this.language; } }
+		public string Language => this.language;
 	}
 }

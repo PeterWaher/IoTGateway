@@ -54,65 +54,65 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Sequence number.
 		/// </summary>
-		public uint SeqNr { get { return this.seqNr; } }
+		public uint SeqNr => this.seqNr;
 
 		/// <summary>
 		/// To
 		/// </summary>
-		public string To { get { return this.to; } }
+		public string To => this.to;
 
 		/// <summary>
 		/// Request XML
 		/// </summary>
 		public string Xml
 		{
-			get { return this.xml; }
-			internal set { this.xml = value; }
+			get => this.xml;
+			internal set => this.xml = value;
 		}
 
 		/// <summary>
 		/// Callback method (for IQ stanzas) to call when a result or error is returned.
 		/// </summary>
-		public IqResultEventHandlerAsync IqCallback { get { return this.iqCallback; } }
+		public IqResultEventHandlerAsync IqCallback => this.iqCallback;
 
 		/// <summary>
 		/// Callback method (for Presence stanzas) to call when a result or error is returned.
 		/// </summary>
-		public PresenceEventHandlerAsync PresenceCallback { get { return this.presenceCallback; } }
+		public PresenceEventHandlerAsync PresenceCallback => this.presenceCallback;
 
 		/// <summary>
 		/// State object passed in the original request.
 		/// </summary>
-		public object State { get { return this.state; } }
+		public object State => this.state;
 
 		/// <summary>
 		/// Retry Timeout, in milliseconds.
 		/// </summary>
-		public int RetryTimeout { get { return this.retryTimeout; } }
+		public int RetryTimeout => this.retryTimeout;
 
 		/// <summary>
 		/// Number of retries (left).
 		/// </summary>
-		public int NrRetries { get { return this.nrRetries; } }
+		public int NrRetries => this.nrRetries;
 
 		/// <summary>
 		/// Maximum retry timeout. Used if <see cref="DropOff"/> is true.
 		/// </summary>
-		public int MaxRetryTimeout { get { return this.maxRetryTimeout; } }
+		public int MaxRetryTimeout => this.maxRetryTimeout;
 
 		/// <summary>
 		/// If the retry timeout should be doubled between retries (true), or if the same retry timeout should be used for all retries.
 		/// The retry timeout will never exceed <see cref="MaxRetryTimeout"/>.
 		/// </summary>
-		public bool DropOff { get { return this.dropOff; } }
+		public bool DropOff => this.dropOff;
 
 		/// <summary>
 		/// When the requests times out.
 		/// </summary>
 		public DateTime Timeout 
 		{
-			get { return this.timeout; }
-			internal set { this.timeout = value; } 
+			get => this.timeout;
+			internal set => this.timeout = value; 
 		}
 
 		/// <summary>

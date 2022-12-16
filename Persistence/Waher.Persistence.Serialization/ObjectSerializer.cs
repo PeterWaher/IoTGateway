@@ -3264,8 +3264,8 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		public bool ArchiveObjects
 		{
-			get { return this.archive; }
-			internal set { this.archive = value; }
+			get => this.archive;
+			internal set => this.archive = value;
 		}
 
 		/// <summary>
@@ -3273,17 +3273,14 @@ namespace Waher.Persistence.Serialization
 		/// </summary>
 		public bool ArchiveTimeDynamic
 		{
-			get { return this.archiveDynamic; }
-			internal set { this.archiveDynamic = value; }
+			get => this.archiveDynamic;
+			internal set => this.archiveDynamic = value;
 		}
 
 		/// <summary>
 		/// If names are normalized or not.
 		/// </summary>
-		public bool NormalizedNames
-		{
-			get { return this.normalized; }
-		}
+		public bool NormalizedNames => this.normalized;
 
 #if NETSTANDARD2_0
 		/// <summary>

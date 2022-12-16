@@ -30,9 +30,6 @@ namespace Waher.Networking.LWM2M.Events
 		/// <summary>
 		/// Request message.
 		/// </summary>
-		public CoapMessage Request
-		{
-			get { return this.request; }
-		}
+		public CoapMessage Request => this.request;
     }
 }

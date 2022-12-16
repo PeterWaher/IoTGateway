@@ -57,8 +57,8 @@ namespace Waher.Things.Ip
 		[Required]
 		public string Host
 		{
-			get { return this.host; }
-			set { this.host = value; }
+			get => this.host;
+			set => this.host = value;
 		}
 
 		/// <summary>

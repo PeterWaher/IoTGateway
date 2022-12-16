@@ -28,18 +28,12 @@ namespace Waher.Script.Objects.Matrices
         /// <summary>
         /// Number of rows.
         /// </summary>
-        public int Rows
-        {
-            get { return this.rows; }
-        }
+        public int Rows => this.rows;
 
         /// <summary>
         /// Number of columns.
         /// </summary>
-        public int Columns
-        {
-            get { return this.columns; }
-        }
+        public int Columns => this.columns;
 
         /// <summary>
         /// Returns the zero element of the group.

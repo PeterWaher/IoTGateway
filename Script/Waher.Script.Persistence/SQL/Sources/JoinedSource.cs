@@ -118,10 +118,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <summary>
 		/// Collection name or alias.
 		/// </summary>
-		public string Name
-		{
-			get => string.Empty;
-		}
+		public string Name => string.Empty;
 
 		/// <summary>
 		/// Checks if the name refers to the source.

@@ -882,43 +882,31 @@ namespace Waher.Networking.MQTT
 		/// <summary>
 		/// Host or IP address of MQTT server.
 		/// </summary>
-		public string Host
-		{
-			get { return this.host; }
-		}
+		public string Host => this.host;
 
 		/// <summary>
 		/// Port number to connect to.
 		/// </summary>
-		public int Port
-		{
-			get { return this.port; }
-		}
+		public int Port => this.port;
 
 		/// <summary>
 		/// If encryption is to be used or not.
 		/// </summary>
-		public bool Tls
-		{
-			get { return this.tls; }
-		}
+		public bool Tls => this.tls;
 
 		/// <summary>
 		/// If server should be trusted, regardless if the operating system could validate its certificate or not.
 		/// </summary>
 		public bool TrustServer
 		{
-			get { return this.trustServer; }
-			set { this.trustServer = value; }
+			get => this.trustServer;
+			set => this.trustServer = value;
 		}
 
 		/// <summary>
 		/// Client ID
 		/// </summary>
-		public string ClientId
-		{
-			get { return this.clientId; }
-		}
+		public string ClientId => this.clientId;
 
 		/// <summary>
 		/// Certificate used by the server.
@@ -942,7 +930,7 @@ namespace Waher.Networking.MQTT
 		/// </summary>
 		public MqttState State
 		{
-			get { return this.state; }
+			get => this.state;
 			internal set
 			{
 				if (this.state != value)

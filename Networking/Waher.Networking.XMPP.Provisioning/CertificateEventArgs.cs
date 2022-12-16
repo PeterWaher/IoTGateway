@@ -47,12 +47,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// Certificate corresponding to the given token.
 		/// </summary>
 #if WINDOWS_UWP
-		public Certificate Certificate
+		public Certificate Certificate => this.certificate;
 #else
-		public X509Certificate2 Certificate
+		public X509Certificate2 Certificate => this.certificate;
 #endif
-		{
-			get { return this.certificate; }
-		}
 	}
 }

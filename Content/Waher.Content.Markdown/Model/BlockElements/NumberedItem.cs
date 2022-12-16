@@ -26,10 +26,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <summary>
 		/// Number associated with item.
 		/// </summary>
-		public int Number
-		{
-			get => this.number;
-		}
+		public int Number => this.number;
 
 		/// <summary>
 		/// Generates Markdown for the markdown element.

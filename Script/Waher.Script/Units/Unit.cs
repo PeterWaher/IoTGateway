@@ -368,18 +368,12 @@ namespace Waher.Script.Units
 		/// <summary>
 		/// Associated prefix.
 		/// </summary>
-		public Prefix Prefix
-		{
-			get { return this.prefix; }
-		}
+		public Prefix Prefix => this.prefix;
 
 		/// <summary>
 		/// Sequence of atomic unit factors, and their corresponding exponents.
 		/// </summary>
-		public ICollection<KeyValuePair<AtomicUnit, int>> Factors
-		{
-			get { return this.factors; }
-		}
+		public ICollection<KeyValuePair<AtomicUnit, int>> Factors => this.factors;
 
 		/// <summary>
 		/// If the unit is empty. (A unit of only a prefix, but no factors, is not empty.)

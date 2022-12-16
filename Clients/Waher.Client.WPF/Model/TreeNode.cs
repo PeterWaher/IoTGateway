@@ -102,18 +102,15 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Parent node. May be null if a root node.
 		/// </summary>
-		public TreeNode Parent
-		{
-			get { return this.parent; }
-		}
+		public TreeNode Parent => this.parent;
 
 		/// <summary>
 		/// Object tagged to the node.
 		/// </summary>
 		public object Tag
 		{
-			get { return this.tag; }
-			set { this.tag = value; }
+			get => this.tag;
+			set => this.tag = value;
 		}
 
 		/// <summary>
@@ -212,10 +209,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Gets available displayable parameters.
 		/// </summary>
-		public virtual DisplayableParameters DisplayableParameters
-		{
-			get { return this.parameters; }
-		}
+		public virtual DisplayableParameters DisplayableParameters => this.parameters;
 
 		/// <summary>
 		/// Raised when the node has been updated. The sender argument will contain a reference to the node.
@@ -235,7 +229,7 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		public bool IsExpanded
 		{
-			get { return this.expanded; }
+			get => this.expanded;
 			set
 			{
 				if (this.expanded != value)

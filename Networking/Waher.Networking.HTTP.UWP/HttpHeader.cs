@@ -232,47 +232,47 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Content-Encoding HTTP Field header. (RFC 2616, §14.11)
 		/// </summary>
-		public HttpFieldContentEncoding ContentEncoding { get { return this.contentEncoding; } }
+		public HttpFieldContentEncoding ContentEncoding => this.contentEncoding;
 
 		/// <summary>
 		/// Content-Language HTTP Field header. (RFC 2616, §14.12)
 		/// </summary>
-		public HttpFieldContentLanguage ContentLanguage { get { return this.contentLanguage; } }
+		public HttpFieldContentLanguage ContentLanguage => this.contentLanguage;
 
 		/// <summary>
 		/// Content-Length HTTP Field header. (RFC 2616, §14.13)
 		/// </summary>
-		public HttpFieldContentLength ContentLength { get { return this.contentLength; } }
+		public HttpFieldContentLength ContentLength => this.contentLength;
 
 		/// <summary>
 		/// Content-Location HTTP Field header. (RFC 2616, §14.14)
 		/// </summary>
-		public HttpFieldContentLocation ContentLocation { get { return this.contentLocation; } }
+		public HttpFieldContentLocation ContentLocation => this.contentLocation;
 
 		/// <summary>
 		/// Content-MD5 HTTP Field header. (RFC 2616, §14.15)
 		/// </summary>
-		public HttpFieldContentMD5 ContentMD5 { get { return this.contentMD5; } }
+		public HttpFieldContentMD5 ContentMD5 => this.contentMD5;
 
 		/// <summary>
 		/// Content-Range HTTP Field header. (RFC 2616, §14.16)
 		/// </summary>
-		public HttpFieldContentRange ContentRange { get { return this.contentRange; } }
+		public HttpFieldContentRange ContentRange => this.contentRange;
 
 		/// <summary>
 		/// Content-Type HTTP Field header. (RFC 2616, §14.17)
 		/// </summary>
-		public HttpFieldContentType ContentType { get { return this.contentType; } }
+		public HttpFieldContentType ContentType => this.contentType;
 
 		/// <summary>
 		/// Transfer-Encoding HTTP Field header. (RFC 2616, §14.41)
 		/// </summary>
-		public HttpFieldTransferEncoding TransferEncoding { get { return this.transferEncoding; } }
+		public HttpFieldTransferEncoding TransferEncoding => this.transferEncoding;
 
 		/// <summary>
 		/// Via HTTP Field header. (RFC 2616, §14.45)
 		/// </summary>
-		public HttpFieldVia Via { get { return this.via; } }
+		public HttpFieldVia Via => this.via;
 
 		/// <summary>
 		/// If the message contains, apart from the header, a message body also.

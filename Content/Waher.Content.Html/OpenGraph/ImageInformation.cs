@@ -24,8 +24,8 @@ namespace Waher.Content.Html.OpenGraph
 		/// </summary>
 		public string Description
 		{
-			get { return this.description; }
-			set { this.description = value; }
+			get => this.description;
+			set => this.description = value;
 		}
 
 		/// <inheritdoc/>

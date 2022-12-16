@@ -23,9 +23,6 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Table ID.
 		/// </summary>
-		public string TableId
-		{
-			get { return this.tableId; }
-		}
+		public string TableId => this.tableId;
 	}
 }

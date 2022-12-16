@@ -32,10 +32,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Owner of connections.
 		/// </summary>
-		public MainWindow Owner
-		{
-			get { return this.owner; }
-		}
+		public MainWindow Owner => this.owner;
 
 		/// <summary>
 		/// Adds a new connection.
@@ -93,7 +90,7 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		public bool Modified
 		{
-			get { return this.modified; }
+			get => this.modified;
 			internal set{ this.modified = true; }
 		}
 

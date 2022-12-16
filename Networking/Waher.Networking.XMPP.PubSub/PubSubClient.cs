@@ -272,10 +272,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// Publish/Subscribe component address.
 		/// </summary>
-		public string ComponentAddress
-		{
-			get { return this.componentAddress; }
-		}
+		public string ComponentAddress => this.componentAddress;
 
 		/// <summary>
 		/// Implemented extensions.

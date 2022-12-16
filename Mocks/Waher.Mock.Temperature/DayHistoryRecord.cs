@@ -35,26 +35,26 @@ namespace Waher.Mock.Temperature
 		/// <summary>
 		/// Period start.
 		/// </summary>
-		public DateTime PeriodStart { get { return this.periodStart; } }
+		public DateTime PeriodStart => this.periodStart;
 
 		/// <summary>
 		/// Period stop.
 		/// </summary>
-		public DateTime PeriodStop { get { return this.periodStop; } }
+		public DateTime PeriodStop => this.periodStop;
 
 		/// <summary>
 		/// Minimum temperature.
 		/// </summary>
-		public double MinTemperature { get { return this.minTemperature; } }
+		public double MinTemperature => this.minTemperature;
 
 		/// <summary>
 		/// Maximum temperature.
 		/// </summary>
-		public double MaxTemperature { get { return this.maxTemperature; } }
+		public double MaxTemperature => this.maxTemperature;
 
 		/// <summary>
 		/// Average temperature.
 		/// </summary>
-		public double AverageTemperature { get { return this.averageTemperature; } }
+		public double AverageTemperature => this.averageTemperature;
 	}
 }

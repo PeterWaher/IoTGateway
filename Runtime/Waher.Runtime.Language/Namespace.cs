@@ -35,8 +35,8 @@ namespace Waher.Runtime.Language
 		[ObjectId]
 		public Guid ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -44,8 +44,8 @@ namespace Waher.Runtime.Language
 		/// </summary>
 		public Guid LanguageId
 		{
-			get { return this.languageId; }
-			set { this.languageId = value; }
+			get => this.languageId;
+			set => this.languageId = value;
 		}
 
 		/// <summary>
@@ -53,8 +53,8 @@ namespace Waher.Runtime.Language
 		/// </summary>
 		public string Name
 		{
-			get { return this.name; }
-			set { this.name = value; }
+			get => this.name;
+			set => this.name = value;
 		}
 
 		/// <summary>

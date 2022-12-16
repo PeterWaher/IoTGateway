@@ -86,60 +86,57 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// Underlying XML definition.
 		/// </summary>
-		public XmlElement Xml
-		{
-			get { return this.xml; }
-		}
+		public XmlElement Xml => this.xml;
 
 		/// <summary>
 		/// State Variable Name
 		/// </summary>
-		public string Name { get { return this.name; } }
+		public string Name => this.name;
 
 		/// <summary>
 		/// Data Type
 		/// </summary>
-		public string DataType { get { return this.dataType; } }
+		public string DataType => this.dataType;
 
 		/// <summary>
 		/// Default Value
 		/// </summary>
-		public string DefaultValue { get { return this.defaultValue; } }
+		public string DefaultValue => this.defaultValue;
 
 		/// <summary>
 		/// If state variable sends events.
 		/// </summary>
-		public bool SendsEvents { get { return this.sendsEvents; } }
+		public bool SendsEvents => this.sendsEvents;
 
 		/// <summary>
 		/// List of allowed values. Provided if <see cref="HasAllowedValues"/> is true.
 		/// </summary>
-		public string[] AllowedValues { get { return this.allowedValues; } }
+		public string[] AllowedValues => this.allowedValues;
 
 		/// <summary>
 		/// If <see cref="AllowedValues"/> contains a list of allowed values.
 		/// </summary>
-		public bool HasAllowedValues { get { return this.hasAllowedValues; } }
+		public bool HasAllowedValues => this.hasAllowedValues;
 
 		/// <summary>
 		/// If <see cref="Minimum"/>, <see cref="Maximum"/> and <see cref="Step"/> defines a range of allowed values.
 		/// </summary>
-		public bool HasAllowedValueRange { get { return this.hasAllowedValueRange; } }
+		public bool HasAllowedValueRange => this.hasAllowedValueRange;
 
 		/// <summary>
 		/// Smallest value allowed. Provided if <see cref="HasAllowedValueRange"/> is true.
 		/// </summary>
-		public string Minimum { get { return this.minimum; } }
+		public string Minimum => this.minimum;
 
 		/// <summary>
 		/// Largest value allowed. Provided if <see cref="HasAllowedValueRange"/> is true.
 		/// </summary>
-		public string Maximum { get { return this.maximum; } }
+		public string Maximum => this.maximum;
 
 		/// <summary>
 		/// Step value. Provided if <see cref="HasAllowedValueRange"/> is true.
 		/// </summary>
-		public string Step { get { return this.step; } }
+		public string Step => this.step;
 
 		/// <summary>
 		/// Converts a value to its XML string representation.

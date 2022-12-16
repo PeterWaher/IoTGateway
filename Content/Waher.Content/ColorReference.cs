@@ -47,27 +47,27 @@ namespace Waher.Content
 		/// <summary>
 		/// Red component.
 		/// </summary>
-		public byte Red { get { return this.red; } }
+		public byte Red => this.red;
 
 		/// <summary>
 		/// Green component.
 		/// </summary>
-		public byte Green { get { return this.green; } }
+		public byte Green => this.green;
 
 		/// <summary>
 		/// Blue component.
 		/// </summary>
-		public byte Blue { get { return this.blue; } }
+		public byte Blue => this.blue;
 
 		/// <summary>
 		/// Alpha component.
 		/// </summary>
-		public byte Alpha { get { return this.alpha; } }
+		public byte Alpha => this.alpha;
 
 		/// <summary>
 		/// If the <see cref="Alpha"/> component was explicitly specified.
 		/// </summary>
-		public bool HasAlpha { get { return this.hasAlpha; } }
+		public bool HasAlpha => this.hasAlpha;
 
 		/// <inheritdoc/>
 		public override string ToString()

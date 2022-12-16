@@ -23,17 +23,11 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// String-representation of meta-data tag value.
 		/// </summary>
-		public override string StringValue
-		{
-			get { return this.value; }
-		}
+		public override string StringValue => this.value;
 
 		/// <summary>
 		/// Meta-data tag value.
 		/// </summary>
-		public override object Value
-		{
-			get { return this.value; }
-		}
+		public override object Value => this.value;
 	}
 }

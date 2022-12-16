@@ -135,10 +135,7 @@ namespace Waher.Client.WPF.Model.PubSub
 			return Task.CompletedTask;
 		}
 
-		public PubSubClient PubSubClient
-		{
-			get { return this.pubSubClient; }
-		}
+		public PubSubClient PubSubClient => this.pubSubClient;
 
 		public override ImageSource ImageResource => XmppAccountNode.database;
 

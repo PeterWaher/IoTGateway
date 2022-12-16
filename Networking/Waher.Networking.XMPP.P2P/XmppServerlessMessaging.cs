@@ -82,18 +82,15 @@ namespace Waher.Networking.XMPP.P2P
 		/// <summary>
 		/// Peer-to-peer network.
 		/// </summary>
-		public PeerToPeerNetwork Network
-		{
-			get { return this.p2pNetwork; }
-		}
+		public PeerToPeerNetwork Network => this.p2pNetwork;
 
 		/// <summary>
 		/// Full JID
 		/// </summary>
 		public string FullJid
 		{
-			get { return this.fullJid; }
-			set { this.fullJid = value; }
+			get => this.fullJid;
+			set => this.fullJid = value;
 		}
 
 		/// <summary>

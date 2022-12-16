@@ -32,34 +32,22 @@ namespace Waher.Things.ControlParameters
 		/// <summary>
 		/// Parameter Name
 		/// </summary>
-		public string Name
-		{
-			get { return this.name; }
-		}
+		public string Name => this.name;
 
 		/// <summary>
 		/// On which page in the control dialog the parameter should appear.
 		/// </summary>
-		public string Page
-		{
-			get { return this.page; }
-		}
+		public string Page => this.page;
 
 		/// <summary>
 		/// Label for parameter.
 		/// </summary>
-		public string Label
-		{
-			get { return this.label; }
-		}
+		public string Label => this.label;
 
 		/// <summary>
 		/// Description for parameter.
 		/// </summary>
-		public string Description
-		{
-			get { return this.description; }
-		}
+		public string Description => this.description;
 
 		/// <summary>
 		/// Sets the value of the control parameter.

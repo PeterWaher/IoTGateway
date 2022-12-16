@@ -91,42 +91,27 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Name of the field.
 		/// </summary>
-		public string FieldName
-		{
-			get { return this.fieldName; }
-		}
+		public string FieldName => this.fieldName;
 
 		/// <summary>
 		/// Current value of the field, held by the subscribing party.
 		/// </summary>
-		public object CurrentValue
-		{
-			get { return this.currentValue; }
-		}
+		public object CurrentValue => this.currentValue;
 
 		/// <summary>
 		/// Trigger event if it changes more than this value, in any direction.
 		/// </summary>
-		public double? ChangedBy
-		{
-			get { return this.changedBy; }
-		}
+		public double? ChangedBy => this.changedBy;
 
 		/// <summary>
 		/// Trigger event if it changes upwards more than this value.
 		/// </summary>
-		public double? ChangedUp
-		{
-			get { return this.changedUp; }
-		}
+		public double? ChangedUp => this.changedUp;
 
 		/// <summary>
 		/// Trigger event if it changes downwards more than this value.
 		/// </summary>
-		public double? ChangedDown
-		{
-			get { return this.changedDown; }
-		}
+		public double? ChangedDown => this.changedDown;
 
 		/// <summary>
 		/// If a change rule is defined.

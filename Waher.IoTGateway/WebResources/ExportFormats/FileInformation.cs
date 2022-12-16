@@ -33,34 +33,22 @@ namespace Waher.IoTGateway.WebResources.ExportFormats
 		/// <summary>
 		/// Name of file
 		/// </summary>
-		public string Name
-		{
-			get { return this.name; }
-		}
+		public string Name => this.name;
 
 		/// <summary>
 		/// When file was created
 		/// </summary>
-		public DateTime Created
-		{
-			get { return this.created; }
-		}
+		public DateTime Created => this.created;
 
 		/// <summary>
 		/// Size of file
 		/// </summary>
-		public long Size
-		{
-			get { return this.size; }
-		}
+		public long Size => this.size;
 
 		/// <summary>
 		/// Formatted string containing size of file using appropriate unit
 		/// </summary>
-		public string SizeStr
-		{
-			get { return this.sizeStr; }
-		}
+		public string SizeStr => this.sizeStr;
 
 		/// <summary>
 		/// If the file represents a key file

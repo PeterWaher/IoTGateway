@@ -49,34 +49,22 @@ namespace Waher.Networking.XMPP.ResultSetManagement
 		/// <summary>
 		/// First item/key in response.
 		/// </summary>
-		public string First
-		{
-			get { return this.first; }
-		}
+		public string First => this.first;
 
 		/// <summary>
 		/// Last item/key in response.
 		/// </summary>
-		public string Last
-		{
-			get { return this.last; }
-		}
+		public string Last => this.last;
 
 		/// <summary>
 		/// Total number of items in result set.
 		/// </summary>
-		public int? Count
-		{
-			get { return this.count; }
-		}
+		public int? Count => this.count;
 
 		/// <summary>
 		/// Index of first response.
 		/// </summary>
-		public int? FirstIndex
-		{
-			get { return this.firstIndex; }
-		}
+		public int? FirstIndex => this.firstIndex;
 
 		/// <summary>
 		/// Checks if the result is paginated.

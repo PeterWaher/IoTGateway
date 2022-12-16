@@ -43,8 +43,8 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public double Magnitude
 		{
-			get { return this.magnitude; }
-			set { this.magnitude = value; }
+			get => this.magnitude;
+			set => this.magnitude = value;
 		}
 
 		/// <summary>
@@ -52,8 +52,8 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public Unit Unit
 		{
-			get { return this.unit; }
-			set { this.unit = value; }
+			get => this.unit;
+			set => this.unit = value;
 		}
 
 		/// <inheritdoc/>

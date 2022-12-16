@@ -109,10 +109,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <summary>
 		/// Dimension of vector.
 		/// </summary>
-		public override int Dimension
-		{
-			get { return this.dimension; }
-		}
+		public override int Dimension => this.dimension;
 
 		/// <inheritdoc/>
 		public override string ToString()
@@ -285,10 +282,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <summary>
 		/// An enumeration of child elements. If the element is a scalar, this property will return null.
 		/// </summary>
-		public override ICollection<IElement> ChildElements
-		{
-			get { return this.Elements; }
-		}
+		public override ICollection<IElement> ChildElements => this.Elements;
 
 		/// <summary>
 		/// Encapsulates a set of elements into a similar structure as that provided by the current element.

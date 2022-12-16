@@ -18,10 +18,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		/// <summary>
 		/// Data Form.
 		/// </summary>
-		public DataForm Form
-		{
-			get { return this.form; }
-		}
+		public DataForm Form => this.form;
 
 		internal abstract bool RemoveExcluded();
 

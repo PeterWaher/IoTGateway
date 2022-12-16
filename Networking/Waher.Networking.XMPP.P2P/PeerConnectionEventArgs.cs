@@ -34,33 +34,21 @@ namespace Waher.Networking.XMPP.P2P
 		/// <summary>
 		/// XMPP client, if aquired, or null otherwise.
 		/// </summary>
-		public XmppClient Client
-		{
-			get { return this.client; }
-		}
+		public XmppClient Client => this.client;
 
 		/// <summary>
 		/// State object passed to the original request.
 		/// </summary>
-		public object State
-		{
-			get { return this.state; }
-		}
+		public object State => this.state;
 
 		/// <summary>
 		/// JID of the local end-point.
 		/// </summary>
-		public string LocalJid
-		{
-			get { return this.localJid; }
-		}
+		public string LocalJid => this.localJid;
 
 		/// <summary>
 		/// JID of the remote end-point.
 		/// </summary>
-		public string RemoteJid
-		{
-			get { return this.remoteJid; }
-		}
+		public string RemoteJid => this.remoteJid;
 	}
 }

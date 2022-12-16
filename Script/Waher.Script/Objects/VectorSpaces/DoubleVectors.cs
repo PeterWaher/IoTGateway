@@ -24,10 +24,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <summary>
 		/// Dimension of vector space.
 		/// </summary>
-		public int Dimension
-		{
-			get { return this.dimension; }
-		}
+		public int Dimension => this.dimension;
 
 		/// <summary>
 		/// Scalar field.

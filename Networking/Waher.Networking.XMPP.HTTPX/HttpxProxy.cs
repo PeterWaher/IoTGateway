@@ -103,7 +103,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		public XmppServerlessMessaging ServerlessMessaging
 		{
-			get { return this.serverlessMessaging; }
+			get => this.serverlessMessaging;
 			set
 			{
 				if (this.serverlessMessaging != null && this.serverlessMessaging != value)
@@ -118,7 +118,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		public IHttpxCache HttpxCache
 		{
-			get { return this.httpxCache; }
+			get => this.httpxCache;
 			set
 			{
 				if (this.httpxCache != null && this.httpxCache != value)
@@ -131,25 +131,19 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <summary>
 		/// Default XMPP client.
 		/// </summary>
-		public XmppClient DefaultXmppClient
-		{
-			get { return this.defaultXmppClient; }
-		}
+		public XmppClient DefaultXmppClient => this.defaultXmppClient;
 
 		/// <summary>
 		/// Default HTTPX client.
 		/// </summary>
-		public HttpxClient DefaultHttpxClient
-		{
-			get { return this.httpxClient; }
-		}
+		public HttpxClient DefaultHttpxClient => this.httpxClient;
 
 		/// <summary>
 		/// In-band bytestream client, if supported.
 		/// </summary>
 		public InBandBytestreams.IbbClient IbbClient
 		{
-			get { return this.ibbClient; }
+			get => this.ibbClient;
 			set
 			{
 				this.ibbClient = value;
@@ -164,7 +158,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		public P2P.SOCKS5.Socks5Proxy Socks5Proxy
 		{
-			get { return this.socks5Proxy; }
+			get => this.socks5Proxy;
 			set
 			{
 				this.socks5Proxy = value;

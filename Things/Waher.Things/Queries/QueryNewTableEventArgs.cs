@@ -27,17 +27,11 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Localized Table Name.
 		/// </summary>
-		public string TableName
-		{
-			get { return this.tableName; }
-		}
+		public string TableName => this.tableName;
 
 		/// <summary>
 		/// Columns
 		/// </summary>
-		public Column[] Columns
-		{
-			get { return this.columns; }
-		}
+		public Column[] Columns => this.columns;
 	}
 }

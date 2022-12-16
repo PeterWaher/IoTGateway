@@ -215,20 +215,14 @@ namespace Waher.Content.Markdown
 		/// <summary>
 		/// Header font sizes for different levels. Index corresponds to header level - 1.
 		/// </summary>
-		public int[] HeaderFontSize
-		{
-			get => this.headerFontSize;
-		}
+		public int[] HeaderFontSize => this.headerFontSize;
 
 		/// <summary>
 		/// Header foreground colors for different levels. Index corresponds to header level - 1.
 		/// 
 		/// NOTE: Property is an array of strings, to allow generation of XAML where access to WPF libraries is not available.
 		/// </summary>
-		public string[] HeaderForegroundColor
-		{
-			get => this.headerForegroundColor;
-		}
+		public string[] HeaderForegroundColor => this.headerForegroundColor;
 
 		/// <summary>
 		/// Margin between list item bullet and list item content.

@@ -26,11 +26,11 @@ namespace Waher.Mock.Temperature
 		/// <summary>
 		/// Timestamp.
 		/// </summary>
-		public DateTime Timestamp { get { return this.timestamp; } }
+		public DateTime Timestamp => this.timestamp;
 
 		/// <summary>
 		/// Temperature.
 		/// </summary>
-		public double Temperature { get { return this.temperature; } }
+		public double Temperature => this.temperature;
 	}
 }

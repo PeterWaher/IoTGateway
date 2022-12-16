@@ -53,42 +53,27 @@ namespace Waher.Script.Objects.Sets
 		/// <summary>
 		/// Start of interval.
 		/// </summary>
-		public double From
-		{
-			get { return this.from; }
-		}
+		public double From => this.from;
 
 		/// <summary>
 		/// End of interval.
 		/// </summary>
-		public double To
-		{
-			get { return this.to; }
-		}
+		public double To => this.to;
 
 		/// <summary>
 		/// Optional step size, if enumeration of values from the interval is important.
 		/// </summary>
-		public double? StepSize
-		{
-			get { return this.stepSize; }
-		}
+		public double? StepSize => this.stepSize;
 
 		/// <summary>
 		/// If the <see cref="From"/> value is included in the interval or not.
 		/// </summary>
-		public bool IncludesFrom
-		{
-			get { return this.includesFrom; }
-		}
+		public bool IncludesFrom => this.includesFrom;
 
 		/// <summary>
 		/// If the <see cref="To"/> value is included in the interval or not.
 		/// </summary>
-		public bool IncludesTo
-		{
-			get { return this.includesTo; }
-		}
+		public bool IncludesTo => this.includesTo;
 
 		/// <summary>
 		/// Checks if the set contains an element.

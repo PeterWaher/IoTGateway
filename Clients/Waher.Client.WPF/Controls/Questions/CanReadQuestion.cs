@@ -46,22 +46,22 @@ namespace Waher.Client.WPF.Controls.Questions
 		[DefaultValueNull]
 		public string[] FieldNames
 		{
-			get { return this.fieldNames; }
-			set { this.fieldNames = value; }
+			get => this.fieldNames;
+			set => this.fieldNames = value;
 		}
 
 		[DefaultValueNull]
 		public string[] AvailableFieldNames
 		{
-			get { return this.availableFieldNames; }
-			set { this.availableFieldNames = value; }
+			get => this.availableFieldNames;
+			set => this.availableFieldNames = value;
 		}
 
 		[DefaultValue(FieldType.All)]
 		public FieldType Categories
 		{
-			get { return this.categories; }
-			set { this.categories = value; }
+			get => this.categories;
+			set => this.categories = value;
 		}
 
 		public override string QuestionString => "Allowed to read?";

@@ -31,26 +31,17 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// Device Location information.
 		/// </summary>
-		public DeviceLocation Location
-		{
-			get { return this.location; }
-		}
+		public DeviceLocation Location => this.location;
 
 		/// <summary>
 		/// Local End Point
 		/// </summary>
-		public IPEndPoint LocalEndPoint
-		{
-			get { return this.localEndPoint; }
-		}
+		public IPEndPoint LocalEndPoint => this.localEndPoint;
 
 		/// <summary>
 		/// Remote End Point
 		/// </summary>
-		public IPEndPoint RemoteEndPoint
-		{
-			get { return this.remoteEndPoint; }
-		}
+		public IPEndPoint RemoteEndPoint => this.remoteEndPoint;
 
 	}
 }

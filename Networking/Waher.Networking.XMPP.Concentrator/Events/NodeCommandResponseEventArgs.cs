@@ -27,9 +27,6 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Node command parameters
 		/// </summary>
-		public DataForm Parameters
-		{
-			get { return this.parameters; }
-		}
+		public DataForm Parameters => this.parameters;
 	}
 }

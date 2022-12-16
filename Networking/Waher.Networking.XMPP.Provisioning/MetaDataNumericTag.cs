@@ -32,9 +32,6 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Meta-data tag value.
 		/// </summary>
-		public override object Value
-		{
-			get { return this.value; }
-		}
+		public override object Value => this.value;
 	}
 }

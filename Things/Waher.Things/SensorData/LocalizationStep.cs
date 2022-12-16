@@ -70,8 +70,8 @@ namespace Waher.Things.SensorData
 		[ShortName("i")]
 		public int StringId
 		{
-			get { return this.stringId; }
-			set { this.stringId = value; }
+			get => this.stringId;
+			set => this.stringId = value;
 		}
 
 		/// <summary>
@@ -81,8 +81,8 @@ namespace Waher.Things.SensorData
 		[ShortName("m")]
 		public string Module
 		{
-			get { return this.module; }
-			set { this.module = value; }
+			get => this.module;
+			set => this.module = value;
 		}
 
 		/// <summary>
@@ -92,8 +92,8 @@ namespace Waher.Things.SensorData
 		[ShortName("s")]
 		public string Seed
 		{
-			get { return this.seed; }
-			set { this.seed = value; }
+			get => this.seed;
+			set => this.seed = value;
 		}
 
 	}

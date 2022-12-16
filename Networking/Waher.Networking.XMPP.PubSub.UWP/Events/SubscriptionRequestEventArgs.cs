@@ -37,18 +37,12 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// JID of subscriber
 		/// </summary>
-		public string Jid
-		{
-			get { return this.jid; }
-		}
+		public string Jid => this.jid;
 
 		/// <summary>
 		/// Form embedded in message.
 		/// </summary>
-		public DataForm Form
-		{
-			get { return this.form; }
-		}
+		public DataForm Form => this.form;
 
 		/// <summary>
 		/// Approves the request.

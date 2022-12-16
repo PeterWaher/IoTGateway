@@ -35,10 +35,7 @@ namespace Waher.Security.DTLS.Events
 		/// <summary>
 		/// Datagram.
 		/// </summary>
-		public byte[] Datagram
-		{
-			get { return this.datagram; }
-		}
+		public byte[] Datagram => this.datagram;
 
 	}
 }

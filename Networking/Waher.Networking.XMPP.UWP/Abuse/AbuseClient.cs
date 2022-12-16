@@ -204,34 +204,22 @@ namespace Waher.Networking.XMPP.Abuse
         /// <summary>
         /// If the server supports the blocking extension.
         /// </summary>
-        public bool SupportsBlocking
-        {
-            get { return this.supportsBlocking; }
-        }
+        public bool SupportsBlocking => this.supportsBlocking;
 
         /// <summary>
         /// If the server supports reporting.
         /// </summary>
-        public bool SupportsReporting
-        {
-            get { return this.supportsReporting; }
-        }
+        public bool SupportsReporting => this.supportsReporting;
 
         /// <summary>
         /// If the server supports spam reporting.
         /// </summary>
-        public bool SupportsSpamReporting
-        {
-            get { return this.supportsSpamReason; }
-        }
+        public bool SupportsSpamReporting => this.supportsSpamReason;
 
         /// <summary>
         /// If the server supports abuse reporting.
         /// </summary>
-        public bool SupportsAbuseReporting
-        {
-            get { return this.supportsAbuseReason; }
-        }
+        public bool SupportsAbuseReporting => this.supportsAbuseReason;
 
 		/// <summary>
 		/// Blocked JIDs.

@@ -28,6 +28,6 @@ namespace Waher.Events.MQTT
 		/// <summary>
 		/// Event.
 		/// </summary>
-		public Event Event { get { return this.ev; } }
+		public Event Event => this.ev;
 	}
 }

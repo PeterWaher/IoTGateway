@@ -33,8 +33,8 @@ namespace Waher.Networking.XMPP.Software
         /// </summary>
         public Package Package
         {
-            get { return this.package; }
-            set { this.package = value; }
+            get => this.package;
+            set => this.package = value;
         }
 
     }

@@ -163,8 +163,8 @@ namespace Waher.Things.SensorData
 		[ShortName("v")]
 		public double Value
 		{
-			get { return this.value; }
-			set { this.value = value; }
+			get => this.value;
+			set => this.value = value;
 		}
 
 		/// <summary>
@@ -174,8 +174,8 @@ namespace Waher.Things.SensorData
 		[DefaultValue(0)]
 		public byte NrDecimals
 		{
-			get { return this.nrDecimals; }
-			set { this.nrDecimals = value; }
+			get => this.nrDecimals;
+			set => this.nrDecimals = value;
 		}
 
 		/// <summary>
@@ -185,8 +185,8 @@ namespace Waher.Things.SensorData
 		[DefaultValueStringEmpty]
 		public string Unit
 		{
-			get { return this.unit; }
-			set { this.unit = value; }
+			get => this.unit;
+			set => this.unit = value;
 		}
 
 		/// <summary>

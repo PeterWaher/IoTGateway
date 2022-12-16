@@ -33,9 +33,6 @@ namespace Waher.Networking.XMPP.Abuse
         /// <summary>
         /// JIDs in block-list.
         /// </summary>
-        public string[] JIDs
-        {
-            get { return this.jids; }
-        }
+        public string[] JIDs => this.jids;
     }
 }

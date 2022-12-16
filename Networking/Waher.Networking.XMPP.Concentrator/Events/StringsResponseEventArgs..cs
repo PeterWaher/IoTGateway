@@ -26,9 +26,6 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Result of operation.
 		/// </summary>
-		public string[] Result
-		{
-			get { return this.result; }
-		}
+		public string[] Result => this.result;
 	}
 }

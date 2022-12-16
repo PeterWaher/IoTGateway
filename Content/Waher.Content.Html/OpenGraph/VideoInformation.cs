@@ -25,8 +25,8 @@ namespace Waher.Content.Html.OpenGraph
 		/// </summary>
 		public int? Width
 		{
-			get { return this.width; }
-			set { this.width = value; }
+			get => this.width;
+			set => this.width = value;
 		}
 
 		/// <summary>
@@ -35,8 +35,8 @@ namespace Waher.Content.Html.OpenGraph
 		/// </summary>
 		public int? Height
 		{
-			get { return this.height; }
-			set { this.height = value; }
+			get => this.height;
+			set => this.height = value;
 		}
 
 		/// <inheritdoc/>

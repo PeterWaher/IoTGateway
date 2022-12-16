@@ -26,21 +26,21 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// SOAP Fault Code
 		/// </summary>
-		public string FaultCode { get { return this.faultCode; } }
+		public string FaultCode => this.faultCode;
 
 		/// <summary>
 		/// SOAP Fault String
 		/// </summary>
-		public string FaultString { get { return this.faultString; } }
+		public string FaultString => this.faultString;
 
 		/// <summary>
 		/// UPnP Error Code
 		/// </summary>
-		public string UPnPErrorCode { get { return this.upnpErrorCode; } }
+		public string UPnPErrorCode => this.upnpErrorCode;
 
 		/// <summary>
 		/// UPnP Error Description
 		/// </summary>
-		public string UPnPErrorDescription { get { return this.upnpErrorDescription; } }
+		public string UPnPErrorDescription => this.upnpErrorDescription;
 	}
 }

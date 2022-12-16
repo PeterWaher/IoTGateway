@@ -18,26 +18,26 @@ namespace Waher.Networking.HTTP.Test
 
 		public DateTime? IfModifiedSince
 		{
-			get { return this.ifModifiedSince; }
-			set { this.ifModifiedSince = value; }
+			get => this.ifModifiedSince;
+			set => this.ifModifiedSince = value;
 		}
 
 		public DateTime? IfUnmodifiedSince
 		{
-			get { return this.ifUnmodifiedSince; }
-			set { this.ifUnmodifiedSince = value; }
+			get => this.ifUnmodifiedSince;
+			set => this.ifUnmodifiedSince = value;
 		}
 
 		public string Accept
 		{
-			get { return this.accept; }
-			set { this.accept = value; }
+			get => this.accept;
+			set => this.accept = value;
 		}
 
 		public CookieContainer Cookies
 		{
-			get { return this.cookies; }
-			set { this.cookies = value; }
+			get => this.cookies;
+			set => this.cookies = value;
 		}
 
 		protected override WebRequest GetWebRequest(Uri Address)

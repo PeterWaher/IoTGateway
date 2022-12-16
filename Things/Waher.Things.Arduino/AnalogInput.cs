@@ -40,7 +40,7 @@ namespace Waher.Things.Arduino
 		[Option(AnalogInputPinMode.Input, 11, "Input")]
 		public AnalogInputPinMode Mode
 		{
-			get { return this.mode; }
+			get => this.mode;
 			set
 			{
 				this.mode = value;
@@ -54,8 +54,8 @@ namespace Waher.Things.Arduino
 		[DefaultValue("Value")]
 		public string FieldName
 		{
-			get { return this.fieldName; }
-			set { this.fieldName = value; }
+			get => this.fieldName;
+			set => this.fieldName = value;
 		}
 
 		[Page(5, "Arduino")]
@@ -64,7 +64,7 @@ namespace Waher.Things.Arduino
 		[DefaultValue("Raw")]
 		public string Expression
 		{
-			get { return this.expression; }
+			get => this.expression;
 			set
 			{
 				if (string.IsNullOrEmpty(value))
@@ -82,8 +82,8 @@ namespace Waher.Things.Arduino
 		[DefaultValueStringEmpty]
 		public string Unit
 		{
-			get { return this.unit; }
-			set { this.unit = value; }
+			get => this.unit;
+			set => this.unit = value;
 		}
 
 		[Page(5, "Arduino")]
@@ -92,8 +92,8 @@ namespace Waher.Things.Arduino
 		[DefaultValue(0)]
 		public byte NrDecimals
 		{
-			get { return this.nrDecimals; }
-			set { this.nrDecimals = value; }
+			get => this.nrDecimals;
+			set => this.nrDecimals = value;
 		}
 
 		public override Task<string> GetTypeNameAsync(Language Language)

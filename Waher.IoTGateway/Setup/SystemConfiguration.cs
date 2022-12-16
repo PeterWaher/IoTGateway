@@ -29,8 +29,8 @@ namespace Waher.IoTGateway.Setup
 		[ObjectId]
 		public Guid ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -39,8 +39,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool Complete
 		{
-			get { return this.complete; }
-			set { this.complete = value; }
+			get => this.complete;
+			set => this.complete = value;
 		}
 
 		/// <summary>
@@ -49,8 +49,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueDateTimeMinValue]
 		public DateTime Created
 		{
-			get { return this.created; }
-			set { this.created = value; }
+			get => this.created;
+			set => this.created = value;
 		}
 
 		/// <summary>
@@ -59,8 +59,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueDateTimeMinValue]
 		public DateTime Updated
 		{
-			get { return this.updated; }
-			set { this.updated = value; }
+			get => this.updated;
+			set => this.updated = value;
 		}
 
 		/// <summary>
@@ -69,8 +69,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueDateTimeMinValue]
 		public DateTime Completed
 		{
-			get { return this.completed; }
-			set { this.completed = value; }
+			get => this.completed;
+			set => this.completed = value;
 		}
 
 		/// <summary>

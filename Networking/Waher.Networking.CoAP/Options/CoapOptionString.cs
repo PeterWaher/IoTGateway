@@ -55,9 +55,6 @@ namespace Waher.Networking.CoAP.Options
 		/// <summary>
 		/// String value.
 		/// </summary>
-		public string Value
-		{
-			get { return this.value; }
-		}
+		public string Value => this.value;
 	}
 }

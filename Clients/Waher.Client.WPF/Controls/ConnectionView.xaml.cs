@@ -48,14 +48,11 @@ namespace Waher.Client.WPF.Controls
 			get { return MainWindow.FindWindow(this); }
 		}
 
-		public Connections Connections
-		{
-			get { return this.connections; }
-		}
+		public Connections Connections => this.connections;
 
 		public string FileName
 		{
-			get { return this.fileName; }
+			get => this.fileName;
 			set
 			{
 				this.fileName = value;
@@ -125,8 +122,7 @@ namespace Waher.Client.WPF.Controls
 			}
 
 			MainWindow MainWindow = MainWindow.FindWindow(this);
-			if (MainWindow != null)
-				MainWindow.SelectionChanged();
+			MainWindow?.SelectionChanged();
 		}
 
 		public bool SaveFile()
@@ -480,10 +476,7 @@ namespace Waher.Client.WPF.Controls
 			this.ConnectionListView_GotFocus(sender, e);
 		}
 
-		public TreeNode SelectedNode
-		{
-			get { return this.selectedNode; }
-		}
+		public TreeNode SelectedNode => this.selectedNode;
 
 		private void TreeContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
 		{
@@ -501,8 +494,7 @@ namespace Waher.Client.WPF.Controls
 
 			Menu.Items.Clear();
 
-			if (this.selectedNode != null)
-				this.selectedNode.AddContexMenuItems(ref Group, Menu);
+			this.selectedNode?.AddContexMenuItems(ref Group, Menu);
 		}
 
 		private void ConnectionListView_GotFocus(object sender, RoutedEventArgs e)
@@ -510,8 +502,7 @@ namespace Waher.Client.WPF.Controls
 			this.selectedNode = this.ConnectionListView.SelectedItem as TreeNode;
 
 			MainWindow MainWindow = MainWindow.FindWindow(this);
-			if (MainWindow != null)
-				MainWindow.SelectionChanged();
+			MainWindow?.SelectionChanged();
 		}
 
 		private void ConnectionTree_GotFocus(object sender, RoutedEventArgs e)
@@ -519,8 +510,7 @@ namespace Waher.Client.WPF.Controls
 			this.selectedNode = this.ConnectionTree.SelectedItem as TreeNode;
 
 			MainWindow MainWindow = MainWindow.FindWindow(this);
-			if (MainWindow != null)
-				MainWindow.SelectionChanged();
+			MainWindow?.SelectionChanged();
 		}
 
 	}

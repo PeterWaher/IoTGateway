@@ -124,18 +124,15 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Provisioning server XMPP address.
 		/// </summary>
-		public string ProvisioningServerAddress
-		{
-			get { return this.provisioningServerAddress; }
-		}
+		public string ProvisioningServerAddress => this.provisioningServerAddress;
 
 		/// <summary>
 		/// JID of owner, if known or available.
 		/// </summary>
 		public string OwnerJid
 		{
-			get { return this.ownerJid; }
-			internal set { this.ownerJid = value; }
+			get => this.ownerJid;
+			internal set => this.ownerJid = value;
 		}
 
 		/// <summary>
@@ -1205,8 +1202,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		public Duration CacheUnusedLifetime
 		{
-			get { return this.cacheUnusedLifetime; }
-			set { this.cacheUnusedLifetime = value; }
+			get => this.cacheUnusedLifetime;
+			set => this.cacheUnusedLifetime = value;
 		}
 
 		private async Task ClearCacheHandler(object Sender, IqEventArgs e)

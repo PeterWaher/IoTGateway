@@ -62,25 +62,16 @@ namespace Waher.Things.Attributes
 		/// <summary>
 		/// String ID in the namespace of the current class, in the default language defined for the class.
 		/// </summary>
-		public int StringId
-		{
-			get { return this.stringId; }
-		}
+		public int StringId => this.stringId;
 
 		/// <summary>
 		/// Default label string, in the default language defined for the class.
 		/// </summary>
-		public string Label
-		{
-			get { return this.label; }
-		}
+		public string Label => this.label;
 
 		/// <summary>
 		/// Priority of page (default=100).
 		/// </summary>
-		public int Priority
-		{
-			get { return this.priority; }
-		}
+		public int Priority => this.priority;
 	}
 }

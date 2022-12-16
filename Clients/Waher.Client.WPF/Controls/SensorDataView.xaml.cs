@@ -77,10 +77,7 @@ namespace Waher.Client.WPF.Controls
 			this.Node?.ViewClosed();
 		}
 
-		public TreeNode Node
-		{
-			get { return this.node; }
-		}
+		public TreeNode Node => this.node;
 
 		private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
 		{

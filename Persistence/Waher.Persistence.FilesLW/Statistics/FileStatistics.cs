@@ -63,26 +63,17 @@ namespace Waher.Persistence.Files.Statistics
 		/// <summary>
 		/// Block size
 		/// </summary>
-		public uint BlockSize
-		{
-			get { return this.blockSize; }
-		}
+		public uint BlockSize => this.blockSize;
 
 		/// <summary>
 		/// Number of searches performed against the file.
 		/// </summary>
-		public ulong NrSearches
-		{
-			get { return this.nrSearches; }
-		}
+		public ulong NrSearches => this.nrSearches;
 
 		/// <summary>
 		/// Number of searches performed, resulting in full file scans.
 		/// </summary>
-		public ulong NrFullFileScans
-		{
-			get { return this.nrFullFileScans; }
-		}
+		public ulong NrFullFileScans => this.nrFullFileScans;
 
 		/// <summary>
 		/// Number of blocks

@@ -38,8 +38,8 @@ namespace Waher.Runtime.Language
 		[ObjectId]
 		public Guid ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -47,8 +47,8 @@ namespace Waher.Runtime.Language
 		/// </summary>
 		public string Code
 		{
-			get { return this.code; }
-			set { this.code = value; }
+			get => this.code;
+			set => this.code = value;
 		}
 
 		/// <summary>
@@ -57,8 +57,8 @@ namespace Waher.Runtime.Language
 		[DefaultValueStringEmpty]
 		public string Name
 		{
-			get { return this.name; }
-			set { this.name = value; }
+			get => this.name;
+			set => this.name = value;
 		}
 
 		/// <summary>
@@ -67,8 +67,8 @@ namespace Waher.Runtime.Language
 		[DefaultValueNull]
 		public byte[] Flag
 		{
-			get { return this.flag; }
-			set { this.flag = value; }
+			get => this.flag;
+			set => this.flag = value;
 		}
 
 		/// <summary>
@@ -77,8 +77,8 @@ namespace Waher.Runtime.Language
 		[DefaultValue(0)]
 		public int FlagWidth
 		{
-			get { return this.flagWidth; }
-			set { this.flagWidth = value; }
+			get => this.flagWidth;
+			set => this.flagWidth = value;
 		}
 
 		/// <summary>
@@ -87,8 +87,8 @@ namespace Waher.Runtime.Language
 		[DefaultValue(0)]
 		public int FlagHeight
 		{
-			get { return this.flagHeight; }
-			set { this.flagHeight = value; }
+			get => this.flagHeight;
+			set => this.flagHeight = value;
 		}
 
 		/// <summary>

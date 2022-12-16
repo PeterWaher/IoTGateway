@@ -21,10 +21,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Tag name.
 		/// </summary>
-		public string Name
-		{
-			get { return this.name; }
-		}
+		public string Name => this.name;
 
 		/// <summary>
 		/// String-representation of meta-data tag value.

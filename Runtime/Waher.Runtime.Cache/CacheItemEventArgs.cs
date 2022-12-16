@@ -63,25 +63,16 @@ namespace Waher.Runtime.Cache
         /// <summary>
         /// Key of item that was removed.
         /// </summary>
-        public KeyType Key
-        {
-            get { return this.key; }
-        }
+        public KeyType Key => this.key;
 
         /// <summary>
         /// Value of item that was removed.
         /// </summary>
-        public ValueType Value
-        {
-            get { return this.value; }
-        }
+        public ValueType Value => this.value;
 
         /// <summary>
         /// Reason for removing the item.
         /// </summary>
-        public RemovedReason Reason
-        {
-            get { return this.reason; }
-        }
+        public RemovedReason Reason => this.reason;
     }
 }

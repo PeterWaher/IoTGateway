@@ -25,17 +25,11 @@ namespace Waher.Things.Attributes
 		/// <summary>
 		/// Smallest accepted value. Can be null, if no minimum exists.
 		/// </summary>
-		public string Min
-		{
-			get { return this.min; }
-		}
+		public string Min => this.min;
 
 		/// <summary>
 		/// Largest accepted value. Can be null, if no maximum exists.
 		/// </summary>
-		public string Max
-		{
-			get { return this.max; }
-		}
+		public string Max => this.max;
 	}
 }

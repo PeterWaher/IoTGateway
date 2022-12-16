@@ -61,41 +61,26 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// Item identity
 		/// </summary>
-		public string ItemId
-		{
-			get { return this.itemId; }
-		}
+		public string ItemId => this.itemId;
 
 		/// <summary>
 		/// Publisher of content.
 		/// </summary>
-		public string Publisher
-		{
-			get { return this.publisher; }
-		}
+		public string Publisher => this.publisher;
 
 		/// <summary>
 		/// Reply-to address
 		/// </summary>
-		public string ReplyTo
-		{
-			get { return this.replyTo; }
-		}
+		public string ReplyTo => this.replyTo;
 
 		/// <summary>
 		/// Item element. The inner XML contains payload, if included in notification.
 		/// </summary>
-		public XmlElement Item
-		{
-			get { return this.item; }
-		}
+		public XmlElement Item => this.item;
 
 		/// <summary>
 		/// If provided, contains information about when the item was published.
 		/// </summary>
-		public DateTime? Delay
-		{
-			get { return this.delay; }
-		}
+		public DateTime? Delay => this.delay;
 	}
 }

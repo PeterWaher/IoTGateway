@@ -30,18 +30,12 @@ namespace Waher.Networking.XMPP.Control.ControlOperations
 		/// <summary>
 		/// Control parameter
 		/// </summary>
-		public BooleanControlParameter Parameter
-		{
-			get { return this.parameter; }
-		}
+		public BooleanControlParameter Parameter => this.parameter;
 
 		/// <summary>
 		/// Value to set.
 		/// </summary>
-		public bool Value
-		{
-			get { return this.value; }
-		}
+		public bool Value => this.value;
 
 		/// <summary>
 		/// Performs the control operation.

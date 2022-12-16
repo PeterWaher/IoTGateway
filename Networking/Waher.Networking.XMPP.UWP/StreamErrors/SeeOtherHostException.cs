@@ -39,6 +39,6 @@ namespace Waher.Networking.XMPP.StreamErrors
 		/// <summary>
 		/// New Host
 		/// </summary>
-		public string NewHost { get { return this.newHost; } }
+		public string NewHost => this.newHost;
 	}
 }

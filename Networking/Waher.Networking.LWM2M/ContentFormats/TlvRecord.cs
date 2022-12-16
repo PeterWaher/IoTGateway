@@ -30,26 +30,17 @@ namespace Waher.Networking.LWM2M.ContentFormats
 		/// <summary>
 		/// Identifier type.
 		/// </summary>
-		public IdentifierType Type
-		{
-			get { return this.type; }
-		}
+		public IdentifierType Type => this.type;
 
 		/// <summary>
 		/// Identifier.
 		/// </summary>
-		public ushort Identifier
-		{
-			get { return this.identifier; }
-		}
+		public ushort Identifier => this.identifier;
 
 		/// <summary>
 		/// Raw value.
 		/// </summary>
-		public byte[] RawValue
-		{
-			get { return this.rawValue; }
-		}
+		public byte[] RawValue => this.rawValue;
 
 		/// <summary>
 		/// If the record is nested.

@@ -9176,41 +9176,41 @@ namespace Waher.Content.Emoji
 		/// <summary>
 		/// Emoji short name.
 		/// </summary>
-		public string ShortName { get { return this.shortName; } }
+		public string ShortName => this.shortName;
 
 		/// <summary>
 		/// Emoji file name.
 		/// </summary>
-		public string FileName { get { return this.fileName; } }
+		public string FileName => this.fileName;
 
 		/// <summary>
 		/// Short description of emoji.
 		/// </summary>
-		public string Description { get { return this.description; } }
+		public string Description => this.description;
 
 		/// <summary>
 		/// Unicode representation of emoji.
 		/// </summary>
-		public string Unicode { get { return this.unicode; } }
+		public string Unicode => this.unicode;
 
 		/// <summary>
 		/// If the emoji is supported by Apple.
 		/// </summary>
-		public bool AppleSupport { get { return this.appleSupport; } }
+		public bool AppleSupport => this.appleSupport;
 
 		/// <summary>
 		/// If the emoji is supported by Google.
 		/// </summary>
-		public bool GoogleSupport { get { return this.googleSupport; } }
+		public bool GoogleSupport => this.googleSupport;
 
 		/// <summary>
 		/// If the emoji is supported by Twitter.
 		/// </summary>
-		public bool TwitterSupport { get { return this.twitterSupport; } }
+		public bool TwitterSupport => this.twitterSupport;
 
 		/// <summary>
 		/// If the emoji is supported by emoji-1.
 		/// </summary>
-		public bool Emoji1Support { get { return this.emoji1Support; } }
+		public bool Emoji1Support => this.emoji1Support;
 	}
 }

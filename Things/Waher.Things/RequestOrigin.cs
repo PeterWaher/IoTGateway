@@ -38,33 +38,21 @@ namespace Waher.Things
 		/// <summary>
 		/// Address of caller.
 		/// </summary>
-		public string From
-		{
-			get { return this.from; }
-		}
+		public string From => this.from;
 
 		/// <summary>
 		/// Device tokens, or null.
 		/// </summary>
-		public string[] DeviceTokens
-		{
-			get { return this.deviceTokens; }
-		}
+		public string[] DeviceTokens => this.deviceTokens;
 
 		/// <summary>
 		/// Service tokens, or null.
 		/// </summary>
-		public string[] ServiceTokens
-		{
-			get { return this.serviceTokens; }
-		}
+		public string[] ServiceTokens => this.serviceTokens;
 
 		/// <summary>
 		/// User tokens, or null.
 		/// </summary>
-		public string[] UserTokens
-		{
-			get { return this.userTokens; }
-		}
+		public string[] UserTokens => this.userTokens;
 	}
 }

@@ -37,17 +37,17 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 		/// <summary>
 		/// JID of item
 		/// </summary>
-		public string JID { get { return this.jid; } }
+		public string JID => this.jid;
 
 		/// <summary>
 		/// Node
 		/// </summary>
-		public string Node { get { return this.node; } }
+		public string Node => this.node;
 
 		/// <summary>
 		/// Name
 		/// </summary>
-		public string Name { get { return this.name; } }
+		public string Name => this.name;
 
 		/// <inheritdoc/>
 		public override string ToString()

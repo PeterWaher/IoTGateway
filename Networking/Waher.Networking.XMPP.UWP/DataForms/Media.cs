@@ -100,25 +100,25 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <summary>
 		/// An array of (Content-Type, URI) pairs pointing to media content.
 		/// </summary>
-		public KeyValuePair<string, Uri>[] URIs { get { return this.uris; } }
+		public KeyValuePair<string, Uri>[] URIs => this.uris;
 
 		/// <summary>
 		/// Width, if specified, null if unspecified.
 		/// </summary>
-		public int? Width { get { return this.width; } }
+		public int? Width => this.width;
 
 		/// <summary>
 		/// Height, if specified, null if unspecified.
 		/// </summary>
-		public int? Height { get { return this.height; } }
+		public int? Height => this.height;
 
 		/// <summary>
 		/// Binary content, if available in the form.
 		/// </summary>
 		public byte[] Binary
 		{
-			get { return this.bin; }
-			internal set { this.bin = value; }
+			get => this.bin;
+			internal set => this.bin = value;
 		}
 
 		/// <summary>
@@ -126,8 +126,8 @@ namespace Waher.Networking.XMPP.DataForms
 		/// </summary>
 		public string ContentType
 		{
-			get { return this.contentType; }
-			internal set { this.contentType = value; }
+			get => this.contentType;
+			internal set => this.contentType = value;
 		}
 
 		/// <summary>
@@ -135,8 +135,8 @@ namespace Waher.Networking.XMPP.DataForms
 		/// </summary>
 		public string URL
 		{
-			get { return this.url; }
-			internal set { this.url = value; }
+			get => this.url;
+			internal set => this.url = value;
 		}
 
 		internal void AnnotateField(StringBuilder Output, bool ValuesOnly, bool IncludeLabels)

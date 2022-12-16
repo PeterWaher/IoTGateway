@@ -203,8 +203,8 @@ namespace Waher.Script
 		/// </summary>
 		public TextWriter ConsoleOut
 		{
-			get { return this.consoleOut; }
-			set { this.consoleOut = value; }
+			get => this.consoleOut;
+			set => this.consoleOut = value;
 		}
 
 		/// <summary>
@@ -212,8 +212,8 @@ namespace Waher.Script
 		/// </summary>
 		public IContextVariables ContextVariables
 		{
-			get { return this.contextVariables; }
-			set { this.contextVariables = value; }
+			get => this.contextVariables;
+			set => this.contextVariables = value;
 		}
 
 		/// <summary>

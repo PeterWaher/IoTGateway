@@ -27,18 +27,15 @@ namespace Waher.Mock
 		/// <summary>
 		/// Component receiving incoming events.
 		/// </summary>
-		public ListView ListView
-		{
-			get { return this.listView; }
-		}
+		public ListView ListView => this.listView;
 
 		/// <summary>
 		/// Maximum number of items in the list view.
 		/// </summary>
 		public int MaxItems
 		{
-			get { return this.maxItems; }
-			set { this.maxItems = value; }
+			get => this.maxItems;
+			set => this.maxItems = value;
 		}
 
 		private async Task Add(SniffItem SniffItem)

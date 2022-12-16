@@ -38,18 +38,12 @@ namespace Waher.Security.DTLS.Events
 		/// <summary>
 		/// If operation concluded successfully.
 		/// </summary>
-		public bool Successful
-		{
-			get { return this.successful; }
-		}
+		public bool Successful => this.successful;
 
 		/// <summary>
 		/// State object passed in original call.
 		/// </summary>
-		public object State
-		{
-			get { return this.state; }
-		}
+		public object State => this.state;
 
 	}
 }

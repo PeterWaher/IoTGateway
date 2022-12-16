@@ -120,10 +120,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Name of resource.
 		/// </summary>
-		public string ResourceName
-		{
-			get { return this.resourceName; }
-		}
+		public string ResourceName => this.resourceName;
 
 		/// <summary>
 		/// If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
@@ -153,10 +150,7 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Array of allowed methods.
 		/// </summary>
-		public string[] AllowedMethods
-		{
-			get { return this.allowedMethods; }
-		}
+		public string[] AllowedMethods => this.allowedMethods;
 
 		/// <summary>
 		/// Salt value used when calculating ETag values.

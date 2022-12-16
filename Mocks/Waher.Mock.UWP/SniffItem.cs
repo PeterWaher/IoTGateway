@@ -83,12 +83,12 @@ namespace Waher.Mock
 		/// <summary>
 		/// Timestamp of event.
 		/// </summary>
-		public DateTime Timestamp { get { return this.timestamp; } }
+		public DateTime Timestamp => this.timestamp;
 
 		/// <summary>
 		/// Sniff item type.
 		/// </summary>
-		public SniffItemType Type { get { return this.type; } }
+		public SniffItemType Type => this.type;
 
 		/// <summary>
 		/// Time of day of event, as a string.
@@ -98,12 +98,12 @@ namespace Waher.Mock
 		/// <summary>
 		/// Message
 		/// </summary>
-		public string Message { get { return this.message; } }
+		public string Message => this.message;
 
 		/// <summary>
 		/// Optional binary data.
 		/// </summary>
-		public byte[] Data { get { return this.data; } }
+		public byte[] Data => this.data;
 
 	}
 }

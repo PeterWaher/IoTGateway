@@ -57,8 +57,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public string Host
 		{
-			get { return this.host; }
-			set { this.host = value; }
+			get => this.host;
+			set => this.host = value;
 		}
 
 		/// <summary>
@@ -66,8 +66,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public string Account
 		{
-			get { return this.account; }
-			set { this.account = value; }
+			get => this.account;
+			set => this.account = value;
 		}
 
 		/// <summary>
@@ -75,8 +75,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public string Password
 		{
-			get { return this.password; }
-			set { this.password = value; }
+			get => this.password;
+			set => this.password = value;
 		}
 
 		/// <summary>
@@ -84,8 +84,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public string PasswordType
 		{
-			get { return this.passwordType; }
-			set { this.passwordType = value; }
+			get => this.passwordType;
+			set => this.passwordType = value;
 		}
 
 		/// <summary>
@@ -93,8 +93,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public string ThingRegistry
 		{
-			get { return this.thingRegistry; }
-			set { this.thingRegistry = value; }
+			get => this.thingRegistry;
+			set => this.thingRegistry = value;
 		}
 
 		/// <summary>
@@ -102,8 +102,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public string Provisioning
 		{
-			get { return this.provisioning; }
-			set { this.provisioning = value; }
+			get => this.provisioning;
+			set => this.provisioning = value;
 		}
 
 		/// <summary>
@@ -111,8 +111,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public string Events
 		{
-			get { return this.events; }
-			set { this.events = value; }
+			get => this.events;
+			set => this.events = value;
 		}
 
 		/// <summary>
@@ -120,8 +120,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool Sniffer
 		{
-			get { return this.sniffer; }
-			set { this.sniffer = value; }
+			get => this.sniffer;
+			set => this.sniffer = value;
 		}
 
 		/// <summary>
@@ -129,8 +129,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public int Port
 		{
-			get { return this.port; }
-			set { this.port = value; }
+			get => this.port;
+			set => this.port = value;
 		}
 
 		/// <summary>
@@ -139,8 +139,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool TrustServer
 		{
-			get { return this.trustServer; }
-			set { this.trustServer = value; }
+			get => this.trustServer;
+			set => this.trustServer = value;
 		}
 
 		/// <summary>
@@ -148,8 +148,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool AllowCramMD5
 		{
-			get { return this.allowCramMD5; }
-			set { this.allowCramMD5 = value; }
+			get => this.allowCramMD5;
+			set => this.allowCramMD5 = value;
 		}
 
 		/// <summary>
@@ -157,8 +157,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool AllowDigestMD5
 		{
-			get { return this.allowDigestMD5; }
-			set { this.allowDigestMD5 = value; }
+			get => this.allowDigestMD5;
+			set => this.allowDigestMD5 = value;
 		}
 
 		/// <summary>
@@ -166,8 +166,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool AllowPlain
 		{
-			get { return this.allowPlain; }
-			set { this.allowPlain = value; }
+			get => this.allowPlain;
+			set => this.allowPlain = value;
 		}
 
 		/// <summary>
@@ -175,8 +175,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool AllowScramSHA1
 		{
-			get { return this.allowScramSHA1; }
-			set { this.allowScramSHA1 = value; }
+			get => this.allowScramSHA1;
+			set => this.allowScramSHA1 = value;
 		}
 
 		/// <summary>
@@ -184,8 +184,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool AllowScramSHA256
 		{
-			get { return this.allowScramSHA256; }
-			set { this.allowScramSHA256 = value; }
+			get => this.allowScramSHA256;
+			set => this.allowScramSHA256 = value;
 		}
 
 		/// <summary>
@@ -193,8 +193,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool AllowEncryption
 		{
-			get { return this.allowEncryption; }
-			set { this.allowEncryption = value; }
+			get => this.allowEncryption;
+			set => this.allowEncryption = value;
 		}
 
 		/// <summary>
@@ -202,8 +202,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool RequestRosterOnStartup
 		{
-			get { return this.requestRosterOnStartup; }
-			set { this.requestRosterOnStartup = value; }
+			get => this.requestRosterOnStartup;
+			set => this.requestRosterOnStartup = value;
 		}
 
 		/// <summary>
@@ -211,8 +211,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool AllowRegistration
 		{
-			get { return this.allowRegistration; }
-			set { this.allowRegistration = value; }
+			get => this.allowRegistration;
+			set => this.allowRegistration = value;
 		}
 
 		/// <summary>
@@ -220,8 +220,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public string FormSignatureKey
 		{
-			get { return this.formSignatureKey; }
-			set { this.formSignatureKey = value; }
+			get => this.formSignatureKey;
+			set => this.formSignatureKey = value;
 		}
 
 		/// <summary>
@@ -229,8 +229,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public string FormSignatureSecret
 		{
-			get { return this.formSignatureSecret; }
-			set { this.formSignatureSecret = value; }
+			get => this.formSignatureSecret;
+			set => this.formSignatureSecret = value;
 		}
 
 		/// <summary>
@@ -239,8 +239,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public string UriEndpoint
 		{
-			get { return this.uriEndpoint; }
-			set { this.uriEndpoint = value; }
+			get => this.uriEndpoint;
+			set => this.uriEndpoint = value;
 		}
 
 #if WINDOWS_UWP
@@ -255,8 +255,8 @@ namespace Waher.Networking.XMPP
 		public X509Certificate ClientCertificate
 #endif
 		{
-			get { return this.clientCertificate; }
-			set { this.clientCertificate = value; }
+			get => this.clientCertificate;
+			set => this.clientCertificate = value;
 		}
 
 	}

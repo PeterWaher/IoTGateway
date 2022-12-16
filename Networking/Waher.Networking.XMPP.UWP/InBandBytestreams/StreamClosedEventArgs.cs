@@ -32,17 +32,11 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// <summary>
 		/// Reason for closing stream.
 		/// </summary>
-		public CloseReason Reason
-		{
-			get { return this.reason; }
-		}
+		public CloseReason Reason => this.reason;
 
 		/// <summary>
 		/// State object.
 		/// </summary>
-		public object State
-		{
-			get { return this.state; }
-		}
+		public object State => this.state;
 	}
 }

@@ -447,7 +447,7 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		public PeerToPeerNetworkState State
 		{
-			get { return this.state; }
+			get => this.state;
 			internal set
 			{
 				if (this.state != value)
@@ -498,26 +498,17 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// External IP Address.
 		/// </summary>
-		public IPAddress ExternalAddress
-		{
-			get { return this.externalAddress; }
-		}
+		public IPAddress ExternalAddress => this.externalAddress;
 
 		/// <summary>
 		/// Local IP Address.
 		/// </summary>
-		public IPAddress LocalAddress
-		{
-			get { return this.localAddress; }
-		}
+		public IPAddress LocalAddress => this.localAddress;
 
 		/// <summary>
 		/// In case <see cref="State"/>=<see cref="PeerToPeerNetworkState.Error"/>, this exception object contains details about the error.
 		/// </summary>
-		public Exception Exception
-		{
-			get { return this.exception; }
-		}
+		public Exception Exception => this.exception;
 
 		/// <summary>
 		/// Waits for the peer-to-peer network object to be ready to receive connections.

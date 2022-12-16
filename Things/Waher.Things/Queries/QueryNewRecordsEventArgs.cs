@@ -24,9 +24,6 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Records
 		/// </summary>
-		public Record[] Records
-		{
-			get { return this.records; }
-		}
+		public Record[] Records => this.records;
 	}
 }

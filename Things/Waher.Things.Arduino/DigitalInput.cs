@@ -36,7 +36,7 @@ namespace Waher.Things.Arduino
 		[Option(DigitalInputPinMode.InputPullUp, 12, "Input with Pull/Up")]
 		public DigitalInputPinMode Mode
 		{
-			get { return this.mode; }
+			get => this.mode;
 			set
 			{
 				this.mode = value;

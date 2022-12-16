@@ -57,10 +57,7 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// HTML text.
 		/// </summary>
-		public string HtmlText
-		{
-			get { return this.htmlText; }
-		}
+		public string HtmlText => this.htmlText;
 
 		private void AssertParsed()
 		{

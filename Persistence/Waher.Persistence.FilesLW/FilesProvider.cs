@@ -442,18 +442,12 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Default collection name.
 		/// </summary>
-		public string DefaultCollectionName
-		{
-			get { return this.defaultCollectionName; }
-		}
+		public string DefaultCollectionName => this.defaultCollectionName;
 
 		/// <summary>
 		/// Base folder of where files will be stored.
 		/// </summary>
-		public string Folder
-		{
-			get { return this.folder; }
-		}
+		public string Folder => this.folder;
 
 		/// <summary>
 		/// If asynchronous file I/O is to be performed (true), or synchronous file I/O (false).
@@ -476,18 +470,12 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// An ID of the files provider. It's unique, and constant during the life-time of the FilesProvider class.
 		/// </summary>
-		public string Id
-		{
-			get { return this.id; }
-		}
+		public string Id => this.id;
 
 		/// <summary>
 		/// Number of bytes used by an Object ID.
 		/// </summary>
-		public int ObjectIdByteCount
-		{
-			get => 16;
-		}
+		public int ObjectIdByteCount => 16;
 
 		/// <summary>
 		/// Size of a block in the B-tree. The size must be a power of two, and should be at least the same
@@ -497,43 +485,34 @@ namespace Waher.Persistence.Files
 		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> will be persisted as BLOBs, with the bulk of the object stored as separate files. 
 		/// Smallest block size = 1024, largest block size = 65536.
 		/// </summary>
-		public int BlockSize { get { return this.blockSize; } }
+		public int BlockSize => this.blockSize;
 
 		/// <summary>
 		/// Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
 		/// of a doubly linked list of blocks of this size.
 		/// </summary>
-		public int BlobBlockSize { get { return this.blobBlockSize; } }
+		public int BlobBlockSize => this.blobBlockSize;
 
 		/// <summary>
 		/// Encoding to use for text properties.
 		/// </summary>
-		public Encoding Encoding { get { return this.encoding; } }
+		public Encoding Encoding => this.encoding;
 
 		/// <summary>
 		/// Timeout, in milliseconds, for database operations.
 		/// </summary>
-		public int TimeoutMilliseconds
-		{
-			get { return this.timeoutMilliseconds; }
-		}
+		public int TimeoutMilliseconds => this.timeoutMilliseconds;
 
 		/// <summary>
 		/// If the files should be encrypted or not.
 		/// </summary>
-		public bool Encrypted
-		{
-			get { return this.encrypted; }
-		}
+		public bool Encrypted => this.encrypted;
 
 #if NETSTANDARD2_0
 		/// <summary>
 		/// If object serializers should be compiled or not.
 		/// </summary>
-		public bool Compiled
-		{
-			get { return this.compiled; }
-		}
+		public bool Compiled => this.compiled;
 
 		/// <summary>
 		/// If old keys are to be removed, before a new encrypted file is created. (Default=true).

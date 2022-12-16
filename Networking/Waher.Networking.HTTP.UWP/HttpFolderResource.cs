@@ -139,7 +139,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public string FolderPath
 		{
-			get { return this.folderPath; }
+			get => this.folderPath;
 			set
 			{
 				string s = value;

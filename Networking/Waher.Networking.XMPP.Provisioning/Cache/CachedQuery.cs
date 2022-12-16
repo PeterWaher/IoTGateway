@@ -32,8 +32,8 @@ namespace Waher.Networking.XMPP.Provisioning.Cache
 		[ObjectId]
 		public Guid ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -41,8 +41,8 @@ namespace Waher.Networking.XMPP.Provisioning.Cache
 		/// </summary>
 		public string Xml
 		{
-			get { return this.xml; }
-			set { this.xml = value; }
+			get => this.xml;
+			set => this.xml = value;
 		}
 
 		/// <summary>
@@ -50,8 +50,8 @@ namespace Waher.Networking.XMPP.Provisioning.Cache
 		/// </summary>
 		public string Method
 		{
-			get { return this.method; }
-			set { this.method = value; }
+			get => this.method;
+			set => this.method = value;
 		}
 
 		/// <summary>
@@ -60,8 +60,8 @@ namespace Waher.Networking.XMPP.Provisioning.Cache
 		[DefaultValueStringEmpty]
 		public string Response
 		{
-			get { return this.response; }
-			set { this.response = value; }
+			get => this.response;
+			set => this.response = value;
 		}
 
 		/// <summary>
@@ -69,8 +69,8 @@ namespace Waher.Networking.XMPP.Provisioning.Cache
 		/// </summary>
 		public DateTime LastUsed
 		{
-			get { return this.lastUsed; }
-			set { this.lastUsed = value; }
+			get => this.lastUsed;
+			set => this.lastUsed = value;
 		}
 
 	}

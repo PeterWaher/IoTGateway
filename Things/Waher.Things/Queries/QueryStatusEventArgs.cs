@@ -23,9 +23,6 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Status message.
 		/// </summary>
-		public string Status
-		{
-			get { return this.status; }
-		}
+		public string Status => this.status;
 	}
 }

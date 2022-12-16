@@ -69,20 +69,11 @@ namespace Waher.Client.WPF.Model.Provisioning
 			}
 		}
 
-		public bool SupportsProvisioning
-		{
-			get { return this.supportsProvisioning; }
-		}
+		public bool SupportsProvisioning => this.supportsProvisioning;
 
-		public ThingRegistryClient ThingRegistryClient
-		{
-			get { return this.registryClient; }
-		}
+		public ThingRegistryClient ThingRegistryClient => this.registryClient;
 
-		public ProvisioningClient ProvisioningClient
-		{
-			get { return this.provisioningClient; }
-		}
+		public ProvisioningClient ProvisioningClient => this.provisioningClient;
 
 		private async Task ProvisioningClient_IsFriendQuestion(object Sender, IsFriendEventArgs e)
 		{

@@ -146,51 +146,33 @@ namespace Waher.Security.JWT
 		/// <summary>
 		/// The Base64URL-encoded header.
 		/// </summary>
-		public string Header
-		{
-			get { return this.header; }
-		}
+		public string Header => this.header;
 
 		/// <summary>
 		/// The Base64URL-encoded payload.
 		/// </summary>
-		public string Payload
-		{
-			get { return this.payload; }
-		}
+		public string Payload => this.payload;
 
 		/// <summary>
 		/// The Base64URL-encoded signature.
 		/// </summary>
-		public string Signature
-		{
-			get { return this.signature; }
-		}
+		public string Signature => this.signature;
 
 		/// <summary>
 		/// String token that can be embedded easily in web requests, etc.
 		/// </summary>
-		public string Token
-		{
-			get { return this.token; }
-		}
+		public string Token => this.token;
 
 		/// <summary>
 		/// JWS signature algoritm.
 		/// </summary>
-		public IJwsAlgorithm Algorithm
-		{
-			get { return this.algorithm; }
-		}
+		public IJwsAlgorithm Algorithm => this.algorithm;
 
 		/// <summary>
 		/// Claims provided in token. For a list of public claim names, see:
 		/// https://www.iana.org/assignments/jwt/jwt.xhtml
 		/// </summary>
-		public IEnumerable<KeyValuePair<string, object>> Claims
-		{
-			get { return this.claims; }
-		}
+		public IEnumerable<KeyValuePair<string, object>> Claims => this.claims;
 
 		/// <summary>
 		/// Tries to get a claim from the JWT token.
@@ -206,66 +188,42 @@ namespace Waher.Security.JWT
 		/// <summary>
 		/// Type of token, if available, null otherwise.
 		/// </summary>
-		public string Type
-		{
-			get { return this.type; }
-		}
+		public string Type => this.type;
 
 		/// <summary>
 		/// Issuer of token, if available, null otherwise.
 		/// </summary>
-		public string Issuer
-		{
-			get { return this.issuer; }
-		}
+		public string Issuer => this.issuer;
 
 		/// <summary>
 		/// Subject of whom the token relates, if available, null otherwise.
 		/// </summary>
-		public string Subject
-		{
-			get { return this.subject; }
-		}
+		public string Subject => this.subject;
 
 		/// <summary>
 		/// Token ID, if available, null otherwise.
 		/// </summary>
-		public string Id
-		{
-			get { return this.id; }
-		}
+		public string Id => this.id;
 
 		/// <summary>
 		/// Indended audience, if available, null otherwise.
 		/// </summary>
-		public string[] Audience
-		{
-			get { return this.audience; }
-		}
+		public string[] Audience => this.audience;
 
 		/// <summary>
 		/// Token expiration time, if available, null otherwise.
 		/// </summary>
-		public DateTime? Expiration
-		{
-			get { return this.expiration; }
-		}
+		public DateTime? Expiration => this.expiration;
 
 		/// <summary>
 		/// Token not valid before this time, if available, null otherwise.
 		/// </summary>
-		public DateTime? NotBefore
-		{
-			get { return this.notBefore; }
-		}
+		public DateTime? NotBefore => this.notBefore;
 
 		/// <summary>
 		/// Token issued at this time, if available, null otherwise.
 		/// </summary>
-		public DateTime? IssuedAt
-		{
-			get { return this.issuedAt; }
-		}
+		public DateTime? IssuedAt => this.issuedAt;
 
 	}
 }

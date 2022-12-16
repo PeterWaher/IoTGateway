@@ -33,17 +33,11 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 		/// <summary>
 		/// Service JID
 		/// </summary>
-		public string JID
-		{
-			get { return this.jid; }
-		}
+		public string JID => this.jid;
 
 		/// <summary>
 		/// State object to pass on to callback method.
 		/// </summary>
-		public object State
-		{
-			get { return this.state; }
-		}
+		public object State => this.state;
 	}
 }

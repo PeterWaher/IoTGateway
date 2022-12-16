@@ -64,17 +64,11 @@ namespace Waher.Persistence.Attributes
 		/// <summary>
 		/// How the type name should be serialized.
 		/// </summary>
-		public TypeNameSerialization TypeNameSerialization
-		{
-			get { return this.typeNameSerialization; }
-		}
+		public TypeNameSerialization TypeNameSerialization => this.typeNameSerialization;
 
 		/// <summary>
 		/// Type field name.
 		/// </summary>
-		public string FieldName
-		{
-			get { return this.fieldName; }
-		}
+		public string FieldName => this.fieldName;
 	}
 }

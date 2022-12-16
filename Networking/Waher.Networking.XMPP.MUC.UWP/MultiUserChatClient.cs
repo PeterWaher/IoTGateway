@@ -90,10 +90,7 @@ namespace Waher.Networking.XMPP.MUC
 		/// <summary>
 		/// Publish/Subscribe component address.
 		/// </summary>
-		public string ComponentAddress
-		{
-			get { return this.componentAddress; }
-		}
+		public string ComponentAddress => this.componentAddress;
 
 		/// <summary>
 		/// Implemented extensions.
@@ -1483,8 +1480,24 @@ namespace Waher.Networking.XMPP.MUC
 		public void SetPresence(string RoomId, string Domain, string NickName, Availability Availability,
 			PresenceEventHandlerAsync Callback, object State)
 		{
-			string Xml = string.Empty;
+			this.SetPresence(RoomId, Domain, NickName, Availability, null, Callback, State);
+		}
+
+		/// <summary>
+		/// Sets the presence of the occupant in a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="NickName">Nickname of the occupant.</param>
+		/// <param name="Availability">Occupant availability.</param>
+		/// <param name="Status">Custom status</param>
+		/// <param name="Callback">Method to call when stanza has been sent.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SetPresence(string RoomId, string Domain, string NickName, Availability Availability,
+			KeyValuePair<string, string>[] Status, PresenceEventHandlerAsync Callback, object State)
+		{
 			string Type = string.Empty;
+			StringBuilder Xml = new StringBuilder();
 
 			switch (Availability)
 			{
@@ -1493,19 +1506,19 @@ namespace Waher.Networking.XMPP.MUC
 					break;
 
 				case Availability.Away:
-					Xml = "<show>away</show>";
+					Xml.Append("<show>away</show>");
 					break;
 
 				case Availability.Chat:
-					Xml = "<show>chat</show>";
+					Xml.Append("<show>chat</show>");
 					break;
 
 				case Availability.DoNotDisturb:
-					Xml = "<show>dnd</show>";
+					Xml.Append("<show>dnd</show>");
 					break;
 
 				case Availability.ExtendedAway:
-					Xml = "<show>xa</show>";
+					Xml.Append("<show>xa</show>");
 					break;
 
 				case Availability.Offline:
@@ -1513,7 +1526,29 @@ namespace Waher.Networking.XMPP.MUC
 					break;
 			}
 
-			this.client.SendDirectedPresence(Type, RoomId + "@" + Domain + "/" + NickName, Xml, Callback, State);
+			if (!(Status is null))
+			{
+				foreach (KeyValuePair<string, string> P in Status)
+				{
+					Xml.Append("<status");
+
+					if (!string.IsNullOrEmpty(P.Key))
+					{
+						Xml.Append(" xml:lang='");
+						Xml.Append(XML.Encode(P.Key));
+						Xml.Append("'>");
+					}
+					else
+						Xml.Append('>');
+
+					Xml.Append(XML.Encode(P.Value));
+					Xml.Append("</status>");
+				}
+			}
+
+			this.client.AddCustomPresenceXml(Availability, Xml);
+
+			this.client.SendDirectedPresence(Type, RoomId + "@" + Domain + "/" + NickName, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -1524,11 +1559,25 @@ namespace Waher.Networking.XMPP.MUC
 		/// <param name="NickName">Nickname of the occupant.</param>
 		/// <param name="Availability">Occupant availability.</param>
 		/// <returns>Task object that finishes when stanza has been sent.</returns>
+		public Task SetPresenceAsync(string RoomId, string Domain, string NickName, Availability Availability)
+		{
+			return this.SetPresenceAsync(RoomId, Domain, NickName, Availability, null);
+		}
+
+		/// <summary>
+		/// Sets the presence of the occupant in a room.
+		/// </summary>
+		/// <param name="RoomId">Room ID.</param>
+		/// <param name="Domain">Domain of service hosting the room.</param>
+		/// <param name="NickName">Nickname of the occupant.</param>
+		/// <param name="Availability">Occupant availability.</param>
+		/// <param name="Status">Custom status</param>
+		/// <returns>Task object that finishes when stanza has been sent.</returns>
 		public Task SetPresenceAsync(string RoomId, string Domain, string NickName,
-			Availability Availability)
+			Availability Availability, params KeyValuePair<string, string>[] Status)
 		{
 			TaskCompletionSource<bool> Result = new TaskCompletionSource<bool>();
-			this.SetPresence(RoomId, Domain, NickName, Availability, (sender, e) =>
+			this.SetPresence(RoomId, Domain, NickName, Availability, Status, (sender, e) =>
 			{
 				Result.TrySetResult(true);
 				return Task.CompletedTask;

@@ -34,8 +34,8 @@ namespace Waher.Things.Metering.Commands
 		[Required]
 		public MessageType MessageType
 		{
-			get { return this.messageType; }
-			set { this.messageType = value; }
+			get => this.messageType;
+			set => this.messageType = value;
 		}
 
 		/// <summary>
@@ -47,8 +47,8 @@ namespace Waher.Things.Metering.Commands
 		[Required]
 		public string MessageBody
 		{
-			get { return this.messaageBody; }
-			set { this.messaageBody = value; }
+			get => this.messaageBody;
+			set => this.messaageBody = value;
 		}
 
 		/// <summary>

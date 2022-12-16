@@ -89,18 +89,12 @@ namespace Waher.Persistence.Files.Storage
 		/// <summary>
 		/// Field names included in the index.
 		/// </summary>
-		public string[] FieldNames
-		{
-			get { return this.fieldNames; }
-		}
+		public string[] FieldNames => this.fieldNames;
 
 		/// <summary>
 		/// If the corresponding field name is sorted in ascending order (true) or descending order (false).
 		/// </summary>
-		public bool[] Ascending
-		{
-			get { return this.ascending; }
-		}
+		public bool[] Ascending => this.ascending;
 
 		/// <summary>
 		/// Index file.
@@ -2053,10 +2047,7 @@ namespace Waher.Persistence.Files.Storage
 		/// <summary>
 		/// Object ID
 		/// </summary>
-		public Guid ObjectId
-		{
-			get { return this.objectId; }
-		}
+		public Guid ObjectId => this.objectId;
 
 		/// <summary>
 		/// Gets the payload size.

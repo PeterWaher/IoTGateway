@@ -18,74 +18,47 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Set.
 		/// </summary>
-		public override ISet AssociatedSet
-		{
-			get { return this.AssociatedField; }
-		}
+		public override ISet AssociatedSet => this.AssociatedField;
 
 		/// <summary>
 		/// Associated Semi-Group.
 		/// </summary>
-		public override ISemiGroup AssociatedSemiGroup
-		{
-			get { return this.AssociatedField; }
-		}
+		public override ISemiGroup AssociatedSemiGroup => this.AssociatedField;
 
 		/// <summary>
 		/// Associated Group.
 		/// </summary>
-		public override IGroup AssociatedGroup
-		{
-			get { return this.AssociatedField; }
-		}
+		public override IGroup AssociatedGroup => this.AssociatedField;
 
 		/// <summary>
 		/// Associated Abelian Group.
 		/// </summary>
-		public override IAbelianGroup AssociatedAbelianGroup
-		{
-			get { return this.AssociatedField; }
-		}
+		public override IAbelianGroup AssociatedAbelianGroup => this.AssociatedField;
 
 		/// <summary>
 		/// Associated Ring.
 		/// </summary>
-		public override IRing AssociatedRing
-		{
-			get { return this.AssociatedField; }
-		}
+		public override IRing AssociatedRing => this.AssociatedField;
 
 		/// <summary>
 		/// Associated Commutative Ring.
 		/// </summary>
-		public override ICommutativeRing AssociatedCommutativeRing
-		{
-			get { return this.AssociatedField; }
-		}
+		public override ICommutativeRing AssociatedCommutativeRing => this.AssociatedField;
 
 		/// <summary>
 		/// Associated Commutative Ring With Identity.
 		/// </summary>
-		public override ICommutativeRingWithIdentity AssociatedCommutativeRingWithIdentity
-		{
-			get { return this.AssociatedField; }
-		}
+		public override ICommutativeRingWithIdentity AssociatedCommutativeRingWithIdentity => this.AssociatedField;
 
 		/// <summary>
 		/// Associated Integral Domain.
 		/// </summary>
-		public override IIntegralDomain AssociatedIntegralDomain
-		{
-			get { return this.AssociatedField; }
-		}
+		public override IIntegralDomain AssociatedIntegralDomain => this.AssociatedField;
 
 		/// <summary>
 		/// Associated Euclidian Domain.
 		/// </summary>
-		public override IEuclidianDomain AssociatedEuclidianDomain
-		{
-			get { return this.AssociatedField; }
-		}
+		public override IEuclidianDomain AssociatedEuclidianDomain => this.AssociatedField;
 
 		/// <summary>
 		/// Associated Field.

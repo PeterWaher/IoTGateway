@@ -57,10 +57,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Any parameter name specifications of the original request.
 		/// </summary>
-		public string[] Parameters
-		{
-			get { return this.parameters; }
-		}
+		public string[] Parameters => this.parameters;
 
 		/// <summary>
 		/// Accept control operations from this remote JID.

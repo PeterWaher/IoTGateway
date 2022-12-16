@@ -36,17 +36,17 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 		/// <summary>
 		/// Additional validation method.
 		/// </summary>
-		public ValidationMethod Additional { get { return this.additional; } }
+		public ValidationMethod Additional => this.additional;
 
 		/// <summary>
 		/// Minimum number of options to select.
 		/// </summary>
-		public int Min { get { return this.min; } }
+		public int Min => this.min;
 
 		/// <summary>
 		/// Maximum number of options to select.
 		/// </summary>
-		public int Max { get { return this.max; } }
+		public int Max => this.max;
 
 		internal override void Serialize(StringBuilder Output)
 		{

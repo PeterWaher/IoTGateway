@@ -79,8 +79,8 @@ namespace Waher.Events.Persistence
 		[ObjectId]
 		public Guid ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -88,8 +88,8 @@ namespace Waher.Events.Persistence
 		/// </summary>
 		public DateTime Timestamp
 		{
-			get { return this.timestamp; }
-			set { this.timestamp = value; }
+			get => this.timestamp;
+			set => this.timestamp = value;
 		}
 
 		/// <summary>
@@ -97,8 +97,8 @@ namespace Waher.Events.Persistence
 		/// </summary>
 		public EventType Type
 		{
-			get { return this.type; }
-			set { this.type = value; }
+			get => this.type;
+			set => this.type = value;
 		}
 
 		/// <summary>
@@ -107,8 +107,8 @@ namespace Waher.Events.Persistence
 		[DefaultValue(EventLevel.Minor)]
 		public EventLevel Level
 		{
-			get { return this.level; }
-			set { this.level = value; }
+			get => this.level;
+			set => this.level = value;
 		}
 
 		/// <summary>
@@ -116,8 +116,8 @@ namespace Waher.Events.Persistence
 		/// </summary>
 		public string Message
 		{
-			get { return this.message; }
-			set { this.message = value; }
+			get => this.message;
+			set => this.message = value;
 		}
 
 		/// <summary>
@@ -149,8 +149,8 @@ namespace Waher.Events.Persistence
 		/// </summary>
 		public string Object
 		{
-			get { return this.obj; }
-			set { this.obj = value; }
+			get => this.obj;
+			set => this.obj = value;
 		}
 
 		/// <summary>
@@ -158,8 +158,8 @@ namespace Waher.Events.Persistence
 		/// </summary>
 		public string Actor
 		{
-			get { return this.actor; }
-			set { this.actor = value; }
+			get => this.actor;
+			set => this.actor = value;
 		}
 
 		/// <summary>
@@ -167,8 +167,8 @@ namespace Waher.Events.Persistence
 		/// </summary>
 		public string EventId
 		{
-			get { return this.eventId; }
-			set { this.eventId = value; }
+			get => this.eventId;
+			set => this.eventId = value;
 		}
 
 		/// <summary>
@@ -176,8 +176,8 @@ namespace Waher.Events.Persistence
 		/// </summary>
 		public string Facility
 		{
-			get { return this.facility; }
-			set { this.facility = value; }
+			get => this.facility;
+			set => this.facility = value;
 		}
 
 		/// <summary>
@@ -186,8 +186,8 @@ namespace Waher.Events.Persistence
 		[DefaultValueStringEmpty]
 		public string Module
 		{
-			get { return this.module; }
-			set { this.module = value; }
+			get => this.module;
+			set => this.module = value;
 		}
 
 		/// <summary>
@@ -196,8 +196,8 @@ namespace Waher.Events.Persistence
 		[DefaultValueStringEmpty]
 		public string StackTrace
 		{
-			get { return this.stackTrace; }
-			set { this.stackTrace = value; }
+			get => this.stackTrace;
+			set => this.stackTrace = value;
 		}
 
 		/// <summary>
@@ -206,8 +206,8 @@ namespace Waher.Events.Persistence
 		[DefaultValueNull]
 		public PersistedTag[] Tags
 		{
-			get { return this.tags; }
-			set { this.tags = value; }
+			get => this.tags;
+			set => this.tags = value;
 		}
 
 		/// <inheritdoc/>
@@ -219,9 +219,6 @@ namespace Waher.Events.Persistence
 		/// <summary>
 		/// Number of days to archive event.
 		/// </summary>
-		public int ArchiveDays
-		{
-			get => PersistedEventLog.ArchiveDays;
-		}
+		public int ArchiveDays => PersistedEventLog.ArchiveDays;
 	}
 }

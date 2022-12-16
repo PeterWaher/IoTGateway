@@ -50,18 +50,12 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Name of current collection.
 		/// </summary>
-		public string CollectionName
-		{
-			get { return this.collectionName; }
-		}
+		public string CollectionName => this.collectionName;
 
 		/// <summary>
 		/// Text encoding to use when serializing strings.
 		/// </summary>
-		public Encoding Encoding
-		{
-			get { return this.encoding; }
-		}
+		public Encoding Encoding => this.encoding;
 
 		/// <summary>
 		/// Serializes a value.

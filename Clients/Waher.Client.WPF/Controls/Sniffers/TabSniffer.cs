@@ -18,8 +18,8 @@ namespace Waher.Client.WPF.Controls.Sniffers
 
 		public string SnifferId
 		{
-			get { return this.snifferId; }
-			set { this.snifferId = value; }
+			get => this.snifferId;
+			set => this.snifferId = value;
 		}
 
 		public override Task ReceiveBinary(DateTime Timestamp, byte[] Data)

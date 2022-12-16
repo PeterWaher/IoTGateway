@@ -29,10 +29,7 @@ namespace Waher.Networking.XMPP.Interoperability
 		/// <summary>
 		/// Reported Interoperability Interfaces.
 		/// </summary>
-		public string[] Interfaces
-		{
-			get { return this.interfaces; }
-		}
+		public string[] Interfaces => this.interfaces;
 
 	}
 }

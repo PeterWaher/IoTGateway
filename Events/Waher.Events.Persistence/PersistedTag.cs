@@ -24,8 +24,8 @@ namespace Waher.Events.Persistence
 		[DefaultValueStringEmpty]
 		public string Name
 		{
-			get { return this.name; }
-			set { this.name = value; }
+			get => this.name;
+			set => this.name = value;
 		}
 
 		/// <summary>
@@ -34,8 +34,8 @@ namespace Waher.Events.Persistence
 		[DefaultValueNull]
 		public object Value
 		{
-			get { return this.value; }
-			set { this.value = value; }
+			get => this.value;
+			set => this.value = value;
 		}
 
 		/// <inheritdoc/>

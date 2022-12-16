@@ -41,7 +41,7 @@ namespace Waher.Things.Gpio
 		[Option(OutputPinMode.OutputOpenSourcePullDown, 21, "Output with open source and pull down")]
 		public OutputPinMode Mode
 		{
-			get { return this.mode; }
+			get => this.mode;
 			set
 			{
 				this.SetDriveMode(value);

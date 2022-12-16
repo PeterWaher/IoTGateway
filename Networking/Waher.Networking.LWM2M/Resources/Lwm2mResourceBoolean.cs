@@ -60,8 +60,8 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public bool? BooleanValue
 		{
-			get { return this.value; }
-			set { this.value = value; }
+			get => this.value;
+			set => this.value = value;
 		}
 
 		/// <summary>

@@ -30,9 +30,6 @@ namespace Waher.Persistence.Attributes
 		/// The method should take one parameter, a <see cref="Dictionary{String, Object}"/>, that represents property or field values
 		/// with no matching properties or fields in the object.
 		/// </summary>
-		public string MethodName
-		{
-			get { return this.methodName; }
-		}
+		public string MethodName => this.methodName;
 	}
 }

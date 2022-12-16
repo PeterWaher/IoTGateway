@@ -37,8 +37,8 @@ namespace Waher.Runtime.Settings.SettingObjects
 		[ObjectId]
 		public string ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -46,8 +46,8 @@ namespace Waher.Runtime.Settings.SettingObjects
 		/// </summary>
 		public string Key
 		{
-			get { return this.key; }
-			set { this.key = value; }
+			get => this.key;
+			set => this.key = value;
 		}
 
 		/// <summary>

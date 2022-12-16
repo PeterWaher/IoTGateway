@@ -24,8 +24,8 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public Dictionary<string, Statistic> CallsPerMethod
 		{
-			get { return this.callsPerMethod; }
-			internal set { this.callsPerMethod = value; }
+			get => this.callsPerMethod;
+			internal set => this.callsPerMethod = value;
 		}
 
 		/// <summary>
@@ -33,8 +33,8 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public Dictionary<string, Statistic> CallsPerUserAgent
 		{
-			get { return this.callsPerUserAgent; }
-			internal set { this.callsPerUserAgent = value; }
+			get => this.callsPerUserAgent;
+			internal set => this.callsPerUserAgent = value;
 		}
 
 		/// <summary>
@@ -42,8 +42,8 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public Dictionary<string, Statistic> CallsPerFrom
 		{
-			get { return this.callsPerFrom; }
-			internal set { this.callsPerFrom = value; }
+			get => this.callsPerFrom;
+			internal set => this.callsPerFrom = value;
 		}
 
 		/// <summary>
@@ -51,8 +51,8 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public Dictionary<string, Statistic> CallsPerResource
 		{
-			get { return this.callsPerResource; }
-			internal set { this.callsPerResource = value; }
+			get => this.callsPerResource;
+			internal set => this.callsPerResource = value;
 		}
 
 		/// <summary>
@@ -60,8 +60,8 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public DateTime LastStat
 		{
-			get { return this.lastStat; }
-			internal set { this.lastStat = value; }
+			get => this.lastStat;
+			internal set => this.lastStat = value;
 		}
 
 		/// <summary>
@@ -69,8 +69,8 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public DateTime CurrentStat
 		{
-			get { return this.currentStat; }
-			internal set { this.currentStat = value; }
+			get => this.currentStat;
+			internal set => this.currentStat = value;
 		}
 
 		/// <summary>
@@ -78,8 +78,8 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public long NrBytesRx
 		{
-			get { return this.nrBytesRx; }
-			internal set { this.nrBytesRx = value; }
+			get => this.nrBytesRx;
+			internal set => this.nrBytesRx = value;
 		}
 
 		/// <summary>
@@ -87,8 +87,8 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public long NrBytesTx
 		{
-			get { return this.nrBytesTx; }
-			internal set { this.nrBytesTx = value; }
+			get => this.nrBytesTx;
+			internal set => this.nrBytesTx = value;
 		}
 
 		/// <summary>
@@ -96,8 +96,8 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public long NrCalls
 		{
-			get { return this.nrCalls; }
-			internal set { this.nrCalls = value; }
+			get => this.nrCalls;
+			internal set => this.nrCalls = value;
 		}
 
 	}

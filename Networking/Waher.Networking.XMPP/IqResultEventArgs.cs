@@ -180,7 +180,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// IQ Response element.
 		/// </summary>
-		public XmlElement Response { get { return this.response; } }
+		public XmlElement Response => this.response;
 
 		/// <summary>
 		/// First child element of the <see cref="Response"/> element.
@@ -207,58 +207,58 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public object State 
 		{
-			get { return this.state; }
-			set { this.state = value; } 
+			get => this.state;
+			set => this.state = value; 
 		}
 
 		/// <summary>
 		/// ID of the request.
 		/// </summary>
-		public string Id { get { return this.id; } }
+		public string Id => this.id;
 
 		/// <summary>
 		/// To address attribute
 		/// </summary>
-		public string To { get { return this.to; } }
+		public string To => this.to;
 
 		/// <summary>
 		/// From address attribute
 		/// </summary>
-		public string From { get { return this.from; } }
+		public string From => this.from;
 
 		/// <summary>
 		/// If the response is an OK result response (true), or an error response (false).
 		/// </summary>
 		public bool Ok
 		{
-			get { return this.ok; }
-			set { this.ok = value; }
+			get => this.ok;
+			set => this.ok = value;
 		}
 
 		/// <summary>
 		/// Error Code
 		/// </summary>
-		public int ErrorCode { get { return this.errorCode; } }
+		public int ErrorCode => this.errorCode;
 
 		/// <summary>
 		/// Error Type
 		/// </summary>
-		public ErrorType ErrorType { get { return this.errorType; } }
+		public ErrorType ErrorType => this.errorType;
 
 		/// <summary>
 		/// Error element.
 		/// </summary>
-		public XmlElement ErrorElement { get { return this.errorElement; } }
+		public XmlElement ErrorElement => this.errorElement;
 
 		/// <summary>
 		/// Any error specific text.
 		/// </summary>
-		public string ErrorText { get { return this.errorText; } }
+		public string ErrorText => this.errorText;
 
 		/// <summary>
 		/// Any stanza error returned.
 		/// </summary>
-		public XmppException StanzaError { get { return this.stanzaError; } }
+		public XmppException StanzaError => this.stanzaError;
 
         /// <summary>
         /// If end-to-end encryption was used in the response.
@@ -271,25 +271,16 @@ namespace Waher.Networking.XMPP
         /// <summary>
         /// End-to-end encryption interface, if used in the request.
         /// </summary>
-        public IEndToEndEncryption E2eEncryption
-        {
-            get { return this.e2eEncryption; }
-        }
+        public IEndToEndEncryption E2eEncryption => this.e2eEncryption;
 
         /// <summary>
         /// Reference to End-to-end encryption endpoint used.
         /// </summary>
-        public string E2eReference
-        {
-            get { return this.e2eReference; }
-        }
+        public string E2eReference => this.e2eReference;
 
         /// <summary>
         /// Type of symmetric cipher used in E2E encryption.
         /// </summary>
-        public IE2eSymmetricCipher E2eSymmetricCipher
-        {
-            get { return this.e2eSymmetricCipher; }
-        }
+        public IE2eSymmetricCipher E2eSymmetricCipher => this.e2eSymmetricCipher;
     }
 }

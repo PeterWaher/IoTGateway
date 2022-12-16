@@ -697,7 +697,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public string ETagSalt
 		{
-			get { return this.eTagSalt; }
+			get => this.eTagSalt;
 			set
 			{
 				if (this.eTagSalt != value)
@@ -722,8 +722,8 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public string Name
 		{
-			get { return this.name; }
-			set { this.name = value; }
+			get => this.name;
+			set => this.name = value;
 		}
 
 		/// <summary>
@@ -1152,8 +1152,8 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public string ResourceOverride
 		{
-			get { return this.resourceOverride; }
-			set { this.resourceOverride = value; }
+			get => this.resourceOverride;
+			set => this.resourceOverride = value;
 		}
 
 		/// <summary>
@@ -1582,7 +1582,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public TimeSpan SessionTimeout
 		{
-			get { return this.sessionTimeout; }
+			get => this.sessionTimeout;
 
 			set
 			{
@@ -1882,7 +1882,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public TimeSpan RequestTimeout
 		{
-			get { return this.requestTimeout; }
+			get => this.requestTimeout;
 
 			set
 			{

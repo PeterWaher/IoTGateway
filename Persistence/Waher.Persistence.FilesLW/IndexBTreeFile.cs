@@ -66,12 +66,12 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Name of corresponding collection name.
 		/// </summary>
-		public string CollectionName { get { return this.collectionName; } }
+		public string CollectionName => this.collectionName;
 
 		/// <summary>
 		/// Encoding to use for text properties.
 		/// </summary>
-		public Encoding Encoding { get { return this.encoding; } }
+		public Encoding Encoding => this.encoding;
 
 		/// <summary>
 		/// Field names included in the index.

@@ -32,15 +32,15 @@ namespace Waher.Client.WPF.Controls.Questions
 		[DefaultValueNull]
 		public string[] ParameterNames
 		{
-			get { return this.parameterNames; }
-			set { this.parameterNames = value; }
+			get => this.parameterNames;
+			set => this.parameterNames = value;
 		}
 
 		[DefaultValueNull]
 		public string[] AvailableParameterNames
 		{
-			get { return this.availableParameterNames; }
-			set { this.availableParameterNames = value; }
+			get => this.availableParameterNames;
+			set => this.availableParameterNames = value;
 		}
 
 		public override string QuestionString => "Allowed to control?";

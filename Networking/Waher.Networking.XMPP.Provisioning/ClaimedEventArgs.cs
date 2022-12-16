@@ -19,9 +19,6 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// If the device is considered a public device, meaning it's available in searches in the thing registry.
 		/// </summary>
-		public bool IsPublic
-		{
-			get { return this.isPublic; }
-		}
+		public bool IsPublic => this.isPublic;
 	}
 }

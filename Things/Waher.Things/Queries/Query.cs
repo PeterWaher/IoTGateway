@@ -95,66 +95,42 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Command ID
 		/// </summary>
-		public string CommandID
-		{
-			get { return this.commandId; }
-		}
+		public string CommandID => this.commandId;
 
 		/// <summary>
 		/// Query ID
 		/// </summary>
-		public string QueryID
-		{
-			get { return this.queryId; }
-		}
+		public string QueryID => this.queryId;
 
 		/// <summary>
 		/// State object.
 		/// </summary>
-		public object State
-		{
-			get { return this.state; }
-		}
+		public object State => this.state;
 
 		/// <summary>
 		/// Language of query.
 		/// </summary>
-		public Language Language
-		{
-			get { return this.language; }
-		}
+		public Language Language => this.language;
 
 		/// <summary>
 		/// Node reference.
 		/// </summary>
-		public INode NodeReference
-		{
-			get { return this.nodeReference; }
-		}
+		public INode NodeReference => this.nodeReference;
 
 		/// <summary>
 		/// If the query is aborted.
 		/// </summary>
-		public bool IsAborted
-		{
-			get { return this.isAborted; }
-		}
+		public bool IsAborted => this.isAborted;
 
 		/// <summary>
 		/// If the query is done.
 		/// </summary>
-		public bool IsDone
-		{
-			get { return this.isDone; }
-		}
+		public bool IsDone => this.isDone;
 
 		/// <summary>
 		/// Curernt sequence number counter.
 		/// </summary>
-		public int SequenceNumber
-		{
-			get { return this.seqNr; }
-		}
+		public int SequenceNumber => this.seqNr;
 
 		/// <summary>
 		/// Gets the next sequence number.

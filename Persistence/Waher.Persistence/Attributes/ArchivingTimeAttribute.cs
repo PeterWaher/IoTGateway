@@ -45,17 +45,11 @@ namespace Waher.Persistence.Attributes
 		/// <summary>
 		/// Number of days to archive objects of this type. If equal to <see cref="int.MaxValue"/>, no limit is defined.
 		/// </summary>
-		public int Days
-		{
-			get { return this.days; }
-		}
+		public int Days => this.days;
 
 		/// <summary>
 		/// A property on the object with this name defines the number of days to archive the object. (Default=<see cref="int.MaxValue"/>, meaning no limit defined.)
 		/// </summary>
-		public string PropertyName
-		{
-			get { return this.propertyName; }
-		}
+		public string PropertyName => this.propertyName;
 	}
 }

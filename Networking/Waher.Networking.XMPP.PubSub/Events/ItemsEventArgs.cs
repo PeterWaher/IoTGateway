@@ -47,17 +47,11 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// Items found.
 		/// </summary>
-		public PubSubItem[] Items
-		{
-			get { return this.items; }
-		}
+		public PubSubItem[] Items => this.items;
 
 		/// <summary>
 		/// Pagination information, if available, null otherwise.
 		/// </summary>
-		public ResultPage Page
-		{
-			get { return this.page; }
-		}
+		public ResultPage Page => this.page;
 	}
 }

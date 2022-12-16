@@ -28,8 +28,8 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public DateTime Value
 		{
-			get { return this.value; }
-			set { this.value = value; }
+			get => this.value;
+			set => this.value = value;
 		}
 
 		/// <inheritdoc/>
@@ -49,10 +49,7 @@ namespace Waher.Script.Objects
 		/// <summary>
 		/// Associated object value.
 		/// </summary>
-		public override object AssociatedObjectValue
-		{
-			get { return this.value; }
-		}
+		public override object AssociatedObjectValue => this.value;
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)

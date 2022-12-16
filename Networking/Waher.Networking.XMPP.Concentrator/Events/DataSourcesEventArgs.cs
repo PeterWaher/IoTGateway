@@ -26,9 +26,6 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// DataSources of the concentrator server.
 		/// </summary>
-		public DataSourceReference[] DataSources
-		{
-			get { return this.dataSources; }
-		}
+		public DataSourceReference[] DataSources => this.dataSources;
 	}
 }

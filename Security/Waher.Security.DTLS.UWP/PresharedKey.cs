@@ -46,17 +46,11 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// UTF-8 encoded Identity.
 		/// </summary>
-		public byte[] Identity
-		{
-			get { return this.identity; }
-		}
+		public byte[] Identity => this.identity;
 
 		/// <summary>
 		/// Secret binary key.
 		/// </summary>
-		public byte[] Key
-		{
-			get { return this.key; }
-		}
+		public byte[] Key => this.key;
     }
 }

@@ -21,10 +21,7 @@ namespace Waher.Script.Units
 		/// <summary>
 		/// Unit name.
 		/// </summary>
-		public string Name
-		{
-			get { return this.name; }
-		}
+		public string Name => this.name;
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)

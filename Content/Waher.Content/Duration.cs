@@ -108,8 +108,8 @@ namespace Waher.Content
 		/// </summary>
 		public int Years
 		{
-			get { return this.years; }
-			set { this.years = value; }
+			get => this.years;
+			set => this.years = value;
 		}
 
 		/// <summary>
@@ -117,8 +117,8 @@ namespace Waher.Content
 		/// </summary>
 		public int Months
 		{
-			get { return this.months; }
-			set { this.months = value; }
+			get => this.months;
+			set => this.months = value;
 		}
 
 		/// <summary>
@@ -126,8 +126,8 @@ namespace Waher.Content
 		/// </summary>
 		public int Days
 		{
-			get { return this.days; }
-			set { this.days = value; }
+			get => this.days;
+			set => this.days = value;
 		}
 
 		/// <summary>
@@ -135,8 +135,8 @@ namespace Waher.Content
 		/// </summary>
 		public int Hours
 		{
-			get { return this.hours; }
-			set { this.hours = value; }
+			get => this.hours;
+			set => this.hours = value;
 		}
 
 		/// <summary>
@@ -144,8 +144,8 @@ namespace Waher.Content
 		/// </summary>
 		public int Minutes
 		{
-			get { return this.minutes; }
-			set { this.minutes = value; }
+			get => this.minutes;
+			set => this.minutes = value;
 		}
 
 		/// <summary>
@@ -153,8 +153,8 @@ namespace Waher.Content
 		/// </summary>
 		public double Seconds
 		{
-			get { return this.seconds; }
-			set { this.seconds = value; }
+			get => this.seconds;
+			set => this.seconds = value;
 		}
 
 		/// <summary>
@@ -162,8 +162,8 @@ namespace Waher.Content
 		/// </summary>
 		public bool Negation
 		{
-			get { return this.negation; }
-			set { this.negation = value; }
+			get => this.negation;
+			set => this.negation = value;
 		}
 
 		/// <summary>

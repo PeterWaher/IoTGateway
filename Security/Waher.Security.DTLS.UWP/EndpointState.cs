@@ -119,7 +119,7 @@ namespace Waher.Security.DTLS
 		/// </summary>
 		public DtlsState State
 		{
-			get { return this.state; }
+			get => this.state;
 			internal set
 			{
 				if (this.state != value)

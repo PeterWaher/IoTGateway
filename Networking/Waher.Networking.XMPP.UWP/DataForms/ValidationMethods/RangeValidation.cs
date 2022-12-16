@@ -34,12 +34,12 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 		/// <summary>
 		/// Minimum value (string representation).
 		/// </summary>
-		public string Min { get { return this.min; } }
+		public string Min => this.min;
 
 		/// <summary>
 		/// Maximum value (string representation).
 		/// </summary>
-		public string Max { get { return this.max; } }
+		public string Max => this.max;
 
 		internal override void Serialize(StringBuilder Output)
 		{

@@ -174,18 +174,12 @@ namespace Waher.Script
 		/// <summary>
 		/// Original script string.
 		/// </summary>
-		public string Script
-		{
-			get { return this.script; }
-		}
+		public string Script => this.script;
 
 		/// <summary>
 		/// Source of script, or null if not defined.
 		/// </summary>
-		public string Source
-		{
-			get { return this.source; }
-		}
+		public string Source => this.source;
 
 		internal char NextChar()
 		{
@@ -5065,8 +5059,8 @@ namespace Waher.Script
 		/// </summary>
 		public object Tag
 		{
-			get { return this.tag; }
-			set { this.tag = value; }
+			get => this.tag;
+			set => this.tag = value;
 		}
 
 		/// <summary>

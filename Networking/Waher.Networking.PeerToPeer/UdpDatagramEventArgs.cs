@@ -34,11 +34,11 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// Remote Endpoint
 		/// </summary>
-		public IPEndPoint RemoteEndpoint { get { return this.remoteEndpoint; } }
+		public IPEndPoint RemoteEndpoint => this.remoteEndpoint;
 
 		/// <summary>
 		/// Binary Datagram
 		/// </summary>
-		public byte[] Data { get { return this.data; } }
+		public byte[] Data => this.data;
 	}
 }

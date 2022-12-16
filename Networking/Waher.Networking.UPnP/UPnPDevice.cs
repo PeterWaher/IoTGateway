@@ -127,100 +127,97 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// Underlying XML definition.
 		/// </summary>
-		public XmlElement Xml
-		{
-			get { return this.xml; }
-		}
+		public XmlElement Xml => this.xml;
 
 		/// <summary>
 		/// Device type
 		/// </summary>
-		public string DeviceType { get { return this.deviceType; } }
+		public string DeviceType => this.deviceType;
 
 		/// <summary>
 		/// Short user-friendly title
 		/// </summary>
-		public string FriendlyName { get { return this.friendlyName; } }
+		public string FriendlyName => this.friendlyName;
 
 		/// <summary>
 		/// Manufacturer name
 		/// </summary>
-		public string Manufacturer { get { return this.manufacturer; } }
+		public string Manufacturer => this.manufacturer;
 
 		/// <summary>
 		/// URL to manufacturer site
 		/// </summary>
-		public string ManufacturerURL { get { return this.manufacturerURL; } }
+		public string ManufacturerURL => this.manufacturerURL;
 
 		/// <summary>
 		/// Long user-friendly title
 		/// </summary>
-		public string ModelDescription { get { return this.modelDescription; } }
+		public string ModelDescription => this.modelDescription;
 
 		/// <summary>
 		/// Model name
 		/// </summary>
-		public string ModelName { get { return this.modelName; } }
+		public string ModelName => this.modelName;
 
 		/// <summary>
 		/// Model number
 		/// </summary>
-		public string ModelNumber { get { return this.modelNumber; } }
+		public string ModelNumber => this.modelNumber;
 
 		/// <summary>
 		/// URL to model site
 		/// </summary>
-		public string ModelURL { get { return this.modelURL; } }
+		public string ModelURL => this.modelURL;
 
 		/// <summary>
 		/// Manufacturer's serial number
 		/// </summary>
-		public string SerialNumber { get { return this.serialNumber; } }
+		public string SerialNumber => this.serialNumber;
 
 		/// <summary>
 		/// Unique Device Name (uuid:UUID)
 		/// </summary>
-		public string UDN { get { return this.udn; } }
+		public string UDN => this.udn;
 
 		/// <summary>
 		/// Universal Product Code
 		/// </summary>
-		public string UPC { get { return this.upc; } }
+		public string UPC => this.upc;
 
 		/// <summary>
 		/// Icons for the device.
 		/// </summary>
-		public UPnPIcon[] Icons { get { return this.icons; } }
+		public UPnPIcon[] Icons => this.icons;
 
 		/// <summary>
 		/// Services published by the device.
 		/// </summary>
-		public UPnPService[] Services { get { return this.services; } }
+		public UPnPService[] Services => this.services;
 
 		/// <summary>
 		/// Embedded devices.
 		/// </summary>
-		public UPnPDevice[] Devices { get { return this.devices; } }
+		public UPnPDevice[] Devices => this.devices;
 
 		/// <summary>
 		/// URL for presentation
 		/// </summary>
-		public string PresentationURL { get { return this.presentationURL; } }
+		public string PresentationURL => this.presentationURL;
 
 		/// <summary>
 		/// URI to manufacturer site
 		/// </summary>
-		public Uri ManufacturerURI { get { return this.manufacturerURI; } }
+		public Uri ManufacturerURI => this.manufacturerURI;
 
 		/// <summary>
 		/// URI to model site
 		/// </summary>
-		public Uri ModelURI { get { return this.modelURI; } }
+		public Uri ModelURI => this.modelURI;
 
 		/// <summary>
 		/// URI for presentation
 		/// </summary>
-		public Uri PresentationURI { get { return this.presentationURI; } }
+		public Uri PresentationURI => this.presentationURI;
 
 		/// <inheritdoc/>
 		public override string ToString()

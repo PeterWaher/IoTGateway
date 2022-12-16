@@ -33,33 +33,24 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		public int Index
 		{
-			get { return this.index; }
-			internal set { this.index = value; }
+			get => this.index;
+			internal set => this.index = value;
 		}
 
 		/// <summary>
 		/// Player ID
 		/// </summary>
-		public Guid PlayerId
-		{
-			get { return this.playerId; }
-		}
+		public Guid PlayerId => this.playerId;
 
 		/// <summary>
 		/// Public Endpoint
 		/// </summary>
-		public IPEndPoint PublicEndpoint
-		{
-			get { return this.publicEndpoint; }
-		}
+		public IPEndPoint PublicEndpoint => this.publicEndpoint;
 
 		/// <summary>
 		/// Local Endpoint
 		/// </summary>
-		public IPEndPoint LocalEndpoint
-		{
-			get { return this.localEndpoint; }
-		}
+		public IPEndPoint LocalEndpoint => this.localEndpoint;
 
 		internal void SetEndpoints(IPEndPoint PublicEndpoint, IPEndPoint LocalEndpoint)
 		{
@@ -122,8 +113,8 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		public PeerConnection Connection
 		{
-			get { return this.connection; }
-			internal set { this.connection = value; }
+			get => this.connection;
+			internal set => this.connection = value;
 		}
 
 		/// <inheritdoc/>

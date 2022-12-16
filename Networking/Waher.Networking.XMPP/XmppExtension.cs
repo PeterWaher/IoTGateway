@@ -41,10 +41,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// XMPP Client.
 		/// </summary>
-		public XmppClient Client
-		{
-			get { return this.client; }
-		}
+		public XmppClient Client => this.client;
 
 		/// <summary>
 		/// If the client has been disposed.

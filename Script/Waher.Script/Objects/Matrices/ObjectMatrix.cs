@@ -125,25 +125,19 @@ namespace Waher.Script.Objects.Matrices
 		/// <summary>
 		/// Number of rows.
 		/// </summary>
-		public int Rows
-		{
-			get { return this.rows; }
-		}
+		public int Rows => this.rows;
 
 		/// <summary>
 		/// Number of columns.
 		/// </summary>
-		public int Columns
-		{
-			get { return this.columns; }
-		}
+		public int Columns => this.columns;
 
 		/// <summary>
 		/// Contains optional column names.
 		/// </summary>
 		public string[] ColumnNames
 		{
-			get { return this.columnNames; }
+			get => this.columnNames;
 			set
 			{
 				if (!(value is null) && value.Length != this.columns)
@@ -524,10 +518,7 @@ namespace Waher.Script.Objects.Matrices
 		/// <summary>
 		/// Dimension of matrix, if seen as a vector of row vectors.
 		/// </summary>
-		public int Dimension
-		{
-			get { return this.rows; }
-		}
+		public int Dimension => this.rows;
 
 		/// <summary>
 		/// Vector of row vectors.

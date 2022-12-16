@@ -30,18 +30,12 @@ namespace Waher.Networking.XMPP.Control.ControlOperations
 		/// <summary>
 		/// Control parameter
 		/// </summary>
-		public DoubleControlParameter Parameter
-		{
-			get { return this.parameter; }
-		}
+		public DoubleControlParameter Parameter => this.parameter;
 
 		/// <summary>
 		/// Value to set.
 		/// </summary>
-		public double Value
-		{
-			get { return this.value; }
-		}
+		public double Value => this.value;
 
 		/// <summary>
 		/// Performs the control operation.

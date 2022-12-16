@@ -718,19 +718,19 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <summary>
 		/// XMPP Client.
 		/// </summary>
-		public XmppClient Client { get { return this.client; } }
+		public XmppClient Client => this.client;
 
 		/// <summary>
 		/// Form type
 		/// </summary>
-		public FormType Type { get { return this.type; } }
+		public FormType Type => this.type;
 
 		/// <summary>
 		/// Fields in the form.
 		/// </summary>
 		public Field[] Fields
 		{
-			get { return this.fields; }
+			get => this.fields;
 			set
 			{
 				this.fieldsByVar.Clear();
@@ -746,8 +746,8 @@ namespace Waher.Networking.XMPP.DataForms
 		/// </summary>
 		public string[] Instructions
 		{
-			get { return this.instructions; }
-			set { this.instructions = value; }
+			get => this.instructions;
+			set => this.instructions = value;
 		}
 
 		/// <summary>
@@ -755,56 +755,53 @@ namespace Waher.Networking.XMPP.DataForms
 		/// </summary>
 		public string Title
 		{
-			get { return this.title; }
-			set { this.title = value; }
+			get => this.title;
+			set => this.title = value;
 		}
 
 		/// <summary>
 		/// Header fields in a report result form.
 		/// </summary>
-		public Field[] Header { get { return this.header; } }
+		public Field[] Header => this.header;
 
 		/// <summary>
 		/// Records in a report result form.
 		/// </summary>
-		public Field[][] Records { get { return this.records; } }
+		public Field[][] Records => this.records;
 
 		/// <summary>
 		/// If the form has pages.
 		/// </summary>
-		public bool HasPages { get { return this.hasPages; } }
+		public bool HasPages => this.hasPages;
 
 		/// <summary>
 		/// Pages in form.
 		/// </summary>
 		public Page[] Pages
 		{
-			get { return this.pages; }
-			set { this.pages = value; }
+			get => this.pages;
+			set => this.pages = value;
 		}
 
 		/// <summary>
 		/// From where the form was sent.
 		/// </summary>
-		public string From { get { return this.from; } }
+		public string From => this.from;
 
 		/// <summary>
 		/// To where the form was sent.
 		/// </summary>
-		public string To { get { return this.to; } }
+		public string To => this.to;
 
 		/// <summary>
 		/// If the form contains post-back fields.
 		/// </summary>
-		public bool ContainsPostBackFields { get { return this.containsPostBackFields; } }
+		public bool ContainsPostBackFields => this.containsPostBackFields;
 
 		/// <summary>
 		/// If the form contains media.
 		/// </summary>
-		public bool HasMedia
-		{
-			get { return this.hasMedia; }
-		}
+		public bool HasMedia => this.hasMedia;
 
 		/// <summary>
 		/// Submits the form.
@@ -881,8 +878,8 @@ namespace Waher.Networking.XMPP.DataForms
 		/// </summary>
 		public object State
 		{
-			get { return this.state; }
-			set { this.state = value; }
+			get => this.state;
+			set => this.state = value;
 		}
 
 		/// <summary>

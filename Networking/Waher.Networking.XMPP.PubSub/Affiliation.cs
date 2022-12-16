@@ -29,25 +29,16 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// Node name.
 		/// </summary>
-		public string Node
-		{
-			get { return this.node; }
-		}
+		public string Node => this.node;
 
 		/// <summary>
 		/// JID receiving notifications.
 		/// </summary>
-		public string Jid
-		{
-			get { return this.jid; }
-		}
+		public string Jid => this.jid;
 
 		/// <summary>
 		/// User affiliation.
 		/// </summary>
-		public AffiliationStatus Status
-		{
-			get { return this.status; }
-		}
+		public AffiliationStatus Status => this.status;
 	}
 }

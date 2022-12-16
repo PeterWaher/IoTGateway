@@ -76,8 +76,8 @@ namespace Waher.Things.Mqtt
 		[DefaultValue(false)]
 		public bool WillRetain
 		{
-			get { return this.willRetain; }
-			set { this.willRetain = value; }
+			get => this.willRetain;
+			set => this.willRetain = value;
 		}
 
 		[Page(10, "Last Will and Testament")]

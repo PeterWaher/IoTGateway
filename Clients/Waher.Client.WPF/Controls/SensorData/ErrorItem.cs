@@ -25,7 +25,7 @@ namespace Waher.Client.WPF.Controls.SensorData
 		/// <summary>
 		/// Error message.
 		/// </summary>
-		public ThingError Error { get { return this.error; } }
+		public ThingError Error => this.error;
 
 		/// <summary>
 		/// Timestamp of event.

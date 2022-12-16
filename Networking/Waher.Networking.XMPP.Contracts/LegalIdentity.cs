@@ -70,8 +70,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public string Id
 		{
-			get { return this.id; }
-			set { this.id = value; }
+			get => this.id;
+			set => this.id = value;
 		}
 
 		/// <summary>
@@ -89,8 +89,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public string Provider
 		{
-			get { return this.provider; }
-			set { this.provider = value; }
+			get => this.provider;
+			set => this.provider = value;
 		}
 
 		/// <summary>
@@ -98,8 +98,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public IdentityState State
 		{
-			get { return this.state; }
-			set { this.state = value; }
+			get => this.state;
+			set => this.state = value;
 		}
 
 		/// <summary>
@@ -107,8 +107,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public DateTime Created
 		{
-			get { return this.created; }
-			set { this.created = value; }
+			get => this.created;
+			set => this.created = value;
 		}
 
 		/// <summary>
@@ -116,8 +116,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public DateTime Updated
 		{
-			get { return this.updated; }
-			set { this.updated = value; }
+			get => this.updated;
+			set => this.updated = value;
 		}
 
 		/// <summary>
@@ -125,8 +125,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public DateTime From
 		{
-			get { return this.from; }
-			set { this.from = value; }
+			get => this.from;
+			set => this.from = value;
 		}
 
 		/// <summary>
@@ -134,8 +134,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public DateTime To
 		{
-			get { return this.to; }
-			set { this.to = value; }
+			get => this.to;
+			set => this.to = value;
 		}
 
 		/// <summary>
@@ -143,8 +143,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public Property[] Properties
 		{
-			get { return this.properties; }
-			set { this.properties = value; }
+			get => this.properties;
+			set => this.properties = value;
 		}
 
 		/// <summary>
@@ -152,8 +152,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public Attachment[] Attachments
 		{
-			get { return this.attachments; }
-			set { this.attachments = value; }
+			get => this.attachments;
+			set => this.attachments = value;
 		}
 
 		/// <summary>
@@ -161,8 +161,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public string ClientKeyName
 		{
-			get { return this.clientKeyName; }
-			set { this.clientKeyName = value; }
+			get => this.clientKeyName;
+			set => this.clientKeyName = value;
 		}
 
 		/// <summary>
@@ -170,8 +170,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public byte[] ClientPubKey
 		{
-			get { return this.clientPubKey; }
-			set { this.clientPubKey = value; }
+			get => this.clientPubKey;
+			set => this.clientPubKey = value;
 		}
 
 		/// <summary>
@@ -179,8 +179,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public byte[] ClientSignature
 		{
-			get { return this.clientSignature; }
-			set { this.clientSignature = value; }
+			get => this.clientSignature;
+			set => this.clientSignature = value;
 		}
 
 		/// <summary>
@@ -188,8 +188,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public byte[] ServerSignature
 		{
-			get { return this.serverSignature; }
-			set { this.serverSignature = value; }
+			get => this.serverSignature;
+			set => this.serverSignature = value;
 		}
 
 		/// <summary>

@@ -64,8 +64,8 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public float? SingleValue
 		{
-			get { return this.value; }
-			set { this.value = value; }
+			get => this.value;
+			set => this.value = value;
 		}
 
 		/// <summary>

@@ -46,7 +46,7 @@ namespace Waher.Client.WPF.Controls.SensorData
 		/// <summary>
 		/// Sensor data field.
 		/// </summary>
-		public Field Field { get { return this.field; } }
+		public Field Field => this.field;
 
 		/// <summary>
 		/// Timestamp of event.

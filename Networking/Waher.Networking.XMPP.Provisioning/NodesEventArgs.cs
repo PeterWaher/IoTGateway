@@ -19,9 +19,6 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Nodes allowed to process. If null, no node restrictions exist.
 		/// </summary>
-		public IThingReference[] Nodes
-		{
-			get { return this.nodes; }
-		}
+		public IThingReference[] Nodes => this.nodes;
 	}
 }

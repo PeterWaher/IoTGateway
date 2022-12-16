@@ -22,9 +22,6 @@ namespace Waher.Things.Attributes
 		/// <summary>
 		/// Regular expression to validate against.
 		/// </summary>
-		public string Pattern
-		{
-			get { return this.pattern; }
-		}
+		public string Pattern => this.pattern;
 	}
 }

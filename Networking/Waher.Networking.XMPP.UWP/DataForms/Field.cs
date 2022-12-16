@@ -70,29 +70,29 @@ namespace Waher.Networking.XMPP.DataForms
 		/// </summary>
 		public DataForm Form
 		{
-			get { return this.form; }
-			internal set { this.form = value; }
+			get => this.form;
+			internal set => this.form = value;
 		}
 
 		/// <summary>
 		/// Variable name
 		/// </summary>
-		public string Var { get { return this.var; } }
+		public string Var => this.var;
 
 		/// <summary>
 		/// Label
 		/// </summary>
-		public string Label { get { return this.label; } }
+		public string Label => this.label;
 
 		/// <summary>
 		/// If the field is required.
 		/// </summary>
-		public bool Required { get { return this.required; } }
+		public bool Required => this.required;
 
 		/// <summary>
 		/// Values for the field (string representations).
 		/// </summary>
-		public string[] ValueStrings { get { return this.valueStrings; } }
+		public string[] ValueStrings => this.valueStrings;
 
 		/// <summary>
 		/// Value as a single string. If field contains multiple values, they will be concatenated into a single string, each one delimited by a CRLF.
@@ -108,30 +108,30 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <summary>
 		/// Options, as (Key=M2H Label, Value=M2M Value) pairs.
 		/// </summary>
-		public KeyValuePair<string, string>[] Options { get { return this.options; } }
+		public KeyValuePair<string, string>[] Options => this.options;
 
 		/// <summary>
 		/// Description
 		/// </summary>
-		public string Description { get { return this.description; } }
+		public string Description => this.description;
 
 		/// <summary>
 		/// Data Type
 		/// </summary>
-		public DataType DataType { get { return this.dataType; } }
+		public DataType DataType => this.dataType;
 
 		/// <summary>
 		/// Validation Method
 		/// </summary>
-		public ValidationMethod ValidationMethod { get { return this.validationMethod; } }
+		public ValidationMethod ValidationMethod => this.validationMethod;
 
 		/// <summary>
 		/// If not null, flags the field as having an error.
 		/// </summary>
 		public string Error
 		{
-			get { return this.error; }
-			set { this.error = value; }
+			get => this.error;
+			set => this.error = value;
 		}
 
 		/// <summary>
@@ -142,30 +142,30 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <summary>
 		/// Flags the field as requiring server post-back after having been edited.
 		/// </summary>
-		public bool PostBack { get { return this.postBack; } }
+		public bool PostBack => this.postBack;
 
 		/// <summary>
 		/// Flags the field as being read-only.
 		/// </summary>
-		public bool ReadOnly { get { return this.readOnly; } }
+		public bool ReadOnly => this.readOnly;
 
 		/// <summary>
 		/// Flags the field as having an undefined or uncertain value.
 		/// </summary>
-		public bool NotSame { get { return this.notSame; } }
+		public bool NotSame => this.notSame;
 
 		/// <summary>
 		/// If the field has been edited.
 		/// </summary>
-		public bool Edited { get { return this.edited; } }
+		public bool Edited => this.edited;
 
 		/// <summary>
 		/// Can be used to sort fields. Not serialized to or from XML.
 		/// </summary>
 		public int Priority
 		{
-			get { return this.priority; }
-			set { this.priority = value; }
+			get => this.priority;
+			set => this.priority = value;
 		}
 
 		/// <summary>
@@ -173,8 +173,8 @@ namespace Waher.Networking.XMPP.DataForms
 		/// </summary>
 		public int Ordinal
 		{
-			get { return this.ordinal; }
-			set { this.ordinal = value; }
+			get => this.ordinal;
+			set => this.ordinal = value;
 		}
 
 		/// <summary>
@@ -398,8 +398,8 @@ namespace Waher.Networking.XMPP.DataForms
 		/// </summary>
 		public bool Exclude
 		{
-			get { return this.exclude; }
-			set { this.exclude = value; }
+			get => this.exclude;
+			set => this.exclude = value;
 		}
 
 		/// <summary>

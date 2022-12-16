@@ -90,10 +90,7 @@ namespace Waher.Networking.XMPP.PEP
 		/// <see cref="PubSubClient"/> used for the Personal Eventing Protocol. Use this client to perform administrative tasks
 		/// of the PEP service.
 		/// </summary>
-		public PubSubClient PubSubClient
-		{
-			get { return this.pubSubClient; }
-		}
+		public PubSubClient PubSubClient => this.pubSubClient;
 
 		/// <summary>
 		/// Implemented extensions.

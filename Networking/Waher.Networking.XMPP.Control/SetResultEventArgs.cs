@@ -27,28 +27,19 @@ namespace Waher.Networking.XMPP.Control
 		/// <summary>
 		/// If set-operation was performed or not. Partial operations also return true.
 		/// </summary>
-		public bool Performed
-		{
-			get { return this.performed; }
-		}
+		public bool Performed => this.performed;
 
 		/// <summary>
 		/// Any nodes returnded in response. This array can be compared to the original array to see if a partial operation was 
 		/// performed. If this array is null, all nodes in the original request were set.
 		/// </summary>
-		public ThingReference[] Nodes
-		{
-			get { return this.nodes; }
-		}
+		public ThingReference[] Nodes => this.nodes;
 
 		/// <summary>
 		/// Any parameter names returnded in response. This array can be compared to the original array to see if a partial operation 
 		/// was performed. If this array is null, all parameters were set.
 		/// </summary>
-		public string[] ParameterNames
-		{
-			get { return this.parameterNames; }
-		}
+		public string[] ParameterNames => this.parameterNames;
 
 	}
 }

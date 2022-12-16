@@ -28,17 +28,11 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// ID of sniffer session.
 		/// </summary>
-		public string SnifferrId
-		{
-			get { return this.snifferId; }
-		}
+		public string SnifferrId => this.snifferId;
 
 		/// <summary>
 		/// When the sniffer should expire, if not unregistered before.
 		/// </summary>
-		public DateTime Expires
-		{
-			get { return this.expires; }
-		}
+		public DateTime Expires => this.expires;
 	}
 }

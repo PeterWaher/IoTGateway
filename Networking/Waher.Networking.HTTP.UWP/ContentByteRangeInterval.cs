@@ -27,26 +27,17 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// First byte of interval.
 		/// </summary>
-		public long First
-		{
-			get { return this.first; }
-		}
+		public long First => this.first;
 
 		/// <summary>
 		/// Last byte of interval, inclusive.
 		/// </summary>
-		public long Last
-		{
-			get { return this.last; }
-		}
+		public long Last => this.last;
 
 		/// <summary>
 		/// Total number of bytes of content entity.
 		/// </summary>
-		public long Total
-		{
-			get { return this.total; }
-		}
+		public long Total => this.total;
 
 		/// <inheritdoc/>
 		public override string ToString()

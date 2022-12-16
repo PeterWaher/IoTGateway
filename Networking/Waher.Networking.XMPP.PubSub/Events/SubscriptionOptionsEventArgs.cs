@@ -39,25 +39,16 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// Node name.
 		/// </summary>
-		public string NodeName
-		{
-			get { return this.nodeName; }
-		}
+		public string NodeName => this.nodeName;
 
 		/// <summary>
 		/// JID of subscription.
 		/// </summary>
-		public string Jid
-		{
-			get { return this.jid; }
-		}
+		public string Jid => this.jid;
 
 		/// <summary>
 		/// Subscriptions options, if available.
 		/// </summary>
-		public SubscriptionOptions Options
-		{
-			get { return this.options; }
-		}
+		public SubscriptionOptions Options => this.options;
 	}
 }

@@ -65,34 +65,22 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <summary>
 		/// If a SOCKS5 proxy has been detected.
 		/// </summary>
-		public bool HasProxy
-		{
-			get { return this.hasProxy; }
-		}
+		public bool HasProxy => this.hasProxy;
 
 		/// <summary>
 		/// JID of SOCKS5 proxy.
 		/// </summary>
-		public string JID
-		{
-			get { return this.jid; }
-		}
+		public string JID => this.jid;
 
 		/// <summary>
 		/// Host name or IP address of SOCKS5 proxy.
 		/// </summary>
-		public string Host
-		{
-			get { return this.host; }
-		}
+		public string Host => this.host;
 
 		/// <summary>
 		/// Port number of SOCKS5 proxy.
 		/// </summary>
-		public int Port
-		{
-			get { return this.port; }
-		}
+		public int Port => this.port;
 
 		/// <summary>
 		/// Starts the search of SOCKS5 proxies.

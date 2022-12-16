@@ -38,34 +38,22 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Set.
 		/// </summary>
-		public override ISet AssociatedSet
-		{
-			get { return this.AssociatedRing; }
-		}
+		public override ISet AssociatedSet => this.AssociatedRing;
 
 		/// <summary>
 		/// Associated Semi-Group.
 		/// </summary>
-		public override ISemiGroup AssociatedSemiGroup
-		{
-			get { return this.AssociatedRing; }
-		}
+		public override ISemiGroup AssociatedSemiGroup => this.AssociatedRing;
 
 		/// <summary>
 		/// Associated Group.
 		/// </summary>
-		public override IGroup AssociatedGroup
-		{
-			get { return this.AssociatedRing; }
-		}
+		public override IGroup AssociatedGroup => this.AssociatedRing;
 
 		/// <summary>
 		/// Associated Abelian Group.
 		/// </summary>
-		public override IAbelianGroup AssociatedAbelianGroup
-		{
-			get { return this.AssociatedRing; }
-		}
+		public override IAbelianGroup AssociatedAbelianGroup => this.AssociatedRing;
 
 		/// <summary>
 		/// Associated Ring.

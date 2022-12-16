@@ -29,10 +29,7 @@ namespace Waher.Client.WPF.Controls
 				Q.Dispose();
 		}
 
-		public XmppAccountNode Owner
-		{
-			get { return this.owner; }
-		}
+		public XmppAccountNode Owner=> this.owner;
 
 		public string ProvisioningJid
 		{

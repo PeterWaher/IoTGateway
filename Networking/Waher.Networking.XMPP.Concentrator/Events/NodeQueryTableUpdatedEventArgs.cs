@@ -28,9 +28,6 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// New Records
 		/// </summary>
-		public Record[] NewRecords
-		{
-			get { return this.newRecords; }
-		}
+		public Record[] NewRecords => this.newRecords;
 	}
 }

@@ -31,33 +31,18 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <summary>
 		/// Stream ID
 		/// </summary>
-		public string StreamId
-		{
-			get { return this.streamId; }
-		}
+		public string StreamId => this.streamId;
 
 		/// <summary>
 		/// XMPP Client.
 		/// </summary>
-		public XmppClient Client
-		{
-			get { return this.client; }
-		}
+		public XmppClient Client => this.client;
 
-		internal DataReceivedEventHandler DataCallback
-		{
-			get { return this.dataCallback; }
-		}
+		internal DataReceivedEventHandler DataCallback => this.dataCallback;
 
-		internal StreamEventHandler CloseCallback
-		{
-			get { return this.closeCallback; }
-		}
+		internal StreamEventHandler CloseCallback => this.closeCallback;
 
-		internal object State
-		{
-			get { return this.state; }
-		}
+		internal object State => this.state;
 
 		/// <summary>
 		/// Call this method to accept the incoming stream.

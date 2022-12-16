@@ -68,50 +68,32 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// Underlying XML Document.
 		/// </summary>
-		public XmlDocument Xml
-		{
-			get { return this.xml; }
-		}
+		public XmlDocument Xml => this.xml;
 
 		/// <summary>
 		/// Major version
 		/// </summary>
-		public int MajorVersion
-		{
-			get { return this.majorVersion; }
-		}
+		public int MajorVersion => this.majorVersion;
 
 		/// <summary>
 		/// Minor version
 		/// </summary>
-		public int MinorVersion
-		{
-			get { return this.minorVersion; }
-		}
+		public int MinorVersion => this.minorVersion;
 
 		/// <summary>
 		/// Base URL
 		/// </summary>
-		public string BaseUrl
-		{
-			get { return this.baseUrl; }
-		}
+		public string BaseUrl => this.baseUrl;
 
 		/// <summary>
 		/// Base URI
 		/// </summary>
-		public Uri BaseUri
-		{
-			get { return this.baseUri; }
-		}
+		public Uri BaseUri => this.baseUri;
 
 		/// <summary>
 		/// Root device
 		/// </summary>
-		public UPnPDevice Device
-		{
-			get { return this.device; }
-		}
+		public UPnPDevice Device => this.device;
 
 		/// <inheritdoc/>
 		public override string ToString()

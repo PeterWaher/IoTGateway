@@ -64,12 +64,12 @@ namespace Waher.Things
 		/// <summary>
 		/// Timestamp of error.
 		/// </summary>
-		public DateTime Timestamp { get { return this.timestamp; } }
+		public DateTime Timestamp => this.timestamp;
 
 		/// <summary>
 		/// Error message.
 		/// </summary>
-		public string ErrorMessage { get { return this.errorMessage; } }
+		public string ErrorMessage => this.errorMessage;
 
 		/// <inheritdoc/>
 		public override string ToString()

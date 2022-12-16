@@ -49,8 +49,8 @@ namespace Waher.Things.Ip
 		[ToolTip(29, "Check if Server Certificate should be trusted.")]
 		public bool TrustServer
 		{
-			get { return this.trustServer; }
-			set { this.trustServer = value; }
+			get => this.trustServer;
+			set => this.trustServer = value;
 		}
 
 		/// <summary>
@@ -63,8 +63,8 @@ namespace Waher.Things.Ip
 		[Range(0, 65535)]
 		public int ListeningPort
 		{
-			get { return this.listeningPort; }
-			set { this.listeningPort = value; }
+			get => this.listeningPort;
+			set => this.listeningPort = value;
 		}
 
 		/// <summary>
@@ -76,8 +76,8 @@ namespace Waher.Things.Ip
 		[DefaultValue(false)]
 		public bool AuthorizedAccess
 		{
-			get { return this.authorizedAccess; }
-			set { this.authorizedAccess = value; }
+			get => this.authorizedAccess;
+			set => this.authorizedAccess = value;
 		}
 
 		/// <summary>
@@ -91,7 +91,7 @@ namespace Waher.Things.Ip
 		[DefaultValueStringEmpty]
 		public string RemoteIps
 		{
-			get { return this.remoteIpsExpression; }
+			get => this.remoteIpsExpression;
 			set 
 			{
 				if (string.IsNullOrEmpty(value))

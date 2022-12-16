@@ -299,18 +299,12 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// External IP Endpoint.
 		/// </summary>
-		public IPEndPoint ExternalEndpoint
-		{
-			get { return this.externalEndpoint; }
-		}
+		public IPEndPoint ExternalEndpoint => this.externalEndpoint;
 
 		/// <summary>
 		/// Local IP Endpoint.
 		/// </summary>
-		public IPEndPoint LocalEndpoint
-		{
-			get { return this.localEndpoint; }
-		}
+		public IPEndPoint LocalEndpoint => this.localEndpoint;
 
 		/// <summary>
 		/// If packets are to be encapsulated and delivered as ordered units (true), or if fragmentation in the 
@@ -318,8 +312,8 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		public bool EncapsulatePackets
 		{
-			get { return this.encapsulatePackets; }
-			set { this.encapsulatePackets = value; }
+			get => this.encapsulatePackets;
+			set => this.encapsulatePackets = value;
 		}
 
 		/// <summary>

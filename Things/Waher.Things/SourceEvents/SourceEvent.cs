@@ -36,8 +36,8 @@ namespace Waher.Things.SourceEvents
 		[ObjectId]
 		public string ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -46,8 +46,8 @@ namespace Waher.Things.SourceEvents
 		[ShortName("s")]
 		public string SourceId
 		{
-			get { return this.sourceId; }
-			set { this.sourceId = value; }
+			get => this.sourceId;
+			set => this.sourceId = value;
 		}
 
 		/// <summary>
@@ -56,8 +56,8 @@ namespace Waher.Things.SourceEvents
 		[ShortName("ts")]
 		public DateTime Timestamp
 		{
-			get { return this.timestamp; }
-			set { this.timestamp = value; }
+			get => this.timestamp;
+			set => this.timestamp = value;
 		}
 
 		/// <summary>

@@ -23,8 +23,8 @@ namespace Waher.Things.SourceEvents
 		/// </summary>
 		public Message[] Messages
 		{
-			get { return this.messages; }
-			set { this.messages = value; }
+			get => this.messages;
+			set => this.messages = value;
 		}
 
 		/// <summary>

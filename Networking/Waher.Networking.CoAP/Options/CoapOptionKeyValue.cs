@@ -61,18 +61,12 @@ namespace Waher.Networking.CoAP.Options
 		/// <summary>
 		/// Key name.
 		/// </summary>
-		public string Key
-		{
-			get { return this.key; }
-		}
+		public string Key => this.key;
 
 		/// <summary>
 		/// Key value.
 		/// </summary>
-		public string KeyValue
-		{
-			get { return this.keyValue; }
-		}
+		public string KeyValue => this.keyValue;
 
 	}
 }

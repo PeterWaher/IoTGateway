@@ -72,15 +72,12 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Sensor Data Client.
 		/// </summary>
-		public SensorClient SensorClient { get { return this.sensorClient; } }
+		public SensorClient SensorClient => this.sensorClient;
 
 		/// <summary>
 		/// Current state of readout.
 		/// </summary>
-		public SensorDataReadoutState State
-		{
-			get { return this.state; }
-		}
+		public SensorDataReadoutState State => this.state;
 
 		internal async Task SetState(SensorDataReadoutState NewState)
 		{
@@ -231,7 +228,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// If the request has been queued on the server side.
 		/// </summary>
-		public bool Queued { get { return this.queued; } }
+		public bool Queued => this.queued;
 
 		internal Task Started()
 		{

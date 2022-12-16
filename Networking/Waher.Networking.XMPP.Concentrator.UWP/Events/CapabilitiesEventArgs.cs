@@ -26,9 +26,6 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Capabilities of the concentrator server.
 		/// </summary>
-		public string[] Capabilities
-		{
-			get { return this.capabilities; }
-		}
+		public string[] Capabilities => this.capabilities;
 	}
 }

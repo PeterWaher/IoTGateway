@@ -21,9 +21,6 @@
 		/// <summary>
 		/// If the value is "100-continue".
 		/// </summary>
-		public bool Continue100
-		{
-			get { return this.continue100; }
-		}
+		public bool Continue100 => this.continue100;
 	}
 }

@@ -230,8 +230,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public NodeAccessModel? AccessModel
 		{
-			get { return this.accessModel; }
-			set { this.accessModel = value; }
+			get => this.accessModel;
+			set => this.accessModel = value;
 		}
 
 		/// <summary>
@@ -239,8 +239,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public string BodyXsltUrl
 		{
-			get { return this.bodyXsltUrl; }
-			set { this.bodyXsltUrl = value; }
+			get => this.bodyXsltUrl;
+			set => this.bodyXsltUrl = value;
 		}
 
 		/// <summary>
@@ -249,8 +249,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public string DataFormXsltUrl
 		{
-			get { return this.dataFormXsltUrl; }
-			set { this.dataFormXsltUrl = value; }
+			get => this.dataFormXsltUrl;
+			set => this.dataFormXsltUrl = value;
 		}
 
 		/// <summary>
@@ -258,8 +258,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public string[] Collections
 		{
-			get { return this.collections; }
-			set { this.collections = value; }
+			get => this.collections;
+			set => this.collections = value;
 		}
 
 		/// <summary>
@@ -267,8 +267,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public string[] Contact
 		{
-			get { return this.contact; }
-			set { this.contact = value; }
+			get => this.contact;
+			set => this.contact = value;
 		}
 
 		/// <summary>
@@ -276,8 +276,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public bool? DeliverNotifications
 		{
-			get { return this.deliverNotifications; }
-			set { this.deliverNotifications = value; }
+			get => this.deliverNotifications;
+			set => this.deliverNotifications = value;
 		}
 
 		/// <summary>
@@ -285,8 +285,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public bool? DeliverPayloads
 		{
-			get { return this.deliverPayloads; }
-			set { this.deliverPayloads = value; }
+			get => this.deliverPayloads;
+			set => this.deliverPayloads = value;
 		}
 
 		/// <summary>
@@ -294,8 +294,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public NodeItemReply? ItemReply
 		{
-			get { return this.itemReply; }
-			set { this.itemReply = value; }
+			get => this.itemReply;
+			set => this.itemReply = value;
 		}
 
 		/// <summary>
@@ -303,8 +303,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public NodeChildAssociationPolicy? ChildAssociationPolicy
 		{
-			get { return this.childAssociationPolicy; }
-			set { this.childAssociationPolicy = value; }
+			get => this.childAssociationPolicy;
+			set => this.childAssociationPolicy = value;
 		}
 
 		/// <summary>
@@ -312,8 +312,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public string[] ChildAssociationWhitelist
 		{
-			get { return this.childAssociationWhitelist; }
-			set { this.childAssociationWhitelist = value; }
+			get => this.childAssociationWhitelist;
+			set => this.childAssociationWhitelist = value;
 		}
 
 		/// <summary>
@@ -321,8 +321,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public string[] Children
 		{
-			get { return this.children; }
-			set { this.children = value; }
+			get => this.children;
+			set => this.children = value;
 		}
 
 		/// <summary>
@@ -330,8 +330,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public int? MaxChildren
 		{
-			get { return this.maxChildren; }
-			set { this.maxChildren = value; }
+			get => this.maxChildren;
+			set => this.maxChildren = value;
 		}
 
 		/// <summary>
@@ -339,8 +339,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public int? MaxItems
 		{
-			get { return this.maxItems; }
-			set { this.maxItems = value; }
+			get => this.maxItems;
+			set => this.maxItems = value;
 		}
 
 		/// <summary>
@@ -348,8 +348,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public int? MaxPayloadSize
 		{
-			get { return this.maxPayloadSize; }
-			set { this.maxPayloadSize = value; }
+			get => this.maxPayloadSize;
+			set => this.maxPayloadSize = value;
 		}
 
 		/// <summary>
@@ -357,8 +357,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public NodeType? NodeType
 		{
-			get { return this.nodeType; }
-			set { this.nodeType = value; }
+			get => this.nodeType;
+			set => this.nodeType = value;
 		}
 
 		/// <summary>
@@ -366,8 +366,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public bool? NotifyConfig
 		{
-			get { return this.notifyConfig; }
-			set { this.notifyConfig = value; }
+			get => this.notifyConfig;
+			set => this.notifyConfig = value;
 		}
 
 		/// <summary>
@@ -375,8 +375,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public bool? NotifyDelete
 		{
-			get { return this.notifyDelete; }
-			set { this.notifyDelete = value; }
+			get => this.notifyDelete;
+			set => this.notifyDelete = value;
 		}
 
 		/// <summary>
@@ -384,8 +384,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public bool? NotifyRetract
 		{
-			get { return this.notifyRetract; }
-			set { this.notifyRetract = value; }
+			get => this.notifyRetract;
+			set => this.notifyRetract = value;
 		}
 
 		/// <summary>
@@ -393,8 +393,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public bool? NotifySubscriptions
 		{
-			get { return this.notifySubscriptions; }
-			set { this.notifySubscriptions = value; }
+			get => this.notifySubscriptions;
+			set => this.notifySubscriptions = value;
 		}
 
 		/// <summary>
@@ -402,8 +402,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public bool? PersistItems
 		{
-			get { return this.persistItems; }
-			set { this.persistItems = value; }
+			get => this.persistItems;
+			set => this.persistItems = value;
 		}
 
 		/// <summary>
@@ -411,8 +411,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public bool? PresenceBasedDelivery
 		{
-			get { return this.presenceBasedDelivery; }
-			set { this.presenceBasedDelivery = value; }
+			get => this.presenceBasedDelivery;
+			set => this.presenceBasedDelivery = value;
 		}
 
 		/// <summary>
@@ -420,8 +420,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public PublisherModel? PublisherModel
 		{
-			get { return this.publisherModel; }
-			set { this.publisherModel = value; }
+			get => this.publisherModel;
+			set => this.publisherModel = value;
 		}
 
 		/// <summary>
@@ -429,8 +429,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public string[] ReplyRooms
 		{
-			get { return this.replyRooms; }
-			set { this.replyRooms = value; }
+			get => this.replyRooms;
+			set => this.replyRooms = value;
 		}
 
 		/// <summary>
@@ -438,8 +438,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public string[] ReplyTo
 		{
-			get { return this.replyTo; }
-			set { this.replyTo = value; }
+			get => this.replyTo;
+			set => this.replyTo = value;
 		}
 
 		/// <summary>
@@ -447,8 +447,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public string[] RosterGroupsAllowed
 		{
-			get { return this.rosterGroupsAllowed; }
-			set { this.rosterGroupsAllowed = value; }
+			get => this.rosterGroupsAllowed;
+			set => this.rosterGroupsAllowed = value;
 		}
 
 		/// <summary>
@@ -456,8 +456,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public SendLastPublishedItem? SendLastPublishedItem
 		{
-			get { return this.sendLastPublishedItem; }
-			set { this.sendLastPublishedItem = value; }
+			get => this.sendLastPublishedItem;
+			set => this.sendLastPublishedItem = value;
 		}
 
 		/// <summary>
@@ -465,8 +465,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public bool? AllowSubscriptions
 		{
-			get { return this.allowSubscriptions; }
-			set { this.allowSubscriptions = value; }
+			get => this.allowSubscriptions;
+			set => this.allowSubscriptions = value;
 		}
 
 		/// <summary>
@@ -474,8 +474,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public string Title
 		{
-			get { return this.title; }
-			set { this.title = value; }
+			get => this.title;
+			set => this.title = value;
 		}
 
 		/// <summary>
@@ -483,8 +483,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public string[] Description
 		{
-			get { return this.description; }
-			set { this.description = value; }
+			get => this.description;
+			set => this.description = value;
 		}
 
 		/// <summary>
@@ -492,8 +492,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public string PayloadType
 		{
-			get { return this.payloadType; }
-			set { this.payloadType = value; }
+			get => this.payloadType;
+			set => this.payloadType = value;
 		}
 
 		/// <summary>
@@ -501,8 +501,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public int? ItemExpireSeconds
 		{
-			get { return this.itemExpireSeconds; }
-			set { this.itemExpireSeconds = value; }
+			get => this.itemExpireSeconds;
+			set => this.itemExpireSeconds = value;
 		}
 
 		/// <summary>
@@ -510,8 +510,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public DateTime? NodeExpires
 		{
-			get { return this.nodeExpires; }
-			set { this.nodeExpires = value; }
+			get => this.nodeExpires;
+			set => this.nodeExpires = value;
 		}
 
 		/// <summary>
@@ -519,8 +519,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public NotificationType? NotificationType
 		{
-			get { return this.notificationType; }
-			set { this.notificationType = value; }
+			get => this.notificationType;
+			set => this.notificationType = value;
 		}
 
 		/// <summary>
@@ -528,8 +528,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public bool? PurgeOffline
 		{
-			get { return this.purgeOffline; }
-			set { this.purgeOffline = value; }
+			get => this.purgeOffline;
+			set => this.purgeOffline = value;
 		}
 
 		/// <summary>

@@ -65,65 +65,41 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Column ID
 		/// </summary>
-		public string ColumnId
-		{
-			get { return this.columnId; }
-		}
+		public string ColumnId => this.columnId;
 
 		/// <summary>
 		/// Optional localized header.
 		/// </summary>
-		public string Header
-		{
-			get { return this.header; }
-		}
+		public string Header => this.header;
 
 		/// <summary>
 		/// Optional Data Suorce ID reference.
 		/// </summary>
-		public string DataSourceId
-		{
-			get { return this.dataSourceId; }
-		}
+		public string DataSourceId => this.dataSourceId;
 
 		/// <summary>
 		/// Optional partition reference.
 		/// </summary>
-		public string Partition
-		{
-			get { return this.partition; }
-		}
+		public string Partition => this.partition;
 
 		/// <summary>
 		/// Optional Foreground Color.
 		/// </summary>
-		public SKColor? FgColor
-		{
-			get { return this.fgColor; }
-		}
+		public SKColor? FgColor => this.fgColor;
 
 		/// <summary>
 		/// Optional Background Color.
 		/// </summary>
-		public SKColor? BgColor
-		{
-			get { return this.bgColor; }
-		}
+		public SKColor? BgColor => this.bgColor;
 
 		/// <summary>
 		/// Optional Column Alignment.
 		/// </summary>
-		public ColumnAlignment? Alignment
-		{
-			get { return this.alignment; }
-		}
+		public ColumnAlignment? Alignment => this.alignment;
 
 		/// <summary>
 		/// Optional Number of Decimals.
 		/// </summary>
-		public byte? NrDecimals
-		{
-			get { return this.nrDecimals; }
-		}
+		public byte? NrDecimals => this.nrDecimals;
 	}
 }

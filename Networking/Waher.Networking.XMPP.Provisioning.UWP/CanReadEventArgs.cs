@@ -104,18 +104,12 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Any field specifications of the original request. If null, all fields are requested.
 		/// </summary>
-		public string[] Fields
-		{
-			get { return this.fields; }
-		}
+		public string[] Fields => this.fields;
 
 		/// <summary>
 		/// Any field types available in the original request.
 		/// </summary>
-		public FieldType FieldTypes
-		{
-			get { return this.fieldTypes; }
-		}
+		public FieldType FieldTypes => this.fieldTypes;
 
 		/// <summary>
 		/// Accept readouts from this remote JID.

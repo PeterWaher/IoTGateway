@@ -65,58 +65,37 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Set.
 		/// </summary>
-		public override ISet AssociatedSet
-		{
-			get { return this.AssociatedVectorSpace; }
-		}
+		public override ISet AssociatedSet => this.AssociatedVectorSpace;
 
 		/// <summary>
 		/// Associated Semi-Group.
 		/// </summary>
-		public override ISemiGroup AssociatedSemiGroup
-		{
-			get { return this.AssociatedVectorSpace; }
-		}
+		public override ISemiGroup AssociatedSemiGroup => this.AssociatedVectorSpace;
 
 		/// <summary>
 		/// Associated Group.
 		/// </summary>
-		public override IGroup AssociatedGroup
-		{
-			get { return this.AssociatedVectorSpace; }
-		}
+		public override IGroup AssociatedGroup => this.AssociatedVectorSpace;
 
 		/// <summary>
 		/// Associated Abelian Group.
 		/// </summary>
-		public override IAbelianGroup AssociatedAbelianGroup
-		{
-			get { return this.AssociatedVectorSpace; }
-		}
+		public override IAbelianGroup AssociatedAbelianGroup => this.AssociatedVectorSpace;
 
 		/// <summary>
 		/// Associated Left-Module.
 		/// </summary>
-		public override ILeftModule AssociatedLeftModule
-		{
-			get { return this.AssociatedVectorSpace; }
-		}
+		public override ILeftModule AssociatedLeftModule => this.AssociatedVectorSpace;
 
 		/// <summary>
 		/// Associated Right-Module.
 		/// </summary>
-		public override IRightModule AssociatedRightModule
-		{
-			get { return this.AssociatedVectorSpace; }
-		}
+		public override IRightModule AssociatedRightModule => this.AssociatedVectorSpace;
 
 		/// <summary>
 		/// Associated Module.
 		/// </summary>
-		public override Sets.IModule AssociatedModule
-		{
-			get { return this.AssociatedVectorSpace; }
-		}
+		public override Sets.IModule AssociatedModule => this.AssociatedVectorSpace;
 
 		/// <summary>
 		/// Associated Right-VectorSpace.
@@ -137,10 +116,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// An enumeration of vector elements.
 		/// </summary>
-		public virtual ICollection<IElement> VectorElements
-		{
-			get { return this.ChildElements; }
-		}
+		public virtual ICollection<IElement> VectorElements => this.ChildElements;
 
         /// <summary>
         /// Gets an element of the vector.

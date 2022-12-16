@@ -24,8 +24,8 @@ namespace Waher.Networking.HTTP.HeaderFields
 		/// </summary>
 		public string Item
 		{
-			get { return this.item; }
-			internal set { this.item = value; }
+			get => this.item;
+			internal set => this.item = value;
 		}
 
 		/// <summary>
@@ -33,8 +33,8 @@ namespace Waher.Networking.HTTP.HeaderFields
 		/// </summary>
 		public double Quality
 		{
-			get { return this.q; }
-			internal set { this.q = value; }
+			get => this.q;
+			internal set => this.q = value;
 		}
 
 		/// <summary>
@@ -42,8 +42,8 @@ namespace Waher.Networking.HTTP.HeaderFields
 		/// </summary>
 		public KeyValuePair<string, string>[] Parameters
 		{
-			get { return this.parameters; }
-			internal set { this.parameters = value; }
+			get => this.parameters;
+			internal set => this.parameters = value;
 		}
 
 		/// <summary>
@@ -51,8 +51,8 @@ namespace Waher.Networking.HTTP.HeaderFields
 		/// </summary>
 		public int Order
 		{
-			get { return this.order; }
-			internal set { this.order = value; }
+			get => this.order;
+			internal set => this.order = value;
 		}
 
 		internal int Detail

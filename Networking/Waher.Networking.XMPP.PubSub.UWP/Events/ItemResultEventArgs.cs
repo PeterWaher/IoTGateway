@@ -32,10 +32,7 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// Item identity
 		/// </summary>
-		public string ItemId
-		{
-			get { return this.itemId; }
-		}
+		public string ItemId => this.itemId;
 
 	}
 }

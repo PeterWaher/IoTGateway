@@ -19,9 +19,6 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Node reference.
 		/// </summary>
-		public ThingReference Node
-		{
-			get { return this.node; }
-		}
+		public ThingReference Node => this.node;
 	}
 }

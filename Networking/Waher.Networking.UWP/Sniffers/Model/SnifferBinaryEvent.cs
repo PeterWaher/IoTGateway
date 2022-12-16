@@ -23,9 +23,6 @@ namespace Waher.Networking.Sniffers.Model
 		/// <summary>
 		/// Data
 		/// </summary>
-		public byte[] Data
-		{
-			get { return this.data; }
-		}
+		public byte[] Data => this.data;
     }
 }

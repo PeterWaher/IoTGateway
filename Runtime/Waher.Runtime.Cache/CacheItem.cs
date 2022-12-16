@@ -19,25 +19,16 @@ namespace Waher.Runtime.Cache
             this.lastUsed = Created;
         }
 
-        internal KeyType Key
-        {
-            get { return this.key; }
-        }
+        internal KeyType Key => this.key;
 
-        internal ValueType Value
-        {
-            get { return this.value; }
-        }
+        internal ValueType Value => this.value;
 
-        internal DateTime Created
-        {
-            get { return this.created; }
-        }
+        internal DateTime Created => this.created;
 
         internal DateTime LastUsed
         {
-            get { return this.lastUsed; }
-            set { this.lastUsed = value; }
+            get => this.lastUsed;
+            set => this.lastUsed = value;
         }
     }
 }

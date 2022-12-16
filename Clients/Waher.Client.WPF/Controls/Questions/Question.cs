@@ -37,57 +37,57 @@ namespace Waher.Client.WPF.Controls.Questions
 		[ObjectId]
 		public Guid ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		[DefaultValueDateTimeMinValue]
 		public DateTime Created
 		{
-			get { return this.created; }
-			set { this.created = value; }
+			get => this.created;
+			set => this.created = value;
 		}
 
 		[DefaultValueStringEmpty]
 		public string Key
 		{
-			get { return this.key; }
-			set { this.key = value; }
+			get => this.key;
+			set => this.key = value;
 		}
 
 		[DefaultValueStringEmpty]
 		public string JID
 		{
-			get { return this.jid; }
-			set { this.jid = value; }
+			get => this.jid;
+			set => this.jid = value;
 		}
 
 		[DefaultValueStringEmpty]
 		public string RemoteJID
 		{
-			get { return this.remoteJid; }
-			set { this.remoteJid = value; }
+			get => this.remoteJid;
+			set => this.remoteJid = value;
 		}
 
 		[DefaultValueStringEmpty]
 		public string OwnerJID
 		{
-			get { return this.ownerJid; }
-			set { this.ownerJid = value; }
+			get => this.ownerJid;
+			set => this.ownerJid = value;
 		}
 
 		[DefaultValueStringEmpty]
 		public string ProvisioningJID
 		{
-			get { return this.provisioningJid; }
-			set { this.provisioningJid = value; }
+			get => this.provisioningJid;
+			set => this.provisioningJid = value;
 		}
 
 		[DefaultValueStringEmpty]
 		public string Sender
 		{
-			get { return this.sender; }
-			set { this.sender = value; }
+			get => this.sender;
+			set => this.sender = value;
 		}
 
 		[IgnoreMember]

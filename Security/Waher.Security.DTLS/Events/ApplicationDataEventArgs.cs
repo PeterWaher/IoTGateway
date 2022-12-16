@@ -32,9 +32,6 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// Application Data.
 		/// </summary>
-		public byte[] ApplicationData
-		{
-			get { return this.applicationData; }
-		}
+		public byte[] ApplicationData => this.applicationData;
 	}
 }

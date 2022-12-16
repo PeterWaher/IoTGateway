@@ -30,26 +30,17 @@ namespace Waher.Networking.XMPP.Control.ControlOperations
 		/// <summary>
 		/// Node on which operation is to be performed.
 		/// </summary>
-		public IThingReference Node
-		{
-			get { return this.node; }
-		}
+		public IThingReference Node => this.node;
 
 		/// <summary>
 		/// Original request.
 		/// </summary>
-		public IqEventArgs Request
-		{
-			get { return this.request; }
-		}
+		public IqEventArgs Request => this.request;
 
 		/// <summary>
 		/// Control parameter name.
 		/// </summary>
-		public string ParameterName
-		{
-			get { return this.parameterName; }
-		}
+		public string ParameterName => this.parameterName;
 
 		/// <summary>
 		/// Performs the control operation.

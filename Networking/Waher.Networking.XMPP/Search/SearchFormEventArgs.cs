@@ -49,10 +49,7 @@ namespace Waher.Networking.XMPP.Search
 		/// <summary>
 		/// Search Form, if available.
 		/// </summary>
-		public DataForm SearchForm
-		{
-			get { return this.searchForm; }
-		}
+		public DataForm SearchForm => this.searchForm;
 
 		/// <summary>
 		/// Form instructions
@@ -138,10 +135,7 @@ namespace Waher.Networking.XMPP.Search
 		/// <summary>
 		/// If the remote end supports search forms, or if the form was constructed on the client side.
 		/// </summary>
-		public bool SupportsForms
-		{
-			get { return this.supportsForms; }
-		}
+		public bool SupportsForms => this.supportsForms;
 
 		private string GetField(string FixedValue, string Var)
 		{

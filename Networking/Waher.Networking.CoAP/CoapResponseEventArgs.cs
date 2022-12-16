@@ -38,17 +38,11 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// If the request was successful or not.
 		/// </summary>
-		public bool Ok
-		{
-			get { return this.ok; }
-		}
+		public bool Ok => this.ok;
 
 		/// <summary>
 		/// State object passed to the original request.
 		/// </summary>
-		public object State
-		{
-			get { return this.state; }
-		}
+		public object State => this.state;
 	}
 }

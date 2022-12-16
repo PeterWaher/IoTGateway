@@ -48,10 +48,7 @@ namespace Waher.Script.Exceptions
 		/// <summary>
 		/// Node where error occurred.
 		/// </summary>
-		public ScriptNode Node
-		{
-			get { return this.node; }
-		}
+		public ScriptNode Node => this.node;
 
 	}
 }

@@ -30,10 +30,7 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// CDATA Content
 		/// </summary>
-		public string Content
-		{
-			get { return this.content; }
-		}
+		public string Content => this.content;
 
 		/// <summary>
 		/// Exports the HTML document to XML.

@@ -22,17 +22,11 @@
 		/// <summary>
 		/// HTTP Field Name
 		/// </summary>
-		public string Key
-		{
-			get { return this.key; }
-		}
+		public string Key => this.key;
 
 		/// <summary>
 		/// HTTP Field Value
 		/// </summary>
-		public string Value
-		{
-			get { return this.value; }
-		}
+		public string Value => this.value;
 	}
 }

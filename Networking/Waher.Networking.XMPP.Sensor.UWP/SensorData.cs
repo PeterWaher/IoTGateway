@@ -71,7 +71,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public IEnumerable<Field> Fields
 		{
-			get { return this.fields; }
+			get => this.fields;
 			set
 			{
 				this.fields = value;
@@ -84,7 +84,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public IEnumerable<ThingError> Errors
 		{
-			get { return this.errors; }
+			get => this.errors;
 			set
 			{
 				this.errors = value;
@@ -97,7 +97,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public bool Done
 		{
-			get { return this.done; }
+			get => this.done;
 			set
 			{
 				this.done = value;
@@ -110,7 +110,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public string Id
 		{
-			get { return this.id; }
+			get => this.id;
 			set
 			{
 				this.id = value;

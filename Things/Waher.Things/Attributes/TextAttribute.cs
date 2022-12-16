@@ -54,25 +54,16 @@ namespace Waher.Things.Attributes
 		/// <summary>
 		/// Where the text is to be placed in relation to the field.
 		/// </summary>
-		public TextPosition Position
-		{
-			get { return this.position; }
-		}
+		public TextPosition Position => this.position;
 
 		/// <summary>
 		/// String ID in the namespace of the current class, in the default language defined for the class.
 		/// </summary>
-		public int StringId
-		{
-			get { return this.stringId; }
-		}
+		public int StringId => this.stringId;
 
 		/// <summary>
 		/// Default label string, in the default language defined for the class.
 		/// </summary>
-		public string Label
-		{
-			get { return this.label; }
-		}
+		public string Label => this.label;
 	}
 }

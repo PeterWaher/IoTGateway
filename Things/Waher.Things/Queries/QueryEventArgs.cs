@@ -21,9 +21,6 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Query originating the event.
 		/// </summary>
-		public Query Query
-		{
-			get { return this.query; }
-		}
+		public Query Query => this.query;
 	}
 }

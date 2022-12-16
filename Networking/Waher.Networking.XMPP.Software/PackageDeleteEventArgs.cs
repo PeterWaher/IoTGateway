@@ -32,8 +32,8 @@ namespace Waher.Networking.XMPP.Software
         /// </summary>
         public bool Delete
         {
-            get { return this.delete; }
-            set { this.delete = value; }
+            get => this.delete;
+            set => this.delete = value;
         }
 
     }

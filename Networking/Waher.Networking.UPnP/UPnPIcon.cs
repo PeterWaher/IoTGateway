@@ -53,40 +53,37 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// Underlying XML definition.
 		/// </summary>
-		public XmlElement Xml
-		{
-			get { return this.xml; }
-		}
+		public XmlElement Xml => this.xml;
 
 		/// <summary>
 		/// URI to image
 		/// </summary>
-		public Uri Uri { get { return this.uri; } }
+		public Uri Uri => this.uri;
 
 		/// <summary>
 		/// Internet Content Type
 		/// </summary>
-		public string Mimetype { get { return this.mimetype; } }
+		public string Mimetype => this.mimetype;
 
 		/// <summary>
 		/// URL to image
 		/// </summary>
-		public string Url { get { return this.url; } }
+		public string Url => this.url;
 
 		/// <summary>
 		/// Width of icon
 		/// </summary>
-		public int Width { get { return this.width; } }
+		public int Width => this.width;
 
 		/// <summary>
 		/// Height of icon
 		/// </summary>
-		public int Height { get { return this.height; } }
+		public int Height => this.height;
 
 		/// <summary>
 		/// Color depth of icon
 		/// </summary>
-		public int Depth { get { return this.depth; } }
+		public int Depth => this.depth;
 
 		/// <inheritdoc/>
 		public override string ToString()

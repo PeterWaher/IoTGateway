@@ -33,6 +33,6 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// New errors reported.
 		/// </summary>
-		public IEnumerable<ThingError> Errors { get { return this.errors; } }
+		public IEnumerable<ThingError> Errors => this.errors;
 	}
 }

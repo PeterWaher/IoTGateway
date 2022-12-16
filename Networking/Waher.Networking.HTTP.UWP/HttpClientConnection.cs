@@ -109,31 +109,16 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		internal Guid Id
-		{
-			get { return this.id; }
-		}
+		internal Guid Id => this.id;
 
-		internal HttpServer Server
-		{
-			get { return this.server; }
-		}
+		internal HttpServer Server => this.server;
 
-		internal bool Disposed
-		{
-			get { return this.disposed; }
-		}
+		internal bool Disposed => this.disposed;
 
-		internal BinaryTcpClient Client
-		{
-			get { return this.client; }
-		}
+		internal BinaryTcpClient Client => this.client;
 
 #if !WINDOWS_UWP
-		internal bool Encrypted
-		{
-			get { return this.encrypted; }
-		}
+		internal bool Encrypted => this.encrypted;
 #endif
 
 		private async Task<bool> BinaryHeaderReceived(byte[] Data, int Offset, int NrRead)

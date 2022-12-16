@@ -45,50 +45,32 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Set.
 		/// </summary>
-		public override ISet AssociatedSet
-		{
-			get { return this.AssociatedModule; }
-		}
+		public override ISet AssociatedSet => this.AssociatedModule;
 
 		/// <summary>
 		/// Associated Semi-Group.
 		/// </summary>
-		public override ISemiGroup AssociatedSemiGroup
-		{
-			get { return this.AssociatedModule; }
-		}
+		public override ISemiGroup AssociatedSemiGroup => this.AssociatedModule;
 
 		/// <summary>
 		/// Associated Group.
 		/// </summary>
-		public override IGroup AssociatedGroup
-		{
-			get { return this.AssociatedModule; }
-		}
+		public override IGroup AssociatedGroup => this.AssociatedModule;
 
 		/// <summary>
 		/// Associated Abelian Group.
 		/// </summary>
-		public override IAbelianGroup AssociatedAbelianGroup
-		{
-			get { return this.AssociatedModule; }
-		}
+		public override IAbelianGroup AssociatedAbelianGroup => this.AssociatedModule;
 
 		/// <summary>
 		/// Associated Left-Module.
 		/// </summary>
-		public virtual ILeftModule AssociatedLeftModule
-		{
-			get { return this.AssociatedModule; }
-		}
+		public virtual ILeftModule AssociatedLeftModule => this.AssociatedModule;
 
 		/// <summary>
 		/// Associated Right-Module.
 		/// </summary>
-		public virtual IRightModule AssociatedRightModule
-		{
-			get { return this.AssociatedModule; }
-		}
+		public virtual IRightModule AssociatedRightModule => this.AssociatedModule;
 
 		/// <summary>
 		/// Associated Module.

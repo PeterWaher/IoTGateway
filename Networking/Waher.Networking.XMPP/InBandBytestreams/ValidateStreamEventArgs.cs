@@ -33,41 +33,23 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// <summary>
 		/// XMPP Client
 		/// </summary>
-		public XmppClient Client
-		{
-			get { return this.client; }
-		}
+		public XmppClient Client => this.client;
 
 		/// <summary>
 		/// Stream ID
 		/// </summary>
-		public string StreamId
-		{
-			get { return this.streamId; }
-		}
+		public string StreamId => this.streamId;
 
 		/// <summary>
 		/// Block Size
 		/// </summary>
-		public int BlockSize
-		{
-			get { return this.blockSize; }
-		}
+		public int BlockSize => this.blockSize;
 
-		internal DataReceivedEventHandler DataCallback
-		{
-			get { return this.dataCallback; }
-		}
+		internal DataReceivedEventHandler DataCallback => this.dataCallback;
 
-		internal StreamClosedEventHandler CloseCallback
-		{
-			get { return this.closeCallback; }
-		}
+		internal StreamClosedEventHandler CloseCallback => this.closeCallback;
 
-		internal object State
-		{
-			get { return this.state; }
-		}
+		internal object State => this.state;
 
 		/// <summary>
 		/// Call this method to accept the incoming stream.

@@ -101,8 +101,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(XmppTransportMethod.C2S)]
 		public XmppTransportMethod TransportMethod
 		{
-			get { return this.transportMethod; }
-			set { this.transportMethod = value; }
+			get => this.transportMethod;
+			set => this.transportMethod = value;
 		}
 
 		/// <summary>
@@ -111,8 +111,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string Host
 		{
-			get { return this.host; }
-			set { this.host = value; }
+			get => this.host;
+			set => this.host = value;
 		}
 
 		/// <summary>
@@ -121,8 +121,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(XmppCredentials.DefaultPort)]
 		public int Port
 		{
-			get { return this.port; }
-			set { this.port = value; }
+			get => this.port;
+			set => this.port = value;
 		}
 
 		/// <summary>
@@ -131,8 +131,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string BoshUrl
 		{
-			get { return this.boshUrl; }
-			set { this.boshUrl = value; }
+			get => this.boshUrl;
+			set => this.boshUrl = value;
 		}
 
 		/// <summary>
@@ -141,8 +141,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string WebSocketUrl
 		{
-			get { return this.wsUrl; }
-			set { this.wsUrl = value; }
+			get => this.wsUrl;
+			set => this.wsUrl = value;
 		}
 
 		/// <summary>
@@ -151,8 +151,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string Account
 		{
-			get { return this.account; }
-			set { this.account = value; }
+			get => this.account;
+			set => this.account = value;
 		}
 
 		/// <summary>
@@ -161,8 +161,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string Password
 		{
-			get { return this.password; }
-			set { this.password = value; }
+			get => this.password;
+			set => this.password = value;
 		}
 
 		/// <summary>
@@ -171,8 +171,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string PasswordType
 		{
-			get { return this.passwordType; }
-			set { this.passwordType = value; }
+			get => this.passwordType;
+			set => this.passwordType = value;
 		}
 
 		/// <summary>
@@ -180,8 +180,8 @@ namespace Waher.IoTGateway.Setup
 		/// </summary>
 		public string AccountHumanReadableName
 		{
-			get { return this.accountHumanReadableName; }
-			set { this.accountHumanReadableName = value; }
+			get => this.accountHumanReadableName;
+			set => this.accountHumanReadableName = value;
 		}
 
 		/// <summary>
@@ -190,8 +190,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string ThingRegistry
 		{
-			get { return this.thingRegistry; }
-			set { this.thingRegistry = value; }
+			get => this.thingRegistry;
+			set => this.thingRegistry = value;
 		}
 
 		/// <summary>
@@ -200,8 +200,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string Provisioning
 		{
-			get { return this.provisioning; }
-			set { this.provisioning = value; }
+			get => this.provisioning;
+			set => this.provisioning = value;
 		}
 
 		/// <summary>
@@ -210,8 +210,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string Events
 		{
-			get { return this.events; }
-			set { this.events = value; }
+			get => this.events;
+			set => this.events = value;
 		}
 
 		/// <summary>
@@ -220,8 +220,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string MultiUserChat
 		{
-			get { return this.muc; }
-			set { this.muc = value; }
+			get => this.muc;
+			set => this.muc = value;
 		}
 
 		/// <summary>
@@ -230,8 +230,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string PubSub
 		{
-			get { return this.pubSub; }
-			set { this.pubSub = value; }
+			get => this.pubSub;
+			set => this.pubSub = value;
 		}
 
 		/// <summary>
@@ -240,8 +240,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string LegalIdentities
 		{
-			get { return this.legal; }
-			set { this.legal = value; }
+			get => this.legal;
+			set => this.legal = value;
 		}
 
 		/// <summary>
@@ -250,8 +250,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string SoftwareUpdates
 		{
-			get { return this.software; }
-			set { this.software = value; }
+			get => this.software;
+			set => this.software = value;
 		}
 
 		/// <summary>
@@ -260,8 +260,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueStringEmpty]
 		public string BareJid
 		{
-			get { return this.bareJid; }
-			set { this.bareJid = value; }
+			get => this.bareJid;
+			set => this.bareJid = value;
 		}
 
 		/// <summary>
@@ -270,8 +270,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool Sniffer
 		{
-			get { return this.sniffer; }
-			set { this.sniffer = value; }
+			get => this.sniffer;
+			set => this.sniffer = value;
 		}
 
 		/// <summary>
@@ -280,8 +280,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool TrustServer
 		{
-			get { return this.trustServer; }
-			set { this.trustServer = value; }
+			get => this.trustServer;
+			set => this.trustServer = value;
 		}
 
 		/// <summary>
@@ -290,8 +290,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool AllowInsecureMechanisms
 		{
-			get { return this.allowInsecureMechanisms; }
-			set { this.allowInsecureMechanisms = value; }
+			get => this.allowInsecureMechanisms;
+			set => this.allowInsecureMechanisms = value;
 		}
 
 		/// <summary>
@@ -300,8 +300,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool StorePasswordInsteadOfHash
 		{
-			get { return this.storePasswordInsteadOfHash; }
-			set { this.storePasswordInsteadOfHash = value; }
+			get => this.storePasswordInsteadOfHash;
+			set => this.storePasswordInsteadOfHash = value;
 		}
 
 		/// <summary>
@@ -310,8 +310,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool CustomBinding
 		{
-			get { return this.customBinding; }
-			set { this.customBinding = value; }
+			get => this.customBinding;
+			set => this.customBinding = value;
 		}
 
 		/// <summary>
@@ -320,8 +320,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool OfflineMessages
 		{
-			get { return this.offlineMessages; }
-			set { this.offlineMessages = value; }
+			get => this.offlineMessages;
+			set => this.offlineMessages = value;
 		}
 
 		/// <summary>
@@ -330,8 +330,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool Blocking
 		{
-			get { return this.blocking; }
-			set { this.blocking = value; }
+			get => this.blocking;
+			set => this.blocking = value;
 		}
 
 		/// <summary>
@@ -340,8 +340,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool Reporting
 		{
-			get { return this.reporting; }
-			set { this.reporting = value; }
+			get => this.reporting;
+			set => this.reporting = value;
 		}
 
 		/// <summary>
@@ -350,8 +350,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool Abuse
 		{
-			get { return this.abuse; }
-			set { this.abuse = value; }
+			get => this.abuse;
+			set => this.abuse = value;
 		}
 
 		/// <summary>
@@ -360,8 +360,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool Spam
 		{
-			get { return this.spam; }
-			set { this.spam = value; }
+			get => this.spam;
+			set => this.spam = value;
 		}
 
 		/// <summary>
@@ -370,8 +370,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool PersonalEventing
 		{
-			get { return this.pep; }
-			set { this.pep = value; }
+			get => this.pep;
+			set => this.pep = value;
 		}
 
 		/// <summary>
@@ -380,8 +380,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValue(false)]
 		public bool Mail
 		{
-			get { return this.mail; }
-			set { this.mail = value; }
+			get => this.mail;
+			set => this.mail = value;
 		}
 
 		/// <summary>

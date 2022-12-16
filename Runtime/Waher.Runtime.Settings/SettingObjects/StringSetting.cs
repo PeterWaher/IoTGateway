@@ -34,8 +34,8 @@ namespace Waher.Runtime.Settings.SettingObjects
 		[DefaultValueStringEmpty]
 		public string Value
 		{
-			get { return this.value; }
-			set { this.value = value; }
+			get => this.value;
+			set => this.value = value;
 		}
 
 		/// <summary>

@@ -28,8 +28,8 @@ namespace Waher.Things.SourceEvents
 		[ShortName("n")]
 		public string NodeId
 		{
-			get { return this.nodeId; }
-			set { this.nodeId = value; }
+			get => this.nodeId;
+			set => this.nodeId = value;
 		}
 
 		/// <summary>
@@ -39,8 +39,8 @@ namespace Waher.Things.SourceEvents
 		[ShortName("p")]
 		public string Partition
 		{
-			get { return this.partition; }
-			set { this.partition = value; }
+			get => this.partition;
+			set => this.partition = value;
 		}
 
 		/// <summary>
@@ -50,8 +50,8 @@ namespace Waher.Things.SourceEvents
 		[ShortName("lg")]
 		public string LogId
 		{
-			get { return this.logId; }
-			set { this.logId = value; }
+			get => this.logId;
+			set => this.logId = value;
 		}
 
 		/// <summary>
@@ -61,8 +61,8 @@ namespace Waher.Things.SourceEvents
 		[ShortName("lc")]
 		public string LocalId
 		{
-			get { return this.localId; }
-			set { this.localId = value; }
+			get => this.localId;
+			set => this.localId = value;
 		}
 	}
 }

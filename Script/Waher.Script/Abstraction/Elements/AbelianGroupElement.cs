@@ -51,26 +51,17 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Set.
 		/// </summary>
-		public override ISet AssociatedSet
-		{
-			get { return this.AssociatedAbelianGroup; }
-		}
+		public override ISet AssociatedSet => this.AssociatedAbelianGroup;
 
 		/// <summary>
 		/// Associated Semi-Group.
 		/// </summary>
-		public override ISemiGroup AssociatedSemiGroup
-		{
-			get { return this.AssociatedAbelianGroup; }
-		}
+		public override ISemiGroup AssociatedSemiGroup => this.AssociatedAbelianGroup;
 
 		/// <summary>
 		/// Associated Group.
 		/// </summary>
-		public override IGroup AssociatedGroup
-		{
-			get { return this.AssociatedAbelianGroup; }
-		}
+		public override IGroup AssociatedGroup => this.AssociatedAbelianGroup;
 
 		/// <summary>
 		/// Associated Abelian Group.

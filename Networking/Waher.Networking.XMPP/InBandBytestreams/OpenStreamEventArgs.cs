@@ -26,10 +26,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// <summary>
 		/// Outgoing stream.
 		/// </summary>
-		public OutgoingStream Output
-		{
-			get { return this.output; }
-		}
+		public OutgoingStream Output => this.output;
 
 	}
 }

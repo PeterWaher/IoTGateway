@@ -82,10 +82,7 @@ namespace Waher.Security.JWS
 		/// <summary>
 		/// RSA Cryptographic service provider.
 		/// </summary>
-		public RSA RSA
-		{
-			get { return this.rsa; }
-		}
+		public RSA RSA => this.rsa;
 
 		private void Init()
 		{

@@ -26,21 +26,21 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// Game data received from this player.
 		/// </summary>
-		public Player FromPlayer { get { return this.fromPlayer; } }
+		public Player FromPlayer => this.fromPlayer;
 
 		/// <summary>
 		/// Game data received over this connection.
 		/// </summary>
-		public PeerConnection Connection { get { return this.connection; } }
+		public PeerConnection Connection => this.connection;
 
 		/// <summary>
 		/// Binary game data packet received.
 		/// </summary>
-		public byte[] Packet { get { return this.packet; } }
+		public byte[] Packet => this.packet;
 
 		/// <summary>
 		/// Game data received.
 		/// </summary>
-		public BinaryInput Data { get { return this.data; } }
+		public BinaryInput Data => this.data;
 	}
 }

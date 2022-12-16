@@ -91,15 +91,15 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		/// <summary>
 		/// Label
 		/// </summary>
-		public string Label { get { return this.label; } }
+		public string Label => this.label;
 
 		/// <summary>
 		/// Can be used to sort pages or sections. Not serialized to or from XML.
 		/// </summary>
 		public int Priority
 		{
-			get { return this.priority; }
-			set { this.priority = value; }
+			get => this.priority;
+			set => this.priority = value;
 		}
 
 		/// <summary>
@@ -107,8 +107,8 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		/// </summary>
 		public int Ordinal
 		{
-			get { return this.ordinal; }
-			set { this.ordinal = value; }
+			get => this.ordinal;
+			set => this.ordinal = value;
 		}
 
 		/// <summary>

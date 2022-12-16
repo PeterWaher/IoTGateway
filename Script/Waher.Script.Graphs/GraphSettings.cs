@@ -37,7 +37,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public int Width
 		{
-			get { return this.width; }
+			get => this.width;
 			set
 			{
 				if (value < 1)
@@ -52,7 +52,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public int Height
 		{
-			get { return this.height; }
+			get => this.height;
 			set
 			{
 				if (value < 1)
@@ -67,8 +67,8 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public SKColor BackgroundColor
 		{
-			get { return this.backgroundColor; }
-			set { this.backgroundColor = value; }
+			get => this.backgroundColor;
+			set => this.backgroundColor = value;
 		}
 
 		/// <summary>
@@ -76,8 +76,8 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public SKColor AxisColor
 		{
-			get { return this.axisColor; }
-			set { this.axisColor = value; }
+			get => this.axisColor;
+			set => this.axisColor = value;
 		}
 
 		/// <summary>
@@ -85,7 +85,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public int AxisWidth
 		{
-			get { return this.axisWidth; }
+			get => this.axisWidth;
 			set
 			{
 				if (value < 0)
@@ -100,8 +100,8 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public SKColor GridColor
 		{
-			get { return this.gridColor; }
-			set { this.gridColor = value; }
+			get => this.gridColor;
+			set => this.gridColor = value;
 		}
 
 		/// <summary>
@@ -109,7 +109,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public int GridWidth
 		{
-			get { return this.gridWidth; }
+			get => this.gridWidth;
 			set
 			{
 				if (value < 0)
@@ -124,7 +124,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public int MarginTop
 		{
-			get { return this.marginTop; }
+			get => this.marginTop;
 			set
 			{
 				if (value < 0)
@@ -139,7 +139,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public int MarginBottom
 		{
-			get { return this.marginBottom; }
+			get => this.marginBottom;
 			set
 			{
 				if (value < 0)
@@ -154,7 +154,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public int MarginLeft
 		{
-			get { return this.marginLeft; }
+			get => this.marginLeft;
 			set
 			{
 				if (value < 0)
@@ -169,7 +169,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public int MarginRight
 		{
-			get { return this.marginRight; }
+			get => this.marginRight;
 			set
 			{
 				if (value < 0)
@@ -184,7 +184,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public int MarginLabel
 		{
-			get { return this.marginLabel; }
+			get => this.marginLabel;
 			set
 			{
 				if (value < 0)
@@ -199,7 +199,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public string FontName
 		{
-			get { return this.fontName; }
+			get => this.fontName;
 			set
 			{
 				if (string.IsNullOrEmpty(value))
@@ -214,7 +214,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public double LabelFontSize
 		{
-			get { return this.labelFontSize; }
+			get => this.labelFontSize;
 			set
 			{
 				if (value < 0)
@@ -229,7 +229,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public int ApproxNrLabelsX
 		{
-			get { return this.approxNrLabelsX; }
+			get => this.approxNrLabelsX;
 			set
 			{
 				if (value < 0)
@@ -244,7 +244,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public int ApproxNrLabelsY
 		{
-			get { return this.approxNrLabelsY; }
+			get => this.approxNrLabelsY;
 			set
 			{
 				if (value < 0)

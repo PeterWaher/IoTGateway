@@ -34,8 +34,8 @@ namespace Waher.Runtime.Settings.SettingObjects
 		[DefaultValue(0L)]
 		public long Value
 		{
-			get { return this.value; }
-			set { this.value = value; }
+			get => this.value;
+			set => this.value = value;
 		}
 
 		/// <summary>

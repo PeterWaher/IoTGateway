@@ -37,8 +37,8 @@ namespace Waher.Things.DisplayableParameters
 		/// </summary>
 		public string Id
 		{
-			get { return this.id; }
-			set { this.id = value; }
+			get => this.id;
+			set => this.id = value;
 		}
 
 		/// <summary>
@@ -46,8 +46,8 @@ namespace Waher.Things.DisplayableParameters
 		/// </summary>
 		public string Name
 		{
-			get { return this.name; }
-			set { this.name = value; }
+			get => this.name;
+			set => this.name = value;
 		}
 
 		/// <summary>

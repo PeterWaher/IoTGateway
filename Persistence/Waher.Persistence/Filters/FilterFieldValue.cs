@@ -24,10 +24,7 @@ namespace Waher.Persistence.Filters
 		/// <summary>
 		/// Value.
 		/// </summary>
-		public object Value
-		{
-			get { return this.value; }
-		}
+		public object Value => this.value;
 
 		/// <summary>
 		/// Returns a normalized filter.

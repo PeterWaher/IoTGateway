@@ -46,26 +46,20 @@ namespace Waher.Content.Html
         /// <summary>
         /// HTML Document
         /// </summary>
-        public HtmlDocument Document
-        {
-            get { return this.document; }
-        }
+        public HtmlDocument Document => this.document;
 
         /// <summary>
         /// Parent node, if available.
         /// </summary>
-        public HtmlNode Parent
-        {
-            get { return this.parent; }
-        }
+        public HtmlNode Parent => this.parent;
 
         /// <summary>
         /// Start position of element.
         /// </summary>
         public int StartPosition
         {
-            get { return this.start; }
-            internal set { this.start = value; }
+            get => this.start;
+            internal set => this.start = value;
         }
 
         /// <summary>
@@ -73,8 +67,8 @@ namespace Waher.Content.Html
         /// </summary>
         public int EndPosition
         {
-            get { return this.end; }
-            internal set { this.end = value; }
+            get => this.end;
+            internal set => this.end = value;
         }
 
         /// <summary>

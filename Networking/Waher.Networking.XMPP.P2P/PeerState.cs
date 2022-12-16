@@ -754,8 +754,8 @@ namespace Waher.Networking.XMPP.P2P
 
 		internal bool HeaderSent
 		{
-			get { return this.headerSent; }
-			set { this.headerSent = value; }
+			get => this.headerSent;
+			set => this.headerSent = value;
 		}
 
 		/// <summary>
@@ -763,7 +763,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		public PeerConnection Peer
 		{
-			get { return this.peer; }
+			get => this.peer;
 			internal set
 			{
 				this.RemoveHandlers();
@@ -775,26 +775,17 @@ namespace Waher.Networking.XMPP.P2P
 		/// <summary>
 		/// XMPP client.
 		/// </summary>
-		public XmppClient XmppClient
-		{
-			get { return this.xmppClient; }
-		}
+		public XmppClient XmppClient => this.xmppClient;
 
 		/// <summary>
 		/// Parent object.
 		/// </summary>
-		public XmppServerlessMessaging Parent
-		{
-			get { return this.parent; }
-		}
+		public XmppServerlessMessaging Parent => this.parent;
 
 		/// <summary>
 		/// Remote Full JID
 		/// </summary>
-		public string RemoteFullJid
-		{
-			get { return this.remoteFullJid; }
-		}
+		public string RemoteFullJid => this.remoteFullJid;
 
 		internal bool HasCallbacks
 		{

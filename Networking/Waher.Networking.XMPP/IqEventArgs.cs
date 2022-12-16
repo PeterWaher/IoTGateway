@@ -109,31 +109,31 @@ namespace Waher.Networking.XMPP
         /// <summary>
         /// IQ element.
         /// </summary>
-        public XmlElement IQ { get { return this.iq; } }
+        public XmlElement IQ => this.iq;
 
         /// <summary>
         /// Query element, if found, null otherwise.
         /// </summary>
         public XmlElement Query
         {
-            get { return this.query; }
-            internal set { this.query = value; }
+            get => this.query;
+            internal set => this.query = value;
         }
 
         /// <summary>
         /// ID of the request.
         /// </summary>
-        public string Id { get { return this.id; } }
+        public string Id => this.id;
 
         /// <summary>
         /// To address attribute
         /// </summary>
-        public string To { get { return this.to; } }
+        public string To => this.to;
 
         /// <summary>
         /// From address attribute
         /// </summary>
-        public string From { get { return this.from; } }
+        public string From => this.from;
 
         /// <summary>
         /// Bare version of the "to" JID.
@@ -174,26 +174,17 @@ namespace Waher.Networking.XMPP
         /// <summary>
         /// End-to-end encryption interface, if used in the request.
         /// </summary>
-        public IEndToEndEncryption E2eEncryption
-        {
-            get { return this.e2eEncryption; }
-        }
+        public IEndToEndEncryption E2eEncryption => this.e2eEncryption;
 
         /// <summary>
         /// Reference to End-to-end encryption endpoint used.
         /// </summary>
-        public string E2eReference
-        {
-            get { return this.e2eReference; }
-        }
+        public string E2eReference => this.e2eReference;
 
         /// <summary>
         /// Type of symmetric cipher used in E2E encryption.
         /// </summary>
-        public IE2eSymmetricCipher E2eSymmetricCipher
-        {
-            get { return this.e2eSymmetricCipher; }
-        }
+        public IE2eSymmetricCipher E2eSymmetricCipher => this.e2eSymmetricCipher;
 
         /// <summary>
         /// Returns a response to the current request.

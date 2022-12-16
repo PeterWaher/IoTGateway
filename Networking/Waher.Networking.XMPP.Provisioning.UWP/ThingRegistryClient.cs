@@ -105,10 +105,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Thing Registry XMPP address.
 		/// </summary>
-		public string ThingRegistryAddress
-		{
-			get { return this.thingRegistryAddress; }
-		}
+		public string ThingRegistryAddress => this.thingRegistryAddress;
 
 		/// <summary>
 		/// Registers a thing in the Thing Registry. Only things that does not have an owner can register with the Thing Registry.

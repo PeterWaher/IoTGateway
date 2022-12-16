@@ -41,15 +41,12 @@ namespace Waher.Client.WPF.Controls
 			this.Node?.ViewClosed();
 		}
 
-		public TreeNode Node
-		{
-			get { return this.node; }
-		}
+		public TreeNode Node => this.node;
 
 		public TabSniffer Sniffer
 		{
-			get { return this.sniffer; }
-			internal set { this.sniffer = value; }
+			get => this.sniffer;
+			internal set => this.sniffer = value;
 		}
 
 		public void Add(SniffItem Item)

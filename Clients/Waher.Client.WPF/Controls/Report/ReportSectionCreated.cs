@@ -31,10 +31,7 @@ namespace Waher.Client.WPF.Controls.Report
 		/// <summary>
 		/// Section header
 		/// </summary>
-		public string Header
-		{
-			get { return this.header; }
-		}
+		public string Header=> this.header;
 
 		/// <summary>
 		/// Exports element to XML

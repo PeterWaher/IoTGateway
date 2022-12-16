@@ -30,10 +30,7 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// Unparsed DTD instruction.
 		/// </summary>
-		public string Instruction
-		{
-			get { return this.instruction; }
-		}
+		public string Instruction => this.instruction;
 
 		/// <summary>
 		/// Exports the HTML document to XML.

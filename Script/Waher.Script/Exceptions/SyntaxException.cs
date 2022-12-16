@@ -52,18 +52,12 @@ namespace Waher.Script.Exceptions
 		/// <summary>
 		/// Position into script where the syntax error was detected.
 		/// </summary>
-		public int Position
-		{
-			get { return this.position; }
-		}
+		public int Position => this.position;
 
 		/// <summary>
 		/// Script expression where syntax error was detected.
 		/// </summary>
-		public string Script
-		{
-			get { return this.script; }
-		}
+		public string Script => this.script;
 
 	}
 }

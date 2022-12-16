@@ -56,18 +56,15 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// DTLS endpoint.
 		/// </summary>
-		public DtlsEndpoint DTLS
-		{
-			get { return this.dtls; }
-		}
+		public DtlsEndpoint DTLS => this.dtls;
 
 		/// <summary>
 		/// Tag owner can use to associate object with another.
 		/// </summary>
 		public object Tag
 		{
-			get { return this.tag; }
-			set { this.tag = value; }
+			get => this.tag;
+			set => this.tag = value;
 		}
 
 		/// <summary>

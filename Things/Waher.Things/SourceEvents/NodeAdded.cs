@@ -101,8 +101,8 @@ namespace Waher.Things.SourceEvents
 		[DefaultValueStringEmpty]
 		public string AfterNodeId
 		{
-			get { return this.afterNodeId; }
-			set { this.afterNodeId = value; }
+			get => this.afterNodeId;
+			set => this.afterNodeId = value;
 		}
 
 		/// <summary>
@@ -111,8 +111,8 @@ namespace Waher.Things.SourceEvents
 		[DefaultValueStringEmpty]
 		public string AfterPartition
 		{
-			get { return this.afterPartition; }
-			set { this.afterPartition = value; }
+			get => this.afterPartition;
+			set => this.afterPartition = value;
 		}
 
 		/// <summary>
@@ -121,8 +121,8 @@ namespace Waher.Things.SourceEvents
 		[DefaultValueStringEmpty]
 		public string DisplayName
 		{
-			get { return this.displayName; }
-			set { this.displayName = value; }
+			get => this.displayName;
+			set => this.displayName = value;
 		}
 
 		/// <summary>
@@ -131,8 +131,8 @@ namespace Waher.Things.SourceEvents
 		[DefaultValueStringEmpty]
 		public string NodeType
 		{
-			get { return this.nodeType; }
-			set { this.nodeType = value; }
+			get => this.nodeType;
+			set => this.nodeType = value;
 		}
 
 		/// <summary>
@@ -141,8 +141,8 @@ namespace Waher.Things.SourceEvents
 		[DefaultValue(false)]
 		public bool Sniffable
 		{
-			get { return this.sniffable; }
-			set { this.sniffable = value; }
+			get => this.sniffable;
+			set => this.sniffable = value;
 		}
 
 		/// <summary>

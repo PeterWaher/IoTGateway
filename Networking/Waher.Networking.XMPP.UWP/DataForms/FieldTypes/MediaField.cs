@@ -69,10 +69,7 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		/// <summary>
 		/// Media content to display in the field.
 		/// </summary>
-		public Media Media
-		{
-			get { return this.media; }
-		}
+		public Media Media => this.media;
 
 		internal override void AnnotateField(StringBuilder Output, bool ValuesOnly, bool IncludeLabels)
 		{

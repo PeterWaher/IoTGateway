@@ -375,10 +375,7 @@ namespace Waher.Security.SPF.Mechanisms
 		/// <summary>
 		/// Mechanism separator
 		/// </summary>
-		public virtual char Separator
-		{
-			get => ':';
-		}
+		public virtual char Separator => ':';
 
 		/// <summary>
 		/// If the domain specification is required.

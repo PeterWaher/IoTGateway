@@ -36,10 +36,7 @@ namespace Waher.Client.WPF.Model.Legal
 			return Result;
 		}
 
-		public ContractsClient ContractsClient
-		{
-			get { return this.contractsClient; }
-		}
+		public ContractsClient ContractsClient => this.contractsClient;
 
 		public override void Dispose()
 		{

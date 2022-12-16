@@ -546,20 +546,17 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Index file.
 		/// </summary>
-		public ObjectBTreeFile DictionaryFile
-		{
-			get { return this.dictionaryFile; }
-		}
+		public ObjectBTreeFile DictionaryFile => this.dictionaryFile;
 
 		/// <summary>
 		/// Name of corresponding collection name.
 		/// </summary>
-		public string CollectionName { get { return this.collectionName; } }
+		public string CollectionName => this.collectionName;
 
 		/// <summary>
 		/// Encoding to use for text properties.
 		/// </summary>
-		public Encoding Encoding { get { return this.encoding; } }
+		public Encoding Encoding => this.encoding;
 
 		/// <summary>
 		/// <see cref="IDictionary{TKey, TValue}.Keys"/>

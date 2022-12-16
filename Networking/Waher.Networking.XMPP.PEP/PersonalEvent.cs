@@ -13,10 +13,7 @@ namespace Waher.Networking.XMPP.PEP
 		/// <summary>
 		/// Node on which the personal event is published on.
 		/// </summary>
-		public virtual string Node
-		{
-			get => this.Namespace;
-		}
+		public virtual string Node => this.Namespace;
 
 		/// <summary>
 		/// Local name of the event element.

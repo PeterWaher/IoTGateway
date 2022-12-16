@@ -20,14 +20,8 @@ namespace Waher.Persistence.Files
 			this.position = Position;
 		}
 
-		internal ObjectBTreeFile File
-		{
-			get { return this.file; }
-		}
+		internal ObjectBTreeFile File => this.file;
 
-		internal BlockInfo Position
-		{
-			get { return this.position; }
-		}
+		internal BlockInfo Position => this.position;
 	}
 }

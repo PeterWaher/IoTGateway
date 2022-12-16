@@ -40,18 +40,15 @@ namespace Waher.Networking.CoAP.CoRE
 		/// <summary>
 		/// URI of resource.
 		/// </summary>
-		public Uri Uri
-		{
-			get { return this.uri; }
-		}
+		public Uri Uri => this.uri;
 
 		/// <summary>
 		/// Relation types, if available, null otherwise.
 		/// </summary>
 		public string[] RelationTypes
 		{
-			get { return this.relationTypes; }
-			internal set { this.relationTypes = value; }
+			get => this.relationTypes;
+			internal set => this.relationTypes = value;
 		}
 
 		/// <summary>
@@ -59,8 +56,8 @@ namespace Waher.Networking.CoAP.CoRE
 		/// </summary>
 		public string[] Rev
 		{
-			get { return this.rev; }
-			internal set { this.rev = value; }
+			get => this.rev;
+			internal set => this.rev = value;
 		}
 
 		/// <summary>
@@ -68,8 +65,8 @@ namespace Waher.Networking.CoAP.CoRE
 		/// </summary>
 		public Uri Anchor
 		{
-			get { return this.anchor; }
-			internal set { this.anchor = value; }
+			get => this.anchor;
+			internal set => this.anchor = value;
 		}
 
 		/// <summary>
@@ -77,8 +74,8 @@ namespace Waher.Networking.CoAP.CoRE
 		/// </summary>
 		public string Language
 		{
-			get { return this.language; }
-			internal set { this.language = value; }
+			get => this.language;
+			internal set => this.language = value;
 		}
 
 		/// <summary>
@@ -86,8 +83,8 @@ namespace Waher.Networking.CoAP.CoRE
 		/// </summary>
 		public string Media
 		{
-			get { return this.media; }
-			internal set { this.media = value; }
+			get => this.media;
+			internal set => this.media = value;
 		}
 
 		/// <summary>
@@ -95,8 +92,8 @@ namespace Waher.Networking.CoAP.CoRE
 		/// </summary>
 		public string Title
 		{
-			get { return this.title; }
-			internal set { this.title = value; }
+			get => this.title;
+			internal set => this.title = value;
 		}
 
 		/// <summary>
@@ -104,8 +101,8 @@ namespace Waher.Networking.CoAP.CoRE
 		/// </summary>
 		public string Type
 		{
-			get { return this.type; }
-			internal set { this.type = value; }
+			get => this.type;
+			internal set => this.type = value;
 		}
 
 		/// <summary>
@@ -113,8 +110,8 @@ namespace Waher.Networking.CoAP.CoRE
 		/// </summary>
 		public string[] ResourceTypes
 		{
-			get { return this.resourceTypes; }
-			internal set { this.resourceTypes = value; }
+			get => this.resourceTypes;
+			internal set => this.resourceTypes = value;
 		}
 
 		/// <summary>
@@ -122,8 +119,8 @@ namespace Waher.Networking.CoAP.CoRE
 		/// </summary>
 		public string[] InterfaceDescriptions
 		{
-			get { return this.interfaceDescriptions; }
-			internal set { this.interfaceDescriptions = value; }
+			get => this.interfaceDescriptions;
+			internal set => this.interfaceDescriptions = value;
 		}
 
 		/// <summary>
@@ -131,8 +128,8 @@ namespace Waher.Networking.CoAP.CoRE
 		/// </summary>
 		public ulong? Size
 		{
-			get { return this.size; }
-			internal set { this.size = value; }
+			get => this.size;
+			internal set => this.size = value;
 		}
 
 		/// <summary>
@@ -140,8 +137,8 @@ namespace Waher.Networking.CoAP.CoRE
 		/// </summary>
 		public bool Observable
 		{
-			get { return this.observable; }
-			internal set { this.observable = value; }
+			get => this.observable;
+			internal set => this.observable = value;
 		}
 
 		/// <inheritdoc/>

@@ -47,8 +47,8 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public Lwm2mObjectInstance ObjectInstance
 		{
-			get { return this.objInstance; }
-			internal set { this.objInstance = value; }
+			get => this.objInstance;
+			internal set => this.objInstance = value;
 		}
 
 		/// <summary>
@@ -59,17 +59,14 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// Name of resource.
 		/// </summary>
-		public string Name
-		{
-			get { return this.name; }
-		}
+		public string Name => this.name;
 
 		/// <summary>
 		/// ID of object.
 		/// </summary>
 		public ushort Id
 		{
-			get { return this.id; }
+			get => this.id;
 			set
 			{
 				if (this.id != value)
@@ -91,7 +88,7 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public ushort InstanceId
 		{
-			get { return this.instanceId; }
+			get => this.instanceId;
 			set
 			{
 				if (this.instanceId != value)
@@ -107,7 +104,7 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public ushort ResourceId
 		{
-			get { return this.resourceId; }
+			get => this.resourceId;
 			set
 			{
 				if (this.resourceId != value)
@@ -121,18 +118,12 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// If the resource allows servers to update the value using write commands.
 		/// </summary>
-		public bool CanWrite
-		{
-			get { return this.canWrite; }
-		}
+		public bool CanWrite => this.canWrite;
 
 		/// <summary>
 		/// If written values should be persisted by the resource.
 		/// </summary>
-		public bool Persist
-		{
-			get { return this.persist; }
-		}
+		public bool Persist => this.persist;
 
 		/// <summary>
 		/// Loads the value of the resource, from persisted storage.

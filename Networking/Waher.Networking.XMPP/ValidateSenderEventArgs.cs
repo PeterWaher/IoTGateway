@@ -49,19 +49,19 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// XMPP Client.
 		/// </summary>
-		public XmppClient Client { get { return this.client; } }
+		public XmppClient Client => this.client;
 
 		/// <summary>
 		/// The stanza.
 		/// </summary>
-		public XmlElement Stanza { get { return this.stanza; } }
+		public XmlElement Stanza => this.stanza;
 
 		/// <summary>
 		/// From where the stanza was received.
 		/// </summary>
 		public string From
 		{
-			get { return this.from; }
+			get => this.from;
 			set
 			{
 				this.from = value;
@@ -72,26 +72,17 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Bare JID of resource sending the stanza.
 		/// </summary>
-		public string FromBareJID
-		{
-			get { return this.fromBareJid; }
-		}
+		public string FromBareJID => this.fromBareJid;
 
 		/// <summary>
 		/// IQ Stanza, or null if message stanza.
 		/// </summary>
-		public IqEventArgs IqStanza
-		{
-			get { return this.iqStanza; }
-		}
+		public IqEventArgs IqStanza => this.iqStanza;
 
 		/// <summary>
 		/// Message Stanza, or null if iq stanza.
 		/// </summary>
-		public MessageEventArgs MessageStanza
-		{
-			get { return this.messageStanza; }
-		}
+		public MessageEventArgs MessageStanza => this.messageStanza;
 
 		/// <summary>
 		/// Called from an event handler to accept the sender.
@@ -112,17 +103,11 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// If an event handler accepts the sender.
 		/// </summary>
-		public bool Accepted
-		{
-			get { return this.accepted; }
-		}
+		public bool Accepted => this.accepted;
 
 		/// <summary>
 		/// If an event handler accepts the sender.
 		/// </summary>
-		public bool Rejected
-		{
-			get { return this.rejected; }
-		}
+		public bool Rejected => this.rejected;
 	}
 }

@@ -40,34 +40,22 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// UPnP Client
 		/// </summary>
-		public UPnPClient Client
-		{
-			get { return this.client; }
-		}
+		public UPnPClient Client => this.client;
 
 		/// <summary>
 		/// UPnP Headers
 		/// </summary>
-		public UPnPHeaders Headers
-		{
-			get { return this.headers; }
-		}
+		public UPnPHeaders Headers => this.headers;
 
 		/// <summary>
 		/// Local End Point
 		/// </summary>
-		public IPEndPoint LocalEndPoint
-		{
-			get { return this.localEndPoint; }
-		}
+		public IPEndPoint LocalEndPoint => this.localEndPoint;
 
 		/// <summary>
 		/// Remote End Point
 		/// </summary>
-		public IPEndPoint RemoteEndPoint
-		{
-			get { return this.remoteEndPoint; }
-		}
+		public IPEndPoint RemoteEndPoint => this.remoteEndPoint;
 
 	}
 }

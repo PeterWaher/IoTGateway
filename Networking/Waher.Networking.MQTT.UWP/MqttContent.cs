@@ -30,26 +30,17 @@ namespace Waher.Networking.MQTT
 		/// <summary>
 		/// MQTT Header
 		/// </summary>
-		public MqttHeader Header
-		{
-			get { return this.header; }
-		}
+		public MqttHeader Header => this.header;
 
 		/// <summary>
 		/// Topic
 		/// </summary>
-		public string Topic
-		{
-			get { return this.topic; }
-		}
+		public string Topic => this.topic;
 
 		/// <summary>
 		/// Binary Data
 		/// </summary>
-		public byte[] Data
-		{
-			get { return this.data; }
-		}
+		public byte[] Data => this.data;
 
 		/// <summary>
 		/// Data stream that can be used to parse incoming data.

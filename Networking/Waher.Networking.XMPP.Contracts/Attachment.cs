@@ -27,8 +27,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public string Id
 		{
-			get { return this.id; }
-			set { this.id = value; }
+			get => this.id;
+			set => this.id = value;
 		}
 
 		/// <summary>
@@ -36,8 +36,8 @@ namespace Waher.Networking.XMPP.Contracts
 		/// </summary>
 		public string LegalId
 		{
-			get { return this.legalId; }
-			set { this.legalId = value; }
+			get => this.legalId;
+			set => this.legalId = value;
 		}
 
 		/// <summary>

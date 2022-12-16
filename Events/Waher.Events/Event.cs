@@ -113,57 +113,57 @@ namespace Waher.Events
 		/// <summary>
 		/// Timestamp of event.
 		/// </summary>
-		public DateTime Timestamp { get { return this.timestamp; } }
+		public DateTime Timestamp => this.timestamp;
 
 		/// <summary>
 		/// Type of event.
 		/// </summary>
-		public EventType Type { get { return this.type; } }
+		public EventType Type => this.type;
 
 		/// <summary>
 		/// Event Level.
 		/// </summary>
-		public EventLevel Level { get { return this.level; } }
+		public EventLevel Level => this.level;
 
 		/// <summary>
 		/// Free-text event message.
 		/// </summary>
-		public string Message { get { return this.message; } }
+		public string Message => this.message;
 
 		/// <summary>
 		/// Object related to the event.
 		/// </summary>
-		public string Object { get { return this.obj; } }
+		public string Object => this.obj;
 
 		/// <summary>
 		/// Actor responsible for the action causing the event.
 		/// </summary>
-		public string Actor { get { return this.actor; } }
+		public string Actor => this.actor;
 
 		/// <summary>
 		/// Computer-readable Event ID identifying type of even.
 		/// </summary>
-		public string EventId { get { return this.eventId; } }
+		public string EventId => this.eventId;
 
 		/// <summary>
 		/// Facility can be either a facility in the network sense or in the system sense.
 		/// </summary>
-		public string Facility { get { return this.facility; } }
+		public string Facility => this.facility;
 
 		/// <summary>
 		/// Module where the event is reported.
 		/// </summary>
-		public string Module { get { return this.module; } }
+		public string Module => this.module;
 
 		/// <summary>
 		/// Stack Trace of event.
 		/// </summary>
-		public string StackTrace { get { return this.stackTrace; } }
+		public string StackTrace => this.stackTrace;
 
 		/// <summary>
 		/// Variable set of tags providing event-specific information.
 		/// </summary>
-		public KeyValuePair<string, object>[] Tags { get { return this.tags; } }
+		public KeyValuePair<string, object>[] Tags => this.tags;
 
 		/// <inheritdoc/>
 		public override string ToString()
@@ -198,9 +198,6 @@ namespace Waher.Events
 		/// <summary>
 		/// List of event sinks to avoid. Can be null.
 		/// </summary>
-		internal LinkedList<IEventSink> ToAvoid
-		{
-			get { return this.toAvoid; }
-		}
+		internal LinkedList<IEventSink> ToAvoid => this.toAvoid;
 	}
 }

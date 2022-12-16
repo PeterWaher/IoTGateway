@@ -27,9 +27,6 @@ namespace Waher.Networking.XMPP.Concentrator
 		/// <summary>
 		/// Status Message
 		/// </summary>
-		public string StatusMessage
-		{
-			get { return this.statusMessage; }
-		}
+		public string StatusMessage => this.statusMessage;
 	}
 }

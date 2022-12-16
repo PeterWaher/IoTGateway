@@ -41,9 +41,6 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// Node name.
 		/// </summary>
-		public string NodeName
-		{
-			get { return this.nodeName; }
-		}
+		public string NodeName => this.nodeName;
     }
 }

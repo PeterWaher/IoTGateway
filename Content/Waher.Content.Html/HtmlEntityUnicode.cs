@@ -30,10 +30,7 @@ namespace Waher.Content.Html
 		/// <summary>
 		/// Unicode number
 		/// </summary>
-		public int Code
-		{
-			get { return this.code; }
-		}
+		public int Code => this.code;
 
 		/// <inheritdoc/>
 		public override string ToString()

@@ -54,31 +54,22 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// Underlying XML definition.
 		/// </summary>
-		public XmlElement Xml
-		{
-			get { return this.xml; }
-		}
+		public XmlElement Xml => this.xml;
 
 		/// <summary>
 		/// Action Name
 		/// </summary>
-		public string Name { get { return this.name; } }
+		public string Name => this.name;
 
 		/// <summary>
 		/// Service Arguments.
 		/// </summary>
-		public UPnPArgument[] Arguments
-		{
-			get { return this.arguments; }
-		}
+		public UPnPArgument[] Arguments => this.arguments;
 
 		/// <summary>
 		/// Parent Service Description Document object.
 		/// </summary>
-		public ServiceDescriptionDocument ServiceDescriptionDocument
-		{
-			get { return this.parent; }
-		}
+		public ServiceDescriptionDocument ServiceDescriptionDocument => this.parent;
 
 		/// <summary>
 		/// Invokes the action.

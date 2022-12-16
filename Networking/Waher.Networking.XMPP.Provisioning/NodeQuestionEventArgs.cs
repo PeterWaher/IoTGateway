@@ -46,50 +46,32 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Any service tokens available in the request.
 		/// </summary>
-		public string[] ServiceTokens
-		{
-			get { return this.serviceTokens; }
-		}
+		public string[] ServiceTokens => this.serviceTokens;
 
 		/// <summary>
 		/// And device tokens available in the request.
 		/// </summary>
-		public string[] DeviceTokens
-		{
-			get { return this.deviceTokens; }
-		}
+		public string[] DeviceTokens => this.deviceTokens;
 
 		/// <summary>
 		/// And user tokens available in the request.
 		/// </summary>
-		public string[] UserTokens
-		{
-			get { return this.userTokens; }
-		}
+		public string[] UserTokens => this.userTokens;
 
 		/// <summary>
 		/// Node ID, if applicable.
 		/// </summary>
-		public string NodeId
-		{
-			get { return this.nodeId; }
-		}
+		public string NodeId => this.nodeId;
 
 		/// <summary>
 		/// Source ID, if applicable.
 		/// </summary>
-		public string SourceId
-		{
-			get { return this.sourceId; }
-		}
+		public string SourceId => this.sourceId;
 
 		/// <summary>
 		/// Partition, if applicable.
 		/// </summary>
-		public string Partition
-		{
-			get { return this.partition; }
-		}
+		public string Partition => this.partition;
 
 	}
 }

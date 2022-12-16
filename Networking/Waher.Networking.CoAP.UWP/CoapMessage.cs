@@ -50,50 +50,35 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// Type of message.
 		/// </summary>
-		public CoapMessageType Type
-		{
-			get { return this.type; }
-		}
+		public CoapMessageType Type => this.type;
 
 		/// <summary>
 		/// Message code.
 		/// </summary>
-		public CoapCode Code
-		{
-			get { return this.code; }
-		}
+		public CoapCode Code => this.code;
 
 		/// <summary>
 		/// Message ID.
 		/// </summary>
-		public ushort MessageId
-		{
-			get { return this.messageId; }
-		}
+		public ushort MessageId => this.messageId;
 
 		/// <summary>
 		/// Token
 		/// </summary>
-		public ulong Token
-		{
-			get { return this.token; }
-		}
+		public ulong Token => this.token;
 
 		/// <summary>
 		/// Available options.
 		/// </summary>
-		public CoapOption[] Options
-		{
-			get { return this.options; }
-		}
+		public CoapOption[] Options => this.options;
 
 		/// <summary>
 		/// Payload, if available, or null otherwise.
 		/// </summary>
 		public byte[] Payload
 		{
-			get { return this.payload; }
-			internal set { this.payload = value; }
+			get => this.payload;
+			internal set => this.payload = value;
 		}
 
 		/// <summary>
@@ -101,25 +86,22 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public Uri BaseUri
 		{
-			get { return this.baseUri; }
-			internal set { this.baseUri = value; }
+			get => this.baseUri;
+			internal set => this.baseUri = value;
 		}
 
 		/// <summary>
 		/// From where the message came.
 		/// </summary>
-		public IPEndPoint From
-		{
-			get { return this.from; }
-		}
+		public IPEndPoint From => this.from;
 
 		/// <summary>
 		/// Optional accept option.
 		/// </summary>
 		public ulong? Accept
 		{
-			get { return this.accept; }
-			internal set { this.accept = value; }
+			get => this.accept;
+			internal set => this.accept = value;
 		}
 
 		/// <summary>
@@ -127,8 +109,8 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public ushort? ContentFormat
 		{
-			get { return this.contentFormat; }
-			internal set { this.contentFormat = value; }
+			get => this.contentFormat;
+			internal set => this.contentFormat = value;
 		}
 
 		/// <summary>
@@ -136,8 +118,8 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public Dictionary<string, string> UriQuery
 		{
-			get { return this.uriQuery; }
-			internal set { this.uriQuery = value; }
+			get => this.uriQuery;
+			internal set => this.uriQuery = value;
 		}
 
 		/// <summary>
@@ -162,8 +144,8 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public ushort? Port
 		{
-			get { return this.port; }
-			internal set { this.port = value; }
+			get => this.port;
+			internal set => this.port = value;
 		}
 
 		/// <summary>
@@ -171,8 +153,8 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public string Host
 		{
-			get { return this.host; }
-			internal set { this.host = value; }
+			get => this.host;
+			internal set => this.host = value;
 		}
 
 		/// <summary>
@@ -180,8 +162,8 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public string Path
 		{
-			get { return this.path; }
-			set { this.path = value; }
+			get => this.path;
+			set => this.path = value;
 		}
 
 		/// <summary>
@@ -190,8 +172,8 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public string SubPath
 		{
-			get { return this.subPath; }
-			set { this.subPath = value; }
+			get => this.subPath;
+			set => this.subPath = value;
 		}
 
 		/// <summary>
@@ -199,8 +181,8 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public uint MaxAge
 		{
-			get { return this.maxAge; }
-			internal set { this.maxAge = value; }
+			get => this.maxAge;
+			internal set => this.maxAge = value;
 		}
 
 		/// <summary>
@@ -208,8 +190,8 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public string LocationPath
 		{
-			get { return this.locationPath; }
-			internal set { this.locationPath = value; }
+			get => this.locationPath;
+			internal set => this.locationPath = value;
 		}
 
 		/// <summary>
@@ -217,8 +199,8 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public Dictionary<string, string> LocationQuery
 		{
-			get { return this.locationQuery; }
-			internal set { this.locationQuery = value; }
+			get => this.locationQuery;
+			internal set => this.locationQuery = value;
 		}
 
 		/// <summary>
@@ -243,8 +225,8 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public uint? Size1
 		{
-			get { return this.size1; }
-			internal set { this.size1 = value; }
+			get => this.size1;
+			internal set => this.size1 = value;
 		}
 
 		/// <summary>
@@ -252,8 +234,8 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public uint? Size2
 		{
-			get { return this.size2; }
-			internal set { this.size2 = value; }
+			get => this.size2;
+			internal set => this.size2 = value;
 		}
 
 		/// <summary>
@@ -261,8 +243,8 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public CoapOptionBlock1 Block1
 		{
-			get { return this.block1; }
-			internal set { this.block1 = value; }
+			get => this.block1;
+			internal set => this.block1 = value;
 		}
 
 		/// <summary>
@@ -270,8 +252,8 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public CoapOptionBlock2 Block2
 		{
-			get { return this.block2; }
-			internal set { this.block2 = value; }
+			get => this.block2;
+			internal set => this.block2 = value;
 		}
 
 		/// <summary>
@@ -279,8 +261,8 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public uint? Observe
 		{
-			get { return this.observe; }
-			internal set { this.observe = value; }
+			get => this.observe;
+			internal set => this.observe = value;
 		}
 
 		/// <summary>

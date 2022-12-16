@@ -32,10 +32,7 @@ namespace Waher.Networking.XMPP.Software
         /// <summary>
         /// File name of local package file.
         /// </summary>
-        public string LocalFileName
-        {
-            get { return this.localFileName; }
-        }
+        public string LocalFileName => this.localFileName;
 
     }
 }

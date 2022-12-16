@@ -21,10 +21,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Owner JID, if claimed.
 		/// </summary>
-		public string OwnerJid
-		{
-			get { return this.ownerJid; }
-		}
+		public string OwnerJid => this.ownerJid;
 
 		/// <summary>
 		/// If the device is already claimed.
@@ -37,9 +34,6 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// If the claimed device is public.
 		/// </summary>
-		public bool IsPublic
-		{
-			get { return this.isPublic; }
-		}
+		public bool IsPublic => this.isPublic;
 	}
 }

@@ -27,6 +27,6 @@ namespace Waher.Events.XMPP
 		/// <summary>
 		/// Event.
 		/// </summary>
-		public Event Event { get { return this.ev; } }
+		public Event Event => this.ev;
 	}
 }

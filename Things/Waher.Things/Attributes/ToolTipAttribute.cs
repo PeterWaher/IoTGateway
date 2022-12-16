@@ -34,17 +34,11 @@ namespace Waher.Things.Attributes
 		/// <summary>
 		/// String ID in the namespace of the current class, in the default language defined for the class.
 		/// </summary>
-		public int StringId
-		{
-			get { return this.stringId; }
-		}
+		public int StringId => this.stringId;
 
 		/// <summary>
 		/// Default tooltip string, in the default language defined for the class.
 		/// </summary>
-		public string ToolTip
-		{
-			get { return this.tooltip; }
-		}
+		public string ToolTip => this.tooltip;
 	}
 }

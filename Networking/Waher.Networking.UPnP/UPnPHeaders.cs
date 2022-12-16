@@ -159,72 +159,72 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// Message direction.
 		/// </summary>
-		public HttpDirection Direction { get { return this.direction; } }
+		public HttpDirection Direction => this.direction;
 
 		/// <summary>
 		/// HTTP Verb
 		/// </summary>
-		public string Verb { get { return this.verb; } }
+		public string Verb => this.verb;
 
 		/// <summary>
 		/// HTTP Parameter
 		/// </summary>
-		public string Parameter { get { return this.parameter; } }
+		public string Parameter => this.parameter;
 
 		/// <summary>
 		/// HTTP Version
 		/// </summary>
-		public double HttpVersion { get { return this.httpVersion; } }
+		public double HttpVersion => this.httpVersion;
 
 		/// <summary>
 		/// Search Target header
 		/// </summary>
-		public string SearchTarget { get { return this.searchTarget; } }
+		public string SearchTarget => this.searchTarget;
 
 		/// <summary>
 		/// Server header
 		/// </summary>
-		public string Server { get { return this.server; } }
+		public string Server => this.server;
 
 		/// <summary>
 		/// Location header
 		/// </summary>
-		public string Location { get { return this.location; } }
+		public string Location => this.location;
 
 		/// <summary>
 		/// Unique Service Name (USN) header
 		/// </summary>
-		public string UniqueServiceName { get { return this.uniqueServiceName; } }
+		public string UniqueServiceName => this.uniqueServiceName;
 
 		/// <summary>
 		/// Response message
 		/// </summary>
-		public string ResponseMessage { get { return this.responseMessage; } }
+		public string ResponseMessage => this.responseMessage;
 
 		/// <summary>
 		/// Host
 		/// </summary>
-		public string Host { get { return this.host; } }
+		public string Host => this.host;
 
 		/// <summary>
 		/// Cache Control
 		/// </summary>
-		public string CacheControl { get { return this.cacheControl; } }
+		public string CacheControl => this.cacheControl;
 
 		/// <summary>
 		/// Notification Type
 		/// </summary>
-		public string NotificationType { get { return this.notificationType; } }
+		public string NotificationType => this.notificationType;
 
 		/// <summary>
 		/// Notification Sub-type
 		/// </summary>
-		public string NotificationSubType { get { return this.notificationSubType; } }
+		public string NotificationSubType => this.notificationSubType;
 
 		/// <summary>
 		/// Response Code
 		/// </summary>
-		public int ResponseCode { get { return this.responseCode; } }
+		public int ResponseCode => this.responseCode;
 
 		/// <summary>
 		/// Gets an enumerator, enumerating all headers.

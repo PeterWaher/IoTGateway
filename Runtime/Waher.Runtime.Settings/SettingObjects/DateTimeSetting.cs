@@ -39,8 +39,8 @@ namespace Waher.Runtime.Settings.SettingObjects
 		[DefaultValueDateTimeMinValue]
 		public DateTime Value
 		{
-			get { return this.value; }
-			set { this.value = value; }
+			get => this.value;
+			set => this.value = value;
 		}
 
 		/// <summary>

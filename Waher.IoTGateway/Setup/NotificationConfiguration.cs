@@ -39,8 +39,8 @@ namespace Waher.IoTGateway.Setup
 		[DefaultValueNull]
 		public CaseInsensitiveString[] Addresses
 		{
-			get { return this.addresses; }
-			set { this.addresses = value; }
+			get => this.addresses;
+			set => this.addresses = value;
 		}
 
 		/// <summary>

@@ -23,10 +23,7 @@ namespace Waher.Networking.XMPP.Provisioning.SearchOperators
 		/// <summary>
 		/// Tag name.
 		/// </summary>
-		public string Name
-		{
-			get { return this.name; }
-		}
+		public string Name => this.name;
 
 		internal void Serialize(StringBuilder Request)
 		{

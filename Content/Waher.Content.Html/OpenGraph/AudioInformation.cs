@@ -26,8 +26,8 @@ namespace Waher.Content.Html.OpenGraph
 		/// </summary>
 		public string Url
 		{
-			get { return this.url; }
-			set { this.url = value; }
+			get => this.url;
+			set => this.url = value;
 		}
 
 		/// <summary>
@@ -36,8 +36,8 @@ namespace Waher.Content.Html.OpenGraph
 		/// </summary>
 		public string SecureUrl
 		{
-			get { return this.secureUrl; }
-			set { this.secureUrl = value; }
+			get => this.secureUrl;
+			set => this.secureUrl = value;
 		}
 
 		/// <summary>
@@ -46,8 +46,8 @@ namespace Waher.Content.Html.OpenGraph
 		/// </summary>
 		public string ContentType
 		{
-			get { return this.contentType; }
-			set { this.contentType = value; }
+			get => this.contentType;
+			set => this.contentType = value;
 		}
 
 		/// <inheritdoc/>

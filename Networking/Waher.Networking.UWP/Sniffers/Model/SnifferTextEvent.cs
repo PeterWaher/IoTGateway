@@ -23,9 +23,6 @@ namespace Waher.Networking.Sniffers.Model
 		/// <summary>
 		/// Text
 		/// </summary>
-		public string Text
-		{
-			get { return this.text; }
-		}
+		public string Text => this.text;
 	}
 }

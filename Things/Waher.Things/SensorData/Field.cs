@@ -180,8 +180,8 @@ namespace Waher.Things.SensorData
 		[ObjectId]
 		public string ObjectId
 		{
-			get { return this.objectId; }
-			set { this.objectId = value; }
+			get => this.objectId;
+			set => this.objectId = value;
 		}
 
 		/// <summary>
@@ -190,8 +190,8 @@ namespace Waher.Things.SensorData
 		[ByReference]
 		public ThingReference Thing
 		{
-			get { return this.thing; }
-			set { this.thing = value; }
+			get => this.thing;
+			set => this.thing = value;
 		}
 
 		/// <summary>
@@ -200,8 +200,8 @@ namespace Waher.Things.SensorData
 		[ShortName("ts")]
 		public DateTime Timestamp
 		{
-			get { return this.timestamp; }
-			set { this.timestamp = value; }
+			get => this.timestamp;
+			set => this.timestamp = value;
 		}
 
 		/// <summary>
@@ -211,8 +211,8 @@ namespace Waher.Things.SensorData
 		[DefaultValueDateTimeMaxValue]
 		public DateTime Expires
 		{
-			get { return this.expires; }
-			set { this.expires = value; }
+			get => this.expires;
+			set => this.expires = value;
 		}
 
 		/// <summary>
@@ -247,8 +247,8 @@ namespace Waher.Things.SensorData
 		[DefaultValueNull]
 		public LocalizationStep[] StringIdSteps
 		{
-			get { return this.stringIdSteps; }
-			set { this.stringIdSteps = value; }
+			get => this.stringIdSteps;
+			set => this.stringIdSteps = value;
 		}
 
 		/// <summary>
@@ -257,8 +257,8 @@ namespace Waher.Things.SensorData
 		[ShortName("t")]
 		public FieldType Type
 		{
-			get { return this.type; }
-			set { this.type = value; }
+			get => this.type;
+			set => this.type = value;
 		}
 
 		/// <summary>
@@ -267,8 +267,8 @@ namespace Waher.Things.SensorData
 		[ShortName("q")]
 		public FieldQoS QoS
 		{
-			get { return this.qos; }
-			set { this.qos = value; }
+			get => this.qos;
+			set => this.qos = value;
 		}
 
 		/// <summary>
@@ -277,8 +277,8 @@ namespace Waher.Things.SensorData
 		[ShortName("n")]
 		public string Name
 		{
-			get { return this.name; }
-			set { this.name = value; }
+			get => this.name;
+			set => this.name = value;
 		}
 
 		/// <summary>
@@ -288,8 +288,8 @@ namespace Waher.Things.SensorData
 		[DefaultValueStringEmpty]
 		public string Module
 		{
-			get { return this.module; }
-			set { this.module = value; }
+			get => this.module;
+			set => this.module = value;
 		}
 
 		/// <summary>
@@ -299,8 +299,8 @@ namespace Waher.Things.SensorData
 		[DefaultValue(false)]
 		public bool Writable
 		{
-			get { return this.writable; }
-			set { this.writable = value; }
+			get => this.writable;
+			set => this.writable = value;
 		}
 
 		/// <inheritdoc/>

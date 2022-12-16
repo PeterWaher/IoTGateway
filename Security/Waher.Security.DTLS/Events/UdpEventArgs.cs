@@ -27,18 +27,12 @@ namespace Waher.Security.DTLS.Events
 		/// <summary>
 		/// Remote endpoint.
 		/// </summary>
-		public IPEndPoint RemoteEndpoint
-		{
-			get { return this.remoteEndpoint; }
-		}
+		public IPEndPoint RemoteEndpoint => this.remoteEndpoint;
 
 		/// <summary>
 		/// DTLS over UDP.
 		/// </summary>
-		public DtlsOverUdp DtlsOverUdp
-		{
-			get { return this.dtlsOverUdp; }
-		}
+		public DtlsOverUdp DtlsOverUdp => this.dtlsOverUdp;
 
 	}
 }

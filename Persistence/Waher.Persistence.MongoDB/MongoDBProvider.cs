@@ -131,18 +131,12 @@ namespace Waher.Persistence.MongoDB
 		/// <summary>
 		/// An ID of the files provider. It's unique, and constant during the life-time of the MongoDBProvider class.
 		/// </summary>
-		public string Id
-		{
-			get { return this.id; }
-		}
+		public string Id => this.id;
 
 		/// <summary>
 		/// Number of bytes used by an Object ID.
 		/// </summary>
-		public int ObjectIdByteCount
-		{
-			get => 12;
-		}
+		public int ObjectIdByteCount => 12;
 
 		/// <summary>
 		/// Gets a collection.
@@ -176,26 +170,17 @@ namespace Waher.Persistence.MongoDB
 		/// <summary>
 		/// Underlying MongoDB client.
 		/// </summary>
-		public MongoClient Client
-		{
-			get { return this.client; }
-		}
+		public MongoClient Client => this.client;
 
 		/// <summary>
 		/// Default collection name.
 		/// </summary>
-		public string DefaultCollectionName
-		{
-			get { return this.defaultCollectionName; }
-		}
+		public string DefaultCollectionName => this.defaultCollectionName;
 
 		/// <summary>
 		/// Default collection.
 		/// </summary>
-		public IMongoCollection<BsonDocument> DefaultCollection
-		{
-			get { return this.defaultCollection; }
-		}
+		public IMongoCollection<BsonDocument> DefaultCollection => this.defaultCollection;
 
 		/// <summary>
 		/// Returns a serializer for a given type.

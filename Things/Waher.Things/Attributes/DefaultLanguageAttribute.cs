@@ -22,9 +22,6 @@ namespace Waher.Things.Attributes
 		/// <summary>
 		/// Default language code.
 		/// </summary>
-		public string LanguageCode
-		{
-			get { return this.languageCode; }
-		}
+		public string LanguageCode => this.languageCode;
 	}
 }

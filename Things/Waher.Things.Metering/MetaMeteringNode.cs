@@ -56,8 +56,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string Name
 		{
-			get { return this.name; }
-			set { this.name = value; }
+			get => this.name;
+			set => this.name = value;
 		}
 
 		/// <summary>
@@ -69,8 +69,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string Class
 		{
-			get { return this.className; }
-			set { this.className = value; }
+			get => this.className;
+			set => this.className = value;
 		}
 
 		/// <summary>
@@ -82,8 +82,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string SerialNumber
 		{
-			get { return this.serialNumber; }
-			set { this.serialNumber = value; }
+			get => this.serialNumber;
+			set => this.serialNumber = value;
 		}
 
 		/// <summary>
@@ -95,8 +95,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string MeterNumber
 		{
-			get { return this.meterNumber; }
-			set { this.meterNumber = value; }
+			get => this.meterNumber;
+			set => this.meterNumber = value;
 		}
 
 		/// <summary>
@@ -108,8 +108,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string MeterLocation
 		{
-			get { return this.meterLocation; }
-			set { this.meterLocation = value; }
+			get => this.meterLocation;
+			set => this.meterLocation = value;
 		}
 
 		/// <summary>
@@ -121,8 +121,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string ManufacturerDomain
 		{
-			get { return this.manufacturerDomain; }
-			set { this.manufacturerDomain = value; }
+			get => this.manufacturerDomain;
+			set => this.manufacturerDomain = value;
 		}
 
 		/// <summary>
@@ -134,8 +134,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string Model
 		{
-			get { return this.model; }
-			set { this.model = value; }
+			get => this.model;
+			set => this.model = value;
 		}
 
 		/// <summary>
@@ -147,8 +147,8 @@ namespace Waher.Things.Metering
 		[DefaultValueNull]
 		public double? Version
 		{
-			get { return this.version; }
-			set { this.version = value; }
+			get => this.version;
+			set => this.version = value;
 		}
 
 		/// <summary>
@@ -160,8 +160,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string ProductUrl
 		{
-			get { return this.productUrl; }
-			set { this.productUrl = value; }
+			get => this.productUrl;
+			set => this.productUrl = value;
 		}
 
 		/// <summary>
@@ -173,8 +173,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string Country
 		{
-			get { return this.country; }
-			set { this.country = value; }
+			get => this.country;
+			set => this.country = value;
 		}
 
 		/// <summary>
@@ -186,8 +186,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string Region
 		{
-			get { return this.region; }
-			set { this.region = value; }
+			get => this.region;
+			set => this.region = value;
 		}
 
 		/// <summary>
@@ -199,8 +199,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string City
 		{
-			get { return this.city; }
-			set { this.city = value; }
+			get => this.city;
+			set => this.city = value;
 		}
 
 		/// <summary>
@@ -212,8 +212,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string Area
 		{
-			get { return this.area; }
-			set { this.area = value; }
+			get => this.area;
+			set => this.area = value;
 		}
 
 		/// <summary>
@@ -225,8 +225,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string Street
 		{
-			get { return this.street; }
-			set { this.street = value; }
+			get => this.street;
+			set => this.street = value;
 		}
 
 		/// <summary>
@@ -238,8 +238,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string StreetNr
 		{
-			get { return this.streetNr; }
-			set { this.streetNr = value; }
+			get => this.streetNr;
+			set => this.streetNr = value;
 		}
 
 		/// <summary>
@@ -267,8 +267,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string Building
 		{
-			get { return this.building; }
-			set { this.building = value; }
+			get => this.building;
+			set => this.building = value;
 		}
 
 		/// <summary>
@@ -280,8 +280,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string Apartment
 		{
-			get { return this.apartment; }
-			set { this.apartment = value; }
+			get => this.apartment;
+			set => this.apartment = value;
 		}
 
 		/// <summary>
@@ -293,8 +293,8 @@ namespace Waher.Things.Metering
 		[DefaultValueStringEmpty]
 		public string Room
 		{
-			get { return this.room; }
-			set { this.room = value; }
+			get => this.room;
+			set => this.room = value;
 		}
 
 		/// <summary>
@@ -306,8 +306,8 @@ namespace Waher.Things.Metering
 		[DefaultValueNull]
 		public double? Latitude
 		{
-			get { return this.latitude; }
-			set { this.latitude = value; }
+			get => this.latitude;
+			set => this.latitude = value;
 		}
 
 		/// <summary>
@@ -319,8 +319,8 @@ namespace Waher.Things.Metering
 		[DefaultValueNull]
 		public double? Longitude
 		{
-			get { return this.longitude; }
-			set { this.longitude = value; }
+			get => this.longitude;
+			set => this.longitude = value;
 		}
 
 		/// <summary>
@@ -332,8 +332,8 @@ namespace Waher.Things.Metering
 		[DefaultValueNull]
 		public double? Altitude
 		{
-			get { return this.altitude; }
-			set { this.altitude = value; }
+			get => this.altitude;
+			set => this.altitude = value;
 		}
 
 		/// <summary>

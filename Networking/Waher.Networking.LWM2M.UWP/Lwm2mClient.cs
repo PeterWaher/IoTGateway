@@ -81,7 +81,7 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public Lwm2mState State
 		{
-			get { return this.state; }
+			get => this.state;
 			internal set
 			{
 				if (this.state != value)
@@ -135,26 +135,17 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// Current CoAP endpoint.
 		/// </summary>
-		public CoapEndpoint CoapEndpoint
-		{
-			get { return this.coapEndpoint; }
-		}
+		public CoapEndpoint CoapEndpoint => this.coapEndpoint;
 
 		/// <summary>
 		/// Server references.
 		/// </summary>
-		public Lwm2mServerReference[] ServerReferences
-		{
-			get { return this.serverReferences; }
-		}
+		public Lwm2mServerReference[] ServerReferences => this.serverReferences;
 
 		/// <summary>
 		/// Client name.
 		/// </summary>
-		public string ClientName
-		{
-			get { return this.clientName; }
-		}
+		public string ClientName => this.clientName;
 
 		#region Bootstrap
 

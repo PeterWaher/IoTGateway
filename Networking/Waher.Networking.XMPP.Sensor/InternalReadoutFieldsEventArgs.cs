@@ -33,6 +33,6 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// New fields reported.
 		/// </summary>
-		public IEnumerable<Field> Fields { get { return this.fields; } }
+		public IEnumerable<Field> Fields => this.fields;
 	}
 }

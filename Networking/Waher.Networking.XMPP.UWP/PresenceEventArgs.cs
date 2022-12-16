@@ -323,60 +323,60 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Type of presence received.
 		/// </summary>
-		public PresenceType Type { get { return this.type; } }
+		public PresenceType Type => this.type;
 
 		/// <summary>
 		/// Resource availability.
 		/// </summary>
-		public Availability Availability { get { return this.availability; } }
+		public Availability Availability => this.availability;
 
 		/// <summary>
 		/// From where the presence was received.
 		/// </summary>
-		public string From { get { return this.from; } }
+		public string From => this.from;
 
 		/// <summary>
 		/// Bare JID of resource sending the presence.
 		/// </summary>
-		public string FromBareJID { get { return this.fromBareJid; } }
+		public string FromBareJID => this.fromBareJid;
 
 		/// <summary>
 		/// To whom the presence was sent.
 		/// </summary>
-		public string To { get { return this.to; } }
+		public string To => this.to;
 
 		/// <summary>
 		/// ID attribute of presence stanza.
 		/// </summary>
-		public string Id { get { return this.id; } }
+		public string Id => this.id;
 
 		/// <summary>
 		/// Human readable status.
 		/// </summary>
-		public string Status { get { return this.status; } }
+		public string Status => this.status;
 
 		/// <summary>
 		/// Presence element.
 		/// </summary>
-		public XmlElement Presence { get { return this.presence; } }
+		public XmlElement Presence => this.presence;
 
 		/// <summary>
 		/// XMPP Client. Is null if event raised by a component.
 		/// </summary>
-		public XmppClient Client { get { return this.client; } }
+		public XmppClient Client => this.client;
 
 		/// <summary>
 		/// XMPP Component. Is null if event raised by a client.
 		/// </summary>
-		public XmppComponent Component { get { return this.component; } }
+		public XmppComponent Component => this.component;
 
 		/// <summary>
 		/// If the connection is being tested.
 		/// </summary>
 		internal bool Testing
 		{
-			get { return this.testing; }
-			set { this.testing = value; }
+			get => this.testing;
+			set => this.testing = value;
 		}
 
 		/// <summary>
@@ -384,8 +384,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool UpdateLastPresence
 		{
-			get { return this.updateLastPresence; }
-			set { this.updateLastPresence = value; }
+			get => this.updateLastPresence;
+			set => this.updateLastPresence = value;
 		}
 
 		/// <summary>
@@ -393,8 +393,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public object State
 		{
-			get { return this.state; }
-			set { this.state = value; }
+			get => this.state;
+			set => this.state = value;
 		}
 
 		/// <summary>
@@ -412,8 +412,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public XmlElement Content
 		{
-			get { return this.content; }
-			internal set { this.content = value; }
+			get => this.content;
+			internal set => this.content = value;
 		}
 
 		/// <summary>
@@ -421,85 +421,73 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool Ok
 		{
-			get { return this.ok; }
-			set { this.ok = value; }
+			get => this.ok;
+			set => this.ok = value;
 		}
 
 		/// <summary>
 		/// Error Code
 		/// </summary>
-		public int ErrorCode { get { return this.errorCode; } }
+		public int ErrorCode => this.errorCode;
 
 		/// <summary>
 		/// Error Type
 		/// </summary>
-		public ErrorType ErrorType { get { return this.errorType; } }
+		public ErrorType ErrorType => this.errorType;
 
 		/// <summary>
 		/// Error element.
 		/// </summary>
-		public XmlElement ErrorElement { get { return this.errorElement; } }
+		public XmlElement ErrorElement => this.errorElement;
 
 		/// <summary>
 		/// Any error specific text.
 		/// </summary>
-		public string ErrorText { get { return this.errorText; } }
+		public string ErrorText => this.errorText;
 
 		/// <summary>
 		/// Any stanza error returned.
 		/// </summary>
-		public XmppException StanzaError { get { return this.stanzaError; } }
+		public XmppException StanzaError => this.stanzaError;
 
 		/// <summary>
 		/// Available set of (language,status) pairs.
 		/// </summary>
-		public KeyValuePair<string, string>[] Statuses { get { return this.statuses; } }
+		public KeyValuePair<string, string>[] Statuses => this.statuses;
 
 		/// <summary>
 		/// Priority of presence stanza.
 		/// </summary>
-		public sbyte Priority { get { return this.priority; } }
+		public sbyte Priority => this.priority;
 
 		/// <summary>
 		/// Timestamp of when the stanza was received.
 		/// </summary>
-		public DateTime Received { get { return this.received; } }
+		public DateTime Received => this.received;
 
 		/// <summary>
 		/// Version of entity capabilities of sender.
 		/// Entity capabilities are defined in XEP-0115: http://xmpp.org/extensions/xep-0115.html
 		/// </summary>
-		public string EntityCapabilityVersion
-		{
-			get { return this.entityCapabilityVersion; }
-		}
+		public string EntityCapabilityVersion => this.entityCapabilityVersion;
 
 		/// <summary>
 		/// Node of entity capabilities of sender.
 		/// Entity capabilities are defined in XEP-0115: http://xmpp.org/extensions/xep-0115.html
 		/// </summary>
-		public string EntityCapabilityNode
-		{
-			get { return this.entityCapabilityNode; }
-		}
+		public string EntityCapabilityNode => this.entityCapabilityNode;
 
 		/// <summary>
 		/// Hash function used in calculation of entity capabilities version of sender.
 		/// Entity capabilities are defined in XEP-0115: http://xmpp.org/extensions/xep-0115.html
 		/// </summary>
-		public string EntityCapabilityHashFunction
-		{
-			get { return this.entityCapabilityHashFunction; }
-		}
+		public string EntityCapabilityHashFunction => this.entityCapabilityHashFunction;
 
 		/// <summary>
 		/// If the presence stanza includes entity capabilities information.
 		/// Entity capabilities are defined in XEP-0115: http://xmpp.org/extensions/xep-0115.html
 		/// </summary>
-		public bool HasEntityCapabilities
-		{
-			get { return this.hasEntityCapabilities; }
-		}
+		public bool HasEntityCapabilities => this.hasEntityCapabilities;
 
 		/// <summary>
 		/// Accepts a subscription or unsubscription request.

@@ -31,66 +31,42 @@ namespace Waher.Persistence.Files.Searching
 		/// <summary>
 		/// Field Name
 		/// </summary>
-		public string FieldName
-		{
-			get { return this.fieldName; }
-		}
+		public string FieldName => this.fieldName;
 
 		/// <summary>
 		/// Minimum endpoint, if a range.
 		/// </summary>
-		public object Min
-		{
-			get { return this.min; }
-		}
+		public object Min => this.min;
 
 		/// <summary>
 		/// Maximum endpoint, if a range.
 		/// </summary>
-		public object Max
-		{
-			get { return this.max; }
-		}
+		public object Max => this.max;
 
 		/// <summary>
 		/// Point value, if not a range.
 		/// </summary>
-		public object Point
-		{
-			get { return this.point; }
-		}
+		public object Point => this.point;
 
 		/// <summary>
 		/// If the minimum endpoint is included in the range.
 		/// </summary>
-		public bool MinInclusive
-		{
-			get { return this.minInclusive; }
-		}
+		public bool MinInclusive => this.minInclusive;
 
 		/// <summary>
 		/// If the maximum endpoint is included in the range.
 		/// </summary>
-		public bool MaxInclusive
-		{
-			get { return this.maxInclusive; }
-		}
+		public bool MaxInclusive => this.maxInclusive;
 
 		/// <summary>
 		/// If the object specifies a range (true) or a single point (false).
 		/// </summary>
-		public bool IsRange
-		{
-			get { return this.isRange; }
-		}
+		public bool IsRange => this.isRange;
 
 		/// <summary>
 		/// If the object specifies a point (true) or a range (false).
 		/// </summary>
-		public bool IsPoint
-		{
-			get { return this.isPoint; }
-		}
+		public bool IsPoint => this.isPoint;
 
 		/// <summary>
 		/// If the range is open-ended.

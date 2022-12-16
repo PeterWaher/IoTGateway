@@ -46,33 +46,21 @@ namespace Waher.Networking.XMPP.PubSub
 		/// <summary>
 		/// If options are supported
 		/// </summary>
-		public OptionsAvailability OptionsSupported
-		{
-			get { return this.availability; }
-		}
+		public OptionsAvailability OptionsSupported => this.availability;
 
 		/// <summary>
 		/// When the subscription expires.
 		/// </summary>
-		public DateTime Expires
-		{
-			get { return this.expires; }
-		}
+		public DateTime Expires => this.expires;
 
 		/// <summary>
 		/// Subscription ID
 		/// </summary>
-		public string SubscriptionId
-		{
-			get { return this.subscriptionId; }
-		}
+		public string SubscriptionId => this.subscriptionId;
 
 		/// <summary>
 		/// Status of subscripton.
 		/// </summary>
-		public NodeSubscriptionStatus Status
-		{
-			get { return this.status; }
-		}
+		public NodeSubscriptionStatus Status => this.status;
 	}
 }

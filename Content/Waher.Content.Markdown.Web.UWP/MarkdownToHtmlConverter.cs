@@ -304,6 +304,8 @@ namespace Waher.Content.Markdown.Web
 				}
 			}
 
+			string s = await this.DoConversion(Doc);	// Result needs to be generated, so that IsDynamic property is properly evaluated. (Can depend on master file, which is loaded during generation.)
+
 			if (!(State.Session is null) && State.Session.TryGetVariable("Response", out v))
 			{
 				if (v.ValueObject is HttpResponse Response)
@@ -328,7 +330,6 @@ namespace Waher.Content.Markdown.Web
 				}
 			}
 
-			string s = await this.DoConversion(Doc);
 			byte[] Data = Utf8WithBOM.GetBytes(s);
 
 			await State.To.WriteAsync(Data, 0, Data.Length);

@@ -6061,7 +6061,7 @@ namespace Waher.Content.Markdown
 		/// <summary>
 		/// If the contents of the document is dynamic (i.e. includes script), or not (i.e. is static).
 		/// </summary>
-		public bool IsDynamic => this.isDynamic;
+		public bool IsDynamic => this.isDynamic || (this.master?.isDynamic ?? false);
 
 		/// <summary>
 		/// Property can be used to tag document with client-specific information.
@@ -6657,7 +6657,7 @@ namespace Waher.Content.Markdown
 		{
 			if (SingleRow && Rows.Length == 1)
 				return Rows[0].Trim();
-			
+
 			StringBuilder sb = new StringBuilder();
 
 			foreach (string Row in Rows)

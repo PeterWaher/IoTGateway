@@ -203,6 +203,22 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Computes an ETag value for a resource.
+		/// </summary>
+		/// <param name="Binary">Binary representation of resource.</param>
+		/// <returns>ETag value.</returns>
+		public string ComputeETag(byte[] Binary)
+		{
+			string ETag = Hashes.ComputeSHA1HashString(Binary);
+
+			string Salt = this.ETagSalt;
+			if (!string.IsNullOrEmpty(Salt))
+				ETag = Hashes.ComputeSHA1HashString(Encoding.UTF8.GetBytes(ETag + Salt));
+
+			return ETag;
+		}
+
+		/// <summary>
 		/// Validates the request itself. This method is called prior to processing the request, to see if it is valid in the context of the resource 
 		/// or not. If not, corresponding HTTP Exceptions should be thrown. Implementing validation checks in this method, instead of the corresponding
 		/// execution method, allows the resource to respond correctly to requests using the "Expect: 100-continue" header.

@@ -367,7 +367,7 @@ namespace Waher.Networking.XMPP.Avatar
 
 							if (LoadAvatar)
 							{
-								switch(Type)
+								switch (Type)
 								{
 									case AvatarType.Xep0008:
 										if (this.e2e is null)
@@ -453,29 +453,50 @@ namespace Waher.Networking.XMPP.Avatar
 
 				Avatar OldAvatar;
 				Avatar NewAvatar;
+				bool IsNew = true;
 
 				lock (this.contactAvatars)
 				{
 					if (this.contactAvatars.TryGetValue(BareJid, out OldAvatar))
-						this.contactAvatars.Remove(BareJid);
-
-					if (!(Bin is null))
 					{
-						if (string.IsNullOrEmpty(Hash))
-							NewAvatar = new Avatar(BareJid.ToLower(), ContentType, Bin, 0, 0);
+						if (AreEqual(OldAvatar.Binary, Bin))
+							IsNew = false;
 						else
-							NewAvatar = new Avatar(BareJid.ToLower(), ContentType, Hash, Bin, 0, 0);
+							this.contactAvatars.Remove(BareJid);
+					}
 
-						this.contactAvatars[BareJid] = NewAvatar;
+					if (IsNew)
+					{
+						if (!(Bin is null))
+						{
+							if (string.IsNullOrEmpty(Hash))
+								NewAvatar = new Avatar(BareJid.ToLower(), ContentType, Bin, 0, 0);
+							else
+								NewAvatar = new Avatar(BareJid.ToLower(), ContentType, Hash, Bin, 0, 0);
+
+							this.contactAvatars[BareJid] = NewAvatar;
+						}
+						else
+							this.contactAvatars[BareJid] = NewAvatar = null;
 					}
 					else
-						this.contactAvatars[BareJid] = NewAvatar = null;
+						NewAvatar = null;
 				}
 
 				AvatarEventHandler h;
 
 				if (!(OldAvatar is null))
 				{
+					if (!IsNew)
+					{
+						if (OldAvatar.Hash != Hash)
+						{
+							OldAvatar.Hash = Hash;
+							await Database.Update(OldAvatar);
+							return;
+						}
+					}
+
 					await Database.Delete(OldAvatar);
 
 					h = this.AvatarRemoved;
@@ -523,6 +544,21 @@ namespace Waher.Networking.XMPP.Avatar
 					}
 				}
 			}
+		}
+
+		private static bool AreEqual(byte[] Bin1, byte[] Bin2)
+		{
+			int i, c = Bin1.Length;
+			if (Bin2.Length != c)
+				return false;
+
+			for (i = 0; i < c; i++)
+			{
+				if (Bin1[i] != Bin2[i])
+					return false;
+			}
+
+			return true;
 		}
 
 		/// <summary>

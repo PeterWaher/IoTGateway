@@ -333,6 +333,7 @@ namespace Waher.Content.Markdown.Web
 			byte[] Data = Utf8WithBOM.GetBytes(s);
 
 			await State.To.WriteAsync(Data, 0, Data.Length);
+			State.ToContentType += "; charset=utf-8";
 
 			return Doc.IsDynamic;
 		}

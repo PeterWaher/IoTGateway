@@ -95,6 +95,7 @@ namespace Waher.Content.Markdown.Web.WebScript
 
 			KeyValuePair<byte[], string> P = await Encoder.EncodeAsync(Result, Encoding.UTF8, State.ToContentType);
 			await State.To.WriteAsync(P.Key, 0, P.Key.Length);
+			State.ToContentType += "; charset=utf-8";
 
 			return true;
 		}

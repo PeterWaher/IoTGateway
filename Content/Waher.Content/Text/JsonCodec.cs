@@ -151,6 +151,11 @@ namespace Waher.Content.Text
 					Grade = Grade.Ok;
 					return true;
 				}
+				else if (Object is IJsonEncodingHint Hint)
+				{
+					Grade = Hint.CanEncodeJson;
+					return Grade != Grade.NotAtAll;
+				}
 				else if (Object is null ||
 					Object is IEnumerable ||
 					Object is IVector ||

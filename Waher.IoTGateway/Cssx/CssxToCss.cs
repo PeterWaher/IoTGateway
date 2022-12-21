@@ -56,7 +56,8 @@ namespace Waher.IoTGateway.Cssx
 			string Css = await Convert(Cssx, State.Session, State.FromFileName);
 
 			byte[] Data = Utf8WithBOM.GetBytes(Css);
-			await State .To.WriteAsync(Data, 0, Data.Length);
+			await State.To.WriteAsync(Data, 0, Data.Length);
+			State.ToContentType += "; charset=utf-8";
 
 			return false;
 		}

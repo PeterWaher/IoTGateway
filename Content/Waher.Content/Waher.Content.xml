@@ -2723,6 +2723,16 @@
             <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
             <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
         </member>
+        <member name="T:Waher.Content.Text.IJsonEncodingHint">
+            <summary>
+            Provides a JSON Encoding hint for an object that implements this interface.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Text.IJsonEncodingHint.CanEncodeJson">
+            <summary>
+            To what extent the object supports JSON encoding.
+            </summary>
+        </member>
         <member name="T:Waher.Content.Text.JsonCodec">
             <summary>
             JSON codec.

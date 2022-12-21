@@ -135,6 +135,19 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Checks if a Content-Type is protected.
+		/// </summary>
+		/// <param name="ContentType">Content-Type to check.</param>
+		/// <returns>if the content type is protected.</returns>
+		public static bool IsProtected(string ContentType)
+		{
+			lock (protectedContentTypes)
+			{
+				return protectedContentTypes.TryGetValue(ContentType, out bool Protected) && Protected;
+			}
+		}
+
+		/// <summary>
 		/// Folder path.
 		/// </summary>
 		public string FolderPath

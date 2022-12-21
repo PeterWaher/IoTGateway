@@ -156,6 +156,38 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Content.Markdown.Functions.MarkdownContent">
+            <summary>
+            Encapsulates markdown content.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.MarkdownContent.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Encapsulates markdown content.
+            </summary>
+            <param name="Argument">Argument.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Functions.MarkdownContent.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Functions.MarkdownContent.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.MarkdownContent.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Content.Markdown.Functions.MarkdownEncode">
             <summary>
             MarkdownEncode(s)
@@ -601,6 +633,29 @@
             <param name="ContentType">Content type.</param>
             <param name="FileExtension">File extension.</param>
             <returns>If the Content-Type was recognized.</returns>
+        </member>
+        <member name="T:Waher.Content.Markdown.MarkdownContent">
+            <summary>
+            Class that can be used to encapsulate Markdown to be returned from a Web Service, bypassing any encoding protections,
+            and avoiding doubly parsing the Markdown.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownContent.#ctor(System.String)">
+            <summary>
+            Class that can be used to encapsulate Markdown to be returned from a Web Service, bypassing any encoding protections,
+            and avoiding doubly parsing the Markdown.
+            </summary>
+            <param name="Markdown">Markdown content to return.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownContent.Markdown">
+            <summary>
+            Markdown content.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownContent.CanEncodeJson">
+            <summary>
+            To what extent the object supports JSON encoding.
+            </summary>
         </member>
         <member name="T:Waher.Content.Markdown.MarkdownElementHandler">
             <summary>
@@ -1224,6 +1279,11 @@
             <param name="Rows">Rows</param>
             <param name="SingleRow">If rows should be concatenated into a single row.</param>
             <returns>Appended rows.</returns>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownDocument.CanEncodeJson">
+            <summary>
+            To what extent the object supports JSON encoding.
+            </summary>
         </member>
         <member name="T:Waher.Content.Markdown.AuthorizeExpression">
             <summary>

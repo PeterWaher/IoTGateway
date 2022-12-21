@@ -1895,6 +1895,7 @@ The following functions are available in the `Waher.Content.Markdown` library.
 | `FromMarkdown(Markdown)`   | Converts a string containing Markdown Representation to a script object. | [Example][FromMarkdownExample] |
 | `InitScriptFile(FileName)` | Evaluates the script in the file defined by `FileName` if not evaluated before, or if timestamp is newer than previous evaluation. | [Example][InitScriptFileExample] |
 | `LoadMarkdown(FileName)`   | Loads a markdown file and preprocesses it before returning it as a string. | [Example][LoadMarkdownExample] |
+| `MarkdownContent(s)`       | Encodes a string as a Markdown Content object for encoding, as results of web service calls. | [Example][MarkdownContentExample] |
 | `MarkdownEncode(s)`        | Encodes a string for inclusion in Markdown. | [Example][MarkdownEncodeExample] |
 | `MarkdownToHtml(s)`        | Parses the markdown provided in `s` and converts it to HTML. Only HTML between BODY tags is returned. | [Example][MarkdowntoHtmlExample] |
 | `MarkdownToHtmlStat(s)`    | Parses the markdown provided in `s` and converts it to HTML. Only HTML between BODY tags is returned. A vector containing the HTML, together with statistics about the document is returned. | [Example][MarkdowntoHtmlStatExample] |
@@ -1912,7 +1913,8 @@ context-specific constants (read-only variables) are available in inline script:
 | `EndPosition`   | The ending position of the script in the markdown document.           |
 
 [LoadMarkdownExample]: Prompt.md?Expression=LoadMarkdown(%22File.md%22)
-[MarkdownEncodeExample]: Prompt.md?Expression=MarkdownEncode(%22test_sister%22)
+[MarkdownContentExample]: Prompt.md?Expression=MarkdownContent(%22*markdown content*%22)
+[MarkdownEncodeExample]: Prompt.md?Expression=MarkdownEncode(%22test_markdown%22)
 [MarkdowntoHtmlExample]: Prompt.md?Expression=MarkdownToHtml(%22:file_folder:%22)
 [MarkdowntoHtmlStatExample]: Prompt.md?Expression=MarkdownToHtmlStat(%22:file_folder:%22)
 [MarkdownStatisticsExample]: Prompt.md?Expression=MarkdownStatistics(%22:file_folder:%22)

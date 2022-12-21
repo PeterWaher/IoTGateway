@@ -17,6 +17,8 @@ using Waher.Events;
 using Waher.Script;
 using Waher.Runtime.Text;
 using Waher.Content.Markdown.Functions;
+using Waher.Runtime.Inventory;
+using Waher.Content.Text;
 
 namespace Waher.Content.Markdown
 {
@@ -32,7 +34,7 @@ namespace Waher.Content.Markdown
 	/// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions.
 	/// See the markdown reference documentation provided with the library for more information.
 	/// </summary>
-	public class MarkdownDocument : IFileNameResource, IEnumerable<MarkdownElement>
+	public class MarkdownDocument : IFileNameResource, IEnumerable<MarkdownElement>, IJsonEncodingHint
 	{
 		internal static readonly Regex endOfHeader = new Regex(@"\n\s*\n", RegexOptions.Multiline | RegexOptions.Compiled);
 		internal static readonly Regex scriptHeader = new Regex(@"^(?'Tag'(([Ss][Cc][Rr][Ii][Pp][Tt])|([Ii][Nn][Ii][Tt]))):\s*(?'ScriptFile'[^\r\n]*)", RegexOptions.Multiline | RegexOptions.Compiled);
@@ -6670,6 +6672,11 @@ namespace Waher.Content.Markdown
 
 			return sb.ToString();
 		}
+
+		/// <summary>
+		/// To what extent the object supports JSON encoding.
+		/// </summary>
+		public Grade CanEncodeJson => Grade.NotAtAll;	// Document reference from child nodes create a stack overflow.
 
 		// TODO: Footnotes in included markdown files.
 	}

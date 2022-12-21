@@ -119,7 +119,12 @@ namespace Waher.Content.Markdown
 		/// <returns>If the encoder can encode the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if (allowEncoding && Object is MarkdownDocument && InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
+			if (Object is MarkdownContent Content && InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
+			{
+				Grade = Grade.Excellent;
+				return true;
+			}
+			else if (allowEncoding && Object is MarkdownDocument && InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Excellent;
 				return true;
@@ -141,27 +146,30 @@ namespace Waher.Content.Markdown
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public async Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
-			if (allowEncoding && Object is MarkdownDocument MarkdownDocument)
+			string Markdown;
+
+			if (Object is MarkdownContent Content)
+				Markdown = Content.Markdown;
+			else if (allowEncoding && Object is MarkdownDocument MarkdownDocument)
+				Markdown = await MarkdownDocument.GenerateMarkdown();
+			else
+				throw new ArgumentException("Object not a markdown document.", nameof(Object));
+
+			string ContentType;
+			byte[] Bin;
+
+			if (Encoding is null)
 			{
-				string Markdown = await MarkdownDocument.GenerateMarkdown();
-				string ContentType;
-				byte[] Bin;
-
-				if (Encoding is null)
-				{
-					ContentType = "text/markdown; charset=utf-8";
-					Bin = Encoding.UTF8.GetBytes(Markdown);
-				}
-				else
-				{
-					ContentType = "text/markdown; charset=" + Encoding.WebName;
-					Bin = Encoding.GetBytes(Markdown);
-				}
-
-				return new KeyValuePair<byte[], string>(Bin, ContentType);
+				ContentType = "text/markdown; charset=utf-8";
+				Bin = Encoding.UTF8.GetBytes(Markdown);
+			}
+			else
+			{
+				ContentType = "text/markdown; charset=" + Encoding.WebName;
+				Bin = Encoding.GetBytes(Markdown);
 			}
 
-			throw new ArgumentException("Object not a markdown document.", nameof(Object));
+			return new KeyValuePair<byte[], string>(Bin, ContentType);
 		}
 
 		/// <summary>

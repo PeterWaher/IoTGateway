@@ -127,6 +127,9 @@ namespace Waher.Networking.HTTP
 			else
 				Result = null;
 
+			if (Response.ResponseSent)
+				return;
+
 			HttpRequestHeader Header = Request.Header;
 			if (Header.Accept is null)
 			{
@@ -144,6 +147,8 @@ namespace Waher.Networking.HTTP
 			{
 				IContentConverter Converter = null;
 				string NewContentType = null;
+				int i = ContentType.IndexOf(';');
+				string ContentTypeNoParams = i < 0 ? ContentType : ContentType.Substring(0, i).TrimEnd();
 
 				foreach (AcceptRecord AcceptRecord in Header.Accept.Records)
 				{
@@ -154,7 +159,7 @@ namespace Waher.Networking.HTTP
 						continue;
 					}
 
-					if (InternetContent.CanConvert(ContentType, NewContentType, out Converter))
+					if (InternetContent.CanConvert(ContentTypeNoParams, NewContentType, out Converter))
 					{
 						Acceptable = true;
 						break;
@@ -163,7 +168,7 @@ namespace Waher.Networking.HTTP
 
 				if (Converter is null)
 				{
-					IContentConverter[] Converters = InternetContent.GetConverters(ContentType);
+					IContentConverter[] Converters = InternetContent.GetConverters(ContentTypeNoParams);
 
 					if (!(Converters is null))
 					{
@@ -178,7 +183,7 @@ namespace Waher.Networking.HTTP
 
 							foreach (string FromContentType in Converter2.FromContentTypes)
 							{
-								if (ContentType == FromContentType)
+								if (ContentTypeNoParams == FromContentType)
 								{
 									Found = true;
 									break;
@@ -238,8 +243,9 @@ namespace Waher.Networking.HTTP
 							Request.Header.GetURL(false, false), NewContentType, f2, Request.Session, Alternatives?.ToArray());
 
 						if (await Converter.ConvertAsync(State))
-							NewContentType = State.ToContentType;
+							Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
 
+						NewContentType = State.ToContentType;
 						ContentType = NewContentType;
 						Acceptable = true;
 						Binary = f2.ToArray();

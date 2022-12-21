@@ -43,7 +43,7 @@ namespace Waher.Persistence.Files.Searching
 
 				foreach (string s in ConstantFields2)
 				{
-					if (Array.IndexOf<string>(ConstantFields1, s) >= 0)
+					if (Array.IndexOf(ConstantFields1, s) >= 0)
 						continue;
 
 					if (Union is null)

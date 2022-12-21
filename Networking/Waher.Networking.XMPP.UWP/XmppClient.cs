@@ -1154,7 +1154,7 @@ namespace Waher.Networking.XMPP
 
 			Task StateEventHandler(object Sender, XmppState NewState)
 			{
-				int i = Array.IndexOf<XmppState>(States, NewState);
+				int i = Array.IndexOf(States, NewState);
 				if (i >= 0)
 					T.TrySetResult(i);
 
@@ -1164,7 +1164,7 @@ namespace Waher.Networking.XMPP
 			this.OnStateChanged += StateEventHandler;
 			try
 			{
-				Result = Array.IndexOf<XmppState>(States, this.state);
+				Result = Array.IndexOf(States, this.state);
 				if (Result < 0)
 				{
 					Task _ = Task.Delay(Timeout).ContinueWith((T2) => T.TrySetResult(-1));

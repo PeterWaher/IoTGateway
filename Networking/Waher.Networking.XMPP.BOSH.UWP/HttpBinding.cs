@@ -401,8 +401,8 @@ namespace Waher.Networking.XMPP.BOSH
 
 				if (this.requests > 1)
 				{
-					Array.Resize<HttpClient>(ref this.httpClients, this.requests);
-					Array.Resize<bool>(ref this.active, this.requests);
+					Array.Resize(ref this.httpClients, this.requests);
+					Array.Resize(ref this.active, this.requests);
 				}
 
 				for (i = 0; i < this.requests; i++)

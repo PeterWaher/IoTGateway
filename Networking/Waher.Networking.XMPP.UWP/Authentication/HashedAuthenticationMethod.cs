@@ -46,7 +46,7 @@ namespace Waher.Networking.XMPP.Authentication
 				A1 = H(A1);
 
 			if (A1.Length < 64)
-				Array.Resize<byte>(ref A1, 64);
+				Array.Resize(ref A1, 64);
 
 			byte[] A3 = (byte[])A1.Clone();
 			int i;

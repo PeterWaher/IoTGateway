@@ -135,6 +135,19 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Checks if a Content-Type is protected.
+		/// </summary>
+		/// <param name="ContentType">Content-Type to check.</param>
+		/// <returns>if the content type is protected.</returns>
+		public static bool IsProtected(string ContentType)
+		{
+			lock (protectedContentTypes)
+			{
+				return protectedContentTypes.TryGetValue(ContentType, out bool Protected) && Protected;
+			}
+		}
+
+		/// <summary>
 		/// Folder path.
 		/// </summary>
 		public string FolderPath
@@ -709,7 +722,7 @@ namespace Waher.Networking.HTTP
 								if (AcceptRecord.Item.EndsWith("/*") || AcceptRecord.Item == NewContentType)
 									continue;
 
-								if (Array.IndexOf<string>(Range, AcceptRecord.Item) >= 0)
+								if (Array.IndexOf(Range, AcceptRecord.Item) >= 0)
 								{
 									if (Alternatives is null)
 										Alternatives = new List<string>();

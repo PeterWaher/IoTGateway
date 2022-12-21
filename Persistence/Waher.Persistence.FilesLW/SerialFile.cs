@@ -307,7 +307,7 @@ namespace Waher.Persistence.Files
 				Hash = Sha1.ComputeHash(Input);
 			}
 
-			Array.Resize<byte>(ref Hash, 16);
+			Array.Resize(ref Hash, 16);
 
 			return Hash;
 		}

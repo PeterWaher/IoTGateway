@@ -830,7 +830,7 @@ namespace Waher.Networking.XMPP.Control
 
 								foreach (ControlParameter P in Parameters)
 								{
-									if (Array.IndexOf<string>(e2.ParameterNames, P.Name) >= 0)
+									if (Array.IndexOf(e2.ParameterNames, P.Name) >= 0)
 										Parameters2.Add(P);
 								}
 

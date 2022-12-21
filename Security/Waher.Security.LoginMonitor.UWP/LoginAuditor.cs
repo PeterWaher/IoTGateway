@@ -452,7 +452,7 @@ namespace Waher.Security.LoginMonitor
 			if (c == 0)
 				Tags = new KeyValuePair<string, object>[1];
 			else
-				Array.Resize<KeyValuePair<string, object>>(ref Tags, c + 1);
+				Array.Resize(ref Tags, c + 1);
 
 			Tags[c] = new KeyValuePair<string, object>("Protocol", Protocol);
 			return await Annotate(RemoteEndpoint, Tags);

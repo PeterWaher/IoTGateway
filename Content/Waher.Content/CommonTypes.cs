@@ -159,7 +159,7 @@ namespace Waher.Content
 
 			int Day = int.Parse(M.Groups["Day"].Value);
 			string MonthStr = M.Groups["Month"].Value;
-			int Month = Array.IndexOf<string>(months, MonthStr) + 1;
+			int Month = Array.IndexOf(months, MonthStr) + 1;
 			int Year = int.Parse(M.Groups["Year"].Value);
 			int Hour = int.Parse(M.Groups["Hour"].Value);
 			int Minute = int.Parse(M.Groups["Minute"].Value);
@@ -845,7 +845,7 @@ namespace Waher.Content
 				if (i > j)
 					sb.Append(s.Substring(j, i - j));
 
-				k = Array.IndexOf<char>(CharactersToEscape, s[i]);
+				k = Array.IndexOf(CharactersToEscape, s[i]);
 				sb.Append(EscapeSequences[k]);
 				j = i + 1;
 				i = s.IndexOfAny(CharactersToEscape, j);

@@ -1048,7 +1048,7 @@ namespace Waher.Persistence.Files
 				{
 					if (s == this.objectIdMemberName)
 						break;
-					else if (ConstantFields is null || Array.IndexOf<string>(ConstantFields, this.objectIdMemberName) < 0)
+					else if (ConstantFields is null || Array.IndexOf(ConstantFields, this.objectIdMemberName) < 0)
 						return false;
 					else
 					{
@@ -1114,7 +1114,7 @@ namespace Waher.Persistence.Files
 				{
 					if (s == this.objectIdMemberName)
 						break;
-					else if (ConstantFields is null || Array.IndexOf<string>(ConstantFields, this.objectIdMemberName) < 0)
+					else if (ConstantFields is null || Array.IndexOf(ConstantFields, this.objectIdMemberName) < 0)
 						return false;
 					else
 					{

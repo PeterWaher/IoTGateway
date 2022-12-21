@@ -355,7 +355,7 @@ namespace Waher.Networking.HTTP
 
 					foreach (int HttpPort in HttpPorts)
 					{
-						if (Array.IndexOf<int>(this.httpPorts, HttpPort) >= 0)
+						if (Array.IndexOf(this.httpPorts, HttpPort) >= 0)
 							continue;
 
 						Listener = null;
@@ -415,7 +415,7 @@ namespace Waher.Networking.HTTP
 						{
 							foreach (int HttpPort in HttpPorts)
 							{
-								if (Array.IndexOf<int>(this.httpPorts, HttpPort) >= 0)
+								if (Array.IndexOf(this.httpPorts, HttpPort) >= 0)
 									continue;
 
 								Listener = null;
@@ -471,10 +471,10 @@ namespace Waher.Networking.HTTP
 #endif
 				foreach (int HttpPort in HttpPorts)
 				{
-					if (Array.IndexOf<int>(this.httpPorts, HttpPort) < 0)
+					if (Array.IndexOf(this.httpPorts, HttpPort) < 0)
 					{
 						int c = this.httpPorts.Length;
-						Array.Resize<int>(ref this.httpPorts, c + 1);
+						Array.Resize(ref this.httpPorts, c + 1);
 						this.httpPorts[c] = HttpPort;
 					}
 				}
@@ -518,7 +518,7 @@ namespace Waher.Networking.HTTP
 						{
 							foreach (int HttpsPort in HttpsPorts)
 							{
-								if (Array.IndexOf<int>(this.httpsPorts, HttpsPort) >= 0)
+								if (Array.IndexOf(this.httpsPorts, HttpsPort) >= 0)
 									continue;
 
 								Listener = null;
@@ -574,10 +574,10 @@ namespace Waher.Networking.HTTP
 
 				foreach (int HttpsPort in HttpsPorts)
 				{
-					if (Array.IndexOf<int>(this.httpsPorts, HttpsPort) < 0)
+					if (Array.IndexOf(this.httpsPorts, HttpsPort) < 0)
 					{
 						int c = this.httpsPorts.Length;
-						Array.Resize<int>(ref this.httpsPorts, c + 1);
+						Array.Resize(ref this.httpsPorts, c + 1);
 						this.httpsPorts[c] = HttpsPort;
 					}
 				}

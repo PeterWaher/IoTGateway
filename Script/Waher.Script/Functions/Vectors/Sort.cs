@@ -250,7 +250,7 @@ namespace Waher.Script.Functions.Vectors
 			}
 
 			if (c == 1)
-				Array.Sort<IElement>(Elements, new ElementOrder(this));
+				Array.Sort(Elements, new ElementOrder(this));
 			else
 			{
 				IComparer<IElement>[] Comparers = new IComparer<IElement>[c];

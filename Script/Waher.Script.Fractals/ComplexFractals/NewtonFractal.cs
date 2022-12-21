@@ -300,7 +300,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			if (Degree < 2)
 			{
-				Array.Resize<double>(ref Coefficients, 3);
+				Array.Resize(ref Coefficients, 3);
 				while (Degree < 2)
 					Coefficients[++Degree] = 0;
 			}
@@ -433,7 +433,7 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 			if (Degree < 2)
 			{
-				Array.Resize<Complex>(ref Coefficients, 3);
+				Array.Resize(ref Coefficients, 3);
 				while (Degree < 2)
 					Coefficients[++Degree] = Complex.Zero;
 			}
@@ -690,8 +690,8 @@ namespace Waher.Script.Fractals.ComplexFractals
 
 					if (x2 < x)
 					{
-						Array.Resize<Complex>(ref Row, x2);
-						Array.Resize<int>(ref Offset, x2);
+						Array.Resize(ref Row, x2);
+						Array.Resize(ref Offset, x2);
 						c = x2;
 					}
 				}

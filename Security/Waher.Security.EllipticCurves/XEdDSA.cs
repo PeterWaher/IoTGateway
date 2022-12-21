@@ -75,7 +75,7 @@ namespace Waher.Security.EllipticCurves
 
                 a = a2.ToByteArray();
                 if (a.Length != ScalarBytes)
-                    Array.Resize<byte>(ref a, ScalarBytes);
+                    Array.Resize(ref a, ScalarBytes);
             }
 
             int DataLen = Data.Length;
@@ -187,7 +187,7 @@ namespace Waher.Security.EllipticCurves
                 // 
                 // byte[] Bin = U.ToByteArray();
                 // if (Bin.Length != ScalarBytes)
-                //     Array.Resize<byte>(ref Bin, ScalarBytes);
+                //     Array.Resize(ref Bin, ScalarBytes);
                 // 
                 // int MaskBits = PBits & 7;
                 // if (MaskBits != 0)

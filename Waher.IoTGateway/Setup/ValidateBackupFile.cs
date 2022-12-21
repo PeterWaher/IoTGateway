@@ -310,13 +310,13 @@ namespace Waher.IoTGateway.Setup
 							}
 							else
 							{
-								Array.Resize<byte>(ref A, this.objectIdByteCount);
+								Array.Resize(ref A, this.objectIdByteCount);
 								ObjectId = Hashes.BinaryToString(A);
 							}
 						}
 						else
 						{
-							Array.Resize<byte>(ref A, this.objectIdByteCount);
+							Array.Resize(ref A, this.objectIdByteCount);
 
 							if (this.objectIdByteCount == 16)
 								ObjectId = new Guid(A).ToString();

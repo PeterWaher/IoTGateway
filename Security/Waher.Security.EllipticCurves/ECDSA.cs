@@ -51,13 +51,13 @@ namespace Waher.Security.EllipticCurves
 
             byte[] S = r.ToByteArray();
             if (S.Length != ScalarBytes)
-                Array.Resize<byte>(ref S, ScalarBytes);
+                Array.Resize(ref S, ScalarBytes);
 
             Array.Copy(S, 0, Signature, 0, ScalarBytes);
 
             S = s.ToByteArray();
             if (S.Length != ScalarBytes)
-                Array.Resize<byte>(ref S, ScalarBytes);
+                Array.Resize(ref S, ScalarBytes);
 
             Array.Copy(S, 0, Signature, ScalarBytes, ScalarBytes);
 
@@ -71,7 +71,7 @@ namespace Waher.Security.EllipticCurves
             int c = Hash.Length;
 
             if (c != ScalarBytes)
-                Array.Resize<byte>(ref Hash, ScalarBytes);
+                Array.Resize(ref Hash, ScalarBytes);
 
             Hash[ScalarBytes - 1] &= MsbMask;
 
@@ -120,13 +120,13 @@ namespace Waher.Security.EllipticCurves
 
             byte[] S = r.ToByteArray();
             if (S.Length != ScalarBytes)
-                Array.Resize<byte>(ref S, ScalarBytes);
+                Array.Resize(ref S, ScalarBytes);
 
             Array.Copy(S, 0, Signature, 0, ScalarBytes);
 
             S = s.ToByteArray();
             if (S.Length != ScalarBytes)
-                Array.Resize<byte>(ref S, ScalarBytes);
+                Array.Resize(ref S, ScalarBytes);
 
             Array.Copy(S, 0, Signature, ScalarBytes, ScalarBytes);
 
@@ -140,7 +140,7 @@ namespace Waher.Security.EllipticCurves
             int c = Hash.Length;
 
             if (c != ScalarBytes)
-                Array.Resize<byte>(ref Hash, ScalarBytes);
+                Array.Resize(ref Hash, ScalarBytes);
 
             Hash[ScalarBytes - 1] &= MsbMask;
 

@@ -118,7 +118,7 @@ namespace Waher.Content.Text
 		{
 			ContentType = ContentType.ToLower();
 
-			if (Array.IndexOf<string>(ContentTypes, ContentType) >= 0)
+			if (Array.IndexOf(ContentTypes, ContentType) >= 0)
 			{
 				FileExtension = "json";
 				return true;

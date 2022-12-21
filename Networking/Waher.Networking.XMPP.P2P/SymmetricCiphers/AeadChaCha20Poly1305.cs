@@ -53,7 +53,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
             byte[] Encrypted = Acp.Encrypt(Data, AssociatedData, out byte[] Mac);
             int c = Encrypted.Length;
             
-            Array.Resize<byte>(ref Encrypted, c + 16);
+            Array.Resize(ref Encrypted, c + 16);
             Array.Copy(Mac, 0, Encrypted, c, 16);
 
             return Encrypted;
@@ -77,7 +77,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
             byte[] Mac = new byte[16];
             Array.Copy(Data, c - 16, Mac, 0, 16);
 
-            Array.Resize<byte>(ref Data, c - 16);
+            Array.Resize(ref Data, c - 16);
 
             return Acp.Decrypt(Data, AssociatedData, Mac);
         }

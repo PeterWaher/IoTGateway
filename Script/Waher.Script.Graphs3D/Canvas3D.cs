@@ -2078,8 +2078,8 @@ namespace Waher.Script.Graphs3D
 
 				if (k != NrNodes)
 				{
-					Array.Resize<Vector3>(ref vw, k);
-					Array.Resize<Vector3>(ref vs, k);
+					Array.Resize(ref vw, k);
+					Array.Resize(ref vs, k);
 				}
 
 				World[l] = vw;

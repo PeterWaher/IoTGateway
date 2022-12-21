@@ -52,7 +52,7 @@ namespace Waher.Content.Html.Css
 		/// <returns>If the decoder can decode an object with the given type.</returns>
 		public bool Decodes(string ContentType, out Grade Grade)
 		{
-			if (Array.IndexOf<string>(CssContentTypes, ContentType) >= 0)
+			if (Array.IndexOf(CssContentTypes, ContentType) >= 0)
 			{
 				Grade = Grade.Barely;
 				return true;

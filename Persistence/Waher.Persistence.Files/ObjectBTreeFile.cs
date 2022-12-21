@@ -828,7 +828,7 @@ namespace Waher.Persistence.Files
 				Hash = Sha1.ComputeHash(Input);
 			}
 
-			Array.Resize<byte>(ref Hash, 16);
+			Array.Resize(ref Hash, 16);
 
 			return Hash;
 		}
@@ -6353,7 +6353,7 @@ namespace Waher.Persistence.Files
 								if (GroupNumbers is null)
 									GroupNumbers = Regex.GetGroupNumbers();
 
-								if (Array.IndexOf<int>(GroupNumbers, l) >= 0)
+								if (Array.IndexOf(GroupNumbers, l) >= 0)
 									return Result.ToString();
 
 								k = 0;

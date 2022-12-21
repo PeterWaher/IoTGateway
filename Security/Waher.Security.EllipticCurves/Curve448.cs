@@ -126,7 +126,7 @@ namespace Waher.Security.EllipticCurves
             switch (Bin.Length)
             {
                 case 56:
-                    Array.Resize<byte>(ref Bin, 57);
+                    Array.Resize(ref Bin, 57);
                     break;
 
                 case 57:
@@ -134,7 +134,7 @@ namespace Waher.Security.EllipticCurves
 
                 default:
                     Bin = Hashes.ComputeSHA512Hash(Secret);
-                    Array.Resize<byte>(ref Bin, 57);
+                    Array.Resize(ref Bin, 57);
                     break;
             }
 

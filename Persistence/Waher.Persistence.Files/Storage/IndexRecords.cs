@@ -2385,7 +2385,7 @@ namespace Waher.Persistence.Files.Storage
 
 					if (s == s2)
 						break;
-					else if (ConstantFields is null || Array.IndexOf<string>(ConstantFields, s2) < 0)
+					else if (ConstantFields is null || Array.IndexOf(ConstantFields, s2) < 0)
 						return false;
 					else
 					{
@@ -2453,7 +2453,7 @@ namespace Waher.Persistence.Files.Storage
 
 					if (s == s2)
 						break;
-					else if (ConstantFields is null || Array.IndexOf<string>(ConstantFields, s2) < 0)
+					else if (ConstantFields is null || Array.IndexOf(ConstantFields, s2) < 0)
 						return false;
 					else
 					{

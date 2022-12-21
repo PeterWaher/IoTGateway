@@ -154,7 +154,7 @@ namespace Waher.Content.Asn1.Model
 							{
 								if (Node is Asn1TypeDefinition TypeDef &&
 									!TypeDef.ConstructedType &&
-									Array.IndexOf<string>(Import.Identifiers, TypeDef.Name) >= 0)
+									Array.IndexOf(Import.Identifiers, TypeDef.Name) >= 0)
 								{
 									await TypeDef.ExportCSharp(Output, State, Indent, CSharpExportPass.Preprocess);
 								}

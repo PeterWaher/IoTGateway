@@ -139,7 +139,7 @@ namespace Waher.Security.EllipticCurves
 
             kt = (Bits + 7) >> 3;
             if (N.Length < kt)
-                Array.Resize<byte>(ref N, kt);
+                Array.Resize(ref N, kt);
 
             while (--Bits >= 0)
             {
@@ -198,7 +198,7 @@ namespace Waher.Security.EllipticCurves
             if (c < d)
             {
                 Sign = (x2[c - 1] & 0x80) != 0;
-                Array.Resize<byte>(ref x2, d);
+                Array.Resize(ref x2, d);
 
                 if (Sign)
                 {
@@ -211,7 +211,7 @@ namespace Waher.Security.EllipticCurves
             else if (d < c)
             {
                 Sign = (x3[d - 1] & 0x80) != 0;
-                Array.Resize<byte>(ref x3, c);
+                Array.Resize(ref x3, c);
 
                 if (Sign)
                 {
@@ -307,7 +307,7 @@ namespace Waher.Security.EllipticCurves
             int c = this.orderBytes;
 
             if (Bin.Length < c)
-                Array.Resize<byte>(ref Bin, c);
+                Array.Resize(ref Bin, c);
 
             return Bin;
         }

@@ -189,7 +189,7 @@ namespace Waher.Networking.Sniffers
 			while (i >= 0)
 			{
 				ch = Text[i];
-				j = Array.IndexOf<char>(controlCharacters, ch);
+				j = Array.IndexOf(controlCharacters, ch);
 				s = controlCharacterNames[j];
 				Text = Text.Remove(i, 1).Insert(i, " " + s + " ");
 				i += s.Length + 2;

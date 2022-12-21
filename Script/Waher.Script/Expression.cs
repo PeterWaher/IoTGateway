@@ -4618,7 +4618,7 @@ namespace Waher.Script
 					if (i > j)
 						sb.Append(s.Substring(j, i - j));
 
-					k = Array.IndexOf<char>(stringCharactersToEscape, s[i]);
+					k = Array.IndexOf(stringCharactersToEscape, s[i]);
 					sb.Append(stringEscapeSequences[k]);
 					j = i + 1;
 					i = s.IndexOfAny(stringCharactersToEscape, j);

@@ -619,7 +619,7 @@ namespace Waher.IoTGateway
 
 				configurations = new SystemConfiguration[SystemConfigurations.Count];
 				SystemConfigurations.Values.CopyTo(configurations, 0);
-				Array.Sort<SystemConfiguration>(configurations, (c1, c2) => c1.Priority - c2.Priority);
+				Array.Sort(configurations, (c1, c2) => c1.Priority - c2.Priority);
 
 				ISystemConfiguration CurrentConfiguration = null;
 				LinkedList<HttpResource> SetupResources = null;
@@ -748,7 +748,7 @@ namespace Waher.IoTGateway
 
 							configurations = new SystemConfiguration[SystemConfigurations.Count];
 							SystemConfigurations.Values.CopyTo(configurations, 0);
-							Array.Sort<SystemConfiguration>(configurations, (c1, c2) => c1.Priority - c2.Priority);
+							Array.Sort(configurations, (c1, c2) => c1.Priority - c2.Priority);
 
 							break;
 						}
@@ -3702,7 +3702,7 @@ namespace Waher.IoTGateway
 					sb.Append(Dns.GetHostName());
 			}
 
-			if (Array.IndexOf<int>(Ports, DefaultPort) < 0 && Ports.Length > 0)
+			if (Array.IndexOf(Ports, DefaultPort) < 0 && Ports.Length > 0)
 			{
 				sb.Append(":");
 				sb.Append(Ports[0].ToString());

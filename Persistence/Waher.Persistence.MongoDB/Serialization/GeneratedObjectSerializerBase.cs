@@ -1048,7 +1048,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 					throw new Exception("MongoDB only supports 12-byte object IDs.");
 			}
 
-			Array.Resize<byte>(ref A, 12);
+			Array.Resize(ref A, 12);
 
 			return new ObjectId(A);
 		}
@@ -1073,7 +1073,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				}
 			}
 
-			Array.Resize<byte>(ref A, 12);
+			Array.Resize(ref A, 12);
 
 			ObjectId = new ObjectId(A);
 			return true;

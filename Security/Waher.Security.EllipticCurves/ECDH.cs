@@ -28,7 +28,7 @@ namespace Waher.Security.EllipticCurves
             byte[] B = P.X.ToByteArray();
 
             if (B.Length != Curve.OrderBytes)
-                Array.Resize<byte>(ref B, Curve.OrderBytes);
+                Array.Resize(ref B, Curve.OrderBytes);
 
             Array.Reverse(B);   // Most significant byte first.
 

@@ -487,7 +487,7 @@ namespace Waher.Script.Operators
 		/// <returns>Differentiated lambda expression.</returns>
 		public ScriptNode Differentiate(string VariableName, Variables Variables)
 		{
-			if (Array.IndexOf<string>(this.argumentNames, VariableName) < 0)
+			if (Array.IndexOf(this.argumentNames, VariableName) < 0)
 				return new ConstantElement(Objects.DoubleNumber.ZeroElement, this.Start, this.Length, this.Expression);
 			else if (this.op is IDifferentiable Differentiable)
 				return new LambdaDefinition(this.argumentNames, this.argumentTypes, Differentiable.Differentiate(VariableName, Variables), this.Start, this.Length, this.Expression);

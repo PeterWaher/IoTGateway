@@ -87,7 +87,7 @@ namespace Waher.Security.ChaChaPoly
             byte[] Result = Accumulator.ToByteArray();
 
             if (Result.Length != 16)
-                Array.Resize<byte>(ref Result, 16);
+                Array.Resize(ref Result, 16);
 
             return Result;
         }
@@ -124,7 +124,7 @@ namespace Waher.Security.ChaChaPoly
             byte[] Result = Accumulator.ToByteArray();
 
             if (Result.Length != 16)
-                Array.Resize<byte>(ref Result, 16);
+                Array.Resize(ref Result, 16);
 
             return Result;
         }

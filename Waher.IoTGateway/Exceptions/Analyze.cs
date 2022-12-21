@@ -144,7 +144,7 @@ namespace Waher.IoTGateway.Exceptions
 		{
 			KeyValuePair<string, Bucket>[] A = new KeyValuePair<string, Bucket>[Histogram.Buckets.Count];
 			Histogram.Buckets.CopyTo(A, 0);
-			Array.Sort<KeyValuePair<string, Bucket>>(A, (r1, r2) =>
+			Array.Sort(A, (r1, r2) =>
 			{
 				long i = r2.Value.Count - r1.Value.Count;
 				if (i != 0)

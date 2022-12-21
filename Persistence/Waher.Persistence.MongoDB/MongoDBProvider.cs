@@ -1683,7 +1683,7 @@ namespace Waher.Persistence.MongoDB
 
 				foreach (string CollectionName in (await this.database.ListCollectionNamesAsync()).ToEnumerable())
 				{
-					if (!(CollectionNames is null) && Array.IndexOf<string>(CollectionNames, CollectionName) < 0)
+					if (!(CollectionNames is null) && Array.IndexOf(CollectionNames, CollectionName) < 0)
 						continue;
 
 					Thread?.NewState(CollectionName);

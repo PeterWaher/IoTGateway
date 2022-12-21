@@ -78,7 +78,7 @@ namespace Waher.Content.Markdown
 		/// <returns>If the decoder can decode an object with the given type.</returns>
 		public bool Decodes(string ContentType, out Grade Grade)
 		{
-			if (Array.IndexOf<string>(ContentTypes, ContentType) >= 0)
+			if (Array.IndexOf(ContentTypes, ContentType) >= 0)
 			{
 				Grade = Grade.Excellent;
 				return true;

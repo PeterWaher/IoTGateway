@@ -60,7 +60,7 @@ namespace Waher.Script.Functions.Vectors
             if (c == 0)
                 throw new ScriptRuntimeException("Empty set of values.", Node);
 
-            Array.Sort<double>(Values);
+            Array.Sort(Values);
 
             return Values[c / 2];
         }
@@ -82,7 +82,7 @@ namespace Waher.Script.Functions.Vectors
             IElement[] A = new IElement[Elements.Count];
             Elements.CopyTo(A, 0);
 
-            Array.Sort<IElement>(A, this.Compare);
+            Array.Sort(A, this.Compare);
 
             return A[c / 2];
         }

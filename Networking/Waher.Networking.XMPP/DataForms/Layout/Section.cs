@@ -197,7 +197,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 			}
 			else
 			{
-				Array.Sort<LayoutElement>(this.staticElements, this.OrderElements);
+				Array.Sort(this.staticElements, this.OrderElements);
 
 				foreach (LayoutElement E in this.staticElements)
 					E.Sort();

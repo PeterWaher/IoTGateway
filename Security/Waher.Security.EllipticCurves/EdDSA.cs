@@ -55,7 +55,7 @@ namespace Waher.Security.EllipticCurves
 
             Bin = s.ToByteArray();
             if (Bin.Length != ScalarBytes)
-                Array.Resize<byte>(ref Bin, ScalarBytes);
+                Array.Resize(ref Bin, ScalarBytes);
 
             byte[] Signature = new byte[ScalarBytes << 1];
 
@@ -121,7 +121,7 @@ namespace Waher.Security.EllipticCurves
 
             byte[] Bin = s.ToByteArray();
             if (Bin.Length != ScalarBytes)
-                Array.Resize<byte>(ref Bin, ScalarBytes);
+                Array.Resize(ref Bin, ScalarBytes);
 
             byte[] Signature = new byte[ScalarBytes << 1];
 
@@ -144,7 +144,7 @@ namespace Waher.Security.EllipticCurves
 
             byte[] y = P.Y.ToByteArray();
             if (y.Length != ScalarBytes)
-                Array.Resize<byte>(ref y, ScalarBytes);
+                Array.Resize(ref y, ScalarBytes);
 
             byte[] x = P.X.ToByteArray();
             int Msb = (ScalarBits + 1) & 7;

@@ -138,7 +138,7 @@ namespace Waher.Content.QR
 				throw new ArgumentException("Message too long for selected version.", nameof(Message));
 			else if (SourceIndex < MessageLen)
 			{
-				Array.Resize<byte>(ref Message, MessageLen);
+				Array.Resize(ref Message, MessageLen);
 				while (SourceIndex < MessageLen)
 				{
 					Message[SourceIndex++] = 236;

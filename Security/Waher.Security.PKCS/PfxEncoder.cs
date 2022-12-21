@@ -341,7 +341,7 @@ namespace Waher.Security.PKCS
 			byte[] A = Primitives.CONCAT(As);
 
 			if (A.Length != n)
-				Array.Resize<byte>(ref A, n);
+				Array.Resize(ref A, n);
 
 			return A;
 		}

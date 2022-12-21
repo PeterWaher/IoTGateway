@@ -558,7 +558,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						{
 							if (Count < BufSize)
 							{
-								Array.Resize<byte>(ref Buf, (int)Count);
+								Array.Resize(ref Buf, (int)Count);
 								BufSize = (int)Count;
 							}
 

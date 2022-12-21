@@ -939,8 +939,8 @@ namespace Waher.Persistence.Files
 					Key = Parameters.P;
 					IV = Parameters.Q;
 
-					Array.Resize<byte>(ref Key, 32);
-					Array.Resize<byte>(ref IV, 32);
+					Array.Resize(ref Key, 32);
+					Array.Resize(ref IV, 32);
 				}
 				else
 				{
@@ -2741,7 +2741,7 @@ namespace Waher.Persistence.Files
 			{
 				foreach (ObjectBTreeFile File in Files)
 				{
-					if (!(CollectionNames is null) && Array.IndexOf<string>(CollectionNames, File.CollectionName) < 0)
+					if (!(CollectionNames is null) && Array.IndexOf(CollectionNames, File.CollectionName) < 0)
 						continue;
 
 					Thread?.NewState(File.CollectionName);
@@ -2983,7 +2983,7 @@ namespace Waher.Persistence.Files
 
 			foreach (ObjectBTreeFile File in this.Files)
 			{
-				if (!(CollectionNames is null) && Array.IndexOf<string>(CollectionNames, File.CollectionName) < 0)
+				if (!(CollectionNames is null) && Array.IndexOf(CollectionNames, File.CollectionName) < 0)
 					continue;
 
 				Thread?.NewState(File.CollectionName);

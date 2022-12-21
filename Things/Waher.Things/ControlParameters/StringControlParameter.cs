@@ -127,7 +127,7 @@ namespace Waher.Things.ControlParameters
 				if (this.regex != null && !this.regex.IsMatch(Value))
 					return false;
 
-				if (this.options != null && Array.IndexOf<string>(this.options, Value) < 0)
+				if (this.options != null && Array.IndexOf(this.options, Value) < 0)
 					return false;
 
 				await this.setHandler(Node, Value);
@@ -151,7 +151,7 @@ namespace Waher.Things.ControlParameters
 			if (this.regex != null && !this.regex.IsMatch(StringValue))
 				return false;
 
-			if (this.options != null && Array.IndexOf<string>(this.options, StringValue) < 0)
+			if (this.options != null && Array.IndexOf(this.options, StringValue) < 0)
 				return false;
 
 			try

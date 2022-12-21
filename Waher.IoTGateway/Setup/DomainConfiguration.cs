@@ -613,7 +613,7 @@ namespace Waher.IoTGateway.Setup
 					Url.Append("http://");
 					Url.Append(DomainName);
 
-					if (Array.IndexOf<int>(HttpPorts, 80) < 0 && HttpPorts.Length > 0)
+					if (Array.IndexOf(HttpPorts, 80) < 0 && HttpPorts.Length > 0)
 					{
 						Url.Append(':');
 						Url.Append(HttpPorts[0].ToString());

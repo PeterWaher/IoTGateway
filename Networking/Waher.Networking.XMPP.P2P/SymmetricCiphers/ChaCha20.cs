@@ -52,7 +52,7 @@ namespace Waher.Networking.XMPP.P2P.SymmetricCiphers
         protected override byte[] GetIV(string Id, string Type, string From, string To, uint Counter)
         {
             byte[] IV = Hashes.ComputeSHA256Hash(Encoding.UTF8.GetBytes(Id + Type + From + To));
-            Array.Resize<byte>(ref IV, 12);
+            Array.Resize(ref IV, 12);
 
             IV[8] = (byte)Counter;
             Counter >>= 8;

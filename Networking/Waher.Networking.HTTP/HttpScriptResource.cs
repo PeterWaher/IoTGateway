@@ -230,7 +230,7 @@ namespace Waher.Networking.HTTP
 							if (AcceptRecord.Item.EndsWith("/*") || AcceptRecord.Item == NewContentType)
 								continue;
 
-							if (Array.IndexOf<string>(Range, AcceptRecord.Item) >= 0)
+							if (Array.IndexOf(Range, AcceptRecord.Item) >= 0)
 							{
 								if (Alternatives is null)
 									Alternatives = new List<string>();

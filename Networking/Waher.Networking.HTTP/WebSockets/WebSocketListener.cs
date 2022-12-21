@@ -117,7 +117,7 @@ namespace Waher.Networking.HTTP.WebSockets
 
 				foreach (string Option in Options)
 				{
-					i = Array.IndexOf<string>(this.subProtocols, Option.Trim().ToLower());
+					i = Array.IndexOf(this.subProtocols, Option.Trim().ToLower());
 					if (i >= 0)
 					{
 						WebSocketProtocol = this.subProtocols[i];

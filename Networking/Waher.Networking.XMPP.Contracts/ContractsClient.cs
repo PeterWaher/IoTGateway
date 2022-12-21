@@ -4861,7 +4861,7 @@ namespace Waher.Networking.XMPP.Contracts
 			Xml.Append("'>");
 
 			Filter = (SearchFilter[])Filter.Clone();
-			Array.Sort<SearchFilter>(Filter, (f1, f2) => f1.Order - f2.Order);
+			Array.Sort(Filter, (f1, f2) => f1.Order - f2.Order);
 
 			int PrevOrder = 0;
 			int PrevOrderCount = 0;

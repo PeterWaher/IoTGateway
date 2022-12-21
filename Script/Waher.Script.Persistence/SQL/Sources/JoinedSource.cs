@@ -330,7 +330,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 			}
 
 			if (i != c)
-				Array.Resize<KeyValuePair<VariableReference, bool>>(ref Order, c);
+				Array.Resize(ref Order, c);
 
 			return Order;
 		}

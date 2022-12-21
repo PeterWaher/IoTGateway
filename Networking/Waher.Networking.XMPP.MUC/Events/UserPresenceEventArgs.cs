@@ -121,7 +121,7 @@ namespace Waher.Networking.XMPP.MUC
 		/// <returns>If status was reported.</returns>
 		public bool HasStatus(MucStatus Status)
 		{
-			return Array.IndexOf<MucStatus>(this.status, Status) >= 0;
+			return Array.IndexOf(this.status, Status) >= 0;
 		}
 	}
 }

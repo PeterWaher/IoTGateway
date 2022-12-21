@@ -289,7 +289,7 @@ namespace Waher.Content
 			if (AcceptedContentTypes.Length == 0)
 				return true;
 			else
-				return Array.IndexOf<string>(AcceptedContentTypes, ContentType) >= 0;
+				return Array.IndexOf(AcceptedContentTypes, ContentType) >= 0;
 		}
 
 		/// <summary>

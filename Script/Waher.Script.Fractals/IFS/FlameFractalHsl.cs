@@ -366,7 +366,7 @@ namespace Waher.Script.Fractals.IFS
             if (!Variables.HandlesPreview)
                 Preview = false;
 
-			Array.Sort<FlameFunction>(Functions, (f1, f2) =>
+			Array.Sort(Functions, (f1, f2) =>
 				{
 					double d = f2.Weight - f1.Weight;
 					if (d < 0)

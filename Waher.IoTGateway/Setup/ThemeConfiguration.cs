@@ -251,7 +251,7 @@ namespace Waher.IoTGateway.Setup
 			ThemeDefinition[] Result = new ThemeDefinition[themeDefinitions.Count];
 			themeDefinitions.Values.CopyTo(Result, 0);
 
-			Array.Sort<ThemeDefinition>(Result, (t1, t2) => t1.Title.CompareTo(t2.Title));
+			Array.Sort(Result, (t1, t2) => t1.Title.CompareTo(t2.Title));
 
 			return Result;
 		}

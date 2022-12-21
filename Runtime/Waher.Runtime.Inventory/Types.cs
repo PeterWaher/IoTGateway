@@ -345,7 +345,7 @@ namespace Waher.Runtime.Inventory
 					if (Order is null)
 						Array.Reverse(Modules);
 					else
-						Array.Sort<IModule>(Modules, Order);
+						Array.Sort(Modules, Order);
 
 					foreach (IModule Module in Modules)
 					{
@@ -618,10 +618,10 @@ namespace Waher.Runtime.Inventory
 					CheckIncluded(ref Assemblies, typeof(Types).GetTypeInfo().Assembly);
 					CheckIncluded(ref Assemblies, typeof(int).GetTypeInfo().Assembly);
 
-					if (Array.IndexOf<Assembly>(Assemblies, A = typeof(Types).GetTypeInfo().Assembly) < 0)
+					if (Array.IndexOf(Assemblies, A = typeof(Types).GetTypeInfo().Assembly) < 0)
 					{
 						int c = Assemblies.Length;
-						Array.Resize<Assembly>(ref Assemblies, c + 1);
+						Array.Resize(ref Assemblies, c + 1);
 						Assemblies[c] = A;
 					}
 
@@ -776,10 +776,10 @@ namespace Waher.Runtime.Inventory
 
 		private static void CheckIncluded(ref Assembly[] Assemblies, Assembly A)
 		{
-			if (Array.IndexOf<Assembly>(Assemblies, A) < 0)
+			if (Array.IndexOf(Assemblies, A) < 0)
 			{
 				int c = Assemblies.Length;
-				Array.Resize<Assembly>(ref Assemblies, c + 1);
+				Array.Resize(ref Assemblies, c + 1);
 				Assemblies[c] = A;
 			}
 		}
@@ -1174,7 +1174,7 @@ namespace Waher.Runtime.Inventory
 
 					if (NrArgs < NrParams)
 					{
-						Array.Resize<object>(ref Arguments, NrParams);
+						Array.Resize(ref Arguments, NrParams);
 
 						for (; i < NrParams; i++)
 							Arguments[i] = Instantiate(ReturnNullIfFail, Parameters[i].ParameterType);

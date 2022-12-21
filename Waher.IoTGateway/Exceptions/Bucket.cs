@@ -24,7 +24,7 @@ namespace Waher.IoTGateway.Exceptions
 					i = 0;
 				}
 				else if ((i = this.SubHistograms.Length) < c)
-					Array.Resize<Histogram<string>>(ref this.SubHistograms, c);
+					Array.Resize(ref this.SubHistograms, c);
 
 				while (i < c)
 					this.SubHistograms[i++] = new Histogram<string>();

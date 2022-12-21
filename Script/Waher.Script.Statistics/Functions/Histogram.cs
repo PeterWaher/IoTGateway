@@ -212,7 +212,7 @@ namespace Waher.Script.Statistics.Functions
 				{
 					int c = ch.Length;
 					i++;
-					Array.Resize<char>(ref ch, c + 1);
+					Array.Resize(ref ch, c + 1);
 					Array.Copy(ch, i, ch, i + 1, c - i);
 					ch[i] = '1';
 				}
@@ -226,7 +226,7 @@ namespace Waher.Script.Statistics.Functions
 						i--;
 
 					if (i < ch.Length - 1)
-						Array.Resize<char>(ref ch, i + 1);
+						Array.Resize(ref ch, i + 1);
 				}
 
 				Label = new string(ch);

@@ -380,8 +380,8 @@ namespace Waher.Script.Fractals.ComplexFractals
 
                     if (x2 < x)
                     {
-                        Array.Resize<Complex>(ref Row, x2);
-                        Array.Resize<int>(ref Offset, x2);
+                        Array.Resize(ref Row, x2);
+                        Array.Resize(ref Offset, x2);
                         c = x2;
                     }
                 }

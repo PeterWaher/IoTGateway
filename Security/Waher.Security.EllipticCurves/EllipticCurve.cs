@@ -259,10 +259,10 @@ namespace Waher.Security.EllipticCurves
 			byte[] Y = Point.Y.ToByteArray();
 
 			if (X.Length != this.orderBytes)
-				Array.Resize<byte>(ref X, this.orderBytes);
+				Array.Resize(ref X, this.orderBytes);
 
 			if (Y.Length != this.orderBytes)
-				Array.Resize<byte>(ref Y, this.orderBytes);
+				Array.Resize(ref Y, this.orderBytes);
 
 			byte[] Result = new byte[this.orderBytes << 1];
 
@@ -464,7 +464,7 @@ namespace Waher.Security.EllipticCurves
 		{
 			int c = Binary.Length;
 			if ((Binary[c - 1] & 0x80) != 0)
-				Array.Resize<byte>(ref Binary, c + 1);
+				Array.Resize(ref Binary, c + 1);
 
 			return new BigInteger(Binary);
 		}

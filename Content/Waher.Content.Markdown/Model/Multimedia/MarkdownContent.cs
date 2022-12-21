@@ -141,7 +141,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
                 if (Loop.FileName == FileName)
                     throw new Exception("Circular reference detected.");
 
-				MarkdownDocument.CopyMetaDataTags(Loop, Markdown);
+				MarkdownDocument.CopyMetaDataTags(Loop, Markdown, false);
 
 				Loop = Loop.Master;
             }

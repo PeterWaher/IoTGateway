@@ -4531,7 +4531,7 @@ namespace Waher.IoTGateway
 				else
 				{
 					ReferenceFileName = Value.Substring(0, i);
-					Value = Value.Substring(i + 1);
+					Value = Value.Substring(i + 5);
 				}
 
 				try

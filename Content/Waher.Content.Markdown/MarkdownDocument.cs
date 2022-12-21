@@ -8,17 +8,17 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content.Emoji;
+using Waher.Content.Markdown.Functions;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.Atoms;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.SpanElements;
+using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Events;
-using Waher.Script;
-using Waher.Runtime.Text;
-using Waher.Content.Markdown.Functions;
 using Waher.Runtime.Inventory;
-using Waher.Content.Text;
+using Waher.Runtime.Text;
+using Waher.Script;
 
 namespace Waher.Content.Markdown
 {
@@ -4542,20 +4542,96 @@ namespace Waher.Content.Markdown
 				if (this.master.metaData.ContainsKey("MASTER"))
 					throw new Exception("Master documents are not allowed to be embedded in other master documents.");
 
-				CopyMetaDataTags(this, this.master);
+				CopyMetaDataTags(this, this.master, true);
 
 				this.master.detail = this;
 			}
 		}
 
-		internal static void CopyMetaDataTags(MarkdownDocument From, MarkdownDocument To)
+		internal static void CopyMetaDataTags(MarkdownDocument Details, MarkdownDocument Master, bool UpdateMasterPaths)
 		{
-			foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> Meta in From.metaData)
+			if (UpdateMasterPaths && !string.IsNullOrEmpty(Details.fileName) && !string.IsNullOrEmpty(Master.fileName))
 			{
-				if (To.metaData.TryGetValue(Meta.Key, out KeyValuePair<string, bool>[] Meta0))
-					To.metaData[Meta.Key] = Concat(Meta0, Meta.Value);
+				string DetailsFileName = Path.GetFullPath(Details.fileName);
+				string MasterFileName = Path.GetFullPath(Master.fileName);
+				string DetailsFolder = Path.GetDirectoryName(DetailsFileName);
+				string MasterFolder = Path.GetDirectoryName(MasterFileName);
+
+				if (DetailsFolder != MasterFolder)
+				{
+					string Prefix = null;
+					
+					foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> Meta in Master.metaData)
+					{
+						switch (Meta.Key)
+						{
+							case "ALTERNATE":
+							case "COPYRIGHT":
+							case "CSS":
+							case "ICON":
+							case "HELP":
+							case "IMAGE":
+							case "INIT":
+							case "JAVASCRIPT":
+							case "LOGIN":
+							case "NEXT":
+							case "PREV":
+							case "PREVIOUS":
+							case "SCRIPT":
+							case "WEB":
+								int i, j, k, l, c, d;
+
+								for (k = 0, l = Meta.Value.Length; k < l; k++)
+								{
+									string s = Meta.Value[k].Key;
+									if (string.IsNullOrEmpty(s))
+										continue;
+
+									if (s[0] == Path.DirectorySeparatorChar || s[0] == '/')
+										continue;
+
+									if (Prefix is null)
+									{
+										string[] DetailsParts = DetailsFolder.Split(Path.DirectorySeparatorChar);
+										string[] MasterParts = MasterFolder.Split(Path.DirectorySeparatorChar);
+										
+										i = 0;
+										c = DetailsParts.Length;
+										d = MasterParts.Length;
+
+										while (i < c && i < d && string.Compare(DetailsParts[i], MasterParts[i], true) == 0)
+											i++;
+
+										StringBuilder sb = new StringBuilder();
+
+										j = c - i;
+										
+										while (j-- > 0)
+											sb.Append("../");
+
+										while (i < d)
+										{
+											sb.Append(MasterParts[i++]);
+											sb.Append('/');
+										}
+
+										Prefix = sb.ToString();
+									}
+
+									Meta.Value[k] = new KeyValuePair<string, bool>(Prefix + s, Meta.Value[k].Value);
+								}
+								break;
+						}
+					}
+				}
+			}
+
+			foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> Meta in Details.metaData)
+			{
+				if (Master.metaData.TryGetValue(Meta.Key, out KeyValuePair<string, bool>[] Meta0))
+					Master.metaData[Meta.Key] = Concat(Meta0, Meta.Value);
 				else
-					To.metaData[Meta.Key] = Meta.Value;
+					Master.metaData[Meta.Key] = Meta.Value;
 			}
 		}
 
@@ -6676,7 +6752,7 @@ namespace Waher.Content.Markdown
 		/// <summary>
 		/// To what extent the object supports JSON encoding.
 		/// </summary>
-		public Grade CanEncodeJson => Grade.NotAtAll;	// Document reference from child nodes create a stack overflow.
+		public Grade CanEncodeJson => Grade.NotAtAll;   // Document reference from child nodes create a stack overflow.
 
 		// TODO: Footnotes in included markdown files.
 	}

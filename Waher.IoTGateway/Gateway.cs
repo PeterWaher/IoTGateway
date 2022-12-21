@@ -73,6 +73,7 @@ using Waher.Script.Graphs;
 using Waher.Runtime.ServiceRegistration;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.Control;
+using Waher.Script.Model;
 
 namespace Waher.IoTGateway
 {
@@ -888,6 +889,8 @@ namespace Waher.IoTGateway
 						}
 					}
 				}
+
+				await LoadScriptResources();
 
 				httpxServer = new HttpxServer(xmppClient, webServer, MaxChunkSize);
 				Types.SetModuleParameter("HTTPX", httpxProxy);
@@ -4424,6 +4427,115 @@ namespace Waher.IoTGateway
 			{
 				WebEventSink Sink = new WebEventSink(SinkId, PageResource, MaxLife, UserVariable, Privileges);
 				Log.Register(Sink);
+			}
+		}
+
+		#endregion
+
+		#region Script Resources
+
+		/// <summary>
+		/// Adds a script resource to the web server hosted by the gateway.
+		/// </summary>
+		/// <param name="ResourceName">Resource name of script resource.</param>
+		/// <param name="Expression">Expression to be executed when resource is accessed.</param>
+		/// <returns>If script resource could be added.</returns>
+		public static async Task<bool> AddScriptResource(string ResourceName, Expression Expression)
+		{
+			if (!await RemoveScriptResource(ResourceName, true))
+				return false;
+
+			webServer.Register(new HttpScriptResource(ResourceName, Expression, true));
+
+			await RuntimeSettings.SetAsync("Gateway.ScriptResource." + ResourceName, Expression.Script);
+
+			return true;
+		}
+
+		/// <summary>
+		/// Adds a script resource to the web server hosted by the gateway.
+		/// </summary>
+		/// <param name="ResourceName">Resource name of script resource.</param>
+		/// <param name="Expression">Expression to be executed when resource is accessed.</param>
+		/// <returns>If script resource could be added.</returns>
+		public static async Task<bool> AddScriptResource(string ResourceName, ScriptNode Expression)
+		{
+			if (!await RemoveScriptResource(ResourceName, true))
+				return false;
+
+			webServer.Register(new HttpScriptResource(ResourceName, Expression, true));
+
+			await RuntimeSettings.SetAsync("Gateway.ScriptResource." + ResourceName, Expression.SubExpression);
+
+			return true;
+		}
+
+		/// <summary>
+		/// Removes a script resource from the web server hosted by the gateway.
+		/// </summary>
+		/// <param name="ResourceName">Resource name of script resource.</param>
+		/// <returns>If a script resource with the given resource name was found and removed.</returns>
+		public static Task<bool> RemoveScriptResource(string ResourceName)
+		{
+			return RemoveScriptResource(ResourceName, false);
+		}
+
+		/// <summary>
+		/// Removes a script resource from the web server hosted by the gateway.
+		/// </summary>
+		/// <param name="ResourceName">Resource name of script resource.</param>
+		/// <param name="ConsiderNonexistantRemoved">How to treat the case if a resource does not exist.</param>
+		/// <returns>If a script resource with the given resource name was found and removed.</returns>
+		private static async Task<bool> RemoveScriptResource(string ResourceName, bool ConsiderNonexistantRemoved)
+		{
+			if (!webServer.TryGetResource(ResourceName, out HttpResource Resource, out string SubPath))
+				return false;
+
+			if (!string.IsNullOrEmpty(SubPath))
+				return ConsiderNonexistantRemoved;
+
+			if (!(Resource is HttpScriptResource))
+				return false;
+
+			webServer.Unregister(Resource);
+
+			await RuntimeSettings.DeleteAsync("Gateway.ScriptResource." + ResourceName);
+
+			return true;
+		}
+
+		private static async Task LoadScriptResources()
+		{
+			Dictionary<string, object> Settings = await RuntimeSettings.GetWhereKeyLikeAsync("Gateway.ScriptResource.*", "*");
+
+			foreach (KeyValuePair<string, object> Setting in Settings)
+			{
+				if (!(Setting.Value is string Value))
+				{
+					Log.Error("Invalid Runtime setting found and ignored.",
+						new KeyValuePair<string, object>("Key", Setting.Key),
+						new KeyValuePair<string, object>("Value", Setting.Value));
+					
+					continue;
+				}
+
+				string ResourceName = Setting.Key.Substring(23);
+				Expression Exp;
+
+				try
+				{
+					Exp = new Expression(Value);
+					webServer.Register(new HttpScriptResource(ResourceName, Exp, true));
+				}
+				catch (Exception ex) 
+				{
+					Log.Error("Invalid Runtime setting script. Resource could not be added.",
+						new KeyValuePair<string, object>("Resource", ResourceName),
+						new KeyValuePair<string, object>("Error", ex.Message),
+						new KeyValuePair<string, object>("Script", Value));
+
+					continue;
+				}
 			}
 		}
 

@@ -74,7 +74,7 @@ namespace Waher.Content.Markdown.Functions
 
 			Source = Path.Combine(Source, Argument);
 
-			if (NeedsExecution(Source))
+			if (await NeedsExecution(Source))
 			{
 				string Script = await Resources.ReadAllTextAsync(Source);
 				Expression Exp = new Expression(Script, Source);
@@ -90,13 +90,13 @@ namespace Waher.Content.Markdown.Functions
 		/// </summary>
 		/// <param name="FileName">File name</param>
 		/// <returns>If script file needs to be executed.</returns>
-		public static bool NeedsExecution(string FileName)
+		public static async Task<bool> NeedsExecution(string FileName)
 		{
 			DateTime Timestamp = File.GetLastWriteTime(FileName);
 			DateTime? LastExecuted;
 			Type RuntimeSettings = null;
-			MethodInfo Get;
-			MethodInfo Set;
+			MethodInfo GetAsync;
+			MethodInfo SetAsync;
 
 			lock (lastExecuted)
 			{
@@ -111,9 +111,10 @@ namespace Waher.Content.Markdown.Functions
 
 			if (!LastExecuted.HasValue &&
 				!((RuntimeSettings = Types.GetType("Waher.Runtime.Settings.RuntimeSettings")) is null) &&
-				!((Get = RuntimeSettings.GetRuntimeMethod("Get", new Type[] { typeof(string), typeof(DateTime) })) is null))
+				!((GetAsync = RuntimeSettings.GetRuntimeMethod("GetAsync", new Type[] { typeof(string), typeof(DateTime) })) is null) &&
+				GetAsync.ReturnType == typeof(Task<DateTime>))
 			{
-				LastExecuted = (DateTime)Get.Invoke(null, new object[] { FileName, DateTime.MinValue });
+				LastExecuted = await (Task<DateTime>)GetAsync.Invoke(null, new object[] { FileName, DateTime.MinValue });
 
 				if (LastExecuted.HasValue && LastExecuted.Value >= Timestamp)
 				{
@@ -135,9 +136,11 @@ namespace Waher.Content.Markdown.Functions
 				RuntimeSettings = Types.GetType("Waher.Runtime.Settings.RuntimeSettings");
 
 			if (!(RuntimeSettings is null) &&
-				!((Set = RuntimeSettings.GetRuntimeMethod("Set", new Type[] { typeof(string), typeof(DateTime) })) is null))
+				!((SetAsync = RuntimeSettings.GetRuntimeMethod("SetAsync", new Type[] { typeof(string), typeof(DateTime) })) is null) &&
+				SetAsync.ReturnType == typeof(Task<bool>))
 			{
-				Set.Invoke(null, new object[] { FileName, Timestamp });
+				Task<bool> Result = (Task<bool>)SetAsync.Invoke(null, new object[] { FileName, Timestamp });
+				await Result;
 			}
 
 			return true;

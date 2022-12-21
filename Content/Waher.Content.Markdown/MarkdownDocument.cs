@@ -287,19 +287,19 @@ namespace Waher.Content.Markdown
 
 							FileName2 = Settings.GetFileName(FileName, FileName2);
 
-							if (Tag == "INIT" && !InitScriptFile.NeedsExecution(FileName2))
+							if (Tag == "INIT" && !await InitScriptFile.NeedsExecution(FileName2))
 								continue;
-
-							Script = await Resources.ReadAllTextAsync(FileName2);
-
-							if (!IsDynamic)
-							{
-								IsDynamic = true;
-								Variables.Add(" MarkdownSettings ", Settings);
-							}
 
 							try
 							{
+								Script = await Resources.ReadAllTextAsync(FileName2);
+
+								if (!IsDynamic)
+								{
+									IsDynamic = true;
+									Variables.Add(" MarkdownSettings ", Settings);
+								}
+
 								Exp = new Expression(Script, FileName2);
 
 								if (!(Settings.AuthorizeExpression is null) &&

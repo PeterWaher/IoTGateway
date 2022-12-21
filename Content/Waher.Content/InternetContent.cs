@@ -313,7 +313,7 @@ namespace Waher.Content
 			if (ContentTypes.Length == 0)
 				throw new ArgumentException("Empty list of content types not permitted.", nameof(ContentTypes));
 
-			if (AcceptedContentTypes.Length == 0)
+			if ((AcceptedContentTypes?.Length ?? 0) == 0)
 			{
 				ContentType = ContentTypes[0];
 				return true;

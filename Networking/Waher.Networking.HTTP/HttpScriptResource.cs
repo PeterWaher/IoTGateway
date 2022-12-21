@@ -19,6 +19,7 @@ namespace Waher.Networking.HTTP
 	{
 		private readonly Expression script;
 		private readonly ScriptNode scriptNode;
+		private readonly string referenceFileName;
 		private readonly bool userSessions;
 		private readonly HttpAuthenticationScheme[] authenticationSchemes;
 
@@ -27,10 +28,11 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ResourceName">Name of resource.</param>
 		/// <param name="Script">Script expression.</param>
+		/// <param name="ReferenceFileName">Optional reference file name for script.</param>
 		/// <param name="UserSessions">If the resource uses user sessions.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public HttpScriptResource(string ResourceName, string Script, bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
-			: this(ResourceName, new Expression(Script), UserSessions, AuthenticationSchemes)
+		public HttpScriptResource(string ResourceName, string Script, string ReferenceFileName, bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
+			: this(ResourceName, new Expression(Script), ReferenceFileName, UserSessions, AuthenticationSchemes)
 		{
 		}
 
@@ -39,13 +41,15 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ResourceName">Name of resource.</param>
 		/// <param name="Script">Script expression.</param>
+		/// <param name="ReferenceFileName">Optional reference file name for script.</param>
 		/// <param name="UserSessions">If the resource uses user sessions.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public HttpScriptResource(string ResourceName, Expression Script, bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
+		public HttpScriptResource(string ResourceName, Expression Script, string ReferenceFileName, bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
 			: base(ResourceName)
 		{
 			this.script = Script;
 			this.scriptNode = null;
+			this.referenceFileName = ReferenceFileName;
 			this.userSessions = UserSessions;
 			this.authenticationSchemes = AuthenticationSchemes;
 		}
@@ -55,13 +59,15 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ResourceName">Name of resource.</param>
 		/// <param name="Script">Script expression.</param>
+		/// <param name="ReferenceFileName">Optional reference file name for script.</param>
 		/// <param name="UserSessions">If the resource uses user sessions.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public HttpScriptResource(string ResourceName, ScriptNode Script, bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
+		public HttpScriptResource(string ResourceName, ScriptNode Script, string ReferenceFileName, bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
 			: base(ResourceName)
 		{
 			this.script = null;
 			this.scriptNode = Script;
+			this.referenceFileName = ReferenceFileName;
 			this.userSessions = UserSessions;
 			this.authenticationSchemes = AuthenticationSchemes;
 		}
@@ -239,7 +245,7 @@ namespace Waher.Networking.HTTP
 							}
 						}
 
-						ConversionState State = new ConversionState(ContentType, f, string.Empty, ResourceName,
+						ConversionState State = new ConversionState(ContentType, f, this.referenceFileName, ResourceName,
 							Request.Header.GetURL(false, false), NewContentType, f2, Request.Session, Alternatives?.ToArray());
 
 						if (await Converter.ConvertAsync(State))

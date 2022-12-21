@@ -1166,8 +1166,7 @@ namespace Waher.IoTGateway
 			IDatabaseProvider DatabaseProvider = Database.Provider;
 			Type ProviderType = DatabaseProvider.GetType();
 			PropertyInfo AutoRepairReportFolder = ProviderType.GetProperty("AutoRepairReportFolder");
-			if (!(AutoRepairReportFolder is null))
-				AutoRepairReportFolder.SetValue(DatabaseProvider, Path.Combine(AppDataFolder, "Backup"));
+			AutoRepairReportFolder?.SetValue(DatabaseProvider, Path.Combine(AppDataFolder, "Backup"));
 
 			MethodInfo MI = ProviderType.GetMethod("RepairIfInproperShutdown", new Type[] { typeof(string) });
 
@@ -4439,15 +4438,16 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="ResourceName">Resource name of script resource.</param>
 		/// <param name="Expression">Expression to be executed when resource is accessed.</param>
+		/// <param name="ReferenceFileName">Optional reference file name for script.</param>
 		/// <returns>If script resource could be added.</returns>
-		public static async Task<bool> AddScriptResource(string ResourceName, Expression Expression)
+		public static async Task<bool> AddScriptResource(string ResourceName, Expression Expression, string ReferenceFileName)
 		{
 			if (!await RemoveScriptResource(ResourceName, true))
 				return false;
 
-			webServer.Register(new HttpScriptResource(ResourceName, Expression, true));
+			webServer.Register(new HttpScriptResource(ResourceName, Expression, ReferenceFileName, true));
 
-			await RuntimeSettings.SetAsync("Gateway.ScriptResource." + ResourceName, Expression.Script);
+			await RuntimeSettings.SetAsync("Gateway.ScriptResource." + ResourceName, ReferenceFileName + " ||| " + Expression.Script);
 
 			return true;
 		}
@@ -4457,15 +4457,16 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="ResourceName">Resource name of script resource.</param>
 		/// <param name="Expression">Expression to be executed when resource is accessed.</param>
+		/// <param name="ReferenceFileName">Optional reference file name for script.</param>
 		/// <returns>If script resource could be added.</returns>
-		public static async Task<bool> AddScriptResource(string ResourceName, ScriptNode Expression)
+		public static async Task<bool> AddScriptResource(string ResourceName, ScriptNode Expression, string ReferenceFileName)
 		{
 			if (!await RemoveScriptResource(ResourceName, true))
 				return false;
 
-			webServer.Register(new HttpScriptResource(ResourceName, Expression, true));
+			webServer.Register(new HttpScriptResource(ResourceName, Expression, ReferenceFileName, true));
 
-			await RuntimeSettings.SetAsync("Gateway.ScriptResource." + ResourceName, Expression.SubExpression);
+			await RuntimeSettings.SetAsync("Gateway.ScriptResource." + ResourceName, ReferenceFileName + " ||| " + Expression.SubExpression);
 
 			return true;
 		}
@@ -4515,23 +4516,35 @@ namespace Waher.IoTGateway
 					Log.Error("Invalid Runtime setting found and ignored.",
 						new KeyValuePair<string, object>("Key", Setting.Key),
 						new KeyValuePair<string, object>("Value", Setting.Value));
-					
+
 					continue;
 				}
 
 				string ResourceName = Setting.Key.Substring(23);
+				string ReferenceFileName;
+				int i;
 				Expression Exp;
+
+				i = Value.IndexOf(" ||| ");
+				if (i < 0)
+					ReferenceFileName = string.Empty;
+				else
+				{
+					ReferenceFileName = Value.Substring(0, i);
+					Value = Value.Substring(i + 1);
+				}
 
 				try
 				{
 					Exp = new Expression(Value);
-					webServer.Register(new HttpScriptResource(ResourceName, Exp, true));
+					webServer.Register(new HttpScriptResource(ResourceName, Exp, ReferenceFileName, true));
 				}
-				catch (Exception ex) 
+				catch (Exception ex)
 				{
 					Log.Error("Invalid Runtime setting script. Resource could not be added.",
 						new KeyValuePair<string, object>("Resource", ResourceName),
 						new KeyValuePair<string, object>("Error", ex.Message),
+						new KeyValuePair<string, object>("ReferenceFileName", ReferenceFileName),
 						new KeyValuePair<string, object>("Script", Value));
 
 					continue;

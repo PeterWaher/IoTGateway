@@ -76,7 +76,7 @@ namespace Waher.IoTGateway.ScriptExtensions.Functions
 
 			string ResourceName = S.Value;
 
-			return new BooleanValue(await Gateway.AddScriptResource(ResourceName, this.Argument2));
+			return new BooleanValue(await Gateway.AddScriptResource(ResourceName, this.Argument2, this.Expression.Source ?? string.Empty));
 		}
 
 		/// <summary>

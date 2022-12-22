@@ -21,6 +21,7 @@ namespace Waher.Networking.XMPP.Avatar
 	public class AvatarClient : XmppExtension
 	{
 		private readonly Dictionary<string, Avatar> contactAvatars = new Dictionary<string, Avatar>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly Dictionary<string, bool> requestingAvatar = new Dictionary<string, bool>();
 		private readonly PepClient pep;
 		private IEndToEndEncryption e2e;
 		private Avatar localAvatar = null;
@@ -365,6 +366,18 @@ namespace Waher.Networking.XMPP.Avatar
 								}
 							}
 
+
+							if (LoadAvatar)
+							{
+								lock (this.requestingAvatar)
+								{
+									if (this.requestingAvatar.ContainsKey(BareJID))
+										LoadAvatar = false;
+									else
+										this.requestingAvatar[BareJID] = true;
+								}
+							}
+
 							if (LoadAvatar)
 							{
 								switch (Type)
@@ -372,8 +385,8 @@ namespace Waher.Networking.XMPP.Avatar
 									case AvatarType.Xep0008:
 										if (this.e2e is null)
 										{
-											this.client.SendIqGet(FullJID, "<query xmlns='jabber:iq:avatar'/>", this.AvatarResponse,
-												new object[] { BareJID, Hash });
+											this.client.SendIqGet(FullJID, "<query xmlns='jabber:iq:avatar'/>",
+												this.AvatarResponse, new object[] { BareJID, Hash });
 										}
 										else
 										{
@@ -385,7 +398,24 @@ namespace Waher.Networking.XMPP.Avatar
 
 									case AvatarType.Xep0153:
 										this.client.SendIqGet(InMuc ? FullJID : BareJID, "<vCard xmlns='vcard-temp'/>",
-											(Sender2, e2) => Task.Run(() => this.ParseVCard(e2, InMuc)), null);
+											(Sender2, e2) =>
+											{
+												lock (this.requestingAvatar)
+												{
+													this.requestingAvatar.Remove(BareJID);
+												}
+
+												Task.Run(() => this.ParseVCard(e2, InMuc));
+
+												return Task.CompletedTask;
+											}, null);
+										break;
+
+									default:
+										lock (this.requestingAvatar)
+										{
+											this.requestingAvatar.Remove(BareJID);
+										}
 										break;
 								}
 							}
@@ -404,6 +434,11 @@ namespace Waher.Networking.XMPP.Avatar
 			object[] P = (object[])e2.State;
 			string BareJID = (string)P[0];
 			string Hash = (string)P[1];
+
+			lock (this.requestingAvatar)
+			{
+				this.requestingAvatar.Remove(BareJID);
+			}
 
 			if (e2.Ok)
 				await this.ParseAvatar(BareJID, Hash, e2.FirstElement);

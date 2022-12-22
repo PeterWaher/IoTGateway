@@ -1890,19 +1890,19 @@ The following functions are available in the `Waher.Script.XmlDSig` library.
 
 The following functions are available in the `Waher.Content.Markdown` library.
 
-| Function                   | Description | Example |
-|----------------------------|-------------|---------|
-| `FromMarkdown(Markdown)`   | Converts a string containing Markdown Representation to a script object. | [Example][FromMarkdownExample] |
-| `InitScriptFile(FileName)` | Evaluates the script in the file defined by `FileName` if not evaluated before, or if timestamp is newer than previous evaluation. | [Example][InitScriptFileExample] |
-| `LoadMarkdown(FileName)`   | Loads a markdown file and preprocesses it before returning it as a string. | [Example][LoadMarkdownExample] |
-| `MarkdownContent(s)`       | Encodes a string as a Markdown Content object for encoding, as results of web service calls. | [Example][MarkdownContentExample] |
-| `MarkdownEncode(s)`        | Encodes a string for inclusion in Markdown. | [Example][MarkdownEncodeExample] |
-| `MarkdownToHtml(s)`        | Parses the markdown provided in `s` and converts it to HTML. Only HTML between BODY tags is returned. | [Example][MarkdowntoHtmlExample] |
-| `MarkdownToHtmlStat(s)`    | Parses the markdown provided in `s` and converts it to HTML. Only HTML between BODY tags is returned. A vector containing the HTML, together with statistics about the document is returned. | [Example][MarkdowntoHtmlStatExample] |
-| `MarkdownStatistics(s)`    | Parses the markdown provided in `s` and returns statistics about the document. | [Example][MarkdownStatisticsExample] |
-| `PreprocessMarkdown(MD)`   | Preprocesses a markdown string `MD`, and returns it as a string. | [Example][PreprocessMarkdownExample] |
-| `ScriptFile(FileName)`     | Evaluates the script in the file defined by `FileName`. | [Example][ScriptFileExample] |
-| `ToMarkdown(Obj)`          | Converts the object to a string containing the Markdown Representation of the object. | [Example][ToMarkdownExample] |
+| Function                           | Description | Example |
+|------------------------------------|-------------|---------|
+| `FromMarkdown(Markdown)`           | Converts a string containing Markdown Representation to a script object. | [Example][FromMarkdownExample] |
+| `InitScriptFile(FileName)`         | Evaluates the script in the file defined by `FileName` if not evaluated before, or if timestamp is newer than previous evaluation. | [Example][InitScriptFileExample] |
+| `LoadMarkdown(FileName[,Headers])` | Loads a markdown file and preprocesses it before returning it as a string. By default, Markdown headers are removed. If you wish Markdown headers to be included, set `Headers´ to `true`. | [Example][LoadMarkdownExample] |
+| `MarkdownContent(s)`               | Encodes a string as a Markdown Content object for encoding, as results of web service calls. | [Example][MarkdownContentExample] |
+| `MarkdownEncode(s)`                | Encodes a string for inclusion in Markdown. | [Example][MarkdownEncodeExample] |
+| `MarkdownToHtml(s)`                | Parses the markdown provided in `s` and converts it to HTML. Only HTML between BODY tags is returned. | [Example][MarkdowntoHtmlExample] |
+| `MarkdownToHtmlStat(s)`            | Parses the markdown provided in `s` and converts it to HTML. Only HTML between BODY tags is returned. A vector containing the HTML, together with statistics about the document is returned. | [Example][MarkdowntoHtmlStatExample] |
+| `MarkdownStatistics(s)`            | Parses the markdown provided in `s` and returns statistics about the document. | [Example][MarkdownStatisticsExample] |
+| `PreprocessMarkdown(MD)`           | Preprocesses a markdown string `MD`, and returns it as a string. | [Example][PreprocessMarkdownExample] |
+| `ScriptFile(FileName)`             | Evaluates the script in the file defined by `FileName`. | [Example][ScriptFileExample] |
+| `ToMarkdown(Obj)`                  | Converts the object to a string containing the Markdown Representation of the object. | [Example][ToMarkdownExample] |
 
 The following 
 context-specific constants (read-only variables) are available in inline script:

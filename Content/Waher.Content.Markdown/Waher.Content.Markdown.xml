@@ -117,14 +117,24 @@
         </member>
         <member name="T:Waher.Content.Markdown.Functions.LoadMarkdown">
             <summary>
-            LoadMarkdown(FileName)
+            LoadMarkdown(FileName[,Headers])
             </summary>
         </member>
         <member name="M:Waher.Content.Markdown.Functions.LoadMarkdown.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
-            LoadMarkdown(FileName)
+            LoadMarkdown(FileName[,Headers])
             </summary>
             <param name="FileName">File name.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.LoadMarkdown.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            LoadMarkdown(FileName[,Headers])
+            </summary>
+            <param name="FileName">File name.</param>
+            <param name="Headers">If Markdown headers should be included.</param>
             <param name="Start">Start position in script expression.</param>
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
@@ -134,25 +144,30 @@
             Name of the function
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.Functions.LoadMarkdown.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
         <member name="P:Waher.Content.Markdown.Functions.LoadMarkdown.IsAsynchronous">
             <summary>
             If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
             <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
             </summary>
         </member>
-        <member name="M:Waher.Content.Markdown.Functions.LoadMarkdown.EvaluateScalar(System.String,Waher.Script.Variables)">
+        <member name="M:Waher.Content.Markdown.Functions.LoadMarkdown.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
-            Evaluates the function on a scalar argument.
+            Evaluates the function.
             </summary>
-            <param name="Argument">Function argument.</param>
+            <param name="Arguments">Function arguments.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Content.Markdown.Functions.LoadMarkdown.EvaluateScalarAsync(System.String,Waher.Script.Variables)">
+        <member name="M:Waher.Content.Markdown.Functions.LoadMarkdown.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
             <summary>
-            Evaluates the function on a scalar argument.
+            Evaluates the function.
             </summary>
-            <param name="Argument">Function argument.</param>
+            <param name="Arguments">Function arguments.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>

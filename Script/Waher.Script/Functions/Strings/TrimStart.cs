@@ -34,7 +34,7 @@ namespace Waher.Script.Functions.Strings
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(string Argument, Variables Variables)
         {
-            return new StringValue(Argument.TrimStart());
+            return new StringValue(Argument?.TrimStart() ?? string.Empty);
         }
     }
 }

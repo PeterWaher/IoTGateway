@@ -42,10 +42,18 @@ namespace Waher.Runtime.Counters
 					}
 				}
 
-				if (string.IsNullOrEmpty(e.Value.Counter.ObjectId))
-					await Database.Insert(e.Value.Counter);
+				if (e.Value.Counter.Counter == 0)
+				{
+					if (!string.IsNullOrEmpty(e.Value.Counter.ObjectId))
+						await Database.Delete(e.Value.Counter);
+				}
 				else
-					await Database.Update(e.Value.Counter);
+				{
+					if (string.IsNullOrEmpty(e.Value.Counter.ObjectId))
+						await Database.Insert(e.Value.Counter);
+					else
+						await Database.Update(e.Value.Counter);
+				}
 
 				e.Value.Stored.TrySetResult(true);
 			}

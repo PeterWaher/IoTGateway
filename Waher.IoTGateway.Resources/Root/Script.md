@@ -2426,6 +2426,9 @@ object
 }
 ```
 
+**Note**: When inserting an object, that object will be returned from the statement. This includes a reference to its newly generated
+Object ID. If inserting an object ex-nihilo, the Object ID is found referring to the property `ObjectId` on the resulting object.
+
 #### INSERT OBJECTS
 
 You can insert a vector or set of objects ex nihilo into a collection using the 
@@ -2460,6 +2463,9 @@ objects
 ```
 
 **Note**: Objects can be returned as a vector, set, or simply as a list of elements separated with commas.
+
+**Note 2**: The objects returned will have their newly generated Object IDs. If inserting an objects ex-nihilo, the Object ID 
+is found referring to the property `ObjectId` on the resulting objects.
 
 #### UPDATE
 

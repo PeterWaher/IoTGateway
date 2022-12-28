@@ -44,6 +44,7 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Contracts;
+using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.HTTPX;
 using Waher.Networking.XMPP.Mail;
 using Waher.Networking.XMPP.MUC;
@@ -51,16 +52,20 @@ using Waher.Networking.XMPP.P2P.SOCKS5;
 using Waher.Networking.XMPP.PEP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.PubSub;
+using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.Software;
 using Waher.Networking.XMPP.Synchronization;
 using Waher.Runtime.Language;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Inventory.Loader;
+using Waher.Runtime.ServiceRegistration;
 using Waher.Runtime.Settings;
 using Waher.Runtime.Timing;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Script;
+using Waher.Script.Graphs;
+using Waher.Script.Model;
 using Waher.Security;
 using Waher.Security.CallStack;
 using Waher.Security.LoginMonitor;
@@ -69,11 +74,6 @@ using Waher.Security.Users;
 using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
-using Waher.Script.Graphs;
-using Waher.Runtime.ServiceRegistration;
-using Waher.Networking.XMPP.Sensor;
-using Waher.Networking.XMPP.Control;
-using Waher.Script.Model;
 
 namespace Waher.IoTGateway
 {
@@ -1824,6 +1824,7 @@ namespace Waher.IoTGateway
 				scheduler?.Dispose();
 				scheduler = null;
 
+				await Script.Threading.Functions.Background.TerminateTasks(10000);
 				await Types.StopAllModules();
 
 				Database.CollectionRepaired -= Database_CollectionRepaired;

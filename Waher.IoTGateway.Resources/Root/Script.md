@@ -1723,6 +1723,8 @@ The following functions are available in the `Waher.Script.Threading` library.
 
 | Function                                | Description | Example |
 |-----------------------------------------|-------------|---------|
+| `Abort(BackgroundId)`                   | Aborts the background processing of script identified by `BackgroundId`. | Abort(Id) |
+| `Background(Script)`                    | Executes the provided script asynchronously in the background. The function does not wait for the result to be completed. The script runs on a separate variable collection, that is initialized with the variables available to the function when executed. The function returns an ID that can be used to abort the process, by calling the `Abort` function. | Background(f(a,b)) |
 | `Semaphore(Name,Script)`                | Protects the evaluation of the script defined by `Script` by using a semaphore of name `Name`. Only one thread can evaluate script in a named semaphore at the same time. | Semaphore('Lock1',f(a,b)) |
 | `Sleep(ms)`                             | Sleeps for a certain number of milliseconds, without consuming processor power. | `Sleep(100)` |
 | `Parallel(Tasks[,Tasks[,Tasks[,...]]])` | Evaluates tasks in parallel. These tasks can either be arguments to the function, or expressed as items in vector arguments. Elements in such vector arguments are evaluated in parallel. Each task receives its own cloned variables collection. | `Parallel([f(a,b), f(c,d)])` |

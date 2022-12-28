@@ -4,6 +4,116 @@
         <name>Waher.Script.Threading</name>
     </assembly>
     <members>
+        <member name="T:Waher.Script.Threading.Functions.Abort">
+            <summary>
+            Aborts the background processing of script
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Threading.Functions.Abort.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Aborts the background processing of script
+            </summary>
+            <param name="Milliseconds">Number of milliseconds to sleep.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Threading.Functions.Abort.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Threading.Functions.Abort.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Threading.Functions.Abort.EvaluateScalar(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Threading.Functions.Abort.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Script.Threading.Functions.Background">
+            <summary>
+            Executes the provided script asynchronously in the background.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Threading.Functions.Background.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Executes the provided script asynchronously in the background.
+            </summary>
+            <param name="Script">Script to execute in the background.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Script.Threading.Functions.Background.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.Threading.Functions.Background.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="M:Waher.Script.Threading.Functions.Background.Evaluate(Waher.Script.Variables)">
+            <summary>
+            Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+            </summary>
+            <param name="Variables">Variables collection.</param>
+            <returns>Result.</returns>
+        </member>
+        <member name="M:Waher.Script.Threading.Functions.Background.Evaluate(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.Threading.Functions.Background.EvaluateInBackground(Waher.Script.Expression,Waher.Script.Variables,System.Boolean)">
+            <summary>
+            Evaluates script in the background.
+            </summary>
+            <param name="Script">Script to evaluate.</param>
+            <param name="Variables">Set of variables.</param>
+            <param name="CatchAndLogExceptions">If exceptions should be caught and logged (true), or passed on to the awaiting task (false).</param>
+            <returns>ID that can be used to abort process, as well as a Task object that can be awaited, for the result.</returns>
+        </member>
+        <member name="M:Waher.Script.Threading.Functions.Background.EvaluateInBackground(Waher.Script.Model.ScriptNode,Waher.Script.Variables,System.Boolean)">
+            <summary>
+            Evaluates script in the background.
+            </summary>
+            <param name="Node">Script to evaluate.</param>
+            <param name="Variables">Set of variables.</param>
+            <param name="CatchAndLogExceptions">If exceptions should be caught and logged (true), or passed on to the awaiting task (false).</param>
+            <returns>ID that can be used to abort process, as well as a Task object that can be awaited, for the result.</returns>
+        </member>
+        <member name="M:Waher.Script.Threading.Functions.Background.AbortBackgroundTask(System.Guid)">
+            <summary>
+            Aborts a background task, earlier started by calling EvaluateInBackground.
+            </summary>
+            <param name="TaskId">ID of background task</param>
+            <returns>If task was found and aborted.</returns>
+        </member>
+        <member name="M:Waher.Script.Threading.Functions.Background.TerminateTasks(System.Int32)">
+            <summary>
+            Waits for all background tasks to terminate. Aborts tasks still executing after timeout elapses.
+            </summary>
+            <param name="Timeout">Timeout, in milliseconds.</param>
+        </member>
         <member name="T:Waher.Script.Threading.Functions.Parallel">
             <summary>
             Executes tasks in parallel.

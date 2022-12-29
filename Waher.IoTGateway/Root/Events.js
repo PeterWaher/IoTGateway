@@ -65,15 +65,41 @@ function CheckEventsWS(TabID)
 
 		PingTimer = window.setInterval(function ()
 		{
-			Socket.send(JSON.stringify({
-				"cmd": "Ping"
-			}));
+			if (Socket)
+			{
+				if (Socket.readyState === Socket.OPEN)
+				{
+					Socket.send(JSON.stringify({
+						"cmd": "Ping"
+					}));
+				}
+				else
+				{
+					if (PingTimer)
+					{
+						window.clearInterval(PingTimer);
+						PingTimer = null;
+					}
+
+					if (!Closed)
+					{
+						window.setTimeout(function ()
+						{
+							NeedsReload = true;
+							CheckEventsWS(TabID);
+						}, 5000);
+					}
+				}
+			}
 		}, 10000);
 
 		window.onbeforeunload = function ()
 		{
 			if (Socket && Socket.readyState === Socket.OPEN)
 			{
+				window.clearInterval(PingTimer);
+				PingTimer = null;
+
 				Socket.send(JSON.stringify({
 					"cmd": "Unregister"
 				}));

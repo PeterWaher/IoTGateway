@@ -460,9 +460,6 @@
     <EmbeddedResource Include="Schema\Report.xsd">
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="Waher.Client.WPF_1_TemporaryKey.pfx" />
-    <None Include="Waher.Client.WPF_2_TemporaryKey.pfx" />
-    <None Include="Waher.Client.WPF_3_TemporaryKey.pfx" />
     <None Include="Waher.Client.WPF_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>

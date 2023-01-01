@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Waher.Persistence.Serialization;
-
-namespace Waher.Persistence.Files.Storage
+﻿namespace Waher.Persistence.Files.Storage
 {
 	internal class MergeResult
 	{

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Waher.Persistence.Files.Storage;
+﻿using Waher.Persistence.Files.Storage;
 
 namespace Waher.Persistence.Files
 {

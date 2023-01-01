@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 #if NETSTANDARD2_0
 using System.Security.Cryptography;
 #endif
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Persistence.Files.Storage
 {

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence.Attributes;
@@ -74,11 +76,78 @@ namespace Waher.Persistence.FullTextSearch
 					IndexableProperties = TypeInfo.GetIndexableProperties(e.Object, CollectionInfo.PropertyNames);
 				else
 					IndexableProperties = GetIndexableProperties(GenObj, CollectionInfo.PropertyNames);
+
+				Dictionary<string, int> Tokens = Tokenize(IndexableProperties.Values);
+				if (Tokens.Count == 0)
+					return;
+
+
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
 			}
+		}
+
+		/// <summary>
+		/// Tokenizes a set of strings.
+		/// </summary>
+		/// <param name="Text">Enumerable set of strings to tokenize.</param>
+		/// <returns>Tokens found, with associated counts.</returns>
+		public static Dictionary<string, int> Tokenize(IEnumerable<string> Text)
+		{
+			Dictionary<string, int> Result = new Dictionary<string, int>();
+			UnicodeCategory Category;
+			StringBuilder sb = new StringBuilder();
+			string Token;
+			bool First = true;
+
+			foreach (string s in Text)
+			{
+				if (string.IsNullOrEmpty(s))
+					continue;
+
+				foreach (char ch in s.ToLower().Normalize(NormalizationForm.FormD))
+				{
+					Category = CharUnicodeInfo.GetUnicodeCategory(ch);
+					if (Category == UnicodeCategory.NonSpacingMark)
+						continue;
+
+					if (char.IsLetterOrDigit(ch))
+					{
+						sb.Append(ch);
+						First = false;
+					}
+					else
+					{
+						if (!First)
+						{
+							Token = sb.ToString();
+							sb.Clear();
+							First = true;
+
+							if (!Result.TryGetValue(Token, out int Nr))
+								Nr = 0;
+
+							Result[Token] = Nr + 1;
+						}
+					}
+				}
+
+				if (!First)
+				{
+					Token = sb.ToString();
+					sb.Clear();
+					First = true;
+
+					if (!Result.TryGetValue(Token, out int Nr))
+						Nr = 0;
+
+					Result[Token] = Nr + 1;
+				}
+			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -132,7 +201,7 @@ namespace Waher.Persistence.FullTextSearch
 				if (!P.Key || (CollectionInfo = P.Value as CollectionInformation) is null)
 				{
 					CollectionInfo = new CollectionInformation(CollectionName, false);
-					await collectionInformation.AddAsync(CollectionName, CollectionInfo);
+					await collectionInformation.AddAsync(CollectionName, CollectionInfo, true);
 					return null;
 				}
 				else if (CollectionInfo.IndexForFullTextSearch)
@@ -193,11 +262,18 @@ namespace Waher.Persistence.FullTextSearch
 				}
 
 				if (New)
-					await collectionInformation.AddAsync(CollectionName, CollectionInfo);
+				{
+					KeyValuePair<bool, object> P = await collectionInformation.TryGetValueAsync(CollectionName);
+
+					if (P.Key && P.Value is CollectionInformation CollectionInfo0)
+						TypeInfo.CollectionInformation = CollectionInfo = CollectionInfo0;
+					else
+						await collectionInformation.AddAsync(CollectionName, CollectionInfo, true);
+				}
 
 				if (!CollectionInfo.IndexForFullTextSearch)
 					return null;
-		
+
 				return new Tuple<CollectionInformation, TypeInformation, GenericObject>(CollectionInfo, TypeInfo, null);
 			}
 		}

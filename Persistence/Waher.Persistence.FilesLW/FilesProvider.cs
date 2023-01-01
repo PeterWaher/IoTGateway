@@ -1263,8 +1263,6 @@ namespace Waher.Persistence.Files
 
 			if (Record.Value is string s)
 				return s != ExpectedValue;
-			else if (Record.Value is KeyValuePair<string, object> P3)
-				return P3.Key != Key || !(P3.Value is string s2) || s2 != ExpectedValue;
 			else
 				return true;
 		}

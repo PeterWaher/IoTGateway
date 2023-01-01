@@ -279,8 +279,9 @@ namespace Waher.Persistence.Files
 		{
 			Task<KeyValuePair<bool, object>> Task = this.TryGetValueAsync(key);
 			FilesProvider.Wait(Task, this.timeoutMilliseconds);
-			value = Task.Result.Value;
-			return Task.Result.Key;
+			KeyValuePair<bool, object> P = Task.Result;
+			value = P.Value;
+			return P.Key;
 		}
 
 		/// <summary>
@@ -314,6 +315,8 @@ namespace Waher.Persistence.Files
 				object Result = await this.dictionaryFile.TryLoadObjectLocked(key, this.keyValueSerializer);
 				if (Result is null)
 					return new KeyValuePair<bool, object>(false, null);
+				else if (Result is KeyValuePair<string, object> P)
+					return new KeyValuePair<bool, object>(P.Key == key, P.Value);
 				else
 					return new KeyValuePair<bool, object>(true, Result);
 			}
@@ -347,7 +350,12 @@ namespace Waher.Persistence.Files
 			await this.dictionaryFile.BeginRead();
 			try
 			{
-				return (KeyValuePair<string, object>)await this.dictionaryFile.LoadObjectLocked(key, this.keyValueSerializer);
+				object Obj = await this.dictionaryFile.LoadObjectLocked(key, this.keyValueSerializer);
+
+				if (Obj is KeyValuePair<string, object> P)
+					return P;
+				else
+					return new KeyValuePair<string, object>(key, Obj);
 			}
 			finally
 			{
@@ -604,13 +612,7 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// <see cref="ICollection{T}.IsReadOnly"/>
 		/// </summary>
-		public bool IsReadOnly
-		{
-			get
-			{
-				return false;
-			}
-		}
+		public bool IsReadOnly => false;
 
 		/// <summary>
 		/// Gets or sets the element with the specified key.

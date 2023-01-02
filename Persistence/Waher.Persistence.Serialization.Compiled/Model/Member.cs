@@ -62,10 +62,12 @@ namespace Waher.Persistence.Serialization.Model
 					break;
 
 				case ObjectSerializer.TYPE_INT16:
+				case ObjectSerializer.TYPE_VARINT16:
 					this.memberTypeCode = TypeCode.Int16;
 					break;
 
 				case ObjectSerializer.TYPE_INT32:
+				case ObjectSerializer.TYPE_VARINT32:
 					this.memberTypeCode = TypeCode.Int32;
 					if (this.memberTypeInfo.IsEnum)
 					{
@@ -75,6 +77,7 @@ namespace Waher.Persistence.Serialization.Model
 					break;
 
 				case ObjectSerializer.TYPE_INT64:
+				case ObjectSerializer.TYPE_VARINT64:
 					this.memberTypeCode = TypeCode.Int64;
 					break;
 
@@ -83,14 +86,17 @@ namespace Waher.Persistence.Serialization.Model
 					break;
 
 				case ObjectSerializer.TYPE_UINT16:
+				case ObjectSerializer.TYPE_VARUINT16:
 					this.memberTypeCode = TypeCode.UInt16;
 					break;
 
 				case ObjectSerializer.TYPE_UINT32:
+				case ObjectSerializer.TYPE_VARUINT32:
 					this.memberTypeCode = TypeCode.UInt32;
 					break;
 
 				case ObjectSerializer.TYPE_UINT64:
+				case ObjectSerializer.TYPE_VARUINT64:
 					this.memberTypeCode = TypeCode.UInt64;
 					break;
 

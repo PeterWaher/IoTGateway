@@ -49,6 +49,12 @@ namespace Waher.Persistence.Serialization.ValueTypes
 				case ObjectSerializer.TYPE_UINT16: return Task.FromResult<object>((char)Reader.ReadUInt16());
 				case ObjectSerializer.TYPE_UINT32: return Task.FromResult<object>((char)Reader.ReadUInt32());
 				case ObjectSerializer.TYPE_UINT64: return Task.FromResult<object>((char)Reader.ReadUInt64());
+				case ObjectSerializer.TYPE_VARINT16: return Task.FromResult<object>((char)Reader.ReadVariableLengthInt16());
+				case ObjectSerializer.TYPE_VARINT32: return Task.FromResult<object>((char)Reader.ReadVariableLengthInt32());
+				case ObjectSerializer.TYPE_VARINT64: return Task.FromResult<object>((char)Reader.ReadVariableLengthInt64());
+				case ObjectSerializer.TYPE_VARUINT16: return Task.FromResult<object>((char)Reader.ReadVariableLengthUInt16());
+				case ObjectSerializer.TYPE_VARUINT32: return Task.FromResult<object>((char)Reader.ReadVariableLengthUInt32());
+				case ObjectSerializer.TYPE_VARUINT64: return Task.FromResult<object>((char)Reader.ReadVariableLengthUInt64());
 				case ObjectSerializer.TYPE_DECIMAL: return Task.FromResult<object>((char)Reader.ReadDecimal());
 				case ObjectSerializer.TYPE_DOUBLE: return Task.FromResult<object>((char)Reader.ReadDouble());
 				case ObjectSerializer.TYPE_SINGLE: return Task.FromResult<object>((char)Reader.ReadSingle());

@@ -151,7 +151,37 @@ namespace Waher.Persistence.Serialization
 		void Write(Guid Value);
 
 		/// <summary>
-		/// Serializes a variable-length integer value.
+		/// Serializes a variable-length 16-bit signed integer value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		void WriteVariableLengthInt16(short Value);
+
+		/// <summary>
+		/// Serializes a variable-length 32-bit signed integer value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		void WriteVariableLengthInt32(int Value);
+
+		/// <summary>
+		/// Serializes a variable-length 64-bit signed integer value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		void WriteVariableLengthInt64(long Value);
+
+		/// <summary>
+		/// Serializes a variable-length 16-bit unsigned integer value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		void WriteVariableLengthUInt16(ushort Value);
+
+		/// <summary>
+		/// Serializes a variable-length 32-bit unsigned integer value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		void WriteVariableLengthUInt32(uint Value);
+
+		/// <summary>
+		/// Serializes a variable-length 64-bit unsigned integer value.
 		/// </summary>
 		/// <param name="Value">Value</param>
 		void WriteVariableLengthUInt64(ulong Value);

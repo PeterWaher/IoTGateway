@@ -69,6 +69,12 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 				case ObjectSerializer.TYPE_UINT16: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadUInt16().ToString()));
 				case ObjectSerializer.TYPE_UINT32: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadUInt32().ToString()));
 				case ObjectSerializer.TYPE_UINT64: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadUInt64().ToString()));
+				case ObjectSerializer.TYPE_VARINT16: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadVariableLengthInt16().ToString()));
+				case ObjectSerializer.TYPE_VARINT32: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadVariableLengthInt32().ToString()));
+				case ObjectSerializer.TYPE_VARINT64: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadVariableLengthInt64().ToString()));
+				case ObjectSerializer.TYPE_VARUINT16: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadVariableLengthUInt16().ToString()));
+				case ObjectSerializer.TYPE_VARUINT32: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadVariableLengthUInt32().ToString()));
+				case ObjectSerializer.TYPE_VARUINT64: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadVariableLengthUInt64().ToString()));
 				case ObjectSerializer.TYPE_DECIMAL: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadDecimal().ToString()));
 				case ObjectSerializer.TYPE_DOUBLE: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadDouble().ToString()));
 				case ObjectSerializer.TYPE_SINGLE: return Task.FromResult<object>(new CaseInsensitiveString(Reader.ReadSingle().ToString()));

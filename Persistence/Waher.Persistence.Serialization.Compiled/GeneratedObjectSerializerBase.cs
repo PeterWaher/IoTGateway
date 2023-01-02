@@ -12,6 +12,69 @@ namespace Waher.Persistence.Serialization
 	public abstract class GeneratedObjectSerializerBase : IObjectSerializer
 	{
 		/// <summary>
+		/// First value that takes 2 bytes (or more). Values below this limit
+		/// is encoded in a shorter manner using variable-length encoding compared
+		/// to a fixed-length encoding.
+		/// </summary>
+		public const ushort UInt16VarSizeLimit = 1 << 7;
+
+		/// <summary>
+		/// First value that takes 4 bytes (or more). Values below this limit
+		/// is encoded in a shorter manner using variable-length encoding compared
+		/// to a fixed-length encoding.
+		/// </summary>
+		public const uint UInt32VarSizeLimit = 1 << (3 * 7);
+
+		/// <summary>
+		/// First value that takes 8 bytes (or more). Values below this limit
+		/// is encoded in a shorter manner using variable-length encoding compared
+		/// to a fixed-length encoding.
+		/// </summary>
+		public const ulong UInt64VarSizeLimit = 1 << (7 * 7);
+
+		/// <summary>
+		/// First positive value that takes 8 bytes (or more). Values above this 
+		/// limit is encoded in a shorter manner using variable-length encoding 
+		/// compared to a fixed-length encoding.
+		/// </summary>
+		public const long Int64VarSizeMaxLimit = (long)(UInt64VarSizeLimit >> 1);
+
+		/// <summary>
+		/// First negative value that takes 8 bytes (or more). Values above this 
+		/// limit is encoded in a shorter manner using variable-length encoding 
+		/// compared to a fixed-length encoding.
+		/// </summary>
+		public const long Int64VarSizeMinLimit = -Int64VarSizeMaxLimit - 1;
+
+		/// <summary>
+		/// First positive value that takes 4 bytes (or more). Values above this 
+		/// limit is encoded in a shorter manner using variable-length encoding 
+		/// compared to a fixed-length encoding.
+		/// </summary>
+		public const int Int32VarSizeMaxLimit = (int)(UInt32VarSizeLimit >> 1);
+
+		/// <summary>
+		/// First negative value that takes 4 bytes (or more). Values above this 
+		/// limit is encoded in a shorter manner using variable-length encoding 
+		/// compared to a fixed-length encoding.
+		/// </summary>
+		public const int Int32VarSizeMinLimit = -Int32VarSizeMaxLimit - 1;
+
+		/// <summary>
+		/// First positive value that takes 2 bytes (or more). Values above this 
+		/// limit is encoded in a shorter manner using variable-length encoding 
+		/// compared to a fixed-length encoding.
+		/// </summary>
+		public const short Int16VarSizeMaxLimit = (short)(UInt16VarSizeLimit >> 1);
+
+		/// <summary>
+		/// First negative value that takes 2 bytes (or more). Values above this 
+		/// limit is encoded in a shorter manner using variable-length encoding 
+		/// compared to a fixed-length encoding.
+		/// </summary>
+		public const short Int16VarSizeMinLimit = -Int16VarSizeMaxLimit - 1;
+
+		/// <summary>
 		/// What type of object is being serialized.
 		/// </summary>
 		public abstract bool IsNullable
@@ -82,6 +145,12 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_UINT16: return Reader.ReadUInt16() != 0;
 				case ObjectSerializer.TYPE_UINT32: return Reader.ReadUInt32() != 0;
 				case ObjectSerializer.TYPE_UINT64: return Reader.ReadUInt64() != 0;
+				case ObjectSerializer.TYPE_VARINT16: return Reader.ReadVariableLengthInt16() != 0;
+				case ObjectSerializer.TYPE_VARINT32: return Reader.ReadVariableLengthInt32() != 0;
+				case ObjectSerializer.TYPE_VARINT64: return Reader.ReadVariableLengthInt64() != 0;
+				case ObjectSerializer.TYPE_VARUINT16: return Reader.ReadVariableLengthUInt16() != 0;
+				case ObjectSerializer.TYPE_VARUINT32: return Reader.ReadVariableLengthUInt32() != 0;
+				case ObjectSerializer.TYPE_VARUINT64: return Reader.ReadVariableLengthUInt64() != 0;
 				case ObjectSerializer.TYPE_DECIMAL: return Reader.ReadDecimal() != 0;
 				case ObjectSerializer.TYPE_DOUBLE: return Reader.ReadDouble() != 0;
 				case ObjectSerializer.TYPE_SINGLE: return Reader.ReadSingle() != 0;
@@ -126,6 +195,12 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_UINT16: return (byte)Reader.ReadUInt16();
 				case ObjectSerializer.TYPE_UINT32: return (byte)Reader.ReadUInt32();
 				case ObjectSerializer.TYPE_UINT64: return (byte)Reader.ReadUInt64();
+				case ObjectSerializer.TYPE_VARINT16: return (byte)Reader.ReadVariableLengthInt16();
+				case ObjectSerializer.TYPE_VARINT32: return (byte)Reader.ReadVariableLengthInt32();
+				case ObjectSerializer.TYPE_VARINT64: return (byte)Reader.ReadVariableLengthInt64();
+				case ObjectSerializer.TYPE_VARUINT16: return (byte)Reader.ReadVariableLengthUInt16();
+				case ObjectSerializer.TYPE_VARUINT32: return (byte)Reader.ReadVariableLengthUInt32();
+				case ObjectSerializer.TYPE_VARUINT64: return (byte)Reader.ReadVariableLengthUInt64();
 				case ObjectSerializer.TYPE_DECIMAL: return (byte)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (byte)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (byte)Reader.ReadSingle();
@@ -172,6 +247,12 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_UINT16: return (sbyte)Reader.ReadUInt16();
 				case ObjectSerializer.TYPE_UINT32: return (sbyte)Reader.ReadUInt32();
 				case ObjectSerializer.TYPE_UINT64: return (sbyte)Reader.ReadUInt64();
+				case ObjectSerializer.TYPE_VARINT16: return (sbyte)Reader.ReadVariableLengthInt16();
+				case ObjectSerializer.TYPE_VARINT32: return (sbyte)Reader.ReadVariableLengthInt32();
+				case ObjectSerializer.TYPE_VARINT64: return (sbyte)Reader.ReadVariableLengthInt64();
+				case ObjectSerializer.TYPE_VARUINT16: return (sbyte)Reader.ReadVariableLengthUInt16();
+				case ObjectSerializer.TYPE_VARUINT32: return (sbyte)Reader.ReadVariableLengthUInt32();
+				case ObjectSerializer.TYPE_VARUINT64: return (sbyte)Reader.ReadVariableLengthUInt64();
 				case ObjectSerializer.TYPE_DECIMAL: return (sbyte)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (sbyte)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (sbyte)Reader.ReadSingle();
@@ -218,6 +299,12 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_UINT16: return (short)Reader.ReadUInt16();
 				case ObjectSerializer.TYPE_UINT32: return (short)Reader.ReadUInt32();
 				case ObjectSerializer.TYPE_UINT64: return (short)Reader.ReadUInt64();
+				case ObjectSerializer.TYPE_VARINT16: return (short)Reader.ReadVariableLengthInt16();
+				case ObjectSerializer.TYPE_VARINT32: return (short)Reader.ReadVariableLengthInt32();
+				case ObjectSerializer.TYPE_VARINT64: return (short)Reader.ReadVariableLengthInt64();
+				case ObjectSerializer.TYPE_VARUINT16: return (short)Reader.ReadVariableLengthUInt16();
+				case ObjectSerializer.TYPE_VARUINT32: return (short)Reader.ReadVariableLengthUInt32();
+				case ObjectSerializer.TYPE_VARUINT64: return (short)Reader.ReadVariableLengthUInt64();
 				case ObjectSerializer.TYPE_DECIMAL: return (short)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (short)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (short)Reader.ReadSingle();
@@ -264,6 +351,12 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_UINT16: return Reader.ReadUInt16();
 				case ObjectSerializer.TYPE_UINT32: return (int)Reader.ReadUInt32();
 				case ObjectSerializer.TYPE_UINT64: return (int)Reader.ReadUInt64();
+				case ObjectSerializer.TYPE_VARINT16: return (int)Reader.ReadVariableLengthInt16();
+				case ObjectSerializer.TYPE_VARINT32: return (int)Reader.ReadVariableLengthInt32();
+				case ObjectSerializer.TYPE_VARINT64: return (int)Reader.ReadVariableLengthInt64();
+				case ObjectSerializer.TYPE_VARUINT16: return (int)Reader.ReadVariableLengthUInt16();
+				case ObjectSerializer.TYPE_VARUINT32: return (int)Reader.ReadVariableLengthUInt32();
+				case ObjectSerializer.TYPE_VARUINT64: return (int)Reader.ReadVariableLengthUInt64();
 				case ObjectSerializer.TYPE_DECIMAL: return (int)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (int)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (int)Reader.ReadSingle();
@@ -303,12 +396,25 @@ namespace Waher.Persistence.Serialization
 			switch (FieldDataType)
 			{
 				case ObjectSerializer.TYPE_BYTE: return Enum.ToObject(EnumType, (int)ReadByte(Reader, FieldDataType));
-				case ObjectSerializer.TYPE_INT16: return Enum.ToObject(EnumType, (int)ReadInt16(Reader, FieldDataType));
-				case ObjectSerializer.TYPE_INT32: return Enum.ToObject(EnumType, ReadInt32(Reader, FieldDataType));
-				case ObjectSerializer.TYPE_INT64: return Enum.ToObject(EnumType, ReadInt64(Reader, FieldDataType));
+				case ObjectSerializer.TYPE_INT16:
+				case ObjectSerializer.TYPE_VARINT16:
+					return Enum.ToObject(EnumType, (int)ReadInt16(Reader, FieldDataType));
+				case ObjectSerializer.TYPE_INT32:
+				case ObjectSerializer.TYPE_VARINT32:
+					return Enum.ToObject(EnumType, ReadInt32(Reader, FieldDataType));
+				case ObjectSerializer.TYPE_INT64:
+				case ObjectSerializer.TYPE_VARINT64:
+					return Enum.ToObject(EnumType, ReadInt64(Reader, FieldDataType));
 				case ObjectSerializer.TYPE_SBYTE: return Enum.ToObject(EnumType, (int)ReadSByte(Reader, FieldDataType));
-				case ObjectSerializer.TYPE_UINT16: return Enum.ToObject(EnumType, (int)ReadUInt16(Reader, FieldDataType));
-				case ObjectSerializer.TYPE_UINT32: return Enum.ToObject(EnumType, (long)ReadUInt32(Reader, FieldDataType));
+				case ObjectSerializer.TYPE_UINT16:
+				case ObjectSerializer.TYPE_VARUINT16:
+					return Enum.ToObject(EnumType, (int)ReadUInt16(Reader, FieldDataType));
+				case ObjectSerializer.TYPE_UINT32:
+				case ObjectSerializer.TYPE_VARUINT32:
+					return Enum.ToObject(EnumType, (long)ReadUInt32(Reader, FieldDataType));
+				case ObjectSerializer.TYPE_UINT64:
+				case ObjectSerializer.TYPE_VARUINT64:
+					return Enum.ToObject(EnumType, (long)ReadUInt64(Reader, FieldDataType));
 				case ObjectSerializer.TYPE_STRING:
 				case ObjectSerializer.TYPE_CI_STRING: return Enum.Parse(EnumType, Reader.ReadString());
 				case ObjectSerializer.TYPE_NULL: return null;
@@ -338,6 +444,12 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_UINT16: return Reader.ReadUInt16();
 				case ObjectSerializer.TYPE_UINT32: return Reader.ReadUInt32();
 				case ObjectSerializer.TYPE_UINT64: return (long)Reader.ReadUInt64();
+				case ObjectSerializer.TYPE_VARINT16: return (long)Reader.ReadVariableLengthInt16();
+				case ObjectSerializer.TYPE_VARINT32: return (long)Reader.ReadVariableLengthInt32();
+				case ObjectSerializer.TYPE_VARINT64: return (long)Reader.ReadVariableLengthInt64();
+				case ObjectSerializer.TYPE_VARUINT16: return (long)Reader.ReadVariableLengthUInt16();
+				case ObjectSerializer.TYPE_VARUINT32: return (long)Reader.ReadVariableLengthUInt32();
+				case ObjectSerializer.TYPE_VARUINT64: return (long)Reader.ReadVariableLengthUInt64();
 				case ObjectSerializer.TYPE_DECIMAL: return (long)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (long)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (long)Reader.ReadSingle();
@@ -384,6 +496,12 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_UINT16: return Reader.ReadUInt16();
 				case ObjectSerializer.TYPE_UINT32: return (ushort)Reader.ReadUInt32();
 				case ObjectSerializer.TYPE_UINT64: return (ushort)Reader.ReadUInt64();
+				case ObjectSerializer.TYPE_VARINT16: return (ushort)Reader.ReadVariableLengthInt16();
+				case ObjectSerializer.TYPE_VARINT32: return (ushort)Reader.ReadVariableLengthInt32();
+				case ObjectSerializer.TYPE_VARINT64: return (ushort)Reader.ReadVariableLengthInt64();
+				case ObjectSerializer.TYPE_VARUINT16: return (ushort)Reader.ReadVariableLengthUInt16();
+				case ObjectSerializer.TYPE_VARUINT32: return (ushort)Reader.ReadVariableLengthUInt32();
+				case ObjectSerializer.TYPE_VARUINT64: return (ushort)Reader.ReadVariableLengthUInt64();
 				case ObjectSerializer.TYPE_DECIMAL: return (ushort)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (ushort)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (ushort)Reader.ReadSingle();
@@ -430,6 +548,12 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_UINT16: return Reader.ReadUInt16();
 				case ObjectSerializer.TYPE_UINT32: return Reader.ReadUInt32();
 				case ObjectSerializer.TYPE_UINT64: return (uint)Reader.ReadUInt64();
+				case ObjectSerializer.TYPE_VARINT16: return (uint)Reader.ReadVariableLengthInt16();
+				case ObjectSerializer.TYPE_VARINT32: return (uint)Reader.ReadVariableLengthInt32();
+				case ObjectSerializer.TYPE_VARINT64: return (uint)Reader.ReadVariableLengthInt64();
+				case ObjectSerializer.TYPE_VARUINT16: return (uint)Reader.ReadVariableLengthUInt16();
+				case ObjectSerializer.TYPE_VARUINT32: return (uint)Reader.ReadVariableLengthUInt32();
+				case ObjectSerializer.TYPE_VARUINT64: return (uint)Reader.ReadVariableLengthUInt64();
 				case ObjectSerializer.TYPE_DECIMAL: return (uint)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (uint)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (uint)Reader.ReadSingle();
@@ -476,6 +600,12 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_UINT16: return Reader.ReadUInt16();
 				case ObjectSerializer.TYPE_UINT32: return Reader.ReadUInt32();
 				case ObjectSerializer.TYPE_UINT64: return Reader.ReadUInt64();
+				case ObjectSerializer.TYPE_VARINT16: return (ulong)Reader.ReadVariableLengthInt16();
+				case ObjectSerializer.TYPE_VARINT32: return (ulong)Reader.ReadVariableLengthInt32();
+				case ObjectSerializer.TYPE_VARINT64: return (ulong)Reader.ReadVariableLengthInt64();
+				case ObjectSerializer.TYPE_VARUINT16: return Reader.ReadVariableLengthUInt16();
+				case ObjectSerializer.TYPE_VARUINT32: return Reader.ReadVariableLengthUInt32();
+				case ObjectSerializer.TYPE_VARUINT64: return Reader.ReadVariableLengthUInt64();
 				case ObjectSerializer.TYPE_DECIMAL: return (ulong)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (ulong)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (ulong)Reader.ReadSingle();
@@ -522,6 +652,12 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_UINT16: return Reader.ReadUInt16();
 				case ObjectSerializer.TYPE_UINT32: return Reader.ReadUInt32();
 				case ObjectSerializer.TYPE_UINT64: return Reader.ReadUInt64();
+				case ObjectSerializer.TYPE_VARINT16: return Reader.ReadVariableLengthInt16();
+				case ObjectSerializer.TYPE_VARINT32: return Reader.ReadVariableLengthInt32();
+				case ObjectSerializer.TYPE_VARINT64: return Reader.ReadVariableLengthInt64();
+				case ObjectSerializer.TYPE_VARUINT16: return Reader.ReadVariableLengthUInt16();
+				case ObjectSerializer.TYPE_VARUINT32: return Reader.ReadVariableLengthUInt32();
+				case ObjectSerializer.TYPE_VARUINT64: return Reader.ReadVariableLengthUInt64();
 				case ObjectSerializer.TYPE_DECIMAL: return Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (decimal)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (decimal)Reader.ReadSingle();
@@ -568,6 +704,12 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_UINT16: return Reader.ReadUInt16();
 				case ObjectSerializer.TYPE_UINT32: return Reader.ReadUInt32();
 				case ObjectSerializer.TYPE_UINT64: return Reader.ReadUInt64();
+				case ObjectSerializer.TYPE_VARINT16: return Reader.ReadVariableLengthInt16();
+				case ObjectSerializer.TYPE_VARINT32: return Reader.ReadVariableLengthInt32();
+				case ObjectSerializer.TYPE_VARINT64: return Reader.ReadVariableLengthInt64();
+				case ObjectSerializer.TYPE_VARUINT16: return Reader.ReadVariableLengthUInt16();
+				case ObjectSerializer.TYPE_VARUINT32: return Reader.ReadVariableLengthUInt32();
+				case ObjectSerializer.TYPE_VARUINT64: return Reader.ReadVariableLengthUInt64();
 				case ObjectSerializer.TYPE_DECIMAL: return (double)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return Reader.ReadSingle();
@@ -614,6 +756,12 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_UINT16: return Reader.ReadUInt16();
 				case ObjectSerializer.TYPE_UINT32: return Reader.ReadUInt32();
 				case ObjectSerializer.TYPE_UINT64: return Reader.ReadUInt64();
+				case ObjectSerializer.TYPE_VARINT16: return Reader.ReadVariableLengthInt16();
+				case ObjectSerializer.TYPE_VARINT32: return Reader.ReadVariableLengthInt32();
+				case ObjectSerializer.TYPE_VARINT64: return Reader.ReadVariableLengthInt64();
+				case ObjectSerializer.TYPE_VARUINT16: return Reader.ReadVariableLengthUInt16();
+				case ObjectSerializer.TYPE_VARUINT32: return Reader.ReadVariableLengthUInt32();
+				case ObjectSerializer.TYPE_VARUINT64: return Reader.ReadVariableLengthUInt64();
 				case ObjectSerializer.TYPE_DECIMAL: return (float)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (float)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return Reader.ReadSingle();
@@ -661,6 +809,12 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_UINT16: return (char)Reader.ReadUInt16();
 				case ObjectSerializer.TYPE_UINT32: return (char)Reader.ReadUInt32();
 				case ObjectSerializer.TYPE_UINT64: return (char)Reader.ReadUInt64();
+				case ObjectSerializer.TYPE_VARINT16: return (char)Reader.ReadVariableLengthInt16();
+				case ObjectSerializer.TYPE_VARINT32: return (char)Reader.ReadVariableLengthInt32();
+				case ObjectSerializer.TYPE_VARINT64: return (char)Reader.ReadVariableLengthInt64();
+				case ObjectSerializer.TYPE_VARUINT16: return (char)Reader.ReadVariableLengthUInt16();
+				case ObjectSerializer.TYPE_VARUINT32: return (char)Reader.ReadVariableLengthUInt32();
+				case ObjectSerializer.TYPE_VARUINT64: return (char)Reader.ReadVariableLengthUInt64();
 				case ObjectSerializer.TYPE_DECIMAL: return (char)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (char)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (char)Reader.ReadSingle();
@@ -865,6 +1019,12 @@ namespace Waher.Persistence.Serialization
 				case ObjectSerializer.TYPE_UINT16: return Reader.ReadUInt16().ToString();
 				case ObjectSerializer.TYPE_UINT32: return Reader.ReadUInt32().ToString();
 				case ObjectSerializer.TYPE_UINT64: return Reader.ReadUInt64().ToString();
+				case ObjectSerializer.TYPE_VARINT16: return Reader.ReadVariableLengthInt16().ToString();
+				case ObjectSerializer.TYPE_VARINT32: return Reader.ReadVariableLengthInt32().ToString();
+				case ObjectSerializer.TYPE_VARINT64: return Reader.ReadVariableLengthInt64().ToString();
+				case ObjectSerializer.TYPE_VARUINT16: return Reader.ReadVariableLengthUInt16().ToString();
+				case ObjectSerializer.TYPE_VARUINT32: return Reader.ReadVariableLengthUInt32().ToString();
+				case ObjectSerializer.TYPE_VARUINT64: return Reader.ReadVariableLengthUInt64().ToString();
 				case ObjectSerializer.TYPE_DECIMAL: return Reader.ReadDecimal().ToString();
 				case ObjectSerializer.TYPE_DOUBLE: return Reader.ReadDouble().ToString();
 				case ObjectSerializer.TYPE_SINGLE: return Reader.ReadSingle().ToString();

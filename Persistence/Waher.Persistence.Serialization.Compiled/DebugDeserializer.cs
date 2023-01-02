@@ -283,15 +283,71 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
-		/// Deserializes a variable-length integer value.
+		/// Deserializes a variable-length 16-bit signed integer value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		public short ReadVariableLengthInt16()
+		{
+			short Result = this.deserializer.ReadVariableLengthInt16();
+			this.output.WriteLine("VarInt16: " + Result);
+			return Result;
+		}
+
+		/// <summary>
+		/// Deserializes a variable-length 32-bit signed integer value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		public int ReadVariableLengthInt32()
+		{
+			int Result = this.deserializer.ReadVariableLengthInt32();
+			this.output.WriteLine("VarInt32: " + Result);
+			return Result;
+		}
+
+		/// <summary>
+		/// Deserializes a variable-length 64-bit signed integer value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		public long ReadVariableLengthInt64()
+		{
+			long Result = this.deserializer.ReadVariableLengthInt64();
+			this.output.WriteLine("VarInt64: " + Result);
+			return Result;
+		}
+
+		/// <summary>
+		/// Deserializes a variable-length 16-bit unsigned integer value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		public ushort ReadVariableLengthUInt16()
+		{
+			ushort Result = this.deserializer.ReadVariableLengthUInt16();
+			this.output.WriteLine("VarUInt16: " + Result);
+			return Result;
+		}
+
+		/// <summary>
+		/// Deserializes a variable-length 32-bit unsigned integer value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		public uint ReadVariableLengthUInt32()
+		{
+			uint Result = this.deserializer.ReadVariableLengthUInt32();
+			this.output.WriteLine("VarUInt32: " + Result);
+			return Result;
+		}
+
+		/// <summary>
+		/// Deserializes a variable-length 64-bit unsigned integer value.
 		/// </summary>
 		/// <returns>Deserialized value.</returns>
 		public ulong ReadVariableLengthUInt64()
 		{
 			ulong Result = this.deserializer.ReadVariableLengthUInt64();
-			this.output.WriteLine("VarUInt: " + Result);
+			this.output.WriteLine("VarUInt64: " + Result);
 			return Result;
 		}
+
 
 		/// <summary>
 		/// Deserializes a bit.
@@ -580,9 +636,9 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Skips a variable-length integer value.
 		/// </summary>
-		public void SkipVariableLengthUInt64()
+		public void SkipVariableLengthInteger()
 		{
-			this.deserializer.SkipVariableLengthUInt64();
+			this.deserializer.SkipVariableLengthInteger();
 			this.output.WriteLine("Skip VarUInt");
 		}
 

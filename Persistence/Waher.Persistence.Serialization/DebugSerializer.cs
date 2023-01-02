@@ -244,13 +244,63 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
-		/// Serializes a variable-length integer value.
+		/// Serializes a variable-length 16-bit signed integer value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		public void WriteVariableLengthInt16(short Value)
+		{
+			this.serializer.WriteVariableLengthInt16(Value);
+			this.output.WriteLine("VarInt16: " + Value);
+		}
+
+		/// <summary>
+		/// Serializes a variable-length 32-bit signed integer value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		public void WriteVariableLengthInt32(int Value)
+		{
+			this.serializer.WriteVariableLengthInt32(Value);
+			this.output.WriteLine("VarInt32: " + Value);
+		}
+
+		/// <summary>
+		/// Serializes a variable-length 64-bit signed integer value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		public void WriteVariableLengthInt64(long Value)
+		{
+			this.serializer.WriteVariableLengthInt64(Value);
+			this.output.WriteLine("VarInt64: " + Value);
+		}
+
+		/// <summary>
+		/// Serializes a variable-length 16-bit unsigned integer value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		public void WriteVariableLengthUInt16(ushort Value)
+		{
+			this.serializer.WriteVariableLengthUInt16(Value);
+			this.output.WriteLine("VarUInt16: " + Value);
+		}
+
+		/// <summary>
+		/// Serializes a variable-length 32-bit unsigned integer value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		public void WriteVariableLengthUInt32(uint Value)
+		{
+			this.serializer.WriteVariableLengthUInt32(Value);
+			this.output.WriteLine("VarUInt32: " + Value);
+		}
+
+		/// <summary>
+		/// Serializes a variable-length 64-bit unsigned integer value.
 		/// </summary>
 		/// <param name="Value">Value</param>
 		public void WriteVariableLengthUInt64(ulong Value)
 		{
 			this.serializer.WriteVariableLengthUInt64(Value);
-			this.output.WriteLine("VarUInt: " + Value);
+			this.output.WriteLine("VarUInt64: " + Value);
 		}
 
 		/// <summary>

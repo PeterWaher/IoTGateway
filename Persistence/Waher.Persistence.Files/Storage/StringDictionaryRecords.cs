@@ -168,6 +168,15 @@ namespace Waher.Persistence.Files.Storage
 					Reader.SkipUInt64();
 					break;
 
+				case ObjectSerializer.TYPE_VARINT16:
+				case ObjectSerializer.TYPE_VARINT32:
+				case ObjectSerializer.TYPE_VARINT64:
+				case ObjectSerializer.TYPE_VARUINT16:
+				case ObjectSerializer.TYPE_VARUINT32:
+				case ObjectSerializer.TYPE_VARUINT64:
+					Reader.SkipVariableLengthInteger();
+					break;
+
 				case ObjectSerializer.TYPE_DECIMAL:
 					Reader.SkipDecimal();
 					break;

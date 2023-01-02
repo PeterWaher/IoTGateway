@@ -1951,6 +1951,301 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.AreEqual(6, Obj2.Duration.Seconds);
 		}
 
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_22_VarLimits_Min()
+		{
+			VarLenIntegers Obj = new VarLenIntegers()
+			{
+				Short = GeneratedObjectSerializerBase.Int16VarSizeMinLimit + 1,
+				Int = GeneratedObjectSerializerBase.Int32VarSizeMinLimit + 1,
+				Long = GeneratedObjectSerializerBase.Int64VarSizeMinLimit + 1,
+				UShort = 0,
+				UInt = 0,
+				ULong = 0
+			};
+
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(VarLenIntegers));
+			object Value;
+
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Short", Obj));
+			AssertEx.Same(Obj.Short, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Int", Obj));
+			AssertEx.Same(Obj.Int, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Long", Obj));
+			AssertEx.Same(Obj.Long, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UShort", Obj));
+			AssertEx.Same(Obj.UShort, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UInt", Obj));
+			AssertEx.Same(Obj.UInt, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("ULong", Obj));
+			AssertEx.Same(Obj.ULong, Value);
+
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+
+			VarLenIntegers Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, GenObj);
+
+			Writer.Restart();
+
+			await GS.Serialize(Writer, false, false, GenObj, null);
+
+			Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Reader.Restart(Data, 0);
+			Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_23_VarLimits_Max()
+		{
+			VarLenIntegers Obj = new VarLenIntegers()
+			{
+				Short = GeneratedObjectSerializerBase.Int16VarSizeMaxLimit - 1,
+				Int = GeneratedObjectSerializerBase.Int32VarSizeMaxLimit - 1,
+				Long = GeneratedObjectSerializerBase.Int64VarSizeMaxLimit - 1,
+				UShort = GeneratedObjectSerializerBase.UInt16VarSizeLimit - 1,
+				UInt = GeneratedObjectSerializerBase.UInt32VarSizeLimit - 1,
+				ULong = GeneratedObjectSerializerBase.UInt64VarSizeLimit - 1
+			};
+
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(VarLenIntegers));
+			object Value;
+
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Short", Obj));
+			AssertEx.Same(Obj.Short, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Int", Obj));
+			AssertEx.Same(Obj.Int, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Long", Obj));
+			AssertEx.Same(Obj.Long, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UShort", Obj));
+			AssertEx.Same(Obj.UShort, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UInt", Obj));
+			AssertEx.Same(Obj.UInt, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("ULong", Obj));
+			AssertEx.Same(Obj.ULong, Value);
+
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+
+			VarLenIntegers Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, GenObj);
+
+			Writer.Restart();
+
+			await GS.Serialize(Writer, false, false, GenObj, null);
+
+			Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Reader.Restart(Data, 0);
+			Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_24_FixedLimits_Min()
+		{
+			VarLenIntegers Obj = new VarLenIntegers()
+			{
+				Short = GeneratedObjectSerializerBase.Int16VarSizeMinLimit,
+				Int = GeneratedObjectSerializerBase.Int32VarSizeMinLimit,
+				Long = GeneratedObjectSerializerBase.Int64VarSizeMinLimit,
+				UShort = 0,
+				UInt = 0,
+				ULong = 0
+			};
+
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(VarLenIntegers));
+			object Value;
+
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Short", Obj));
+			AssertEx.Same(Obj.Short, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Int", Obj));
+			AssertEx.Same(Obj.Int, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Long", Obj));
+			AssertEx.Same(Obj.Long, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UShort", Obj));
+			AssertEx.Same(Obj.UShort, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UInt", Obj));
+			AssertEx.Same(Obj.UInt, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("ULong", Obj));
+			AssertEx.Same(Obj.ULong, Value);
+
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+
+			VarLenIntegers Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, GenObj);
+
+			Writer.Restart();
+
+			await GS.Serialize(Writer, false, false, GenObj, null);
+
+			Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Reader.Restart(Data, 0);
+			Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_25_FixedLimits_Max()
+		{
+			VarLenIntegers Obj = new VarLenIntegers()
+			{
+				Short = GeneratedObjectSerializerBase.Int16VarSizeMaxLimit,
+				Int = GeneratedObjectSerializerBase.Int32VarSizeMaxLimit,
+				Long = GeneratedObjectSerializerBase.Int64VarSizeMaxLimit,
+				UShort = GeneratedObjectSerializerBase.UInt16VarSizeLimit,
+				UInt = GeneratedObjectSerializerBase.UInt32VarSizeLimit,
+				ULong = GeneratedObjectSerializerBase.UInt64VarSizeLimit
+			};
+
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(VarLenIntegers));
+			object Value;
+
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Short", Obj));
+			AssertEx.Same(Obj.Short, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Int", Obj));
+			AssertEx.Same(Obj.Int, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("Long", Obj));
+			AssertEx.Same(Obj.Long, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UShort", Obj));
+			AssertEx.Same(Obj.UShort, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("UInt", Obj));
+			AssertEx.Same(Obj.UInt, Value);
+			Assert.IsNotNull(Value = await S.TryGetFieldValue("ULong", Obj));
+			AssertEx.Same(Obj.ULong, Value);
+
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+
+			VarLenIntegers Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, GenObj);
+
+			Writer.Restart();
+
+			await GS.Serialize(Writer, false, false, GenObj, null);
+
+			Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Reader.Restart(Data, 0);
+			Obj2 = (VarLenIntegers)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+		}
+
+		internal static void AssertEqual(VarLenIntegers Obj, VarLenIntegers Obj2)
+		{
+			AssertEx.Same(Obj.Short, Obj2.Short);
+			AssertEx.Same(Obj.Int, Obj2.Int);
+			AssertEx.Same(Obj.Long, Obj2.Long);
+			AssertEx.Same(Obj.UShort, Obj2.UShort);
+			AssertEx.Same(Obj.UInt, Obj2.UInt);
+			AssertEx.Same(Obj.ULong, Obj2.ULong);
+			AssertEx.Same(Obj.ObjectId, Obj2.ObjectId);
+		}
+
+		internal static void AssertEqual(VarLenIntegers Obj, GenericObject GenObj)
+		{
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEx.Same(Obj.Short, GenObj["Short"]);
+			AssertEx.Same(Obj.Int, GenObj["Int"]);
+			AssertEx.Same(Obj.Long, GenObj["Long"]);
+			AssertEx.Same(Obj.UShort, GenObj["UShort"]);
+			AssertEx.Same(Obj.UInt, GenObj["UInt"]);
+			AssertEx.Same(Obj.ULong, GenObj["ULong"]);
+			AssertEx.Same(Obj.ObjectId, GenObj.ObjectId);
+		}
+
 		// TODO: Objects, by reference, nullable (incl. null strings, arrays)
 		// TODO: Multidimensional arrays
 	}

@@ -156,7 +156,37 @@ namespace Waher.Persistence.Serialization
 		Guid ReadGuid();
 
 		/// <summary>
-		/// Deserializes a variable-length integer value.
+		/// Deserializes a variable-length 16-bit signed integer value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		short ReadVariableLengthInt16();
+
+		/// <summary>
+		/// Deserializes a variable-length 32-bit signed integer value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		int ReadVariableLengthInt32();
+
+		/// <summary>
+		/// Deserializes a variable-length 64-bit signed integer value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		long ReadVariableLengthInt64();
+
+		/// <summary>
+		/// Deserializes a variable-length 16-bit unsigned integer value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		ushort ReadVariableLengthUInt16();
+
+		/// <summary>
+		/// Deserializes a variable-length 32-bit unsigned integer value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		uint ReadVariableLengthUInt32();
+
+		/// <summary>
+		/// Deserializes a variable-length 64-bit unsigned integer value.
 		/// </summary>
 		/// <returns>Deserialized value.</returns>
 		ulong ReadVariableLengthUInt64();
@@ -344,7 +374,7 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Skips a variable-length integer value.
 		/// </summary>
-		void SkipVariableLengthUInt64();
+		void SkipVariableLengthInteger();
 
 		/// <summary>
 		/// Skips a bit.

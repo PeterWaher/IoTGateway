@@ -49,6 +49,12 @@ namespace Waher.Persistence.Serialization.ValueTypes
 				case ObjectSerializer.TYPE_UINT16: return Task.FromResult<object>(Reader.ReadUInt16());
 				case ObjectSerializer.TYPE_UINT32: return Task.FromResult<object>((ushort)Reader.ReadUInt32());
 				case ObjectSerializer.TYPE_UINT64: return Task.FromResult<object>((ushort)Reader.ReadUInt64());
+				case ObjectSerializer.TYPE_VARINT16: return Task.FromResult<object>((ushort)Reader.ReadVariableLengthInt16());
+				case ObjectSerializer.TYPE_VARINT32: return Task.FromResult<object>((ushort)Reader.ReadVariableLengthInt32());
+				case ObjectSerializer.TYPE_VARINT64: return Task.FromResult<object>((ushort)Reader.ReadVariableLengthInt64());
+				case ObjectSerializer.TYPE_VARUINT16: return Task.FromResult<object>((ushort)Reader.ReadVariableLengthUInt16());
+				case ObjectSerializer.TYPE_VARUINT32: return Task.FromResult<object>((ushort)Reader.ReadVariableLengthUInt32());
+				case ObjectSerializer.TYPE_VARUINT64: return Task.FromResult<object>((ushort)Reader.ReadVariableLengthUInt64());
 				case ObjectSerializer.TYPE_DECIMAL: return Task.FromResult<object>((ushort)Reader.ReadDecimal());
 				case ObjectSerializer.TYPE_DOUBLE: return Task.FromResult<object>((ushort)Reader.ReadDouble());
 				case ObjectSerializer.TYPE_SINGLE: return Task.FromResult<object>((ushort)Reader.ReadSingle());
@@ -71,10 +77,23 @@ namespace Waher.Persistence.Serialization.ValueTypes
 		/// <param name="State">State object, passed on in recursive calls.</param>
 		public override Task Serialize(ISerializer Writer, bool WriteTypeCode, bool Embedded, object Value, object State)
 		{
-			if (WriteTypeCode)
-				Writer.WriteBits(ObjectSerializer.TYPE_UINT16, 6);
+			ushort i = (ushort)Value;
 
-			Writer.Write((ushort)Value);
+			if (WriteTypeCode)
+			{
+				if (i < GeneratedObjectSerializerBase.UInt16VarSizeLimit)
+				{
+					Writer.WriteBits(ObjectSerializer.TYPE_VARUINT16, 6);
+					Writer.WriteVariableLengthUInt16(i);
+				}
+				else
+				{
+					Writer.WriteBits(ObjectSerializer.TYPE_UINT16, 6);
+					Writer.Write(i);
+				}
+			}
+			else
+				Writer.Write(i);
 
 			return Task.CompletedTask;
 		}

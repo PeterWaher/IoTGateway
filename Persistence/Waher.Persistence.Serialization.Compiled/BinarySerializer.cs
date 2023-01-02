@@ -358,7 +358,90 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
-		/// Serializes a variable-length integer value.
+		/// Serializes a variable-length 16-bit signed integer value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		public void WriteVariableLengthInt16(short Value)
+		{
+			if (Value < 0)
+				this.WriteVariableLengthUInt16((ushort)((((-Value - 1)) << 1) | 1));
+			else
+				this.WriteVariableLengthUInt16((ushort)(Value << 1));
+		}
+
+
+		/// <summary>
+		/// Serializes a variable-length 32-bit signed integer value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		public void WriteVariableLengthInt32(int Value)
+		{
+			if (Value < 0)
+				this.WriteVariableLengthUInt32((((uint)(-Value - 1)) << 1) | 1);
+			else
+				this.WriteVariableLengthUInt32(((uint)Value) << 1);
+		}
+
+		/// <summary>
+		/// Serializes a variable-length 64-bit signed integer value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		public void WriteVariableLengthInt64(long Value)
+		{
+			if (Value < 0)
+				this.WriteVariableLengthUInt64((((ulong)(-Value - 1)) << 1) | 1);
+			else
+				this.WriteVariableLengthUInt64(((ulong)Value) << 1);
+		}
+
+		/// <summary>
+		/// Serializes a variable-length 16-bit unsigned integer value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		public void WriteVariableLengthUInt16(ushort Value)
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			byte b;
+
+			do
+			{
+				b = (byte)(Value & 0x7f);
+				Value >>= 7;
+				if (Value > 0)
+					b |= 0x80;
+
+				this.ms.WriteByte(b);
+			}
+			while (Value > 0);
+		}
+
+		/// <summary>
+		/// Serializes a variable-length 32-bit unsigned integer value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		public void WriteVariableLengthUInt32(uint Value)
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			byte b;
+
+			do
+			{
+				b = (byte)(Value & 0x7f);
+				Value >>= 7;
+				if (Value > 0)
+					b |= 0x80;
+
+				this.ms.WriteByte(b);
+			}
+			while (Value > 0);
+		}
+
+		/// <summary>
+		/// Serializes a variable-length 64-bit signed integer value.
 		/// </summary>
 		/// <param name="Value">Value</param>
 		public void WriteVariableLengthUInt64(ulong Value)

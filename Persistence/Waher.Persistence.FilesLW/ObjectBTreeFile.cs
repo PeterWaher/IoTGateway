@@ -878,9 +878,7 @@ namespace Waher.Persistence.Files
 
 						Block = await this.LoadBlockLocked(SourceIndex, false);
 
-						if (!(this.blocksToSave is null))
-							this.blocksToSave.Remove(SourceIndex);
-
+						this.blocksToSave?.Remove(SourceIndex);
 						this.provider.RemoveBlock(this.id, SourceIndex);
 
 						this.QueueSaveBlockLocked(DestinationIndex, Block);
@@ -912,16 +910,12 @@ namespace Waher.Persistence.Files
 					}
 					else
 					{
-						if (!(this.blocksToSave is null))
-							this.blocksToSave.Remove(DestinationIndex);
-
+						this.blocksToSave?.Remove(DestinationIndex);
 						this.provider.RemoveBlock(this.id, DestinationIndex);
 
 						if (SourceIndex != DestinationIndex)
 						{
-							if (!(this.blocksToSave is null))
-								this.blocksToSave.Remove(SourceIndex);
-
+							this.blocksToSave?.Remove(SourceIndex);
 							this.provider.RemoveBlock(this.id, SourceIndex);
 						}
 					}
@@ -1085,8 +1079,7 @@ namespace Waher.Persistence.Files
 					Array.Copy(DecryptedBlock, KeySize + 8, Result, i, NrRead);
 					i += NrRead;
 
-					if (!(Statistics is null))
-						Statistics.ReportBlobBlockStatistics((uint)(KeySize + 8 + NrRead), (uint)(this.blobBlockSize - NrRead - KeySize - 8));
+					Statistics?.ReportBlobBlockStatistics((uint)(KeySize + 8 + NrRead), (uint)(this.blobBlockSize - NrRead - KeySize - 8));
 				}
 
 				if (BlobBlockIndex != uint.MaxValue)
@@ -4726,14 +4719,17 @@ namespace Waher.Persistence.Files
 					break;
 
 				case ObjectSerializer.TYPE_INT16:
+				case ObjectSerializer.TYPE_VARINT16:
 					XmlOutput.WriteElementString("Int16", Searching.Comparison.ToString(Item, TypeCode));
 					break;
 
 				case ObjectSerializer.TYPE_INT32:
+				case ObjectSerializer.TYPE_VARINT32:
 					XmlOutput.WriteElementString("Int32", Searching.Comparison.ToString(Item, TypeCode));
 					break;
 
 				case ObjectSerializer.TYPE_INT64:
+				case ObjectSerializer.TYPE_VARINT64:
 					XmlOutput.WriteElementString("Int64", Searching.Comparison.ToString(Item, TypeCode));
 					break;
 
@@ -4762,14 +4758,17 @@ namespace Waher.Persistence.Files
 					break;
 
 				case ObjectSerializer.TYPE_UINT16:
+				case ObjectSerializer.TYPE_VARUINT16:
 					XmlOutput.WriteElementString("UInt16", Searching.Comparison.ToString(Item, TypeCode));
 					break;
 
 				case ObjectSerializer.TYPE_UINT32:
+				case ObjectSerializer.TYPE_VARUINT32:
 					XmlOutput.WriteElementString("UInt32", Searching.Comparison.ToString(Item, TypeCode));
 					break;
 
 				case ObjectSerializer.TYPE_UINT64:
+				case ObjectSerializer.TYPE_VARUINT64:
 					XmlOutput.WriteElementString("UInt64", Searching.Comparison.ToString(Item, TypeCode));
 					break;
 

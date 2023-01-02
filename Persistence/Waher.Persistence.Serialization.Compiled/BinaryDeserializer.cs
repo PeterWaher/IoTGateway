@@ -420,7 +420,95 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
-		/// Deserializes a variable-length integer value.
+		/// Deserializes a variable-length 16-bit signed integer value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		public short ReadVariableLengthInt16()
+		{
+			ushort i = this.ReadVariableLengthUInt16();
+			short j = (short)(i >> 1);
+			if ((i & 1) != 0)
+				return (short)(-j - 1);
+			else
+				return j;
+		}
+
+		/// <summary>
+		/// Deserializes a variable-length 32-bit signed integer value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		public int ReadVariableLengthInt32()
+		{
+			uint i = this.ReadVariableLengthUInt32();
+			int j = (int)(i >> 1);
+			if ((i & 1) != 0)
+				return -j - 1;
+			else
+				return j;
+		}
+
+		/// <summary>
+		/// Deserializes a variable-length 64-bit signed integer value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		public long ReadVariableLengthInt64()
+		{
+			ulong i = this.ReadVariableLengthUInt64();
+			long j = (long)(i >> 1);
+			if ((i & 1) != 0)
+				return -j - 1;
+			else
+				return j;
+		}
+
+		/// <summary>
+		/// Deserializes a variable-length 16-bit unsigned integer value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		public ushort ReadVariableLengthUInt16()
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			byte b = this.data[this.pos++];
+			ushort Result = (byte)(b & 0x7f);
+			int Offset = 0;
+
+			while ((b & 0x80) != 0)
+			{
+				Offset += 7;
+				b = this.data[this.pos++];
+				Result |= (ushort)((b & 0x7f) << Offset);
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Deserializes a variable-length 32-bit unsigned integer value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		public uint ReadVariableLengthUInt32()
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			byte b = this.data[this.pos++];
+			uint Result = (byte)(b & 0x7f);
+			int Offset = 0;
+
+			while ((b & 0x80) != 0)
+			{
+				Offset += 7;
+				b = this.data[this.pos++];
+				Result |= (uint)((b & 0x7f) << Offset);
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Deserializes a variable-length 64-bit unsigned integer value.
 		/// </summary>
 		/// <returns>Deserialized value.</returns>
 		public ulong ReadVariableLengthUInt64()
@@ -803,7 +891,7 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Skips a variable-length integer value.
 		/// </summary>
-		public void SkipVariableLengthUInt64()
+		public void SkipVariableLengthInteger()
 		{
 			if (this.bitOffset > 0)
 				this.FlushBits();

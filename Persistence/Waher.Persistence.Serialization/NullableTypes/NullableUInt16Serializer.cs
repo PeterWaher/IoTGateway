@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Waher.Persistence.Serialization.ValueTypes;
 
 namespace Waher.Persistence.Serialization.NullableTypes
 {
@@ -49,6 +50,12 @@ namespace Waher.Persistence.Serialization.NullableTypes
 				case ObjectSerializer.TYPE_UINT16: return Task.FromResult<object>((ushort?)Reader.ReadUInt16());
 				case ObjectSerializer.TYPE_UINT32: return Task.FromResult<object>((ushort?)Reader.ReadUInt32());
 				case ObjectSerializer.TYPE_UINT64: return Task.FromResult<object>((ushort?)Reader.ReadUInt64());
+				case ObjectSerializer.TYPE_VARINT16: return Task.FromResult<object>((ushort?)Reader.ReadVariableLengthInt16());
+				case ObjectSerializer.TYPE_VARINT32: return Task.FromResult<object>((ushort?)Reader.ReadVariableLengthInt32());
+				case ObjectSerializer.TYPE_VARINT64: return Task.FromResult<object>((ushort?)Reader.ReadVariableLengthInt64());
+				case ObjectSerializer.TYPE_VARUINT16: return Task.FromResult<object>((ushort?)Reader.ReadVariableLengthUInt16());
+				case ObjectSerializer.TYPE_VARUINT32: return Task.FromResult<object>((ushort?)Reader.ReadVariableLengthUInt32());
+				case ObjectSerializer.TYPE_VARUINT64: return Task.FromResult<object>((ushort?)Reader.ReadVariableLengthUInt64());
 				case ObjectSerializer.TYPE_DECIMAL: return Task.FromResult<object>((ushort?)Reader.ReadDecimal());
 				case ObjectSerializer.TYPE_DOUBLE: return Task.FromResult<object>((ushort?)Reader.ReadDouble());
 				case ObjectSerializer.TYPE_SINGLE: return Task.FromResult<object>((ushort?)Reader.ReadSingle());
@@ -81,7 +88,22 @@ namespace Waher.Persistence.Serialization.NullableTypes
 					return Task.CompletedTask;
 				}
 				else
-					Writer.WriteBits(ObjectSerializer.TYPE_UINT16, 6);
+				{
+					ushort i = Value2.Value;
+
+					if (i < GeneratedObjectSerializerBase.UInt16VarSizeLimit)
+					{
+						Writer.WriteBits(ObjectSerializer.TYPE_VARUINT16, 6);
+						Writer.WriteVariableLengthUInt16(i);
+					}
+					else
+					{
+						Writer.WriteBits(ObjectSerializer.TYPE_UINT16, 6);
+						Writer.Write(i);
+					}
+
+					return Task.CompletedTask;
+				}
 			}
 			else if (!Value2.HasValue)
 				throw new NullReferenceException("Value cannot be null.");

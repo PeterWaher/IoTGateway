@@ -54,7 +54,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 			string CollectionName;
 
 			if (!Embedded)
-				Reader.SkipVariableLengthUInt64();  // Content length.
+				Reader.SkipVariableLengthInteger();  // Content length.
 
 			if (!DataType.HasValue)
 			{
@@ -96,6 +96,24 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 
 				case ObjectSerializer.TYPE_UINT64:
 					return Reader.ReadUInt64();
+
+				case ObjectSerializer.TYPE_VARINT16:
+					return Reader.ReadVariableLengthInt16();
+
+				case ObjectSerializer.TYPE_VARINT32:
+					return Reader.ReadVariableLengthInt32();
+
+				case ObjectSerializer.TYPE_VARINT64:
+					return Reader.ReadVariableLengthInt64();
+
+				case ObjectSerializer.TYPE_VARUINT16:
+					return Reader.ReadVariableLengthUInt16();
+
+				case ObjectSerializer.TYPE_VARUINT32:
+					return Reader.ReadVariableLengthUInt32();
+
+				case ObjectSerializer.TYPE_VARUINT64:
+					return Reader.ReadVariableLengthUInt64();
 
 				case ObjectSerializer.TYPE_DECIMAL:
 					return Reader.ReadDecimal();
@@ -262,6 +280,30 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 
 					case ObjectSerializer.TYPE_UINT64:
 						Properties[FieldName] = Reader.ReadUInt64();
+						break;
+
+					case ObjectSerializer.TYPE_VARINT16:
+						Properties[FieldName] = Reader.ReadVariableLengthInt16();
+						break;
+
+					case ObjectSerializer.TYPE_VARINT32:
+						Properties[FieldName] = Reader.ReadVariableLengthInt32();
+						break;
+
+					case ObjectSerializer.TYPE_VARINT64:
+						Properties[FieldName] = Reader.ReadVariableLengthInt64();
+						break;
+
+					case ObjectSerializer.TYPE_VARUINT16:
+						Properties[FieldName] = Reader.ReadVariableLengthUInt16();
+						break;
+
+					case ObjectSerializer.TYPE_VARUINT32:
+						Properties[FieldName] = Reader.ReadVariableLengthUInt32();
+						break;
+
+					case ObjectSerializer.TYPE_VARUINT64:
+						Properties[FieldName] = Reader.ReadVariableLengthUInt64();
 						break;
 
 					case ObjectSerializer.TYPE_DECIMAL:

@@ -130,16 +130,19 @@ namespace Waher.Persistence.Files.Searching
 					break;
 
 				case ObjectSerializer.TYPE_INT16:
+				case ObjectSerializer.TYPE_VARINT16:
 					Value = (decimal)((short)Value);
 					TypeCode = ObjectSerializer.TYPE_DECIMAL;
 					break;
 
 				case ObjectSerializer.TYPE_INT32:
+				case ObjectSerializer.TYPE_VARINT32:
 					Value = (decimal)((int)Value);
 					TypeCode = ObjectSerializer.TYPE_DECIMAL;
 					break;
 
 				case ObjectSerializer.TYPE_INT64:
+				case ObjectSerializer.TYPE_VARINT64:
 					Value = (decimal)((long)Value);
 					TypeCode = ObjectSerializer.TYPE_DECIMAL;
 					break;
@@ -150,16 +153,19 @@ namespace Waher.Persistence.Files.Searching
 					break;
 
 				case ObjectSerializer.TYPE_UINT16:
+				case ObjectSerializer.TYPE_VARUINT16:
 					Value = (decimal)((ushort)Value);
 					TypeCode = ObjectSerializer.TYPE_DECIMAL;
 					break;
 
 				case ObjectSerializer.TYPE_UINT32:
+				case ObjectSerializer.TYPE_VARUINT32:
 					Value = (decimal)((uint)Value);
 					TypeCode = ObjectSerializer.TYPE_DECIMAL;
 					break;
 
 				case ObjectSerializer.TYPE_UINT64:
+				case ObjectSerializer.TYPE_VARUINT64:
 					Value = (decimal)((ulong)Value);
 					TypeCode = ObjectSerializer.TYPE_DECIMAL;
 					break;
@@ -274,6 +280,7 @@ namespace Waher.Persistence.Files.Searching
 					return true;
 
 				case ObjectSerializer.TYPE_INT16:
+				case ObjectSerializer.TYPE_VARINT16:
 					short i16 = (short)Value;
 					if (i16 == short.MaxValue)
 						Value = short.MaxValue + 1;
@@ -285,6 +292,7 @@ namespace Waher.Persistence.Files.Searching
 					return true;
 
 				case ObjectSerializer.TYPE_INT32:
+				case ObjectSerializer.TYPE_VARINT32:
 					int i32 = (int)Value;
 					if (i32 == int.MaxValue)
 						Value = (long)int.MaxValue + 1;
@@ -296,6 +304,7 @@ namespace Waher.Persistence.Files.Searching
 					return true;
 
 				case ObjectSerializer.TYPE_INT64:
+				case ObjectSerializer.TYPE_VARINT64:
 					long i64 = (long)Value;
 					if (i64 == long.MaxValue)
 						Value = (ulong)long.MaxValue + 1;
@@ -318,6 +327,7 @@ namespace Waher.Persistence.Files.Searching
 					return true;
 
 				case ObjectSerializer.TYPE_UINT16:
+				case ObjectSerializer.TYPE_VARUINT16:
 					ushort ui16 = (ushort)Value;
 					if (ui16 == ushort.MaxValue)
 						Value = (uint)ushort.MaxValue + 1;
@@ -329,6 +339,7 @@ namespace Waher.Persistence.Files.Searching
 					return true;
 
 				case ObjectSerializer.TYPE_UINT32:
+				case ObjectSerializer.TYPE_VARUINT32:
 					uint ui32 = (uint)Value;
 					if (ui32 == uint.MaxValue)
 						Value = (ulong)uint.MaxValue + 1;
@@ -340,6 +351,7 @@ namespace Waher.Persistence.Files.Searching
 					return true;
 
 				case ObjectSerializer.TYPE_UINT64:
+				case ObjectSerializer.TYPE_VARUINT64:
 					ulong ui64 = (ulong)Value;
 					if (ui64 == ulong.MaxValue)
 					{
@@ -726,6 +738,7 @@ namespace Waher.Persistence.Files.Searching
 					return true;
 
 				case ObjectSerializer.TYPE_INT16:
+				case ObjectSerializer.TYPE_VARINT16:
 					short i16 = (short)Value;
 					if (i16 == short.MinValue)
 						Value = short.MinValue - 1;
@@ -737,6 +750,7 @@ namespace Waher.Persistence.Files.Searching
 					return true;
 
 				case ObjectSerializer.TYPE_INT32:
+				case ObjectSerializer.TYPE_VARINT32:
 					int i32 = (int)Value;
 					if (i32 == int.MinValue)
 						Value = (long)int.MinValue - 1;
@@ -748,6 +762,7 @@ namespace Waher.Persistence.Files.Searching
 					return true;
 
 				case ObjectSerializer.TYPE_INT64:
+				case ObjectSerializer.TYPE_VARINT64:
 					long i64 = (long)Value;
 					if (i64 == long.MinValue)
 					{
@@ -779,6 +794,7 @@ namespace Waher.Persistence.Files.Searching
 					return true;
 
 				case ObjectSerializer.TYPE_UINT16:
+				case ObjectSerializer.TYPE_VARUINT16:
 					ushort ui16 = (ushort)Value;
 					if (ui16 == ushort.MinValue)
 						Value = (short)ushort.MinValue - 1;
@@ -790,6 +806,7 @@ namespace Waher.Persistence.Files.Searching
 					return true;
 
 				case ObjectSerializer.TYPE_UINT32:
+				case ObjectSerializer.TYPE_VARUINT32:
 					uint ui32 = (uint)Value;
 					if (ui32 == uint.MinValue)
 						Value = (int)uint.MinValue - 1;
@@ -801,6 +818,7 @@ namespace Waher.Persistence.Files.Searching
 					return true;
 
 				case ObjectSerializer.TYPE_UINT64:
+				case ObjectSerializer.TYPE_VARUINT64:
 					ulong ui64 = (ulong)Value;
 					if (ui64 == ulong.MinValue)
 						Value = (long)ulong.MinValue - 1;

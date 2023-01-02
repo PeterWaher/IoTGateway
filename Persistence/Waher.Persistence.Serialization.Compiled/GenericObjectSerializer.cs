@@ -79,7 +79,7 @@ namespace Waher.Persistence.Serialization
 			string CollectionName;
 
 			if (!Embedded)
-				Reader.SkipVariableLengthUInt64();  // Content length.
+				Reader.SkipVariableLengthInteger();  // Content length.
 
 			if (!DataType.HasValue)
 			{
@@ -121,6 +121,24 @@ namespace Waher.Persistence.Serialization
 
 				case ObjectSerializer.TYPE_UINT64:
 					return Reader.ReadUInt64();
+
+				case ObjectSerializer.TYPE_VARINT16:
+					return Reader.ReadVariableLengthInt16();
+
+				case ObjectSerializer.TYPE_VARINT32:
+					return Reader.ReadVariableLengthInt32();
+
+				case ObjectSerializer.TYPE_VARINT64:
+					return Reader.ReadVariableLengthInt64();
+
+				case ObjectSerializer.TYPE_VARUINT16:
+					return Reader.ReadVariableLengthUInt16();
+
+				case ObjectSerializer.TYPE_VARUINT32:
+					return Reader.ReadVariableLengthUInt32();
+
+				case ObjectSerializer.TYPE_VARUINT64:
+					return Reader.ReadVariableLengthUInt64();
 
 				case ObjectSerializer.TYPE_DECIMAL:
 					return Reader.ReadDecimal();
@@ -283,6 +301,30 @@ namespace Waher.Persistence.Serialization
 
 						case ObjectSerializer.TYPE_UINT64:
 							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadUInt64()));
+							break;
+
+						case ObjectSerializer.TYPE_VARINT16:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthInt16()));
+							break;
+
+						case ObjectSerializer.TYPE_VARINT32:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthInt32()));
+							break;
+
+						case ObjectSerializer.TYPE_VARINT64:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthInt64()));
+							break;
+
+						case ObjectSerializer.TYPE_VARUINT16:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthUInt16()));
+							break;
+
+						case ObjectSerializer.TYPE_VARUINT32:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthUInt32()));
+							break;
+
+						case ObjectSerializer.TYPE_VARUINT64:
+							Properties.AddLast(new KeyValuePair<string, object>(FieldName, Reader.ReadVariableLengthUInt64()));
 							break;
 
 						case ObjectSerializer.TYPE_DECIMAL:

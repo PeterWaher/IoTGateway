@@ -78,7 +78,7 @@ namespace Waher.Persistence.Serialization
 
 			if (DataType == ObjectSerializer.TYPE_MAX)
 			{
-				Reader.SkipVariableLengthUInt64();
+				Reader.SkipVariableLengthInteger();
 				DataType = Reader.ReadBits(6);
 			}
 
@@ -144,6 +144,30 @@ namespace Waher.Persistence.Serialization
 
 				case ObjectSerializer.TYPE_UINT64:
 					Value = Reader.ReadUInt64();
+					break;
+
+				case ObjectSerializer.TYPE_VARINT16:
+					Value = Reader.ReadVariableLengthInt16();
+					break;
+
+				case ObjectSerializer.TYPE_VARINT32:
+					Value = Reader.ReadVariableLengthInt32();
+					break;
+
+				case ObjectSerializer.TYPE_VARINT64:
+					Value = Reader.ReadVariableLengthInt64();
+					break;
+
+				case ObjectSerializer.TYPE_VARUINT16:
+					Value = Reader.ReadVariableLengthUInt16();
+					break;
+
+				case ObjectSerializer.TYPE_VARUINT32:
+					Value = Reader.ReadVariableLengthUInt32();
+					break;
+
+				case ObjectSerializer.TYPE_VARUINT64:
+					Value = Reader.ReadVariableLengthUInt64();
 					break;
 
 				case ObjectSerializer.TYPE_DECIMAL:

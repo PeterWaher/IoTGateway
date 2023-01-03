@@ -45,15 +45,32 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_01_InsertObject()
 		{
-			TestClass Obj = new()
+			TaskCompletionSource<bool> Result = new();
+			Task ObjectIndexed(object Sender, ObjectReferenceEventArgs e)
 			{
-				IndexedProperty1 = "Hello World.",
-				IndexedProperty2 = "Kilroy was here.",
-				NonIndexedProperty1 = "This is a test.",
-				NonIndexedProperty2 = "Testing indexation."
+				Result.TrySetResult(true);
+				return Task.CompletedTask;
 			};
 
-			await Database.Insert(Obj);
+			FullTextSearchModule.ObjectAddedToIndex += ObjectIndexed;
+			try
+			{
+				TestClass Obj = new()
+				{
+					IndexedProperty1 = "Hello World.",
+					IndexedProperty2 = "Kilroy was here.",
+					NonIndexedProperty1 = "This is a test.",
+					NonIndexedProperty2 = "Testing indexation."
+				};
+
+				await Database.Insert(Obj);
+
+				Assert.IsTrue(await Result.Task);
+			}
+			finally
+			{
+				FullTextSearchModule.ObjectAddedToIndex -= ObjectIndexed;
+			}
 		}
 
 		// TODO: GenericObject tests

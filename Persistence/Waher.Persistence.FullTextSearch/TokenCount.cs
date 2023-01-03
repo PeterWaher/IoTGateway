@@ -1,4 +1,6 @@
-﻿using Waher.Persistence.Attributes;
+﻿using System;
+using System.Text;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Persistence.FullTextSearch
 {
@@ -12,7 +14,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// Represents a token and a corresponding occurrence count.
 		/// </summary>
 		public TokenCount()
-		{ 
+		{
 		}
 
 		/// <summary>
@@ -39,5 +41,22 @@ namespace Waher.Persistence.FullTextSearch
 		/// Reference is stored in this block in the full-text-search index.
 		/// </summary>
 		public uint Block { get; set; }
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(this.Token);
+			sb.Append(':');
+			sb.Append(this.Count);
+			sb.Append(" (");
+			sb.Append(this.Block.ToString());
+			sb.Append(')');
+
+			return sb.ToString();
+		}
 	}
 }

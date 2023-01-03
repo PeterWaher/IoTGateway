@@ -9,17 +9,23 @@ namespace Waher.Persistence.FullTextSearch
 	/// </summary>
 	internal class TypeInformation
 	{
-		private Dictionary<string, KeyValuePair<PropertyInfo, FieldInfo>> properties = new Dictionary<string, KeyValuePair<PropertyInfo, FieldInfo>>();
+		private readonly Dictionary<string, KeyValuePair<PropertyInfo, FieldInfo>> properties = new Dictionary<string, KeyValuePair<PropertyInfo, FieldInfo>>();
 
 		/// <summary>
 		/// Contains information about a type, in relation to full-text-search.
 		/// </summary>
 		/// <param name="Type">Type</param>
 		/// <param name="TypeInfo">Type information.</param>
-		public TypeInformation(Type Type, TypeInfo TypeInfo)
+		/// <param name="CollectionName">Collection name for objects of the corresponding type.</param>
+		/// <param name="CollectionInformation">Indexing information for a collection.</param>
+		public TypeInformation(Type Type, TypeInfo TypeInfo, string CollectionName, 
+			CollectionInformation CollectionInformation)
 		{
 			this.Type = Type;
 			this.TypeInfo = TypeInfo;
+			this.CollectionName = CollectionName;
+			this.HasCollection = !string.IsNullOrEmpty(CollectionName);
+			this.CollectionInformation = CollectionInformation;
 		}
 
 		/// <summary>
@@ -33,13 +39,19 @@ namespace Waher.Persistence.FullTextSearch
 		public TypeInfo TypeInfo { get; }
 
 		/// <summary>
-		/// Information about associated collection.
+		/// Collection name for objects of the corresponding type.
 		/// </summary>
-		public CollectionInformation CollectionInformation
-		{
-			get;
-			internal set;
-		}
+		public string CollectionName { get; }
+
+		/// <summary>
+		/// If a collection-name is defined.
+		/// </summary>
+		public bool HasCollection { get; }
+
+		/// <summary>
+		/// Indexing information for a collection.
+		/// </summary>
+		public CollectionInformation CollectionInformation { get; }
 
 		/// <summary>
 		/// Gets the indexable property values from an object. Property values will be returned in lower-case.

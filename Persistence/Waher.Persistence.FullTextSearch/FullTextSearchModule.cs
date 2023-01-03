@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence.Attributes;
@@ -19,7 +20,9 @@ namespace Waher.Persistence.FullTextSearch
 	public class FullTextSearchModule : IModule
 	{
 		private static IPersistentDictionary collectionInformation;
-		private static Dictionary<Type, TypeInformation> typesChecked;
+		private static Dictionary<string, CollectionInformation> collections;
+		private static Dictionary<Type, TypeInformation> types;
+		private static SemaphoreSlim synchObj;
 
 		/// <summary>
 		/// Full-text search module, controlling the life-cycle of the full-text-search engine.
@@ -34,11 +37,14 @@ namespace Waher.Persistence.FullTextSearch
 		public async Task Start()
 		{
 			collectionInformation = await Database.GetDictionary("FullTextSearchSettings");
-			typesChecked = new Dictionary<Type, TypeInformation>();
+			collections = new Dictionary<string, CollectionInformation>();
+			types = new Dictionary<Type, TypeInformation>();
 
-			Database.ObjectInserted += this.Database_ObjectInserted;
-			Database.ObjectUpdated += this.Database_ObjectUpdated;
-			Database.ObjectDeleted += this.Database_ObjectDeleted;
+			synchObj = new SemaphoreSlim(1);
+
+			Database.ObjectInserted += Database_ObjectInserted;
+			Database.ObjectUpdated += Database_ObjectUpdated;
+			Database.ObjectDeleted += Database_ObjectDeleted;
 		}
 
 		/// <summary>
@@ -46,24 +52,32 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		public Task Stop()
 		{
-			Database.ObjectInserted -= this.Database_ObjectInserted;
-			Database.ObjectUpdated -= this.Database_ObjectUpdated;
-			Database.ObjectDeleted -= this.Database_ObjectDeleted;
+			Database.ObjectInserted -= Database_ObjectInserted;
+			Database.ObjectUpdated -= Database_ObjectUpdated;
+			Database.ObjectDeleted -= Database_ObjectDeleted;
+
+			// TODO: Wait for current objects to be finished.
+
+			synchObj.Dispose();
+			synchObj = null;
 
 			collectionInformation.Dispose();
 			collectionInformation = null;
 
-			typesChecked.Clear();
-			typesChecked = null;
+			collections.Clear();
+			collections = null;
+
+			types.Clear();
+			types = null;
 
 			return Task.CompletedTask;
 		}
 
-		private async void Database_ObjectInserted(object Sender, ObjectEventArgs e)
+		private static async void Database_ObjectInserted(object Sender, ObjectEventArgs e)
 		{
 			try
 			{
-				Tuple<CollectionInformation, TypeInformation, GenericObject> P = await this.Process(e.Object);
+				Tuple<CollectionInformation, TypeInformation, GenericObject> P = await Prepare(e.Object);
 				if (P is null)
 					return;
 
@@ -156,12 +170,25 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="Obj">Generic object.</param>
 		/// <param name="PropertyNames">Indexable property names.</param>
 		/// <returns>Indexable property values found.</returns>
-		public static Dictionary<string, string> GetIndexableProperties(object Obj, params string[] PropertyNames)
+		public static async Task<Dictionary<string, string>> GetIndexableProperties(object Obj, params string[] PropertyNames)
 		{
-			Type T = Obj?.GetType() ?? typeof(object);
-			TypeInfo TI = T.GetTypeInfo();
-			TypeInformation TypeInfo = new TypeInformation(T, TI);
-			return TypeInfo.GetIndexableProperties(Obj, PropertyNames);
+			if (Obj is null)
+				return new Dictionary<string, string>();
+			else if (Obj is GenericObject GenObj)
+				return GetIndexableProperties(GenObj, PropertyNames);
+			else
+			{
+				await synchObj.WaitAsync();
+				try
+				{
+					TypeInformation TypeInfo = await GetTypeInfoLocked(Obj.GetType());
+					return TypeInfo.GetIndexableProperties(Obj, PropertyNames);
+				}
+				finally
+				{
+					synchObj.Release();
+				}
+			}
 		}
 
 		/// <summary>
@@ -174,115 +201,216 @@ namespace Waher.Persistence.FullTextSearch
 		{
 			Dictionary<string, string> Result = new Dictionary<string, string>();
 
-			foreach (string PropertyName in PropertyNames)
+			if (!(Obj is null))
 			{
-				if (Obj.TryGetFieldValue(PropertyName, out object Value))
+				foreach (string PropertyName in PropertyNames)
 				{
-					if (Value is string s)
-						Result[PropertyName] = s.ToLower();
-					else if (Value is CaseInsensitiveString cis)
-						Result[PropertyName] = cis.LowerCase;
+					if (Obj.TryGetFieldValue(PropertyName, out object Value))
+					{
+						if (Value is string s)
+							Result[PropertyName] = s.ToLower();
+						else if (Value is CaseInsensitiveString cis)
+							Result[PropertyName] = cis.LowerCase;
+					}
 				}
 			}
 
 			return Result;
 		}
 
-		private async Task<Tuple<CollectionInformation, TypeInformation, GenericObject>> Process(object Object)
+		private static async Task<CollectionInformation> GetCollectionInfoLocked(string CollectionName, bool CreateIfNotExists)
 		{
-			CollectionInformation CollectionInfo;
-			string CollectionName;
+			if (collections.TryGetValue(CollectionName, out CollectionInformation Result))
+				return Result;
 
-			if (Object is GenericObject GenObj)
+			KeyValuePair<bool, object> P = await collectionInformation.TryGetValueAsync(CollectionName);
+			if (P.Key && P.Value is CollectionInformation Result2)
 			{
-				CollectionName = GenObj.CollectionName;
-				KeyValuePair<bool, object> P = await collectionInformation.TryGetValueAsync(CollectionName);
-
-				if (!P.Key || (CollectionInfo = P.Value as CollectionInformation) is null)
-				{
-					CollectionInfo = new CollectionInformation(CollectionName, false);
-					await collectionInformation.AddAsync(CollectionName, CollectionInfo, true);
-					return null;
-				}
-				else if (CollectionInfo.IndexForFullTextSearch)
-					return new Tuple<CollectionInformation, TypeInformation, GenericObject>(CollectionInfo, null, GenObj);
-				else
-					return null;
+				collections[CollectionName] = Result2;
+				return Result2;
 			}
-			else
+
+			if (!CreateIfNotExists)
+				return null;
+
+			Result = new CollectionInformation(CollectionName, CollectionName, false);
+			collections[CollectionName] = Result;
+			await collectionInformation.AddAsync(CollectionName, Result, true);
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Defines the Full-text-search index collection name, for objects in a given collection.
+		/// </summary>
+		/// <param name="IndexCollection">Collection name for full-text-search index of objects in the given collection.</param>
+		/// <param name="CollectionName">Collection of objects to index.</param>
+		public static async Task SetFullTextSearchIndexCollection(string IndexCollection, string CollectionName)
+		{
+			await synchObj.WaitAsync();
+			try
 			{
-				Type T = Object.GetType();
-				TypeInformation TypeInfo;
-				bool New;
+				CollectionInformation Info = await GetCollectionInfoLocked(CollectionName, true);
 
-				lock (typesChecked)
+				if (Info.IndexCollectionName != IndexCollection)
 				{
-					if (typesChecked.TryGetValue(T, out TypeInfo))
-					{
-						CollectionInfo = TypeInfo.CollectionInformation;
-						if (CollectionInfo is null || !CollectionInfo.IndexForFullTextSearch)
-							return null;
-
-						CollectionName = CollectionInfo.CollectionName;
-						New = false;
-					}
-					else
-					{
-						TypeInfo TI = T.GetTypeInfo();
-
-						FullTextSearchAttribute SearchAttr = TI.GetCustomAttribute<FullTextSearchAttribute>(true);
-						CollectionNameAttribute CollectionAttr = TI.GetCustomAttribute<CollectionNameAttribute>(true);
-
-						if (CollectionAttr is null)
-						{
-							typesChecked[T] = new TypeInformation(T, TI)
-							{
-								CollectionInformation = new CollectionInformation(string.Empty, false)
-							};
-
-							return null;
-						}
-						else
-						{
-							CollectionName = CollectionAttr.Name;
-
-							if (SearchAttr is null)
-								CollectionInfo = new CollectionInformation(CollectionName, false);
-							else
-								CollectionInfo = new CollectionInformation(CollectionName, true, SearchAttr.PropertyNames);
-
-							typesChecked[T] = TypeInfo = new TypeInformation(T, TI)
-							{
-								CollectionInformation = CollectionInfo
-							};
-
-							New = true;
-						}
-					}
+					Info.IndexCollectionName = IndexCollection;
+					await collectionInformation.AddAsync(Info.CollectionName, Info, true);
 				}
-
-				if (New)
-				{
-					KeyValuePair<bool, object> P = await collectionInformation.TryGetValueAsync(CollectionName);
-
-					if (P.Key && P.Value is CollectionInformation CollectionInfo0)
-						TypeInfo.CollectionInformation = CollectionInfo = CollectionInfo0;
-					else
-						await collectionInformation.AddAsync(CollectionName, CollectionInfo, true);
-				}
-
-				if (!CollectionInfo.IndexForFullTextSearch)
-					return null;
-
-				return new Tuple<CollectionInformation, TypeInformation, GenericObject>(CollectionInfo, TypeInfo, null);
+			}
+			finally
+			{
+				synchObj.Release();
 			}
 		}
 
-		private async void Database_ObjectUpdated(object Sender, ObjectEventArgs e)
+		/// <summary>
+		/// Adds properties for full-text-search indexation.
+		/// </summary>
+		/// <param name="CollectionName">Collection name.</param>
+		/// <param name="Properties">Properties to index.</param>
+		/// <returns>If new property names were found and added.</returns>
+		public static async Task<bool> AddFullTextSearch(string CollectionName, params string[] Properties)
+		{
+			await synchObj.WaitAsync();
+			try
+			{
+				CollectionInformation Info = await GetCollectionInfoLocked(CollectionName, true);
+
+				if (Info.AddIndexableProperties(Properties))
+				{
+					await collectionInformation.AddAsync(Info.CollectionName, Info, true);
+					return true;
+				}
+				else
+					return false;
+			}
+			finally
+			{
+				synchObj.Release();
+			}
+		}
+
+		/// <summary>
+		/// Removes properties from full-text-search indexation.
+		/// </summary>
+		/// <param name="CollectionName">Collection name.</param>
+		/// <param name="Properties">Properties to remove from indexation.</param>
+		/// <returns>If property names were found and removed.</returns>
+		public static async Task<bool> RemoveFullTextSearch(string CollectionName, params string[] Properties)
+		{
+			await synchObj.WaitAsync();
+			try
+			{
+				CollectionInformation Info = await GetCollectionInfoLocked(CollectionName, true);
+
+				if (Info.RemoveIndexableProperties(Properties))
+				{
+					await collectionInformation.AddAsync(Info.CollectionName, Info, true);
+					return true;
+				}
+				else
+					return false;
+			}
+			finally
+			{
+				synchObj.Release();
+			}
+		}
+
+		/// <summary>
+		/// Gets indexed properties for full-text-search indexation.
+		/// </summary>
+		/// <param name="CollectionName">Collection name.</param>
+		/// <returns>Array of indexed properties.</returns>
+		public static async Task<string[]> GetFullTextSearchIndexedProperties(string CollectionName)
+		{
+			await synchObj.WaitAsync();
+			try
+			{
+				CollectionInformation Info = await GetCollectionInfoLocked(CollectionName, false);
+
+				if (Info is null || !Info.IndexForFullTextSearch)
+					return new string[0];
+				else
+					return (string[])Info.PropertyNames.Clone();
+			}
+			finally
+			{
+				synchObj.Release();
+			}
+		}
+
+		private static async Task<Tuple<CollectionInformation, TypeInformation, GenericObject>> Prepare(object Object)
+		{
+			await synchObj.WaitAsync();
+			try
+			{
+				if (Object is GenericObject GenObj)
+					return await PrepareLocked(GenObj);
+				else
+					return await PrepareLocked(Object.GetType());
+			}
+			finally
+			{
+				synchObj.Release();
+			}
+		}
+
+		private static async Task<Tuple<CollectionInformation, TypeInformation, GenericObject>> PrepareLocked(GenericObject GenObj)
+		{
+			CollectionInformation CollectionInfo = await GetCollectionInfoLocked(GenObj.CollectionName, true);
+
+			if (CollectionInfo.IndexForFullTextSearch)
+				return new Tuple<CollectionInformation, TypeInformation, GenericObject>(CollectionInfo, null, GenObj);
+			else
+				return null;
+		}
+
+		private static async Task<TypeInformation> GetTypeInfoLocked(Type T)
+		{
+			if (types.TryGetValue(T, out TypeInformation Result))
+				return Result;
+
+			TypeInfo TI = T.GetTypeInfo();
+			FullTextSearchAttribute SearchAttr = TI.GetCustomAttribute<FullTextSearchAttribute>(true);
+			CollectionNameAttribute CollectionAttr = TI.GetCustomAttribute<CollectionNameAttribute>(true);
+
+			if (CollectionAttr is null)
+				Result = new TypeInformation(T, TI, null, null);
+			else
+			{
+				string CollectionName = CollectionAttr.Name;
+				CollectionInformation Info = await GetCollectionInfoLocked(CollectionName, true);
+
+				Result = new TypeInformation(T, TI, CollectionName, Info);
+
+				if (!(SearchAttr is null) && Info.AddIndexableProperties(SearchAttr.PropertyNames))
+					await collectionInformation.AddAsync(CollectionName, Info, true);
+			}
+
+			types[T] = Result;
+
+			return Result;
+		}
+
+		private static async Task<Tuple<CollectionInformation, TypeInformation, GenericObject>> PrepareLocked(Type T)
+		{
+			TypeInformation TypeInfo = await GetTypeInfoLocked(T);
+			if (!TypeInfo.HasCollection)
+				return null;
+
+			if (!TypeInfo.CollectionInformation?.IndexForFullTextSearch ?? false)
+				return null;
+
+			return new Tuple<CollectionInformation, TypeInformation, GenericObject>(TypeInfo.CollectionInformation, TypeInfo, null);
+		}
+
+		private static async void Database_ObjectUpdated(object Sender, ObjectEventArgs e)
 		{
 			try
 			{
-				Tuple<CollectionInformation, TypeInformation, GenericObject> P = await this.Process(e.Object);
+				Tuple<CollectionInformation, TypeInformation, GenericObject> P = await Prepare(e.Object);
 				if (P is null)
 					return;
 
@@ -293,11 +421,11 @@ namespace Waher.Persistence.FullTextSearch
 			}
 		}
 
-		private async void Database_ObjectDeleted(object Sender, ObjectEventArgs e)
+		private static async void Database_ObjectDeleted(object Sender, ObjectEventArgs e)
 		{
 			try
 			{
-				Tuple<CollectionInformation, TypeInformation, GenericObject> P = await this.Process(e.Object);
+				Tuple<CollectionInformation, TypeInformation, GenericObject> P = await Prepare(e.Object);
 				if (P is null)
 					return;
 

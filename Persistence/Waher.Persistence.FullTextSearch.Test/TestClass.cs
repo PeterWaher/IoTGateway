@@ -3,7 +3,7 @@
 namespace Waher.Persistence.FullTextSearch.Test
 {
 	[CollectionName("Test")]
-	[FullTextSearch(nameof(IndexedProperty1), nameof(IndexedProperty2))]
+	[FullTextSearch("FullTextSearch", nameof(IndexedProperty1), nameof(IndexedProperty2))]
 	public class TestClass
 	{
 		[ObjectId]

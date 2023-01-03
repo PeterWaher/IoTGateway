@@ -30,7 +30,7 @@ namespace Waher.Persistence.Serialization
 		/// is encoded in a shorter manner using variable-length encoding compared
 		/// to a fixed-length encoding.
 		/// </summary>
-		public const ulong UInt64VarSizeLimit = 1 << (7 * 7);
+		public const ulong UInt64VarSizeLimit = 1UL << (7 * 7);
 
 		/// <summary>
 		/// First positive value that takes 8 bytes (or more). Values above this 

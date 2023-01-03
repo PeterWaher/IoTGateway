@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
@@ -21,6 +22,7 @@ namespace Waher.Persistence.FullTextSearch
 	{
 		private static IPersistentDictionary collectionInformation;
 		private static Dictionary<string, CollectionInformation> collections;
+		private static Dictionary<string, IPersistentDictionary> indices;
 		private static Dictionary<Type, TypeInformation> types;
 		private static SemaphoreSlim synchObj;
 
@@ -36,49 +38,65 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		public async Task Start()
 		{
-			collectionInformation = await Database.GetDictionary("FullTextSearchSettings");
+			collectionInformation = await Database.GetDictionary("FullTextSearchCollections");
 			collections = new Dictionary<string, CollectionInformation>();
+			indices = new Dictionary<string, IPersistentDictionary>();
 			types = new Dictionary<Type, TypeInformation>();
 
 			synchObj = new SemaphoreSlim(1);
 
-			Database.ObjectInserted += Database_ObjectInserted;
-			Database.ObjectUpdated += Database_ObjectUpdated;
-			Database.ObjectDeleted += Database_ObjectDeleted;
+			Database.ObjectInserted += this.Database_ObjectInserted;
+			Database.ObjectUpdated += this.Database_ObjectUpdated;
+			Database.ObjectDeleted += this.Database_ObjectDeleted;
 		}
 
 		/// <summary>
 		/// Stops the module.
 		/// </summary>
-		public Task Stop()
+		public async Task Stop()
 		{
-			Database.ObjectInserted -= Database_ObjectInserted;
-			Database.ObjectUpdated -= Database_ObjectUpdated;
-			Database.ObjectDeleted -= Database_ObjectDeleted;
+			Database.ObjectInserted -= this.Database_ObjectInserted;
+			Database.ObjectUpdated -= this.Database_ObjectUpdated;
+			Database.ObjectDeleted -= this.Database_ObjectDeleted;
 
 			// TODO: Wait for current objects to be finished.
 
-			synchObj.Dispose();
-			synchObj = null;
+			await synchObj.WaitAsync();
+			try
+			{
+				foreach (IPersistentDictionary Index in indices.Values)
+					Index.Dispose();
 
-			collectionInformation.Dispose();
-			collectionInformation = null;
+				indices.Clear();
+				indices = null;
 
-			collections.Clear();
-			collections = null;
+				collectionInformation.Dispose();
+				collectionInformation = null;
 
-			types.Clear();
-			types = null;
+				collections.Clear();
+				collections = null;
 
-			return Task.CompletedTask;
+				types.Clear();
+				types = null;
+			}
+			finally
+			{
+				synchObj.Release();
+				synchObj.Dispose();
+				synchObj = null;
+			}
 		}
 
-		private static async void Database_ObjectInserted(object Sender, ObjectEventArgs e)
+		private async void Database_ObjectInserted(object Sender, ObjectEventArgs e)
 		{
 			try
 			{
 				Tuple<CollectionInformation, TypeInformation, GenericObject> P = await Prepare(e.Object);
 				if (P is null)
+					return;
+
+				object ObjectId = await Database.TryGetObjectId(e.Object);
+				if (ObjectId is null)
 					return;
 
 				CollectionInformation CollectionInfo = P.Item1;
@@ -91,11 +109,40 @@ namespace Waher.Persistence.FullTextSearch
 				else
 					IndexableProperties = GetIndexableProperties(GenObj, CollectionInfo.PropertyNames);
 
-				Dictionary<string, int> Tokens = Tokenize(IndexableProperties.Values);
-				if (Tokens.Count == 0)
+				if (IndexableProperties.Count == 0)
 					return;
 
+				TokenCount[] Tokens = Tokenize(IndexableProperties.Values);
+				if (Tokens is null)
+					return;
 
+				ObjectReference Ref;
+
+				await synchObj.WaitAsync();
+				try
+				{
+					ulong Index = await GetNextIndexNrLocked(CollectionInfo.IndexCollectionName);
+
+					Ref = new ObjectReference()
+					{
+						IndexCollection = CollectionInfo.IndexCollectionName,
+						Collection = CollectionInfo.CollectionName,
+						ObjectInstanceId = ObjectId,
+						Index = Index,
+						Tokens = Tokens
+					};
+
+					await AddTokensToIndexLocked(Ref);
+					await Database.Insert(Ref);
+				}
+				finally
+				{
+					synchObj.Release();
+				}
+
+				ObjectReferenceEventHandler h = ObjectAddedToIndex;
+				if (!(h is null))
+					await h(this, new ObjectReferenceEventArgs(Ref));
 			}
 			catch (Exception ex)
 			{
@@ -104,13 +151,117 @@ namespace Waher.Persistence.FullTextSearch
 		}
 
 		/// <summary>
+		/// Event raised when a new object instance has been indexed in the
+		/// full-text-search index.
+		/// </summary>
+		public static event ObjectReferenceEventHandler ObjectAddedToIndex;
+
+		private static async Task<IPersistentDictionary> GetIndexLocked(string IndexCollection)
+		{
+			if (indices.TryGetValue(IndexCollection, out IPersistentDictionary Result))
+				return Result;
+
+			Result = await Database.GetDictionary(IndexCollection);
+			indices[IndexCollection] = Result;
+
+			return Result;
+		}
+
+		private static async Task AddTokensToIndexLocked(ObjectReference Ref)
+		{
+			DateTime TP = DateTime.UtcNow;
+			IPersistentDictionary Index = await GetIndexLocked(Ref.IndexCollection);
+
+			foreach (TokenCount Token in Ref.Tokens)
+			{
+				KeyValuePair<bool, object> P = await Index.TryGetValueAsync(Token.Token);
+				int c;
+
+				if (!P.Key || !(P.Value is TokenReferences References))
+				{
+					References = new TokenReferences()
+					{
+						LastBlock = 0,
+						ObjectReferences = new ulong[] { Ref.Index },
+						Counts = new uint[] { Token.Count },
+						Timestamps = new DateTime[] { TP }
+					};
+
+					await Index.AddAsync(Token.Token, References, true);
+				}
+				else if ((c = References.ObjectReferences.Length) < TokenReferences.MaxReferences)
+				{
+					ulong[] NewReferences = new ulong[c + 1];
+					uint[] NewCounts = new uint[c + 1];
+					DateTime[] NewTimestamps = new DateTime[c + 1];
+
+					Array.Copy(References.ObjectReferences, 0, NewReferences, 0, c);
+					Array.Copy(References.Counts, 0, NewCounts, 0, c);
+					Array.Copy(References.Timestamps, 0, NewTimestamps, 0, c);
+
+					NewReferences[c] = Ref.Index;
+					NewCounts[c] = Token.Count;
+					NewTimestamps[c] = TP;
+
+					References.ObjectReferences = NewReferences;
+					References.Counts = NewCounts;
+					References.Timestamps = NewTimestamps;
+
+					await Index.AddAsync(Token.Token, References, true);
+				}
+				else
+				{
+					References.LastBlock++;
+
+					TokenReferences NewBlock = new TokenReferences()
+					{
+						LastBlock = 0,
+						Counts = References.Counts,
+						ObjectReferences = References.ObjectReferences,
+						Timestamps = References.Timestamps
+					};
+
+					await Index.AddAsync(Token + " " + References.LastBlock.ToString(), NewBlock, true);
+
+					References.ObjectReferences = new ulong[] { Ref.Index };
+					References.Counts = new uint[] { Token.Count };
+					References.Timestamps = new DateTime[] { TP };
+
+					await Index.AddAsync(Token.Token, References, true);
+				}
+
+				Token.Block = References.LastBlock + 1;
+			}
+		}
+
+		private static async Task RemoveTokensFromIndexLocked(ObjectReference Ref)
+		{
+			// TODO
+		}
+
+		private static async Task<ulong> GetNextIndexNrLocked(string IndexedCollection)
+		{
+			string Key = " C(" + IndexedCollection + ")";
+			KeyValuePair<bool, object> P = await collectionInformation.TryGetValueAsync(Key);
+
+			if (!P.Key || !(P.Value is ulong Nr))
+				Nr = 0;
+
+			Nr++;
+
+			await collectionInformation.AddAsync(Key, Nr, true);
+
+			return Nr;
+		}
+
+		/// <summary>
 		/// Tokenizes a set of strings.
 		/// </summary>
 		/// <param name="Text">Enumerable set of strings to tokenize.</param>
 		/// <returns>Tokens found, with associated counts.</returns>
-		public static Dictionary<string, int> Tokenize(IEnumerable<string> Text)
+		public static TokenCount[] Tokenize(IEnumerable<string> Text)
 		{
-			Dictionary<string, int> Result = new Dictionary<string, int>();
+			Dictionary<string, uint> Result = new Dictionary<string, uint>();
 			UnicodeCategory Category;
 			StringBuilder sb = new StringBuilder();
 			string Token;
@@ -140,10 +291,10 @@ namespace Waher.Persistence.FullTextSearch
 							sb.Clear();
 							First = true;
 
-							if (!Result.TryGetValue(Token, out int Nr))
-								Nr = 0;
-
-							Result[Token] = Nr + 1;
+							if (!Result.TryGetValue(Token, out uint Nr))
+								Result[Token] = 1;
+							else if (Nr < uint.MaxValue)
+								Result[Token] = Nr + 1;
 						}
 					}
 				}
@@ -154,14 +305,24 @@ namespace Waher.Persistence.FullTextSearch
 					sb.Clear();
 					First = true;
 
-					if (!Result.TryGetValue(Token, out int Nr))
-						Nr = 0;
-
-					Result[Token] = Nr + 1;
+					if (!Result.TryGetValue(Token, out uint Nr))
+						Result[Token] = 1;
+					else if (Nr < uint.MaxValue)
+						Result[Token] = Nr + 1;
 				}
 			}
 
-			return Result;
+			int c = Result.Count;
+			if (c == 0)
+				return null;
+
+			int i = 0;
+			TokenCount[] Counts = new TokenCount[c];
+
+			foreach (KeyValuePair<string, uint> P in Result)
+				Counts[i++] = new TokenCount(P.Key, P.Value);
+
+			return Counts;
 		}
 
 		/// <summary>
@@ -406,7 +567,7 @@ namespace Waher.Persistence.FullTextSearch
 			return new Tuple<CollectionInformation, TypeInformation, GenericObject>(TypeInfo.CollectionInformation, TypeInfo, null);
 		}
 
-		private static async void Database_ObjectUpdated(object Sender, ObjectEventArgs e)
+		private async void Database_ObjectUpdated(object Sender, ObjectEventArgs e)
 		{
 			try
 			{
@@ -421,7 +582,7 @@ namespace Waher.Persistence.FullTextSearch
 			}
 		}
 
-		private static async void Database_ObjectDeleted(object Sender, ObjectEventArgs e)
+		private async void Database_ObjectDeleted(object Sender, ObjectEventArgs e)
 		{
 			try
 			{

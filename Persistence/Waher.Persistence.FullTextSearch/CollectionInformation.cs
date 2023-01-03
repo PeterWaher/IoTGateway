@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Persistence.FullTextSearch
 {
 	/// <summary>
 	/// Contains information about a collection, in relation to full-text-search.
 	/// </summary>
+	[TypeName(TypeNameSerialization.FullName)]
 	public class CollectionInformation
 	{
 		/// <summary>

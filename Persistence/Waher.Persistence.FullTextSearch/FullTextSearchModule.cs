@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
@@ -785,7 +784,73 @@ namespace Waher.Persistence.FullTextSearch
 				if (P is null)
 					return;
 
-				// TODO
+				object ObjectId = await Database.TryGetObjectId(e.Object);
+				if (ObjectId is null)
+					return;
+
+				CollectionInformation CollectionInfo = P.Item1;
+				TypeInformation TypeInfo = P.Item2;
+				GenericObject GenObj = P.Item3;
+				Dictionary<string, string> IndexableProperties;
+
+				if (GenObj is null)
+					IndexableProperties = TypeInfo.GetIndexableProperties(e.Object, CollectionInfo.PropertyNames);
+				else
+					IndexableProperties = GetIndexableProperties(GenObj, CollectionInfo.PropertyNames);
+
+				if (IndexableProperties.Count == 0)
+					return;
+
+				TokenCount[] Tokens = Tokenize(IndexableProperties.Values);
+				if (Tokens is null)
+					return;
+
+				ObjectReference Ref = await Database.FindFirstIgnoreRest<ObjectReference>(new FilterAnd(
+					new FilterFieldEqualTo("Collection", P.Item1.CollectionName),
+					new FilterFieldEqualTo("ObjectInstanceId", ObjectId)));
+
+				bool Added = false;
+
+				await synchObj.WaitAsync();
+				try
+				{
+					if (Ref is null)
+					{
+						ulong Index = await GetNextIndexNrLocked(CollectionInfo.IndexCollectionName);
+
+						Ref = new ObjectReference()
+						{
+							IndexCollection = CollectionInfo.IndexCollectionName,
+							Collection = CollectionInfo.CollectionName,
+							ObjectInstanceId = ObjectId,
+							Index = Index,
+							Tokens = Tokens
+						};
+
+						await AddTokensToIndexLocked(Ref);
+						await Database.Insert(Ref);
+
+						Added = true;
+					}
+					else
+					{
+						await RemoveTokensFromIndexLocked(Ref);
+
+						Ref.Tokens = Tokens;
+						await AddTokensToIndexLocked(Ref);
+
+						await Database.Update(Ref);
+					}
+				}
+				finally
+				{
+					synchObj.Release();
+				}
+
+				if (Added)
+					await Search.RaiseObjectAddedToIndex(this, new ObjectReferenceEventArgs(Ref));
+				else
+					await Search.RaiseObjectUpdatedInIndex(this, new ObjectReferenceEventArgs(Ref));
 			}
 			catch (Exception ex)
 			{

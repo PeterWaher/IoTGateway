@@ -45,6 +45,11 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_01_InsertObject()
 		{
+			await this.CreateInstance();
+		}
+
+		private async Task<TestClass> CreateInstance()
+		{
 			TaskCompletionSource<bool> Result = new();
 			Task ObjectIndexed(object Sender, ObjectReferenceEventArgs e)
 			{
@@ -68,6 +73,8 @@ namespace Waher.Persistence.FullTextSearch.Test
 				Task _ = Task.Delay(5000).ContinueWith((_) => Result.TrySetResult(false));
 
 				Assert.IsTrue(await Result.Task);
+
+				return Obj;
 			}
 			finally
 			{
@@ -88,13 +95,24 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_03_DeleteObject()
 		{
+			await this.DeleteAllObjects(true);
+		}
+
+		private async Task DeleteAllObjects(bool ExceptionIfNone)
+		{
 			IEnumerable<TestClass> Objects = await Database.Find<TestClass>();
 			int NrObjects = 0;
 
 			foreach (TestClass Obj in Objects)
 				NrObjects++;
 
-			Assert.IsTrue(NrObjects > 0, "No objects to delete. (Make sure you've run test 01 first, to insert at least one object.)");
+			if (NrObjects == 0)
+			{
+				if (ExceptionIfNone)
+					Assert.Fail("No objects to delete. (Make sure you've run test 01 first, to insert at least one object.)");
+
+				return;
+			}
 
 			TaskCompletionSource<bool> Result = new();
 			Task ObjectRemoved(object Sender, ObjectReferenceEventArgs e)
@@ -126,11 +144,54 @@ namespace Waher.Persistence.FullTextSearch.Test
 			Assert.AreEqual(0, SearchResult.Length);
 		}
 
+		[TestMethod]
+		public async Task Test_04_UpdateObject()
+		{
+			await this.DeleteAllObjects(false);
+
+			TestClass Obj = await this.CreateInstance();
+			TaskCompletionSource<bool> Result = new();
+			Task ObjectUpdated(object Sender, ObjectReferenceEventArgs e)
+			{
+				Result.TrySetResult(true);
+				return Task.CompletedTask;
+			};
+
+			Search.ObjectUpdatedInIndex += ObjectUpdated;
+			try
+			{
+				Obj.IndexedProperty2 = "Roy was here.";
+
+				await Database.Update(Obj);
+
+				Task _ = Task.Delay(5000).ContinueWith((_) => Result.TrySetResult(false));
+
+				Assert.IsTrue(await Result.Task);
+			}
+			finally
+			{
+				Search.ObjectUpdatedInIndex -= ObjectUpdated;
+			}
+
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, 10,
+				FullTextSearchOrder.Relevance, "Kilroy");
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(0, SearchResult.Length);
+
+			SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, 10,
+				FullTextSearchOrder.Relevance, "Roy");
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(1, SearchResult.Length);
+		}
+
 		// TODO: GenericObject tests
 		// TODO: Script-only tests
 		// TODO: With/without accents in search
 		// TODO: Tokens beginning with search keyword
 		// TODO: Pagination & Multiple blocks/pages (> 100 objects)
 		// TODO: Orders (> 100 objects)
+		// TODO: Relevance, Occurrence, NewToOld, OldToNew
 	}
 }

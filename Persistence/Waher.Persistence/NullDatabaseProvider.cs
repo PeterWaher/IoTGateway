@@ -392,7 +392,7 @@ namespace Waher.Persistence
 		/// <returns>Collections with errors found.</returns>
 		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
-			return Task.FromResult<string[]>(new string[0]);
+			return Task.FromResult(new string[0]);
 		}
 
 		/// <summary>
@@ -406,7 +406,7 @@ namespace Waher.Persistence
 		/// <returns>Collections with errors found.</returns>
 		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, ProfilerThread Thread)
 		{
-			return Task.FromResult<string[]>(new string[0]);
+			return Task.FromResult(new string[0]);
 		}
 
 		/// <summary>
@@ -419,7 +419,7 @@ namespace Waher.Persistence
 		/// <returns>Collections with errors found and repaired.</returns>
 		public Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData)
 		{
-			return Task.FromResult<string[]>(new string[0]);
+			return Task.FromResult(new string[0]);
 		}
 
 		/// <summary>
@@ -433,7 +433,7 @@ namespace Waher.Persistence
 		/// <returns>Collections with errors found and repaired.</returns>
 		public Task<string[]> Repair(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, ProfilerThread Thread)
 		{
-			return Task.FromResult<string[]>(new string[0]);
+			return Task.FromResult(new string[0]);
 		}
 
 		/// <summary>
@@ -447,7 +447,7 @@ namespace Waher.Persistence
 		/// <returns>Collections with errors found, and repaired if <paramref name="Repair"/>=true.</returns>
 		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair)
 		{
-			return Task.FromResult<string[]>(new string[0]);
+			return Task.FromResult(new string[0]);
 		}
 
 		/// <summary>
@@ -462,7 +462,7 @@ namespace Waher.Persistence
 		/// <returns>Collections with errors found, and repaired if <paramref name="Repair"/>=true.</returns>
 		public Task<string[]> Analyze(XmlWriter Output, string XsltPath, string ProgramDataFolder, bool ExportData, bool Repair, ProfilerThread Thread)
 		{
-			return Task.FromResult<string[]>(new string[0]);
+			return Task.FromResult(new string[0]);
 		}
 
 		/// <summary>
@@ -472,7 +472,7 @@ namespace Waher.Persistence
 		/// <returns>Collections repaired.</returns>
 		public Task<string[]> Repair(params string[] CollectionNames)
 		{
-			return Task.FromResult<string[]>(new string[0]);
+			return Task.FromResult(new string[0]);
 		}
 
 		/// <summary>
@@ -483,7 +483,7 @@ namespace Waher.Persistence
 		/// <returns>Collections repaired.</returns>
 		public Task<string[]> Repair(ProfilerThread Thread, params string[] CollectionNames)
 		{
-			return Task.FromResult<string[]>(new string[0]);
+			return Task.FromResult(new string[0]);
 		}
 
 		/// <summary>
@@ -540,12 +540,18 @@ namespace Waher.Persistence
 		public Task<IPersistentDictionary> GetDictionary(string Collection) => throw new InvalidOperationException("Server is shutting down.");
 
 		/// <summary>
+		/// Gets an array of available dictionary collections.
+		/// </summary>
+		/// <returns>Array of dictionary collections.</returns>
+		public Task<string[]> GetDictionaries() => Task.FromResult(new string[0]);
+
+		/// <summary>
 		/// Gets an array of available collections.
 		/// </summary>
 		/// <returns>Array of collections.</returns>
 		public Task<string[]> GetCollections()
 		{
-			return Task.FromResult<string[]>(new string[0]);
+			return Task.FromResult(new string[0]);
 		}
 
 		/// <summary>
@@ -555,7 +561,7 @@ namespace Waher.Persistence
 		/// <returns>Collection name.</returns>
 		public Task<string> GetCollection(Type Type)
 		{
-			return Task.FromResult<string>(string.Empty);
+			return Task.FromResult(string.Empty);
 		}
 
 		/// <summary>
@@ -565,7 +571,7 @@ namespace Waher.Persistence
 		/// <returns>Collection name.</returns>
 		public Task<string> GetCollection(Object Object)
 		{
-			return Task.FromResult<string>(string.Empty);
+			return Task.FromResult(string.Empty);
 		}
 
 		/// <summary>
@@ -577,7 +583,7 @@ namespace Waher.Persistence
 		/// defined by <paramref name="Collection"/>.</returns>
 		public Task<bool> IsLabel(string Collection, string Label)
 		{
-			return Task.FromResult<bool>(false);
+			return Task.FromResult(false);
 		}
 
 		/// <summary>
@@ -586,7 +592,7 @@ namespace Waher.Persistence
 		/// <returns>Array of labels.</returns>
 		public Task<string[]> GetLabels(string Collection)
 		{
-			return Task.FromResult<string[]>(new string[0]);
+			return Task.FromResult(new string[0]);
 		}
 
 		/// <summary>

@@ -1363,7 +1363,7 @@ namespace Waher.Persistence.Files
 			{
 				if (!CanRetry)
 					ExceptionDispatchInfo.Capture(ex).Throw();
-				
+
 				return await GetIndexFile(File, false, RegenerationOptions, FieldNames);
 			}
 			finally
@@ -2587,6 +2587,29 @@ namespace Waher.Persistence.Files
 			{
 				this.dictionaries.Remove(Dictionary);
 			}
+		}
+
+		/// <summary>
+		/// Gets an array of available dictionary collections.
+		/// </summary>
+		/// <returns>Array of dictionary collections.</returns>
+		public Task<string[]> GetDictionaries()
+		{
+			string Folder = Path.Combine(this.folder, "Dictionaries");
+			if (!Directory.Exists(Folder))
+				return Task.FromResult(new string[0]);
+
+			List<string> Collections = new List<string>();
+
+			foreach (string FullFileName in Directory.GetFiles(Folder, "*.dict", SearchOption.TopDirectoryOnly))
+			{
+				string LocalFileName = Path.GetFileName(FullFileName);
+
+				if (LocalFileName.EndsWith(".dict", StringComparison.OrdinalIgnoreCase))
+					Collections.Add(LocalFileName.Substring(0, LocalFileName.Length - 5));
+			}
+
+			return Task.FromResult(Collections.ToArray());
 		}
 
 		/// <summary>

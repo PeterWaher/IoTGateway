@@ -3280,6 +3280,12 @@
             <param name="Collection">Collection Name</param>
             <returns>Persistent dictionary</returns>
         </member>
+        <member name="M:Waher.Persistence.Database.GetDictionaries">
+            <summary>
+            Gets an array of available dictionary collections.
+            </summary>
+            <returns>Array of dictionary collections.</returns>
+        </member>
         <member name="M:Waher.Persistence.Database.GetCollections">
             <summary>
             Gets an array of available collections.
@@ -4647,6 +4653,12 @@
             <param name="Collection">Collection Name</param>
             <returns>Persistent dictionary</returns>
         </member>
+        <member name="M:Waher.Persistence.IDatabaseProvider.GetDictionaries">
+            <summary>
+            Gets an array of available dictionary collections.
+            </summary>
+            <returns>Array of dictionary collections.</returns>
+        </member>
         <member name="M:Waher.Persistence.IDatabaseProvider.GetCollections">
             <summary>
             Gets an array of available collections.
@@ -5559,6 +5571,12 @@
             </summary>
             <param name="Collection">Collection Name</param>
             <returns>Persistent dictionary</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.GetDictionaries">
+            <summary>
+            Gets an array of available dictionary collections.
+            </summary>
+            <returns>Array of dictionary collections.</returns>
         </member>
         <member name="M:Waher.Persistence.NullDatabaseProvider.GetCollections">
             <summary>

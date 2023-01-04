@@ -488,6 +488,12 @@ namespace Waher.Persistence
 		Task<IPersistentDictionary> GetDictionary(string Collection);
 
 		/// <summary>
+		/// Gets an array of available dictionary collections.
+		/// </summary>
+		/// <returns>Array of dictionary collections.</returns>
+		Task<string[]> GetDictionaries();
+
+		/// <summary>
 		/// Gets an array of available collections.
 		/// </summary>
 		/// <returns>Array of collections.</returns>

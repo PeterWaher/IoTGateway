@@ -1097,6 +1097,12 @@
             <param name="Collection">Collection Name</param>
             <returns>Persistent dictionary</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.FilesProvider.GetDictionaries">
+            <summary>
+            Gets an array of available dictionary collections.
+            </summary>
+            <returns>Array of dictionary collections.</returns>
+        </member>
         <member name="M:Waher.Persistence.Files.FilesProvider.Generalize(System.Object)">
             <summary>
             Creates a generalized representation of an object.

@@ -1829,7 +1829,24 @@ namespace Waher.Persistence.MongoDB
 		/// <returns>Persistent dictionary</returns>
 		public Task<IPersistentDictionary> GetDictionary(string Collection)
 		{
-			return Task.FromResult<IPersistentDictionary>(new StringDictionary(Collection, this));  // TODO
+			return Task.FromResult<IPersistentDictionary>(new StringDictionary("DICT_" + Collection, this));  // TODO
+		}
+
+		/// <summary>
+		/// Gets an array of available dictionary collections.
+		/// </summary>
+		/// <returns>Array of dictionary collections.</returns>
+		public async Task<string[]> GetDictionaries()
+		{
+			List<string> Collections = new List<string>();
+
+			foreach (string CollectionName in (await this.database.ListCollectionNamesAsync()).ToEnumerable())
+			{
+				if (CollectionName.StartsWith("DICT_"))
+					Collections.Add(CollectionName);
+			}
+
+			return Collections.ToArray();
 		}
 
 		/// <summary>
@@ -1841,7 +1858,10 @@ namespace Waher.Persistence.MongoDB
 			List<string> Collections = new List<string>();
 
 			foreach (string CollectionName in (await this.database.ListCollectionNamesAsync()).ToEnumerable())
-				Collections.Add(CollectionName);
+			{
+				if (!CollectionName.StartsWith("DICT_"))
+					Collections.Add(CollectionName);
+			}
 
 			return Collections.ToArray();
 		}

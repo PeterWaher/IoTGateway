@@ -3688,7 +3688,7 @@
             </summary>
             <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
         </member>
-        <member name="M:Waher.Persistence.Files.Searching.SingletonCursor`1.#ctor(`0,Waher.Persistence.Serialization.ObjectSerializer,System.Guid)">
+        <member name="M:Waher.Persistence.Files.Searching.SingletonCursor`1.#ctor(`0,Waher.Persistence.Serialization.IObjectSerializer,System.Guid)">
             <summary>
             Provides a cursor into a set of a single object.
             </summary>
@@ -5034,6 +5034,14 @@
             <summary>
             Deletes the dictionary and disposes the object.
             </summary>
+        </member>
+        <member name="M:Waher.Persistence.Files.StringDictionary.GetEntriesAsync(System.String,System.String)">
+            <summary>
+            Gets a range of entries from one key to another.
+            </summary>
+            <param name="FromKey">Inclusive limit. If null, all keys to <paramref name="ToKey"/> are included.</param>
+            <param name="ToKey">Exclusive limit. If null, all keys from <paramref name="FromKey"/> are included.</param>
+            <returns>Found entries.</returns>
         </member>
         <member name="M:Waher.Persistence.Files.ValueCollection.CopyToAsync(System.Object[],System.Int32)">
             <summary>

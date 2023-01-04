@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
-using Waher.Persistence.Files.Storage;
 
 namespace Waher.Persistence.Files.Searching
 {
@@ -15,7 +12,8 @@ namespace Waher.Persistence.Files.Searching
 	internal class SingletonCursor<T> : ICursor<T>
 	{
 		private readonly T value;
-		private readonly ObjectSerializer serializer;
+		private readonly IObjectSerializer serializer;
+		private readonly ObjectSerializer objectSerializer;
 		private readonly Guid objectId;
 		private bool isCurrent = false;
 
@@ -25,10 +23,11 @@ namespace Waher.Persistence.Files.Searching
 		/// <param name="Value">Singleton value.</param>
 		/// <param name="Serializer">Serializer of <paramref name="Value"/>.</param>
 		///	<param name="ObjectId">Object ID.</param>
-		internal SingletonCursor(T Value, ObjectSerializer Serializer, Guid ObjectId)
+		internal SingletonCursor(T Value, IObjectSerializer Serializer, Guid ObjectId)
 		{
 			this.value = Value;
 			this.serializer = Serializer;
+			this.objectSerializer = Serializer as ObjectSerializer;
 			this.objectId = ObjectId;
 		}
 
@@ -144,10 +143,10 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
 		public bool SameSortOrder(string[] ConstantFields, string[] SortOrder)
 		{
-			if (SortOrder is null || SortOrder.Length != 1)
+			if (SortOrder is null || SortOrder.Length != 1 || this.objectSerializer is null)
 				return false;
 
-			string s = this.serializer.ObjectIdMemberName;
+			string s = this.objectSerializer.ObjectIdMemberName;
 			return (SortOrder[0] == s || SortOrder[0] == "+" + s);
 		}
 
@@ -160,10 +159,10 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
 		public bool ReverseSortOrder(string[] ConstantFields, string[] SortOrder)
 		{
-			if (SortOrder is null || SortOrder.Length != 1)
+			if (SortOrder is null || SortOrder.Length != 1 || this.objectSerializer is null)
 				return false;
 
-			string s = this.serializer.ObjectIdMemberName;
+			string s = this.objectSerializer.ObjectIdMemberName;
 			return (SortOrder[0] == "-" + s);
 		}
 

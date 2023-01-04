@@ -193,6 +193,52 @@ namespace Waher.Persistence.MongoDB
 		}
 
 		/// <summary>
+		/// Gets a range of entries from one key to another.
+		/// </summary>
+		/// <param name="FromKey">Inclusive limit. If null, all keys to <paramref name="ToKey"/> are included.</param>
+		/// <param name="ToKey">Exclusive limit. If null, all keys from <paramref name="FromKey"/> are included.</param>
+		/// <returns>Found entries.</returns>
+		public async Task<KeyValuePair<string, object>[]> GetEntriesAsync(string FromKey, string ToKey)
+		{
+			IEnumerable<DictionaryEntry> Entries;
+
+			if (FromKey is null)
+			{
+				if (ToKey is null)
+				{
+					Entries = await Database.Find<DictionaryEntry>(
+						new FilterFieldEqualTo("Collection", this.collectionName));
+				}
+				else
+				{
+					Entries = await Database.Find<DictionaryEntry>(new FilterAnd(
+						new FilterFieldEqualTo("Collection", this.collectionName),
+						new FilterFieldLesserThan("Key", ToKey)));
+				}
+			}
+			else if (ToKey is null)
+			{
+				Entries = await Database.Find<DictionaryEntry>(new FilterAnd(
+					new FilterFieldEqualTo("Collection", this.collectionName),
+					new FilterFieldGreaterOrEqualTo("Key", FromKey)));
+			}
+			else
+			{
+				Entries = await Database.Find<DictionaryEntry>(new FilterAnd(
+					new FilterFieldEqualTo("Collection", this.collectionName),
+					new FilterFieldGreaterOrEqualTo("Key", FromKey),
+					new FilterFieldLesserThan("Key", ToKey)));
+			}
+
+			List<KeyValuePair<string, object>> Result = new List<KeyValuePair<string, object>>();
+
+			foreach (DictionaryEntry Entry in Entries)
+				Result.Add(new KeyValuePair<string, object>(Entry.Key, Entry.Value));
+
+			return Result.ToArray();
+		}
+
+		/// <summary>
 		/// Gets the value associated with the specified key.
 		/// </summary>
 		/// <param name="key">The key whose value to get.</param>

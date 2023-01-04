@@ -6029,8 +6029,8 @@ namespace Waher.Persistence.Files
 				throw this.UnknownFilterType(Filter);
 		}
 
-		private async Task<ICursor<T>> TryGetObjectIdCursorLocked<T>(FilterFieldValue FilterFieldValue,
-			ObjectSerializer Serializer)
+		internal async Task<ICursor<T>> TryGetObjectIdCursorLocked<T>(FilterFieldValue FilterFieldValue,
+			IObjectSerializer Serializer)
 		{
 			object Value = FilterFieldValue.Value;
 			Guid ObjectId;
@@ -6048,8 +6048,8 @@ namespace Waher.Persistence.Files
 			{
 				try
 				{
-
 					T Obj = await this.LoadObject<T>(ObjectId);
+					
 					return new Searching.ObjectIdCursor<T>(
 						new Searching.SingletonCursor<T>(Obj, Serializer, ObjectId),
 						FilterFieldValue.FieldName);

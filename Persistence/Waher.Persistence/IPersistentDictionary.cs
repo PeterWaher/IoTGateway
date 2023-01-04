@@ -66,5 +66,13 @@ namespace Waher.Persistence
 		/// <exception cref="ArgumentNullException">key is null.</exception>
 		Task<KeyValuePair<bool, object>> TryGetValueAsync(string key);
 
+		/// <summary>
+		/// Gets a range of entries from one key to another.
+		/// </summary>
+		/// <param name="FromKey">Inclusive limit. If null, all keys to <paramref name="ToKey"/> are included.</param>
+		/// <param name="ToKey">Exclusive limit. If null, all keys from <paramref name="FromKey"/> are included.</param>
+		/// <returns>Found entries.</returns>
+		Task<KeyValuePair<string, object>[]> GetEntriesAsync(string FromKey, string ToKey);
+
 	}
 }

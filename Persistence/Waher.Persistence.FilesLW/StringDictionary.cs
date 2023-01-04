@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Storage;
+using Waher.Persistence.Files.Searching;
 
 namespace Waher.Persistence.Files
 {
@@ -652,5 +653,53 @@ namespace Waher.Persistence.Files
 				File.Delete(BlobFileName);
 			}
 		}
+
+		/// <summary>
+		/// Gets a range of entries from one key to another.
+		/// </summary>
+		/// <param name="FromKey">Inclusive limit. If null, all keys to <paramref name="ToKey"/> are included.</param>
+		/// <param name="ToKey">Exclusive limit. If null, all keys from <paramref name="FromKey"/> are included.</param>
+		/// <returns>Found entries.</returns>
+		public async Task<KeyValuePair<string, object>[]> GetEntriesAsync(string FromKey, string ToKey)
+		{
+			await this.dictionaryFile.BeginRead();
+			try
+			{
+				ICursor<KeyValuePair<string, object>> Entries;
+
+				if (FromKey is null)
+					Entries = await this.GetEnumeratorLocked();
+				else
+				{
+					Entries = await this.dictionaryFile.TryGetObjectIdCursorLocked<KeyValuePair<string, object>>(
+						new FilterFieldGreaterOrEqualTo("Key", FromKey), this.keyValueSerializer);
+				}
+
+				List<KeyValuePair<string, object>> Result = new List<KeyValuePair<string, object>>();
+
+				if (ToKey is null)
+				{
+					while (await Entries.MoveNextAsyncLocked())
+						Result.Add(Entries.Current);
+				}
+				else
+				{
+					while (await Entries.MoveNextAsyncLocked())
+					{
+						if (string.Compare(Entries.Current.Key, ToKey, false) >= 0)
+							break;
+
+						Result.Add(Entries.Current);
+					}
+				}
+
+				return Result.ToArray();
+			}
+			finally
+			{
+				await this.dictionaryFile.EndRead();
+			}
+		}
+
 	}
 }

@@ -55,6 +55,26 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		public static event ObjectReferenceEventHandler ObjectAddedToIndex;
 
+		internal static async Task RaiseObjectRemovedFromIndex(object Sender, ObjectReferenceEventArgs e)
+		{
+			try
+			{
+				ObjectReferenceEventHandler h = ObjectRemovedFromIndex;
+				if (!(h is null))
+					await h(Sender, e);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
+		/// Event raised when an object instance has been removed from the
+		/// full-text-search index.
+		/// </summary>
+		public static event ObjectReferenceEventHandler ObjectRemovedFromIndex;
+
 		/// <summary>
 		/// Performs a Full-Text-Search
 		/// </summary>

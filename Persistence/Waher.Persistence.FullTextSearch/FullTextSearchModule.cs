@@ -229,11 +229,6 @@ namespace Waher.Persistence.FullTextSearch
 			}
 		}
 
-		private static async Task RemoveTokensFromIndexLocked(ObjectReference Ref)
-		{
-			// TODO
-		}
-
 		private static async Task<ulong> GetNextIndexNrLocked(string IndexedCollection)
 		{
 			string Key = " C(" + IndexedCollection + ")";
@@ -699,7 +694,7 @@ namespace Waher.Persistence.FullTextSearch
 		private static readonly NewestOrder newestOrder = new NewestOrder();
 		private static readonly OldestOrder oldestOrder = new OldestOrder();
 
-		private async void Database_ObjectUpdated(object Sender, ObjectEventArgs e)
+		private async void Database_ObjectDeleted(object Sender, ObjectEventArgs e)
 		{
 			try
 			{
@@ -707,7 +702,28 @@ namespace Waher.Persistence.FullTextSearch
 				if (P is null)
 					return;
 
-				// TODO
+				object ObjectId = await Database.TryGetObjectId(e.Object);
+				if (ObjectId is null)
+					return;
+
+				ObjectReference Ref = await Database.FindFirstIgnoreRest<ObjectReference>(new FilterAnd(
+					new FilterFieldEqualTo("Collection", P.Item1.CollectionName),
+					new FilterFieldEqualTo("ObjectInstanceId", ObjectId)));
+
+				if (Ref is null)
+					return;
+
+				await synchObj.WaitAsync();
+				try
+				{
+					await RemoveTokensFromIndexLocked(Ref);
+				}
+				finally
+				{
+					synchObj.Release();
+				}
+
+				await Search.RaiseObjectRemovedFromIndex(this, new ObjectReferenceEventArgs(Ref));
 			}
 			catch (Exception ex)
 			{
@@ -715,7 +731,53 @@ namespace Waher.Persistence.FullTextSearch
 			}
 		}
 
-		private async void Database_ObjectDeleted(object Sender, ObjectEventArgs e)
+		private static async Task RemoveTokensFromIndexLocked(ObjectReference Ref)
+		{
+			IPersistentDictionary Index = await GetIndexLocked(Ref.IndexCollection);
+
+			foreach (TokenCount Token in Ref.Tokens)
+			{
+				string Suffix = " " + Token.Block.ToString();
+				KeyValuePair<bool, object> P = await Index.TryGetValueAsync(Token.Token + Suffix);
+
+				if (!P.Key)
+					P = await Index.TryGetValueAsync(Token.Token);
+
+				if (!P.Key || !(P.Value is TokenReferences References))
+					continue;
+
+				int i = Array.IndexOf(References.ObjectReferences, Ref.Index);
+				if (i < 0)
+					continue;
+
+				int c = References.ObjectReferences.Length;
+				ulong[] NewReferences = new ulong[c - 1];
+				uint[] NewCounts = new uint[c - 1];
+				DateTime[] NewTimestamps = new DateTime[c - 1];
+
+				if (i > 0)
+				{
+					Array.Copy(References.ObjectReferences, 0, NewReferences, 0, i);
+					Array.Copy(References.Counts, 0, NewCounts, 0, i);
+					Array.Copy(References.Timestamps, 0, NewTimestamps, 0, i);
+				}
+
+				if (i < c - 1)
+				{
+					Array.Copy(References.ObjectReferences, i + 1, NewReferences, i, c - i - 1);
+					Array.Copy(References.Counts, i + 1, NewCounts, i, c - i - 1);
+					Array.Copy(References.Timestamps, i + 1, NewTimestamps, i, c - i - 1);
+				}
+
+				References.ObjectReferences = NewReferences;
+				References.Counts = NewCounts;
+				References.Timestamps = NewTimestamps;
+
+				await Index.AddAsync(Token.Token, References, true);
+			}
+		}
+
+		private async void Database_ObjectUpdated(object Sender, ObjectEventArgs e)
 		{
 			try
 			{

@@ -65,6 +65,8 @@ namespace Waher.Persistence.FullTextSearch.Test
 
 				await Database.Insert(Obj);
 
+				Task _ = Task.Delay(5000).ContinueWith((_) => Result.TrySetResult(false));
+
 				Assert.IsTrue(await Result.Task);
 			}
 			finally
@@ -76,10 +78,52 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_02_Search()
 		{
-			TestClass[] Result = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, 10, 
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, 10,
 				FullTextSearchOrder.Relevance, "Hello", "Clown", "Kilroy");
 
-			Assert.IsNotNull(Result);
+			Assert.IsNotNull(SearchResult);
+			Assert.IsTrue(SearchResult.Length > 0, "No objects found. (Make sure you've run test 01 first, to insert at least one object.)");
+		}
+
+		[TestMethod]
+		public async Task Test_03_DeleteObject()
+		{
+			IEnumerable<TestClass> Objects = await Database.Find<TestClass>();
+			int NrObjects = 0;
+
+			foreach (TestClass Obj in Objects)
+				NrObjects++;
+
+			Assert.IsTrue(NrObjects > 0, "No objects to delete. (Make sure you've run test 01 first, to insert at least one object.)");
+
+			TaskCompletionSource<bool> Result = new();
+			Task ObjectRemoved(object Sender, ObjectReferenceEventArgs e)
+			{
+				if (--NrObjects == 0)
+					Result.TrySetResult(true);
+
+				return Task.CompletedTask;
+			};
+
+			Search.ObjectRemovedFromIndex += ObjectRemoved;
+			try
+			{
+				await Database.Delete(Objects);
+
+				Task _ = Task.Delay(5000).ContinueWith((_) => Result.TrySetResult(false));
+
+				Assert.IsTrue(await Result.Task);
+			}
+			finally
+			{
+				Search.ObjectRemovedFromIndex -= ObjectRemoved;
+			}
+
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, 10,
+				FullTextSearchOrder.Relevance, "Hello", "Clown", "Kilroy");
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(0, SearchResult.Length);
 		}
 
 		// TODO: GenericObject tests

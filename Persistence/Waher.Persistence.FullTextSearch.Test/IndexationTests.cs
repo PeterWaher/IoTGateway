@@ -52,7 +52,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 				return Task.CompletedTask;
 			};
 
-			FullTextSearchModule.ObjectAddedToIndex += ObjectIndexed;
+			Search.ObjectAddedToIndex += ObjectIndexed;
 			try
 			{
 				TestClass Obj = new()
@@ -69,11 +69,24 @@ namespace Waher.Persistence.FullTextSearch.Test
 			}
 			finally
 			{
-				FullTextSearchModule.ObjectAddedToIndex -= ObjectIndexed;
+				Search.ObjectAddedToIndex -= ObjectIndexed;
 			}
+		}
+
+		[TestMethod]
+		public async Task Test_02_Search()
+		{
+			TestClass[] Result = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, 10, 
+				FullTextSearchOrder.Relevance, "Hello", "Clown", "Kilroy");
+
+			Assert.IsNotNull(Result);
 		}
 
 		// TODO: GenericObject tests
 		// TODO: Script-only tests
+		// TODO: With/without accents in search
+		// TODO: Tokens beginning with search keyword
+		// TODO: Pagination & Multiple blocks/pages (> 100 objects)
+		// TODO: Orders (> 100 objects)
 	}
 }

@@ -6,6 +6,10 @@ namespace Waher.Persistence.FullTextSearch.Test
 	[FullTextSearch("FullTextSearch", nameof(IndexedProperty1), nameof(IndexedProperty2))]
 	public class TestClass
 	{
+		public TestClass()
+		{
+		}
+
 		[ObjectId]
 		public string? ObjectID { get; set; }
 

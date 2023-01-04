@@ -8,6 +8,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence.Attributes;
+using Waher.Persistence.Filters;
+using Waher.Persistence.FullTextSearch.KeywordEnumerators;
+using Waher.Persistence.FullTextSearch.Orders;
 using Waher.Persistence.LifeCycle;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
@@ -140,21 +143,13 @@ namespace Waher.Persistence.FullTextSearch
 					synchObj.Release();
 				}
 
-				ObjectReferenceEventHandler h = ObjectAddedToIndex;
-				if (!(h is null))
-					await h(this, new ObjectReferenceEventArgs(Ref));
+				await Search.RaiseObjectAddedToIndex(this, new ObjectReferenceEventArgs(Ref));
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
 			}
 		}
-
-		/// <summary>
-		/// Event raised when a new object instance has been indexed in the
-		/// full-text-search index.
-		/// </summary>
-		public static event ObjectReferenceEventHandler ObjectAddedToIndex;
 
 		private static async Task<IPersistentDictionary> GetIndexLocked(string IndexCollection)
 		{
@@ -259,7 +254,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		/// <param name="Text">Enumerable set of strings to tokenize.</param>
 		/// <returns>Tokens found, with associated counts.</returns>
-		public static TokenCount[] Tokenize(IEnumerable<string> Text)
+		internal static TokenCount[] Tokenize(IEnumerable<string> Text)
 		{
 			Dictionary<string, uint> Result = new Dictionary<string, uint>();
 			UnicodeCategory Category;
@@ -331,7 +326,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="Obj">Generic object.</param>
 		/// <param name="PropertyNames">Indexable property names.</param>
 		/// <returns>Indexable property values found.</returns>
-		public static async Task<Dictionary<string, string>> GetIndexableProperties(object Obj, params string[] PropertyNames)
+		internal static async Task<Dictionary<string, string>> GetIndexableProperties(object Obj, params string[] PropertyNames)
 		{
 			if (Obj is null)
 				return new Dictionary<string, string>();
@@ -358,7 +353,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="Obj">Generic object.</param>
 		/// <param name="PropertyNames">Indexable property names.</param>
 		/// <returns>Indexable property values found.</returns>
-		public static Dictionary<string, string> GetIndexableProperties(GenericObject Obj, params string[] PropertyNames)
+		internal static Dictionary<string, string> GetIndexableProperties(GenericObject Obj, params string[] PropertyNames)
 		{
 			Dictionary<string, string> Result = new Dictionary<string, string>();
 
@@ -379,7 +374,13 @@ namespace Waher.Persistence.FullTextSearch
 			return Result;
 		}
 
-		private static async Task<CollectionInformation> GetCollectionInfoLocked(string CollectionName, bool CreateIfNotExists)
+		private static Task<CollectionInformation> GetCollectionInfoLocked(string CollectionName, bool CreateIfNotExists)
+		{
+			return GetCollectionInfoLocked(CollectionName, CollectionName, CreateIfNotExists);
+		}
+
+		private static async Task<CollectionInformation> GetCollectionInfoLocked(
+			string IndexCollectionName, string CollectionName, bool CreateIfNotExists)
 		{
 			if (collections.TryGetValue(CollectionName, out CollectionInformation Result))
 				return Result;
@@ -394,7 +395,7 @@ namespace Waher.Persistence.FullTextSearch
 			if (!CreateIfNotExists)
 				return null;
 
-			Result = new CollectionInformation(CollectionName, CollectionName, false);
+			Result = new CollectionInformation(IndexCollectionName, CollectionName, false);
 			collections[CollectionName] = Result;
 			await collectionInformation.AddAsync(CollectionName, Result, true);
 
@@ -406,12 +407,12 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		/// <param name="IndexCollection">Collection name for full-text-search index of objects in the given collection.</param>
 		/// <param name="CollectionName">Collection of objects to index.</param>
-		public static async Task SetFullTextSearchIndexCollection(string IndexCollection, string CollectionName)
+		internal static async Task SetFullTextSearchIndexCollection(string IndexCollection, string CollectionName)
 		{
 			await synchObj.WaitAsync();
 			try
 			{
-				CollectionInformation Info = await GetCollectionInfoLocked(CollectionName, true);
+				CollectionInformation Info = await GetCollectionInfoLocked(IndexCollection, CollectionName, true);
 
 				if (Info.IndexCollectionName != IndexCollection)
 				{
@@ -431,7 +432,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="CollectionName">Collection name.</param>
 		/// <param name="Properties">Properties to index.</param>
 		/// <returns>If new property names were found and added.</returns>
-		public static async Task<bool> AddFullTextSearch(string CollectionName, params string[] Properties)
+		internal static async Task<bool> AddFullTextSearch(string CollectionName, params string[] Properties)
 		{
 			await synchObj.WaitAsync();
 			try
@@ -458,7 +459,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="CollectionName">Collection name.</param>
 		/// <param name="Properties">Properties to remove from indexation.</param>
 		/// <returns>If property names were found and removed.</returns>
-		public static async Task<bool> RemoveFullTextSearch(string CollectionName, params string[] Properties)
+		internal static async Task<bool> RemoveFullTextSearch(string CollectionName, params string[] Properties)
 		{
 			await synchObj.WaitAsync();
 			try
@@ -484,7 +485,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		/// <param name="CollectionName">Collection name.</param>
 		/// <returns>Array of indexed properties.</returns>
-		public static async Task<string[]> GetFullTextSearchIndexedProperties(string CollectionName)
+		internal static async Task<string[]> GetFullTextSearchIndexedProperties(string CollectionName)
 		{
 			await synchObj.WaitAsync();
 			try
@@ -542,7 +543,7 @@ namespace Waher.Persistence.FullTextSearch
 			else
 			{
 				string CollectionName = CollectionAttr.Name;
-				CollectionInformation Info = await GetCollectionInfoLocked(CollectionName, true);
+				CollectionInformation Info = await GetCollectionInfoLocked(SearchAttr?.IndexCollection ?? CollectionName, CollectionName, true);
 
 				Result = new TypeInformation(T, TI, CollectionName, Info);
 
@@ -567,6 +568,137 @@ namespace Waher.Persistence.FullTextSearch
 			return new Tuple<CollectionInformation, TypeInformation, GenericObject>(TypeInfo.CollectionInformation, TypeInfo, null);
 		}
 
+		/// <summary>
+		/// Performs a Full-Text-Search
+		/// </summary>
+		/// <param name="IndexCollection">Index collection name.</param>
+		/// <param name="Offset">Index of first object matching the keywords.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Keywords">Keywords to search for.</param>
+		/// <returns>Array of objects</returns>
+		internal static async Task<T[]> FullTextSearch<T>(string IndexCollection,
+			int Offset, int MaxCount, FullTextSearchOrder Order, params string[] Keywords)
+			where T : class
+		{
+			if (MaxCount <= 0)
+				return new T[0];
+
+			TokenCount[] Tokens = Tokenize(Keywords);
+			int NrTokens = Tokens.Length;
+
+			if (NrTokens == 0)
+				return new T[0];
+
+			Array.Sort(Tokens, descendingLengthOrder);
+
+			Dictionary<ulong, LinkedList<TokenReference>> ReferencesByObject;
+
+			await synchObj.WaitAsync();
+			try
+			{
+				IPersistentDictionary Index = await GetIndexLocked(IndexCollection);
+
+				ReferencesByObject = new Dictionary<ulong, LinkedList<TokenReference>>();
+
+				foreach (TokenCount Token in Tokens)
+				{
+					TokenReferenceEnumerator e;
+
+					switch (Order)
+					{
+						case FullTextSearchOrder.Relevance:
+						case FullTextSearchOrder.Newest:
+						case FullTextSearchOrder.Occurrences:
+						default:
+							e = new TokenReferencesNewToOld(Index, Token.Token);
+							break;
+
+						case FullTextSearchOrder.Oldest:
+							e = new TokenReferencesOldToNew(Index, Token.Token);
+							break;
+					}
+
+					while (await e.MoveNextAsync())
+					{
+						TokenReference Ref = e.Current;
+
+						if (!ReferencesByObject.TryGetValue(Ref.ObjectReference, out LinkedList<TokenReference> References))
+						{
+							References = new LinkedList<TokenReference>();
+							ReferencesByObject[Ref.ObjectReference] = References;
+						}
+
+						References.AddLast(Ref);
+					}
+				}
+			}
+			finally
+			{
+				synchObj.Release();
+			}
+
+			int c = ReferencesByObject.Count;
+			LinkedList<TokenReference>[] FoundReferences = new LinkedList<TokenReference>[c];
+			ReferencesByObject.Values.CopyTo(FoundReferences, 0);
+
+			switch (Order)
+			{
+				case FullTextSearchOrder.Relevance:
+				default:
+					Array.Sort(FoundReferences, relevanceOrder);
+					break;
+
+				case FullTextSearchOrder.Occurrences:
+					Array.Sort(FoundReferences, occurrencesOrder);
+					break;
+
+				case FullTextSearchOrder.Newest:
+					Array.Sort(FoundReferences, newestOrder);
+					break;
+
+				case FullTextSearchOrder.Oldest:
+					Array.Sort(FoundReferences, oldestOrder);
+					break;
+			}
+
+			List<T> Result = new List<T>();
+
+			foreach (LinkedList<TokenReference> ObjectReference in FoundReferences)
+			{
+				ulong RefIndex = ObjectReference.First.Value.ObjectReference;
+				ObjectReference Ref = await Database.FindFirstIgnoreRest<ObjectReference>(new FilterAnd(
+					new FilterFieldEqualTo("IndexCollection", IndexCollection),
+					new FilterFieldEqualTo("Index", RefIndex)));
+
+				if (Ref is null)
+					continue;
+
+				T Object = await Database.TryLoadObject<T>(Ref.Collection, Ref.ObjectInstanceId);
+				if (Object is null)
+					continue;
+
+				if (Offset > 0)
+				{
+					Offset--;
+					continue;
+				}
+
+				Result.Add(Object);
+				MaxCount--;
+
+				if (MaxCount <= 0)
+					break;
+			}
+
+			return Result.ToArray();
+		}
+
+		private static readonly DescendingLengthOrder descendingLengthOrder = new DescendingLengthOrder();
+		private static readonly RelevanceOrder relevanceOrder = new RelevanceOrder();
+		private static readonly OccurrencesOrder occurrencesOrder = new OccurrencesOrder();
+		private static readonly NewestOrder newestOrder = new NewestOrder();
+		private static readonly OldestOrder oldestOrder = new OldestOrder();
+
 		private async void Database_ObjectUpdated(object Sender, ObjectEventArgs e)
 		{
 			try
@@ -575,6 +707,7 @@ namespace Waher.Persistence.FullTextSearch
 				if (P is null)
 					return;
 
+				// TODO
 			}
 			catch (Exception ex)
 			{
@@ -590,6 +723,7 @@ namespace Waher.Persistence.FullTextSearch
 				if (P is null)
 					return;
 
+				// TODO
 			}
 			catch (Exception ex)
 			{

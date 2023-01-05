@@ -568,10 +568,15 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="IndexCollection">Index collection name.</param>
 		/// <param name="Offset">Index of first object matching the keywords.</param>
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Order">The order of objects to return.</param>
+		/// <param name="PaginationStrategy">How to handle pagination.</param>
 		/// <param name="Keywords">Keywords to search for.</param>
-		/// <returns>Array of objects</returns>
+		/// <returns>Array of objects. Depending on choice of
+		/// <paramref name="PaginationStrategy"/>, null items may be returned
+		/// if underlying object is not compatible with <typeparamref name="T"/>.</returns>
 		internal static async Task<T[]> FullTextSearch<T>(string IndexCollection,
-			int Offset, int MaxCount, FullTextSearchOrder Order, params string[] Keywords)
+			int Offset, int MaxCount, FullTextSearchOrder Order,
+			PaginationStrategy PaginationStrategy, params string[] Keywords)
 			where T : class
 		{
 			if (MaxCount <= 0)
@@ -657,30 +662,97 @@ namespace Waher.Persistence.FullTextSearch
 
 			List<T> Result = new List<T>();
 
-			foreach (LinkedList<TokenReference> ObjectReference in FoundReferences)
+			switch (PaginationStrategy)
 			{
-				ulong RefIndex = ObjectReference.First.Value.ObjectReference;
-				ObjectReference Ref = await Database.FindFirstIgnoreRest<ObjectReference>(new FilterAnd(
-					new FilterFieldEqualTo("IndexCollection", IndexCollection),
-					new FilterFieldEqualTo("Index", RefIndex)));
+				case PaginationStrategy.PaginateOverObjectsNullIfIncompatible:
+				default:
+					foreach (LinkedList<TokenReference> ObjectReference in FoundReferences)
+					{
+						ulong RefIndex = ObjectReference.First.Value.ObjectReference;
+						if (Offset > 0)
+						{
+							Offset--;
+							continue;
+						}
 
-				if (Ref is null)
-					continue;
+						ObjectReference Ref = await Database.FindFirstIgnoreRest<ObjectReference>(new FilterAnd(
+							new FilterFieldEqualTo("IndexCollection", IndexCollection),
+							new FilterFieldEqualTo("Index", RefIndex)));
 
-				T Object = await Database.TryLoadObject<T>(Ref.Collection, Ref.ObjectInstanceId);
-				if (Object is null)
-					continue;
+						if (Ref is null)
+							Result.Add(null);
+						else
+						{
+							T Object = await Database.TryLoadObject<T>(Ref.Collection, Ref.ObjectInstanceId);
+							if (Object is null)
+								Result.Add(null);
+							else
+								Result.Add(Object);
+						}
 
-				if (Offset > 0)
-				{
-					Offset--;
-					continue;
-				}
+						MaxCount--;
 
-				Result.Add(Object);
-				MaxCount--;
+						if (MaxCount <= 0)
+							break;
+					}
+					break;
 
-				if (MaxCount <= 0)
+				case PaginationStrategy.PaginateOverObjectsOnlyCompatible:
+					foreach (LinkedList<TokenReference> ObjectReference in FoundReferences)
+					{
+						ulong RefIndex = ObjectReference.First.Value.ObjectReference;
+						if (Offset > 0)
+						{
+							Offset--;
+							continue;
+						}
+
+						ObjectReference Ref = await Database.FindFirstIgnoreRest<ObjectReference>(new FilterAnd(
+							new FilterFieldEqualTo("IndexCollection", IndexCollection),
+							new FilterFieldEqualTo("Index", RefIndex)));
+
+						if (Ref is null)
+							continue;
+
+						T Object = await Database.TryLoadObject<T>(Ref.Collection, Ref.ObjectInstanceId);
+						if (Object is null)
+							continue;
+
+						Result.Add(Object);
+						MaxCount--;
+
+						if (MaxCount <= 0)
+							break;
+					}
+					break;
+
+				case PaginationStrategy.PaginationOverCompatibleOnly:
+					foreach (LinkedList<TokenReference> ObjectReference in FoundReferences)
+					{
+						ulong RefIndex = ObjectReference.First.Value.ObjectReference;
+						ObjectReference Ref = await Database.FindFirstIgnoreRest<ObjectReference>(new FilterAnd(
+							new FilterFieldEqualTo("IndexCollection", IndexCollection),
+							new FilterFieldEqualTo("Index", RefIndex)));
+
+						if (Ref is null)
+							continue;
+
+						T Object = await Database.TryLoadObject<T>(Ref.Collection, Ref.ObjectInstanceId);
+						if (Object is null)
+							continue;
+
+						if (Offset > 0)
+						{
+							Offset--;
+							continue;
+						}
+
+						Result.Add(Object);
+						MaxCount--;
+
+						if (MaxCount <= 0)
+							break;
+					}
 					break;
 			}
 

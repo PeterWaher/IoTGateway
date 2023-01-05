@@ -31,6 +31,34 @@ namespace Waher.Persistence.FullTextSearch
 	}
 
 	/// <summary>
+	/// How pagination in full-text-searches should be handled.
+	/// </summary>
+	public enum PaginationStrategy
+	{
+		/// <summary>
+		/// Pagination is done over objects found in search. Incompatible types
+		/// are returned as null. Makes pagination quicker, as objects do not need
+		/// to be preloaded, and can be skipped quicker.
+		/// </summary>
+		PaginateOverObjectsNullIfIncompatible,
+
+		/// <summary>
+		/// Pagination is done over objects found in search. Only compatible
+		/// objects are returned. Amount of objects returned might be less than
+		/// number of objects found, making evaluation of next offset in paginated
+		/// search difficult.
+		/// </summary>
+		PaginateOverObjectsOnlyCompatible,
+
+		/// <summary>
+		/// Pagination is done over compatible objects found in search. Pagination
+		/// becomes more resource intensive, as all objects need to be loaded to be
+		/// checked if they are compatible or not.
+		/// </summary>
+		PaginationOverCompatibleOnly
+	}
+
+	/// <summary>
 	/// Static class for access to Full-Text-Search
 	/// </summary>
 	public static class Search
@@ -102,12 +130,15 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="Offset">Index of first object matching the keywords.</param>
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="Keywords">Keywords to search for.</param>
-		/// <returns>Array of objects</returns>
+		/// <returns>Array of objects. Depending on choice of
+		/// <paramref name="PaginationStrategy"/>, null items may be returned
+		/// if underlying object is not compatible with <typeparamref name="T"/>.</returns>
 		public static Task<T[]> FullTextSearch<T>(string IndexCollection, 
 			int Offset, int MaxCount, FullTextSearchOrder Order, params string[] Keywords)
 			where T : class
 		{
-			return FullTextSearchModule.FullTextSearch<T>(IndexCollection, Offset, MaxCount, Order, Keywords);
+			return FullTextSearchModule.FullTextSearch<T>(IndexCollection, Offset, MaxCount,
+				Order, PaginationStrategy.PaginateOverObjectsNullIfIncompatible, Keywords);
 		}
 	}
 }

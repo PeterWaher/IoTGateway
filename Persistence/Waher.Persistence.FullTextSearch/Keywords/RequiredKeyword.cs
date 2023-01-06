@@ -128,10 +128,10 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 					foreach (ulong ObjectReference in ToRemove)
 						Process.ReferencesByObject.Remove(ObjectReference);
 				}
-
-				if (Process.ReferencesByObject.Count == 0)
-					return false;
 			}
+
+			if (Process.ReferencesByObject.Count == 0)
+				return false;
 
 			Process.IncRestricted();
 

@@ -590,12 +590,6 @@ namespace Waher.Persistence.FullTextSearch
 					sb.Append(ch);
 					First = false;
 				}
-				else if (ch == '*' || ch == '%' || ch == '¤' || ch == '#')
-				{
-					sb.Append(ch);
-					Type = 1;
-					Wildcard = new string(ch, 1);
-				}
 				else if (Type == 2)
 				{
 					if (ch == '/')
@@ -626,6 +620,12 @@ namespace Waher.Persistence.FullTextSearch
 						sb.Append(ch);
 						First = false;
 					}
+				}
+				else if (Type == 0 && (ch == '*' || ch == '%' || ch == '¤' || ch == '#'))
+				{
+					sb.Append(ch);
+					Type = 1;
+					Wildcard = new string(ch, 1);
 				}
 				else
 				{

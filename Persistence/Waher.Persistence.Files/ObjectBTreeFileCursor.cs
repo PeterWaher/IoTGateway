@@ -208,41 +208,68 @@ namespace Waher.Persistence.Files
 			if (this.blockUpdateCounter != this.file.BlockUpdateCounter)
 				throw new InvalidOperationException("Contents of file has been changed.");
 
+			object ObjectId;
+			uint BlockLink;
+			int Pos;
+
 			if (!this.hasCurrent)
 			{
 				if (!(this.startingPoint is null))
 				{
 					this.GoToStartingPoint(this.startingPoint);
 					this.hasCurrent = true;
-					return await this.MoveNextAsyncLocked();
+
+					if (this.currentRank.HasValue)
+						this.currentRank++;
+
+					if (this.currentReader.BytesLeft >= 4)
+					{
+						this.currentReader.SkipBlockLink(); // Must skip first left branch
+
+						Pos = this.currentReader.Position;
+						ObjectId = this.recordHandler.GetKey(this.currentReader);
+						if (!(ObjectId is null))
+						{
+							await this.LoadObjectLocked(ObjectId, Pos);
+							return true;
+						}
+
+						Pos = this.currentReader.Position;
+						ObjectId = this.recordHandler.GetKey(this.currentReader);
+						if (!(ObjectId is null))
+						{
+							await this.LoadObjectLocked(ObjectId, Pos);
+							return true;
+						}
+					}
+					else
+						ObjectId = null;
 				}
 				else
 					return await this.GoToFirstLocked();
 			}
-
-			if (this.currentRank.HasValue)
-				this.currentRank++;
-
-			object ObjectId;
-			uint BlockLink;
-			int Pos;
-
-			if (this.currentReader.BytesLeft >= 4)
-			{
-				BlockLink = this.currentReader.ReadBlockLink();
-				if (BlockLink != 0)
-					return await this.GoToFirstLocked(BlockLink);
-
-				Pos = this.currentReader.Position;
-				ObjectId = this.recordHandler.GetKey(this.currentReader);
-				if (!(ObjectId is null))
-				{
-					await this.LoadObjectLocked(ObjectId, Pos);
-					return true;
-				}
-			}
 			else
-				ObjectId = null;
+			{
+				if (this.currentRank.HasValue)
+					this.currentRank++;
+
+				if (this.currentReader.BytesLeft >= 4)
+				{
+					BlockLink = this.currentReader.ReadBlockLink();
+					if (BlockLink != 0)
+						return await this.GoToFirstLocked(BlockLink);
+
+					Pos = this.currentReader.Position;
+					ObjectId = this.recordHandler.GetKey(this.currentReader);
+					if (!(ObjectId is null))
+					{
+						await this.LoadObjectLocked(ObjectId, Pos);
+						return true;
+					}
+				}
+				else
+					ObjectId = null;
+			}
 
 			BlockLink = this.currentHeader.LastBlockIndex;
 			if (BlockLink != 0)
@@ -993,14 +1020,14 @@ namespace Waher.Persistence.Files
 					if (!await this.GoToFirstLocked())
 						return null;
 
-					BlockInfo Position = new BlockInfo(this.currentHeader, this.currentBlock, this.currentBlockIndex, this.currentObjPos, false);
+					BlockInfo Position = new BlockInfo(this.currentHeader, this.currentBlock, this.currentBlockIndex, this.currentObjPos, false, true);
 					this.Reset();
 
 					return new Bookmark(this.file, Position);
 				}
 			}
 			else
-				return new Bookmark(this.file, new BlockInfo(this.currentHeader, this.currentBlock, this.currentBlockIndex, this.currentObjPos, false));
+				return new Bookmark(this.file, new BlockInfo(this.currentHeader, this.currentBlock, this.currentBlockIndex, this.currentObjPos, false, true));
 		}
 
 		/// <summary>

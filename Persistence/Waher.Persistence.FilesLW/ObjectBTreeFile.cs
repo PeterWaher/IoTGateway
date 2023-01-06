@@ -1209,7 +1209,7 @@ namespace Waher.Persistence.Files
 					Reader.Restart(DecryptedBlock, 0);
 					ObjectId2 = this.recordHandler.GetKey(Reader);
 
-					Info = await this.FindNodeLocked(ObjectId2);
+					Info = await this.FindNodeLocked(ObjectId2, false);
 					if (!(Info is null))
 					{
 						Reader.Restart(Info.Block, Info.InternalPosition + 4);
@@ -1923,7 +1923,7 @@ namespace Waher.Persistence.Files
 				else if (IsEmpty || Comparison > 0)
 				{
 					if (Header.LastBlockIndex == 0)
-						return new BlockInfo(Header, Block, BlockIndex, IsEmpty ? Pos : Reader.Position, LastObject);
+						return new BlockInfo(Header, Block, BlockIndex, IsEmpty ? Pos : Reader.Position, LastObject, false);
 					else
 						BlockIndex = Header.LastBlockIndex;
 				}
@@ -1931,7 +1931,7 @@ namespace Waher.Persistence.Files
 				{
 					LastObject = false;
 					if (BlockLink == 0)
-						return new BlockInfo(Header, Block, BlockIndex, Pos, false);
+						return new BlockInfo(Header, Block, BlockIndex, Pos, false, false);
 					else
 						BlockIndex = BlockLink;
 				}
@@ -1991,7 +1991,7 @@ namespace Waher.Persistence.Files
 
 		internal async Task<object> LoadObjectLocked(object ObjectId, IObjectSerializer Serializer)
 		{
-			BlockInfo Info = await this.FindNodeLocked(ObjectId);
+			BlockInfo Info = await this.FindNodeLocked(ObjectId, false);
 			if (Info is null)
 				throw new KeyNotFoundException("Object not found.");
 
@@ -2013,7 +2013,7 @@ namespace Waher.Persistence.Files
 
 		internal async Task<object> TryLoadObjectLocked(object ObjectId, IObjectSerializer Serializer)
 		{
-			BlockInfo Info = await this.FindNodeLocked(ObjectId);
+			BlockInfo Info = await this.FindNodeLocked(ObjectId, false);
 			if (Info is null)
 				return null;
 			else
@@ -2073,12 +2073,13 @@ namespace Waher.Persistence.Files
 			return await Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 		}
 
-		internal async Task<BlockInfo> FindNodeLocked(object ObjectId)
+		internal async Task<BlockInfo> FindNodeLocked(object ObjectId, bool ReturnInsertPositionIfNotFound)
 		{
 #if ASSERT_LOCKS
 			this.fileAccess.AssertReadingOrWriting();
 #endif
 			uint BlockIndex = 0;
+			bool LastObject = true;
 
 			if (ObjectId is null || (ObjectId is Guid && ObjectId.Equals(Guid.Empty)))
 				return null;
@@ -2118,18 +2119,29 @@ namespace Waher.Persistence.Files
 				while (Comparison > 0 && Reader.BytesLeft >= 4);
 
 				if (Comparison == 0)                                       // Object ID found.
-					return new BlockInfo(Header, Block, BlockIndex, Pos, false);
+					return new BlockInfo(Header, Block, BlockIndex, Pos, false, true);
 				else if (IsEmpty || Comparison > 0)
 				{
 					if (Header.LastBlockIndex == 0)
-						return null;
+					{
+						if (ReturnInsertPositionIfNotFound)
+							return new BlockInfo(Header, Block, BlockIndex, IsEmpty ? Pos : Reader.Position, LastObject, false);
+						else
+							return null;
+					}
 					else
 						BlockIndex = Header.LastBlockIndex;
 				}
 				else
 				{
+					LastObject = false;
 					if (BlockLink == 0)
-						return null;
+					{
+						if (ReturnInsertPositionIfNotFound)
+							return new BlockInfo(Header, Block, BlockIndex, Pos, false, false);
+						else
+							return null;
+					}
 					else
 						BlockIndex = BlockLink;
 				}
@@ -2208,7 +2220,7 @@ namespace Waher.Persistence.Files
 		private async Task UpdateObjectLocked(object Object, ObjectSerializer Serializer)
 		{
 			Guid ObjectId = await Serializer.GetObjectId(Object, false, NestedLocks.CreateIfNested(this, true, Serializer));
-			BlockInfo Info = await this.FindNodeLocked(ObjectId);
+			BlockInfo Info = await this.FindNodeLocked(ObjectId, false);
 			if (Info is null)
 				throw new KeyNotFoundException("Object not found.");
 
@@ -2644,7 +2656,7 @@ namespace Waher.Persistence.Files
 #if ASSERT_LOCKS
 			this.fileAccess.AssertWriting();
 #endif
-			BlockInfo Info = await this.FindNodeLocked(ObjectId);
+			BlockInfo Info = await this.FindNodeLocked(ObjectId, false);
 			if (Info is null)
 				throw new KeyNotFoundException("Object not found.");
 
@@ -3752,7 +3764,7 @@ namespace Waher.Persistence.Files
 
 			Array.Copy(Block, PrevPos + 4, OldSeparator, 0, c);
 
-			await this.ReplaceObjectLocked(Object, new BlockInfo(Header, Block, BlockIndex, PrevPos, false), false);
+			await this.ReplaceObjectLocked(Object, new BlockInfo(Header, Block, BlockIndex, PrevPos, false, true), false);
 
 			return OldSeparator;
 		}
@@ -3881,7 +3893,7 @@ namespace Waher.Persistence.Files
 
 			Array.Copy(Block, PrevPos + 4, OldSeparator, 0, c);
 
-			await this.ReplaceObjectLocked(Object, new BlockInfo(Header, Block, BlockIndex, PrevPos, false), false);
+			await this.ReplaceObjectLocked(Object, new BlockInfo(Header, Block, BlockIndex, PrevPos, false, true), false);
 
 			return OldSeparator;
 		}
@@ -4905,7 +4917,7 @@ namespace Waher.Persistence.Files
 #if ASSERT_LOCKS
 			this.fileAccess.AssertReadingOrWriting();
 #endif
-			BlockInfo Info = await this.FindNodeLocked(ObjectId);
+			BlockInfo Info = await this.FindNodeLocked(ObjectId, false);
 			if (Info is null)
 				throw new KeyNotFoundException("Object not found.");
 
@@ -6063,7 +6075,7 @@ namespace Waher.Persistence.Files
 			{
 				if (Searching.Comparison.Increment(ref ObjectId))
 				{
-					BlockInfo Info = (await this.FindNodeLocked(ObjectId)) ?? await this.FindLeafNodeLocked(ObjectId);
+					BlockInfo Info = await this.FindNodeLocked(ObjectId, true);
 					ObjectBTreeFileCursor<T> e = await this.GetTypedEnumeratorAsyncLocked<T>();
 					e.SetStartingPoint(Info);
 
@@ -6072,7 +6084,7 @@ namespace Waher.Persistence.Files
 			}
 			else if (FilterFieldValue is FilterFieldGreaterOrEqualTo)
 			{
-				BlockInfo Info = (await this.FindNodeLocked(ObjectId)) ?? await this.FindLeafNodeLocked(ObjectId);
+				BlockInfo Info = await this.FindNodeLocked(ObjectId, true);
 				ObjectBTreeFileCursor<T> e = await this.GetTypedEnumeratorAsyncLocked<T>();
 				e.SetStartingPoint(Info);
 
@@ -6080,7 +6092,7 @@ namespace Waher.Persistence.Files
 			}
 			else if (FilterFieldValue is FilterFieldLesserThan)
 			{
-				BlockInfo Info = (await this.FindNodeLocked(ObjectId)) ?? await this.FindLeafNodeLocked(ObjectId);
+				BlockInfo Info = await this.FindNodeLocked(ObjectId, true);
 				ObjectBTreeFileCursor<T> e = await this.GetTypedEnumeratorAsyncLocked<T>();
 				e.SetStartingPoint(Info);
 
@@ -6091,7 +6103,7 @@ namespace Waher.Persistence.Files
 			{
 				if (Searching.Comparison.Increment(ref ObjectId))
 				{
-					BlockInfo Info = (await this.FindNodeLocked(ObjectId)) ?? await this.FindLeafNodeLocked(ObjectId);
+					BlockInfo Info = await this.FindNodeLocked(ObjectId, true);
 					ObjectBTreeFileCursor<T> e = await this.GetTypedEnumeratorAsyncLocked<T>();
 					e.SetStartingPoint(Info);
 

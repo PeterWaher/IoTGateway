@@ -117,7 +117,7 @@ namespace Waher.Persistence.Files
 			await this.dictionaryFile.BeginRead();
 			try
 			{
-				BlockInfo Info = await this.dictionaryFile.FindNodeLocked(key);
+				BlockInfo Info = await this.dictionaryFile.FindNodeLocked(key, false);
 				return !(Info is null);
 			}
 			finally
@@ -170,18 +170,25 @@ namespace Waher.Persistence.Files
 			try
 			{
 				byte[] Bin = await this.SerializeLocked(key, value, Serializer);
-				BlockInfo Info = await this.dictionaryFile.FindLeafNodeLocked(key);
-				if (Info is null)
+				BlockInfo Info;
+
+				if (ReplaceIfExists)
 				{
-					if (!ReplaceIfExists)
-						throw new ArgumentException("A key with that value already exists.", nameof(key));
+					Info = await this.dictionaryFile.FindNodeLocked(key, true);
 
-					Info = await this.dictionaryFile.FindNodeLocked(key);
-
-					await this.dictionaryFile.ReplaceObjectLocked(Bin, Info, true);
+					if (Info.Match)
+						await this.dictionaryFile.ReplaceObjectLocked(Bin, Info, true);
+					else
+						await this.dictionaryFile.SaveNewObjectLocked(Bin, Info);
 				}
 				else
+				{
+					Info = await this.dictionaryFile.FindLeafNodeLocked(key);
+					if (Info is null)
+						throw new ArgumentException("A key with that value already exists.", nameof(key));
+
 					await this.dictionaryFile.SaveNewObjectLocked(Bin, Info);
+				}
 			}
 			finally
 			{
@@ -672,8 +679,7 @@ namespace Waher.Persistence.Files
 					Entries = await this.GetEnumeratorLocked();
 				else
 				{
-					BlockInfo Info = (await this.dictionaryFile.FindNodeLocked(FromKey)) ?? 
-						await this.dictionaryFile.FindLeafNodeLocked(FromKey);
+					BlockInfo Info = await this.dictionaryFile.FindNodeLocked(FromKey, true);
 					ObjectBTreeFileCursor<KeyValuePair<string, object>> e =
 						await ObjectBTreeFileCursor<KeyValuePair<string, object>>.CreateLocked(this.dictionaryFile, this.recordHandler, this.keyValueSerializer);
 

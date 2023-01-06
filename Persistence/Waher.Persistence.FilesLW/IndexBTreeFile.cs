@@ -535,8 +535,8 @@ namespace Waher.Persistence.Files
 
 			IndexBTreeFileCursor<T> Result = await IndexBTreeFileCursor<T>.CreateLocked(this, this.recordHandler);
 
-			BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
-			Result.SetStartingPoint(Leaf);
+			BlockInfo Node = await this.indexFile.FindNodeLocked(Key, true);
+			Result.SetStartingPoint(Node);
 
 			return Result;
 		}
@@ -572,8 +572,8 @@ namespace Waher.Persistence.Files
 
 			IndexBTreeFileCursor<T> Result = await IndexBTreeFileCursor<T>.CreateLocked(this, this.recordHandler);
 
-			BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
-			Result.SetStartingPoint(Leaf);
+			BlockInfo Node = await this.indexFile.FindNodeLocked(Key, true);
+			Result.SetStartingPoint(Node);
 
 			return Result;
 		}
@@ -611,8 +611,8 @@ namespace Waher.Persistence.Files
 
 			IndexBTreeFileCursor<T> Result = await IndexBTreeFileCursor<T>.CreateLocked(this, this.recordHandler);
 
-			BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
-			Result.SetStartingPoint(Leaf);
+			BlockInfo Node = await this.indexFile.FindNodeLocked(Key, true);
+			Result.SetStartingPoint(Node);
 
 			return Result;
 		}
@@ -648,8 +648,8 @@ namespace Waher.Persistence.Files
 
 			IndexBTreeFileCursor<T> Result = await IndexBTreeFileCursor<T>.CreateLocked(this, this.recordHandler);
 
-			BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
-			Result.SetStartingPoint(Leaf);
+			BlockInfo Node = await this.indexFile.FindNodeLocked(Key, true);
+			Result.SetStartingPoint(Node);
 
 			return Result;
 		}

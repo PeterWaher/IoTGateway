@@ -86,7 +86,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		public async Task Test_02_Search()
 		{
 			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, 10,
-				FullTextSearchOrder.Relevance, "Hello", "Clown", "Kilroy");
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("Hello Clown Kilroy"));
 
 			Assert.IsNotNull(SearchResult);
 			Assert.IsTrue(SearchResult.Length > 0, "No objects found. (Make sure you've run test 01 first, to insert at least one object.)");
@@ -138,7 +138,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 			}
 
 			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, 10,
-				FullTextSearchOrder.Relevance, "Hello", "Clown", "Kilroy");
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("Hello Clown Kilroy"));
 
 			Assert.IsNotNull(SearchResult);
 			Assert.AreEqual(0, SearchResult.Length);
@@ -174,13 +174,13 @@ namespace Waher.Persistence.FullTextSearch.Test
 			}
 
 			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, 10,
-				FullTextSearchOrder.Relevance, "Kilroy");
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("Kilroy"));
 
 			Assert.IsNotNull(SearchResult);
 			Assert.AreEqual(0, SearchResult.Length);
 
 			SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, 10,
-				FullTextSearchOrder.Relevance, "Roy");
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("Roy"));
 
 			Assert.IsNotNull(SearchResult);
 			Assert.AreEqual(1, SearchResult.Length);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Persistence.FullTextSearch.Keywords;
 
 namespace Waher.Persistence.FullTextSearch
 {
@@ -124,6 +125,16 @@ namespace Waher.Persistence.FullTextSearch
 		public static event ObjectReferenceEventHandler ObjectUpdatedInIndex;
 
 		/// <summary>
+		/// Parses a search string into keyworkds.
+		/// </summary>
+		/// <param name="Search">Search string.</param>
+		/// <returns>Keywords</returns>
+		public static Keyword[] ParseKeywords(string Search)
+		{
+			return FullTextSearchModule.ParseKeywords(Search);
+		}
+
+		/// <summary>
 		/// Performs a Full-Text-Search
 		/// </summary>
 		/// <param name="IndexCollection">Index collection name.</param>
@@ -134,7 +145,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// <paramref name="PaginationStrategy"/>, null items may be returned
 		/// if underlying object is not compatible with <typeparamref name="T"/>.</returns>
 		public static Task<T[]> FullTextSearch<T>(string IndexCollection, 
-			int Offset, int MaxCount, FullTextSearchOrder Order, params string[] Keywords)
+			int Offset, int MaxCount, FullTextSearchOrder Order, params Keyword[] Keywords)
 			where T : class
 		{
 			return FullTextSearchModule.FullTextSearch<T>(IndexCollection, Offset, MaxCount,

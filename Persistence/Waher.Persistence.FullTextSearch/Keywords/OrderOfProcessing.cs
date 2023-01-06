@@ -1,29 +1,33 @@
 ﻿using System.Collections.Generic;
 
-namespace Waher.Persistence.FullTextSearch.Orders
+namespace Waher.Persistence.FullTextSearch.Keywords
 {
     /// <summary>
     /// Orders strings in descending length order
     /// </summary>
-    public class DescendingLengthOrder : IComparer<TokenCount>
+    public class OrderOfProcessing : IComparer<Keyword>
     {
         /// <summary>
         /// Orders strings in descending length order
         /// </summary>
-        public DescendingLengthOrder()
+        public OrderOfProcessing()
         {
         }
 
         /// <summary>
         /// <see cref="IComparer<string>.Compare"/>
         /// </summary>
-        public int Compare(TokenCount x, TokenCount y)
+        public int Compare(Keyword x, Keyword y)
         {
-            int i = y.Token.Length - x.Token.Length;
+            int i = y.OrderCategory - x.OrderCategory;
             if (i != 0)
                 return i;
-            else
-                return string.Compare(x.Token, y.Token);
+
+            i = y.OrderComplexity - x.OrderComplexity;
+            if (i != 0) 
+                return i;
+
+            return string.Compare(x.ToString(), y.ToString());
         }
     }
 }

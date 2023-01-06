@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
-using Waher.Persistence.FullTextSearch.KeywordEnumerators;
+using Waher.Persistence.FullTextSearch.Keywords;
 using Waher.Persistence.FullTextSearch.Orders;
 using Waher.Persistence.LifeCycle;
 using Waher.Persistence.Serialization;
@@ -563,6 +563,151 @@ namespace Waher.Persistence.FullTextSearch
 		}
 
 		/// <summary>
+		/// Parses a search string into keyworkds.
+		/// </summary>
+		/// <param name="Search">Search string.</param>
+		/// <returns>Keywords</returns>
+		internal static Keyword[] ParseKeywords(string Search)
+		{
+			List<Keyword> Result = new List<Keyword>();
+			StringBuilder sb = new StringBuilder();
+			bool First = true;
+			bool Required = false;
+			bool Prohibited = false;
+			string Wildcard = null;
+			int Type = 0;
+			Keyword Keyword;
+			string Token;
+
+			foreach (char ch in Search.ToLower().Normalize(NormalizationForm.FormD))
+			{
+				UnicodeCategory Category = CharUnicodeInfo.GetUnicodeCategory(ch);
+				if (Category == UnicodeCategory.NonSpacingMark)
+					continue;
+
+				if (char.IsLetterOrDigit(ch))
+				{
+					sb.Append(ch);
+					First = false;
+				}
+				else if (ch == '*' || ch == '%' || ch == '¤' || ch == '#')
+				{
+					sb.Append(ch);
+					Type = 1;
+					Wildcard = new string(ch, 1);
+				}
+				else if (Type == 2)
+				{
+					if (ch == '/')
+					{
+						Token = sb.ToString();
+						sb.Clear();
+						First = true;
+						Type = 0;
+
+						Keyword = new RegexKeyword(Token);
+
+						if (Required)
+						{
+							Keyword = new RequiredKeyword(Keyword);
+							Required = false;
+						}
+
+						if (Prohibited)
+						{
+							Keyword = new ProhibitedKeyword(Keyword);
+							Prohibited = false;
+						}
+
+						Result.Add(Keyword);
+					}
+					else
+					{
+						sb.Append(ch);
+						First = false;
+					}
+				}
+				else
+				{
+					if (!First)
+					{
+						Token = sb.ToString();
+						sb.Clear();
+						First = true;
+
+						if (Type == 1)
+						{
+							Keyword = new WildcardKeyword(Token, Wildcard);
+							Wildcard = null;
+						}
+						else
+							Keyword = new PlainKeyword(Token);
+
+						if (Required)
+						{
+							Keyword = new RequiredKeyword(Keyword);
+							Required = false;
+						}
+
+						if (Prohibited)
+						{
+							Keyword = new ProhibitedKeyword(Keyword);
+							Prohibited = false;
+						}
+
+						Result.Add(Keyword);
+						Type = 0;
+					}
+
+					if (ch == '+')
+					{
+						Required = true;
+						Prohibited = false;
+					}
+					else if (ch == '-')
+					{
+						Prohibited = true;
+						Required = false;
+					}
+					else if (ch == '/')
+						Type = 2;
+				}
+			}
+
+			if (!First)
+			{
+				Token = sb.ToString();
+				sb.Clear();
+
+				switch (Type)
+				{
+					case 0:
+					default:
+						Keyword = new PlainKeyword(Token);
+						break;
+
+					case 1:
+						Keyword = new WildcardKeyword(Token, Wildcard);
+						break;
+
+					case 2:
+						Keyword = new RegexKeyword(Token);
+						break;
+				}
+
+				if (Required)
+					Keyword = new RequiredKeyword(Keyword);
+
+				if (Prohibited)
+					Keyword = new ProhibitedKeyword(Keyword);
+
+				Result.Add(Keyword);
+			}
+
+			return Result.ToArray();
+		}
+
+		/// <summary>
 		/// Performs a Full-Text-Search
 		/// </summary>
 		/// <param name="IndexCollection">Index collection name.</param>
@@ -576,59 +721,32 @@ namespace Waher.Persistence.FullTextSearch
 		/// if underlying object is not compatible with <typeparamref name="T"/>.</returns>
 		internal static async Task<T[]> FullTextSearch<T>(string IndexCollection,
 			int Offset, int MaxCount, FullTextSearchOrder Order,
-			PaginationStrategy PaginationStrategy, params string[] Keywords)
+			PaginationStrategy PaginationStrategy, params Keyword[] Keywords)
 			where T : class
 		{
-			if (MaxCount <= 0)
+			if (MaxCount <= 0 || Keywords is null)
 				return new T[0];
 
-			TokenCount[] Tokens = Tokenize(Keywords);
-			int NrTokens = Tokens.Length;
-
-			if (NrTokens == 0)
+			int NrKeywords = Keywords.Length;
+			if (NrKeywords == 0)
 				return new T[0];
 
-			Array.Sort(Tokens, descendingLengthOrder);
+			Keywords = (Keyword[])Keywords.Clone();
+			Array.Sort(Keywords, orderOfProcessing);
 
-			Dictionary<ulong, LinkedList<TokenReference>> ReferencesByObject;
+			SearchProcess Process;
 
 			await synchObj.WaitAsync();
 			try
 			{
 				IPersistentDictionary Index = await GetIndexLocked(IndexCollection);
+				
+				Process = new SearchProcess(Index);
 
-				ReferencesByObject = new Dictionary<ulong, LinkedList<TokenReference>>();
-
-				foreach (TokenCount Token in Tokens)
+				foreach (Keyword Keyword in Keywords)
 				{
-					TokenReferenceEnumerator e;
-
-					switch (Order)
-					{
-						case FullTextSearchOrder.Relevance:
-						case FullTextSearchOrder.Newest:
-						case FullTextSearchOrder.Occurrences:
-						default:
-							e = new TokenReferencesNewToOld(Index, Token.Token);
-							break;
-
-						case FullTextSearchOrder.Oldest:
-							e = new TokenReferencesOldToNew(Index, Token.Token);
-							break;
-					}
-
-					while (await e.MoveNextAsync())
-					{
-						TokenReference Ref = e.Current;
-
-						if (!ReferencesByObject.TryGetValue(Ref.ObjectReference, out LinkedList<TokenReference> References))
-						{
-							References = new LinkedList<TokenReference>();
-							ReferencesByObject[Ref.ObjectReference] = References;
-						}
-
-						References.AddLast(Ref);
-					}
+					if (!await Keyword.Process(Process))
+						return new T[0];
 				}
 			}
 			finally
@@ -636,9 +754,9 @@ namespace Waher.Persistence.FullTextSearch
 				synchObj.Release();
 			}
 
-			int c = ReferencesByObject.Count;
+			int c = Process.ReferencesByObject.Count;
 			LinkedList<TokenReference>[] FoundReferences = new LinkedList<TokenReference>[c];
-			ReferencesByObject.Values.CopyTo(FoundReferences, 0);
+			Process.ReferencesByObject.Values.CopyTo(FoundReferences, 0);
 
 			switch (Order)
 			{
@@ -759,7 +877,7 @@ namespace Waher.Persistence.FullTextSearch
 			return Result.ToArray();
 		}
 
-		private static readonly DescendingLengthOrder descendingLengthOrder = new DescendingLengthOrder();
+		private static readonly OrderOfProcessing orderOfProcessing = new OrderOfProcessing();
 		private static readonly RelevanceOrder relevanceOrder = new RelevanceOrder();
 		private static readonly OccurrencesOrder occurrencesOrder = new OccurrencesOrder();
 		private static readonly NewestOrder newestOrder = new NewestOrder();

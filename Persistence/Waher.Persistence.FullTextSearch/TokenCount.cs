@@ -20,10 +20,12 @@ namespace Waher.Persistence.FullTextSearch
 		/// <summary>
 		/// Represents a token and a corresponding occurrence count.
 		/// </summary>
-		public TokenCount(string Token, uint Count)
+		/// <param name="Token">Token</param>
+		/// <param name="DocIndex">Document indices for each occurrence of the token.</param>
+		public TokenCount(string Token, uint[] DocIndex)
 		{
 			this.Token = Token;
-			this.Count = Count;
+			this.DocIndex = DocIndex;
 			this.Block = 0;
 		}
 
@@ -33,9 +35,9 @@ namespace Waher.Persistence.FullTextSearch
 		public string Token { get; set; }
 
 		/// <summary>
-		/// Count
+		/// Index inside document of each occurrence.
 		/// </summary>
-		public uint Count { get; set; }
+		public uint[] DocIndex { get; set; }
 
 		/// <summary>
 		/// Reference is stored in this block in the full-text-search index.
@@ -51,8 +53,14 @@ namespace Waher.Persistence.FullTextSearch
 
 			sb.Append(this.Token);
 			sb.Append(':');
-			sb.Append(this.Count);
-			sb.Append(" (");
+
+			foreach (uint Index in this.DocIndex)
+			{
+				sb.Append(Index.ToString());
+				sb.Append(' ');
+			}
+			
+			sb.Append('(');
 			sb.Append(this.Block.ToString());
 			sb.Append(')');
 

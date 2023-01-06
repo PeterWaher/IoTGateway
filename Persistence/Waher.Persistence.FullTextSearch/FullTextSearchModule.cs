@@ -131,7 +131,8 @@ namespace Waher.Persistence.FullTextSearch
 						Collection = CollectionInfo.CollectionName,
 						ObjectInstanceId = ObjectId,
 						Index = Index,
-						Tokens = Tokens
+						Tokens = Tokens,
+						Indexed = DateTime.UtcNow
 					};
 
 					await AddTokensToIndexLocked(Ref);
@@ -177,7 +178,7 @@ namespace Waher.Persistence.FullTextSearch
 					{
 						LastBlock = 0,
 						ObjectReferences = new ulong[] { Ref.Index },
-						Counts = new uint[] { Token.Count },
+						Counts = new uint[] { (uint)Token.DocIndex.Length },
 						Timestamps = new DateTime[] { TP }
 					};
 
@@ -194,7 +195,7 @@ namespace Waher.Persistence.FullTextSearch
 					Array.Copy(References.Timestamps, 0, NewTimestamps, 0, c);
 
 					NewReferences[c] = Ref.Index;
-					NewCounts[c] = Token.Count;
+					NewCounts[c] = (uint)Token.DocIndex.Length;
 					NewTimestamps[c] = TP;
 
 					References.ObjectReferences = NewReferences;
@@ -218,7 +219,7 @@ namespace Waher.Persistence.FullTextSearch
 					await Index.AddAsync(Token.Token + " " + References.LastBlock.ToString(), NewBlock, true);
 
 					References.ObjectReferences = new ulong[] { Ref.Index };
-					References.Counts = new uint[] { Token.Count };
+					References.Counts = new uint[] { (uint)Token.DocIndex.Length };
 					References.Timestamps = new DateTime[] { TP };
 
 					await Index.AddAsync(Token.Token, References, true);
@@ -250,11 +251,12 @@ namespace Waher.Persistence.FullTextSearch
 		/// <returns>Tokens found, with associated counts.</returns>
 		internal static TokenCount[] Tokenize(IEnumerable<string> Text)
 		{
-			Dictionary<string, uint> Result = new Dictionary<string, uint>();
+			Dictionary<string, List<uint>> Result = new Dictionary<string, List<uint>>();
 			UnicodeCategory Category;
 			StringBuilder sb = new StringBuilder();
 			string Token;
 			bool First = true;
+			uint TokenIndex = 0;
 
 			foreach (string s in Text)
 			{
@@ -280,10 +282,13 @@ namespace Waher.Persistence.FullTextSearch
 							sb.Clear();
 							First = true;
 
-							if (!Result.TryGetValue(Token, out uint Nr))
-								Result[Token] = 1;
-							else if (Nr < uint.MaxValue)
-								Result[Token] = Nr + 1;
+							if (!Result.TryGetValue(Token, out List<uint> DocIndex))
+							{
+								DocIndex = new List<uint>();
+								Result[Token] = DocIndex;
+							}
+
+							DocIndex.Add(++TokenIndex);
 						}
 					}
 				}
@@ -294,10 +299,13 @@ namespace Waher.Persistence.FullTextSearch
 					sb.Clear();
 					First = true;
 
-					if (!Result.TryGetValue(Token, out uint Nr))
-						Result[Token] = 1;
-					else if (Nr < uint.MaxValue)
-						Result[Token] = Nr + 1;
+					if (!Result.TryGetValue(Token, out List<uint> DocIndex))
+					{
+						DocIndex = new List<uint>();
+						Result[Token] = DocIndex;
+					}
+
+					DocIndex.Add(++TokenIndex);
 				}
 			}
 
@@ -308,8 +316,8 @@ namespace Waher.Persistence.FullTextSearch
 			int i = 0;
 			TokenCount[] Counts = new TokenCount[c];
 
-			foreach (KeyValuePair<string, uint> P in Result)
-				Counts[i++] = new TokenCount(P.Key, P.Value);
+			foreach (KeyValuePair<string, List<uint>> P in Result)
+				Counts[i++] = new TokenCount(P.Key, P.Value.ToArray());
 
 			return Counts;
 		}
@@ -572,6 +580,21 @@ namespace Waher.Persistence.FullTextSearch
 		/// <returns>Keywords</returns>
 		internal static Keyword[] ParseKeywords(string Search, bool TreatKeywordsAsPrefixes)
 		{
+			return ParseKeywords(Search, TreatKeywordsAsPrefixes, true);
+		}
+
+		/// <summary>
+		/// Parses a search string into keyworkds.
+		/// </summary>
+		/// <param name="Search">Search string.</param>
+		/// <param name="TreatKeywordsAsPrefixes">If keywords should be treated as
+		/// prefixes. Example: "test" would match "test", "tests" and "testing" if
+		/// treated as a prefix, but also "tester", "testosterone", etc.</param>
+		/// <param name="ParseQuotes">If quotes are to be processed.</param>
+		/// <returns>Keywords</returns>
+		private static Keyword[] ParseKeywords(string Search, bool TreatKeywordsAsPrefixes,
+			bool ParseQuotes)
+		{
 			List<Keyword> Result = new List<Keyword>();
 			StringBuilder sb = new StringBuilder();
 			bool First = true;
@@ -602,27 +625,43 @@ namespace Waher.Persistence.FullTextSearch
 						First = true;
 						Type = 0;
 
-						Keyword = new RegexKeyword(Token);
-
-						if (Required)
-						{
-							Keyword = new RequiredKeyword(Keyword);
-							Required = false;
-						}
-
-						if (Prohibited)
-						{
-							Keyword = new ProhibitedKeyword(Keyword);
-							Prohibited = false;
-						}
-
-						Result.Add(Keyword);
+						Add(new RegexKeyword(Token), Result, ref Required, ref Prohibited);
 					}
 					else
 					{
 						sb.Append(ch);
 						First = false;
 					}
+				}
+				else if (Type == 3)
+				{
+					if (ch == '"')
+					{
+						Token = sb.ToString();
+						sb.Clear();
+						First = true;
+						Type = 0;
+
+						Add(new SequenceOfKeywords(ParseKeywords(sb.ToString(), false)),
+							Result, ref Required, ref Prohibited);
+					}
+					else
+						sb.Append(ch);
+				}
+				else if (Type == 4)
+				{
+					if (ch == '\'')
+					{
+						Token = sb.ToString();
+						sb.Clear();
+						First = true;
+						Type = 0;
+
+						Add(new SequenceOfKeywords(ParseKeywords(sb.ToString(), false)),
+							Result, ref Required, ref Prohibited);
+					}
+					else
+						sb.Append(ch);
 				}
 				else if (Type == 0 && (ch == '*' || ch == '%' || ch == '¤' || ch == '#'))
 				{
@@ -648,19 +687,7 @@ namespace Waher.Persistence.FullTextSearch
 						else
 							Keyword = new PlainKeyword(Token);
 
-						if (Required)
-						{
-							Keyword = new RequiredKeyword(Keyword);
-							Required = false;
-						}
-
-						if (Prohibited)
-						{
-							Keyword = new ProhibitedKeyword(Keyword);
-							Prohibited = false;
-						}
-
-						Result.Add(Keyword);
+						Add(Keyword, Result, ref Required, ref Prohibited);
 						Type = 0;
 					}
 
@@ -676,6 +703,10 @@ namespace Waher.Persistence.FullTextSearch
 					}
 					else if (ch == '/')
 						Type = 2;
+					else if (ch == '"' && ParseQuotes)
+						Type = 3;
+					else if (ch == '\'' && ParseQuotes)
+						Type = 4;
 				}
 			}
 
@@ -703,16 +734,27 @@ namespace Waher.Persistence.FullTextSearch
 						break;
 				}
 
-				if (Required)
-					Keyword = new RequiredKeyword(Keyword);
-
-				if (Prohibited)
-					Keyword = new ProhibitedKeyword(Keyword);
-
-				Result.Add(Keyword);
+				Add(Keyword, Result, ref Required, ref Prohibited);
 			}
 
 			return Result.ToArray();
+		}
+
+		private static void Add(Keyword Keyword, List<Keyword> Result, ref bool Required, ref bool Prohibited)
+		{
+			if (Required)
+			{
+				Keyword = new RequiredKeyword(Keyword);
+				Required = false;
+			}
+
+			if (Prohibited)
+			{
+				Keyword = new ProhibitedKeyword(Keyword);
+				Prohibited = false;
+			}
+
+			Result.Add(Keyword);
 		}
 
 		/// <summary>
@@ -749,7 +791,7 @@ namespace Waher.Persistence.FullTextSearch
 			{
 				IPersistentDictionary Index = await GetIndexLocked(IndexCollection);
 
-				Process = new SearchProcess(Index);
+				Process = new SearchProcess(Index, IndexCollection);
 
 				foreach (Keyword Keyword in Keywords)
 				{
@@ -801,10 +843,7 @@ namespace Waher.Persistence.FullTextSearch
 							continue;
 						}
 
-						ObjectReference Ref = await Database.FindFirstIgnoreRest<ObjectReference>(new FilterAnd(
-							new FilterFieldEqualTo("IndexCollection", IndexCollection),
-							new FilterFieldEqualTo("Index", RefIndex)));
-
+						ObjectReference Ref = await Process.TryGetObjectReference(RefIndex, true);
 						if (Ref is null)
 							Result.Add(null);
 						else
@@ -833,10 +872,7 @@ namespace Waher.Persistence.FullTextSearch
 							continue;
 						}
 
-						ObjectReference Ref = await Database.FindFirstIgnoreRest<ObjectReference>(new FilterAnd(
-							new FilterFieldEqualTo("IndexCollection", IndexCollection),
-							new FilterFieldEqualTo("Index", RefIndex)));
-
+						ObjectReference Ref = await Process.TryGetObjectReference(RefIndex, true);
 						if (Ref is null)
 							continue;
 
@@ -856,9 +892,7 @@ namespace Waher.Persistence.FullTextSearch
 					foreach (LinkedList<TokenReference> ObjectReference in FoundReferences)
 					{
 						ulong RefIndex = ObjectReference.First.Value.ObjectReference;
-						ObjectReference Ref = await Database.FindFirstIgnoreRest<ObjectReference>(new FilterAnd(
-							new FilterFieldEqualTo("IndexCollection", IndexCollection),
-							new FilterFieldEqualTo("Index", RefIndex)));
+						ObjectReference Ref = await Process.TryGetObjectReference(RefIndex, true);
 
 						if (Ref is null)
 							continue;
@@ -1022,7 +1056,8 @@ namespace Waher.Persistence.FullTextSearch
 							Collection = CollectionInfo.CollectionName,
 							ObjectInstanceId = ObjectId,
 							Index = Index,
-							Tokens = Tokens
+							Tokens = Tokens,
+							Indexed = DateTime.UtcNow
 						};
 
 						await AddTokensToIndexLocked(Ref);

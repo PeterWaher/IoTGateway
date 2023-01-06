@@ -50,25 +50,25 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		/// <summary>
 		/// Gets available token references.
 		/// </summary>
-		/// <param name="Index">Dictionary containing token references.</param>
+		/// <param name="Process">Current search process.</param>
 		/// <returns>Enumerable set of token references.</returns>
-		public override async Task<IEnumerable<KeyValuePair<string, TokenReferences>>> GetTokenReferences(IPersistentDictionary Index)
+		public override async Task<IEnumerable<KeyValuePair<string, TokenReferences>>> GetTokenReferences(SearchProcess Process)
 		{
 			string Preamble = FilterFieldLikeRegEx.GetRegExConstantPrefix(this.Expression, this.Parsed);
 			LinkedList<KeyValuePair<string, TokenReferences>> Result = new LinkedList<KeyValuePair<string, TokenReferences>>();
 
 			if (string.IsNullOrEmpty(Preamble))
 			{
-				int c = Index.Count;
+				int c = Process.Index.Count;
 				string[] Keys = new string[c];
-				Index.Keys.CopyTo(Keys, 0);
+				Process.Index.Keys.CopyTo(Keys, 0);
 
 				foreach (string Key in Keys)
 				{
 					Match M = this.Parsed.Match(Key);
 					if (M.Success && M.Index == 0 && M.Length == Key.Length)
 					{
-						KeyValuePair<bool, object> P = await Index.TryGetValueAsync(Key);
+						KeyValuePair<bool, object> P = await Process.Index.TryGetValueAsync(Key);
 						if (P.Key && P.Value is TokenReferences References)
 							Result.AddLast(new KeyValuePair<string, TokenReferences>(Key, References));
 					}
@@ -80,7 +80,7 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 				Characters[Characters.Length - 1]++;
 				string ToExclusive = new string(Characters);
 
-				KeyValuePair<string, object>[] Records = await Index.GetEntriesAsync(Preamble, ToExclusive);
+				KeyValuePair<string, object>[] Records = await Process.Index.GetEntriesAsync(Preamble, ToExclusive);
 
 				foreach (KeyValuePair<string, object> Rec in Records)
 				{

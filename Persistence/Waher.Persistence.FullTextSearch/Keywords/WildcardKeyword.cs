@@ -51,13 +51,13 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		/// <summary>
 		/// Gets available token references.
 		/// </summary>
-		/// <param name="Index">Dictionary containing token references.</param>
+		/// <param name="Process">Current search process.</param>
 		/// <returns>Enumerable set of token references.</returns>
-		public override async Task<IEnumerable<KeyValuePair<string, TokenReferences>>> GetTokenReferences(IPersistentDictionary Index)
+		public override async Task<IEnumerable<KeyValuePair<string, TokenReferences>>> GetTokenReferences(SearchProcess Process)
 		{
 			int i = this.Keyword.IndexOf(this.Wildcard);
 			if (i <= 0)
-				return await base.GetTokenReferences(Index);
+				return await base.GetTokenReferences(Process);
 
 			string Preamble = this.Keyword.Substring(0, i);
 			char[] Characters = Preamble.ToCharArray();
@@ -65,7 +65,7 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 			string ToExclusive = new string(Characters);
 
 			LinkedList<KeyValuePair<string, TokenReferences>> Result = new LinkedList<KeyValuePair<string, TokenReferences>>();
-			KeyValuePair<string, object>[] Records = await Index.GetEntriesAsync(Preamble, ToExclusive);
+			KeyValuePair<string, object>[] Records = await Process.Index.GetEntriesAsync(Preamble, ToExclusive);
 
 			foreach (KeyValuePair<string, object> Rec in Records)
 			{

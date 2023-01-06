@@ -58,11 +58,11 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		/// <summary>
 		/// Gets available token references.
 		/// </summary>
-		/// <param name="Index">Dictionary containing token references.</param>
+		/// <param name="Process">Current search process.</param>
 		/// <returns>Enumerable set of token references.</returns>
-		public override Task<IEnumerable<KeyValuePair<string, TokenReferences>>> GetTokenReferences(IPersistentDictionary Index)
+		public override Task<IEnumerable<KeyValuePair<string, TokenReferences>>> GetTokenReferences(SearchProcess Process)
 		{
-			return this.Keyword.GetTokenReferences(Index);
+			return this.Keyword.GetTokenReferences(Process);
 		}
 
 		/// <summary>
@@ -72,7 +72,7 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		/// <returns>If the process can continue (true) or if an empty result is concluded (false).</returns>
 		public override async Task<bool> Process(SearchProcess Process)
 		{
-			IEnumerable<KeyValuePair<string, TokenReferences>> Records = await this.GetTokenReferences(Process.Index);
+			IEnumerable<KeyValuePair<string, TokenReferences>> Records = await this.GetTokenReferences(Process);
 
 			foreach (KeyValuePair<string, TokenReferences> Rec in Records)
 			{

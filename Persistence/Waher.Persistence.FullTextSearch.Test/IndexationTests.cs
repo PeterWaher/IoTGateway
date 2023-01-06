@@ -193,13 +193,5 @@ namespace Waher.Persistence.FullTextSearch.Test
 			Assert.IsNotNull(SearchResult);
 			Assert.AreEqual(1, SearchResult.Length);
 		}
-
-		// TODO: GenericObject tests
-		// TODO: Script-only tests
-		// TODO: With/without accents in search
-		// TODO: Tokens beginning with search keyword
-		// TODO: Pagination & Multiple blocks/pages (> 100 objects)
-		// TODO: Orders (> 100 objects)
-		// TODO: Relevance, Occurrence, NewToOld, OldToNew
 	}
 }

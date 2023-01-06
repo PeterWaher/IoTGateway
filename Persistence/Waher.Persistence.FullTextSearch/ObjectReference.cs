@@ -1,4 +1,6 @@
-﻿using Waher.Persistence.Attributes;
+﻿using System;
+using System.Collections.Generic;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Persistence.FullTextSearch
 {
@@ -48,5 +50,31 @@ namespace Waher.Persistence.FullTextSearch
 		/// Token count in document.
 		/// </summary>
 		public TokenCount[] Tokens { get; set; }
+
+		/// <summary>
+		/// When object was indexed.
+		/// </summary>
+		public DateTime Indexed { get; set; }
+
+		/// <summary>
+		/// Tries to get a specific token count.
+		/// </summary>
+		/// <param name="Token">Token</param>
+		/// <param name="Count">Count, if found.</param>
+		/// <returns>If the corresponding token was found.</returns>
+		public bool TryGetCount(string Token, out TokenCount Count)
+		{
+			if (this.tokensByName is null)
+			{
+				this.tokensByName = new Dictionary<string, TokenCount>(StringComparer.InvariantCultureIgnoreCase);
+
+				foreach (TokenCount TokenCount in this.Tokens)
+					this.tokensByName[TokenCount.Token] = TokenCount;
+			}
+
+			return this.tokensByName.TryGetValue(Token, out Count);
+		}
+
+		private Dictionary<string, TokenCount> tokensByName = null;
 	}
 }

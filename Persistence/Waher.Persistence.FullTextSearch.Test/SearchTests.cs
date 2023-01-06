@@ -148,7 +148,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Kil* -Clown"));
 
 			Assert.IsNotNull(SearchResult);
-			Assert.AreEqual(200, SearchResult.Length);
+			Assert.AreEqual(100, SearchResult.Length);
 		}
 
 		[TestMethod]
@@ -158,7 +158,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("*roy -Clown"));
 
 			Assert.IsNotNull(SearchResult);
-			Assert.AreEqual(200, SearchResult.Length);
+			Assert.AreEqual(100, SearchResult.Length);
 		}
 
 		[TestMethod]
@@ -168,7 +168,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("/Kil.*/ -Clown"));
 
 			Assert.IsNotNull(SearchResult);
-			Assert.AreEqual(200, SearchResult.Length);
+			Assert.AreEqual(100, SearchResult.Length);
 		}
 
 		[TestMethod]
@@ -178,7 +178,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("/.*roy/ -Clown"));
 
 			Assert.IsNotNull(SearchResult);
-			Assert.AreEqual(200, SearchResult.Length);
+			Assert.AreEqual(100, SearchResult.Length);
 		}
 
 	}

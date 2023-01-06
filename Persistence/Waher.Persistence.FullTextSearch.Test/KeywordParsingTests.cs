@@ -48,7 +48,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		public void Test_05_Wildcard2()
 		{
 			this.Parse("+Kil* was -not here.",
-				new RequiredKeyword(new WildcardKeyword("Kil*", "*")),
+				new RequiredKeyword(new WildcardKeyword("kil*", "*")),
 				new PlainKeyword("was"),
 				new ProhibitedKeyword(new PlainKeyword("not")),
 				new PlainKeyword("here"));
@@ -58,7 +58,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		public void Test_06_Wildcard3()
 		{
 			this.Parse("+K*y was -not here.",
-				new RequiredKeyword(new WildcardKeyword("K*y", "*")),
+				new RequiredKeyword(new WildcardKeyword("k*y", "*")),
 				new PlainKeyword("was"),
 				new ProhibitedKeyword(new PlainKeyword("not")),
 				new PlainKeyword("here"));
@@ -68,7 +68,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		public void Test_07_RegularExpression()
 		{
 			this.Parse("+/(Kil|Fitz)roy/ was -not here.",
-				new RequiredKeyword(new RegexKeyword("(Kil|Fitz)roy")),
+				new RequiredKeyword(new RegexKeyword("(kil|fitz)roy")),
 				new PlainKeyword("was"),
 				new ProhibitedKeyword(new PlainKeyword("not")),
 				new PlainKeyword("here"));
@@ -78,7 +78,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		public void Test_08_RegularExpression2()
 		{
 			this.Parse("+/Kil(roy|ling)/ was -not here.",
-				new RequiredKeyword(new RegexKeyword("Kil(roy|ling)")),
+				new RequiredKeyword(new RegexKeyword("kil(roy|ling)")),
 				new PlainKeyword("was"),
 				new ProhibitedKeyword(new PlainKeyword("not")),
 				new PlainKeyword("here"));
@@ -88,7 +88,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		public void Test_09_RegularExpression3()
 		{
 			this.Parse("+/K.+y/ was -not here.",
-				new RequiredKeyword(new RegexKeyword("K.+y")),
+				new RequiredKeyword(new RegexKeyword("k.+y")),
 				new PlainKeyword("was"),
 				new ProhibitedKeyword(new PlainKeyword("not")),
 				new PlainKeyword("here"));

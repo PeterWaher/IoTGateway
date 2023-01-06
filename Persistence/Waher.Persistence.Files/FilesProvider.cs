@@ -64,7 +64,7 @@ namespace Waher.Persistence.Files
 		private readonly Dictionary<string, ObjectBTreeFile> files = new Dictionary<string, ObjectBTreeFile>();
 		private readonly Dictionary<string, LabelFile> labelFiles = new Dictionary<string, LabelFile>();
 		private readonly Dictionary<ObjectBTreeFile, bool> hasUnsavedData = new Dictionary<ObjectBTreeFile, bool>();
-		private readonly Dictionary<StringDictionary, bool> dictionaries = new Dictionary<StringDictionary, bool>();
+		private readonly Dictionary<string, StringDictionary> dictionaries = new Dictionary<string, StringDictionary>(StringComparer.CurrentCultureIgnoreCase);
 		private StringDictionary master;
 		private Cache<long, byte[]> blocks;
 		private readonly object synchObj = new object();
@@ -1104,7 +1104,7 @@ namespace Waher.Persistence.Files
 					if (!(this.master is null))
 						List.Add(this.master.DictionaryFile);
 
-					foreach (StringDictionary Dictionary in this.dictionaries.Keys)
+					foreach (StringDictionary Dictionary in this.dictionaries.Values)
 						List.Add(Dictionary.DictionaryFile);
 
 					if (List.Count == 0)
@@ -2564,6 +2564,12 @@ namespace Waher.Persistence.Files
 		/// <returns>Persistent dictionary</returns>
 		public async Task<IPersistentDictionary> GetDictionary(string Collection)
 		{
+			lock (this.files)
+			{
+				if (this.dictionaries.TryGetValue(Collection, out StringDictionary Dictionary))
+					return Dictionary;
+			}
+
 			string FileName = Path.Combine(this.folder, "Dictionaries");
 			if (!Directory.Exists(FileName))
 				Directory.CreateDirectory(FileName);
@@ -2577,7 +2583,7 @@ namespace Waher.Persistence.Files
 		{
 			lock (this.files)
 			{
-				this.dictionaries[Dictionary] = true;
+				this.dictionaries[Dictionary.CollectionName] = Dictionary;
 			}
 		}
 
@@ -2585,7 +2591,7 @@ namespace Waher.Persistence.Files
 		{
 			lock (this.files)
 			{
-				this.dictionaries.Remove(Dictionary);
+				this.dictionaries.Remove(Dictionary.CollectionName);
 			}
 		}
 

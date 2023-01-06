@@ -6037,8 +6037,8 @@ namespace Waher.Persistence.Files
 
 			if (Value is Guid Guid)
 				ObjectId = Guid;
-			else if (Value is string s)
-				ObjectId = new Guid(s);
+			else if (Value is string s && Guid.TryParse(s, out Guid))
+				ObjectId = Guid;
 			else if (Value is byte[] ba)
 				ObjectId = new Guid(ba);
 			else

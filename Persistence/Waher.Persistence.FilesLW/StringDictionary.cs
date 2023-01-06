@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Storage;
 using Waher.Persistence.Files.Searching;
+using Waher.Persistence.Filters;
 
 namespace Waher.Persistence.Files
 {
@@ -671,8 +672,14 @@ namespace Waher.Persistence.Files
 					Entries = await this.GetEnumeratorLocked();
 				else
 				{
-					Entries = await this.dictionaryFile.TryGetObjectIdCursorLocked<KeyValuePair<string, object>>(
-						new FilterFieldGreaterOrEqualTo("Key", FromKey), this.keyValueSerializer);
+					BlockInfo Info = (await this.dictionaryFile.FindNodeLocked(FromKey)) ?? 
+						await this.dictionaryFile.FindLeafNodeLocked(FromKey);
+					ObjectBTreeFileCursor<KeyValuePair<string, object>> e =
+						await ObjectBTreeFileCursor<KeyValuePair<string, object>>.CreateLocked(this.dictionaryFile, this.recordHandler, this.keyValueSerializer);
+
+					e.SetStartingPoint(Info);
+
+					Entries = e;
 				}
 
 				List<KeyValuePair<string, object>> Result = new List<KeyValuePair<string, object>>();

@@ -215,7 +215,7 @@ namespace Waher.Persistence.FullTextSearch
 						Timestamps = References.Timestamps
 					};
 
-					await Index.AddAsync(Token + " " + References.LastBlock.ToString(), NewBlock, true);
+					await Index.AddAsync(Token.Token + " " + References.LastBlock.ToString(), NewBlock, true);
 
 					References.ObjectReferences = new ulong[] { Ref.Index };
 					References.Counts = new uint[] { Token.Count };

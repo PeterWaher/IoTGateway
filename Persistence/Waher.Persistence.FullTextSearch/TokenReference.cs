@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Waher.Persistence.FullTextSearch
 {
@@ -38,5 +39,22 @@ namespace Waher.Persistence.FullTextSearch
 		/// Timestamps when corresponding object refernce was indexed.
 		/// </summary>
 		public DateTime Timestamp { get; set; }
+
+		/// <inheritdoc/>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(this.Token);
+			sb.Append(':');
+			sb.Append(this.ObjectReference);
+			sb.Append(" (");
+			sb.Append(this.Count.ToString());
+			sb.Append(", ");
+			sb.Append(this.Timestamp.ToString());
+			sb.Append(')');
+
+			return sb.ToString();
+		}
 	}
 }

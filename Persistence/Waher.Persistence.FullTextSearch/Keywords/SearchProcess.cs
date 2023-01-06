@@ -7,8 +7,6 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 	/// </summary>
 	public class SearchProcess
 	{
-		private int NrRestricted = 0;
-
 		/// <summary>
 		/// Contains information about a search process.
 		/// </summary>
@@ -53,8 +51,6 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		/// </summary>
 		public void IncRestricted()
 		{
-			this.NrRestricted++;
-
 			if (!this.IsRestricted)
 			{
 				this.IsRestricted = true;

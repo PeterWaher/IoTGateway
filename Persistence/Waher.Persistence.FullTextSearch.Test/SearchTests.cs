@@ -181,5 +181,15 @@ namespace Waher.Persistence.FullTextSearch.Test
 			Assert.AreEqual(100, SearchResult.Length);
 		}
 
+		[TestMethod]
+		public async Task Test_09_Accents()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("Pele"));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(100, SearchResult.Length);
+		}
+
 	}
 }

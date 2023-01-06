@@ -3936,6 +3936,14 @@
             <param name="Value">Field value for comparison.</param>
             <returns>Result of comparison.</returns>
         </member>
+        <member name="M:Waher.Persistence.Filters.FilterFieldLikeRegEx.GetRegExConstantPrefix(System.String,System.Text.RegularExpressions.Regex)">
+            <summary>
+            Gets any constant prefix from a regular expression. This prefix
+            </summary>
+            <param name="RegularExpression">String-representation of regular expression.</param>
+            <param name="Regex">Parsed version of regular expression.</param>
+            <returns>Contant prefix.</returns>
+        </member>
         <member name="T:Waher.Persistence.Filters.FilterFieldNotEqualTo">
             <summary>
             This filter selects objects that have a named field not equal to a given value.

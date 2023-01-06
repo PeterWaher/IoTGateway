@@ -131,7 +131,21 @@ namespace Waher.Persistence.FullTextSearch
 		/// <returns>Keywords</returns>
 		public static Keyword[] ParseKeywords(string Search)
 		{
-			return FullTextSearchModule.ParseKeywords(Search);
+			return ParseKeywords(Search, false);
+		}
+
+		/// <summary>
+		/// Parses a search string into keyworkds.
+		/// </summary>
+		/// <param name="Search">Search string.</param>
+		/// <param name="TreatKeywordsAsPrefixes">If keywords should be treated as
+		/// prefixes. Example: "test" would match "test", "tests" and "testing" if
+		/// treated as a prefix, but also "tester", "testosterone", etc.
+		/// Default is false.</param>
+		/// <returns>Keywords</returns>
+		public static Keyword[] ParseKeywords(string Search, bool TreatKeywordsAsPrefixes)
+		{
+			return FullTextSearchModule.ParseKeywords(Search, TreatKeywordsAsPrefixes);
 		}
 
 		/// <summary>

@@ -191,5 +191,105 @@ namespace Waher.Persistence.FullTextSearch.Test
 			Assert.AreEqual(100, SearchResult.Length);
 		}
 
+		[TestMethod]
+		public async Task Test_10_PlainSearch_1_AsPrefixes()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("Kilroy", true));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(200, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_11_PlainSearch_2_AsPrefixes()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("Hello Clown Kilroy", true));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(500, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_12_Required_AsPrefixes()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("Hello Clown +Kilroy", true));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(200, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_13_Prohibited_AsPrefixes()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("Hello Clown -Fitzroy", true));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(300, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_14_Wildcard_1_AsPrefixes()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("Kil* -Clown", true));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(100, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_15_Wildcard_2_AsPrefixes()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("*roy -Clown", true));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(100, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_16_Regex_1_AsPrefixes()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("/Kil.*/ -Clown", true));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(100, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_17_Regex_2_AsPrefixes()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("/.*roy/ -Clown", true));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(100, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_18_Accents_AsPrefixes()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("Pele", true));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(100, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_19_AsPrefixes()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("TEST", true));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(100, SearchResult.Length);
+		}
+
 	}
 }

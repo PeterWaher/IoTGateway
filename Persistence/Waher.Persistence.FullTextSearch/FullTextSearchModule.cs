@@ -566,8 +566,11 @@ namespace Waher.Persistence.FullTextSearch
 		/// Parses a search string into keyworkds.
 		/// </summary>
 		/// <param name="Search">Search string.</param>
+		/// <param name="TreatKeywordsAsPrefixes">If keywords should be treated as
+		/// prefixes. Example: "test" would match "test", "tests" and "testing" if
+		/// treated as a prefix, but also "tester", "testosterone", etc.</param>
 		/// <returns>Keywords</returns>
-		internal static Keyword[] ParseKeywords(string Search)
+		internal static Keyword[] ParseKeywords(string Search, bool TreatKeywordsAsPrefixes)
 		{
 			List<Keyword> Result = new List<Keyword>();
 			StringBuilder sb = new StringBuilder();
@@ -640,6 +643,8 @@ namespace Waher.Persistence.FullTextSearch
 							Keyword = new WildcardKeyword(Token, Wildcard);
 							Wildcard = null;
 						}
+						else if (TreatKeywordsAsPrefixes)
+							Keyword = new WildcardKeyword(Token + "*", "*");
 						else
 							Keyword = new PlainKeyword(Token);
 
@@ -683,7 +688,10 @@ namespace Waher.Persistence.FullTextSearch
 				{
 					case 0:
 					default:
-						Keyword = new PlainKeyword(Token);
+						if (TreatKeywordsAsPrefixes)
+							Keyword = new WildcardKeyword(Token + "*", "*");
+						else
+							Keyword = new PlainKeyword(Token);
 						break;
 
 					case 1:
@@ -740,7 +748,7 @@ namespace Waher.Persistence.FullTextSearch
 			try
 			{
 				IPersistentDictionary Index = await GetIndexLocked(IndexCollection);
-				
+
 				Process = new SearchProcess(Index);
 
 				foreach (Keyword Keyword in Keywords)

@@ -17,7 +17,7 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		public RegexKeyword(string Expression)
 		{
 			this.Expression = Expression;
-			this.Parsed = new Regex(Expression);
+			this.Parsed = new Regex(Expression, RegexOptions.IgnoreCase | RegexOptions.Singleline);
 		}
 
 		/// <summary>

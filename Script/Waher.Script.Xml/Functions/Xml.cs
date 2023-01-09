@@ -57,7 +57,9 @@ namespace Waher.Script.Xml.Functions
 		{
             object Obj = Argument.AssociatedObjectValue;
 
-            if (Obj is string s)
+            if (Obj is null)
+                return Argument;
+            else if (Obj is string s)
                 return this.EvaluateScalar(s, Variables);
             else if (Obj is XmlDocument)
                 return Argument;

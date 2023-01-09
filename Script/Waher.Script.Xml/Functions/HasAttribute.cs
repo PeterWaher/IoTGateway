@@ -44,6 +44,10 @@ namespace Waher.Script.Xml.Functions
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(IElement Argument1, IElement Argument2, Variables Variables)
 		{
+			object Obj = Argument1.AssociatedObjectValue;
+			if (Obj is null)
+				return Argument1;
+
 			string Name = Argument2.AssociatedObjectValue?.ToString() ?? string.Empty;
 
 			if (Argument1.AssociatedObjectValue is XmlElement E)

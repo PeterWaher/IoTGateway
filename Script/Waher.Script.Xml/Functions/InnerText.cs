@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using System.Xml;
+﻿using System.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -42,7 +41,11 @@ namespace Waher.Script.Xml.Functions
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
 		{
-			if (Argument.AssociatedObjectValue is XmlNode N)
+			object Obj = Argument.AssociatedObjectValue;
+
+			if (Obj is null)
+				return Argument;
+			else if (Obj is XmlNode N)
 				return new StringValue(N.InnerText);
 			else
 				throw new ScriptRuntimeException("XML node expected.", this);

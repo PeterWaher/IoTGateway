@@ -43,6 +43,11 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		/// </summary>
 		public override int OrderComplexity => this.Keyword.OrderComplexity;
 
+		/// <summary>
+		/// If keyword should be ignored.
+		/// </summary>
+		public override bool Ignore => this.Keyword.Ignore;
+
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{

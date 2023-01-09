@@ -22,6 +22,7 @@ namespace Waher.Persistence.FullTextSearch
 	[ModuleDependency(typeof(DatabaseModule))]
 	public class FullTextSearchModule : IModule
 	{
+		private static Dictionary<string, bool> stopWords = new Dictionary<string, bool>();
 		private static IPersistentDictionary collectionInformation;
 		private static Dictionary<string, CollectionInformation> collections;
 		private static Dictionary<string, IPersistentDictionary> indices;
@@ -683,7 +684,7 @@ namespace Waher.Persistence.FullTextSearch
 							Wildcard = null;
 						}
 						else if (TreatKeywordsAsPrefixes)
-							Keyword = new WildcardKeyword(Token + "*", "*");
+							Keyword = new WildcardKeyword(Token);
 						else
 							Keyword = new PlainKeyword(Token);
 
@@ -720,7 +721,7 @@ namespace Waher.Persistence.FullTextSearch
 					case 0:
 					default:
 						if (TreatKeywordsAsPrefixes)
-							Keyword = new WildcardKeyword(Token + "*", "*");
+							Keyword = new WildcardKeyword(Token);
 						else
 							Keyword = new PlainKeyword(Token);
 						break;
@@ -795,6 +796,9 @@ namespace Waher.Persistence.FullTextSearch
 
 				foreach (Keyword Keyword in Keywords)
 				{
+					if (Keyword.Ignore)
+						continue;
+
 					if (!await Keyword.Process(Process))
 						return new T[0];
 				}
@@ -1089,6 +1093,31 @@ namespace Waher.Persistence.FullTextSearch
 			{
 				Log.Critical(ex);
 			}
+		}
+
+		/// <summary>
+		/// Registers stop-words with the search-engine.
+		/// Stop-words are ignored in searches.
+		/// </summary>
+		/// <param name="StopWords">Stop words.</param>
+		internal static void RegisterStopWords(params string[] StopWords)
+		{
+			Dictionary<string, bool> NewList = new Dictionary<string, bool>();
+
+			foreach (KeyValuePair<string, bool> P in stopWords)
+				NewList[P.Key] = P.Value;
+
+			stopWords = NewList;
+		}
+
+		/// <summary>
+		/// Checks if a word is a stop word.
+		/// </summary>
+		/// <param name="StopWord">Word to check.</param>
+		/// <returns>If word is a stop word.</returns>
+		internal static bool IsStopWord(string StopWord)
+		{
+			return stopWords.TryGetValue(StopWord, out bool b) && b;
 		}
 	}
 }

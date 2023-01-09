@@ -21,9 +21,14 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 			this.Required = true;
 			this.OrderCategory = int.MaxValue;
 			this.OrderComplexity = int.MaxValue;
+			this.Ignore = true;
 
 			foreach (Keyword Keyword in Keywords)
 			{
+				if (Keyword.Ignore)
+					continue;
+
+				this.Ignore = false;
 				this.Optional |= Keyword.Optional;
 				this.Required &= Keyword.Required;
 				this.OrderCategory = Math.Min(this.OrderCategory, Keyword.OrderCategory);
@@ -59,6 +64,11 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		/// </summary>
 		public override int OrderComplexity { get; }
 
+		/// <summary>
+		/// If keyword should be ignored.
+		/// </summary>
+		public override bool Ignore { get; }
+
 		/// <inheritdoc/>
 		public override bool Equals(object obj)
 		{
@@ -89,6 +99,9 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 
 			foreach (Keyword Keyword in this.Keywords)
 			{
+				if (Keyword.Ignore)
+					continue;
+
 				if (First)
 					First = false;
 				else
@@ -117,6 +130,9 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 
 			foreach (Keyword Keyword in this.Keywords)
 			{
+				if (Keyword.Ignore)
+					continue;
+
 				Records = await Keyword.GetTokenReferences(Process);
 
 				if (ExpectedDocIndex is null)

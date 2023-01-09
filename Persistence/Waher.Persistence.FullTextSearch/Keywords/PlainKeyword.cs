@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Waher.Persistence.FullTextSearch.Keywords
@@ -16,12 +15,19 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		public PlainKeyword(string Keyword)
 		{
 			this.Keyword = Keyword;
+			this.Ignore = string.IsNullOrEmpty(Keyword) ||
+				FullTextSearchModule.IsStopWord(Keyword);
 		}
 
 		/// <summary>
 		/// Keyword
 		/// </summary>
 		public string Keyword { get; }
+
+		/// <summary>
+		/// If keyword should be ignored.
+		/// </summary>
+		public override bool Ignore { get; }
 
 		/// <summary>
 		/// Order complexity (within category) of keyword

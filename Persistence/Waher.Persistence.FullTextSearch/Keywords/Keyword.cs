@@ -40,6 +40,11 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		/// </summary>
 		public virtual int OrderComplexity => 0;
 
+		/// <summary>
+		/// If keyword should be ignored.
+		/// </summary>
+		public virtual bool Ignore => false;
+
 		/// <inheritdoc/>
 		public new abstract bool Equals(object obj);
 

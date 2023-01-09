@@ -10,6 +10,15 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 	public class WildcardKeyword : RegexKeyword
 	{
 		/// <summary>
+		/// Represents a plain keyword, where keyword acts as a prefix.
+		/// </summary>
+		/// <param name="Keyword">Keyword</param>
+		public WildcardKeyword(string Keyword)
+			: this(Keyword + "*", "*")
+		{
+		}
+
+		/// <summary>
 		/// Represents a wildcard keyword.
 		/// </summary>
 		/// <param name="Keyword">Keyword</param>

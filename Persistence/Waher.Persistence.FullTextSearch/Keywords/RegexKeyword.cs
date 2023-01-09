@@ -18,6 +18,16 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		{
 			this.Expression = Expression;
 			this.Parsed = new Regex(Expression, RegexOptions.IgnoreCase | RegexOptions.Singleline);
+
+			if (Expression.EndsWith(".*"))
+			{
+				string s = Expression.Substring(0, Expression.Length - 2);
+
+				this.Ignore = string.IsNullOrEmpty(s) || FullTextSearchModule.IsStopWord(s);
+			}
+			else
+				this.Ignore = false;
+
 		}
 
 		/// <summary>
@@ -34,6 +44,11 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		/// Order complexity (within category) of keyword
 		/// </summary>
 		public override int OrderComplexity => this.Expression.Length;
+
+		/// <summary>
+		/// If keyword should be ignored.
+		/// </summary>
+		public override bool Ignore { get; }
 
 		/// <inheritdoc/>
 		public override bool Equals(object obj)

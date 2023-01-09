@@ -165,5 +165,26 @@ namespace Waher.Persistence.FullTextSearch
 			return FullTextSearchModule.FullTextSearch<T>(IndexCollection, Offset, MaxCount,
 				Order, PaginationStrategy.PaginateOverObjectsNullIfIncompatible, Keywords);
 		}
+
+		/// <summary>
+		/// Registers stop-words with the search-engine.
+		/// Stop-words are ignored in searches.
+		/// </summary>
+		/// <param name="StopWords">Stop words.</param>
+		internal static void RegisterStopWords(params string[] StopWords)
+		{
+			FullTextSearchModule.RegisterStopWords(StopWords);
+		}
+
+		/// <summary>
+		/// Checks if a word is a stop word.
+		/// </summary>
+		/// <param name="StopWord">Word to check.</param>
+		/// <returns>If word is a stop word.</returns>
+		internal static bool IsStopWord(string StopWord)
+		{
+			return FullTextSearchModule.IsStopWord(StopWord);
+		}
+
 	}
 }

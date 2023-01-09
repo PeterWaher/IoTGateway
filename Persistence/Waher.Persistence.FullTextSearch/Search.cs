@@ -171,7 +171,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// Stop-words are ignored in searches.
 		/// </summary>
 		/// <param name="StopWords">Stop words.</param>
-		internal static void RegisterStopWords(params string[] StopWords)
+		public static void RegisterStopWords(params string[] StopWords)
 		{
 			FullTextSearchModule.RegisterStopWords(StopWords);
 		}
@@ -181,7 +181,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		/// <param name="StopWord">Word to check.</param>
 		/// <returns>If word is a stop word.</returns>
-		internal static bool IsStopWord(string StopWord)
+		public static bool IsStopWord(string StopWord)
 		{
 			return FullTextSearchModule.IsStopWord(StopWord);
 		}

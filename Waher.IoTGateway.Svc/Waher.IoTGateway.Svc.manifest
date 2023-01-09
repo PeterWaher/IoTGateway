@@ -373,6 +373,8 @@
 	<Assembly fileName='Waher.Persistence.pdb'/>
 	<Assembly fileName='Waher.Persistence.Files.dll'/>
 	<Assembly fileName='Waher.Persistence.Files.pdb'/>
+	<Assembly fileName='Waher.Persistence.FullTextSearch.dll'/>
+	<Assembly fileName='Waher.Persistence.FullTextSearch.pdb'/>
 	<Assembly fileName='Waher.Persistence.MongoDB.dll'/>
 	<Assembly fileName='Waher.Persistence.MongoDB.pdb'/>
 	<Assembly fileName='Waher.Persistence.Serialization.Compiled.dll'/>

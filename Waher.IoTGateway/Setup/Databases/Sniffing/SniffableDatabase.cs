@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.Sniffers;
 using Waher.Persistence;
+using Waher.Persistence.FullTextSearch;
 using Waher.Persistence.Serialization;
 
 namespace Waher.IoTGateway.Setup.Databases.Sniffing
@@ -64,6 +65,10 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 					Database.ObjectDeleted += Database_ObjectDeleted;
 					Database.ObjectInserted += Database_ObjectInserted;
 					Database.ObjectUpdated += Database_ObjectUpdated;
+
+					Search.ObjectAddedToIndex += this.Search_ObjectAddedToIndex;
+					Search.ObjectUpdatedInIndex += this.Search_ObjectUpdatedInIndex;
+					Search.ObjectRemovedFromIndex += this.Search_ObjectRemovedFromIndex;
 				}
 				else
 				{
@@ -72,6 +77,10 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 					Database.ObjectDeleted -= Database_ObjectDeleted;
 					Database.ObjectInserted -= Database_ObjectInserted;
 					Database.ObjectUpdated -= Database_ObjectUpdated;
+
+					Search.ObjectAddedToIndex -= this.Search_ObjectAddedToIndex;
+					Search.ObjectUpdatedInIndex -= this.Search_ObjectUpdatedInIndex;
+					Search.ObjectRemovedFromIndex -= this.Search_ObjectRemovedFromIndex;
 				}
 
 				this.prevHasSniffers = b;
@@ -151,6 +160,24 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 		private void Database_CollectionCleared(object Sender, CollectionEventArgs e)
 		{
 			this.Information("Collection has been cleared: " + e.Collection);
+		}
+
+		private Task Search_ObjectAddedToIndex(object Sender, ObjectReferenceEventArgs e)
+		{
+			this.Information("Object added to full-text-search index: " + e.Reference.IndexCollection);
+			return Task.CompletedTask;
+		}
+
+		private Task Search_ObjectUpdatedInIndex(object Sender, ObjectReferenceEventArgs e)
+		{
+			this.Information("Object updated in full-text-search index: " + e.Reference.IndexCollection);
+			return Task.CompletedTask;
+		}
+
+		private Task Search_ObjectRemovedFromIndex(object Sender, ObjectReferenceEventArgs e)
+		{
+			this.Information("Object removed from full-text-search index: " + e.Reference.IndexCollection);
+			return Task.CompletedTask;
 		}
 	}
 }

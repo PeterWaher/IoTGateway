@@ -312,6 +312,16 @@
             Contains the CR LF character sequence.
             </summary>
         </member>
+        <member name="F:Waher.Content.CommonTypes.ControlCharacters">
+            <summary>
+            Contains control characters.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.CommonTypes.WhiteSpace">
+            <summary>
+            Contains white-space characters.
+            </summary>
+        </member>
         <member name="M:Waher.Content.CommonTypes.TryParse(System.String,System.Double@)">
             <summary>
             Tries to decode a string encoded double.

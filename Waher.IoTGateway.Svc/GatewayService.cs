@@ -14,6 +14,7 @@ namespace Waher.IoTGateway.Svc
 	public class GatewayService : ServiceBase
 	{
 		private bool autoPaused = false;
+		private bool starting = false;
 
 		/// <summary>
 		/// Gateway Service
@@ -37,15 +38,28 @@ namespace Waher.IoTGateway.Svc
 			{
 				bool Started;
 
-				using (PendingTimer Timer = new PendingTimer(this))
+				if (starting)
+					Started = false;
+				else
 				{
-					Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+					using (PendingTimer Timer = new PendingTimer(this))
+					{
+						Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
-					Gateway.GetDatabaseProvider += Program.GetDatabase;
-					Gateway.RegistrationSuccessful += Program.RegistrationSuccessful;
-					Gateway.OnTerminate += this.TerminateService;
+						Gateway.GetDatabaseProvider += Program.GetDatabase;
+						Gateway.RegistrationSuccessful += Program.RegistrationSuccessful;
+						Gateway.OnTerminate += this.TerminateService;
 
-					Started = Gateway.Start(false, true, Program.InstanceName).Result;
+						starting = true;
+						try
+						{
+							Started = Gateway.Start(false, true, Program.InstanceName).Result;
+						}
+						finally
+						{
+							starting = false;
+						}
+					}
 				}
 
 				if (!Started)
@@ -119,9 +133,22 @@ namespace Waher.IoTGateway.Svc
 			{
 				bool Started;
 
-				using (PendingTimer Timer = new PendingTimer(this))
+				if (starting)
+					Started = false;
+				else
 				{
-					Started = Gateway.Start(false, true, Program.InstanceName).Result;
+					using (PendingTimer Timer = new PendingTimer(this))
+					{
+						starting = true;
+						try
+						{
+							Started = Gateway.Start(false, true, Program.InstanceName).Result;
+						}
+						finally
+						{
+							starting = false;
+						}
+					}
 				}
 
 				if (!Started)
@@ -154,9 +181,15 @@ namespace Waher.IoTGateway.Svc
 				case PowerBroadcastStatus.ResumeSuspend:
 					if (this.autoPaused)
 					{
-						Log.Notice("Resuming service.");
 						this.autoPaused = false;
-						this.OnContinue();
+
+						if (starting)
+							Log.Warning("Gateway is in the process of starting, called from another source.");
+						else
+						{
+							Log.Notice("Resuming service.");
+							this.OnContinue();
+						}
 					}
 					return true;
 

@@ -212,6 +212,14 @@
             <param name="RoleId">Role ID.</param>
             <returns>Role object.</returns>
         </member>
+        <member name="M:Waher.Security.Users.Roles.GetRole(System.String,System.Boolean)">
+            <summary>
+            Gets the <see cref="T:Waher.Security.Users.Role"/> object corresponding to a Role ID.
+            </summary>
+            <param name="RoleId">Role ID.</param>
+            <param name="CreateIfNew">If role should be created, if it does not exist.</param>
+            <returns>Role object.</returns>
+        </member>
         <member name="M:Waher.Security.Users.Roles.LoadAll">
             <summary>
             Loads all roles

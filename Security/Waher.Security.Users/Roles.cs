@@ -20,7 +20,18 @@ namespace Waher.Security.Users
 		/// </summary>
 		/// <param name="RoleId">Role ID.</param>
 		/// <returns>Role object.</returns>
-		public static async Task<Role> GetRole(string RoleId)
+		public static Task<Role> GetRole(string RoleId)
+		{
+			return GetRole(RoleId, true);
+		}
+
+		/// <summary>
+		/// Gets the <see cref="Role"/> object corresponding to a Role ID.
+		/// </summary>
+		/// <param name="RoleId">Role ID.</param>
+		/// <param name="CreateIfNew">If role should be created, if it does not exist.</param>
+		/// <returns>Role object.</returns>
+		public static async Task<Role> GetRole(string RoleId, bool CreateIfNew)
 		{
 			await synchObj.BeginWrite();
 			try
@@ -31,6 +42,9 @@ namespace Waher.Security.Users
 				Role = await Database.FindFirstDeleteRest<Role>(new FilterFieldEqualTo("Id", RoleId));
 				if (Role is null)
 				{
+					if (!CreateIfNew)
+						return null;
+
 					Role = new Role()
 					{
 						Id = RoleId,

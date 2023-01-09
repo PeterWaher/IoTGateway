@@ -248,9 +248,19 @@ namespace Waher.Persistence.FullTextSearch
 		/// <summary>
 		/// Tokenizes a set of strings.
 		/// </summary>
+		/// <param name="Text">String to tokenize.</param>
+		/// <returns>Tokens found, with associated counts.</returns>
+		public static TokenCount[] Tokenize(string Text)
+		{
+			return Tokenize(new string[] { Text });
+		}
+
+		/// <summary>
+		/// Tokenizes a set of strings.
+		/// </summary>
 		/// <param name="Text">Enumerable set of strings to tokenize.</param>
 		/// <returns>Tokens found, with associated counts.</returns>
-		internal static TokenCount[] Tokenize(IEnumerable<string> Text)
+		public static TokenCount[] Tokenize(IEnumerable<string> Text)
 		{
 			Dictionary<string, List<uint>> Result = new Dictionary<string, List<uint>>();
 			UnicodeCategory Category;

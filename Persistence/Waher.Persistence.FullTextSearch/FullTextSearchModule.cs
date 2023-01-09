@@ -642,7 +642,7 @@ namespace Waher.Persistence.FullTextSearch
 						First = true;
 						Type = 0;
 
-						Add(new SequenceOfKeywords(ParseKeywords(sb.ToString(), false)),
+						Add(new SequenceOfKeywords(ParseKeywords(Token, false)),
 							Result, ref Required, ref Prohibited);
 					}
 					else
@@ -657,7 +657,7 @@ namespace Waher.Persistence.FullTextSearch
 						First = true;
 						Type = 0;
 
-						Add(new SequenceOfKeywords(ParseKeywords(sb.ToString(), false)),
+						Add(new SequenceOfKeywords(ParseKeywords(Token, false)),
 							Result, ref Required, ref Prohibited);
 					}
 					else

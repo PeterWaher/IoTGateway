@@ -182,6 +182,57 @@ namespace Waher.Persistence.FullTextSearch.Test
 				new WildcardKeyword("here*", "*"));
 		}
 
+		[TestMethod]
+		public void Test_19_Sequence_Quotes()
+		{
+			this.Parse("\"Kilroy was here\"", true,
+				new SequenceOfKeywords(
+					new PlainKeyword("kilroy"),
+					new PlainKeyword("was"),
+					new PlainKeyword("here")));
+		}
+
+		[TestMethod]
+		public void Test_20_Sequence_Apostrophes()
+		{
+			this.Parse("'Kilroy was here'", true,
+				new SequenceOfKeywords(
+					new PlainKeyword("kilroy"),
+					new PlainKeyword("was"),
+					new PlainKeyword("here")));
+		}
+
+		[TestMethod]
+		public void Test_21_Sequence_Nesting1()
+		{
+			this.Parse("+'Kilroy was here'", true,
+				new RequiredKeyword(
+					new SequenceOfKeywords(
+						new PlainKeyword("kilroy"),
+						new PlainKeyword("was"),
+						new PlainKeyword("here"))));
+		}
+
+		[TestMethod]
+		public void Test_22_Sequence_Nesting2()
+		{
+			this.Parse("'Kilroy was' here", true,
+				new SequenceOfKeywords(
+					new PlainKeyword("kilroy"),
+					new PlainKeyword("was")),
+				new WildcardKeyword("here*", "*"));
+		}
+
+		[TestMethod]
+		public void Test_23_Sequence_Nesting3()
+		{
+			this.Parse("Kilroy 'was here'", true,
+				new WildcardKeyword("kilroy*", "*"),
+				new SequenceOfKeywords(
+					new PlainKeyword("was"),
+					new PlainKeyword("here")));
+		}
+
 		private void Parse(string Query, bool TreatKeywordsAsPrefixes, params Keyword[] Keywords)
 		{
 			Keyword[] Parsed = Search.ParseKeywords(Query, TreatKeywordsAsPrefixes);

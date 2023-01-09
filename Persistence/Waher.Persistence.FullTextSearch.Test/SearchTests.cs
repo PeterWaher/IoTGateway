@@ -291,5 +291,75 @@ namespace Waher.Persistence.FullTextSearch.Test
 			Assert.AreEqual(100, SearchResult.Length);
 		}
 
+		[TestMethod]
+		public async Task Test_20_Sequence1()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("'Kilroy was here'", true));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(100, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_21_Sequence2()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("'Kilroy here was'", true));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(0, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_22_Sequence3()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("Kilroy 'was here'", true));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(300, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_23_Sequence4()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("Kilroy +'was here'", true));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(200, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_24_Sequence5()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("+Kilroy +'was here'", true));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(100, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_25_Sequence6()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("'Kilroy was' here", true));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(200, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_26_Sequence7()
+		{
+			TestClass[] SearchResult = await Search.FullTextSearch<TestClass>("FullTextSearch", 0, int.MaxValue,
+				FullTextSearchOrder.Relevance, Search.ParseKeywords("+'Kilroy was' here", true));
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(100, SearchResult.Length);
+		}
+
 	}
 }

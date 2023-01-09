@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,7 +14,7 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		/// Represents a sequence of keywords.
 		/// </summary>
 		/// <param name="Keywords">Keywords</param>
-		public SequenceOfKeywords(Keyword[] Keywords)
+		public SequenceOfKeywords(params Keyword[] Keywords)
 			: base()
 		{
 			this.Optional = false;
@@ -169,7 +167,7 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 									Key <<= 32;
 									Key |= DocIndex;
 
-									if (ExpectedDocIndex2.ContainsKey(Key))
+									if (ExpectedDocIndex.ContainsKey(Key))
 										ExpectedDocIndex2[Key + 1] = Ref;
 								}
 							}

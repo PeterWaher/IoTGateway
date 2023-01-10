@@ -16,6 +16,5 @@ namespace Waher.Persistence.FullTextSearch.Test
 		{
 			return Initialize("Test", "FullTextSearch");
 		}
-
 	}
 }

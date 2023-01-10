@@ -59,7 +59,7 @@ namespace Waher.Persistence.Serialization
 		public string CollectionName
 		{
 			get => this.collectionName;
-			internal set => this.collectionName = value;
+			set => this.collectionName = value;
 		}
 
 		/// <summary>

@@ -36,10 +36,13 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 		/// </summary>
 		/// <param name="Value">Object to tokenize.</param>
 		/// <param name="TokenCounts">Token counts.</param>
-		public void Tokenize(object Value, Dictionary<string, List<uint>> TokenCounts)
+		/// <param name="DocumentIndexOffset">Document Index Offset. Used to
+		/// identify sequences of tokens in a document.</param>
+		public void Tokenize(object Value, Dictionary<string, List<uint>> TokenCounts,
+			ref uint DocumentIndexOffset)
 		{
 			if (Value is string s)
-				Tokenize(s, TokenCounts);
+				Tokenize(s, TokenCounts, ref DocumentIndexOffset);
 		}
 
 		/// <summary>
@@ -47,13 +50,15 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 		/// </summary>
 		/// <param name="Text">String to tokenize.</param>
 		/// <param name="TokenCounts">Token counts.</param>
-		public static void Tokenize(string Text, Dictionary<string, List<uint>> TokenCounts)
+		/// <param name="DocumentIndexOffset">Document Index Offset. Used to
+		/// identify sequences of tokens in a document.</param>
+		public static void Tokenize(string Text, Dictionary<string, List<uint>> TokenCounts,
+			ref uint DocumentIndexOffset)
 		{
 			UnicodeCategory Category;
 			StringBuilder sb = new StringBuilder();
 			string Token;
 			bool First = true;
-			uint TokenIndex = 0;
 
 			foreach (char ch in Text.ToLower().Normalize(NormalizationForm.FormD))
 			{
@@ -80,7 +85,7 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 							TokenCounts[Token] = DocIndex;
 						}
 
-						DocIndex.Add(++TokenIndex);
+						DocIndex.Add(++DocumentIndexOffset);
 					}
 				}
 			}
@@ -89,7 +94,6 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 			{
 				Token = sb.ToString();
 				sb.Clear();
-				First = true;
 
 				if (!TokenCounts.TryGetValue(Token, out List<uint> DocIndex))
 				{
@@ -97,7 +101,7 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 					TokenCounts[Token] = DocIndex;
 				}
 
-				DocIndex.Add(++TokenIndex);
+				DocIndex.Add(++DocumentIndexOffset);
 			}
 		}
 

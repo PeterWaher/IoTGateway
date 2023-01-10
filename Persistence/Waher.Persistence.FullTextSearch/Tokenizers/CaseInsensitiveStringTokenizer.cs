@@ -34,10 +34,13 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 		/// </summary>
 		/// <param name="Value">Object to tokenize.</param>
 		/// <param name="TokenCounts">Token counts.</param>
-		public void Tokenize(object Value, Dictionary<string, List<uint>> TokenCounts)
+		/// <param name="DocumentIndexOffset">Document Index Offset. Used to
+		/// identify sequences of tokens in a document.</param>
+		public void Tokenize(object Value, Dictionary<string, List<uint>> TokenCounts,
+			ref uint DocumentIndexOffset)
 		{
 			if (Value is CaseInsensitiveString s)
-				StringTokenizer.Tokenize(s.LowerCase, TokenCounts);
+				StringTokenizer.Tokenize(s.LowerCase, TokenCounts, ref DocumentIndexOffset);
 		}
 
 	}

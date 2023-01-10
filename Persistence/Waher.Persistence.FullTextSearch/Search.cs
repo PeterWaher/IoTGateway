@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence.FullTextSearch.Keywords;
@@ -184,6 +185,30 @@ namespace Waher.Persistence.FullTextSearch
 		public static bool IsStopWord(string StopWord)
 		{
 			return FullTextSearchModule.IsStopWord(StopWord);
+		}
+
+		/// <summary>
+		/// Tokenizes a set of objects using available tokenizers.
+		/// Tokenizers are classes with a default contructor, implementing
+		/// the <see cref="ITokenizer"/> interface.
+		/// </summary>
+		/// <param name="Objects">Objects to tokenize.</param>
+		/// <returns>Tokens</returns>
+		public static TokenCount[] Tokenize(IEnumerable<object> Objects)
+		{
+			return FullTextSearchModule.Tokenize(Objects);
+		}
+
+		/// <summary>
+		/// Tokenizes a set of objects using available tokenizers.
+		/// Tokenizers are classes with a default contructor, implementing
+		/// the <see cref="ITokenizer"/> interface.
+		/// </summary>
+		/// <param name="Objects">Objects to tokenize.</param>
+		/// <returns>Tokens</returns>
+		public static TokenCount[] Tokenize(params object[] Objects)
+		{
+			return FullTextSearchModule.Tokenize(Objects);
 		}
 
 	}

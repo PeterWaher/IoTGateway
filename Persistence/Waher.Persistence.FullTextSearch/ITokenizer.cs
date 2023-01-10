@@ -14,7 +14,9 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		/// <param name="Value">Object to tokenize.</param>
 		/// <param name="TokenCounts">Token counts.</param>
-		/// <returns>Tokens found.</returns>
-		void Tokenize(object Value, Dictionary<string, List<uint>> TokenCounts);
+		/// <param name="DocumentIndexOffset">Document Index Offset. Used to
+		/// identify sequences of tokens in a document.</param>
+		void Tokenize(object Value, Dictionary<string, List<uint>> TokenCounts,
+			ref uint DocumentIndexOffset);
 	}
 }

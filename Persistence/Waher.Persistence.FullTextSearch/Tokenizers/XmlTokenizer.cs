@@ -39,7 +39,10 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 		/// </summary>
 		/// <param name="Value">Object to tokenize.</param>
 		/// <param name="TokenCounts">Token counts.</param>
-		public void Tokenize(object Value, Dictionary<string, List<uint>> TokenCounts)
+		/// <param name="DocumentIndexOffset">Document Index Offset. Used to
+		/// identify sequences of tokens in a document.</param>
+		public void Tokenize(object Value, Dictionary<string, List<uint>> TokenCounts,
+			ref uint DocumentIndexOffset)
 		{
 			if (Value is XmlNode N)
 			{
@@ -47,7 +50,7 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 				
 				GetText(N, sb);
 
-				StringTokenizer.Tokenize(sb.ToString(), TokenCounts);
+				StringTokenizer.Tokenize(sb.ToString(), TokenCounts, ref DocumentIndexOffset);
 			}
 		}
 

@@ -1051,6 +1051,7 @@ namespace Waher.Persistence.FullTextSearch
 		public static TokenCount[] Tokenize(IEnumerable<object> Objects)
 		{
 			Dictionary<string, List<uint>> TokenCounts = new Dictionary<string, List<uint>>();
+			uint DocumentationIndexOffset = 0;
 
 			foreach (object Object in Objects)
 			{
@@ -1079,7 +1080,7 @@ namespace Waher.Persistence.FullTextSearch
 						continue;
 				}
 
-				Tokenizer.Tokenize(Object, TokenCounts);
+				Tokenizer.Tokenize(Object, TokenCounts, ref DocumentationIndexOffset);
 			}
 
 			int c = TokenCounts.Count;

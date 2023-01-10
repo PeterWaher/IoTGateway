@@ -52,6 +52,9 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 		/// <param name="Process">Current tokenization process.</param>
 		public static void Tokenize(string Text, TokenizationProcess Process)
 		{
+			if (string.IsNullOrEmpty(Text))
+				return;
+
 			UnicodeCategory Category;
 			StringBuilder sb = new StringBuilder();
 			string Token;

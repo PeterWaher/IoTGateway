@@ -110,17 +110,13 @@ namespace Waher.Persistence.FullTextSearch
 				CollectionInformation CollectionInfo = P.Item1;
 				TypeInformation TypeInfo = P.Item2;
 				GenericObject GenObj = P.Item3;
-				Dictionary<string, object> IndexableProperties;
+				TokenCount[] Tokens;
 
 				if (GenObj is null)
-					IndexableProperties = TypeInfo.GetIndexableProperties(e.Object, CollectionInfo.PropertyNames);
+					Tokens = await TypeInfo.Tokenize(e.Object, CollectionInfo.PropertyNames);
 				else
-					IndexableProperties = GetIndexableProperties(GenObj, CollectionInfo.PropertyNames);
+					Tokens = await Tokenize(GenObj, CollectionInfo.PropertyNames);
 
-				if (IndexableProperties.Count == 0)
-					return;
-
-				TokenCount[] Tokens = await Tokenize(IndexableProperties.Values);
 				if (Tokens is null)
 					return;
 
@@ -248,55 +244,6 @@ namespace Waher.Persistence.FullTextSearch
 			await collectionInformation.AddAsync(Key, Nr, true);
 
 			return Nr;
-		}
-
-		/// <summary>
-		/// Gets the indexable property values from an object. Property values will be returned in lower-case.
-		/// </summary>
-		/// <param name="Obj">Generic object.</param>
-		/// <param name="PropertyNames">Indexable property names.</param>
-		/// <returns>Indexable property values found.</returns>
-		internal static async Task<Dictionary<string, object>> GetIndexableProperties(object Obj, params string[] PropertyNames)
-		{
-			if (Obj is null)
-				return new Dictionary<string, object>();
-			else if (Obj is GenericObject GenObj)
-				return GetIndexableProperties(GenObj, PropertyNames);
-			else
-			{
-				await synchObj.WaitAsync();
-				try
-				{
-					TypeInformation TypeInfo = await GetTypeInfoLocked(Obj.GetType());
-					return TypeInfo.GetIndexableProperties(Obj, PropertyNames);
-				}
-				finally
-				{
-					synchObj.Release();
-				}
-			}
-		}
-
-		/// <summary>
-		/// Gets the indexable property values from an object. Property values will be returned in lower-case.
-		/// </summary>
-		/// <param name="Obj">Generic object.</param>
-		/// <param name="PropertyNames">Indexable property names.</param>
-		/// <returns>Indexable property values found.</returns>
-		internal static Dictionary<string, object> GetIndexableProperties(GenericObject Obj, params string[] PropertyNames)
-		{
-			Dictionary<string, object> Result = new Dictionary<string, object>();
-
-			if (!(Obj is null))
-			{
-				foreach (string PropertyName in PropertyNames)
-				{
-					if (Obj.TryGetFieldValue(PropertyName, out object Value))
-						Result[PropertyName] = Value;
-				}
-			}
-
-			return Result;
 		}
 
 		private static Task<CollectionInformation> GetCollectionInfoLocked(string CollectionName, bool CreateIfNotExists)
@@ -462,18 +409,23 @@ namespace Waher.Persistence.FullTextSearch
 			TypeInfo TI = T.GetTypeInfo();
 			FullTextSearchAttribute SearchAttr = TI.GetCustomAttribute<FullTextSearchAttribute>(true);
 			CollectionNameAttribute CollectionAttr = TI.GetCustomAttribute<CollectionNameAttribute>(true);
+			ITokenizer CustomTokenizer = Types.FindBest<ITokenizer, Type>(T);
 
 			if (CollectionAttr is null)
-				Result = new TypeInformation(T, TI, null, null);
+				Result = new TypeInformation(T, TI, null, null, CustomTokenizer);
 			else
 			{
 				string CollectionName = CollectionAttr.Name;
 				CollectionInformation Info = await GetCollectionInfoLocked(SearchAttr?.IndexCollection ?? CollectionName, CollectionName, true);
 
-				Result = new TypeInformation(T, TI, CollectionName, Info);
+				Result = new TypeInformation(T, TI, CollectionName, Info, CustomTokenizer);
 
-				if (!(SearchAttr is null) && Info.AddIndexableProperties(SearchAttr.PropertyNames))
+				if (!(SearchAttr is null) &&
+					SearchAttr.HasPropertyNames &&
+					Info.AddIndexableProperties(SearchAttr.PropertyNames))
+				{
 					await collectionInformation.AddAsync(CollectionName, Info, true);
+				}
 			}
 
 			types[T] = Result;
@@ -949,17 +901,13 @@ namespace Waher.Persistence.FullTextSearch
 				CollectionInformation CollectionInfo = P.Item1;
 				TypeInformation TypeInfo = P.Item2;
 				GenericObject GenObj = P.Item3;
-				Dictionary<string, object> IndexableProperties;
+				TokenCount[] Tokens;
 
 				if (GenObj is null)
-					IndexableProperties = TypeInfo.GetIndexableProperties(e.Object, CollectionInfo.PropertyNames);
+					Tokens = await TypeInfo.Tokenize(e.Object, CollectionInfo.PropertyNames);
 				else
-					IndexableProperties = GetIndexableProperties(GenObj, CollectionInfo.PropertyNames);
+					Tokens = await Tokenize(GenObj, CollectionInfo.PropertyNames);
 
-				if (IndexableProperties.Count == 0)
-					return;
-
-				TokenCount[] Tokens = await Tokenize(IndexableProperties.Values);
 				if (Tokens is null)
 					return;
 
@@ -1055,7 +1003,21 @@ namespace Waher.Persistence.FullTextSearch
 		public static async Task<TokenCount[]> Tokenize(IEnumerable<object> Objects)
 		{
 			TokenizationProcess Process = new TokenizationProcess();
+			await Tokenize(Objects, Process);
+		
+			return Process.ToArray();
+		}
 
+		/// <summary>
+		/// Tokenizes a set of objects using available tokenizers.
+		/// Tokenizers are classes with a default contructor, implementing
+		/// the <see cref="ITokenizer"/> interface.
+		/// </summary>
+		/// <param name="Objects">Objects to tokenize.</param>
+		/// <param name="Process">Tokenization process.</param>
+		public static async Task Tokenize(IEnumerable<object> Objects,
+			TokenizationProcess Process)
+		{
 			foreach (object Object in Objects)
 			{
 				if (Object is null)
@@ -1084,19 +1046,8 @@ namespace Waher.Persistence.FullTextSearch
 				}
 
 				await Tokenizer.Tokenize(Object, Process);
+				Process.DocumentIndexOffset++;
 			}
-
-			int c = Process.TokenCounts.Count;
-			if (c == 0)
-				return null;
-
-			int i = 0;
-			TokenCount[] Counts = new TokenCount[c];
-
-			foreach (KeyValuePair<string, List<uint>> P in Process.TokenCounts)
-				Counts[i++] = new TokenCount(P.Key, P.Value.ToArray());
-
-			return Counts;
 		}
 
 		private static readonly Dictionary<Type, ITokenizer> tokenizers = new Dictionary<Type, ITokenizer>();
@@ -1107,6 +1058,31 @@ namespace Waher.Persistence.FullTextSearch
 			{
 				tokenizers.Clear();
 			}
+		}
+
+		/// <summary>
+		/// Gets the indexable property values from an object. Property values will be returned in lower-case.
+		/// </summary>
+		/// <param name="Obj">Generic object.</param>
+		/// <param name="PropertyNames">Indexable property names.</param>
+		/// <returns>Indexable property values found.</returns>
+		internal static Task<TokenCount[]> Tokenize(GenericObject Obj, params string[] PropertyNames)
+		{
+			LinkedList<object> Values = new LinkedList<object>();
+
+			if (!(Obj is null))
+			{
+				foreach (string PropertyName in PropertyNames)
+				{
+					if (Obj.TryGetFieldValue(PropertyName, out object Value))
+						Values.AddLast(Value);
+				}
+			}
+
+			if (Values.First is null)
+				return Task.FromResult<TokenCount[]>(null);
+
+			return Tokenize(Values);
 		}
 
 	}

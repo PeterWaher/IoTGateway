@@ -19,6 +19,9 @@ namespace Waher.Persistence.Serialization
 		private bool propertiesUpdated = false;
 		private Guid objectId = Guid.Empty;
 
+		/// <summary>
+		/// Generic object. Contains a sequence of properties.
+		/// </summary>
 		internal GenericObject()
 		{
 		}

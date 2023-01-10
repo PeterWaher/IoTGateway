@@ -211,5 +211,47 @@ namespace Waher.Persistence.FullTextSearch
 			return FullTextSearchModule.Tokenize(Objects);
 		}
 
+		/// <summary>
+		/// Defines the Full-text-search index collection name, for objects in a given collection.
+		/// </summary>
+		/// <param name="IndexCollection">Collection name for full-text-search index of objects in the given collection.</param>
+		/// <param name="CollectionName">Collection of objects to index.</param>
+		public static Task SetFullTextSearchIndexCollection(string IndexCollection, string CollectionName)
+		{
+			return FullTextSearchModule.SetFullTextSearchIndexCollection(IndexCollection, CollectionName);
+		}
+
+		/// <summary>
+		/// Adds properties for full-text-search indexation.
+		/// </summary>
+		/// <param name="CollectionName">Collection name.</param>
+		/// <param name="Properties">Properties to index.</param>
+		/// <returns>If new property names were found and added.</returns>
+		public static Task<bool> AddFullTextSearch(string CollectionName, params string[] Properties)
+		{
+			return FullTextSearchModule.AddFullTextSearch(CollectionName, Properties);
+		}
+
+		/// <summary>
+		/// Removes properties from full-text-search indexation.
+		/// </summary>
+		/// <param name="CollectionName">Collection name.</param>
+		/// <param name="Properties">Properties to remove from indexation.</param>
+		/// <returns>If property names were found and removed.</returns>
+		public static Task<bool> RemoveFullTextSearch(string CollectionName, params string[] Properties)
+		{
+			return FullTextSearchModule.RemoveFullTextSearch(CollectionName, Properties);
+		}
+
+		/// <summary>
+		/// Gets indexed properties for full-text-search indexation.
+		/// </summary>
+		/// <param name="CollectionName">Collection name.</param>
+		/// <returns>Array of indexed properties.</returns>
+		public static Task<string[]> GetFullTextSearchIndexedProperties(string CollectionName)
+		{
+			return FullTextSearchModule.GetFullTextSearchIndexedProperties(CollectionName);
+		}
+
 	}
 }

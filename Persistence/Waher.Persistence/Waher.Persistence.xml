@@ -5783,6 +5783,11 @@
             Generic object. Contains a sequence of properties.
             </summary>
         </member>
+        <member name="M:Waher.Persistence.Serialization.GenericObject.#ctor">
+            <summary>
+            Generic object. Contains a sequence of properties.
+            </summary>
+        </member>
         <member name="M:Waher.Persistence.Serialization.GenericObject.#ctor(System.String,System.String,System.Guid,System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
             <summary>
             Generic object. Contains a sequence of properties.

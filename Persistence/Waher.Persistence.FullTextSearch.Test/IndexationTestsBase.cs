@@ -1,10 +1,12 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.FullTextSearch.Test.Classes;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.FullTextSearch.Test
 {
-	public abstract class IndexationTestsBase<T>
-		where T : class, ITestClass
+	public abstract class IndexationTestsBase<InstanceType, SetterType>
+		where InstanceType : class
+		where SetterType : class, ITestClassSetter
 	{
 		private readonly string collectioName;
 		private readonly string indexCollection;
@@ -21,13 +23,13 @@ namespace Waher.Persistence.FullTextSearch.Test
 			await CreateInstance();
 		}
 
-		public static Task<T> CreateInstance()
+		public static Task<InstanceType> CreateInstance()
 		{
 			return CreateInstance("Hello World.", "Kilroy was here.",
 				"This is a test.", "Testing indexation.");
 		}
 
-		public static async Task<T> CreateInstance(string IndexedProperty1,
+		public static async Task<InstanceType> CreateInstance(string IndexedProperty1,
 			string IndexedProperty2, string NonIndexedProperty1,
 			string NonIndexedProperty2)
 		{
@@ -41,11 +43,11 @@ namespace Waher.Persistence.FullTextSearch.Test
 			Search.ObjectAddedToIndex += ObjectIndexed;
 			try
 			{
-				T Obj = Activator.CreateInstance<T>();
-				Obj.IndexedProperty1 = IndexedProperty1;
-				Obj.IndexedProperty2 = IndexedProperty2;
-				Obj.NonIndexedProperty1 = NonIndexedProperty1;
-				Obj.NonIndexedProperty2 = NonIndexedProperty2;
+				InstanceType Obj = Types.Instantiate<InstanceType>(false);
+				SetterType Setter = Types.Instantiate<SetterType>(false);
+
+				Setter.Set(Obj, IndexedProperty1, IndexedProperty2,
+					NonIndexedProperty1, NonIndexedProperty2);
 
 				await Database.Insert(Obj);
 
@@ -67,7 +69,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 			await this.Clear();
 			await CreateInstance();
 
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, 10,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, 10,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Hello Clown Kilroy"));
 
 			Assert.IsNotNull(SearchResult);
@@ -84,10 +86,10 @@ namespace Waher.Persistence.FullTextSearch.Test
 
 		private async Task DeleteAllObjects()
 		{
-			IEnumerable<T> Objects = await Database.Find<T>();
+			IEnumerable<object> Objects = await Database.Find(this.collectioName);
 			int NrObjects = 0;
 
-			foreach (T Obj in Objects)
+			foreach (InstanceType Obj in Objects)
 				NrObjects++;
 
 			if (NrObjects == 0)
@@ -116,7 +118,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 				Search.ObjectRemovedFromIndex -= ObjectRemoved;
 			}
 
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, 10,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, 10,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Hello Clown Kilroy"));
 
 			Assert.IsNotNull(SearchResult);
@@ -128,7 +130,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		{
 			await this.Clear();
 
-			T Obj = await CreateInstance();
+			InstanceType Obj = await CreateInstance();
 			TaskCompletionSource<bool> Result = new();
 			Task ObjectUpdated(object Sender, ObjectReferenceEventArgs e)
 			{
@@ -139,7 +141,9 @@ namespace Waher.Persistence.FullTextSearch.Test
 			Search.ObjectUpdatedInIndex += ObjectUpdated;
 			try
 			{
-				Obj.IndexedProperty2 = "Roy was here.";
+				SetterType Setter = Types.Instantiate<SetterType>(false);
+
+				Setter.Set(Obj, "Roy was here.");
 
 				await Database.Update(Obj);
 
@@ -152,13 +156,13 @@ namespace Waher.Persistence.FullTextSearch.Test
 				Search.ObjectUpdatedInIndex -= ObjectUpdated;
 			}
 
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, 10,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, 10,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Kilroy"));
 
 			Assert.IsNotNull(SearchResult);
 			Assert.AreEqual(0, SearchResult.Length);
 
-			SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, 10,
+			SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, 10,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Roy"));
 
 			Assert.IsNotNull(SearchResult);

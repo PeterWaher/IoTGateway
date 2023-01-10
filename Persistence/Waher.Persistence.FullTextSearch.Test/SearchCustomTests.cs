@@ -4,10 +4,10 @@ using Waher.Persistence.FullTextSearch.Test.Classes;
 namespace Waher.Persistence.FullTextSearch.Test
 {
 	[TestClass]
-	public class SearchCustomTests : SearchTestsBase<CustomTokenizationTestClass>
+	public class SearchCustomTests : SearchTestsBase<CustomTokenizationTestClass, TestClassSetter>
 	{
 		public SearchCustomTests()
-			: base("TestCustom", "FullTextSearchCustom")
+			: base("FullTextSearchCustom")
 		{
 		}
 

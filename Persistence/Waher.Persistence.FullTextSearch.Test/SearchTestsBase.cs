@@ -3,15 +3,14 @@ using Waher.Persistence.FullTextSearch.Test.Classes;
 
 namespace Waher.Persistence.FullTextSearch.Test
 {
-	public abstract class SearchTestsBase<T>
-		where T : class, ITestClass
+	public abstract class SearchTestsBase<InstanceType, SetterType>
+		where InstanceType : class
+		where SetterType : class, ITestClassSetter
 	{
-		private readonly string collectioName;
 		private readonly string indexCollection;
 
-		public SearchTestsBase(string CollectioName, string IndexCollection)
+		public SearchTestsBase(string IndexCollection)
 		{
-			this.collectioName = CollectioName;
 			this.indexCollection = IndexCollection;
 		}
 
@@ -54,7 +53,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 					switch (i % 5)
 					{
 						case 0:
-							await IndexationTestsBase<T>.CreateInstance(
+							await IndexationTestsBase<InstanceType, SetterType>.CreateInstance(
 								"Hello World number " + i.ToString(),
 								"Kilroy was here.",
 								"Clowns are fun.",
@@ -62,7 +61,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 							break;
 
 						case 1:
-							await IndexationTestsBase<T>.CreateInstance(
+							await IndexationTestsBase<InstanceType, SetterType>.CreateInstance(
 								"Hello World number " + i.ToString(),
 								"Fitzroy was here.",
 								"Clowns are scary.",
@@ -70,7 +69,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 							break;
 
 						case 2:
-							await IndexationTestsBase<T>.CreateInstance(
+							await IndexationTestsBase<InstanceType, SetterType>.CreateInstance(
 								"Hello World number " + i.ToString(),
 								"Kilroy is a Clown.",
 								"Clowns are fun.",
@@ -78,7 +77,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 							break;
 
 						case 3:
-							await IndexationTestsBase<T>.CreateInstance(
+							await IndexationTestsBase<InstanceType, SetterType>.CreateInstance(
 								"Hello World number " + i.ToString(),
 								"Fitzroy is not a Clown.",
 								"Clowns are scary.",
@@ -86,7 +85,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 							break;
 
 						case 4:
-							await IndexationTestsBase<T>.CreateInstance(
+							await IndexationTestsBase<InstanceType, SetterType>.CreateInstance(
 								"Hello World number " + i.ToString(),
 								"Testing accents with Pelé.",
 								"Clowns is the plural form of Clown.",
@@ -111,7 +110,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_01_PlainSearch_1()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Kilroy"));
 
 			Assert.IsNotNull(SearchResult);
@@ -121,7 +120,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_02_PlainSearch_2()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Hello Clown Kilroy"));
 
 			Assert.IsNotNull(SearchResult);
@@ -131,7 +130,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_03_Required()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Hello Clown +Kilroy"));
 
 			Assert.IsNotNull(SearchResult);
@@ -141,7 +140,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_04_Prohibited()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Hello Clown -Fitzroy"));
 
 			Assert.IsNotNull(SearchResult);
@@ -151,7 +150,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_05_Wildcard_1()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Kil* -Clown"));
 
 			Assert.IsNotNull(SearchResult);
@@ -161,7 +160,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_06_Wildcard_2()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("*roy -Clown"));
 
 			Assert.IsNotNull(SearchResult);
@@ -171,7 +170,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_07_Regex_1()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("/Kil.*/ -Clown"));
 
 			Assert.IsNotNull(SearchResult);
@@ -181,7 +180,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_08_Regex_2()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("/.*roy/ -Clown"));
 
 			Assert.IsNotNull(SearchResult);
@@ -191,7 +190,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_09_Accents()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Pele"));
 
 			Assert.IsNotNull(SearchResult);
@@ -201,7 +200,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_10_PlainSearch_1_AsPrefixes()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Kilroy", true));
 
 			Assert.IsNotNull(SearchResult);
@@ -211,7 +210,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_11_PlainSearch_2_AsPrefixes()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Hello Clown Kilroy", true));
 
 			Assert.IsNotNull(SearchResult);
@@ -221,7 +220,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_12_Required_AsPrefixes()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Hello Clown +Kilroy", true));
 
 			Assert.IsNotNull(SearchResult);
@@ -231,7 +230,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_13_Prohibited_AsPrefixes()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Hello Clown -Fitzroy", true));
 
 			Assert.IsNotNull(SearchResult);
@@ -241,7 +240,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_14_Wildcard_1_AsPrefixes()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Kil* -Clown", true));
 
 			Assert.IsNotNull(SearchResult);
@@ -251,7 +250,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_15_Wildcard_2_AsPrefixes()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("*roy -Clown", true));
 
 			Assert.IsNotNull(SearchResult);
@@ -261,7 +260,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_16_Regex_1_AsPrefixes()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("/Kil.*/ -Clown", true));
 
 			Assert.IsNotNull(SearchResult);
@@ -271,7 +270,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_17_Regex_2_AsPrefixes()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("/.*roy/ -Clown", true));
 
 			Assert.IsNotNull(SearchResult);
@@ -281,7 +280,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_18_Accents_AsPrefixes()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Pele", true));
 
 			Assert.IsNotNull(SearchResult);
@@ -291,7 +290,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_19_AsPrefixes()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("TEST", true));
 
 			Assert.IsNotNull(SearchResult);
@@ -301,7 +300,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_20_Sequence1()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("'Kilroy was here'", true));
 
 			Assert.IsNotNull(SearchResult);
@@ -311,7 +310,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_21_Sequence2()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("'Kilroy here was'", true));
 
 			Assert.IsNotNull(SearchResult);
@@ -321,7 +320,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_22_Sequence3()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Kilroy 'was here'", true));
 
 			Assert.IsNotNull(SearchResult);
@@ -331,7 +330,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_23_Sequence4()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("Kilroy +'was here'", true));
 
 			Assert.IsNotNull(SearchResult);
@@ -341,7 +340,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_24_Sequence5()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("+Kilroy +'was here'", true));
 
 			Assert.IsNotNull(SearchResult);
@@ -351,7 +350,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_25_Sequence6()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("'Kilroy was' here", true));
 
 			Assert.IsNotNull(SearchResult);
@@ -361,7 +360,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_26_Sequence7()
 		{
-			T[] SearchResult = await Search.FullTextSearch<T>(this.indexCollection, 0, int.MaxValue,
+			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Search.ParseKeywords("+'Kilroy was' here", true));
 
 			Assert.IsNotNull(SearchResult);

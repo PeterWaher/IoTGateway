@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
+using Waher.Persistence.FullTextSearch.Tokenizers;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.FullTextSearch
@@ -13,10 +14,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// Tokenizes an object.
 		/// </summary>
 		/// <param name="Value">Object to tokenize.</param>
-		/// <param name="TokenCounts">Token counts.</param>
-		/// <param name="DocumentIndexOffset">Document Index Offset. Used to
-		/// identify sequences of tokens in a document.</param>
-		void Tokenize(object Value, Dictionary<string, List<uint>> TokenCounts,
-			ref uint DocumentIndexOffset);
+		/// <param name="Process">Current tokenization process.</param>
+		Task Tokenize(object Value, TokenizationProcess Process);
 	}
 }

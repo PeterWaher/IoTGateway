@@ -8,36 +8,36 @@ namespace Waher.Persistence.FullTextSearch.Test
 	public class TokenizationTests
 	{
 		[TestMethod]
-		public void Test_01_String()
+		public async Task Test_01_String()
 		{
-			AreEqual(Search.Tokenize("Kilroy was here."),
+			AreEqual(await Search.Tokenize("Kilroy was here."),
 				new TokenCount("kilroy", 1),
 				new TokenCount("was", 2),
 				new TokenCount("here", 3));
 		}
 
 		[TestMethod]
-		public void Test_02_CaseInsensitiveString()
+		public async Task Test_02_CaseInsensitiveString()
 		{
-			AreEqual(Search.Tokenize(new CaseInsensitiveString("Kilroy was here.")),
+			AreEqual(await Search.Tokenize(new CaseInsensitiveString("Kilroy was here.")),
 				new TokenCount("kilroy", 1),
 				new TokenCount("was", 2),
 				new TokenCount("here", 3));
 		}
 
 		[TestMethod]
-		public void Test_03_StringArray()
+		public async Task Test_03_StringArray()
 		{
-			AreEqual(Search.Tokenize((object)(new string[] { "Kilroy", "was", "here" })),
+			AreEqual(await Search.Tokenize((object)(new string[] { "Kilroy", "was", "here" })),
 				new TokenCount("kilroy", 1),
 				new TokenCount("was", 3),
 				new TokenCount("here", 5));
 		}
 
 		[TestMethod]
-		public void Test_04_CaseInsensitiveArray()
+		public async Task Test_04_CaseInsensitiveArray()
 		{
-			AreEqual(Search.Tokenize((object)(new CaseInsensitiveString[]
+			AreEqual(await Search.Tokenize((object)(new CaseInsensitiveString[]
 				{
 					new CaseInsensitiveString("Kilroy"),
 					new CaseInsensitiveString("was"),
@@ -49,18 +49,18 @@ namespace Waher.Persistence.FullTextSearch.Test
 		}
 
 		[TestMethod]
-		public void Test_05_XmlDocument()
+		public async Task Test_05_XmlDocument()
 		{
-			AreEqual(Search.Tokenize(GetXmlDocument()),
+			AreEqual(await Search.Tokenize(GetXmlDocument()),
 				new TokenCount("kilroy", 1),
 				new TokenCount("was", 2),
 				new TokenCount("here", 3));
 		}
 
 		[TestMethod]
-		public void Test_06_XmlElement()
+		public async Task Test_06_XmlElement()
 		{
-			AreEqual(Search.Tokenize(GetXmlDocument().DocumentElement),
+			AreEqual(await Search.Tokenize(GetXmlDocument().DocumentElement),
 				new TokenCount("kilroy", 1),
 				new TokenCount("was", 2),
 				new TokenCount("here", 3));
@@ -68,7 +68,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 
 		private static XmlDocument GetXmlDocument()
 		{
-			XmlDocument Doc = new XmlDocument();
+			XmlDocument Doc = new();
 			Doc.LoadXml("<a><b c='Kilroy'>was here</b></a>");
 			return Doc;
 		}

@@ -194,7 +194,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		/// <param name="Objects">Objects to tokenize.</param>
 		/// <returns>Tokens</returns>
-		public static TokenCount[] Tokenize(IEnumerable<object> Objects)
+		public static Task<TokenCount[]> Tokenize(IEnumerable<object> Objects)
 		{
 			return FullTextSearchModule.Tokenize(Objects);
 		}
@@ -206,7 +206,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		/// <param name="Objects">Objects to tokenize.</param>
 		/// <returns>Tokens</returns>
-		public static TokenCount[] Tokenize(params object[] Objects)
+		public static Task<TokenCount[]> Tokenize(params object[] Objects)
 		{
 			return FullTextSearchModule.Tokenize(Objects);
 		}

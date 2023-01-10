@@ -10,6 +10,7 @@ using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
 using Waher.Persistence.FullTextSearch.Keywords;
 using Waher.Persistence.FullTextSearch.Orders;
+using Waher.Persistence.FullTextSearch.Tokenizers;
 using Waher.Persistence.LifeCycle;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
@@ -119,7 +120,7 @@ namespace Waher.Persistence.FullTextSearch
 				if (IndexableProperties.Count == 0)
 					return;
 
-				TokenCount[] Tokens = Tokenize(IndexableProperties.Values);
+				TokenCount[] Tokens = await Tokenize(IndexableProperties.Values);
 				if (Tokens is null)
 					return;
 
@@ -958,7 +959,7 @@ namespace Waher.Persistence.FullTextSearch
 				if (IndexableProperties.Count == 0)
 					return;
 
-				TokenCount[] Tokens = Tokenize(IndexableProperties.Values);
+				TokenCount[] Tokens = await Tokenize(IndexableProperties.Values);
 				if (Tokens is null)
 					return;
 
@@ -1028,6 +1029,9 @@ namespace Waher.Persistence.FullTextSearch
 			foreach (KeyValuePair<string, bool> P in stopWords)
 				NewList[P.Key] = P.Value;
 
+			foreach (string StopWord in StopWords)
+				NewList[StopWord] = true;
+
 			stopWords = NewList;
 		}
 
@@ -1048,10 +1052,9 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		/// <param name="Objects">Objects to tokenize.</param>
 		/// <returns>Tokens</returns>
-		public static TokenCount[] Tokenize(IEnumerable<object> Objects)
+		public static async Task<TokenCount[]> Tokenize(IEnumerable<object> Objects)
 		{
-			Dictionary<string, List<uint>> TokenCounts = new Dictionary<string, List<uint>>();
-			uint DocumentationIndexOffset = 0;
+			TokenizationProcess Process = new TokenizationProcess();
 
 			foreach (object Object in Objects)
 			{
@@ -1080,17 +1083,17 @@ namespace Waher.Persistence.FullTextSearch
 						continue;
 				}
 
-				Tokenizer.Tokenize(Object, TokenCounts, ref DocumentationIndexOffset);
+				await Tokenizer.Tokenize(Object, Process);
 			}
 
-			int c = TokenCounts.Count;
+			int c = Process.TokenCounts.Count;
 			if (c == 0)
 				return null;
 
 			int i = 0;
 			TokenCount[] Counts = new TokenCount[c];
 
-			foreach (KeyValuePair<string, List<uint>> P in TokenCounts)
+			foreach (KeyValuePair<string, List<uint>> P in Process.TokenCounts)
 				Counts[i++] = new TokenCount(P.Key, P.Value.ToArray());
 
 			return Counts;

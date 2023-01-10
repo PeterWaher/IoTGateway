@@ -163,8 +163,27 @@ namespace Waher.Persistence.FullTextSearch
 			int Offset, int MaxCount, FullTextSearchOrder Order, params Keyword[] Keywords)
 			where T : class
 		{
+			return FullTextSearch<T>(IndexCollection, Offset, MaxCount, Order,
+				PaginationStrategy.PaginateOverObjectsNullIfIncompatible, Keywords);
+		}
+
+		/// <summary>
+		/// Performs a Full-Text-Search
+		/// </summary>
+		/// <param name="IndexCollection">Index collection name.</param>
+		/// <param name="Offset">Index of first object matching the keywords.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Keywords">Keywords to search for.</param>
+		/// <returns>Array of objects. Depending on choice of
+		/// <paramref name="PaginationStrategy"/>, null items may be returned
+		/// if underlying object is not compatible with <typeparamref name="T"/>.</returns>
+		public static Task<T[]> FullTextSearch<T>(string IndexCollection,
+			int Offset, int MaxCount, FullTextSearchOrder Order,
+			PaginationStrategy PaginationStrategy, params Keyword[] Keywords)
+			where T : class
+		{
 			return FullTextSearchModule.FullTextSearch<T>(IndexCollection, Offset, MaxCount,
-				Order, PaginationStrategy.PaginateOverObjectsNullIfIncompatible, Keywords);
+				Order, PaginationStrategy, Keywords);
 		}
 
 		/// <summary>

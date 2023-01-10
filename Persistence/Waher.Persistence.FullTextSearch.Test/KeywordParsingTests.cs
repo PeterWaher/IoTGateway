@@ -1,11 +1,49 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Text;
+using Waher.Events;
+using Waher.Events.Console;
+using Waher.Persistence.Files;
 using Waher.Persistence.FullTextSearch.Keywords;
+using Waher.Persistence.FullTextSearch.Test.Classes;
+using Waher.Persistence.Serialization;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.FullTextSearch.Test
 {
 	[TestClass]
 	public class KeywordParsingTests
 	{
+		private static FilesProvider? filesProvider = null;
+
+		[AssemblyInitialize]
+		public static async Task AssemblyInitialize(TestContext _)
+		{
+			Types.Initialize(
+				typeof(Database).Assembly,
+				typeof(FilesProvider).Assembly,
+				typeof(ObjectSerializer).Assembly,
+				typeof(FullTextSearchModule).Assembly,
+				typeof(TestClass).Assembly);
+
+			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
+			Database.Register(filesProvider);
+
+			Log.Register(new ConsoleEventSink());
+
+			await Types.StartAllModules(10000);
+		}
+
+		[AssemblyCleanup]
+		public static async Task AssemblyCleanup()
+		{
+			Log.Terminate();
+
+			await Types.StopAllModules();
+
+			filesProvider?.Dispose();
+			filesProvider = null;
+		}
+
 		[TestMethod]
 		public void Test_01_Plain()
 		{

@@ -1,8 +1,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Persistence.FullTextSearch.Test.Classes;
 
 namespace Waher.Persistence.FullTextSearch.Test
 {
-	[TestClass]
+    [TestClass]
 	public class SearchTests
 	{
 		[ClassInitialize]
@@ -12,14 +13,12 @@ namespace Waher.Persistence.FullTextSearch.Test
 			await CreateDataset();
 		}
 
-		public static async Task Clear()
+		private static async Task Clear()
 		{
 			await Database.Clear("Test");
-			await Database.Clear("FullTextSearch");
 			await Database.Clear("FullTextSearchObjects");
 
 			await (await Database.GetDictionary("FullTextSearch")).ClearAsync();
-			await (await Database.GetDictionary("FullTextSearchCollections")).ClearAsync();
 		}
 
 		public static async Task CreateDataset()

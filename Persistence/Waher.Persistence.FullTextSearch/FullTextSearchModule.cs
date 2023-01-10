@@ -426,6 +426,11 @@ namespace Waher.Persistence.FullTextSearch
 				{
 					await collectionInformation.AddAsync(CollectionName, Info, true);
 				}
+				else if (!(CustomTokenizer is null) && !Info.IndexForFullTextSearch)
+				{
+					Info.IndexForFullTextSearch = true;
+					await collectionInformation.AddAsync(CollectionName, Info, true);
+				}
 			}
 
 			types[T] = Result;

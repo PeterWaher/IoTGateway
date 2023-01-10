@@ -9,7 +9,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_01_Plain()
 		{
-			this.Parse("Kilroy was here.", false,
+			Parse("Kilroy was here.", false,
 				new PlainKeyword("kilroy"),
 				new PlainKeyword("was"),
 				new PlainKeyword("here"));
@@ -18,7 +18,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_02_Required()
 		{
-			this.Parse("+Kilroy was here.", false,
+			Parse("+Kilroy was here.", false,
 				new RequiredKeyword(new PlainKeyword("kilroy")),
 				new PlainKeyword("was"),
 				new PlainKeyword("here"));
@@ -27,7 +27,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_03_Prohibited()
 		{
-			this.Parse("+Kilroy was -not here.", false,
+			Parse("+Kilroy was -not here.", false,
 				new RequiredKeyword(new PlainKeyword("kilroy")),
 				new PlainKeyword("was"),
 				new ProhibitedKeyword(new PlainKeyword("not")),
@@ -37,7 +37,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_04_Wildcard()
 		{
-			this.Parse("+*roy was -not here.", false,
+			Parse("+*roy was -not here.", false,
 				new RequiredKeyword(new WildcardKeyword("*roy", "*")),
 				new PlainKeyword("was"),
 				new ProhibitedKeyword(new PlainKeyword("not")),
@@ -47,7 +47,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_05_Wildcard2()
 		{
-			this.Parse("+Kil* was -not here.", false,
+			Parse("+Kil* was -not here.", false,
 				new RequiredKeyword(new WildcardKeyword("kil*", "*")),
 				new PlainKeyword("was"),
 				new ProhibitedKeyword(new PlainKeyword("not")),
@@ -57,7 +57,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_06_Wildcard3()
 		{
-			this.Parse("+K*y was -not here.", false,
+			Parse("+K*y was -not here.", false,
 				new RequiredKeyword(new WildcardKeyword("k*y", "*")),
 				new PlainKeyword("was"),
 				new ProhibitedKeyword(new PlainKeyword("not")),
@@ -67,7 +67,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_07_RegularExpression()
 		{
-			this.Parse("+/(Kil|Fitz)roy/ was -not here.", false,
+			Parse("+/(Kil|Fitz)roy/ was -not here.", false,
 				new RequiredKeyword(new RegexKeyword("(kil|fitz)roy")),
 				new PlainKeyword("was"),
 				new ProhibitedKeyword(new PlainKeyword("not")),
@@ -77,7 +77,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_08_RegularExpression2()
 		{
-			this.Parse("+/Kil(roy|ling)/ was -not here.", false,
+			Parse("+/Kil(roy|ling)/ was -not here.", false,
 				new RequiredKeyword(new RegexKeyword("kil(roy|ling)")),
 				new PlainKeyword("was"),
 				new ProhibitedKeyword(new PlainKeyword("not")),
@@ -87,7 +87,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_09_RegularExpression3()
 		{
-			this.Parse("+/K.+y/ was -not here.", false,
+			Parse("+/K.+y/ was -not here.", false,
 				new RequiredKeyword(new RegexKeyword("k.+y")),
 				new PlainKeyword("was"),
 				new ProhibitedKeyword(new PlainKeyword("not")),
@@ -97,7 +97,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_10_Plain_AsPrefixes()
 		{
-			this.Parse("Kilroy was here.", true,
+			Parse("Kilroy was here.", true,
 				new WildcardKeyword("kilroy*", "*"),
 				new WildcardKeyword("was*", "*"),
 				new WildcardKeyword("here*", "*"));
@@ -106,7 +106,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_11_Required_AsPrefixes()
 		{
-			this.Parse("+Kilroy was here.", true,
+			Parse("+Kilroy was here.", true,
 				new RequiredKeyword(new WildcardKeyword("kilroy*", "*")),
 				new WildcardKeyword("was*", "*"),
 				new WildcardKeyword("here*", "*"));
@@ -115,7 +115,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_12_Prohibited_AsPrefixes()
 		{
-			this.Parse("+Kilroy was -not here.", true,
+			Parse("+Kilroy was -not here.", true,
 				new RequiredKeyword(new WildcardKeyword("kilroy*", "*")),
 				new WildcardKeyword("was*", "*"),
 				new ProhibitedKeyword(new WildcardKeyword("not*", "*")),
@@ -125,7 +125,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_13_Wildcard_AsPrefixes()
 		{
-			this.Parse("+*roy was -not here.", true,
+			Parse("+*roy was -not here.", true,
 				new RequiredKeyword(new WildcardKeyword("*roy", "*")),
 				new WildcardKeyword("was*", "*"),
 				new ProhibitedKeyword(new WildcardKeyword("not*", "*")),
@@ -135,7 +135,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_14_Wildcard2_AsPrefixes()
 		{
-			this.Parse("+Kil* was -not here.", true,
+			Parse("+Kil* was -not here.", true,
 				new RequiredKeyword(new WildcardKeyword("kil*", "*")),
 				new WildcardKeyword("was*", "*"),
 				new ProhibitedKeyword(new WildcardKeyword("not*", "*")),
@@ -145,7 +145,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_15_Wildcard3_AsPrefixes()
 		{
-			this.Parse("+K*y was -not here.", true,
+			Parse("+K*y was -not here.", true,
 				new RequiredKeyword(new WildcardKeyword("k*y", "*")),
 				new WildcardKeyword("was*", "*"),
 				new ProhibitedKeyword(new WildcardKeyword("not*", "*")),
@@ -155,7 +155,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_16_RegularExpression_AsPrefixes()
 		{
-			this.Parse("+/(Kil|Fitz)roy/ was -not here.", true,
+			Parse("+/(Kil|Fitz)roy/ was -not here.", true,
 				new RequiredKeyword(new RegexKeyword("(kil|fitz)roy")),
 				new WildcardKeyword("was*", "*"),
 				new ProhibitedKeyword(new WildcardKeyword("not*", "*")),
@@ -165,7 +165,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_17_RegularExpression2_AsPrefixes()
 		{
-			this.Parse("+/Kil(roy|ling)/ was -not here.", true,
+			Parse("+/Kil(roy|ling)/ was -not here.", true,
 				new RequiredKeyword(new RegexKeyword("kil(roy|ling)")),
 				new WildcardKeyword("was*", "*"),
 				new ProhibitedKeyword(new WildcardKeyword("not*", "*")),
@@ -175,7 +175,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_18_RegularExpression3_AsPrefixes()
 		{
-			this.Parse("+/K.+y/ was -not here.", true,
+			Parse("+/K.+y/ was -not here.", true,
 				new RequiredKeyword(new RegexKeyword("k.+y")),
 				new WildcardKeyword("was*", "*"),
 				new ProhibitedKeyword(new WildcardKeyword("not*", "*")),
@@ -185,7 +185,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_19_Sequence_Quotes()
 		{
-			this.Parse("\"Kilroy was here\"", true,
+			Parse("\"Kilroy was here\"", true,
 				new SequenceOfKeywords(
 					new PlainKeyword("kilroy"),
 					new PlainKeyword("was"),
@@ -195,7 +195,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_20_Sequence_Apostrophes()
 		{
-			this.Parse("'Kilroy was here'", true,
+			Parse("'Kilroy was here'", true,
 				new SequenceOfKeywords(
 					new PlainKeyword("kilroy"),
 					new PlainKeyword("was"),
@@ -205,7 +205,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_21_Sequence_Nesting1()
 		{
-			this.Parse("+'Kilroy was here'", true,
+			Parse("+'Kilroy was here'", true,
 				new RequiredKeyword(
 					new SequenceOfKeywords(
 						new PlainKeyword("kilroy"),
@@ -216,7 +216,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_22_Sequence_Nesting2()
 		{
-			this.Parse("'Kilroy was' here", true,
+			Parse("'Kilroy was' here", true,
 				new SequenceOfKeywords(
 					new PlainKeyword("kilroy"),
 					new PlainKeyword("was")),
@@ -226,14 +226,14 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public void Test_23_Sequence_Nesting3()
 		{
-			this.Parse("Kilroy 'was here'", true,
+			Parse("Kilroy 'was here'", true,
 				new WildcardKeyword("kilroy*", "*"),
 				new SequenceOfKeywords(
 					new PlainKeyword("was"),
 					new PlainKeyword("here")));
 		}
 
-		private void Parse(string Query, bool TreatKeywordsAsPrefixes, params Keyword[] Keywords)
+		private static void Parse(string Query, bool TreatKeywordsAsPrefixes, params Keyword[] Keywords)
 		{
 			Keyword[] Parsed = Search.ParseKeywords(Query, TreatKeywordsAsPrefixes);
 			int i, c;

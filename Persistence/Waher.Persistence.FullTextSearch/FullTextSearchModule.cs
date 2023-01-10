@@ -51,6 +51,8 @@ namespace Waher.Persistence.FullTextSearch
 			Database.ObjectInserted += this.Database_ObjectInserted;
 			Database.ObjectUpdated += this.Database_ObjectUpdated;
 			Database.ObjectDeleted += this.Database_ObjectDeleted;
+
+			Types.OnInvalidated += this.Types_OnInvalidated;
 		}
 
 		/// <summary>
@@ -61,6 +63,8 @@ namespace Waher.Persistence.FullTextSearch
 			Database.ObjectInserted -= this.Database_ObjectInserted;
 			Database.ObjectUpdated -= this.Database_ObjectUpdated;
 			Database.ObjectDeleted -= this.Database_ObjectDeleted;
+
+			Types.OnInvalidated -= this.Types_OnInvalidated;
 
 			// TODO: Wait for current objects to be finished.
 
@@ -105,7 +109,7 @@ namespace Waher.Persistence.FullTextSearch
 				CollectionInformation CollectionInfo = P.Item1;
 				TypeInformation TypeInfo = P.Item2;
 				GenericObject GenObj = P.Item3;
-				Dictionary<string, string> IndexableProperties;
+				Dictionary<string, object> IndexableProperties;
 
 				if (GenObj is null)
 					IndexableProperties = TypeInfo.GetIndexableProperties(e.Object, CollectionInfo.PropertyNames);
@@ -246,103 +250,15 @@ namespace Waher.Persistence.FullTextSearch
 		}
 
 		/// <summary>
-		/// Tokenizes a set of strings.
-		/// </summary>
-		/// <param name="Text">String to tokenize.</param>
-		/// <returns>Tokens found, with associated counts.</returns>
-		public static TokenCount[] Tokenize(string Text)
-		{
-			return Tokenize(new string[] { Text });
-		}
-
-		/// <summary>
-		/// Tokenizes a set of strings.
-		/// </summary>
-		/// <param name="Text">Enumerable set of strings to tokenize.</param>
-		/// <returns>Tokens found, with associated counts.</returns>
-		public static TokenCount[] Tokenize(IEnumerable<string> Text)
-		{
-			Dictionary<string, List<uint>> Result = new Dictionary<string, List<uint>>();
-			UnicodeCategory Category;
-			StringBuilder sb = new StringBuilder();
-			string Token;
-			bool First = true;
-			uint TokenIndex = 0;
-
-			foreach (string s in Text)
-			{
-				if (string.IsNullOrEmpty(s))
-					continue;
-
-				foreach (char ch in s.ToLower().Normalize(NormalizationForm.FormD))
-				{
-					Category = CharUnicodeInfo.GetUnicodeCategory(ch);
-					if (Category == UnicodeCategory.NonSpacingMark)
-						continue;
-
-					if (char.IsLetterOrDigit(ch))
-					{
-						sb.Append(ch);
-						First = false;
-					}
-					else
-					{
-						if (!First)
-						{
-							Token = sb.ToString();
-							sb.Clear();
-							First = true;
-
-							if (!Result.TryGetValue(Token, out List<uint> DocIndex))
-							{
-								DocIndex = new List<uint>();
-								Result[Token] = DocIndex;
-							}
-
-							DocIndex.Add(++TokenIndex);
-						}
-					}
-				}
-
-				if (!First)
-				{
-					Token = sb.ToString();
-					sb.Clear();
-					First = true;
-
-					if (!Result.TryGetValue(Token, out List<uint> DocIndex))
-					{
-						DocIndex = new List<uint>();
-						Result[Token] = DocIndex;
-					}
-
-					DocIndex.Add(++TokenIndex);
-				}
-			}
-
-			int c = Result.Count;
-			if (c == 0)
-				return null;
-
-			int i = 0;
-			TokenCount[] Counts = new TokenCount[c];
-
-			foreach (KeyValuePair<string, List<uint>> P in Result)
-				Counts[i++] = new TokenCount(P.Key, P.Value.ToArray());
-
-			return Counts;
-		}
-
-		/// <summary>
 		/// Gets the indexable property values from an object. Property values will be returned in lower-case.
 		/// </summary>
 		/// <param name="Obj">Generic object.</param>
 		/// <param name="PropertyNames">Indexable property names.</param>
 		/// <returns>Indexable property values found.</returns>
-		internal static async Task<Dictionary<string, string>> GetIndexableProperties(object Obj, params string[] PropertyNames)
+		internal static async Task<Dictionary<string, object>> GetIndexableProperties(object Obj, params string[] PropertyNames)
 		{
 			if (Obj is null)
-				return new Dictionary<string, string>();
+				return new Dictionary<string, object>();
 			else if (Obj is GenericObject GenObj)
 				return GetIndexableProperties(GenObj, PropertyNames);
 			else
@@ -366,21 +282,16 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="Obj">Generic object.</param>
 		/// <param name="PropertyNames">Indexable property names.</param>
 		/// <returns>Indexable property values found.</returns>
-		internal static Dictionary<string, string> GetIndexableProperties(GenericObject Obj, params string[] PropertyNames)
+		internal static Dictionary<string, object> GetIndexableProperties(GenericObject Obj, params string[] PropertyNames)
 		{
-			Dictionary<string, string> Result = new Dictionary<string, string>();
+			Dictionary<string, object> Result = new Dictionary<string, object>();
 
 			if (!(Obj is null))
 			{
 				foreach (string PropertyName in PropertyNames)
 				{
 					if (Obj.TryGetFieldValue(PropertyName, out object Value))
-					{
-						if (Value is string s)
-							Result[PropertyName] = s.ToLower();
-						else if (Value is CaseInsensitiveString cis)
-							Result[PropertyName] = cis.LowerCase;
-					}
+						Result[PropertyName] = Value;
 				}
 			}
 
@@ -1037,7 +948,7 @@ namespace Waher.Persistence.FullTextSearch
 				CollectionInformation CollectionInfo = P.Item1;
 				TypeInformation TypeInfo = P.Item2;
 				GenericObject GenObj = P.Item3;
-				Dictionary<string, string> IndexableProperties;
+				Dictionary<string, object> IndexableProperties;
 
 				if (GenObj is null)
 					IndexableProperties = TypeInfo.GetIndexableProperties(e.Object, CollectionInfo.PropertyNames);
@@ -1129,5 +1040,70 @@ namespace Waher.Persistence.FullTextSearch
 		{
 			return stopWords.TryGetValue(StopWord, out bool b) && b;
 		}
+
+		/// <summary>
+		/// Tokenizes a set of objects using available tokenizers.
+		/// Tokenizers are classes with a default contructor, implementing
+		/// the <see cref="ITokenizer"/> interface.
+		/// </summary>
+		/// <param name="Objects">Objects to tokenize.</param>
+		/// <returns>Tokens</returns>
+		public static TokenCount[] Tokenize(IEnumerable<object> Objects)
+		{
+			Dictionary<string, List<uint>> TokenCounts = new Dictionary<string, List<uint>>();
+
+			foreach (object Object in Objects)
+			{
+				if (Object is null)
+					continue;
+
+				Type T = Object.GetType();
+				ITokenizer Tokenizer;
+
+				lock (tokenizers)
+				{
+					if (tokenizers.TryGetValue(T, out Tokenizer) && Tokenizer is null)
+						continue;
+				}
+
+				if (Tokenizer is null)
+				{
+					Tokenizer = Types.FindBest<ITokenizer, Type>(T);
+
+					lock (tokenizers)
+					{
+						tokenizers[T] = Tokenizer;
+					}
+
+					if (Tokenizer is null)
+						continue;
+				}
+
+				Tokenizer.Tokenize(Object, TokenCounts);
+			}
+
+			int c = TokenCounts.Count;
+			if (c == 0)
+				return null;
+
+			int i = 0;
+			TokenCount[] Counts = new TokenCount[c];
+
+			foreach (KeyValuePair<string, List<uint>> P in TokenCounts)
+				Counts[i++] = new TokenCount(P.Key, P.Value.ToArray());
+
+			return Counts;
+		}
+
+		private static readonly Dictionary<Type, ITokenizer> tokenizers = new Dictionary<Type, ITokenizer>();
+
+		private void Types_OnInvalidated(object sender, EventArgs e)
+		{
+			lock (tokenizers)
+			{
+				tokenizers.Clear();
+			}
+		}
+
 	}
 }

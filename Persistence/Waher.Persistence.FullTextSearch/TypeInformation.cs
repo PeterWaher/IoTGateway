@@ -59,9 +59,9 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="Obj">Generic object.</param>
 		/// <param name="PropertyNames">Indexable property names.</param>
 		/// <returns>Indexable property values found.</returns>
-		public Dictionary<string, string> GetIndexableProperties(object Obj, params string[] PropertyNames)
+		public Dictionary<string, object> GetIndexableProperties(object Obj, params string[] PropertyNames)
 		{
-			Dictionary<string, string> Result = new Dictionary<string, string>();
+			Dictionary<string, object> Result = new Dictionary<string, object>();
 			object Value;
 
 			lock (this.properties)
@@ -84,10 +84,7 @@ namespace Waher.Persistence.FullTextSearch
 					else
 						continue;
 
-					if (Value is string s)
-						Result[PropertyName] = s.ToLower();
-					else if (Value is CaseInsensitiveString cis)
-						Result[PropertyName] = cis.LowerCase;
+					Result[PropertyName] = Value;
 				}
 			}
 

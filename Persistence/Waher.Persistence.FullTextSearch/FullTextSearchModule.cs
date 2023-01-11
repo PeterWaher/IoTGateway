@@ -13,6 +13,7 @@ using Waher.Persistence.FullTextSearch.Orders;
 using Waher.Persistence.FullTextSearch.Tokenizers;
 using Waher.Persistence.LifeCycle;
 using Waher.Persistence.Serialization;
+using Waher.Runtime.Cache;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.FullTextSearch
@@ -23,6 +24,7 @@ namespace Waher.Persistence.FullTextSearch
 	[ModuleDependency(typeof(DatabaseModule))]
 	public class FullTextSearchModule : IModule
 	{
+		private static Cache<string, QueryRecord> queryCache;
 		private static Dictionary<string, bool> stopWords = new Dictionary<string, bool>();
 		private static IPersistentDictionary collectionInformation;
 		private static Dictionary<string, CollectionInformation> collections;
@@ -46,6 +48,7 @@ namespace Waher.Persistence.FullTextSearch
 			collections = new Dictionary<string, CollectionInformation>();
 			indices = new Dictionary<string, IPersistentDictionary>();
 			types = new Dictionary<Type, TypeInformation>();
+			queryCache = new Cache<string, QueryRecord>(int.MaxValue, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
 
 			synchObj = new SemaphoreSlim(1);
 
@@ -74,6 +77,9 @@ namespace Waher.Persistence.FullTextSearch
 			{
 				foreach (IPersistentDictionary Index in indices.Values)
 					Index.Dispose();
+
+				queryCache.Dispose();
+				queryCache = null;
 
 				indices.Clear();
 				indices = null;
@@ -144,6 +150,8 @@ namespace Waher.Persistence.FullTextSearch
 				{
 					synchObj.Release();
 				}
+
+				queryCache.Clear();
 
 				await Search.RaiseObjectAddedToIndex(this, new ObjectReferenceEventArgs(Ref));
 			}
@@ -664,51 +672,83 @@ namespace Waher.Persistence.FullTextSearch
 			Keywords = (Keyword[])Keywords.Clone();
 			Array.Sort(Keywords, orderOfProcessing);
 
-			SearchProcess Process;
+			StringBuilder sb = new StringBuilder();
 
-			await synchObj.WaitAsync();
-			try
+			sb.Append(IndexCollection);
+			sb.Append(' ');
+			sb.Append(Order.ToString());
+
+			foreach (Keyword Keyword in Keywords)
 			{
-				IPersistentDictionary Index = await GetIndexLocked(IndexCollection);
-
-				Process = new SearchProcess(Index, IndexCollection);
-
-				foreach (Keyword Keyword in Keywords)
+				if (!Keyword.Ignore)
 				{
-					if (Keyword.Ignore)
-						continue;
-
-					if (!await Keyword.Process(Process))
-						return new T[0];
+					sb.Append(' ');
+					sb.Append(Keyword.ToString());
 				}
 			}
-			finally
+
+			string Key = sb.ToString();
+			LinkedList<TokenReference>[] FoundReferences;
+			SearchProcess Process;
+
+			if (queryCache.TryGetValue(Key, out QueryRecord QueryRecord))
 			{
-				synchObj.Release();
+				FoundReferences = QueryRecord.FoundReferences;
+				Process = QueryRecord.Process;
 			}
-
-			int c = Process.ReferencesByObject.Count;
-			LinkedList<TokenReference>[] FoundReferences = new LinkedList<TokenReference>[c];
-			Process.ReferencesByObject.Values.CopyTo(FoundReferences, 0);
-
-			switch (Order)
+			else
 			{
-				case FullTextSearchOrder.Relevance:
-				default:
-					Array.Sort(FoundReferences, relevanceOrder);
-					break;
+				await synchObj.WaitAsync();
+				try
+				{
+					IPersistentDictionary Index = await GetIndexLocked(IndexCollection);
 
-				case FullTextSearchOrder.Occurrences:
-					Array.Sort(FoundReferences, occurrencesOrder);
-					break;
+					Process = new SearchProcess(Index, IndexCollection);
 
-				case FullTextSearchOrder.Newest:
-					Array.Sort(FoundReferences, newestOrder);
-					break;
+					foreach (Keyword Keyword in Keywords)
+					{
+						if (Keyword.Ignore)
+							continue;
 
-				case FullTextSearchOrder.Oldest:
-					Array.Sort(FoundReferences, oldestOrder);
-					break;
+						if (!await Keyword.Process(Process))
+							return new T[0];
+					}
+				}
+				finally
+				{
+					synchObj.Release();
+				}
+
+				int c = Process.ReferencesByObject.Count;
+				
+				FoundReferences = new LinkedList<TokenReference>[c];
+				Process.ReferencesByObject.Values.CopyTo(FoundReferences, 0);
+
+				switch (Order)
+				{
+					case FullTextSearchOrder.Relevance:
+					default:
+						Array.Sort(FoundReferences, relevanceOrder);
+						break;
+
+					case FullTextSearchOrder.Occurrences:
+						Array.Sort(FoundReferences, occurrencesOrder);
+						break;
+
+					case FullTextSearchOrder.Newest:
+						Array.Sort(FoundReferences, newestOrder);
+						break;
+
+					case FullTextSearchOrder.Oldest:
+						Array.Sort(FoundReferences, oldestOrder);
+						break;
+				}
+
+				queryCache[Key] = new QueryRecord()
+				{
+					FoundReferences = FoundReferences,
+					Process = Process
+				};
 			}
 
 			List<T> Result = new List<T>();
@@ -719,13 +759,13 @@ namespace Waher.Persistence.FullTextSearch
 				default:
 					foreach (LinkedList<TokenReference> ObjectReference in FoundReferences)
 					{
-						ulong RefIndex = ObjectReference.First.Value.ObjectReference;
 						if (Offset > 0)
 						{
 							Offset--;
 							continue;
 						}
 
+						ulong RefIndex = ObjectReference.First.Value.ObjectReference;
 						ObjectReference Ref = await Process.TryGetObjectReference(RefIndex, true);
 						if (Ref is null)
 							Result.Add(null);
@@ -748,13 +788,13 @@ namespace Waher.Persistence.FullTextSearch
 				case PaginationStrategy.PaginateOverObjectsOnlyCompatible:
 					foreach (LinkedList<TokenReference> ObjectReference in FoundReferences)
 					{
-						ulong RefIndex = ObjectReference.First.Value.ObjectReference;
 						if (Offset > 0)
 						{
 							Offset--;
 							continue;
 						}
 
+						ulong RefIndex = ObjectReference.First.Value.ObjectReference;
 						ObjectReference Ref = await Process.TryGetObjectReference(RefIndex, true);
 						if (Ref is null)
 							continue;
@@ -808,6 +848,12 @@ namespace Waher.Persistence.FullTextSearch
 		private static readonly NewestOrder newestOrder = new NewestOrder();
 		private static readonly OldestOrder oldestOrder = new OldestOrder();
 
+		private class QueryRecord
+		{
+			public LinkedList<TokenReference>[] FoundReferences;
+			public SearchProcess Process;
+		}
+
 		private async void Database_ObjectDeleted(object Sender, ObjectEventArgs e)
 		{
 			try
@@ -836,6 +882,8 @@ namespace Waher.Persistence.FullTextSearch
 				{
 					synchObj.Release();
 				}
+
+				queryCache.Clear();
 
 				await Search.RaiseObjectRemovedFromIndex(this, new ObjectReferenceEventArgs(Ref));
 			}
@@ -958,6 +1006,8 @@ namespace Waher.Persistence.FullTextSearch
 				{
 					synchObj.Release();
 				}
+
+				queryCache.Clear();
 
 				if (Added)
 					await Search.RaiseObjectAddedToIndex(this, new ObjectReferenceEventArgs(Ref));

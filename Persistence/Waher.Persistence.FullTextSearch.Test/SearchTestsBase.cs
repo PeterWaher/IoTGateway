@@ -364,7 +364,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		{
 			Keyword[] Keywords = Search.ParseKeywords(Query, TreatKeywordsAsPrefixes);
 			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
-				FullTextSearchOrder.Relevance, Keywords);
+				FullTextSearchOrder.Relevance, PaginationStrategy.PaginateOverObjectsNullIfIncompatible, Keywords);
 			List<InstanceType> Paginated = new();
 			int Offset = 0;
 			int MaxCount = 25;

@@ -5,7 +5,7 @@ using Waher.Persistence.Serialization;
 namespace Waher.Persistence.FullTextSearch.Test
 {
 	[TestClass]
-	public class SearchGenericTests : SearchTestsBase<GenericObject, GenericSetter>
+	public class SearchGenericTests : SearchTestsBase<GenericObject, GenericAccess>
 	{
 		public SearchGenericTests()
 			: base("FullTextSearchGeneric")

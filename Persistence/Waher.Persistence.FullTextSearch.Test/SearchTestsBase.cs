@@ -1,12 +1,13 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.FullTextSearch.Keywords;
 using Waher.Persistence.FullTextSearch.Test.Classes;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.FullTextSearch.Test
 {
-	public abstract class SearchTestsBase<InstanceType, SetterType>
+	public abstract class SearchTestsBase<InstanceType, AccessType>
 		where InstanceType : class
-		where SetterType : class, ITestClassSetter
+		where AccessType : class, ITestClassAccess
 	{
 		private readonly string indexCollection;
 
@@ -54,7 +55,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 					switch (i % 5)
 					{
 						case 0:
-							await IndexationTestsBase<InstanceType, SetterType>.CreateInstance(
+							await IndexationTestsBase<InstanceType, AccessType>.CreateInstance(
 								"Hello World number " + i.ToString() + ". This document is also a document that contains multiple references to the word 'word' and the word document.",
 								"Kilroy was here.",
 								"Clowns are fun.",
@@ -62,7 +63,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 							break;
 
 						case 1:
-							await IndexationTestsBase<InstanceType, SetterType>.CreateInstance(
+							await IndexationTestsBase<InstanceType, AccessType>.CreateInstance(
 								"Hello World number " + i.ToString(),
 								"Fitzroy was here.",
 								"Clowns are scary.",
@@ -70,7 +71,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 							break;
 
 						case 2:
-							await IndexationTestsBase<InstanceType, SetterType>.CreateInstance(
+							await IndexationTestsBase<InstanceType, AccessType>.CreateInstance(
 								"Hello World number " + i.ToString(),
 								"Kilroy is a Clown.",
 								"Clowns are fun.",
@@ -78,7 +79,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 							break;
 
 						case 3:
-							await IndexationTestsBase<InstanceType, SetterType>.CreateInstance(
+							await IndexationTestsBase<InstanceType, AccessType>.CreateInstance(
 								"Hello World number " + i.ToString(),
 								"Fitzroy is not a Clown.",
 								"Clowns are scary.",
@@ -86,7 +87,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 							break;
 
 						case 4:
-							await IndexationTestsBase<InstanceType, SetterType>.CreateInstance(
+							await IndexationTestsBase<InstanceType, AccessType>.CreateInstance(
 								"Hello World number " + i.ToString(),
 								"Testing accents with Pelé.",
 								"Clowns is the plural form of Clown.",
@@ -360,11 +361,90 @@ namespace Waher.Persistence.FullTextSearch.Test
 			Assert.AreEqual(100, SearchResult.Length);
 		}
 
-		private async Task<InstanceType[]> DoSearch(string Query, bool TreatKeywordsAsPrefixes)
+		[TestMethod]
+		public async Task Test_29_By_Relevance()
+		{
+			InstanceType[] SearchResult = await this.DoSearch("Kilroy word document number /5\\d/", false);
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(500, SearchResult.Length);
+
+			InstanceType? Last = null;
+			Dictionary<string, uint>? LastCounts = null;
+			AccessType Access = Types.Instantiate<AccessType>(false);
+
+			foreach (InstanceType Current in SearchResult)
+			{
+				Dictionary<string, uint> CurrentCounts = await CountTokens(Current, "kilroy", "word", "document", "number", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59");
+
+				if (Last is not null && LastCounts is not null)
+				{
+					uint LastIndex = LastCounts[" NrOccurrences"];
+					uint CurrentIndex = CurrentCounts[" NrOccurrences"];
+
+					if (LastIndex < CurrentIndex)
+						Assert.Fail("Relevance order failure on number of occurrences of tokens found.");
+					else if (LastIndex == CurrentIndex)
+					{
+						LastIndex = LastCounts[" NrTokens"];
+						CurrentIndex = CurrentCounts[" NrTokens"];
+
+						if (LastIndex < CurrentIndex)
+							Assert.Fail("Relevance order failure on number of tokens found.");
+						else if (LastIndex == CurrentIndex)
+						{
+							DateTime LastTP = Access.GetCreated(Last);
+							DateTime CurrentTP = Access.GetCreated(Current);
+
+							if (LastTP < CurrentTP)
+								Assert.Fail("Relevance order failure on creation timestamp.");
+						}
+					}
+				}
+
+				Last = Current;
+				LastCounts = CurrentCounts;
+			}
+		}
+
+		private static async Task<Dictionary<string, uint>> CountTokens(InstanceType Object, params string[] Tokens)
+		{
+			Dictionary<string, uint> Counts = new();
+			uint NrTokens = 0;
+			uint NrOccurrences = 0;
+
+			foreach (string s in Tokens)
+				Counts[s] = 0;
+
+			TokenCount[] TokenCounts = await Search.Tokenize(Object);
+
+			foreach (TokenCount TokenCount in TokenCounts)
+			{
+				if (Counts.TryGetValue(TokenCount.Token, out uint Nr))
+				{
+					uint c = (uint)TokenCount.DocIndex.Length;
+					Counts[TokenCount.Token] = Nr + c;
+					NrTokens++;
+					NrOccurrences += c;
+				}
+			}
+
+			Counts[" NrTokens"] = NrTokens;
+			Counts[" NrOccurrences"] = NrOccurrences;
+
+			return Counts;
+		}
+
+		private Task<InstanceType[]> DoSearch(string Query, bool TreatKeywordsAsPrefixes)
+		{
+			return this.DoSearch(Query, FullTextSearchOrder.Relevance, TreatKeywordsAsPrefixes);
+		}
+
+		private async Task<InstanceType[]> DoSearch(string Query, FullTextSearchOrder Order, bool TreatKeywordsAsPrefixes)
 		{
 			Keyword[] Keywords = Search.ParseKeywords(Query, TreatKeywordsAsPrefixes);
 			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
-				FullTextSearchOrder.Relevance, PaginationStrategy.PaginateOverObjectsNullIfIncompatible, Keywords);
+				Order, PaginationStrategy.PaginateOverObjectsNullIfIncompatible, Keywords);
 			List<InstanceType> Paginated = new();
 			int Offset = 0;
 			int MaxCount = 25;
@@ -372,7 +452,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 			while (true)
 			{
 				InstanceType[] Page = await Search.FullTextSearch<InstanceType>(this.indexCollection, Offset, MaxCount,
-					FullTextSearchOrder.Relevance, PaginationStrategy.PaginateOverObjectsNullIfIncompatible, Keywords);
+					Order, PaginationStrategy.PaginateOverObjectsNullIfIncompatible, Keywords);
 
 				Paginated.AddRange(Page);
 				Offset += Page.Length;

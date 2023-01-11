@@ -123,7 +123,7 @@ namespace Waher.Persistence.FullTextSearch
 				else
 					Tokens = await Tokenize(GenObj, CollectionInfo.PropertyNames);
 
-				if (Tokens is null)
+				if ((Tokens?.Length ?? 0) == 0)
 					return;
 
 				ObjectReference Ref;
@@ -720,7 +720,7 @@ namespace Waher.Persistence.FullTextSearch
 				}
 
 				int c = Process.ReferencesByObject.Count;
-				
+
 				FoundReferences = new LinkedList<TokenReference>[c];
 				Process.ReferencesByObject.Values.CopyTo(FoundReferences, 0);
 
@@ -961,7 +961,7 @@ namespace Waher.Persistence.FullTextSearch
 				else
 					Tokens = await Tokenize(GenObj, CollectionInfo.PropertyNames);
 
-				if (Tokens is null)
+				if ((Tokens?.Length ?? 0) == 0)
 					return;
 
 				ObjectReference Ref = await Database.FindFirstIgnoreRest<ObjectReference>(new FilterAnd(
@@ -1059,7 +1059,7 @@ namespace Waher.Persistence.FullTextSearch
 		{
 			TokenizationProcess Process = new TokenizationProcess();
 			await Tokenize(Objects, Process);
-		
+
 			return Process.ToArray();
 		}
 
@@ -1080,14 +1080,14 @@ namespace Waher.Persistence.FullTextSearch
 
 				Type T = Object.GetType();
 				ITokenizer Tokenizer;
+				bool Found;
 
 				lock (tokenizers)
 				{
-					if (tokenizers.TryGetValue(T, out Tokenizer) && Tokenizer is null)
-						continue;
+					Found = tokenizers.TryGetValue(T, out Tokenizer);
 				}
 
-				if (Tokenizer is null)
+				if (!Found)
 				{
 					Tokenizer = Types.FindBest<ITokenizer, Type>(T);
 
@@ -1095,12 +1095,30 @@ namespace Waher.Persistence.FullTextSearch
 					{
 						tokenizers[T] = Tokenizer;
 					}
-
-					if (Tokenizer is null)
-						continue;
 				}
 
-				await Tokenizer.Tokenize(Object, Process);
+				if (Tokenizer is null)
+				{
+					Tuple<CollectionInformation, TypeInformation, GenericObject> P = await Prepare(Object);
+					if (P is null)
+						continue;
+
+					object ObjectId = await Database.TryGetObjectId(Object);
+					if (ObjectId is null)
+						return;
+
+					CollectionInformation CollectionInfo = P.Item1;
+					TypeInformation TypeInfo = P.Item2;
+					GenericObject GenObj = P.Item3;
+
+					if (GenObj is null)
+						await TypeInfo.Tokenize(Object, Process, CollectionInfo.PropertyNames);
+					else
+						await Tokenize(GenObj, Process, CollectionInfo.PropertyNames);
+				}
+				else
+					await Tokenizer.Tokenize(Object, Process);
+
 				Process.DocumentIndexOffset++;
 			}
 		}
@@ -1123,6 +1141,37 @@ namespace Waher.Persistence.FullTextSearch
 		/// <returns>Indexable property values found.</returns>
 		internal static Task<TokenCount[]> Tokenize(GenericObject Obj, params string[] PropertyNames)
 		{
+			LinkedList<object> Values = GetValues(Obj, PropertyNames);
+
+			if (Values.First is null)
+				return Task.FromResult<TokenCount[]>(null);
+
+			return Tokenize(Values);
+		}
+
+		/// <summary>
+		/// Gets the indexable property values from an object. Property values will be returned in lower-case.
+		/// </summary>
+		/// <param name="Obj">Generic object.</param>
+		/// <param name="Process">Tokenization process.</param>
+		/// <param name="PropertyNames">Indexable property names.</param>
+		/// <returns>Indexable property values found.</returns>
+		internal static async Task Tokenize(GenericObject Obj, TokenizationProcess Process, params string[] PropertyNames)
+		{
+			LinkedList<object> Values = GetValues(Obj, PropertyNames);
+
+			if (!(Values.First is null))
+				await Tokenize(Values, Process);
+		}
+
+		/// <summary>
+		/// Gets object property values from a generic object.
+		/// </summary>
+		/// <param name="Obj">Generic object</param>
+		/// <param name="PropertyNames">Property names</param>
+		/// <returns>Enumeration of property values.</returns>
+		internal static LinkedList<object> GetValues(GenericObject Obj, params string[] PropertyNames)
+		{
 			LinkedList<object> Values = new LinkedList<object>();
 
 			if (!(Obj is null))
@@ -1134,10 +1183,7 @@ namespace Waher.Persistence.FullTextSearch
 				}
 			}
 
-			if (Values.First is null)
-				return Task.FromResult<TokenCount[]>(null);
-
-			return Tokenize(Values);
+			return Values;
 		}
 
 	}

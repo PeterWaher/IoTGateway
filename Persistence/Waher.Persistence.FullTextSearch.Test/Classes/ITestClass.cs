@@ -7,5 +7,6 @@
         string IndexedProperty2 { get; set; }
         string NonIndexedProperty1 { get; set; }
         string NonIndexedProperty2 { get; set; }
-    }
+        DateTime Created { get; set; }
+	}
 }

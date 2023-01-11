@@ -4,7 +4,7 @@ using Waher.Persistence.FullTextSearch.Test.Classes;
 namespace Waher.Persistence.FullTextSearch.Test
 {
 	[TestClass]
-	public class SearchTests : SearchTestsBase<TestClass, TestClassSetter>
+	public class SearchTests : SearchTestsBase<TestClass, TestClassAccess>
 	{
 		public SearchTests()
 			: base("FullTextSearch")

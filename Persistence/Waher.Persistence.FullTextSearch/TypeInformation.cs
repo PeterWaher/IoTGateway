@@ -81,11 +81,21 @@ namespace Waher.Persistence.FullTextSearch
 		{
 			TokenizationProcess Process = new TokenizationProcess();
 
+			await this.Tokenize(Obj, Process, PropertyNames);
+
+			return Process.ToArray();
+		}
+
+		/// <summary>
+		/// Tokenizes properties in an object, given a set of property names.
+		/// </summary>
+		/// <param name="Obj">Object instance to tokenize.</param>
+		/// <param name="Process">Tokenization process.</param>
+		/// <param name="PropertyNames">Indexable property names.</param>
+		public async Task Tokenize(object Obj, TokenizationProcess Process, params string[] PropertyNames)
+		{
 			if (this.hasCustomTokenizer)
-			{
 				await this.customTokenizer.Tokenize(Obj, Process);
-				return Process.ToArray();
-			}
 			else
 			{
 				LinkedList<object> Values = new LinkedList<object>();
@@ -115,10 +125,8 @@ namespace Waher.Persistence.FullTextSearch
 					}
 				}
 
-				if (Values.First is null)
-					return null;
-
-				return await FullTextSearchModule.Tokenize(Values);
+				if (!(Values.First is null))
+					await FullTextSearchModule.Tokenize(Values, Process);
 			}
 		}
 

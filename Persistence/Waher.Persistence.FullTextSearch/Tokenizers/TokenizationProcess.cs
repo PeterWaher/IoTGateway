@@ -34,7 +34,7 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 		{
 			int c = this.TokenCounts.Count;
 			if (c == 0)
-				return null;
+				return new TokenCount[0];
 
 			int i = 0;
 			TokenCount[] Counts = new TokenCount[c];

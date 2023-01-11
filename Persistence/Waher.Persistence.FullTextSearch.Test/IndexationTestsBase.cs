@@ -4,9 +4,9 @@ using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.FullTextSearch.Test
 {
-	public abstract class IndexationTestsBase<InstanceType, SetterType>
+	public abstract class IndexationTestsBase<InstanceType, AccessType>
 		where InstanceType : class
-		where SetterType : class, ITestClassSetter
+		where AccessType : class, ITestClassAccess
 	{
 		private readonly string collectioName;
 		private readonly string indexCollection;
@@ -44,9 +44,9 @@ namespace Waher.Persistence.FullTextSearch.Test
 			try
 			{
 				InstanceType Obj = Types.Instantiate<InstanceType>(false);
-				SetterType Setter = Types.Instantiate<SetterType>(false);
+				AccessType Access = Types.Instantiate<AccessType>(false);
 
-				Setter.Set(Obj, IndexedProperty1, IndexedProperty2,
+				Access.Set(Obj, IndexedProperty1, IndexedProperty2,
 					NonIndexedProperty1, NonIndexedProperty2);
 
 				await Database.Insert(Obj);
@@ -141,9 +141,9 @@ namespace Waher.Persistence.FullTextSearch.Test
 			Search.ObjectUpdatedInIndex += ObjectUpdated;
 			try
 			{
-				SetterType Setter = Types.Instantiate<SetterType>(false);
+				AccessType Access = Types.Instantiate<AccessType>(false);
 
-				Setter.Set(Obj, "Roy was here.");
+				Access.Set(Obj, "Roy was here.");
 
 				await Database.Update(Obj);
 

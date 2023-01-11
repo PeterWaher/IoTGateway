@@ -17,6 +17,7 @@ namespace Waher.Persistence.FullTextSearch.Test.Classes
 		public string IndexedProperty2 { get; set; } = string.Empty;
 		public string NonIndexedProperty1 { get; set; } = string.Empty;
 		public string NonIndexedProperty2 { get; set; } = string.Empty;
+		public DateTime Created { get; set; } = DateTime.MinValue;
 
 		public override bool Equals(object? obj)
 		{
@@ -24,12 +25,15 @@ namespace Waher.Persistence.FullTextSearch.Test.Classes
 				this.IndexedProperty1 == o.IndexedProperty1 &&
 				this.IndexedProperty2 == o.IndexedProperty2 &&
 				this.NonIndexedProperty1 == o.NonIndexedProperty1 &&
-				this.NonIndexedProperty2 == o.NonIndexedProperty2;
+				this.NonIndexedProperty2 == o.NonIndexedProperty2 &&
+				this.Created == o.Created;
 		}
 
 		public override int GetHashCode()
 		{
 			int Result = this.ObjectID?.GetHashCode() ?? 0;
+
+			Result ^= Result << 5 ^ this.Created.GetHashCode();
 
 			if (this.IndexedProperty1 is not null)
 				Result ^= Result << 5 ^ this.IndexedProperty1.GetHashCode();

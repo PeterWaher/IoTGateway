@@ -348,7 +348,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 			InstanceType[] SearchResult = await this.DoSearch("'number /[1-5]\\d/'", false);
 
 			Assert.IsNotNull(SearchResult);
-			Assert.AreEqual(250, SearchResult.Length);
+			Assert.AreEqual(50, SearchResult.Length);
 		}
 
 		private async Task<InstanceType[]> DoSearch(string Query, bool TreatKeywordsAsPrefixes)

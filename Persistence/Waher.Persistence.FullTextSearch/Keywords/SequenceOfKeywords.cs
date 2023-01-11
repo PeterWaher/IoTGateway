@@ -107,7 +107,7 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 				else
 					sb.Append(' ');
 
-				sb.Append(Keywords.ToString());
+				sb.Append(Keyword.ToString());
 			}
 
 			sb.Append('"');

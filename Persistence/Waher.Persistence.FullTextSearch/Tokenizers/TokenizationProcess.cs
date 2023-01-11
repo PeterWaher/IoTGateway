@@ -43,7 +43,6 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 				Counts[i++] = new TokenCount(P.Key, P.Value.ToArray());
 
 			return Counts;
-
 		}
 	}
 }

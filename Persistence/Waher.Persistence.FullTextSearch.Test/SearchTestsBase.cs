@@ -344,7 +344,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 
 		private async Task<InstanceType[]> DoSearch(string Query, bool TreatKeywordsAsPrefixes)
 		{
-			Keyword[] Keywords = Search.ParseKeywords("+'Kilroy was' here", TreatKeywordsAsPrefixes);
+			Keyword[] Keywords = Search.ParseKeywords(Query, TreatKeywordsAsPrefixes);
 			InstanceType[] SearchResult = await Search.FullTextSearch<InstanceType>(this.indexCollection, 0, int.MaxValue,
 				FullTextSearchOrder.Relevance, Keywords);
 			List<InstanceType> Paginated = new();

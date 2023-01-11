@@ -159,7 +159,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 			InstanceType[] SearchResult = await this.DoSearch("*roy -Clown", false);
 
 			Assert.IsNotNull(SearchResult);
-			Assert.AreEqual(100, SearchResult.Length);
+			Assert.AreEqual(200, SearchResult.Length);
 		}
 
 		[TestMethod]
@@ -177,7 +177,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 			InstanceType[] SearchResult = await this.DoSearch("/.*roy/ -Clown", false);
 
 			Assert.IsNotNull(SearchResult);
-			Assert.AreEqual(100, SearchResult.Length);
+			Assert.AreEqual(200, SearchResult.Length);
 		}
 
 		[TestMethod]
@@ -240,7 +240,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 			InstanceType[] SearchResult = await this.DoSearch("*roy -Clown", true);
 
 			Assert.IsNotNull(SearchResult);
-			Assert.AreEqual(100, SearchResult.Length);
+			Assert.AreEqual(200, SearchResult.Length);
 		}
 
 		[TestMethod]
@@ -258,7 +258,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 			InstanceType[] SearchResult = await this.DoSearch("/.*roy/ -Clown", true);
 
 			Assert.IsNotNull(SearchResult);
-			Assert.AreEqual(100, SearchResult.Length);
+			Assert.AreEqual(200, SearchResult.Length);
 		}
 
 		[TestMethod]
@@ -340,6 +340,15 @@ namespace Waher.Persistence.FullTextSearch.Test
 
 			Assert.IsNotNull(SearchResult);
 			Assert.AreEqual(100, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_27_Regex_Range()
+		{
+			InstanceType[] SearchResult = await this.DoSearch("'number /[1-5]\\d/'", false);
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(250, SearchResult.Length);
 		}
 
 		private async Task<InstanceType[]> DoSearch(string Query, bool TreatKeywordsAsPrefixes)

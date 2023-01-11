@@ -74,18 +74,18 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 
 			if (string.IsNullOrEmpty(Preamble))
 			{
-				int c = Process.Index.Count;
-				string[] Keys = new string[c];
-				Process.Index.Keys.CopyTo(Keys, 0);
+				string[] Keys = await Process.Index.GetKeysAsync();
 
 				foreach (string Key in Keys)
 				{
 					Match M = this.Parsed.Match(Key);
 					if (M.Success && M.Index == 0 && M.Length == Key.Length)
 					{
-						KeyValuePair<bool, object> P = await Process.Index.TryGetValueAsync(Key);
-						if (P.Key && P.Value is TokenReferences References)
-							Result.AddLast(new KeyValuePair<string, TokenReferences>(Key, References));
+						foreach (KeyValuePair<string, object> P in await Process.Index.GetEntriesAsync(Key, Key + "!"))
+						{
+							if (P.Value is TokenReferences References)
+								Result.AddLast(new KeyValuePair<string, TokenReferences>(P.Key, References));
+						}
 					}
 				}
 			}

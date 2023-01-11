@@ -68,5 +68,16 @@ namespace Waher.Persistence.MongoDB
 		{
 			return new ValueEnumeration(this.dictionary.GetEnumerator());
 		}
+
+		public object[] GetAllValues()
+		{
+			List<object> Result = new List<object>();
+			IEnumerator<KeyValuePair<string, object>> e = this.dictionary.GetEnumerator();
+
+			while (e.MoveNext())
+				Result.Add(e.Current.Value);
+
+			return Result.ToArray();
+		}
 	}
 }

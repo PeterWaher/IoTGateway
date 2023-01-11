@@ -74,5 +74,31 @@ namespace Waher.Persistence
 		/// <returns>Found entries.</returns>
 		Task<KeyValuePair<string, object>[]> GetEntriesAsync(string FromKey, string ToKey);
 
+		/// <summary>
+		/// Copies available keys to a string array.
+		/// </summary>
+		/// <param name="Keys">Array to receive keys.</param>
+		/// <param name="Offset">Offset into array to start copying to.</param>
+		Task CopyKeysToAsync(string[] Keys, int Offset);
+
+		/// <summary>
+		/// Copies available values to an array.
+		/// </summary>
+		/// <param name="Values">Array to receive values.</param>
+		/// <param name="Offset">Offset into array to start copying to.</param>
+		Task CopyValuesToAsync(object[] Values, int Offset);
+
+		/// <summary>
+		/// Gets all keys.
+		/// </summary>
+		/// <returns>Array of keys.</returns>
+		Task<string[]> GetKeysAsync();
+
+		/// <summary>
+		/// Gets all values.
+		/// </summary>
+		/// <returns>Array of values.</returns>
+		Task<object[]> GetValuesAsync();
+
 	}
 }

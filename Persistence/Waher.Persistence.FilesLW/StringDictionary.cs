@@ -714,5 +714,43 @@ namespace Waher.Persistence.Files
 			}
 		}
 
+		/// <summary>
+		/// Copies available keys to a string array.
+		/// </summary>
+		/// <param name="Keys">Array to receive keys.</param>
+		/// <param name="Offset">Offset into array to start copying to.</param>
+		public Task CopyKeysToAsync(string[] Keys, int Offset)
+		{
+			return this.keyCollection.CopyToAsync(Keys, Offset);
+		}
+
+		/// <summary>
+		/// Copies available values to an array.
+		/// </summary>
+		/// <param name="Values">Array to receive values.</param>
+		/// <param name="Offset">Offset into array to start copying to.</param>
+		public Task CopyValuesToAsync(object[] Values, int Offset)
+		{
+			return this.valueCollection.CopyToAsync(Values, Offset);
+		}
+
+		/// <summary>
+		/// Gets all keys.
+		/// </summary>
+		/// <returns>Array of keys.</returns>
+		public Task<string[]> GetKeysAsync()
+		{
+			return this.keyCollection.GetKeysAsync();
+		}
+
+		/// <summary>
+		/// Gets all values.
+		/// </summary>
+		/// <returns>Array of values.</returns>
+		public Task<object[]> GetValuesAsync()
+		{
+			return this.valueCollection.GetValuesAsync();
+		}
+
 	}
 }

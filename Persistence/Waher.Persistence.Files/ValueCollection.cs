@@ -15,21 +15,9 @@ namespace Waher.Persistence.Files
 			this.dictionary = Dictionary;
 		}
 
-		public int Count
-		{
-			get
-			{
-				return this.dictionary.Count;
-			}
-		}
+		public int Count => this.dictionary.Count;
 
-		public bool IsReadOnly
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public bool IsReadOnly => true;
 
 		public void Add(object item)
 		{
@@ -86,6 +74,30 @@ namespace Waher.Persistence.Files
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return new ValueEnumeration(this.dictionary.GetEnumerator());
+		}
+
+		/// <summary>
+		/// Gets all values.
+		/// </summary>
+		/// <returns>Array of values.</returns>
+		public async Task<object[]> GetValuesAsync()
+		{
+			List<object> Result = new List<object>();
+
+			await this.dictionary.DictionaryFile.BeginRead();
+			try
+			{
+				ObjectBTreeFileCursor<KeyValuePair<string, object>> e = await this.dictionary.GetEnumeratorLocked();
+
+				while (await e.MoveNextAsyncLocked())
+					Result.Add(e.Current.Value);
+			}
+			finally
+			{
+				await this.dictionary.DictionaryFile.EndRead();
+			}
+
+			return Result.ToArray();
 		}
 	}
 }

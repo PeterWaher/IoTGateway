@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Waher.Events;
 using Waher.Persistence.Filters;
 using Waher.Persistence.MongoDB.Serialization;
 
@@ -480,6 +479,46 @@ namespace Waher.Persistence.MongoDB
 		{
 			this.Clear();
 			this.Dispose();
+		}
+
+		/// <summary>
+		/// Copies available keys to a string array.
+		/// </summary>
+		/// <param name="Keys">Array to receive keys.</param>
+		/// <param name="Offset">Offset into array to start copying to.</param>
+		public Task CopyKeysToAsync(string[] Keys, int Offset)
+		{
+			this.keyCollection.CopyTo(Keys, Offset);    // TODO: Make asynchronous.
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Copies available values to an array.
+		/// </summary>
+		/// <param name="Values">Array to receive values.</param>
+		/// <param name="Offset">Offset into array to start copying to.</param>
+		public Task CopyValuesToAsync(object[] Values, int Offset)
+		{
+			this.valueCollection.CopyTo(Values, Offset);    // TODO: Make asynchronous.
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Gets all keys.
+		/// </summary>
+		/// <returns>Array of keys.</returns>
+		public Task<string[]> GetKeysAsync()
+		{
+			return Task.FromResult(this.keyCollection.GetAllKeys());
+		}
+
+		/// <summary>
+		/// Gets all values.
+		/// </summary>
+		/// <returns>Array of values.</returns>
+		public Task<object[]> GetValuesAsync()
+		{
+			return Task.FromResult(this.valueCollection.GetAllValues());
 		}
 	}
 }

@@ -18,7 +18,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		public static async Task Initialize(string CollectioName, string IndexCollection)
 		{
 			await Clear(CollectioName, IndexCollection);
-			await CreateDataset(CollectioName, IndexCollection);
+			await CreateDataset(IndexCollection);
 		}
 
 		private static async Task Clear(string CollectioName, string IndexCollection)
@@ -29,7 +29,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 			await (await Database.GetDictionary(IndexCollection)).ClearAsync();
 		}
 
-		public static async Task CreateDataset(string CollectioName, string IndexCollection)
+		public static async Task CreateDataset(string IndexCollection)
 		{
 			TaskCompletionSource<bool> Done = new();
 			int i, c = TokenReferences.MaxReferences * 5;
@@ -55,7 +55,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 					{
 						case 0:
 							await IndexationTestsBase<InstanceType, SetterType>.CreateInstance(
-								"Hello World number " + i.ToString(),
+								"Hello World number " + i.ToString() + ". This document is also a document that contains multiple references to the word 'word' and the word document.",
 								"Kilroy was here.",
 								"Clowns are fun.",
 								"Testing indexation.");
@@ -349,6 +349,15 @@ namespace Waher.Persistence.FullTextSearch.Test
 
 			Assert.IsNotNull(SearchResult);
 			Assert.AreEqual(50, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_28_Regex_RecurringWords()
+		{
+			InstanceType[] SearchResult = await this.DoSearch("'word document'", false);
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(100, SearchResult.Length);
 		}
 
 		private async Task<InstanceType[]> DoSearch(string Query, bool TreatKeywordsAsPrefixes)

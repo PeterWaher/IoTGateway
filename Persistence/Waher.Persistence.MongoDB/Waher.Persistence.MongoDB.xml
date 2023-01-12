@@ -3207,5 +3207,31 @@
             Deletes the dictionary and disposes the object.
             </summary>
         </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.CopyKeysToAsync(System.String[],System.Int32)">
+            <summary>
+            Copies available keys to a string array.
+            </summary>
+            <param name="Keys">Array to receive keys.</param>
+            <param name="Offset">Offset into array to start copying to.</param>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.CopyValuesToAsync(System.Object[],System.Int32)">
+            <summary>
+            Copies available values to an array.
+            </summary>
+            <param name="Values">Array to receive values.</param>
+            <param name="Offset">Offset into array to start copying to.</param>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.GetKeysAsync">
+            <summary>
+            Gets all keys.
+            </summary>
+            <returns>Array of keys.</returns>
+        </member>
+        <member name="M:Waher.Persistence.MongoDB.StringDictionary.GetValuesAsync">
+            <summary>
+            Gets all values.
+            </summary>
+            <returns>Array of values.</returns>
+        </member>
     </members>
 </doc>

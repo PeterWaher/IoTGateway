@@ -296,21 +296,25 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				{
 					ex = Log.UnnestException(ex);
 
+					Output.AppendLine("<font class=\"error\">");
+
 					if (ex is AggregateException ex2)
 					{
 						foreach (Exception ex3 in ex2.InnerExceptions)
 						{
-							Output.Append("<p><font class=\"error\">");
+							Output.Append("<p>");
 							Output.Append(XML.HtmlValueEncode(ex3.Message));
-							Output.AppendLine("</font></p>");
+							Output.AppendLine("</p>");
 						}
 					}
 					else
 					{
-						Output.Append("<p><font class=\"error\">");
+						Output.Append("<p>");
 						Output.Append(XML.HtmlValueEncode(ex.Message));
-						Output.Append("</font></p>");
+						Output.Append("</p>");
 					}
+
+					Output.Append("</font>");
 				}
 			}
 

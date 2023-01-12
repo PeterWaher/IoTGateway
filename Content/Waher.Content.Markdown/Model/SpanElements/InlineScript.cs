@@ -185,13 +185,15 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			{
 				ex = Log.UnnestException(ex);
 
+				Output.Append("<font class=\"error\">");
+
 				if (ex is AggregateException ex2)
 				{
 					foreach (Exception ex3 in ex2.InnerExceptions)
 					{
-						Output.Append("<p><font class=\"error\">");
-						Output.Append(MarkdownDocument.Encode(ex3.Message));
-						Output.AppendLine("</font></p>");
+						Output.Append("<p>");
+						Output.Append(XML.HtmlValueEncode(ex3.Message));
+						Output.AppendLine("</p>");
 					}
 				}
 				else
@@ -199,13 +201,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					if (AloneInParagraph)
 						Output.Append("<p>");
 
-					Output.Append("<font class=\"error\">");
 					Output.Append(MarkdownDocument.Encode(ex.Message));
-					Output.Append("</font>");
 
 					if (AloneInParagraph)
 						Output.Append("</p>");
 				}
+
+				Output.Append("</font>");
 			}
 			else if (Result is ObjectMatrix M && !(M.ColumnNames is null))
 			{
@@ -357,13 +359,15 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			{
 				ex = Log.UnnestException(ex);
 
+				Output.AppendLine("<font class=\"error\">");
+
 				if (ex is AggregateException ex2)
 				{
 					foreach (Exception ex3 in ex2.InnerExceptions)
 					{
-						Output.Append("<p><font class=\"error\">");
+						Output.Append("<p>");
 						Output.Append(XML.HtmlValueEncode(ex3.Message));
-						Output.AppendLine("</font></p>");
+						Output.AppendLine("</p>");
 					}
 				}
 				else
@@ -371,13 +375,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					if (AloneInParagraph)
 						Output.Append("<p>");
 
-					Output.Append("<font class=\"error\">");
 					Output.Append(XML.HtmlValueEncode(ex.Message));
-					Output.Append("</font>");
 
 					if (AloneInParagraph)
 						Output.Append("</p>");
 				}
+
+				Output.AppendLine("</font>");
 			}
 			else if (Result is ObjectMatrix M && !(M.ColumnNames is null))
 			{

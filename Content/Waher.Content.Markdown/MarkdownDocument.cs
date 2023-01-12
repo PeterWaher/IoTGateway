@@ -379,22 +379,22 @@ namespace Waher.Content.Markdown
 				{
 					ex = Log.UnnestException(ex);
 
+					StringBuilder sb = new StringBuilder();
+
+					sb.AppendLine("<font class=\"error\">");
+
 					if (ex is AggregateException ex2)
 					{
-						StringBuilder sb = new StringBuilder();
-
 						foreach (Exception ex3 in ex2.InnerExceptions)
 						{
 							CheckException(ex3, TransparentExceptionTypes);
 
 							Log.Critical(ex3, FileName);
 
-							sb.Append("<p><font class=\"error\">");
+							sb.Append("<p>");
 							sb.Append(XML.HtmlValueEncode(ex3.Message));
-							sb.Append("</font></p>");
+							sb.AppendLine("</p>");
 						}
-
-						Result = sb.ToString();
 					}
 					else
 					{
@@ -402,8 +402,12 @@ namespace Waher.Content.Markdown
 
 						Log.Critical(ex, FileName);
 
-						Result = "<font class=\"error\">" + XML.HtmlValueEncode(ex.Message) + "</font>";
+						sb.AppendLine(XML.HtmlValueEncode(ex.Message));
 					}
+
+					sb.AppendLine("</font>");
+
+					Result = sb.ToString();
 				}
 
 				if (!(Result is null))
@@ -2183,23 +2187,24 @@ namespace Waher.Content.Markdown
 						{
 							ex = Log.UnnestException(ex);
 
+							Elements.AddLast(new HtmlBlock(this, new MarkdownElement[]
+							{
+								new InlineHTML(this, "<font class=\"error\">")
+							}));
+
 							if (ex is AggregateException ex2)
 							{
-								StringBuilder sb = new StringBuilder();
-
 								foreach (Exception ex3 in ex2.InnerExceptions)
 								{
 									this.CheckException(ex3);
 
 									Log.Critical(ex3, this.fileName);
 
-									sb.Append("<p><font class=\"error\">");
-									sb.Append(XML.HtmlValueEncode(ex3.Message));
-									sb.Append("</font></p>");
+									Elements.AddLast(new Paragraph(this, new MarkdownElement[]
+									{
+										new InlineText(this, ex3.Message)
+									}));
 								}
-
-								string[] Rows = ex.Message.Replace("\r\n", "\n").Split(CommonTypes.CRLF);
-								Elements.AddLast(new CodeBlock(this, Rows, 0, Rows.Length - 1, 0));
 							}
 							else
 							{
@@ -2207,9 +2212,16 @@ namespace Waher.Content.Markdown
 
 								Log.Critical(ex, this.fileName);
 
-								string[] Rows = ex.Message.Replace("\r\n", "\n").Split(CommonTypes.CRLF);
-								Elements.AddLast(new CodeBlock(this, Rows, 0, Rows.Length - 1, 0));
+								Elements.AddLast(new Paragraph(this, new MarkdownElement[]
+								{
+									new InlineText(this, ex.Message)
+								}));
 							}
+
+							Elements.AddLast(new HtmlBlock(this, new MarkdownElement[]
+							{
+								new InlineHTML(this, "</font>")
+							}));
 
 							this.CheckException(ex);
 						}

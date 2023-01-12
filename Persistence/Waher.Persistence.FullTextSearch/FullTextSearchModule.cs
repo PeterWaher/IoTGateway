@@ -123,7 +123,7 @@ namespace Waher.Persistence.FullTextSearch
 				else
 					Tokens = await Tokenize(GenObj, CollectionInfo.PropertyNames);
 
-				if ((Tokens?.Length ?? 0) == 0)
+				if (Tokens.Length == 0)
 					return;
 
 				ObjectReference Ref;
@@ -961,12 +961,12 @@ namespace Waher.Persistence.FullTextSearch
 				else
 					Tokens = await Tokenize(GenObj, CollectionInfo.PropertyNames);
 
-				if ((Tokens?.Length ?? 0) == 0)
-					return;
-
 				ObjectReference Ref = await Database.FindFirstIgnoreRest<ObjectReference>(new FilterAnd(
 					new FilterFieldEqualTo("Collection", P.Item1.CollectionName),
 					new FilterFieldEqualTo("ObjectInstanceId", ObjectId)));
+
+				if (AreSame(Tokens, Ref?.Tokens))
+					return;
 
 				bool Added = false;
 
@@ -975,6 +975,9 @@ namespace Waher.Persistence.FullTextSearch
 				{
 					if (Ref is null)
 					{
+						if (Tokens.Length == 0)
+							return;
+
 						ulong Index = await GetNextIndexNrLocked(CollectionInfo.IndexCollectionName);
 
 						Ref = new ObjectReference()
@@ -1018,6 +1021,25 @@ namespace Waher.Persistence.FullTextSearch
 			{
 				Log.Critical(ex);
 			}
+		}
+
+		private static bool AreSame(TokenCount[] Tokens1, TokenCount[] Tokens2)
+		{
+			int c = Tokens1?.Length ?? 0;
+			int d = Tokens2?.Length ?? 0;
+
+			if (c != d)
+				return false;
+
+			int i;
+
+			for (i = 0; i < c; i++)
+			{
+				if (!Tokens1[i].Equals(Tokens2[i]))
+					return false;
+			}
+
+			return true;
 		}
 
 		/// <summary>

@@ -364,7 +364,8 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_29_By_Relevance()
 		{
-			InstanceType[] SearchResult = await this.DoSearch("Kilroy word document number /5\\d/", false);
+			InstanceType[] SearchResult = await this.DoSearch("Kilroy word document number /5\\d/",
+				FullTextSearchOrder.Relevance, false);
 
 			Assert.IsNotNull(SearchResult);
 			Assert.AreEqual(500, SearchResult.Length);
@@ -379,8 +380,8 @@ namespace Waher.Persistence.FullTextSearch.Test
 
 				if (Last is not null && LastCounts is not null)
 				{
-					uint LastIndex = LastCounts[" NrOccurrences"];
-					uint CurrentIndex = CurrentCounts[" NrOccurrences"];
+					uint LastIndex = LastCounts[" NrTimes"];
+					uint CurrentIndex = CurrentCounts[" NrTimes"];
 
 					if (LastIndex < CurrentIndex)
 						Assert.Fail("Relevance order failure on number of occurrences of tokens found.");
@@ -407,11 +408,116 @@ namespace Waher.Persistence.FullTextSearch.Test
 			}
 		}
 
+		[TestMethod]
+		public async Task Test_30_By_Occurrences()
+		{
+			InstanceType[] SearchResult = await this.DoSearch("Kilroy word document number /5\\d/",
+				FullTextSearchOrder.Occurrences, false);
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(500, SearchResult.Length);
+
+			InstanceType? Last = null;
+			Dictionary<string, uint>? LastCounts = null;
+			AccessType Access = Types.Instantiate<AccessType>(false);
+
+			foreach (InstanceType Current in SearchResult)
+			{
+				Dictionary<string, uint> CurrentCounts = await CountTokens(Current, "kilroy", "word", "document", "number", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59");
+
+				if (Last is not null && LastCounts is not null)
+				{
+					uint LastIndex = LastCounts[" NrTokens"];
+					uint CurrentIndex = CurrentCounts[" NrTokens"];
+
+					if (LastIndex < CurrentIndex)
+						Assert.Fail("Relevance order failure on number of occurrences of tokens found.");
+					else if (LastIndex == CurrentIndex)
+					{
+						LastIndex = LastCounts[" NrTimes"];
+						CurrentIndex = CurrentCounts[" NrTimes"];
+
+						if (LastIndex < CurrentIndex)
+							Assert.Fail("Relevance order failure on number of tokens found.");
+						else if (LastIndex == CurrentIndex)
+						{
+							DateTime LastTP = Access.GetCreated(Last);
+							DateTime CurrentTP = Access.GetCreated(Current);
+
+							if (LastTP < CurrentTP)
+								Assert.Fail("Occurences order failure on creation timestamp.");
+						}
+					}
+				}
+
+				Last = Current;
+				LastCounts = CurrentCounts;
+			}
+		}
+
+		[TestMethod]
+		public async Task Test_31_By_NewToOld()
+		{
+			InstanceType[] SearchResult = await this.DoSearch("Kilroy word document number /5\\d/",
+				FullTextSearchOrder.Newest, false);
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(500, SearchResult.Length);
+
+			InstanceType? Last = null;
+			AccessType Access = Types.Instantiate<AccessType>(false);
+
+			foreach (InstanceType Current in SearchResult)
+			{
+				Dictionary<string, uint> CurrentCounts = await CountTokens(Current, "kilroy", "word", "document", "number", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59");
+
+				if (Last is not null)
+				{
+					DateTime LastTP = Access.GetCreated(Last);
+					DateTime CurrentTP = Access.GetCreated(Current);
+
+					if (LastTP < CurrentTP)
+						Assert.Fail("NewToOld order failure on creation timestamp.");
+				}
+
+				Last = Current;
+			}
+		}
+
+		[TestMethod]
+		public async Task Test_32_By_NewToOld()
+		{
+			InstanceType[] SearchResult = await this.DoSearch("Kilroy word document number /5\\d/",
+				FullTextSearchOrder.Oldest, false);
+
+			Assert.IsNotNull(SearchResult);
+			Assert.AreEqual(500, SearchResult.Length);
+
+			InstanceType? Last = null;
+			AccessType Access = Types.Instantiate<AccessType>(false);
+
+			foreach (InstanceType Current in SearchResult)
+			{
+				Dictionary<string, uint> CurrentCounts = await CountTokens(Current, "kilroy", "word", "document", "number", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59");
+
+				if (Last is not null)
+				{
+					DateTime LastTP = Access.GetCreated(Last);
+					DateTime CurrentTP = Access.GetCreated(Current);
+
+					if (LastTP > CurrentTP)
+						Assert.Fail("NewToOld order failure on creation timestamp.");
+				}
+
+				Last = Current;
+			}
+		}
+
 		private static async Task<Dictionary<string, uint>> CountTokens(InstanceType Object, params string[] Tokens)
 		{
 			Dictionary<string, uint> Counts = new();
 			uint NrTokens = 0;
-			uint NrOccurrences = 0;
+			uint NrTimes = 0;
 
 			foreach (string s in Tokens)
 				Counts[s] = 0;
@@ -425,12 +531,12 @@ namespace Waher.Persistence.FullTextSearch.Test
 					uint c = (uint)TokenCount.DocIndex.Length;
 					Counts[TokenCount.Token] = Nr + c;
 					NrTokens++;
-					NrOccurrences += c;
+					NrTimes += c;
 				}
 			}
 
 			Counts[" NrTokens"] = NrTokens;
-			Counts[" NrOccurrences"] = NrOccurrences;
+			Counts[" NrTimes"] = NrTimes;
 
 			return Counts;
 		}

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Persistence.FullTextSearch.Orders;
 
 namespace Waher.Persistence.FullTextSearch.Keywords
 {
@@ -93,16 +94,16 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 					if (Process.IsRestricted)
 						Process.Found[ObjectReference] = true;
 
-					if (!Process.ReferencesByObject.TryGetValue(ObjectReference, out LinkedList<TokenReference> ByObjectReference))
+					if (!Process.ReferencesByObject.TryGetValue(ObjectReference, out MatchInformation ByObjectReference))
 					{
 						if (Process.IsRestricted)
 							continue;
 
-						ByObjectReference = new LinkedList<TokenReference>();
+						ByObjectReference = new MatchInformation();
 						Process.ReferencesByObject[ObjectReference] = ByObjectReference;
 					}
 
-					ByObjectReference.AddLast(new TokenReference()
+					ByObjectReference.AddTokenReference(new TokenReference()
 					{
 						Count = References.Counts[j],
 						LastBlock = References.LastBlock,

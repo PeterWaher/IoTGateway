@@ -364,7 +364,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_29_By_Relevance()
 		{
-			InstanceType[] SearchResult = await this.DoSearch("Kilroy word document number /5\\d/",
+			InstanceType[] SearchResult = await this.DoSearch("Fitzroy word document number /5\\d/",
 				FullTextSearchOrder.Relevance, false);
 
 			Assert.IsNotNull(SearchResult);
@@ -376,7 +376,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 
 			foreach (InstanceType Current in SearchResult)
 			{
-				Dictionary<string, uint> CurrentCounts = await CountTokens(Current, "kilroy", "word", "document", "number", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59");
+				Dictionary<string, uint> CurrentCounts = await CountTokens(Current, "fitzroy", "word", "document", "number", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59");
 
 				if (Last is not null && LastCounts is not null)
 				{
@@ -384,7 +384,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 					uint CurrentIndex = CurrentCounts[" NrTimes"];
 
 					if (LastIndex < CurrentIndex)
-						Assert.Fail("Relevance order failure on number of occurrences of tokens found.");
+						Assert.Fail("Relevance order failure on number of times tokens were found.");
 					else if (LastIndex == CurrentIndex)
 					{
 						LastIndex = LastCounts[" NrTokens"];
@@ -411,7 +411,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		[TestMethod]
 		public async Task Test_30_By_Occurrences()
 		{
-			InstanceType[] SearchResult = await this.DoSearch("Kilroy word document number /5\\d/",
+			InstanceType[] SearchResult = await this.DoSearch("Fitzroy word document number /5\\d/",
 				FullTextSearchOrder.Occurrences, false);
 
 			Assert.IsNotNull(SearchResult);
@@ -423,7 +423,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 
 			foreach (InstanceType Current in SearchResult)
 			{
-				Dictionary<string, uint> CurrentCounts = await CountTokens(Current, "kilroy", "word", "document", "number", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59");
+				Dictionary<string, uint> CurrentCounts = await CountTokens(Current, "fitzroy", "word", "document", "number", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59");
 
 				if (Last is not null && LastCounts is not null)
 				{
@@ -431,14 +431,14 @@ namespace Waher.Persistence.FullTextSearch.Test
 					uint CurrentIndex = CurrentCounts[" NrTokens"];
 
 					if (LastIndex < CurrentIndex)
-						Assert.Fail("Relevance order failure on number of occurrences of tokens found.");
+						Assert.Fail("Occurrences order failure on number of tokens found.");
 					else if (LastIndex == CurrentIndex)
 					{
 						LastIndex = LastCounts[" NrTimes"];
 						CurrentIndex = CurrentCounts[" NrTimes"];
 
 						if (LastIndex < CurrentIndex)
-							Assert.Fail("Relevance order failure on number of tokens found.");
+							Assert.Fail("Occurrences order failure on number of times tokens were found.");
 						else if (LastIndex == CurrentIndex)
 						{
 							DateTime LastTP = Access.GetCreated(Last);
@@ -469,7 +469,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 
 			foreach (InstanceType Current in SearchResult)
 			{
-				Dictionary<string, uint> CurrentCounts = await CountTokens(Current, "kilroy", "word", "document", "number", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59");
+				Dictionary<string, uint> CurrentCounts = await CountTokens(Current, "fitzroy", "word", "document", "number", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59");
 
 				if (Last is not null)
 				{
@@ -498,7 +498,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 
 			foreach (InstanceType Current in SearchResult)
 			{
-				Dictionary<string, uint> CurrentCounts = await CountTokens(Current, "kilroy", "word", "document", "number", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59");
+				Dictionary<string, uint> CurrentCounts = await CountTokens(Current, "fitzroy", "word", "document", "number", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59");
 
 				if (Last is not null)
 				{

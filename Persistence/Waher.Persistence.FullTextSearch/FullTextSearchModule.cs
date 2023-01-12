@@ -688,7 +688,7 @@ namespace Waher.Persistence.FullTextSearch
 			}
 
 			string Key = sb.ToString();
-			LinkedList<TokenReference>[] FoundReferences;
+			MatchInformation[] FoundReferences;
 			SearchProcess Process;
 
 			if (queryCache.TryGetValue(Key, out QueryRecord QueryRecord))
@@ -721,7 +721,7 @@ namespace Waher.Persistence.FullTextSearch
 
 				int c = Process.ReferencesByObject.Count;
 
-				FoundReferences = new LinkedList<TokenReference>[c];
+				FoundReferences = new MatchInformation[c];
 				Process.ReferencesByObject.Values.CopyTo(FoundReferences, 0);
 
 				switch (Order)
@@ -757,7 +757,7 @@ namespace Waher.Persistence.FullTextSearch
 			{
 				case PaginationStrategy.PaginateOverObjectsNullIfIncompatible:
 				default:
-					foreach (LinkedList<TokenReference> ObjectReference in FoundReferences)
+					foreach (MatchInformation ObjectReference in FoundReferences)
 					{
 						if (Offset > 0)
 						{
@@ -765,7 +765,7 @@ namespace Waher.Persistence.FullTextSearch
 							continue;
 						}
 
-						ulong RefIndex = ObjectReference.First.Value.ObjectReference;
+						ulong RefIndex = ObjectReference.ObjectReference;
 						ObjectReference Ref = await Process.TryGetObjectReference(RefIndex, true);
 						if (Ref is null)
 							Result.Add(null);
@@ -786,7 +786,7 @@ namespace Waher.Persistence.FullTextSearch
 					break;
 
 				case PaginationStrategy.PaginateOverObjectsOnlyCompatible:
-					foreach (LinkedList<TokenReference> ObjectReference in FoundReferences)
+					foreach (MatchInformation ObjectReference in FoundReferences)
 					{
 						if (Offset > 0)
 						{
@@ -794,7 +794,7 @@ namespace Waher.Persistence.FullTextSearch
 							continue;
 						}
 
-						ulong RefIndex = ObjectReference.First.Value.ObjectReference;
+						ulong RefIndex = ObjectReference.ObjectReference;
 						ObjectReference Ref = await Process.TryGetObjectReference(RefIndex, true);
 						if (Ref is null)
 							continue;
@@ -812,9 +812,9 @@ namespace Waher.Persistence.FullTextSearch
 					break;
 
 				case PaginationStrategy.PaginationOverCompatibleOnly:
-					foreach (LinkedList<TokenReference> ObjectReference in FoundReferences)
+					foreach (MatchInformation ObjectReference in FoundReferences)
 					{
-						ulong RefIndex = ObjectReference.First.Value.ObjectReference;
+						ulong RefIndex = ObjectReference.ObjectReference;
 						ObjectReference Ref = await Process.TryGetObjectReference(RefIndex, true);
 
 						if (Ref is null)
@@ -850,7 +850,7 @@ namespace Waher.Persistence.FullTextSearch
 
 		private class QueryRecord
 		{
-			public LinkedList<TokenReference>[] FoundReferences;
+			public MatchInformation[] FoundReferences;
 			public SearchProcess Process;
 		}
 

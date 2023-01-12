@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Waher.Persistence.Filters;
+using Waher.Persistence.FullTextSearch.Orders;
 
 namespace Waher.Persistence.FullTextSearch.Keywords
 {
@@ -21,7 +21,7 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		{
 			this.Index = Index;
 			this.indexCollection = IndexCollection;
-			this.ReferencesByObject = new Dictionary<ulong, LinkedList<TokenReference>>();
+			this.ReferencesByObject = new Dictionary<ulong, MatchInformation>();
 			this.IsRestricted = false;
 		}
 
@@ -33,7 +33,7 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		/// <summary>
 		/// References found.
 		/// </summary>
-		public Dictionary<ulong, LinkedList<TokenReference>> ReferencesByObject { get; }
+		public Dictionary<ulong, MatchInformation> ReferencesByObject { get; }
 
 		/// <summary>
 		/// If the search process is restricted.

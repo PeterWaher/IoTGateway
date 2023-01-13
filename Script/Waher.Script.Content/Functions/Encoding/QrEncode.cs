@@ -77,10 +77,7 @@ namespace Waher.Script.Content.Functions.Encoding
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			string Text = Arguments[0].AssociatedObjectValue?.ToString();
-			object Obj = Arguments[1].AssociatedObjectValue;
-
-			if (!(Obj is CorrectionLevel Level) && !Enum.TryParse<CorrectionLevel>(Obj?.ToString(), out Level))
-				throw new ScriptRuntimeException("Invalid Error Correction Level.", this);
+			CorrectionLevel Level = this.ToEnum<CorrectionLevel>(Arguments[1]);
 
 			if (Arguments.Length == 2)
 				return new StringValue(encoder.GenerateMatrix(Level, Text).ToHalfBlockText());

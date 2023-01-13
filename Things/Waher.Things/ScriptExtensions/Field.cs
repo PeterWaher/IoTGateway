@@ -149,21 +149,11 @@ namespace Waher.Things.ScriptExtensions.SensorData
 
 			if (i < c)
 			{
-				Obj = Arguments[i++].AssociatedObjectValue;
-
-				if (Obj is FieldType T || Enum.TryParse<FieldType>(Obj?.ToString() ?? string.Empty, out T))
-					Type = T;
-				else
-					throw new ScriptRuntimeException("Expected field type.", this);
+				Type = this.ToEnum<FieldType>(Arguments[i++]);
 
 				if (i < c)
 				{
-					Obj = Arguments[i++].AssociatedObjectValue;
-
-					if (Obj is FieldQoS Q || Enum.TryParse<FieldQoS>(Obj?.ToString() ?? string.Empty, out Q))
-						QoS = Q;
-					else
-						throw new ScriptRuntimeException("Expected field quality of service.", this);
+					QoS = this.ToEnum<FieldQoS>(Arguments[i++]);
 
 					if (i < c)
 					{

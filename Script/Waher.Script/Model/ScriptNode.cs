@@ -368,6 +368,30 @@ namespace Waher.Script.Model
 		}
 
 		/// <summary>
+		/// Tries to convert an element to an enumeration value.
+		/// </summary>
+		/// <param name="Value">Element value.</param>
+		/// <returns>Enumeration value, if successful.</returns>
+		protected T ToEnum<T>(IElement Value)
+			where T : struct
+		{
+			if (Value is ObjectValue Obj)
+			{
+				if (Obj.AssociatedObjectValue is T e)
+					return e;
+			}
+			else if (Value is DoubleNumber d)
+				return (T)Enum.ToObject(typeof(T), (int)d.Value);
+
+			string s = Value?.AssociatedObjectValue?.ToString() ?? string.Empty;
+
+			if (Enum.TryParse<T>(s, out T Result))
+				return Result;
+
+			throw new ScriptRuntimeException("Enumeration of type " + typeof(T).FullName + " expected.", this);
+		}
+
+		/// <summary>
 		/// Waits for any asynchronous process to terminate.
 		/// </summary>
 		/// <param name="Result">Result, possibly asynchronous result.</param>

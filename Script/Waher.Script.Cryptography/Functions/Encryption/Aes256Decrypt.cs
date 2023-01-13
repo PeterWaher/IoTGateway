@@ -88,24 +88,8 @@ namespace Waher.Script.Cryptography.Functions.Encryption
 				throw new ScriptRuntimeException("Initiation Vector to use for decryption must be binary (i.e. an array of bytes).", this);
 
 			int c = Arguments.Length;
-			CipherMode CipherMode;
-
-			if (c <= 3)
-				CipherMode = CipherMode.CBC;
-			else if (Arguments[3].AssociatedObjectValue is CipherMode CipherMode2)
-				CipherMode = CipherMode2;
-			else if (!Enum.TryParse<CipherMode>(Arguments[3].AssociatedObjectValue.ToString() ?? string.Empty, out CipherMode))
-				throw new ScriptRuntimeException("Invalid Cipher Mode.", this);
-
-			PaddingMode PaddingMode;
-
-			if (c <= 4)
-				PaddingMode = PaddingMode.PKCS7;
-			else if (Arguments[4].AssociatedObjectValue is PaddingMode PaddingMode2)
-				PaddingMode = PaddingMode2;
-			else if (!Enum.TryParse<PaddingMode>(Arguments[4].AssociatedObjectValue.ToString() ?? string.Empty, out PaddingMode))
-				throw new ScriptRuntimeException("Invalid Padding Mode.", this);
-
+			CipherMode CipherMode = c <= 3 ? CipherMode.CBC : this.ToEnum<CipherMode>(Arguments[3]);
+			PaddingMode PaddingMode = c <= 4 ? PaddingMode.PKCS7 : this.ToEnum<PaddingMode>(Arguments[4]);
 
 			using (Aes Aes = Aes.Create())
 			{

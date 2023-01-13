@@ -91,41 +91,9 @@ namespace Waher.Script.Networking.Functions
 		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
 			string Name = Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty;
-			string s;
-			object Obj;
-			QTYPE TYPE;
-			QCLASS CLASS;
 			int c = Arguments.Length;
-
-			if (c < 2)
-				TYPE = QTYPE.A;
-			else
-			{
-				Obj = Arguments[1].AssociatedObjectValue;
-				if (Obj is QTYPE Type2)
-					TYPE = Type2;
-				else
-				{
-					s = Obj?.ToString() ?? string.Empty;
-					if (!Enum.TryParse<QTYPE>(s, out TYPE))
-						throw new ScriptRuntimeException("Invalid QTYPE: " + s, this);
-				}
-			}
-
-			if (c < 3)
-				CLASS = QCLASS.IN;
-			else
-			{
-				Obj = Arguments[2].AssociatedObjectValue;
-				if (Obj is QCLASS Class2)
-					CLASS = Class2;
-				else
-				{
-					s = Obj?.ToString() ?? string.Empty;
-					if (!Enum.TryParse<QCLASS>(s, out CLASS))
-						throw new ScriptRuntimeException("Invalid QCLASS: " + s, this);
-				}
-			}
+			QTYPE TYPE = c < 2 ? QTYPE.A : this.ToEnum<QTYPE>(Arguments[1]);
+			QCLASS CLASS = c < 3 ? QCLASS.IN : this.ToEnum<QCLASS>(Arguments[2]);
 
 			ResourceRecord[] Records = await DnsResolver.Resolve(Name, TYPE, CLASS);
 

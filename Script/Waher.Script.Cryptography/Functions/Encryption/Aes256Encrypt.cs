@@ -75,37 +75,18 @@ namespace Waher.Script.Cryptography.Functions.Encryption
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
-			byte[] Data = Arguments[0].AssociatedObjectValue as byte[];
-			if (Data is null)
+			if (!(Arguments[0].AssociatedObjectValue is byte[] Data))
 				throw new ScriptRuntimeException("Data to encrypt must be binary (i.e. an array of bytes).", this);
 
-			byte[] Key = Arguments[1].AssociatedObjectValue as byte[];
-			if (Key is null)
+			if (!(Arguments[1].AssociatedObjectValue is byte[] Key))
 				throw new ScriptRuntimeException("Key to use for encryption must be binary (i.e. an array of bytes).", this);
 
-			byte[] IV = Arguments[2].AssociatedObjectValue as byte[];
-			if (IV is null)
+			if (!(Arguments[2].AssociatedObjectValue is byte[] IV))
 				throw new ScriptRuntimeException("Initiation Vector to use for encryption must be binary (i.e. an array of bytes).", this);
 
 			int c = Arguments.Length;
-			CipherMode CipherMode;
-
-			if (c <= 3)
-				CipherMode = CipherMode.CBC;
-			else if (Arguments[3].AssociatedObjectValue is CipherMode CipherMode2)
-				CipherMode = CipherMode2;
-			else if (!Enum.TryParse<CipherMode>(Arguments[3].AssociatedObjectValue.ToString() ?? string.Empty, out CipherMode))
-				throw new ScriptRuntimeException("Invalid Cipher Mode.", this);
-
-			PaddingMode PaddingMode;
-
-			if (c <= 4)
-				PaddingMode = PaddingMode.PKCS7;
-			else if (Arguments[4].AssociatedObjectValue is PaddingMode PaddingMode2)
-				PaddingMode = PaddingMode2;
-			else if (!Enum.TryParse<PaddingMode>(Arguments[4].AssociatedObjectValue.ToString() ?? string.Empty, out PaddingMode))
-				throw new ScriptRuntimeException("Invalid Padding Mode.", this);
-
+			CipherMode CipherMode = c <= 3 ? CipherMode.CBC : this.ToEnum<CipherMode>(Arguments[3]);
+			PaddingMode PaddingMode = c <= 4 ? PaddingMode.PKCS7 : this.ToEnum<PaddingMode>(Arguments[4]);
 
 			using (Aes Aes = Aes.Create())
 			{

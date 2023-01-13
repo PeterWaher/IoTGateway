@@ -3,7 +3,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
-using Waher.Script.Operators.Membership;
 
 namespace Waher.Script.Functions.Runtime
 {
@@ -139,7 +138,7 @@ namespace Waher.Script.Functions.Runtime
 			}
 
 			object Result = this.method.Invoke(this.obj, P);
-			Result = await NamedMethodCall.WaitPossibleTask(Result);
+			Result = await ScriptNode.WaitPossibleTask(Result);
 			return Expression.Encapsulate(Result);
 		}
 

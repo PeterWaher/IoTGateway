@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -291,6 +294,27 @@ namespace Waher.Persistence.FullTextSearch
 			await collectionInformation.AddAsync(CollectionName, Result, true);
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Gets the database collections that get indexed into a given index colltion.
+		/// </summary>
+		/// <param name="IndexCollectionName"></param>
+		/// <returns></returns>
+		private static async Task<string[]> GetCollectionNamesLocked(string IndexCollectionName)
+		{
+			List<string> Result = new List<string>();
+
+			foreach (object Obj in await collectionInformation.GetValuesAsync())
+			{
+				if (Obj is CollectionInformation Info)
+				{
+					if (Info.IndexCollectionName == IndexCollectionName)
+						Result.Add(Info.CollectionName);
+				}
+			}
+
+			return Result.ToArray();
 		}
 
 		/// <summary>
@@ -1067,10 +1091,31 @@ namespace Waher.Persistence.FullTextSearch
 		{
 			try
 			{
-				await Database.FindDelete<ObjectReference>(
-					new FilterFieldEqualTo("Collection", e.Collection));
+				IEnumerable<ObjectReference> ObjectsDeleted;
 
-				await Search.RaiseCollectionCleared(this, e);
+				do
+				{
+					ObjectsDeleted = await Database.FindDelete<ObjectReference>(0, 1000,
+						new FilterFieldEqualTo("Collection", e.Collection));
+
+					foreach (ObjectReference Ref in ObjectsDeleted)
+					{
+						await synchObj.WaitAsync();
+						try
+						{
+							await RemoveTokensFromIndexLocked(Ref);
+						}
+						finally
+						{
+							synchObj.Release();
+						}
+
+						queryCache.Clear();
+
+						await Search.RaiseObjectRemovedFromIndex(this, new ObjectReferenceEventArgs(Ref));
+					}
+				}
+				while (!IsEmpty(ObjectsDeleted));
 			}
 			catch (Exception ex)
 			{
@@ -1081,19 +1126,41 @@ namespace Waher.Persistence.FullTextSearch
 		/// <summary>
 		/// Reindexes the full-text-search index for a database collection.
 		/// </summary>
-		/// <param name="CollectionName">Collection</param>
-		public static async Task ReindexCollection(string CollectionName)
+		/// <param name="IndexCollectionName">Index Collection</param>
+		public static async Task ReindexCollection(string IndexCollectionName)
 		{
 			try
 			{
-				await Database.FindDelete<ObjectReference>(
-					new FilterFieldEqualTo("Collection", CollectionName));
+				string[] Collections;
 
-				await Search.RaiseCollectionCleared(instance, new CollectionEventArgs(CollectionName));
+				await synchObj.WaitAsync();
+				try
+				{
+					IPersistentDictionary Index = await GetIndexLocked(IndexCollectionName);
+					await Index.ClearAsync();
+
+					IEnumerable<ObjectReference> ObjectsDeleted;
+
+					do
+					{
+						ObjectsDeleted = await Database.FindDelete<ObjectReference>(0, 1000,
+							new FilterFieldEqualTo("IndexCollection", IndexCollectionName));
+
+						foreach (ObjectReference Ref in ObjectsDeleted)
+							await Search.RaiseObjectRemovedFromIndex(instance, new ObjectReferenceEventArgs(Ref));
+					}
+					while (!IsEmpty(ObjectsDeleted));
+
+					Collections = await GetCollectionNamesLocked(IndexCollectionName);
+				}
+				finally
+				{
+					synchObj.Release();
+				}
 
 				ReindexCollectionIteration Iteration = new ReindexCollectionIteration();
 
-				await Database.Iterate<object>(Iteration, new string[] { CollectionName });
+				await Database.Iterate<object>(Iteration, Collections);
 			}
 			catch (Exception ex)
 			{
@@ -1101,16 +1168,33 @@ namespace Waher.Persistence.FullTextSearch
 			}
 		}
 
+		private static bool IsEmpty(IEnumerable<ObjectReference> Objects)
+		{
+			foreach (ObjectReference Ref in Objects)
+				return false;
+
+			return true;
+		}
+
 		private class ReindexCollectionIteration : IDatabaseIteration<object>
 		{
 			public Task StartDatabase() => Task.CompletedTask;
-			public Task StartCollection(string CollectionName) => Task.CompletedTask;
 			public Task EndDatabase() => Task.CompletedTask;
 			public Task EndCollection() => Task.CompletedTask;
 			public Task IncompatibleObject(object ObjectId) => Task.CompletedTask;
-			
+
+			public int NrObjectsProcessed = 0;
+			public int NrCollectionsProcessed = 0;
+
+			public Task StartCollection(string CollectionName)
+			{
+				this.NrCollectionsProcessed++;
+				return Task.CompletedTask;
+			}
+
 			public async Task ProcessObject(object Object)
 			{
+				this.NrObjectsProcessed++;
 				await instance.ObjectInserted(new ObjectEventArgs(Object));
 			}
 

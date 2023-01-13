@@ -4,5 +4,100 @@
         <name>Waher.Script.FullTextSearch</name>
     </assembly>
     <members>
+        <member name="T:Waher.Script.FullTextSearch.Functions.Search">
+            <summary>
+            Full-Text-search
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.Search.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Full-Text-search
+            </summary>
+            <param name="IndexCollection">Full-text-search index.</param>
+            <param name="Query">Query string.</param>
+            <param name="Strict">If keywords should be used as defined (true), or
+            as prefixes (false).</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.Search.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Full-Text-search
+            </summary>
+            <param name="IndexCollection">Full-text-search index.</param>
+            <param name="Query">Query string.</param>
+            <param name="Strict">If keywords should be used as defined (true), or
+            as prefixes (false).</param>
+            <param name="Offset">Offset into search result.</param>
+            <param name="MaxCount">Maximum number of items to return.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.Search.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Full-Text-search
+            </summary>
+            <param name="IndexCollection">Full-text-search index.</param>
+            <param name="Query">Query string.</param>
+            <param name="Strict">If keywords should be used as defined (true), or
+            as prefixes (false).</param>
+            <param name="Offset">Offset into search result.</param>
+            <param name="MaxCount">Maximum number of items to return.</param>
+            <param name="Order">Sort order.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.Search.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Full-Text-search
+            </summary>
+            <param name="IndexCollection">Full-text-search index.</param>
+            <param name="Query">Query string.</param>
+            <param name="Strict">If keywords should be used as defined (true), or
+            as prefixes (false).</param>
+            <param name="Offset">Offset into search result.</param>
+            <param name="MaxCount">Maximum number of items to return.</param>
+            <param name="Order">Sort order.</param>
+            <param name="PaginationStrategy">Pagination Strategy</param>
+            <param name="Type">Type of object to search for.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression.</param>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.Search.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.Search.DefaultArgumentNames">
+            <summary>
+            Default Argument names
+            </summary>
+        </member>
+        <member name="P:Waher.Script.FullTextSearch.Functions.Search.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.Search.Evaluate(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.Search.EvaluateAsync(Waher.Script.Abstraction.Elements.IElement[],Waher.Script.Variables)">
+            <summary>
+            Evaluates the function.
+            </summary>
+            <param name="Arguments">Function arguments.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
     </members>
 </doc>

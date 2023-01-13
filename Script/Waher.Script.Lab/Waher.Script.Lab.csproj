@@ -277,6 +277,10 @@
       <Project>{a88f6f6a-0c2f-4a0c-a999-9359ca3570a8}</Project>
       <Name>Waher.Persistence.FilesLW</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence.FullTextSearch\Waher.Persistence.FullTextSearch.csproj">
+      <Project>{56867025-b65d-43d4-b914-9c7cf9a42bc0}</Project>
+      <Name>Waher.Persistence.FullTextSearch</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Persistence\Waher.Persistence.Serialization\Waher.Persistence.Serialization.csproj">
       <Project>{a67f86b3-a5c7-4f97-824e-bd7c20594a24}</Project>
       <Name>Waher.Persistence.Serialization</Name>
@@ -320,6 +324,10 @@
     <ProjectReference Include="..\Waher.Script.Fractals\Waher.Script.Fractals.csproj">
       <Project>{1c042e75-04d8-4cac-91b8-a7f559ac9d2b}</Project>
       <Name>Waher.Script.Fractals</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Script.FullTextSearch\Waher.Script.FullTextSearch.csproj">
+      <Project>{fbdb82df-f638-49f2-94c9-c49153f8a776}</Project>
+      <Name>Waher.Script.FullTextSearch</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Script.Graphs3D\Waher.Script.Graphs3D.csproj">
       <Project>{a0be2c7f-2272-468c-8b4a-05a246d5aaf3}</Project>

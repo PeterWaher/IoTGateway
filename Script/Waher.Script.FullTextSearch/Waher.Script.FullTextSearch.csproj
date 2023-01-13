@@ -36,7 +36,10 @@ Script Syntax: https://waher.se/Script.md#threadingRelatedFunctionsWaherScriptFu
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Functions\" />
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence.FullTextSearch\Waher.Persistence.FullTextSearch.csproj" />
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\Waher.Script\Waher.Script.csproj" />
   </ItemGroup>
 
 </Project>

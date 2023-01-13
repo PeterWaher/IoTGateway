@@ -1670,7 +1670,90 @@ subsections will not be repeated here.
 
 #### Full-text-search functions (Waher.Script.FullTextSearch)
 
+This module adds full-text-search capabilities to script, using the full-text-search
+module provided in `Waher.Persistence.FullTextSearch` library. The following functions
+are available:
 
+| Function | Description | Example |
+|----------|-------------|---------|
+| `Search(Index,Query,Strict[,Offset,MaxCount[,Order[,Type,PaginationStrategy]]])` | Performs a full-text-search of the query `Query` in the full-text-search index `Index`. `Strict` controls if keywords are as-is (`true`) or prefixes (`false`). Pagination is controlled by `Offset` abd `MaxCount`. The sort order is defined by `Order`. Types searches can be performed, controlled by the optional arguments `Type` and `PaginationStrategy`. | `Search("Index","Kilroy was here",0,25,"Relevance")` |
+
+##### Full-text-search query syntax
+
+Full-text-search is done prividing a query string. This query string contains *keywords*
+separated by whitespace. Keywords only consist of *letters* and *digits*, and are
+*case insensitive*. Punctuation characters, accents, etc., are ignored. So are a 
+configurable set of *stop words*, common words that have little significance in
+full-text-search. If the keyword is prefixed with a `+`, it is required to exist. 
+If it is prefixed by `-`, it is prohibited. No prefix means it is optional. Wildcards 
+are permitted in keywords. You can use any of the characters `*`, `%`, `¤` or `#` as 
+wildcard characters. You can also use regular expressions by encapsulating it between 
+`/` characters, such as `/regex/`. You can search for sequences of keywords by 
+encapsulating them between apostrophes `'` or quotes `"`.
+
+| Summary                                                                         |||
+| Syntax             | Example                | Discription                         |
+|:-------------------|:-----------------------|:------------------------------------|
+| `keyword`          | `kilroy`               | Letters or digits, case-insensitive |
+| `+`                | `+kilroy`              | Required keyword                    |
+| `-`                | `-kilroy`              | Prohibited keyword                  |
+| `*`, `%`, `¤`, `#` | `kil*`, `%roy`, `k¤r#` | Wildcards                           |
+| `/regex/`          | `/(kil|fitz)roy/`      | Regular expression                  |
+| `'`, `"`           | `"kilroy was here"`    | Sequence of keywords                |
+
+The syntax can be nested, so you can combine the different constructs.
+
+| Composite Examples                |
+|:----------------------------------|
+| `Kilroy was here.`                |
+| `+Kilroy was here.`               |
+| `+Kilroy was -not here.`          |
+| `+*roy was -not here.`            |
+| `+Kil* was -not here.`            |
+| `+K*y was -not here.`             |
+| `+/(Kil|Fitz)roy/ was -not here.` |
+| `+/Kil(roy|ling)/ was -not here.` |
+| `+/K.+y/ was -not here.`          |
+| `+'Kilroy was here'`              |
+| `'Kilroy was' here`               |
+| `Kilroy 'was here'`               |
+
+##### Strictness
+
+Strictness in search is controlled by the `Strict` argument in the `Search` function.
+If `true`, each keyword is interpreted as-is. The `keyword` will match `search`, but
+not `searching`. If `Strict` is `false`, keywords are interpreted as *prefixes*.
+The keyword `search` will therefore also match `searching`.
+
+##### Search order
+
+Search order in the `Search` function is controlled by the optional `Order` arguments.
+If not provided, `Relevance` is used. You can provide string values, or an enumeration
+value of type `Waher.Persistence.FullTextSearch.FullTextSearchOrder`. Possible values:
+
+| Order         | Description |
+|:--------------|:------------|
+| `Relevance`   | Objects are ordered, first by number of distinct keywords found in each object, then by total number of occurrences of keywords, then indexation timestmap. |
+| `Occurrences` | Objects are ordered, first by number of occurrences of keywords found in each object, then by number of distinct keywords, then indexation timestmap. |
+| `Newest`      | Objects are ordered, by indexation timestamp, newest objects first. |
+| `Oldest`      | Objects are ordered, by indexation timestamp, oldest objects first. |
+
+##### Pagination Strategy
+
+When searching for typed objects, especially in full-text-search collections indexing
+objects of multiple types, a strategy for how to handle pagination and incompatible types
+is necessary, for performance reasons. This is controlled by the optional `PaginationStrategy`
+argument in the `Search` function, together with the `Type` argument, that controls the
+type of objects to search for. You can provide a string value, or an enumeration value
+of type `Waher.Persistence.FullTextSearch.PaginationStrategy`. The default value is
+`PaginateOverObjectsNullIfIncompatible`, which is the fastest option. But incompatible
+objects will be returned as `null`. The following values are available.
+
+| Strategy      | Description |
+|:--------------|:------------|
+| `PaginateOverObjectsNullIfIncompatible` | Pagination is done over objects found in search. Incompatible types are returned as null. Makes pagination quicker, as objects do not need to be preloaded, and can be skipped quicker. |
+| `PaginateOverObjectsOnlyCompatible`     | Pagination is done over objects found in search. Only compatible objects are returned. Amount of objects returned might be less than number of objects found, making evaluation of next offset in paginated search difficult. |
+| `PaginationOverCompatibleOnly`          | Pagination is done over compatible objects found in search. Pagination becomes more resource intensive, as all objects need to be loaded to be checked if they are compatible or not. |
 
 #### Networking-related functions (Waher.Script.Networking)
 

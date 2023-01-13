@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Waher.Persistence
 {
@@ -9,7 +8,7 @@ namespace Waher.Persistence
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void CollectionEventHandler(object Sender, CollectionEventArgs e);
+	public delegate Task CollectionEventHandler(object Sender, CollectionEventArgs e);
 
 	/// <summary>
 	/// Event arguments for collection events.

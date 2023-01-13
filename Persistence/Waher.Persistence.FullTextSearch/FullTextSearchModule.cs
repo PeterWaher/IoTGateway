@@ -30,6 +30,7 @@ namespace Waher.Persistence.FullTextSearch
 		private static Dictionary<string, CollectionInformation> collections;
 		private static Dictionary<string, IPersistentDictionary> indices;
 		private static Dictionary<Type, TypeInformation> types;
+		private static FullTextSearchModule instance = null;
 		private static SemaphoreSlim synchObj;
 
 		/// <summary>
@@ -51,10 +52,12 @@ namespace Waher.Persistence.FullTextSearch
 			queryCache = new Cache<string, QueryRecord>(int.MaxValue, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
 
 			synchObj = new SemaphoreSlim(1);
+			instance = this;
 
 			Database.ObjectInserted += this.Database_ObjectInserted;
 			Database.ObjectUpdated += this.Database_ObjectUpdated;
 			Database.ObjectDeleted += this.Database_ObjectDeleted;
+			Database.CollectionCleared += this.Database_CollectionCleared;
 
 			Types.OnInvalidated += this.Types_OnInvalidated;
 		}
@@ -67,6 +70,7 @@ namespace Waher.Persistence.FullTextSearch
 			Database.ObjectInserted -= this.Database_ObjectInserted;
 			Database.ObjectUpdated -= this.Database_ObjectUpdated;
 			Database.ObjectDeleted -= this.Database_ObjectDeleted;
+			Database.CollectionCleared -= this.Database_CollectionCleared;
 
 			Types.OnInvalidated -= this.Types_OnInvalidated;
 
@@ -92,16 +96,23 @@ namespace Waher.Persistence.FullTextSearch
 
 				types.Clear();
 				types = null;
+
 			}
 			finally
 			{
 				synchObj.Release();
 				synchObj.Dispose();
 				synchObj = null;
+				instance = null;
 			}
 		}
 
-		private async void Database_ObjectInserted(object Sender, ObjectEventArgs e)
+		private void Database_ObjectInserted(object Sender, ObjectEventArgs e)
+		{
+			Task.Run(() => this.ObjectInserted(e));
+		}
+
+		private async Task ObjectInserted(ObjectEventArgs e)
 		{
 			try
 			{
@@ -854,7 +865,12 @@ namespace Waher.Persistence.FullTextSearch
 			public SearchProcess Process;
 		}
 
-		private async void Database_ObjectDeleted(object Sender, ObjectEventArgs e)
+		private void Database_ObjectDeleted(object Sender, ObjectEventArgs e)
+		{
+			Task.Run(() => this.ObjectDeleted(e));
+		}
+
+		private async Task ObjectDeleted(ObjectEventArgs e)
 		{
 			try
 			{
@@ -939,7 +955,12 @@ namespace Waher.Persistence.FullTextSearch
 			}
 		}
 
-		private async void Database_ObjectUpdated(object Sender, ObjectEventArgs e)
+		private void Database_ObjectUpdated(object Sender, ObjectEventArgs e)
+		{
+			Task.Run(() => this.ObjectUpdated(e));
+		}
+
+		private async Task ObjectUpdated(ObjectEventArgs e)
 		{
 			try
 			{
@@ -1040,6 +1061,64 @@ namespace Waher.Persistence.FullTextSearch
 			}
 
 			return true;
+		}
+
+		private async Task Database_CollectionCleared(object Sender, CollectionEventArgs e)
+		{
+			try
+			{
+				await Database.FindDelete<ObjectReference>(
+					new FilterFieldEqualTo("Collection", e.Collection));
+
+				await Search.RaiseCollectionCleared(this, e);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
+		/// Reindexes the full-text-search index for a database collection.
+		/// </summary>
+		/// <param name="CollectionName">Collection</param>
+		public static async Task ReindexCollection(string CollectionName)
+		{
+			try
+			{
+				await Database.FindDelete<ObjectReference>(
+					new FilterFieldEqualTo("Collection", CollectionName));
+
+				await Search.RaiseCollectionCleared(instance, new CollectionEventArgs(CollectionName));
+
+				ReindexCollectionIteration Iteration = new ReindexCollectionIteration();
+
+				await Database.Iterate<object>(Iteration, new string[] { CollectionName });
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		private class ReindexCollectionIteration : IDatabaseIteration<object>
+		{
+			public Task StartDatabase() => Task.CompletedTask;
+			public Task StartCollection(string CollectionName) => Task.CompletedTask;
+			public Task EndDatabase() => Task.CompletedTask;
+			public Task EndCollection() => Task.CompletedTask;
+			public Task IncompatibleObject(object ObjectId) => Task.CompletedTask;
+			
+			public async Task ProcessObject(object Object)
+			{
+				await instance.ObjectInserted(new ObjectEventArgs(Object));
+			}
+
+			public Task ReportException(Exception Exception)
+			{
+				Log.Critical(Exception);
+				return Task.CompletedTask;
+			}
 		}
 
 		/// <summary>

@@ -157,9 +157,10 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 			}
 		}
 
-		private void Database_CollectionCleared(object Sender, CollectionEventArgs e)
+		private Task Database_CollectionCleared(object Sender, CollectionEventArgs e)
 		{
 			this.Information("Collection has been cleared: " + e.Collection);
+			return Task.CompletedTask;
 		}
 
 		private Task Search_ObjectAddedToIndex(object Sender, ObjectReferenceEventArgs e)

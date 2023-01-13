@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Profiling;
 
@@ -213,18 +214,18 @@ namespace Waher.Persistence
 			RaiseCollectionCleared(Collection);
 		}
 
-		private static void RaiseCollectionCleared(string Collection)
+		private static async void RaiseCollectionCleared(string Collection)
 		{
 			CollectionEventHandler h = CollectionCleared;
 			if (!(h is null))
 			{
 				try
 				{
-					h(Provider, new CollectionEventArgs(Collection));
+					await h(Provider, new CollectionEventArgs(Collection));
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
-					// Ignore
+					Log.Critical(ex);
 				}
 			}
 		}

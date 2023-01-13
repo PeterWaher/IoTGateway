@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.Sniffers;
 using Waher.Persistence;
@@ -111,9 +112,10 @@ namespace Waher.IoTGateway.Setup.Databases.Sniffing
 			}
 		}
 
-		private void Ledger_CollectionCleared(object Sender, CollectionEventArgs e)
+		private Task Ledger_CollectionCleared(object Sender, CollectionEventArgs e)
 		{
 			this.Information("Collection has been cleared: " + e.Collection);
+			return Task.CompletedTask;
 		}
 	}
 }

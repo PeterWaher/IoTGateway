@@ -1045,7 +1045,7 @@ namespace Waher.Persistence
 			{
 				try
 				{
-					h(Provider, new CollectionEventArgs(CollectionName));
+					await h(Provider, new CollectionEventArgs(CollectionName));
 				}
 				catch (Exception)
 				{

@@ -125,6 +125,29 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		public static event ObjectReferenceEventHandler ObjectUpdatedInIndex;
 
+		internal static async Task RaiseCollectionCleared(object Sender, CollectionEventArgs e)
+		{
+			try
+			{
+				CollectionEventHandler h = CollectionCleared;
+				if (!(h is null))
+					await h(Sender, e);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
+		/// Event raised when a collection has been cleared, wither because
+		/// the underlying database collection has been cleared, or because the
+		/// collection is being prepared for reindexation. Re-indexed objects will
+		/// be reported as added, after the corresponding collection has been 
+		/// cleared.
+		/// </summary>
+		public static event CollectionEventHandler CollectionCleared;
+
 		/// <summary>
 		/// Parses a search string into keyworkds.
 		/// </summary>
@@ -270,6 +293,15 @@ namespace Waher.Persistence.FullTextSearch
 		public static Task<string[]> GetFullTextSearchIndexedProperties(string CollectionName)
 		{
 			return FullTextSearchModule.GetFullTextSearchIndexedProperties(CollectionName);
+		}
+
+		/// <summary>
+		/// Reindexes the full-text-search index for a database collection.
+		/// </summary>
+		/// <param name="CollectionName">Collection</param>
+		public static Task ReindexCollection(string CollectionName)
+		{
+			return FullTextSearchModule.ReindexCollection(CollectionName);
 		}
 
 	}

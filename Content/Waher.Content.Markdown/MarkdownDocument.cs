@@ -3394,49 +3394,54 @@ namespace Waher.Content.Markdown
 									}
 								}
 
-								DefinitionList.AddChildren(new DefinitionTerms(this, TotItem));
-
-								Text.Clear();
-								Elements.Clear();
-								Elements.AddLast(DefinitionList);
-
-								while (((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160)
-									State.NextCharSameRow();
-
-								List<string> Rows = new List<string>();
-								List<int> Positions = new List<int>()
+								if (TotItem is null)
+									Text.Append(ch);
+								else
 								{
-									State.CurrentPosition
-								};
+									DefinitionList.AddChildren(new DefinitionTerms(this, TotItem));
 
-								Rows.Add(State.RestOfRow());
+									Text.Clear();
+									Elements.Clear();
+									Elements.AddLast(DefinitionList);
 
-								while (!State.EOF)
-								{
-									if (State.PeekNextCharSameRow() == ':')
-									{
-										DefinitionList.AddChildren(new DefinitionDescriptions(this, new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray()))));
-
+									while (((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160)
 										State.NextCharSameRow();
-										State.SkipWhitespaceSameRow(3);
 
-										Rows.Clear();
-										Positions.Clear();
-
-										Positions.Add(State.CurrentPosition);
-										Rows.Add(State.RestOfRow());
-									}
-									else
+									List<string> Rows = new List<string>();
+									List<int> Positions = new List<int>()
 									{
-										State.SkipWhitespaceSameRow(4);
+										State.CurrentPosition
+									};
 
-										Positions.Add(State.CurrentPosition);
-										Rows.Add(State.RestOfRow());
+									Rows.Add(State.RestOfRow());
+
+									while (!State.EOF)
+									{
+										if (State.PeekNextCharSameRow() == ':')
+										{
+											DefinitionList.AddChildren(new DefinitionDescriptions(this, new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray()))));
+
+											State.NextCharSameRow();
+											State.SkipWhitespaceSameRow(3);
+
+											Rows.Clear();
+											Positions.Clear();
+
+											Positions.Add(State.CurrentPosition);
+											Rows.Add(State.RestOfRow());
+										}
+										else
+										{
+											State.SkipWhitespaceSameRow(4);
+
+											Positions.Add(State.CurrentPosition);
+											Rows.Add(State.RestOfRow());
+										}
 									}
-								}
 
-								if (Rows.Count > 0)
-									DefinitionList.AddChildren(new DefinitionDescriptions(this, new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray()))));
+									if (Rows.Count > 0)
+										DefinitionList.AddChildren(new DefinitionDescriptions(this, new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray()))));
+								}
 							}
 							else
 								Text.Append(ch);

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30621.155
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script", "Script\Waher.Script\Waher.Script.csproj", "{D3E25552-C25F-45B3-B42C-008F8C481010}"
 EndProject
@@ -90,6 +90,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Threading", "Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj", "{D51F054A-85AD-40C6-9AD9-051E1A2D71F3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Threading", "Script\Waher.Script.Threading\Waher.Script.Threading.csproj", "{C7973D12-709E-4673-A03A-1A395B4AB64C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.FullTextSearch", "Persistence\Waher.Persistence.FullTextSearch\Waher.Persistence.FullTextSearch.csproj", "{AE75B416-05C4-4E9A-B774-8774F1DDB189}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.FullTextSearch", "Script\Waher.Script.FullTextSearch\Waher.Script.FullTextSearch.csproj", "{295BB8D1-77FE-4B46-A7CA-4700621086BA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -241,6 +245,14 @@ Global
 		{C7973D12-709E-4673-A03A-1A395B4AB64C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7973D12-709E-4673-A03A-1A395B4AB64C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7973D12-709E-4673-A03A-1A395B4AB64C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE75B416-05C4-4E9A-B774-8774F1DDB189}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE75B416-05C4-4E9A-B774-8774F1DDB189}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE75B416-05C4-4E9A-B774-8774F1DDB189}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE75B416-05C4-4E9A-B774-8774F1DDB189}.Release|Any CPU.Build.0 = Release|Any CPU
+		{295BB8D1-77FE-4B46-A7CA-4700621086BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{295BB8D1-77FE-4B46-A7CA-4700621086BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{295BB8D1-77FE-4B46-A7CA-4700621086BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{295BB8D1-77FE-4B46-A7CA-4700621086BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -265,6 +277,7 @@ Global
 		{2269E977-2063-471D-8314-2174717AA2BA} = {EECF8A99-FA34-4A25-B67A-97EC55EE5C7E}
 		{2F49A001-8C02-4EDF-8F80-F4DDF4708E40} = {0D510A76-814B-4D6E-8D13-9C59507F7A7C}
 		{D51F054A-85AD-40C6-9AD9-051E1A2D71F3} = {0D510A76-814B-4D6E-8D13-9C59507F7A7C}
+		{AE75B416-05C4-4E9A-B774-8774F1DDB189} = {0709170C-60A7-4421-8A74-07B7F294A229}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09539FCE-8EB5-447C-A9AF-6FA30BE14418}

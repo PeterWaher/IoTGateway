@@ -488,7 +488,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="Offset">Offset into array to start copying to.</param>
 		public Task CopyKeysToAsync(string[] Keys, int Offset)
 		{
-			this.keyCollection.CopyTo(Keys, Offset);    // TODO: Make asynchronous.
+			((KeyCollection)this.Keys).CopyTo(Keys, Offset);    // TODO: Make asynchronous.
 			return Task.CompletedTask;
 		}
 
@@ -499,7 +499,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="Offset">Offset into array to start copying to.</param>
 		public Task CopyValuesToAsync(object[] Values, int Offset)
 		{
-			this.valueCollection.CopyTo(Values, Offset);    // TODO: Make asynchronous.
+			((ValueCollection)this.Values).CopyTo(Values, Offset);    // TODO: Make asynchronous.
 			return Task.CompletedTask;
 		}
 
@@ -509,7 +509,7 @@ namespace Waher.Persistence.MongoDB
 		/// <returns>Array of keys.</returns>
 		public Task<string[]> GetKeysAsync()
 		{
-			return Task.FromResult(this.keyCollection.GetAllKeys());
+			return Task.FromResult(((KeyCollection)this.Keys).GetAllKeys());
 		}
 
 		/// <summary>
@@ -518,7 +518,7 @@ namespace Waher.Persistence.MongoDB
 		/// <returns>Array of values.</returns>
 		public Task<object[]> GetValuesAsync()
 		{
-			return Task.FromResult(this.valueCollection.GetAllValues());
+			return Task.FromResult(((ValueCollection)this.Values).GetAllValues());
 		}
 	}
 }

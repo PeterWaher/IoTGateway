@@ -89,7 +89,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 			IEnumerable<object> Objects = await Database.Find(this.collectioName);
 			int NrObjects = 0;
 
-			foreach (InstanceType Obj in Objects)
+			foreach (object Obj in Objects)
 				NrObjects++;
 
 			if (NrObjects == 0)
@@ -167,6 +167,24 @@ namespace Waher.Persistence.FullTextSearch.Test
 
 			Assert.IsNotNull(SearchResult);
 			Assert.AreEqual(1, SearchResult.Length);
+		}
+
+		[TestMethod]
+		public async Task Test_05_IteratingObjects()
+		{
+			int i;
+
+			for (i = 0; i < 10; i++)
+				await CreateInstance();
+
+			TestIteration<InstanceType> Iteration = new();
+
+			await Database.Iterate(Iteration, new string[] { this.collectioName });
+
+			Assert.IsFalse(Iteration.ExceptionsLogged);
+			Assert.IsFalse(Iteration.IncompatibleLogged);
+			Assert.AreEqual(1, Iteration.Collections.Length);
+			Assert.IsTrue(Iteration.Objects.Length >= 10);
 		}
 
 		private async Task Clear()

@@ -1248,7 +1248,7 @@ namespace Waher.Persistence.Files
 			KeyValuePair<bool, object> P2 = await this.master.TryGetValueAsync(File.FileName);
 			string s2 = sb.ToString();
 
-			if (this.NeedsMasterRegistryUpdate(P2, File.FileName, s2))
+			if (this.NeedsMasterRegistryUpdate(P2, s2))
 				await this.master.AddAsync(File.FileName, s2, true);
 
 			await this.GetFieldCode(null, CollectionName);
@@ -1256,7 +1256,7 @@ namespace Waher.Persistence.Files
 			return File;
 		}
 
-		private bool NeedsMasterRegistryUpdate(KeyValuePair<bool, object> Record, string Key, string ExpectedValue)
+		private bool NeedsMasterRegistryUpdate(KeyValuePair<bool, object> Record, string ExpectedValue)
 		{
 			if (!Record.Key)
 				return true;
@@ -1385,7 +1385,7 @@ namespace Waher.Persistence.Files
 			KeyValuePair<bool, object> P = await this.master.TryGetValueAsync(s);
 			string s2 = sb.ToString();
 
-			if (this.NeedsMasterRegistryUpdate(P, s, s2))
+			if (this.NeedsMasterRegistryUpdate(P, s2))
 				await this.master.AddAsync(s, s2, true);
 
 			return IndexFile;
@@ -2740,7 +2740,7 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// Performs an export of the entire database.
+		/// Performs an export of the database.
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
@@ -2752,7 +2752,7 @@ namespace Waher.Persistence.Files
 
 
 		/// <summary>
-		/// Performs an export of the entire database.
+		/// Performs an export of the database.
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
@@ -2875,6 +2875,104 @@ namespace Waher.Persistence.Files
 		{
 			ObjectBTreeFile File = await this.GetFile(CollectionName);
 			await File.ClearAsync();
+		}
+
+		#endregion
+
+		#region Iterate
+
+		/// <summary>
+		/// Performs an iteration of contents of the entire database.
+		/// </summary>
+		/// <typeparam name="T">Type of objects to iterate.</typeparam>
+		/// <param name="Recipient">Recipient of iterated objects.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public Task Iterate<T>(IDatabaseIteration<T> Recipient, string[] CollectionNames)
+			where T : class
+		{
+			return this.Iterate(Recipient, CollectionNames, null);
+		}
+
+		/// <summary>
+		/// Performs an iteration of contents of the entire database.
+		/// </summary>
+		/// <typeparam name="T">Type of objects to iterate.</typeparam>
+		/// <param name="Recipient">Recipient of iterated objects.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public async Task Iterate<T>(IDatabaseIteration<T> Recipient, string[] CollectionNames, ProfilerThread Thread)
+			where T : class
+		{
+			ObjectBTreeFile[] Files = this.Files;
+
+			Thread?.Start();
+			await Recipient.StartDatabase();
+			try
+			{
+				foreach (ObjectBTreeFile File in Files)
+				{
+					if (!(CollectionNames is null) && Array.IndexOf(CollectionNames, File.CollectionName) < 0)
+						continue;
+
+					Thread?.NewState(File.CollectionName);
+					await Recipient.StartCollection(File.CollectionName);
+					try
+					{
+						await File.BeginRead();
+						try
+						{
+							ObjectBTreeFileCursor<T> e = await File.GetTypedEnumeratorAsyncLocked<T>();
+
+							while (await e.MoveNextAsyncLocked())
+							{
+								if (e.CurrentTypeCompatible)
+									await Recipient.ProcessObject(e.Current);
+								else if (!(e.CurrentObjectId is null))
+									await Recipient.IncompatibleObject(e.CurrentObjectId);
+							}
+						}
+						finally
+						{
+							await File.EndRead();
+						}
+					}
+					catch (Exception ex)
+					{
+						this.ReportException(ex, Recipient);
+					}
+					finally
+					{
+						await Recipient.EndCollection();
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Thread?.Exception(ex);
+				this.ReportException(ex, Recipient);
+			}
+			finally
+			{
+				await Recipient.EndDatabase();
+				Thread?.Idle();
+				Thread?.Stop();
+			}
+		}
+
+		private void ReportException<T>(Exception ex, IDatabaseIteration<T> Recipient)
+			where T : class
+		{
+			ex = Log.UnnestException(ex);
+
+			if (ex is AggregateException ex2)
+			{
+				foreach (Exception ex3 in ex2.InnerExceptions)
+					Recipient.ReportException(ex3);
+			}
+			else
+				Recipient.ReportException(ex);
 		}
 
 		#endregion

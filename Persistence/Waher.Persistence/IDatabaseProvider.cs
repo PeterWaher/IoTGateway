@@ -328,7 +328,7 @@ namespace Waher.Persistence
 		Task<object> TryLoadObject(string CollectionName, object ObjectId);
 
 		/// <summary>
-		/// Performs an export of the entire database.
+		/// Performs an export of the database.
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
@@ -336,13 +336,34 @@ namespace Waher.Persistence
 		Task Export(IDatabaseExport Output, string[] CollectionNames);
 
 		/// <summary>
-		/// Performs an export of the entire database.
+		/// Performs an export of the database.
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
 		/// <param name="Thread">Optional Profiler thread.</param>
 		/// <returns>Task object for synchronization purposes.</returns>
 		Task Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread);
+
+		/// <summary>
+		/// Performs an iteration of contents of the entire database.
+		/// </summary>
+		/// <typeparam name="T">Type of objects to iterate.</typeparam>
+		/// <param name="Recipient">Recipient of iterated objects.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		Task Iterate<T>(IDatabaseIteration<T> Recipient, string[] CollectionNames)
+			where T : class;
+
+		/// <summary>
+		/// Performs an iteration of contents of the entire database.
+		/// </summary>
+		/// <typeparam name="T">Type of objects to iterate.</typeparam>
+		/// <param name="Recipient">Recipient of iterated objects.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		Task Iterate<T>(IDatabaseIteration<T> Recipient, string[] CollectionNames, ProfilerThread Thread)
+			where T : class;
 
 		/// <summary>
 		/// Clears a collection of all objects.

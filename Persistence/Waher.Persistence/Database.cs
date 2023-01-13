@@ -960,7 +960,7 @@ namespace Waher.Persistence
 		}
 
 		/// <summary>
-		/// Performs an export of the entire database.
+		/// Performs an export of the database.
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <returns>Task object for synchronization purposes.</returns>
@@ -970,7 +970,7 @@ namespace Waher.Persistence
 		}
 
 		/// <summary>
-		/// Performs an export of the entire database.
+		/// Performs an export of the database.
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null (default), all collections will be exported.</param>
@@ -981,7 +981,7 @@ namespace Waher.Persistence
 		}
 
 		/// <summary>
-		/// Performs an export of the entire database.
+		/// Performs an export of the database.
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null (default), all collections will be exported.</param>
@@ -990,6 +990,45 @@ namespace Waher.Persistence
 		public static Task Export(IDatabaseExport Output, string[] CollectionNames, ProfilerThread Thread)
 		{
 			return Provider.Export(Output, CollectionNames, Thread);
+		}
+
+		/// <summary>
+		/// Performs an iteration of contents of the entire database.
+		/// </summary>
+		/// <typeparam name="T">Type of objects to iterate.</typeparam>
+		/// <param name="Recipient">Recipient of iterated objects.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public static Task Iterate<T>(IDatabaseIteration<T> Recipient)
+			where T : class
+		{
+			return Iterate(Recipient, null);
+		}
+
+		/// <summary>
+		/// Performs an iteration of contents of the entire database.
+		/// </summary>
+		/// <typeparam name="T">Type of objects to iterate.</typeparam>
+		/// <param name="Recipient">Recipient of iterated objects.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public static Task Iterate<T>(IDatabaseIteration<T> Recipient, string[] CollectionNames)
+			where T : class
+		{
+			return Provider.Iterate(Recipient, CollectionNames);
+		}
+
+		/// <summary>
+		/// Performs an iteration of contents of the entire database.
+		/// </summary>
+		/// <typeparam name="T">Type of objects to iterate.</typeparam>
+		/// <param name="Recipient">Recipient of iterated objects.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public static Task Iterate<T>(IDatabaseIteration<T> Recipient, string[] CollectionNames, ProfilerThread Thread)
+			where T : class
+		{
+			return Provider.Iterate(Recipient, CollectionNames, Thread);
 		}
 
 		/// <summary>

@@ -1652,7 +1652,7 @@ namespace Waher.Persistence.MongoDB
 		}
 
 		/// <summary>
-		/// Performs an export of the entire database.
+		/// Performs an export of the database.
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
@@ -1663,7 +1663,7 @@ namespace Waher.Persistence.MongoDB
 		}
 
 		/// <summary>
-		/// Performs an export of the entire database.
+		/// Performs an export of the database.
 		/// </summary>
 		/// <param name="Output">Database will be output to this interface.</param>
 		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
@@ -1780,6 +1780,108 @@ namespace Waher.Persistence.MongoDB
 			}
 			else
 				Output.ReportException(ex);
+		}
+
+
+		/// <summary>
+		/// Performs an iteration of contents of the entire database.
+		/// </summary>
+		/// <typeparam name="T">Type of objects to iterate.</typeparam>
+		/// <param name="Recipient">Recipient of iterated objects.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public Task Iterate<T>(IDatabaseIteration<T> Recipient, string[] CollectionNames)
+			where T : class
+		{
+			return this.Iterate(Recipient, CollectionNames, null);
+		}
+
+		/// <summary>
+		/// Performs an iteration of contents of the entire database.
+		/// </summary>
+		/// <typeparam name="T">Type of objects to iterate.</typeparam>
+		/// <param name="Recipient">Recipient of iterated objects.</param>
+		/// <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+		/// <param name="Thread">Optional Profiler thread.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public async Task Iterate<T>(IDatabaseIteration<T> Recipient, string[] CollectionNames, ProfilerThread Thread)
+			where T : class
+		{
+			Thread?.Start();
+			await Recipient.StartDatabase();
+			try
+			{
+				ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+				BsonDeserializationArgs Args = new BsonDeserializationArgs()
+				{
+					NominalType = typeof(GenericObject)
+				};
+
+				foreach (string CollectionName in (await this.database.ListCollectionNamesAsync()).ToEnumerable())
+				{
+					if (!(CollectionNames is null) && Array.IndexOf(CollectionNames, CollectionName) < 0)
+						continue;
+
+					Thread?.NewState(CollectionName);
+
+					IMongoCollection<BsonDocument> Collection = this.database.GetCollection<BsonDocument>(CollectionName);
+
+					await Recipient.StartCollection(CollectionName);
+					try
+					{
+						foreach (BsonDocument Doc in (await Collection.FindAsync<BsonDocument>(Builders<BsonDocument>.Filter.Empty)).ToEnumerable())
+						{
+							BsonDocumentReader Reader = new BsonDocumentReader(Doc);
+							BsonDeserializationContext Context = BsonDeserializationContext.CreateRoot(Reader);
+
+							object Object = Serializer.Deserialize(Context, Args);
+
+							if (Object is T Obj)
+								await Recipient.ProcessObject(Obj);
+							else if (!(Object is null))
+							{
+								ObjectId ObjectId = await Serializer.GetObjectId(Object, false);
+								if (ObjectId != ObjectId.Empty)
+									await Recipient.IncompatibleObject(ObjectId);
+							}
+						}
+					}
+					catch (Exception ex)
+					{
+						Thread?.Exception(ex);
+						this.ReportException(ex, Recipient);
+					}
+					finally
+					{
+						await Recipient.EndCollection();
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Thread?.Exception(ex);
+				this.ReportException(ex, Recipient);
+			}
+			finally
+			{
+				await Recipient.EndDatabase();
+				Thread?.Idle();
+				Thread?.Stop();
+			}
+		}
+
+		private void ReportException<T>(Exception ex, IDatabaseIteration<T> Recipient)
+			where T : class
+		{
+			ex = Events.Log.UnnestException(ex);
+
+			if (ex is AggregateException ex2)
+			{
+				foreach (Exception ex3 in ex2.InnerExceptions)
+					Recipient.ReportException(ex3);
+			}
+			else
+				Recipient.ReportException(ex);
 		}
 
 		/// <summary>

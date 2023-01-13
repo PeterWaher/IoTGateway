@@ -3104,14 +3104,14 @@
         </member>
         <member name="M:Waher.Persistence.Database.Export(Waher.Persistence.Serialization.IDatabaseExport)">
             <summary>
-            Performs an export of the entire database.
+            Performs an export of the database.
             </summary>
             <param name="Output">Database will be output to this interface.</param>
             <returns>Task object for synchronization purposes.</returns>
         </member>
         <member name="M:Waher.Persistence.Database.Export(Waher.Persistence.Serialization.IDatabaseExport,System.String[])">
             <summary>
-            Performs an export of the entire database.
+            Performs an export of the database.
             </summary>
             <param name="Output">Database will be output to this interface.</param>
             <param name="CollectionNames">Optional array of collections to export. If null (default), all collections will be exported.</param>
@@ -3119,10 +3119,37 @@
         </member>
         <member name="M:Waher.Persistence.Database.Export(Waher.Persistence.Serialization.IDatabaseExport,System.String[],Waher.Runtime.Profiling.ProfilerThread)">
             <summary>
-            Performs an export of the entire database.
+            Performs an export of the database.
             </summary>
             <param name="Output">Database will be output to this interface.</param>
             <param name="CollectionNames">Optional array of collections to export. If null (default), all collections will be exported.</param>
+            <param name="Thread">Optional Profiler thread.</param>
+            <returns>Task object for synchronization purposes.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Database.Iterate``1(Waher.Persistence.Serialization.IDatabaseIteration{``0})">
+            <summary>
+            Performs an iteration of contents of the entire database.
+            </summary>
+            <typeparam name="T">Type of objects to iterate.</typeparam>
+            <param name="Recipient">Recipient of iterated objects.</param>
+            <returns>Task object for synchronization purposes.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Database.Iterate``1(Waher.Persistence.Serialization.IDatabaseIteration{``0},System.String[])">
+            <summary>
+            Performs an iteration of contents of the entire database.
+            </summary>
+            <typeparam name="T">Type of objects to iterate.</typeparam>
+            <param name="Recipient">Recipient of iterated objects.</param>
+            <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+            <returns>Task object for synchronization purposes.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Database.Iterate``1(Waher.Persistence.Serialization.IDatabaseIteration{``0},System.String[],Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Performs an iteration of contents of the entire database.
+            </summary>
+            <typeparam name="T">Type of objects to iterate.</typeparam>
+            <param name="Recipient">Recipient of iterated objects.</param>
+            <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
             <param name="Thread">Optional Profiler thread.</param>
             <returns>Task object for synchronization purposes.</returns>
         </member>
@@ -4506,7 +4533,7 @@
         </member>
         <member name="M:Waher.Persistence.IDatabaseProvider.Export(Waher.Persistence.Serialization.IDatabaseExport,System.String[])">
             <summary>
-            Performs an export of the entire database.
+            Performs an export of the database.
             </summary>
             <param name="Output">Database will be output to this interface.</param>
             <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
@@ -4514,9 +4541,28 @@
         </member>
         <member name="M:Waher.Persistence.IDatabaseProvider.Export(Waher.Persistence.Serialization.IDatabaseExport,System.String[],Waher.Runtime.Profiling.ProfilerThread)">
             <summary>
-            Performs an export of the entire database.
+            Performs an export of the database.
             </summary>
             <param name="Output">Database will be output to this interface.</param>
+            <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+            <param name="Thread">Optional Profiler thread.</param>
+            <returns>Task object for synchronization purposes.</returns>
+        </member>
+        <member name="M:Waher.Persistence.IDatabaseProvider.Iterate``1(Waher.Persistence.Serialization.IDatabaseIteration{``0},System.String[])">
+            <summary>
+            Performs an iteration of contents of the entire database.
+            </summary>
+            <typeparam name="T">Type of objects to iterate.</typeparam>
+            <param name="Recipient">Recipient of iterated objects.</param>
+            <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+            <returns>Task object for synchronization purposes.</returns>
+        </member>
+        <member name="M:Waher.Persistence.IDatabaseProvider.Iterate``1(Waher.Persistence.Serialization.IDatabaseIteration{``0},System.String[],Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Performs an iteration of contents of the entire database.
+            </summary>
+            <typeparam name="T">Type of objects to iterate.</typeparam>
+            <param name="Recipient">Recipient of iterated objects.</param>
             <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
             <param name="Thread">Optional Profiler thread.</param>
             <returns>Task object for synchronization purposes.</returns>
@@ -5459,7 +5505,7 @@
         </member>
         <member name="M:Waher.Persistence.NullDatabaseProvider.Export(Waher.Persistence.Serialization.IDatabaseExport,System.String[])">
             <summary>
-            Performs an export of the entire database.
+            Performs an export of the database.
             </summary>
             <param name="Output">Database will be output to this interface.</param>
             <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
@@ -5467,9 +5513,28 @@
         </member>
         <member name="M:Waher.Persistence.NullDatabaseProvider.Export(Waher.Persistence.Serialization.IDatabaseExport,System.String[],Waher.Runtime.Profiling.ProfilerThread)">
             <summary>
-            Performs an export of the entire database.
+            Performs an export of the database.
             </summary>
             <param name="Output">Database will be output to this interface.</param>
+            <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+            <param name="Thread">Optional Profiler thread.</param>
+            <returns>Task object for synchronization purposes.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Iterate``1(Waher.Persistence.Serialization.IDatabaseIteration{``0},System.String[])">
+            <summary>
+            Performs an iteration of contents of the entire database.
+            </summary>
+            <typeparam name="T">Type of objects to iterate.</typeparam>
+            <param name="Recipient">Recipient of iterated objects.</param>
+            <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
+            <returns>Task object for synchronization purposes.</returns>
+        </member>
+        <member name="M:Waher.Persistence.NullDatabaseProvider.Iterate``1(Waher.Persistence.Serialization.IDatabaseIteration{``0},System.String[],Waher.Runtime.Profiling.ProfilerThread)">
+            <summary>
+            Performs an iteration of contents of the entire database.
+            </summary>
+            <typeparam name="T">Type of objects to iterate.</typeparam>
+            <param name="Recipient">Recipient of iterated objects.</param>
             <param name="CollectionNames">Optional array of collections to export. If null, all collections will be exported.</param>
             <param name="Thread">Optional Profiler thread.</param>
             <returns>Task object for synchronization purposes.</returns>
@@ -6024,6 +6089,52 @@
             <param name="Message">Error message.</param>
         </member>
         <member name="M:Waher.Persistence.Serialization.IDatabaseExport.ReportException(System.Exception)">
+            <summary>
+            Is called when an exception has occurred.
+            </summary>
+            <param name="Exception">Exception object.</param>
+        </member>
+        <member name="T:Waher.Persistence.Serialization.IDatabaseIteration`1">
+            <summary>
+            Interface for iterations of database contents.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.IDatabaseIteration`1.StartDatabase">
+            <summary>
+            Is called when iteration of database is started.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.IDatabaseIteration`1.EndDatabase">
+            <summary>
+            Is called when iteration of database is finished.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.IDatabaseIteration`1.StartCollection(System.String)">
+            <summary>
+            Is called when a collection is started.
+            </summary>
+            <param name="CollectionName">Name of collection</param>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.IDatabaseIteration`1.EndCollection">
+            <summary>
+            Is called when a collection is finished.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.IDatabaseIteration`1.ProcessObject(`0)">
+            <summary>
+            Is called when an object is processed.
+            </summary>
+            <param name="Object">Object being iterated.</param>
+            <returns>Object ID of object, after optional mapping.</returns>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.IDatabaseIteration`1.IncompatibleObject(System.Object)">
+            <summary>
+            Is called when an incompatible (with <typeparamref name="T"/>) object 
+            is processed.
+            </summary>
+            <param name="ObjectId">Object ID of object.</param>
+        </member>
+        <member name="M:Waher.Persistence.Serialization.IDatabaseIteration`1.ReportException(System.Exception)">
             <summary>
             Is called when an exception has occurred.
             </summary>

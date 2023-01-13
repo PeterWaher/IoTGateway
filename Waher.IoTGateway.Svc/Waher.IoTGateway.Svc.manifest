@@ -421,6 +421,8 @@
 	<Assembly fileName='Waher.Script.Data.PostgreSQL.pdb'/>
 	<Assembly fileName='Waher.Script.Fractals.dll'/>
 	<Assembly fileName='Waher.Script.Fractals.pdb'/>
+	<Assembly fileName='Waher.Script.FullTextSearch.dll'/>
+	<Assembly fileName='Waher.Script.FullTextSearch.pdb'/>
 	<Assembly fileName='Waher.Script.Graphs.dll'/>
 	<Assembly fileName='Waher.Script.Graphs.pdb'/>
 	<Assembly fileName='Waher.Script.Graphs3D.dll'/>

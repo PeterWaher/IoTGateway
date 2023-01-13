@@ -1668,6 +1668,10 @@ subsections will not be repeated here.
 | `ConnectPostgreSql(ConnectionString[,UserName,Password])` | Connects to an external PostgreSQL Server database using a connection string, and optionally providing credentials. | `db:=ConnectPostgreSql(cs,UserName,Password)` |
 | `ConnectPostgreSql(Host,Database,UserName,Password)`      | Connects to an external PostgreSQL Server database `Database` hosted by a machine reachable on `Host`, and providing credentials. | `db:=ConnectPostgreSql("Server","Database",UserName,Password)` |
 
+#### Full-text-search functions (Waher.Script.FullTextSearch)
+
+
+
 #### Networking-related functions (Waher.Script.Networking)
 
 The following functions are available in the `Waher.Script.Networking` library.

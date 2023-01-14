@@ -235,7 +235,8 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		/// <param name="IndexCollection">Collection name for full-text-search index of objects in the given collection.</param>
 		/// <param name="CollectionName">Collection of objects to index.</param>
-		public static Task SetFullTextSearchIndexCollection(string IndexCollection, string CollectionName)
+		/// <returns>If the configuration was changed.</returns>
+		public static Task<bool> SetFullTextSearchIndexCollection(string IndexCollection, string CollectionName)
 		{
 			return FullTextSearchModule.SetFullTextSearchIndexCollection(IndexCollection, CollectionName);
 		}
@@ -265,6 +266,15 @@ namespace Waher.Persistence.FullTextSearch
 		/// <summary>
 		/// Gets indexed properties for full-text-search indexation.
 		/// </summary>
+		/// <returns>Dictionary of indexed properties, per collection.</returns>
+		public static Task<Dictionary<string, string[]>> GetFullTextSearchIndexedProperties()
+		{
+			return FullTextSearchModule.GetFullTextSearchIndexedProperties();
+		}
+
+		/// <summary>
+		/// Gets indexed properties for full-text-search indexation.
+		/// </summary>
 		/// <param name="CollectionName">Collection name.</param>
 		/// <returns>Array of indexed properties.</returns>
 		public static Task<string[]> GetFullTextSearchIndexedProperties(string CollectionName)
@@ -273,10 +283,31 @@ namespace Waher.Persistence.FullTextSearch
 		}
 
 		/// <summary>
+		/// Gets the database collections that get indexed into a given index colltion.
+		/// </summary>
+		/// <returns>Collection Names indexed in the full-text-search index by index collection.</returns>
+		public static Task<Dictionary<string, string[]>> GetCollectionNames()
+		{
+			return FullTextSearchModule.GetCollectionNames();
+		}
+
+		/// <summary>
+		/// Gets the database collections that get indexed into a given index colltion.
+		/// </summary>
+		/// <param name="IndexCollectionName">Index Collection Name</param>
+		/// <returns>Collection Names indexed in the full-text-search index
+		/// defined by <paramref name="IndexCollectionName"/>.</returns>
+		public static Task<string[]> GetCollectionNames(string IndexCollectionName)
+		{
+			return FullTextSearchModule.GetCollectionNames(IndexCollectionName);
+		}
+
+		/// <summary>
 		/// Reindexes the full-text-search index for a database collection.
 		/// </summary>
 		/// <param name="IndexCollectionName">Index Collection</param>
-		public static Task ReindexCollection(string IndexCollectionName)
+		/// <returns>Number of objects reindexed.</returns>
+		public static Task<long> ReindexCollection(string IndexCollectionName)
 		{
 			return FullTextSearchModule.ReindexCollection(IndexCollectionName);
 		}

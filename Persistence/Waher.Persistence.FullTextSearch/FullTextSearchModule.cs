@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -296,15 +297,75 @@ namespace Waher.Persistence.FullTextSearch
 		/// <summary>
 		/// Gets the database collections that get indexed into a given index colltion.
 		/// </summary>
-		/// <param name="IndexCollectionName"></param>
-		/// <returns></returns>
+		/// <param name="IndexCollectionName">Index Collection Name</param>
+		/// <returns>Collection Names indexed in the full-text-search index
+		/// defined by <paramref name="IndexCollectionName"/>.</returns>
+		public static async Task<Dictionary<string, string[]>> GetCollectionNames()
+		{
+			Dictionary<string, List<string>> ByIndex = new Dictionary<string, List<string>>();
+
+			await synchObj.WaitAsync();
+			try
+			{
+				foreach (object Obj in await collectionInformation.GetValuesAsync())
+				{
+					if (Obj is CollectionInformation Info && Info.IndexForFullTextSearch)
+					{
+						if (!ByIndex.TryGetValue(Info.IndexCollectionName, out List<string> Collections))
+						{
+							Collections = new List<string>();
+							ByIndex[Info.IndexCollectionName] = Collections;
+						}
+
+						Collections.Add(Info.CollectionName);
+					}
+				}
+			}
+			finally
+			{
+				synchObj.Release();
+			}
+
+			Dictionary<string, string[]> Result = new Dictionary<string, string[]>();
+
+			foreach (KeyValuePair<string, List<string>> Rec in ByIndex)
+				Result[Rec.Key] = Rec.Value.ToArray();
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Gets the database collections that get indexed into a given index colltion.
+		/// </summary>
+		/// <param name="IndexCollectionName">Index Collection Name</param>
+		/// <returns>Collection Names indexed in the full-text-search index
+		/// defined by <paramref name="IndexCollectionName"/>.</returns>
+		public static async Task<string[]> GetCollectionNames(string IndexCollectionName)
+		{
+			await synchObj.WaitAsync();
+			try
+			{
+				return await GetCollectionNamesLocked(IndexCollectionName);
+			}
+			finally
+			{
+				synchObj.Release();
+			}
+		}
+
+		/// <summary>
+		/// Gets the database collections that get indexed into a given index colltion.
+		/// </summary>
+		/// <param name="IndexCollectionName">Index Collection Name</param>
+		/// <returns>Collection Names indexed in the full-text-search index
+		/// defined by <paramref name="IndexCollectionName"/>.</returns>
 		private static async Task<string[]> GetCollectionNamesLocked(string IndexCollectionName)
 		{
 			List<string> Result = new List<string>();
 
 			foreach (object Obj in await collectionInformation.GetValuesAsync())
 			{
-				if (Obj is CollectionInformation Info)
+				if (Obj is CollectionInformation Info && Info.IndexForFullTextSearch)
 				{
 					if (Info.IndexCollectionName == IndexCollectionName)
 						Result.Add(Info.CollectionName);
@@ -319,7 +380,8 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		/// <param name="IndexCollection">Collection name for full-text-search index of objects in the given collection.</param>
 		/// <param name="CollectionName">Collection of objects to index.</param>
-		internal static async Task SetFullTextSearchIndexCollection(string IndexCollection, string CollectionName)
+		/// <returns>If the configuration was changed.</returns>
+		internal static async Task<bool> SetFullTextSearchIndexCollection(string IndexCollection, string CollectionName)
 		{
 			await synchObj.WaitAsync();
 			try
@@ -330,7 +392,11 @@ namespace Waher.Persistence.FullTextSearch
 				{
 					Info.IndexCollectionName = IndexCollection;
 					await collectionInformation.AddAsync(Info.CollectionName, Info, true);
+
+					return true;
 				}
+				else
+					return false;
 			}
 			finally
 			{
@@ -390,6 +456,31 @@ namespace Waher.Persistence.FullTextSearch
 			{
 				synchObj.Release();
 			}
+		}
+
+		/// <summary>
+		/// Gets indexed properties for full-text-search indexation.
+		/// </summary>
+		/// <returns>Dictionary of indexed properties, per collection.</returns>
+		internal static async Task<Dictionary<string, string[]>> GetFullTextSearchIndexedProperties()
+		{
+			Dictionary<string, string[]> Result = new Dictionary<string, string[]>();
+
+			await synchObj.WaitAsync();
+			try
+			{
+				foreach (object Obj in await collectionInformation.GetValuesAsync())
+				{
+					if (Obj is CollectionInformation Info && Info.IndexForFullTextSearch)
+						Result[Info.CollectionName] = Info.PropertyNames;
+				}
+			}
+			finally
+			{
+				synchObj.Release();
+			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -1124,45 +1215,41 @@ namespace Waher.Persistence.FullTextSearch
 		/// Reindexes the full-text-search index for a database collection.
 		/// </summary>
 		/// <param name="IndexCollectionName">Index Collection</param>
-		public static async Task ReindexCollection(string IndexCollectionName)
+		/// <returns>Number of objects reindexed.</returns>
+		public static async Task<long> ReindexCollection(string IndexCollectionName)
 		{
+			string[] Collections;
+
+			await synchObj.WaitAsync();
 			try
 			{
-				string[] Collections;
+				IPersistentDictionary Index = await GetIndexLocked(IndexCollectionName);
+				await Index.ClearAsync();
 
-				await synchObj.WaitAsync();
-				try
+				IEnumerable<ObjectReference> ObjectsDeleted;
+
+				do
 				{
-					IPersistentDictionary Index = await GetIndexLocked(IndexCollectionName);
-					await Index.ClearAsync();
+					ObjectsDeleted = await Database.FindDelete<ObjectReference>(0, 1000,
+						new FilterFieldEqualTo("IndexCollection", IndexCollectionName));
 
-					IEnumerable<ObjectReference> ObjectsDeleted;
-
-					do
-					{
-						ObjectsDeleted = await Database.FindDelete<ObjectReference>(0, 1000,
-							new FilterFieldEqualTo("IndexCollection", IndexCollectionName));
-
-						foreach (ObjectReference Ref in ObjectsDeleted)
-							await Search.RaiseObjectRemovedFromIndex(instance, new ObjectReferenceEventArgs(Ref));
-					}
-					while (!IsEmpty(ObjectsDeleted));
-
-					Collections = await GetCollectionNamesLocked(IndexCollectionName);
+					foreach (ObjectReference Ref in ObjectsDeleted)
+						await Search.RaiseObjectRemovedFromIndex(instance, new ObjectReferenceEventArgs(Ref));
 				}
-				finally
-				{
-					synchObj.Release();
-				}
+				while (!IsEmpty(ObjectsDeleted));
 
-				ReindexCollectionIteration Iteration = new ReindexCollectionIteration();
-
-				await Database.Iterate<object>(Iteration, Collections);
+				Collections = await GetCollectionNamesLocked(IndexCollectionName);
 			}
-			catch (Exception ex)
+			finally
 			{
-				Log.Critical(ex);
+				synchObj.Release();
 			}
+
+			ReindexCollectionIteration Iteration = new ReindexCollectionIteration();
+
+			await Database.Iterate<object>(Iteration, Collections);
+
+			return Iteration.NrObjectsProcessed;
 		}
 
 		private static bool IsEmpty(IEnumerable<ObjectReference> Objects)
@@ -1180,7 +1267,7 @@ namespace Waher.Persistence.FullTextSearch
 			public Task EndCollection() => Task.CompletedTask;
 			public Task IncompatibleObject(object ObjectId) => Task.CompletedTask;
 
-			public int NrObjectsProcessed = 0;
+			public long NrObjectsProcessed = 0;
 			public int NrCollectionsProcessed = 0;
 
 			public Task StartCollection(string CollectionName)

@@ -8,7 +8,7 @@ namespace Waher.Script.FullTextSearch.Functions
 	/// <summary>
 	/// Matches a Full-Text-Search Index with a Database Collection.
 	/// </summary>
-	public class EnableFts : FunctionTwoScalarVariables
+	public class FtsCollection : FunctionTwoScalarVariables
 	{
 		/// <summary>
 		/// Matches a Full-Text-Search Index with a Database Collection.
@@ -18,7 +18,7 @@ namespace Waher.Script.FullTextSearch.Functions
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public EnableFts(ScriptNode IndexCollection, ScriptNode DatabaseCollection,
+		public FtsCollection(ScriptNode IndexCollection, ScriptNode DatabaseCollection,
 			int Start, int Length, Expression Expression)
 			: base(IndexCollection, DatabaseCollection, Start, Length, Expression)
 		{
@@ -27,7 +27,7 @@ namespace Waher.Script.FullTextSearch.Functions
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => nameof(EnableFts);
+		public override string FunctionName => nameof(FtsCollection);
 
 		/// <summary>
 		/// Default Argument names

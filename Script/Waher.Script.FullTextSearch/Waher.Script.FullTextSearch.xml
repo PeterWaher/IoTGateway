@@ -51,12 +51,12 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="T:Waher.Script.FullTextSearch.Functions.EnableFts">
+        <member name="T:Waher.Script.FullTextSearch.Functions.FtsCollection">
             <summary>
             Matches a Full-Text-Search Index with a Database Collection.
             </summary>
         </member>
-        <member name="M:Waher.Script.FullTextSearch.Functions.EnableFts.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+        <member name="M:Waher.Script.FullTextSearch.Functions.FtsCollection.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
             <summary>
             Matches a Full-Text-Search Index with a Database Collection.
             </summary>
@@ -66,23 +66,23 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
-        <member name="P:Waher.Script.FullTextSearch.Functions.EnableFts.FunctionName">
+        <member name="P:Waher.Script.FullTextSearch.Functions.FtsCollection.FunctionName">
             <summary>
             Name of the function
             </summary>
         </member>
-        <member name="P:Waher.Script.FullTextSearch.Functions.EnableFts.DefaultArgumentNames">
+        <member name="P:Waher.Script.FullTextSearch.Functions.FtsCollection.DefaultArgumentNames">
             <summary>
             Default Argument names
             </summary>
         </member>
-        <member name="P:Waher.Script.FullTextSearch.Functions.EnableFts.IsAsynchronous">
+        <member name="P:Waher.Script.FullTextSearch.Functions.FtsCollection.IsAsynchronous">
             <summary>
             If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
             <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
             </summary>
         </member>
-        <member name="M:Waher.Script.FullTextSearch.Functions.EnableFts.EvaluateScalar(System.String,System.String,Waher.Script.Variables)">
+        <member name="M:Waher.Script.FullTextSearch.Functions.FtsCollection.EvaluateScalar(System.String,System.String,Waher.Script.Variables)">
             <summary>
             Evaluates the function on two scalar arguments.
             </summary>
@@ -91,7 +91,7 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
-        <member name="M:Waher.Script.FullTextSearch.Functions.EnableFts.EvaluateScalarAsync(System.String,System.String,Waher.Script.Variables)">
+        <member name="M:Waher.Script.FullTextSearch.Functions.FtsCollection.EvaluateScalarAsync(System.String,System.String,Waher.Script.Variables)">
             <summary>
             Evaluates the function on two scalar arguments.
             </summary>

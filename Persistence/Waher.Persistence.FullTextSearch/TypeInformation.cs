@@ -12,6 +12,7 @@ namespace Waher.Persistence.FullTextSearch
 	internal class TypeInformation
 	{
 		private readonly Dictionary<string, KeyValuePair<PropertyInfo, FieldInfo>> properties = new Dictionary<string, KeyValuePair<PropertyInfo, FieldInfo>>();
+		private readonly FullTextSearchAttribute searchAttribute;
 		private readonly ITokenizer customTokenizer;
 		private readonly bool hasCustomTokenizer;
 
@@ -24,8 +25,10 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="CollectionInformation">Indexing information for a collection.</param>
 		/// <param name="CustomTokenizer">Optional custom tokenizer creating tokens for objects
 		/// of this type.</param>
+		/// <param name="SearchAttribute">Full-text-search attribute.</param>
 		public TypeInformation(Type Type, TypeInfo TypeInfo, string CollectionName, 
-			CollectionInformation CollectionInformation, ITokenizer CustomTokenizer)
+			CollectionInformation CollectionInformation, ITokenizer CustomTokenizer,
+			FullTextSearchAttribute SearchAttribute)
 		{
 			this.Type = Type;
 			this.TypeInfo = TypeInfo;
@@ -34,6 +37,7 @@ namespace Waher.Persistence.FullTextSearch
 			this.CollectionInformation = CollectionInformation;
 			this.customTokenizer = CustomTokenizer;
 			this.hasCustomTokenizer = !(CustomTokenizer is null);
+			this.searchAttribute = SearchAttribute;
 		}
 
 		/// <summary>
@@ -70,6 +74,19 @@ namespace Waher.Persistence.FullTextSearch
 		/// If the type has a custom tokenizer.
 		/// </summary>
 		public bool HasCustomTokenizer => this.hasCustomTokenizer;
+
+		/// <summary>
+		/// If the index collection is dynamic (i.e. depends on object instance).
+		/// </summary>
+		public bool DynamicIndexCollection => this.searchAttribute?.DynamicIndexCollection ?? false;
+
+		/// <summary>
+		/// Name of full-text-search index collection.
+		/// </summary>
+		public string GetIndexCollection(object Reference)
+		{
+			return this.searchAttribute?.GetIndexCollection(Reference) ?? this.CollectionInformation.IndexCollectionName;
+		}
 
 		/// <summary>
 		/// Tokenizes properties in an object, given a set of property names.

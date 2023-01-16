@@ -23,8 +23,11 @@ namespace Waher.Persistence.FullTextSearch
 		/// class, that tokenizer will be used instead of the property array, to extract
 		/// tokens from the object.</param>
 		public FullTextSearchAttribute(string IndexCollection, params string[] PropertyNames)
-			: this(IndexCollection, false, PropertyNames)
 		{
+			this.indexCollection = IndexCollection;
+			this.propertyNames = PropertyNames;
+			this.hasPropertyNames = (PropertyNames?.Length ?? 0) > 0;
+			this.isPropertyReference = false;
 		}
 
 		/// <summary>
@@ -37,14 +40,22 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="PropertyNames">Array of property (or field) names to index. 
 		/// If not provided, and a <see cref="ITokenizer"/> exists for objects of this
 		/// class, that tokenizer will be used instead of the property array, to extract
-		/// tokens from the object.</param>
-		public FullTextSearchAttribute(string IndexCollection, bool PropertyReference, params string[] PropertyNames)
+		/// tokens from the object.
+		/// 
+		/// Note: Classes using dynamic index collection names require custom
+		/// tokenizers to be tokenized properly.</param>
+		public FullTextSearchAttribute(string IndexCollection, bool PropertyReference)
 		{
 			this.indexCollection = IndexCollection;
-			this.propertyNames = PropertyNames;
+			this.propertyNames = new string[0];
 			this.hasPropertyNames = (PropertyNames?.Length ?? 0) > 0;
 			this.isPropertyReference = PropertyReference;
 		}
+
+		/// <summary>
+		/// If the index collection is dynamic (i.e. depends on object instance).
+		/// </summary>
+		public bool DynamicIndexCollection => this.isPropertyReference;
 
 		/// <summary>
 		/// Name of full-text-search index collection.

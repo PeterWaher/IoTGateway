@@ -191,6 +191,7 @@ namespace Waher.Persistence.FullTextSearch.Test
 		{
 			await Database.Clear(this.collectioName);
 			await Database.Clear("FullTextSearchObjects");
+			await Database.Clear("FullTextSearchFiles");
 
 			await (await Database.GetDictionary(this.indexCollection)).ClearAsync();
 		}

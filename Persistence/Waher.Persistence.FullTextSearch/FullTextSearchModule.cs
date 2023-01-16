@@ -130,11 +130,18 @@ namespace Waher.Persistence.FullTextSearch
 				TypeInformation TypeInfo = P.Item2;
 				GenericObject GenObj = P.Item3;
 				TokenCount[] Tokens;
+				string IndexName;
 
 				if (GenObj is null)
+				{
+					IndexName = TypeInfo.GetIndexCollection(e.Object);
 					Tokens = await TypeInfo.Tokenize(e.Object, CollectionInfo.PropertyNames);
+				}
 				else
+				{
+					IndexName = CollectionInfo.IndexCollectionName;
 					Tokens = await Tokenize(GenObj, CollectionInfo.PropertyNames);
+				}
 
 				if (Tokens.Length == 0)
 					return;
@@ -144,11 +151,11 @@ namespace Waher.Persistence.FullTextSearch
 				await synchObj.WaitAsync();
 				try
 				{
-					ulong Index = await GetNextIndexNrLocked(CollectionInfo.IndexCollectionName);
+					ulong Index = await GetNextIndexNrLocked(IndexName);
 
 					Ref = new ObjectReference()
 					{
-						IndexCollection = CollectionInfo.IndexCollectionName,
+						IndexCollection = IndexName,
 						Collection = CollectionInfo.CollectionName,
 						ObjectInstanceId = ObjectId,
 						Index = Index,
@@ -544,15 +551,16 @@ namespace Waher.Persistence.FullTextSearch
 			ITokenizer CustomTokenizer = Types.FindBest<ITokenizer, Type>(T);
 
 			if (CollectionAttr is null)
-				Result = new TypeInformation(T, TI, null, null, CustomTokenizer);
+				Result = new TypeInformation(T, TI, null, null, CustomTokenizer, null);
 			else
 			{
 				string CollectionName = CollectionAttr.Name;
-				string IndexName = SearchAttr?.GetIndexCollection(Instance) ?? CollectionName;
+				bool DynamicIndex = SearchAttr?.DynamicIndexCollection ?? false;
+				string IndexName = DynamicIndex ? null : SearchAttr?.GetIndexCollection(Instance) ?? CollectionName;
 
 				CollectionInformation Info = await GetCollectionInfoLocked(IndexName, CollectionName, true);
 
-				Result = new TypeInformation(T, TI, CollectionName, Info, CustomTokenizer);
+				Result = new TypeInformation(T, TI, CollectionName, Info, CustomTokenizer, SearchAttr);
 
 				if (!(SearchAttr is null) &&
 					SearchAttr.HasPropertyNames &&
@@ -1114,11 +1122,18 @@ namespace Waher.Persistence.FullTextSearch
 						if (Tokens.Length == 0)
 							return;
 
-						ulong Index = await GetNextIndexNrLocked(CollectionInfo.IndexCollectionName);
+						string IndexName;
+
+						if (GenObj is null)
+							IndexName = TypeInfo.GetIndexCollection(e.Object);
+						else
+							IndexName = CollectionInfo.IndexCollectionName;
+
+						ulong Index = await GetNextIndexNrLocked(IndexName);
 
 						Ref = new ObjectReference()
 						{
-							IndexCollection = CollectionInfo.IndexCollectionName,
+							IndexCollection = IndexName,
 							Collection = CollectionInfo.CollectionName,
 							ObjectInstanceId = ObjectId,
 							Index = Index,
@@ -1487,7 +1502,7 @@ namespace Waher.Persistence.FullTextSearch
 			IEnumerable<FileReference> ReferencesInDB = await Database.Find<FileReference>(
 				new FilterAnd(
 					new FilterFieldEqualTo("IndexCollection", IndexCollection),
-					new FilterFieldLikeRegEx("FileName", Folder + "%")));
+					new FilterFieldLikeRegEx("FileName", Database.WildcardToRegex(Folder + "*", "*"))));
 
 			foreach (FileReference Reference in ReferencesInDB)
 				References[Reference.FileName] = Reference;
@@ -1503,13 +1518,14 @@ namespace Waher.Persistence.FullTextSearch
 
 				if (References.TryGetValue(FileName, out FileReference Ref))
 				{
+					References.Remove(FileName);
+
 					if (Ref.Timestamp == TP)
 						continue;
 
 					Ref.Timestamp = TP;
 					await Database.Update(Ref); // Will trigger retokenization of file.
 
-					References.Remove(FileName);
 					Result.NrUpdated++;
 					Result.TotalChanges++;
 				}

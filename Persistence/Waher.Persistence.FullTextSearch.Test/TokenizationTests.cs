@@ -1,6 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Xml;
-using Waher.Persistence.FullTextSearch.Keywords;
 
 namespace Waher.Persistence.FullTextSearch.Test
 {

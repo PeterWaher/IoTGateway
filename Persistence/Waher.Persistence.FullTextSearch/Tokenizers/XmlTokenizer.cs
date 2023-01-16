@@ -43,15 +43,23 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 		public Task Tokenize(object Value, TokenizationProcess Process)
 		{
 			if (Value is XmlNode N)
-			{
-				StringBuilder sb = new StringBuilder();
-				
-				GetText(N, sb);
-
-				StringTokenizer.Tokenize(sb.ToString(), Process);
-			}
+				Tokenize(N, Process);
 
 			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Tokenizes an XML Document or XML Fragment.
+		/// </summary>
+		/// <param name="Xml">XML to tokenize.</param>
+		/// <param name="Process">Current tokenization process.</param>
+		public static void Tokenize(XmlNode Xml, TokenizationProcess Process)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			GetText(Xml, sb);
+
+			StringTokenizer.Tokenize(sb.ToString(), Process);
 		}
 
 		private static void GetText(XmlNode N, StringBuilder Text)

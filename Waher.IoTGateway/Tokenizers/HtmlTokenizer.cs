@@ -2,7 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Content.Markdown;
+using Waher.Content.Html;
 using Waher.Persistence.FullTextSearch;
 using Waher.Persistence.FullTextSearch.Files;
 using Waher.Persistence.FullTextSearch.Tokenizers;
@@ -11,14 +11,14 @@ using Waher.Runtime.Inventory;
 namespace Waher.IoTGateway.Tokenizers
 {
 	/// <summary>
-	/// Tokenizes contents defined in a Markdown document.
+	/// Tokenizes contents defined in an HTML document.
 	/// </summary>
-	public class MarkdownTokenizer : ITokenizer, IFileTokenizer
+	public class HtmlTokenizer : ITokenizer, IFileTokenizer
 	{
 		/// <summary>
-		/// Tokenizes contents defined in a Markdown document.
+		/// Tokenizes contents defined in an HTML document.
 		/// </summary>
-		public MarkdownTokenizer()
+		public HtmlTokenizer()
 		{
 		}
 
@@ -29,7 +29,7 @@ namespace Waher.IoTGateway.Tokenizers
 		/// <returns>How well objects of this type are supported.</returns>
 		public Grade Supports(Type Object)
 		{
-			if (Object == typeof(MarkdownDocument))
+			if (Object == typeof(HtmlDocument))
 				return Grade.Ok;
 			else
 				return Grade.NotAtAll;
@@ -42,10 +42,16 @@ namespace Waher.IoTGateway.Tokenizers
 		/// <returns>How well the tokenizer supports files having this extension.</returns>
 		public Grade Supports(string Extension)
 		{
-			if (Extension == "md")
-				return Grade.Ok;
-			else
-				return Grade.NotAtAll;
+			switch (Extension)
+			{
+				case "htm":
+				case "html":
+				case "xhtml":
+					return Grade.Ok;
+
+				default:
+					return Grade.NotAtAll;
+			}
 		}
 
 		/// <summary>
@@ -55,35 +61,46 @@ namespace Waher.IoTGateway.Tokenizers
 		/// <param name="Process">Current tokenization process.</param>
 		public async Task Tokenize(object Value, TokenizationProcess Process)
 		{
-			if (Value is MarkdownDocument Doc)
+			if (Value is HtmlDocument Doc)
 				await Tokenize(Doc, Process);
 		}
 
 		/// <summary>
-		/// Tokenizes a Markdown document.
+		/// Tokenizes an HTML document.
 		/// </summary>
 		/// <param name="Doc">Document to tokenize.</param>
 		/// <param name="Process">Current tokenization process.</param>
-		public static async Task Tokenize(MarkdownDocument Doc, TokenizationProcess Process)
+		public static Task Tokenize(HtmlDocument Doc, TokenizationProcess Process)
 		{
 			StringBuilder sb = new StringBuilder();
 
-			Append(sb, Doc.Description);
-			Append(sb, Doc.Author);
-			Append(sb, Doc.Keywords);
-			Append(sb, Doc.Subtitle);
-			Append(sb, Doc.Title);
+			GetText(Doc.Root, sb);
 
-			await Doc.GeneratePlainText(sb);
 			StringTokenizer.Tokenize(sb.ToString(), Process);
+
+			return Task.CompletedTask;
 		}
 
-		private static void Append(StringBuilder sb, string[] Strings)
+		private static void GetText(HtmlNode N, StringBuilder Text)
 		{
-			if (!(Strings is null))
+			if (N is HtmlElement E)
 			{
-				foreach (string s in Strings)
-					sb.AppendLine(s);
+				foreach (HtmlAttribute Attr in E.Attributes)
+				{
+					Text.Append(' ');
+					Text.Append(Attr.Value);
+				}
+
+				if (E.HasChildren)
+				{
+					foreach (HtmlNode N2 in E.Children)
+						GetText(N2, Text);
+				}
+			}
+			else if (N is HtmlText T)
+			{
+				Text.Append(' ');
+				Text.Append(T.InlineText);
 			}
 		}
 
@@ -95,7 +112,7 @@ namespace Waher.IoTGateway.Tokenizers
 		public async Task Tokenize(FileReference Reference, TokenizationProcess Process)
 		{
 			string Text = await Resources.ReadAllTextAsync(Reference.FileName);
-			MarkdownDocument Doc = await MarkdownDocument.CreateAsync(Text);
+			HtmlDocument Doc = new HtmlDocument(Text);
 
 			await Tokenize(Doc, Process);
 		}

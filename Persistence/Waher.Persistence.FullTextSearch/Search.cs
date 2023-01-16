@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Persistence.FullTextSearch.Files;
 using Waher.Persistence.FullTextSearch.Keywords;
 
 namespace Waher.Persistence.FullTextSearch
@@ -312,5 +313,27 @@ namespace Waher.Persistence.FullTextSearch
 			return FullTextSearchModule.ReindexCollection(IndexCollectionName);
 		}
 
+		/// <summary>
+		/// Indexes or reindexes files in a folder.
+		/// </summary>
+		/// <param name="IndexCollection">Name of index collection.</param>
+		/// <param name="Folder">Folder name.</param>
+		/// <param name="Recursive">If processing of files in subfolders should be performed.</param>
+		/// <returns>Statistics about indexation process.</returns>
+		public static Task<FolderIndexationStatistics> IndexFolder(string IndexCollection, string Folder, bool Recursive)
+		{
+			return FullTextSearchModule.IndexFolder(IndexCollection, Folder, Recursive);
+		}
+
+		/// <summary>
+		/// Indexes or reindexes a file.
+		/// </summary>
+		/// <param name="IndexCollection">Name of index collection.</param>
+		/// <param name="FileName">File name.</param>
+		/// <returns>If index was updated.</returns>
+		public static Task<bool> IndexFile(string IndexCollection, string FileName)
+		{
+			return FullTextSearchModule.IndexFile(IndexCollection, FileName);
+		}
 	}
 }

@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
+using Waher.Persistence.FullTextSearch.Files;
 using Waher.Persistence.FullTextSearch.Keywords;
 using Waher.Persistence.FullTextSearch.Orders;
 using Waher.Persistence.FullTextSearch.Tokenizers;
@@ -514,7 +515,7 @@ namespace Waher.Persistence.FullTextSearch
 				if (Object is GenericObject GenObj)
 					return await PrepareLocked(GenObj);
 				else
-					return await PrepareLocked(Object.GetType());
+					return await PrepareLocked(Object.GetType(), Object);
 			}
 			finally
 			{
@@ -532,7 +533,7 @@ namespace Waher.Persistence.FullTextSearch
 				return null;
 		}
 
-		private static async Task<TypeInformation> GetTypeInfoLocked(Type T)
+		private static async Task<TypeInformation> GetTypeInfoLocked(Type T, object Instance)
 		{
 			if (types.TryGetValue(T, out TypeInformation Result))
 				return Result;
@@ -547,7 +548,9 @@ namespace Waher.Persistence.FullTextSearch
 			else
 			{
 				string CollectionName = CollectionAttr.Name;
-				CollectionInformation Info = await GetCollectionInfoLocked(SearchAttr?.IndexCollection ?? CollectionName, CollectionName, true);
+				string IndexName = SearchAttr?.GetIndexCollection(Instance) ?? CollectionName;
+
+				CollectionInformation Info = await GetCollectionInfoLocked(IndexName, CollectionName, true);
 
 				Result = new TypeInformation(T, TI, CollectionName, Info, CustomTokenizer);
 
@@ -569,9 +572,9 @@ namespace Waher.Persistence.FullTextSearch
 			return Result;
 		}
 
-		private static async Task<Tuple<CollectionInformation, TypeInformation, GenericObject>> PrepareLocked(Type T)
+		private static async Task<Tuple<CollectionInformation, TypeInformation, GenericObject>> PrepareLocked(Type T, object Instance)
 		{
-			TypeInformation TypeInfo = await GetTypeInfoLocked(T);
+			TypeInformation TypeInfo = await GetTypeInfoLocked(T, Instance);
 			if (!TypeInfo.HasCollection)
 				return null;
 
@@ -1254,7 +1257,7 @@ namespace Waher.Persistence.FullTextSearch
 
 		private static bool IsEmpty(IEnumerable<ObjectReference> Objects)
 		{
-			foreach (ObjectReference Ref in Objects)
+			foreach (ObjectReference _ in Objects)
 				return false;
 
 			return true;
@@ -1453,6 +1456,142 @@ namespace Waher.Persistence.FullTextSearch
 			}
 
 			return Values;
+		}
+
+		/// <summary>
+		/// Indexes or reindexes files in a folder.
+		/// </summary>
+		/// <param name="IndexCollection">Name of index collection.</param>
+		/// <param name="Folder">Folder name.</param>
+		/// <param name="Recursive">If processing of files in subfolders should be performed.</param>
+		/// <returns>Statistics about indexation process.</returns>
+		internal static async Task<FolderIndexationStatistics> IndexFolder(string IndexCollection, string Folder, bool Recursive)
+		{
+			if (string.IsNullOrEmpty(IndexCollection))
+				throw new ArgumentException("Empty index.", nameof(IndexCollection));
+
+			if (string.IsNullOrEmpty(Folder))
+				throw new ArgumentException("Empty folder.", nameof(Folder));
+
+			Folder = Path.GetFullPath(Folder);
+			if (!Directory.Exists(Folder))
+				throw new ArgumentException("Folder does not exist.", nameof(Folder));
+
+			if (Folder[Folder.Length - 1] != Path.DirectorySeparatorChar)
+				Folder += Path.DirectorySeparatorChar;
+
+			string[] FileNames = Directory.GetFiles(Folder, "*.*", Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+			Dictionary<CaseInsensitiveString, FileReference> References = new Dictionary<CaseInsensitiveString, FileReference>();
+			FolderIndexationStatistics Result = new FolderIndexationStatistics();
+
+			IEnumerable<FileReference> ReferencesInDB = await Database.Find<FileReference>(
+				new FilterAnd(
+					new FilterFieldEqualTo("IndexCollection", IndexCollection),
+					new FilterFieldLikeRegEx("FileName", Folder + "%")));
+
+			foreach (FileReference Reference in ReferencesInDB)
+				References[Reference.FileName] = Reference;
+
+			foreach (string FileName in FileNames)
+			{
+				if (!FileReferenceTokenizer.HasTokenizer(FileName))
+					continue;
+
+				Result.NrFiles++;
+
+				DateTime TP = File.GetLastWriteTimeUtc(FileName);
+
+				if (References.TryGetValue(FileName, out FileReference Ref))
+				{
+					if (Ref.Timestamp == TP)
+						continue;
+
+					Ref.Timestamp = TP;
+					await Database.Update(Ref); // Will trigger retokenization of file.
+
+					References.Remove(FileName);
+					Result.NrUpdated++;
+					Result.TotalChanges++;
+				}
+				else
+				{
+					Ref = new FileReference()
+					{
+						FileName = FileName,
+						IndexCollection = IndexCollection,
+						Timestamp = TP
+					};
+
+					await Database.Insert(Ref); // Will trigger tokenization of file.
+
+					Result.NrAdded++;
+					Result.TotalChanges++;
+				}
+			}
+
+			foreach (FileReference Reference in References.Values)
+			{
+				await Database.Delete(Reference);   // Will trigger removal of tokens.
+				Result.NrDeleted++;
+				Result.TotalChanges++;
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Indexes or reindexes a file.
+		/// </summary>
+		/// <param name="IndexCollection">Name of index collection.</param>
+		/// <param name="FileName">File name.</param>
+		/// <returns>If index was updated.</returns>
+		internal static async Task<bool> IndexFile(string IndexCollection, string FileName)
+		{
+			FileName = Path.GetFullPath(FileName);
+
+			FileReference ReferenceInDB = await Database.FindFirstIgnoreRest<FileReference>(
+				new FilterAnd(
+					new FilterFieldEqualTo("IndexCollection", IndexCollection),
+					new FilterFieldEqualTo("FileName", FileName)));
+
+			if (!FileReferenceTokenizer.HasTokenizer(FileName))
+				return false;
+
+			if (File.Exists(FileName))
+			{
+				DateTime TP = File.GetLastWriteTimeUtc(FileName);
+
+				if (ReferenceInDB is null)
+				{
+					ReferenceInDB = new FileReference()
+					{
+						FileName = FileName,
+						IndexCollection = IndexCollection,
+						Timestamp = TP
+					};
+
+					await Database.Insert(ReferenceInDB); // Will trigger tokenization of file.
+
+					return true;
+				}
+				else
+				{
+					if (ReferenceInDB.Timestamp == TP)
+						return false;
+
+					ReferenceInDB.Timestamp = TP;
+					await Database.Update(ReferenceInDB); // Will trigger retokenization of file.
+
+					return true;
+				}
+			}
+			else if (ReferenceInDB is null)
+				return false;
+			else
+			{
+				await Database.Delete(ReferenceInDB);   // Will trigger removal of tokens.
+				return true;
+			}
 		}
 
 	}

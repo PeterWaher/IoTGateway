@@ -392,7 +392,16 @@ namespace Waher.Persistence.FullTextSearch
 			await synchObj.WaitAsync();
 			try
 			{
-				CollectionInformation Info = await GetCollectionInfoLocked(IndexCollection, CollectionName, true);
+				CollectionInformation Info = await GetCollectionInfoLocked(IndexCollection, CollectionName, false);
+				bool Created;
+
+				if (Info is null)
+				{
+					Created = true;
+					Info = await GetCollectionInfoLocked(IndexCollection, CollectionName, true);
+				}
+				else
+					Created = false;
 
 				if (Info.IndexCollectionName != IndexCollection)
 				{
@@ -402,7 +411,7 @@ namespace Waher.Persistence.FullTextSearch
 					return true;
 				}
 				else
-					return false;
+					return Created;
 			}
 			finally
 			{

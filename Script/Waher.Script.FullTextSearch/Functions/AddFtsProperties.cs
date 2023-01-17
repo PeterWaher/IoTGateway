@@ -113,7 +113,8 @@ namespace Waher.Script.FullTextSearch.Functions
 
 			for (i = 0; i < c; i++)
 			{
-				Obj = V.GetElement(i);
+				Argument = V.GetElement(i);
+				Obj = Argument.AssociatedObjectValue;
 
 				if (Obj is PropertyDefinition Def2)
 					Result[i] = Def2;

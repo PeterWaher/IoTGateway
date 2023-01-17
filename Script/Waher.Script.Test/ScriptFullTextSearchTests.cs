@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence;
 using Waher.Persistence.FullTextSearch;
+using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Script.Test
 {
@@ -54,70 +56,76 @@ namespace Waher.Script.Test
 		public async Task Test_06_GetFtsProperties_1()
 		{
 			object Obj = await this.Test("GetFtsProperties('Test')");
-			PropertyDefinition[] Properties;
+			PropertyDefinition Def;
+			Array Properties;
 
-			Assert.IsNotNull(Properties = Obj as PropertyDefinition[]);
+			Assert.IsNotNull(Properties = Obj as Array);
 			Assert.AreEqual(2, Properties.Length);
 
-			Assert.AreEqual("P1", Properties[0].Definition);
-			Assert.AreEqual(null, Properties[0].ExternalSource);
-			Assert.AreEqual(PropertyType.Label, Properties[0].Type);
+			Assert.IsNotNull(Def = Properties.GetValue(0) as PropertyDefinition);
+			Assert.AreEqual("P1", Def.Definition);
+			Assert.AreEqual(null, Def.ExternalSource);
+			Assert.AreEqual(PropertyType.Label, Def.Type);
 
-			Assert.AreEqual("P2", Properties[1].Definition);
-			Assert.AreEqual(null, Properties[1].ExternalSource);
-			Assert.AreEqual(PropertyType.Label, Properties[1].Type);
+			Assert.IsNotNull(Def = Properties.GetValue(1) as PropertyDefinition);
+			Assert.AreEqual("P2", Def.Definition);
+			Assert.AreEqual(null, Def.ExternalSource);
+			Assert.AreEqual(PropertyType.Label, Def.Type);
 		}
 
 		[TestMethod]
 		public async Task Test_07_GetFtsProperties_2()
 		{
 			object Obj = await this.Test("GetFtsProperties()");
-			Dictionary<string, object> ByCollection;
-			PropertyDefinition[] Properties;
+			Dictionary<string, IElement> ByCollection;
+			PropertyDefinition Def;
+			Array Properties;
 
-			Assert.IsNotNull(ByCollection = Obj as Dictionary<string, object>);
+			Assert.IsNotNull(ByCollection = Obj as Dictionary<string, IElement>);
 			Assert.AreEqual(1, ByCollection.Count);
 
-			Assert.IsTrue(ByCollection.TryGetValue("Test", out Obj));
+			Assert.IsTrue(ByCollection.TryGetValue("Test", out IElement E));
 
-			Assert.IsNotNull(Properties = Obj as PropertyDefinition[]);
+			Assert.IsNotNull(Properties = E.AssociatedObjectValue as Array);
 			Assert.AreEqual(2, Properties.Length);
 
-			Assert.AreEqual("P1", Properties[0].Definition);
-			Assert.AreEqual(null, Properties[0].ExternalSource);
-			Assert.AreEqual(PropertyType.Label, Properties[0].Type);
+			Assert.IsNotNull(Def = Properties.GetValue(0) as PropertyDefinition);
+			Assert.AreEqual("P1", Def.Definition);
+			Assert.AreEqual(null, Def.ExternalSource);
+			Assert.AreEqual(PropertyType.Label, Def.Type);
 
-			Assert.AreEqual("P2", Properties[1].Definition);
-			Assert.AreEqual(null, Properties[1].ExternalSource);
-			Assert.AreEqual(PropertyType.Label, Properties[1].Type);
+			Assert.IsNotNull(Def = Properties.GetValue(1) as PropertyDefinition);
+			Assert.AreEqual("P2", Def.Definition);
+			Assert.AreEqual(null, Def.ExternalSource);
+			Assert.AreEqual(PropertyType.Label, Def.Type);
 		}
 
 		[TestMethod]
 		public async Task Test_08_GetFtsCollections_1()
 		{
 			object Obj = await this.Test("GetFtsCollections('TestIndex')");
-			string[] Collections;
+			Array Collections;
 
-			Assert.IsNotNull(Collections = Obj as string[]);
+			Assert.IsNotNull(Collections = Obj as Array);
 			Assert.AreEqual(1, Collections.Length);
-			Assert.AreEqual("Test", Collections[0]);
+			Assert.AreEqual("Test", Collections.GetValue(0));
 		}
 
 		[TestMethod]
 		public async Task Test_09_GetFtsCollections_2()
 		{
 			object Obj = await this.Test("GetFtsCollections()");
-			Dictionary<string, object> ByCollection;
-			string[] Collections;
+			Dictionary<string, IElement> ByCollection;
+			Array Collections;
 
-			Assert.IsNotNull(ByCollection = Obj as Dictionary<string, object>);
+			Assert.IsNotNull(ByCollection = Obj as Dictionary<string, IElement>);
 			Assert.AreEqual(1, ByCollection.Count);
 
-			Assert.IsTrue(ByCollection.TryGetValue("TestIndex", out Obj));
+			Assert.IsTrue(ByCollection.TryGetValue("TestIndex", out IElement E));
 
-			Assert.IsNotNull(Collections = Obj as string[]);
+			Assert.IsNotNull(Collections = E.AssociatedObjectValue as Array);
 			Assert.AreEqual(1, Collections.Length);
-			Assert.AreEqual("Test", Collections[0]);
+			Assert.AreEqual("Test", Collections.GetValue(0));
 		}
 
 		private async Task<object> Test(string Script)

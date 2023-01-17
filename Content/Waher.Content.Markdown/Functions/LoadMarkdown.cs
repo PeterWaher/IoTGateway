@@ -116,30 +116,10 @@ namespace Waher.Content.Markdown.Functions
 
 			if (!IncludeHeaders)
 			{
-				Match M = MarkdownDocument.endOfHeader.Match(Markdown);
-				if (M.Success)
-				{
-					string Header = Markdown.Substring(0, M.Index);
-					string[] Rows = Header.Split(CommonTypes.CRLF);
-					string s;
-					bool IsHeader = true;
+				int? Pos = MarkdownDocument.HeaderEndPosition(Markdown);
 
-					foreach (string Row in Rows)
-					{
-						s = Row.Trim();
-						if (string.IsNullOrEmpty(s))
-							continue;
-
-						if (s.IndexOf(':') < 0)
-						{
-							IsHeader = false;
-							break;
-						}
-					}
-
-					if (IsHeader)
-						Markdown = Markdown.Substring(M.Index).TrimStart();
-				}
+				if (Pos.HasValue)
+					Markdown = Markdown.Substring(Pos.Value).TrimStart();
 			}
 
 			return new StringValue(Markdown);

@@ -376,6 +376,47 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="T:Waher.Content.Markdown.Functions.ParseMarkdown">
+            <summary>
+            ParseMarkdown(Markdown)
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.ParseMarkdown.#ctor(Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            ParseMarkdown(Markdown)
+            </summary>
+            <param name="Markdown">Markdown.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
+        <member name="P:Waher.Content.Markdown.Functions.ParseMarkdown.FunctionName">
+            <summary>
+            Name of the function
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Functions.ParseMarkdown.IsAsynchronous">
+            <summary>
+            If the node (or its decendants) include asynchronous evaluation. Asynchronous nodes should be evaluated using
+            <see cref="M:Waher.Script.Model.ScriptNode.EvaluateAsync(Waher.Script.Variables)"/>.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.ParseMarkdown.EvaluateScalar(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Functions.ParseMarkdown.EvaluateScalarAsync(System.String,Waher.Script.Variables)">
+            <summary>
+            Evaluates the function on a scalar argument.
+            </summary>
+            <param name="Argument">Function argument.</param>
+            <param name="Variables">Variables collection.</param>
+            <returns>Function result.</returns>
+        </member>
         <member name="T:Waher.Content.Markdown.Functions.PreprocessMarkdown">
             <summary>
             PreprocessMarkdown(Markdown)
@@ -726,6 +767,13 @@
             If an exception is thrown when processing script in markdown, and the exception is of
             any of these types, the exception will be rethrown, instead of shown as an error in the generated output.
             </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.HeaderEndPosition(System.String)">
+            <summary>
+            Gets the end position of the header, if one is found, null otherwise.
+            </summary>
+            <param name="Markdown">Markdown</param>
+            <returns></returns>
         </member>
         <member name="M:Waher.Content.Markdown.MarkdownDocument.Preprocess(System.String,Waher.Content.Markdown.MarkdownSettings,System.Type[])">
             <summary>

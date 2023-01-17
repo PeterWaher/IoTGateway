@@ -223,6 +223,34 @@ namespace Waher.Content.Markdown
 		public Type[] TransparentExceptionTypes => this.transparentExceptionTypes;
 
 		/// <summary>
+		/// Gets the end position of the header, if one is found, null otherwise.
+		/// </summary>
+		/// <param name="Markdown">Markdown</param>
+		/// <returns></returns>
+		public static int? HeaderEndPosition(string Markdown)
+		{
+			Match M = endOfHeader.Match(Markdown);
+			if (!M.Success)
+				return null;
+
+			string Header = Markdown.Substring(0, M.Index);
+			string[] Rows = Header.Split(CommonTypes.CRLF);
+			string s;
+
+			foreach (string Row in Rows)
+			{
+				s = Row.Trim();
+				if (string.IsNullOrEmpty(s))
+					continue;
+
+				if (s.IndexOf(':') < 0)
+					return null;
+			}
+
+			return M.Index;
+		}
+
+		/// <summary>
 		/// Preprocesses markdown text.
 		/// </summary>
 		/// <param name="Markdown">Markdown text</param>
@@ -4577,7 +4605,7 @@ namespace Waher.Content.Markdown
 				if (DetailsFolder != MasterFolder)
 				{
 					string Prefix = null;
-					
+
 					foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> Meta in Master.metaData)
 					{
 						switch (Meta.Key)
@@ -4611,7 +4639,7 @@ namespace Waher.Content.Markdown
 									{
 										string[] DetailsParts = DetailsFolder.Split(Path.DirectorySeparatorChar);
 										string[] MasterParts = MasterFolder.Split(Path.DirectorySeparatorChar);
-										
+
 										i = 0;
 										c = DetailsParts.Length;
 										d = MasterParts.Length;
@@ -4622,7 +4650,7 @@ namespace Waher.Content.Markdown
 										StringBuilder sb = new StringBuilder();
 
 										j = c - i;
-										
+
 										while (j-- > 0)
 											sb.Append("../");
 

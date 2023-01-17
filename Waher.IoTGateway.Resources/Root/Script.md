@@ -1999,6 +1999,7 @@ The following functions are available in the `Waher.Content.Markdown` library.
 | `MarkdownToHtml(s)`                | Parses the markdown provided in `s` and converts it to HTML. Only HTML between BODY tags is returned. | [Example][MarkdowntoHtmlExample] |
 | `MarkdownToHtmlStat(s)`            | Parses the markdown provided in `s` and converts it to HTML. Only HTML between BODY tags is returned. A vector containing the HTML, together with statistics about the document is returned. | [Example][MarkdowntoHtmlStatExample] |
 | `MarkdownStatistics(s)`            | Parses the markdown provided in `s` and returns statistics about the document. | [Example][MarkdownStatisticsExample] |
+| `ParseMarkdown(MD)`                | Parses the markdown provided in the string `MD`, and returns it as `MarkdownDocument` object. | [Example][ParseMarkdownExample] |
 | `PreprocessMarkdown(MD)`           | Preprocesses a markdown string `MD`, and returns it as a string. | [Example][PreprocessMarkdownExample] |
 | `ScriptFile(FileName)`             | Evaluates the script in the file defined by `FileName`. | [Example][ScriptFileExample] |
 | `ToMarkdown(Obj)`                  | Converts the object to a string containing the Markdown Representation of the object. | [Example][ToMarkdownExample] |
@@ -2017,6 +2018,7 @@ context-specific constants (read-only variables) are available in inline script:
 [MarkdowntoHtmlExample]: Prompt.md?Expression=MarkdownToHtml(%22:file_folder:%22)
 [MarkdowntoHtmlStatExample]: Prompt.md?Expression=MarkdownToHtmlStat(%22:file_folder:%22)
 [MarkdownStatisticsExample]: Prompt.md?Expression=MarkdownStatistics(%22:file_folder:%22)
+[ParseMarkdownExample]: Prompt.md?Expression=s%3A%3D%22Hello%20World%21%22%3BParseMarkdown%28%22%2A%7B%7Bs%7D%7D%2A%22%29
 [PreprocessMarkdownExample]: Prompt.md?Expression=s%3A%3D%22Hello%20World%21%22%3BPreprocessMarkdown%28%22%2A%7B%7Bs%7D%7D%2A%22%29
 [FromMarkdownExample]: Prompt.md?Expression=FromMarkdown(%22`10%20kWh`%22)
 [ToMarkdownExample]: Prompt.md?Expression=ToMarkdown((x:=-10..10;y:=sin(x);plot2dcurve(x,y)))

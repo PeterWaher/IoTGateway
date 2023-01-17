@@ -158,7 +158,7 @@ namespace Waher.Script.FullTextSearch.Functions
 			FullTextSearchOrder Order = i < c ? this.ToEnum<FullTextSearchOrder>(Arguments[i++]) : FullTextSearchOrder.Relevance;
 			PaginationStrategy Strategy = i < c ? this.ToEnum<PaginationStrategy>(Arguments[i++]) : PaginationStrategy.PaginateOverObjectsNullIfIncompatible;
 
-			if (i < c)
+			if (i >= c)
 			{
 				return new ObjectVector(
 					await Waher.Persistence.FullTextSearch.Search.FullTextSearch<GenericObject>(

@@ -37,6 +37,7 @@
     <ProjectReference Include="..\Waher.Script.Graphs\Waher.Script.Graphs.csproj" />
     <ProjectReference Include="..\Waher.Script.Persistence\Waher.Script.Persistence.csproj" />
     <ProjectReference Include="..\Waher.Script.Statistics\Waher.Script.Statistics.csproj" />
+    <ProjectReference Include="..\Waher.Script.Threading\Waher.Script.Threading.csproj" />
     <ProjectReference Include="..\Waher.Script.Xml\Waher.Script.Xml.csproj" />
     <ProjectReference Include="..\Waher.Script\Waher.Script.csproj" />
   </ItemGroup>

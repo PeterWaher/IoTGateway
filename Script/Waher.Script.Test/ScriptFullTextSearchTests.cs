@@ -128,6 +128,26 @@ namespace Waher.Script.Test
 			Assert.AreEqual("Test", Collections.GetValue(0));
 		}
 
+		[TestMethod]
+		public async Task Test_10_Insert_Search_1()
+		{
+			object Obj = await this.Test("insert into Test object {'P1':'Hello World','P2':'Kilroy was here.','P3':'Fitzroy also'};Sleep(1000);Search('TestIndex','+Kilroy -Fitzroy',false)");
+			Array ResultSet;
+
+			Assert.IsNotNull(ResultSet = Obj as Array);
+			Assert.IsTrue(ResultSet.Length > 0);
+		}
+
+		[TestMethod]
+		public async Task Test_11_Reindex_Search_1()
+		{
+			object Obj = await this.Test("insert into Test object {'P1':'Hello World','P2':'Kilroy was here.','P3':'Fitzroy also'};Sleep(1000);Reindex('TestIndex');Sleep(1000);Search('TestIndex','+Kilroy -Fitzroy',false)");
+			Array ResultSet;
+
+			Assert.IsNotNull(ResultSet = Obj as Array);
+			Assert.IsTrue(ResultSet.Length > 0);
+		}
+
 		private async Task<object> Test(string Script)
 		{
 			Variables v = new Variables();
@@ -140,8 +160,6 @@ namespace Waher.Script.Test
 		/*
 | `FtsFile(Index,FileName)`                                                        | Indexes (or reindexes) a specific file, using the full-text-search collection index defined by `Index`. If the file does not exist, it is removed from the index. | `FtsFolder("FTS",Folder,true)` |
 | `FtsFolder(Index,Folder[,Recursive])`                                            | Indexes files in a folder given by `Folder`, using the full-text-search collection index defined by `Index`. Files can be processed recursively in subfolders if `Recursive` is `true` (default is `false`). To keep folder updated, call `FtsFile` when a file is modified, created or deleted. `FtsFolder` only updates files who have not been indexed before, or whose timestamps have changed since last indexation. | `FtsFolder("FTS",Folder,true)` |
-| `ReindexFts(Index)                                                               | Reindexes the full-text-search index defined by `Index`. This process may take some time, as all objects in the corresponding collections will be iterated and reindexed. | `ReindexFts("FTS")` |
-| `Search(Index,Query,Strict[,Offset,MaxCount[,Order[,Type,PaginationStrategy]]])` | Performs a full-text-search of the query `Query` in the full-text-search index `Index`. `Strict` controls if keywords are as-is (`true`) or prefixes (`false`). Pagination is controlled by `Offset` abd `MaxCount`. The sort order is defined by `Order`. Types searches can be performed, controlled by the optional arguments `Type` and `PaginationStrategy`. | `Search("FTS","Kilroy was here",0,25,"Relevance")` |
 
 		ExpressionEvaluator
 		LambdaEvaluator

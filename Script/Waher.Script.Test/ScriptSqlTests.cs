@@ -35,7 +35,8 @@ namespace Waher.Script.Test
 				typeof(ObjectSerializer).Assembly,
 				typeof(Duration).Assembly,
 				typeof(Waher.Persistence.FullTextSearch.Search).Assembly,
-				typeof(FullTextSearch.Functions.Search).Assembly);
+				typeof(FullTextSearch.Functions.Search).Assembly,
+				typeof(Threading.Functions.Sleep).Assembly);
 
 			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
 			Database.Register(filesProvider);

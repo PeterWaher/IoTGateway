@@ -23,13 +23,13 @@ namespace Waher.IoTGateway.Tokenizers
 		}
 
 		/// <summary>
-		/// If the interface understands objects such as <paramref name="Object"/>.
+		/// If the interface understands objects such as <paramref name="Type"/>.
 		/// </summary>
-		/// <param name="Object">Object</param>
+		/// <param name="Type">Object</param>
 		/// <returns>How well objects of this type are supported.</returns>
-		public Grade Supports(Type Object)
+		public Grade Supports(Type Type)
 		{
-			if (Object == typeof(MarkdownDocument))
+			if (Type == typeof(MarkdownDocument))
 				return Grade.Ok;
 			else
 				return Grade.NotAtAll;

@@ -77,7 +77,7 @@ namespace Waher.Script.FullTextSearch.Functions
 		{
 			if (Arguments.Length == 0)
 			{
-				Dictionary<string, string[]> Collections = await Persistence.FullTextSearch.Search.GetCollectionNames();
+				Dictionary<string, string[]> Collections = await Waher.Persistence.FullTextSearch.Search.GetCollectionNames();
 				Dictionary<string, IElement> Result = new Dictionary<string, IElement>();
 
 				foreach (KeyValuePair<string, string[]> Rec in Collections)
@@ -88,7 +88,7 @@ namespace Waher.Script.FullTextSearch.Functions
 			else
 			{
 				string Index = Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty;
-				string[] Collections = await Persistence.FullTextSearch.Search.GetCollectionNames(Index);
+				string[] Collections = await Waher.Persistence.FullTextSearch.Search.GetCollectionNames(Index);
 
 				return new ObjectVector(Collections);
 			}

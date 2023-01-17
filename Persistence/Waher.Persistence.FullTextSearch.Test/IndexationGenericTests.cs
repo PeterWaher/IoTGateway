@@ -16,7 +16,9 @@ namespace Waher.Persistence.FullTextSearch.Test
 		public static async Task ClassInitialize(TestContext _)
 		{
 			await Search.SetFullTextSearchIndexCollection("FullTextSearchGeneric", "TestGeneric");
-			await Search.AddFullTextSearch("TestGeneric", "IndexedProperty1", "IndexedProperty2");
+			await Search.AddFullTextSearch("TestGeneric", 
+				new PropertyDefinition("IndexedProperty1"), 
+				new PropertyDefinition("IndexedProperty2"));
 		}
 	}
 }

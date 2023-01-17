@@ -151,7 +151,7 @@ namespace Waher.Script.FullTextSearch.Functions
 			if (!Strict.HasValue)
 				throw new ScriptRuntimeException("Expected boolean Strict argument.", this);
 
-			Keyword[] Keywords = Persistence.FullTextSearch.Search.ParseKeywords(Query, !Strict.Value);
+			Keyword[] Keywords = Waher.Persistence.FullTextSearch.Search.ParseKeywords(Query, !Strict.Value);
 
 			int Offset = i < c ? (int)Expression.ToDouble(Arguments[i++]) : 0;
 			int MaxCount = i < c ? (int)Expression.ToDouble(Arguments[i++]) : int.MaxValue;
@@ -161,7 +161,7 @@ namespace Waher.Script.FullTextSearch.Functions
 			if (i < c)
 			{
 				return new ObjectVector(
-					await Persistence.FullTextSearch.Search.FullTextSearch<GenericObject>(
+					await Waher.Persistence.FullTextSearch.Search.FullTextSearch<GenericObject>(
 						IndexCollection, Offset, MaxCount, Order, Strategy, Keywords));
 			}
 			else
@@ -192,7 +192,7 @@ namespace Waher.Script.FullTextSearch.Functions
 			}
 		}
 
-		private static readonly Type searchClass = typeof(Persistence.FullTextSearch.Search);
+		private static readonly Type searchClass = typeof(Waher.Persistence.FullTextSearch.Search);
 		private static readonly MethodInfo fullTextSearchMethod = GetFullTextSearchMethod();
 
 		private static MethodInfo GetFullTextSearchMethod()

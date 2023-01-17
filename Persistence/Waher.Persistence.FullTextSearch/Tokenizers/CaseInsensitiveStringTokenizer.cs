@@ -22,9 +22,9 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 		/// </summary>
 		/// <param name="Type">Type of object to tokenize</param>
 		/// <returns>How well such objects are tokenized.</returns>
-		public Grade Supports(Type Object)
+		public Grade Supports(Type Type)
 		{
-			if (Object == typeof(CaseInsensitiveString))
+			if (Type == typeof(CaseInsensitiveString))
 				return Grade.Ok;
 			else
 				return Grade.NotAtAll;

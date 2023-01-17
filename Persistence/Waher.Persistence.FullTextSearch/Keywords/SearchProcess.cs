@@ -17,6 +17,7 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		/// Contains information about a search process.
 		/// </summary>
 		/// <param name="Index">Index dictionary</param>
+		/// <param name="IndexCollection">Index collection name</param>
 		public SearchProcess(IPersistentDictionary Index, string IndexCollection)
 		{
 			this.Index = Index;

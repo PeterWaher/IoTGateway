@@ -61,7 +61,7 @@ namespace Waher.Script.FullTextSearch.Functions
 		/// <returns>Function result.</returns>
 		public override async Task<IElement> EvaluateScalarAsync(string Argument1, string Argument2, Variables Variables)
 		{
-			bool Result = await Persistence.FullTextSearch.Search.SetFullTextSearchIndexCollection(Argument1, Argument2);
+			bool Result = await Waher.Persistence.FullTextSearch.Search.SetFullTextSearchIndexCollection(Argument1, Argument2);
 			
 			return Result ? BooleanValue.True : BooleanValue.False;
 		}

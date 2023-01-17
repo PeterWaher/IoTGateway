@@ -13,7 +13,7 @@ namespace Waher.Persistence.FullTextSearch.Keywords
 		/// <summary>
 		/// Represents a wildcard keyword.
 		/// </summary>
-		/// <param name="Keyword">Keyword</param>
+		/// <param name="Expression">Keyword, as a regular expression.</param>
 		public RegexKeyword(string Expression)
 		{
 			this.Expression = Expression;

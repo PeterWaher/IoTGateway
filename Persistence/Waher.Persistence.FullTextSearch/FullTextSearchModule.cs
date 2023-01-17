@@ -135,12 +135,12 @@ namespace Waher.Persistence.FullTextSearch
 				if (GenObj is null)
 				{
 					IndexName = TypeInfo.GetIndexCollection(e.Object);
-					Tokens = await TypeInfo.Tokenize(e.Object, CollectionInfo.PropertyNames);
+					Tokens = await TypeInfo.Tokenize(e.Object, CollectionInfo.Properties);
 				}
 				else
 				{
 					IndexName = CollectionInfo.IndexCollectionName;
-					Tokens = await Tokenize(GenObj, CollectionInfo.PropertyNames);
+					Tokens = await Tokenize(GenObj, CollectionInfo.Properties);
 				}
 
 				if (Tokens.Length == 0)
@@ -305,9 +305,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// <summary>
 		/// Gets the database collections that get indexed into a given index colltion.
 		/// </summary>
-		/// <param name="IndexCollectionName">Index Collection Name</param>
-		/// <returns>Collection Names indexed in the full-text-search index
-		/// defined by <paramref name="IndexCollectionName"/>.</returns>
+		/// <returns>Collection Names indexed in the full-text-search index.</returns>
 		public static async Task<Dictionary<string, string[]>> GetCollectionNames()
 		{
 			Dictionary<string, List<string>> ByIndex = new Dictionary<string, List<string>>();
@@ -418,7 +416,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="CollectionName">Collection name.</param>
 		/// <param name="Properties">Properties to index.</param>
 		/// <returns>If new property names were found and added.</returns>
-		internal static async Task<bool> AddFullTextSearch(string CollectionName, params string[] Properties)
+		internal static async Task<bool> AddFullTextSearch(string CollectionName, params PropertyDefinition[] Properties)
 		{
 			await synchObj.WaitAsync();
 			try
@@ -445,7 +443,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="CollectionName">Collection name.</param>
 		/// <param name="Properties">Properties to remove from indexation.</param>
 		/// <returns>If property names were found and removed.</returns>
-		internal static async Task<bool> RemoveFullTextSearch(string CollectionName, params string[] Properties)
+		internal static async Task<bool> RemoveFullTextSearch(string CollectionName, params PropertyDefinition[] Properties)
 		{
 			await synchObj.WaitAsync();
 			try
@@ -470,9 +468,9 @@ namespace Waher.Persistence.FullTextSearch
 		/// Gets indexed properties for full-text-search indexation.
 		/// </summary>
 		/// <returns>Dictionary of indexed properties, per collection.</returns>
-		internal static async Task<Dictionary<string, string[]>> GetFullTextSearchIndexedProperties()
+		internal static async Task<Dictionary<string, PropertyDefinition[]>> GetFullTextSearchIndexedProperties()
 		{
-			Dictionary<string, string[]> Result = new Dictionary<string, string[]>();
+			Dictionary<string, PropertyDefinition[]> Result = new Dictionary<string, PropertyDefinition[]>();
 
 			await synchObj.WaitAsync();
 			try
@@ -480,7 +478,7 @@ namespace Waher.Persistence.FullTextSearch
 				foreach (object Obj in await collectionInformation.GetValuesAsync())
 				{
 					if (Obj is CollectionInformation Info && Info.IndexForFullTextSearch)
-						Result[Info.CollectionName] = Info.PropertyNames;
+						Result[Info.CollectionName] = Info.Properties;
 				}
 			}
 			finally
@@ -496,7 +494,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		/// <param name="CollectionName">Collection name.</param>
 		/// <returns>Array of indexed properties.</returns>
-		internal static async Task<string[]> GetFullTextSearchIndexedProperties(string CollectionName)
+		internal static async Task<PropertyDefinition[]> GetFullTextSearchIndexedProperties(string CollectionName)
 		{
 			await synchObj.WaitAsync();
 			try
@@ -504,9 +502,9 @@ namespace Waher.Persistence.FullTextSearch
 				CollectionInformation Info = await GetCollectionInfoLocked(CollectionName, false);
 
 				if (Info is null || !Info.IndexForFullTextSearch)
-					return new string[0];
+					return new PropertyDefinition[0];
 				else
-					return (string[])Info.PropertyNames.Clone();
+					return (PropertyDefinition[])Info.Properties.Clone();
 			}
 			finally
 			{
@@ -563,8 +561,8 @@ namespace Waher.Persistence.FullTextSearch
 				Result = new TypeInformation(T, TI, CollectionName, Info, CustomTokenizer, SearchAttr);
 
 				if (!(SearchAttr is null) &&
-					SearchAttr.HasPropertyNames &&
-					Info.AddIndexableProperties(SearchAttr.PropertyNames))
+					SearchAttr.HasPropertyDefinitions &&
+					Info.AddIndexableProperties(SearchAttr.Properties))
 				{
 					await collectionInformation.AddAsync(CollectionName, Info, true);
 				}
@@ -1101,9 +1099,9 @@ namespace Waher.Persistence.FullTextSearch
 				TokenCount[] Tokens;
 
 				if (GenObj is null)
-					Tokens = await TypeInfo.Tokenize(e.Object, CollectionInfo.PropertyNames);
+					Tokens = await TypeInfo.Tokenize(e.Object, CollectionInfo.Properties);
 				else
-					Tokens = await Tokenize(GenObj, CollectionInfo.PropertyNames);
+					Tokens = await Tokenize(GenObj, CollectionInfo.Properties);
 
 				ObjectReference Ref = await Database.FindFirstIgnoreRest<ObjectReference>(new FilterAnd(
 					new FilterFieldEqualTo("Collection", P.Item1.CollectionName),
@@ -1399,9 +1397,9 @@ namespace Waher.Persistence.FullTextSearch
 					GenericObject GenObj = P.Item3;
 
 					if (GenObj is null)
-						await TypeInfo.Tokenize(Object, Process, CollectionInfo.PropertyNames);
+						await TypeInfo.Tokenize(Object, Process, CollectionInfo.Properties);
 					else
-						await Tokenize(GenObj, Process, CollectionInfo.PropertyNames);
+						await Tokenize(GenObj, Process, CollectionInfo.Properties);
 				}
 				else
 					await Tokenizer.Tokenize(Object, Process);
@@ -1424,16 +1422,16 @@ namespace Waher.Persistence.FullTextSearch
 		/// Gets the indexable property values from an object. Property values will be returned in lower-case.
 		/// </summary>
 		/// <param name="Obj">Generic object.</param>
-		/// <param name="PropertyNames">Indexable property names.</param>
+		/// <param name="Properties">Indexable properties.</param>
 		/// <returns>Indexable property values found.</returns>
-		internal static Task<TokenCount[]> Tokenize(GenericObject Obj, params string[] PropertyNames)
+		internal static async Task<TokenCount[]> Tokenize(GenericObject Obj, params PropertyDefinition[] Properties)
 		{
-			LinkedList<object> Values = GetValues(Obj, PropertyNames);
+			LinkedList<object> Values = await GetValues(Obj, Properties);
 
 			if (Values.First is null)
-				return Task.FromResult<TokenCount[]>(null);
+				return null;
 
-			return Tokenize(Values);
+			return await Tokenize(Values);
 		}
 
 		/// <summary>
@@ -1441,11 +1439,11 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		/// <param name="Obj">Generic object.</param>
 		/// <param name="Process">Tokenization process.</param>
-		/// <param name="PropertyNames">Indexable property names.</param>
+		/// <param name="Properties">Indexable properties.</param>
 		/// <returns>Indexable property values found.</returns>
-		internal static async Task Tokenize(GenericObject Obj, TokenizationProcess Process, params string[] PropertyNames)
+		internal static async Task Tokenize(GenericObject Obj, TokenizationProcess Process, params PropertyDefinition[] Properties)
 		{
-			LinkedList<object> Values = GetValues(Obj, PropertyNames);
+			LinkedList<object> Values = await GetValues(Obj, Properties);
 
 			if (!(Values.First is null))
 				await Tokenize(Values, Process);
@@ -1455,17 +1453,19 @@ namespace Waher.Persistence.FullTextSearch
 		/// Gets object property values from a generic object.
 		/// </summary>
 		/// <param name="Obj">Generic object</param>
-		/// <param name="PropertyNames">Property names</param>
+		/// <param name="Properties">Properties</param>
 		/// <returns>Enumeration of property values.</returns>
-		internal static LinkedList<object> GetValues(GenericObject Obj, params string[] PropertyNames)
+		internal static async Task<LinkedList<object>> GetValues(GenericObject Obj, params PropertyDefinition[] Properties)
 		{
 			LinkedList<object> Values = new LinkedList<object>();
+			object Value;
 
 			if (!(Obj is null))
 			{
-				foreach (string PropertyName in PropertyNames)
+				foreach (PropertyDefinition Property in Properties)
 				{
-					if (Obj.TryGetFieldValue(PropertyName, out object Value))
+					Value = await Property.GetValue(Obj);
+					if (!(Value is null))
 						Values.AddLast(Value);
 				}
 			}

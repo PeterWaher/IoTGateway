@@ -11,7 +11,6 @@ namespace Waher.Persistence.FullTextSearch
 	/// </summary>
 	internal class TypeInformation
 	{
-		private readonly Dictionary<string, KeyValuePair<PropertyInfo, FieldInfo>> properties = new Dictionary<string, KeyValuePair<PropertyInfo, FieldInfo>>();
 		private readonly FullTextSearchAttribute searchAttribute;
 		private readonly ITokenizer customTokenizer;
 		private readonly bool hasCustomTokenizer;
@@ -26,7 +25,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="CustomTokenizer">Optional custom tokenizer creating tokens for objects
 		/// of this type.</param>
 		/// <param name="SearchAttribute">Full-text-search attribute.</param>
-		public TypeInformation(Type Type, TypeInfo TypeInfo, string CollectionName, 
+		public TypeInformation(Type Type, TypeInfo TypeInfo, string CollectionName,
 			CollectionInformation CollectionInformation, ITokenizer CustomTokenizer,
 			FullTextSearchAttribute SearchAttribute)
 		{
@@ -92,13 +91,13 @@ namespace Waher.Persistence.FullTextSearch
 		/// Tokenizes properties in an object, given a set of property names.
 		/// </summary>
 		/// <param name="Obj">Object instance to tokenize.</param>
-		/// <param name="PropertyNames">Indexable property names.</param>
+		/// <param name="Properties">Indexable properties.</param>
 		/// <returns>Tokens found.</returns>
-		public async Task<TokenCount[]> Tokenize(object Obj, params string[] PropertyNames)
+		public async Task<TokenCount[]> Tokenize(object Obj, params PropertyDefinition[] Properties)
 		{
 			TokenizationProcess Process = new TokenizationProcess();
 
-			await this.Tokenize(Obj, Process, PropertyNames);
+			await this.Tokenize(Obj, Process, Properties);
 
 			return Process.ToArray();
 		}
@@ -108,8 +107,8 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		/// <param name="Obj">Object instance to tokenize.</param>
 		/// <param name="Process">Tokenization process.</param>
-		/// <param name="PropertyNames">Indexable property names.</param>
-		public async Task Tokenize(object Obj, TokenizationProcess Process, params string[] PropertyNames)
+		/// <param name="Properties">Indexable properties.</param>
+		public async Task Tokenize(object Obj, TokenizationProcess Process, params PropertyDefinition[] Properties)
 		{
 			if (this.hasCustomTokenizer)
 				await this.customTokenizer.Tokenize(Obj, Process);
@@ -118,28 +117,11 @@ namespace Waher.Persistence.FullTextSearch
 				LinkedList<object> Values = new LinkedList<object>();
 				object Value;
 
-				lock (this.properties)
+				foreach (PropertyDefinition Property in Properties)
 				{
-					foreach (string PropertyName in PropertyNames)
-					{
-						if (!this.properties.TryGetValue(PropertyName, out KeyValuePair<PropertyInfo, FieldInfo> P))
-						{
-							P = new KeyValuePair<PropertyInfo, FieldInfo>(
-								this.Type.GetRuntimeProperty(PropertyName),
-								this.Type.GetRuntimeField(PropertyName));
-
-							this.properties[PropertyName] = P;
-						}
-
-						if (!(P.Key is null))
-							Value = P.Key.GetValue(Obj, null);
-						else if (!(P.Value is null))
-							Value = P.Value.GetValue(Obj);
-						else
-							continue;
-
+					Value = await Property.GetValue(Obj);
+					if (!(Value is null))
 						Values.AddLast(Value);
-					}
 				}
 
 				if (!(Values.First is null))

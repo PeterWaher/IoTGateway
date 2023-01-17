@@ -16,7 +16,7 @@ namespace Waher.Persistence.FullTextSearch.Orders
 		}
 
 		/// <summary>
-		/// <see cref="IComparer<string>.Compare"/>
+		/// <see cref="IComparer{MatchInformation}.Compare"/>
 		/// </summary>
 		public int Compare(MatchInformation x, MatchInformation y)
 		{

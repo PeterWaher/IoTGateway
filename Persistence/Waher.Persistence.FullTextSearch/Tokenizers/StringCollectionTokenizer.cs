@@ -23,9 +23,9 @@ namespace Waher.Persistence.FullTextSearch.Tokenizers
 		/// </summary>
 		/// <param name="Type">Type of object to tokenize</param>
 		/// <returns>How well such objects are tokenized.</returns>
-		public Grade Supports(Type Object)
+		public Grade Supports(Type Type)
 		{
-			if (typeInfo.IsAssignableFrom(Object))
+			if (typeInfo.IsAssignableFrom(Type))
 				return Grade.Ok;
 			else
 				return Grade.NotAtAll;

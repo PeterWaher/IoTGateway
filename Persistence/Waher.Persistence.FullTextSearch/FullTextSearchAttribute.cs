@@ -10,23 +10,45 @@ namespace Waher.Persistence.FullTextSearch
 	public class FullTextSearchAttribute : Attribute
 	{
 		private readonly string indexCollection;
-		private readonly string[] propertyNames;
-		private readonly bool hasPropertyNames;
+		private readonly PropertyDefinition[] properties;
+		private readonly bool hasPropertyDefinitions;
 		private readonly bool isPropertyReference;
 
 		/// <summary>
 		/// This attribute defines that objects of this type should be indexed in the full-text-search index.
 		/// </summary>
 		/// <param name="IndexCollection">Name of full-text-search index collection.</param>
-		/// <param name="PropertyNames">Array of property (or field) names to index. 
+		public FullTextSearchAttribute(string IndexCollection)
+			: this(IndexCollection, new PropertyDefinition[0])
+		{
+		}
+
+		/// <summary>
+		/// This attribute defines that objects of this type should be indexed in the full-text-search index.
+		/// </summary>
+		/// <param name="IndexCollection">Name of full-text-search index collection.</param>
+		/// <param name="Properties">Array of property (or field) names used to index objects of this type. 
 		/// If not provided, and a <see cref="ITokenizer"/> exists for objects of this
 		/// class, that tokenizer will be used instead of the property array, to extract
 		/// tokens from the object.</param>
-		public FullTextSearchAttribute(string IndexCollection, params string[] PropertyNames)
+		public FullTextSearchAttribute(string IndexCollection, params string[] Properties)
+			: this(IndexCollection, PropertyDefinition.ToArray(Properties))
+		{
+		}
+
+		/// <summary>
+		/// This attribute defines that objects of this type should be indexed in the full-text-search index.
+		/// </summary>
+		/// <param name="IndexCollection">Name of full-text-search index collection.</param>
+		/// <param name="Properties">Array of property (or field) definitions used to index objects of this type. 
+		/// If not provided, and a <see cref="ITokenizer"/> exists for objects of this
+		/// class, that tokenizer will be used instead of the property array, to extract
+		/// tokens from the object.</param>
+		public FullTextSearchAttribute(string IndexCollection, params PropertyDefinition[] Properties)
 		{
 			this.indexCollection = IndexCollection;
-			this.propertyNames = PropertyNames;
-			this.hasPropertyNames = (PropertyNames?.Length ?? 0) > 0;
+			this.properties = Properties;
+			this.hasPropertyDefinitions = (Properties?.Length ?? 0) > 0;
 			this.isPropertyReference = false;
 		}
 
@@ -34,21 +56,17 @@ namespace Waher.Persistence.FullTextSearch
 		/// This attribute defines that objects of this type should be indexed in the full-text-search index.
 		/// </summary>
 		/// <param name="IndexCollection">Name of full-text-search index collection.</param>
-		/// <param name="MethodReference">If the <paramref name="IndexCollection"/> reference
+		/// <param name="PropertyReference">If the <paramref name="IndexCollection"/> reference
 		/// is pointing to a property on the object (true) or is a constant index collection
-		/// reference (false).</param>
-		/// <param name="PropertyNames">Array of property (or field) names to index. 
-		/// If not provided, and a <see cref="ITokenizer"/> exists for objects of this
-		/// class, that tokenizer will be used instead of the property array, to extract
-		/// tokens from the object.
+		/// reference (false).
 		/// 
 		/// Note: Classes using dynamic index collection names require custom
 		/// tokenizers to be tokenized properly.</param>
 		public FullTextSearchAttribute(string IndexCollection, bool PropertyReference)
 		{
 			this.indexCollection = IndexCollection;
-			this.propertyNames = new string[0];
-			this.hasPropertyNames = (PropertyNames?.Length ?? 0) > 0;
+			this.properties = new PropertyDefinition[0];
+			this.hasPropertyDefinitions = (Properties?.Length ?? 0) > 0;
 			this.isPropertyReference = PropertyReference;
 		}
 
@@ -68,7 +86,7 @@ namespace Waher.Persistence.FullTextSearch
 				PropertyInfo PI = T.GetRuntimeProperty(this.indexCollection);
 				if (PI is null)
 					throw new ArgumentException("Object lacks a property named " + this.indexCollection, nameof(Reference));
-				
+
 				object Obj = PI.GetValue(Reference);
 
 				if (Obj is string s)
@@ -81,14 +99,14 @@ namespace Waher.Persistence.FullTextSearch
 		}
 
 		/// <summary>
-		/// Array of property (or field) names to index.
+		/// Array of property (or field) definitions used to index objects of this type.
 		/// </summary>
-		public string[] PropertyNames => this.propertyNames;
+		public PropertyDefinition[] Properties => this.properties;
 
 		/// <summary>
 		/// If property names are defined for this class (true), or
 		/// if objects are to be tokenized using a specialized tokenizer (false).
 		/// </summary>
-		public bool HasPropertyNames => this.hasPropertyNames;
+		public bool HasPropertyDefinitions => this.hasPropertyDefinitions;
 	}
 }

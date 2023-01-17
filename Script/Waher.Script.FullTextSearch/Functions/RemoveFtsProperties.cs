@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Waher.Persistence.FullTextSearch;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -66,12 +67,9 @@ namespace Waher.Script.FullTextSearch.Functions
 		public override async Task<IElement> EvaluateAsync(IElement[] Arguments, Variables Variables)
 		{
 			string Collection = Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty;
-			string[] Properties = Arguments[1].AssociatedObjectValue as string[];
+			PropertyDefinition[] Properties = AddFtsProperties.GetPropertyDefinitions(Arguments[1], this);
 
-			if (Properties is null)
-				throw new ScriptRuntimeException("Expected array of strings for the Properties argument.", this);
-
-			bool Result = await Persistence.FullTextSearch.Search.RemoveFullTextSearch(Collection, Properties);
+			bool Result = await Waher.Persistence.FullTextSearch.Search.RemoveFullTextSearch(Collection, Properties);
 
 			return Result ? BooleanValue.True : BooleanValue.False;
 		}

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Persistence.FullTextSearch;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -77,10 +78,10 @@ namespace Waher.Script.FullTextSearch.Functions
 		{
 			if (Arguments.Length == 0)
 			{
-				Dictionary<string, string[]> Properties = await Persistence.FullTextSearch.Search.GetFullTextSearchIndexedProperties();
+				Dictionary<string, PropertyDefinition[]> Properties = await Waher.Persistence.FullTextSearch.Search.GetFullTextSearchIndexedProperties();
 				Dictionary<string, IElement> Result = new Dictionary<string, IElement>();
 
-				foreach (KeyValuePair<string, string[]> Rec in Properties)
+				foreach (KeyValuePair<string, PropertyDefinition[]> Rec in Properties)
 					Result[Rec.Key] = new ObjectVector(Rec.Value);
 
 				return new ObjectValue(Result);
@@ -88,7 +89,7 @@ namespace Waher.Script.FullTextSearch.Functions
 			else
 			{
 				string Collection = Arguments[0].AssociatedObjectValue?.ToString() ?? string.Empty;
-				string[] Properties = await Persistence.FullTextSearch.Search.GetFullTextSearchIndexedProperties(Collection);
+				PropertyDefinition[] Properties = await Waher.Persistence.FullTextSearch.Search.GetFullTextSearchIndexedProperties(Collection);
 
 				return new ObjectVector(Properties);
 			}

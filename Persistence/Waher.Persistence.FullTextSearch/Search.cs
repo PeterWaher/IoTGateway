@@ -157,9 +157,9 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="Offset">Index of first object matching the keywords.</param>
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="Keywords">Keywords to search for.</param>
-		/// <returns>Array of objects. Depending on choice of
-		/// <paramref name="PaginationStrategy"/>, null items may be returned
-		/// if underlying object is not compatible with <typeparamref name="T"/>.</returns>
+		/// <param name="Order">Sort order of result set.</param>
+		/// <returns>Array of objects. Noncompatible (with <typeparamref name="T"/>) items are returned as null 
+		/// in the array..</returns>
 		public static Task<T[]> FullTextSearch<T>(string IndexCollection, 
 			int Offset, int MaxCount, FullTextSearchOrder Order, params Keyword[] Keywords)
 			where T : class
@@ -175,6 +175,8 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="Offset">Index of first object matching the keywords.</param>
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="Keywords">Keywords to search for.</param>
+		/// <param name="Order">Sort order of result set.</param>
+		/// <param name="PaginationStrategy">How to handle noncompatible items.</param>
 		/// <returns>Array of objects. Depending on choice of
 		/// <paramref name="PaginationStrategy"/>, null items may be returned
 		/// if underlying object is not compatible with <typeparamref name="T"/>.</returns>
@@ -248,7 +250,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="CollectionName">Collection name.</param>
 		/// <param name="Properties">Properties to index.</param>
 		/// <returns>If new property names were found and added.</returns>
-		public static Task<bool> AddFullTextSearch(string CollectionName, params string[] Properties)
+		public static Task<bool> AddFullTextSearch(string CollectionName, params PropertyDefinition[] Properties)
 		{
 			return FullTextSearchModule.AddFullTextSearch(CollectionName, Properties);
 		}
@@ -259,7 +261,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="CollectionName">Collection name.</param>
 		/// <param name="Properties">Properties to remove from indexation.</param>
 		/// <returns>If property names were found and removed.</returns>
-		public static Task<bool> RemoveFullTextSearch(string CollectionName, params string[] Properties)
+		public static Task<bool> RemoveFullTextSearch(string CollectionName, params PropertyDefinition[] Properties)
 		{
 			return FullTextSearchModule.RemoveFullTextSearch(CollectionName, Properties);
 		}
@@ -268,7 +270,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// Gets indexed properties for full-text-search indexation.
 		/// </summary>
 		/// <returns>Dictionary of indexed properties, per collection.</returns>
-		public static Task<Dictionary<string, string[]>> GetFullTextSearchIndexedProperties()
+		public static Task<Dictionary<string, PropertyDefinition[]>> GetFullTextSearchIndexedProperties()
 		{
 			return FullTextSearchModule.GetFullTextSearchIndexedProperties();
 		}
@@ -278,7 +280,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// </summary>
 		/// <param name="CollectionName">Collection name.</param>
 		/// <returns>Array of indexed properties.</returns>
-		public static Task<string[]> GetFullTextSearchIndexedProperties(string CollectionName)
+		public static Task<PropertyDefinition[]> GetFullTextSearchIndexedProperties(string CollectionName)
 		{
 			return FullTextSearchModule.GetFullTextSearchIndexedProperties(CollectionName);
 		}

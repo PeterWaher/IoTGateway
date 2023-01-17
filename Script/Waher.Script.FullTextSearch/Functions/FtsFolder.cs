@@ -87,7 +87,7 @@ namespace Waher.Script.FullTextSearch.Functions
 			if (!Recursive.HasValue)
 				throw new ScriptRuntimeException("Expected Boolean Value for Recursive argument.", this);
 
-			FolderIndexationStatistics Result = await Persistence.FullTextSearch.Search.IndexFolder(Index, Folder, Recursive.Value);
+			FolderIndexationStatistics Result = await Waher.Persistence.FullTextSearch.Search.IndexFolder(Index, Folder, Recursive.Value);
 
 			return new ObjectValue(Result);
 		}

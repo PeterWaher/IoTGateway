@@ -59,7 +59,7 @@ namespace Waher.Script.FullTextSearch.Functions
 		/// <returns>Function result.</returns>
 		public override async Task<IElement> EvaluateScalarAsync(string Argument, Variables Variables)
 		{
-			long NrObjects = await Persistence.FullTextSearch.Search.ReindexCollection(Argument);
+			long NrObjects = await Waher.Persistence.FullTextSearch.Search.ReindexCollection(Argument);
 
 			return new DoubleNumber(NrObjects);
 		}

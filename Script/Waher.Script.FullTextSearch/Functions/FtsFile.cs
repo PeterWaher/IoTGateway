@@ -75,7 +75,7 @@ namespace Waher.Script.FullTextSearch.Functions
 			if (string.IsNullOrEmpty(FileName))
 				throw new ScriptRuntimeException("Empty filename.", this);
 
-			bool Result = await Persistence.FullTextSearch.Search.IndexFile(Index, FileName);
+			bool Result = await Waher.Persistence.FullTextSearch.Search.IndexFile(Index, FileName);
 
 			return Result ? BooleanValue.True : BooleanValue.False;
 		}

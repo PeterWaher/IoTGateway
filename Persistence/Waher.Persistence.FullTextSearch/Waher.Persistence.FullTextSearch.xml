@@ -14,14 +14,14 @@
             Contains information about a collection, in relation to full-text-search.
             </summary>
         </member>
-        <member name="M:Waher.Persistence.FullTextSearch.CollectionInformation.#ctor(System.String,System.String,System.Boolean,System.String[])">
+        <member name="M:Waher.Persistence.FullTextSearch.CollectionInformation.#ctor(System.String,System.String,System.Boolean,Waher.Persistence.FullTextSearch.PropertyDefinition[])">
             <summary>
             Contains information about a collection, in relation to full-text-search.
             </summary>
             <param name="IndexCollectionName">Full-text-search index collection name.</param>
             <param name="CollectionName">Full Type Name.</param>
             <param name="IndexForFullTextSearch">If class should be indexed for full-text-search.</param>
-            <param name="PropertyNames">Names of properties (or fields) to index.</param>
+            <param name="Properties">Properties (or fields) to index.</param>
         </member>
         <member name="P:Waher.Persistence.FullTextSearch.CollectionInformation.IndexCollectionName">
             <summary>
@@ -38,20 +38,25 @@
             If collection should be indexed.
             </summary>
         </member>
-        <member name="P:Waher.Persistence.FullTextSearch.CollectionInformation.PropertyNames">
+        <member name="P:Waher.Persistence.FullTextSearch.CollectionInformation.Properties">
             <summary>
-            Property names to index
+            Properties to index
             </summary>
         </member>
-        <member name="M:Waher.Persistence.FullTextSearch.CollectionInformation.AddIndexableProperties(System.String[])">
+        <member name="P:Waher.Persistence.FullTextSearch.CollectionInformation.PropertyTypes">
+            <summary>
+            Types of indexed properties.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.CollectionInformation.AddIndexableProperties(Waher.Persistence.FullTextSearch.PropertyDefinition[])">
             <summary>
             Adds properties for full-text-search indexation.
             </summary>
-            <param name="Properties">Property names to add.</param>
+            <param name="Properties">Properties to add.</param>
             <returns>If new property names were found and added, changing
             the state of the object.</returns>
         </member>
-        <member name="M:Waher.Persistence.FullTextSearch.CollectionInformation.RemoveIndexableProperties(System.String[])">
+        <member name="M:Waher.Persistence.FullTextSearch.CollectionInformation.RemoveIndexableProperties(Waher.Persistence.FullTextSearch.PropertyDefinition[])">
             <summary>
             Removes properties from full-text-search indexation.
             </summary>
@@ -184,12 +189,28 @@
             This attribute defines that objects of this type should be indexed in the full-text-search index.
             </summary>
         </member>
+        <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchAttribute.#ctor(System.String)">
+            <summary>
+            This attribute defines that objects of this type should be indexed in the full-text-search index.
+            </summary>
+            <param name="IndexCollection">Name of full-text-search index collection.</param>
+        </member>
         <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchAttribute.#ctor(System.String,System.String[])">
             <summary>
             This attribute defines that objects of this type should be indexed in the full-text-search index.
             </summary>
             <param name="IndexCollection">Name of full-text-search index collection.</param>
-            <param name="PropertyNames">Array of property (or field) names to index. 
+            <param name="Properties">Array of property (or field) names used to index objects of this type. 
+            If not provided, and a <see cref="T:Waher.Persistence.FullTextSearch.ITokenizer"/> exists for objects of this
+            class, that tokenizer will be used instead of the property array, to extract
+            tokens from the object.</param>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchAttribute.#ctor(System.String,Waher.Persistence.FullTextSearch.PropertyDefinition[])">
+            <summary>
+            This attribute defines that objects of this type should be indexed in the full-text-search index.
+            </summary>
+            <param name="IndexCollection">Name of full-text-search index collection.</param>
+            <param name="Properties">Array of property (or field) definitions used to index objects of this type. 
             If not provided, and a <see cref="T:Waher.Persistence.FullTextSearch.ITokenizer"/> exists for objects of this
             class, that tokenizer will be used instead of the property array, to extract
             tokens from the object.</param>
@@ -199,13 +220,9 @@
             This attribute defines that objects of this type should be indexed in the full-text-search index.
             </summary>
             <param name="IndexCollection">Name of full-text-search index collection.</param>
-            <param name="MethodReference">If the <paramref name="IndexCollection"/> reference
+            <param name="PropertyReference">If the <paramref name="IndexCollection"/> reference
             is pointing to a property on the object (true) or is a constant index collection
-            reference (false).</param>
-            <param name="PropertyNames">Array of property (or field) names to index. 
-            If not provided, and a <see cref="T:Waher.Persistence.FullTextSearch.ITokenizer"/> exists for objects of this
-            class, that tokenizer will be used instead of the property array, to extract
-            tokens from the object.
+            reference (false).
             
             Note: Classes using dynamic index collection names require custom
             tokenizers to be tokenized properly.</param>
@@ -220,12 +237,12 @@
             Name of full-text-search index collection.
             </summary>
         </member>
-        <member name="P:Waher.Persistence.FullTextSearch.FullTextSearchAttribute.PropertyNames">
+        <member name="P:Waher.Persistence.FullTextSearch.FullTextSearchAttribute.Properties">
             <summary>
-            Array of property (or field) names to index.
+            Array of property (or field) definitions used to index objects of this type.
             </summary>
         </member>
-        <member name="P:Waher.Persistence.FullTextSearch.FullTextSearchAttribute.HasPropertyNames">
+        <member name="P:Waher.Persistence.FullTextSearch.FullTextSearchAttribute.HasPropertyDefinitions">
             <summary>
             If property names are defined for this class (true), or
             if objects are to be tokenized using a specialized tokenizer (false).
@@ -255,9 +272,7 @@
             <summary>
             Gets the database collections that get indexed into a given index colltion.
             </summary>
-            <param name="IndexCollectionName">Index Collection Name</param>
-            <returns>Collection Names indexed in the full-text-search index
-            defined by <paramref name="IndexCollectionName"/>.</returns>
+            <returns>Collection Names indexed in the full-text-search index.</returns>
         </member>
         <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchModule.GetCollectionNames(System.String)">
             <summary>
@@ -283,7 +298,7 @@
             <param name="CollectionName">Collection of objects to index.</param>
             <returns>If the configuration was changed.</returns>
         </member>
-        <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchModule.AddFullTextSearch(System.String,System.String[])">
+        <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchModule.AddFullTextSearch(System.String,Waher.Persistence.FullTextSearch.PropertyDefinition[])">
             <summary>
             Adds properties for full-text-search indexation.
             </summary>
@@ -291,7 +306,7 @@
             <param name="Properties">Properties to index.</param>
             <returns>If new property names were found and added.</returns>
         </member>
-        <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchModule.RemoveFullTextSearch(System.String,System.String[])">
+        <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchModule.RemoveFullTextSearch(System.String,Waher.Persistence.FullTextSearch.PropertyDefinition[])">
             <summary>
             Removes properties from full-text-search indexation.
             </summary>
@@ -386,29 +401,29 @@
             <param name="Objects">Objects to tokenize.</param>
             <param name="Process">Tokenization process.</param>
         </member>
-        <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchModule.Tokenize(Waher.Persistence.Serialization.GenericObject,System.String[])">
+        <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchModule.Tokenize(Waher.Persistence.Serialization.GenericObject,Waher.Persistence.FullTextSearch.PropertyDefinition[])">
             <summary>
             Gets the indexable property values from an object. Property values will be returned in lower-case.
             </summary>
             <param name="Obj">Generic object.</param>
-            <param name="PropertyNames">Indexable property names.</param>
+            <param name="Properties">Indexable properties.</param>
             <returns>Indexable property values found.</returns>
         </member>
-        <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchModule.Tokenize(Waher.Persistence.Serialization.GenericObject,Waher.Persistence.FullTextSearch.Tokenizers.TokenizationProcess,System.String[])">
+        <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchModule.Tokenize(Waher.Persistence.Serialization.GenericObject,Waher.Persistence.FullTextSearch.Tokenizers.TokenizationProcess,Waher.Persistence.FullTextSearch.PropertyDefinition[])">
             <summary>
             Gets the indexable property values from an object. Property values will be returned in lower-case.
             </summary>
             <param name="Obj">Generic object.</param>
             <param name="Process">Tokenization process.</param>
-            <param name="PropertyNames">Indexable property names.</param>
+            <param name="Properties">Indexable properties.</param>
             <returns>Indexable property values found.</returns>
         </member>
-        <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchModule.GetValues(Waher.Persistence.Serialization.GenericObject,System.String[])">
+        <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchModule.GetValues(Waher.Persistence.Serialization.GenericObject,Waher.Persistence.FullTextSearch.PropertyDefinition[])">
             <summary>
             Gets object property values from a generic object.
             </summary>
             <param name="Obj">Generic object</param>
-            <param name="PropertyNames">Property names</param>
+            <param name="Properties">Properties</param>
             <returns>Enumeration of property values.</returns>
         </member>
         <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchModule.IndexFolder(System.String,System.String,System.Boolean)">
@@ -427,6 +442,24 @@
             <param name="IndexCollection">Name of index collection.</param>
             <param name="FileName">File name.</param>
             <returns>If index was updated.</returns>
+        </member>
+        <member name="T:Waher.Persistence.FullTextSearch.IPropertyEvaluator">
+            <summary>
+            Custom external property evaluator.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.IPropertyEvaluator.Prepare(System.String)">
+            <summary>
+            Prepares the evaluator with its definition.
+            </summary>
+            <param name="Definition">Property definition</param>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.IPropertyEvaluator.Evaluate(System.Object)">
+            <summary>
+            Evaluates the property evaluator, on an object instance.
+            </summary>
+            <param name="Instance">Object instance being indexed.</param>
+            <returns>Property value.</returns>
         </member>
         <member name="T:Waher.Persistence.FullTextSearch.ITokenizer">
             <summary>
@@ -510,7 +543,11 @@
             Orders strings in descending length order
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Waher.Persistence.FullTextSearch.Keywords.OrderOfProcessing.Compare(Waher.Persistence.FullTextSearch.Keywords.Keyword,Waher.Persistence.FullTextSearch.Keywords.Keyword)" -->
+        <member name="M:Waher.Persistence.FullTextSearch.Keywords.OrderOfProcessing.Compare(Waher.Persistence.FullTextSearch.Keywords.Keyword,Waher.Persistence.FullTextSearch.Keywords.Keyword)">
+            <summary>
+            <see cref="M:System.Collections.Generic.IComparer`1.Compare(`0,`0)"/>
+            </summary>
+        </member>
         <member name="T:Waher.Persistence.FullTextSearch.Keywords.PlainKeyword">
             <summary>
             Represents a plain text keyword.
@@ -620,7 +657,7 @@
             <summary>
             Represents a wildcard keyword.
             </summary>
-            <param name="Keyword">Keyword</param>
+            <param name="Expression">Keyword, as a regular expression.</param>
         </member>
         <member name="P:Waher.Persistence.FullTextSearch.Keywords.RegexKeyword.Expression">
             <summary>
@@ -726,6 +763,7 @@
             Contains information about a search process.
             </summary>
             <param name="Index">Index dictionary</param>
+            <param name="IndexCollection">Index collection name</param>
         </member>
         <member name="P:Waher.Persistence.FullTextSearch.Keywords.SearchProcess.Index">
             <summary>
@@ -993,7 +1031,11 @@
             Orders entries from newest to oldest.
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Waher.Persistence.FullTextSearch.Orders.NewestOrder.Compare(Waher.Persistence.FullTextSearch.Orders.MatchInformation,Waher.Persistence.FullTextSearch.Orders.MatchInformation)" -->
+        <member name="M:Waher.Persistence.FullTextSearch.Orders.NewestOrder.Compare(Waher.Persistence.FullTextSearch.Orders.MatchInformation,Waher.Persistence.FullTextSearch.Orders.MatchInformation)">
+            <summary>
+            <see cref="M:System.Collections.Generic.IComparer`1.Compare(`0,`0)"/>
+            </summary>
+        </member>
         <member name="T:Waher.Persistence.FullTextSearch.Orders.OccurrencesOrder">
             <summary>
             Orders entries based on occurrences of keywords.
@@ -1004,7 +1046,11 @@
             Orders entries based on occurrences of keywords.
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Waher.Persistence.FullTextSearch.Orders.OccurrencesOrder.Compare(Waher.Persistence.FullTextSearch.Orders.MatchInformation,Waher.Persistence.FullTextSearch.Orders.MatchInformation)" -->
+        <member name="M:Waher.Persistence.FullTextSearch.Orders.OccurrencesOrder.Compare(Waher.Persistence.FullTextSearch.Orders.MatchInformation,Waher.Persistence.FullTextSearch.Orders.MatchInformation)">
+            <summary>
+            <see cref="M:System.Collections.Generic.IComparer`1.Compare(`0,`0)"/>
+            </summary>
+        </member>
         <member name="T:Waher.Persistence.FullTextSearch.Orders.OldestOrder">
             <summary>
             Orders entries from oldest to newest.
@@ -1015,7 +1061,11 @@
             Orders entries from oldest to newest.
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Waher.Persistence.FullTextSearch.Orders.OldestOrder.Compare(Waher.Persistence.FullTextSearch.Orders.MatchInformation,Waher.Persistence.FullTextSearch.Orders.MatchInformation)" -->
+        <member name="M:Waher.Persistence.FullTextSearch.Orders.OldestOrder.Compare(Waher.Persistence.FullTextSearch.Orders.MatchInformation,Waher.Persistence.FullTextSearch.Orders.MatchInformation)">
+            <summary>
+            <see cref="M:System.Collections.Generic.IComparer`1.Compare(`0,`0)"/>
+            </summary>
+        </member>
         <member name="T:Waher.Persistence.FullTextSearch.Orders.RelevanceOrder">
             <summary>
             Orders entries based on relevance.
@@ -1026,7 +1076,85 @@
             Orders entries based on relevance.
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Waher.Persistence.FullTextSearch.Orders.RelevanceOrder.Compare(Waher.Persistence.FullTextSearch.Orders.MatchInformation,Waher.Persistence.FullTextSearch.Orders.MatchInformation)" -->
+        <member name="M:Waher.Persistence.FullTextSearch.Orders.RelevanceOrder.Compare(Waher.Persistence.FullTextSearch.Orders.MatchInformation,Waher.Persistence.FullTextSearch.Orders.MatchInformation)">
+            <summary>
+            <see cref="M:System.Collections.Generic.IComparer`1.Compare(`0,`0)"/>
+            </summary>
+        </member>
+        <member name="T:Waher.Persistence.FullTextSearch.PropertyType">
+            <summary>
+            Type of indexed property.
+            </summary>
+        </member>
+        <member name="F:Waher.Persistence.FullTextSearch.PropertyType.Label">
+            <summary>
+            A label (field or property) containing the value to be tokenized.
+            </summary>
+        </member>
+        <member name="F:Waher.Persistence.FullTextSearch.PropertyType.External">
+            <summary>
+            Reference to external evaluator, returning an object that is tokenized.
+            </summary>
+        </member>
+        <member name="T:Waher.Persistence.FullTextSearch.PropertyDefinition">
+            <summary>
+            Defines an indexable property.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyDefinition.#ctor">
+            <summary>
+            Defines an indexable property.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyDefinition.#ctor(System.String)">
+            <summary>
+            Defines an indexable property.
+            </summary>
+            <param name="Label">Property of Field name.</param>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyDefinition.#ctor(System.String,System.String)">
+            <summary>
+            Defines an indexable property.
+            </summary>
+            <param name="ExternalSource">External Source</param>
+            <param name="Definition">Definition</param>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyDefinition.ToArray(System.String[])">
+            <summary>
+            Creates an array of property definitions from an array of property names.
+            </summary>
+            <param name="PropertyNames">Property names</param>
+            <returns>Array of property definitions</returns>
+        </member>
+        <member name="P:Waher.Persistence.FullTextSearch.PropertyDefinition.Definition">
+            <summary>
+            Definition, as a string.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.FullTextSearch.PropertyDefinition.ExternalSource">
+            <summary>
+            External source.
+            </summary>
+        </member>
+        <member name="P:Waher.Persistence.FullTextSearch.PropertyDefinition.Type">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyDefinition.GetValue(System.Object)">
+            <summary>
+            Gets the object to index.
+            </summary>
+            <param name="Instance">Object instance being indexed.</param>
+            <returns>Property value to index.</returns>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyDefinition.GetValue(Waher.Persistence.Serialization.GenericObject)">
+            <summary>
+            Gets the object to index.
+            </summary>
+            <param name="Instance">Object instance being indexed.</param>
+            <returns>Property value to index.</returns>
+        </member>
         <member name="T:Waher.Persistence.FullTextSearch.FullTextSearchOrder">
             <summary>
             Order in which results are returned.
@@ -1128,9 +1256,9 @@
             <param name="Offset">Index of first object matching the keywords.</param>
             <param name="MaxCount">Maximum number of objects to return.</param>
             <param name="Keywords">Keywords to search for.</param>
-            <returns>Array of objects. Depending on choice of
-            <paramref name="PaginationStrategy"/>, null items may be returned
-            if underlying object is not compatible with <typeparamref name="T"/>.</returns>
+            <param name="Order">Sort order of result set.</param>
+            <returns>Array of objects. Noncompatible (with <typeparamref name="T"/>) items are returned as null 
+            in the array..</returns>
         </member>
         <member name="M:Waher.Persistence.FullTextSearch.Search.FullTextSearch``1(System.String,System.Int32,System.Int32,Waher.Persistence.FullTextSearch.FullTextSearchOrder,Waher.Persistence.FullTextSearch.PaginationStrategy,Waher.Persistence.FullTextSearch.Keywords.Keyword[])">
             <summary>
@@ -1140,6 +1268,8 @@
             <param name="Offset">Index of first object matching the keywords.</param>
             <param name="MaxCount">Maximum number of objects to return.</param>
             <param name="Keywords">Keywords to search for.</param>
+            <param name="Order">Sort order of result set.</param>
+            <param name="PaginationStrategy">How to handle noncompatible items.</param>
             <returns>Array of objects. Depending on choice of
             <paramref name="PaginationStrategy"/>, null items may be returned
             if underlying object is not compatible with <typeparamref name="T"/>.</returns>
@@ -1184,7 +1314,7 @@
             <param name="CollectionName">Collection of objects to index.</param>
             <returns>If the configuration was changed.</returns>
         </member>
-        <member name="M:Waher.Persistence.FullTextSearch.Search.AddFullTextSearch(System.String,System.String[])">
+        <member name="M:Waher.Persistence.FullTextSearch.Search.AddFullTextSearch(System.String,Waher.Persistence.FullTextSearch.PropertyDefinition[])">
             <summary>
             Adds properties for full-text-search indexation.
             </summary>
@@ -1192,7 +1322,7 @@
             <param name="Properties">Properties to index.</param>
             <returns>If new property names were found and added.</returns>
         </member>
-        <member name="M:Waher.Persistence.FullTextSearch.Search.RemoveFullTextSearch(System.String,System.String[])">
+        <member name="M:Waher.Persistence.FullTextSearch.Search.RemoveFullTextSearch(System.String,Waher.Persistence.FullTextSearch.PropertyDefinition[])">
             <summary>
             Removes properties from full-text-search indexation.
             </summary>
@@ -1637,21 +1767,21 @@
             Name of full-text-search index collection.
             </summary>
         </member>
-        <member name="M:Waher.Persistence.FullTextSearch.TypeInformation.Tokenize(System.Object,System.String[])">
+        <member name="M:Waher.Persistence.FullTextSearch.TypeInformation.Tokenize(System.Object,Waher.Persistence.FullTextSearch.PropertyDefinition[])">
             <summary>
             Tokenizes properties in an object, given a set of property names.
             </summary>
             <param name="Obj">Object instance to tokenize.</param>
-            <param name="PropertyNames">Indexable property names.</param>
+            <param name="Properties">Indexable properties.</param>
             <returns>Tokens found.</returns>
         </member>
-        <member name="M:Waher.Persistence.FullTextSearch.TypeInformation.Tokenize(System.Object,Waher.Persistence.FullTextSearch.Tokenizers.TokenizationProcess,System.String[])">
+        <member name="M:Waher.Persistence.FullTextSearch.TypeInformation.Tokenize(System.Object,Waher.Persistence.FullTextSearch.Tokenizers.TokenizationProcess,Waher.Persistence.FullTextSearch.PropertyDefinition[])">
             <summary>
             Tokenizes properties in an object, given a set of property names.
             </summary>
             <param name="Obj">Object instance to tokenize.</param>
             <param name="Process">Tokenization process.</param>
-            <param name="PropertyNames">Indexable property names.</param>
+            <param name="Properties">Indexable properties.</param>
         </member>
     </members>
 </doc>

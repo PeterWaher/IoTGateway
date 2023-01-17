@@ -13,7 +13,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// Contains information about a collection, in relation to full-text-search.
 		/// </summary>
 		public CollectionInformation()
-			: this(string.Empty, string.Empty, false, new string[0])
+			: this(string.Empty, string.Empty, false, new PropertyDefinition[0])
 		{
 		}
 
@@ -23,14 +23,14 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="IndexCollectionName">Full-text-search index collection name.</param>
 		/// <param name="CollectionName">Full Type Name.</param>
 		/// <param name="IndexForFullTextSearch">If class should be indexed for full-text-search.</param>
-		/// <param name="PropertyNames">Names of properties (or fields) to index.</param>
+		/// <param name="Properties">Properties (or fields) to index.</param>
 		public CollectionInformation(string IndexCollectionName, string CollectionName,
-			bool IndexForFullTextSearch, params string[] PropertyNames)
+			bool IndexForFullTextSearch, params PropertyDefinition[] Properties)
 		{
 			this.IndexCollectionName = IndexCollectionName;
 			this.CollectionName = CollectionName;
 			this.IndexForFullTextSearch = IndexForFullTextSearch;
-			this.PropertyNames = PropertyNames;
+			this.Properties = Properties;
 		}
 
 		/// <summary>
@@ -49,29 +49,34 @@ namespace Waher.Persistence.FullTextSearch
 		public bool IndexForFullTextSearch { get; set; }
 
 		/// <summary>
-		/// Property names to index
+		/// Properties to index
 		/// </summary>
-		public string[] PropertyNames { get; set; }
+		public PropertyDefinition[] Properties { get; set; }
+
+		/// <summary>
+		/// Types of indexed properties.
+		/// </summary>
+		public PropertyType[] PropertyTypes { get; set; }
 
 		/// <summary>
 		/// Adds properties for full-text-search indexation.
 		/// </summary>
-		/// <param name="Properties">Property names to add.</param>
+		/// <param name="Properties">Properties to add.</param>
 		/// <returns>If new property names were found and added, changing
 		/// the state of the object.</returns>
-		public bool AddIndexableProperties(params string[] Properties)
+		public bool AddIndexableProperties(params PropertyDefinition[] Properties)
 		{
-			Dictionary<string, bool> ByName = new Dictionary<string, bool>();
+			Dictionary<string, PropertyDefinition> ByName = new Dictionary<string, PropertyDefinition>();
 			bool New = false;
 
-			foreach (string Name in this.PropertyNames)
-				ByName[Name] = true;
+			foreach (PropertyDefinition Property in this.Properties)
+				ByName[Property.Definition] = Property;
 
-			foreach (string Name in Properties)
+			foreach (PropertyDefinition Property in Properties)
 			{
-				if (!ByName.ContainsKey(Name))
+				if (!ByName.ContainsKey(Property.Definition))
 				{
-					ByName[Name] = true;
+					ByName[Property.Definition] = Property;
 					New = true;
 				}
 			}
@@ -80,11 +85,11 @@ namespace Waher.Persistence.FullTextSearch
 				return false;
 
 			int c = ByName.Count;
-			string[] Names = new string[c];
+			PropertyDefinition[] Definitions = new PropertyDefinition[c];
 
-			ByName.Keys.CopyTo(Names, 0);
+			ByName.Values.CopyTo(Definitions, 0);
 
-			this.PropertyNames = Names;
+			this.Properties = Definitions;
 			this.IndexForFullTextSearch = true;
 
 			return true;
@@ -96,17 +101,17 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="Properties">Properties to remove from indexation.</param>
 		/// <returns>If new property names were found and added, changing
 		/// the state of the object.</returns>
-		public bool RemoveIndexableProperties(params string[] Properties)
+		public bool RemoveIndexableProperties(params PropertyDefinition[] Properties)
 		{
-			Dictionary<string, bool> ByName = new Dictionary<string, bool>();
+			Dictionary<string, PropertyDefinition> ByName = new Dictionary<string, PropertyDefinition>();
 			bool Removed = false;
 
-			foreach (string Name in this.PropertyNames)
-				ByName[Name] = true;
+			foreach (PropertyDefinition Property in this.Properties)
+				ByName[Property.Definition] = Property;
 
-			foreach (string Name in Properties)
+			foreach (PropertyDefinition Property in Properties)
 			{
-				if (ByName.Remove(Name))
+				if (ByName.Remove(Property.Definition))
 					Removed = true;
 			}
 
@@ -114,11 +119,11 @@ namespace Waher.Persistence.FullTextSearch
 				return false;
 
 			int c = ByName.Count;
-			string[] Names = new string[c];
+			PropertyDefinition[] Definitions = new PropertyDefinition[c];
 
-			ByName.Keys.CopyTo(Names, 0);
+			ByName.Values.CopyTo(Definitions, 0);
 
-			this.PropertyNames = Names;
+			this.Properties = Definitions;
 			this.IndexForFullTextSearch = c > 0;
 
 			return true;

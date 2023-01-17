@@ -15,7 +15,7 @@ namespace Waher.Persistence.FullTextSearch.Keywords
         }
 
         /// <summary>
-        /// <see cref="IComparer<string>.Compare"/>
+        /// <see cref="IComparer{Keyword}.Compare"/>
         /// </summary>
         public int Compare(Keyword x, Keyword y)
         {

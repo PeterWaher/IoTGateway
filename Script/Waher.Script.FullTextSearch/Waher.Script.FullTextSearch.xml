@@ -51,6 +51,14 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.AddFtsProperties.GetPropertyDefinitions(Waher.Script.Abstraction.Elements.IElement,Waher.Script.Model.ScriptNode)">
+            <summary>
+            Gets property definitions.
+            </summary>
+            <param name="Argument">Argument provided in function.</param>
+            <param name="Node">Node evaluating method.</param>
+            <returns>Array of property definitions.</returns>
+        </member>
         <member name="T:Waher.Script.FullTextSearch.Functions.FtsCollection">
             <summary>
             Matches a Full-Text-Search Index with a Database Collection.
@@ -500,6 +508,54 @@
             <param name="Arguments">Function arguments.</param>
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
+        </member>
+        <member name="T:Waher.Persistence.FullTextSearch.PropertyEvaluators.ExpressionEvaluator">
+            <summary>
+            Evaluates property values where properties are defined as script expressions.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyEvaluators.ExpressionEvaluator.#ctor">
+            <summary>
+            Evaluates property values where properties are defined as script expressions.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyEvaluators.ExpressionEvaluator.Prepare(System.String)">
+            <summary>
+            Parses a property definition.
+            </summary>
+            <param name="Definition">Property definition</param>
+            <returns>Parsed definition.</returns>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyEvaluators.ExpressionEvaluator.Evaluate(System.Object)">
+            <summary>
+            Evaluates the parsed definition, on an object instance.
+            </summary>
+            <param name="Instance">Object instance being indexed.</param>
+            <returns>Property value.</returns>
+        </member>
+        <member name="T:Waher.Persistence.FullTextSearch.PropertyEvaluators.LambdaEvaluator">
+            <summary>
+            Evaluates property values where properties are defined as script expressions.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyEvaluators.LambdaEvaluator.#ctor">
+            <summary>
+            Evaluates property values where properties are defined as script expressions.
+            </summary>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyEvaluators.LambdaEvaluator.Prepare(System.String)">
+            <summary>
+            Parses a property definition.
+            </summary>
+            <param name="Definition">Property definition</param>
+            <returns>Parsed definition.</returns>
+        </member>
+        <member name="M:Waher.Persistence.FullTextSearch.PropertyEvaluators.LambdaEvaluator.Evaluate(System.Object)">
+            <summary>
+            Evaluates the parsed definition, on an object instance.
+            </summary>
+            <param name="Instance">Object instance being indexed.</param>
+            <returns>Property value.</returns>
         </member>
     </members>
 </doc>

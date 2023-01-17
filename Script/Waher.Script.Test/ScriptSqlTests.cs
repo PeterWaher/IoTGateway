@@ -42,7 +42,20 @@ namespace Waher.Script.Test
 			Database.Register(filesProvider);
 
 			await Types.StartAllModules(10000);
+		}
 
+		[AssemblyCleanup]
+		public static async Task AssemblyCleanup()
+		{
+			await Types.StopAllModules();
+
+			filesProvider?.Dispose();
+			filesProvider = null;
+		}
+
+		[ClassInitialize]
+		public static async Task ClassInitialize(TestContext _)
+		{
 			await Database.Clear("Orders");
 			await Database.Clear("WebUsers");
 
@@ -92,15 +105,6 @@ namespace Waher.Script.Test
 				ContactName = "CP3",
 				Country = "C2"
 			});
-		}
-
-		[AssemblyCleanup]
-		public static async Task AssemblyCleanup()
-		{
-			await Types.StopAllModules();
-
-			filesProvider?.Dispose();
-			filesProvider = null;
 		}
 
 		private async Task Test(string Script, object[][] ExpectedOutput)

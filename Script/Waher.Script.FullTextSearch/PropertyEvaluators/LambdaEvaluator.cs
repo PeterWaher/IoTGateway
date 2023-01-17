@@ -46,7 +46,9 @@ namespace Waher.Persistence.FullTextSearch.PropertyEvaluators
 				else
 					this.variables.Object = Instance;
 
-				return await this.lambda.EvaluateAsync(new IElement[] { Expression.Encapsulate(Instance) }, this.variables);
+				IElement E = await this.lambda.EvaluateAsync(new IElement[] { Expression.Encapsulate(Instance) }, this.variables);
+
+				return E.AssociatedObjectValue;
 			}
 			else
 				return null;

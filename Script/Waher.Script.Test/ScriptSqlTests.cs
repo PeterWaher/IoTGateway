@@ -33,10 +33,14 @@ namespace Waher.Script.Test
 				typeof(Database).Assembly,
 				typeof(FilesProvider).Assembly,
 				typeof(ObjectSerializer).Assembly,
-				typeof(Duration).Assembly);
+				typeof(Duration).Assembly,
+				typeof(Waher.Persistence.FullTextSearch.Search).Assembly,
+				typeof(FullTextSearch.Functions.Search).Assembly);
 
 			filesProvider = await FilesProvider.CreateAsync("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000);
 			Database.Register(filesProvider);
+
+			await Types.StartAllModules(10000);
 
 			await Database.Clear("Orders");
 			await Database.Clear("WebUsers");
@@ -90,8 +94,10 @@ namespace Waher.Script.Test
 		}
 
 		[AssemblyCleanup]
-		public static void AssemblyCleanup()
+		public static async Task AssemblyCleanup()
 		{
+			await Types.StopAllModules();
+
 			filesProvider?.Dispose();
 			filesProvider = null;
 		}

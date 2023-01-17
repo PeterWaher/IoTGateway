@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence;
@@ -19,6 +18,7 @@ namespace Waher.Script.Test
 			await (await Database.GetDictionary("TestIndex")).ClearAsync();
 
 			await Database.Clear("FullTextSearchObjects");
+			await Database.Clear("FullTextSearchFiles");
 			await (await Database.GetDictionary("FullTextSearchCollections")).ClearAsync();
 		}
 
@@ -141,11 +141,36 @@ namespace Waher.Script.Test
 		[TestMethod]
 		public async Task Test_11_Reindex_Search_1()
 		{
-			object Obj = await this.Test("insert into Test object {'P1':'Hello World','P2':'Kilroy was here.','P3':'Fitzroy also'};Sleep(1000);Reindex('TestIndex');Sleep(1000);Search('TestIndex','+Kilroy -Fitzroy',false)");
+			object Obj = await this.Test("insert into Test object {'P1':'Hello World','P2':'Kilroy was here.','P3':'Fitzroy also'};Sleep(1000);ReindexFts('TestIndex');Sleep(1000);Search('TestIndex','+Kilroy -Fitzroy',false)");
 			Array ResultSet;
 
 			Assert.IsNotNull(ResultSet = Obj as Array);
 			Assert.IsTrue(ResultSet.Length > 0);
+		}
+
+		[TestMethod]
+		public async Task Test_12_FtsFolder_Search_1()
+		{
+			object Obj = await this.Test("FtsFolder('TestIndex','Files',true);Sleep(1000);Search('TestIndex','+Kilroy -Fitzroy',false)");
+			Array ResultSet;
+
+			Assert.IsNotNull(ResultSet = Obj as Array);
+			Assert.IsTrue(ResultSet.Length >= 10, "Only " + ResultSet.Length.ToString() + " objects found. Expected at least 10.");
+		}
+
+		[TestMethod]
+		public async Task Test_13_FtsFile_Search_1()
+		{
+			object Obj = await this.Test("Search('TestIndex','+Kilroy -Fitzroy',false)");
+			Array ResultSet;
+
+			Assert.IsNotNull(ResultSet = Obj as Array);
+			int c = ResultSet.Length;
+
+			Obj = await this.Test("FtsFile('TestIndex','File/1.txt');Sleep(1000);Search('TestIndex','+Kilroy -Fitzroy',false)");
+			Assert.IsNotNull(ResultSet = Obj as Array);
+
+			Assert.AreEqual(c + 1, ResultSet.Length);
 		}
 
 		private async Task<object> Test(string Script)
@@ -158,9 +183,6 @@ namespace Waher.Script.Test
 		}
 
 		/*
-| `FtsFile(Index,FileName)`                                                        | Indexes (or reindexes) a specific file, using the full-text-search collection index defined by `Index`. If the file does not exist, it is removed from the index. | `FtsFolder("FTS",Folder,true)` |
-| `FtsFolder(Index,Folder[,Recursive])`                                            | Indexes files in a folder given by `Folder`, using the full-text-search collection index defined by `Index`. Files can be processed recursively in subfolders if `Recursive` is `true` (default is `false`). To keep folder updated, call `FtsFile` when a file is modified, created or deleted. `FtsFolder` only updates files who have not been indexed before, or whose timestamps have changed since last indexation. | `FtsFolder("FTS",Folder,true)` |
-
 		ExpressionEvaluator
 		LambdaEvaluator
 		 */

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Inventory;
@@ -138,7 +139,17 @@ namespace Waher.Persistence.FullTextSearch
 
 				case PropertyType.External:
 					if (!(this.evaluator is null))
-						return await this.evaluator.Evaluate(Instance);
+					{
+						try
+						{
+							return await this.evaluator.Evaluate(Instance);
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+							return null;
+						}
+					}
 					break;
 			}
 

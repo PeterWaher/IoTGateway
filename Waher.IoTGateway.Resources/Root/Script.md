@@ -1688,7 +1688,7 @@ are available:
 
 ##### Full-text-search query syntax
 
-Full-text-search is done prividing a query string. This query string contains *keywords*
+Full-text-search is done providing a query string. This query string contains *keywords*
 separated by whitespace. Keywords only consist of *letters* and *digits*, and are
 *case insensitive*. Punctuation characters, accents, etc., are ignored. So are a 
 configurable set of *stop words*, common words that have little significance in
@@ -1725,6 +1725,9 @@ The syntax can be nested, so you can combine the different constructs.
 | `+'Kilroy was here'`              |
 | `'Kilroy was' here`               |
 | `Kilroy 'was here'`               |
+
+**Note**: The words `was` and `here` are used as examples only, to highlight syntax. 
+They are typically considered *stop words*, and thus ignored in a real search.
 
 ##### Strictness
 

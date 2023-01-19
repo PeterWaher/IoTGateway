@@ -894,7 +894,6 @@ namespace Waher.IoTGateway
 				}
 
 				await LoadScriptResources();
-				await ProcessServiceConfigurations(false);
 
 				httpxServer = new HttpxServer(xmppClient, webServer, MaxChunkSize);
 				Types.SetModuleParameter("HTTPX", httpxProxy);
@@ -1051,7 +1050,10 @@ namespace Waher.IoTGateway
 					}
 
 					if (await Types.StartAllModules(int.MaxValue, new ModuleStartOrder()))
+					{
 						Log.Informational("Server started.");
+						await ProcessServiceConfigurations(false);
+					}
 					else
 						Log.Critical("Unable to start all modules.");
 

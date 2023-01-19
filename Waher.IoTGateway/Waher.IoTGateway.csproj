@@ -90,6 +90,7 @@
     <None Remove="Root\Sniffers\Sniffer.md" />
     <None Remove="Root\Sniffers\XMPP.md" />
     <None Remove="Schema\GatewayConfiguration.xsd" />
+    <None Remove="Schema\ServiceConfiguration.xsd" />
     <None Remove="Schema\Theme.xsd" />
     <None Remove="Transforms\DbStatXmlToHtml.xslt" />
     <None Remove="Waher.IoTGateway.manifest" />
@@ -295,6 +296,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Schema\ServiceConfiguration.xsd" />
     <EmbeddedResource Include="Schema\Theme.xsd" />
     <EmbeddedResource Include="Schema\GatewayConfiguration.xsd" />
     <EmbeddedResource Include="Transforms\DbStatXmlToHtml.xslt">

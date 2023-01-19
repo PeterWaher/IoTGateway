@@ -75,6 +75,8 @@ using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
 using Waher.Runtime.Threading;
+using Waher.Networking.HTTP.Vanity;
+using Waher.Content.Markdown.Functions;
 
 namespace Waher.IoTGateway
 {
@@ -892,6 +894,7 @@ namespace Waher.IoTGateway
 				}
 
 				await LoadScriptResources();
+				await ProcessServiceConfigurations();
 
 				httpxServer = new HttpxServer(xmppClient, webServer, MaxChunkSize);
 				Types.SetModuleParameter("HTTPX", httpxProxy);
@@ -4555,6 +4558,107 @@ namespace Waher.IoTGateway
 
 					continue;
 				}
+			}
+		}
+
+		private static async Task ProcessServiceConfigurations()
+		{
+			string[] ConfigurationFiles = Directory.GetFiles(appDataFolder, "*.config", SearchOption.TopDirectoryOnly);
+
+			foreach (string ConfigurationFile in ConfigurationFiles)
+				await ProcessServiceConfigurationFile(ConfigurationFile);
+		}
+
+		private const string ServiceConfigurationRoot = "ServiceConfiguration";
+		private const string ServiceConfigurationNamespace = "http://waher.se/Schema/ServiceConfiguration.xsd";
+
+		/// <summary>
+		/// Processes a Service Configuration File. This method should be called for each service configuration file,
+		/// either when service starts, or when file is updated or is installed.
+		/// </summary>
+		/// <param name="ConfigurationFileName">File Name of Service Configuration file.</param>
+		/// <returns>If file was successfully loaded and executed.</returns>
+		public static async Task<bool> ProcessServiceConfigurationFile(string ConfigurationFileName)
+		{
+			try
+			{
+				ConfigurationFileName = Path.GetFullPath(ConfigurationFileName);
+
+				string DirectoryName = Path.GetDirectoryName(ConfigurationFileName);
+				if (!DirectoryName.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
+					DirectoryName += Path.DirectorySeparatorChar;
+
+				if (string.Compare(DirectoryName, appDataFolder, true) != 0)
+					return false;
+
+				if (!File.Exists(ConfigurationFileName))
+					return false;
+
+				XmlDocument Doc = new XmlDocument();
+				Doc.Load(ConfigurationFileName);
+
+				if (Doc.LocalName != ServiceConfigurationRoot || Doc.NamespaceURI != ServiceConfigurationNamespace)
+					return false;
+
+				XSL.Validate(Path.GetFileName(ConfigurationFileName), Doc, ServiceConfigurationRoot, ServiceConfigurationNamespace,
+					XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.ServiceConfiguration.xsd", typeof(Gateway).Assembly));
+
+				bool ExecuteInitScript = await InitScriptFile.NeedsExecution(ConfigurationFileName);
+
+				webServer.UnregisterVanityResources(ConfigurationFileName);
+
+				foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
+				{
+					if (!(N is XmlElement E))
+						continue;
+
+					switch (E.LocalName)
+					{
+						case "VanityResources":
+							foreach (XmlNode N2 in E.ChildNodes)
+							{
+								if (N2 is XmlElement E2 && E2.LocalName == "VanityResource")
+								{
+									string RegEx = XML.Attribute(E2, "regex");
+									string Url = XML.Attribute(E2, "url");
+
+									try
+									{
+										webServer.RegisterVanityResource(RegEx, Url, ConfigurationFileName);
+									}
+									catch (Exception ex)
+									{
+										Log.Error("Unable to register vanity resource: " + ex.Message,
+											new KeyValuePair<string, object>("RegEx", RegEx),
+											new KeyValuePair<string, object>("Url", Url));
+									}
+								}
+							}
+							break;
+
+						case "StartupScript":           // Always execute
+							Expression Exp = new Expression(E.InnerText);
+							Variables v = new Variables();
+							await Exp.EvaluateAsync(v);
+							break;
+
+						case "InitializationScript":    // Execute, only if changed
+							if (ExecuteInitScript)
+							{
+								Exp = new Expression(E.InnerText);
+								v = new Variables();
+								await Exp.EvaluateAsync(v);
+							}
+							break;
+					}
+				}
+
+				return true;
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex, ConfigurationFileName);
+				return false;
 			}
 		}
 

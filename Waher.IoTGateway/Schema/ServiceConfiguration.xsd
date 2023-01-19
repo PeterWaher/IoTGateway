@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ServiceConfiguration"
+           targetNamespace="http://waher.se/Schema/ServiceConfiguration.xsd"
+           elementFormDefault="qualified"
+           xmlns="http://waher.se/Schema/ServiceConfiguration.xsd"
+           xmlns:mstns="http://waher.se/Schema/ServiceConfiguration.xsd"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="ServiceConfiguration">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="VanityResources" minOccurs="0" maxOccurs="1">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="VanityResource" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:attribute name="regex" type="xs:string" use="required"/>
+									<xs:attribute name="url" type="xs:string" use="required"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="InitializationScript" type="xs:string" minOccurs="0" maxOccurs="0"/>
+				<xs:element name="StartupScript" type="xs:string" minOccurs="0" maxOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

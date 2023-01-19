@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.Threading;
 using System.Threading.Tasks;
+using Waher.Runtime.Threading;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Operators;
@@ -14,7 +14,7 @@ namespace Waher.Script.Data.Model
 	/// </summary>
 	public class MsSqlStoredProcedure : ILambdaExpression, IDisposable
 	{
-		private readonly SemaphoreSlim synchObj = new SemaphoreSlim(1);
+		private readonly MultiReadSingleWriteObject synchObj = new MultiReadSingleWriteObject();
 		private readonly SqlCommand command;
 		private readonly int nrParameters;
 		private readonly string[] parameterNames;
@@ -84,7 +84,7 @@ namespace Waher.Script.Data.Model
 		{
 			int i;
 
-			await this.synchObj.WaitAsync();
+			await this.synchObj.BeginWrite();
 			try
 			{
 				for (i = 0; i < this.nrParameters; i++)
@@ -185,7 +185,7 @@ namespace Waher.Script.Data.Model
 			}
 			finally
 			{
-				this.synchObj.Release();
+				await this.synchObj.EndWrite();
 			}
 		}
 

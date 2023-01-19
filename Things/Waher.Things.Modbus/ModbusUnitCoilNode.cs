@@ -89,7 +89,7 @@ namespace Waher.Things.Modbus
 			}
 			finally
 			{
-				Client.Leave();
+				await Client.Leave();
 			}
 		}
 
@@ -121,7 +121,7 @@ namespace Waher.Things.Modbus
 						}
 						finally
 						{
-							Client.Leave();
+							await Client.Leave();
 						}
 					},
 					async (Node, Value) =>
@@ -137,7 +137,7 @@ namespace Waher.Things.Modbus
 						}
 						finally
 						{
-							Client.Leave();
+							await Client.Leave();
 						}
 					})
 			});

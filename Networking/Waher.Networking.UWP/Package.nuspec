@@ -15,8 +15,9 @@
     <copyright>Copyright © Waher Data AB 2015-2022. All rights reserved.</copyright>
     <tags>networking communication uwp</tags>
     <dependencies>
-      <dependency id="Waher.Events" version="1.1.2"/>
-    </dependencies>
+			<dependency id="Waher.Events" version="1.1.2"/>
+			<dependency id="Waher.Runtime.Threading" version="1.2.1"/>
+		</dependencies>
   </metadata>
   <files>
     <file src="..\..\Images\Icon_64x64.png" target="Meta" />

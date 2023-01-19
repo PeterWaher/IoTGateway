@@ -1,7 +1,7 @@
 ﻿using MySqlConnector;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
+using Waher.Runtime.Threading;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Data.Model;
 using Waher.Script.Model;
@@ -14,7 +14,7 @@ namespace Waher.Script.Data.MySQL.Model
 	/// </summary>
 	public class StoredProcedure : ILambdaExpression, IDisposable
 	{
-		private readonly SemaphoreSlim synchObj = new SemaphoreSlim(1);
+		private readonly MultiReadSingleWriteObject synchObj = new MultiReadSingleWriteObject();
 		private readonly MySqlCommand command;
 		private readonly int nrParameters;
 		private readonly string[] parameterNames;
@@ -84,7 +84,7 @@ namespace Waher.Script.Data.MySQL.Model
 		{
 			int i;
 
-			await this.synchObj.WaitAsync();
+			await this.synchObj.BeginWrite();
 			try
 			{
 				for (i = 0; i < this.nrParameters; i++)
@@ -227,7 +227,7 @@ namespace Waher.Script.Data.MySQL.Model
 			}
 			finally
 			{
-				this.synchObj.Release();
+				await this.synchObj.EndWrite();
 			}
 		}
 

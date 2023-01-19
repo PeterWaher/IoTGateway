@@ -2776,6 +2776,7 @@
           "Waher.Runtime.Cache": "1.0.6",
           "Waher.Runtime.Inventory": "1.1.2",
           "Waher.Runtime.Text": "1.0.1",
+          "Waher.Runtime.Threading": "1.2.1",
           "Waher.Script": "2.4.10",
           "Waher.Script.Graphs": "2.0.8"
         }
@@ -2803,7 +2804,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
-          "Waher.Events": "1.1.2"
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Threading": "1.2.1"
         }
       },
       "Waher.Networking.XMPP.Concentrator.UWP/1.0.0": {
@@ -5783,6 +5785,7 @@
           "Waher.Runtime.Cache": "1.0.6",
           "Waher.Runtime.Inventory": "1.1.2",
           "Waher.Runtime.Text": "1.0.1",
+          "Waher.Runtime.Threading": "1.2.1",
           "Waher.Script": "2.4.10",
           "Waher.Script.Graphs": "2.0.8"
         }
@@ -5810,7 +5813,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
-          "Waher.Events": "1.1.2"
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Threading": "1.2.1"
         }
       },
       "Waher.Networking.XMPP.Concentrator.UWP/1.0.0": {
@@ -8826,6 +8830,7 @@
           "Waher.Runtime.Cache": "1.0.6",
           "Waher.Runtime.Inventory": "1.1.2",
           "Waher.Runtime.Text": "1.0.1",
+          "Waher.Runtime.Threading": "1.2.1",
           "Waher.Script": "2.4.10",
           "Waher.Script.Graphs": "2.0.8"
         }
@@ -8853,7 +8858,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
-          "Waher.Events": "1.1.2"
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Threading": "1.2.1"
         }
       },
       "Waher.Networking.XMPP.Concentrator.UWP/1.0.0": {
@@ -11842,6 +11848,7 @@
           "Waher.Runtime.Cache": "1.0.6",
           "Waher.Runtime.Inventory": "1.1.2",
           "Waher.Runtime.Text": "1.0.1",
+          "Waher.Runtime.Threading": "1.2.1",
           "Waher.Script": "2.4.10",
           "Waher.Script.Graphs": "2.0.8"
         }
@@ -11869,7 +11876,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
-          "Waher.Events": "1.1.2"
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Threading": "1.2.1"
         }
       },
       "Waher.Networking.XMPP.Concentrator.UWP/1.0.0": {
@@ -14894,6 +14902,7 @@
           "Waher.Runtime.Cache": "1.0.6",
           "Waher.Runtime.Inventory": "1.1.2",
           "Waher.Runtime.Text": "1.0.1",
+          "Waher.Runtime.Threading": "1.2.1",
           "Waher.Script": "2.4.10",
           "Waher.Script.Graphs": "2.0.8"
         }
@@ -14921,7 +14930,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
-          "Waher.Events": "1.1.2"
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Threading": "1.2.1"
         }
       },
       "Waher.Networking.XMPP.Concentrator.UWP/1.0.0": {
@@ -17910,6 +17920,7 @@
           "Waher.Runtime.Cache": "1.0.6",
           "Waher.Runtime.Inventory": "1.1.2",
           "Waher.Runtime.Text": "1.0.1",
+          "Waher.Runtime.Threading": "1.2.1",
           "Waher.Script": "2.4.10",
           "Waher.Script.Graphs": "2.0.8"
         }
@@ -17937,7 +17948,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
-          "Waher.Events": "1.1.2"
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Threading": "1.2.1"
         }
       },
       "Waher.Networking.XMPP.Concentrator.UWP/1.0.0": {
@@ -20962,6 +20974,7 @@
           "Waher.Runtime.Cache": "1.0.6",
           "Waher.Runtime.Inventory": "1.1.2",
           "Waher.Runtime.Text": "1.0.1",
+          "Waher.Runtime.Threading": "1.2.1",
           "Waher.Script": "2.4.10",
           "Waher.Script.Graphs": "2.0.8"
         }
@@ -20989,7 +21002,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
-          "Waher.Events": "1.1.2"
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Threading": "1.2.1"
         }
       },
       "Waher.Networking.XMPP.Concentrator.UWP/1.0.0": {

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
+using Waher.Runtime.Threading;
 
 namespace Waher.Networking.Sniffers
 {
@@ -17,7 +17,7 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		protected XmlWriter output;
 
-		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
+		private readonly MultiReadSingleWriteObject semaphore = new MultiReadSingleWriteObject();
 		private readonly BinaryPresentationMethod binaryPresentationMethod;
 		private bool disposed = false;
 
@@ -62,7 +62,7 @@ namespace Waher.Networking.Sniffers
 			if (this.disposed)
 				return;
 
-			await this.semaphore.WaitAsync();
+			await this.semaphore.BeginWrite();
 			try
 			{
 				await this.BeforeWrite();
@@ -133,7 +133,7 @@ namespace Waher.Networking.Sniffers
 			}
 			finally
 			{
-				this.semaphore.Release();
+				await this.semaphore.EndWrite();
 			}
 		}
 
@@ -196,7 +196,7 @@ namespace Waher.Networking.Sniffers
 				i = Text.IndexOfAny(controlCharacters, i);
 			}
 
-			await this.semaphore.WaitAsync();
+			await this.semaphore.BeginWrite();
 			try
 			{
 				try
@@ -228,7 +228,7 @@ namespace Waher.Networking.Sniffers
 			}
 			finally
 			{
-				this.semaphore.Release();
+				await this.semaphore.EndWrite();
 			}
 		}
 

@@ -44,6 +44,7 @@ https://waher.se/Script.md#externalDatabaseRelatedFunctionsWaherScriptData</Desc
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj" />
     <ProjectReference Include="..\Waher.Script\Waher.Script.csproj" />
   </ItemGroup>
 

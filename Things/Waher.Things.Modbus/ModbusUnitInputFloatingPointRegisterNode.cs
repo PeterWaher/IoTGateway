@@ -181,7 +181,7 @@ namespace Waher.Things.Modbus
 			}
 			finally
 			{
-				Client.Leave();
+				await Client.Leave();
 			}
 		}
 

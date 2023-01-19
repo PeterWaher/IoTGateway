@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Threading;
 using System.Threading.Tasks;
+using Waher.Runtime.Threading;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -15,7 +15,7 @@ namespace Waher.Script.Data.Model
 	public class MsSqlDatabase : ExternalDatabase
 	{
 		private readonly Dictionary<string, MsSqlStoredProcedure> procedures = new Dictionary<string, MsSqlStoredProcedure>();
-		private readonly SemaphoreSlim synchObject = new SemaphoreSlim(1);
+		private readonly MultiReadSingleWriteObject synchObject = new MultiReadSingleWriteObject();
 		private SqlConnection connection;
 
 		/// <summary>
@@ -73,7 +73,7 @@ namespace Waher.Script.Data.Model
 		/// <returns>Lambda expression.</returns>
 		public override async Task<ILambdaExpression> GetProcedure(string Name)
 		{
-			await this.synchObject.WaitAsync();
+			await this.synchObject.BeginWrite();
 			try
 			{
 				if (this.procedures.TryGetValue(Name, out MsSqlStoredProcedure Result))
@@ -92,7 +92,7 @@ namespace Waher.Script.Data.Model
 			}
 			finally
 			{
-				this.synchObject.Release();
+				await this.synchObject.EndWrite();
 			}
 		}
 	}

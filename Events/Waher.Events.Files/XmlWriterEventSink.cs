@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Runtime.Threading;
 
 namespace Waher.Events.Files
 {
@@ -17,7 +17,7 @@ namespace Waher.Events.Files
 		/// </summary>
 		protected XmlWriter output;
 
-		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
+		private readonly MultiReadSingleWriteObject semaphore = new MultiReadSingleWriteObject();
 		private bool disposed = false;
 
 		/// <summary>
@@ -66,7 +66,7 @@ namespace Waher.Events.Files
 			if (this.disposed)
 				return;
 
-			await this.semaphore.WaitAsync();
+			await this.semaphore.BeginWrite();
 			try
 			{
 				await this.BeforeWrite();
@@ -133,7 +133,7 @@ namespace Waher.Events.Files
 			}
 			finally
 			{
-				this.semaphore.Release();
+				await this.semaphore.EndWrite();
 			}
 		}
 

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using SkiaSharp;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Runtime.Threading;
 using Waher.Script.Graphs;
 
 namespace Waher.Content.Markdown.Consolidation
@@ -18,7 +18,7 @@ namespace Waher.Content.Markdown.Consolidation
 	{
 		private readonly string threadId;
 		private readonly SortedDictionary<string, SourceState> sources = new SortedDictionary<string, SourceState>();
-		private readonly SemaphoreSlim synchObject = new SemaphoreSlim(1);
+		private readonly MultiReadSingleWriteObject synchObject = new MultiReadSingleWriteObject();
 		private readonly int maxPaletteSize;
 		private Dictionary<string, KeyValuePair<SKColor, int>> legend = null;
 		private DocumentType type = DocumentType.Empty;
@@ -49,7 +49,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// </summary>
 		public async Task<string[]> GetSources()
 		{
-			await this.synchObject.WaitAsync();
+			await this.synchObject.BeginRead();
 			try
 			{
 				string[] Result = new string[this.sources.Count];
@@ -58,7 +58,7 @@ namespace Waher.Content.Markdown.Consolidation
 			}
 			finally
 			{
-				this.synchObject.Release();
+				await this.synchObject.EndRead();
 			}
 		}
 
@@ -67,7 +67,7 @@ namespace Waher.Content.Markdown.Consolidation
 		/// </summary>
 		public async Task<int> GetNrReportedSources()
 		{
-			await this.synchObject.WaitAsync();
+			await this.synchObject.BeginRead();
 			try
 			{
 				int Result = 0;
@@ -82,7 +82,7 @@ namespace Waher.Content.Markdown.Consolidation
 			}
 			finally
 			{
-				this.synchObject.Release();
+				await this.synchObject.EndRead();
 			}
 		}
 
@@ -225,7 +225,7 @@ namespace Waher.Content.Markdown.Consolidation
 			DocumentType Type;
 			bool Result;
 
-			await this.synchObject.WaitAsync();
+			await this.synchObject.BeginWrite();
 			try
 			{
 				if ((Result = !this.sources.TryGetValue(Source, out SourceState State)) || State.IsDefault)
@@ -309,7 +309,7 @@ namespace Waher.Content.Markdown.Consolidation
 			}
 			finally
 			{
-				this.synchObject.Release();
+				await this.synchObject.EndWrite();
 			}
 
 			if (Update)
@@ -363,7 +363,7 @@ namespace Waher.Content.Markdown.Consolidation
 		{
 			StringBuilder Markdown = new StringBuilder();
 
-			await this.synchObject.WaitAsync();
+			await this.synchObject.BeginRead();
 			try
 			{
 				switch (this.type)
@@ -579,7 +579,7 @@ namespace Waher.Content.Markdown.Consolidation
 			}
 			finally
 			{
-				this.synchObject.Release();
+				await this.synchObject.EndRead();
 			}
 
 			return Markdown.ToString();

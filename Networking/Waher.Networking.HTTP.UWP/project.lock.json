@@ -2642,7 +2642,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
-          "Waher.Events": "1.1.2"
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Threading": "1.2.1"
         }
       },
       "Waher.Networking.WHOIS.UWP/1.0.0": {
@@ -2691,6 +2692,15 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.2"
+        }
+      },
+      "Waher.Runtime.Threading/1.2.1": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Cache": "1.0.6"
         }
       },
       "Waher.Script/2.4.10": {
@@ -5392,7 +5402,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
-          "Waher.Events": "1.1.2"
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Threading": "1.2.1"
         }
       },
       "Waher.Networking.WHOIS.UWP/1.0.0": {
@@ -5441,6 +5452,15 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.2"
+        }
+      },
+      "Waher.Runtime.Threading/1.2.1": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Cache": "1.0.6"
         }
       },
       "Waher.Script/2.4.10": {
@@ -8178,7 +8198,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
-          "Waher.Events": "1.1.2"
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Threading": "1.2.1"
         }
       },
       "Waher.Networking.WHOIS.UWP/1.0.0": {
@@ -8227,6 +8248,15 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.2"
+        }
+      },
+      "Waher.Runtime.Threading/1.2.1": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Cache": "1.0.6"
         }
       },
       "Waher.Script/2.4.10": {
@@ -10937,7 +10967,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
-          "Waher.Events": "1.1.2"
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Threading": "1.2.1"
         }
       },
       "Waher.Networking.WHOIS.UWP/1.0.0": {
@@ -10986,6 +11017,15 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.2"
+        }
+      },
+      "Waher.Runtime.Threading/1.2.1": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Cache": "1.0.6"
         }
       },
       "Waher.Script/2.4.10": {
@@ -13732,7 +13772,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
-          "Waher.Events": "1.1.2"
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Threading": "1.2.1"
         }
       },
       "Waher.Networking.WHOIS.UWP/1.0.0": {
@@ -13781,6 +13822,15 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.2"
+        }
+      },
+      "Waher.Runtime.Threading/1.2.1": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Cache": "1.0.6"
         }
       },
       "Waher.Script/2.4.10": {
@@ -16491,7 +16541,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
-          "Waher.Events": "1.1.2"
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Threading": "1.2.1"
         }
       },
       "Waher.Networking.WHOIS.UWP/1.0.0": {
@@ -16540,6 +16591,15 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.2"
+        }
+      },
+      "Waher.Runtime.Threading/1.2.1": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Cache": "1.0.6"
         }
       },
       "Waher.Script/2.4.10": {
@@ -19286,7 +19346,8 @@
         "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "6.2.14",
-          "Waher.Events": "1.1.2"
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Threading": "1.2.1"
         }
       },
       "Waher.Networking.WHOIS.UWP/1.0.0": {
@@ -19335,6 +19396,15 @@
         "dependencies": {
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.1.2"
+        }
+      },
+      "Waher.Runtime.Threading/1.2.1": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Events": "1.1.2",
+          "Waher.Runtime.Cache": "1.0.6"
         }
       },
       "Waher.Script/2.4.10": {
@@ -29285,6 +29355,11 @@
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Temporary/Waher.Runtime.Temporary.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Temporary/Waher.Runtime.Temporary.csproj"
+    },
+    "Waher.Runtime.Threading/1.2.1": {
+      "type": "project",
+      "path": "../../Runtime/Waher.Runtime.Threading/Waher.Runtime.Threading.csproj",
+      "msbuildProject": "../../Runtime/Waher.Runtime.Threading/Waher.Runtime.Threading.csproj"
     },
     "Waher.Script/2.4.10": {
       "type": "project",

@@ -142,6 +142,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Threading\Waher.Runtime.Threading.csproj">
+      <Project>{47f772fe-c923-4f5c-83b5-a4bef962ae15}</Project>
+      <Name>Waher.Runtime.Threading</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.UWP\Waher.Networking.UWP.csproj">
       <Project>{6c7adaeb-7809-4d79-ad1b-e981b4a18b1f}</Project>
       <Name>Waher.Networking.UWP</Name>

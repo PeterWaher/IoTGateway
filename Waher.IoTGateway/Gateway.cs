@@ -74,6 +74,7 @@ using Waher.Security.Users;
 using Waher.Things;
 using Waher.Things.Metering;
 using Waher.Things.SensorData;
+using Waher.Runtime.Threading;
 
 namespace Waher.IoTGateway
 {
@@ -146,8 +147,8 @@ namespace Waher.IoTGateway
 		private static LoginAuditor loginAuditor = null;
 		private static Scheduler scheduler = null;
 		private readonly static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
-		private static Semaphore gatewayRunning = null;
-		private static Semaphore startingServer = null;
+		private static System.Threading.Semaphore gatewayRunning = null;
+		private static System.Threading.Semaphore startingServer = null;
 		private static Emoji1LocalFiles emoji1_24x24 = null;
 		private static StreamWriter exceptionFile = null;
 		private static CaseInsensitiveString domain = null;
@@ -216,11 +217,11 @@ namespace Waher.IoTGateway
 			instance = InstanceName;
 
 			string Suffix = string.IsNullOrEmpty(InstanceName) ? string.Empty : "." + InstanceName;
-			gatewayRunning = new Semaphore(1, 1, "Waher.IoTGateway.Running" + Suffix);
+			gatewayRunning = new System.Threading.Semaphore(1, 1, "Waher.IoTGateway.Running" + Suffix);
 			if (!gatewayRunning.WaitOne(1000))
 				return false; // Is running in another process.
 
-			startingServer = new Semaphore(1, 1, "Waher.IoTGateway.Starting" + Suffix);
+			startingServer = new System.Threading.Semaphore(1, 1, "Waher.IoTGateway.Starting" + Suffix);
 			if (!startingServer.WaitOne(1000))
 			{
 				gatewayRunning.Release();
@@ -4240,22 +4241,26 @@ namespace Waher.IoTGateway
 							Detail = await MarkdownDocument.CreateAsync(Markdown, Doc.Settings);
 					}
 
-					if (!(Doc.Tag is SemaphoreSlim Semaphore))
+					if (!(Doc.Tag is MultiReadSingleWriteObject DocSynchObj))
 					{
-						Semaphore = new SemaphoreSlim(1);
-						Doc.Tag = Semaphore;
+						DocSynchObj = new MultiReadSingleWriteObject();
+						Doc.Tag = DocSynchObj;
 					}
 
-					await Semaphore.WaitAsync(30000);
-					try
+					if (await DocSynchObj.TryBeginWrite(30000))
 					{
-						Doc.Detail = Detail;
-						return await Doc.GenerateHTML();
+						try
+						{
+							Doc.Detail = Detail;
+							return await Doc.GenerateHTML();
+						}
+						finally
+						{
+							await DocSynchObj.EndWrite();
+						}
 					}
-					finally
-					{
-						Semaphore.Release();
-					}
+					else
+						throw new ServiceUnavailableException("Unable to generate custom HTML error document.");
 				}
 				else
 				{

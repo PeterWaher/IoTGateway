@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
+using Waher.Runtime.Threading;
 
 namespace Waher.Networking.Sniffers
 {
@@ -51,7 +51,7 @@ namespace Waher.Networking.Sniffers
 		private readonly BinaryPresentationMethod binaryPresentationMethod;
 		private readonly LineEnding lineEndingMethod;
 		private bool consoleWidthWorks = true;
-		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
+		private readonly MultiReadSingleWriteObject syncObj = new MultiReadSingleWriteObject();
 
 		/// <summary>
 		/// Outputs sniffed data to <see cref="Console.Out"/>.
@@ -184,7 +184,7 @@ namespace Waher.Networking.Sniffers
 
 		private async Task Output(DateTime _, string s, ConsoleColor Fg, ConsoleColor Bg)
 		{
-			await this.semaphore.WaitAsync();
+			await this.syncObj.BeginWrite();
 			try
 			{
 				if (this.lineEndingMethod == LineEnding.PadWithSpaces)
@@ -253,7 +253,7 @@ namespace Waher.Networking.Sniffers
 			}
 			finally
 			{
-				this.semaphore.Release();
+				await this.syncObj.EndWrite();
 			}
 		}
 
@@ -264,7 +264,7 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public virtual void Dispose()
 		{
-			this.semaphore.Dispose();
+			this.syncObj.Dispose();
 		}
 	}
 }

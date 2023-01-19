@@ -1,12 +1,12 @@
 ﻿using SkiaSharp;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
+using Waher.Runtime.Threading;
 using Waher.Things.Queries;
 
 namespace Waher.Networking.XMPP.Concentrator.Queries
@@ -16,7 +16,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 	/// </summary>
 	public class NodeQuery : IDisposable
 	{
-		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
+		private readonly MultiReadSingleWriteObject syncObj = new MultiReadSingleWriteObject();
 		private readonly string queryId;
 		private readonly string to;
 		private readonly string nodeID;
@@ -131,16 +131,15 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		/// If query reception is paused. It can be resumed, by calling <see cref="Resume"/>. The object is paused by default,
 		/// and resumed when event handlers have been properly assigned.
 		/// </summary>
-		public bool Paused
-		{
-			get
-			{
-				this.semaphore.Wait();
-				bool Result = this.paused;
-				this.semaphore.Release();
+		public Task<bool> Paused => this.GetPaused();
 
-				return Result;
-			}
+		private async Task<bool> GetPaused()
+		{
+			await this.syncObj.BeginWrite();
+			bool Result = this.paused;
+			await this.syncObj.EndWrite();
+
+			return Result;
 		}
 
 		/// <summary>
@@ -157,7 +156,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 		/// </summary>
 		public async Task ResumeAsync()
 		{
-			await this.semaphore.WaitAsync();
+			await this.syncObj.BeginWrite();
 			try
 			{
 				if (this.paused)
@@ -177,7 +176,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 			}
 			finally
 			{
-				this.semaphore.Release();
+				await this.syncObj.EndWrite();
 			}
 		}
 
@@ -194,7 +193,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 				this.NextSequenceNr();
 				await this.ProcessQueryProgress(e);
 
-				if (this.HasQueued)
+				if (await this.HasQueued())
 				{
 					ExpectedSeqNr++;
 
@@ -805,7 +804,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 
 		internal async Task Queue(int SequenceNr, MessageEventArgs e)
 		{
-			await this.semaphore.WaitAsync();
+			await this.syncObj.BeginWrite();
 			try
 			{
 				if (this.queuedMessages is null)
@@ -836,20 +835,17 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 			}
 			finally
 			{
-				this.semaphore.Release();
+				await this.syncObj.EndWrite();
 			}
 		}
 
-		internal bool HasQueued
+		internal async Task<bool> HasQueued()
 		{
-			get
-			{
-				this.semaphore.Wait();
-				bool Result = !(this.queuedMessages is null);
-				this.semaphore.Release();
+			await this.syncObj.BeginWrite();
+			bool Result = !(this.queuedMessages is null);
+			await this.syncObj.EndWrite();
 
-				return Result;
-			}
+			return Result;
 		}
 
 		internal int SequenceNr => this.seqNr;
@@ -861,7 +857,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 
 		internal async Task<MessageEventArgs> PopQueued(int ExpectedSequenceNr)
 		{
-			await this.semaphore.WaitAsync();
+			await this.syncObj.BeginWrite();
 			try
 			{
 				KeyValuePair<int, MessageEventArgs> P;
@@ -882,7 +878,7 @@ namespace Waher.Networking.XMPP.Concentrator.Queries
 			}
 			finally
 			{
-				this.semaphore.Release();
+				await this.syncObj.EndWrite();
 			}
 		}
 

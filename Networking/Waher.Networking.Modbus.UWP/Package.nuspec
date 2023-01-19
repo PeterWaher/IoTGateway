@@ -17,7 +17,8 @@
     <dependencies>
       <dependency id="Waher.Events" version="1.1.2"/>
       <dependency id="Waher.Networking.UWP" version="2.1.0"/>
-    </dependencies>
+			<dependency id="Waher.Runtime.Threading" version="1.2.1"/>
+		</dependencies>
   </metadata>
   <files>
     <file src="..\..\Images\Icon_64x64.png" target="Meta" />

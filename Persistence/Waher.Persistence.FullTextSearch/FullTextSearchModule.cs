@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Persistence.Attributes;
@@ -17,6 +16,7 @@ using Waher.Persistence.LifeCycle;
 using Waher.Persistence.Serialization;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Inventory;
+using Waher.Runtime.Threading;
 
 namespace Waher.Persistence.FullTextSearch
 {
@@ -33,7 +33,7 @@ namespace Waher.Persistence.FullTextSearch
 		private static Dictionary<string, IPersistentDictionary> indices;
 		private static Dictionary<Type, TypeInformation> types;
 		private static FullTextSearchModule instance = null;
-		private static SemaphoreSlim synchObj;
+		private static MultiReadSingleWriteObject synchObj;
 
 		/// <summary>
 		/// Full-text search module, controlling the life-cycle of the full-text-search engine.
@@ -53,7 +53,7 @@ namespace Waher.Persistence.FullTextSearch
 			types = new Dictionary<Type, TypeInformation>();
 			queryCache = new Cache<string, QueryRecord>(int.MaxValue, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
 
-			synchObj = new SemaphoreSlim(1);
+			synchObj = new MultiReadSingleWriteObject();
 			instance = this;
 
 			Database.ObjectInserted += this.Database_ObjectInserted;
@@ -78,7 +78,7 @@ namespace Waher.Persistence.FullTextSearch
 
 			// TODO: Wait for current objects to be finished.
 
-			await synchObj.WaitAsync();
+			await synchObj.BeginWrite();
 			try
 			{
 				foreach (IPersistentDictionary Index in indices.Values)
@@ -102,7 +102,7 @@ namespace Waher.Persistence.FullTextSearch
 			}
 			finally
 			{
-				synchObj.Release();
+				await synchObj.EndWrite();
 				synchObj.Dispose();
 				synchObj = null;
 				instance = null;
@@ -148,7 +148,7 @@ namespace Waher.Persistence.FullTextSearch
 
 				ObjectReference Ref;
 
-				await synchObj.WaitAsync();
+				await synchObj.BeginWrite();
 				try
 				{
 					ulong Index = await GetNextIndexNrLocked(IndexName);
@@ -168,7 +168,7 @@ namespace Waher.Persistence.FullTextSearch
 				}
 				finally
 				{
-					synchObj.Release();
+					await synchObj.EndWrite();
 				}
 
 				queryCache.Clear();
@@ -181,13 +181,16 @@ namespace Waher.Persistence.FullTextSearch
 			}
 		}
 
-		private static async Task<IPersistentDictionary> GetIndexLocked(string IndexCollection)
+		private static async Task<IPersistentDictionary> GetIndexLocked(string IndexCollection, bool CreateIfNotFound)
 		{
 			if (indices.TryGetValue(IndexCollection, out IPersistentDictionary Result))
 				return Result;
 
-			Result = await Database.GetDictionary(IndexCollection);
-			indices[IndexCollection] = Result;
+			if (CreateIfNotFound)
+			{
+				Result = await Database.GetDictionary(IndexCollection);
+				indices[IndexCollection] = Result;
+			}
 
 			return Result;
 		}
@@ -195,7 +198,7 @@ namespace Waher.Persistence.FullTextSearch
 		private static async Task AddTokensToIndexLocked(ObjectReference Ref)
 		{
 			DateTime TP = DateTime.UtcNow;
-			IPersistentDictionary Index = await GetIndexLocked(Ref.IndexCollection);
+			IPersistentDictionary Index = await GetIndexLocked(Ref.IndexCollection, true);
 
 			foreach (TokenCount Token in Ref.Tokens)
 			{
@@ -310,7 +313,7 @@ namespace Waher.Persistence.FullTextSearch
 		{
 			Dictionary<string, List<string>> ByIndex = new Dictionary<string, List<string>>();
 
-			await synchObj.WaitAsync();
+			await synchObj.BeginRead();
 			try
 			{
 				foreach (object Obj in await collectionInformation.GetValuesAsync())
@@ -329,7 +332,7 @@ namespace Waher.Persistence.FullTextSearch
 			}
 			finally
 			{
-				synchObj.Release();
+				await synchObj.EndRead();
 			}
 
 			Dictionary<string, string[]> Result = new Dictionary<string, string[]>();
@@ -348,14 +351,14 @@ namespace Waher.Persistence.FullTextSearch
 		/// defined by <paramref name="IndexCollectionName"/>.</returns>
 		public static async Task<string[]> GetCollectionNames(string IndexCollectionName)
 		{
-			await synchObj.WaitAsync();
+			await synchObj.BeginRead();
 			try
 			{
 				return await GetCollectionNamesLocked(IndexCollectionName);
 			}
 			finally
 			{
-				synchObj.Release();
+				await synchObj.EndRead();
 			}
 		}
 
@@ -389,7 +392,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// <returns>If the configuration was changed.</returns>
 		internal static async Task<bool> SetFullTextSearchIndexCollection(string IndexCollection, string CollectionName)
 		{
-			await synchObj.WaitAsync();
+			await synchObj.BeginWrite();
 			try
 			{
 				CollectionInformation Info = await GetCollectionInfoLocked(IndexCollection, CollectionName, false);
@@ -415,7 +418,7 @@ namespace Waher.Persistence.FullTextSearch
 			}
 			finally
 			{
-				synchObj.Release();
+				await synchObj.EndWrite();
 			}
 		}
 
@@ -427,7 +430,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// <returns>If new property names were found and added.</returns>
 		internal static async Task<bool> AddFullTextSearch(string CollectionName, params PropertyDefinition[] Properties)
 		{
-			await synchObj.WaitAsync();
+			await synchObj.BeginWrite();
 			try
 			{
 				CollectionInformation Info = await GetCollectionInfoLocked(CollectionName, true);
@@ -442,7 +445,7 @@ namespace Waher.Persistence.FullTextSearch
 			}
 			finally
 			{
-				synchObj.Release();
+				await synchObj.EndWrite();
 			}
 		}
 
@@ -454,7 +457,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// <returns>If property names were found and removed.</returns>
 		internal static async Task<bool> RemoveFullTextSearch(string CollectionName, params PropertyDefinition[] Properties)
 		{
-			await synchObj.WaitAsync();
+			await synchObj.BeginWrite();
 			try
 			{
 				CollectionInformation Info = await GetCollectionInfoLocked(CollectionName, true);
@@ -469,7 +472,7 @@ namespace Waher.Persistence.FullTextSearch
 			}
 			finally
 			{
-				synchObj.Release();
+				await synchObj.EndWrite();
 			}
 		}
 
@@ -481,7 +484,7 @@ namespace Waher.Persistence.FullTextSearch
 		{
 			Dictionary<string, PropertyDefinition[]> Result = new Dictionary<string, PropertyDefinition[]>();
 
-			await synchObj.WaitAsync();
+			await synchObj.BeginRead();
 			try
 			{
 				foreach (object Obj in await collectionInformation.GetValuesAsync())
@@ -492,7 +495,7 @@ namespace Waher.Persistence.FullTextSearch
 			}
 			finally
 			{
-				synchObj.Release();
+				await synchObj.EndRead();
 			}
 
 			return Result;
@@ -505,7 +508,7 @@ namespace Waher.Persistence.FullTextSearch
 		/// <returns>Array of indexed properties.</returns>
 		internal static async Task<PropertyDefinition[]> GetFullTextSearchIndexedProperties(string CollectionName)
 		{
-			await synchObj.WaitAsync();
+			await synchObj.BeginRead();
 			try
 			{
 				CollectionInformation Info = await GetCollectionInfoLocked(CollectionName, false);
@@ -517,13 +520,13 @@ namespace Waher.Persistence.FullTextSearch
 			}
 			finally
 			{
-				synchObj.Release();
+				await synchObj.EndRead();
 			}
 		}
 
 		private static async Task<Tuple<CollectionInformation, TypeInformation, GenericObject>> Prepare(object Object)
 		{
-			await synchObj.WaitAsync();
+			await synchObj.BeginWrite();
 			try
 			{
 				if (Object is GenericObject GenObj)
@@ -533,7 +536,7 @@ namespace Waher.Persistence.FullTextSearch
 			}
 			finally
 			{
-				synchObj.Release();
+				await synchObj.EndWrite();
 			}
 		}
 
@@ -830,7 +833,7 @@ namespace Waher.Persistence.FullTextSearch
 
 			string Key = sb.ToString();
 			MatchInformation[] FoundReferences;
-			SearchProcess Process;
+			SearchProcess Process = null;
 
 			if (queryCache.TryGetValue(Key, out QueryRecord QueryRecord))
 			{
@@ -839,25 +842,54 @@ namespace Waher.Persistence.FullTextSearch
 			}
 			else
 			{
-				await synchObj.WaitAsync();
+				IPersistentDictionary Index;
+
+				await synchObj.BeginRead();
 				try
 				{
-					IPersistentDictionary Index = await GetIndexLocked(IndexCollection);
+					Index = await GetIndexLocked(IndexCollection, false);
 
-					Process = new SearchProcess(Index, IndexCollection);
-
-					foreach (Keyword Keyword in Keywords)
+					if (!(Index is null))
 					{
-						if (Keyword.Ignore)
-							continue;
+						Process = new SearchProcess(Index, IndexCollection);
 
-						if (!await Keyword.Process(Process))
-							return new T[0];
+						foreach (Keyword Keyword in Keywords)
+						{
+							if (Keyword.Ignore)
+								continue;
+
+							if (!await Keyword.Process(Process))
+								return new T[0];
+						}
 					}
 				}
 				finally
 				{
-					synchObj.Release();
+					await synchObj.EndRead();
+				}
+
+				if (Index is null)
+				{
+					await synchObj.BeginWrite();
+					try
+					{
+						Index = await GetIndexLocked(IndexCollection, true);
+
+						Process = new SearchProcess(Index, IndexCollection);
+
+						foreach (Keyword Keyword in Keywords)
+						{
+							if (Keyword.Ignore)
+								continue;
+
+							if (!await Keyword.Process(Process))
+								return new T[0];
+						}
+					}
+					finally
+					{
+						await synchObj.EndWrite();
+					}
 				}
 
 				int c = Process.ReferencesByObject.Count;
@@ -1019,14 +1051,14 @@ namespace Waher.Persistence.FullTextSearch
 				if (Ref is null)
 					return;
 
-				await synchObj.WaitAsync();
+				await synchObj.BeginWrite();
 				try
 				{
 					await RemoveTokensFromIndexLocked(Ref);
 				}
 				finally
 				{
-					synchObj.Release();
+					await synchObj.EndWrite();
 				}
 
 				queryCache.Clear();
@@ -1041,7 +1073,7 @@ namespace Waher.Persistence.FullTextSearch
 
 		private static async Task RemoveTokensFromIndexLocked(ObjectReference Ref)
 		{
-			IPersistentDictionary Index = await GetIndexLocked(Ref.IndexCollection);
+			IPersistentDictionary Index = await GetIndexLocked(Ref.IndexCollection, true);
 
 			foreach (TokenCount Token in Ref.Tokens)
 			{
@@ -1121,7 +1153,7 @@ namespace Waher.Persistence.FullTextSearch
 
 				bool Added = false;
 
-				await synchObj.WaitAsync();
+				await synchObj.BeginWrite();
 				try
 				{
 					if (Ref is null)
@@ -1165,7 +1197,7 @@ namespace Waher.Persistence.FullTextSearch
 				}
 				finally
 				{
-					synchObj.Release();
+					await synchObj.EndWrite();
 				}
 
 				queryCache.Clear();
@@ -1213,14 +1245,14 @@ namespace Waher.Persistence.FullTextSearch
 
 					foreach (ObjectReference Ref in ObjectsDeleted)
 					{
-						await synchObj.WaitAsync();
+						await synchObj.BeginWrite();
 						try
 						{
 							await RemoveTokensFromIndexLocked(Ref);
 						}
 						finally
 						{
-							synchObj.Release();
+							await synchObj.EndWrite();
 						}
 
 						queryCache.Clear();
@@ -1243,32 +1275,33 @@ namespace Waher.Persistence.FullTextSearch
 		/// <returns>Number of objects reindexed.</returns>
 		public static async Task<long> ReindexCollection(string IndexCollectionName)
 		{
+			IPersistentDictionary Index;
 			string[] Collections;
 
-			await synchObj.WaitAsync();
+			await synchObj.BeginWrite();
 			try
 			{
-				IPersistentDictionary Index = await GetIndexLocked(IndexCollectionName);
+				Index = await GetIndexLocked(IndexCollectionName, true);
 				await Index.ClearAsync();
-
-				IEnumerable<ObjectReference> ObjectsDeleted;
-
-				do
-				{
-					ObjectsDeleted = await Database.FindDelete<ObjectReference>(0, 1000,
-						new FilterFieldEqualTo("IndexCollection", IndexCollectionName));
-
-					foreach (ObjectReference Ref in ObjectsDeleted)
-						await Search.RaiseObjectRemovedFromIndex(instance, new ObjectReferenceEventArgs(Ref));
-				}
-				while (!IsEmpty(ObjectsDeleted));
 
 				Collections = await GetCollectionNamesLocked(IndexCollectionName);
 			}
 			finally
 			{
-				synchObj.Release();
+				await synchObj.EndWrite();
 			}
+
+			IEnumerable<ObjectReference> ObjectsDeleted;
+
+			do
+			{
+				ObjectsDeleted = await Database.FindDelete<ObjectReference>(0, 1000,
+					new FilterFieldEqualTo("IndexCollection", IndexCollectionName));
+
+				foreach (ObjectReference Ref in ObjectsDeleted)
+					await Search.RaiseObjectRemovedFromIndex(instance, new ObjectReferenceEventArgs(Ref));
+			}
+			while (!IsEmpty(ObjectsDeleted));
 
 			ReindexCollectionIteration Iteration = new ReindexCollectionIteration();
 

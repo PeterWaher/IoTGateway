@@ -5,10 +5,10 @@ using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Security.Authentication;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Waher.Networking.Modbus.Exceptions;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Threading;
 
 namespace Waher.Networking.Modbus
 {
@@ -28,7 +28,7 @@ namespace Waher.Networking.Modbus
 
 		private readonly Dictionary<ushort, Transaction> transactions = new Dictionary<ushort, Transaction>();
 		private readonly BinaryTcpClient tcpClient;
-		private readonly SemaphoreSlim synchObject = new SemaphoreSlim(1);
+		private readonly MultiReadSingleWriteObject synchObject = new MultiReadSingleWriteObject();
 		private ushort transactionId = 0;
 		private int timeoutMs = 10000;
 		private bool connected = false;
@@ -663,15 +663,15 @@ namespace Waher.Networking.Modbus
 		/// </summary>
 		public Task Enter()
 		{
-			return this.synchObject.WaitAsync();
+			return this.synchObject.BeginWrite();
 		}
 
 		/// <summary>
 		/// Leaves unique access to the TCP client. Must be called exactly one for each call to <see cref="Enter"/>.
 		/// </summary>
-		public void Leave()
+		public Task Leave()
 		{
-			this.synchObject.Release();
+			return this.synchObject.EndWrite();
 		}
 
 	}

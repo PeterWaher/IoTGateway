@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Waher.Networking.Sniffers.Model;
+using Waher.Runtime.Threading;
 
 namespace Waher.Networking.Sniffers
 {
@@ -13,7 +13,7 @@ namespace Waher.Networking.Sniffers
 	public class InMemorySniffer : SnifferBase, IEnumerable<SnifferEvent>, IDisposable
 	{
 		private readonly LinkedList<SnifferEvent> events = new LinkedList<SnifferEvent>();
-		private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
+		private readonly MultiReadSingleWriteObject semaphore = new MultiReadSingleWriteObject();
 		private readonly int maxCount;
 		private int count = 0;
 		private bool disposed = false;
@@ -119,7 +119,7 @@ namespace Waher.Networking.Sniffers
 		{
 			if (!this.disposed)
 			{
-				await this.semaphore.WaitAsync();
+				await this.semaphore.BeginWrite();
 				try
 				{
 					this.events.AddLast(Event);
@@ -130,7 +130,7 @@ namespace Waher.Networking.Sniffers
 				}
 				finally
 				{
-					this.semaphore.Release();
+					await this.semaphore.EndWrite();
 				}
 			}
 		}
@@ -215,7 +215,7 @@ namespace Waher.Networking.Sniffers
 				return new SnifferEvent[0];
 			else
 			{
-				await this.semaphore.WaitAsync();
+				await this.semaphore.BeginRead();
 				try
 				{
 					SnifferEvent[] Result = new SnifferEvent[this.count];
@@ -224,7 +224,7 @@ namespace Waher.Networking.Sniffers
 				}
 				finally
 				{
-					this.semaphore.Release();
+					await this.semaphore.EndRead();
 				}
 			}
 		}

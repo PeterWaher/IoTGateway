@@ -2,13 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Modbus;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Language;
+using Waher.Runtime.Threading;
 using Waher.Things.Ip;
 
 namespace Waher.Things.Modbus
@@ -65,7 +65,7 @@ namespace Waher.Things.Modbus
 		#region TCP/IP connections
 
 		private readonly static Cache<string, ModbusTcpClient> clients = GetCache();
-		private readonly static SemaphoreSlim clientsSynchObject = new SemaphoreSlim(1);
+		private readonly static MultiReadSingleWriteObject clientsSynchObject = new MultiReadSingleWriteObject();
 
 		private static Cache<string, ModbusTcpClient> GetCache()
 		{
@@ -113,7 +113,7 @@ namespace Waher.Things.Modbus
 					clients.Remove(Key);
 			}
 
-			await clientsSynchObject.WaitAsync();
+			await clientsSynchObject.BeginWrite();
 			try
 			{
 				if (clients.TryGetValue(Key, out Client))
@@ -125,7 +125,7 @@ namespace Waher.Things.Modbus
 			}
 			finally
 			{
-				clientsSynchObject.Release();
+				await clientsSynchObject.EndWrite();
 			}
 
 			return Client;

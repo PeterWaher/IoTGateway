@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.OleDb;
-using System.Threading;
 using System.Threading.Tasks;
+using Waher.Runtime.Threading;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
@@ -16,7 +16,7 @@ namespace Waher.Script.Data.Model
 	public class OleDbDatabase : ExternalDatabase
 	{
 		private readonly Dictionary<string, OleDbStoredProcedure> procedures = new Dictionary<string, OleDbStoredProcedure>();
-		private readonly SemaphoreSlim synchObject = new SemaphoreSlim(1);
+		private readonly MultiReadSingleWriteObject synchObject = new MultiReadSingleWriteObject();
 		private OleDbConnection connection;
 
 		/// <summary>
@@ -74,7 +74,7 @@ namespace Waher.Script.Data.Model
 		/// <returns>Lambda expression.</returns>
 		public override async Task<ILambdaExpression> GetProcedure(string Name)
 		{
-			await this.synchObject.WaitAsync();
+			await this.synchObject.BeginWrite();
 			try
 			{
 				if (this.procedures.TryGetValue(Name, out OleDbStoredProcedure Result))
@@ -93,7 +93,7 @@ namespace Waher.Script.Data.Model
 			}
 			finally
 			{
-				this.synchObject.Release();
+				await this.synchObject.EndWrite();
 			}
 		}
 	}

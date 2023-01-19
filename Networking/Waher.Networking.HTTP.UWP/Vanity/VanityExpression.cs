@@ -9,5 +9,6 @@ namespace Waher.Networking.HTTP.Vanity
 		public Regex Expression;
 		public string MapSeed;
 		public KeyValuePair<int, string>[] Parameters;
+		public object Tag;
 	}
 }

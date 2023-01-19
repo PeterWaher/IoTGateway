@@ -1998,6 +1998,19 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Registers a vanity resource.
+		/// </summary>
+		/// <param name="RegexPattern">Regular expression used to match incoming requests.</param>
+		/// <param name="MapTo">Resources matching <paramref name="RegexPattern"/> will be mapped to resources of this type.
+		/// Named group values found using the regular expression can be used in the map, between curly braces { and }.</param>
+		/// <param name="Tag">Tags the expression with an object. This tag can be used when
+		/// unregistering all vanity resources tagged with the given tag.</param>
+		public void RegisterVanityResource(string RegexPattern, string MapTo, object Tag)
+		{
+			this.vanityResources.RegisterVanityResource(RegexPattern, MapTo, Tag);
+		}
+
+		/// <summary>
 		/// Unregisters a vanity resource.
 		/// </summary>
 		/// <param name="RegexPattern">Regular expression used to match incoming requests.</param>
@@ -2005,6 +2018,16 @@ namespace Waher.Networking.HTTP
 		public bool UnregisterVanityResource(string RegexPattern)
 		{
 			return this.vanityResources.UnregisterVanityResource(RegexPattern);
+		}
+
+		/// <summary>
+		/// Unregisters vanity resources tagged with a specific object.
+		/// </summary>
+		/// <param name="Tag">Remove all vanity resources tagged with this object.</param>
+		/// <returns>Number of vanity resources removed.</returns>
+		public int UnregisterVanityResources(object Tag)
+		{
+			return this.vanityResources.UnregisterVanityResources(Tag);
 		}
 
 		/// <summary>

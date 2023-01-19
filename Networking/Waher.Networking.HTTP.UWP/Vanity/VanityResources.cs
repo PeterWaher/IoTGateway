@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Waher.Security.LoginMonitor;
 
 namespace Waher.Networking.HTTP.Vanity
 {
@@ -27,6 +28,19 @@ namespace Waher.Networking.HTTP.Vanity
 		/// Named group values found using the regular expression can be used in the map, between curly braces { and }.</param>
 		public void RegisterVanityResource(string RegexPattern, string MapTo)
 		{
+			this.RegisterVanityResource(RegexPattern, MapTo, null);
+		}
+
+		/// <summary>
+		/// Registers a vanity resource.
+		/// </summary>
+		/// <param name="RegexPattern">Regular expression used to match incoming requests.</param>
+		/// <param name="MapTo">Resources matching <paramref name="RegexPattern"/> will be mapped to resources of this type.
+		/// Named group values found using the regular expression can be used in the map, between curly braces { and }.</param>
+		/// <param name="Tag">Tags the expression with an object. This tag can be used when
+		/// unregistering all vanity resources tagged with the given tag.</param>
+		public void RegisterVanityResource(string RegexPattern, string MapTo, object Tag)
+		{
 			lock (this.vanityResources)
 			{
 				if (!this.vanityResources.TryGetValue(RegexPattern, out VanityExpression Exp))
@@ -34,7 +48,8 @@ namespace Waher.Networking.HTTP.Vanity
 					Exp = new VanityExpression()
 					{
 						Pattern = RegexPattern,
-						Expression = new Regex(RegexPattern, RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant)
+						Expression = new Regex(RegexPattern, RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant),
+						Tag = Tag
 					};
 					this.vanityResources[RegexPattern] = Exp;
 				}
@@ -82,6 +97,45 @@ namespace Waher.Networking.HTTP.Vanity
 				else
 					return false;
 			}
+		}
+
+		/// <summary>
+		/// Unregisters vanity resources tagged with a specific object.
+		/// </summary>
+		/// <param name="Tag">Remove all vanity resources tagged with this object.</param>
+		/// <returns>Number of vanity resources removed.</returns>
+		public int UnregisterVanityResources(object Tag)
+		{
+			if (Tag is null)
+				return 0;
+
+			LinkedList<string> ToRemove = null;
+			int NrRemoved = 0;
+
+			lock (this.vanityResources)
+			{
+				foreach (KeyValuePair<string, VanityExpression> P in this.vanityResources)
+				{
+					if (!(P.Value.Tag is null) && P.Value.Tag.Equals(Tag))
+					{
+						if (ToRemove is null)
+							ToRemove = new LinkedList<string>();
+
+						ToRemove.AddLast(P.Key);
+					}
+				}
+
+				if (!(ToRemove is null))
+				{
+					foreach (string Key in ToRemove)
+					{
+						if (this.vanityResources.Remove(Key))
+							NrRemoved++;
+					}
+				}
+			}
+
+			return NrRemoved;
 		}
 
 		/// <summary>

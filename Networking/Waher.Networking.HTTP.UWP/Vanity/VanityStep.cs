@@ -37,7 +37,8 @@ namespace Waher.Networking.HTTP.Vanity
 							Pattern = Exp.Pattern.Substring(1),
 							Expression = Exp.Expression,
 							MapSeed = Exp.MapSeed,
-							Parameters = Exp.Parameters
+							Parameters = Exp.Parameters,
+							Tag = Exp.Tag
 						});
 					}
 				}

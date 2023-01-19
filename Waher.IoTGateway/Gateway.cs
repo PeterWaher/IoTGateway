@@ -4615,7 +4615,7 @@ namespace Waher.IoTGateway
 				XmlDocument Doc = new XmlDocument();
 				Doc.Load(ConfigurationFileName);
 
-				if (Doc.LocalName != ServiceConfigurationRoot || Doc.NamespaceURI != ServiceConfigurationNamespace)
+				if (Doc.DocumentElement.LocalName != ServiceConfigurationRoot || Doc.DocumentElement.NamespaceURI != ServiceConfigurationNamespace)
 					return false;
 
 				XSL.Validate(Path.GetFileName(ConfigurationFileName), Doc, ServiceConfigurationRoot, ServiceConfigurationNamespace,

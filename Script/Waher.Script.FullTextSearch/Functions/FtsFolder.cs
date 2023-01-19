@@ -44,6 +44,24 @@ namespace Waher.Script.FullTextSearch.Functions
 		}
 
 		/// <summary>
+		/// Indexes files in a folder.
+		/// </summary>
+		/// <param name="IndexCollection">Name of Full-text-search index.</param>
+		/// <param name="Folder">Folder to index.</param>
+		/// <param name="Recursive">If search should be recursive through sub folders.</param>
+		/// <param name="SubFoldersToExclude">Sub-folders to exclude from index.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
+		public FtsFolder(ScriptNode IndexCollection, ScriptNode Folder, ScriptNode Recursive, ScriptNode SubFoldersToExclude,
+			int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { IndexCollection, Folder, Recursive, SubFoldersToExclude },
+				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Vector }, 
+				  Start, Length, Expression)
+		{
+		}
+
+		/// <summary>
 		/// Name of the function
 		/// </summary>
 		public override string FunctionName => nameof(FtsFolder);
@@ -87,7 +105,26 @@ namespace Waher.Script.FullTextSearch.Functions
 			if (!Recursive.HasValue)
 				throw new ScriptRuntimeException("Expected Boolean Value for Recursive argument.", this);
 
-			FolderIndexationStatistics Result = await Waher.Persistence.FullTextSearch.Search.IndexFolder(Index, Folder, Recursive.Value);
+			string[] SubFoldersToExclude;
+
+			if (i < c)
+			{
+				if (Arguments[i] is IVector V)
+				{
+					int j, d = V.Dimension;
+
+					SubFoldersToExclude = new string[d];
+
+					for (j = 0; j < d; j++)
+						SubFoldersToExclude[j] = V.GetElement(j).AssociatedObjectValue?.ToString();
+				}
+				else
+					SubFoldersToExclude = new string[] { Arguments[i].AssociatedObjectValue?.ToString() };
+			}
+			else
+				SubFoldersToExclude = new string[0];
+
+			FolderIndexationStatistics Result = await Waher.Persistence.FullTextSearch.Search.IndexFolder(Index, Folder, Recursive.Value, SubFoldersToExclude);
 
 			return new ObjectValue(Result);
 		}

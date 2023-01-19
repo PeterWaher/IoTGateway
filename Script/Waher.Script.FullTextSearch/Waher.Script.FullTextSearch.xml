@@ -181,6 +181,18 @@
             <param name="Length">Length of expression covered by node.</param>
             <param name="Expression">Expression containing script.</param>
         </member>
+        <member name="M:Waher.Script.FullTextSearch.Functions.FtsFolder.#ctor(Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,Waher.Script.Model.ScriptNode,System.Int32,System.Int32,Waher.Script.Expression)">
+            <summary>
+            Indexes files in a folder.
+            </summary>
+            <param name="IndexCollection">Name of Full-text-search index.</param>
+            <param name="Folder">Folder to index.</param>
+            <param name="Recursive">If search should be recursive through sub folders.</param>
+            <param name="SubFoldersToExclude">Sub-folders to exclude from index.</param>
+            <param name="Start">Start position in script expression.</param>
+            <param name="Length">Length of expression covered by node.</param>
+            <param name="Expression">Expression containing script.</param>
+        </member>
         <member name="P:Waher.Script.FullTextSearch.Functions.FtsFolder.FunctionName">
             <summary>
             Name of the function

@@ -321,10 +321,12 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="IndexCollection">Name of index collection.</param>
 		/// <param name="Folder">Folder name.</param>
 		/// <param name="Recursive">If processing of files in subfolders should be performed.</param>
+		/// <param name="ExcludeSubfolders">Any subfolders to exclude (in recursive mode).</param>
 		/// <returns>Statistics about indexation process.</returns>
-		public static Task<FolderIndexationStatistics> IndexFolder(string IndexCollection, string Folder, bool Recursive)
+		public static Task<FolderIndexationStatistics> IndexFolder(string IndexCollection, string Folder, bool Recursive,
+			params string[] ExcludeSubfolders)
 		{
-			return FullTextSearchModule.IndexFolder(IndexCollection, Folder, Recursive);
+			return FullTextSearchModule.IndexFolder(IndexCollection, Folder, Recursive, ExcludeSubfolders);
 		}
 
 		/// <summary>

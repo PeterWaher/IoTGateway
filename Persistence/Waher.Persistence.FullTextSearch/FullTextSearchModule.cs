@@ -1521,8 +1521,10 @@ namespace Waher.Persistence.FullTextSearch
 		/// <param name="IndexCollection">Name of index collection.</param>
 		/// <param name="Folder">Folder name.</param>
 		/// <param name="Recursive">If processing of files in subfolders should be performed.</param>
+		/// <param name="ExcludeSubfolders">Any subfolders to exclude (in recursive mode).</param>
 		/// <returns>Statistics about indexation process.</returns>
-		internal static async Task<FolderIndexationStatistics> IndexFolder(string IndexCollection, string Folder, bool Recursive)
+		internal static async Task<FolderIndexationStatistics> IndexFolder(string IndexCollection, string Folder, bool Recursive,
+			params string[] ExcludeSubfolders)
 		{
 			if (string.IsNullOrEmpty(IndexCollection))
 				throw new ArgumentException("Empty index.", nameof(IndexCollection));
@@ -1540,6 +1542,22 @@ namespace Waher.Persistence.FullTextSearch
 			string[] FileNames = Directory.GetFiles(Folder, "*.*", Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 			Dictionary<CaseInsensitiveString, FileReference> References = new Dictionary<CaseInsensitiveString, FileReference>();
 			FolderIndexationStatistics Result = new FolderIndexationStatistics();
+			int i, c, d;
+
+			if (!(ExcludeSubfolders is null))
+			{
+				ExcludeSubfolders = (string[])ExcludeSubfolders.Clone();
+				c = ExcludeSubfolders.Length;
+
+				for (i = 0; i < c; i++)
+				{
+					ExcludeSubfolders[i] = Path.GetFullPath(ExcludeSubfolders[i]);
+					d = ExcludeSubfolders[i].Length;
+
+					if (d == 0 || ExcludeSubfolders[i][d - 1] != Path.DirectorySeparatorChar)
+						ExcludeSubfolders[i] += Path.DirectorySeparatorChar;
+				}
+			}
 
 			IEnumerable<FileReference> ReferencesInDB = await Database.Find<FileReference>(
 				new FilterAnd(
@@ -1551,6 +1569,23 @@ namespace Waher.Persistence.FullTextSearch
 
 			foreach (string FileName in FileNames)
 			{
+				if (!(ExcludeSubfolders is null))
+				{
+					bool Exclude = false;
+
+					foreach (string s in ExcludeSubfolders)
+					{
+						if (FileName.StartsWith(s))
+						{
+							Exclude = true;
+							break;
+						}
+					}
+
+					if (Exclude)
+						continue;
+				}
+
 				if (!FileReferenceTokenizer.HasTokenizer(FileName))
 					continue;
 

@@ -426,13 +426,14 @@
             <param name="Properties">Properties</param>
             <returns>Enumeration of property values.</returns>
         </member>
-        <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchModule.IndexFolder(System.String,System.String,System.Boolean)">
+        <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchModule.IndexFolder(System.String,System.String,System.Boolean,System.String[])">
             <summary>
             Indexes or reindexes files in a folder.
             </summary>
             <param name="IndexCollection">Name of index collection.</param>
             <param name="Folder">Folder name.</param>
             <param name="Recursive">If processing of files in subfolders should be performed.</param>
+            <param name="ExcludeSubfolders">Any subfolders to exclude (in recursive mode).</param>
             <returns>Statistics about indexation process.</returns>
         </member>
         <member name="M:Waher.Persistence.FullTextSearch.FullTextSearchModule.IndexFile(System.String,System.String)">
@@ -1364,13 +1365,14 @@
             <param name="IndexCollectionName">Index Collection</param>
             <returns>Number of objects reindexed.</returns>
         </member>
-        <member name="M:Waher.Persistence.FullTextSearch.Search.IndexFolder(System.String,System.String,System.Boolean)">
+        <member name="M:Waher.Persistence.FullTextSearch.Search.IndexFolder(System.String,System.String,System.Boolean,System.String[])">
             <summary>
             Indexes or reindexes files in a folder.
             </summary>
             <param name="IndexCollection">Name of index collection.</param>
             <param name="Folder">Folder name.</param>
             <param name="Recursive">If processing of files in subfolders should be performed.</param>
+            <param name="ExcludeSubfolders">Any subfolders to exclude (in recursive mode).</param>
             <returns>Statistics about indexation process.</returns>
         </member>
         <member name="M:Waher.Persistence.FullTextSearch.Search.IndexFile(System.String,System.String)">

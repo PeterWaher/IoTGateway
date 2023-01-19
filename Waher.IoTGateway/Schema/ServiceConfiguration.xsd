@@ -21,8 +21,8 @@
 						</xs:sequence>
 					</xs:complexType>
 				</xs:element>
-				<xs:element name="InitializationScript" type="xs:string" minOccurs="0" maxOccurs="0"/>
-				<xs:element name="StartupScript" type="xs:string" minOccurs="0" maxOccurs="0"/>
+				<xs:element name="InitializationScript" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="StartupScript" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

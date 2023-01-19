@@ -85,10 +85,13 @@ namespace Waher.IoTGateway.Tokenizers
 		{
 			if (N is HtmlElement E)
 			{
-				foreach (HtmlAttribute Attr in E.Attributes)
+				if (E.HasAttributes)
 				{
-					Text.Append(' ');
-					Text.Append(Attr.Value);
+					foreach (HtmlAttribute Attr in E.Attributes)
+					{
+						Text.Append(' ');
+						Text.Append(Attr.Value);
+					}
 				}
 
 				if (E.HasChildren)

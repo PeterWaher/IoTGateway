@@ -66,18 +66,21 @@ namespace Waher.Content.Html
 
 					Name = Value = null;
 
-					foreach (HtmlAttribute Attr in Meta.Attributes)
+					if (Meta.HasAttributes)
 					{
-						switch (Attr.Name)
+						foreach (HtmlAttribute Attr in Meta.Attributes)
 						{
-							case "property":
-							case "name":
-								Name = Attr.Value;
-								break;
+							switch (Attr.Name)
+							{
+								case "property":
+								case "name":
+									Name = Attr.Value;
+									break;
 
-							case "content":
-								Value = Attr.Value;
-								break;
+								case "content":
+									Value = Attr.Value;
+									break;
+							}
 						}
 					}
 

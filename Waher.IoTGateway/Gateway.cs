@@ -894,7 +894,7 @@ namespace Waher.IoTGateway
 				}
 
 				await LoadScriptResources();
-				await ProcessServiceConfigurations();
+				await ProcessServiceConfigurations(false);
 
 				httpxServer = new HttpxServer(xmppClient, webServer, MaxChunkSize);
 				Types.SetModuleParameter("HTTPX", httpxProxy);
@@ -4561,12 +4561,29 @@ namespace Waher.IoTGateway
 			}
 		}
 
-		private static async Task ProcessServiceConfigurations()
+		/// <summary>
+		/// Processes new Service Configuration Files. This method should be called after installation of new
+		/// services (or updating such services) contaiing such service configuration files in the root application 
+		/// data folder.
+		/// </summary>
+		/// <returns>Number of configuration files executed.</returns>
+		public static Task<int> ProcessNewServiceConfigurations()
+		{
+			return ProcessServiceConfigurations(true);
+		}
+
+		private static async Task<int> ProcessServiceConfigurations(bool OnlyIfChanged)
 		{
 			string[] ConfigurationFiles = Directory.GetFiles(appDataFolder, "*.config", SearchOption.TopDirectoryOnly);
+			int NrExecuted = 0;
 
 			foreach (string ConfigurationFile in ConfigurationFiles)
-				await ProcessServiceConfigurationFile(ConfigurationFile);
+			{
+				if (await ProcessServiceConfigurationFile(ConfigurationFile, OnlyIfChanged))
+					NrExecuted++;
+			}
+
+			return NrExecuted;
 		}
 
 		private const string ServiceConfigurationRoot = "ServiceConfiguration";
@@ -4577,8 +4594,9 @@ namespace Waher.IoTGateway
 		/// either when service starts, or when file is updated or is installed.
 		/// </summary>
 		/// <param name="ConfigurationFileName">File Name of Service Configuration file.</param>
+		/// <param name="OnlyIfChanged">Only execute contents in file, if file has changed.</param>
 		/// <returns>If file was successfully loaded and executed.</returns>
-		public static async Task<bool> ProcessServiceConfigurationFile(string ConfigurationFileName)
+		public static async Task<bool> ProcessServiceConfigurationFile(string ConfigurationFileName, bool OnlyIfChanged)
 		{
 			try
 			{
@@ -4604,6 +4622,11 @@ namespace Waher.IoTGateway
 					XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.ServiceConfiguration.xsd", typeof(Gateway).Assembly));
 
 				bool ExecuteInitScript = await InitScriptFile.NeedsExecution(ConfigurationFileName);
+
+				if (OnlyIfChanged && !ExecuteInitScript)
+					return false;
+
+				Log.Notice("Applying Service Configurations.", ConfigurationFileName);
 
 				webServer.UnregisterVanityResources(ConfigurationFileName);
 

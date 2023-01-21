@@ -4510,7 +4510,7 @@ namespace Waher.Content.Markdown
 		/// <param name="Output">Markdown will be output here.</param>
 		public async Task GenerateMarkdown(StringBuilder Output)
 		{
-			if (!string.IsNullOrEmpty(this.fileName) && this.metaData.TryGetValue("MASTER", out KeyValuePair<string, bool>[] Master) && Master.Length == 1)
+			if (this.metaData.TryGetValue("MASTER", out KeyValuePair<string, bool>[] Master) && Master.Length == 1)
 			{
 				await this.LoadMasterIfNotLoaded(Master[0].Key);
 				await this.master.GenerateMarkdown(Output, false);
@@ -4565,7 +4565,7 @@ namespace Waher.Content.Markdown
 		/// <param name="Output">HTML will be output here.</param>
 		public async Task GenerateHTML(StringBuilder Output)
 		{
-			if (!string.IsNullOrEmpty(this.fileName) && this.metaData.TryGetValue("MASTER", out KeyValuePair<string, bool>[] Master) && Master.Length == 1)
+			if (this.metaData.TryGetValue("MASTER", out KeyValuePair<string, bool>[] Master) && Master.Length == 1)
 			{
 				await this.LoadMasterIfNotLoaded(Master[0].Key);
 				await this.master.GenerateHTML(Output, false);
@@ -4578,7 +4578,19 @@ namespace Waher.Content.Markdown
 		{
 			if (this.master is null)
 			{
-				string FileName = this.settings.GetFileName(this.fileName, MasterMetaValue);
+				string FileName;
+
+				if (!string.IsNullOrEmpty(this.fileName))
+					FileName = this.settings.GetFileName(this.fileName, MasterMetaValue);
+				else if (!string.IsNullOrEmpty(this.resourceName))
+				{
+					FileName = Path.Combine(this.resourceName, MasterMetaValue);
+					if (!(this.settings.ResourceMap is null) && this.settings.ResourceMap.TryGetFileName(FileName, false, out string s))
+						FileName = s;
+				}
+				else
+					FileName = MasterMetaValue;
+
 				string MarkdownText = await Resources.ReadAllTextAsync(FileName);
 				this.master = await CreateAsync(MarkdownText, this.settings);
 				this.master.fileName = FileName;

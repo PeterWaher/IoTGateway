@@ -2576,6 +2576,23 @@
             <returns>Binary content.</returns>
             <exception cref="T:System.IO.IOException">If Resource name is not valid or resource not found.</exception>
         </member>
+        <member name="M:Waher.Content.Resources.LoadResourceAsText(System.String)">
+            <summary>
+            Loads a text resource from an embedded resource.
+            </summary>
+            <param name="ResourceName">Resource Name.</param>
+            <returns>Text content.</returns>
+            <exception cref="T:System.IO.IOException">If Resource name is not valid or resource not found.</exception>
+        </member>
+        <member name="M:Waher.Content.Resources.LoadResourceAsText(System.String,System.Reflection.Assembly)">
+            <summary>
+            Loads a text resource from an embedded resource.
+            </summary>
+            <param name="ResourceName">Resource Name.</param>
+            <param name="Assembly">Assembly containing the resource.</param>
+            <returns>Text content.</returns>
+            <exception cref="T:System.IO.IOException">If Resource name is not valid or resource not found.</exception>
+        </member>
         <member name="M:Waher.Content.Resources.LoadCertificate(System.String)">
             <summary>
             Loads a certificate from an embedded resource.

@@ -4411,6 +4411,22 @@
             <param name="Variables">Variables collection.</param>
             <returns>Function result.</returns>
         </member>
+        <member name="M:Waher.Script.Functions.DateAndTime.DateTime.FromInteger(System.Int64,System.DateTimeKind)">
+            <summary>
+            Converts an integer to a <see cref="T:System.DateTime"/>.
+            If integer is a 32-bit integer, it is considered a UNIX time,
+            representing the number of seconds after the <see cref="F:Waher.Script.Functions.DateAndTime.DateTime.UnixEpoch"/>.
+            64-bit integers are considered <see cref="T:System.DateTime"/> ticks.
+            </summary>
+            <param name="Nr">Integer</param>
+            <param name="Kind">Kind</param>
+            <returns>DateTime value.</returns>
+        </member>
+        <member name="F:Waher.Script.Functions.DateAndTime.DateTime.UnixEpoch">
+            <summary>
+            Unix Date and Time epoch, starting at 1970-01-01T00:00:00Z
+            </summary>
+        </member>
         <member name="M:Waher.Script.Functions.DateAndTime.DateTime.TryParse(System.String,System.DateTime@)">
             <summary>
             Parses DateTime values from short forms of strings.

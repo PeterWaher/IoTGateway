@@ -160,7 +160,7 @@ namespace Waher.Script.Functions.DateAndTime
 			else
 			{
 				if (CheckAgainst is DoubleNumber D)
-					TP = new System.DateTime((long)D.Value);
+					TP = DateTime.FromInteger((long)D.Value, DateTimeKind.Local);
 				else
 				{
 					string s = CheckAgainst.AssociatedObjectValue?.ToString() ?? string.Empty;
@@ -168,7 +168,7 @@ namespace Waher.Script.Functions.DateAndTime
 					if (!System.DateTime.TryParse(s, out TP))
 					{
 						if (long.TryParse(s, out long Ticks))
-							TP = new System.DateTime(Ticks);
+							TP = DateTime.FromInteger(Ticks, DateTimeKind.Local);
 						else
 							return PatternMatchResult.NoMatch;
 					}

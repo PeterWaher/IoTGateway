@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -103,9 +104,9 @@ namespace Waher.Script.Functions.DateAndTime
 				object Obj = Arguments[0].AssociatedObjectValue;
 
 				if (Obj is long L)
-					return new DateTimeValue(new System.DateTime(L));
+					return new DateTimeValue(FromInteger(L, DateTimeKind.Unspecified));
 				else if (Obj is double Dbl)
-					return new DateTimeValue(new System.DateTime((long)Dbl));
+					return new DateTimeValue(FromInteger((long)Dbl, DateTimeKind.Unspecified));
 				else if (!(Obj is null) && TryParse(Obj.ToString(), out System.DateTime TP))
 					return new DateTimeValue(TP);
 				else
@@ -139,6 +140,35 @@ namespace Waher.Script.Functions.DateAndTime
 					throw new ScriptRuntimeException("Invalid number of parameters.", this);
 			}
 		}
+
+		/// <summary>
+		/// Converts an integer to a <see cref="System.DateTime"/>.
+		/// If integer is a 32-bit integer, it is considered a UNIX time,
+		/// representing the number of seconds after the <see cref="UnixEpoch"/>.
+		/// 64-bit integers are considered <see cref="System.DateTime"/> ticks.
+		/// </summary>
+		/// <param name="Nr">Integer</param>
+		/// <param name="Kind">Kind</param>
+		/// <returns>DateTime value.</returns>
+		public static System.DateTime FromInteger(long Nr, DateTimeKind Kind)
+		{
+			if (Nr >= int.MinValue && Nr <= int.MaxValue)
+			{
+				System.DateTime Result = UnixEpoch.AddSeconds((int)Nr);
+
+				if (Kind == DateTimeKind.Local)
+					Result = Result.ToLocalTime();
+
+				return Result;
+			}
+			else
+				return new System.DateTime(Nr, Kind);
+		}
+
+		/// <summary>
+		/// Unix Date and Time epoch, starting at 1970-01-01T00:00:00Z
+		/// </summary>
+		public static readonly System.DateTime UnixEpoch = new System.DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
 		/// <summary>
 		/// Parses DateTime values from short forms of strings.
@@ -274,7 +304,7 @@ namespace Waher.Script.Functions.DateAndTime
 			else
 			{
 				if (CheckAgainst is DoubleNumber D)
-					TP = new System.DateTime((long)D.Value);
+					TP = FromInteger((long)D.Value, DateTimeKind.Unspecified);
 				else
 				{
 					string s = CheckAgainst.AssociatedObjectValue?.ToString() ?? string.Empty;
@@ -282,7 +312,7 @@ namespace Waher.Script.Functions.DateAndTime
 					if (!System.DateTime.TryParse(s, out TP))
 					{
 						if (long.TryParse(s, out long Ticks))
-							TP = new System.DateTime(Ticks);
+							TP = FromInteger(Ticks, DateTimeKind.Unspecified);
 						else
 							return PatternMatchResult.NoMatch;
 					}

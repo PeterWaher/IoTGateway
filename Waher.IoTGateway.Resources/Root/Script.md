@@ -969,6 +969,10 @@ The following table lists available string-related functions:
 | `TimeSpan(Day,Hour,Minute,Second)`                         | Creates a TimeSpan value.                                                                             | Extracts days, hours, minutes and seconds from a time span value.                               | `TimeSpan(2,14,34,12)`                     |
 | `TimeSpan(Day,Hour,Minute,Second,MSecond)`                 | Creates a TimeSpan value.                                                                             | Extracts days, hours, minutes, seconds and milliseconds from a time span value.                 | `TimeSpan(2,14,34,12,123)`                 |
 
+**Note**: When specifying a date and time using ticks, the number of ticks can either
+mean the number of seconds from the UNIX Epoch (at 1970-01-01 00:00:00), if ticks
+fit as a 32-bit integer, or the number of 100ns ticks since 0001-01-01 00:00:00.
+
 ### Vector Functions
 
 The following functions operate on vectors:

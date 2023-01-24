@@ -137,6 +137,56 @@
             <param name="DTO">Value to encode.</param>
             <returns>XML-encoded value.</returns>
         </member>
+        <member name="M:Waher.Content.Xml.XML.Encode(Waher.Content.NamedDictionary{System.String,System.Object})">
+            <summary>
+            Encodes a named dictionary as XML.
+            </summary>
+            <param name="Object">Object.</param>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Encode(Waher.Content.NamedDictionary{System.String,System.Object},System.Nullable{System.Int32})">
+            <summary>
+            Encodes a named dictionary as XML.
+            </summary>
+            <param name="Object">Object.</param>
+            <param name="Indent">If XML should be indented.</param>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Encode(Waher.Content.NamedDictionary{System.String,System.Object},System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes a named dictionary as XML.
+            </summary>
+            <param name="Object">Object.</param>
+            <param name="Indent">If XML should be indented.</param>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.Encode(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,System.Object}},System.String,System.String,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes a named dictionary as XML.
+            </summary>
+            <param name="Object">Object.</param>
+            <param name="LocalName">Local Name of XML Element to encode the object.</param>
+            <param name="Namespace">Namespace of XML Element to encode the object.</param>
+            <param name="Indent">If XML should be indented.</param>
+            <param name="Xml">XML Output.</param>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.EncodeAttribute(System.String,System.Object,System.Text.StringBuilder)">
+            <summary>
+            Encodes a property as an XML attribute.
+            </summary>
+            <param name="Key">Parameter key.</param>
+            <param name="Value">Parameter value.</param>
+            <param name="Xml">XML Output.</param>
+            <returns>If value was encoded.</returns>
+        </member>
+        <member name="M:Waher.Content.Xml.XML.EncodeChildElement(System.String,System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes a property as an XML attribute.
+            </summary>
+            <param name="Key">Parameter key.</param>
+            <param name="Value">Parameter value.</param>
+            <param name="Indent">If XML should be indented.</param>
+            <param name="Xml">XML Output.</param>
+            <returns>If value was encoded.</returns>
+        </member>
         <member name="M:Waher.Content.Xml.XML.DecodeString(System.String)">
             <summary>
             Decodes a string used in XML.

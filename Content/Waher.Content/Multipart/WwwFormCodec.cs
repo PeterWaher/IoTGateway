@@ -158,8 +158,7 @@ namespace Waher.Content.Multipart
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
-			if (Object is Dictionary<string, string> Form &&
-				InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
+			if (Object is Dictionary<string, string> Form)
 			{
 				StringBuilder sb = new StringBuilder();
 				string ContentType;

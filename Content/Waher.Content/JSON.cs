@@ -18,7 +18,7 @@ namespace Waher.Content
 		/// </summary>
 		public static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-		#region Encoding/Decoding
+		#region Parsing
 
 		/// <summary>
 		/// Parses a JSON string.
@@ -450,6 +450,10 @@ namespace Waher.Content
 				throw new Exception("Invalid hexadecimal digit.");
 		}
 
+		#endregion
+
+		#region Encoding
+
 		/// <summary>
 		/// Encodes a string for inclusion in JSON.
 		/// </summary>
@@ -506,8 +510,8 @@ namespace Waher.Content
 		/// Encodes an object as JSON.
 		/// </summary>
 		/// <param name="Object">Object.</param>
-		/// <param name="Json">JSON Output.</param>
 		/// <param name="Indent">If JSON should be indented.</param>
+		/// <param name="Json">JSON Output.</param>
 		/// <param name="AdditionalProperties">Optional additional properties.</param>
 		public static void Encode(IEnumerable<KeyValuePair<string, object>> Object, int? Indent, StringBuilder Json,
 			params KeyValuePair<string, object>[] AdditionalProperties)
@@ -585,8 +589,8 @@ namespace Waher.Content
 		/// Encodes an object as JSON.
 		/// </summary>
 		/// <param name="Object">Object.</param>
-		/// <param name="Json">JSON Output.</param>
 		/// <param name="Indent">If JSON should be indented.</param>
+		/// <param name="Json">JSON Output.</param>
 		public static void Encode(IEnumerable<KeyValuePair<string, IElement>> Object, int? Indent, StringBuilder Json)
 		{
 			bool First = true;
@@ -738,9 +742,9 @@ namespace Waher.Content
 
 						if (Indent.HasValue)
 						{
+							Indent--;
 							Json.AppendLine();
 							Json.Append(new string('\t', Indent.Value));
-							Indent--;
 						}
 
 						Json.Append('}');
@@ -787,8 +791,8 @@ namespace Waher.Content
 
 					if (!First && Indent.HasValue)
 					{
-						Json.AppendLine();
 						Indent--;
+						Json.AppendLine();
 						Json.Append(new string('\t', Indent.Value));
 					}
 
@@ -831,8 +835,8 @@ namespace Waher.Content
 
 					if (!First && Indent.HasValue)
 					{
-						Json.AppendLine();
 						Indent--;
+						Json.AppendLine();
 						Json.Append(new string('\t', Indent.Value));
 					}
 

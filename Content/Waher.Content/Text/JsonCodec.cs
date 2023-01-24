@@ -193,23 +193,18 @@ namespace Waher.Content.Text
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
-			if (InternetContent.IsAccepted(JsonContentTypes, out _, AcceptedContentTypes))
+			string Json = JSON.Encode(Object, false);
+			string ContentType = "application/json";
+
+			if (Encoding is null)
 			{
-				string Json = JSON.Encode(Object, false);
-				string ContentType = "application/json";
-
-				if (Encoding is null)
-				{
-					Encoding = Encoding.UTF8;
-					ContentType += "; charset=utf-8";
-				}
-				else
-					ContentType += "; charset=" + Encoding.WebName;
-
-				return Task.FromResult(new KeyValuePair<byte[], string>(Encoding.GetBytes(Json), ContentType));
+				Encoding = Encoding.UTF8;
+				ContentType += "; charset=utf-8";
 			}
 			else
-				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+				ContentType += "; charset=" + Encoding.WebName;
+
+			return Task.FromResult(new KeyValuePair<byte[], string>(Encoding.GetBytes(Json), ContentType));
 		}
 	}
 }

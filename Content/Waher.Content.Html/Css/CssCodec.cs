@@ -152,27 +152,25 @@ namespace Waher.Content.Html.Css
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
-			if (InternetContent.IsAccepted(CssContentTypes, out string ContentType, AcceptedContentTypes))
+			if (!InternetContent.IsAccepted(CssContentTypes, out string ContentType, AcceptedContentTypes))
+				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+
+			string s;
+
+			if (Object is CssDocument CssDoc)
+				s = CssDoc.Css;
+			else
+				s = Object.ToString();
+
+			if (Encoding is null)
 			{
-				string s;
-
-				if (Object is CssDocument CssDoc)
-					s = CssDoc.Css;
-				else
-					s = Object.ToString();
-
-				if (Encoding is null)
-				{
-					ContentType += "; charset=utf-8";
-					Encoding = Encoding.UTF8;
-				}
-				else
-					ContentType += "; charset=" + Encoding.WebName;
-				
-				return Task.FromResult(new KeyValuePair<byte[], string>(Encoding.GetBytes(s), ContentType));
+				ContentType += "; charset=utf-8";
+				Encoding = Encoding.UTF8;
 			}
+			else
+				ContentType += "; charset=" + Encoding.WebName;
 
-			throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+			return Task.FromResult(new KeyValuePair<byte[], string>(Encoding.GetBytes(s), ContentType));
 		}
 	}
 }

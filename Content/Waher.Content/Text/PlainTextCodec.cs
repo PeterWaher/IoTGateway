@@ -219,22 +219,17 @@ namespace Waher.Content.Text
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
-			if (this.Encodes(Object, out Grade _, AcceptedContentTypes))
-			{
-				string ContentType;
+			string ContentType;
 
-				if (Encoding is null)
-				{
-					ContentType = "text/plain; charset=utf-8";
-					Encoding = Encoding.UTF8;
-				}
-				else
-					ContentType = "text/plain; charset=" + Encoding.WebName;
-					
-				return Task.FromResult(new KeyValuePair<byte[], string>(Encoding.GetBytes(Object.ToString()), ContentType));
+			if (Encoding is null)
+			{
+				ContentType = "text/plain; charset=utf-8";
+				Encoding = Encoding.UTF8;
 			}
 			else
-				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+				ContentType = "text/plain; charset=" + Encoding.WebName;
+
+			return Task.FromResult(new KeyValuePair<byte[], string>(Encoding.GetBytes(Object.ToString()), ContentType));
 		}
 	}
 }

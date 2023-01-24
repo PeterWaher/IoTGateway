@@ -4,7 +4,10 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content.Text;
 using Waher.Runtime.Inventory;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Functions.Scalar;
 
 namespace Waher.Content.Xml.Text
 {
@@ -173,10 +176,17 @@ namespace Waher.Content.Xml.Text
 		/// <returns>If the encoder can encode the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if ((Object is XmlDocument || Object is XmlElement) &&
+			if ((Object is XmlDocument || Object is XmlElement || Object is NamedDictionary<string, object>) &&
 				InternetContent.IsAccepted(XmlContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Ok;
+				return true;
+			}
+
+			if ((Object is NamedDictionary<string, IElement>) &&
+				InternetContent.IsAccepted(XmlContentTypes, AcceptedContentTypes))
+			{
+				Grade = Grade.Barely;
 				return true;
 			}
 
@@ -194,55 +204,88 @@ namespace Waher.Content.Xml.Text
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
-			if ((Object is XmlDocument || Object is XmlElement) &&
-				InternetContent.IsAccepted(XmlContentTypes, out string ContentType, AcceptedContentTypes))
+			if (InternetContent.IsAccepted(XmlContentTypes, out string ContentType, AcceptedContentTypes))
 			{
-				if (!(Object is XmlDocument Doc))
+				if (Object is XmlDocument Doc)
+					return this.EncodeAsync(Doc, Encoding, ContentType);
+				else if (Object is XmlElement E)
 				{
 					Doc = new XmlDocument();
-
-					if (Object is XmlElement E)
-						Doc.AppendChild(Doc.ImportNode(E, true));
+					Doc.AppendChild(Doc.ImportNode(E, true));
+					return this.EncodeAsync(Doc, Encoding, ContentType);
 				}
-
-				MemoryStream ms = null;
-				XmlWriterSettings Settings;
-				XmlWriter w = null;
-				byte[] Result;
-
-				try
+				else if (Object is NamedDictionary<string, object> Obj)
 				{
-					ms = new MemoryStream();
-					Settings = XML.WriterSettings(false, false);
-
-					if (Encoding is null)
-					{
-						Settings.Encoding = Encoding.UTF8;
-						ContentType += "; charset=utf-8";
-					}
-					else
-					{
-						Settings.Encoding = Encoding;
-						ContentType += "; charset=" + Encoding.WebName;
-					}
-
-					w = XmlWriter.Create(ms, Settings);
-
-					Doc.Save(w);
-					w.Flush();
-
-					Result = ms.ToArray();
+					string Xml = XML.Encode(Obj);
+					return this.EncodeAsync(Xml, Encoding, ContentType);
 				}
-				finally
+				else if (Object is NamedDictionary<string, IElement> Obj2)
 				{
-					w?.Dispose();
-					ms?.Dispose();
+					string Xml = XML.Encode(NamedDictionary<string, object>.ToNamedDictionary(Obj2));
+					return this.EncodeAsync(Xml, Encoding, ContentType);
+				}
+			}
+
+			throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+		}
+
+		private Task<KeyValuePair<byte[], string>> EncodeAsync(XmlDocument Doc, Encoding Encoding, string ContentType)
+		{
+			MemoryStream ms = null;
+			XmlWriterSettings Settings;
+			XmlWriter w = null;
+			byte[] Result;
+
+			try
+			{
+				ms = new MemoryStream();
+				Settings = XML.WriterSettings(false, false);
+
+				if (Encoding is null)
+				{
+					Settings.Encoding = Encoding.UTF8;
+					ContentType += "; charset=utf-8";
+				}
+				else
+				{
+					Settings.Encoding = Encoding;
+					ContentType += "; charset=" + Encoding.WebName;
 				}
 
-				return Task.FromResult(new KeyValuePair<byte[], string>(Result, ContentType));
+				w = XmlWriter.Create(ms, Settings);
+
+				Doc.Save(w);
+				w.Flush();
+
+				Result = ms.ToArray();
+			}
+			finally
+			{
+				w?.Dispose();
+				ms?.Dispose();
+			}
+
+			return Task.FromResult(new KeyValuePair<byte[], string>(Result, ContentType));
+		}
+
+		private Task<KeyValuePair<byte[], string>> EncodeAsync(string Xml, Encoding Encoding, string ContentType)
+		{
+			byte[] Bin;
+
+			if (Encoding is null)
+			{
+				ContentType += "; charset=utf-8";
+				Bin = Encoding.UTF8.GetBytes(Xml);
 			}
 			else
-				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+			{
+				ContentType += "; charset=" + Encoding.WebName;
+				Bin = Encoding.GetBytes(Xml);
+			}
+
+			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
 		}
+
+
 	}
 }

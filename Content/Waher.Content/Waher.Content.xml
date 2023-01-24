@@ -1845,8 +1845,8 @@
             Encodes an object as JSON.
             </summary>
             <param name="Object">Object.</param>
-            <param name="Json">JSON Output.</param>
             <param name="Indent">If JSON should be indented.</param>
+            <param name="Json">JSON Output.</param>
             <param name="AdditionalProperties">Optional additional properties.</param>
         </member>
         <member name="M:Waher.Content.JSON.Encode(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Waher.Script.Abstraction.Elements.IElement}},System.Nullable{System.Int32},System.Text.StringBuilder)">
@@ -1854,8 +1854,8 @@
             Encodes an object as JSON.
             </summary>
             <param name="Object">Object.</param>
-            <param name="Json">JSON Output.</param>
             <param name="Indent">If JSON should be indented.</param>
+            <param name="Json">JSON Output.</param>
         </member>
         <member name="T:Waher.Content.Multipart.AlternativeCodec">
             <summary>
@@ -2433,6 +2433,74 @@
             <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
             <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
             <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
+        </member>
+        <member name="T:Waher.Content.NamedDictionary`2">
+            <summary>
+            A Named dictionary is a dictionary, with a local name and a namespace.
+            Use it to return content that can be encoded both as JSON or XML.
+            </summary>
+            <typeparam name="TKey">Key Type</typeparam>
+            <typeparam name="TValue">Value Type</typeparam>
+        </member>
+        <member name="M:Waher.Content.NamedDictionary`2.#ctor">
+            <summary>
+            A Named dictionary is a dictionary, with a local name and a namespace.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.NamedDictionary`2.#ctor(System.String,System.String)">
+            <summary>
+            A Named dictionary is a dictionary, with a local name and a namespace.
+            </summary>
+            <param name="LocalName">Local Name</param>
+            <param name="Namespace">Namespace</param>
+        </member>
+        <member name="M:Waher.Content.NamedDictionary`2.#ctor(System.Collections.Generic.IDictionary{`0,`1})">
+            <summary>
+            A Named dictionary is a dictionary, with a local name and a namespace.
+            </summary>
+            <param name="Dictionary">Dictionary with items.</param>
+        </member>
+        <member name="M:Waher.Content.NamedDictionary`2.#ctor(System.Collections.Generic.IEqualityComparer{`0})">
+            <summary>
+            A Named dictionary is a dictionary, with a local name and a namespace.
+            </summary>
+            <param name="Comparer">Comparer</param>
+        </member>
+        <member name="M:Waher.Content.NamedDictionary`2.#ctor(System.Int32)">
+            <summary>
+            A Named dictionary is a dictionary, with a local name and a namespace.
+            </summary>
+            <param name="Capacity">Initial Capacity.</param>
+        </member>
+        <member name="M:Waher.Content.NamedDictionary`2.#ctor(System.Collections.Generic.IDictionary{`0,`1},System.Collections.Generic.IEqualityComparer{`0})">
+            <summary>
+            A Named dictionary is a dictionary, with a local name and a namespace.
+            </summary>
+            <param name="Dictionary">Dictionary with items.</param>
+            <param name="Comparer">Comparer</param>
+        </member>
+        <member name="M:Waher.Content.NamedDictionary`2.#ctor(System.Int32,System.Collections.Generic.IEqualityComparer{`0})">
+            <summary>
+            A Named dictionary is a dictionary, with a local name and a namespace.
+            </summary>
+            <param name="Capacity">Initial Capacity.</param>
+            <param name="Comparer">Comparer</param>
+        </member>
+        <member name="M:Waher.Content.NamedDictionary`2.ToNamedDictionary(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Waher.Script.Abstraction.Elements.IElement}})">
+            <summary>
+            Creates a Named Dictionary from a script object ex-nihilo
+            </summary>
+            <param name="Dictionary">Script object.</param>
+        </member>
+        <member name="P:Waher.Content.NamedDictionary`2.LocalName">
+            <summary>
+            Local Name of dictionary.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.NamedDictionary`2.Namespace">
+            <summary>
+            Namespace of dictionary.
+            </summary>
         </member>
         <member name="T:Waher.Content.Posters.PosterBase">
             <summary>

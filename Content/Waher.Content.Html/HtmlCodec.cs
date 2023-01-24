@@ -166,36 +166,34 @@ namespace Waher.Content.Html
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
-			if (InternetContent.IsAccepted(HtmlContentTypes, out string ContentType, AcceptedContentTypes))
+			if (!InternetContent.IsAccepted(HtmlContentTypes, out string ContentType, AcceptedContentTypes))
+				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+
+			string Html = null;
+			byte[] Bin;
+
+			if (Object is HtmlDocument HtmlDoc)
+				Html = HtmlDoc.HtmlText;
+			else if (Object is string s)
+				Html = s;
+
+			if (Html is null)
+				Bin = null;
+			else
 			{
-				string Html = null;
-				byte[] Bin;
-
-				if (Object is HtmlDocument HtmlDoc)
-					Html = HtmlDoc.HtmlText;
-				else if (Object is string s)
-					Html = s;
-
-				if (Html is null)
-					Bin = null;
+				if (Encoding is null)
+				{
+					ContentType += "; charset=utf-8";
+					Bin = Encoding.UTF8.GetBytes(Html);
+				}
 				else
 				{
-					if (Encoding is null)
-					{
-						ContentType += "; charset=utf-8";
-						Bin = Encoding.UTF8.GetBytes(Html);
-					}
-					else
-					{
-						ContentType += "; charset=" + Encoding.WebName;
-						Bin = Encoding.GetBytes(Html);
-					}
+					ContentType += "; charset=" + Encoding.WebName;
+					Bin = Encoding.GetBytes(Html);
 				}
-
-				return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
 			}
 
-			throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
+			return Task.FromResult(new KeyValuePair<byte[], string>(Bin, ContentType));
 		}
 	}
 }

@@ -3,8 +3,10 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
-using System.Xml.Schema;
-using Waher.Events;
+using System.Reflection;
+using System.Collections;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Objects.Matrices;
 
 namespace Waher.Content.Xml
 {
@@ -13,7 +15,7 @@ namespace Waher.Content.Xml
 	/// </summary>
 	public static class XML
 	{
-		#region Encoding/Decoding
+		#region Encoding
 
 		/// <summary>
 		/// Encodes a string for use in XML.
@@ -155,6 +157,358 @@ namespace Waher.Content.Xml
 
 			return sb.ToString();
 		}
+
+		/// <summary>
+		/// Encodes a named dictionary as XML.
+		/// </summary>
+		/// <param name="Object">Object.</param>
+		public static string Encode(NamedDictionary<string, object> Object)
+		{
+			return Encode(Object, null);
+		}
+
+		/// <summary>
+		/// Encodes a named dictionary as XML.
+		/// </summary>
+		/// <param name="Object">Object.</param>
+		/// <param name="Indent">If XML should be indented.</param>
+		public static string Encode(NamedDictionary<string, object> Object, int? Indent)
+		{
+			StringBuilder sb = new StringBuilder();
+			Encode(Object, Indent, sb);
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Encodes a named dictionary as XML.
+		/// </summary>
+		/// <param name="Object">Object.</param>
+		/// <param name="Indent">If XML should be indented.</param>
+		/// <param name="Xml">XML Output.</param>
+		public static void Encode(NamedDictionary<string, object> Object, int? Indent, StringBuilder Xml)
+		{
+			Encode(Object, Object.LocalName, Object.Namespace, Indent, Xml);
+		}
+
+		/// <summary>
+		/// Encodes a named dictionary as XML.
+		/// </summary>
+		/// <param name="Object">Object.</param>
+		/// <param name="LocalName">Local Name of XML Element to encode the object.</param>
+		/// <param name="Namespace">Namespace of XML Element to encode the object.</param>
+		/// <param name="Indent">If XML should be indented.</param>
+		/// <param name="Xml">XML Output.</param>
+		private static void Encode(IEnumerable<KeyValuePair<string, object>> Object,
+			string LocalName, string Namespace, int? Indent, StringBuilder Xml)
+		{
+			Xml.Append('<');
+			Xml.Append(LocalName);
+
+			if (!string.IsNullOrEmpty(Namespace))
+			{
+				Xml.Append(" xmlns='");
+				Xml.Append(Namespace);
+				Xml.Append("'");
+			}
+
+			bool HasChildren = false;
+
+			foreach (KeyValuePair<string, object> Member in Object)
+			{
+				if (!EncodeAttribute(Member.Key, Member.Value, Xml))
+					HasChildren = true;
+			}
+
+			if (HasChildren)
+			{
+				Xml.Append('>');
+
+				if (Indent.HasValue)
+					Indent++;
+
+				foreach (KeyValuePair<string, object> Member in Object)
+					EncodeChildElement(Member.Key, Member.Value, Indent, Xml);
+
+				if (Indent.HasValue)
+				{
+					Indent--;
+					Xml.AppendLine();
+					Xml.Append(new string('\t', Indent.Value));
+				}
+
+				Xml.Append("</");
+				Xml.Append(LocalName);
+				Xml.Append('>');
+			}
+			else
+				Xml.Append("/>");
+		}
+
+		/// <summary>
+		/// Encodes a property as an XML attribute.
+		/// </summary>
+		/// <param name="Key">Parameter key.</param>
+		/// <param name="Value">Parameter value.</param>
+		/// <param name="Xml">XML Output.</param>
+		/// <returns>If value was encoded.</returns>
+		private static bool EncodeAttribute(string Key, object Value, StringBuilder Xml)
+		{
+			Type T = Value.GetType();
+			TypeInfo TI = T.GetTypeInfo();
+			string ValueString;
+
+			if (TI.IsValueType)
+			{
+				if (Value is bool b)
+					ValueString = CommonTypes.Encode(b);
+				else if (Value is char ch)
+					ValueString = Encode(new string(ch, 1));
+				else if (Value is double dbl)
+					ValueString = CommonTypes.Encode(dbl);
+				else if (Value is float fl)
+					ValueString = CommonTypes.Encode(fl);
+				else if (Value is decimal dec)
+					ValueString = CommonTypes.Encode(dec);
+				else if (TI.IsEnum)
+					ValueString = Encode(Value.ToString());
+				else if (Value is DateTime TP)
+					ValueString = XML.Encode(TP);
+				else if (Value is int || Value is long || Value is short || Value is byte ||
+					Value is uint || Value is ulong || Value is ushort || Value is sbyte)
+				{
+					ValueString = Value.ToString();
+				}
+				else
+					ValueString = Encode(Value.ToString());
+			}
+			else if (Value is string s)
+				ValueString = XML.Encode(s);
+			else
+				return false;
+
+			Xml.Append(' ');
+			Xml.Append(Key);
+			Xml.Append("='");
+			Xml.Append(ValueString);
+			Xml.Append('\'');
+
+			return true;
+		}
+
+		/// <summary>
+		/// Encodes a property as an XML attribute.
+		/// </summary>
+		/// <param name="Key">Parameter key.</param>
+		/// <param name="Value">Parameter value.</param>
+		/// <param name="Indent">If XML should be indented.</param>
+		/// <param name="Xml">XML Output.</param>
+		/// <returns>If value was encoded.</returns>
+		private static bool EncodeChildElement(string Key, object Value,
+			int? Indent, StringBuilder Xml)
+		{
+			Type T = Value.GetType();
+			TypeInfo TI = T.GetTypeInfo();
+
+			if (TI.IsValueType || Value is string)
+				return false;
+
+			if (Indent.HasValue)
+			{
+				Xml.AppendLine();
+				Xml.Append(new string('\t', Indent.Value));
+			}
+
+			if (Value is byte[] ByteArray)
+			{
+				Xml.Append('<');
+				Xml.Append(Key);
+				Xml.Append('>');
+				Xml.Append(Convert.ToBase64String(ByteArray));
+				Xml.Append("</");
+				Xml.Append(Key);
+				Xml.Append('>');
+			}
+			else if (Value is IEnumerable<KeyValuePair<string, object>> Obj)
+				Encode(Obj, Key, null, Indent, Xml);
+			else if (Value is IEnumerable<KeyValuePair<string, IElement>> Obj2)
+				Encode(NamedDictionary<string, object>.ToNamedDictionary(Obj2), Key, null, Indent, Xml);
+			else if (Value is ObjectMatrix M && !(M.ColumnNames is null))
+			{
+				string[] Names = M.ColumnNames;
+				int Rows = M.Rows;
+				int Columns = M.Columns;
+				int x, y;
+
+				Xml.Append('<');
+				Xml.Append(Key);
+				Xml.Append('>');
+
+				if (Indent.HasValue)
+					Indent++;
+
+				for (y = 0; y < Rows; y++)
+				{
+					if (Indent.HasValue)
+					{
+						Xml.AppendLine();
+						Xml.Append(new string('\t', Indent.Value));
+						Indent++;
+					}
+
+
+					Xml.Append("<Record>");
+
+					for (x = 0; x < Columns; x++)
+					{
+						if (Indent.HasValue)
+						{
+							Xml.AppendLine();
+							Xml.Append(new string('\t', Indent.Value));
+						}
+
+						EncodeChildElement(Encode(Names[x]), M.GetElement(x, y).AssociatedObjectValue, Indent, Xml);
+					}
+
+					if (Indent.HasValue)
+					{
+						Indent--;
+						Xml.AppendLine();
+						Xml.Append(new string('\t', Indent.Value));
+					}
+
+					Xml.Append("</Record>");
+				}
+
+				if (Indent.HasValue)
+				{
+					Indent--;
+
+					if (Rows > 0 && Columns > 0)
+					{
+						Xml.AppendLine();
+						Xml.Append(new string('\t', Indent.Value));
+					}
+				}
+
+				Xml.Append("</");
+				Xml.Append(Key);
+				Xml.Append('>');
+			}
+			else if (Value is IVector V)
+			{
+				bool HashItems = false;
+
+				Xml.Append('<');
+				Xml.Append(Key);
+				Xml.Append('>');
+
+				if (Indent.HasValue)
+					Indent++;
+
+				foreach (IElement Element in V.VectorElements)
+				{
+					HashItems = true;
+
+					if (Indent.HasValue)
+					{
+						Xml.AppendLine();
+						Xml.Append(new string('\t', Indent.Value));
+					}
+
+					object Obj3 = Element.AssociatedObjectValue;
+
+					if (Obj3 is NamedDictionary<string, object> Named)
+						Encode(Named, Indent, Xml);
+					else
+						EncodeChildElement("Item", Obj3, Indent, Xml);
+				}
+
+				if (HashItems && Indent.HasValue)
+				{
+					Indent--;
+					Xml.AppendLine();
+					Xml.Append(new string('\t', Indent.Value));
+				}
+
+				Xml.Append("</");
+				Xml.Append(Key);
+				Xml.Append('>');
+			}
+			else if (Value is IDictionary Dictionary)
+			{
+				LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();
+
+				foreach (object Key2 in Dictionary.Keys)
+					Properties.AddLast(new KeyValuePair<string, object>(Key2.ToString(), Dictionary[Key]));
+
+				Encode(Properties, Key, null, Indent, Xml);
+			}
+			else if (Value is IEnumerable E)
+			{
+				IEnumerator e = E.GetEnumerator();
+				bool HashItems = false;
+
+				Xml.Append('<');
+				Xml.Append(Key);
+				Xml.Append('>');
+
+				if (Indent.HasValue)
+					Indent++;
+
+				while (e.MoveNext())
+				{
+					HashItems = true;
+
+					if (Indent.HasValue)
+					{
+						Xml.AppendLine();
+						Xml.Append(new string('\t', Indent.Value));
+					}
+
+					object Obj3 = e.Current;
+
+					if (Obj3 is NamedDictionary<string, object> Named)
+						Encode(Named, Indent, Xml);
+					else
+						EncodeChildElement("Item", Obj3, Indent, Xml);
+				}
+
+				if (HashItems && Indent.HasValue)
+				{
+					Indent--;
+					Xml.AppendLine();
+					Xml.Append(new string('\t', Indent.Value));
+				}
+
+				Xml.Append("</");
+				Xml.Append(Key);
+				Xml.Append('>');
+			}
+			else
+			{
+				LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();
+
+				foreach (FieldInfo FI in T.GetRuntimeFields())
+				{
+					if (FI.IsPublic && !FI.IsStatic)
+						Properties.AddLast(new KeyValuePair<string, object>(FI.Name, FI.GetValue(Value)));
+				}
+
+				foreach (PropertyInfo PI in T.GetRuntimeProperties())
+				{
+					if (PI.CanRead && PI.GetMethod.IsPublic && PI.GetIndexParameters().Length == 0)
+						Properties.AddLast(new KeyValuePair<string, object>(PI.Name, PI.GetValue(Value, null)));
+				}
+
+				Encode(Properties, Key, null, Indent, Xml);
+			}
+
+			return true;
+		}
+
+		#endregion
+
+		#region Parsing
 
 		/// <summary>
 		/// Decodes a string used in XML.

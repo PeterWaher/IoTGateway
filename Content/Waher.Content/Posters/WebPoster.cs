@@ -59,7 +59,8 @@ namespace Waher.Content.Posters
 		/// <returns>Encoded response.</returns>
 		public override async Task<KeyValuePair<byte[], string>> PostAsync(Uri Uri, byte[] EncodedData, string ContentType, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
-			using (HttpClient HttpClient = new HttpClient(WebGetter.GetClientHandler(Certificate), true)
+			HttpClientHandler Handler = WebGetter.GetClientHandler(Certificate);
+			using (HttpClient HttpClient = new HttpClient(Handler, true)
 			{
 				Timeout = TimeSpan.FromMilliseconds(TimeoutMs)
 			})
@@ -72,7 +73,7 @@ namespace Waher.Content.Posters
 				})
 				{
 					Request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(ContentType);
-					WebGetter.PrepareHeaders(Request, Headers);
+					WebGetter.PrepareHeaders(Request, Headers, Handler);
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
 

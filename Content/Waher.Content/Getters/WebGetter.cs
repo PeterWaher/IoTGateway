@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.ExceptionServices;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Waher.Content.Text;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
 
@@ -71,7 +73,8 @@ namespace Waher.Content.Getters
 		/// <returns>Decoded object.</returns>
 		public async Task<object> GetAsync(Uri Uri, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
-			using (HttpClient HttpClient = new HttpClient(GetClientHandler(Certificate), true)
+			HttpClientHandler Handler = GetClientHandler(Certificate);
+			using (HttpClient HttpClient = new HttpClient(Handler, true)
 			{
 				Timeout = TimeSpan.FromMilliseconds(TimeoutMs)
 			})
@@ -82,7 +85,7 @@ namespace Waher.Content.Getters
 					Method = HttpMethod.Get
 				})
 				{
-					PrepareHeaders(Request, Headers);
+					PrepareHeaders(Request, Headers, Handler);
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
 
@@ -91,7 +94,21 @@ namespace Waher.Content.Getters
 			}
 		}
 
-		internal static HttpClientHandler GetClientHandler(X509Certificate Certificate)
+		/// <summary>
+		/// Gets a HTTP Client handler
+		/// </summary>
+		/// <returns>Http Client Handler</returns>
+		public static HttpClientHandler GetClientHandler()
+		{
+			return GetClientHandler(null);
+		}
+
+		/// <summary>
+		/// Gets a HTTP Client handler
+		/// </summary>
+		/// <param name="Certificate">Optional Client certificate</param>
+		/// <returns>Http Client Handler</returns>
+		public static HttpClientHandler GetClientHandler(X509Certificate Certificate)
 		{
 			HttpClientHandler Handler = new HttpClientHandler()
 			{
@@ -163,7 +180,7 @@ namespace Waher.Content.Getters
 			return Decoded;
 		}
 
-		internal static void PrepareHeaders(HttpRequestMessage Request, KeyValuePair<string, string>[] Headers)
+		internal static void PrepareHeaders(HttpRequestMessage Request, KeyValuePair<string, string>[] Headers, HttpClientHandler Handler)
 		{
 			if (!(Headers is null))
 			{
@@ -182,6 +199,51 @@ namespace Waher.Content.Getters
 								Request.Headers.Authorization = new AuthenticationHeaderValue(Header.Value);
 							else
 								Request.Headers.Authorization = new AuthenticationHeaderValue(Header.Value.Substring(0, i), Header.Value.Substring(i + 1).TrimStart());
+							break;
+
+						case "Cookie":
+							string Name = null;
+							string Value = null;
+							string Path = null;
+							string Domain = null;
+							bool First = true;
+
+							foreach (KeyValuePair<string, string> P in CommonTypes.ParseFieldValues(Header.Value))
+							{
+								if (First)
+								{
+									Name = P.Key;
+									Value = P.Value;
+									First = false;
+								}
+								else
+								{
+									switch (P.Key.ToLower())
+									{
+										case "path":
+											Path = P.Value;
+											break;
+
+										case "domain":
+											Domain = P.Value;
+											break;
+									}
+								}
+							}
+
+							if (First)
+								break;
+
+							Cookie Cookie;
+
+							if (!string.IsNullOrEmpty(Domain))
+								Cookie = new Cookie(Name, Value, Path ?? string.Empty, Domain);
+							else if (!string.IsNullOrEmpty(Path))
+								Cookie = new Cookie(Name, Value, Path);
+							else
+								Cookie = new Cookie(Name, Value);
+
+							Handler.CookieContainer.Add(Request.RequestUri, Cookie);
 							break;
 
 						default:
@@ -214,7 +276,8 @@ namespace Waher.Content.Getters
 		/// <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
 		public async Task<KeyValuePair<string, TemporaryStream>> GetTempStreamAsync(Uri Uri, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
-			using (HttpClient HttpClient = new HttpClient(GetClientHandler(Certificate), true)
+			HttpClientHandler Handler = GetClientHandler(Certificate);
+			using (HttpClient HttpClient = new HttpClient(Handler, true)
 			{
 				Timeout = TimeSpan.FromMilliseconds(10000)
 			})
@@ -225,7 +288,7 @@ namespace Waher.Content.Getters
 					Method = HttpMethod.Get
 				})
 				{
-					PrepareHeaders(Request, Headers);
+					PrepareHeaders(Request, Headers, Handler);
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
 
@@ -284,7 +347,8 @@ namespace Waher.Content.Getters
 		/// <returns>Decoded headers object.</returns>
 		public async Task<object> HeadAsync(Uri Uri, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
 		{
-			using (HttpClient HttpClient = new HttpClient(GetClientHandler(Certificate), true)
+			HttpClientHandler Handler = GetClientHandler(Certificate);
+			using (HttpClient HttpClient = new HttpClient(Handler, true)
 			{
 				Timeout = TimeSpan.FromMilliseconds(TimeoutMs)
 			})
@@ -295,7 +359,7 @@ namespace Waher.Content.Getters
 					Method = HttpMethod.Head
 				})
 				{
-					PrepareHeaders(Request, Headers);
+					PrepareHeaders(Request, Headers, Handler);
 
 					HttpResponseMessage Response = await HttpClient.SendAsync(Request);
 					Dictionary<string, object> Result = new Dictionary<string, object>()

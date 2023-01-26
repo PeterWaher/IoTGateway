@@ -967,6 +967,19 @@
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Decoded object.</returns>
         </member>
+        <member name="M:Waher.Content.Getters.WebGetter.GetClientHandler">
+            <summary>
+            Gets a HTTP Client handler
+            </summary>
+            <returns>Http Client Handler</returns>
+        </member>
+        <member name="M:Waher.Content.Getters.WebGetter.GetClientHandler(System.Security.Cryptography.X509Certificates.X509Certificate)">
+            <summary>
+            Gets a HTTP Client handler
+            </summary>
+            <param name="Certificate">Optional Client certificate</param>
+            <returns>Http Client Handler</returns>
+        </member>
         <member name="M:Waher.Content.Getters.WebGetter.ProcessResponse(System.Net.Http.HttpResponseMessage,System.Uri)">
             <summary>
             Decodes a response from the web. If the response is a success, the decoded response is returned.

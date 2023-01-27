@@ -3432,11 +3432,13 @@ namespace Waher.Persistence.Files
 
 						IndexStat = await Index.ComputeStatisticsLocked(ObjectIds);
 
+						if (IndexStat.NrObjects > FileStat.NrObjects)
+							IndexStat.LogError("Too many objects in index.");
+
 						if (Repair && (
 							IndexStat.IsCorrupt || 
 							OldFileStat.IsCorrupt || 
-							FileStat.IsCorrupt || 
-							IndexStat.NrObjects > FileStat.NrObjects))
+							FileStat.IsCorrupt))
 						{
 							await Index.RegenerateLocked();
 
@@ -3444,12 +3446,7 @@ namespace Waher.Persistence.Files
 
 							IndexStat = await Index.ComputeStatisticsLocked(ObjectIds);
 
-							if (OldIndexStat.IsCorrupt)
-								IndexStat.LogComment("Index was regenerated due to errors found in index file.");
-							else if (FileStat.IsCorrupt || OldFileStat.IsCorrupt)
-								IndexStat.LogComment("Index was regenerated due to errors found in object file.");
-							else
-								IndexStat.LogComment("Index was regenerated due to incorrect number of objects in index file.");
+							IndexStat.LogComment("Index was regenerated due to errors found.");
 						}
 
 						WriteStat(Output, IndexStat);

@@ -201,7 +201,7 @@ namespace Waher.Persistence.Files.Statistics
 		/// <summary>
 		/// Number of objects stored.
 		/// </summary>
-		public ulong NrObjects
+		public uint NrObjects
 		{
 			get
 			{

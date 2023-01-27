@@ -3119,6 +3119,7 @@ namespace Waher.Persistence.Files
 
 					KeyValuePair<FileStatistics, Dictionary<Guid, bool>> P = await File.ComputeStatisticsLocked();
 					FileStatistics FileStat = P.Key;
+					FileStatistics OldFileStat = FileStat;
 					Dictionary<Guid, bool> ObjectIds;
 					FileStatistics IndexStat;
 
@@ -3431,12 +3432,24 @@ namespace Waher.Persistence.Files
 
 						IndexStat = await Index.ComputeStatisticsLocked(ObjectIds);
 
-						if (Repair && (IndexStat.IsCorrupt || FileStat.IsCorrupt))
+						if (Repair && (
+							IndexStat.IsCorrupt || 
+							OldFileStat.IsCorrupt || 
+							FileStat.IsCorrupt || 
+							IndexStat.NrObjects > FileStat.NrObjects))
 						{
 							await Index.RegenerateLocked();
 
+							FileStatistics OldIndexStat = IndexStat;
+
 							IndexStat = await Index.ComputeStatisticsLocked(ObjectIds);
-							IndexStat.LogComment("Index was regenerated due to errors found.");
+
+							if (OldIndexStat.IsCorrupt)
+								IndexStat.LogComment("Index was regenerated due to errors found in index file.");
+							else if (FileStat.IsCorrupt || OldFileStat.IsCorrupt)
+								IndexStat.LogComment("Index was regenerated due to errors found in object file.");
+							else
+								IndexStat.LogComment("Index was regenerated due to incorrect number of objects in index file.");
 						}
 
 						WriteStat(Output, IndexStat);

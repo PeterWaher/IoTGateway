@@ -2376,6 +2376,17 @@
             <param name="Index">Index file to add.</param>
             <returns>If the index was found and removed.</returns>
         </member>
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.RegenerateIndex(Waher.Persistence.Files.IndexBTreeFile)">
+            <summary>
+            Regenerates a given index.
+            </summary>
+            <param name="Index">Index to regenerate.</param>
+        </member>
+        <member name="M:Waher.Persistence.Files.ObjectBTreeFile.RegenerateIndices">
+            <summary>
+            Regenerates all indices.
+            </summary>
+        </member>
         <member name="P:Waher.Persistence.Files.ObjectBTreeFile.Indices">
             <summary>
             Available indices.

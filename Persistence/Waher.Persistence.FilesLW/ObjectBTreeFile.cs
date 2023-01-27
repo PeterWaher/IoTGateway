@@ -5181,6 +5181,40 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Regenerates a given index.
+		/// </summary>
+		/// <param name="Index">Index to regenerate.</param>
+		public async Task RegenerateIndex(IndexBTreeFile Index)
+		{
+			await this.BeginWrite();
+			try
+			{
+				await Index.RegenerateLocked();
+			}
+			finally
+			{
+				await this.EndWrite();
+			}
+		}
+
+		/// <summary>
+		/// Regenerates all indices.
+		/// </summary>
+		public async Task RegenerateIndices()
+		{
+			await this.BeginWrite();
+			try
+			{
+				foreach (IndexBTreeFile Index in this.indices)
+					await Index.RegenerateLocked();
+			}
+			finally
+			{
+				await this.EndWrite();
+			}
+		}
+
+		/// <summary>
 		/// Available indices.
 		/// </summary>
 		public IndexBTreeFile[] Indices => this.indices;
@@ -6061,7 +6095,7 @@ namespace Waher.Persistence.Files
 				try
 				{
 					T Obj = await this.LoadObject<T>(ObjectId);
-					
+
 					return new Searching.ObjectIdCursor<T>(
 						new Searching.SingletonCursor<T>(Obj, Serializer, ObjectId),
 						FilterFieldValue.FieldName);

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Operators.Vectors
 {
@@ -50,9 +50,6 @@ namespace Waher.Script.Operators.Vectors
 			if (E is ISet S)
 				return VectorDefinition.Encapsulate(S.ChildElements, false, this);
 
-			if (this.nullCheck && E.AssociatedObjectValue is null)
-				return E;
-
 			return VectorDefinition.Encapsulate(new IElement[] { E }, false, this);
 		}
 
@@ -64,101 +61,99 @@ namespace Waher.Script.Operators.Vectors
 		/// <returns>Pattern match result</returns>
 		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
 		{
-			bool VectorOfObjects = this.op is ObjectExNihilo;
-			string VariableName = null;
-
-			if (!VectorOfObjects)
-			{
-				if (!this.ForAllChildNodes((ScriptNode Node, out ScriptNode NewNode, object State) =>
-				{
-					NewNode = null;
-
-					if (Node is VariableReference Ref)
-					{
-						if (VariableName is null)
-							VariableName = Ref.VariableName;
-						else if (VariableName != Ref.VariableName)
-							return false;
-					}
-
-					return true;
-				}, null, SearchMethod.TreeOrder))
-				{
-					return PatternMatchResult.Unknown;
-				}
-			}
-
 			if (!(CheckAgainst is IVector Vector))
 			{
 				Vector = this.ConvertToVector(CheckAgainst) as IVector;
 				if (Vector is null)
-					return PatternMatchResult.Unknown;
+					return PatternMatchResult.Match;
 			}
 
-			bool HasVariable = !string.IsNullOrEmpty(VariableName);
+			if (this.op is VariableReference Ref)
+				return this.op.PatternMatch(Vector, AlreadyFound);
 
-			if (HasVariable && AlreadyFound.ContainsKey(VariableName))
-				return this.op.PatternMatch(CheckAgainst, AlreadyFound);
+			Dictionary<string, PatternRec> VariableNames = null;
 
-			List<IElement> Elements = HasVariable || VectorOfObjects ? new List<IElement>() : null;
+			this.ForAllChildNodes((ScriptNode Node, out ScriptNode NewNode, object State) =>
+			{
+				NewNode = null;
+
+				if (Node is VariableReference Ref2)
+				{
+					if (VariableNames is null)
+						VariableNames = new Dictionary<string, PatternRec>();
+
+					if (!VariableNames.ContainsKey(Ref2.VariableName))
+					{
+						if (AlreadyFound.TryGetValue(Ref2.VariableName, out IElement E))
+						{
+							VariableNames[Ref2.VariableName] = new PatternRec()
+							{
+								New = null,
+								Prev = E
+							};
+						}
+						else
+						{
+							VariableNames[Ref2.VariableName] = new PatternRec()
+							{
+								New = new List<IElement>(),
+								Prev = null
+							};
+						}
+					}
+				}
+
+				return true;
+			}, null, SearchMethod.TreeOrder);
 
 			foreach (IElement Element in Vector.VectorElements)
 			{
-				if (VectorOfObjects)
+				switch (this.op.PatternMatch(Element, AlreadyFound))
 				{
-					Dictionary<string, IElement> ObjProperties = new Dictionary<string, IElement>();
-
-					PatternMatchResult Result = this.op.PatternMatch(Element, ObjProperties);
-					if (Result != PatternMatchResult.Match)
-						return Result;
-
-					Elements.Add(new ObjectValue(ObjProperties));
-				}
-				else
-				{
-					switch (this.op.PatternMatch(Element, AlreadyFound))
-					{
-						case PatternMatchResult.Match:
-							if (HasVariable)
+					case PatternMatchResult.Match:
+						if (!(VariableNames is null))
+						{
+							foreach (KeyValuePair<string, PatternRec> P in VariableNames)
 							{
-								if (AlreadyFound.TryGetValue(VariableName, out IElement Item))
+								if (!(P.Value.New is null))
 								{
-									Elements.Add(Item);
-									AlreadyFound.Remove(VariableName);
+									if (AlreadyFound.TryGetValue(P.Key, out IElement E))
+									{
+										P.Value.New.Add(E);
+										AlreadyFound.Remove(P.Key);
+									}
+									else
+										P.Value.New.Add(ObjectValue.Null);
 								}
-								else
-									Elements.Add(ObjectValue.Null);
 							}
-							break;
+						}
+						break;
 
-						case PatternMatchResult.NoMatch:
-							return PatternMatchResult.NoMatch;
+					case PatternMatchResult.NoMatch:
+						return PatternMatchResult.NoMatch;
 
-						case PatternMatchResult.Unknown:
-						default:
-							return PatternMatchResult.Unknown;
-					}
+					case PatternMatchResult.Unknown:
+					default:
+						return PatternMatchResult.Unknown;
 				}
 			}
 
-			if (HasVariable)
-				AlreadyFound[VariableName] = VectorDefinition.Encapsulate(Elements, false, this);
-			else if (VectorOfObjects)
+			if (!(VariableNames is null))
 			{
-				int i = 1;
-				string s = "v1";
-
-				while (AlreadyFound.ContainsKey(s))
+				foreach (KeyValuePair<string, PatternRec> P in VariableNames)
 				{
-					i++;
-					s = "v" + i.ToString();
+					if (!(P.Value.New is null))
+						AlreadyFound[P.Key] = VectorDefinition.Encapsulate(P.Value.New, false, this);
 				}
-
-				AlreadyFound[s]= VectorDefinition.Encapsulate(Elements, false, this);
 			}
 
 			return PatternMatchResult.Match;
 		}
 
+		private class PatternRec
+		{
+			public List<IElement> New;
+			public IElement Prev;
+		}
 	}
 }

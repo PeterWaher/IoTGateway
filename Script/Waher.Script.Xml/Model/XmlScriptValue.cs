@@ -178,6 +178,8 @@ namespace Waher.Script.Xml.Model
 			{
 				return this.node.PatternMatch(new StringValue(CheckAgainst.InnerText), AlreadyFound);
 			}
+			else if (CheckAgainst is XmlElement)
+				return this.node.PatternMatch(new ObjectValue(CheckAgainst), AlreadyFound);
 			else if (CheckAgainst is null)
 				return this.node.PatternMatch(ObjectValue.Null, AlreadyFound);
 			else
@@ -194,7 +196,8 @@ namespace Waher.Script.Xml.Model
 			return (CheckAgainst is XmlText ||
 				CheckAgainst is XmlWhitespace ||
 				CheckAgainst is XmlSignificantWhitespace ||
-				CheckAgainst is XmlCDataSection);
+				CheckAgainst is XmlCDataSection ||
+				CheckAgainst is XmlElement);
 		}
 
 	}

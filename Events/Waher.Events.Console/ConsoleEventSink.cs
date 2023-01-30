@@ -12,13 +12,14 @@ namespace Waher.Events.Console
 	{
 		private const int TabWidth = 8;
 		private readonly bool beep;
+		private readonly bool includeStackTraces = false;
 		private bool consoleWidthWorks = true;
 
 		/// <summary>
 		/// Outputs events to the console standard output.
 		/// </summary>
 		public ConsoleEventSink()
-			: this(true)
+			: this(true, false)
 		{
 		}
 
@@ -28,9 +29,20 @@ namespace Waher.Events.Console
 		/// <param name="Beep">Beep if events of type <see cref="EventType.Critical"/>, <see cref="EventType.Alert"/>
 		/// or <see cref="EventType.Emergency"/> are logged.</param>
 		public ConsoleEventSink(bool Beep)
+			: this(Beep, false)
+		{
+		}
+
+		/// <summary>
+		/// Outputs events to the console standard output.
+		/// </summary>
+		/// <param name="Beep">Beep if events of type <see cref="EventType.Critical"/>, <see cref="EventType.Alert"/>
+		/// or <see cref="EventType.Emergency"/> are logged.</param>
+		public ConsoleEventSink(bool Beep, bool IncludeStackTraces)
 			: base("Console Event Sink")
 		{
 			this.beep = Beep;
+			this.includeStackTraces = IncludeStackTraces;
 		}
 
 		/// <inheritdoc/>
@@ -156,6 +168,20 @@ namespace Waher.Events.Console
 						i = Output.ToString().Length % Width;
 						if (i > 0)
 							Output.Append(new string(' ', Width - i));
+					}
+
+					if (this.includeStackTraces && !string.IsNullOrEmpty(Event.StackTrace))
+					{
+						Output.Append(Event.StackTrace);
+
+						if (WriteLine)
+							Output.AppendLine();
+						else
+						{
+							i = Output.ToString().Length % Width;
+							if (i > 0)
+								Output.Append(new string(' ', Width - i));
+						}
 					}
 
 					Output.Append("  ");

@@ -21,6 +21,13 @@
             <param name="Beep">Beep if events of type <see cref="F:Waher.Events.EventType.Critical"/>, <see cref="F:Waher.Events.EventType.Alert"/>
             or <see cref="F:Waher.Events.EventType.Emergency"/> are logged.</param>
         </member>
+        <member name="M:Waher.Events.Console.ConsoleEventSink.#ctor(System.Boolean,System.Boolean)">
+            <summary>
+            Outputs events to the console standard output.
+            </summary>
+            <param name="Beep">Beep if events of type <see cref="F:Waher.Events.EventType.Critical"/>, <see cref="F:Waher.Events.EventType.Alert"/>
+            or <see cref="F:Waher.Events.EventType.Emergency"/> are logged.</param>
+        </member>
         <member name="M:Waher.Events.Console.ConsoleEventSink.Queue(Waher.Events.Event)">
             <inheritdoc/>
         </member>

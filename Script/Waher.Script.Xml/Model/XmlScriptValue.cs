@@ -10,6 +10,7 @@ using Waher.Persistence;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Xml.Model
 {
@@ -187,6 +188,17 @@ namespace Waher.Script.Xml.Model
 		}
 
 		/// <summary>
+		/// Performs a pattern match operation.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <param name="AlreadyFound">Variables already identified.</param>
+		/// <returns>Pattern match result</returns>
+		public override PatternMatchResult PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+		{
+			return this.node.PatternMatch(CheckAgainst, AlreadyFound);
+		}
+
+		/// <summary>
 		/// If the node is applicable in pattern matching against <paramref name="CheckAgainst"/>.
 		/// </summary>
 		/// <param name="CheckAgainst">Value to check against.</param>
@@ -198,6 +210,16 @@ namespace Waher.Script.Xml.Model
 				CheckAgainst is XmlSignificantWhitespace ||
 				CheckAgainst is XmlCDataSection ||
 				CheckAgainst is XmlElement);
+		}
+
+		/// <summary>
+		/// If rule can be applied another time against <paramref name="CheckAgainst"/>.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <returns>If the node is re-applicable for pattern matching.</returns>
+		public override bool IsVector
+		{
+			get => this.node is ToVector Vector && Vector.Operand is XmlScriptDocument;
 		}
 
 	}

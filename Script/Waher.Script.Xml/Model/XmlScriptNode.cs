@@ -122,5 +122,15 @@ namespace Waher.Script.Xml.Model
 		/// <param name="CheckAgainst">Value to check against.</param>
 		/// <returns>If the node is applicable for pattern matching.</returns>
 		public abstract bool IsApplicable(XmlNode CheckAgainst);
+
+		/// <summary>
+		/// If rule can be applied another time against <paramref name="CheckAgainst"/>.
+		/// </summary>
+		/// <param name="CheckAgainst">Value to check against.</param>
+		/// <returns>If the node is re-applicable for pattern matching.</returns>
+		public virtual bool IsVector
+		{
+			get => false;
+		}
 	}
 }

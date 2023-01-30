@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
+using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Xml.Model
 {
@@ -39,7 +40,7 @@ namespace Waher.Script.Xml.Model
 
 			this.attributes = Attributes;
 			this.attributes?.SetParent(this);
-			
+
 			this.nrAttributes = Attributes.Length;
 
 			this.CalcIsAsync();
@@ -391,8 +392,41 @@ namespace Waher.Script.Xml.Model
 							{
 								if (N2.IsApplicable(N))
 								{
-									Result = N2.PatternMatch(N, AlreadyFound);
-									N = N.NextSibling;
+									if (N2.IsVector && N is XmlElement E2)
+									{
+										List<XmlElement> Elements = new List<XmlElement>() { E2 };
+
+										while (true)
+										{
+											N = N.NextSibling;
+											if (N is null)
+												break;
+											else if (N is XmlElement E3)
+											{
+												if (E3.LocalName == E2.LocalName &&
+													E3.NamespaceURI == E2.NamespaceURI)
+												{
+													Elements.Add(E3);
+												}
+												else
+													break;
+											}
+											else if ((N is XmlText && string.IsNullOrWhiteSpace(N.InnerText)) ||
+												N is XmlComment)
+											{
+												continue;
+											}
+											else
+												break;
+										}
+
+										Result = N2.PatternMatch(new ObjectVector(Elements.ToArray()), AlreadyFound);
+									}
+									else
+									{
+										Result = N2.PatternMatch(N, AlreadyFound);
+										N = N.NextSibling;
+									}
 								}
 								else if ((N2 is XmlScriptText Text && string.IsNullOrWhiteSpace(Text.Text)) ||
 									N2 is XmlScriptComment)

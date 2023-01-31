@@ -1,20 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
 using Waher.Runtime.Inventory;
 
-namespace Waher.Content.Json.ReferenceTypes
+namespace Waher.Content.Json.ValueTypes
 {
 	/// <summary>
-	/// Encodes <see cref="Dictionary{String, Object}"/> values.
+	/// Encodes <see cref="DateTimeOffset"/> values.
 	/// </summary>
-	public class TypedDictionaryEncoder : IJsonEncoder
+	public class DateTimeOffsetEncoder : IJsonEncoder
 	{
 		/// <summary>
-		/// Encodes <see cref="Dictionary{String, Object}"/> values.
+		/// Encodes <see cref="DateTimeOffset"/> values.
 		/// </summary>
-		public TypedDictionaryEncoder()
+		public DateTimeOffsetEncoder()
 		{
 		}
 
@@ -26,7 +24,10 @@ namespace Waher.Content.Json.ReferenceTypes
 		/// <param name="Json">JSON output.</param>
 		public void Encode(object Object, int? Indent, StringBuilder Json)
 		{
-			JSON.Encode((Dictionary<string, object>)Object, Indent, Json, null);
+			DateTime TP = ((DateTimeOffset)Object).ToUniversalTime().DateTime;
+			int Seconds = (int)(TP - JSON.UnixEpoch).TotalSeconds;
+
+			Json.Append(Seconds.ToString());
 		}
 
 		/// <summary>
@@ -36,7 +37,7 @@ namespace Waher.Content.Json.ReferenceTypes
 		/// <returns>How well objects of the given type are encoded.</returns>
 		public Grade Supports(Type ObjectType)
 		{
-			return typeof(Dictionary<string, object>).GetTypeInfo().IsAssignableFrom(ObjectType.GetTypeInfo()) ? Grade.Excellent : Grade.NotAtAll;
+			return ObjectType == typeof(DateTimeOffset) ? Grade.Ok : Grade.NotAtAll;
 		}
 	}
 }

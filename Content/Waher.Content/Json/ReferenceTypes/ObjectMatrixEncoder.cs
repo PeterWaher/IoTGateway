@@ -74,7 +74,7 @@ namespace Waher.Content.Json.ReferenceTypes
 					Json.Append('"');
 					Json.Append(JSON.Encode(Names[x]));
 					Json.Append("\":");
-					Encode(M.GetElement(x, y).AssociatedObjectValue, Indent, Json);
+					JSON.Encode(M.GetElement(x, y).AssociatedObjectValue, Indent, Json);
 				}
 
 				if (Indent.HasValue)

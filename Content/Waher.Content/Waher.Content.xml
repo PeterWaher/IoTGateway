@@ -2192,6 +2192,31 @@
             <param name="ObjectType">Type of object to encode.</param>
             <returns>How well objects of the given type are encoded.</returns>
         </member>
+        <member name="T:Waher.Content.Json.ValueTypes.DateTimeOffsetEncoder">
+            <summary>
+            Encodes <see cref="T:System.DateTimeOffset"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.DateTimeOffsetEncoder.#ctor">
+            <summary>
+            Encodes <see cref="T:System.DateTimeOffset"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.DateTimeOffsetEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.DateTimeOffsetEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
         <member name="T:Waher.Content.Json.ValueTypes.DecimalEncoder">
             <summary>
             Encodes <see cref="T:System.Decimal"/> values.

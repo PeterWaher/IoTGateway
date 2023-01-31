@@ -29,20 +29,31 @@ namespace Waher.Content.Json.ReferenceTypes
 		{
 			Type T = Object.GetType();
 			LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();
+			object Value;
 
 			foreach (FieldInfo FI in T.GetRuntimeFields())
 			{
 				if (FI.IsPublic && !FI.IsStatic)
-					Properties.AddLast(new KeyValuePair<string, object>(FI.Name, FI.GetValue(Object)));
+				{
+					Value = FI.GetValue(Object);
+
+					if (!Object.Equals(Value))
+						Properties.AddLast(new KeyValuePair<string, object>(FI.Name, Value));
+				}
 			}
 
 			foreach (PropertyInfo PI in T.GetRuntimeProperties())
 			{
 				if (PI.CanRead && PI.GetMethod.IsPublic && PI.GetIndexParameters().Length == 0)
-					Properties.AddLast(new KeyValuePair<string, object>(PI.Name, PI.GetValue(Object, null)));
+				{
+					Value = PI.GetValue(Object, null);
+
+					if (!Object.Equals(Value))
+						Properties.AddLast(new KeyValuePair<string, object>(PI.Name, Value));
+				}
 			}
 
-			Encode(Properties, Indent, Json);
+			JSON.Encode(Properties, Indent, Json);
 		}
 
 		/// <summary>

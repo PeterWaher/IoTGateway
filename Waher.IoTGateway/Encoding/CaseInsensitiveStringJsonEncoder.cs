@@ -1,20 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
+using Waher.Content;
+using Waher.Content.Json;
+using Waher.Persistence;
 using Waher.Runtime.Inventory;
 
-namespace Waher.Content.Json.ReferenceTypes
+namespace Waher.Script.Persistence.Encoding
 {
 	/// <summary>
-	/// Encodes <see cref="Dictionary{String, Object}"/> values.
+	/// Encodes <see cref="string"/> values.
 	/// </summary>
-	public class TypedDictionaryEncoder : IJsonEncoder
+	public class CaseInsensitiveStringJsonEncoder : IJsonEncoder
 	{
 		/// <summary>
-		/// Encodes <see cref="Dictionary{String, Object}"/> values.
+		/// Encodes <see cref="string"/> values.
 		/// </summary>
-		public TypedDictionaryEncoder()
+		public CaseInsensitiveStringJsonEncoder()
 		{
 		}
 
@@ -26,7 +27,11 @@ namespace Waher.Content.Json.ReferenceTypes
 		/// <param name="Json">JSON output.</param>
 		public void Encode(object Object, int? Indent, StringBuilder Json)
 		{
-			JSON.Encode((Dictionary<string, object>)Object, Indent, Json, null);
+			CaseInsensitiveString s = (CaseInsensitiveString)Object;
+			
+			Json.Append('"');
+			Json.Append(JSON.Encode(s.Value));
+			Json.Append('"');
 		}
 
 		/// <summary>
@@ -36,7 +41,7 @@ namespace Waher.Content.Json.ReferenceTypes
 		/// <returns>How well objects of the given type are encoded.</returns>
 		public Grade Supports(Type ObjectType)
 		{
-			return typeof(Dictionary<string, object>).GetTypeInfo().IsAssignableFrom(ObjectType.GetTypeInfo()) ? Grade.Excellent : Grade.NotAtAll;
+			return ObjectType == typeof(CaseInsensitiveString) ? Grade.Excellent : Grade.NotAtAll;
 		}
 	}
 }

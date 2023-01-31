@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
@@ -36,7 +38,7 @@ namespace Waher.Content.Json.ReferenceTypes
 		/// <returns>How well objects of the given type are encoded.</returns>
 		public Grade Supports(Type ObjectType)
 		{
-			return ObjectType == typeof(Dictionary<string, IElement>) ? Grade.Excellent : Grade.NotAtAll;
+			return typeof(Dictionary<string, IElement>).GetTypeInfo().IsAssignableFrom(ObjectType.GetTypeInfo()) ? Grade.Excellent : Grade.NotAtAll;
 		}
 	}
 }

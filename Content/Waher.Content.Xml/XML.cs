@@ -273,6 +273,8 @@ namespace Waher.Content.Xml
 					ValueString = Encode(Value.ToString());
 				else if (Value is DateTime TP)
 					ValueString = XML.Encode(TP);
+				else if (Value is DateTimeOffset TPO)
+					ValueString = XML.Encode(TPO);
 				else if (Value is int || Value is long || Value is short || Value is byte ||
 					Value is uint || Value is ulong || Value is ushort || Value is sbyte)
 				{
@@ -354,7 +356,6 @@ namespace Waher.Content.Xml
 						Xml.Append(new string('\t', Indent.Value));
 						Indent++;
 					}
-
 
 					Xml.Append("<Record>");
 
@@ -443,6 +444,13 @@ namespace Waher.Content.Xml
 
 				Encode(Properties, Key, null, Indent, Xml);
 			}
+			else if (Value is XmlDocument Doc)
+			{
+				if (!(Doc.DocumentElement is null))
+					Xml.Append(Doc.DocumentElement.OuterXml);
+			}
+			else if (Value is XmlElement E2)
+				Xml.Append(E2.OuterXml);
 			else if (Value is IEnumerable E)
 			{
 				IEnumerator e = E.GetEnumerator();

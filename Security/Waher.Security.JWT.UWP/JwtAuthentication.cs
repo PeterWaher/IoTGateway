@@ -37,6 +37,27 @@ namespace Waher.Security.JWT
 		/// be accepted.</param>
 		/// <param name="Factory">JWT token factory.</param>
 		public JwtAuthentication(string Realm, IUserSource Users, JwtFactory Factory)
+			: base()
+		{
+			this.realm = Realm;
+			this.users = Users;
+			this.factory = Factory;
+		}
+
+		/// <summary>
+		/// Use JWT tokens for authentication. The Bearer scheme defined in RFC 6750 is used:
+		/// https://tools.ietf.org/html/rfc6750
+		/// </summary>
+		/// <param name="RequireEncryption">If encryption is required.</param>
+		/// <param name="MinStrength">Minimum security strength of algorithms used.</param>
+		/// <param name="Realm">Realm.</param>
+		/// <param name="Users">Optional Collection of users to authenticate against.
+		/// If no collection is provided, any JWT token created by the factory will
+		/// be accepted.</param>
+		/// <param name="Factory">JWT token factory.</param>
+		public JwtAuthentication(bool RequireEncryption, int MinStrength,
+			string Realm, IUserSource Users, JwtFactory Factory)
+			: base(RequireEncryption, MinStrength)
 		{
 			this.realm = Realm;
 			this.users = Users;

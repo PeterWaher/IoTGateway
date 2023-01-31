@@ -1870,6 +1870,478 @@
             <param name="Indent">If JSON should be indented.</param>
             <param name="Json">JSON Output.</param>
         </member>
+        <member name="M:Waher.Content.JSON.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Extensible encoding of object <paramref name="Object"/>, by using
+            best available <see cref="T:Waher.Content.Json.IJsonEncoder"/> for the corresponding type.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Optional indentation.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="T:Waher.Content.Json.IJsonEncoder">
+            <summary>
+            Interface for encoding objects of certain types to JSON.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.IJsonEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="T:Waher.Content.Json.ReferenceTypes.ByteArrayEncoder">
+            <summary>
+            Encodes <see cref="M:System.Byte.#ctor"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.ByteArrayEncoder.#ctor">
+            <summary>
+            Encodes <see cref="M:System.Byte.#ctor"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.ByteArrayEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.ByteArrayEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Json.ReferenceTypes.DefaultReferenceTypeEncoder">
+            <summary>
+            Encoder used for reference types, if no other encoder is found.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.DefaultReferenceTypeEncoder.#ctor">
+            <summary>
+            Encoder used for reference types, if no other encoder is found.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.DefaultReferenceTypeEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.DefaultReferenceTypeEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Json.ReferenceTypes.EnumerableEncoder">
+            <summary>
+            Encodes <see cref="T:System.Collections.IEnumerable"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.EnumerableEncoder.#ctor">
+            <summary>
+            Encodes <see cref="T:System.Collections.IEnumerable"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.EnumerableEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.EnumerableEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Json.ReferenceTypes.ObjectExNihiloEncoder">
+            <summary>
+            Encodes <see cref="T:System.Collections.Generic.Dictionary`2"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.ObjectExNihiloEncoder.#ctor">
+            <summary>
+            Encodes <see cref="T:System.Collections.Generic.Dictionary`2"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.ObjectExNihiloEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.ObjectExNihiloEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Json.ReferenceTypes.ObjectMatrixEncoder">
+            <summary>
+            Encodes <see cref="T:Waher.Script.Objects.Matrices.ObjectMatrix"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.ObjectMatrixEncoder.#ctor">
+            <summary>
+            Encodes <see cref="T:Waher.Script.Objects.Matrices.ObjectMatrix"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.ObjectMatrixEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.ObjectMatrixEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Json.ReferenceTypes.StringEncoder">
+            <summary>
+            Encodes <see cref="T:System.String"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.StringEncoder.#ctor">
+            <summary>
+            Encodes <see cref="T:System.String"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.StringEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.StringEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Json.ReferenceTypes.TypedDictionaryEncoder">
+            <summary>
+            Encodes <see cref="T:System.Collections.Generic.Dictionary`2"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.TypedDictionaryEncoder.#ctor">
+            <summary>
+            Encodes <see cref="T:System.Collections.Generic.Dictionary`2"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.TypedDictionaryEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.TypedDictionaryEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Json.ReferenceTypes.UntypedDictionaryEncoder">
+            <summary>
+            Encodes <see cref="T:System.Collections.IDictionary"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.UntypedDictionaryEncoder.#ctor">
+            <summary>
+            Encodes <see cref="T:System.Collections.IDictionary"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.UntypedDictionaryEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.UntypedDictionaryEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Json.ReferenceTypes.VectorEncoder">
+            <summary>
+            Encodes <see cref="T:Waher.Script.Abstraction.Elements.IVector"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.VectorEncoder.#ctor">
+            <summary>
+            Encodes <see cref="T:Waher.Script.Abstraction.Elements.IVector"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.VectorEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ReferenceTypes.VectorEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Json.ValueTypes.BooleanEncoder">
+            <summary>
+            Encodes <see cref="T:System.Boolean"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.BooleanEncoder.#ctor">
+            <summary>
+            Encodes <see cref="T:System.Boolean"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.BooleanEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.BooleanEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Json.ValueTypes.CharEncoder">
+            <summary>
+            Encodes <see cref="T:System.Char"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.CharEncoder.#ctor">
+            <summary>
+            Encodes <see cref="T:System.Char"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.CharEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.CharEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Json.ValueTypes.DateTimeEncoder">
+            <summary>
+            Encodes <see cref="T:System.DateTime"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.DateTimeEncoder.#ctor">
+            <summary>
+            Encodes <see cref="T:System.DateTime"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.DateTimeEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.DateTimeEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Json.ValueTypes.DecimalEncoder">
+            <summary>
+            Encodes <see cref="T:System.Decimal"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.DecimalEncoder.#ctor">
+            <summary>
+            Encodes <see cref="T:System.Decimal"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.DecimalEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.DecimalEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Json.ValueTypes.DefaultValueTypeEncoder">
+            <summary>
+            Encoder used for value types, if no other encoder is found.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.DefaultValueTypeEncoder.#ctor">
+            <summary>
+            Encoder used for value types, if no other encoder is found.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.DefaultValueTypeEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.DefaultValueTypeEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Json.ValueTypes.DoubleEncoder">
+            <summary>
+            Encodes <see cref="T:System.Double"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.DoubleEncoder.#ctor">
+            <summary>
+            Encodes <see cref="T:System.Double"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.DoubleEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.DoubleEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Json.ValueTypes.EnumEncoder">
+            <summary>
+            Encodes <see cref="T:System.Enum"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.EnumEncoder.#ctor">
+            <summary>
+            Encodes <see cref="T:System.Enum"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.EnumEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.EnumEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Json.ValueTypes.IntegerEncoder">
+            <summary>
+            Encodes <see cref="T:System.Double"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.IntegerEncoder.#ctor">
+            <summary>
+            Encodes <see cref="T:System.Double"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.IntegerEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.IntegerEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Json.ValueTypes.SingleEncoder">
+            <summary>
+            Encodes <see cref="T:System.Single"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.SingleEncoder.#ctor">
+            <summary>
+            Encodes <see cref="T:System.Single"/> values.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.SingleEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Json.ValueTypes.SingleEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
         <member name="T:Waher.Content.Multipart.AlternativeCodec">
             <summary>
             Codec of alternative data.

@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
+using Waher.Content.Json;
+using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Objects.Matrices;
 
 namespace Waher.Content
 {
@@ -17,6 +16,22 @@ namespace Waher.Content
 		/// Unix Date and Time epoch, starting at 1970-01-01T00:00:00Z
 		/// </summary>
 		public static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+		private static readonly Dictionary<Type, IJsonEncoder> encoders;
+
+		static JSON()
+		{
+			encoders = new Dictionary<Type, IJsonEncoder>();
+			Types.OnInvalidated += Types_OnInvalidated;
+		}
+
+		private static void Types_OnInvalidated(object sender, EventArgs e)
+		{
+			lock (encoders)
+			{
+				encoders.Clear();
+			}
+		}
 
 		#region Parsing
 
@@ -575,11 +590,15 @@ namespace Waher.Content
 				}
 			}
 
-			if (!First && Indent.HasValue)
+			if (Indent.HasValue)
 			{
-				Json.AppendLine();
 				Indent--;
-				Json.Append(new string('\t', Indent.Value));
+
+				if (!First)
+				{
+					Json.AppendLine();
+					Json.Append(new string('\t', Indent.Value));
+				}
 			}
 
 			Json.Append('}');
@@ -626,240 +645,46 @@ namespace Waher.Content
 				}
 			}
 
-			if (!First && Indent.HasValue)
+			if (Indent.HasValue)
 			{
-				Json.AppendLine();
 				Indent--;
-				Json.Append(new string('\t', Indent.Value));
+
+				if (!First)
+				{
+					Json.AppendLine();
+					Json.Append(new string('\t', Indent.Value));
+				}
 			}
 
 			Json.Append('}');
 		}
 
-		private static void Encode(object Object, int? Indent, StringBuilder Json)
+		/// <summary>
+		/// Extensible encoding of object <paramref name="Object"/>, by using
+		/// best available <see cref="IJsonEncoder"/> for the corresponding type.
+		/// </summary>
+		/// <param name="Object">Object to encode.</param>
+		/// <param name="Indent">Optional indentation.</param>
+		/// <param name="Json">JSON output.</param>
+		public static void Encode(object Object, int? Indent, StringBuilder Json)
 		{
 			if (Object is null)
 				Json.Append("null");
 			else
 			{
 				Type T = Object.GetType();
-				TypeInfo TI = T.GetTypeInfo();
+				IJsonEncoder Encoder;
 
-				if (TI.IsValueType)
+				lock (encoders)
 				{
-					if (Object is bool b)
-						Json.Append(CommonTypes.Encode(b));
-					else if (Object is char ch)
+					if (!encoders.TryGetValue(T, out Encoder))
 					{
-						Json.Append('"');
-						Json.Append(Encode(new string(ch, 1)));
-						Json.Append('"');
-					}
-					else if (Object is double dbl)
-						Json.Append(CommonTypes.Encode(dbl));
-					else if (Object is float fl)
-						Json.Append(CommonTypes.Encode(fl));
-					else if (Object is decimal dec)
-						Json.Append(CommonTypes.Encode(dec));
-					else if (TI.IsEnum)
-					{
-						Json.Append('"');
-						Json.Append(Encode(Object.ToString()));
-						Json.Append('"');
-					}
-					else if (Object is DateTime TP)
-						Json.Append(((int)((TP.ToUniversalTime() - UnixEpoch).TotalSeconds)).ToString());
-					else if (Object is int || Object is long || Object is short || Object is byte ||
-						Object is uint || Object is ulong || Object is ushort || Object is sbyte)
-					{
-						Json.Append(Object.ToString());
-					}
-					else
-					{
-						Json.Append('"');
-						Json.Append(Encode(Object.ToString()));
-						Json.Append('"');
+						Encoder = Types.FindBest<IJsonEncoder, Type>(T);
+						encoders[T] = Encoder;
 					}
 				}
-				else if (Object is string s)
-				{
-					Json.Append('"');
-					Json.Append(Encode(s));
-					Json.Append('"');
-				}
-				else if (Object is byte[] ByteArray)
-				{
-					Json.Append('"');
-					Json.Append(Convert.ToBase64String(ByteArray));
-					Json.Append('"');
-				}
-				else if (Object is IEnumerable<KeyValuePair<string, object>> Obj)
-					Encode(Obj, Indent, Json, null);
-				else if (Object is IEnumerable<KeyValuePair<string, IElement>> Obj2)
-					Encode(Obj2, Indent, Json);
-				else if (Object is ObjectMatrix M && !(M.ColumnNames is null))
-				{
-					string[] Names = M.ColumnNames;
-					int Rows = M.Rows;
-					int Columns = M.Columns;
-					int x, y;
 
-					Json.Append('[');
-
-					if (Indent.HasValue)
-						Indent++;
-
-					for (y = 0; y < Rows; y++)
-					{
-						if (y > 0)
-							Json.Append(',');
-
-						if (Indent.HasValue)
-						{
-							Json.AppendLine();
-							Json.Append(new string('\t', Indent.Value));
-							Indent++;
-						}
-
-						Json.Append('{');
-
-						for (x = 0; x < Columns; x++)
-						{
-							if (x > 0)
-								Json.Append(',');
-
-							if (Indent.HasValue)
-							{
-								Json.AppendLine();
-								Json.Append(new string('\t', Indent.Value));
-							}
-
-							Json.Append('"');
-							Json.Append(Encode(Names[x]));
-							Json.Append("\":");
-							Encode(M.GetElement(x, y).AssociatedObjectValue, Indent, Json);
-						}
-
-						if (Indent.HasValue)
-						{
-							Indent--;
-							Json.AppendLine();
-							Json.Append(new string('\t', Indent.Value));
-						}
-
-						Json.Append('}');
-					}
-
-
-					if (Indent.HasValue)
-					{
-						Indent--;
-
-						if (Rows > 0 && Columns > 0)
-						{
-							Json.AppendLine();
-							Json.Append(new string('\t', Indent.Value));
-						}
-					}
-
-					Json.Append(']');
-				}
-				else if (Object is IVector V)
-				{
-					bool First = true;
-
-					Json.Append('[');
-
-					if (Indent.HasValue)
-						Indent++;
-
-					foreach (IElement Element in V.VectorElements)
-					{
-						if (First)
-							First = false;
-						else
-							Json.Append(',');
-
-						if (Indent.HasValue)
-						{
-							Json.AppendLine();
-							Json.Append(new string('\t', Indent.Value));
-						}
-
-						Encode(Element.AssociatedObjectValue, Indent, Json);
-					}
-
-					if (!First && Indent.HasValue)
-					{
-						Indent--;
-						Json.AppendLine();
-						Json.Append(new string('\t', Indent.Value));
-					}
-
-					Json.Append(']');
-				}
-				else if (Object is IDictionary Dictionary)
-				{
-					LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();
-
-					foreach (object Key in Dictionary.Keys)
-						Properties.AddLast(new KeyValuePair<string, object>(Key.ToString(), Dictionary[Key]));
-
-					Encode(Properties, Indent, Json);
-				}
-				else if (Object is IEnumerable E)
-				{
-					IEnumerator e = E.GetEnumerator();
-					bool First = true;
-
-					Json.Append('[');
-
-					if (Indent.HasValue)
-						Indent++;
-
-					while (e.MoveNext())
-					{
-						if (First)
-							First = false;
-						else
-							Json.Append(',');
-
-						if (Indent.HasValue)
-						{
-							Json.AppendLine();
-							Json.Append(new string('\t', Indent.Value));
-						}
-
-						Encode(e.Current, Indent, Json);
-					}
-
-					if (!First && Indent.HasValue)
-					{
-						Indent--;
-						Json.AppendLine();
-						Json.Append(new string('\t', Indent.Value));
-					}
-
-					Json.Append(']');
-				}
-				else
-				{
-					LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();
-
-					foreach (FieldInfo FI in T.GetRuntimeFields())
-					{
-						if (FI.IsPublic && !FI.IsStatic)
-							Properties.AddLast(new KeyValuePair<string, object>(FI.Name, FI.GetValue(Object)));
-					}
-
-					foreach (PropertyInfo PI in T.GetRuntimeProperties())
-					{
-						if (PI.CanRead && PI.GetMethod.IsPublic && PI.GetIndexParameters().Length == 0)
-							Properties.AddLast(new KeyValuePair<string, object>(PI.Name, PI.GetValue(Object, null)));
-					}
-
-					Encode(Properties, Indent, Json);
-				}
+				Encoder.Encode(Object, Indent, Json);
 			}
 		}
 

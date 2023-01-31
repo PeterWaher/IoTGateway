@@ -12,6 +12,7 @@ using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
+using Waher.Runtime.Inventory;
 using Waher.Security.SHA3;
 using static System.Environment;
 
@@ -245,6 +246,9 @@ namespace Waher.Utility.Install
 
 				if (Verbose)
 					Log.Register(new Events.Console.ConsoleEventSink());
+
+				Types.Initialize(typeof(Program).Assembly,
+					typeof(JSON).Assembly);
 
 				Semaphore GatewayRunning = null;
 				Semaphore StartingServer = null;

@@ -89,6 +89,64 @@
             <returns>Encoded object, as well as Content Type of encoding. Includes information about any text encodings used.</returns>
             <exception cref="T:System.ArgumentException">If the object cannot be encoded.</exception>
         </member>
+        <member name="T:Waher.Content.Xml.Text.XmlDocumentJsonEncoder">
+            <summary>
+            Encodes an XML Document as a JSON object.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Xml.Text.XmlDocumentJsonEncoder.#ctor">
+            <summary>
+            Encodes an XML Document as a JSON object.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Xml.Text.XmlDocumentJsonEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Xml.Text.XmlDocumentJsonEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
+        <member name="T:Waher.Content.Xml.Text.XmlElementJsonEncoder">
+            <summary>
+            Encodes an XML Element as a JSON object.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Xml.Text.XmlElementJsonEncoder.#ctor">
+            <summary>
+            Encodes an XML Element as a JSON object.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Xml.Text.XmlElementJsonEncoder.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes the <paramref name="Object"/> to JSON.
+            </summary>
+            <param name="Object">Object to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Xml.Text.XmlElementJsonEncoder.Encode(System.Xml.XmlElement,System.Nullable{System.Int32},System.Text.StringBuilder)">
+            <summary>
+            Encodes an <see cref="T:System.Xml.XmlElement"/> to JSON.
+            </summary>
+            <param name="Xml">XML to encode.</param>
+            <param name="Indent">Any indentation to apply.</param>
+            <param name="Json">JSON output.</param>
+        </member>
+        <member name="M:Waher.Content.Xml.Text.XmlElementJsonEncoder.Supports(System.Type)">
+            <summary>
+            How well the JSON encoder encodes objects of type <paramref name="ObjectType"/>.
+            </summary>
+            <param name="ObjectType">Type of object to encode.</param>
+            <returns>How well objects of the given type are encoded.</returns>
+        </member>
         <member name="T:Waher.Content.Xml.XML">
             <summary>
             Helps with common XML-related tasks.

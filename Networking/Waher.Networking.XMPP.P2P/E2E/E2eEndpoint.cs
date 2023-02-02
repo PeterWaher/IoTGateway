@@ -109,22 +109,19 @@ namespace Waher.Networking.XMPP.P2P.E2E
         /// <returns>Parsed key information, if possible, null if XML is not well-defined.</returns>
         public IE2eEndpoint Parse(XmlElement Xml)
         {
-            byte[] PublicKey = null;
-
             foreach (XmlAttribute Attr in Xml.Attributes)
             {
                 switch (Attr.Name)
                 {
                     case "pub":
-                        PublicKey = Convert.FromBase64String(Attr.Value);
-                        break;
-                }
-            }
+						return this.CreatePublic(Convert.FromBase64String(Attr.Value));
 
-            if (PublicKey is null)
-                return null;
-            else
-                return this.CreatePublic(PublicKey);
+					case "d":
+						return this.CreatePrivate(Convert.FromBase64String(Attr.Value));
+				}
+			}
+
+            return null;
         }
 
         /// <summary>

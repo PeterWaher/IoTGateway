@@ -364,7 +364,7 @@ namespace Waher.Networking.XMPP
 				{
 					this.resources.Remove(e.From);
 
-					if (this.lastPresence != null && this.lastPresence.From == e.From)
+					if (!(this.lastPresence is null) && this.lastPresence.From == e.From)
 						this.lastPresence = null;
 				}
 				else if (e.Type == PresenceType.Available)
@@ -409,7 +409,7 @@ namespace Waher.Networking.XMPP
 			if (e.Ok)
 				return Task.CompletedTask;
 
-			if (e.ErrorElement != null && e.ErrorElement.LocalName == FeatureNotImplementedException.LocalName)
+			if (!(e.ErrorElement is null) && e.ErrorElement.LocalName == FeatureNotImplementedException.LocalName)
 				return Task.CompletedTask;
 
 			Client.Unavail(e2);
@@ -424,7 +424,7 @@ namespace Waher.Networking.XMPP
 		{
 			get
 			{
-				return this.lastPresence != null;
+				return !(this.lastPresence is null);
 			}
 		}
 

@@ -41,7 +41,7 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 		{
 			KeyValuePair<string, string>[] Options = Field.Options;
 
-			if (Options != null && Options.Length > 0)
+			if (!(Options is null) && Options.Length > 0)
 			{
 				foreach (string s in Strings)
 				{

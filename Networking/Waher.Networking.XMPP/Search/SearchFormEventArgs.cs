@@ -361,7 +361,7 @@ namespace Waher.Networking.XMPP.Search
 								Dictionary<string, bool> HeadersSorted = new Dictionary<string, bool>();
 								string Header;
 
-								if (Form.Header != null)
+								if (!(Form.Header is null))
 								{
 									foreach (Field F in Form.Header)
 									{

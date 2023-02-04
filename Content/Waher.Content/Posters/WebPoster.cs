@@ -96,7 +96,7 @@ namespace Waher.Content.Posters
 				await WebGetter.ProcessResponse(Response, Uri);
 
 			byte[] Bin = await Response.Content.ReadAsByteArrayAsync();
-			string ContentType = Response.Content.Headers.ContentType.ToString();
+			string ContentType = Response.Content.Headers.ContentType?.ToString() ?? "application/octet-stream";
 
 			return new KeyValuePair<byte[], string>(Bin, ContentType);
 		}

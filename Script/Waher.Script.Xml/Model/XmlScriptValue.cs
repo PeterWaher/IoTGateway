@@ -219,7 +219,7 @@ namespace Waher.Script.Xml.Model
 		/// <returns>If the node is re-applicable for pattern matching.</returns>
 		public override bool IsVector
 		{
-			get => this.node is ToVector Vector && Vector.Operand is XmlScriptDocument;
+			get => this.node is ToVector Vector;
 		}
 
 	}

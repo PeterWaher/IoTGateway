@@ -253,6 +253,9 @@ namespace Waher.Content.Xml
 		/// <returns>If value was encoded.</returns>
 		private static bool EncodeAttribute(string Key, object Value, StringBuilder Xml)
 		{
+			if (Value is null)
+				return false;
+
 			Type T = Value.GetType();
 			TypeInfo TI = T.GetTypeInfo();
 			string ValueString;
@@ -308,6 +311,9 @@ namespace Waher.Content.Xml
 		private static bool EncodeChildElement(string Key, object Value,
 			int? Indent, StringBuilder Xml)
 		{
+			if (Value is null)
+				return false;
+
 			Type T = Value.GetType();
 			TypeInfo TI = T.GetTypeInfo();
 

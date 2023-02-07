@@ -1,19 +1,21 @@
 ﻿using System;
+using System.Reflection;
 using System.Text;
 using Waher.Runtime.Inventory;
+using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects.Matrices;
 
 namespace Waher.Content.Json.ReferenceTypes
 {
 	/// <summary>
-	/// Encodes <see cref="ObjectMatrix"/> values.
+	/// Encodes <see cref="IElement"/> values.
 	/// </summary>
-	public class ObjectMatrixEncoder : IJsonEncoder
+	public class ScriptElementEncoder : IJsonEncoder
 	{
 		/// <summary>
-		/// Encodes <see cref="ObjectMatrix"/> values.
+		/// Encodes <see cref="IElement"/> values.
 		/// </summary>
-		public ObjectMatrixEncoder()
+		public ScriptElementEncoder()
 		{
 		}
 
@@ -109,7 +111,13 @@ namespace Waher.Content.Json.ReferenceTypes
 		/// <returns>How well objects of the given type are encoded.</returns>
 		public Grade Supports(Type ObjectType)
 		{
-			return ObjectType == typeof(ObjectMatrix) ? Grade.Excellent : Grade.NotAtAll;
+			if (typeof(IElement).GetTypeInfo().IsAssignableFrom(ObjectType.GetTypeInfo()) &&
+				!typeof(IVector).GetTypeInfo().IsAssignableFrom(ObjectType.GetTypeInfo()))
+			{
+				return Grade.Ok;
+			}
+			else
+				return Grade.NotAtAll;
 		}
 	}
 }

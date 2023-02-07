@@ -57,6 +57,9 @@ namespace Waher.Script.Functions.Runtime
 		{
 			IElement E = await this.Argument.EvaluateAsync(Variables);
 			object Obj = E.AssociatedObjectValue;
+			if (Obj is null)
+				return ObjectValue.Null;
+			
 			List<IElement> Elements = new List<IElement>();
 
 			if (Obj is Type T)

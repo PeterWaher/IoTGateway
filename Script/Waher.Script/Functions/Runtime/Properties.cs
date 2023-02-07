@@ -56,6 +56,9 @@ namespace Waher.Script.Functions.Runtime
 		{
 			IElement E = await this.Argument.EvaluateAsync(Variables);
 			object Obj = E.AssociatedObjectValue;
+			if (Obj is null)
+				return ObjectValue.Null;
+
 			IPropertyEnumerator Enumerator = GetEnumerator(Obj.GetType());
 
 			if (Enumerator is null)

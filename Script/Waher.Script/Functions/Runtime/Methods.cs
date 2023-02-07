@@ -64,6 +64,9 @@ namespace Waher.Script.Functions.Runtime
 		public override IElement Evaluate(IElement Argument, Variables Variables)
 		{
 			object Obj = Argument.AssociatedObjectValue;
+			if (Obj is null)
+				return ObjectValue.Null;
+
 			List<IElement> Elements = new List<IElement>();
 
 			if (Obj is Type T)

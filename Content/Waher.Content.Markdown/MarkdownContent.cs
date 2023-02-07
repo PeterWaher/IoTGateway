@@ -1,13 +1,13 @@
-﻿using Waher.Content.Text;
+﻿using Waher.Content.Json;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Markdown
 {
-	/// <summary>
-	/// Class that can be used to encapsulate Markdown to be returned from a Web Service, bypassing any encoding protections,
-	/// and avoiding doubly parsing the Markdown.
-	/// </summary>
-	public class MarkdownContent : IJsonEncodingHint
+    /// <summary>
+    /// Class that can be used to encapsulate Markdown to be returned from a Web Service, bypassing any encoding protections,
+    /// and avoiding doubly parsing the Markdown.
+    /// </summary>
+    public class MarkdownContent : IJsonEncodingHint
 	{
 		private readonly string markdown;
 

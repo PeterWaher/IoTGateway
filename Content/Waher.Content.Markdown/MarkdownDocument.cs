@@ -13,22 +13,22 @@ using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.Atoms;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.SpanElements;
-using Waher.Content.Text;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Text;
 using Waher.Script;
+using Waher.Content.Json;
 
 namespace Waher.Content.Markdown
 {
-	/// <summary>
-	/// Delegate for markdown element callback methods.
-	/// </summary>
-	/// <param name="Element">Markdown element</param>
-	/// <param name="State">State object.</param>
-	/// <returns>If process should continue.</returns>
-	public delegate bool MarkdownElementHandler(MarkdownElement Element, object State);
+    /// <summary>
+    /// Delegate for markdown element callback methods.
+    /// </summary>
+    /// <param name="Element">Markdown element</param>
+    /// <param name="State">State object.</param>
+    /// <returns>If process should continue.</returns>
+    public delegate bool MarkdownElementHandler(MarkdownElement Element, object State);
 
 	/// <summary>
 	/// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions.

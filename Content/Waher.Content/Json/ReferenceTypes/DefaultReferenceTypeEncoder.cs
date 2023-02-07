@@ -44,7 +44,10 @@ namespace Waher.Content.Json.ReferenceTypes
 
 			foreach (PropertyInfo PI in T.GetRuntimeProperties())
 			{
-				if (PI.CanRead && PI.GetMethod.IsPublic && PI.GetIndexParameters().Length == 0)
+				if (PI.CanRead && 
+					PI.GetMethod.IsPublic && 
+					!PI.GetMethod.IsSpecialName &&
+					PI.GetIndexParameters().Length == 0)
 				{
 					Value = PI.GetValue(Object, null);
 

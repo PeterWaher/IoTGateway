@@ -122,6 +122,15 @@ namespace Waher.Runtime.Transactions
 					if (await this.DoPrepare())
 					{
 						await this.SetStateLocked(TransactionState.Prepared);
+
+						try
+						{
+							await this.AfterPrepare();
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
 						return true;
 					}
 					else
@@ -148,6 +157,14 @@ namespace Waher.Runtime.Transactions
 		/// </summary>
 		/// <returns>If the preparation phase is OK or not.</returns>
 		protected abstract Task<bool> DoPrepare();
+
+		/// <summary>
+		/// Is called after preparation has completed.
+		/// </summary>
+		protected virtual Task AfterPrepare()
+		{
+			return Task.CompletedTask;
+		}
 
 		private void AssertState(params TransactionState[] States)
 		{
@@ -179,6 +196,15 @@ namespace Waher.Runtime.Transactions
 					if (await this.DoExecute())
 					{
 						await this.SetStateLocked(TransactionState.Executed);
+
+						try
+						{
+							await this.AfterExecute();
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
 						return true;
 					}
 					else
@@ -207,6 +233,14 @@ namespace Waher.Runtime.Transactions
 		protected abstract Task<bool> DoExecute();
 
 		/// <summary>
+		/// Is called after execution has completed.
+		/// </summary>
+		protected virtual Task AfterExecute()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
 		/// Commits any changes made during the execution phase.
 		/// </summary>
 		/// <returns>If the transaction was successfully committed.</returns>
@@ -224,6 +258,15 @@ namespace Waher.Runtime.Transactions
 					if (await this.DoCommit())
 					{
 						await this.SetStateLocked(TransactionState.Committed);
+
+						try
+						{
+							await this.AfterCommit();
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
 						return true;
 					}
 					else
@@ -252,6 +295,14 @@ namespace Waher.Runtime.Transactions
 		protected abstract Task<bool> DoCommit();
 
 		/// <summary>
+		/// Is called after preparation has completed.
+		/// </summary>
+		protected virtual Task AfterCommit()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
 		/// Rolls back any changes made during the execution phase.
 		/// </summary>
 		/// <returns>If the transaction was successfully rolled back.</returns>
@@ -270,6 +321,15 @@ namespace Waher.Runtime.Transactions
 					if (await this.DoRollback())
 					{
 						await this.SetStateLocked(TransactionState.RolledBack);
+
+						try
+						{
+							await this.AfterRollback();
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
 						return true;
 					}
 					else
@@ -296,6 +356,14 @@ namespace Waher.Runtime.Transactions
 		/// </summary>
 		/// <returns>If the transaction was successfully rolled back.</returns>
 		protected abstract Task<bool> DoRollback();
+
+		/// <summary>
+		/// Is called after preparation has completed.
+		/// </summary>
+		protected virtual Task AfterRollback()
+		{
+			return Task.CompletedTask;
+		}
 
 		/// <summary>
 		/// Calls <paramref name="Action"/> when the transaction is idle.
@@ -337,6 +405,15 @@ namespace Waher.Runtime.Transactions
 						{
 							await this.DoRollback();
 							await this.SetStateLocked(TransactionState.RolledBack);
+
+							try
+							{
+								await this.AfterRollback();
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+							}
 						}
 						catch (Exception ex)
 						{

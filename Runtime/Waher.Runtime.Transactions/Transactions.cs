@@ -63,11 +63,14 @@ namespace Waher.Runtime.Transactions
 		/// <summary>
 		/// Creates a new transaction
 		/// </summary>
+		/// <typeparam name="T2">Type of transaction class to create. Must be
+		/// equal to <typeparamref name="T"/> or a descendant.</typeparam>
 		/// <param name="Arguments">Constructor arguments.</param>
 		/// <returns>New transaction</returns>
-		public T CreateNew(params object[] Arguments)
+		public T2 CreateNew<T2>(params object[] Arguments)
+			where T2 : T
 		{
-			T Transaction = Types.Instantiate<T>(false, Arguments);
+			T2 Transaction = Types.Instantiate<T2>(false, Arguments);
 			this.transactions.Add(Transaction.Id, Transaction);
 			return Transaction;
 		}

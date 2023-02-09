@@ -261,6 +261,11 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public static readonly Regex BareJidRegEx = new Regex("^(?:([^@/<>'\\\"\\s]+)@)([^@/<>'\\\"\\s]+)$", RegexOptions.Singleline | RegexOptions.Compiled);
 
+		/// <summary>
+		/// Regular expression for Domain JIDs
+		/// </summary>
+		public static readonly Regex DomainJidRegEx = new Regex("^(?:([^@/<>'\\\"\\s]+))$", RegexOptions.Singleline | RegexOptions.Compiled);
+
 		private readonly static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 		private static Type[] alternativeBindingMechanisms = null;
 

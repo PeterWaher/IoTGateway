@@ -2562,7 +2562,7 @@ namespace Waher.Networking.XMPP
 			else
 			{
 				Item = h(BareJid);
-				return Item != null;
+				return !(Item is null);
 			}
 		}
 

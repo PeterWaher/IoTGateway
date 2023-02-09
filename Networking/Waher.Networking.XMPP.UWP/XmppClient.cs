@@ -261,6 +261,11 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public static readonly Regex BareJidRegEx = new Regex("^(?:([^@/<>'\\\"\\s]+)@)([^@/<>'\\\"\\s]+)$", RegexOptions.Singleline | RegexOptions.Compiled);
 
+		/// <summary>
+		/// Regular expression for Domain JIDs
+		/// </summary>
+		public static readonly Regex DomainJidRegEx = new Regex("^(?:([^@/<>'\\\"\\s]+))$", RegexOptions.Singleline | RegexOptions.Compiled);
+
 		private readonly static RandomNumberGenerator rnd = RandomNumberGenerator.Create();
 		private static Type[] alternativeBindingMechanisms = null;
 
@@ -1256,7 +1261,7 @@ namespace Waher.Networking.XMPP
 
 			ITextTransportLayer TTL;
 
-			if ((TTL = this.textTransportLayer) != null)
+			if (!((TTL = this.textTransportLayer) is null))
 			{
 				this.textTransportLayer = null;
 				TTL.Dispose();
@@ -1304,7 +1309,7 @@ namespace Waher.Networking.XMPP
 			if (this.disposed)
 				throw new ObjectDisposedException(nameof(XmppClient), "XMPP Client has already been disposed.");
 
-			if (this.textTransportLayer != null && !(this.textTransportLayer is AlternativeTransport))
+			if (!(this.textTransportLayer is null) && !(this.textTransportLayer is AlternativeTransport))
 				throw new Exception("Reconnections must be made in the underlying transport layer.");
 			else
 			{
@@ -1866,7 +1871,7 @@ namespace Waher.Networking.XMPP
 
 			ITextTransportLayer TTL;
 
-			if ((TTL = this.textTransportLayer) != null)
+			if (!((TTL = this.textTransportLayer) is null))
 			{
 				this.textTransportLayer = null;
 				TTL.Dispose();
@@ -2338,7 +2343,7 @@ namespace Waher.Networking.XMPP
 						else if (E.LocalName == "request" && E.NamespaceURI == NamespaceMessageDeliveryReceipts && !string.IsNullOrEmpty(e.Id))
 						{
 							RosterItem Item = this.GetRosterItemLocked(GetBareJID(e.To));
-							if (Item != null && (Item.State == SubscriptionState.Both || Item.State == SubscriptionState.From))
+							if (!(Item is null) && (Item.State == SubscriptionState.Both || Item.State == SubscriptionState.From))
 							{
 								this.SendMessage(MessageType.Normal, e.From, "<received xmlns='" + NamespaceMessageDeliveryReceipts +
 									"' id='" + XML.Encode(e.Id) + "'/>", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
@@ -6234,7 +6239,7 @@ namespace Waher.Networking.XMPP
 
 			if (string.IsNullOrEmpty(Node))
 			{
-				if (CacheResponse && this.serverFeatures != null)
+				if (CacheResponse && !(this.serverFeatures is null))
 				{
 					ServiceDiscoveryEventArgs e2 = new ServiceDiscoveryEventArgs(this.serverFeatures, this.serverFeatures.Identities,
 						this.serverFeatures.Features, this.serverFeatures.ExtendedInformation)
@@ -6284,7 +6289,7 @@ namespace Waher.Networking.XMPP
 			Dictionary<string, DataForm> ExtendedInformation = new Dictionary<string, DataForm>();
 			List<Identity> Identities = new List<Identity>();
 
-			if (Callback != null || CacheResponse)
+			if (!(Callback is null) || CacheResponse)
 			{
 				if (e.Ok)
 				{
@@ -6510,7 +6515,7 @@ namespace Waher.Networking.XMPP
 
 			if (string.IsNullOrEmpty(Node))
 			{
-				if (CacheResponse && this.serverComponents != null)
+				if (CacheResponse && !(this.serverComponents is null))
 				{
 					ServiceItemsDiscoveryEventArgs e2 = new ServiceItemsDiscoveryEventArgs(this.serverComponents, this.serverComponents.Items)
 					{
@@ -6560,7 +6565,7 @@ namespace Waher.Networking.XMPP
 			bool CacheResponse = (bool)P[2];
 			List<Item> Items = new List<Item>();
 
-			if (Callback != null || CacheResponse)
+			if (!(Callback is null) || CacheResponse)
 			{
 				if (e.Ok)
 				{
@@ -7919,7 +7924,7 @@ namespace Waher.Networking.XMPP
 				XmlElement Result = null;
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null)
+				if (e.Ok && !((E = e.FirstElement) is null))
 				{
 					foreach (XmlNode N in e.FirstElement.ChildNodes)
 					{

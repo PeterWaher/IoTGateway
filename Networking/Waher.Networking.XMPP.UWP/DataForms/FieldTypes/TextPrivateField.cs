@@ -70,7 +70,7 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		{
 			object[] Result = base.Validate(Value);
 
-			if (!this.HasError && Value != null && Value.Length > 1)
+			if (!this.HasError && !(Value is null) && Value.Length > 1)
 				this.Error = "Only one value allowed.";
 
 			return Result;

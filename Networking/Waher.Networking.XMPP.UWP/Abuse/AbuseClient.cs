@@ -122,7 +122,7 @@ namespace Waher.Networking.XMPP.Abuse
                 foreach (XmlNode N in e.Query.ChildNodes)
                 {
                     E = N as XmlElement;
-                    if (E != null && E.LocalName == "item")
+                    if (!(E is null) && E.LocalName == "item")
                     {
                         JID = XML.Attribute(E, "jid");
                         this.blockList[JID] = true;
@@ -144,7 +144,7 @@ namespace Waher.Networking.XMPP.Abuse
                 foreach (XmlNode N in e.Query.ChildNodes)
                 {
                     E = N as XmlElement;
-                    if (E != null && E.LocalName == "item")
+                    if (!(E is null) && E.LocalName == "item")
                     {
                         Found = true;
                         JID = XML.Attribute(E, "jid");
@@ -253,7 +253,7 @@ namespace Waher.Networking.XMPP.Abuse
                 XmlElement E, E2;
                 string JID;
 
-                if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "blocklist" && E.NamespaceURI == NamespaceBlocking)
+                if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "blocklist" && E.NamespaceURI == NamespaceBlocking)
                 {
                     lock (this.blockList)
                     {
@@ -262,7 +262,7 @@ namespace Waher.Networking.XMPP.Abuse
                         foreach (XmlNode N in E.ChildNodes)
                         {
                             E2 = N as XmlElement;
-                            if (E2 != null && E2.LocalName == "item")
+                            if (!(E2 is null) && E2.LocalName == "item")
                             {
                                 JID = XML.Attribute(E2, "jid");
                                 if (!string.IsNullOrEmpty(JID))

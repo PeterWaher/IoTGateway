@@ -73,10 +73,10 @@ namespace Waher.Networking.XMPP.ResultSetManagement
 		/// <returns>Pagination, if found, null otherwise.</returns>
 		public static ResultPage IsPaginated(XmlNode FirstSibling)
 		{
-			while (FirstSibling != null && (FirstSibling.LocalName != "set" || FirstSibling.NamespaceURI != RestrictedQuery.NamespaceResultSetManagement))
+			while (!(FirstSibling is null) && (FirstSibling.LocalName != "set" || FirstSibling.NamespaceURI != RestrictedQuery.NamespaceResultSetManagement))
 				FirstSibling = FirstSibling.NextSibling;
 
-			if (FirstSibling != null && FirstSibling is XmlElement E)
+			if (!(FirstSibling is null) && FirstSibling is XmlElement E)
 				return new ResultPage(E);
 			else
 				return null;

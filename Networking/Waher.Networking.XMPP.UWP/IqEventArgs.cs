@@ -168,7 +168,7 @@ namespace Waher.Networking.XMPP
         /// </summary>
         public bool UsesE2eEncryption
         {
-            get { return this.e2eEncryption != null; }
+            get { return !(this.e2eEncryption is null); }
         }
 
         /// <summary>

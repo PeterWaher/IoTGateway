@@ -3507,10 +3507,11 @@ namespace Waher.Persistence.Serialization
 				Replace("\f", "\\f").
 				Replace("\b", "\\b").
 				Replace("\a", "\\a").
+				Replace("\v", "\\v").
 				Replace("\"", "\\\"");
 		}
 
-		private static readonly char[] specialCharacters = new char[] { '\\', '\n', '\r', '\t', '\f', '\b', '\a', '"' };
+		private static readonly char[] specialCharacters = new char[] { '\\', '\n', '\r', '\t', '\f', '\b', '\a', '\v', '"' };
 
 		/// <summary>
 		/// Name of collection objects of this type is to be stored in, if available. If not available, this property returns null.

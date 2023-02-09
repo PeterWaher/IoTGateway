@@ -173,10 +173,10 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 				{
 					DataForm Form = new DataForm(Client, E, null, null, e.From, e.To);
 					Field F = Form["FORM_TYPE"];
-					if (F != null && F.ValueString == Namespace)
+					if (!(F is null) && F.ValueString == Namespace)
 					{
 						F = Form["max-file-size"];
-						if (F != null && long.TryParse(F.ValueString, out long l))
+						if (!(F is null) && long.TryParse(F.ValueString, out long l))
 							return l;
 					}
 				}
@@ -252,7 +252,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 			{
 				XmlElement E;
 
-				if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "slot" && E.NamespaceURI == Namespace)
+				if (e.Ok && !((E = e.FirstElement) is null) && E.LocalName == "slot" && E.NamespaceURI == Namespace)
 				{
 					foreach (XmlNode N in E.ChildNodes)
 					{

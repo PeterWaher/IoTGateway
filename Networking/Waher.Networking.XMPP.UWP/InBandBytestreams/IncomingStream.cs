@@ -85,7 +85,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 		internal bool BlocksMissing
 		{
-			get { return this.tempStream != null; }
+			get { return !(this.tempStream is null); }
 		}
 
 		internal async Task<bool> DataReceived(byte[] Data, int Seq)

@@ -31,7 +31,7 @@ namespace Waher.Networking.XMPP.BitsOfBinary
 		{
 			XmlElement E;
 
-			if (e.Ok && (E = e.FirstElement) != null)
+			if (e.Ok && !((E = e.FirstElement) is null))
 			{
 				this.contentId = XML.Attribute(E, "cid");
 				this.contentType = XML.Attribute(E, "type");

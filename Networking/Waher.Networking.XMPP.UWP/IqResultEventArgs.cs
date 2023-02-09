@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Xml;
 using Waher.Content.Xml;
+using Waher.Script.Constants;
 
 namespace Waher.Networking.XMPP
 {
@@ -109,19 +110,17 @@ namespace Waher.Networking.XMPP
             this.e2eSymmetricCipher = E2eSymmetricCipher;
         }
 
-        /// <summary>
-        /// Event arguments for responses to IQ queries.
-        /// </summary>
-        /// <param name="Response">Response element.</param>
-        /// <param name="Id">ID attribute.</param>
-        /// <param name="To">To attribute.</param>
-        /// <param name="From">From attribute.</param>
-        /// <param name="Ok">If response is a proper response (true), or an error response (false).</param>
-        /// <param name="State">State object passed in the original request.</param>
-        public IqResultEventArgs(XmlElement Response, string Id, string To, string From, bool Ok, object State)
+		/// <summary>
+		/// Event arguments for responses to IQ queries.
+		/// </summary>
+		/// <param name="Response">Response element.</param>
+		/// <param name="Id">ID attribute.</param>
+		/// <param name="To">To attribute.</param>
+		/// <param name="From">From attribute.</param>
+		/// <param name="Ok">If response is a proper response (true), or an error response (false).</param>
+		/// <param name="State">State object passed in the original request.</param>
+		public IqResultEventArgs(XmlElement Response, string Id, string To, string From, bool Ok, object State)
 		{
-			XmlElement E;
-
 			this.response = Response;
 			this.id = Id;
 			this.to = To;
@@ -130,12 +129,11 @@ namespace Waher.Networking.XMPP
 			this.state = State;
 			this.errorCode = 0;
 
-			if (!Ok && Response != null)
+			if (!Ok && !(Response is null))
 			{
 				foreach (XmlNode N in Response.ChildNodes)
 				{
-					E = N as XmlElement;
-					if (E is null)
+						if (!(N is XmlElement E))
 						continue;
 
 					if (E.LocalName == "error" && E.NamespaceURI == Response.NamespaceURI)
@@ -171,7 +169,7 @@ namespace Waher.Networking.XMPP
 						}
 
 						this.stanzaError = XmppClient.GetExceptionObject(E);
-						this.errorText = this.stanzaError.Message;
+						this.errorText = StanzaError.Message;
 					}
 				}
 			}
@@ -265,7 +263,7 @@ namespace Waher.Networking.XMPP
         /// </summary>
         public bool UsesE2eEncryption
         {
-            get { return this.e2eEncryption != null; }
+            get { return !(this.e2eEncryption is null); }
         }
 
         /// <summary>

@@ -89,9 +89,9 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 
 			foreach (object Obj in Parsed)
 			{
-				if (Min != null && Min.CompareTo(Obj) > 0)
+				if (!(Min is null) && Min.CompareTo(Obj) > 0)
 					Field.Error = "Value out of range.";
-				else if (Max != null && Max.CompareTo(Obj) < 0)
+				else if (!(Max is null) && Max.CompareTo(Obj) < 0)
 					Field.Error = "Value out of range.";
 			}
 		}

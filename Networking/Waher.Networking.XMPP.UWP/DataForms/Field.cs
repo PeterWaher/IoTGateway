@@ -257,7 +257,7 @@ namespace Waher.Networking.XMPP.DataForms
 
 		private Task FormUpdated(object Sender, IqResultEventArgs e)
 		{
-			if (e.Ok && Sender is XmppClient Client && Client != null)
+			if (e.Ok && Sender is XmppClient Client && !(Client is null))
 			{
 				foreach (XmlNode N in e.Response)
 				{
@@ -422,10 +422,10 @@ namespace Waher.Networking.XMPP.DataForms
 				return false;
 			}
 
-			if (this.dataType != null && !this.dataType.Equals(SecondaryField.dataType))
+			if (!(this.dataType is null) && !this.dataType.Equals(SecondaryField.dataType))
 				return false;
 
-			if (this.validationMethod != null && !this.validationMethod.Equals(SecondaryField.validationMethod))
+			if (!(this.validationMethod is null) && !this.validationMethod.Equals(SecondaryField.validationMethod))
 				return false;
 
 			this.readOnly |= SecondaryField.readOnly;

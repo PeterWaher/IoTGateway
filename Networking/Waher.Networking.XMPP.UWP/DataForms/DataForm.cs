@@ -270,7 +270,7 @@ namespace Waher.Networking.XMPP.DataForms
 
 				foreach (Field F in this.fields)
 				{
-					if (F is MediaField MediaField && MediaField.Media != null)
+					if (F is MediaField MediaField && !(MediaField.Media is null))
 					{
 						foreach (KeyValuePair<string, Uri> Uri in MediaField.Media.URIs)
 						{
@@ -829,7 +829,7 @@ namespace Waher.Networking.XMPP.DataForms
 		/// </summary>
 		public bool CanSubmit
 		{
-			get { return this.onSubmit != null; }
+			get { return !(this.onSubmit is null); }
 		}
 
 		/// <summary>
@@ -870,7 +870,7 @@ namespace Waher.Networking.XMPP.DataForms
 		/// </summary>
 		public bool CanCancel
 		{
-			get { return this.onCancel != null; }
+			get { return !(this.onCancel is null); }
 		}
 
 		/// <summary>
@@ -1078,14 +1078,14 @@ namespace Waher.Networking.XMPP.DataForms
 			Field oauth_consumer_key = this["oauth_consumer_key"];
 			Field oauth_signature = this["oauth_signature"];
 
-			if (oauth_version != null &&
-				oauth_signature_method != null &&
-				oauth_token != null &&
-				oauth_token_secret != null &&
-				oauth_nonce != null &&
-				oauth_timestamp != null &&
-				oauth_consumer_key != null &&
-				oauth_signature != null)
+			if (!(oauth_version is null ||
+				oauth_signature_method is null ||
+				oauth_token is null ||
+				oauth_token_secret is null ||
+				oauth_nonce is null ||
+				oauth_timestamp is null ||
+				oauth_consumer_key is null ||
+				oauth_signature is null))
 			{
 				SortedDictionary<string, string> Sorted = new SortedDictionary<string, string>();
 				DateTime Now = DateTime.Now.ToUniversalTime();

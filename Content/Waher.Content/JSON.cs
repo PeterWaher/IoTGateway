@@ -479,8 +479,8 @@ namespace Waher.Content
 			return CommonTypes.Escape(s, jsonCharactersToEscape, jsonCharacterEscapes);
 		}
 
-		private static readonly char[] jsonCharactersToEscape = new char[] { '\\', '"', '\n', '\r', '\t', '\b', '\f', '\a' };
-		private static readonly string[] jsonCharacterEscapes = new string[] { "\\\\", "\\\"", "\\n", "\\r", "\\t", "\\b", "\\f", "\\a" };
+		private static readonly char[] jsonCharactersToEscape = new char[] { '\\', '"', '\n', '\r', '\t', '\b', '\f', '\a', '\v' };
+		private static readonly string[] jsonCharacterEscapes = new string[] { "\\\\", "\\\"", "\\n", "\\r", "\\t", "\\b", "\\f", "\\a", "\\v" };
 
 		/// <summary>
 		/// Encodes an object as JSON.

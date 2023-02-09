@@ -4633,8 +4633,8 @@ namespace Waher.Script
 			return sb.ToString();
 		}
 
-		private static readonly char[] stringCharactersToEscape = new char[] { '\\', '"', '\n', '\r', '\t', '\b', '\f', '\a' };
-		private static readonly string[] stringEscapeSequences = new string[] { "\\\\", "\\\"", "\\n", "\\r", "\\t", "\\b", "\\f", "\\a" };
+		private static readonly char[] stringCharactersToEscape = new char[] { '\\', '"', '\n', '\r', '\t', '\b', '\f', '\a', '\v' };
+		private static readonly string[] stringEscapeSequences = new string[] { "\\\\", "\\\"", "\\n", "\\r", "\\t", "\\b", "\\f", "\\a", "\\v" };
 
 		/// <summary>
 		/// Converts an object to a string.

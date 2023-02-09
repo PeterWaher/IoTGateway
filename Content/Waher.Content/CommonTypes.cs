@@ -800,8 +800,8 @@ namespace Waher.Content
 			return Escape(s, regexCharactersToEscape, regexCharacterEscapes);
 		}
 
-		private static readonly char[] regexCharactersToEscape = new char[] { '\\', '[', '^', '$', '.', '|', '?', '*', '+', '(', ')', '{', '}', '\n', '\r', '\t', '\b', '\f', '\a' };
-		private static readonly string[] regexCharacterEscapes = new string[] { "\\\\", "\\[", "\\^", "\\$", "\\.", "\\|", "\\?", "\\*", "\\+", "\\(", "\\)", "\\{", "\\}", "\\n", "\\r", "\\t", "\\b", "\\f", "\\a" };
+		private static readonly char[] regexCharactersToEscape = new char[] { '\\', '[', '^', '$', '.', '|', '?', '*', '+', '(', ')', '{', '}', '\n', '\r', '\t', '\b', '\f', '\a', '\v' };
+		private static readonly string[] regexCharacterEscapes = new string[] { "\\\\", "\\[", "\\^", "\\$", "\\.", "\\|", "\\?", "\\*", "\\+", "\\(", "\\)", "\\{", "\\}", "\\n", "\\r", "\\t", "\\b", "\\f", "\\a", "\\v" };
 
 		/// <summary>
 		/// Escapes a set of characters in a string.

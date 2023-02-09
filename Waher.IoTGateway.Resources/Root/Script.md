@@ -1777,7 +1777,10 @@ The following functions are available in the `Waher.Script.Networking` library.
 | Function | Description | Example |
 |----------|-------------|---------|
 | `Dns(Name[,QTYPE[,QCLASS]])` | Makes a DNS request to resolve a name, given a QTYPE (default `QTYPE.A`) and QCLASS (default `QCLASS.IN`). | `DNS(Domain,QTYPE.TXT)` |
+| `Ping(Host)`                 | Performs an ICMP Echo to the `Host`, and returns the roundtrip time. | `ping('example.com')` |
 | `Rdap(Ip)`                   | Makes an RDAP request to provide JSON information about an IP-address.    | `RDAP("1.2.3.4")`  |
+| `RDns(IpAddress)`            | Makes a Reverse DNS lookup of an IP Address. | `RDNS("1.2.3.4")` |
+| `Route(Host)`                | Uses the ICMP Echo protocol to find the route in the IP network to a given host. | `route('example.com')` |
 | `WhoIs(Ip)`                  | Makes a WHOIS request to provide textual information about an IP-address. | `WHOIS("1.2.3.4")` |
 
 #### Persistence-related functions (Waher.Script.Persistence)
@@ -2136,7 +2139,7 @@ The following functions are available in the `Waher.Security.JWT` and `Waher.Sec
 
 #### Thing-related Extensions (Waher.Things)
 
-The following functions are available in web pages hosted by the IoT Gateway:
+The following functions are available in the `Waher.Things` library.
 
 | Function                                                    | Description |
 |-------------------------------------------------------------|-------------|

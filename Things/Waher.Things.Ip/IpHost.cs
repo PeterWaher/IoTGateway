@@ -10,6 +10,7 @@ using Waher.Things.DisplayableParameters;
 using Waher.Things.SensorData;
 using Waher.Things.Metering;
 using Waher.Things.Metering.NodeTypes;
+using Waher.Script.Constants;
 
 namespace Waher.Things.Ip
 {
@@ -74,123 +75,31 @@ namespace Waher.Things.Ip
 		{
 			try
 			{
-				Ping Icmp = new Ping();
-
-				PingReply Response = await Icmp.SendPingAsync(this.host, 10000, data, options);
-				DateTime Now = DateTime.Now;
-				string Module = typeof(IpHost).Namespace;
-
-				if (Response.Status == IPStatus.Success)
+				using (Ping Icmp = new Ping())
 				{
-					List<Field> Fields = new List<Field>()
-					{
-						new QuantityField(this, Now, "Ping", Response.RoundtripTime, 0, "ms", FieldType.Momentary, FieldQoS.AutomaticReadout, Module, 7)
-					};
+					PingReply Response = await Icmp.SendPingAsync(this.host, 2000, data, options);
+					DateTime Now = DateTime.Now;
+					string Module = typeof(IpHost).Namespace;
 
-					if (Request.IsIncluded(FieldType.Identity))
+					if (Response.Status == IPStatus.Success)
 					{
-						Fields.Add(new StringField(this, Now, "IP Address", Response.Address.ToString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 8));
-						this.AddIdentityReadout(Fields, Now);
+						List<Field> Fields = new List<Field>()
+						{
+							new QuantityField(this, Now, "Ping", Response.RoundtripTime, 0, "ms", FieldType.Momentary, FieldQoS.AutomaticReadout, Module, 7)
+						};
+
+						if (Request.IsIncluded(FieldType.Identity))
+						{
+							Fields.Add(new StringField(this, Now, "IP Address", Response.Address.ToString(), FieldType.Identity, FieldQoS.AutomaticReadout, Module, 8));
+							this.AddIdentityReadout(Fields, Now);
+						}
+
+						Request.ReportFields(true, Fields);
 					}
-
-					Request.ReportFields(true, Fields);
-				}
-				else
-				{
-					switch (Response.Status)
+					else
 					{
-						case IPStatus.BadDestination:
-							Request.ReportErrors(true, new ThingError(this, Now, "Bad destination"));
-							break;
-
-						case IPStatus.BadHeader:
-							Request.ReportErrors(true, new ThingError(this, Now, "Bad header"));
-							break;
-
-						case IPStatus.BadOption:
-							Request.ReportErrors(true, new ThingError(this, Now, "Bad option"));
-							break;
-
-						case IPStatus.BadRoute:
-							Request.ReportErrors(true, new ThingError(this, Now, "Bad route"));
-							break;
-
-						case IPStatus.DestinationHostUnreachable:
-							Request.ReportErrors(true, new ThingError(this, Now, "Destination host unreachable"));
-							break;
-
-						case IPStatus.DestinationNetworkUnreachable:
-							Request.ReportErrors(true, new ThingError(this, Now, "Destination network unreachable"));
-							break;
-
-						case IPStatus.DestinationPortUnreachable:
-							Request.ReportErrors(true, new ThingError(this, Now, "Destination port unreachable"));
-							break;
-
-						case IPStatus.DestinationProhibited:
-							Request.ReportErrors(true, new ThingError(this, Now, "Destination prohibited"));
-							break;
-						/*
-					case IPStatus.DestinationProtocolUnreachable:
-						Request.ReportErrors(true, new ThingError(this, Now, "Destination protocol unreachable"));
-						break;
-						*/
-						case IPStatus.DestinationScopeMismatch:
-							Request.ReportErrors(true, new ThingError(this, Now, "Destination scope mismatch"));
-							break;
-
-						case IPStatus.DestinationUnreachable:
-							Request.ReportErrors(true, new ThingError(this, Now, "Destination unreachable"));
-							break;
-
-						case IPStatus.HardwareError:
-							Request.ReportErrors(true, new ThingError(this, Now, "Hardware error"));
-							break;
-
-						case IPStatus.IcmpError:
-							Request.ReportErrors(true, new ThingError(this, Now, "ICMP error"));
-							break;
-
-						case IPStatus.NoResources:
-							Request.ReportErrors(true, new ThingError(this, Now, "No resources"));
-							break;
-
-						case IPStatus.PacketTooBig:
-							Request.ReportErrors(true, new ThingError(this, Now, "Packet too big"));
-							break;
-
-						case IPStatus.ParameterProblem:
-							Request.ReportErrors(true, new ThingError(this, Now, "Parameter problem"));
-							break;
-
-						case IPStatus.SourceQuench:
-							Request.ReportErrors(true, new ThingError(this, Now, "Source quench"));
-							break;
-
-						case IPStatus.TimedOut:
-							Request.ReportErrors(true, new ThingError(this, Now, "Timed out"));
-							break;
-
-						case IPStatus.TimeExceeded:
-							Request.ReportErrors(true, new ThingError(this, Now, "Time exceeded"));
-							break;
-
-						case IPStatus.TtlExpired:
-							Request.ReportErrors(true, new ThingError(this, Now, "TTL expired"));
-							break;
-
-						case IPStatus.TtlReassemblyTimeExceeded:
-							Request.ReportErrors(true, new ThingError(this, Now, "TTL reassembly time exceeded"));
-							break;
-
-						case IPStatus.UnrecognizedNextHeader:
-							Request.ReportErrors(true, new ThingError(this, Now, "Unrecognized next header"));
-							break;
-
-						case IPStatus.Unknown:
-						default:
-							Request.ReportErrors(true, new ThingError(this, Now, "Unknown error"));
-							break;
+						Request.ReportErrors(true, new ThingError(this, Now,
+							GetErrorMessage(Response)));
 					}
 				}
 			}
@@ -204,6 +113,39 @@ namespace Waher.Things.Ip
 			catch (Exception ex)
 			{
 				Request.ReportErrors(true, new ThingError(this, ex.Message));
+			}
+		}
+
+		private static string GetErrorMessage(PingReply Response)
+		{
+			switch (Response.Status)
+			{
+				case IPStatus.Success: return null;
+				case IPStatus.BadDestination: return "Bad destination";
+				case IPStatus.BadHeader: return "Bad header";
+				case IPStatus.BadOption: return "Bad option";
+				case IPStatus.BadRoute: return "Bad route";
+				case IPStatus.DestinationHostUnreachable: return "Destination host unreachable";
+				case IPStatus.DestinationNetworkUnreachable: return "Destination network unreachable";
+				case IPStatus.DestinationPortUnreachable: return "Destination port unreachable";
+				case IPStatus.DestinationProhibited: return "Destination prohibited";
+				//case IPStatus.DestinationProtocolUnreachable: return "Destination protocol unreachable";
+				case IPStatus.DestinationScopeMismatch: return "Destination scope mismatch";
+				case IPStatus.DestinationUnreachable: return "Destination unreachable";
+				case IPStatus.HardwareError: return "Hardware error";
+				case IPStatus.IcmpError: return "ICMP error";
+				case IPStatus.NoResources: return "No resources";
+				case IPStatus.PacketTooBig: return "Packet too big";
+				case IPStatus.ParameterProblem: return "Parameter problem";
+				case IPStatus.SourceQuench: return "Source quench";
+				case IPStatus.TimedOut: return "Timed out";
+				case IPStatus.TimeExceeded: return "Time exceeded";
+				case IPStatus.TtlExpired: return "TTL expired";
+				case IPStatus.TtlReassemblyTimeExceeded: return "TTL reassembly time exceeded";
+				case IPStatus.UnrecognizedNextHeader: return "Unrecognized next header";
+				case IPStatus.Unknown:
+				default:
+					return "Unknown error";
 			}
 		}
 
@@ -224,6 +166,5 @@ namespace Waher.Things.Ip
 
 			return Result;
 		}
-
 	}
 }

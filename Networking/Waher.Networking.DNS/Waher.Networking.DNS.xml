@@ -604,6 +604,13 @@
             if maxValue equals 0, maxValue is returned.</returns>
             <exception cref="T:System.ArgumentOutOfRangeException">maxValue is less than 0</exception>
         </member>
+        <member name="M:Waher.Networking.DNS.DnsResolver.ReverseDns(System.Net.IPAddress)">
+            <summary>
+            Performs a reverse DNS lookup of an IP address.
+            </summary>
+            <param name="Address">IP Address</param>
+            <returns>Names associated with IP Address.</returns>
+        </member>
         <member name="T:Waher.Networking.DNS.Enumerations.CLASS">
             <summary>
             TYPE fields are used in resource records.

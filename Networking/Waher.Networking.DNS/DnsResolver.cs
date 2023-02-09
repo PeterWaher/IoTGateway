@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -963,6 +964,59 @@ namespace Waher.Networking.DNS
 			{
 				return rnd.Next(MaxValue);
 			}
+		}
+
+		/// <summary>
+		/// Performs a reverse DNS lookup of an IP address.
+		/// </summary>
+		/// <param name="Address">IP Address</param>
+		/// <returns>Names associated with IP Address.</returns>
+		public static async Task<string[]> ReverseDns(IPAddress Address)
+		{
+			StringBuilder sb = new StringBuilder();
+			byte[] Bytes = Address.GetAddressBytes();
+			int i = Bytes.Length;
+
+			if (Address.AddressFamily == AddressFamily.InterNetwork)
+			{
+				while (i-- > 0)
+				{
+					sb.Append(Bytes[i].ToString());
+					sb.Append('.');
+				}
+
+				sb.Append("in-addr.arpa");
+			}
+			else if (Address.AddressFamily == AddressFamily.InterNetworkV6)
+			{
+				Address.GetAddressBytes();
+
+				while (i-- > 0)
+				{
+					byte b = Bytes[i];
+
+					sb.Append((b & 15).ToString("x1"));
+					sb.Append('.');
+
+					sb.Append((b >> 4).ToString("x1"));
+					sb.Append('.');
+				}
+
+				sb.Append("ip6.arpa");
+			}
+			else
+				throw new ArgumentException("Unsupported address family.", nameof(Address));
+
+			ResourceRecord[] Records = await Resolve(sb.ToString(), QTYPE.PTR, QCLASS.IN);
+			List<string> Names = new List<string>();
+
+			foreach (ResourceRecord Rec in Records)
+			{
+				if (Rec is PTR PtrRecord)
+					Names.Add(PtrRecord.Name2);
+			}
+
+			return Names.ToArray();
 		}
 
 	}

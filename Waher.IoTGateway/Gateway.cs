@@ -2520,9 +2520,10 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Privilege">Required user privilege.</param>
-		public static void AssertUserAuthenticated(HttpRequest Request, string Privilege)
+		/// <returns>Logged in user.</returns>
+		public static IUser AssertUserAuthenticated(HttpRequest Request, string Privilege)
 		{
-			AssertUserAuthenticated(Request.Session, Privilege);
+			return AssertUserAuthenticated(Request.Session, Privilege);
 		}
 
 		/// <summary>
@@ -2530,7 +2531,8 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Session">Session Variables</param>
 		/// <param name="Privilege">Required user privilege.</param>
-		public static void AssertUserAuthenticated(Variables Session, string Privilege)
+		/// <returns>Logged in user.</returns>
+		public static IUser AssertUserAuthenticated(Variables Session, string Privilege)
 		{
 			if (Session is null ||
 				!Session.TryGetVariable("User", out Variable v) ||
@@ -2539,6 +2541,8 @@ namespace Waher.IoTGateway
 			{
 				throw new ForbiddenException("Access denied.");
 			}
+
+			return User;
 		}
 
 		/// <summary>
@@ -2546,9 +2550,10 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Privileges">Required user privileges.</param>
-		public static void AssertUserAuthenticated(HttpRequest Request, string[] Privileges)
+		/// <returns>Logged in user.</returns>
+		public static IUser AssertUserAuthenticated(HttpRequest Request, string[] Privileges)
 		{
-			AssertUserAuthenticated(Request.Session, Privileges);
+			return AssertUserAuthenticated(Request.Session, Privileges);
 		}
 
 		/// <summary>
@@ -2556,7 +2561,8 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="Session">Session Variables</param>
 		/// <param name="Privileges">Required user privileges.</param>
-		public static void AssertUserAuthenticated(Variables Session, string[] Privileges)
+		/// <returns>Logged in user.</returns>
+		public static IUser AssertUserAuthenticated(Variables Session, string[] Privileges)
 		{
 			if (Session is null ||
 				!Session.TryGetVariable("User", out Variable v) ||
@@ -2570,6 +2576,8 @@ namespace Waher.IoTGateway
 				if (!User.HasPrivilege(Privilege))
 					throw new ForbiddenException("Access denied.");
 			}
+
+			return User;
 		}
 
 		#endregion

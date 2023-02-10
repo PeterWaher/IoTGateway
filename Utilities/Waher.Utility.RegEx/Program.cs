@@ -40,13 +40,13 @@ namespace Waher.Utility.RegEx
 		/// </summary>
 		/// <example>
 		/// Updating copyright statements in csproj, nuspec and cs files:
-		/// Waher.Utility.RegEx.exe -p "C:\My Projects\IoTGateway\*.csproj" -p "C:\My Projects\IoTGateway\*.cs" -p "C:\My Projects\IoTGateway\*.nuspec" -f "Copyright (©|\([cC]\)) (?'Name'Waher( *\w+)*)\s*(?'From'\d{4})(-(?'To'\d{4}))?" -x "C:\Downloads\Temp\1.xml" -s -o -n -r "Copyright © ${Name} ${From}-2022"
+		/// Waher.Utility.RegEx.exe -p "C:\My Projects\IoTGateway\*.csproj" -p "C:\My Projects\IoTGateway\*.cs" -p "C:\My Projects\IoTGateway\*.nuspec" -f "Copyright (©|\([cC]\)) (?'Name'Waher( *\w+)*)\s*(?'From'\d{4})(-(?'To'\d{4}))?" -x "C:\Downloads\Temp\1.xml" -s -o -n -r "Copyright © ${Name} ${From}-2023"
 		/// 
 		/// Updating copyright statements in markdown files:
-		/// Waher.Utility.RegEx.exe -p "C:\My Projects\IoTGateway\*.md" -f "\([cC]\) \[(?'Name'Waher( *\w+)*)\]\((?'Url'[^)\n]*)\)\s*(?'From'\d{4})(-(?'To'\d{4}))?" -x "C:\Downloads\Temp\2.xml" -s -o -n -r "(c) [${Name}](${Url}) ${From}-2022"
+		/// Waher.Utility.RegEx.exe -p "C:\My Projects\IoTGateway\*.md" -f "\([cC]\) \[(?'Name'Waher( *\w+)*)\]\((?'Url'[^)\n]*)\)\s*(?'From'\d{4})(-(?'To'\d{4}))?" -x "C:\Downloads\Temp\2.xml" -s -o -n -r "(c) [${Name}](${Url}) ${From}-2023"
 		/// 
 		/// Updating copyright statements in RTF files:
-		/// Waher.Utility.RegEx.exe -p "C:\My Projects\IoTGateway\*.rtf" -f "\\'a9 (?'Name'Waher( *\w+)*)\s*(?'From'\d{4})(-(?'To'\d{4}))?" -x "C:\Downloads\Temp\3.xml" -s -o -n -r "\'a9 ${Name} ${From}-2022"
+		/// Waher.Utility.RegEx.exe -p "C:\My Projects\IoTGateway\*.rtf" -f "\\'a9 (?'Name'Waher( *\w+)*)\s*(?'From'\d{4})(-(?'To'\d{4}))?" -x "C:\Downloads\Temp\3.xml" -s -o -n -r "\'a9 ${Name} ${From}-2023"
 		/// </example>
 		static int Main(string[] args)
 		{

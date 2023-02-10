@@ -8,7 +8,7 @@
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
     <Description>Contains script extensions for signing and verifying XML documents using the XMLDSIG standard.</Description>
-    <Copyright>Copyright © Waher Data AB 2021-2022. All rights reserved.</Copyright>
+    <Copyright>Copyright © Waher Data AB 2021-2023. All rights reserved.</Copyright>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script.XmlDSig</PackageProjectUrl>
     <PackageIcon>Icon_64x64.png</PackageIcon>

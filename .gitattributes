@@ -19,3 +19,6 @@
 *.WXS	 diff=astextplain
 *.wxl	 diff=astextplain
 *.WXL	 diff=astextplain
+*.manifest diff=astextplain
+*.config diff=astextplain
+

@@ -2522,8 +2522,18 @@ namespace Waher.IoTGateway
 		/// <param name="Privilege">Required user privilege.</param>
 		public static void AssertUserAuthenticated(HttpRequest Request, string Privilege)
 		{
-			if (Request.Session is null ||
-				!Request.Session.TryGetVariable("User", out Variable v) ||
+			AssertUserAuthenticated(Request.Session, Privilege);
+		}
+
+		/// <summary>
+		/// Makes sure a request is being made from a session with a successful user login.
+		/// </summary>
+		/// <param name="Session">Session Variables</param>
+		/// <param name="Privilege">Required user privilege.</param>
+		public static void AssertUserAuthenticated(Variables Session, string Privilege)
+		{
+			if (Session is null ||
+				!Session.TryGetVariable("User", out Variable v) ||
 				!(v.ValueObject is IUser User) ||
 				!User.HasPrivilege(Privilege))
 			{
@@ -2538,8 +2548,18 @@ namespace Waher.IoTGateway
 		/// <param name="Privileges">Required user privileges.</param>
 		public static void AssertUserAuthenticated(HttpRequest Request, string[] Privileges)
 		{
-			if (Request.Session is null ||
-				!Request.Session.TryGetVariable("User", out Variable v) ||
+			AssertUserAuthenticated(Request.Session, Privileges);
+		}
+
+		/// <summary>
+		/// Makes sure a request is being made from a session with a successful user login.
+		/// </summary>
+		/// <param name="Session">Session Variables</param>
+		/// <param name="Privileges">Required user privileges.</param>
+		public static void AssertUserAuthenticated(Variables Session, string[] Privileges)
+		{
+			if (Session is null ||
+				!Session.TryGetVariable("User", out Variable v) ||
 				!(v.ValueObject is IUser User))
 			{
 				throw new ForbiddenException("Access denied.");

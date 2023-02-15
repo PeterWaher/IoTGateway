@@ -70,6 +70,11 @@
             If XAML is handled.
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.GraphViz.GraphViz.HandlesLaTeX">
+            <summary>
+            If LaTeX is handled.
+            </summary>
+        </member>
         <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.GenerateHTML(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates HTML for the markdown element.
@@ -110,6 +115,17 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.GraphViz.GraphViz.GenerateLaTeX(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX text for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
             <param name="Rows">Code rows.</param>
             <param name="Language">Language used.</param>
             <param name="Indent">Additional indenting.</param>

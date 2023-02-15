@@ -4,11 +4,14 @@ using System.Threading.Tasks;
 using System.Xml;
 using SkiaSharp;
 using Waher.Content.Emoji;
+using Waher.Content.Html.Elements;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.Multimedia;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Script;
+using Waher.Script.Constants;
+using Waher.Script.Functions.Analytic;
 using Waher.Script.Graphs;
 using Waher.Script.Objects.Matrices;
 
@@ -624,7 +627,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				return;
 
 			string s;
-			
+
 			if (State.InLabel)
 			{
 				s = Result?.ToString();
@@ -730,6 +733,227 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			if (this.aloneInParagraph)
 				Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Generates LaTeX for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		public override async Task GenerateLaTeX(StringBuilder Output)
+		{
+			object Result = await this.EvaluateExpression();
+
+			await GenerateLaTeX(Result, Output, this.aloneInParagraph, this.variables);
+		}
+
+		/// <summary>
+		/// Generates HTML from Script output.
+		/// </summary>
+		/// <param name="Result">Script output.</param>
+		/// <param name="Output">HTML output.</param>
+		/// <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
+		/// <param name="Variables">Current variables.</param>
+		public static async Task GenerateLaTeX(object Result, StringBuilder Output, bool AloneInParagraph, Variables Variables)
+		{
+			if (Result is null)
+				return;
+
+			if (Result is XmlDocument Xml)
+				Result = await MarkdownDocument.TransformXml(Xml, Variables);
+
+			if (Result is Graph G)
+			{
+				PixelInformation Pixels = G.CreatePixels(Variables, out GraphSettings GraphSettings);
+				byte[] Bin = Pixels.EncodeAsPng();
+				string FileName = await ImageContent.GetTemporaryFile(Bin, "png");
+
+				if (AloneInParagraph)
+				{
+					Output.AppendLine("\\begin{figure}[h]");
+					Output.AppendLine("\\centering");
+				}
+
+				Output.Append("\\fbox{\\includegraphics[width=");
+				Output.Append(((GraphSettings.Width * 3) / 4).ToString());
+				Output.Append("pt, height=");
+				Output.Append(((GraphSettings.Height * 3) / 4).ToString());
+				Output.Append("pt]{");
+				Output.Append(FileName.Replace('\\', '/'));
+				Output.Append("}}");
+
+				if (AloneInParagraph)
+					Output.AppendLine("\\end{figure}");
+			}
+			else if (Result is PixelInformation Pixels)
+			{
+				byte[] Bin = Pixels.EncodeAsPng();
+				string FileName = await ImageContent.GetTemporaryFile(Bin, "png");
+
+				if (AloneInParagraph)
+				{
+					Output.AppendLine("\\begin{figure}[h]");
+					Output.AppendLine("\\centering");
+				}
+
+				Output.Append("\\fbox{\\includegraphics[width=");
+				Output.Append(((Pixels.Width * 3) / 4).ToString());
+				Output.Append("pt, height=");
+				Output.Append(((Pixels.Height * 3) / 4).ToString());
+				Output.Append("pt]{");
+				Output.Append(FileName.Replace('\\', '/'));
+				Output.Append("}}");
+
+				if (AloneInParagraph)
+					Output.AppendLine("\\end{figure}");
+			}
+			else if (Result is SKImage Img)
+			{
+				using (SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100))
+				{
+					byte[] Bin = Data.ToArray();
+					string FileName = await ImageContent.GetTemporaryFile(Bin, "png");
+
+					if (AloneInParagraph)
+					{
+						Output.AppendLine("\\begin{figure}[h]");
+						Output.AppendLine("\\centering");
+					}
+
+					Output.Append("\\fbox{\\includegraphics[width=");
+					Output.Append(((Img.Width * 3) / 4).ToString());
+					Output.Append("pt, height=");
+					Output.Append(((Img.Height * 3) / 4).ToString());
+					Output.Append("pt]{");
+					Output.Append(FileName.Replace('\\', '/'));
+					Output.Append("}}");
+
+					if (AloneInParagraph)
+						Output.AppendLine("\\end{figure}");
+				}
+			}
+			else if (Result is Exception ex)
+			{
+				bool First = true;
+
+				ex = Log.UnnestException(ex);
+
+				Output.AppendLine("\\texttt{\\color{red}");
+
+				if (ex is AggregateException ex2)
+				{
+					foreach (Exception ex3 in ex2.InnerExceptions)
+					{
+						foreach (string Row in ex3.Message.Replace("\r\n", "\n").
+							Replace('\r', '\n').Split('\n'))
+						{
+							if (First)
+								First = false;
+							else
+								Output.AppendLine("\\\\");
+
+							Output.Append(InlineText.EscapeLaTeX(Row));
+						}
+					}
+				}
+				else
+				{
+					foreach (string Row in ex.Message.Replace("\r\n", "\n").
+						Replace('\r', '\n').Split('\n'))
+					{
+						if (First)
+							First = false;
+						else
+							Output.AppendLine("\\\\");
+
+						Output.Append(InlineText.EscapeLaTeX(Row));
+					}
+				}
+
+				Output.AppendLine("}");
+
+				if (AloneInParagraph)
+				{
+					Output.AppendLine();
+					Output.AppendLine();
+				}
+			}
+			else if (Result is ObjectMatrix M && !(M.ColumnNames is null))
+			{
+				Output.AppendLine("\\begin{table}[!h]");
+				Output.AppendLine("\\centering");
+				Output.Append("\\begin{tabular}{");
+				foreach (string _ in M.ColumnNames)
+					Output.Append("|c");
+
+				Output.AppendLine("|}");
+				Output.AppendLine("\\hline");
+
+				bool First = true;
+
+				foreach (string Name in M.ColumnNames)
+				{
+					if (First)
+						First = false;
+					else
+						Output.Append(" & ");
+
+					Output.Append(InlineText.EscapeLaTeX(Name));
+				}
+
+				Output.AppendLine("\\\\");
+				Output.AppendLine("\\hline");
+
+				int x, y;
+
+				for (y = 0; y < M.Rows; y++)
+				{
+					for (x = 0; x < M.Columns; x++)
+					{
+						if (x > 0)
+							Output.Append(" & ");
+
+						object Item = M.GetElement(x, y).AssociatedObjectValue;
+						if (!(Item is null))
+						{
+							if (Item is string s2)
+								Output.Append(InlineText.EscapeLaTeX(s2));
+							else if (Item is MarkdownElement Element)
+							{
+								Output.Append('{');
+								await Element.GenerateLaTeX(Output);
+								Output.Append('}');
+							}
+							else
+							{
+								Output.Append('{');
+								Output.Append(InlineText.EscapeLaTeX(Expression.ToString(Item)));
+								Output.Append('}');
+							}
+						}
+
+						Output.Append("</td>");
+					}
+
+					Output.AppendLine("\\\\");
+				}
+
+				Output.AppendLine("\\hline");
+				Output.AppendLine("\\end{tabular}");
+				Output.AppendLine("\\end{table}");
+			}
+			else if (Result is Array A)
+			{
+				foreach (object Item in A)
+					await GenerateLaTeX(Item, Output, false, Variables);
+			}
+			else
+				Output.Append(InlineText.EscapeLaTeX(Result?.ToString() ?? string.Empty));
+
+			if (AloneInParagraph)
+			{
+				Output.AppendLine();
+				Output.AppendLine();
+			}
 		}
 
 		/// <summary>

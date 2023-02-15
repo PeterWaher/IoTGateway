@@ -59,6 +59,11 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		public bool HandlesXAML => true;
 
 		/// <summary>
+		/// If LaTeX is handled.
+		/// </summary>
+		public bool HandlesLaTeX => true;
+
+		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
@@ -71,7 +76,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		{
 			Output.Append("<figure>");
 			Output.Append("<img class=\"aloneUnsized\" src=\"");
-			Output.Append(GenerateUrl(Language, Rows, out string ContentType, out string Title));
+			Output.Append(GenerateUrl(Language, Rows, out string _, out string Title));
 			Output.Append('"');
 
 			if (!string.IsNullOrEmpty(Title))
@@ -184,6 +189,33 @@ namespace Waher.Content.Markdown.Model.CodeContent
 			{
 				Url = GenerateUrl(Language, Rows, out _, out _)
 			});
+
+			return true;
+		}
+
+		/// <summary>
+		/// Generates LaTeX text for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		/// <param name="Rows">Code rows.</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		public async Task<bool> GenerateLaTeX(StringBuilder Output, string[] Rows, string Language, int Indent,
+			MarkdownDocument Document)
+		{
+			byte[] Bin = Convert.FromBase64String(GetImageBase64(Rows));
+			string FileName = await Multimedia.ImageContent.GetTemporaryFile(Bin);
+
+			Output.AppendLine("\\begin{figure}[h]");
+			Output.AppendLine("\\centering");
+
+			Output.Append("\\fbox{\\includegraphics{");
+			Output.Append(FileName.Replace('\\', '/'));
+			Output.AppendLine("}}");
+
+			Output.AppendLine("\\end{figure}");
 
 			return true;
 		}

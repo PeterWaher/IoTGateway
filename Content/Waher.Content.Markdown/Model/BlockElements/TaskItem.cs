@@ -164,6 +164,25 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
+		/// Generates LaTeX for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		public override async Task GenerateLaTeX(StringBuilder Output)
+		{
+			Output.Append("\\item");
+
+			if (this.isChecked)
+				Output.Append("[\\checked]");
+
+			Output.Append('{');
+
+			foreach (MarkdownElement E in this.Children)
+				await E.GenerateLaTeX(Output);
+
+			Output.AppendLine("}");
+		}
+
+		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
 		internal override bool InlineSpanElement => this.Child.InlineSpanElement;

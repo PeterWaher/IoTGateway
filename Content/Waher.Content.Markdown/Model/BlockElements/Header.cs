@@ -239,6 +239,97 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
+		/// Generates LaTeX for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		public override async Task GenerateLaTeX(StringBuilder Output)
+		{
+			string Command;
+
+			switch (this.Document.Settings.LaTeXSettings.DocumentClass)
+			{
+				case LaTeXDocumentClass.Book:
+				case LaTeXDocumentClass.Report:
+					switch (this.level)
+					{
+						case 1:
+							Command = "part";
+							break;
+
+						case 2:
+							Command = "chapter";
+							break;
+
+						case 3:
+							Command = "section";
+							break;
+
+						case 4:
+							Command = "subsection";
+							break;
+
+						case 5:
+							Command = "subsubsection";
+							break;
+
+						case 6:
+							Command = "paragraph";
+							break;
+
+						case 7:
+						default:
+							Command = "subparagraph";
+							break;
+					}
+					break;
+
+				case LaTeXDocumentClass.Article:
+				case LaTeXDocumentClass.Standalone:
+				default:
+					switch (this.level)
+					{
+						case 1:
+							Command = "section";
+							break;
+
+						case 2:
+							Command = "subsection";
+							break;
+
+						case 3:
+							Command = "subsubsection";
+							break;
+
+						case 4:
+							Command = "paragraph";
+							break;
+
+						case 5:
+						default:
+							Command = "subparagraph";
+							break;
+					}
+					break;
+			}
+
+			Output.Append('\\');
+			Output.Append(Command);
+			Output.Append("*{");
+
+			foreach (MarkdownElement E in this.Children)
+				await E.GenerateLaTeX(Output);
+
+			Output.AppendLine("}");
+			Output.AppendLine();
+
+			foreach (MarkdownElement E in this.Children)
+				await E.GenerateLaTeX(Output);
+
+			Output.AppendLine();
+			Output.AppendLine();
+		}
+
+		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
 		internal override bool InlineSpanElement => false;

@@ -7,12 +7,12 @@ using Waher.Runtime.Inventory;
 namespace Waher.Content.Json.ReferenceTypes
 {
 	/// <summary>
-	/// Encodes <see cref="IEnumerable{KeyValuePair{string, object}}"/> values.
+	/// Encodes <see cref="IEnumerable{T}"/> values.
 	/// </summary>
 	public class TypedDictionaryEncoder2 : IJsonEncoder
 	{
 		/// <summary>
-		/// Encodes <see cref="IEnumerable{KeyValuePair{string, object}}"/> values.
+		/// Encodes <see cref="IEnumerable{T}"/> values.
 		/// </summary>
 		public TypedDictionaryEncoder2()
 		{

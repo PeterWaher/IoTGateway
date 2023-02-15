@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
@@ -511,6 +512,71 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			Output.WriteEndElement();
 			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Generates LaTeX for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		public override async Task GenerateLaTeX(StringBuilder Output)
+		{
+			if (!(this.handler is null) && this.handler.HandlesLaTeX)
+			{
+				try
+				{
+					if (await this.handler.GenerateLaTeX(Output, this.rows, this.language, this.indent, this.Document))
+						return;
+				}
+				catch (Exception ex)
+				{
+					bool First = true;
+
+					ex = Log.UnnestException(ex);
+
+					Output.AppendLine("\\texttt{\\color{red}");
+
+					if (ex is AggregateException ex2)
+					{
+						foreach (Exception ex3 in ex2.InnerExceptions)
+						{
+							foreach (string Row in ex3.Message.Replace("\r\n", "\n").
+								Replace('\r', '\n').Split('\n'))
+							{
+								if (First)
+									First = false;
+								else
+									Output.AppendLine("\\\\");
+
+								Output.Append(InlineText.EscapeLaTeX(Row));
+							}
+						}
+					}
+					else
+					{
+						foreach (string Row in ex.Message.Replace("\r\n", "\n").
+							Replace('\r', '\n').Split('\n'))
+						{
+							if (First)
+								First = false;
+							else
+								Output.AppendLine("\\\\");
+
+							Output.Append(InlineText.EscapeLaTeX(Row));
+						}
+					}
+
+					Output.AppendLine("}");
+					Output.AppendLine();
+				}
+			}
+
+			Output.Append("\\texttt{");
+
+			foreach (MarkdownElement E in this.Children)
+				await E.GenerateLaTeX(Output);
+
+			Output.AppendLine("}");
+			Output.AppendLine();
 		}
 
 		/// <summary>

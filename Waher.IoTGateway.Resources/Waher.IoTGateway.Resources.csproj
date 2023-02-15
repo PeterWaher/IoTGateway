@@ -188,6 +188,10 @@
     <None Remove="Root\MarkdownLab\MarkdownLab.js" />
     <None Remove="Root\MarkdownLab\MarkdownLab.md" />
     <None Remove="Root\MarkdownLab\MarkdownLabHtml.md" />
+    <None Remove="Root\MarkdownLab\MarkdownLabLaTeXArticle.md" />
+    <None Remove="Root\MarkdownLab\MarkdownLabLaTeXBook.md" />
+    <None Remove="Root\MarkdownLab\MarkdownLabLaTeXReport.md" />
+    <None Remove="Root\MarkdownLab\MarkdownLabLaTeXStandalone.md" />
     <None Remove="Root\MarkdownLab\MarkdownLabSmartContract.md" />
     <None Remove="Root\MarkdownLab\MarkdownLabText.md" />
     <None Remove="Root\MarkdownLab\MarkdownLabXamarinForms.md" />
@@ -691,6 +695,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\MarkdownLab\MarkdownLab.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\MarkdownLab\MarkdownLabLaTeXStandalone.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\MarkdownLab\MarkdownLabLaTeXReport.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\MarkdownLab\MarkdownLabLaTeXArticle.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\MarkdownLab\MarkdownLabLaTeXBook.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\MarkdownLab\MarkdownLabXamarinForms.md">

@@ -593,6 +593,71 @@
             If typographical extensions should conform to XML entities (true), or if HTML entities can be used as well (false).
             </summary>
         </member>
+        <member name="T:Waher.Content.Markdown.LaTeXDocumentClass">
+            <summary>
+            Document class of LaTeX output.
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.LaTeXDocumentClass.Article">
+            <summary>
+            LaTeX Article
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.LaTeXDocumentClass.Report">
+            <summary>
+            LaTeX Report
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.LaTeXDocumentClass.Book">
+            <summary>
+            LaTeX Book
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.LaTeXDocumentClass.Standalone">
+            <summary>
+            Standalone output
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Markdown.LaTeXPaper">
+            <summary>
+            LaTeX output paper format
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.LaTeXPaper.Letter">
+            <summary>
+            Letter paper output
+            </summary>
+        </member>
+        <member name="F:Waher.Content.Markdown.LaTeXPaper.A4">
+            <summary>
+            A4 paper output
+            </summary>
+        </member>
+        <member name="T:Waher.Content.Markdown.LaTeXSettings">
+            <summary>
+            Contains settings that the LaTeX export uses to customize LaTeX output.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Markdown.LaTeXSettings.#ctor">
+            <summary>
+            Contains settings that the LaTeX export uses to customize LaTeX output.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.LaTeXSettings.DocumentClass">
+            <summary>
+            Document class of LaTeX output.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.LaTeXSettings.PaperFormat">
+            <summary>
+            Document output paper format.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.LaTeXSettings.DefaultFontSize">
+            <summary>
+            Default font size, in points (pt)
+            </summary>
+        </member>
         <member name="T:Waher.Content.Markdown.MarkdownCodec">
             <summary>
             Markdown encoder.
@@ -1348,6 +1413,25 @@
             To what extent the object supports JSON encoding.
             </summary>
         </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateLaTeX">
+            <summary>
+            Generates HTML from the markdown text.
+            </summary>
+            <returns>HTML</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates HTML from the markdown text.
+            </summary>
+            <param name="Output">HTML will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.MarkdownDocument.GenerateLaTeX(System.Text.StringBuilder,System.Boolean)">
+            <summary>
+            Generates HTML from the markdown text.
+            </summary>
+            <param name="Output">HTML will be output here.</param>
+            <param name="Inclusion">If the HTML is to be included in another document (true), or if it is a standalone document (false).</param>
+        </member>
         <member name="T:Waher.Content.Markdown.AuthorizeExpression">
             <summary>
             Delegate for expression authorization methods.
@@ -1476,6 +1560,11 @@
         <member name="P:Waher.Content.Markdown.MarkdownSettings.HtmlSettings">
             <summary>
             HTML Settings used for HTML rendering.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.MarkdownSettings.LaTeXSettings">
+            <summary>
+            LaTeX Settings used for LaTeX rendering.
             </summary>
         </member>
         <member name="T:Waher.Content.Markdown.MarkdownStatistics">
@@ -1879,6 +1968,12 @@
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.Atoms.Atom.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.Atoms.Atom.Equals(System.Object)">
             <summary>
             Determines whether the specified object is equal to the current object.
@@ -2041,6 +2136,12 @@
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.BlockQuote.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.BlockQuote.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -2125,6 +2226,12 @@
             </summary>
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.BulletList.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.BulletList.InlineSpanElement">
             <summary>
@@ -2230,6 +2337,12 @@
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CodeBlock.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.CodeBlock.Indent">
             <summary>
             Code block indentation.
@@ -2316,6 +2429,12 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.CommentBlock.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.CommentBlock.InlineSpanElement">
             <summary>
@@ -2406,6 +2525,12 @@
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.DefinitionDescriptions.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.DefinitionDescriptions.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -2493,6 +2618,12 @@
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.DefinitionList.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.DefinitionList.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -2576,6 +2707,12 @@
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.DefinitionTerms.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.DefinitionTerms.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -2645,6 +2782,12 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.DeleteBlocks.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.DeleteBlocks.InlineSpanElement">
             <summary>
@@ -2732,6 +2875,12 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Footnote.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.Footnote.InlineSpanElement">
             <summary>
@@ -2845,6 +2994,12 @@
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Header.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.Header.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -2936,6 +3091,12 @@
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.HorizontalRule.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.HorizontalRule.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -3018,6 +3179,12 @@
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.HtmlBlock.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.HtmlBlock.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -3088,6 +3255,12 @@
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.InsertBlocks.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.InsertBlocks.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -3157,6 +3330,12 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.InvisibleBreak.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.InvisibleBreak.InlineSpanElement">
             <summary>
@@ -3240,6 +3419,12 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.NestedBlock.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.NestedBlock.InlineSpanElement">
             <summary>
@@ -3331,6 +3516,12 @@
             </summary>
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.NumberedItem.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.NumberedItem.InlineSpanElement">
             <summary>
@@ -3445,6 +3636,12 @@
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.NumberedList.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.NumberedList.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -3523,6 +3720,12 @@
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Paragraph.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.Paragraph.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -3599,6 +3802,12 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Sections.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.Sections.InlineSpanElement">
             <summary>
@@ -3702,6 +3911,12 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.SectionSeparator.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.SectionSeparator.InlineSpanElement">
             <summary>
@@ -3826,6 +4041,12 @@
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.Table.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.Table.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -3927,6 +4148,12 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.TaskItem.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.TaskItem.InlineSpanElement">
             <summary>
@@ -4033,6 +4260,12 @@
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.TaskList.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.TaskList.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -4116,6 +4349,12 @@
             </summary>
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.BlockElements.UnnumberedItem.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.BlockElements.UnnumberedItem.InlineSpanElement">
             <summary>
@@ -4209,6 +4448,11 @@
             If XAML is handled.
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.Model.CodeContent.GraphContent.HandlesLaTeX">
+            <summary>
+            If LaTeX is handled.
+            </summary>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.CodeContent.GraphContent.GenerateHTML(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates HTML for the markdown element.
@@ -4262,6 +4506,17 @@
             <param name="Document">Markdown document containing element.</param>
             <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.GraphContent.GenerateLaTeX(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX text for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.CodeContent.GraphContent.GenerateImage(System.String[],System.String,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates an image of the contents.
@@ -4307,6 +4562,11 @@
         <member name="P:Waher.Content.Markdown.Model.CodeContent.ImageContent.HandlesXAML">
             <summary>
             If XAML is handled.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Markdown.Model.CodeContent.ImageContent.HandlesLaTeX">
+            <summary>
+            If LaTeX is handled.
             </summary>
         </member>
         <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GenerateHTML(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
@@ -4372,6 +4632,17 @@
             <param name="Document">Markdown document containing element.</param>
             <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GenerateLaTeX(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX text for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.CodeContent.ImageContent.GenerateImage(System.String[],System.String,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates an image of the contents.
@@ -4414,6 +4685,11 @@
             If XAML is handled.
             </summary>
         </member>
+        <member name="P:Waher.Content.Markdown.Model.ICodeContent.HandlesLaTeX">
+            <summary>
+            If LaTeX is handled.
+            </summary>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.ICodeContent.GenerateHTML(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
             <summary>
             Generates HTML for the markdown element.
@@ -4454,6 +4730,17 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+            <param name="Rows">Code rows.</param>
+            <param name="Language">Language used.</param>
+            <param name="Indent">Additional indenting.</param>
+            <param name="Document">Markdown document containing element.</param>
+            <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.ICodeContent.GenerateLaTeX(System.Text.StringBuilder,System.String[],System.String,System.Int32,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX text for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
             <param name="Rows">Code rows.</param>
             <param name="Language">Language used.</param>
             <param name="Indent">Additional indenting.</param>
@@ -4525,7 +4812,7 @@
             <summary>
             Generates Plain Text for the markdown element.
             </summary>
-            <param name="Output">HTML will be output here.</param>
+            <param name="Output">Plain text will be output here.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -4548,6 +4835,16 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.IMultimediaContent.GenerateLaTeX(System.Text.StringBuilder,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX text for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -4659,6 +4956,12 @@
             </summary>
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.MarkdownElement.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.MarkdownElement.OutsideParagraph">
             <summary>
@@ -5012,6 +5315,16 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.MultimediaContent.GenerateLaTeX(System.Text.StringBuilder,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX text for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.MultimediaItem">
             <summary>
             Multimedia item.
@@ -5136,6 +5449,16 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.AudioContent.GenerateLaTeX(System.Text.StringBuilder,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX text for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.Multimedia.ImageContent">
             <summary>
             Image content.
@@ -5191,11 +5514,29 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.ImageContent.GenerateLaTeX(System.Text.StringBuilder,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX text for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.Multimedia.ImageContent.GetTemporaryFile(System.Byte[])">
             <summary>
             Stores an image in binary form as a temporary file. Files will be deleted when application closes.
             </summary>
             <param name="BinaryImage">Binary image.</param>
+            <returns>Temporary file name.</returns>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.ImageContent.GetTemporaryFile(System.Byte[],System.String)">
+            <summary>
+            Stores an image in binary form as a temporary file. Files will be deleted when application closes.
+            </summary>
+            <param name="BinaryImage">Binary image.</param>
+            <param name="FileExtension">File extension.</param>
             <returns>Temporary file name.</returns>
         </member>
         <member name="T:Waher.Content.Markdown.Model.Multimedia.MarkdownContent">
@@ -5258,6 +5599,16 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.MarkdownContent.GenerateLaTeX(System.Text.StringBuilder,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX text for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -5328,6 +5679,16 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.TableOfContents.GenerateLaTeX(System.Text.StringBuilder,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX text for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.Multimedia.VideoContent">
             <summary>
             Video content.
@@ -5378,6 +5739,16 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.VideoContent.GenerateLaTeX(System.Text.StringBuilder,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX text for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -5438,6 +5809,16 @@
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
             <param name="Document">Markdown document containing element.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.WebPageContent.GenerateLaTeX(System.Text.StringBuilder,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX text for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
         <member name="T:Waher.Content.Markdown.Model.Multimedia.YouTubeContent">
             <summary>
             YouTube content.
@@ -5488,6 +5869,16 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+            <param name="Items">Multimedia items.</param>
+            <param name="ChildNodes">Child nodes.</param>
+            <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+            <param name="Document">Markdown document containing element.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.Multimedia.YouTubeContent.GenerateLaTeX(System.Text.StringBuilder,Waher.Content.Markdown.Model.MultimediaItem[],System.Collections.Generic.IEnumerable{Waher.Content.Markdown.Model.MarkdownElement},System.Boolean,Waher.Content.Markdown.MarkdownDocument)">
+            <summary>
+            Generates LaTeX text for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
             <param name="Items">Multimedia items.</param>
             <param name="ChildNodes">Child nodes.</param>
             <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -5546,6 +5937,12 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Abbreviation.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.Abbreviation.InlineSpanElement">
             <summary>
@@ -5646,6 +6043,12 @@
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.AutomaticLinkMail.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.AutomaticLinkMail.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -5736,6 +6139,12 @@
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.AutomaticLinkUrl.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.AutomaticLinkUrl.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -5811,6 +6220,12 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Delete.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.Delete.InlineSpanElement">
             <summary>
@@ -5971,6 +6386,12 @@
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.EmojiReference.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.EmojiReference.OutsideParagraph">
             <summary>
             If element, parsed as a span element, can stand outside of a paragraph if alone in it.
@@ -6051,6 +6472,12 @@
             </summary>
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Emphasize.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.Emphasize.InlineSpanElement">
             <summary>
@@ -6137,6 +6564,12 @@
             </summary>
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.FootnoteReference.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.FootnoteReference.InlineSpanElement">
             <summary>
@@ -6228,6 +6661,12 @@
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.HashTag.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.HashTag.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -6317,6 +6756,12 @@
             </summary>
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.HtmlEntity.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.HtmlEntity.InlineSpanElement">
             <summary>
@@ -6408,6 +6853,12 @@
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.HtmlEntityUnicode.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.HtmlEntityUnicode.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -6494,6 +6945,12 @@
             </summary>
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineCode.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.InlineCode.InlineSpanElement">
             <summary>
@@ -6590,6 +7047,12 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineHTML.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.InlineHTML.InlineSpanElement">
             <summary>
@@ -6759,6 +7222,21 @@
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineScript.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineScript.GenerateLaTeX(System.Object,System.Text.StringBuilder,System.Boolean,Waher.Script.Variables)">
+            <summary>
+            Generates HTML from Script output.
+            </summary>
+            <param name="Result">Script output.</param>
+            <param name="Output">HTML output.</param>
+            <param name="AloneInParagraph">If the script output is to be presented alone in a paragraph.</param>
+            <param name="Variables">Current variables.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.InlineScript.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -6881,6 +7359,19 @@
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineText.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.InlineText.EscapeLaTeX(System.String)">
+            <summary>
+            Escapes text for output in a LaTeX document.
+            </summary>
+            <param name="s">String to escape.</param>
+            <returns>Escaped string.</returns>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.InlineText.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -6963,6 +7454,12 @@
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Insert.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.Insert.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -7031,6 +7528,12 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.LineBreak.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.LineBreak.InlineSpanElement">
             <summary>
@@ -7122,6 +7625,12 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Link.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.Link.InlineSpanElement">
             <summary>
@@ -7216,6 +7725,12 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.LinkReference.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.LinkReference.InlineSpanElement">
             <summary>
@@ -7323,6 +7838,12 @@
             </summary>
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.MetaReference.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.MetaReference.InlineSpanElement">
             <summary>
@@ -7433,6 +7954,12 @@
             </summary>
             <param name="Output">XAML will be output here.</param>
             <param name="State">Xamarin Forms XAML Rendering State.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Multimedia.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.Multimedia.OutsideParagraph">
             <summary>
@@ -7612,6 +8139,12 @@
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.StrikeThrough.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.StrikeThrough.InlineSpanElement">
             <summary>
             If the element is an inline span element.
@@ -7683,6 +8216,12 @@
             </summary>
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Strong.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.Strong.InlineSpanElement">
             <summary>
@@ -7762,6 +8301,12 @@
             </summary>
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.SubScript.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.SubScript.GeneratePlainText(System.Text.StringBuilder)">
             <summary>
@@ -7855,6 +8400,12 @@
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
         </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.SuperScript.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
+        </member>
         <member name="M:Waher.Content.Markdown.Model.SpanElements.SuperScript.GeneratePlainText(System.Text.StringBuilder)">
             <summary>
             Generates plain text for the markdown element.
@@ -7939,6 +8490,12 @@
             </summary>
             <param name="Output">Smart Contract XML will be output here.</param>
             <param name="State">Current rendering state.</param>
+        </member>
+        <member name="M:Waher.Content.Markdown.Model.SpanElements.Underline.GenerateLaTeX(System.Text.StringBuilder)">
+            <summary>
+            Generates LaTeX for the markdown element.
+            </summary>
+            <param name="Output">LaTeX will be output here.</param>
         </member>
         <member name="P:Waher.Content.Markdown.Model.SpanElements.Underline.InlineSpanElement">
             <summary>

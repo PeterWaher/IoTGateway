@@ -111,6 +111,29 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
+		/// Generates LaTeX for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		public override Task GenerateLaTeX(StringBuilder Output)
+		{
+			Output.AppendLine(EscapeLaTeX(this.value));
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Escapes text for output in a LaTeX document.
+		/// </summary>
+		/// <param name="s">String to escape.</param>
+		/// <returns>Escaped string.</returns>
+		public static string EscapeLaTeX(string s)
+		{
+			return CommonTypes.Escape(s, latexCharactersToEscape, latexCharacterEscapes);
+		}
+
+		private static readonly char[] latexCharactersToEscape = new char[] { '\\', '#', '$', '%', '&', '{', '}' };
+		private static readonly string[] latexCharacterEscapes = new string[] { "\\,", "\\#", "\\$", "\\%", "\\&", "\\{", "\\}" };
+
+		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
 		internal override bool InlineSpanElement => true;

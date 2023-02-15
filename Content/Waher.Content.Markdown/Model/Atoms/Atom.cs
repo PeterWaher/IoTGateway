@@ -105,6 +105,15 @@ namespace Waher.Content.Markdown.Model.Atoms
 			throw MustBeReassembled();
 		}
 
+		/// <summary>
+		/// Generates LaTeX for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		public override Task GenerateLaTeX(StringBuilder Output)
+		{
+			throw MustBeReassembled();
+		}
+
 		private static Exception MustBeReassembled()
 		{
 			return new NotSupportedException("Atomic elements must be reassembled before being exported or used for output.");

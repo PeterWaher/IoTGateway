@@ -247,6 +247,15 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
+		/// Generates LaTeX for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		public override Task GenerateLaTeX(StringBuilder Output)
+		{
+			return this.MultimediaHandler.GenerateLaTeX(Output, this.items, this.Children, this.aloneInParagraph, this.Document);
+		}
+
+		/// <summary>
 		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
 		/// </summary>
 		internal override bool OutsideParagraph => true;

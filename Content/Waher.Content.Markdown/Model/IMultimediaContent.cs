@@ -39,7 +39,7 @@ namespace Waher.Content.Markdown.Model
 		/// <summary>
 		/// Generates Plain Text for the markdown element.
 		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
+		/// <param name="Output">Plain text will be output here.</param>
 		/// <param name="Items">Multimedia items.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
@@ -70,5 +70,16 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Document">Markdown document containing element.</param>
 		Task GenerateXamarinForms(XmlWriter Output, XamarinRenderingState State, MultimediaItem[] Items,
 			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document);
+
+		/// <summary>
+		/// Generates LaTeX text for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		/// <param name="Items">Multimedia items.</param>
+		/// <param name="ChildNodes">Child nodes.</param>
+		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		Task GenerateLaTeX(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
+			bool AloneInParagraph, MarkdownDocument Document);
 	}
 }

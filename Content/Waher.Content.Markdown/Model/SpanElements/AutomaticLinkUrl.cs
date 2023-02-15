@@ -112,6 +112,17 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
+		/// Generates LaTeX for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		public override Task GenerateLaTeX(StringBuilder Output)
+		{
+			Output.AppendLine(InlineText.EscapeLaTeX(this.url));
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
 		internal override bool InlineSpanElement => true;

@@ -884,6 +884,102 @@
             </summary>
             <returns>Negated duration.</returns>
         </member>
+        <member name="T:Waher.Content.Getters.DataGetter">
+            <summary>
+            Gets data encoded into data URIs.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Getters.DataGetter.#ctor">
+            <summary>
+            Gets data encoded into data URIs.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Getters.DataGetter.UriSchemes">
+            <summary>
+            Supported URI schemes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Getters.DataGetter.CanGet(System.Uri,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the getter is able to get a resource, given its URI.
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Grade">How well the getter would be able to get a resource given the indicated URI.</param>
+            <returns>If the getter can get a resource with the indicated URI.</returns>
+        </member>
+        <member name="M:Waher.Content.Getters.DataGetter.GetAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded object.</returns>
+        </member>
+        <member name="M:Waher.Content.Getters.DataGetter.GetAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded object.</returns>
+        </member>
+        <member name="M:Waher.Content.Getters.DataGetter.Decode(System.Uri)">
+            <summary>
+            Decodes a Data URI.
+            </summary>
+            <param name="Uri">Data URI</param>
+            <returns>Decoded Data URI</returns>
+            <exception cref="T:System.ArgumentException">If URI is invalid.</exception>
+        </member>
+        <member name="M:Waher.Content.Getters.DataGetter.GetTempStreamAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+        </member>
+        <member name="M:Waher.Content.Getters.DataGetter.GetTempStreamAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets a (possibly big) resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Content-Type, together with a Temporary file, if resource has been downloaded, or null if resource is data-less.</returns>
+        </member>
+        <member name="M:Waher.Content.Getters.DataGetter.CanHead(System.Uri,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the getter is able to get headers of a resource, given its URI.
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Grade">How well the header would be able to get the headers of a resource given the indicated URI.</param>
+            <returns>If the header can get the headers of a resource with the indicated URI.</returns>
+        </member>
+        <member name="M:Waher.Content.Getters.DataGetter.HeadAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets the headers of a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded headers object.</returns>
+        </member>
+        <member name="M:Waher.Content.Getters.DataGetter.HeadAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Gets the headers of a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded headers object.</returns>
+        </member>
         <member name="T:Waher.Content.Getters.WebException">
             <summary>
             Exception class for web exceptions.
@@ -2108,12 +2204,12 @@
         </member>
         <member name="T:Waher.Content.Json.ReferenceTypes.ObjectExNihiloEncoder2">
             <summary>
-            Encodes <see cref="!:IEnumerable&lt;KeyValuePair&lt;string, IElement&gt;&gt;"/> values.
+            Encodes <see cref="T:System.Collections.Generic.IEnumerable`1"/> values.
             </summary>
         </member>
         <member name="M:Waher.Content.Json.ReferenceTypes.ObjectExNihiloEncoder2.#ctor">
             <summary>
-            Encodes <see cref="!:IEnumerable&lt;KeyValuePair&lt;string, IElement&gt;&gt;"/> values.
+            Encodes <see cref="T:System.Collections.Generic.IEnumerable`1"/> values.
             </summary>
         </member>
         <member name="M:Waher.Content.Json.ReferenceTypes.ObjectExNihiloEncoder2.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">
@@ -2233,12 +2329,12 @@
         </member>
         <member name="T:Waher.Content.Json.ReferenceTypes.TypedDictionaryEncoder2">
             <summary>
-            Encodes <see cref="!:IEnumerable&lt;KeyValuePair&lt;string, object&gt;&gt;"/> values.
+            Encodes <see cref="T:System.Collections.Generic.IEnumerable`1"/> values.
             </summary>
         </member>
         <member name="M:Waher.Content.Json.ReferenceTypes.TypedDictionaryEncoder2.#ctor">
             <summary>
-            Encodes <see cref="!:IEnumerable&lt;KeyValuePair&lt;string, object&gt;&gt;"/> values.
+            Encodes <see cref="T:System.Collections.Generic.IEnumerable`1"/> values.
             </summary>
         </member>
         <member name="M:Waher.Content.Json.ReferenceTypes.TypedDictionaryEncoder2.Encode(System.Object,System.Nullable{System.Int32},System.Text.StringBuilder)">

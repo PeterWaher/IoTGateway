@@ -46,7 +46,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			Output.Append("&#");
 			Output.Append(this.code.ToString());
 			Output.Append(';');
-		
+
 			return Task.CompletedTask;
 		}
 
@@ -57,7 +57,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override Task GeneratePlainText(StringBuilder Output)
 		{
 			Output.Append((char)this.code);
-	
+
 			return Task.CompletedTask;
 		}
 
@@ -99,7 +99,18 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override Task GenerateSmartContractXml(XmlWriter Output, SmartContractRenderState State)
 		{
 			Output.WriteElementString("text", new string((char)this.code, 1));
-		
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Generates LaTeX for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		public override Task GenerateLaTeX(StringBuilder Output)
+		{
+			Output.Append(InlineText.EscapeLaTeX(new string((char)this.code, 1)));
+
 			return Task.CompletedTask;
 		}
 

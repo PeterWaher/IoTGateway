@@ -26,6 +26,10 @@ Markdown: ([documentation](/Markdown.md))
 <button class="posButton" data-suffix="XamarinForms" onclick="FormatButtonClicked(this)">Xamarin</button>
 <button class="posButton" data-suffix="Xaml" onclick="FormatButtonClicked(this)">XAML</button>
 <button class="posButton" data-suffix="Xml" onclick="FormatButtonClicked(this)">XML</button>
+<button class="posButton" data-suffix="LaTeXBook" onclick="FormatButtonClicked(this)">LaTeX Book</button>
+<button class="posButton" data-suffix="LaTeXReport" onclick="FormatButtonClicked(this)">LaTeX Report</button>
+<button class="posButton" data-suffix="LaTeXArticle" onclick="FormatButtonClicked(this)">LaTeX Article</button>
+<button class="posButton" data-suffix="LaTeXStandalone" onclick="FormatButtonClicked(this)">LaTeX Standalone</button>
 
 <div id="HtmlDiv">
 </div>

@@ -93,6 +93,20 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
+		/// Generates LaTeX for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		public override async Task GenerateLaTeX(StringBuilder Output)
+		{
+			Output.Append("\\textbf{");
+
+			foreach (MarkdownElement E in this.Children)
+				await E.GenerateLaTeX(Output);
+
+			Output.Append("}");
+		}
+
+		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
 		internal override bool InlineSpanElement => true;

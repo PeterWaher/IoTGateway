@@ -220,6 +220,36 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
+		/// Generates LaTeX for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		public override Task GenerateLaTeX(StringBuilder Output)
+		{
+			bool FirstOnRow = true;
+
+			if (this.TryGetMetaData(out KeyValuePair<string, bool>[] Values))
+			{
+				foreach (KeyValuePair<string, bool> P in Values)
+				{
+					if (FirstOnRow)
+						FirstOnRow = false;
+					else
+						Output.Append(' ');
+
+					Output.Append(InlineText.EscapeLaTeX(P.Key));
+
+					if (P.Value)
+					{
+						Output.AppendLine();
+						FirstOnRow = true;
+					}
+				}
+			}
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
 		internal override bool InlineSpanElement => true;

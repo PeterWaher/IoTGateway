@@ -56,6 +56,11 @@ namespace Waher.Content.Markdown.Model.CodeContent
 		public bool HandlesXAML => true;
 
 		/// <summary>
+		/// If LaTeX is handled.
+		/// </summary>
+		public bool HandlesLaTeX => true;
+
+		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
@@ -188,6 +193,31 @@ namespace Waher.Content.Markdown.Model.CodeContent
 				await SpanElements.InlineScript.GenerateXamarinForms(G, Output, State, true, 
 					Document.Settings.Variables ?? new Variables(), Document.Settings.XamlSettings);
 				
+				return true;
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Generates LaTeX text for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		/// <param name="Rows">Code rows.</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		public async Task<bool> GenerateLaTeX(StringBuilder Output, string[] Rows, string Language, int Indent,
+			MarkdownDocument Document)
+		{
+			try
+			{
+				Graph G = await GetGraph(Rows);
+				await SpanElements.InlineScript.GenerateLaTeX(G, Output, true, Document.Settings.Variables ?? new Variables());
 				return true;
 			}
 			catch (Exception ex)

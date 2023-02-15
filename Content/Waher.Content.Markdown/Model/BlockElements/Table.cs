@@ -2,7 +2,10 @@
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Waher.Content.Html.Elements;
+using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Content.Xml;
+using Waher.Script.Constants;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -605,7 +608,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 					await Paragraph.GenerateXamarinFormsLabel(Output, E, true, State);
 
-					Output.WriteEndElement();	// Paragraph
+					Output.WriteEndElement();   // Paragraph
 				}
 				else
 				{
@@ -614,12 +617,139 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 					Output.WriteStartElement("StackLayout");
 					await E.GenerateXamarinForms(Output, new XamarinRenderingState());
-					Output.WriteEndElement();	// StackLayout
-					
+					Output.WriteEndElement();   // StackLayout
+
 					Output.WriteEndElement();   // ContentView
 				}
 
 				Output.WriteEndElement();   // Frame
+			}
+		}
+
+		/// <summary>
+		/// Generates LaTeX for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		public override async Task GenerateLaTeX(StringBuilder Output)
+		{
+			MarkdownElement E;
+			string s;
+			int i, j, k;
+
+			Output.AppendLine("\\begin{table}[!h]");
+			Output.AppendLine("\\centering");
+			Output.Append("\\begin{tabular}{");
+			foreach (TextAlignment Alignment in this.alignments)
+			{
+				Output.Append('|');
+				Append(Output, Alignment);
+			}
+
+			Output.AppendLine("|}");
+			Output.AppendLine("\\hline");
+
+			foreach (MarkdownElement[] Row in this.headers)
+			{
+				for (i = 0; i < this.columns; i++)
+				{
+					if (i > 0)
+						Output.Append(" & ");
+
+					k = 1;
+					j = i + 1;
+					while (j < this.columns && Row[j++] is null)
+						k++;
+
+					if (k > 1)
+					{
+						Output.Append("\\multicolumn{");
+						Output.Append(k.ToString());
+						Output.Append("}{|");
+						Append(Output, this.alignments[i]);
+						Output.Append("|}{");
+					}
+
+					E = Row[i];
+					if (!(E is null))
+						await E.GenerateLaTeX(Output);
+
+					if (k > 1)
+						Output.Append("}");
+				}
+
+				Output.AppendLine("\\\\");
+			}
+
+			Output.AppendLine("\\hline");
+
+			foreach (MarkdownElement[] Row in this.rows)
+			{
+				for (i = 0; i < this.columns; i++)
+				{
+					if (i > 0)
+						Output.Append(" & ");
+
+					k = 1;
+					j = i + 1;
+					while (j < this.columns && Row[j++] is null)
+						k++;
+
+					if (k > 1)
+					{
+						Output.Append("\\multicolumn{");
+						Output.Append(k.ToString());
+						Output.Append("}{|");
+						Append(Output, this.alignments[i]);
+						Output.Append("|}{");
+					}
+
+					E = Row[i];
+					if (!(E is null))
+						await E.GenerateLaTeX(Output);
+
+					if (k > 1)
+						Output.Append("}");
+				}
+			}
+
+			Output.AppendLine("\\hline");
+			Output.AppendLine("\\end{tabular}");
+
+			if (!string.IsNullOrEmpty(this.id))
+			{
+				Output.Append("\\caption{");
+
+				s = string.IsNullOrEmpty(this.caption) ? this.id : this.caption;
+				
+				Output.Append(InlineText.EscapeLaTeX(s));
+
+				Output.AppendLine("}");
+				Output.Append("\\label{");
+
+				Output.Append(InlineText.EscapeLaTeX(this.id));
+
+				Output.AppendLine("}");
+			}
+
+			Output.AppendLine("\\end{table}");
+		}
+
+		private static void Append(StringBuilder Output, TextAlignment Alignment)
+		{
+			switch (Alignment)
+			{
+				case TextAlignment.Left:
+				default:
+					Output.Append('l');
+					break;
+
+				case TextAlignment.Center:
+					Output.Append('c');
+					break;
+
+				case TextAlignment.Right:
+					Output.Append('r');
+					break;
 			}
 		}
 

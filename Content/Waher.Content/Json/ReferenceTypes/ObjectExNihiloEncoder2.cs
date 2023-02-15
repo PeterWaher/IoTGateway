@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
@@ -9,12 +8,12 @@ using Waher.Script.Abstraction.Elements;
 namespace Waher.Content.Json.ReferenceTypes
 {
 	/// <summary>
-	/// Encodes <see cref="IEnumerable{KeyValuePair{string, IElement}}"/> values.
+	/// Encodes <see cref="IEnumerable{T}"/> values.
 	/// </summary>
 	public class ObjectExNihiloEncoder2 : IJsonEncoder
 	{
 		/// <summary>
-		/// Encodes <see cref="IEnumerable{KeyValuePair{string, IElement}}"/> values.
+		/// Encodes <see cref="IEnumerable{T}"/> values.
 		/// </summary>
 		public ObjectExNihiloEncoder2()
 		{

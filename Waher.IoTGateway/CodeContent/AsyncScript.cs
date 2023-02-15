@@ -86,6 +86,11 @@ namespace Waher.IoTGateway.CodeContent
 		public bool HandlesXAML => true;
 
 		/// <summary>
+		/// If LaTeX is handled.
+		/// </summary>
+		public bool HandlesLaTeX => true;
+
+		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
@@ -237,6 +242,27 @@ namespace Waher.IoTGateway.CodeContent
 			object Result = await this.Evaluate(Script, Variables);
 
 			await InlineScript.GenerateXamarinForms(Result, Output, State, true, Variables, Document.Settings.XamlSettings);
+
+			return true;
+		}
+
+		/// <summary>
+		/// Generates LaTeX text for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		/// <param name="Rows">Code rows.</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		/// <returns>If content was rendered. If returning false, the default rendering of the code block will be performed.</returns>
+		public async Task<bool> GenerateLaTeX(StringBuilder Output, string[] Rows, string Language, int Indent,
+			MarkdownDocument Document)
+		{
+			Expression Script = this.BuildExpression(Rows);
+			Variables Variables = Document.Settings.Variables;
+			object Result = await this.Evaluate(Script, Variables);
+
+			await InlineScript.GenerateLaTeX(Result, Output, true, Variables);
 
 			return true;
 		}

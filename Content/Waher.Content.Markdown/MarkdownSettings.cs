@@ -20,6 +20,7 @@ namespace Waher.Content.Markdown
 	{
 		private XamlSettings xamlSettings = null;
 		private HtmlSettings htmlSettings = null;
+		private LaTeXSettings latexSettings = null;
 		private IEmojiSource emojiSource;
 		private Variables variables;
 		private AuthorizeExpression authorizeExpression;
@@ -245,6 +246,15 @@ namespace Waher.Content.Markdown
 		{
 			get => this.htmlSettings;
 			set => this.htmlSettings = value;
+		}
+
+		/// <summary>
+		/// LaTeX Settings used for LaTeX rendering.
+		/// </summary>
+		public LaTeXSettings LaTeXSettings
+		{
+			get => this.latexSettings;
+			set => this.latexSettings = value;
 		}
 
 	}

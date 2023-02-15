@@ -126,6 +126,79 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
+		/// Generates LaTeX for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		public override async Task GenerateLaTeX(StringBuilder Output)
+		{
+			int State = 0;
+
+			Output.AppendLine("\\begin{description}");
+
+			foreach (MarkdownElement E in this.Children)
+			{
+				if (E is DefinitionTerms Terms)
+				{
+					switch (State)
+					{
+						case 0:
+							Output.Append("\\item[");
+							await Terms.GenerateLaTeX(Output);
+							State++;
+							break;
+
+						case 1:
+							Output.Append(", ");
+							await Terms.GenerateLaTeX(Output);
+							break;
+
+						case 2:
+							Output.AppendLine("}");
+							Output.Append("\\item[");
+							State--;
+							await Terms.GenerateLaTeX(Output);
+							break;
+					}
+				}
+				else if (E is DefinitionDescriptions Descriptions)
+				{
+					switch (State)
+					{
+						case 0:
+							Output.Append("\\item{");
+							await Descriptions.GenerateLaTeX(Output);
+							State += 2;
+							break;
+
+						case 1:
+							Output.Append("]{");
+							await Descriptions.GenerateLaTeX(Output);
+							State++;
+							break;
+
+						case 2:
+							Output.AppendLine();
+							await Descriptions.GenerateLaTeX(Output);
+							break;
+					}
+				}
+			}
+
+			switch (State)
+			{
+				case 1:
+					Output.AppendLine("]{}");
+					break;
+
+				case 2:
+					Output.AppendLine("}");
+					break;
+			}
+
+			Output.AppendLine("\\end{description}");
+		}
+
+		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
 		internal override bool InlineSpanElement => false;

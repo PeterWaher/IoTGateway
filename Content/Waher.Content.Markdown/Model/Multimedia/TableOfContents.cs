@@ -239,5 +239,20 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			return Task.CompletedTask;	// TODO: Table of Contents in Xamarin.Forms
 		}
 
+		/// <summary>
+		/// Generates LaTeX text for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		/// <param name="Items">Multimedia items.</param>
+		/// <param name="ChildNodes">Child nodes.</param>
+		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		public override Task GenerateLaTeX(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
+			bool AloneInParagraph, MarkdownDocument Document)
+		{
+			Output.AppendLine("\\tableofcontents");
+			return Task.CompletedTask;
+		}
+
 	}
 }

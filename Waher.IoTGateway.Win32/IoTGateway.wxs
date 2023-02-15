@@ -1704,6 +1704,10 @@
 								<File Id='MarkdownLab.js' Name='MarkdownLab.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLab.js'/>
 								<File Id='MarkdownLab.md' Name='MarkdownLab.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLab.md'/>
 								<File Id='MarkdownLabHtml.md' Name='MarkdownLabHtml.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabHtml.md'/>
+								<File Id='MarkdownLabLaTeXArticle.md' Name='MarkdownLabLaTeXArticle.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabLaTeXArticle.md'/>
+								<File Id='MarkdownLabLaTeXBook.md' Name='MarkdownLabLaTeXBook.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabLaTeXBook.md'/>
+								<File Id='MarkdownLabLaTeXReport.md' Name='MarkdownLabLaTeXReport.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabLaTeXReport.md'/>
+								<File Id='MarkdownLabLaTeXStandalone.md' Name='MarkdownLabLaTeXStandalone.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabLaTeXStandalone.md'/>
 								<File Id='MarkdownLabSmartContract.md' Name='MarkdownLabSmartContract.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabSmartContract.md'/>
 								<File Id='MarkdownLabText.md' Name='MarkdownLabText.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabText.md'/>
 								<File Id='MarkdownLabXamarinForms.md' Name='MarkdownLabXamarinForms.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\Root\MarkdownLab\MarkdownLabXamarinForms.md'/>
@@ -1713,7 +1717,11 @@
 								<RemoveFile Id='RemoveMarkdownLab.js' Name='MarkdownLab.js' On='uninstall'/>
 								<RemoveFile Id='RemoveMarkdownLab.md' Name='MarkdownLab.md' On='uninstall'/>
 								<RemoveFile Id='RemoveMarkdownLabHtml.md' Name='MarkdownLabHtml.md' On='uninstall'/>
-								<RemoveFile Id='RemoveMarkdownLabSmartContract.md' Name='MarkdownLab.mdSmartContract' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLabLaTeXArticle.md' Name='MarkdownLabLaTeXArticle' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLabLaTeXBook.md' Name='MarkdownLabLaTeXBook' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLabLaTeXReport.md' Name='MarkdownLabLaTeXReport' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLabLaTeXStandalone.md' Name='MarkdownLabLaTeXStandalone' On='uninstall'/>
+								<RemoveFile Id='RemoveMarkdownLabSmartContract.md' Name='MarkdownLabSmartContract.md' On='uninstall'/>
 								<RemoveFile Id='RemoveMarkdownLabText.md' Name='MarkdownLabText.md' On='uninstall'/>
 								<RemoveFile Id='RemoveMarkdownLabXamarinForms.md' Name='MarkdownLabXamarinForms.md' On='uninstall'/>
 								<RemoveFile Id='RemoveMarkdownLabXaml.md' Name='MarkdownLabXaml.md' On='uninstall'/>

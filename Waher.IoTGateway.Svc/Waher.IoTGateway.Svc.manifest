@@ -755,6 +755,10 @@
 			<Content fileName="MarkdownLab.js"/>
 			<Content fileName="MarkdownLab.md"/>
 			<Content fileName="MarkdownLabHtml.md"/>
+			<Content fileName="MarkdownLabLaTeXArticle.md"/>
+			<Content fileName="MarkdownLabLaTeXBook.md"/>
+			<Content fileName="MarkdownLabLaTeXReport.md"/>
+			<Content fileName="MarkdownLabLaTeXStandalone.md"/>
 			<Content fileName="MarkdownLabSmartContract.md"/>
 			<Content fileName="MarkdownLabText.md"/>
 			<Content fileName="MarkdownLabXamarinForms.md"/>

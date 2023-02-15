@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Waher.Content.Markdown.Model
+﻿namespace Waher.Content.Markdown.Model
 {
 	/// <summary>
 	/// Xamarin XAML Rendering State.

@@ -124,6 +124,19 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
+		/// Generates LaTeX for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		public override Task GenerateLaTeX(StringBuilder Output)
+		{
+			Output.AppendLine();
+			Output.AppendLine("\\newpage");
+			Output.AppendLine();
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
 		internal override bool InlineSpanElement => false;

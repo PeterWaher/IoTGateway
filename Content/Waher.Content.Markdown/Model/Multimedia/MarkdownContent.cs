@@ -5,6 +5,7 @@ using System.Xml;
 using Waher.Runtime.Inventory;
 using Waher.Script;
 using System.Threading.Tasks;
+using Waher.Content.Markdown.Model.SpanElements;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {
@@ -57,8 +58,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             bool AloneInParagraph, MarkdownDocument Document)
         {
             Variables Variables = Document.Settings.Variables;
-            if (!(Variables is null))
-                Variables.Push();
+            Variables?.Push();
 
             try
             {
@@ -73,8 +73,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             }
             finally
             {
-                if (!(Variables is null))
-                    Variables.Pop();
+                Variables?.Pop();
             }
         }
 
@@ -161,8 +160,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             bool AloneInParagraph, MarkdownDocument Document)
         {
             Variables Variables = Document.Settings.Variables;
-            if (!(Variables is null))
-                Variables.Push();
+            Variables?.Push();
 
             try
             {
@@ -177,8 +175,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             }
             finally
             {
-                if (!(Variables is null))
-                    Variables.Pop();
+                Variables?.Pop();
             }
         }
 
@@ -195,8 +192,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
         {
             Variables Variables = Document.Settings.Variables;
-            if (!(Variables is null))
-                Variables.Push();
+            Variables?.Push();
 
             try
             {
@@ -208,8 +204,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             }
             finally
             {
-                if (!(Variables is null))
-                    Variables.Pop();
+                Variables?.Pop();
             }
         }
 
@@ -226,8 +221,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
         {
             Variables Variables = Document.Settings.Variables;
-            if (!(Variables is null))
-                Variables.Push();
+            Variables?.Push();
 
             try
             {
@@ -239,10 +233,40 @@ namespace Waher.Content.Markdown.Model.Multimedia
             }
             finally
             {
-                if (!(Variables is null))
-                    Variables.Pop();
+                Variables?.Pop();
             }
         }
 
-    }
+		/// <summary>
+		/// Generates LaTeX text for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		/// <param name="Items">Multimedia items.</param>
+		/// <param name="ChildNodes">Child nodes.</param>
+		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		public override async Task GenerateLaTeX(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
+			bool AloneInParagraph, MarkdownDocument Document)
+		{
+			Variables Variables = Document.Settings.Variables;
+			Variables?.Push();
+
+			try
+			{
+				foreach (MultimediaItem Item in Items)
+				{
+					MarkdownDocument Markdown = await this.GetMarkdown(Item, Document.URL);
+					await Markdown.GenerateLaTeX(Output);
+
+					if (AloneInParagraph)
+						Output.AppendLine();
+				}
+			}
+			finally
+			{
+				Variables?.Pop();
+			}
+		}
+
+	}
 }

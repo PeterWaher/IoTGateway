@@ -87,13 +87,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates plain text for the markdown element.
 		/// </summary>
 		/// <param name="Output">Plain text will be output here.</param>
-		public override async Task GeneratePlainText(StringBuilder Output)
+		public override Task GeneratePlainText(StringBuilder Output)
 		{
 			string s = Html.HtmlEntity.EntityToCharacter(this.entity);
-			if (s is null)
-				await this.GenerateHTML(Output);
-			else
+			if (!string.IsNullOrEmpty(s))
 				Output.Append(s);
+
+			return Task.CompletedTask;
 		}
 
 		/// <inheritdoc/>
@@ -143,6 +143,19 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			string s = Html.HtmlEntity.EntityToCharacter(this.entity);
 			if (!string.IsNullOrEmpty(s))
 				Output.WriteElementString("text", s);
+
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Generates LaTeX for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		public override Task GenerateLaTeX(StringBuilder Output)
+		{
+			string s = Html.HtmlEntity.EntityToCharacter(this.entity);
+			if (!string.IsNullOrEmpty(s))
+				Output.Append(InlineText.EscapeLaTeX(s));
 
 			return Task.CompletedTask;
 		}

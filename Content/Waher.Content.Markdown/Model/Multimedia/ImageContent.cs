@@ -10,6 +10,9 @@ using Waher.Content.Emoji;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
+using Waher.Content.Markdown.Model.SpanElements;
+using Waher.Runtime.Temporary;
+using Waher.Content.Html.Elements;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {
@@ -303,18 +306,96 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		}
 
 		/// <summary>
+		/// Generates LaTeX text for the markdown element.
+		/// </summary>
+		/// <param name="Output">LaTeX will be output here.</param>
+		/// <param name="Items">Multimedia items.</param>
+		/// <param name="ChildNodes">Child nodes.</param>
+		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		public override async Task GenerateLaTeX(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
+			bool AloneInParagraph, MarkdownDocument Document)
+		{
+			foreach (MultimediaItem Item in Items)
+			{
+				KeyValuePair<string, TemporaryStream> P = await InternetContent.GetTempStreamAsync(new Uri(Item.Url), 60000);
+
+				using (TemporaryStream f = P.Value)
+				{
+					int c = (int)Math.Min(int.MaxValue, f.Length);
+					byte[] Bin = new byte[c];
+
+					f.Position = 0;
+					await f.ReadAsync(Bin, 0, c);
+
+					string FileName = await GetTemporaryFile(Bin);
+
+					if (AloneInParagraph)
+					{
+						Output.AppendLine("\\begin{figure}[h]");
+						Output.AppendLine("\\centering");
+					}
+
+					Output.Append("\\fbox{\\includegraphics");
+
+					if (Item.Width.HasValue || Item.Height.HasValue)
+					{
+						Output.Append('[');
+
+						if (Item.Width.HasValue)
+						{
+							Output.Append("width=");
+							Output.Append(((Item.Width.Value * 3) / 4).ToString());
+							Output.Append("pt");
+						}
+
+						if (Item.Height.HasValue)
+						{
+							if (Item.Width.HasValue)
+								Output.Append(", ");
+
+							Output.Append("height=");
+							Output.Append(((Item.Height.Value * 3) / 4).ToString());
+							Output.Append("pt");
+						}
+
+						Output.Append(']');
+					}
+
+					Output.Append('{');
+					Output.Append(FileName.Replace('\\', '/'));
+					Output.Append("}}");
+
+					if (AloneInParagraph)
+						Output.AppendLine("\\end{figure}");
+				}
+			}
+		}
+
+		/// <summary>
 		/// Stores an image in binary form as a temporary file. Files will be deleted when application closes.
 		/// </summary>
 		/// <param name="BinaryImage">Binary image.</param>
 		/// <returns>Temporary file name.</returns>
-		public static async Task<string> GetTemporaryFile(byte[] BinaryImage)
+		public static Task<string> GetTemporaryFile(byte[] BinaryImage)
+		{
+			return GetTemporaryFile(BinaryImage, "tmp");
+		}
+
+		/// <summary>
+		/// Stores an image in binary form as a temporary file. Files will be deleted when application closes.
+		/// </summary>
+		/// <param name="BinaryImage">Binary image.</param>
+		/// <param name="FileExtension">File extension.</param>
+		/// <returns>Temporary file name.</returns>
+		public static async Task<string> GetTemporaryFile(byte[] BinaryImage, string FileExtension)
 		{
 			string FileName;
 
 			using (SHA256 H = SHA256.Create())
 			{
 				byte[] Digest = H.ComputeHash(BinaryImage);
-				FileName = Path.Combine(Path.GetTempPath(), "tmp" + Base64Url.Encode(Digest) + ".tmp");
+				FileName = Path.Combine(Path.GetTempPath(), "tmp" + Base64Url.Encode(Digest) + "." + FileExtension);
 			}
 
 			if (!File.Exists(FileName))

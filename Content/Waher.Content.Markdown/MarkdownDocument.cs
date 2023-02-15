@@ -6811,6 +6811,175 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		public Grade CanEncodeJson => Grade.NotAtAll;   // Document reference from child nodes create a stack overflow.
 
+
+		/// <summary>
+		/// Generates HTML from the markdown text.
+		/// </summary>
+		/// <returns>HTML</returns>
+		public async Task<string> GenerateLaTeX()
+		{
+			StringBuilder Output = new StringBuilder();
+			await this.GenerateLaTeX(Output);
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Generates HTML from the markdown text.
+		/// </summary>
+		/// <param name="Output">HTML will be output here.</param>
+		public async Task GenerateLaTeX(StringBuilder Output)
+		{
+			if (this.metaData.TryGetValue("MASTER", out KeyValuePair<string, bool>[] Master) && Master.Length == 1)
+			{
+				await this.LoadMasterIfNotLoaded(Master[0].Key);
+				await this.master.GenerateLaTeX(Output, false);
+			}
+			else
+				await this.GenerateLaTeX(Output, false);
+		}
+
+		/// <summary>
+		/// Generates HTML from the markdown text.
+		/// </summary>
+		/// <param name="Output">HTML will be output here.</param>
+		/// <param name="Inclusion">If the HTML is to be included in another document (true), or if it is a standalone document (false).</param>
+		internal async Task GenerateLaTeX(StringBuilder Output, bool Inclusion)
+		{
+			if (this.settings.LaTeXSettings is null)
+				this.settings.LaTeXSettings = new LaTeXSettings();
+
+			if (!Inclusion && this.metaData.TryGetValue("BODYONLY", out KeyValuePair<string, bool>[] Values))
+			{
+				if (CommonTypes.TryParse(Values[0].Key, out bool b) && b)
+					Inclusion = true;
+			}
+
+			if (!Inclusion)
+			{
+				bool MakeTitle = false;
+
+				Output.Append("\\documentclass[");
+				Output.Append(this.settings.LaTeXSettings.DefaultFontSize.ToString());
+				Output.Append("pt, ");
+
+				switch (this.settings.LaTeXSettings.PaperFormat)
+				{
+					case LaTeXPaper.A4:
+					default:
+						Output.Append("a4paper");
+						break;
+
+					case LaTeXPaper.Letter:
+						Output.Append("letterpaper");
+						break;
+				}
+
+				Output.Append("]{");
+				switch (this.settings.LaTeXSettings.DocumentClass)
+				{
+					case LaTeXDocumentClass.Article:
+					default:
+						Output.Append("article");
+						break;
+
+					case LaTeXDocumentClass.Report:
+						Output.Append("report");
+						break;
+
+					case LaTeXDocumentClass.Book:
+						Output.Append("book");
+						break;
+
+					case LaTeXDocumentClass.Standalone:
+						Output.Append("standalone");
+						break;
+				}
+				Output.AppendLine("}");
+
+				// Strike-out cf. https://tex.stackexchange.com/questions/546884/strikethrough-command-in-latex
+				Output.AppendLine("\\newlength{\\wdth}");
+				Output.AppendLine("\\newcommand{\\strike}[1]{\\settowidth{\\wdth}{#1}\\rlap{\\rule[.5ex]{\\wdth}{.4pt}}#1}");
+
+				if (this.metaData.TryGetValue("TITLE", out Values))
+				{
+					MakeTitle = true;
+
+					foreach (KeyValuePair<string, bool> P in Values)
+					{
+						Output.Append("\\title{");
+						Output.Append(P.Key);
+						Output.AppendLine("}");
+					}
+
+					if (this.metaData.TryGetValue("SUBTITLE", out Values))
+					{
+						foreach (KeyValuePair<string, bool> P2 in Values)
+						{
+							Output.Append("\\subtitle{");
+							Output.Append(P2.Key);
+							Output.AppendLine("}");
+						}
+					}
+				}
+
+				if (this.metaData.TryGetValue("AUTHOR", out Values))
+				{
+					MakeTitle = true;
+
+					foreach (KeyValuePair<string, bool> P in Values)
+					{
+						Output.Append("\\author{");
+						Output.Append(P.Key);
+						Output.AppendLine("}");
+					}
+				}
+
+				if (this.metaData.TryGetValue("DATE", out Values))
+				{
+					MakeTitle = true;
+
+					foreach (KeyValuePair<string, bool> P in Values)
+					{
+						Output.Append("\\date{");
+						Output.Append(P.Key);
+						Output.AppendLine("}");
+					}
+				}
+
+				// Todo-lists in LaTeX, cf. https://tex.stackexchange.com/questions/247681/how-to-create-checkbox-todo-list
+
+				Output.AppendLine("\\usepackage{enumitem}");
+				Output.AppendLine("\\usepackage{amssymb}");
+				Output.AppendLine("\\usepackage{graphicx}");
+				Output.AppendLine("\\usepackage{pifont}");
+				Output.AppendLine("\\usepackage{multirow}");
+				Output.AppendLine("\newlist{tasklist}{itemize}{2}");
+				Output.AppendLine("\\setlist[tasklist]{label=$\\square$}");
+				Output.AppendLine("\\newcommand{\\checkmark}{\\ding{51}}");
+				Output.AppendLine("\\newcommand{\\checked}{\\rlap{$\\square$}{\\raisebox{2pt}{\\large\\hspace{1pt}\\checkmark}}\\hspace{-2.5pt}}");
+				Output.AppendLine("\\begin{document}");
+
+				if (MakeTitle)
+					Output.AppendLine("\\maketitle");
+
+				if (this.metaData.TryGetValue("DESCRIPTION", out Values))
+				{
+					Output.AppendLine("\\begin{abstract}");
+
+					foreach (KeyValuePair<string, bool> P in Values)
+						Output.AppendLine(InlineText.EscapeLaTeX(P.Key));
+
+					Output.AppendLine("\\end{abstract}");
+				}
+			}
+
+			foreach (MarkdownElement E in this.elements)
+				await E.GenerateLaTeX(Output);
+
+			if (!Inclusion)
+				Output.AppendLine("\\end{document}");
+		}
+
 		// TODO: Footnotes in included markdown files.
 	}
 }

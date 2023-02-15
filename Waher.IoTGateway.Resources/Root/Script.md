@@ -1932,6 +1932,8 @@ The following functions are available in the `Waher.Script.Cryptography` library
 | `Sha3_256(Data)`                                           | Calculates a 256-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3256Example] |
 | `Sha3_384(Data)`                                           | Calculates a 384-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3384Example] |
 | `Sha3_512(Data)`                                           | Calculates a 512-bit SHA-3 Hash Digest of `Data`.  | [Example][Sha3512Example] |
+| `Shake128(Bits,Data)`                                      | Calculates a SHAKE128 (part of SHA-3) Hash Digest (having `Bits` number of bits) of `Data`.  | [Example][Shake128Example] |
+| `Shake256(Bits,Data)`                                      | Calculates a SHAKE256 (part of SHA-3) Hash Digest (having `Bits` number of bits) of `Data`.  | [Example][Shake256Example] |
 | `X25519([PrivKey])`                                        | Creates a Curve25519 curve, with optional private key (`PrivKey`). | [Example][X25519Example] |
 | `X448([PrivKey])`                                          | Creates a Curve448 curve, with optional private key (`PrivKey`). | [Example][X448Example] |
 
@@ -1958,6 +1960,8 @@ The following functions are available in the `Waher.Script.Cryptography` library
 [Sha3256Example]: Prompt.md?Expression=Sha3_256(Utf8Encode(%22Hello%22))
 [Sha3384Example]: Prompt.md?Expression=Sha3_384(Utf8Encode(%22Hello%22))
 [Sha3512Example]: Prompt.md?Expression=Sha3_512(Utf8Encode(%22Hello%22))
+[Shake128Example]: Prompt.md?Expression=Shake128(16*8,Utf8Encode(%22Hello%22))
+[Shake256Example]: Prompt.md?Expression=Shake256(16*8,Utf8Encode(%22Hello%22))
 [X25519Example]: Prompt.md?Expression=X25519()
 [X448Example]: Prompt.md?Expression=X448()
 

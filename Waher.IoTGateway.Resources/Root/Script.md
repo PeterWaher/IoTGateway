@@ -888,10 +888,12 @@ The following table lists available scalar functions:
 | `Dbl(x)`     | Alias for `Double(x)`                     | Asserts `x` is a double-precision floating-point value. | `Dbl("3.14")`     |
 | `Double(x)`  | Converts `x` to a double value.           | Asserts `x` is a double-precision floating-point value. | `Double(pi)`      |
 | `Floor(z)`   | Round `z` down to closest integer.        | Asserts `z` is an Integer.                              | `Floor(pi)`       |
+| `Guid(x)`    | Converts `x` to a GUID value.             | Asserts `x` is a GUID.                                  | `Guid(s)`         |
 | `Int(x)`     | Alias for `Integer(x)`                    | Asserts `x` is an Integer.                              | `Int(pi)`         |
 | `Integer(x)` | Round `x` down to closest integer.        | Asserts `x` is an Integer.                              | `Integer(pi)`     |
 | `Max(x,y)`   | Largest of `x` and `y`.                   |                                                         | `Max(10,a)`       |
 | `Min(x,y)`   | Smallest of `x` and `y`.                  |                                                         | `Min(10,a)`       |
+| `NewGuid()`  | Creates a new GUID.                       |                                                         | `NewGuid()`       |
 | `Num(x)`     | Alias for `Number(x)`.                    | Asserts `x` is a number.                                | `Num('100')`      |
 | `Number(x)`  | Converts `x` to a number.                 | Asserts `x` is a number.                                | `Number('100')`   |
 | `Round(z)`   | Round `z` up or down to closest integer.  | Asserts `z` is an Integer.                              | `Round(pi)`       |

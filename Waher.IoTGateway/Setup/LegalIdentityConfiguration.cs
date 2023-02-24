@@ -633,7 +633,7 @@ namespace Waher.IoTGateway.Setup
 				return;
 			}
 
-			DateTime Expires = ApprovedLegalIdExpires;
+			DateTime Expires = LatestApprovedLegalIdentityExpires;
 			if (Expires < Now)
 			{
 				await Gateway.SendNotification("No approved Legal Identity registered for the gateway.", string.Empty);
@@ -985,22 +985,24 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
-		/// Expiry date of any approved identity or identities. If none found, <see cref="DateTime.MinValue"/> is returned.
+		/// Expiry date of latest approved legal identity.
 		/// </summary>
-		public static DateTime ApprovedLegalIdExpires
+		public static DateTime LatestApprovedLegalIdentityExpires
 		{
 			get
 			{
-				DateTime Result = DateTime.MinValue;
-				DateTime Now = DateTime.Now;
+				if (!HasApprovedLegalIdentities)
+					return DateTime.MinValue;
+
+				LegalIdentity Latest = null;
 
 				foreach (LegalIdentity Identity in approvedIdentities)
 				{
-					if (Identity.From <= Now && Identity.To > Result)
-						Result = Identity.To;
+					if (Latest is null || Identity.Created > Latest.Created)
+						Latest = Identity;
 				}
 
-				return Result;
+				return Latest?.To ?? DateTime.MinValue;
 			}
 		}
 

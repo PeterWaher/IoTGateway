@@ -78,6 +78,7 @@ namespace Waher.IoTGateway.Setup
 		private string country = string.Empty;
 		private AlternativeField[] altFields = null;
 		private AlternativeField[] passwordHashes = null;
+		private DateTime checkApprovedExpiry = DateTime.MinValue;
 
 		/// <summary>
 		/// Configures legal identity for the gateway.
@@ -314,14 +315,14 @@ namespace Waher.IoTGateway.Setup
 				this.handlersAdded = true;
 				this.prevClient = Gateway.ContractsClient;
 
-				Gateway.XmppClient.OnStateChanged += XmppClient_OnStateChanged;
+				Gateway.XmppClient.OnStateChanged += this.XmppClient_OnStateChanged;
 
-				Gateway.ContractsClient.ContractDeleted += ContractsClient_ContractDeleted;
-				Gateway.ContractsClient.ContractSigned += ContractsClient_ContractSigned;
-				Gateway.ContractsClient.ContractUpdated += ContractsClient_ContractUpdated;
-				Gateway.ContractsClient.IdentityUpdated += ContractsClient_IdentityUpdated;
-				Gateway.ContractsClient.PetitionedIdentityResponseReceived += ContractsClient_PetitionedIdentityResponseReceived;
-				Gateway.ContractsClient.PetitionedContractResponseReceived += ContractsClient_PetitionedContractResponseReceived;
+				Gateway.ContractsClient.ContractDeleted += this.ContractsClient_ContractDeleted;
+				Gateway.ContractsClient.ContractSigned += this.ContractsClient_ContractSigned;
+				Gateway.ContractsClient.ContractUpdated += this.ContractsClient_ContractUpdated;
+				Gateway.ContractsClient.IdentityUpdated += this.ContractsClient_IdentityUpdated;
+				Gateway.ContractsClient.PetitionedIdentityResponseReceived += this.ContractsClient_PetitionedIdentityResponseReceived;
+				Gateway.ContractsClient.PetitionedContractResponseReceived += this.ContractsClient_PetitionedContractResponseReceived;
 
 				Gateway.ContractsClient.SetAllowedSources(approvedContractClientSources);
 
@@ -592,6 +593,8 @@ namespace Waher.IoTGateway.Setup
 			this.applyLegalIdentity = WebServer.Register("/Settings/ApplyLegalIdentity", null, this.ApplyLegalIdentity, true, false, true);
 			this.contractAction = WebServer.Register("/Settings/ContractAction", null, this.ContractAction, true, false, true);
 
+			this.checkApprovedExpiry = Gateway.ScheduleEvent(this.CheckApprovedExpiry, DateTime.Now.AddMinutes(5), true);
+
 			return base.InitSetup(WebServer);
 		}
 
@@ -604,7 +607,58 @@ namespace Waher.IoTGateway.Setup
 			WebServer.Unregister(this.applyLegalIdentity);
 			WebServer.Unregister(this.contractAction);
 
+			Gateway.CancelScheduledEvent(this.checkApprovedExpiry);
+			this.checkApprovedExpiry = DateTime.MinValue;
+
 			return base.UnregisterSetup(WebServer);
+		}
+
+		private async Task CheckApprovedExpiry(object State)
+		{
+			if (!(State is bool Reschedule))
+				Reschedule = false;
+
+			DateTime Now = DateTime.Now;
+			DateTime Today = Now.Date;
+
+			if (Reschedule)
+				this.checkApprovedExpiry = Gateway.ScheduleEvent(this.CheckApprovedExpiry, Today.AddDays(1).AddMinutes(5), true);
+
+			if (!this.useLegalIdentity)
+				return;
+
+			if (Gateway.XmppClient.State != XmppState.Connected)
+			{
+				Gateway.ScheduleEvent(this.CheckApprovedExpiry, Now.AddMinutes(5), false);
+				return;
+			}
+
+			DateTime Expires = ApprovedLegalIdExpires;
+			if (Expires < Now)
+			{
+				await Gateway.SendNotification("No approved Legal Identity registered for the gateway.", string.Empty);
+				return;
+			}
+
+			int Days = (int)(Expires - Today).TotalDays;
+
+			if (Days < 60)
+			{
+				switch (Days)
+				{
+					case 0:
+						await Gateway.SendNotification("The approved Legal Identity for the gateway **expires today**.", string.Empty);
+						return;
+
+					case 1:
+						await Gateway.SendNotification("The approved Legal Identity for the gateway **expires tomorrow**.", string.Empty);
+						return;
+
+					default:
+						await Gateway.SendNotification("The approved Legal Identity for the gateway **expires in " + Days.ToString() + " days**.", string.Empty);
+						return;
+				}
+			}
 		}
 
 		/// <summary>
@@ -867,10 +921,7 @@ namespace Waher.IoTGateway.Setup
 			else
 				Password = string.Empty;
 
-			ContractSignatureRequest SignatureRequest = await Database.TryLoadObject<ContractSignatureRequest>(RequestId);
-			if (SignatureRequest is null)
-				throw new NotFoundException("Content Signature Request not found.");
-
+			ContractSignatureRequest SignatureRequest = await Database.TryLoadObject<ContractSignatureRequest>(RequestId) ?? throw new NotFoundException("Content Signature Request not found.");
 			if (SignatureRequest.Signed.HasValue)
 				throw new BadRequestException("Contract has already been signed.");
 
@@ -934,6 +985,26 @@ namespace Waher.IoTGateway.Setup
 		}
 
 		/// <summary>
+		/// Expiry date of any approved identity or identities. If none found, <see cref="DateTime.MinValue"/> is returned.
+		/// </summary>
+		public static DateTime ApprovedLegalIdExpires
+		{
+			get
+			{
+				DateTime Result = DateTime.MinValue;
+				DateTime Now = DateTime.Now;
+
+				foreach (LegalIdentity Identity in approvedIdentities)
+				{
+					if (Identity.From <= Now && Identity.To > Result)
+						Result = Identity.To;
+				}
+
+				return Result;
+			}
+		}
+
+		/// <summary>
 		/// Gets the legal identity that corresponds to a given password, from the corresponding hash digests.
 		/// </summary>
 		/// <param name="Password">Password</param>
@@ -947,7 +1018,7 @@ namespace Waher.IoTGateway.Setup
 			{
 				string H = this.CalcPasswordhash(ID, Password);
 
-				foreach (AlternativeField F in passwordHashes)
+				foreach (AlternativeField F in this.passwordHashes)
 				{
 					if (F.Key == ID.Id)
 					{

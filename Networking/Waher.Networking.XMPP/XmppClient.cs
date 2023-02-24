@@ -546,7 +546,7 @@ namespace Waher.Networking.XMPP
 				if (alternativeBindingMechanisms is null)
 				{
 					alternativeBindingMechanisms = Types.GetTypesImplementingInterface(typeof(IAlternativeTransport));
-					Types.OnInvalidated += Types_OnInvalidated;
+					Types.OnInvalidated += this.Types_OnInvalidated;
 				}
 
 				IAlternativeTransport Best = Types.FindBest<IAlternativeTransport, Uri>(URI, alternativeBindingMechanisms);
@@ -555,7 +555,7 @@ namespace Waher.Networking.XMPP
 				{
 					IAlternativeTransport AlternativeTransport = Best.Instantiate(URI, this, new XmppBindingInterface(this));
 					this.textTransportLayer = AlternativeTransport;
-					this.textTransportLayer.OnReceived += TextTransportLayer_OnReceived_NoSniff;
+					this.textTransportLayer.OnReceived += this.TextTransportLayer_OnReceived_NoSniff;
 					this.sendHeartbeats = !AlternativeTransport.HandlesHeartbeats;
 				}
 				else
@@ -623,7 +623,7 @@ namespace Waher.Networking.XMPP
 				this.clientName = AssemblyName;
 
 			this.clientVersion = Name.Version.ToString();
-			this.bareJid = this.fullJid = this.userName + "@" + Domain;
+			this.bareJid = this.fullJid = this.userName + "@" + this.Domain;
 
 			/* Alternative for UWP:
 			string DeviceFamily = Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamily;
@@ -670,8 +670,8 @@ namespace Waher.Networking.XMPP
 			this.bareJid = this.fullJid = BareJid;
 			this.ResetState(false, true);
 
-			this.textTransportLayer.OnReceived += TextTransportLayer_OnReceived;
-			this.textTransportLayer.OnSent += TextTransportLayer_OnSent;
+			this.textTransportLayer.OnReceived += this.TextTransportLayer_OnReceived;
+			this.textTransportLayer.OnSent += this.TextTransportLayer_OnSent;
 		}
 
 		private Task<bool> TextTransportLayer_OnSent(object _, string Packet)
@@ -894,7 +894,7 @@ namespace Waher.Networking.XMPP
 				}
 				catch (Exception ex2)
 				{
-					Exception(ex2);
+					this.Exception(ex2);
 				}
 			}
 
@@ -2749,7 +2749,7 @@ namespace Waher.Networking.XMPP
 					catch (Exception ex)
 					{
 						if (e.UsesE2eEncryption)
-							e.E2eEncryption.SendIqError(this, E2ETransmission.NormalIfNotE2E, e.Id, e.From, ExceptionToXmppXml(ex));
+							e.E2eEncryption.SendIqError(this, E2ETransmission.NormalIfNotE2E, e.Id, e.From, this.ExceptionToXmppXml(ex));
 						else
 							this.SendIqError(e.Id, e.From, ex);
 					}
@@ -4383,7 +4383,7 @@ namespace Waher.Networking.XMPP
 								}
 								catch (Exception ex)
 								{
-									Exception(ex);
+									this.Exception(ex);
 								}
 							}
 							else
@@ -4579,7 +4579,7 @@ namespace Waher.Networking.XMPP
 					}
 					catch (Exception ex)
 					{
-						Exception(ex);
+						this.Exception(ex);
 					}
 				}
 			}
@@ -4620,7 +4620,7 @@ namespace Waher.Networking.XMPP
 										}
 										catch (Exception ex)
 										{
-											Exception(ex);
+											this.Exception(ex);
 										}
 
 										return;
@@ -4874,13 +4874,13 @@ namespace Waher.Networking.XMPP
 		{
 			lock (this.synchObject)
 			{
-				if (this.roster.TryGetValue(BareJID, out RosterItem RosterItem))
+				if (this.roster.TryGetValue(this.BareJID, out RosterItem RosterItem))
 				{
 					Item.PendingSubscription = RosterItem.PendingSubscription;
 					Item.State = RosterItem.State;
 				}
 
-				this.roster[BareJID] = Item;
+				this.roster[this.BareJID] = Item;
 			}
 
 			StringBuilder Xml = new StringBuilder();
@@ -6154,10 +6154,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Information">Extended service discovery information.</param>
 		public void AddExtendedServiceDiscoveryInformation(DataForm Information)
 		{
-			Field FormTypeField = Information["FORM_TYPE"];
-			if (FormTypeField is null)
-				throw new ArgumentException("Extended Service Discovery Information forms must contain a FORM_TYPE field.", nameof(Information));
-
+			Field FormTypeField = Information["FORM_TYPE"] ?? throw new ArgumentException("Extended Service Discovery Information forms must contain a FORM_TYPE field.", nameof(Information));
 			string FormType = FormTypeField.ValueString;
 
 			lock (this.synchObject)
@@ -6435,7 +6432,7 @@ namespace Waher.Networking.XMPP
 		/// <exception cref="XmppException">If an IQ error is returned.</exception>
 		public Task<ServiceDiscoveryEventArgs> ServiceDiscoveryAsync(IEndToEndEncryption E2eEncryption, string To)
 		{
-			return ServiceDiscoveryAsync(E2eEncryption, To, string.Empty);
+			return this.ServiceDiscoveryAsync(E2eEncryption, To, string.Empty);
 		}
 
 		/// <summary>
@@ -6670,7 +6667,7 @@ namespace Waher.Networking.XMPP
 		/// <exception cref="XmppException">If an IQ error is returned.</exception>
 		public Task<ServiceItemsDiscoveryEventArgs> ServiceItemsDiscoveryAsync(string To)
 		{
-			return ServiceItemsDiscoveryAsync(null, To, string.Empty);
+			return this.ServiceItemsDiscoveryAsync(null, To, string.Empty);
 		}
 
 		/// <summary>
@@ -6695,7 +6692,7 @@ namespace Waher.Networking.XMPP
 		/// <exception cref="XmppException">If an IQ error is returned.</exception>
 		public Task<ServiceItemsDiscoveryEventArgs> ServiceItemsDiscoveryAsync(string To, string Node)
 		{
-			return ServiceItemsDiscoveryAsync(null, To, Node);
+			return this.ServiceItemsDiscoveryAsync(null, To, Node);
 		}
 
 		/// <summary>
@@ -6906,7 +6903,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void SendSearchFormRequest(string To, SearchFormEventHandler FormCallback, SearchResultEventHandler ResultCallback, object State)
 		{
-			SendSearchFormRequest(null, To, FormCallback, ResultCallback, State);
+			this.SendSearchFormRequest(null, To, FormCallback, ResultCallback, State);
 		}
 
 		/// <summary>
@@ -7160,7 +7157,7 @@ namespace Waher.Networking.XMPP
 			set
 			{
 				if (value <= 0)
-					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(KeepAliveSeconds));
+					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(this.KeepAliveSeconds));
 
 				this.keepAliveSeconds = value;
 			}
@@ -7196,7 +7193,7 @@ namespace Waher.Networking.XMPP
 			set
 			{
 				if (value <= 0)
-					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(MaxAssuredMessagesPendingFromSource));
+					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(this.MaxAssuredMessagesPendingFromSource));
 
 				this.maxAssuredMessagesPendingFromSource = value;
 			}
@@ -7211,7 +7208,7 @@ namespace Waher.Networking.XMPP
 			set
 			{
 				if (value <= 0)
-					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(MaxAssuredMessagesPendingTotal));
+					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(this.MaxAssuredMessagesPendingTotal));
 
 				this.maxAssuredMessagesPendingTotal = value;
 			}
@@ -7227,7 +7224,7 @@ namespace Waher.Networking.XMPP
 			set
 			{
 				if (value <= 0)
-					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(DefaultRetryTimeout));
+					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(this.DefaultRetryTimeout));
 
 				this.defaultRetryTimeout = value;
 			}
@@ -7244,7 +7241,7 @@ namespace Waher.Networking.XMPP
 			set
 			{
 				if (value < 0)
-					throw new ArgumentOutOfRangeException("Value cannot be negative.", nameof(DefaultNrRetries));
+					throw new ArgumentOutOfRangeException("Value cannot be negative.", nameof(this.DefaultNrRetries));
 
 				this.defaultNrRetries = value;
 			}
@@ -7260,7 +7257,7 @@ namespace Waher.Networking.XMPP
 			set
 			{
 				if (value <= 0)
-					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(DefaultMaxRetryTimeout));
+					throw new ArgumentOutOfRangeException("Value must be positive.", nameof(this.DefaultMaxRetryTimeout));
 
 				this.defaultMaxRetryTimeout = value;
 			}

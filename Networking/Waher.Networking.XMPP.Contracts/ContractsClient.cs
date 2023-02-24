@@ -259,11 +259,14 @@ namespace Waher.Networking.XMPP.Contracts
 
 					DisposeEndpoints = false;
 
-					foreach (EllipticCurveEndpoint Curve in AvailableEndpoints)
+					foreach (IE2eEndpoint Endpoint in AvailableEndpoints)
 					{
-						Key = this.GetKey(Curve.Curve);
-						await RuntimeSettings.SetAsync(this.keySettingsPrefix + Curve.LocalName, Convert.ToBase64String(Key));
-						Keys.Add(Curve);
+						if (Endpoint is EllipticCurveEndpoint Curve)
+						{
+							Key = this.GetKey(Curve.Curve);
+							await RuntimeSettings.SetAsync(this.keySettingsPrefix + Curve.LocalName, Convert.ToBase64String(Key));
+							Keys.Add(Curve);
+						}
 					}
 
 					Timestamp = DateTime.Now;
@@ -6198,10 +6201,7 @@ namespace Waher.Networking.XMPP.Contracts
 		/// <returns>Encrypted message, together with the public key used to obtain the shared secret.</returns>
 		public (byte[], byte[]) Encrypt(byte[] Message, byte[] Nonce, byte[] RecipientPublicKey, string RecipientPublicKeyName, string RecipientPublicKeyNamespace)
 		{
-			IE2eEndpoint LocalEndpoint = this.localKeys.FindLocalEndpoint(RecipientPublicKeyName, RecipientPublicKeyNamespace);
-			if (LocalEndpoint is null)
-				throw new NotSupportedException("Unable to find matching local key.");
-
+			IE2eEndpoint LocalEndpoint = this.localKeys.FindLocalEndpoint(RecipientPublicKeyName, RecipientPublicKeyNamespace) ?? throw new NotSupportedException("Unable to find matching local key.");
 			IE2eEndpoint RemoteEndpoint = LocalEndpoint.CreatePublic(RecipientPublicKey);
 			byte[] LocalPublicKey = LocalEndpoint.PublicKey;
 			byte[] Secret = LocalEndpoint.GetSharedSecret(RemoteEndpoint);
@@ -6248,7 +6248,7 @@ namespace Waher.Networking.XMPP.Contracts
 			j += Message.Length;
 
 			if (j < c)
-				rnd.GetBytes(ToEncrypt, j, c - j);
+				this.rnd.GetBytes(ToEncrypt, j, c - j);
 
 			Array.Copy(Digest, 0, Key, 0, 16);
 			Array.Copy(Digest, 16, IV, 0, 16);

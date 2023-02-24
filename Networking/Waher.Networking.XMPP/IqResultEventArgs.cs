@@ -133,7 +133,7 @@ namespace Waher.Networking.XMPP
 			{
 				foreach (XmlNode N in Response.ChildNodes)
 				{
-						if (!(N is XmlElement E))
+					if (!(N is XmlElement E))
 						continue;
 
 					if (E.LocalName == "error" && E.NamespaceURI == Response.NamespaceURI)
@@ -169,7 +169,7 @@ namespace Waher.Networking.XMPP
 						}
 
 						this.stanzaError = XmppClient.GetExceptionObject(E);
-						this.errorText = StanzaError.Message;
+						this.errorText = this.stanzaError.Message;
 					}
 				}
 			}

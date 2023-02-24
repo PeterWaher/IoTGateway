@@ -27,6 +27,7 @@
             </summary>
             <param name="Beep">Beep if events of type <see cref="F:Waher.Events.EventType.Critical"/>, <see cref="F:Waher.Events.EventType.Alert"/>
             or <see cref="F:Waher.Events.EventType.Emergency"/> are logged.</param>
+            <param name="IncludeStackTraces">If Stack traces should be included in console output.</param>
         </member>
         <member name="M:Waher.Events.Console.ConsoleEventSink.Queue(Waher.Events.Event)">
             <inheritdoc/>

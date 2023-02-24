@@ -38,6 +38,7 @@ namespace Waher.Events.Console
 		/// </summary>
 		/// <param name="Beep">Beep if events of type <see cref="EventType.Critical"/>, <see cref="EventType.Alert"/>
 		/// or <see cref="EventType.Emergency"/> are logged.</param>
+		/// <param name="IncludeStackTraces">If Stack traces should be included in console output.</param>
 		public ConsoleEventSink(bool Beep, bool IncludeStackTraces)
 			: base("Console Event Sink")
 		{

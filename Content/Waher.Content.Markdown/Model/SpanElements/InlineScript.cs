@@ -782,7 +782,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.Append("}}");
 
 				if (AloneInParagraph)
+				{
 					Output.AppendLine("\\end{figure}");
+					Output.AppendLine();
+				}
 			}
 			else if (Result is PixelInformation Pixels)
 			{
@@ -804,7 +807,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.Append("}}");
 
 				if (AloneInParagraph)
+				{
 					Output.AppendLine("\\end{figure}");
+					Output.AppendLine();
+				}
 			}
 			else if (Result is SKImage Img)
 			{
@@ -828,7 +834,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					Output.Append("}}");
 
 					if (AloneInParagraph)
+					{
 						Output.AppendLine("\\end{figure}");
+						Output.AppendLine();
+					}
 				}
 			}
 			else if (Result is Exception ex)
@@ -940,6 +949,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				Output.AppendLine("\\hline");
 				Output.AppendLine("\\end{tabular}");
 				Output.AppendLine("\\end{table}");
+				Output.AppendLine();
 			}
 			else if (Result is Array A)
 			{

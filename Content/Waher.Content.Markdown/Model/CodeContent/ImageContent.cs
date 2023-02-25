@@ -216,6 +216,7 @@ namespace Waher.Content.Markdown.Model.CodeContent
 			Output.AppendLine("}}");
 
 			Output.AppendLine("\\end{figure}");
+			Output.AppendLine();
 
 			return true;
 		}

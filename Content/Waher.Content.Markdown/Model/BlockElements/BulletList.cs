@@ -266,6 +266,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				await E.GenerateLaTeX(Output);
 
 			Output.AppendLine("\\end{itemize}");
+			Output.AppendLine();
 		}
 
 		/// <summary>

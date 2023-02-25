@@ -509,6 +509,7 @@ namespace Waher.Content.Markdown.PlantUml
 			}
 
 			Output.AppendLine("\\end{figure}");
+			Output.AppendLine();
 
 			return true;
 		}

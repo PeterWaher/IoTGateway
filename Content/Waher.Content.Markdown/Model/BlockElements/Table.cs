@@ -732,6 +732,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			}
 
 			Output.AppendLine("\\end{table}");
+			Output.AppendLine();
 		}
 
 		private static void Append(StringBuilder Output, TextAlignment Alignment)

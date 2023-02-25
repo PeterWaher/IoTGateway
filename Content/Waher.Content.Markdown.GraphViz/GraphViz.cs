@@ -668,6 +668,7 @@ namespace Waher.Content.Markdown.GraphViz
 			}
 
 			Output.AppendLine("\\end{figure}");
+			Output.AppendLine();
 
 			return true;
 		}

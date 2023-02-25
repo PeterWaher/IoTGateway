@@ -367,6 +367,7 @@ namespace Waher.Content.Markdown.Layout2D
 			}
 
 			Output.AppendLine("\\end{figure}");
+			Output.AppendLine();
 
 			return true;
 		}

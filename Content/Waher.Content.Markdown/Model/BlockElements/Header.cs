@@ -321,12 +321,6 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			Output.AppendLine("}");
 			Output.AppendLine();
-
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateLaTeX(Output);
-
-			Output.AppendLine();
-			Output.AppendLine();
 		}
 
 		/// <summary>

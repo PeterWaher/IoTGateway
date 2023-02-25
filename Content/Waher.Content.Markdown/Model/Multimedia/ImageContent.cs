@@ -367,7 +367,10 @@ namespace Waher.Content.Markdown.Model.Multimedia
 					Output.Append("}}");
 
 					if (AloneInParagraph)
+					{
 						Output.AppendLine("\\end{figure}");
+						Output.AppendLine();
+					}
 				}
 			}
 		}

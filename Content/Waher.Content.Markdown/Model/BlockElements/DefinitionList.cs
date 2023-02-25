@@ -196,6 +196,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			}
 
 			Output.AppendLine("\\end{description}");
+			Output.AppendLine();
 		}
 
 		/// <summary>

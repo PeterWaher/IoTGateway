@@ -6953,10 +6953,10 @@ namespace Waher.Content.Markdown
 				Output.AppendLine("\\usepackage{graphicx}");
 				Output.AppendLine("\\usepackage{pifont}");
 				Output.AppendLine("\\usepackage{multirow}");
-				Output.AppendLine("\newlist{tasklist}{itemize}{2}");
+				Output.AppendLine("\\newlist{tasklist}{itemize}{2}");
 				Output.AppendLine("\\setlist[tasklist]{label=$\\square$}");
-				Output.AppendLine("\\newcommand{\\checkmark}{\\ding{51}}");
-				Output.AppendLine("\\newcommand{\\checked}{\\rlap{$\\square$}{\\raisebox{2pt}{\\large\\hspace{1pt}\\checkmark}}\\hspace{-2.5pt}}");
+				Output.AppendLine("\\newcommand{\\checkmarksymbol}{\\ding{51}}");
+				Output.AppendLine("\\newcommand{\\checked}{\\rlap{$\\square$}{\\raisebox{2pt}{\\large\\hspace{1pt}\\checkmarksymbol}}\\hspace{-2.5pt}}");
 				Output.AppendLine("\\begin{document}");
 
 				if (MakeTitle)

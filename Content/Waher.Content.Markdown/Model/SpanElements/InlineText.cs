@@ -116,7 +116,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">LaTeX will be output here.</param>
 		public override Task GenerateLaTeX(StringBuilder Output)
 		{
-			Output.AppendLine(EscapeLaTeX(this.value));
+			Output.Append(EscapeLaTeX(this.value));
 			return Task.CompletedTask;
 		}
 

@@ -133,6 +133,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				await E.GenerateLaTeX(Output);
 
 			Output.AppendLine("\\end{quote}");
+			Output.AppendLine();
 		}
 
 		/// <summary>

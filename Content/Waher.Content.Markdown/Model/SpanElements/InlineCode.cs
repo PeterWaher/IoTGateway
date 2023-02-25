@@ -127,14 +127,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Generates LaTeX for the markdown element.
 		/// </summary>
 		/// <param name="Output">LaTeX will be output here.</param>
-		public override async Task GenerateLaTeX(StringBuilder Output)
+		public override Task GenerateLaTeX(StringBuilder Output)
 		{
 			Output.Append("\\texttt{");
-
-			foreach (MarkdownElement E in this.Children)
-				await E.GenerateLaTeX(Output);
-
+			Output.Append(InlineText.EscapeLaTeX(this.code));
 			Output.Append("}");
+
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

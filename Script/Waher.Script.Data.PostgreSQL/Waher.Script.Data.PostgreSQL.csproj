@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>2.0.2</Version>
+    <Version>2.0.3</Version>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -22,7 +22,7 @@ https://waher.se/Script.md#externalPostgreSQLDatabaseRelatedFunctionsWaherScript
     <PackageTags>script execution parsing external PostgreSQL database</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>2.0.2</AssemblyVersion>
-    <FileVersion>2.0.2</FileVersion>
+    <FileVersion>2.0.3</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

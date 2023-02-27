@@ -19,8 +19,8 @@ Script Syntax: https://waher.se/Script.md#contentRelatedFunctionsWaherScriptCont
     <PackageTags>script execution parsing content</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>2.0.5</AssemblyVersion>
-    <FileVersion>2.0.5</FileVersion>
-    <Version>2.0.5</Version>
+    <FileVersion>2.0.6</FileVersion>
+    <Version>2.0.6</Version>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>Icon_64x64.png</PackageIcon>
   </PropertyGroup>

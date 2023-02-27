@@ -316,6 +316,10 @@
       <Project>{47f772fe-c923-4f5c-83b5-a4bef962ae15}</Project>
       <Name>Waher.Runtime.Threading</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
+      <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
+      <Name>Waher.Script</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
       <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
       <Name>Waher.Security</Name>

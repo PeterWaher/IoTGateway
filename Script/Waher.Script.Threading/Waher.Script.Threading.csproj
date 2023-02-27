@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
-    <Version>2.0.1</Version>
+    <Version>2.0.2</Version>
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
@@ -18,7 +18,7 @@ Script Syntax: https://waher.se/Script.md#threadingRelatedFunctionsWaherScriptTh
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>script execution parsing threading parallel semaphore</PackageTags>
     <AssemblyVersion>2.0.1</AssemblyVersion>
-    <FileVersion>2.0.1</FileVersion>
+    <FileVersion>2.0.2</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>

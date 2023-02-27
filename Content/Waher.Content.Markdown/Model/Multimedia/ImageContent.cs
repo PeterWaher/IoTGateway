@@ -318,58 +318,75 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		{
 			foreach (MultimediaItem Item in Items)
 			{
-				KeyValuePair<string, TemporaryStream> P = await InternetContent.GetTempStreamAsync(new Uri(Item.Url), 60000);
+				string Url = Document.CheckURL(Item.Url, Document.URL);
 
-				using (TemporaryStream f = P.Value)
+				if (Uri.TryCreate(Url, UriKind.RelativeOrAbsolute, out Uri ParsedUri))
 				{
-					int c = (int)Math.Min(int.MaxValue, f.Length);
-					byte[] Bin = new byte[c];
+					KeyValuePair<string, TemporaryStream> P;
 
-					f.Position = 0;
-					await f.ReadAsync(Bin, 0, c);
-
-					string FileName = await GetTemporaryFile(Bin);
-
-					if (AloneInParagraph)
+					if (ParsedUri.IsAbsoluteUri)
 					{
-						Output.AppendLine("\\begin{figure}[h]");
-						Output.AppendLine("\\centering");
+						P = await InternetContent.GetTempStreamAsync(new Uri(Item.Url), 60000);
+					}
+					else
+					{
+						string FileName = Document.Settings.GetFileName(Document.FileName, Url);
+						if (!File.Exists(FileName))
+							continue;
+
 					}
 
-					Output.Append("\\fbox{\\includegraphics");
-
-					if (Item.Width.HasValue || Item.Height.HasValue)
+					using (TemporaryStream f = P.Value)
 					{
-						Output.Append('[');
+						int c = (int)Math.Min(int.MaxValue, f.Length);
+						byte[] Bin = new byte[c];
 
-						if (Item.Width.HasValue)
+						f.Position = 0;
+						await f.ReadAsync(Bin, 0, c);
+
+						string FileName = await GetTemporaryFile(Bin);
+
+						if (AloneInParagraph)
 						{
-							Output.Append("width=");
-							Output.Append(((Item.Width.Value * 3) / 4).ToString());
-							Output.Append("pt");
+							Output.AppendLine("\\begin{figure}[h]");
+							Output.AppendLine("\\centering");
 						}
 
-						if (Item.Height.HasValue)
+						Output.Append("\\fbox{\\includegraphics");
+
+						if (Item.Width.HasValue || Item.Height.HasValue)
 						{
+							Output.Append('[');
+
 							if (Item.Width.HasValue)
-								Output.Append(", ");
+							{
+								Output.Append("width=");
+								Output.Append(((Item.Width.Value * 3) / 4).ToString());
+								Output.Append("pt");
+							}
 
-							Output.Append("height=");
-							Output.Append(((Item.Height.Value * 3) / 4).ToString());
-							Output.Append("pt");
+							if (Item.Height.HasValue)
+							{
+								if (Item.Width.HasValue)
+									Output.Append(", ");
+
+								Output.Append("height=");
+								Output.Append(((Item.Height.Value * 3) / 4).ToString());
+								Output.Append("pt");
+							}
+
+							Output.Append(']');
 						}
 
-						Output.Append(']');
-					}
+						Output.Append('{');
+						Output.Append(FileName.Replace('\\', '/'));
+						Output.Append("}}");
 
-					Output.Append('{');
-					Output.Append(FileName.Replace('\\', '/'));
-					Output.Append("}}");
-
-					if (AloneInParagraph)
-					{
-						Output.AppendLine("\\end{figure}");
-						Output.AppendLine();
+						if (AloneInParagraph)
+						{
+							Output.AppendLine("\\end{figure}");
+							Output.AppendLine();
+						}
 					}
 				}
 			}

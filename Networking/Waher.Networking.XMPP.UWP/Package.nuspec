@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Networking.XMPP.UWP</id>
-    <version>2.1.0</version>
+    <version>2.1.1</version>
     <title>Waher.Networking.XMPP.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
@@ -47,16 +47,17 @@ Support for other extensions is provided by separate nuget packages. See: https:
     <copyright>Copyright © Waher Data AB 2016-2023. All rights reserved.</copyright>
     <tags>networking communication xmpp uwp</tags>
     <dependencies>
-      <dependency id="Waher.Content" version="2.4.8"/>
-      <dependency id="Waher.Content.Xml" version="2.0.5"/>
+      <dependency id="Waher.Content" version="2.5.0"/>
+      <dependency id="Waher.Content.Xml" version="2.1.0"/>
       <dependency id="Waher.Events" version="1.1.2"/>
-      <dependency id="Waher.Networking.UWP" version="2.1.0"/>
-      <dependency id="Waher.Persistence" version="1.8.2"/>
+      <dependency id="Waher.Networking.UWP" version="2.1.1"/>
+      <dependency id="Waher.Persistence" version="1.9.0"/>
       <dependency id="Waher.Runtime.Cache" version="1.0.6"/>
       <dependency id="Waher.Runtime.Inventory" version="1.1.2"/>
       <dependency id="Waher.Runtime.Temporary" version="1.0.0"/>
       <dependency id="Waher.Runtime.Threading" version="1.2.1"/>
-      <dependency id="Waher.Security" version="1.0.8"/>
+			<dependency id="Waher.Script" version="2.4.11"/>
+			<dependency id="Waher.Security" version="1.0.8"/>
     </dependencies>
   </metadata>
   <files>

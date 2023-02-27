@@ -19,10 +19,10 @@ https://waher.se/Script.md#xmlRelatedFunctionsWaherScriptXml</Description>
     <PackageTags>script execution xml</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>2.1.5</AssemblyVersion>
-    <FileVersion>2.1.5</FileVersion>
+    <FileVersion>2.1.6</FileVersion>
     <PackageIcon>Icon_64x64.png</PackageIcon>
     <PackageIconUrl />
-    <Version>2.1.5</Version>
+    <Version>2.1.6</Version>
   </PropertyGroup>
 
   <ItemGroup>

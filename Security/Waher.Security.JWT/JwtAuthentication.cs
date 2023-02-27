@@ -44,6 +44,21 @@ namespace Waher.Security.JWT
 			this.factory = Factory;
 		}
 
+#if WINDOWS_UWP
+		/// <summary>
+		/// Use JWT tokens for authentication. The Bearer scheme defined in RFC 6750 is used:
+		/// https://tools.ietf.org/html/rfc6750
+		/// </summary>
+		/// <param name="RequireEncryption">If encryption is required.</param>
+		/// <param name="Realm">Realm.</param>
+		/// <param name="Users">Optional Collection of users to authenticate against.
+		/// If no collection is provided, any JWT token created by the factory will
+		/// be accepted.</param>
+		/// <param name="Factory">JWT token factory.</param>
+		public JwtAuthentication(bool RequireEncryption, 
+			string Realm, IUserSource Users, JwtFactory Factory)
+			: base(RequireEncryption)
+#else
 		/// <summary>
 		/// Use JWT tokens for authentication. The Bearer scheme defined in RFC 6750 is used:
 		/// https://tools.ietf.org/html/rfc6750
@@ -58,6 +73,7 @@ namespace Waher.Security.JWT
 		public JwtAuthentication(bool RequireEncryption, int MinStrength,
 			string Realm, IUserSource Users, JwtFactory Factory)
 			: base(RequireEncryption, MinStrength)
+#endif
 		{
 			this.realm = Realm;
 			this.users = Users;

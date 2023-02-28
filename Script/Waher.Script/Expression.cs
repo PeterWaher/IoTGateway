@@ -390,8 +390,7 @@ namespace Waher.Script
 					{
 						case "FOREACH":
 							this.pos += 7;
-							In In = this.AssertOperandNotNull(this.ParseList()) as In;
-							if (In is null)
+							if (!(this.AssertOperandNotNull(this.ParseList()) is In In))
 								throw new SyntaxException("IN statement expected", this.pos, this.script);
 
 							VariableReference Ref = In.LeftOperand as VariableReference;
@@ -1262,8 +1261,7 @@ namespace Waher.Script
 					else
 						throw new SyntaxException("Invalid argument list.", Left.Start, this.script);
 
-					ScriptNode Operand = this.ParseEquivalence();
-					if (Operand is null)
+					if (!(this.ParseEquivalence() is ScriptNode Operand))
 						throw new SyntaxException("Lambda function body missing.", this.pos, this.script);
 
 					return new LambdaDefinition(ArgumentNames, ArgumentTypes, Operand, Start, this.pos - Start, this);
@@ -3578,8 +3576,7 @@ namespace Waher.Script
 						{
 							this.pos++;
 
-							ScriptNode Operand = this.ParseEquivalence();
-							if (Operand is null)
+							if (!(this.ParseEquivalence() is ScriptNode Operand))
 								throw new SyntaxException("Lambda function body missing.", this.pos, this.script);
 
 							return new LambdaDefinition(new string[0], new ArgumentType[0], Operand, Start, this.pos - Start, this);

@@ -891,7 +891,7 @@ namespace Waher.Things.Metering
 		public virtual async Task<IEnumerable<Message>> GetMessagesAsync(RequestOrigin Caller)
 		{
 			IEnumerable<MeteringMessage> Messages = await Database.Find<MeteringMessage>(
-				new FilterFieldEqualTo("NodeId", this.objectId), "Timestamp");
+				new FilterFieldEqualTo("NodeId", this.objectId), "Created");
 			LinkedList<Message> Result = new LinkedList<Message>();
 
 			foreach (MeteringMessage Msg in Messages)

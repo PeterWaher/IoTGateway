@@ -2272,10 +2272,11 @@ The following predefined constants are also available:
 The following functions are available in applications running on the Paiwise nuget. This includes the
 IoT Broker or the Neuron^TM.
 
-| Function                 | Description                                                                                                           | Example                     |
-|--------------------------|-----------------------------------------------------------------------------------------------------------------------|-----------------------------|
-| `ExchangeRate(From,To)`  | Gets the current exchange rate between two currencies. Requires a currency converter to be configured for the system. | `ExchangeRate("USD","EUR")` |
-
+| Function                                                | Description                                                                                                           | Example                     |
+|---------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|-----------------------------|
+| `ExchangeRate(From,To)`                                 | Gets the current exchange rate between two currencies. Requires a currency converter to be configured for the system. | `ExchangeRate("USD","EUR")` |
+| `GetServiceProvidersForBuyingEDaler(Country,Currency)`  | Gets available service providers that can be used to buy eDaler(R) in a given country, given its country code, and a currency. | `GetServiceProvidersForBuyingEDaler("US","USD")` |
+| `GetServiceProvidersForSellingEDaler(Country,Currency)` | Gets available service providers that can be used to sell eDaler(R) in a given country, given its country code, and a currency. | `GetServiceProvidersForSellingEDaler("US","USD")` |
 
 =========================================================================================================================================================
 

@@ -801,9 +801,8 @@ namespace Waher.Things.Metering
 		/// <returns>Set of displayable parameters.</returns>
 		public virtual async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
-			Namespace Namespace = await Language.GetNamespaceAsync(typeof(MeteringNode).Namespace);
-			if (Namespace is null)
-				Namespace = await Language.CreateNamespaceAsync(typeof(MeteringNode).Namespace);
+			Namespace Namespace = await Language.GetNamespaceAsync(typeof(MeteringNode).Namespace)
+				?? await Language.CreateNamespaceAsync(typeof(MeteringNode).Namespace);
 
 			LinkedList<Parameter> Result = new LinkedList<Parameter>();
 			string s;

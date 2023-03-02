@@ -2115,10 +2115,7 @@ namespace Waher.IoTGateway
 		/// <exception cref="InvalidOperationException">If no <see cref="OnTerminate"/> event handler has been set.</exception>
 		public static void Terminate()
 		{
-			EventHandler h = OnTerminate;
-			if (h is null)
-				throw new InvalidOperationException("No OnTerminate event handler set.");
-
+			EventHandler h = OnTerminate ?? throw new InvalidOperationException("No OnTerminate event handler set.");
 			try
 			{
 				h(instance, EventArgs.Empty);

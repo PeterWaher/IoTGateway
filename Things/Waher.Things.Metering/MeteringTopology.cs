@@ -43,7 +43,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		public MeteringTopology()
 		{
-			lastChanged = RuntimeSettings.Get(MeteringTopology.SourceID + ".LastChanged", DateTime.MinValue);
+			this.lastChanged = RuntimeSettings.Get(SourceID + ".LastChanged", DateTime.MinValue);
 
 			if (instance is null)
 				instance = this;
@@ -54,7 +54,7 @@ namespace Waher.Things.Metering
 		/// </summary>
 		string IDataSource.SourceID
 		{
-			get { return MeteringTopology.SourceID; }
+			get { return SourceID; }
 		}
 
 		/// <summary>
@@ -78,12 +78,12 @@ namespace Waher.Things.Metering
 		/// </summary>
 		public DateTime LastChanged
 		{
-			get { return lastChanged; }
+			get { return this.lastChanged; }
 			internal set
 			{
-				if (lastChanged != value)
+				if (this.lastChanged != value)
 				{
-					lastChanged = value;
+					this.lastChanged = value;
 					Task _ = RuntimeSettings.SetAsync("MeteringTopology.LastChanged", value);
 				}
 			}
@@ -111,7 +111,7 @@ namespace Waher.Things.Metering
 
 		internal static async Task<MeteringNode> GetNode(IThingReference NodeRef)
 		{
-			if (NodeRef.SourceId != MeteringTopology.SourceID || !string.IsNullOrEmpty(NodeRef.Partition))
+			if (NodeRef.SourceId != SourceID || !string.IsNullOrEmpty(NodeRef.Partition))
 				return null;
 
 			lock (nodes)
@@ -139,7 +139,7 @@ namespace Waher.Things.Metering
 
 		internal static MeteringNode RegisterNode(MeteringNode Node)
 		{
-			if (Node.SourceId == MeteringTopology.SourceID && string.IsNullOrEmpty(Node.Partition))
+			if (Node.SourceId == SourceID && string.IsNullOrEmpty(Node.Partition))
 			{
 				lock (nodes)
 				{
@@ -158,7 +158,7 @@ namespace Waher.Things.Metering
 
 		internal static void UnregisterNode(MeteringNode Node)
 		{
-			if (Node.SourceId == MeteringTopology.SourceID && string.IsNullOrEmpty(Node.Partition))
+			if (Node.SourceId == SourceID && string.IsNullOrEmpty(Node.Partition))
 			{
 				lock (nodes)
 				{
@@ -231,7 +231,7 @@ namespace Waher.Things.Metering
 				await Database.Insert(Result);
 
 				Language Language = await Translator.GetDefaultLanguageAsync();
-				await MeteringTopology.NewEvent(new NodeAdded()
+				await NewEvent(new NodeAdded()
 				{
 					Parameters = await Result.GetDisplayableParameterAraryAsync(Language, RequestOrigin.Empty),
 					NodeType = Result.GetType().FullName,

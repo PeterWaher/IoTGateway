@@ -55,14 +55,14 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			base.Dispose();
 
-			Client.UnregisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentrator, this.QueryProgressHandler, false);
-			Client.UnregisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentrator, this.SniffMessageHandler, false);
-			Client.UnregisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentrator, this.NodeAddedMessageHandler, false);
-			Client.UnregisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentrator, this.NodeUpdatedMessageHandler, false);
-			Client.UnregisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentrator, this.NodeRemovedMessageHandler, false);
-			Client.UnregisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentrator, this.NodeStatusChangedMessageHandler, false);
-			Client.UnregisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentrator, this.NodeMovedUpMessageHandler, false);
-			Client.UnregisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentrator, this.NodeMovedDownMessageHandler, false);
+			this.client.UnregisterMessageHandler("queryProgress", ConcentratorServer.NamespaceConcentrator, this.QueryProgressHandler, false);
+			this.client.UnregisterMessageHandler("sniff", ConcentratorServer.NamespaceConcentrator, this.SniffMessageHandler, false);
+			this.client.UnregisterMessageHandler("nodeAdded", ConcentratorServer.NamespaceConcentrator, this.NodeAddedMessageHandler, false);
+			this.client.UnregisterMessageHandler("nodeUpdated", ConcentratorServer.NamespaceConcentrator, this.NodeUpdatedMessageHandler, false);
+			this.client.UnregisterMessageHandler("nodeRemoved", ConcentratorServer.NamespaceConcentrator, this.NodeRemovedMessageHandler, false);
+			this.client.UnregisterMessageHandler("nodeStatusChanged", ConcentratorServer.NamespaceConcentrator, this.NodeStatusChangedMessageHandler, false);
+			this.client.UnregisterMessageHandler("nodeMovedUp", ConcentratorServer.NamespaceConcentrator, this.NodeMovedUpMessageHandler, false);
+			this.client.UnregisterMessageHandler("nodeMovedDown", ConcentratorServer.NamespaceConcentrator, this.NodeMovedDownMessageHandler, false);
 		}
 
 		/// <summary>
@@ -506,9 +506,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							string Id = XML.Attribute(E2, "id");
 							string Name = XML.Attribute(E2, "name");
 
-							if (!(ParameterList is null))
-								ParameterList.Add(new BooleanParameter(Id, Name, XML.Attribute(E2, "value", false)));
-
+							ParameterList?.Add(new BooleanParameter(Id, Name, XML.Attribute(E2, "value", false)));
 							break;
 
 						case "color":
@@ -518,71 +516,56 @@ namespace Waher.Networking.XMPP.Concentrator
 							string s = XML.Attribute(E2, "value");
 							TryParse(s, out SKColor Value);
 
-							if (!(ParameterList is null))
-								ParameterList.Add(new ColorParameter(Id, Name, Value));
-
+							ParameterList?.Add(new ColorParameter(Id, Name, Value));
 							break;
+
 						case "dateTime":
 							Id = XML.Attribute(E2, "id");
 							Name = XML.Attribute(E2, "name");
 
-							if (!(ParameterList is null))
-								ParameterList.Add(new DateTimeParameter(Id, Name, XML.Attribute(E2, "value", DateTime.MinValue)));
-
+							ParameterList?.Add(new DateTimeParameter(Id, Name, XML.Attribute(E2, "value", DateTime.MinValue)));
 							break;
 
 						case "double":
 							Id = XML.Attribute(E2, "id");
 							Name = XML.Attribute(E2, "name");
 
-							if (!(ParameterList is null))
-								ParameterList.Add(new DoubleParameter(Id, Name, XML.Attribute(E2, "value", 0.0)));
-
+							ParameterList?.Add(new DoubleParameter(Id, Name, XML.Attribute(E2, "value", 0.0)));
 							break;
 
 						case "duration":
 							Id = XML.Attribute(E2, "id");
 							Name = XML.Attribute(E2, "name");
 
-							if (!(ParameterList is null))
-								ParameterList.Add(new DurationParameter(Id, Name, XML.Attribute(E2, "value", Duration.Zero)));
-
+							ParameterList?.Add(new DurationParameter(Id, Name, XML.Attribute(E2, "value", Duration.Zero)));
 							break;
 
 						case "int":
 							Id = XML.Attribute(E2, "id");
 							Name = XML.Attribute(E2, "name");
 
-							if (!(ParameterList is null))
-								ParameterList.Add(new Int32Parameter(Id, Name, XML.Attribute(E2, "value", 0)));
-
+							ParameterList?.Add(new Int32Parameter(Id, Name, XML.Attribute(E2, "value", 0)));
 							break;
 
 						case "long":
 							Id = XML.Attribute(E2, "id");
 							Name = XML.Attribute(E2, "name");
 
-							if (!(ParameterList is null))
-								ParameterList.Add(new Int64Parameter(Id, Name, XML.Attribute(E2, "value", 0L)));
-
+							ParameterList?.Add(new Int64Parameter(Id, Name, XML.Attribute(E2, "value", 0L)));
 							break;
 
 						case "string":
 							Id = XML.Attribute(E2, "id");
 							Name = XML.Attribute(E2, "name");
 
-							if (!(ParameterList is null))
-								ParameterList.Add(new StringParameter(Id, Name, XML.Attribute(E2, "value")));
-
+							ParameterList?.Add(new StringParameter(Id, Name, XML.Attribute(E2, "value")));
 							break;
 
 						case "time":
 							Id = XML.Attribute(E2, "id");
 							Name = XML.Attribute(E2, "name");
 
-							if (!(ParameterList is null))
-								ParameterList.Add(new TimeSpanParameter(Id, Name, XML.Attribute(E2, "value", TimeSpan.Zero)));
-
+							ParameterList?.Add(new TimeSpanParameter(Id, Name, XML.Attribute(E2, "value", TimeSpan.Zero)));
 							break;
 
 						case "message":
@@ -591,9 +574,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							Things.DisplayableParameters.MessageType Type = XML.Attribute(E2, "type", 
 								Things.DisplayableParameters.MessageType.Information);
 
-							if (!(MessageList is null))
-								MessageList.Add(new Message(Timestamp, Type, EventId, E2.InnerText));
-
+							MessageList?.Add(new Message(Timestamp, Type, EventId, E2.InnerText));
 							break;
 					}
 				}

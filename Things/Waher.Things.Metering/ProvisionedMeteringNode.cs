@@ -263,8 +263,7 @@ namespace Waher.Things.Metering
 
 						Form.Fields.Add(MediaField);
 
-						if (!(Page is null))
-							Page.Add(new FieldReference(Form.Form, MediaField.Var));
+						Page?.Add(new FieldReference(Form.Form, MediaField.Var));
 					}
 				}
 			}

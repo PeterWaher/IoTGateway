@@ -44,7 +44,7 @@ namespace Waher.Things.Xmpp
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult<bool>(Parent is Root);
+			return Task.FromResult(Parent is Root);
 		}
 
 		/// <summary>
@@ -54,7 +54,7 @@ namespace Waher.Things.Xmpp
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult<bool>(Child is SourceNode || Child is XmppNode);
+			return Task.FromResult(Child is SourceNode || Child is XmppNode);
 		}
 
 	}

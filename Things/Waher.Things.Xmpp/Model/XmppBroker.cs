@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.XMPP;
+using Waher.Script.Functions.Strings;
 
 namespace Waher.Things.Xmpp.Model
 {
@@ -57,6 +59,14 @@ namespace Waher.Things.Xmpp.Model
 			this.xmppClient.AllowScramSHA1 = this.allowInsecureMechanisms;
 
 			this.xmppClient.OnStateChanged += this.XmppClient_OnStateChanged;
+			this.xmppClient.OnPresence += this.XmppClient_OnPresence;
+			this.xmppClient.OnPresenceSubscribe += this.XmppClient_OnPresenceSubscribe;
+			this.xmppClient.OnPresenceSubscribed += this.XmppClient_OnPresenceSubscribed;
+			this.xmppClient.OnPresenceUnsubscribe += this.XmppClient_OnPresenceUnsubscribe;
+			this.xmppClient.OnPresenceUnsubscribed += this.XmppClient_OnPresenceUnsubscribed;
+			this.xmppClient.OnRosterItemAdded += this.XmppClient_OnRosterItemAdded;
+			this.xmppClient.OnRosterItemRemoved += this.XmppClient_OnRosterItemRemoved;
+			this.xmppClient.OnRosterItemUpdated += this.XmppClient_OnRosterItemUpdated;
 
 			this.xmppClient.Connect();
 		}
@@ -66,6 +76,14 @@ namespace Waher.Things.Xmpp.Model
 			if (!(this.xmppClient is null))
 			{
 				this.xmppClient.OnStateChanged -= this.XmppClient_OnStateChanged;
+				this.xmppClient.OnPresence -= this.XmppClient_OnPresence;
+				this.xmppClient.OnPresenceSubscribe -= this.XmppClient_OnPresenceSubscribe;
+				this.xmppClient.OnPresenceSubscribed -= this.XmppClient_OnPresenceSubscribed;
+				this.xmppClient.OnPresenceUnsubscribe -= this.XmppClient_OnPresenceUnsubscribe;
+				this.xmppClient.OnPresenceUnsubscribed -= this.XmppClient_OnPresenceUnsubscribed;
+				this.xmppClient.OnRosterItemAdded -= this.XmppClient_OnRosterItemAdded;
+				this.xmppClient.OnRosterItemRemoved -= this.XmppClient_OnRosterItemRemoved;
+				this.xmppClient.OnRosterItemUpdated -= this.XmppClient_OnRosterItemUpdated;
 
 				this.xmppClient.Dispose();
 				this.xmppClient = null;
@@ -101,6 +119,148 @@ namespace Waher.Things.Xmpp.Model
 			{
 				Log.Critical(ex);
 			}
+		}
+
+		private async Task XmppClient_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
+		{
+			if (this.node is null)
+			{
+				e.Decline();
+				return;
+			}
+
+			RosterItemNode RosterItem = await this.node.GetRosterItem(e.FromBareJID, true);
+
+			if (string.IsNullOrEmpty(this.node.AutoAcceptPattern))
+			{
+				e.Decline();
+				
+				await RosterItem.LogInformationAsync("Presence subscription received and declined.");
+				return;
+			}
+
+			try
+			{
+				Regex Parsed = new Regex(this.node.AutoAcceptPattern, RegexOptions.Singleline | RegexOptions.IgnoreCase);
+				Match M = Parsed.Match(e.FromBareJID);
+
+				if (M.Success && M.Index == 0 && M.Length == e.FromBareJID.Length)
+				{
+					e.Accept();
+					await RosterItem.LogInformationAsync("Presence subscription received and accepted.");
+				}
+				else
+				{
+					e.Decline();
+					await RosterItem.LogInformationAsync("Presence subscription received and declined.");
+				}
+			}
+			catch (Exception ex)
+			{
+				e.Decline();
+
+				await RosterItem.LogInformationAsync("Presence subscription received and declined.");
+				await this.node.LogErrorAsync("Unable to parse regular expression: " + ex.Message);
+			}
+		}
+
+		private async Task XmppClient_OnPresenceSubscribed(object Sender, PresenceEventArgs e)
+		{
+			if (this.node is null)
+				return;
+
+			RosterItemNode RosterItem = await this.node.GetRosterItem(e.FromBareJID, true);
+			await RosterItem.LogInformationAsync("Subscribed.");
+		}
+
+		private async Task XmppClient_OnPresenceUnsubscribe(object Sender, PresenceEventArgs e)
+		{
+			e.Accept();
+
+			if (this.node is null)
+				return;
+
+			RosterItemNode RosterItem = await this.node.GetRosterItem(e.FromBareJID, true);
+
+			await RosterItem.LogInformationAsync("Presence unsubscribed by " + e.FromBareJID);
+		}
+
+		private async Task XmppClient_OnPresenceUnsubscribed(object Sender, PresenceEventArgs e)
+		{
+			if (this.node is null)
+				return;
+
+			RosterItemNode RosterItem = await this.node.GetRosterItem(e.FromBareJID, true);
+
+			await RosterItem.LogInformationAsync("Unsubscribed from " + e.FromBareJID);
+		}
+
+		private Task XmppClient_OnPresence(object Sender, PresenceEventArgs e)
+		{
+			return Task.CompletedTask;
+		}
+
+		private async Task XmppClient_OnRosterItemAdded(object Sender, RosterItem Item)
+		{
+			if (this.node is null)
+				return;
+
+			RosterItemNode Node = await this.node.GetRosterItem(Item.BareJid, true);
+			bool Changed = 
+				Node.SubscriptionState != Item.State ||
+				Node.ContactName != Item.Name || 
+				Node.PendingSubscription != Item.PendingSubscription ||
+				!AreSame(Node.Groups, Item.Groups);
+
+			if (Changed)
+			{
+				Node.SubscriptionState = Item.State;
+				Node.ContactName = Item.Name;
+				Node.PendingSubscription = Item.PendingSubscription;
+				Node.Groups = Item.Groups ?? new string[0];
+
+				await Node.UpdateAsync();
+			}
+		}
+
+		private static bool AreSame(string[] A1, string[] A2)
+		{
+			if ((A1 is null) ^ (A2 is null))
+				return false;
+
+			if (A1 is null)
+				return true;
+
+			int c = A1.Length;
+			if (c != A2.Length)
+				return false;
+
+			int i;
+
+			for (i = 0; i < c; i++)
+			{
+				if (A1[i] != A2[i])
+					return false;
+			}
+
+			return true;
+		}
+
+		private Task XmppClient_OnRosterItemUpdated(object Sender, RosterItem Item)
+		{
+			return this.XmppClient_OnRosterItemAdded(Sender, Item);
+		}
+
+		private async Task XmppClient_OnRosterItemRemoved(object Sender, RosterItem Item)
+		{
+			if (this.node is null)
+				return;
+
+			RosterItemNode Node = await this.node.GetRosterItem(Item.BareJid, false);
+			if (Node is null)
+				return;
+
+			await Node.DestroyAsync();
 		}
 	}
 }

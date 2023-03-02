@@ -43,7 +43,7 @@ namespace Waher.Things.Xmpp
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult<bool>(Parent is ConcentratorDevice || Parent is XmppBrokerNode);
+			return Task.FromResult(Parent is ConcentratorDevice || Parent is XmppBrokerNode);
 		}
 
 		/// <summary>
@@ -53,7 +53,7 @@ namespace Waher.Things.Xmpp
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult<bool>(Child is PartitionNode || Child is XmppNode);
+			return Task.FromResult(Child is PartitionNode || Child is XmppNode);
 		}
 
 	}

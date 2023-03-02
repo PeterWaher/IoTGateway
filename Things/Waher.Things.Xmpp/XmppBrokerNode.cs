@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Networking.Sniffers;
+using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
 using Waher.Things.Attributes;
@@ -13,6 +15,7 @@ namespace Waher.Things.Xmpp
 {
 	public class XmppBrokerNode : IpHostPort, ISniffable
 	{
+		private readonly Dictionary<CaseInsensitiveString, RosterItemNode> roster = new Dictionary<CaseInsensitiveString, RosterItemNode>();
 		private string userName = string.Empty;
 		private string password = string.Empty;
 		private string passwordMechanism = string.Empty;
@@ -78,6 +81,14 @@ namespace Waher.Things.Xmpp
 			set => this.allowInsecureMechanisms = value;
 		}
 
+		/// <summary>
+		/// Partition ID
+		/// </summary>
+		[Page(28, "Roster", 110)]
+		[Header(32, "Auto-accept Pattern:")]
+		[ToolTip(33, "If a presence subscription comes from a JID that matches this regular expression, it will be automatically accepted.")]
+		public string AutoAcceptPattern { get; set; }
+
 		public override Task<string> GetTypeNameAsync(Language Language)
 		{
 			return Language.GetStringAsync(typeof(XmppBrokerNode), 23, "XMPP Broker");
@@ -85,8 +96,8 @@ namespace Waher.Things.Xmpp
 
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult<bool>(Child is XmppNode || Child is SourceNode || Child is PartitionNode || 
-				Child is ConcentratorDevice);
+			return Task.FromResult(Child is XmppNode || Child is SourceNode || Child is PartitionNode ||
+				Child is ConcentratorDevice || Child is RosterItemNode);
 		}
 
 		public override Task DestroyAsync()
@@ -204,6 +215,85 @@ namespace Waher.Things.Xmpp
 
 			return Result;
 		}
+
+		#region Roster
+
+		public async Task<RosterItemNode> GetRosterItem(string BareJID, bool CreateIfNotExists)
+		{
+			RosterItemNode Result;
+			bool Load;
+
+			lock (this.roster)
+			{
+				if (this.roster.TryGetValue(BareJID, out Result))
+					return Result;
+
+				Load = this.roster.Count == 0;
+			}
+
+			if (Load)
+			{
+				IEnumerable<INode> Children = await this.ChildNodes;
+
+				lock (this.roster)
+				{
+					foreach (INode Node in Children)
+					{
+						if (Node is RosterItemNode RosterItem)
+							this.roster[RosterItem.BareJID] = RosterItem;
+					}
+
+					if (this.roster.TryGetValue(BareJID, out Result))
+						return Result;
+				}
+			}
+
+			if (CreateIfNotExists)
+			{
+				Result = new RosterItemNode()
+				{
+					NodeId = await GetUniqueNodeId(this.NodeId + ", " + BareJID),
+					BareJID = BareJID
+				};
+
+				await this.AddAsync(Result);
+
+				return Result;
+			}
+			else
+				return null;
+		}
+
+		public override async Task<bool> RemoveAsync(INode Child)
+		{
+			if (!await base.RemoveAsync(Child))
+				return false;
+
+			if (Child is RosterItemNode Item)
+			{
+				lock (this.roster)
+				{
+					this.roster.Remove(Item.BareJID);
+				}
+			}
+
+			return true;
+		}
+
+		public override async Task AddAsync(INode Child)
+		{
+			await base.AddAsync(Child);
+
+			if (Child is RosterItemNode Item)
+			{
+				lock (this.roster)
+				{
+					this.roster[Item.BareJID] = Item;
+				}
+			}
+		}
+
+		#endregion
 
 	}
 }

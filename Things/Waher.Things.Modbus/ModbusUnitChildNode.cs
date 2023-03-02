@@ -24,7 +24,7 @@ namespace Waher.Things.Modbus
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult<bool>(Parent is ModbusUnitNode || Parent is ModbusCompositeChildNode);
+			return Task.FromResult(Parent is ModbusUnitNode || Parent is ModbusCompositeChildNode);
 		}
 
 		/// <summary>

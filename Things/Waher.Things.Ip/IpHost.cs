@@ -25,7 +25,7 @@ namespace Waher.Things.Ip
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult<bool>(Parent is Root || Parent is IpHost);
+			return Task.FromResult(Parent is Root || Parent is IpHost);
 		}
 
 		/// <summary>
@@ -35,7 +35,7 @@ namespace Waher.Things.Ip
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult<bool>(Child is IpHost);
+			return Task.FromResult(Child is IpHost);
 		}
 
 		/// <summary>

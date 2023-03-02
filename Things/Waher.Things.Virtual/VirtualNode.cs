@@ -63,7 +63,7 @@ namespace Waher.Things.Virtual
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult<bool>(Child is VirtualNode);
+			return Task.FromResult(Child is VirtualNode);
 		}
 
 		/// <summary>
@@ -73,7 +73,7 @@ namespace Waher.Things.Virtual
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult<bool>(Parent is Root || Parent is VirtualNode);
+			return Task.FromResult(Parent is Root || Parent is VirtualNode);
 		}
 
 		/// <summary>

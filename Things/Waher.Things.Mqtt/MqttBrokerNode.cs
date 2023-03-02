@@ -100,7 +100,7 @@ namespace Waher.Things.Mqtt
 
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult<bool>(Child is MqttTopicNode);
+			return Task.FromResult(Child is MqttTopicNode);
 		}
 
 		public override Task DestroyAsync()

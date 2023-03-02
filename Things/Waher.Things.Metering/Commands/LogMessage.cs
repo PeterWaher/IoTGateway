@@ -122,7 +122,7 @@ namespace Waher.Things.Metering.Commands
 		/// <param name="Language">Language to use.</param>
 		public Task<string> GetConfirmationStringAsync(Language Language)
 		{
-			return Task.FromResult<string>(string.Empty);
+			return Task.FromResult(string.Empty);
 		}
 
 		/// <summary>

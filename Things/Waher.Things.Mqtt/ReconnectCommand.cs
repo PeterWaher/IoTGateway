@@ -36,7 +36,7 @@ namespace Waher.Things.Mqtt
 
 		public Task<string> GetConfirmationStringAsync(Language Language)
 		{
-			return Task.FromResult<string>(string.Empty);
+			return Task.FromResult(string.Empty);
 		}
 
 		public Task<string> GetFailureStringAsync(Language Language)

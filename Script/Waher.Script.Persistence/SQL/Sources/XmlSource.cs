@@ -173,7 +173,7 @@ namespace Waher.Script.Persistence.SQL.Sources
 		/// <returns>If the label is a label in the source.</returns>
 		public Task<bool> IsLabel(string Label)
 		{
-			return Task.FromResult<bool>(false);
+			return Task.FromResult(false);
 		}
 
 		/// <summary>

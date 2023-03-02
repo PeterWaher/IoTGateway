@@ -73,7 +73,7 @@ namespace Waher.Networking.HTTP
 					return this.BinaryDataReceived(Buffer, Offset, Count);
 			}
 			else
-				return this.webSocket?.WebSocketDataReceived(Buffer, Offset, Count) ?? Task.FromResult<bool>(false);
+				return this.webSocket?.WebSocketDataReceived(Buffer, Offset, Count) ?? Task.FromResult(false);
 		}
 
 		private Task Client_OnError(object Sender, Exception Exception)

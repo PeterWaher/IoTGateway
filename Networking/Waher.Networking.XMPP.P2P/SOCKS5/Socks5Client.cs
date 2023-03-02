@@ -162,7 +162,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			if (this.HasSniffers)
 				this.TransmitBinary(BinaryTcpClient.ToArray(Buffer, Offset, Count));
 
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 
 		private async Task<bool> Client_OnReceived(object Sender, byte[] Buffer, int Offset, int Count)

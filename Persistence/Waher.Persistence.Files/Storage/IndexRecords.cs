@@ -3274,7 +3274,7 @@ namespace Waher.Persistence.Files.Storage
 		/// <returns>If the following object is a BLOB.</returns>
 		public Task<bool> IsBlob(BinaryDeserializer Reader)
 		{
-			return Task.FromResult<bool>(false);
+			return Task.FromResult(false);
 		}
 
 		/// <summary>

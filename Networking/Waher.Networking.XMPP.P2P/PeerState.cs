@@ -823,7 +823,7 @@ namespace Waher.Networking.XMPP.P2P
 			TextEventHandler h = this.OnReceived;
 
 			if (h is null)
-				Result = Task.FromResult<bool>(false);
+				Result = Task.FromResult(false);
 			else
 			{
 				try
@@ -833,7 +833,7 @@ namespace Waher.Networking.XMPP.P2P
 				catch (Exception ex)
 				{
 					Log.Critical(ex);
-					Result = Task.FromResult<bool>(false);
+					Result = Task.FromResult(false);
 				}
 
 				//if (Result && !(this.callbacks is null))
@@ -920,7 +920,7 @@ namespace Waher.Networking.XMPP.P2P
 				}
 			}
 
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -947,7 +947,7 @@ namespace Waher.Networking.XMPP.P2P
 				this.lastActivity = DateTime.Now;
 			}
 
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>

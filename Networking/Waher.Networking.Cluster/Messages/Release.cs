@@ -30,7 +30,7 @@ namespace Waher.Networking.Cluster.Messages
 		public Task<bool> MessageReceived(ClusterEndpoint Endpoint, IPEndPoint RemoteEndpoint)
 		{
 			Endpoint.Released(this.Resource);
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 	}
 }

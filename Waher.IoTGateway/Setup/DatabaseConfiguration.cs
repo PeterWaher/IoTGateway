@@ -307,7 +307,7 @@ namespace Waher.IoTGateway.Setup
 			this.databasePluginSettings = Plugin.CreateNewSettings();
 			this.Step = 1;
 
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 
 	}

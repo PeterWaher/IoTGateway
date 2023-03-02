@@ -211,7 +211,7 @@ namespace Waher.IoTGateway.Setup
 		/// <returns>If the configuration was changed.</returns>
 		public virtual Task<bool> SimplifiedConfiguration()
 		{
-			return Task.FromResult<bool>(false);
+			return Task.FromResult(false);
 		}
 	}
 }

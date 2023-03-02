@@ -1979,7 +1979,7 @@ namespace Waher.IoTGateway.Setup
 		/// <returns>If the configuration was changed.</returns>
 		public override Task<bool> SimplifiedConfiguration()
 		{
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 
 	}

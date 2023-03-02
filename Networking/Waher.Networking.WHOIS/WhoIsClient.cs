@@ -91,7 +91,7 @@ namespace Waher.Networking.WHOIS
 
 			this.received.Set();
 
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>

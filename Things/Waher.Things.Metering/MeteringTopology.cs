@@ -175,7 +175,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the source is visible to the caller.</returns>
 		public Task<bool> CanViewAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult<bool>(true);     // TODO: Check user privileges
+			return Task.FromResult(true);     // TODO: Check user privileges
 		}
 
 		/// <summary>

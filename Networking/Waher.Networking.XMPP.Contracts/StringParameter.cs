@@ -201,14 +201,14 @@ namespace Waher.Networking.XMPP.Contracts
 			int i;
 
 			if (this.value is null)
-				return Task.FromResult<bool>(false);
+				return Task.FromResult(false);
 
 			if (!(this.min is null))
 			{
 				i = string.Compare(this.value, this.min);
 
 				if (i < 0 || (i == 0 && !this.minIncluded))
-					return Task.FromResult<bool>(false);
+					return Task.FromResult(false);
 			}
 
 			if (!(this.max is null))
@@ -216,14 +216,14 @@ namespace Waher.Networking.XMPP.Contracts
 				i = string.Compare(this.value, this.max);
 
 				if (i > 0 || (i == 0 && !this.maxIncluded))
-					return Task.FromResult<bool>(false);
+					return Task.FromResult(false);
 			}
 
 			if (this.minLength.HasValue && this.value.Length < this.minLength.Value)
-				return Task.FromResult<bool>(false);
+				return Task.FromResult(false);
 
 			if (this.maxLength.HasValue && this.value.Length > this.maxLength.Value)
-				return Task.FromResult<bool>(false);
+				return Task.FromResult(false);
 
 			if (!string.IsNullOrEmpty(this.regEx))
 			{
@@ -236,7 +236,7 @@ namespace Waher.Networking.XMPP.Contracts
 						this.match = this.parsed.Match(this.value);
 
 					if (!this.match.Success || this.match.Index > 0 || this.match.Length < this.value.Length)
-						return Task.FromResult<bool>(false);
+						return Task.FromResult(false);
 				}
 				catch (Exception)
 				{

@@ -37,7 +37,7 @@ namespace Waher.Networking.Cluster.Messages
 		public Task<bool> MessageReceived(ClusterEndpoint Endpoint, IPEndPoint RemoteEndpoint)
 		{
 			Endpoint.AssuredTransport(this.MessageID, this.Message);
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 	}
 }

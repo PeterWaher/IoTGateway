@@ -28,7 +28,7 @@ namespace Waher.Things.Ip
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult<bool>(false);
+			return Task.FromResult(false);
 		}
 
 		/// <summary>

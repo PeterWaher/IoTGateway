@@ -760,7 +760,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the node is visible to the caller.</returns>
 		public virtual Task<bool> CanViewAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult<bool>(true);     // TODO: Check user privileges
+			return Task.FromResult(true);     // TODO: Check user privileges
 		}
 
 		/// <summary>
@@ -770,7 +770,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the node can be edited by the caller.</returns>
 		public virtual Task<bool> CanEditAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult<bool>(true);     // TODO: Check user privileges
+			return Task.FromResult(true);     // TODO: Check user privileges
 		}
 
 		/// <summary>
@@ -780,7 +780,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the node can be added to by the caller.</returns>
 		public virtual Task<bool> CanAddAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult<bool>(true);     // TODO: Check user privileges
+			return Task.FromResult(true);     // TODO: Check user privileges
 		}
 
 		/// <summary>
@@ -790,7 +790,7 @@ namespace Waher.Things.Metering
 		/// <returns>If the node can be added to by the caller.</returns>
 		public virtual Task<bool> CanDestroyAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult<bool>(true);     // TODO: Check user privileges
+			return Task.FromResult(true);     // TODO: Check user privileges
 		}
 
 		/// <summary>
@@ -921,7 +921,7 @@ namespace Waher.Things.Metering
 		public virtual Task<bool> MoveUpAsync(RequestOrigin Caller)
 		{
 			if (!(this.Parent is MeteringNode Parent))
-				return Task.FromResult<bool>(false);
+				return Task.FromResult(false);
 			else
 				return Parent.MoveUpAsync(this, Caller);
 		}
@@ -934,7 +934,7 @@ namespace Waher.Things.Metering
 		public virtual Task<bool> MoveDownAsync(RequestOrigin Caller)
 		{
 			if (!(this.Parent is MeteringNode Parent))
-				return Task.FromResult<bool>(false);
+				return Task.FromResult(false);
 			else
 				return Parent.MoveDownAsync(this, Caller);
 		}

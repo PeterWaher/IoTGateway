@@ -125,7 +125,7 @@ namespace Waher.IoTGateway.CodeContent
 
 			Document.QueueAsyncTask(() => this.Evaluate(Script, Variables, Id));
 
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 
 		private Expression BuildExpression(string[] Rows)

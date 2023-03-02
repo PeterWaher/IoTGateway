@@ -21,7 +21,7 @@ namespace Waher.Things.Mqtt
 
 		public Task<bool> CanExecuteAsync(RequestOrigin Caller)
 		{
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 
 		public ICommand Copy()

@@ -34,7 +34,7 @@ namespace Waher.Things.Metering.NodeTypes
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -44,7 +44,7 @@ namespace Waher.Things.Metering.NodeTypes
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult<bool>(false);
+			return Task.FromResult(false);
 		}
 	}
 }

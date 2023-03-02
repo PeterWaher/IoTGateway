@@ -118,7 +118,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			if (this.tempStream is null || this.aborted || this.done)
 				throw new IOException("Stream not open");
 
-			if (!await (this.syncObject?.TryBeginWrite(10000) ?? Task.FromResult<bool>(false)))
+			if (!await (this.syncObject?.TryBeginWrite(10000) ?? Task.FromResult(false)))
 				throw new TimeoutException();
 
 			try
@@ -143,7 +143,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			if (this.tempStream is null || this.aborted || this.done)
 				throw new IOException("Stream not open");
 
-			if (!await (this.syncObject?.TryBeginWrite(10000) ?? Task.FromResult<bool>(false)))
+			if (!await (this.syncObject?.TryBeginWrite(10000) ?? Task.FromResult(false)))
 				throw new TimeoutException();
 
 			try
@@ -268,7 +268,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 			if (!(this.tempStream is null))
 			{
-				if (!await (this.syncObject?.TryBeginWrite(10000) ?? Task.FromResult<bool>(false)))
+				if (!await (this.syncObject?.TryBeginWrite(10000) ?? Task.FromResult(false)))
 					throw new TimeoutException();
 
 				try
@@ -295,7 +295,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 			if (!(this.tempStream is null))
 			{
-				if (!await (this.syncObject?.TryBeginWrite(10000) ?? Task.FromResult<bool>(false)))
+				if (!await (this.syncObject?.TryBeginWrite(10000) ?? Task.FromResult(false)))
 					throw new TimeoutException();
 
 				try

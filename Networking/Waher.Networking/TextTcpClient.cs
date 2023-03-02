@@ -132,7 +132,7 @@ namespace Waher.Networking
 			if (this.sniffText && this.HasSniffers)
 				this.ReceiveText(Data);
 
-			return this.OnReceived?.Invoke(this, Data) ?? Task.FromResult<bool>(true);
+			return this.OnReceived?.Invoke(this, Data) ?? Task.FromResult(true);
 		}
 
 		/// <summary>

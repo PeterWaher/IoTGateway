@@ -677,7 +677,7 @@ namespace Waher.Networking.XMPP
 		private Task<bool> TextTransportLayer_OnSent(object _, string Packet)
 		{
 			this.TransmitText(Packet);
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 
 		private Task<bool> TextTransportLayer_OnReceived(object _, string Packet)
@@ -700,7 +700,7 @@ namespace Waher.Networking.XMPP
 			if (Packet.StartsWith("</"))
 			{
 				this.ToError();
-				return Task.FromResult<bool>(false);
+				return Task.FromResult(false);
 			}
 			else
 				return this.ProcessFragment(Packet);
@@ -809,7 +809,7 @@ namespace Waher.Networking.XMPP
 		private Task<bool> OnSent(object _, string Text)
 		{
 			this.TransmitText(Text);
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 
 		private Task<bool> OnReceived(object _, string Text)

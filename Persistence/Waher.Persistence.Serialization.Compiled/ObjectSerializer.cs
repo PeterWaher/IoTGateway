@@ -4800,7 +4800,7 @@ namespace Waher.Persistence.Serialization
 				else if (!(this.objectIdPropertyInfo is null))
 					ObjectId = this.objectIdPropertyInfo.GetValue(Value);
 				else
-					return Task.FromResult<bool>(false);
+					return Task.FromResult(false);
 			}
 			else
 			{
@@ -4808,18 +4808,18 @@ namespace Waher.Persistence.Serialization
 				if (!(this.objectIdMember is null))
 					ObjectId = this.objectIdMember.Get(Value);
 				else
-					return Task.FromResult<bool>(false);
+					return Task.FromResult(false);
 #if NETSTANDARD2_0
 			}
 #endif
 
 			if (ObjectId is null)
-				return Task.FromResult<bool>(false);
+				return Task.FromResult(false);
 
 			if (ObjectId is Guid && ObjectId.Equals(Guid.Empty))
-				return Task.FromResult<bool>(false);
+				return Task.FromResult(false);
 
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -4841,7 +4841,7 @@ namespace Waher.Persistence.Serialization
 				else if (!(this.objectIdPropertyInfo is null))
 					MemberType = this.objectIdPropertyInfo.PropertyType;
 				else
-					return Task.FromResult<bool>(false);
+					return Task.FromResult(false);
 			}
 			else
 			{
@@ -4849,7 +4849,7 @@ namespace Waher.Persistence.Serialization
 				if (!(this.objectIdMember is null))
 					MemberType = this.objectIdMember.MemberType;
 				else
-					return Task.FromResult<bool>(false);
+					return Task.FromResult(false);
 #if NETSTANDARD2_0
 			}
 #endif
@@ -4861,7 +4861,7 @@ namespace Waher.Persistence.Serialization
 			else if (MemberType == typeof(byte[]))
 				Obj = ObjectId.ToByteArray();
 			else
-				return Task.FromResult<bool>(false);
+				return Task.FromResult(false);
 
 #if NETSTANDARD2_0
 			if (this.compiled)
@@ -4875,7 +4875,7 @@ namespace Waher.Persistence.Serialization
 #endif
 				this.objectIdMember.Set(Value, Obj);
 
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>

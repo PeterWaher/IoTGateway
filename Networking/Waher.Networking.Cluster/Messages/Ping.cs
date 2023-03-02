@@ -18,7 +18,7 @@ namespace Waher.Networking.Cluster.Messages
 		/// In Acknowledged service, this corresponds to ACK/NACK.</returns>
 		public Task<bool> MessageReceived(ClusterEndpoint Endpoint, IPEndPoint RemoteEndpoint)
 		{
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 	}
 }

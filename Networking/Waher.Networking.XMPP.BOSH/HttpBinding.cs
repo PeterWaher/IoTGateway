@@ -876,7 +876,7 @@ namespace Waher.Networking.XMPP.BOSH
 			if (!(Xml is null))
 				return this.RaiseOnReceived(Xml);
 			else
-				return Task.FromResult<bool>(true);
+				return Task.FromResult(true);
 		}
 
 		/// <summary>

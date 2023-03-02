@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Sensor;
-using Waher.Runtime.Inventory;
 using Waher.Runtime.Language;
 using Waher.Things.SensorData;
 
@@ -37,8 +37,19 @@ namespace Waher.Things.Xmpp
 		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
 		public Task StartReadout(ISensorReadout Request)
 		{
-			if (Types.TryGetModuleParameter("XMPP", out object Obj) && Obj is XmppClient Client &&
-				Client.TryGetExtension(out SensorClient SensorClient))
+			XmppClient Client;
+
+			try
+			{
+				Client = this.GetClient();
+			}
+			catch (Exception ex)
+			{
+				Request.ReportErrors(true, new ThingError(this, ex.Message));
+				return Task.CompletedTask;
+			}
+
+			if (Client.TryGetExtension(out SensorClient SensorClient))
 			{
 				string JID = string.Empty;
 				string NID = this.RemoteNodeID;

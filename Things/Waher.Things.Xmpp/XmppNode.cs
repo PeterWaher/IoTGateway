@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Waher.Networking.XMPP;
+using Waher.Runtime.Inventory;
 using Waher.Things.Attributes;
 using Waher.Things.Metering;
 
@@ -32,7 +35,8 @@ namespace Waher.Things.Xmpp
 		/// <returns>If the parent is acceptable.</returns>
 		public override Task<bool> AcceptsParentAsync(INode Parent)
 		{
-			return Task.FromResult<bool>(Parent is ConcentratorDevice || Parent is SourceNode || Parent is PartitionNode);
+			return Task.FromResult<bool>(Parent is ConcentratorDevice || Parent is SourceNode || Parent is PartitionNode ||
+				Parent is XmppBrokerNode);
 		}
 
 		/// <summary>
@@ -42,8 +46,22 @@ namespace Waher.Things.Xmpp
 		/// <returns>If the child is acceptable.</returns>
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
-			return Task.FromResult<bool>(false);
+			return Task.FromResult(false);
 		}
 
+		/// <summary>
+		/// Gets the XMPP Client associated with node.
+		/// </summary>
+		/// <returns>XMPP Client</returns>
+		/// <exception cref="Exception">If no XMPP Client could be found, associated with node.</exception>
+		public XmppClient GetClient()
+		{
+			if (this.Parent is XmppBrokerNode BrokerNode)
+				return BrokerNode.GetBroker().Client;
+			else if (Types.TryGetModuleParameter("XMPP", out object Obj) && Obj is XmppClient Client)
+				return Client;
+			else
+				throw new Exception("No XMPP Client associated with node.");
+		}
 	}
 }

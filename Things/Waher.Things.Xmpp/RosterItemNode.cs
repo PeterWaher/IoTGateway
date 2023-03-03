@@ -118,7 +118,7 @@ namespace Waher.Things.Xmpp
 
 			if (this.Parent is XmppBrokerNode BrokerNode)
 			{
-				XmppBroker Broker = BrokerNode.GetBroker();
+				XmppBroker Broker = await BrokerNode.GetBroker();
 				XmppClient Client = Broker.Client;
 				Namespace Namespace = await Language.GetNamespaceAsync(typeof(XmppBrokerNode).Namespace);
 

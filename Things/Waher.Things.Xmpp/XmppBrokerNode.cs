@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Networking.Sniffers;
@@ -97,7 +96,7 @@ namespace Waher.Things.Xmpp
 		public override Task<bool> AcceptsChildAsync(INode Child)
 		{
 			return Task.FromResult(Child is XmppNode || Child is SourceNode || Child is PartitionNode ||
-				Child is ConcentratorDevice || Child is RosterItemNode);
+				Child is ConcentratorDevice || Child is RosterItemNode || Child is XmppExtensionNode);
 		}
 
 		public override Task DestroyAsync()
@@ -130,7 +129,7 @@ namespace Waher.Things.Xmpp
 			return base.NodeUpdated();
 		}
 
-		internal XmppBroker GetBroker()
+		internal Task<XmppBroker> GetBroker()
 		{
 			return XmppBrokers.GetBroker(this, this.Key, this.Host, this.Port, this.Tls, this.userName, this.password,
 				this.passwordMechanism, this.trustServer, this.allowInsecureMechanisms);
@@ -143,7 +142,7 @@ namespace Waher.Things.Xmpp
 		/// </summary>
 		public void Add(ISniffer Sniffer)
 		{
-			this.GetBroker().Client?.Add(Sniffer);
+			this.GetBroker().Result?.Client?.Add(Sniffer);
 		}
 
 		/// <summary>
@@ -151,7 +150,7 @@ namespace Waher.Things.Xmpp
 		/// </summary>
 		public void AddRange(IEnumerable<ISniffer> Sniffers)
 		{
-			this.GetBroker().Client?.AddRange(Sniffers);
+			this.GetBroker().Result?.Client?.AddRange(Sniffers);
 		}
 
 		/// <summary>
@@ -159,7 +158,7 @@ namespace Waher.Things.Xmpp
 		/// </summary>
 		public bool Remove(ISniffer Sniffer)
 		{
-			return this.GetBroker().Client?.Remove(Sniffer) ?? false;
+			return this.GetBroker().Result?.Client?.Remove(Sniffer) ?? false;
 		}
 
 		/// <summary>
@@ -167,7 +166,7 @@ namespace Waher.Things.Xmpp
 		/// </summary>
 		public ISniffer[] Sniffers
 		{
-			get { return this.GetBroker().Client?.Sniffers ?? new ISniffer[0]; }
+			get { return this.GetBroker().Result?.Client?.Sniffers ?? new ISniffer[0]; }
 		}
 
 		/// <summary>
@@ -175,7 +174,7 @@ namespace Waher.Things.Xmpp
 		/// </summary>
 		public bool HasSniffers
 		{
-			get { return this.GetBroker().Client?.HasSniffers ?? false; }
+			get { return this.GetBroker().Result?.Client?.HasSniffers ?? false; }
 		}
 
 		/// <summary>
@@ -188,7 +187,7 @@ namespace Waher.Things.Xmpp
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return this.GetBroker().Client?.GetEnumerator() ?? new ISniffer[0].GetEnumerator();
+			return this.GetBroker().Result?.Client?.GetEnumerator() ?? new ISniffer[0].GetEnumerator();
 		}
 
 		#endregion
@@ -200,7 +199,7 @@ namespace Waher.Things.Xmpp
 			List<ICommand> Result = new List<ICommand>();
 
 			Result.AddRange(await base.Commands);
-			Result.Add(new ReconnectCommand(this.GetBroker().Client));
+			Result.Add(new ReconnectCommand((await this.GetBroker()).Client));
 
 			return Result;
 		}
@@ -208,7 +207,7 @@ namespace Waher.Things.Xmpp
 		public async override Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
 			LinkedList<Parameter> Result = await base.GetDisplayableParametersAsync(Language, Caller) as LinkedList<Parameter>;
-			XmppBroker Broker = this.GetBroker();
+			XmppBroker Broker = await this.GetBroker();
 
 			Result.AddLast(new StringParameter("State", await Language.GetStringAsync(typeof(XmppBrokerNode), 27, "State"),
 				Broker.Client.State.ToString() ?? string.Empty));

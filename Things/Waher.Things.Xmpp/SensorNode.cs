@@ -35,18 +35,18 @@ namespace Waher.Things.Xmpp
 		/// Starts the readout of the sensor.
 		/// </summary>
 		/// <param name="Request">Request object. All fields and errors should be reported to this interface.</param>
-		public Task StartReadout(ISensorReadout Request)
+		public async Task StartReadout(ISensorReadout Request)
 		{
 			XmppClient Client;
 
 			try
 			{
-				Client = this.GetClient();
+				Client = await this.GetClient();
 			}
 			catch (Exception ex)
 			{
 				Request.ReportErrors(true, new ThingError(this, ex.Message));
-				return Task.CompletedTask;
+				return;
 			}
 
 			if (Client.TryGetExtension(out SensorClient SensorClient))
@@ -76,13 +76,13 @@ namespace Waher.Things.Xmpp
 				if (Item is null)
 				{
 					Request.ReportErrors(true, new ThingError(this, "JID not available in roster."));
-					return Task.CompletedTask;
+					return;
 				}
 
 				if (!Item.HasLastPresence || !Item.LastPresence.IsOnline)
 				{
 					Request.ReportErrors(true, new ThingError(this, "Concentrator not online."));
-					return Task.CompletedTask;
+					return;
 				}
 
 				TaskCompletionSource<bool> Done = new TaskCompletionSource<bool>();
@@ -132,14 +132,9 @@ namespace Waher.Things.Xmpp
 
 					return Task.CompletedTask;
 				};
-
-				return Done.Task;
 			}
 			else
-			{
 				Request.ReportErrors(true, new ThingError(this, "No XMPP Sensor Client available."));
-				return Task.CompletedTask;
-			}
 		}
 	}
 }

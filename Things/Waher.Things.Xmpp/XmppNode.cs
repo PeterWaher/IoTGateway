@@ -54,10 +54,10 @@ namespace Waher.Things.Xmpp
 		/// </summary>
 		/// <returns>XMPP Client</returns>
 		/// <exception cref="Exception">If no XMPP Client could be found, associated with node.</exception>
-		public XmppClient GetClient()
+		public async Task<XmppClient> GetClient()
 		{
 			if (this.Parent is XmppBrokerNode BrokerNode)
-				return BrokerNode.GetBroker().Client;
+				return (await BrokerNode.GetBroker()).Client;
 			else if (Types.TryGetModuleParameter("XMPP", out object Obj) && Obj is XmppClient Client)
 				return Client;
 			else

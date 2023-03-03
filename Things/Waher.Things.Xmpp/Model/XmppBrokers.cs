@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Security;
 
 namespace Waher.Things.Xmpp.Model
@@ -34,8 +35,8 @@ namespace Waher.Things.Xmpp.Model
 			return Hashes.ComputeSHA1HashString(Encoding.UTF8.GetBytes(sb.ToString()));
 		}
 
-		public static XmppBroker GetBroker(XmppBrokerNode Node, string Key, string Host, int Port, bool Tls, string UserName, 
-			string Password, string PasswordMechanism, bool TrustServer, bool AllowInsecureMechanisms)
+		public static async Task<XmppBroker> GetBroker(XmppBrokerNode Node, string Key, string Host, int Port, bool Tls, 
+			string UserName, string Password, string PasswordMechanism, bool TrustServer, bool AllowInsecureMechanisms)
 		{
 			XmppBroker Broker;
 
@@ -45,7 +46,7 @@ namespace Waher.Things.Xmpp.Model
 					return Broker;
 			}
 
-			Broker = new XmppBroker(Node, Host, Port, Tls, UserName, Password, PasswordMechanism, TrustServer, AllowInsecureMechanisms);
+			Broker = await XmppBroker.Create(Node, Host, Port, Tls, UserName, Password, PasswordMechanism, TrustServer, AllowInsecureMechanisms);
 
 			lock (brokers)
 			{

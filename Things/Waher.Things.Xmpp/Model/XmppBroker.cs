@@ -3,7 +3,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.XMPP;
-using Waher.Script.Functions.Strings;
 
 namespace Waher.Things.Xmpp.Model
 {
@@ -20,7 +19,7 @@ namespace Waher.Things.Xmpp.Model
 		private readonly bool trustServer = false;
 		private readonly bool allowInsecureMechanisms = false;
 
-		public XmppBroker(XmppBrokerNode Node, string Host, int Port, bool Tls, string UserName, string Password,
+		private XmppBroker(XmppBrokerNode Node, string Host, int Port, bool Tls, string UserName, string Password,
 			string PasswordMechanism, bool TrustServer, bool AllowInsecureMechanisms)
 		{
 			this.node = Node;
@@ -32,13 +31,21 @@ namespace Waher.Things.Xmpp.Model
 			this.passwordMechanism = PasswordMechanism;
 			this.trustServer = TrustServer;
 			this.allowInsecureMechanisms = AllowInsecureMechanisms;
+		}
 
-			this.Open();
+		public static async Task<XmppBroker> Create(XmppBrokerNode Node, string Host, int Port, bool Tls, string UserName, string Password,
+			string PasswordMechanism, bool TrustServer, bool AllowInsecureMechanisms)
+		{
+			XmppBroker Result = new XmppBroker(Node, Host, Port, Tls, UserName, Password, PasswordMechanism, TrustServer, AllowInsecureMechanisms);
+
+			await Result.Open();
+
+			return Result;
 		}
 
 		internal XmppClient Client => this.xmppClient;
 
-		private void Open()
+		private async Task Open()
 		{
 			if (string.IsNullOrEmpty(this.passwordMechanism))
 			{
@@ -68,13 +75,25 @@ namespace Waher.Things.Xmpp.Model
 			this.xmppClient.OnRosterItemRemoved += this.XmppClient_OnRosterItemRemoved;
 			this.xmppClient.OnRosterItemUpdated += this.XmppClient_OnRosterItemUpdated;
 
+			foreach (INode Node in await this.node.ChildNodes)
+			{
+				if (Node is XmppExtensionNode Extension)
+					await Extension.RegisterExtension(this.xmppClient);
+			}
+
 			this.xmppClient.Connect();
 		}
 
-		private void Close()
+		private async Task Close()
 		{
 			if (!(this.xmppClient is null))
 			{
+				foreach (INode Node in await this.node.ChildNodes)
+				{
+					if (Node is XmppExtensionNode Extension)
+						await Extension.UnregisterExtension(this.xmppClient);
+				}
+
 				this.xmppClient.OnStateChanged -= this.XmppClient_OnStateChanged;
 				this.xmppClient.OnPresence -= this.XmppClient_OnPresence;
 				this.xmppClient.OnPresenceSubscribe -= this.XmppClient_OnPresenceSubscribe;
@@ -92,7 +111,7 @@ namespace Waher.Things.Xmpp.Model
 
 		public void Dispose()
 		{
-			this.Close();
+			Task.Run(() => this.Close());
 		}
 
 		private async Task XmppClient_OnStateChanged(object Sender, XmppState NewState)

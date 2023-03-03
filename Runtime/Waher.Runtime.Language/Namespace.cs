@@ -182,7 +182,7 @@ namespace Waher.Runtime.Language
 					Level = Level
 				};
 
-				lock (synchObject)
+				lock (this.synchObject)
 				{
 					this.stringsById[Id] = Result;
 				}

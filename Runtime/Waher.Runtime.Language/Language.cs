@@ -179,9 +179,9 @@ namespace Waher.Runtime.Language
 					Name = Name
 				};
 
-				lock (synchObject)
+				lock (this.synchObject)
 				{
-					this.namespacesByName[Code] = Result;
+					this.namespacesByName[this.code] = Result;
 				}
 
 				await Database.Insert(Result);
@@ -211,9 +211,8 @@ namespace Waher.Runtime.Language
 		/// <returns>Localized string.</returns>
 		public async Task<string> GetStringAsync(Type Type, string Id, string Default)
 		{
-			Namespace Namespace = await this.GetNamespaceAsync(Type.Namespace);
-			if (Namespace is null)
-				Namespace = await this.CreateNamespaceAsync(Type.Namespace);
+			Namespace Namespace = await this.GetNamespaceAsync(Type.Namespace)
+				?? await this.CreateNamespaceAsync(Type.Namespace);
 
 			return await Namespace.GetStringAsync(Id, Default);
 		}

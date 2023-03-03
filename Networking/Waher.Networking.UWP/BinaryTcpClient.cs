@@ -639,7 +639,7 @@ namespace Waher.Networking
 			if (this.sniffBinary && this.HasSniffers)
 				this.ReceiveBinary(ToArray(Buffer, Offset, Count));
 
-			return this.OnReceived?.Invoke(this, Buffer, Offset, Count) ?? Task.FromResult<bool>(true);
+			return this.OnReceived?.Invoke(this, Buffer, Offset, Count) ?? Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -995,7 +995,7 @@ namespace Waher.Networking
 			lock (this.synchObj)
 			{
 				if (!this.connected || !this.sending)
-					return Task.FromResult<bool>(true);
+					return Task.FromResult(true);
 
 				if (this.idleQueue is null)
 					this.idleQueue = new LinkedList<TaskCompletionSource<bool>>();

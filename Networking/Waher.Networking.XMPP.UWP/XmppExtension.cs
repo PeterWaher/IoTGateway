@@ -22,7 +22,7 @@ namespace Waher.Networking.XMPP
 		{
 			this.client = Client;
 			this.client.RegisterExtension(this);
-			this.client.OnDisposed += Client_OnDisposed;
+			this.client.OnDisposed += this.Client_OnDisposed;
 		}
 
 		private void Client_OnDisposed(object sender, EventArgs e)

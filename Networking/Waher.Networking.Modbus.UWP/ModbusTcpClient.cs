@@ -244,7 +244,7 @@ namespace Waher.Networking.Modbus
 				}
 			}
 
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 
 		private void ProcessIncomingPacket()

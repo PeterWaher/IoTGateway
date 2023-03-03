@@ -252,7 +252,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			if (this.pos > 0)
 				return this.WriteChunk(true);
 			else
-				return Task.FromResult<bool>(true);
+				return Task.FromResult(true);
 		}
 
 		/// <summary>

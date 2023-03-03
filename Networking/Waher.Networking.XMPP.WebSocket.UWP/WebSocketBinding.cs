@@ -558,7 +558,7 @@ namespace Waher.Networking.XMPP.WebSocket
 		private Task<bool> FragmentReceived(string Xml)
 		{
 			if (this.terminated)
-				return Task.FromResult<bool>(false);
+				return Task.FromResult(false);
 
 			if (Xml.StartsWith("<close"))
 			{
@@ -573,7 +573,7 @@ namespace Waher.Networking.XMPP.WebSocket
 					if (!this.closeSent)
 						this.CloseSession();
 
-					return Task.FromResult<bool>(false);
+					return Task.FromResult(false);
 				}
 			}
 

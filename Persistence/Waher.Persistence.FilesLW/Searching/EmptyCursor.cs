@@ -94,7 +94,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		public Task<bool> MoveNextAsyncLocked()
 		{
-			return Task.FromResult<bool>(false);
+			return Task.FromResult(false);
 		}
 
 		/// <summary>
@@ -105,7 +105,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		public Task<bool> MovePreviousAsyncLocked()
 		{
-			return Task.FromResult<bool>(false);
+			return Task.FromResult(false);
 		}
 
 		public IEnumerator<T> GetEnumerator()

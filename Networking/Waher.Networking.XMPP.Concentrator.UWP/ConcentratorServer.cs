@@ -81,18 +81,18 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.provisioningClient = ProvisioningClient;
 
 			this.sensorServer = new SensorServer(this.client, ProvisioningClient, true);
-			this.sensorServer.OnGetNode += OnGetNode;
-			this.sensorServer.OnExecuteReadoutRequest += SensorServer_OnExecuteReadoutRequest;
+			this.sensorServer.OnGetNode += this.OnGetNode;
+			this.sensorServer.OnExecuteReadoutRequest += this.SensorServer_OnExecuteReadoutRequest;
 
 			this.controlServer = new ControlServer(this.client, ProvisioningClient);
-			this.controlServer.OnGetNode += OnGetNode;
-			this.controlServer.OnGetControlParameters += ControlServer_OnGetControlParameters;
+			this.controlServer.OnGetNode += this.OnGetNode;
+			this.controlServer.OnGetControlParameters += this.ControlServer_OnGetControlParameters;
 
 			if (!(this.thingRegistryClient is null))
 			{
-				this.thingRegistryClient.Claimed += ThingRegistryClient_Claimed;
-				this.thingRegistryClient.Disowned += ThingRegistryClient_Disowned;
-				this.thingRegistryClient.Removed += ThingRegistryClient_Removed;
+				this.thingRegistryClient.Claimed += this.ThingRegistryClient_Claimed;
+				this.thingRegistryClient.Disowned += this.ThingRegistryClient_Disowned;
+				this.thingRegistryClient.Removed += this.ThingRegistryClient_Removed;
 			}
 
 			foreach (IDataSource DataSource in DataSources)
@@ -506,9 +506,8 @@ namespace Waher.Networking.XMPP.Concentrator
 			if (string.IsNullOrEmpty(LanguageCode))
 				LanguageCode = DefaultLanguageCode;
 
-			Language Language = await Translator.GetLanguageAsync(LanguageCode);
-			if (Language is null)
-				Language = await Translator.GetDefaultLanguageAsync();
+			Language Language = await Translator.GetLanguageAsync(LanguageCode)
+				?? await Translator.GetDefaultLanguageAsync();
 
 			return Language;
 		}
@@ -826,7 +825,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Xml.Append(NamespaceConcentrator);
 				Xml.Append("'");
 
-				await ExportAttributes(Xml, Node, Language);
+				await this.ExportAttributes(Xml, Node, Language);
 
 				if (Parameters || Messages)
 				{
@@ -911,7 +910,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 
 				Xml.Append("<nodeInfo");
-				await ExportAttributes(Xml, Node, Language);
+				await this.ExportAttributes(Xml, Node, Language);
 
 				if (Parameters || Messages)
 				{
@@ -991,7 +990,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					if ((OnlyIfDerivedFrom is null || this.IsAssignableFrom(OnlyIfDerivedFrom, Node)) && await Node.CanViewAsync(Caller))
 					{
 						Xml.Append("<nodeInfo");
-						await ExportAttributes(Xml, Node, Language);
+						await this.ExportAttributes(Xml, Node, Language);
 
 						if (Parameters || Messages)
 						{
@@ -1130,7 +1129,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						continue;
 
 					Xml.Append("<nodeInfo");
-					await ExportAttributes(Xml, Node, Language);
+					await this.ExportAttributes(Xml, Node, Language);
 
 					if (Parameters || Messages)
 					{
@@ -1187,7 +1186,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							continue;
 
 						Xml.Append("<nodeInfo");
-						await ExportAttributes(Xml, ChildNode, Language);
+						await this.ExportAttributes(Xml, ChildNode, Language);
 
 						if (Parameters || Messages)
 						{
@@ -1243,7 +1242,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						break;
 
 					Xml.Append("<nodeInfo");
-					await ExportAttributes(Xml, Node, Language);
+					await this.ExportAttributes(Xml, Node, Language);
 
 					if (Parameters || Messages)
 					{
@@ -1639,7 +1638,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						Xml.Append("<nodeInfo xmlns='");
 						Xml.Append(NamespaceConcentrator);
 						Xml.Append("'");
-						await ExportAttributes(Xml, Node, Language);
+						await this.ExportAttributes(Xml, Node, Language);
 						Xml.Append(">");
 						await this.ExportParametersAndMessages(Xml, Node, true, true, Language, Caller);
 						Xml.Append("</nodeInfo>");
@@ -2159,7 +2158,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Xml.Append("<nodeInfo xmlns='");
 				Xml.Append(NamespaceConcentrator);
 				Xml.Append("'");
-				await ExportAttributes(Xml, PresumptiveChild, Language);
+				await this.ExportAttributes(Xml, PresumptiveChild, Language);
 				Xml.Append(">");
 				await this.ExportParametersAndMessages(Xml, PresumptiveChild, true, true, Language, Caller);
 				Xml.Append("</nodeInfo>");
@@ -2376,7 +2375,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				Result.Add(new MetaDataStringTag("KEY", Key));
 
 				MetaDataTag[] Tags = Result.ToArray();
-				string IoTDisco = ThingRegistryClient.EncodeAsIoTDiscoURI(Tags);
+				string IoTDisco = this.ThingRegistryClient.EncodeAsIoTDiscoURI(Tags);
 
 				await RuntimeSettings.SetAsync("IoTDisco." + KeyId, IoTDisco);
 
@@ -2769,18 +2768,18 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					e.IqResult(string.Empty);
 
-					Query.OnAborted += Query_OnAborted;
-					Query.OnBeginSection += Query_OnBeginSection;
-					Query.OnDone += Query_OnDone;
-					Query.OnEndSection += Query_OnEndSection;
-					Query.OnMessage += Query_OnMessage;
-					Query.OnNewObject += Query_OnNewObject;
-					Query.OnNewRecords += Query_OnNewRecords;
-					Query.OnNewTable += Query_OnNewTable;
-					Query.OnStarted += Query_OnStarted;
-					Query.OnStatus += Query_OnStatus;
-					Query.OnTableDone += Query_OnTableDone;
-					Query.OnTitle += Query_OnTitle;
+					Query.OnAborted += this.Query_OnAborted;
+					Query.OnBeginSection += this.Query_OnBeginSection;
+					Query.OnDone += this.Query_OnDone;
+					Query.OnEndSection += this.Query_OnEndSection;
+					Query.OnMessage += this.Query_OnMessage;
+					Query.OnNewObject += this.Query_OnNewObject;
+					Query.OnNewRecords += this.Query_OnNewRecords;
+					Query.OnNewTable += this.Query_OnNewTable;
+					Query.OnStarted += this.Query_OnStarted;
+					Query.OnStatus += this.Query_OnStatus;
+					Query.OnTableDone += this.Query_OnTableDone;
+					Query.OnTitle += this.Query_OnTitle;
 
 					try
 					{
@@ -3359,9 +3358,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (!Node.HasCommands)
 				{
-					if (!(CommonCommands is null))
-						CommonCommands.Clear();
-
+					CommonCommands?.Clear();
 					break;
 				}
 
@@ -3779,18 +3776,18 @@ namespace Waher.Networking.XMPP.Concentrator
 				return;
 			}
 
-			Query.OnAborted += Query_OnAborted;
-			Query.OnBeginSection += Query_OnBeginSection;
-			Query.OnDone += Query_OnDone;
-			Query.OnEndSection += Query_OnEndSection;
-			Query.OnMessage += Query_OnMessage;
-			Query.OnNewObject += Query_OnNewObject;
-			Query.OnNewRecords += Query_OnNewRecords;
-			Query.OnNewTable += Query_OnNewTable;
-			Query.OnStarted += Query_OnStarted;
-			Query.OnStatus += Query_OnStatus;
-			Query.OnTableDone += Query_OnTableDone;
-			Query.OnTitle += Query_OnTitle;
+			Query.OnAborted += this.Query_OnAborted;
+			Query.OnBeginSection += this.Query_OnBeginSection;
+			Query.OnDone += this.Query_OnDone;
+			Query.OnEndSection += this.Query_OnEndSection;
+			Query.OnMessage += this.Query_OnMessage;
+			Query.OnNewObject += this.Query_OnNewObject;
+			Query.OnNewRecords += this.Query_OnNewRecords;
+			Query.OnNewTable += this.Query_OnNewTable;
+			Query.OnStarted += this.Query_OnStarted;
+			Query.OnStatus += this.Query_OnStatus;
+			Query.OnTableDone += this.Query_OnTableDone;
+			Query.OnTitle += this.Query_OnTitle;
 
 			StringBuilder Xml = new StringBuilder();
 			string ErrorMessage;

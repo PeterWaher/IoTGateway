@@ -33,7 +33,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			this.task.TrySetResult(true);
 			this.timeoutTimer?.Dispose();
 			this.timeoutTimer = null;
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -89,7 +89,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		public override Task<bool> EncodeAsync(byte[] Data, int Offset, int NrBytes)
 		{
 			this.ms.Write(Data, Offset, NrBytes);
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 
 		/// <summary>
@@ -98,7 +98,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		public override Task<bool> FlushAsync()
 		{
 			this.ms.Flush();
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 	}
 }

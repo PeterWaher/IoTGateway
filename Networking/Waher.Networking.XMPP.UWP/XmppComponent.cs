@@ -213,7 +213,7 @@ namespace Waher.Networking.XMPP
 		private Task<bool> OnSent(object _, string Text)
 		{
 			this.TransmitText(Text);
-			return Task.FromResult<bool>(true);
+			return Task.FromResult(true);
 		}
 
 		private Task<bool> OnReceived(object _, string Text)

@@ -236,6 +236,10 @@ namespace Waher.Content.Multipart
 								case "ATTACHMENT":
 									EmbeddedContent.Disposition = ContentDisposition.Attachment;
 									break;
+
+								case "FORM-DATA":
+									EmbeddedContent.Disposition = ContentDisposition.FormData;
+									break;
 							}
 							break;
 
@@ -277,8 +281,7 @@ namespace Waher.Content.Multipart
 						Form[EmbeddedContent.Name + "_FileName"] = EmbeddedContent.FileName;
 				}
 
-				if (!(List is null))
-					List.Add(EmbeddedContent);
+				List?.Add(EmbeddedContent);
 			}
 		}
 
@@ -438,6 +441,18 @@ namespace Waher.Content.Multipart
 		}
 
 		/// <summary>
+		/// Encodes multi-part form data
+		/// </summary>
+		/// <param name="Content">Form fields.</param>
+		/// <returns>Encoded multi-part form data, together with Content-Type.</returns>
+		public static async Task<KeyValuePair<byte[], string>> Encode(IEnumerable<EmbeddedContent> Content)
+		{
+			string Boundary = Guid.NewGuid().ToString();
+			string ContentType = FormDataDecoder.ContentType + "; boundary=\"" + Boundary + "\"";
+			return new KeyValuePair<byte[], string>(await Encode(Content, Boundary), ContentType);
+		}
+
+		/// <summary>
 		/// Encodes multi-part content
 		/// </summary>
 		/// <param name="Content">Multi-part content.</param>
@@ -448,6 +463,7 @@ namespace Waher.Content.Multipart
 			using (MemoryStream ms = new MemoryStream())
 			{
 				StringBuilder Header = new StringBuilder();
+				byte[] HeaderBin;
 
 				foreach (EmbeddedContent Alternative in Content)
 				{
@@ -466,7 +482,7 @@ namespace Waher.Content.Multipart
 					Header.Append("\r\nContent-Type: ");
 					Header.Append(Alternative.ContentType);
 
-					if (!string.IsNullOrEmpty(Alternative.Name))
+					if (!string.IsNullOrEmpty(Alternative.Name) && Alternative.Disposition != ContentDisposition.FormData)
 					{
 						Header.Append("; name=\"");
 						Header.Append(Alternative.Name.Replace("\"", "\\\""));
@@ -480,6 +496,17 @@ namespace Waher.Content.Multipart
 
 						switch (Alternative.Disposition)
 						{
+							case ContentDisposition.FormData:
+								Header.Append("form-data");
+
+								if (!string.IsNullOrEmpty(Alternative.Name))
+								{
+									Header.Append("; name=\"");
+									Header.Append(Alternative.Name.Replace("\"", "\\\""));
+									Header.Append("\"");
+								}
+								break;
+
 							case ContentDisposition.Inline:
 								Header.Append("inline");
 								break;
@@ -512,11 +539,19 @@ namespace Waher.Content.Multipart
 
 					Header.Append("\r\n\r\n");
 
-					byte[] HeaderBin = Encoding.ASCII.GetBytes(Header.ToString());
-
+					HeaderBin = Encoding.ASCII.GetBytes(Header.ToString());
 					ms.Write(HeaderBin, 0, HeaderBin.Length);
 					ms.Write(Alternative.Raw, 0, Alternative.Raw.Length);
 				}
+
+
+				Header.Clear();
+				Header.Append("\r\n--");
+				Header.Append(Boundary);
+				Header.Append("--");
+
+				HeaderBin = Encoding.ASCII.GetBytes(Header.ToString());
+				ms.Write(HeaderBin, 0, HeaderBin.Length);
 
 				return ms.ToArray();
 			}

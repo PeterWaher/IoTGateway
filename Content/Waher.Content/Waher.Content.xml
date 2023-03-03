@@ -2954,6 +2954,13 @@
             <param name="FileExtension">File extension.</param>
             <returns>If the Content-Type was recognized.</returns>
         </member>
+        <member name="M:Waher.Content.Multipart.FormDataDecoder.Encode(System.Collections.Generic.IEnumerable{Waher.Content.Multipart.EmbeddedContent})">
+            <summary>
+            Encodes multi-part form data
+            </summary>
+            <param name="Content">Form fields.</param>
+            <returns>Encoded multi-part form data, together with Content-Type.</returns>
+        </member>
         <member name="M:Waher.Content.Multipart.FormDataDecoder.Encode(System.Collections.Generic.IEnumerable{Waher.Content.Multipart.EmbeddedContent},System.String)">
             <summary>
             Encodes multi-part content

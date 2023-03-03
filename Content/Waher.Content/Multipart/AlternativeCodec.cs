@@ -126,7 +126,7 @@ namespace Waher.Content.Multipart
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
 			if (Object is ContentAlternatives &&
-				InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
+				InternetContent.IsAccepted(this.ContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Ok;
 				return true;
@@ -149,7 +149,7 @@ namespace Waher.Content.Multipart
 		public async Task<KeyValuePair<byte[], string>> EncodeAsync(object Object, Encoding Encoding, params string[] AcceptedContentTypes)
 		{
 			if (Object is ContentAlternatives Alternatives &&
-				InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
+				InternetContent.IsAccepted(this.ContentTypes, AcceptedContentTypes))
 			{
 				string Boundary = Guid.NewGuid().ToString();
 				string ContentType = AlternativeCodec.ContentType + "; boundary=\"" + Boundary + "\"";

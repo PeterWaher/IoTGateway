@@ -21,6 +21,11 @@ namespace Waher.Content.Multipart
 		Attachment,
 
 		/// <summary>
+		/// Content is available as a field in a form
+		/// </summary>
+		FormData,
+
+		/// <summary>
 		/// Unknown or unspecified disposition
 		/// </summary>
 		Unknown

@@ -188,9 +188,8 @@ namespace Waher.Runtime.Language
 		public static async Task<Language> GetDefaultLanguageAsync()
 		{
 			string Code = DefaultLanguageCode;
-			Language Result = await GetLanguageAsync(Code);
-			if (Result is null)
-				Result = await CreateLanguageAsync(Code, Code == "en" ? "English" : Code, null, 0, 0);
+			Language Result = await GetLanguageAsync(Code)
+				?? await CreateLanguageAsync(Code, Code == "en" ? "English" : Code, null, 0, 0);
 
 			return Result;
 		}

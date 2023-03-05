@@ -77,8 +77,11 @@ namespace Waher.Things.Xmpp.Model
 
 			foreach (INode Node in await this.node.ChildNodes)
 			{
-				if (Node is XmppExtensionNode Extension)
+				if (Node is XmppExtensionNode Extension && 
+					!Extension.IsRegisteredExtension(this.xmppClient))
+				{
 					await Extension.RegisterExtension(this.xmppClient);
+				}
 			}
 
 			this.xmppClient.Connect();
@@ -90,8 +93,11 @@ namespace Waher.Things.Xmpp.Model
 			{
 				foreach (INode Node in await this.node.ChildNodes)
 				{
-					if (Node is XmppExtensionNode Extension)
+					if (Node is XmppExtensionNode Extension &&
+						Extension.IsRegisteredExtension(this.xmppClient))
+					{
 						await Extension.UnregisterExtension(this.xmppClient);
+					}
 				}
 
 				this.xmppClient.OnStateChanged -= this.XmppClient_OnStateChanged;

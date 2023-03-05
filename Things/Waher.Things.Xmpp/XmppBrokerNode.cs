@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Waher.Networking.Sniffers;
+using Waher.Networking.XMPP;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Runtime.Language;
@@ -263,6 +265,35 @@ namespace Waher.Things.Xmpp
 				return null;
 		}
 
+		public override async Task AddAsync(INode Child)
+		{
+			await base.AddAsync(Child);
+
+			if (Child is RosterItemNode Item)
+			{
+				lock (this.roster)
+				{
+					this.roster[Item.BareJID] = Item;
+				}
+			}
+
+			if (Child is XmppExtensionNode Extension)
+			{
+				try
+				{
+					XmppBroker Broker = await this.GetBroker();
+					XmppClient Client = Broker.Client;
+
+					if (!Extension.IsRegisteredExtension(Client))
+						await Extension.RegisterExtension(Client);
+				}
+				catch (Exception ex)
+				{
+					await this.LogErrorAsync(ex.Message);
+				}
+			}
+		}
+
 		public override async Task<bool> RemoveAsync(INode Child)
 		{
 			if (!await base.RemoveAsync(Child))
@@ -276,20 +307,23 @@ namespace Waher.Things.Xmpp
 				}
 			}
 
-			return true;
-		}
-
-		public override async Task AddAsync(INode Child)
-		{
-			await base.AddAsync(Child);
-
-			if (Child is RosterItemNode Item)
+			if (Child is XmppExtensionNode Extension)
 			{
-				lock (this.roster)
+				try
 				{
-					this.roster[Item.BareJID] = Item;
+					XmppBroker Broker = await this.GetBroker();
+					XmppClient Client = Broker.Client;
+
+					if (Extension.IsRegisteredExtension(Client))
+						await Extension.UnregisterExtension(Client);
+				}
+				catch (Exception ex)
+				{
+					await this.LogErrorAsync(ex.Message);
 				}
 			}
+
+			return true;
 		}
 
 		#endregion

@@ -49,5 +49,12 @@ namespace Waher.Things.Xmpp
 		/// <param name="Client">XMPP Client</param>
 		public abstract Task UnregisterExtension(XmppClient Client);
 
+		/// <summary>
+		/// Checks if the extension has been registered on an XMPP Client.
+		/// </summary>
+		/// <param name="Client">XMPP Client.</param>
+		/// <returns>If the extension has been registered.</returns>
+		public abstract bool IsRegisteredExtension(XmppClient Client);
+
 	}
 }

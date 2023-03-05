@@ -2788,6 +2788,11 @@
             Content is available as an attachment
             </summary>
         </member>
+        <member name="F:Waher.Content.Multipart.ContentDisposition.FormData">
+            <summary>
+            Content is available as a field in a form
+            </summary>
+        </member>
         <member name="F:Waher.Content.Multipart.ContentDisposition.Unknown">
             <summary>
             Unknown or unspecified disposition

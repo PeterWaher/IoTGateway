@@ -393,7 +393,8 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public async Task ClearAsync()
 		{
-			await this.dictionaryFile.ClearAsync();
+			if (!(this.dictionaryFile is null))
+				await this.dictionaryFile.ClearAsync();
 
 			if (!(this.inMemory is null))
 			{

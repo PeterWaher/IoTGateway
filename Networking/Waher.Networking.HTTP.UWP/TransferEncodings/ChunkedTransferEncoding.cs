@@ -131,12 +131,11 @@ namespace Waher.Networking.HTTP.TransferEncodings
 					case 4:     // Data
 						if (i + this.chunkSize <= c)
 						{
-							if (!(this.output is null) && !await this.output.SendAsync(Data, i, this.chunkSize))
+							if (this.output is null || !await this.output.SendAsync(Data, i, this.chunkSize))
 								this.transferError = true;
 
-							if (!(this.clientConnection is null))
-								this.clientConnection.Server.DataTransmitted(this.chunkSize);
-							
+							this.clientConnection?.Server.DataTransmitted(this.chunkSize);
+
 							i += this.chunkSize;
 							this.chunkSize = 0;
 							this.state++;
@@ -144,12 +143,11 @@ namespace Waher.Networking.HTTP.TransferEncodings
 						else
 						{
 							j = c - i;
-							if (!(this.output is null) && !await this.output.SendAsync(Data, i, j))
+							if (this.output is null || !await this.output.SendAsync(Data, i, j))
 								this.transferError = true;
 
-							if (!(this.clientConnection is null))
-								this.clientConnection.Server.DataTransmitted(j);
-							
+							this.clientConnection?.Server.DataTransmitted(j);
+
 							this.chunkSize -= j;
 							i = c;
 						}
@@ -207,35 +205,35 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 		private async Task<bool> WriteChunk(bool Flush)
 		{
-			if (!(this.output is null))
+			if (this.output is null)
+				return false;
+
+			string s = this.pos.ToString("X") + "\r\n";
+			byte[] ChunkHeader = Encoding.ASCII.GetBytes(s);
+			int Len = ChunkHeader.Length;
+			byte[] Chunk = new byte[Len + this.pos + 2];
+
+			Array.Copy(ChunkHeader, 0, Chunk, 0, Len);
+			Array.Copy(this.chunk, 0, Chunk, Len, this.pos);
+			Len += this.pos;
+			Chunk[Len] = (byte)'\r';
+			Chunk[Len + 1] = (byte)'\n';
+
+			await this.output.SendAsync(Chunk, 0, Len + 2);
+
+			if (Flush)
+				await this.output.FlushAsync();
+
+			if (!(this.clientConnection is null))
 			{
-				string s = this.pos.ToString("X") + "\r\n";
-				byte[] ChunkHeader = Encoding.ASCII.GetBytes(s);
-				int Len = ChunkHeader.Length;
-				byte[] Chunk = new byte[Len + this.pos + 2];
+				this.clientConnection.Server.DataTransmitted(Len + 2);
 
-				Array.Copy(ChunkHeader, 0, Chunk, 0, Len);
-				Array.Copy(this.chunk, 0, Chunk, Len, this.pos);
-				Len += this.pos;
-				Chunk[Len] = (byte)'\r';
-				Chunk[Len + 1] = (byte)'\n';
-
-				await this.output?.SendAsync(Chunk, 0, Len + 2);
-
-				if (Flush)
-					await this.output.FlushAsync();
-
-				if (!(this.clientConnection is null))
+				if (this.clientConnection.HasSniffers)
 				{
-					this.clientConnection.Server.DataTransmitted(Len + 2);
-
-					if (this.clientConnection.HasSniffers)
-					{
-						if (this.txText)
-							this.clientConnection.TransmitText(this.textEncoding.GetString(this.chunk, 0, this.pos));
-						else
-							this.clientConnection.TransmitBinary(Chunk);
-					}
+					if (this.txText)
+						this.clientConnection.TransmitText(this.textEncoding.GetString(this.chunk, 0, this.pos));
+					else
+						this.clientConnection.TransmitBinary(Chunk);
 				}
 			}
 

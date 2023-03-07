@@ -44,7 +44,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		public override async Task<ulong> DecodeAsync(byte[] Data, int Offset, int NrRead)
 		{
 			ulong NrAccepted;
-			if (!(this.output is null) && !await this.output.SendAsync(Data, Offset, NrRead))
+			if (this.output is null || !await this.output.SendAsync(Data, Offset, NrRead))
 				this.transferError = true;
 
 			if (NrRead >= this.bytesLeft)
@@ -103,7 +103,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 			if (this.bytesLeft <= NrBytes)
 			{
-				if (!(this.output is null) && !await this.output.SendAsync(Data, Offset, (int)this.bytesLeft))
+				if (this.output is null || !await this.output.SendAsync(Data, Offset, (int)this.bytesLeft))
 					return false;
 
 				NrBytes -= (int)this.bytesLeft;
@@ -114,7 +114,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			}
 			else
 			{
-				if (!(this.output is null) && !await this.output.SendAsync(Data, Offset, NrBytes))
+				if (this.output is null || !await this.output.SendAsync(Data, Offset, NrBytes))
 					return false;
 
 				this.bytesLeft -= NrBytes;
@@ -128,7 +128,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// </summary>
 		public override Task<bool> FlushAsync()
 		{
-			return this.output.FlushAsync();
+			return this.output?.FlushAsync() ?? Task.FromResult(false);
 		}
 
 		/// <summary>
@@ -136,7 +136,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// </summary>
 		public override Task<bool> ContentSentAsync()
 		{
-			return this.output.FlushAsync();
+			return this.output?.FlushAsync() ?? Task.FromResult(false);
 		}
 	}
 }

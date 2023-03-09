@@ -25,12 +25,16 @@ namespace Waher.Content
 		private static string[] canDecodeFileExtensions = null;
 		private static string[] canGetUriSchemes = null;
 		private static string[] canPostToUriSchemes = null;
+		private static string[] canPutToUriSchemes = null;
+		private static string[] canDeleteToUriSchemes = null;
 		private static string[] canHeadUriSchemes = null;
 		private static IContentEncoder[] encoders = null;
 		private static IContentDecoder[] decoders = null;
 		private static IContentConverter[] converters = null;
 		private static IContentGetter[] getters = null;
 		private static IContentPoster[] posters = null;
+		private static IContentPutter[] putters = null;
+		private static IContentDeleter[] deleters = null;
 		private static IContentHeader[] headers = null;
 		private readonly static Dictionary<string, KeyValuePair<Grade, IContentDecoder>> decoderByContentType =
 			new Dictionary<string, KeyValuePair<Grade, IContentDecoder>>(StringComparer.CurrentCultureIgnoreCase);
@@ -42,6 +46,8 @@ namespace Waher.Content
 		private readonly static Dictionary<string, List<IContentConverter>> convertersByFrom = new Dictionary<string, List<IContentConverter>>();
 		private readonly static Dictionary<string, IContentGetter[]> gettersByScheme = new Dictionary<string, IContentGetter[]>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, IContentPoster[]> postersByScheme = new Dictionary<string, IContentPoster[]>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly static Dictionary<string, IContentPutter[]> puttersByScheme = new Dictionary<string, IContentPutter[]>(StringComparer.CurrentCultureIgnoreCase);
+		private readonly static Dictionary<string, IContentDeleter[]> deletersByScheme = new Dictionary<string, IContentDeleter[]>(StringComparer.CurrentCultureIgnoreCase);
 		private readonly static Dictionary<string, IContentHeader[]> headersByScheme = new Dictionary<string, IContentHeader[]>(StringComparer.CurrentCultureIgnoreCase);
 
 		static InternetContent()
@@ -60,6 +66,10 @@ namespace Waher.Content
 			decoders = null;
 			converters = null;
 			getters = null;
+			headers = null;
+			posters = null;
+			putters = null;
+			deleters = null;
 
 			lock (decoderByContentType)
 			{
@@ -90,6 +100,26 @@ namespace Waher.Content
 			lock (gettersByScheme)
 			{
 				gettersByScheme.Clear();
+			}
+
+			lock (headersByScheme)
+			{
+				headersByScheme.Clear();
+			}
+
+			lock (postersByScheme)
+			{
+				postersByScheme.Clear();
+			}
+
+			lock (puttersByScheme)
+			{
+				puttersByScheme.Clear();
+			}
+
+			lock (deletersByScheme)
+			{
+				deletersByScheme.Clear();
 			}
 		}
 
@@ -1426,6 +1456,446 @@ namespace Waher.Content
 				throw new ArgumentException("URI Scheme not recognized (POST): " + Uri.Scheme, nameof(Uri));
 
 			return Poster.PostAsync(Uri, EncodedData, ContentType, Certificate, TimeoutMs, Headers);
+		}
+
+		#endregion
+
+		#region Putting to resources
+
+		/// <summary>
+		/// Internet URI Schemes that can be putted to.
+		/// </summary>
+		public static string[] CanPutToUriSchemes
+		{
+			get
+			{
+				if (canPutToUriSchemes is null)
+				{
+					SortedDictionary<string, bool> UriSchemes = new SortedDictionary<string, bool>();
+
+					foreach (IContentPutter Putter in Putters)
+					{
+						foreach (string Scheme in Putter.UriSchemes)
+							UriSchemes[Scheme] = true;
+					}
+
+					string[] Schemes = new string[UriSchemes.Count];
+					UriSchemes.Keys.CopyTo(Schemes, 0);
+
+					canPutToUriSchemes = Schemes;
+				}
+
+				return canPutToUriSchemes;
+			}
+		}
+
+		/// <summary>
+		/// Available Internet Content Putters.
+		/// </summary>
+		public static IContentPutter[] Putters
+		{
+			get
+			{
+				if (putters is null)
+					BuildPutters();
+
+				return putters;
+			}
+		}
+
+		private static void BuildPutters()
+		{
+			List<IContentPutter> Putters = new List<IContentPutter>();
+			Type[] PutterTypes = Types.GetTypesImplementingInterface(typeof(IContentPutter));
+			Dictionary<string, List<IContentPutter>> ByScheme = new Dictionary<string, List<IContentPutter>>();
+			IContentPutter Putter;
+
+			foreach (Type T in PutterTypes)
+			{
+				ConstructorInfo CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
+					continue;
+
+				try
+				{
+					Putter = (IContentPutter)CI.Invoke(Types.NoParameters);
+				}
+				catch (Exception)
+				{
+					continue;
+				}
+
+				Putters.Add(Putter);
+
+				foreach (string Schema in Putter.UriSchemes)
+				{
+					if (!ByScheme.TryGetValue(Schema, out List<IContentPutter> List))
+					{
+						List = new List<IContentPutter>();
+						ByScheme[Schema] = List;
+					}
+
+					List.Add(Putter);
+				}
+			}
+
+			lock (puttersByScheme)
+			{
+				foreach (KeyValuePair<string, List<IContentPutter>> P in ByScheme)
+					puttersByScheme[P.Key] = P.Value.ToArray();
+			}
+
+			putters = Putters.ToArray();
+		}
+
+		/// <summary>
+		/// If a resource can be putted to, given its URI.
+		/// </summary>
+		/// <param name="Uri">URI of resource.</param>
+		/// <param name="Grade">How well the putted can put to the resource.</param>
+		/// <param name="Putter">Best putter for the URI.</param>
+		/// <returns>If a resource with the given URI can be putted to.</returns>
+		public static bool CanPut(Uri Uri, out Grade Grade, out IContentPutter Putter)
+		{
+			if (Uri is null)
+				throw new ArgumentNullException("URI cannot be null.", nameof(Uri));
+
+			if (putters is null)
+				BuildPutters();
+
+			IContentPutter[] Putters;
+
+			lock (puttersByScheme)
+			{
+				if (Uri is null || !puttersByScheme.TryGetValue(Uri.Scheme, out Putters))
+				{
+					Putter = null;
+					Grade = Grade.NotAtAll;
+					return false;
+				}
+			}
+
+			Grade = Grade.NotAtAll;
+			Putter = null;
+
+			foreach (IContentPutter Putter2 in Putters)
+			{
+				if (Putter2.CanPut(Uri, out Grade Grade2) && Grade2 > Grade)
+				{
+					Grade = Grade2;
+					Putter = Putter2;
+				}
+			}
+
+			return !(Putter is null);
+		}
+
+		/// <summary>
+		/// Puts to a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Data">Data to put.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded response.</returns>
+		public static Task<object> PutAsync(Uri Uri, object Data, params KeyValuePair<string, string>[] Headers)
+		{
+			return PutAsync(Uri, Data, null, Headers);
+		}
+
+		/// <summary>
+		/// Puts to a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Data">Data to put.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded response.</returns>
+		public static Task<object> PutAsync(Uri Uri, object Data, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanPut(Uri, out Grade _, out IContentPutter Putter))
+				throw new ArgumentException("URI Scheme not recognized (PUT): " + Uri.Scheme, nameof(Uri));
+
+			return Putter.PutAsync(Uri, Data, Certificate, Headers);
+		}
+
+		/// <summary>
+		/// Puts to a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Data">Data to put.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded response.</returns>
+		public static Task<object> PutAsync(Uri Uri, object Data, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			return PutAsync(Uri, Data, null, TimeoutMs, Headers);
+		}
+
+		/// <summary>
+		/// Puts to a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Data">Data to put.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded response.</returns>
+		public static Task<object> PutAsync(Uri Uri, object Data, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanPut(Uri, out Grade _, out IContentPutter Putter))
+				throw new ArgumentException("URI Scheme not recognized (PUT): " + Uri.Scheme, nameof(Uri));
+
+			return Putter.PutAsync(Uri, Data, Certificate, TimeoutMs, Headers);
+		}
+
+		/// <summary>
+		/// Puts to a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="EncodedData">Encoded data to be putted.</param>
+		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Encoded response.</returns>
+		public static Task<KeyValuePair<byte[], string>> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, params KeyValuePair<string, string>[] Headers)
+		{
+			return PutAsync(Uri, EncodedData, ContentType, null, Headers);
+		}
+
+		/// <summary>
+		/// Puts to a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="EncodedData">Encoded data to be putted.</param>
+		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Encoded response.</returns>
+		public static Task<KeyValuePair<byte[], string>> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanPut(Uri, out Grade _, out IContentPutter Putter))
+				throw new ArgumentException("URI Scheme not recognized (PUT): " + Uri.Scheme, nameof(Uri));
+
+			return Putter.PutAsync(Uri, EncodedData, ContentType, Certificate, Headers);
+		}
+
+		/// <summary>
+		/// Puts to a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="EncodedData">Encoded data to be putted.</param>
+		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Encoded response.</returns>
+		public static Task<KeyValuePair<byte[], string>> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			return PutAsync(Uri, EncodedData, ContentType, null, TimeoutMs, Headers);
+		}
+
+		/// <summary>
+		/// Puts to a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="EncodedData">Encoded data to be putted.</param>
+		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Encoded response.</returns>
+		public static Task<KeyValuePair<byte[], string>> PutAsync(Uri Uri, byte[] EncodedData, string ContentType, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanPut(Uri, out Grade _, out IContentPutter Putter))
+				throw new ArgumentException("URI Scheme not recognized (PUT): " + Uri.Scheme, nameof(Uri));
+
+			return Putter.PutAsync(Uri, EncodedData, ContentType, Certificate, TimeoutMs, Headers);
+		}
+
+		#endregion
+
+		#region Deleting to resources
+
+		/// <summary>
+		/// Internet URI Schemes that can be deleted to.
+		/// </summary>
+		public static string[] CanDeleteToUriSchemes
+		{
+			get
+			{
+				if (canDeleteToUriSchemes is null)
+				{
+					SortedDictionary<string, bool> UriSchemes = new SortedDictionary<string, bool>();
+
+					foreach (IContentDeleter Deleter in Deleters)
+					{
+						foreach (string Scheme in Deleter.UriSchemes)
+							UriSchemes[Scheme] = true;
+					}
+
+					string[] Schemes = new string[UriSchemes.Count];
+					UriSchemes.Keys.CopyTo(Schemes, 0);
+
+					canDeleteToUriSchemes = Schemes;
+				}
+
+				return canDeleteToUriSchemes;
+			}
+		}
+
+		/// <summary>
+		/// Available Internet Content Deleters.
+		/// </summary>
+		public static IContentDeleter[] Deleters
+		{
+			get
+			{
+				if (deleters is null)
+					BuildDeleters();
+
+				return deleters;
+			}
+		}
+
+		private static void BuildDeleters()
+		{
+			List<IContentDeleter> Deleters = new List<IContentDeleter>();
+			Type[] DeleterTypes = Types.GetTypesImplementingInterface(typeof(IContentDeleter));
+			Dictionary<string, List<IContentDeleter>> ByScheme = new Dictionary<string, List<IContentDeleter>>();
+			IContentDeleter Deleter;
+
+			foreach (Type T in DeleterTypes)
+			{
+				ConstructorInfo CI = Types.GetDefaultConstructor(T);
+				if (CI is null)
+					continue;
+
+				try
+				{
+					Deleter = (IContentDeleter)CI.Invoke(Types.NoParameters);
+				}
+				catch (Exception)
+				{
+					continue;
+				}
+
+				Deleters.Add(Deleter);
+
+				foreach (string Schema in Deleter.UriSchemes)
+				{
+					if (!ByScheme.TryGetValue(Schema, out List<IContentDeleter> List))
+					{
+						List = new List<IContentDeleter>();
+						ByScheme[Schema] = List;
+					}
+
+					List.Add(Deleter);
+				}
+			}
+
+			lock (deletersByScheme)
+			{
+				foreach (KeyValuePair<string, List<IContentDeleter>> P in ByScheme)
+					deletersByScheme[P.Key] = P.Value.ToArray();
+			}
+
+			deleters = Deleters.ToArray();
+		}
+
+		/// <summary>
+		/// If a resource can be deleted to, given its URI.
+		/// </summary>
+		/// <param name="Uri">URI of resource.</param>
+		/// <param name="Grade">How well the deleted can delete to the resource.</param>
+		/// <param name="Deleter">Best deleter for the URI.</param>
+		/// <returns>If a resource with the given URI can be deleted to.</returns>
+		public static bool CanDelete(Uri Uri, out Grade Grade, out IContentDeleter Deleter)
+		{
+			if (Uri is null)
+				throw new ArgumentNullException("URI cannot be null.", nameof(Uri));
+
+			if (deleters is null)
+				BuildDeleters();
+
+			IContentDeleter[] Deleters;
+
+			lock (deletersByScheme)
+			{
+				if (Uri is null || !deletersByScheme.TryGetValue(Uri.Scheme, out Deleters))
+				{
+					Deleter = null;
+					Grade = Grade.NotAtAll;
+					return false;
+				}
+			}
+
+			Grade = Grade.NotAtAll;
+			Deleter = null;
+
+			foreach (IContentDeleter Deleter2 in Deleters)
+			{
+				if (Deleter2.CanDelete(Uri, out Grade Grade2) && Grade2 > Grade)
+				{
+					Grade = Grade2;
+					Deleter = Deleter2;
+				}
+			}
+
+			return !(Deleter is null);
+		}
+
+		/// <summary>
+		/// Deletes a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded response.</returns>
+		public static Task<object> DeleteAsync(Uri Uri, params KeyValuePair<string, string>[] Headers)
+		{
+			return DeleteAsync(Uri, null, Headers);
+		}
+
+		/// <summary>
+		/// Deletes a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded response.</returns>
+		public static Task<object> DeleteAsync(Uri Uri, X509Certificate Certificate, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanDelete(Uri, out Grade _, out IContentDeleter Deleter))
+				throw new ArgumentException("URI Scheme not recognized (DELETE): " + Uri.Scheme, nameof(Uri));
+
+			return Deleter.DeleteAsync(Uri, Certificate, Headers);
+		}
+
+		/// <summary>
+		/// Deletes a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Data">Data to delete.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded response.</returns>
+		public static Task<object> DeleteAsync(Uri Uri, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			return DeleteAsync(Uri, null, TimeoutMs, Headers);
+		}
+
+		/// <summary>
+		/// Deletes a resource, using a Uniform Resource Identifier (or Locator).
+		/// </summary>
+		/// <param name="Uri">URI</param>
+		/// <param name="Data">Data to delete.</param>
+		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+		/// <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+		/// <returns>Decoded response.</returns>
+		public static Task<object> DeleteAsync(Uri Uri, X509Certificate Certificate, int TimeoutMs, params KeyValuePair<string, string>[] Headers)
+		{
+			if (!CanDelete(Uri, out Grade _, out IContentDeleter Deleter))
+				throw new ArgumentException("URI Scheme not recognized (DELETE): " + Uri.Scheme, nameof(Uri));
+
+			return Deleter.DeleteAsync(Uri, Certificate, TimeoutMs, Headers);
 		}
 
 		#endregion

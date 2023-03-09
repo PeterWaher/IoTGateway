@@ -7,7 +7,6 @@ using System.Runtime.ExceptionServices;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using Waher.Content.Text;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Temporary;
 

@@ -1791,7 +1791,7 @@ The following functions are available in the `Waher.Script.Persistence` library.
 
 | Function                                                 | Description | Example |
 |----------------------------------------------------------|-------------|---------|
-| `DeleteObject(Obj)`                                      | Deletes an object from the underlying persistence layer. | `Delete(Obj)` |
+| `DeleteObject(Obj)`                                      | Deletes an object from the underlying persistence layer. | `DeleteObject(Obj)` |
 | `FindObjects(Type, Offset, MaxCount, Filter, SortOrder)` | Finds objects of a given `Type`. `Offset` and `MaxCount` provide a means to paginate the result set. `Filter` can be null, if none is used, or a string containing an expression to limit the result set. `SortOrder` sorts the result. It also determines the index to use. | `FindObjects(Namespace.CustomType, 0, 10, "StringProperty='StringValue'", ["Property1","Property2"])` |
 | `Generalize(Object)`                                     | Creates a generalized representation of the data in the object `Object`. This generalized representation can be more easily serialized, to JSON for instance, or to an object database. | `generalize(Obj)` |
 | `GetSetting(Name,DefaultValue)`                          | Gets a runtime setting with name `Name`. If one is not found, the `DefaultValue` value is returned. | `GetSetting("Name","Kilroy")` |
@@ -1864,6 +1864,7 @@ The following functions are available in the `Waher.Script.Content` library.
 | `Base64UrlDecode(Data)`                            | Decodes binary data from a string using BASE64URL encoding. | [Example][Base64UrlDecodeExample] |
 | `Base64UrlEncode(Data)`                            | Encodes binary data to a string using BASE64URL encoding. | [Example][Base64UrlEncodeExample] |
 | `Decode(Content,Type)`                             | Decodes `Content` using the available Internet Content Type decoder for Content Type `Type`. | [Example][DecodeExample] |
+| `Delete(Url,Accept/Headers,[Certificate])`         | Deletes a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes the response, in accordance with the content type returned. The second argument is required, to differ the function from the `Delete(x)` function, that destroys a variable `x` and disposes of its value. The headers can be an empty object `{}`. If providing a `Certificate`, mutual TLS can be used. | [Example][DeleteExample] |
 | `Duration(s)`                                      | Parses a string `s` into a Duration value. | `Duration("PT10H30M")` |
 | `Duration(Years,Month,Dats,Hours,Minutes,Seconds)` | Creates a Duration value. | `Duration(0,0,0,10,30,0)` |
 | `Encode(Object[,Types])`                           | Encodes `Object` using the available Internet Content Type encoders. If `Types` is provided, it is an array of acceptable content types that can be used. The result is a two-dimensional vector, containing the binary encoding as the first element, and the content type as the second element. | [Example][EncodeExample] |
@@ -1873,6 +1874,7 @@ The following functions are available in the `Waher.Script.Content` library.
 | `HtmlValueEncode(s)`                               | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. | [Example][HtmlValueEncodeExample] |
 | `LoadFile(FileName[,ContentType])`                 | Loads a file and decodes it. By default, the content type defined by the file extension is used, if defined. You can also explicitly provide a content type. | [Example][LoadFileExample] |
 | `Post(Url,Data[,Accept/Headers,[Certificate]])`    | Encodes data and posts it to a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes the response, in accordance with the content type returned. If a third argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. If providing a `Certificate`, mutual TLS can be used. | [Example][PostExample] |
+| `Put(Url,Data[,Accept/Headers,[Certificate]])`     | Encodes data and PUTs it to a resource, in accordance with the [URI scheme](#uriSchemes) of the `Url`, and decodes the response, in accordance with the content type returned. If a third argument is provided, it either represents an `Accept` header, if a string, or custom protocol-specific headers or options, if an object. If providing a `Certificate`, mutual TLS can be used. | [Example][PutExample] |
 | `QrEncode(Text,Level)`                             | Encodes text in `Text` to a QR Code using Error Correction level defined by `Level`. Response is a text string where the QR Code is encoded using block characters. | [Example][QrExample] |
 | `QrEncode(Text,Level[,Width[,Height]])`            | Encodes text in `Text` to a QR Code using Error Correction level defined by `Level`. Response is a bitmap with the specified dimensions. If only `Width` is specified, `Height` will be assued to be identical. | [Example][QrExample2] |
 | `SaveFile(Obj,FileName)`                           | Encodes an object `Obj` in accordance with its type and file extension, and saves it as a file. | [Example][SaveFileExample] |
@@ -1888,6 +1890,7 @@ The following functions are available in the `Waher.Script.Content` library.
 [Base64UrlDecodeExample]: Prompt.md?Expression=Decode(Base64UrlDecode("SGVsbG8"),"text/plain")
 [Base64UrlEncodeExample]: Prompt.md?Expression=Base64UrlEncode(Encode("Hello")[0])
 [DecodeExample]: Prompt.md?Expression=Decode(Csv,%22text/csv%22)
+[DeleteExample]: Prompt.md?Expression=Delete(%22URL%22,{})
 [EncodeExample]: Prompt.md?Expression=Encode("Hello",[%22text/plain%22])
 [GetExample]: Prompt.md?Expression=Get(%22URL%22)
 [HeadExample]: Prompt.md?Expression=Head(%22URL%22)
@@ -1895,6 +1898,7 @@ The following functions are available in the `Waher.Script.Content` library.
 [HtmlValueEncodeExample]: Prompt.md?Expression=HtmlValueEncode(%22%3Ctag%3E%22)
 [LoadFileExample]: Prompt.md?Expression=LoadFile(%22FileName%22)
 [PostExample]: Prompt.md?Expression=Post(%22URL%22,%22Data%22)
+[PutExample]: Prompt.md?Expression=Put(%22URL%22,%22Data%22)
 [QrExample]: Prompt.md?Expression=QrEncode("Hello World","Q")
 [QrExample2]: Prompt.md?Expression=QrEncode("Hello World","Q",300)
 [SaveFileExample]: Prompt.md?Expression=SaveFile(Graph,%22Graph.png%22)

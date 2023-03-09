@@ -10,25 +10,25 @@ using Waher.Script.Model;
 namespace Waher.Script.Content.Functions.InputOutput
 {
 	/// <summary>
-	/// Post(Url,Data)
+	/// Put(Url,Data)
 	/// </summary>
-	public class Post : FunctionMultiVariate
+	public class Put : FunctionMultiVariate
 	{
 		/// <summary>
-		/// Post(Url,Data)
+		/// Put(Url,Data)
 		/// </summary>
 		/// <param name="Url">URL.</param>
 		/// <param name="Data">Data</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Post(ScriptNode Url, ScriptNode Data, int Start, int Length, Expression Expression)
+		public Put(ScriptNode Url, ScriptNode Data, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Url, Data }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Normal }, Start, Length, Expression)
 		{
 		}
 
 		/// <summary>
-		/// Post(Url,Data,Headers)
+		/// Put(Url,Data,Headers)
 		/// </summary>
 		/// <param name="Url">URL.</param>
 		/// <param name="Data">Data</param>
@@ -36,13 +36,13 @@ namespace Waher.Script.Content.Functions.InputOutput
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Post(ScriptNode Url, ScriptNode Data, ScriptNode Headers, int Start, int Length, Expression Expression)
+		public Put(ScriptNode Url, ScriptNode Data, ScriptNode Headers, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Url, Data, Headers }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Normal, ArgumentType.Normal }, Start, Length, Expression)
 		{
 		}
 
 		/// <summary>
-		/// Post(Url,Data,Headers,Certificate)
+		/// Put(Url,Data,Headers,Certificate)
 		/// </summary>
 		/// <param name="Url">URL.</param>
 		/// <param name="Data">Data</param>
@@ -51,7 +51,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Post(ScriptNode Url, ScriptNode Data, ScriptNode Headers, ScriptNode Certificate, int Start, int Length, Expression Expression)
+		public Put(ScriptNode Url, ScriptNode Data, ScriptNode Headers, ScriptNode Certificate, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Url, Data, Headers, Certificate }, new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal }, Start, Length, Expression)
 		{
 		}
@@ -59,7 +59,7 @@ namespace Waher.Script.Content.Functions.InputOutput
 		/// <summary>
 		/// Name of the function
 		/// </summary>
-		public override string FunctionName => nameof(Post);
+		public override string FunctionName => nameof(Put);
 
 		/// <summary>
 		/// Default Argument names
@@ -104,10 +104,10 @@ namespace Waher.Script.Content.Functions.InputOutput
 				if (!(Arguments[3].AssociatedObjectValue is X509Certificate Certificate))
 					throw new ScriptRuntimeException("Expected X.509 certificate in fourth argument.", this);
 
-				Result = await InternetContent.PostAsync(Url, Data, Certificate, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
+				Result = await InternetContent.PutAsync(Url, Data, Certificate, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
 			}
 			else
-				Result = await InternetContent.PostAsync(Url, Data, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
+				Result = await InternetContent.PutAsync(Url, Data, HeaderList?.ToArray() ?? new KeyValuePair<string, string>[0]);
 
 			return Expression.Encapsulate(Result);
 		}

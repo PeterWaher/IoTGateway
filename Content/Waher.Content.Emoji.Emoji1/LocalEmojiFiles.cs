@@ -238,9 +238,9 @@ namespace Waher.Content.Emoji.Emoji1
 		public async Task GenerateHTML(StringBuilder Output, EmojiInfo Emoji, int Level, bool EmbedImage)
 		{
 			Output.Append("<img alt=\":");
-			Output.Append(Encode(Emoji.ShortName));
-			Output.Append(":\" title=\"");
 			Output.Append(Encode(Emoji.Description));
+			Output.Append(":\" title=\"");
+			Output.Append(Encode(Emoji.ShortName));
 			Output.Append("\" width=\"");
 			Output.Append(this.CalcSize(this.width, Level).ToString());
 			Output.Append("\" height=\"");

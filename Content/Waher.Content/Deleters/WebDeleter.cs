@@ -50,8 +50,6 @@ namespace Waher.Content.Deleters
 		/// Deletes a resource, using a Uniform Resource Identifier (or Locator).
 		/// </summary>
 		/// <param name="Uri">URI</param>
-		/// <param name="EncodedData">Encoded data to be deleted.</param>
-		/// <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
 		/// <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
 		/// <param name="TimeoutMs">Timeout, in milliseconds.</param>
 		/// <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>

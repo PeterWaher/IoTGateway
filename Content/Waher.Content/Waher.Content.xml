@@ -659,6 +659,81 @@
             <param name="Matrix">Matrix</param>
             <returns>CSV-string</returns>
         </member>
+        <member name="T:Waher.Content.Deleters.DeleterBase">
+            <summary>
+            Abstract base class for deleters.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Deleters.DeleterBase.#ctor">
+            <summary>
+            Abstract base class for deleters.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Deleters.DeleterBase.UriSchemes">
+            <summary>
+            Supported URI schemes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Deleters.DeleterBase.CanDelete(System.Uri,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the deleter is able to delete to a resource, given its URI.
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Grade">How well the deleter would be able to delete to a resource given the indicated URI.</param>
+            <returns>If the deleter can delete to a resource with the indicated URI.</returns>
+        </member>
+        <member name="M:Waher.Content.Deleters.DeleterBase.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Deletes a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.Deleters.DeleterBase.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Deletes a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="T:Waher.Content.Deleters.WebDeleter">
+            <summary>
+            Deletes to resources on the Web (i.e. using HTTP or HTTPS).
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Deleters.WebDeleter.#ctor">
+            <summary>
+            Deletes to resources on the Web (i.e. using HTTP or HTTPS).
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Deleters.WebDeleter.UriSchemes">
+            <summary>
+            Supported URI schemes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Deleters.WebDeleter.CanDelete(System.Uri,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the deleter is able to delete to a resource, given its URI.
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Grade">How well the deleter would be able to delete to a resource given the indicated URI.</param>
+            <returns>If the deleter can delete to a resource with the indicated URI.</returns>
+        </member>
+        <member name="M:Waher.Content.Deleters.WebDeleter.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Deletes a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
+        </member>
         <member name="T:Waher.Content.Duration">
             <summary>
             Represents a duration value, as defined by the xsd:duration data type:
@@ -1186,6 +1261,44 @@
             <returns>Decoded object.</returns>
             <exception cref="T:System.ArgumentException">If the object cannot be decoded.</exception>
         </member>
+        <member name="T:Waher.Content.IContentDeleter">
+            <summary>
+            Basic interface for Internet Content deleters. A class implementing this interface and having a default constructor, will be able
+            to partake in deleting content through the static <see cref="T:Waher.Content.InternetContent"/> class. No registration is required.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.IContentDeleter.UriSchemes">
+            <summary>
+            Supported URI schemes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.IContentDeleter.CanDelete(System.Uri,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the deleter is able to delete to a resource, given its URI.
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Grade">How well the deleter would be able to delete to a resource given the indicated URI.</param>
+            <returns>If the deleter can delete to a resource with the indicated URI.</returns>
+        </member>
+        <member name="M:Waher.Content.IContentDeleter.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Deletes a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.IContentDeleter.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Deletes a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
         <member name="T:Waher.Content.IContentEncoder">
             <summary>
             Basic interface for Internet Content encoders. A class implementing this interface and having a default constructor, will be able
@@ -1363,6 +1476,69 @@
             </summary>
             <param name="Uri">URI</param>
             <param name="EncodedData">Encoded data to be posted.</param>
+            <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+            <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
+        </member>
+        <member name="T:Waher.Content.IContentPutter">
+            <summary>
+            Basic interface for Internet Content putters. A class implementing this interface and having a default constructor, will be able
+            to partake in putting content through the static <see cref="T:Waher.Content.InternetContent"/> class. No registration is required.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.IContentPutter.UriSchemes">
+            <summary>
+            Supported URI schemes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.IContentPutter.CanPut(System.Uri,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the putter is able to put to a resource, given its URI.
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Grade">How well the putter would be able to put to a resource given the indicated URI.</param>
+            <returns>If the putter can put to a resource with the indicated URI.</returns>
+        </member>
+        <member name="M:Waher.Content.IContentPutter.PutAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Data">Data to put.</param>
+            <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.IContentPutter.PutAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Data">Data to put.</param>
+            <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.IContentPutter.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="EncodedData">Encoded data to be puted.</param>
+            <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+            <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.IContentPutter.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="EncodedData">Encoded data to be puted.</param>
             <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
             <param name="Certificate">Optional Client certificate to use in a Mutual TLS session.</param>
             <param name="TimeoutMs">Timeout, in milliseconds.</param>
@@ -1815,6 +1991,164 @@
             <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
             <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
             <returns>Encoded response.</returns>
+        </member>
+        <member name="P:Waher.Content.InternetContent.CanPutToUriSchemes">
+            <summary>
+            Internet URI Schemes that can be putted to.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.InternetContent.Putters">
+            <summary>
+            Available Internet Content Putters.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.InternetContent.CanPut(System.Uri,Waher.Runtime.Inventory.Grade@,Waher.Content.IContentPutter@)">
+            <summary>
+            If a resource can be putted to, given its URI.
+            </summary>
+            <param name="Uri">URI of resource.</param>
+            <param name="Grade">How well the putted can put to the resource.</param>
+            <param name="Putter">Best putter for the URI.</param>
+            <returns>If a resource with the given URI can be putted to.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.PutAsync(System.Uri,System.Object,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Data">Data to put.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.PutAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Data">Data to put.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.PutAsync(System.Uri,System.Object,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Data">Data to put.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.PutAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Data">Data to put.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.PutAsync(System.Uri,System.Byte[],System.String,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="EncodedData">Encoded data to be putted.</param>
+            <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="EncodedData">Encoded data to be putted.</param>
+            <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.PutAsync(System.Uri,System.Byte[],System.String,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="EncodedData">Encoded data to be putted.</param>
+            <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="EncodedData">Encoded data to be putted.</param>
+            <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
+        </member>
+        <member name="P:Waher.Content.InternetContent.CanDeleteToUriSchemes">
+            <summary>
+            Internet URI Schemes that can be deleted to.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.InternetContent.Deleters">
+            <summary>
+            Available Internet Content Deleters.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.InternetContent.CanDelete(System.Uri,Waher.Runtime.Inventory.Grade@,Waher.Content.IContentDeleter@)">
+            <summary>
+            If a resource can be deleted to, given its URI.
+            </summary>
+            <param name="Uri">URI of resource.</param>
+            <param name="Grade">How well the deleted can delete to the resource.</param>
+            <param name="Deleter">Best deleter for the URI.</param>
+            <returns>If a resource with the given URI can be deleted to.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.DeleteAsync(System.Uri,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Deletes a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Deletes a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.DeleteAsync(System.Uri,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Deletes a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.InternetContent.DeleteAsync(System.Uri,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Deletes a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
         </member>
         <member name="P:Waher.Content.InternetContent.CanHeadUriSchemes">
             <summary>
@@ -3445,6 +3779,108 @@
             <param name="Uri">Original URI of request.</param>
             <returns>Decoded response, if success.</returns>
             <exception cref="T:Waher.Content.Getters.WebException">If response does not indicate a success.</exception>
+        </member>
+        <member name="T:Waher.Content.Putters.PutterBase">
+            <summary>
+            Abstract base class for putters.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Putters.PutterBase.#ctor">
+            <summary>
+            Abstract base class for putters.
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Putters.PutterBase.UriSchemes">
+            <summary>
+            Supported URI schemes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Putters.PutterBase.CanPut(System.Uri,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the putter is able to put to a resource, given its URI.
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Grade">How well the putter would be able to put to a resource given the indicated URI.</param>
+            <returns>If the putter can put to a resource with the indicated URI.</returns>
+        </member>
+        <member name="M:Waher.Content.Putters.PutterBase.PutAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Data">Data to put.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.Putters.PutterBase.PutAsync(System.Uri,System.Object,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Data">Data to put.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds. (Default=60000)</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Decoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.Putters.PutterBase.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="EncodedData">Encoded data to be puted.</param>
+            <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
+        </member>
+        <member name="M:Waher.Content.Putters.PutterBase.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="EncodedData">Encoded data to be puted.</param>
+            <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
+        </member>
+        <member name="T:Waher.Content.Putters.WebPutter">
+            <summary>
+            Puts to resources on the Web (i.e. using HTTP or HTTPS).
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Putters.WebPutter.#ctor">
+            <summary>
+            Puts to resources on the Web (i.e. using HTTP or HTTPS).
+            </summary>
+        </member>
+        <member name="P:Waher.Content.Putters.WebPutter.UriSchemes">
+            <summary>
+            Supported URI schemes.
+            </summary>
+        </member>
+        <member name="M:Waher.Content.Putters.WebPutter.CanPut(System.Uri,Waher.Runtime.Inventory.Grade@)">
+            <summary>
+            If the putter is able to put to a resource, given its URI.
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="Grade">How well the putter would be able to put to a resource given the indicated URI.</param>
+            <returns>If the putter can put to a resource with the indicated URI.</returns>
+        </member>
+        <member name="M:Waher.Content.Putters.WebPutter.PutAsync(System.Uri,System.Byte[],System.String,System.Security.Cryptography.X509Certificates.X509Certificate,System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Puts to a resource, using a Uniform Resource Identifier (or Locator).
+            </summary>
+            <param name="Uri">URI</param>
+            <param name="EncodedData">Encoded data to be puted.</param>
+            <param name="ContentType">Content-Type of encoded data in <paramref name="EncodedData"/>.</param>
+            <param name="Certificate">Optional client certificate to use in a Mutual TLS session.</param>
+            <param name="TimeoutMs">Timeout, in milliseconds.</param>
+            <param name="Headers">Optional headers. Interpreted in accordance with the corresponding URI scheme.</param>
+            <returns>Encoded response.</returns>
         </member>
         <member name="T:Waher.Content.Resources">
             <summary>

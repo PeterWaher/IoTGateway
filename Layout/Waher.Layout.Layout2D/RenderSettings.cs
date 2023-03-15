@@ -174,7 +174,7 @@ namespace Waher.Layout.Layout2D
 		}
 
 		/// <summary>
-		/// Pixels per inch (defualt=96 pixels/inch)
+		/// Pixels per inch (default=96 pixels/inch)
 		/// </summary>
 		public float PixelsPerInch
 		{

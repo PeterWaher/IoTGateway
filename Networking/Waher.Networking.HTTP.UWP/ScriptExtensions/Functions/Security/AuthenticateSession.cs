@@ -88,7 +88,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 			}
 
 			if (!Variables.TryGetVariable(UserVariable, out Variable Variable) || !(Variable.ValueObject is IUser User))
-				throw new ForbiddenException("Access denied.");
+				throw ForbiddenException.AccessDenied(string.Empty, string.Empty, string.Empty);
 
 			return new ObjectValue(User);
 		}

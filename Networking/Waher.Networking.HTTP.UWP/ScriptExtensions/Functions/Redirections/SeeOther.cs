@@ -34,6 +34,11 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Redirections
 		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement Argument, Variables Variables)
 		{
+			// To allow the PRG pattern, where a POST temporary redirects to the same resource.
+			Variables.Remove(" LastPost ");
+			Variables.Remove(" LastPostResource ");
+			Variables.Remove(" LastPostReferer ");
+
 			throw new SeeOtherException(Argument.AssociatedObjectValue?.ToString() ?? string.Empty);
 		}
 	}

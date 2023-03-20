@@ -157,7 +157,9 @@ namespace Waher.Content.Markdown.Web
 			if (Doc.TryGetMetaData("UserVariable", out KeyValuePair<string, bool>[] MetaValues))
 			{
 				object User = null;
+				IUser User2 = null;
 				bool Authorized = true;
+				string MissingPrivilege = null;
 
 				if (!Doc.TryGetMetaData("Login", out KeyValuePair<string, bool>[] Login))
 					Login = null;
@@ -216,7 +218,8 @@ namespace Waher.Content.Markdown.Web
 
 					if (!(Privilege is null))
 					{
-						if (!(v.ValueObject is IUser User2))
+						User2 = v.ValueObject as IUser;
+						if (User2 is null)
 						{
 							Authorized = false;
 							break;
@@ -226,6 +229,7 @@ namespace Waher.Content.Markdown.Web
 						{
 							if (!User2.HasPrivilege(P2.Key))
 							{
+								MissingPrivilege = P2.Key;
 								Authorized = false;
 								break;
 							}
@@ -259,11 +263,12 @@ namespace Waher.Content.Markdown.Web
 						}
 					}
 
-					throw new ForbiddenException("Access denied.");
+					throw ForbiddenException.AccessDenied(State.FromFileName, User2?.UserName ?? User?.ToString() ?? string.Empty,
+						MissingPrivilege);
 				}
 
 				if (User is null)
-					throw new ForbiddenException("Access denied.");
+					throw ForbiddenException.AccessDenied(State.FromFileName, string.Empty, string.Empty);
 
 				State.Session[" User "] = User;
 			}
@@ -304,7 +309,7 @@ namespace Waher.Content.Markdown.Web
 				}
 			}
 
-			string s = await this.DoConversion(Doc);	// Result needs to be generated, so that IsDynamic property is properly evaluated. (Can depend on master file, which is loaded during generation.)
+			string s = await this.DoConversion(Doc);    // Result needs to be generated, so that IsDynamic property is properly evaluated. (Can depend on master file, which is loaded during generation.)
 
 			if (!(State.Session is null) && State.Session.TryGetVariable("Response", out v))
 			{

@@ -49,15 +49,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include=".bak\Waher.Content.Xml\Text\XmlCodec.cs" />
+    <Compile Include=".bak\Waher.Content.Xml\Text\XmlDocumentJsonEncoder.cs" />
+    <Compile Include=".bak\Waher.Content.Xml\Text\XmlElementJsonEncoder.cs" />
     <Compile Include=".bak\Waher.Content\Audio\AudioDecoder.cs" />
     <Compile Include=".bak\Waher.Content\Base64Url.cs" />
+    <Compile Include=".bak\Waher.Content\Binary\BinaryCodec.cs" />
     <Compile Include=".bak\Waher.Content\Binary\BinaryDecoder.cs" />
     <Compile Include=".bak\Waher.Content\Binary\FileEncoder.cs" />
     <Compile Include=".bak\Waher.Content\Binary\FileReference.cs" />
     <Compile Include=".bak\Waher.Content\ConversionState.cs" />
+    <Compile Include=".bak\Waher.Content\IContentDeleter.cs" />
     <Compile Include=".bak\Waher.Content\IContentGetter.cs" />
     <Compile Include=".bak\Waher.Content\IContentHeader.cs" />
     <Compile Include=".bak\Waher.Content\IContentPoster.cs" />
+    <Compile Include=".bak\Waher.Content\IContentPutter.cs" />
     <Compile Include=".bak\Waher.Content\IInternetContent.cs" />
     <Compile Include=".bak\Waher.Content\IResourceMap.cs" />
     <Compile Include=".bak\Waher.Content\Json\IJsonEncoder.cs" />
@@ -155,6 +160,7 @@
     <Compile Include=".bak\Waher.Script\Functions\Runtime\Fields.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\MethodLambda.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\Methods.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Runtime\Names.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\Optional.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\Preview.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Runtime\Properties.cs" />
@@ -164,7 +170,9 @@
     <Compile Include=".bak\Waher.Script\Functions\Runtime\Required.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Scalar\Boolean.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Scalar\Double.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Scalar\Guid.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Scalar\Integer.cs" />
+    <Compile Include=".bak\Waher.Script\Functions\Scalar\NewGuid.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Strings\After.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Strings\Before.cs" />
     <Compile Include=".bak\Waher.Script\Functions\Strings\Concat.cs" />

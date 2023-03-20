@@ -66,12 +66,14 @@ namespace Waher.WebService.Script
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public async Task POST(HttpRequest Request, HttpResponse Response)
 		{
+			IUser User = null;
+
 			if (Request.Session is null ||
 				!Request.Session.TryGetVariable("User", out Variable v) ||
-				!(v.ValueObject is IUser User) ||
+				((User = v.ValueObject as IUser) is null) ||
 				!User.HasPrivilege("Admin.Lab.Script"))
 			{
-				throw new ForbiddenException("Access denied.");
+				throw ForbiddenException.AccessDenied(this.ResourceName, User?.UserName ?? string.Empty, "Admin.Lab.Script");
 			}
 
 			object Obj = Request.HasData ? await Request.DecodeDataAsync() : null;

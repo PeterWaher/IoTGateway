@@ -84,7 +84,7 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 					else
 						Message = "Access denied.";
 
-					throw new ForbiddenException(Message);
+					throw ForbiddenException.AccessDenied(Message, string.Empty, User.UserName, Privilege);
 				}
 			}
 

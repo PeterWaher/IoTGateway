@@ -1,4 +1,7 @@
-﻿namespace Waher.Networking.HTTP
+﻿using System.Collections.Generic;
+using Waher.Events;
+
+namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// The server understood the request, but is refusing to fulfill it. Authorization will not help and the request SHOULD NOT be repeated. 
@@ -52,6 +55,34 @@
 		public ForbiddenException(byte[] Content, string ContentType)
 			: base(Code, StatusMessage, Content, ContentType)
 		{
+		}
+
+		/// <summary>
+		/// Returns a <see cref="ForbiddenException"/> object, and logs a entry in the event log about the event.
+		/// </summary>
+		/// <param name="ObjectId">Object ID</param>
+		/// <param name="ActorId">Actor ID</param>
+		/// <param name="MissingPrivilege">Missing Privilege.</param>
+		/// <returns>Exception object.</returns>
+		public static ForbiddenException AccessDenied(string ObjectId, string ActorId, string MissingPrivilege)
+		{
+			return AccessDenied("Access denied.", ObjectId, ActorId, MissingPrivilege);
+		}
+
+		/// <summary>
+		/// Returns a <see cref="ForbiddenException"/> object, and logs a entry in the event log about the event.
+		/// </summary>
+		/// <param name="Message">Exception message.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <param name="ActorId">Actor ID</param>
+		/// <param name="MissingPrivilege">Missing Privilege.</param>
+		/// <returns>Exception object.</returns>
+		public static ForbiddenException AccessDenied(string Message, string ObjectId, string ActorId, string MissingPrivilege)
+		{
+			Log.Notice(Message, ObjectId, ActorId, "AccessDenied",
+				new KeyValuePair<string, object>("MissingPrivilege", MissingPrivilege));
+
+			return new ForbiddenException("Access denied.");
 		}
 	}
 }

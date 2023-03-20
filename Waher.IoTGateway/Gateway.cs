@@ -2531,12 +2531,14 @@ namespace Waher.IoTGateway
 		/// <returns>Logged in user.</returns>
 		public static IUser AssertUserAuthenticated(Variables Session, string Privilege)
 		{
+			IUser User = null;
+
 			if (Session is null ||
 				!Session.TryGetVariable("User", out Variable v) ||
-				!(v.ValueObject is IUser User) ||
+				((User = v.ValueObject as IUser) is null) ||
 				!User.HasPrivilege(Privilege))
 			{
-				throw new ForbiddenException("Access denied.");
+				throw ForbiddenException.AccessDenied(string.Empty, User?.UserName, Privilege);
 			}
 
 			return User;
@@ -2561,17 +2563,19 @@ namespace Waher.IoTGateway
 		/// <returns>Logged in user.</returns>
 		public static IUser AssertUserAuthenticated(Variables Session, string[] Privileges)
 		{
+			IUser User = null;
+
 			if (Session is null ||
 				!Session.TryGetVariable("User", out Variable v) ||
-				!(v.ValueObject is IUser User))
+				((User = v.ValueObject as IUser) is null))
 			{
-				throw new ForbiddenException("Access denied.");
+				throw ForbiddenException.AccessDenied(string.Empty, string.Empty, string.Empty);
 			}
 
 			foreach (string Privilege in Privileges)
 			{
 				if (!User.HasPrivilege(Privilege))
-					throw new ForbiddenException("Access denied.");
+					throw ForbiddenException.AccessDenied(string.Empty, User.UserName, Privilege);
 			}
 
 			return User;

@@ -34,7 +34,10 @@ namespace Waher.IoTGateway.WebResources
 		/// <returns>Challenge string.</returns>
 		public override string GetChallenge()
 		{
-			throw new ForbiddenException("Access denied.");
+			foreach (string Privilege in this.privileges)
+				throw ForbiddenException.AccessDenied(string.Empty, string.Empty, Privilege);
+
+			throw ForbiddenException.AccessDenied(string.Empty, string.Empty, string.Empty);
 		}
 
 		/// <summary>

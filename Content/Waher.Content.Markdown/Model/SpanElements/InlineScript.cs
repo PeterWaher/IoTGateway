@@ -184,6 +184,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 						Output.Append("</figure>");
 				}
 			}
+			else if (Result is MarkdownDocument Doc)
+				await Doc.GenerateMarkdown(Output, true);
+			else if (Result is MarkdownContent Markdown)
+			{
+				Doc = await MarkdownDocument.CreateAsync(Markdown.Markdown);
+				await Doc.GenerateMarkdown(Output, true);
+			}
 			else if (Result is Exception ex)
 			{
 				ex = Log.UnnestException(ex);
@@ -357,6 +364,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					if (AloneInParagraph)
 						Output.Append("</figure>");
 				}
+			}
+			else if (Result is MarkdownDocument Doc)
+				await Doc.GenerateHTML(Output, true);
+			else if (Result is MarkdownContent Markdown)
+			{
+				Doc = await MarkdownDocument.CreateAsync(Markdown.Markdown);
+				await Doc.GenerateHTML(Output, true);
 			}
 			else if (Result is Exception ex)
 			{
@@ -544,6 +558,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					}, string.Empty);
 				}
 			}
+			else if (Result is MarkdownDocument Doc)
+				await Doc.GenerateXAML(Output, true);
+			else if (Result is MarkdownContent Markdown)
+			{
+				Doc = await MarkdownDocument.CreateAsync(Markdown.Markdown);
+				await Doc.GenerateXAML(Output, true);
+			}
 			else if (Result is Exception ex)
 			{
 				ex = Log.UnnestException(ex);
@@ -666,6 +687,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 						Height = Img.Height
 					});
 				}
+			}
+			else if (Result is MarkdownDocument Doc)
+				await Doc.GenerateXamarinForms(Output, true);
+			else if (Result is MarkdownContent Markdown)
+			{
+				Doc = await MarkdownDocument.CreateAsync(Markdown.Markdown);
+				await Doc.GenerateXamarinForms(Output, true);
 			}
 			else if (Result is Exception ex)
 			{
@@ -839,6 +867,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 						Output.AppendLine();
 					}
 				}
+			}
+			else if (Result is MarkdownDocument Doc)
+				await Doc.GenerateLaTeX(Output, true);
+			else if (Result is MarkdownContent Markdown)
+			{
+				Doc = await MarkdownDocument.CreateAsync(Markdown.Markdown);
+				await Doc.GenerateLaTeX(Output, true);
 			}
 			else if (Result is Exception ex)
 			{

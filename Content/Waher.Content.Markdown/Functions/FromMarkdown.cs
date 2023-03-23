@@ -176,6 +176,8 @@ namespace Waher.Content.Markdown.Functions
 						break;
 				}
 			}
+			else if (Element is null)
+				return ObjectValue.Null;
 
 			sb = new StringBuilder();
 			await Element.GeneratePlainText(sb);

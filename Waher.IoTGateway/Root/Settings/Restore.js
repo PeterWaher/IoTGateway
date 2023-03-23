@@ -60,7 +60,7 @@ function Restore()
         "length": c + d,
         "pos": 0,
         "block": 0,
-        "chunkSize": 256 * 1024,
+        "chunkSize": 4 * 1024 * 1024,
         "files": new Array(c + d),
         "Advance": function ()
         {

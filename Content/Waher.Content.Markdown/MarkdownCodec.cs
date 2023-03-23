@@ -78,7 +78,7 @@ namespace Waher.Content.Markdown
 		/// <returns>If the decoder can decode an object with the given type.</returns>
 		public bool Decodes(string ContentType, out Grade Grade)
 		{
-			if (Array.IndexOf(ContentTypes, ContentType) >= 0)
+			if (Array.IndexOf(this.ContentTypes, ContentType) >= 0)
 			{
 				Grade = Grade.Excellent;
 				return true;
@@ -119,12 +119,12 @@ namespace Waher.Content.Markdown
 		/// <returns>If the encoder can encode the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if (Object is MarkdownContent Content && InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
+			if (Object is MarkdownContent && InternetContent.IsAccepted(this.ContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Excellent;
 				return true;
 			}
-			else if (allowEncoding && Object is MarkdownDocument && InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
+			else if (allowEncoding && Object is MarkdownDocument && InternetContent.IsAccepted(this.ContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Excellent;
 				return true;

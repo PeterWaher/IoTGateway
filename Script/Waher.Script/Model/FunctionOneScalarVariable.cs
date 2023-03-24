@@ -187,10 +187,10 @@ namespace Waher.Script.Model
                     return await this.EvaluateScalarAsync(ComplexNumber.Value, Variables);
 
                 if (Argument is BooleanValue BooleanValue)
-                    return await this .EvaluateScalarAsync(BooleanValue.Value, Variables);
+                    return await this.EvaluateScalarAsync(BooleanValue.Value, Variables);
 
                 if (Argument is StringValue StringValue)
-                    return await this .EvaluateScalarAsync(StringValue.Value, Variables);
+                    return await this.EvaluateScalarAsync(StringValue.Value, Variables);
 
                 if (Argument is PhysicalQuantity PhysicalQuantity)
                     return await this.EvaluateScalarAsync(PhysicalQuantity.Magnitude, Variables);

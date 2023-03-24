@@ -1989,9 +1989,8 @@ namespace Waher.Persistence.Files
 
 		internal async Task<object> LoadObjectLocked(object ObjectId, IObjectSerializer Serializer)
 		{
-			BlockInfo Info = await this.FindNodeLocked(ObjectId, false);
-			if (Info is null)
-				throw new KeyNotFoundException("Object not found.");
+			BlockInfo Info = await this.FindNodeLocked(ObjectId, false)
+				?? throw new KeyNotFoundException("Object not found.");
 
 			return await this.ParseObjectLocked(Info, Serializer);
 		}
@@ -2218,9 +2217,8 @@ namespace Waher.Persistence.Files
 		private async Task UpdateObjectLocked(object Object, ObjectSerializer Serializer)
 		{
 			Guid ObjectId = await Serializer.GetObjectId(Object, false, NestedLocks.CreateIfNested(this, true, Serializer));
-			BlockInfo Info = await this.FindNodeLocked(ObjectId, false);
-			if (Info is null)
-				throw new KeyNotFoundException("Object not found.");
+			BlockInfo Info = await this.FindNodeLocked(ObjectId, false)
+				?? throw new KeyNotFoundException("Object not found.");
 
 			object Old = await this.ParseObjectLocked(Info, Serializer);
 
@@ -2654,9 +2652,8 @@ namespace Waher.Persistence.Files
 #if ASSERT_LOCKS
 			this.fileAccess.AssertWriting();
 #endif
-			BlockInfo Info = await this.FindNodeLocked(ObjectId, false);
-			if (Info is null)
-				throw new KeyNotFoundException("Object not found.");
+			BlockInfo Info = await this.FindNodeLocked(ObjectId, false)
+				?? throw new KeyNotFoundException("Object not found.");
 
 			byte[] Block = Info.Block;
 			BlockHeader Header = Info.Header;
@@ -4915,9 +4912,8 @@ namespace Waher.Persistence.Files
 #if ASSERT_LOCKS
 			this.fileAccess.AssertReadingOrWriting();
 #endif
-			BlockInfo Info = await this.FindNodeLocked(ObjectId, false);
-			if (Info is null)
-				throw new KeyNotFoundException("Object not found.");
+			BlockInfo Info = await this.FindNodeLocked(ObjectId, false)
+				?? throw new KeyNotFoundException("Object not found.");
 
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Info.Block, this.blockLimit, BlockHeaderSize);
 			ulong Rank = 0;
@@ -5546,7 +5542,7 @@ namespace Waher.Persistence.Files
 			return new Searching.SortedCursor<T>(SortedObjects, Records);
 		}
 
-		private string ToString(string[] SortOrder)
+		private static string ToString(string[] SortOrder)
 		{
 			if (SortOrder is null)
 				return string.Empty;
@@ -6058,7 +6054,7 @@ namespace Waher.Persistence.Files
 
 						Cursor = new Searching.FilteredCursor<T>(Cursor,
 							new Searching.FilterFieldLesserThan(FilterFieldLikeRegEx.FieldName, ConstantPrefix2),
-							true, true, Provider);
+							true, true, this.Provider);
 					}
 
 					return new Searching.FilteredCursor<T>(Cursor, FilterFieldLikeRegEx2, false, true, this.provider);

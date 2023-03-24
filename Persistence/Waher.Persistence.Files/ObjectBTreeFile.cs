@@ -5324,17 +5324,18 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="BestNrFields">Number of index fields used in best index.</param>
 		/// <param name="FirstRequired">Number of field names in index that must exist among properties.</param>
-		/// <param name="RequiredProperties">Number of properties that required field names may choose from.</param>
+		/// <param name="NrRequiredPropertyCandidates">Number of properties that required field names may choose from.</param>
 		/// <param name="Properties">Properties to search on. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
 		/// <returns>Best index to use for the search. If no index is found matching the properties, null is returned.</returns>
-		internal IndexBTreeFile FindBestIndex(out int BestNrFields, int FirstRequired, int RequiredProperties, params string[] Properties)
+		internal IndexBTreeFile FindBestIndex(out int BestNrFields, int FirstRequired, int NrRequiredPropertyCandidates, params string[] Properties)
 		{
 			Dictionary<string, int> PropertyOrder = new Dictionary<string, int>();
 			IndexBTreeFile Best = null;
 			int i, c = Properties?.Length ?? 0;
 			int MinOrdinal, NrFields;
 			int BestMinOrdinal = int.MaxValue;
+			int ExpectedOptional = FirstRequired;
 			bool RequiredMismatch;
 			string s;
 
@@ -5360,10 +5361,20 @@ namespace Waher.Persistence.Files
 					if (!PropertyOrder.TryGetValue(FieldName, out int PropertyOrdinal))
 						break;
 
-					if (NrFields < FirstRequired && PropertyOrdinal >= RequiredProperties)
+					if (NrFields < FirstRequired)
 					{
-						RequiredMismatch = true;
-						break;
+						if (PropertyOrdinal >= NrRequiredPropertyCandidates)
+						{
+							RequiredMismatch = true;
+							break;
+						}
+					}
+					else
+					{
+						if (PropertyOrdinal != ExpectedOptional)
+							break;
+
+						ExpectedOptional++;
 					}
 
 					NrFields++;

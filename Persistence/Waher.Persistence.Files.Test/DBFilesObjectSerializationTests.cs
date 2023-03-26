@@ -7,6 +7,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Serialization;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
+using IdApp.Test.Serialization;
+using Waher.Content;
+using Waher.Events;
 
 #if !LW
 using Waher.Persistence.Files.Test.Classes;
@@ -2244,6 +2247,185 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(Obj.UInt, GenObj["UInt"]);
 			AssertEx.Same(Obj.ULong, GenObj["ULong"]);
 			AssertEx.Same(Obj.ObjectId, GenObj.ObjectId);
+		}
+
+		[TestMethod]
+		public async Task DBFiles_ObjSerialization_26_Nested()
+		{
+			NestedClass Obj = this.CreateNestedTestClass();
+			IObjectSerializer S = await provider.GetObjectSerializer(typeof(NestedClass));
+			ISerializer Writer = new DebugSerializer(new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8), Console.Out);
+
+			await S.Serialize(Writer, false, false, Obj, null);
+
+			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+
+			IDeserializer Reader = new DebugDeserializer(new BinaryDeserializer(provider.DefaultCollectionName, Encoding.UTF8, Data, uint.MaxValue), Console.Out);
+
+			NestedClass Obj2 = (NestedClass)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
+			GenericObject GenObj = (GenericObject)await GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, GenObj);
+
+			Writer.Restart();
+
+			await GS.Serialize(Writer, false, false, GenObj, null);
+
+			Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Reader.Restart(Data, 0);
+			Obj2 = (NestedClass)await S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+		}
+
+		private NestedClass CreateNestedTestClass()
+		{
+			return new NestedClass()
+			{
+				ObjectId = Guid.NewGuid(),
+				UI8 = byte.MaxValue,
+				UI16 = ushort.MaxValue,
+				UI32 = uint.MaxValue,
+				UI64 = ulong.MaxValue,
+				I8 = sbyte.MaxValue,
+				I16 = short.MaxValue,
+				I32 = int.MaxValue,
+				I64 = long.MaxValue,
+				S = "Kilroy was here",
+				Cis = new CaseInsensitiveString("Hello WORLD"),
+				Ch = 'a',
+				Bin = Encoding.UTF8.GetBytes("Hello World"),
+				Id = Guid.NewGuid(),
+				TS = TimeSpan.FromHours(12),
+				D = Duration.Parse("P1Y2M3DT4H5M6S"),
+				Null = null,
+				B = true,
+				Fl = float.MaxValue,
+				Db = double.MaxValue,
+				Dc = decimal.MaxValue,
+				E = EventType.Notice,
+				TP = DateTime.Now,
+				TPO = DateTimeOffset.Now,
+				A = new string[] { "Kilroy", "was", "here" },
+				Nested = new NestedClass()
+				{
+					ObjectId = Guid.NewGuid(),
+					UI8 = byte.MinValue,
+					UI16 = ushort.MinValue,
+					UI32 = uint.MinValue,
+					UI64 = ulong.MinValue,
+					I8 = sbyte.MinValue,
+					I16 = short.MinValue,
+					I32 = int.MinValue,
+					I64 = long.MinValue,
+					S = "Kilroy was here",
+					Cis = new CaseInsensitiveString("Hello WORLD"),
+					Ch = 'a',
+					Bin = Encoding.UTF8.GetBytes("Hello World"),
+					Id = Guid.NewGuid(),
+					TS = TimeSpan.FromHours(12),
+					D = Duration.Parse("P1Y2M3DT4H5M6S"),
+					Null = null,
+					B = true,
+					Fl = float.MinValue,
+					Db = double.MinValue,
+					Dc = decimal.MinValue,
+					E = EventType.Notice,
+					TP = DateTime.Now,
+					TPO = DateTimeOffset.Now,
+					A = new string[] { "Kilroy", "was", "here" },
+					Nested = null,
+				},
+			};
+		}
+		internal static void AssertEqual(NestedClass Obj, NestedClass Obj2)
+		{
+			if ((Obj is null) ^ (Obj2 is null))
+				Assert.Fail("Object null check fail.");
+
+			if (Obj is null)
+				return;
+
+			//AssertEx.Same(Obj.ObjectId, Obj2.ObjectId);
+			AssertEx.Same(Obj.UI8, Obj2.UI8);
+			AssertEx.Same(Obj.UI16, Obj2.UI16);
+			AssertEx.Same(Obj.UI32, Obj2.UI32);
+			AssertEx.Same(Obj.UI64, Obj2.UI64);
+			AssertEx.Same(Obj.I8, Obj2.I8);
+			AssertEx.Same(Obj.I16, Obj2.I16);
+			AssertEx.Same(Obj.I32, Obj2.I32);
+			AssertEx.Same(Obj.I64, Obj2.I64);
+			AssertEx.Same(Obj.S, Obj2.S);
+			AssertEx.Same(Obj.Cis, Obj2.Cis);
+			AssertEx.Same(Obj.Ch, Obj2.Ch);
+			AssertEx.Same(Obj.Bin, Obj2.Bin);
+			AssertEx.Same(Obj.Id, Obj2.Id);
+			AssertEx.Same(Obj.TS, Obj2.TS);
+			AssertEx.Same(Obj.D, Obj2.D);
+			AssertEx.Same(Obj.Null, Obj2.Null);
+			AssertEx.Same(Obj.B, Obj2.B);
+			AssertEx.Same(Obj.Fl, Obj2.Fl);
+			AssertEx.Same(Obj.Db, Obj2.Db);
+			AssertEx.Same(Obj.Dc, Obj2.Dc);
+			AssertEx.Same(Obj.E, Obj2.E);
+			AssertEx.Same(Obj.TP, Obj2.TP);
+			AssertEx.Same(Obj.TPO, Obj2.TPO);
+			AssertEx.Same(Obj.A, Obj2.A);
+
+			AssertEqual(Obj.Nested, Obj2.Nested);
+		}
+
+		internal static void AssertEqual(NestedClass Obj, GenericObject GenObj)
+		{
+			if ((Obj is null) ^ (GenObj is null))
+				Assert.Fail("Object null check fail.");
+
+			if (Obj is null)
+				return;
+
+			//AssertEx.Same(GenObj.CollectionName, "Default");
+			//AssertEx.Same(Obj.ObjectId, GenObj.ObjectId);
+			AssertEx.Same(Obj.UI8, GenObj["UI8"]);
+			AssertEx.Same(Obj.UI16, GenObj["UI16"]);
+			AssertEx.Same(Obj.UI32, GenObj["UI32"]);
+			AssertEx.Same(Obj.UI64, GenObj["UI64"]);
+			AssertEx.Same(Obj.I8, GenObj["I8"]);
+			AssertEx.Same(Obj.I16, GenObj["I16"]);
+			AssertEx.Same(Obj.I32, GenObj["I32"]);
+			AssertEx.Same(Obj.I64, GenObj["I64"]);
+			AssertEx.Same(Obj.S, GenObj["S"]);
+			AssertEx.Same(Obj.Cis, GenObj["Cis"]);
+			AssertEx.Same(Obj.Ch, GenObj["Ch"]);
+			AssertEx.Same(Obj.Bin, GenObj["Bin"]);
+			AssertEx.Same(Obj.Id, GenObj["Id"]);
+			AssertEx.Same(Obj.TS, GenObj["TS"]);
+			//AssertEx.Same(Obj.D, GenObj["D"]);
+			AssertEx.Same(Obj.Null, GenObj["Null"]);
+			AssertEx.Same(Obj.B, GenObj["B"]);
+			AssertEx.Same(Obj.Fl, GenObj["Fl"]);
+			AssertEx.Same(Obj.Db, GenObj["Db"]);
+			AssertEx.Same(Obj.Dc, GenObj["Dc"]);
+			//AssertEx.Same(Obj.E, GenObj["E"]);
+			AssertEx.Same(Obj.TP, GenObj["TP"]);
+			AssertEx.Same(Obj.TPO, GenObj["TPO"]);
+			AssertEx.Same(Obj.A, GenObj["A"]);
+
+			AssertEqual(Obj.Nested, GenObj["Nested"] as GenericObject);
 		}
 
 		// TODO: Objects, by reference, nullable (incl. null strings, arrays)

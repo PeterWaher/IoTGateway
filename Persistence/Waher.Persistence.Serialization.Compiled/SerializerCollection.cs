@@ -175,22 +175,21 @@ namespace Waher.Persistence.Serialization
 
 					return Result;
 				}
+
+				Result = new ObjectSerializer();
+				this.serializers[Type] = Result;
 			}
 
 			try
 			{
 #if NETSTANDARD2_0
-				Result = await ObjectSerializer.Create(Type, this.context, this.compiled);
+				await ((ObjectSerializer)Result).Prepare(Type, this.context, this.compiled);
 #else
-				Result = await ObjectSerializer.Create(Type, this.context);
+				await ((ObjectSerializer)Result).Prepare(Type, this.context);
 #endif
 				await Result.Init();
 
-				lock (this.synchObj)
-				{
-					this.serializers[Type] = Result;
-					this.serializerAdded.Set();
-				}
+				this.serializerAdded.Set();
 			}
 			catch (FileLoadException ex)
 			{
@@ -206,6 +205,19 @@ namespace Waher.Persistence.Serialization
 						if (this.serializers.TryGetValue(Type, out Result))
 							return Result;
 					}
+				}
+			}
+			catch (Exception ex)
+			{
+				lock (this.synchObj)
+				{
+					if (this.serializers.TryGetValue(Type, out IObjectSerializer Result2) &&
+						Result2 == Result)
+					{
+						this.serializers.Remove(Type);
+					}
+
+					ExceptionDispatchInfo.Capture(ex).Throw();
 				}
 			}
 

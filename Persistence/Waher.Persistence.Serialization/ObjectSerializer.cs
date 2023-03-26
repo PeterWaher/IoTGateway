@@ -239,7 +239,7 @@ namespace Waher.Persistence.Serialization
 			this.indices = new string[0][];
 		}
 
-		private ObjectSerializer()
+		internal ObjectSerializer()
 		{
 		}
 
@@ -258,7 +258,7 @@ namespace Waher.Persistence.Serialization
 		public static async Task<ObjectSerializer> Create(Type Type, ISerializerContext Context, bool Compiled)
 		{
 			ObjectSerializer Result = new ObjectSerializer();
-			await Result.Initialize(Type, Context, Compiled);
+			await Result.Prepare(Type, Context, Compiled);
 			return Result;
 		}
 #else
@@ -270,26 +270,26 @@ namespace Waher.Persistence.Serialization
 		public static async Task<ObjectSerializer> Create(Type Type, ISerializerContext Context)
 		{
 			ObjectSerializer Result = new ObjectSerializer();
-			await Result.Initialize(Type, Context);
+			await Result.Prepare(Type, Context);
 			return Result;
 		}
 #endif
 
 #if NETSTANDARD2_0
 		/// <summary>
-		/// Initializes a serializer that serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
+		/// Prepares a serializer that serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
 		/// </summary>
 		/// <param name="Type">Type to serialize.</param>
 		/// <param name="Context">Serialization context.</param>
 		/// <param name="Compiled">If object serializers should be compiled or not.</param>
-		private async Task Initialize(Type Type, ISerializerContext Context, bool Compiled)
+		internal async Task Prepare(Type Type, ISerializerContext Context, bool Compiled)
 #else
 		/// <summary>
-		/// Initializes a serializer that serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
+		/// Prepares a serializer that serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
 		/// </summary>
 		/// <param name="Type">Type to serialize.</param>
 		/// <param name="Context">Serialization context.</param>
-		private async Task Initialize(Type Type, ISerializerContext Context)
+		internal async Task Prepare(Type Type, ISerializerContext Context)
 #endif
 		{
 			string TypeName = Type.Name.Replace("`", "_GT_");

@@ -671,7 +671,7 @@ namespace Waher.Content.Xml
 
 						s = s.Substring(0, i);
 
-						DT = new DateTime(Year, Month, Day, 0, 0, 0, DateTimeKind.Utc);
+						DT = new DateTime(Year, Month, Day, 0, 0, 0);
 					}
 
 					if (TimeSpan.TryParse(s, out TimeSpan TS))

@@ -3479,7 +3479,11 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// If the serializer is successfully prepared, and can be used.
 		/// </summary>
-		public bool Prepared => this.prepared;
+		public bool Prepared
+		{
+			get => this.prepared;
+			protected set => this.prepared = value;
+		}
 
 #if NETSTANDARD2_0
 		private static string GetLocation(Type T)

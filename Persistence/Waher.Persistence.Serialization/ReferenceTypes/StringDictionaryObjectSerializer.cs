@@ -20,6 +20,7 @@ namespace Waher.Persistence.Serialization.ReferenceTypes
 		{
 			this.ArchiveObjects = false;
 			this.ArchiveTimeDynamic = false;
+			this.Prepared = true;
 		}
 
 		/// <summary>

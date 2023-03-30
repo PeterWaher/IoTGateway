@@ -34,6 +34,7 @@ namespace Waher.Persistence.Serialization
 
 			this.ArchiveObjects = true;
 			this.ArchiveTimeDynamic = true;
+			this.Prepared = true;
 		}
 
 		/// <summary>

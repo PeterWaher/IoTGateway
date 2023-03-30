@@ -135,6 +135,7 @@ namespace Waher.Persistence.Serialization
 		{
 			IObjectSerializer Result;
 			TypeInfo TI = Type.GetTypeInfo();
+			DateTime Start = DateTime.Now;
 
 			do
 			{
@@ -147,7 +148,7 @@ namespace Waher.Persistence.Serialization
 							if (ObjectSerializer.Prepared)
 								return Result;
 							else
-								Result = null;	// Wait for preparation process of serializer to complete (or fail).
+								Result = null;  // Wait for preparation process of serializer to complete (or fail).
 						}
 						else
 							return Result;
@@ -195,7 +196,12 @@ namespace Waher.Persistence.Serialization
 				}
 
 				if (Result is null)
-					await Task.Delay(100);	// Await for compilation of previous attempt completes.
+				{
+					if (DateTime.Now.Subtract(Start).TotalMinutes >= 1)
+						throw new Exception("Unable to create an object serializer for type: " + Type.FullName + ". Timeout.");
+
+					await Task.Delay(100);  // Await for compilation of previous attempt completes.
+				}
 			}
 			while (Result is null);
 

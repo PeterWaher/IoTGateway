@@ -136,49 +136,68 @@ namespace Waher.Persistence.Serialization
 			IObjectSerializer Result;
 			TypeInfo TI = Type.GetTypeInfo();
 
-			lock (this.synchObj)
+			do
 			{
-				if (this.serializers.TryGetValue(Type, out Result))
-					return Result;
-
-				if (TI.IsEnum)
-					Result = new EnumSerializer(Type);
-				else if (Type.IsArray)
+				lock (this.synchObj)
 				{
-					Type ElementType = Type.GetElementType();
-					Type T = Types.GetType(typeof(ByteArraySerializer).FullName.Replace("ByteArray", "Array"));
-					Type SerializerType = T.MakeGenericType(new Type[] { ElementType });
-					Result = (IObjectSerializer)Activator.CreateInstance(SerializerType, this.context);
-				}
-				else if (TI.IsGenericType)
-				{
-					Type GT = Type.GetGenericTypeDefinition();
-					if (GT == typeof(Nullable<>))
+					if (this.serializers.TryGetValue(Type, out Result))
 					{
-						Type NullableType = Type.GenericTypeArguments[0];
-
-						if (NullableType.GetTypeInfo().IsEnum)
-							Result = new Serialization.NullableTypes.NullableEnumSerializer(NullableType);
+						if (Result is ObjectSerializer ObjectSerializer)
+						{
+							if (ObjectSerializer.Prepared)
+								return Result;
+							else
+								Result = null;	// Wait for preparation process of serializer to complete (or fail).
+						}
 						else
-							Result = null;
+							return Result;
 					}
 					else
-						Result = null;
+					{
+						if (TI.IsEnum)
+							Result = new EnumSerializer(Type);
+						else if (Type.IsArray)
+						{
+							Type ElementType = Type.GetElementType();
+							Type T = Types.GetType(typeof(ByteArraySerializer).FullName.Replace("ByteArray", "Array"));
+							Type SerializerType = T.MakeGenericType(new Type[] { ElementType });
+							Result = (IObjectSerializer)Activator.CreateInstance(SerializerType, this.context);
+						}
+						else if (TI.IsGenericType)
+						{
+							Type GT = Type.GetGenericTypeDefinition();
+							if (GT == typeof(Nullable<>))
+							{
+								Type NullableType = Type.GenericTypeArguments[0];
+
+								if (NullableType.GetTypeInfo().IsEnum)
+									Result = new NullableTypes.NullableEnumSerializer(NullableType);
+								else
+									Result = null;
+							}
+							else
+								Result = null;
+						}
+						else
+							Result = null;
+
+						if (!(Result is null))
+						{
+							this.serializers[Type] = Result;
+							this.serializerAdded.Set();
+
+							return Result;
+						}
+
+						Result = new ObjectSerializer();
+						this.serializers[Type] = Result;
+					}
 				}
-				else
-					Result = null;
 
-				if (!(Result is null))
-				{
-					this.serializers[Type] = Result;
-					this.serializerAdded.Set();
-
-					return Result;
-				}
-
-				Result = new ObjectSerializer();
-				this.serializers[Type] = Result;
+				if (Result is null)
+					await Task.Delay(100);	// Await for compilation of previous attempt completes.
 			}
+			while (Result is null);
 
 			try
 			{

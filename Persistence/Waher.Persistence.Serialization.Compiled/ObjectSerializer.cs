@@ -222,6 +222,7 @@ namespace Waher.Persistence.Serialization
 		private bool normalized;
 		private bool hasByRef = false;
 		private bool backupCollection = true;
+		private bool prepared = false;
 		private string noBackupReason = null;
 
 		internal ObjectSerializer(ISerializerContext Context, Type Type)    // Note order.
@@ -3472,7 +3473,13 @@ namespace Waher.Persistence.Serialization
 #if NETSTANDARD2_0
 			}
 #endif
+			this.prepared = true;
 		}
+
+		/// <summary>
+		/// If the serializer is successfully prepared, and can be used.
+		/// </summary>
+		public bool Prepared => this.prepared;
 
 #if NETSTANDARD2_0
 		private static string GetLocation(Type T)

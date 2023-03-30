@@ -521,7 +521,7 @@ namespace Waher.Persistence.Serialization
 
 					MemberTypes[MemberType] = true;
 
-					foreach (Attribute Attr in Member.GetCustomAttributes(true))
+					foreach (object Attr in Member.GetCustomAttributes(true))
 					{
 						if (Attr is IgnoreMemberAttribute)
 						{
@@ -769,7 +769,7 @@ namespace Waher.Persistence.Serialization
 						}
 					}
 
-					foreach (Attribute Attr in Member.GetCustomAttributes(true))
+					foreach (object Attr in Member.GetCustomAttributes(true))
 					{
 						if (Attr is IgnoreMemberAttribute || Attr is ObjectIdAttribute)
 						{
@@ -1014,7 +1014,7 @@ namespace Waher.Persistence.Serialization
 							}
 						}
 
-						foreach (Attribute Attr in Member.GetCustomAttributes(true))
+						foreach (object Attr in Member.GetCustomAttributes(true))
 						{
 							if (Attr is IgnoreMemberAttribute || Attr is ObjectIdAttribute)
 							{
@@ -2365,7 +2365,7 @@ namespace Waher.Persistence.Serialization
 						}
 					}
 
-					foreach (Attribute Attr in Member.GetCustomAttributes(true))
+					foreach (object Attr in Member.GetCustomAttributes(true))
 					{
 						if (Attr is IgnoreMemberAttribute)
 						{
@@ -3414,7 +3414,7 @@ namespace Waher.Persistence.Serialization
 					Ignore = false;
 					ShortName = null;
 
-					foreach (Attribute Attr in MemberInfo.GetCustomAttributes(true))
+					foreach (object Attr in MemberInfo.GetCustomAttributes(true))
 					{
 						if (Attr is IgnoreMemberAttribute)
 						{
@@ -3696,9 +3696,7 @@ namespace Waher.Persistence.Serialization
 					if (this.typeNameSerialization == TypeNameSerialization.LocalName && TypeName.IndexOf('.') < 0)
 						TypeName = this.type.Namespace + "." + TypeName;
 
-					Type DesiredType = Types.GetType(TypeName);
-					if (DesiredType is null)
-						DesiredType = typeof(GenericObject);
+					Type DesiredType = Types.GetType(TypeName) ?? typeof(GenericObject);
 
 					if (DesiredType != this.type)
 					{
@@ -4186,10 +4184,8 @@ namespace Waher.Persistence.Serialization
 										case TYPE_GUID:
 											Guid RefObjectId = Reader.ReadGuid();
 											object Value = await this.context.TryLoadObject(Member.MemberType, RefObjectId,
-												(EmbeddedValue) => Member.Set(Result, EmbeddedValue));
-
-											if (Value is null)
-												throw new KeyNotFoundException("Referenced object not found.");
+												(EmbeddedValue) => Member.Set(Result, EmbeddedValue))
+												?? throw new KeyNotFoundException("Referenced object not found.");
 
 											Member.Set(Result, Value);
 											break;

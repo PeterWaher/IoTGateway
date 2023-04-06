@@ -10,6 +10,7 @@ using System.Xml;
 using Microsoft.Deployment.WindowsInstaller;
 using Waher.Content;
 using Waher.Content.Xml;
+using Waher.Runtime.Inventory;
 using static System.Environment;
 
 namespace Waher.IoTGateway.Installers
@@ -816,14 +817,14 @@ namespace Waher.IoTGateway.Installers
 			if (string.IsNullOrEmpty(ManifestFile))
 				throw new Exception("Missing manifest file.");
 
-			if (string.IsNullOrEmpty(ServerApplication))
-				throw new Exception("Missing server application.");
-
 			if (string.IsNullOrEmpty(ProgramDataFolder))
 			{
-				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "IoT Gateway");
+				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(SpecialFolder.CommonApplicationData), "IoT Gateway");
 				Session.Log("Using default program data folder: " + ProgramDataFolder);
 			}
+
+			if (string.IsNullOrEmpty(ServerApplication))
+				throw new Exception("Missing server application.");
 
 			if (!File.Exists(ServerApplication))
 				throw new Exception("Server application not found: " + ServerApplication);
@@ -957,6 +958,14 @@ namespace Waher.IoTGateway.Installers
 			CopyContent(Session, SourceFolder, AppFolder, ProgramDataFolder, Module);
 
 			Session.Log("Encoding JSON");
+
+			if (!Types.IsInitialized)
+			{
+				Types.Initialize(
+					typeof(CustomActions).Assembly,
+					typeof(JSON).Assembly);
+			}
+
 			s = JSON.Encode(Deps, true);
 
 			Session.Log("Writing " + DepsJsonFileName);
@@ -1278,6 +1287,14 @@ namespace Waher.IoTGateway.Installers
 			}
 
 			Session.Log("Encoding JSON");
+
+			if (!Types.IsInitialized)
+			{
+				Types.Initialize(
+					typeof(CustomActions).Assembly,
+					typeof(JSON).Assembly);
+			}
+
 			s = JSON.Encode(Deps, true);
 
 			Session.Log("Writing " + DepsJsonFileName);

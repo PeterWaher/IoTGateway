@@ -254,8 +254,8 @@ namespace Waher.Networking.XMPP.PubSub
 		{
 			this.componentAddress = ComponentAddress;
 
-			Client.RegisterMessageHandler("event", NamespacePubSubEvents, this.EventNotificationHandler, true);
-			Client.RegisterMessageFormHandler(FormTypeSubscriptionAuthorization, this.SubscriptionAuthorizationHandler);
+			this.Client.RegisterMessageHandler("event", NamespacePubSubEvents, this.EventNotificationHandler, true);
+			this.Client.RegisterMessageFormHandler(FormTypeSubscriptionAuthorization, this.SubscriptionAuthorizationHandler);
 		}
 
 		/// <summary>
@@ -263,8 +263,8 @@ namespace Waher.Networking.XMPP.PubSub
 		/// </summary>
 		public override void Dispose()
 		{
-			Client.UnregisterMessageHandler("event", NamespacePubSubEvents, this.EventNotificationHandler, true);
-			Client.UnregisterMessageFormHandler(FormTypeSubscriptionAuthorization, this.SubscriptionAuthorizationHandler);
+			this.Client.UnregisterMessageHandler("event", NamespacePubSubEvents, this.EventNotificationHandler, true);
+			this.Client.UnregisterMessageFormHandler(FormTypeSubscriptionAuthorization, this.SubscriptionAuthorizationHandler);
 
 			base.Dispose();
 		}
@@ -1959,8 +1959,7 @@ namespace Waher.Networking.XMPP.PubSub
 				Xml.Append("</items>");
 			}
 
-			if (!(Page is null))
-				Page.Append(Xml);
+			Page?.Append(Xml);
 
 			Xml.Append("</pubsub>");
 

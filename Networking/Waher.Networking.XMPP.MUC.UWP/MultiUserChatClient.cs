@@ -70,7 +70,7 @@ namespace Waher.Networking.XMPP.MUC
 			this.client.RegisterMessageFormHandler(FormTypeRequest, this.UserRequestHandler);
 			this.client.RegisterMessageFormHandler(FormTypeRegister, this.RegistrationRequestHandler);
 
-			this.client.OnGroupChatMessage += Client_OnGroupChatMessage;
+			this.client.OnGroupChatMessage += this.Client_OnGroupChatMessage;
 		}
 
 		/// <inheritdoc/>
@@ -82,7 +82,7 @@ namespace Waher.Networking.XMPP.MUC
 			this.client.UnregisterMessageFormHandler(FormTypeRequest, this.UserRequestHandler);
 			this.client.UnregisterMessageFormHandler(FormTypeRegister, this.RegistrationRequestHandler);
 
-			this.client.OnGroupChatMessage -= Client_OnGroupChatMessage;
+			this.client.OnGroupChatMessage -= this.Client_OnGroupChatMessage;
 
 			base.Dispose();
 		}

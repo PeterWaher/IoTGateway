@@ -414,7 +414,7 @@ namespace Waher.Runtime.Inventory
 
 				try
 				{
-					Module = (IModule)Types.Instantiate(T);
+					Module = (IModule)Instantiate(T);
 					Modules.Add(Module);
 				}
 				catch (Exception ex)
@@ -798,9 +798,8 @@ namespace Waher.Runtime.Inventory
 		/// <exception cref="ArgumentException">If no type with the given name exists.</exception>
 		public static object CreateObject(string TypeName, params object[] Parameters)
 		{
-			Type T = GetType(TypeName);
-			if (T is null)
-				throw new ArgumentException("Type not loaded: " + TypeName, nameof(TypeName));
+			Type T = GetType(TypeName)
+				?? throw new ArgumentException("Type not loaded: " + TypeName, nameof(TypeName));
 
 			return Activator.CreateInstance(T, Parameters);
 		}
@@ -1000,12 +999,17 @@ namespace Waher.Runtime.Inventory
 		{
 			InterfaceType Best = default;
 			Grade BestGrade = Grade.NotAtAll;
+			TypeInfo TI;
 
 			foreach (Type T2 in Interfaces)
 			{
+				TI = T2.GetTypeInfo();
+				if (TI.IsAbstract || TI.IsInterface || TI.IsGenericTypeDefinition)
+					continue;
+
 				try
 				{
-					InterfaceType Enumerator = (InterfaceType)Types.Instantiate(T2);
+					InterfaceType Enumerator = (InterfaceType)Instantiate(T2);
 					Grade Grade = Enumerator.Supports(Object);
 					if (Grade > BestGrade)
 					{
@@ -1051,12 +1055,17 @@ namespace Waher.Runtime.Inventory
 			where InterfaceType : IProcessingSupport<ObjectType>
 		{
 			List<InterfaceType> Result = new List<InterfaceType>();
+			TypeInfo TI;
 
 			foreach (Type T2 in Interfaces)
 			{
+				TI = T2.GetTypeInfo();
+				if (TI.IsAbstract || TI.IsInterface || TI.IsGenericTypeDefinition)
+					continue;
+
 				try
 				{
-					InterfaceType Enumerator = (InterfaceType)Types.Instantiate(T2);
+					InterfaceType Enumerator = (InterfaceType)Instantiate(T2);
 					if (Enumerator.Supports(Object) >= MinSupport)
 						Result.Add(Enumerator);
 				}

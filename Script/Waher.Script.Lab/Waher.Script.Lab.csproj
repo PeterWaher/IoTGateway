@@ -349,10 +349,6 @@
       <Project>{8850d7c6-da07-4bcb-b39a-7090eb39f581}</Project>
       <Name>Waher.Script.Statistics</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Waher.Script.System\Waher.Script.System.csproj">
-      <Project>{b62cc398-d36a-4999-8044-0469f8bf6fb0}</Project>
-      <Name>Waher.Script.System</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Waher.Script.Threading\Waher.Script.Threading.csproj">
       <Project>{c7973d12-709e-4673-a03a-1a395b4ab64c}</Project>
       <Name>Waher.Script.Threading</Name>

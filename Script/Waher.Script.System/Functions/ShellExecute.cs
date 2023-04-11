@@ -79,7 +79,8 @@ namespace Waher.Script.System.Functions
 				RedirectStandardOutput = true,
 				WorkingDirectory = WorkFolder,
 				CreateNoWindow = true,
-				WindowStyle = ProcessWindowStyle.Hidden
+				WindowStyle = ProcessWindowStyle.Hidden, 
+				ErrorDialog = false
 			};
 
 			Process P = new Process();

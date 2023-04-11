@@ -1824,6 +1824,14 @@ The following functions are available in the `Waher.Script.Statistics` library.
 | `Uniform([Min,Max][,N]])`                  | Generates a random number using the Uniform distribution. If no interval is given, the standard interval [0,1] is assumed. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Uniform(0,10,10000),0,10,10);VerticalBars(Labels,Counts)` |
 | `Weibull(Shape,Scale[,N]])`                | Generates a random number using the Weibull distribution. If `N` is provided, a vector with random elements is returned. | `[Labels,Counts]:=Histogram(Weibull(5,3,10000),0,10,10);VerticalBars(Labels,Counts)` |
 
+#### System-related functions (Waher.Script.System)
+
+The following functions are available in the `Waher.Script.Statistics` library.
+
+| Function | Description |
+|----------|-------------|
+| `ShellExecute(FileName,Arguments,WorkFolder)` | Starts a process and executes a shell command-line instruction. |
+
 #### Threading-related functions (Waher.Script.Threading)
 
 The following functions are available in the `Waher.Script.Threading` library.

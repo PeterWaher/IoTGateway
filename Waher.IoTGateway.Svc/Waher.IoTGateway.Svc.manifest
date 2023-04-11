@@ -433,6 +433,8 @@
 	<Assembly fileName='Waher.Script.Persistence.pdb'/>
 	<Assembly fileName='Waher.Script.Statistics.dll'/>
 	<Assembly fileName='Waher.Script.Statistics.pdb'/>
+	<Assembly fileName='Waher.Script.System.dll'/>
+	<Assembly fileName='Waher.Script.System.pdb'/>
 	<Assembly fileName='Waher.Script.Threading.dll'/>
 	<Assembly fileName='Waher.Script.Threading.pdb'/>
 	<Assembly fileName='Waher.Script.Xml.dll'/>

@@ -302,6 +302,7 @@
 							<File Id='Waher.Script.Networking.dll' Name='Waher.Script.Networking.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Networking.dll' Vital='yes'/>
 							<File Id='Waher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Persistence.dll' Vital='yes'/>
 							<File Id='Waher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Statistics.dll' Vital='yes'/>
+							<File Id='Waher.Script.System.dll' Name='Waher.Script.System.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.System.dll' Vital='yes'/>
 							<File Id='Waher.Script.Threading.dll' Name='Waher.Script.Threading.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Threading.dll' Vital='yes'/>
 							<File Id='Waher.Script.Xml.dll' Name='Waher.Script.Xml.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Xml.dll' Vital='yes'/>
 							<File Id='Waher.Script.XmlDSig.dll' Name='Waher.Script.XmlDSig.dll' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.XmlDSig.dll' Vital='yes'/>
@@ -374,6 +375,7 @@
 							<RemoveFile Id='RemoveWaher.Script.Networking.dll' Name='Waher.Script.Networking.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Statistics.dll' Name='Waher.Script.Statistics.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.System.dll' Name='Waher.Script.System.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Threading.dll' Name='Waher.Script.Threading.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Xml.dll' Name='Waher.Script.Xml.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.XmlDSig.dll' Name='Waher.Script.XmlDSig.dll' On='uninstall'/>
@@ -471,6 +473,7 @@
 							<File Id='Waher.Script.Networking.xml' Name='Waher.Script.Networking.xml' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Networking.xml' Vital='yes'/>
 							<File Id='Waher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Persistence.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Statistics.pdb' Name='Waher.Script.Statistics.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Statistics.pdb' Vital='yes'/>
+							<File Id='Waher.Script.System.pdb' Name='Waher.Script.System.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.System.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Threading.pdb' Name='Waher.Script.Threading.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Threading.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Xml.pdb' Name='Waher.Script.Xml.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.Xml.pdb' Vital='yes'/>
 							<File Id='Waher.Script.XmlDSig.pdb' Name='Waher.Script.XmlDSig.pdb' DiskId='1' Source='..\..\..\Clients\Waher.Client.WPF\bin\$(var.Configuration)\Waher.Script.XmlDSig.pdb' Vital='yes'/>
@@ -569,6 +572,7 @@
 							<RemoveFile Id='RemoveWaher.Script.Networking.xml' Name='Waher.Script.Networking.xml' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Statistics.pdb' Name='Waher.Script.Statistics.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.System.pdb' Name='Waher.Script.System.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Threading.pdb' Name='Waher.Script.Threading.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Xml.pdb' Name='Waher.Script.Xml.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.XmlDSig.pdb' Name='Waher.Script.XmlDSig.pdb' On='uninstall'/>

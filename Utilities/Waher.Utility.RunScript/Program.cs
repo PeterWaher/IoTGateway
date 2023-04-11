@@ -145,9 +145,11 @@ namespace Waher.Utility.RunScript
 					typeof(Script.Fractals.FractalGraph).Assembly,
 					typeof(Script.Graphs.Graph).Assembly,
 					typeof(Script.Graphs3D.Canvas3D).Assembly,
+					typeof(Script.FullTextSearch.Functions.AddFtsProperties).Assembly,
 					typeof(Script.Networking.Functions.Dns).Assembly,
 					typeof(Script.Persistence.Functions.DeleteObject).Assembly,
 					typeof(Script.Statistics.StatMath).Assembly,
+					typeof(Script.System.Functions.ShellExecute).Assembly,
 					typeof(Script.Xml.XmlOutput).Assembly);
 
 				string Script = File.ReadAllText(ScriptFile);

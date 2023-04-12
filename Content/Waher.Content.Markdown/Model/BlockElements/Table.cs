@@ -710,6 +710,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					if (k > 1)
 						Output.Append("}");
 				}
+
+				Output.AppendLine("\\\\");
 			}
 
 			Output.AppendLine("\\hline");

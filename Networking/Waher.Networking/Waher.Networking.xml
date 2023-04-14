@@ -1753,6 +1753,139 @@
             Resets the enumerator.
             </summary>
         </member>
+        <member name="T:Waher.Networking.Sniffers.SnifferProxy">
+            <summary>
+            A sniffer that redirects incoming events to another sniffable object.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.#ctor(Waher.Networking.Sniffers.ISniffable)">
+            <summary>
+            A sniffer that redirects incoming events to another sniffable object.
+            </summary>
+            <param name="Sniffable">Sniffable object to receive incoming sniffer events.</param>
+        </member>
+        <member name="P:Waher.Networking.Sniffers.SnifferProxy.Sniffable">
+            <summary>
+            Object receiving incoming sniffer events.
+            </summary>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.ReceiveBinary(System.Byte[])">
+            <summary>
+            Called when binary data has been received.
+            </summary>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.ReceiveBinary(System.DateTime,System.Byte[])">
+            <summary>
+            Called when binary data has been received.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.TransmitBinary(System.Byte[])">
+            <summary>
+            Called when binary data has been transmitted.
+            </summary>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.TransmitBinary(System.DateTime,System.Byte[])">
+            <summary>
+            Called when binary data has been transmitted.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Data">Binary Data.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.ReceiveText(System.String)">
+            <summary>
+            Called when text has been received.
+            </summary>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.ReceiveText(System.DateTime,System.String)">
+            <summary>
+            Called when text has been received.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.TransmitText(System.String)">
+            <summary>
+            Called when text has been transmitted.
+            </summary>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.TransmitText(System.DateTime,System.String)">
+            <summary>
+            Called when text has been transmitted.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Text">Text</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.Information(System.String)">
+            <summary>
+            Called to inform the viewer of something.
+            </summary>
+            <param name="Comment">Comment.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.Information(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of something.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Comment">Comment.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.Warning(System.String)">
+            <summary>
+            Called to inform the viewer of a warning state.
+            </summary>
+            <param name="Warning">Warning.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.Warning(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of a warning state.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Warning">Warning.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.Error(System.String)">
+            <summary>
+            Called to inform the viewer of an error state.
+            </summary>
+            <param name="Error">Error.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.Error(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of an error state.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Error">Error.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.Exception(System.String)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Exception">Exception.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.Exception(System.DateTime,System.String)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Exception">Exception.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.Exception(System.Exception)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Exception">Exception.</param>
+        </member>
+        <member name="M:Waher.Networking.Sniffers.SnifferProxy.Exception(System.DateTime,System.Exception)">
+            <summary>
+            Called to inform the viewer of an exception state.
+            </summary>
+            <param name="Timestamp">Timestamp of event.</param>
+            <param name="Exception">Exception.</param>
+        </member>
         <member name="T:Waher.Networking.Sniffers.TextFileSniffer">
             <summary>
             Outputs sniffed data to a text file.

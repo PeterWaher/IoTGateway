@@ -26,6 +26,7 @@ namespace Waher.Persistence.FullTextSearch
 	[ModuleDependency(typeof(DatabaseModule))]
 	public class FullTextSearchModule : IModule
 	{
+		private static readonly MultiReadSingleWriteObject synchObj = new MultiReadSingleWriteObject();
 		private static Cache<string, QueryRecord> queryCache;
 		private static Dictionary<string, bool> stopWords = new Dictionary<string, bool>();
 		private static IPersistentDictionary collectionInformation;
@@ -33,7 +34,6 @@ namespace Waher.Persistence.FullTextSearch
 		private static Dictionary<string, IPersistentDictionary> indices;
 		private static Dictionary<Type, TypeInformation> types;
 		private static FullTextSearchModule instance = null;
-		private static MultiReadSingleWriteObject synchObj;
 
 		/// <summary>
 		/// Full-text search module, controlling the life-cycle of the full-text-search engine.
@@ -53,7 +53,6 @@ namespace Waher.Persistence.FullTextSearch
 			types = new Dictionary<Type, TypeInformation>();
 			queryCache = new Cache<string, QueryRecord>(int.MaxValue, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
 
-			synchObj = new MultiReadSingleWriteObject();
 			instance = this;
 
 			Database.ObjectInserted += this.Database_ObjectInserted;
@@ -103,8 +102,6 @@ namespace Waher.Persistence.FullTextSearch
 			finally
 			{
 				await synchObj.EndWrite();
-				synchObj.Dispose();
-				synchObj = null;
 				instance = null;
 			}
 		}

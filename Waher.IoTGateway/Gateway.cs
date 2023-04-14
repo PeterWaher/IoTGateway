@@ -2563,11 +2563,9 @@ namespace Waher.IoTGateway
 		/// <returns>Logged in user.</returns>
 		public static IUser AssertUserAuthenticated(Variables Session, string[] Privileges)
 		{
-			IUser User = null;
-
 			if (Session is null ||
 				!Session.TryGetVariable("User", out Variable v) ||
-				((User = v.ValueObject as IUser) is null))
+				(!(v.ValueObject is IUser User)))
 			{
 				throw ForbiddenException.AccessDenied(string.Empty, string.Empty, string.Empty);
 			}

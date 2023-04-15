@@ -4,6 +4,37 @@
         <name>Waher.Runtime.Language</name>
     </assembly>
     <members>
+        <member name="T:Waher.Runtime.Language.ITranslator">
+            <summary>
+            Interface for language translators
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Language.ITranslator.CanDetectLanguage">
+            <summary>
+            If the translator can detect language or not.
+            </summary>
+        </member>
+        <member name="P:Waher.Runtime.Language.ITranslator.SupportedLanguages">
+            <summary>
+            What languages are supported by the translator.
+            </summary>
+        </member>
+        <member name="M:Waher.Runtime.Language.ITranslator.DetectLanguage(System.String)">
+            <summary>
+            Tries to detect the language used in the provided text.
+            </summary>
+            <param name="Text">Natural language text.</param>
+            <returns>Language code of detected language, or empty string if not detected.</returns>
+        </member>
+        <member name="M:Waher.Runtime.Language.ITranslator.Translate(System.String,System.String,System.String)">
+            <summary>
+            Translates natural language text, from one language to another.
+            </summary>
+            <param name="Text">Text to translate.</param>
+            <param name="FromLanguage">From language</param>
+            <param name="ToLanguage">To language</param>
+            <returns>Translated text.</returns>
+        </member>
         <member name="T:Waher.Runtime.Language.Language">
             <summary>
             Contains information about a language.

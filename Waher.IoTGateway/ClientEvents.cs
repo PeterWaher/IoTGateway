@@ -37,6 +37,8 @@ namespace Waher.IoTGateway
 	/// 
 	/// GetTabIDs() returns the set of Tab IDs fr all open web clients.
 	/// 
+	/// GetTabIDInformation() allows you to get available information about a specific Tab.
+	/// 
 	/// PushEvent() allows you to push information to a set of clients, identified by their Tab IDs. Events.js performs constant long-polling
 	/// of the server, to retrieve any events it might push to the client. Events include a Type and a Data element. The Type is translated into
 	/// a Javascript function name. Data is passed to the function, as a parameter. The Data parameter can be either a string, or a JSON object.
@@ -216,7 +218,6 @@ namespace Waher.IoTGateway
 
 			if (!string.IsNullOrEmpty(Uri.Query))
 			{
-
 				s = Uri.Query;
 				if (s.StartsWith("?"))
 					s = s.Substring(1);
@@ -239,7 +240,11 @@ namespace Waher.IoTGateway
 			}
 
 			if (eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
+			{
 				Queue.WebSocket = Socket;
+				Queue.Uri = Uri;
+				Queue.Query = Query;
+			}
 			else
 			{
 				HttpFieldCookie Cookie = Request.Header.Cookie;
@@ -247,7 +252,9 @@ namespace Waher.IoTGateway
 
 				Queue = new TabQueue(TabID, HttpSessionID, Session)
 				{
-					WebSocket = Socket
+					WebSocket = Socket,
+					Uri = Uri,
+					Query = Query
 				};
 
 				eventsByTabID[TabID] = Queue;
@@ -1125,7 +1132,71 @@ namespace Waher.IoTGateway
 			return Result2;
 		}
 
-		private class TabQueue : IDisposable
+		/// <summary>
+		/// Gets information about a Tab, given its ID.
+		/// </summary>
+		/// <param name="TabID">Tab ID</param>
+		/// <returns>Tab information, if found, null otherwise.</returns>
+		public static TabInformation GetTabIDInformation(string TabID)
+		{
+			if (eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
+				return new TabInformation(Queue);
+			else
+				return null;
+		}
+
+		/// <summary>
+		/// Information about a tab.
+		/// </summary>
+		public class TabInformation
+		{
+			/// <summary>
+			/// Information about a tab.
+			/// </summary>
+			/// <param name="Queue">Queue object.</param>
+			internal TabInformation(TabQueue Queue)
+			{
+				this.TabID = Queue.TabID;
+				this.SessionID = Queue.SessionID;
+				this.Session = Queue.Session;
+				this.Uri = Queue.Uri;
+
+				this.Query = new Dictionary<string, string>();
+
+				if (!(Queue.Query is null))
+				{
+					foreach ((string, string, string) Rec in Queue.Query)
+						this.Query[Rec.Item1] = Rec.Item3;
+				}
+			}
+
+			/// <summary>
+			/// Tab ID
+			/// </summary>
+			public string TabID { get; }
+
+			/// <summary>
+			/// Session ID
+			/// </summary>
+			public string SessionID { get; }
+
+			/// <summary>
+			/// Session variables
+			/// </summary>
+			public Variables Session { get; }
+
+			/// <summary>
+			/// URI being viewed
+			/// </summary>
+			public Uri Uri { get; }
+
+			/// <summary>
+			/// Query parameters.
+			/// </summary>
+			public Dictionary<string, string> Query { get; }
+		}
+
+		internal class TabQueue : IDisposable
 		{
 			public string TabID;
 			public string SessionID;
@@ -1134,6 +1205,8 @@ namespace Waher.IoTGateway
 			public LinkedList<string> Queue = new LinkedList<string>();
 			public HttpResponse Response = null;
 			public WebSocket WebSocket = null;
+			public Uri Uri = null;
+			public (string, string, string)[] Query = null;
 
 			public TabQueue(string ID, string SessionID, Variables Session)
 			{

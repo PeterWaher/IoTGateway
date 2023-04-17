@@ -763,9 +763,17 @@ namespace Waher.IoTGateway
 			{
 				if (tabIdsByLocation.TryGetValue(Location, out Dictionary<string, (string, string, string)[]> TabIDs))
 					return ProcessQueryFilterLocked(TabIDs, QueryFilter, IgnoreCase);
-				else
-					return new string[0];
 			}
+
+			if (eventsByTabID.TryGetValue(Location, out TabQueue Queue))
+			{
+				return ProcessQueryFilterLocked(new Dictionary<string, (string, string, string)[]>()
+				{
+					{ Location, Queue.Query }
+				}, QueryFilter, IgnoreCase);
+			}
+			else
+				return new string[0];
 		}
 
 		/// <summary>

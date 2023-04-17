@@ -66,9 +66,9 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 
 			string UserVariable = Arguments[1].AssociatedObjectValue?.ToString() ?? string.Empty;
 
-			if (Arguments.Length > 3)
+			if (Arguments.Length > 2)
 			{
-				object Obj = Arguments[3].AssociatedObjectValue;
+				object Obj = Arguments[2].AssociatedObjectValue;
 
 				if (Obj is bool UseEncryption)
 				{
@@ -87,8 +87,11 @@ namespace Waher.Networking.HTTP.ScriptExtensions.Functions.Security
 				}
 			}
 
-			if (!Variables.TryGetVariable(UserVariable, out Variable Variable) || !(Variable.ValueObject is IUser User))
+			if (!Variables.TryGetVariable(UserVariable, out Variable Variable) ||
+				!(Variable.ValueObject is IUser User))
+			{
 				throw ForbiddenException.AccessDenied(string.Empty, string.Empty, string.Empty);
+			}
 
 			return new ObjectValue(User);
 		}

@@ -239,7 +239,7 @@ namespace Waher.IoTGateway
 				}
 			}
 
-			if (eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
+			if (eventsByTabID.TryGetValue(TabID, out TabQueue Queue) && !(Queue.SyncObj is null))
 			{
 				Queue.WebSocket = Socket;
 				Queue.Uri = Uri;
@@ -250,13 +250,23 @@ namespace Waher.IoTGateway
 				HttpFieldCookie Cookie = Request.Header.Cookie;
 				string HttpSessionID = Cookie is null ? string.Empty : Cookie["HttpSessionID"];
 
-				Queue = new TabQueue(TabID, HttpSessionID, Session)
+				TabQueue Queue2 = new TabQueue(TabID, HttpSessionID, Session)
 				{
 					WebSocket = Socket,
 					Uri = Uri,
 					Query = Query
 				};
 
+				if (!(Queue is null))
+				{
+					while (!(Queue.Queue.First is null))
+					{
+						Queue2.Queue.AddLast(Queue.Queue.First.Value);
+						Queue.Queue.RemoveFirst();
+					}
+				}
+
+				Queue = Queue2;
 				eventsByTabID[TabID] = Queue;
 			}
 

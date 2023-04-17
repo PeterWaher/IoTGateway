@@ -24,8 +24,8 @@ namespace Waher.IoTGateway
 		public ClientEventsWebSocket()
 			: base("/ClientEventsWS", true, 10 * 1024 * 1024, 10 * 1024 * 1024, "ls")
 		{
-			this.Accept += ClientEventsWebSocket_Accept;
-			this.Connected += ClientEventsWebSocket_Connected;
+			this.Accept += this.ClientEventsWebSocket_Accept;
+			this.Connected += this.ClientEventsWebSocket_Connected;
 		}
 
 		/// <summary>
@@ -47,9 +47,9 @@ namespace Waher.IoTGateway
 
 		private void ClientEventsWebSocket_Connected(object Sender, WebSocketEventArgs e)
 		{
-			e.Socket.Closed += Socket_Closed;
-			e.Socket.Disposed += Socket_Disposed;
-			e.Socket.TextReceived += Socket_TextReceived;
+			e.Socket.Closed += this.Socket_Closed;
+			e.Socket.Disposed += this.Socket_Disposed;
+			e.Socket.TextReceived += this.Socket_TextReceived;
 		}
 
 		private void Socket_TextReceived(object Sender, WebSocketTextEventArgs e)

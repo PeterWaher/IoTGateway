@@ -22,13 +22,13 @@ using Waher.Content.Json;
 
 namespace Waher.Content.Markdown
 {
-    /// <summary>
-    /// Delegate for markdown element callback methods.
-    /// </summary>
-    /// <param name="Element">Markdown element</param>
-    /// <param name="State">State object.</param>
-    /// <returns>If process should continue.</returns>
-    public delegate bool MarkdownElementHandler(MarkdownElement Element, object State);
+	/// <summary>
+	/// Delegate for markdown element callback methods.
+	/// </summary>
+	/// <param name="Element">Markdown element</param>
+	/// <param name="State">State object.</param>
+	/// <returns>If process should continue.</returns>
+	public delegate bool MarkdownElementHandler(MarkdownElement Element, object State);
 
 	/// <summary>
 	/// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions.
@@ -4407,6 +4407,8 @@ namespace Waher.Content.Markdown
 			bool InBlock = false;
 			bool InRow = false;
 			bool NonWhitespaceInRow = false;
+			bool StartsWithHashSigns = false;
+			bool IsHeader = false;
 
 			Len = MarkdownText.Length;
 
@@ -4423,6 +4425,15 @@ namespace Waher.Content.Markdown
 							Positions.Add(RowStart);
 							Rows.Add(MarkdownText.Substring(RowStart, RowEnd - RowStart + 1));
 							InRow = false;
+
+							if (IsHeader && Rows.Count == 1)
+							{
+								Blocks.Add(new Block(Rows.ToArray(), Positions.ToArray(), FirstLineIndent / 4));
+								Rows.Clear();
+								Positions.Clear();
+								InBlock = false;
+								FirstLineIndent = 0;
+							}
 						}
 						else
 						{
@@ -4439,13 +4450,20 @@ namespace Waher.Content.Markdown
 
 					LineIndent = 0;
 					NonWhitespaceInRow = false;
+					StartsWithHashSigns = false;
+					IsHeader = false;
 				}
 				else if (ch <= ' ' || ch == 160)
 				{
 					if (InBlock)
 					{
 						if (InRow)
+						{
 							RowEnd = Pos;
+
+							if (StartsWithHashSigns)
+								IsHeader = true;
+						}
 						else
 						{
 							if (LineIndent >= FirstLineIndent)
@@ -4464,6 +4482,8 @@ namespace Waher.Content.Markdown
 						FirstLineIndent += 4;
 					else if (ch == ' ' || ch == 160)
 						FirstLineIndent++;
+
+					StartsWithHashSigns = false;
 				}
 				else
 				{
@@ -4472,7 +4492,12 @@ namespace Waher.Content.Markdown
 						InRow = true;
 						InBlock = true;
 						RowStart = Pos;
+
+						if (ch == '#')
+							StartsWithHashSigns = true;
 					}
+					else 
+						StartsWithHashSigns = false;
 
 					RowEnd = Pos;
 					NonWhitespaceInRow = true;

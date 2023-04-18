@@ -112,7 +112,8 @@ namespace Waher.IoTGateway.WebResources
 						}
 					}
 
-					sb.Append('.');
+					sb.Append(". Remote Endpoint: ");
+					sb.Append(Request.RemoteEndPoint);
 
 					Request.Session["LoginError"] = sb.ToString();
 					throw new SeeOtherException(Request.Header.Referer.Value);

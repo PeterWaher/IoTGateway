@@ -515,7 +515,8 @@ namespace Waher.Networking.HTTP
 									if (d > 1)
 										sb.Append('s');
 
-									sb.Append('.');
+									sb.Append(". Remote Endpoint: ");
+									sb.Append(Request.RemoteEndPoint);
 
 									Error = new TooManyRequestsException(sb.ToString());
 								}

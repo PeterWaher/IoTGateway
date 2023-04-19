@@ -1,8 +1,6 @@
-﻿using System;
-using SkiaSharp;
+﻿using SkiaSharp;
 using Waher.Content.QR;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
 using Waher.Script.Model;
 using Waher.Script.Objects;

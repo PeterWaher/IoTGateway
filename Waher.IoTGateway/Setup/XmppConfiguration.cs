@@ -619,7 +619,7 @@ namespace Waher.IoTGateway.Setup
 				this.client.Add(Sniffer);
 			}
 
-			this.client.OnStateChanged += Client_OnStateChanged;
+			this.client.OnStateChanged += this.Client_OnStateChanged;
 			this.client.Connect();
 		}
 
